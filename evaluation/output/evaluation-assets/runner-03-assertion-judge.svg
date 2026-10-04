@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="1320" viewBox="0 0 1320 1320"><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="#62758a"/></marker></defs><rect width="100%" height="100%" fill="#f7fafc"/><style>text{font-family:Arial,sans-serif;fill:#18334e}.title{font-size:28px;font-weight:700}.sub{font-size:17px;fill:#526a80}.label{font-size:19px;font-weight:600}.body{font-size:17px}.edge{fill:none;stroke:#62758a;stroke-width:2;marker-end:url(#arrow)}</style><text x="40" y="45" class="title">3. Assertion và LLM-judge — hai kết quả tách biệt</text><text x="40" y="78" class="sub">Judge-only / Hybrid AND là cách chấm bổ sung của nhóm, không ghi đè TSR reference BTC.</text>
+<rect x="370" y="110" width="580" height="100" rx="13" fill="#e5f2ff" stroke="#9ab1c5"/>
+<text x="660" y="140" text-anchor="middle" class="label">Scenario + grading contract + validated evidence</text>
+<text x="660" y="165" text-anchor="middle" class="body">Ghim mode / applicability / criterion trước run</text>
+<polyline points="660,210 660,255" class="edge"/>
+<rect x="370" y="255" width="580" height="100" rx="13" fill="#e5f2ff" stroke="#9ab1c5"/>
+<text x="660" y="285" text-anchor="middle" class="label">Luôn chạy scorer BTC cho phần áp dụng</text>
+<text x="660" y="310" text-anchor="middle" class="body">success_if từng call → TSR chính thức</text>
+<text x="660" y="335" text-anchor="middle" class="body">Không có success_if: ghi coverage, không tự PASS</text>
+<polyline points="660,355 660,400" class="edge"/>
+<rect x="370" y="400" width="580" height="95" rx="13" fill="#e5f2ff" stroke="#9ab1c5"/>
+<text x="660" y="430" text-anchor="middle" class="label">Có mục tiêu chất lượng cần Judge?</text>
+<text x="660" y="455" text-anchor="middle" class="body">Theo contract / rubric, không phải assertion FAIL thì đổi judge</text>
+<polyline points="370,445 210,445 210,540" class="edge"/>
+<text x="245" y="430" class="sub">Không</text>
+<polyline points="950,445 1110,445 1110,540" class="edge"/>
+<text x="1005" y="430" class="sub">Có</text>
+<rect x="40" y="540" width="340" height="110" rx="13" fill="#e5f2ff" stroke="#9ab1c5"/>
+<text x="210" y="570" text-anchor="middle" class="label">Assertion-only bổ sung</text>
+<text x="210" y="595" text-anchor="middle" class="body">Kiểm tool thành công / state / PII</text>
+<text x="210" y="620" text-anchor="middle" class="body">Handoff: đủ schema + đúng scope</text>
+<rect x="910" y="540" width="370" height="140" rx="13" fill="#e5f2ff" stroke="#9ab1c5"/>
+<text x="1095" y="570" text-anchor="middle" class="label">Criterion selector → Judge</text>
+<text x="1095" y="595" text-anchor="middle" class="body">Chọn J01–J12 theo applicability</text>
+<text x="1095" y="620" text-anchor="middle" class="body">Output PASS/FAIL + evidence</text>
+<text x="1095" y="645" text-anchor="middle" class="body">Lỗi: sửa output tối đa 1 lần [nhóm]</text>
+<polyline points="1110,680 1110,725" class="edge"/>
+<rect x="910" y="725" width="370" height="100" rx="13" fill="#e5f2ff" stroke="#9ab1c5"/>
+<text x="1095" y="755" text-anchor="middle" class="label">Judge result hợp lệ?</text>
+<text x="1095" y="780" text-anchor="middle" class="body">Không: INCOMPLETE / review</text>
+<text x="1095" y="805" text-anchor="middle" class="body">Có: aggregate tiêu chí đã chọn</text>
+<polyline points="210,650 210,865 660,865 660,900" class="edge"/>
+<polyline points="1110,825 1110,865 660,865" class="edge"/>
+<rect x="260" y="900" width="800" height="110" rx="13" fill="#e5f2ff" stroke="#9ab1c5"/>
+<text x="660" y="930" text-anchor="middle" class="label">Supplemental verdict + completeness</text>
+<text x="660" y="955" text-anchor="middle" class="body">Hybrid: assertion AND judge; lỗi judge không thành PASS</text>
+<text x="660" y="980" text-anchor="middle" class="body">Hard FAIL đã chứng minh vẫn FAIL, dù evidence còn thiếu</text>
+</svg>

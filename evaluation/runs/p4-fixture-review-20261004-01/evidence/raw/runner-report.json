@@ -1,0 +1,152 @@
+{
+  "notice": "P2 execution only; not BTC trace, scorer, runtime isolation proof or quality acceptance",
+  "run_id": "FIXTURE-R0",
+  "fixture": true,
+  "configs": [
+    "full",
+    "baseline_no_memory"
+  ],
+  "execution_complete": true,
+  "bindings": [
+    {
+      "config": "full",
+      "scenario_id": "FIXTURE-M1",
+      "type": "bound",
+      "capabilities": [
+        "after_call_barrier",
+        "briefs",
+        "business_tools",
+        "memory_isolation",
+        "memory_read_gate",
+        "snapshots",
+        "timestamps",
+        "usage"
+      ],
+      "retry": {
+        "agent": 0,
+        "tool": 0
+      },
+      "code_sha256": "4edbd47919f9eb486cde5680f61041ec1b90c8a53aff84f590067290308975ab",
+      "pid": 55276
+    },
+    {
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "type": "bound",
+      "capabilities": [
+        "after_call_barrier",
+        "briefs",
+        "business_tools",
+        "memory_isolation",
+        "memory_read_gate",
+        "snapshots",
+        "timestamps",
+        "usage"
+      ],
+      "retry": {
+        "agent": 0,
+        "tool": 0
+      },
+      "code_sha256": "4edbd47919f9eb486cde5680f61041ec1b90c8a53aff84f590067290308975ab",
+      "pid": 55283
+    }
+  ],
+  "calls": [
+    {
+      "context": {
+        "run_id": "FIXTURE-R0",
+        "config": "full",
+        "scenario_id": "FIXTURE-M1",
+        "call": "call_1",
+        "turn": 1
+      },
+      "attempted": true,
+      "completed": true,
+      "barrier_complete": true,
+      "failed": false
+    },
+    {
+      "context": {
+        "run_id": "FIXTURE-R0",
+        "config": "full",
+        "scenario_id": "FIXTURE-M1",
+        "call": "call_2",
+        "turn": 1
+      },
+      "attempted": true,
+      "completed": true,
+      "barrier_complete": true,
+      "failed": false
+    },
+    {
+      "context": {
+        "run_id": "FIXTURE-R0",
+        "config": "baseline_no_memory",
+        "scenario_id": "FIXTURE-M1",
+        "call": "call_1",
+        "turn": 1
+      },
+      "attempted": true,
+      "completed": true,
+      "barrier_complete": true,
+      "failed": false
+    },
+    {
+      "context": {
+        "run_id": "FIXTURE-R0",
+        "config": "baseline_no_memory",
+        "scenario_id": "FIXTURE-M1",
+        "call": "call_2",
+        "turn": 1
+      },
+      "attempted": true,
+      "completed": true,
+      "barrier_complete": true,
+      "failed": false
+    }
+  ],
+  "attempted_calls": 4,
+  "completed_calls": 4,
+  "failed_calls": 0,
+  "errors": [],
+  "coverage": {
+    "expected_ids": [
+      "FIXTURE-R0/full/FIXTURE-M1/call_1/1",
+      "FIXTURE-R0/full/FIXTURE-M1/call_2/1",
+      "FIXTURE-R0/baseline_no_memory/FIXTURE-M1/call_1/1",
+      "FIXTURE-R0/baseline_no_memory/FIXTURE-M1/call_2/1"
+    ],
+    "observed_ids": [
+      "FIXTURE-R0/full/FIXTURE-M1/call_1/1",
+      "FIXTURE-R0/full/FIXTURE-M1/call_2/1",
+      "FIXTURE-R0/baseline_no_memory/FIXTURE-M1/call_1/1",
+      "FIXTURE-R0/baseline_no_memory/FIXTURE-M1/call_2/1"
+    ],
+    "missing_ids": [],
+    "duplicate_ids": [],
+    "unknown_ids": []
+  },
+  "validation_status": {
+    "verdict": "PASS",
+    "completeness": "COMPLETE",
+    "reason_codes": []
+  },
+  "evaluation_status": {
+    "verdict": "UNDETERMINED",
+    "completeness": "INCOMPLETE",
+    "reason_codes": [
+      "P3_EVIDENCE_AND_TRACE_PENDING"
+    ]
+  },
+  "deferred": [
+    {
+      "id": "btc.validator",
+      "reason": "DEFERRED_BY_USER_2026_10_04"
+    },
+    {
+      "id": "btc.audio_segments",
+      "reason": "DEFERRED_BY_USER_2026_10_04"
+    }
+  ],
+  "btc_full_readiness": "INCOMPLETE"
+}

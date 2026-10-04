@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 1600 960">
+<title>Pipeline đánh giá ASR M1</title><desc>Chuẩn bị audio và đáp án riêng, chạy Whisper Medium trên audio, kiểm tra coverage, chấm raw và normalized, báo cáo lỗi. Ground truth không được đưa vào model.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10" fill="#496078"/></marker></defs>
+<style>text{font-family:Arial,sans-serif;fill:#172b45} .title{font-size:40px;font-weight:bold}.section{font-size:23px;font-weight:bold}.name{font-size:25px;font-weight:bold}.sub{font-size:21px}.small{font-size:19px}.line{fill:none;stroke:#496078;stroke-width:3;marker-end:url(#arrow)}.box{stroke:#c3d0de;stroke-width:2;rx:16}.blue{fill:#e8f2ff}.green{fill:#e3f5ec}.purple{fill:#efeafb}.gold{fill:#fff2da}.red{fill:#ffe8e6}</style>
+<rect width="1600" height="960" fill="#ffffff"/>
+<text x="55" y="65" class="title">ĐÁNH GIÁ ASR M1 — TỪ AUDIO ĐẾN BẰNG CHỨNG</text>
+<text x="55" y="102" class="sub">Hai đường riêng: audio để nhận dạng · ground truth chỉ dùng sau nhận dạng để chấm</text>
+<rect x="35" y="130" width="1530" height="230" rx="22" fill="#f6f9fc"/>
+<text x="55" y="166" class="section">1. CHUẨN BỊ DỮ LIỆU</text>
+<rect x="55" y="190" width="290" height="125" class="box blue"/><text x="75" y="229" class="name">Script của nhóm</text><text x="75" y="265" class="sub">SĐT · tiền · ngày hẹn</text><text x="75" y="293" class="small">Khách dev / eval tách biệt</text>
+<path d="M345 248 H390" class="line"/>
+<rect x="400" y="190" width="290" height="125" class="box blue"/><text x="420" y="229" class="name">Edge TTS cũ</text><text x="420" y="265" class="sub">HoaiMy + NamMinh</text><text x="420" y="293" class="small">Clean / nhiễu mô phỏng</text>
+<path d="M690 248 H735" class="line"/>
+<rect x="745" y="190" width="340" height="125" class="box green"/><text x="765" y="229" class="name">Nghe duyệt audio + GT</text><text x="765" y="265" class="sub">Khớp lời đọc và entity?</text><text x="765" y="293" class="small">Sai → sửa phiên bản, duyệt lại</text>
+<path d="M1085 248 H1130" class="line"/>
+<rect x="1140" y="190" width="365" height="125" class="box gold"/><text x="1160" y="229" class="name">Bộ mới: 6 dev + 20 eval</text><text x="1160" y="265" class="sub">26 WAV · khoảng 19 phút</text><text x="1160" y="293" class="small">Hiện đang chờ nghe duyệt</text>
+<rect x="35" y="380" width="1530" height="260" rx="22" fill="#f6f9fc"/>
+<text x="55" y="417" class="section">2. CHẠY ASR — DEV TRƯỚC, KHÓA CẤU HÌNH RỒI EVAL</text>
+<rect x="55" y="455" width="280" height="130" class="box blue"/><text x="75" y="492" class="name">Preflight</text><text x="75" y="528" class="sub">ID · WAV · số lượng</text><text x="75" y="558" class="small">PCM16 / mono / 16 kHz</text>
+<path d="M335 518 H375" class="line"/>
+<rect x="385" y="455" width="340" height="130" class="box purple"/><text x="405" y="492" class="name">Whisper Medium local</text><text x="405" y="528" class="sub">faster-whisper · tiếng Việt</text><text x="405" y="558" class="small">Chỉ audio + cấu hình đã ghim</text>
+<path d="M725 518 H765" class="line"/>
+<rect x="775" y="455" width="340" height="130" class="box blue"/><text x="795" y="492" class="name">Transcript + xử lý số</text><text x="795" y="528" class="sub">Raw text · chuẩn hóa · ITN</text><text x="795" y="558" class="small">Entity tiền / SĐT; ngày bổ sung</text>
+<path d="M1115 518 H1155" class="line"/>
+<rect x="1165" y="455" width="340" height="130" class="box gold"/><text x="1185" y="492" class="name">Validate + coverage</text><text x="1185" y="528" class="sub">Đủ ID và hypothesis hợp lệ?</text><text x="1185" y="558" class="small">Thiếu / hỏng → INCOMPLETE</text>
+<text x="55" y="620" class="small">Đo thời gian backend; bỏ 3 warm-up khỏi timing, vẫn chấm chất lượng cả 3 file.</text>
+<rect x="35" y="660" width="1530" height="250" rx="22" fill="#f6f9fc"/>
+<text x="55" y="698" class="section">3. CHẤM VÀ BÁO CÁO — KHÔNG DÙNG ĐÁP ÁN ĐỂ SỬA LỜI MODEL</text>
+<rect x="55" y="730" width="280" height="125" class="box green"/><text x="75" y="767" class="name">Ground truth riêng</text><text x="75" y="803" class="sub">Transcript + entity chuẩn</text><text x="75" y="832" class="small">Không truyền vào Whisper</text>
+<path d="M335 790 H385" class="line"/>
+<rect x="395" y="730" width="350" height="125" class="box purple"/><text x="415" y="767" class="name">Scorer BTC nguyên bản</text><text x="415" y="803" class="sub">WER · CER · entity</text><text x="415" y="832" class="small">Raw / normalized báo riêng</text>
+<path d="M1335 585 V650 H1530 V711 H570 V720" class="line"/>
+<path d="M745 790 H785" class="line"/>
+<rect x="795" y="730" width="320" height="125" class="box blue"/><text x="815" y="767" class="name">Báo cáo + lỗi</text><text x="815" y="803" class="sub">Coverage · timing · entity</text><text x="815" y="832" class="small">Manifest · hash · config lock</text>
+<path d="M1115 790 H1155" class="line"/>
+<rect x="1165" y="730" width="340" height="125" class="box gold"/><text x="1185" y="767" class="name">Kết luận theo bằng chứng</text><text x="1185" y="803" class="sub">Chưa duyệt GT ≠ đạt M1</text><text x="1185" y="832" class="small">12 audio BTC: chờ lúc thi</text>
+<text x="55" y="889" class="small">Tối ưu trên dev; eval đã xem lỗi chỉ còn là regression. Không tuyên bố hai voice cũ là giọng ba miền.</text>
+<path d="M1320 315 V348 H20 V520 H45" class="line"/>
+</svg>

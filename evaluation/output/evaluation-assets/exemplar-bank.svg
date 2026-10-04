@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 1600 950">
+<title>Exemplar Bank kết nối flow Evaluation</title><desc>Từ QA và Source Gate đến tuyển mẫu, review, evaluation, active; mẫu active được retrieve thành few-shot cho Advisor.</desc>
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10" fill="#506780"/></marker></defs>
+<style>text{font-family:Arial,sans-serif;fill:#172b45}.title{font-size:37px;font-weight:bold}.head{font-size:25px;font-weight:bold}.label{font-size:22px;font-weight:bold}.sub{font-size:19px}.box{stroke:#bbcbdb;stroke-width:2;rx:15}.line{fill:none;stroke:#506780;stroke-width:3;marker-end:url(#a)}</style>
+<rect width="1600" height="950" fill="white"/>
+<text x="45" y="60" class="title">EXEMPLAR BANK — HỌC CÁCH TƯ VẤN, KHÔNG CHÉP ĐÁP ÁN</text>
+<text x="45" y="102" class="sub">M2 tùy chọn nhóm · thiết kế chưa build · dùng chung review và Evaluation Gate</text>
+<text x="45" y="157" class="head">1. TUYỂN MẪU TỪ CUỘC GỌI</text>
+<rect x="40" y="185" width="210" height="110" class="box" fill="#e8f2ff"/><text x="145" y="226" text-anchor="middle" class="label">8. After-call</text><text x="145" y="262" text-anchor="middle" class="sub">Trace / tool / outcome</text>
+<path d="M250 240 H287" class="line"/>
+<rect x="295" y="185" width="210" height="110" class="box" fill="#e8f2ff"/><text x="400" y="226" text-anchor="middle" class="label">10. QA</text><text x="400" y="262" text-anchor="middle" class="sub">Chấm + evidence</text>
+<path d="M505 240 H542" class="line"/>
+<rect x="550" y="185" width="210" height="110" class="box" fill="#fff2da"/><text x="655" y="226" text-anchor="middle" class="label">Source Gate</text><text x="655" y="262" text-anchor="middle" class="sub">Được phép học?</text>
+<path d="M760 240 H797" class="line"/>
+<rect x="805" y="185" width="210" height="110" class="box" fill="#e3f5ec"/><text x="910" y="226" text-anchor="middle" class="label">11. Evidence Pool</text><text x="910" y="262" text-anchor="middle" class="sub">Giữ nguồn gốc</text>
+<path d="M1015 240 H1052" class="line"/>
+<rect x="1060" y="185" width="210" height="110" class="box" fill="#fff2da"/><text x="1165" y="219" text-anchor="middle" class="label">Chốt + policy clean</text><text x="1165" y="249" text-anchor="middle" class="sub">Tool thành công?</text><text x="1165" y="276" text-anchor="middle" class="sub">Đủ bằng chứng?</text>
+<path d="M1270 240 H1307" class="line"/>
+<rect x="1315" y="185" width="240" height="110" class="box" fill="#e8f2ff"/><text x="1435" y="226" text-anchor="middle" class="label">Exemplar candidate</text><text x="1435" y="262" text-anchor="middle" class="sub">Ẩn danh + Growth test</text>
+<text x="45" y="334" class="sub">Nguồn bị hạn chế → report-only; vi phạm → reject; thiếu evidence → pending. Không tự tuyển từ Frozen/hidden.</text>
+<text x="45" y="403" class="head">2. HỘI TỤ VỚI FAQ / PLAYBOOK TRƯỚC KHI ACTIVE</text>
+<rect x="160" y="440" width="330" height="115" class="box" fill="#e8f2ff"/><text x="325" y="483" text-anchor="middle" class="label">14. Policy + người duyệt</text><text x="325" y="521" text-anchor="middle" class="sub">Duyệt mẫu / test / version / hash</text>
+<path d="M490 496 H595" class="line"/>
+<rect x="605" y="440" width="390" height="115" class="box" fill="#eeeafa"/><text x="800" y="483" text-anchor="middle" class="label">15. Evaluation Gate</text><text x="800" y="521" text-anchor="middle" class="sub">Frozen + Growth · OFF/ON · regression</text>
+<path d="M995 496 H1100" class="line"/>
+<rect x="1110" y="440" width="380" height="115" class="box" fill="#e3f5ec"/><text x="1300" y="483" text-anchor="middle" class="label">16. Active bank + rollback</text><text x="1300" y="521" text-anchor="middle" class="sub">Chỉ bản đúng hash đã đo và duyệt</text>
+<path d="M1435 295 V365 H20 V496 H150" class="line"/>
+<text x="45" y="602" class="sub">Không đạt / thiếu suite áp dụng → giữ candidate. Full/baseline giữ exemplar như nhau; OFF/ON là phép đo riêng.</text>
+<text x="45" y="680" class="head">3. DÙNG MẪU TRONG CUỘC GỌI TIẾP THEO</text>
+<rect x="80" y="725" width="300" height="110" class="box" fill="#e8f2ff"/><text x="230" y="765" text-anchor="middle" class="label">2. Retrieve mẫu active</text><text x="230" y="802" text-anchor="middle" class="sub">Đúng tình huống / persona</text>
+<path d="M380 780 H438" class="line"/>
+<rect x="448" y="725" width="300" height="110" class="box" fill="#fff2da"/><text x="598" y="765" text-anchor="middle" class="label">Selector + budget</text><text x="598" y="802" text-anchor="middle" class="sub">0–3 mẫu; chật thì cắt trước</text>
+<path d="M748 780 H806" class="line"/>
+<rect x="816" y="725" width="300" height="110" class="box" fill="#eeeafa"/><text x="966" y="765" text-anchor="middle" class="label">4. Advisor + few-shot</text><text x="966" y="802" text-anchor="middle" class="sub">Giá / tồn kho vẫn tra tool mới</text>
+<path d="M1116 780 H1174" class="line"/>
+<rect x="1184" y="725" width="330" height="110" class="box" fill="#e8f2ff"/><text x="1349" y="765" text-anchor="middle" class="label">5. Guard → phản hồi</text><text x="1349" y="802" text-anchor="middle" class="sub">Kiểm lời Agent vừa tạo</text>
+<path d="M1300 555 V640 H20 V780 H70" class="line"/>
+<text x="45" y="889" class="sub">Không có mẫu phù hợp → chạy bình thường. Không copy PII, giá cũ, tool call cũ hoặc instruction trong lời khách.</text>
+<text x="45" y="922" class="sub">Ô2 chưa biết objection: chọn 0; có thể refresh riêng exemplar trước ô4, không nạp lại memory trong baseline.</text>
+</svg>

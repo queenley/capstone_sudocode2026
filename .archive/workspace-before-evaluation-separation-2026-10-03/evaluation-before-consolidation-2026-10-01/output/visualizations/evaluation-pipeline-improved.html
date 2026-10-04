@@ -1,0 +1,271 @@
+<div id="evaluation-pipeline-improved" class="eval-viz">
+  <h2>Agent flow — Evaluation pipeline improved</h2>
+  <div class="viz-row legend" aria-label="Legend">
+    <span><i class="swatch runtime"></i> Runtime</span>
+    <span><i class="swatch agent"></i> Agent / processor</span>
+    <span><i class="swatch evidence"></i> Evidence / knowledge</span>
+    <span><i class="swatch gate"></i> Decision gate</span>
+  </div>
+
+  <svg class="flow-svg" viewBox="0 0 1600 1110" role="img" aria-labelledby="eval-flow-title eval-flow-desc">
+    <title id="eval-flow-title">Call, after-call, improvement and evaluation flow</title>
+    <desc id="eval-flow-desc">Three horizontal zones show the live call, after-call processing, and improvement. The evaluation gate expands into fixed-turn official evaluation, separate simulator evaluation, assertion and judge scoring, release decision, activation and rollback.</desc>
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 Z" fill="currentColor"></path>
+      </marker>
+      <marker id="arrow-dash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 Z" fill="currentColor"></path>
+      </marker>
+      <filter id="rough" x="-3%" y="-3%" width="106%" height="106%">
+        <feTurbulence baseFrequency="0.006" numOctaves="1" seed="8" result="noise"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.1"></feDisplacementMap>
+      </filter>
+    </defs>
+
+    <rect class="lane lane-call" x="20" y="24" width="1560" height="270" rx="30"></rect>
+    <rect class="lane lane-after" x="20" y="315" width="1560" height="190" rx="30"></rect>
+    <rect class="lane lane-improve" x="20" y="526" width="1560" height="555" rx="30"></rect>
+    <text class="lane-title title-call" x="55" y="58">During the call — every turn</text>
+    <text class="lane-title title-after" x="55" y="350">After the call</text>
+    <text class="lane-title title-improve" x="55" y="562">Improvement — gated, evaluated, reversible</text>
+
+    <!-- During the call -->
+    <g class="node runtime-node" transform="translate(48 88)">
+      <rect width="150" height="70" rx="16"></rect>
+      <text x="75" y="29"><tspan>Customer</tspan><tspan x="75" dy="22">calls / chats</tspan></text>
+    </g>
+    <g class="node runtime-node" transform="translate(48 195)">
+      <rect width="170" height="70" rx="16"></rect>
+      <text x="85" y="28"><tspan>1 · Perceive</tspan><tspan x="85" dy="22">clean · ITN · PII</tspan></text>
+    </g>
+    <g class="node runtime-node" transform="translate(250 195)">
+      <rect width="180" height="70" rx="16"></rect>
+      <text x="90" y="28"><tspan>2 · Load context</tspan><tspan x="90" dy="22">identity · Call Brief</tspan></text>
+    </g>
+    <g class="node runtime-node" transform="translate(465 195)">
+      <rect width="165" height="70" rx="16"></rect>
+      <text x="82.5" y="28"><tspan>3 · Route</tspan><tspan x="82.5" dy="22">pick a lane</tspan></text>
+    </g>
+    <g class="node agent-node" transform="translate(665 195)">
+      <rect width="180" height="70" rx="16"></rect>
+      <text x="90" y="28"><tspan>4 · AdvisorAgent</tspan><tspan x="90" dy="22">plan · call tools</tspan></text>
+    </g>
+    <g class="node runtime-node" transform="translate(880 195)">
+      <rect width="165" height="70" rx="16"></rect>
+      <text x="82.5" y="28"><tspan>5 · Guard</tspan><tspan x="82.5" dy="22">rules · policy</tspan></text>
+    </g>
+    <g class="node runtime-node" transform="translate(1080 195)">
+      <rect width="165" height="70" rx="16"></rect>
+      <text x="82.5" y="28"><tspan>6 · Respond</tspan><tspan x="82.5" dy="22">speak / copilot</tspan></text>
+    </g>
+    <g class="node runtime-node" transform="translate(1280 195)">
+      <rect width="165" height="70" rx="16"></rect>
+      <text x="82.5" y="28"><tspan>7 · Persist</tspan><tspan x="82.5" dy="22">working memory</tspan></text>
+    </g>
+    <g class="node runtime-node" transform="translate(1368 82)">
+      <rect width="180" height="76" rx="16"></rect>
+      <text x="90" y="28"><tspan>6a · Consultant</tspan><tspan x="90" dy="22">takes over · answers</tspan></text>
+    </g>
+
+    <path class="edge" d="M123 158 V195"></path>
+    <path class="edge" d="M218 230 H250"></path>
+    <path class="edge" d="M430 230 H465"></path>
+    <path class="edge" d="M630 230 H665"></path>
+    <path class="edge" d="M845 230 H880"></path>
+    <path class="edge" d="M1045 230 H1080"></path>
+    <path class="edge" d="M1245 230 H1280"></path>
+    <path class="edge dashed" d="M1240 205 C1290 150 1320 125 1368 120"></path>
+    <text class="edge-label" x="1285" y="158">handoff</text>
+    <path class="edge" d="M1162 195 V112 H198"></path>
+    <text class="edge-label" x="700" y="102">reply · next turn</text>
+    <path class="edge dashed" d="M962 195 V172 H755 V195"></path>
+    <text class="edge-label" x="840" y="165">redo</text>
+
+    <!-- After call -->
+    <g class="node runtime-node" transform="translate(1280 378)">
+      <rect width="190" height="76" rx="16"></rect>
+      <text x="95" y="28"><tspan>8 · After-call</tspan><tspan x="95" dy="22">trace · outcome · source</tspan></text>
+    </g>
+    <g class="node agent-node" transform="translate(1005 378)">
+      <rect width="205" height="76" rx="16"></rect>
+      <text x="102.5" y="28"><tspan>9 · MemoryAgent</tspan><tspan x="102.5" dy="22">facts · episodes · ledger</tspan></text>
+    </g>
+    <g class="node evidence-node" transform="translate(720 378)">
+      <rect width="215" height="76" rx="16"></rect>
+      <text x="107.5" y="28"><tspan>Memory ledger</tspan><tspan x="107.5" dy="22">for next Call Brief</tspan></text>
+    </g>
+    <path class="edge" d="M1362 265 V378"></path>
+    <text class="edge-label" x="1380" y="332">hangup</text>
+    <path class="edge" d="M1280 416 H1210"></path>
+    <path class="edge" d="M1005 416 H935"></path>
+    <path class="edge dashed" d="M720 405 C500 350 390 320 340 265"></path>
+    <text class="edge-label" x="488" y="344">next call · Call Brief</text>
+
+    <!-- Improvement: reflection branch -->
+    <g class="node agent-node" transform="translate(1320 590)">
+      <rect width="210" height="78" rx="16"></rect>
+      <text x="105" y="27"><tspan>10 · QaAgent</tspan><tspan x="105" dy="21">score · evidence</tspan><tspan x="105" dy="19">select worthy lessons</tspan></text>
+    </g>
+    <g class="node gate-node" transform="translate(1110 590)">
+      <polygon points="95,0 190,39 95,78 0,39"></polygon>
+      <text x="95" y="31"><tspan>Source Gate</tspan><tspan x="95" dy="20">learning allowed?</tspan></text>
+    </g>
+    <g class="node evidence-node" transform="translate(870 590)">
+      <rect width="205" height="78" rx="16"></rect>
+      <text x="102.5" y="28"><tspan>11 · Evidence pool</tspan><tspan x="102.5" dy="22">lessons by situation</tspan></text>
+    </g>
+    <g class="node gate-node" transform="translate(655 590)">
+      <polygon points="92,0 184,39 92,78 0,39"></polygon>
+      <text x="92" y="31"><tspan>12 · Threshold</tspan><tspan x="92" dy="20">enough evidence?</tspan></text>
+    </g>
+    <g class="node agent-node" transform="translate(410 590)">
+      <rect width="210" height="78" rx="16"></rect>
+      <text x="105" y="27"><tspan>13 · Consolidate</tspan><tspan x="105" dy="21">compare evidence</tspan><tspan x="105" dy="19">playbook candidate</tspan></text>
+    </g>
+    <path class="edge" d="M1375 454 V590"></path>
+    <path class="edge" d="M1320 629 H1300"></path>
+    <path class="edge" d="M1110 629 H1075"></path>
+    <path class="edge" d="M870 629 H839"></path>
+    <path class="edge" d="M655 629 H620"></path>
+    <path class="edge dashed" d="M747 590 V570 H972 V590"></path>
+    <text class="edge-label" x="820" y="563">wait for more</text>
+    <path class="edge muted-edge" d="M1205 668 V700 H1370"></path>
+    <text class="edge-label" x="1262" y="695">blocked → report only</text>
+
+    <!-- Improvement: immediate FAQ branch -->
+    <g class="node runtime-node" transform="translate(1310 724)">
+      <rect width="225" height="76" rx="16"></rect>
+      <text x="112.5" y="28"><tspan>6b · FAQ draft</tspan><tspan x="112.5" dy="22">general · no PII · sources</tspan></text>
+    </g>
+    <g class="node runtime-node" transform="translate(1025 724)">
+      <rect width="240" height="76" rx="16"></rect>
+      <text x="120" y="28"><tspan>6c · Save candidate</tspan><tspan x="120" dy="22">plus Growth test candidate</tspan></text>
+    </g>
+    <path class="edge" d="M1458 158 V724 H1535"></path>
+    <text class="edge-label" x="1470" y="510">consultant answer</text>
+    <path class="edge" d="M1310 762 H1265"></path>
+
+    <!-- Common approval and evaluation gate -->
+    <g class="node runtime-node" transform="translate(710 724)">
+      <rect width="260" height="76" rx="16"></rect>
+      <text x="130" y="27"><tspan>14 · Policy + Human Review</tspan><tspan x="130" dy="21">source · PII · policy · scope</tspan><tspan x="130" dy="19">approve candidate</tspan></text>
+    </g>
+    <path class="edge" d="M410 650 C370 700 520 762 710 762"></path>
+    <path class="edge" d="M1025 762 H970"></path>
+
+    <g class="node agent-node" transform="translate(350 720)">
+      <rect width="305" height="84" rx="16"></rect>
+      <text x="152.5" y="27"><tspan>15 · Evaluation Gate</tspan><tspan x="152.5" dy="21">Frozen regression + Growth target</tspan><tspan x="152.5" dy="19">release only when PASS</tspan></text>
+    </g>
+    <path class="edge" d="M710 762 H655"></path>
+
+    <g class="node evidence-node" transform="translate(50 710)">
+      <rect width="245" height="105" rx="18"></rect>
+      <text x="122.5" y="28"><tspan>16 · Knowledge Base</tspan><tspan x="122.5" dy="21">active FAQ + playbook</tspan><tspan x="122.5" dy="20">versioned · reversible</tspan><tspan x="122.5" dy="20">read next calls</tspan></text>
+    </g>
+    <path class="edge" d="M350 762 H295"></path>
+    <path class="edge dashed" d="M172 710 V285 H340"></path>
+    <text class="edge-label" x="184" y="515">active version only</text>
+
+    <!-- Expanded evaluation pipeline -->
+    <rect class="eval-panel" x="300" y="842" width="1240" height="208" rx="22"></rect>
+    <text class="eval-title" x="325" y="874">15 · Evaluation pipeline — expanded</text>
+
+    <g class="mini source-mini" transform="translate(325 900)">
+      <rect width="170" height="52" rx="12"></rect>
+      <text x="85" y="22"><tspan>Freeze manifest</tspan><tspan x="85" dy="18">candidate + active</tspan></text>
+    </g>
+    <g class="mini source-mini" transform="translate(535 900)">
+      <rect width="190" height="52" rx="12"></rect>
+      <text x="95" y="22"><tspan>Fixed-turn suite</tspan><tspan x="95" dy="18">Full + baseline_no_memory</tspan></text>
+    </g>
+    <g class="mini source-mini" transform="translate(765 900)">
+      <rect width="180" height="52" rx="12"></rect>
+      <text x="90" y="22"><tspan>Trace evidence</tspan><tspan x="90" dy="18">questions · claims · tools</tspan></text>
+    </g>
+    <g class="mini source-mini" transform="translate(985 900)">
+      <rect width="220" height="52" rx="12"></rect>
+      <text x="110" y="22"><tspan>Deterministic scorers</tspan><tspan x="110" dy="18">RQR · CCR · TSR · HR</tspan></text>
+    </g>
+    <g class="mini source-mini" transform="translate(1245 900)">
+      <rect width="180" height="52" rx="12"></rect>
+      <text x="90" y="22"><tspan>Judge when required</tspan><tspan x="90" dy="18">rubric · evidence · kappa</tspan></text>
+    </g>
+    <path class="edge mini-edge" d="M495 926 H535"></path>
+    <path class="edge mini-edge" d="M725 926 H765"></path>
+    <path class="edge mini-edge" d="M945 926 H985"></path>
+    <path class="edge mini-edge" d="M1205 926 H1245"></path>
+
+    <g class="mini gate-mini" transform="translate(710 978)">
+      <polygon points="100,0 200,30 100,60 0,30"></polygon>
+      <text x="100" y="23"><tspan>Release Gate</tspan><tspan x="100" dy="18">complete · no regression</tspan></text>
+    </g>
+    <path class="edge mini-edge" d="M1335 952 V1008 H910"></path>
+    <path class="edge mini-edge" d="M710 1008 H520"></path>
+    <text class="edge-label" x="570" y="998">PASS → activate 16</text>
+    <path class="edge muted-edge" d="M810 1038 V1060 H1050"></path>
+    <text class="edge-label" x="860" y="1055">FAIL / INCOMPLETE → keep active version · return proposal</text>
+
+    <g class="mini simulator-mini" transform="translate(1230 982)">
+      <rect width="255" height="56" rx="12"></rect>
+      <text x="127.5" y="21"><tspan>Simulator M2 · 3 seeds</tspan><tspan x="127.5" dy="18">separate stability report</tspan></text>
+    </g>
+    <path class="edge dashed mini-edge" d="M1230 1010 H1115 V952"></path>
+  </svg>
+
+  <div class="selected-detail text-small" aria-live="polite">
+    Frozen/Hidden only measure the system. Production, development and allowed simulator evidence may enter learning. FAQ/playbook changes remain candidates until review and Evaluation PASS.
+  </div>
+</div>
+
+<style>
+  #evaluation-pipeline-improved {
+    color: var(--foreground);
+    width: 100%;
+    font-family: ui-rounded, "Marker Felt", "Comic Sans MS", system-ui, sans-serif;
+  }
+  #evaluation-pipeline-improved h2 { margin: 0 0 8px; font-weight: 500; }
+  #evaluation-pipeline-improved .legend { justify-content: flex-start; gap: 18px; margin-bottom: 8px; color: var(--muted-foreground); }
+  #evaluation-pipeline-improved .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  #evaluation-pipeline-improved .swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  #evaluation-pipeline-improved .swatch.runtime { background: color-mix(in srgb, var(--blue) 25%, var(--card)); }
+  #evaluation-pipeline-improved .swatch.agent { background: color-mix(in srgb, var(--purple) 24%, var(--card)); }
+  #evaluation-pipeline-improved .swatch.evidence { background: color-mix(in srgb, var(--green) 22%, var(--card)); }
+  #evaluation-pipeline-improved .swatch.gate { background: color-mix(in srgb, var(--yellow) 25%, var(--card)); }
+  #evaluation-pipeline-improved .flow-svg { width: 100%; height: auto; display: block; }
+  #evaluation-pipeline-improved .lane { stroke-width: 2; }
+  #evaluation-pipeline-improved .lane-call { fill: color-mix(in srgb, var(--blue) 6%, transparent); stroke: color-mix(in srgb, var(--blue) 28%, var(--border)); }
+  #evaluation-pipeline-improved .lane-after { fill: color-mix(in srgb, var(--purple) 6%, transparent); stroke: color-mix(in srgb, var(--purple) 28%, var(--border)); }
+  #evaluation-pipeline-improved .lane-improve { fill: color-mix(in srgb, var(--yellow) 7%, transparent); stroke: color-mix(in srgb, var(--orange) 28%, var(--border)); }
+  #evaluation-pipeline-improved .lane-title { font-size: 20px; font-weight: 500; }
+  #evaluation-pipeline-improved .title-call { fill: var(--blue); }
+  #evaluation-pipeline-improved .title-after { fill: var(--purple); }
+  #evaluation-pipeline-improved .title-improve { fill: var(--orange); }
+  #evaluation-pipeline-improved .node rect,
+  #evaluation-pipeline-improved .node polygon,
+  #evaluation-pipeline-improved .mini rect,
+  #evaluation-pipeline-improved .mini polygon { stroke: color-mix(in srgb, var(--foreground) 55%, var(--border)); stroke-width: 2.2; filter: url(#rough); }
+  #evaluation-pipeline-improved .runtime-node rect { fill: color-mix(in srgb, var(--blue) 22%, var(--card)); }
+  #evaluation-pipeline-improved .agent-node rect { fill: color-mix(in srgb, var(--purple) 23%, var(--card)); }
+  #evaluation-pipeline-improved .evidence-node rect { fill: color-mix(in srgb, var(--green) 21%, var(--card)); }
+  #evaluation-pipeline-improved .gate-node polygon,
+  #evaluation-pipeline-improved .gate-mini polygon { fill: color-mix(in srgb, var(--yellow) 26%, var(--card)); }
+  #evaluation-pipeline-improved .node text { text-anchor: middle; font-size: 15px; fill: var(--foreground); }
+  #evaluation-pipeline-improved .edge { fill: none; stroke: var(--foreground); stroke-width: 2; marker-end: url(#arrow); color: var(--foreground); }
+  #evaluation-pipeline-improved .dashed { stroke-dasharray: 9 7; marker-end: url(#arrow-dash); }
+  #evaluation-pipeline-improved .muted-edge { stroke: var(--muted-foreground); color: var(--muted-foreground); }
+  #evaluation-pipeline-improved .edge-label { font-size: 13px; fill: var(--muted-foreground); }
+  #evaluation-pipeline-improved .eval-panel { fill: color-mix(in srgb, var(--card) 70%, transparent); stroke: var(--border); stroke-width: 2; }
+  #evaluation-pipeline-improved .eval-title { font-size: 18px; font-weight: 500; fill: var(--foreground); }
+  #evaluation-pipeline-improved .source-mini rect { fill: color-mix(in srgb, var(--blue) 16%, var(--card)); }
+  #evaluation-pipeline-improved .simulator-mini rect { fill: color-mix(in srgb, var(--orange) 18%, var(--card)); }
+  #evaluation-pipeline-improved .mini text { text-anchor: middle; font-size: 12px; fill: var(--foreground); }
+  #evaluation-pipeline-improved .mini-edge { stroke-width: 1.6; }
+  #evaluation-pipeline-improved .selected-detail { margin-top: 8px; color: var(--muted-foreground); }
+  @media (max-width: 600px) {
+    #evaluation-pipeline-improved .legend { gap: 10px; }
+    #evaluation-pipeline-improved .flow-svg { min-width: 720px; }
+    #evaluation-pipeline-improved { overflow-x: auto; }
+  }
+</style>

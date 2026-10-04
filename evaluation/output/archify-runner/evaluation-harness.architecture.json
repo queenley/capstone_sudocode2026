@@ -1,0 +1,526 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Evaluation Harness — kiến trúc quanh Runner",
+    "output": "evaluation/output/archify-runner/evaluation-harness.html",
+    "quality_profile": "showcase",
+    "locale": "en"
+  },
+  "components": [
+    {
+      "id": "dataset",
+      "type": "database",
+      "label": "Frozen + scenario",
+      "sublabel": "success_if / slot / contract",
+      "pos": [
+        40,
+        40
+      ],
+      "size": [
+        250,
+        76
+      ]
+    },
+    {
+      "id": "config",
+      "type": "database",
+      "label": "Cấu hình cố định",
+      "sublabel": "Model · prompt · tools · KB",
+      "pos": [
+        400,
+        40
+      ],
+      "size": [
+        250,
+        76
+      ]
+    },
+    {
+      "id": "gt",
+      "type": "database",
+      "label": "Ground truth BTC",
+      "sublabel": "Catalog · policy · ngày gọi",
+      "pos": [
+        760,
+        40
+      ],
+      "size": [
+        250,
+        76
+      ],
+      "tag": "Không cấp đáp án cho Agent"
+    },
+    {
+      "id": "runner",
+      "type": "backend",
+      "label": "Evaluation Runner",
+      "sublabel": "Validate input → ghim manifest",
+      "pos": [
+        400,
+        210
+      ],
+      "size": [
+        250,
+        76
+      ]
+    },
+    {
+      "id": "full",
+      "type": "backend",
+      "label": "System: Memory ON",
+      "sublabel": "Call 1 → chờ memory → Call n",
+      "pos": [
+        200,
+        380
+      ],
+      "size": [
+        250,
+        76
+      ],
+      "tag": "State full riêng"
+    },
+    {
+      "id": "baseline",
+      "type": "backend",
+      "label": "Baseline: Memory OFF",
+      "sublabel": "Cùng call / seed / tools / KB",
+      "pos": [
+        600,
+        380
+      ],
+      "size": [
+        250,
+        76
+      ],
+      "tag": "Chặn đọc memory phiên trước"
+    },
+    {
+      "id": "evidence",
+      "type": "database",
+      "label": "Evidence Collector",
+      "sublabel": "Transcript · tools · state · usage",
+      "pos": [
+        400,
+        550
+      ],
+      "size": [
+        250,
+        76
+      ]
+    },
+    {
+      "id": "coverage",
+      "type": "security",
+      "label": "Schema + Coverage",
+      "sublabel": "ID / hash / expected vs observed",
+      "pos": [
+        400,
+        720
+      ],
+      "size": [
+        250,
+        76
+      ],
+      "tag": "Thiếu: đánh dấu INCOMPLETE"
+    },
+    {
+      "id": "extract",
+      "type": "backend",
+      "label": "Evidence Extractors",
+      "sublabel": "Questions · facts_used · claims",
+      "pos": [
+        400,
+        890
+      ],
+      "size": [
+        250,
+        76
+      ]
+    },
+    {
+      "id": "score",
+      "type": "backend",
+      "label": "BTC Metric Scorers",
+      "sublabel": "RQR · CCR · TSR/hard · HR",
+      "pos": [
+        400,
+        1060
+      ],
+      "size": [
+        250,
+        76
+      ],
+      "tag": "Guardrail · memory · latency"
+    },
+    {
+      "id": "truth",
+      "type": "backend",
+      "label": "GT Resolver",
+      "sublabel": "Đúng khách / SKU / ngày / policy",
+      "pos": [
+        760,
+        1060
+      ],
+      "size": [
+        250,
+        76
+      ]
+    },
+    {
+      "id": "judge",
+      "type": "backend",
+      "label": "Judge / supplemental",
+      "sublabel": "Rubric J01–J12 + hard checks",
+      "pos": [
+        400,
+        1230
+      ],
+      "size": [
+        250,
+        76
+      ],
+      "tag": "Nếu áp dụng; lỗi ≠ PASS"
+    },
+    {
+      "id": "aggregate",
+      "type": "backend",
+      "label": "Report Aggregator",
+      "sublabel": "BTC raw + bổ sung + coverage",
+      "pos": [
+        400,
+        1400
+      ],
+      "size": [
+        250,
+        76
+      ],
+      "tag": "Tách metric và completeness"
+    },
+    {
+      "id": "report",
+      "type": "database",
+      "label": "Bảng A.6 + run artifacts",
+      "sublabel": "Baseline | System | Delta",
+      "pos": [
+        400,
+        1570
+      ],
+      "size": [
+        250,
+        76
+      ],
+      "tag": "Trace · metrics · errors · cost"
+    },
+    {
+      "id": "threshold",
+      "type": "security",
+      "label": "Kiểm ngưỡng áp dụng",
+      "sublabel": "RQR ↓≥40%; TSR ≥70%; HR ≤5%",
+      "pos": [
+        400,
+        1740
+      ],
+      "size": [
+        250,
+        76
+      ],
+      "tag": "N/A / INCOMPLETE không tự đạt"
+    },
+    {
+      "id": "audio",
+      "type": "database",
+      "label": "ASR eval dataset",
+      "sublabel": "Audio + transcript/entity GT",
+      "pos": [
+        40,
+        550
+      ],
+      "size": [
+        250,
+        76
+      ],
+      "tag": "BTC khi phát + ≥20 file nhóm"
+    },
+    {
+      "id": "asr",
+      "type": "backend",
+      "label": "Local ASR + ITN",
+      "sublabel": "Raw text + entities + segments",
+      "pos": [
+        40,
+        720
+      ],
+      "size": [
+        250,
+        76
+      ]
+    },
+    {
+      "id": "asrscore",
+      "type": "backend",
+      "label": "ASR Scorer",
+      "sublabel": "WER · CER · tiền/SĐT",
+      "pos": [
+        40,
+        890
+      ],
+      "size": [
+        250,
+        76
+      ],
+      "tag": "M2: speaker turn accuracy"
+    },
+    {
+      "id": "asrreport",
+      "type": "database",
+      "label": "ASR report + coverage",
+      "sublabel": "Expected / observed audio IDs",
+      "pos": [
+        40,
+        1400
+      ],
+      "size": [
+        250,
+        76
+      ]
+    },
+    {
+      "id": "m2input",
+      "type": "database",
+      "label": "Dataset suite M2",
+      "sublabel": "60 QA · corpus · persona / seeds",
+      "pos": [
+        760,
+        550
+      ],
+      "size": [
+        250,
+        76
+      ]
+    },
+    {
+      "id": "m2runner",
+      "type": "backend",
+      "label": "M2 Suite Runners",
+      "sublabel": "RAG · simulator · tool · voice",
+      "pos": [
+        760,
+        720
+      ],
+      "size": [
+        250,
+        76
+      ],
+      "tag": "State riêng / 3 seed simulator"
+    },
+    {
+      "id": "m2score",
+      "type": "backend",
+      "label": "M2 Suite Scorers",
+      "sublabel": "Retrieval / abstain / answer",
+      "pos": [
+        760,
+        890
+      ],
+      "size": [
+        250,
+        76
+      ],
+      "tag": "TTFA · concurrency · tool accuracy"
+    },
+    {
+      "id": "m2report",
+      "type": "database",
+      "label": "M2 report + coverage",
+      "sublabel": "qid / seed / session / agreement",
+      "pos": [
+        760,
+        1400
+      ],
+      "size": [
+        250,
+        76
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "dataset_runner",
+      "from": "dataset",
+      "to": "runner"
+    },
+    {
+      "id": "config_runner",
+      "from": "config",
+      "to": "runner"
+    },
+    {
+      "id": "runner_full",
+      "from": "runner",
+      "to": "full"
+    },
+    {
+      "id": "runner_baseline",
+      "from": "runner",
+      "to": "baseline"
+    },
+    {
+      "id": "full_evidence",
+      "from": "full",
+      "to": "evidence"
+    },
+    {
+      "id": "baseline_evidence",
+      "from": "baseline",
+      "to": "evidence"
+    },
+    {
+      "id": "evidence_coverage",
+      "from": "evidence",
+      "to": "coverage"
+    },
+    {
+      "id": "coverage_extract",
+      "from": "coverage",
+      "to": "extract"
+    },
+    {
+      "id": "extract_score",
+      "from": "extract",
+      "to": "score"
+    },
+    {
+      "id": "score_judge",
+      "from": "score",
+      "to": "judge",
+      "label": "Có áp dụng"
+    },
+    {
+      "id": "judge_aggregate",
+      "from": "judge",
+      "to": "aggregate",
+      "label": "Kết quả riêng"
+    },
+    {
+      "id": "score_aggregate",
+      "from": "score",
+      "to": "aggregate",
+      "label": "Không judge"
+    },
+    {
+      "id": "gt_truth",
+      "from": "gt",
+      "to": "truth",
+      "label": "GT"
+    },
+    {
+      "id": "truth_score",
+      "from": "truth",
+      "to": "score"
+    },
+    {
+      "id": "truth_judge",
+      "from": "truth",
+      "to": "judge",
+      "label": "Rubric + GT"
+    },
+    {
+      "id": "aggregate_report",
+      "from": "aggregate",
+      "to": "report"
+    },
+    {
+      "id": "report_threshold",
+      "from": "report",
+      "to": "threshold"
+    },
+    {
+      "id": "audio_asr",
+      "from": "audio",
+      "to": "asr"
+    },
+    {
+      "id": "asr_asrscore",
+      "from": "asr",
+      "to": "asrscore"
+    },
+    {
+      "id": "asrscore_asrreport",
+      "from": "asrscore",
+      "to": "asrreport"
+    },
+    {
+      "id": "asrreport_aggregate",
+      "from": "asrreport",
+      "to": "aggregate"
+    },
+    {
+      "id": "m2input_m2runner",
+      "from": "m2input",
+      "to": "m2runner"
+    },
+    {
+      "id": "m2runner_m2score",
+      "from": "m2runner",
+      "to": "m2score"
+    },
+    {
+      "id": "m2score_m2report",
+      "from": "m2score",
+      "to": "m2report"
+    },
+    {
+      "id": "m2report_aggregate",
+      "from": "m2report",
+      "to": "aggregate"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Đầu vào và phép so công bằng",
+      "items": [
+        "Frozen + grading contract; cấu hình, KB, catalog/policy snapshot và seed nghiệp vụ giữ nguyên.",
+        "Full và baseline có state riêng; baseline chỉ chặn đọc memory hội thoại phiên trước, không bỏ working memory.",
+        "Chạy call đúng ngày; chờ after-call trước call sau. Input ASR lỗi được giữ theo scenario."
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Scorer BTC và kiểm tra bổ sung",
+      "items": [
+        "Questions: RQR; facts_used/tool args: CCR; claims so GT: HR; success_if: TSR và TSR ca khó.",
+        "Giữ report reference_eval.py nguyên bản. Kiểm value, tool result, brief schema, memory/PII và chất lượng báo riêng.",
+        "Judge chọn J01–J12 theo applicability; không thay assertion FAIL bằng judge PASS. Hybrid AND là thiết kế nhóm."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "ASR / M2 tách cohort",
+      "items": [
+        "ASR: audio + transcript/entity GT → local ASR → raw + normalize WER/CER; ITN tiền/SĐT riêng.",
+        "M2: diarization turn accuracy (không DER), RAG retrieval/abstain + answer/version, simulator 3 seed; không gộp fixed-turn.",
+        "M2 còn Tool-Call Accuracy, TTFA, ≥2 phiên đồng thời, judge/human agreement. Suite M2 không chặn M1 khi không áp dụng."
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Evidence thiếu không được biến thành PASS",
+      "items": [
+        "Schema/ID/hash và expected/observed call/turn/audio/qid được kiểm trước chấm; vẫn giữ hard FAIL đã chứng minh.",
+        "Thiếu GT, baseline RQR=0 hoặc mẫu số=0 báo N/A / INCOMPLETE, không tự đạt ngưỡng.",
+        "Latency derived bỏ 3 warm-up; quality giữ mọi turn. Candidate/model version được ghim cho phép so."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Đọc và nguồn",
+      "items": [
+        "Thiết kế theo Evaluation_QD (1).md, evaluation-runner-flow.md và evaluation-flow.md; không phải benchmark đã chạy.",
+        "Nguồn BTC: DIEU-CHINH-DE.md; eval/reference_eval.py; eval/llm_judge_rubric.json; schemas/; catalog/; policy/; asr/; rag/; simulator/.",
+        "Chỉ mô tả hệ thống đánh giá, không có Source Gate học, FAQ candidate hay release. UI Archify tiếng Anh, nội dung tiếng Việt."
+      ]
+    }
+  ]
+}

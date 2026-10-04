@@ -1,0 +1,112 @@
+{
+  "report_schema_version": "1.2.0",
+  "coverage": {
+    "expected": 4,
+    "observed": 4,
+    "missing_ids": [],
+    "unknown_ids": [],
+    "complete": true,
+    "status": "COMPLETE"
+  },
+  "inventory": {
+    "expected_dialogues": 4,
+    "expected_turns": 28,
+    "expected_entities": 8,
+    "observed_hypotheses": 4,
+    "observed_entities": 4,
+    "audio_minutes": 2.404
+  },
+  "acceptance": "UNDETERMINED",
+  "reason": "No quality threshold configured; human listening review is reported separately.",
+  "human_review_complete": false,
+  "btc_audio_evaluated": false,
+  "timing": {
+    "samples": 4,
+    "model_load_seconds": 0.6079992500017397,
+    "asr_seconds_per_audio_minute": 11.645814108813886
+  },
+  "raw_metrics": {
+    "normalization": "lowercase, NFC, bỏ dấu câu, gộp khoảng trắng; số/SĐT so exact-match sau ITN",
+    "WER": 14.8,
+    "CER": 16.2,
+    "entity_accuracy": 50.0,
+    "n_entities": 8,
+    "diarization_turn_accuracy": null,
+    "n_dialogues": 4,
+    "wer_noisy": 13.9,
+    "wer_clean": 15.1,
+    "per_dialogue": {
+      "TEAM-DEV-01": {
+        "wer": 14.2,
+        "cer": 16.1,
+        "noisy": false
+      },
+      "TEAM-DEV-02": {
+        "wer": 16.2,
+        "cer": 17.4,
+        "noisy": false
+      },
+      "TEAM-DEV-03": {
+        "wer": 14.8,
+        "cer": 15.4,
+        "noisy": false
+      },
+      "TEAM-DEV-04": {
+        "wer": 13.9,
+        "cer": 15.9,
+        "noisy": true
+      }
+    }
+  },
+  "normalized_metrics": {
+    "normalization": "lowercase, NFC, bỏ dấu câu, gộp khoảng trắng; số/SĐT so exact-match sau ITN",
+    "WER": 6.3,
+    "CER": 5.0,
+    "entity_accuracy": 50.0,
+    "n_entities": 8,
+    "diarization_turn_accuracy": null,
+    "n_dialogues": 4,
+    "wer_noisy": 5.6,
+    "wer_clean": 6.6,
+    "per_dialogue": {
+      "TEAM-DEV-01": {
+        "wer": 5.7,
+        "cer": 4.8,
+        "noisy": false
+      },
+      "TEAM-DEV-02": {
+        "wer": 7.6,
+        "cer": 6.0,
+        "noisy": false
+      },
+      "TEAM-DEV-03": {
+        "wer": 6.5,
+        "cer": 4.5,
+        "noisy": false
+      },
+      "TEAM-DEV-04": {
+        "wer": 5.6,
+        "cer": 4.5,
+        "noisy": true
+      }
+    }
+  },
+  "supplemental_entity_accuracy": {
+    "money": {
+      "correct": 4,
+      "total": 4,
+      "accuracy": 100.0
+    },
+    "phone": {
+      "correct": 0,
+      "total": 4,
+      "accuracy": 0.0
+    }
+  },
+  "supplemental_entity_formula": "100 * correct exact-match / all GT entities of that type; missing hypotheses count incorrect",
+  "limitations": [
+    "Entity extractor v2 supports explicit phone, integer VND price and budget; date/SKU/area remain unsupported.",
+    "Synthetic TTS is not representative human/noisy-call evaluation.",
+    "No diarization inference; TTS timing labels are never ASR predictions."
+  ]
+}

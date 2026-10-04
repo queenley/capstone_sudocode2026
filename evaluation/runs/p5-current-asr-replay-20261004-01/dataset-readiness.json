@@ -1,0 +1,124 @@
+{
+  "dataset_id": "P5-TEMP-20261004",
+  "version": "current-v1",
+  "provisional": true,
+  "review_policy": {
+    "required": false,
+    "reason": "USER_SKIP_REVIEW_TEMPORARY_DATASET_2026_10_04"
+  },
+  "source_asset_root": "/Users/vqd/SUDO_PROJECT_MAIN/evaluation",
+  "status": {
+    "verdict": "UNDETERMINED",
+    "completeness": "INCOMPLETE",
+    "reason_codes": [
+      "DATASET_QUOTA",
+      "PRODUCT_CORPUS_INVENTORY_NOT_SUPPLIED",
+      "PROVISIONAL_DATASET"
+    ]
+  },
+  "issues": [
+    {
+      "code": "DATASET_QUOTA",
+      "message": "frozen_ordinary: {'actual': 0, 'required': 20}",
+      "classification": "missing_evidence",
+      "artifact": {
+        "path": "datasets/p5-current/registry.json",
+        "sha256": "ac557c2499561fc5317a92858d6752452934743d8111a17b42a66a52c1c36ad2",
+        "pointer": ""
+      },
+      "json_pointer": ""
+    },
+    {
+      "code": "DATASET_QUOTA",
+      "message": "frozen_hard: {'actual': 0, 'required': 5}",
+      "classification": "missing_evidence",
+      "artifact": {
+        "path": "datasets/p5-current/registry.json",
+        "sha256": "ac557c2499561fc5317a92858d6752452934743d8111a17b42a66a52c1c36ad2",
+        "pointer": ""
+      },
+      "json_pointer": ""
+    },
+    {
+      "code": "PROVISIONAL_DATASET",
+      "message": "User requested existing temporary data; replacement expected",
+      "classification": "missing_evidence",
+      "artifact": {
+        "path": "datasets/p5-current/registry.json",
+        "sha256": "ac557c2499561fc5317a92858d6752452934743d8111a17b42a66a52c1c36ad2",
+        "pointer": ""
+      },
+      "json_pointer": ""
+    },
+    {
+      "code": "PRODUCT_CORPUS_INVENTORY_NOT_SUPPLIED",
+      "message": "120 transcripts/40 audio/1h/30 multisession/10 multichannel need separate inventory",
+      "classification": "missing_evidence",
+      "artifact": {
+        "path": "datasets/p5-current/registry.json",
+        "sha256": "ac557c2499561fc5317a92858d6752452934743d8111a17b42a66a52c1c36ad2",
+        "pointer": ""
+      },
+      "json_pointer": ""
+    }
+  ],
+  "execution_gate": {
+    "allowed": true,
+    "reason_codes": []
+  },
+  "scenario_inventory": [
+    {
+      "scenario_id": "FIXTURE-M1",
+      "split": "development",
+      "fixture": true,
+      "calls": 2,
+      "hard_case": null,
+      "customer_phone": "0900000000",
+      "channels": [
+        "unspecified"
+      ]
+    }
+  ],
+  "asr_inventory": [
+    {
+      "split": "dev",
+      "declared": 4,
+      "valid_wav": 4,
+      "audio_seconds": 144.216,
+      "human_verified": 0,
+      "review_status": "pending_human_listening"
+    },
+    {
+      "split": "eval",
+      "declared": 20,
+      "valid_wav": 20,
+      "audio_seconds": 723.5039999999999,
+      "human_verified": 0,
+      "review_status": "pending_human_listening"
+    }
+  ],
+  "quotas": {
+    "frozen_ordinary": {
+      "actual": 0,
+      "required": 20
+    },
+    "frozen_hard": {
+      "actual": 0,
+      "required": 5
+    },
+    "team_eval_audio": {
+      "actual": 20,
+      "required": 20
+    }
+  },
+  "product_corpus_C1": {
+    "transcripts": null,
+    "audio_files": null,
+    "audio_seconds": null,
+    "multisession_customers": null,
+    "multichannel_customers": null
+  },
+  "benchmark_ready": false,
+  "btc_audio_evaluated": false,
+  "notice": "P5 provisional inventory, not a Frozen/production benchmark certification"
+}

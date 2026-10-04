@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="1320" viewBox="0 0 1320 1320"><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="#62758a"/></marker></defs><rect width="100%" height="100%" fill="#f7fafc"/><style>text{font-family:Arial,sans-serif;fill:#18334e}.title{font-size:28px;font-weight:700}.sub{font-size:17px;fill:#526a80}.label{font-size:19px;font-weight:600}.body{font-size:17px}.edge{fill:none;stroke:#62758a;stroke-width:2;marker-end:url(#arrow)}</style><text x="40" y="45" class="title">2. Kiểm chứng evidence → chấm → báo cáo</text><text x="40" y="78" class="sub">Giữ report BTC nguyên bản; kiểm tra bổ sung và coverage được báo riêng.</text>
+<rect x="40" y="110" width="790" height="100" rx="13" fill="#e5f2ff" stroke="#9ab1c5"/>
+<text x="435" y="140" text-anchor="middle" class="label">Evidence Memory ON + OFF</text>
+<text x="435" y="165" text-anchor="middle" class="body">Validate schema, ID trùng/thiếu, call/turn, artifact và GT coverage</text>
+<rect x="910" y="110" width="370" height="100" rx="13" fill="#e5f2ff" stroke="#9ab1c5"/>
+<text x="1095" y="140" text-anchor="middle" class="label">ASR / M2 suite evidence</text>
+<text x="1095" y="165" text-anchor="middle" class="body">Kiểm đủ audio_id / qid / seed</text>
+<polyline points="435,210 435,265" class="edge"/>
+<polyline points="1095,210 1095,265" class="edge"/>
+<rect x="40" y="265" width="220" height="130" rx="13" fill="#e5f2ff" stroke="#9ab1c5"/>
+<text x="150" y="295" text-anchor="middle" class="label">Questions extractor</text>
+<text x="150" y="320" text-anchor="middle" class="body">Slot + open / confirm</text>
+<text x="150" y="345" text-anchor="middle" class="body">→ RQR</text>
+<text x="150" y="370" text-anchor="middle" class="body">Không chỉ đếm text</text>
+<rect x="300" y="265" width="220" height="130" rx="13" fill="#e5f2ff" stroke="#9ab1c5"/>
+<text x="410" y="295" text-anchor="middle" class="label">Fact usage checker</text>
+<text x="410" y="320" text-anchor="middle" class="body">facts_used + tool args</text>
+<text x="410" y="345" text-anchor="middle" class="body">→ CCR</text>
+<text x="410" y="370" text-anchor="middle" class="body">Bổ sung đúng value</text>
+<rect x="560" y="265" width="270" height="130" rx="13" fill="#e5f2ff" stroke="#9ab1c5"/>
+<text x="695" y="295" text-anchor="middle" class="label">Assertion Runner</text>
+<text x="695" y="320" text-anchor="middle" class="body">success_if từng call</text>
+<text x="695" y="345" text-anchor="middle" class="body">→ TSR + TSR hard</text>
+<text x="695" y="370" text-anchor="middle" class="body">Guardrail / memory checks</text>
+<rect x="910" y="265" width="370" height="130" rx="13" fill="#e5f2ff" stroke="#9ab1c5"/>
+<text x="1095" y="295" text-anchor="middle" class="label">ASR / RAG / simulator scorers</text>
+<text x="1095" y="320" text-anchor="middle" class="body">ASR: WER, CER, tiền / SĐT</text>
+<text x="1095" y="345" text-anchor="middle" class="body">M2: diarization, RAG, 3 seed</text>
+<text x="1095" y="370" text-anchor="middle" class="body">Không gộp simulator vào fixed-turn</text>
+<polyline points="435,240 150,240 150,265" class="edge"/>
+<polyline points="435,240 695,240 695,265" class="edge"/>
+<rect x="40" y="460" width="350" height="130" rx="13" fill="#e5f2ff" stroke="#9ab1c5"/>
+<text x="215" y="490" text-anchor="middle" class="label">Claims ↔ GT đúng thời điểm</text>
+<text x="215" y="515" text-anchor="middle" class="body">Giá / KM nguyên tử → HR</text>
+<text x="215" y="540" text-anchor="middle" class="body">Thiếu GT → chưa đủ bằng chứng</text>
+<text x="215" y="565" text-anchor="middle" class="body">Không coi không có claim là đạt</text>
+<rect x="450" y="460" width="380" height="130" rx="13" fill="#e5f2ff" stroke="#9ab1c5"/>
+<text x="640" y="490" text-anchor="middle" class="label">Latency + usage scorer</text>
+<text x="640" y="515" text-anchor="middle" class="body">M1: TTFT / total / Call Brief</text>
+<text x="640" y="540" text-anchor="middle" class="body">3 warm-up chỉ bỏ khỏi latency</text>
+<text x="640" y="565" text-anchor="middle" class="body">M2: TTFA + ≥2 phiên đồng thời</text>
+<rect x="910" y="460" width="370" height="130" rx="13" fill="#e5f2ff" stroke="#9ab1c5"/>
+<text x="1095" y="490" text-anchor="middle" class="label">Quality judge khi áp dụng</text>
+<text x="1095" y="515" text-anchor="middle" class="body">Criterion BTC + evidence PASS/FAIL</text>
+<text x="1095" y="540" text-anchor="middle" class="body">≥20 mẫu người, báo agreement</text>
+<text x="1095" y="565" text-anchor="middle" class="body">Judge lỗi → chưa chấm hoàn tất</text>
+<polyline points="40,160 20,160 20,435 215,435 215,460" class="edge"/>
+<polyline points="830,160 865,160 865,435 640,435 640,460" class="edge"/>
+<polyline points="1280,160 1300,160 1300,435 1095,435 1095,460" class="edge"/>
+<polyline points="150,395 150,415 420,415 420,655" class="edge"/>
+<polyline points="410,395 410,405 880,405 880,655" class="edge"/>
+<polyline points="1095,395 1095,420 895,420 895,655" class="edge"/>
+<polyline points="695,395 855,395 855,655" class="edge"/>
+<polyline points="215,590 215,655" class="edge"/>
+<polyline points="640,590 640,655" class="edge"/>
+<polyline points="1095,590 1095,655" class="edge"/>
+<polyline points="215,655 1095,655" class="edge"/>
+<polyline points="660,655 660,705" class="edge"/>
+<rect x="260" y="705" width="800" height="110" rx="13" fill="#e5f2ff" stroke="#9ab1c5"/>
+<text x="660" y="735" text-anchor="middle" class="label">Tổng hợp theo suite / cohort — không thay mẫu số âm thầm</text>
+<text x="660" y="760" text-anchor="middle" class="body">BTC raw report + supplemental metrics + validation / coverage</text>
+<text x="660" y="785" text-anchor="middle" class="body">PASS / FAIL riêng với completeness; hard FAIL vẫn giữ</text>
+<polyline points="660,815 660,860" class="edge"/>
+<rect x="260" y="860" width="800" height="110" rx="13" fill="#e5f2ff" stroke="#9ab1c5"/>
+<text x="660" y="890" text-anchor="middle" class="label">Bảng A.6: Baseline | System | Delta + kiểm ngưỡng</text>
+<text x="660" y="915" text-anchor="middle" class="body">RQR giảm tương đối ≥40%; TSR ≥70%; HR giá/KM ≤5%</text>
+<text x="660" y="940" text-anchor="middle" class="body">RQR baseline=0 / thiếu GT / thiếu evidence → N/A hoặc INCOMPLETE</text>
+<polyline points="660,970 660,1010" class="edge"/>
+<rect x="260" y="1010" width="800" height="90" rx="13" fill="#e5f2ff" stroke="#9ab1c5"/>
+<text x="660" y="1040" text-anchor="middle" class="label">Xuất báo cáo + evidence có thể truy vết</text>
+<text x="660" y="1065" text-anchor="middle" class="body">manifest · trace · report_btc · coverage · table · errors (≥10 lỗi)</text>
+</svg>

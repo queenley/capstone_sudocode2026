@@ -1,0 +1,443 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Evaluation & Improvement · Theo vai trò",
+    "output": "evaluation/output/archify-evaluation/evaluation.html",
+    "quality_profile": "showcase",
+    "locale": "en"
+  },
+  "lanes": [
+    {
+      "id": "consultant",
+      "label": "Consultant · nhánh FAQ"
+    },
+    {
+      "id": "aftercall",
+      "label": "After-call · bộ nhớ khách"
+    },
+    {
+      "id": "qa",
+      "label": "QaAgent · chất lượng và bài học"
+    },
+    {
+      "id": "learning",
+      "label": "Consolidator · đề xuất cải tiến"
+    },
+    {
+      "id": "review",
+      "label": "QA / người duyệt"
+    },
+    {
+      "id": "evaluation",
+      "label": "Evaluation Runner · kiểm chứng"
+    },
+    {
+      "id": "release",
+      "label": "Knowledge Base · phát hành"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "consultant",
+      "lane": "consultant",
+      "col": 0,
+      "type": "external",
+      "label": "6a Consultant",
+      "sublabel": "Trả lời khi handoff",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "faqgate",
+      "lane": "consultant",
+      "col": 1,
+      "type": "security",
+      "label": "Source Gate",
+      "sublabel": "Kiểm quyền dùng nguồn",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "faq",
+      "lane": "consultant",
+      "col": 2,
+      "type": "backend",
+      "label": "6b FAQ nháp",
+      "sublabel": "Khái quát, bỏ PII",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "candidate",
+      "lane": "consultant",
+      "col": 5,
+      "type": "database",
+      "label": "6c Candidate + test",
+      "sublabel": "Chưa đưa lên live",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "endcall",
+      "lane": "aftercall",
+      "col": 0,
+      "type": "backend",
+      "label": "8 After-call",
+      "sublabel": "Thu trace khi kết thúc",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "memory",
+      "lane": "aftercall",
+      "col": 1,
+      "type": "backend",
+      "label": "9 MemoryAgent",
+      "sublabel": "Facts / episodes đúng khách",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "ledger",
+      "lane": "aftercall",
+      "col": 2,
+      "type": "database",
+      "label": "Customer ledger",
+      "sublabel": "Call Brief cho lần sau",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "qaagent",
+      "lane": "qa",
+      "col": 0,
+      "type": "backend",
+      "label": "10 QaAgent",
+      "sublabel": "Chấm + lesson / no-change",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "source",
+      "lane": "qa",
+      "col": 1,
+      "type": "security",
+      "label": "Source Gate",
+      "sublabel": "Frozen: chỉ phân tích lỗi",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "pool",
+      "lane": "qa",
+      "col": 2,
+      "type": "database",
+      "label": "11 Evidence Pool",
+      "sublabel": "Nguồn được phép học",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "threshold",
+      "lane": "qa",
+      "col": 3,
+      "type": "security",
+      "label": "12 Đủ bằng chứng?",
+      "sublabel": "Chưa đủ: chờ / review",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "draft",
+      "lane": "learning",
+      "col": 3,
+      "type": "backend",
+      "label": "13 Consolidator",
+      "sublabel": "So sánh thắng / thua",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "playbook",
+      "lane": "learning",
+      "col": 4,
+      "type": "database",
+      "label": "Playbook / prompt nháp",
+      "sublabel": "Bài học có evidence",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "exemplar",
+      "lane": "learning",
+      "col": 2,
+      "type": "backend",
+      "label": "Lọc Exemplar",
+      "sublabel": "Đơn thành công, policy sạch",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "bank",
+      "lane": "learning",
+      "col": 1,
+      "type": "database",
+      "label": "Exemplar candidate",
+      "sublabel": "Ẩn PII + gắn tình huống",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "approval",
+      "lane": "review",
+      "col": 5,
+      "type": "security",
+      "label": "14 Người duyệt",
+      "sublabel": "Policy + nguồn + version",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "ab",
+      "lane": "review",
+      "col": 4,
+      "type": "backend",
+      "label": "M2: duyệt protocol A/B",
+      "sublabel": "Chạy offline, đề xuất winner",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "runner",
+      "lane": "evaluation",
+      "col": 3,
+      "type": "backend",
+      "label": "15 Evaluation Runner",
+      "sublabel": "R0/R1; M2 thêm R2",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "metrics",
+      "lane": "evaluation",
+      "col": 4,
+      "type": "backend",
+      "label": "Score + coverage",
+      "sublabel": "BTC + bổ sung, đúng cohort",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "gate",
+      "lane": "evaluation",
+      "col": 5,
+      "type": "security",
+      "label": "Evaluation Gate",
+      "sublabel": "PASS đủ suite + đúng hash",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "hold",
+      "lane": "release",
+      "col": 4,
+      "type": "database",
+      "label": "Giữ candidate",
+      "sublabel": "FAIL / INCOMPLETE / tranh chấp",
+      "width": 185,
+      "height": 74
+    },
+    {
+      "id": "active",
+      "lane": "release",
+      "col": 5,
+      "type": "database",
+      "label": "16 KB active",
+      "sublabel": "FAQ / playbook / exemplar",
+      "width": 185,
+      "height": 74
+    }
+  ],
+  "edges": [
+    {
+      "id": "consultant_faqgate",
+      "from": "consultant",
+      "to": "faqgate"
+    },
+    {
+      "id": "faqgate_faq",
+      "from": "faqgate",
+      "to": "faq",
+      "label": "Được học"
+    },
+    {
+      "id": "faq_candidate",
+      "from": "faq",
+      "to": "candidate"
+    },
+    {
+      "id": "candidate_approval",
+      "from": "candidate",
+      "to": "approval",
+      "label": "Nháp + test"
+    },
+    {
+      "id": "endcall_memory",
+      "from": "endcall",
+      "to": "memory"
+    },
+    {
+      "id": "memory_ledger",
+      "from": "memory",
+      "to": "ledger"
+    },
+    {
+      "id": "endcall_qaagent",
+      "from": "endcall",
+      "to": "qaagent",
+      "label": "Trace",
+      "variant": "dashed"
+    },
+    {
+      "id": "qaagent_source",
+      "from": "qaagent",
+      "to": "source"
+    },
+    {
+      "id": "source_pool",
+      "from": "source",
+      "to": "pool",
+      "label": "Được học"
+    },
+    {
+      "id": "pool_threshold",
+      "from": "pool",
+      "to": "threshold"
+    },
+    {
+      "id": "threshold_draft",
+      "from": "threshold",
+      "to": "draft",
+      "label": "Đủ"
+    },
+    {
+      "id": "draft_playbook",
+      "from": "draft",
+      "to": "playbook"
+    },
+    {
+      "id": "playbook_approval",
+      "from": "playbook",
+      "to": "approval",
+      "label": "Candidate"
+    },
+    {
+      "id": "pool_exemplar",
+      "from": "pool",
+      "to": "exemplar",
+      "label": "Đơn xác minh",
+      "variant": "dashed"
+    },
+    {
+      "id": "exemplar_bank",
+      "from": "exemplar",
+      "to": "bank"
+    },
+    {
+      "id": "bank_approval",
+      "from": "bank",
+      "to": "approval",
+      "label": "Candidate",
+      "variant": "dashed"
+    },
+    {
+      "id": "approval_runner",
+      "from": "approval",
+      "to": "runner",
+      "label": "Duyệt"
+    },
+    {
+      "id": "approval_ab",
+      "from": "approval",
+      "to": "ab",
+      "label": "Nếu A/B",
+      "variant": "dashed"
+    },
+    {
+      "id": "ab_approval",
+      "from": "ab",
+      "to": "approval",
+      "label": "Winner → duyệt lại",
+      "variant": "dashed"
+    },
+    {
+      "id": "runner_metrics",
+      "from": "runner",
+      "to": "metrics"
+    },
+    {
+      "id": "metrics_gate",
+      "from": "metrics",
+      "to": "gate"
+    },
+    {
+      "id": "gate_active",
+      "from": "gate",
+      "to": "active",
+      "label": "PASS"
+    },
+    {
+      "id": "gate_hold",
+      "from": "gate",
+      "to": "hold",
+      "label": "FAIL / thiếu",
+      "variant": "security"
+    },
+    {
+      "id": "approval_hold",
+      "from": "approval",
+      "to": "hold",
+      "label": "Chưa duyệt",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "amber",
+      "title": "Source Gate — thiết kế nhóm",
+      "items": [
+        "Quyết định nguồn có được dùng để học hay chỉ báo cáo; không phải cổng nhập Frozen hoặc kiểm giá.",
+        "Nguồn bị chặn / chưa rõ quyền: report hoặc review, không tạo candidate tự động."
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Bốn cơ chế dùng chung đường duyệt",
+      "items": [
+        "Knowledge Gap: câu chưa trả lời → Consultant → FAQ nháp + Growth test.",
+        "Reflection: record mỗi call; bài học được phép → pool → playbook.",
+        "Exemplar: chỉ ví dụ đã xác minh → candidate → duyệt → evaluation.",
+        "M2 A/B: duyệt protocol → chạy hai nhánh state riêng → đề xuất winner; winner vẫn phải qua release gate."
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "15 — hợp đồng kiểm chứng",
+      "items": [
+        "Giữ Frozen và cấu hình cố định; full / baseline chỉ khác quyền đọc memory hội thoại phiên trước.",
+        "M1: assertion, metrics, ASR, latency; M2 thêm các suite áp dụng. Simulator tách fixed-turn.",
+        "Thiếu evidence không thành PASS; hard FAIL vẫn giữ. Candidate đổi sau đo phải duyệt / đo lại."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "16 — sử dụng và rollback",
+      "items": [
+        "Chỉ bản đã duyệt, đo đúng hash mới active; có version và rollback.",
+        "Customer ledger không phải kho bài học dùng chung. Không đưa PII vào FAQ / few-shot.",
+        "Đây là sơ đồ thiết kế, không chứng minh Agent đã triển khai hoặc chạy đạt."
+      ]
+    }
+  ]
+}

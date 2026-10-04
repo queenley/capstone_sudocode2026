@@ -1,0 +1,48 @@
+{
+  "before": "evaluation/asr/runs/eval-v4-replay",
+  "after": "evaluation/asr/runs/eval-whisper-medium-v1",
+  "report_hashes": [
+    "2009a2bba32449257868045d061998feefdb769a7c6767ee728ec19e83839376",
+    "e463016e69a4155e1891288c9cb57527d459ca40450e92c9407b22cd65042b55"
+  ],
+  "rows": [
+    {
+      "metric": "WER",
+      "before": 6.1,
+      "after": 1.9,
+      "delta_percentage_points": -4.2
+    },
+    {
+      "metric": "CER",
+      "before": 4.6,
+      "after": 1.3,
+      "delta_percentage_points": -3.3
+    },
+    {
+      "metric": "entity_accuracy",
+      "before": 52.5,
+      "after": 80.0,
+      "delta_percentage_points": 27.5
+    },
+    {
+      "metric": "money_accuracy",
+      "before": 100.0,
+      "after": 100.0,
+      "delta_percentage_points": 0.0
+    },
+    {
+      "metric": "phone_accuracy",
+      "before": 5.0,
+      "after": 60.0,
+      "delta_percentage_points": 55.0
+    }
+  ],
+  "same_audio": true,
+  "same_GT": true,
+  "quality_acceptance": "UNDETERMINED",
+  "normalizer_versions": [
+    "vi-numbers-v3",
+    "vi-numbers-v3"
+  ],
+  "note": "Percentages are on synthetic data pending human listening; delta is percentage points, not relative reduction."
+}

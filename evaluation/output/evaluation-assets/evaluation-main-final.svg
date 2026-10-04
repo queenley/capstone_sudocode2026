@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 1600 1000">
+<title>Flow chính Evaluation và bốn cơ chế cải tiến</title><desc>Consultant hoặc QA sau call qua Source Gate; FAQ, Exemplar, Reflection và A/B hội tụ tại review, evaluation rồi active; thiếu bằng chứng giữ candidate.</desc>
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10" fill="#4c647e"/></marker></defs>
+<style>text{font-family:Arial,sans-serif;fill:#172b45}.title{font-size:36px;font-weight:bold}.label{font-size:24px;font-weight:bold}.sub{font-size:20px}.note{font-size:19px}.box{stroke:#bdcddd;stroke-width:2;rx:16}.line{fill:none;stroke:#4c647e;stroke-width:3;marker-end:url(#a)}.bus{fill:none;stroke:#4c647e;stroke-width:3}</style>
+<rect width="1600" height="1000" fill="white"/>
+<text x="40" y="58" class="title">EVALUATION — FLOW CHÍNH SAU KHI BỔ SUNG CẢI TIẾN</text>
+<text x="40" y="96" class="sub">Thu evidence → kiểm nguồn → tạo candidate → duyệt → đo → active / rollback</text>
+<rect x="50" y="160" width="240" height="110" class="box" fill="#e8f2ff"/><text x="170" y="203" text-anchor="middle" class="label">6a. Consultant</text><text x="170" y="241" text-anchor="middle" class="sub">Câu trả lời có nguồn</text>
+<rect x="370" y="160" width="240" height="110" class="box" fill="#e8f2ff"/><text x="490" y="203" text-anchor="middle" class="label">8. After-call</text><text x="490" y="241" text-anchor="middle" class="sub">Trace / tool / outcome</text>
+<path d="M610 215 H680" class="line"/>
+<rect x="690" y="160" width="240" height="110" class="box" fill="#eeeafa"/><text x="810" y="203" text-anchor="middle" class="label">10. QA / record</text><text x="810" y="241" text-anchor="middle" class="sub">Điểm + lesson/no-change</text>
+<path d="M930 215 H1000" class="line"/>
+<rect x="1010" y="160" width="240" height="110" class="box" fill="#fff2da"/><text x="1130" y="203" text-anchor="middle" class="label">Source Gate</text><text x="1130" y="241" text-anchor="middle" class="sub">Được phép học?</text>
+<path d="M170 160 V125 H1130 V150" class="line"/>
+<path d="M1250 215 H1300" class="line"/>
+<rect x="1310" y="160" width="240" height="110" class="box" fill="#e3f5ec"/><text x="1430" y="203" text-anchor="middle" class="label">11. Evidence Pool</text><text x="1430" y="241" text-anchor="middle" class="sub">Chỉ nguồn allow</text>
+<path d="M1430 270 V310 H210" class="bus"/>
+<path d="M210 310 V340" class="line"/><path d="M600 310 V340" class="line"/><path d="M990 310 V340" class="line"/><path d="M1385 310 V340" class="line"/>
+<rect x="40" y="350" width="340" height="135" class="box" fill="#e8f2ff"/><text x="210" y="390" text-anchor="middle" class="label">M1 · Knowledge Gap</text><text x="210" y="426" text-anchor="middle" class="sub">6b–6c. FAQ draft + Growth</text><text x="210" y="459" text-anchor="middle" class="sub">Câu hỏi chưa trả lời được</text>
+<rect x="430" y="350" width="340" height="135" class="box" fill="#e8f2ff"/><text x="600" y="390" text-anchor="middle" class="label">M2 · Exemplar Bank</text><text x="600" y="426" text-anchor="middle" class="sub">Chốt thật + policy clean</text><text x="600" y="459" text-anchor="middle" class="sub">Mẫu hội thoại → few-shot</text>
+<rect x="820" y="350" width="340" height="135" class="box" fill="#e8f2ff"/><text x="990" y="390" text-anchor="middle" class="label">M2 · Reflection</text><text x="990" y="426" text-anchor="middle" class="sub">12. Đủ evidence →13. Draft</text><text x="990" y="459" text-anchor="middle" class="sub">Bài học → playbook</text>
+<rect x="1210" y="350" width="350" height="135" class="box" fill="#e8f2ff"/><text x="1385" y="390" text-anchor="middle" class="label">M2 · A/B strategy</text><text x="1385" y="426" text-anchor="middle" class="sub">14 duyệt A/B →15 experiment</text><text x="1385" y="459" text-anchor="middle" class="sub">So sánh → candidate tốt hơn</text>
+<path d="M210 485 V525 H1385 V485" class="bus"/><path d="M600 485 V525" class="bus"/><path d="M990 485 V525" class="bus"/>
+<path d="M320 525 V610" class="line"/>
+<text x="390" y="570" class="note">Mọi candidate đều có nguồn, phiên bản và test; không tự cập nhật khi đang đo.</text>
+<rect x="130" y="620" width="380" height="125" class="box" fill="#e8f2ff"/><text x="320" y="661" text-anchor="middle" class="label">14. Policy + người duyệt</text><text x="320" y="697" text-anchor="middle" class="sub">Nội dung / Growth / version / hash</text><text x="320" y="727" text-anchor="middle" class="note">Chưa duyệt → giữ candidate</text>
+<path d="M510 682 H620" class="line"/>
+<rect x="630" y="620" width="480" height="125" class="box" fill="#eeeafa"/><text x="870" y="661" text-anchor="middle" class="label">15. Evaluation Gate</text><text x="870" y="697" text-anchor="middle" class="sub">Fixed-turn · ASR · suites M2 áp dụng</text><text x="870" y="727" text-anchor="middle" class="note">Frozen / Growth riêng · active vs candidate</text>
+<path d="M1110 682 H1190" class="line"/><text x="1128" y="665" class="note">PASS</text>
+<rect x="1200" y="620" width="350" height="125" class="box" fill="#e3f5ec"/><text x="1375" y="661" text-anchor="middle" class="label">16. Active + rollback</text><text x="1375" y="697" text-anchor="middle" class="sub">FAQ / bank / playbook / strategy</text><text x="1375" y="727" text-anchor="middle" class="note">Đúng bản đã duyệt và đo</text>
+<path d="M870 745 V790 H705 V825" class="line"/>
+<rect x="500" y="835" width="410" height="100" class="box" fill="#fff2da"/><text x="705" y="875" text-anchor="middle" class="label">FAIL / INCOMPLETE / chưa rõ</text><text x="705" y="911" text-anchor="middle" class="sub">Giữ active cũ; sửa/review candidate</text>
+<path d="M1375 745 V825" class="line"/>
+<rect x="1200" y="835" width="350" height="100" class="box" fill="#e3f5ec"/><text x="1375" y="875" text-anchor="middle" class="label">Cuộc gọi tiếp theo</text><text x="1375" y="911" text-anchor="middle" class="sub">Ô2 retrieve → ô4 Advisor → guard</text>
+<text x="40" y="835" class="note">Nguồn deny → report-only.</text><text x="40" y="866" class="note">Mẫu ít → A/B chưa kết luận.</text><text x="40" y="897" class="note">Lesson nháp ≠ memory active.</text>
+<text x="40" y="976" class="note">Thiết kế chưa build. M1 không chờ nhánh M2 tùy chọn; bản thắng A/B không đi tắt release gate.</text>
+</svg>

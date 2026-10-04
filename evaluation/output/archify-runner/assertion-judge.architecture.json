@@ -1,0 +1,439 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Assertion & LLM-judge — kiến trúc chấm",
+    "output": "evaluation/output/archify-runner/assertion-judge.html",
+    "quality_profile": "showcase",
+    "locale": "en"
+  },
+  "components": [
+    {
+      "id": "scenario",
+      "type": "database",
+      "label": "Scenario + success_if",
+      "sublabel": "Mục tiêu / call / expected_outcome",
+      "pos": [
+        40,
+        40
+      ],
+      "size": [
+        255,
+        76
+      ]
+    },
+    {
+      "id": "contract",
+      "type": "database",
+      "label": "Grading Contract",
+      "sublabel": "Mode · suite · rules · GT refs",
+      "pos": [
+        400,
+        40
+      ],
+      "size": [
+        255,
+        76
+      ]
+    },
+    {
+      "id": "trace",
+      "type": "database",
+      "label": "Validated Evidence",
+      "sublabel": "Transcript · tools · state · brief",
+      "pos": [
+        760,
+        40
+      ],
+      "size": [
+        255,
+        76
+      ]
+    },
+    {
+      "id": "coverage",
+      "type": "security",
+      "label": "Input / Evidence Validator",
+      "sublabel": "Schema · ID · hash · GT coverage",
+      "pos": [
+        400,
+        210
+      ],
+      "size": [
+        255,
+        76
+      ],
+      "tag": "Thiếu evidence: ghi completeness"
+    },
+    {
+      "id": "router",
+      "type": "security",
+      "label": "Grading Mode Router",
+      "sublabel": "Assertion-only / judge-only / hybrid",
+      "pos": [
+        400,
+        380
+      ],
+      "size": [
+        255,
+        76
+      ],
+      "tag": "Không đổi mode để cứu FAIL"
+    },
+    {
+      "id": "btc",
+      "type": "backend",
+      "label": "BTC Assertion Scorer",
+      "sublabel": "check_call → task_success_rate",
+      "pos": [
+        40,
+        550
+      ],
+      "size": [
+        255,
+        76
+      ],
+      "tag": "Luôn giữ chấm BTC áp dụng"
+    },
+    {
+      "id": "btcreport",
+      "type": "database",
+      "label": "TSR BTC nguyên bản",
+      "sublabel": "success_if → scenario + ca khó",
+      "pos": [
+        40,
+        1740
+      ],
+      "size": [
+        255,
+        76
+      ]
+    },
+    {
+      "id": "assert",
+      "type": "backend",
+      "label": "Supplemental Assertions",
+      "sublabel": "Tool result · value · schema · PII",
+      "pos": [
+        400,
+        550
+      ],
+      "size": [
+        255,
+        76
+      ]
+    },
+    {
+      "id": "averdict",
+      "type": "database",
+      "label": "Assertion Result",
+      "sublabel": "PASS / FAIL + evidence refs",
+      "pos": [
+        400,
+        720
+      ],
+      "size": [
+        255,
+        76
+      ],
+      "tag": "Lỗi thu evidence báo riêng"
+    },
+    {
+      "id": "selector",
+      "type": "backend",
+      "label": "Criterion Selector",
+      "sublabel": "J01–J12 theo applicability",
+      "pos": [
+        760,
+        550
+      ],
+      "size": [
+        255,
+        76
+      ],
+      "tag": "Lưu selected IDs + lý do"
+    },
+    {
+      "id": "prompt",
+      "type": "backend",
+      "label": "Judge Prompt Builder",
+      "sublabel": "Scenario · GT · transcript · criteria",
+      "pos": [
+        760,
+        720
+      ],
+      "size": [
+        255,
+        76
+      ]
+    },
+    {
+      "id": "model",
+      "type": "backend",
+      "label": "LLM-as-a-judge",
+      "sublabel": "Chấm từng criterion PASS/FAIL",
+      "pos": [
+        760,
+        890
+      ],
+      "size": [
+        255,
+        76
+      ]
+    },
+    {
+      "id": "validate",
+      "type": "security",
+      "label": "Judge Output Validator",
+      "sublabel": "JSON · ID đủ/không trùng · quote",
+      "pos": [
+        760,
+        1060
+      ],
+      "size": [
+        255,
+        76
+      ],
+      "tag": "Output hỏng: sửa tối đa1 lần"
+    },
+    {
+      "id": "quality",
+      "type": "database",
+      "label": "Quality Verdict",
+      "sublabel": "Criteria áp dụng → PASS / FAIL",
+      "pos": [
+        760,
+        1230
+      ],
+      "size": [
+        255,
+        76
+      ],
+      "tag": "Chỉ khi đủ output hợp lệ"
+    },
+    {
+      "id": "error",
+      "type": "security",
+      "label": "JUDGE_ERROR / missing",
+      "sublabel": "INCOMPLETE + review",
+      "pos": [
+        760,
+        1400
+      ],
+      "size": [
+        255,
+        76
+      ],
+      "tag": "Không giả verdict FAIL/PASS"
+    },
+    {
+      "id": "combine",
+      "type": "backend",
+      "label": "Mode-aware Combiner",
+      "sublabel": "Assertion / judge / Hybrid AND",
+      "pos": [
+        400,
+        1400
+      ],
+      "size": [
+        255,
+        76
+      ],
+      "tag": "Hard FAIL không bị xóa"
+    },
+    {
+      "id": "result",
+      "type": "database",
+      "label": "Supplemental Result",
+      "sublabel": "Verdict + completeness riêng",
+      "pos": [
+        400,
+        1570
+      ],
+      "size": [
+        255,
+        76
+      ]
+    },
+    {
+      "id": "report",
+      "type": "database",
+      "label": "Report Aggregator",
+      "sublabel": "TSR BTC + quality + coverage",
+      "pos": [
+        400,
+        1740
+      ],
+      "size": [
+        255,
+        76
+      ],
+      "tag": "Nối kiến trúc Harness toàn cảnh"
+    }
+  ],
+  "connections": [
+    {
+      "id": "scenario_coverage",
+      "from": "scenario",
+      "to": "coverage"
+    },
+    {
+      "id": "contract_coverage",
+      "from": "contract",
+      "to": "coverage"
+    },
+    {
+      "id": "trace_coverage",
+      "from": "trace",
+      "to": "coverage"
+    },
+    {
+      "id": "coverage_router",
+      "from": "coverage",
+      "to": "router"
+    },
+    {
+      "id": "coverage_btc",
+      "from": "coverage",
+      "to": "btc",
+      "label": "BTC áp dụng"
+    },
+    {
+      "id": "btc_btcreport",
+      "from": "btc",
+      "to": "btcreport"
+    },
+    {
+      "id": "btcreport_report",
+      "from": "btcreport",
+      "to": "report"
+    },
+    {
+      "id": "router_assert",
+      "from": "router",
+      "to": "assert",
+      "label": "Assertion / hybrid"
+    },
+    {
+      "id": "router_selector",
+      "from": "router",
+      "to": "selector",
+      "label": "Judge / hybrid"
+    },
+    {
+      "id": "assert_averdict",
+      "from": "assert",
+      "to": "averdict"
+    },
+    {
+      "id": "averdict_combine",
+      "from": "averdict",
+      "to": "combine"
+    },
+    {
+      "id": "selector_prompt",
+      "from": "selector",
+      "to": "prompt"
+    },
+    {
+      "id": "prompt_model",
+      "from": "prompt",
+      "to": "model"
+    },
+    {
+      "id": "model_validate",
+      "from": "model",
+      "to": "validate"
+    },
+    {
+      "id": "validate_quality",
+      "from": "validate",
+      "to": "quality",
+      "label": "Hợp lệ"
+    },
+    {
+      "id": "validate_error",
+      "from": "validate",
+      "to": "error",
+      "label": "Lỗi / thiếu"
+    },
+    {
+      "id": "quality_combine",
+      "from": "quality",
+      "to": "combine"
+    },
+    {
+      "id": "error_combine",
+      "from": "error",
+      "to": "combine"
+    },
+    {
+      "id": "combine_result",
+      "from": "combine",
+      "to": "result"
+    },
+    {
+      "id": "result_report",
+      "from": "result",
+      "to": "report"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Chọn mode trước khi chấm — thiết kế nhóm",
+      "items": [
+        "Assertion-only: mục tiêu biểu diễn bằng code. Judge-only: mục tiêu lời thoại; không bỏ chấm BTC nghiệp vụ.",
+        "Hybrid: bổ sung assertion AND judge. Không lấy judge cứu một assertion FAIL.",
+        "Quy tắc chọn criterion ghim trong contract; quyết định thực tế theo scenario/trace được lưu cùng run/call/criterion ID."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Assertion Runner: kiểm được bằng dữ liệu",
+      "items": [
+        "order.create/update: SKU, size, giá, qty, kết quả tool và trạng thái thực; callback đúng ngày; refresh quote đúng hiệu lực.",
+        "Handoff: expected_outcome ngoài phạm vi → handoff.transfer + brief đủ schema; không handoff không tạo brief giả.",
+        "Phân biệt Agent sinh brief sai (FAIL đã chứng minh) với harness không thu brief (INCOMPLETE)."
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Criterion Selector — không bỏ vì Agent thiếu hành động",
+      "items": [
+        "Mặc định J02 no fabrication, J06 tone Vietnamese, J08 over-confirmation.",
+        "Call2+: J01; mâu thuẫn: J03; danh tính lệch: J04; chuyển máy: J05; order.create: J07.",
+        "CCCD/STK: J09; hỏi AI: J10; budget/COD: J11; hết hàng: J12. Giữ nguyên applies_to/pass_if rubric BTC.",
+        "J01: nhắc ≥1 sản phẩm hoặc rào cản phiên trước, dưới dạng xác nhận; không nhắc quá3 thông tin cũ."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Judge output và độ tin cậy",
+      "items": [
+        "Prompt: scenario + transcript/tool timeline + GT đúng ngày + criteria đã chọn. Không cấp rubric/GT cho Agent đang thử.",
+        "JSON verdict từng criterion_id: PASS hoặc FAIL + evidence trích đúng; thiếu/trùng ID, quote không tồn tại hoặc model error là lỗi chấm.",
+        "Thiết kế nhóm: sửa output hỏng tối đa1 lần; không retry để tìm PASS. Temperature0 không bảo đảm tất định.",
+        "M2 chấm người ≥20 (call, criterion), báo agreement/kappa; kappa<0,6 cần phân tích, không tự coi judge tin cậy."
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Tổng hợp hai trục",
+      "items": [
+        "Hard FAIL đã chứng minh luôn giữ FAIL, kể cả judge còn lỗi/thiếu. Completeness được báo riêng.",
+        "Đủ checks áp dụng + đạt → PASS; không có hard fail nhưng thiếu check/judge → INCOMPLETE, không PASS.",
+        "N/A metric không đồng nghĩa suite NOT_APPLICABLE. Báo TSR BTC và supplemental scenario verdict riêng."
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Nguồn / ranh giới",
+      "items": [
+        "Nguồn: evaluation-flow.md C1–C2, grading-contract.schema.json, BTC eval/llm_judge_rubric.json và reference_eval.py check_call/task_success_rate.",
+        "Một scenario official PASS khi các call có success_if đều đạt; call không có success_if không tự biến thành PASS coverage.",
+        "Đây là kiến trúc thiết kế, không phải judge/runner đã chạy. UI Archify tiếng Anh, nội dung tiếng Việt."
+      ]
+    }
+  ]
+}

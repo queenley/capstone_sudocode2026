@@ -1,0 +1,351 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "command": "finalize",
+  "status": "fail",
+  "type": "workflow",
+  "quality": "showcase",
+  "specification": {
+    "path": "/Users/vqd/SUDO_PROJECT_MAIN/evaluation/output/archify-evaluation/evaluation.workflow.json",
+    "sha256": "6db91b94f7a6efbb59c5850920e5d1bc3856fe47a7053fc6eb74690d0b290577",
+    "bytes": 10383
+  },
+  "artifact": {
+    "path": "/Users/vqd/SUDO_PROJECT_MAIN/evaluation/output/archify-evaluation/evaluation.html"
+  },
+  "gates": {
+    "validate": "fail",
+    "deliver": "not-run",
+    "check": "not-run",
+    "browser-check": "not-run"
+  },
+  "failedStage": "validate",
+  "diagnostics": [
+    {
+      "code": "composition/proper-crossing",
+      "severity": "error",
+      "message": "[composition/proper-crossing] showcase workflow edges[14] id \"gate_hold\" \"gate\" -> \"hold\" crosses edges[16] id \"metrics_gate\" \"metrics\" -> \"gate\" at [1151.2, 776] (segments 2 and 4) — adjust route/via, bias, or channel coordinates so the edges use separate lane corridors.",
+      "subject": {
+        "diagramType": "workflow",
+        "collection": "edges",
+        "index": 14,
+        "id": "gate_hold",
+        "from": "gate",
+        "to": "hold"
+      },
+      "evidence": {
+        "otherRelationship": {
+          "diagramType": "workflow",
+          "collection": "edges",
+          "index": 16,
+          "id": "metrics_gate",
+          "from": "metrics",
+          "to": "gate"
+        },
+        "point": [
+          1151.2000000000003,
+          776
+        ],
+        "segmentIndex": 2,
+        "otherSegmentIndex": 4
+      },
+      "supportedFixes": [
+        "adjust route/via, bias, or channel coordinates so the edges use separate lane corridors"
+      ]
+    },
+    {
+      "code": "composition/ambiguous-corridor",
+      "severity": "error",
+      "message": "[composition/ambiguous-corridor] showcase workflow edges[1] id \"approval_ab\" \"approval\" -> \"ab\" shares a 28px corridor with edges[17] id \"playbook_approval\" \"playbook\" -> \"approval\" at [1205.5, 598] -> [1233.5, 598] (segments 1 and 2; minimum 8px) — adjust route/via, bias, or channel coordinates so unrelated edges do not visually merge.",
+      "subject": {
+        "diagramType": "workflow",
+        "collection": "edges",
+        "index": 1,
+        "id": "approval_ab",
+        "from": "approval",
+        "to": "ab"
+      },
+      "evidence": {
+        "otherRelationship": {
+          "diagramType": "workflow",
+          "collection": "edges",
+          "index": 17,
+          "id": "playbook_approval",
+          "from": "playbook",
+          "to": "approval"
+        },
+        "overlapLengthPx": 28,
+        "minimumPx": 8,
+        "from": [
+          1205.45,
+          598
+        ],
+        "to": [
+          1233.5,
+          598
+        ],
+        "segmentIndex": 1,
+        "otherSegmentIndex": 2
+      },
+      "supportedFixes": [
+        "adjust route/via, bias, or channel coordinates so unrelated edges do not visually merge"
+      ]
+    },
+    {
+      "code": "composition/ambiguous-corridor",
+      "severity": "error",
+      "message": "[composition/ambiguous-corridor] showcase workflow edges[2] id \"approval_hold\" \"approval\" -> \"hold\" shares a 96.5px corridor with edges[13] id \"gate_active\" \"gate\" -> \"active\" at [1257.5, 862] -> [1354, 862] (segments 2 and 3; minimum 8px) — adjust route/via, bias, or channel coordinates so unrelated edges do not visually merge.",
+      "subject": {
+        "diagramType": "workflow",
+        "collection": "edges",
+        "index": 2,
+        "id": "approval_hold",
+        "from": "approval",
+        "to": "hold"
+      },
+      "evidence": {
+        "otherRelationship": {
+          "diagramType": "workflow",
+          "collection": "edges",
+          "index": 13,
+          "id": "gate_active",
+          "from": "gate",
+          "to": "active"
+        },
+        "overlapLengthPx": 96.5,
+        "minimumPx": 8,
+        "from": [
+          1257.5,
+          862
+        ],
+        "to": [
+          1354,
+          862
+        ],
+        "segmentIndex": 2,
+        "otherSegmentIndex": 3
+      },
+      "supportedFixes": [
+        "adjust route/via, bias, or channel coordinates so unrelated edges do not visually merge"
+      ]
+    },
+    {
+      "code": "composition/ambiguous-corridor",
+      "severity": "error",
+      "message": "[composition/ambiguous-corridor] showcase workflow edges[3] id \"approval_runner\" \"approval\" -> \"runner\" shares a 32px corridor with edges[16] id \"metrics_gate\" \"metrics\" -> \"gate\" at [1149, 776] -> [1149, 808] (segments 1 and 3; minimum 8px) — adjust route/via, bias, or channel coordinates so unrelated edges do not visually merge.",
+      "subject": {
+        "diagramType": "workflow",
+        "collection": "edges",
+        "index": 3,
+        "id": "approval_runner",
+        "from": "approval",
+        "to": "runner"
+      },
+      "evidence": {
+        "otherRelationship": {
+          "diagramType": "workflow",
+          "collection": "edges",
+          "index": 16,
+          "id": "metrics_gate",
+          "from": "metrics",
+          "to": "gate"
+        },
+        "overlapLengthPx": 32,
+        "minimumPx": 8,
+        "from": [
+          1149,
+          776
+        ],
+        "to": [
+          1149,
+          808
+        ],
+        "segmentIndex": 1,
+        "otherSegmentIndex": 3
+      },
+      "supportedFixes": [
+        "adjust route/via, bias, or channel coordinates so unrelated edges do not visually merge"
+      ]
+    },
+    {
+      "code": "composition/ambiguous-corridor",
+      "severity": "error",
+      "message": "[composition/ambiguous-corridor] showcase workflow edges[4] id \"bank_approval\" \"bank\" -> \"approval\" shares a 100px corridor with edges[5] id \"candidate_approval\" \"candidate\" -> \"approval\" at [1370, 466] -> [1370, 566] (segments 2 and 1; minimum 8px) — adjust route/via, bias, or channel coordinates so unrelated edges do not visually merge.",
+      "subject": {
+        "diagramType": "workflow",
+        "collection": "edges",
+        "index": 4,
+        "id": "bank_approval",
+        "from": "bank",
+        "to": "approval"
+      },
+      "evidence": {
+        "otherRelationship": {
+          "diagramType": "workflow",
+          "collection": "edges",
+          "index": 5,
+          "id": "candidate_approval",
+          "from": "candidate",
+          "to": "approval"
+        },
+        "overlapLengthPx": 100,
+        "minimumPx": 8,
+        "from": [
+          1370,
+          466
+        ],
+        "to": [
+          1370,
+          566
+        ],
+        "segmentIndex": 2,
+        "otherSegmentIndex": 1
+      },
+      "supportedFixes": [
+        "adjust route/via, bias, or channel coordinates so unrelated edges do not visually merge"
+      ]
+    },
+    {
+      "code": "composition/ambiguous-corridor",
+      "severity": "error",
+      "message": "[composition/ambiguous-corridor] showcase workflow edges[13] id \"gate_active\" \"gate\" -> \"active\" shares a 12px corridor with edges[14] id \"gate_hold\" \"gate\" -> \"hold\" at [1257.5, 730] -> [1269.5, 730] (segments 1 and 1; minimum 8px) — adjust route/via, bias, or channel coordinates so unrelated edges do not visually merge.",
+      "subject": {
+        "diagramType": "workflow",
+        "collection": "edges",
+        "index": 13,
+        "id": "gate_active",
+        "from": "gate",
+        "to": "active"
+      },
+      "evidence": {
+        "otherRelationship": {
+          "diagramType": "workflow",
+          "collection": "edges",
+          "index": 14,
+          "id": "gate_hold",
+          "from": "gate",
+          "to": "hold"
+        },
+        "overlapLengthPx": 12,
+        "minimumPx": 8,
+        "from": [
+          1257.5,
+          730
+        ],
+        "to": [
+          1269.5,
+          730
+        ],
+        "segmentIndex": 1,
+        "otherSegmentIndex": 1
+      },
+      "supportedFixes": [
+        "adjust route/via, bias, or channel coordinates so unrelated edges do not visually merge"
+      ]
+    },
+    {
+      "code": "composition/ambiguous-corridor",
+      "severity": "error",
+      "message": "[composition/ambiguous-corridor] showcase workflow edges[18] id \"pool_exemplar\" \"pool\" -> \"exemplar\" shares a 530.1px corridor with edges[23] id \"threshold_draft\" \"threshold\" -> \"draft\" at [807.9, 466] -> [1338, 466] (segments 3 and 3; minimum 8px) — adjust route/via, bias, or channel coordinates so unrelated edges do not visually merge.",
+      "subject": {
+        "diagramType": "workflow",
+        "collection": "edges",
+        "index": 18,
+        "id": "pool_exemplar",
+        "from": "pool",
+        "to": "exemplar"
+      },
+      "evidence": {
+        "otherRelationship": {
+          "diagramType": "workflow",
+          "collection": "edges",
+          "index": 23,
+          "id": "threshold_draft",
+          "from": "threshold",
+          "to": "draft"
+        },
+        "overlapLengthPx": 530.1,
+        "minimumPx": 8,
+        "from": [
+          807.9,
+          466
+        ],
+        "to": [
+          1338,
+          466
+        ],
+        "segmentIndex": 3,
+        "otherSegmentIndex": 3
+      },
+      "supportedFixes": [
+        "adjust route/via, bias, or channel coordinates so unrelated edges do not visually merge"
+      ]
+    },
+    {
+      "code": "composition/ambiguous-corridor",
+      "severity": "error",
+      "message": "[composition/ambiguous-corridor] showcase workflow edges[2] id \"approval_hold\" \"approval\" -> \"hold\" shares a 118.3px corridor with edges[14] id \"gate_hold\" \"gate\" -> \"hold\" at [1032.9, 862] -> [1151.2, 862] (segments 2 and 3; minimum 8px) — adjust route/via, bias, or channel coordinates so unrelated edges do not visually merge.",
+      "subject": {
+        "diagramType": "workflow",
+        "collection": "edges",
+        "index": 2,
+        "id": "approval_hold",
+        "from": "approval",
+        "to": "hold"
+      },
+      "evidence": {
+        "otherRelationship": {
+          "diagramType": "workflow",
+          "collection": "edges",
+          "index": 14,
+          "id": "gate_hold",
+          "from": "gate",
+          "to": "hold"
+        },
+        "overlapLengthPx": 118.3,
+        "minimumPx": 8,
+        "from": [
+          1032.9,
+          862
+        ],
+        "to": [
+          1151.2,
+          862
+        ],
+        "segmentIndex": 2,
+        "otherSegmentIndex": 3
+      },
+      "supportedFixes": [
+        "adjust route/via, bias, or channel coordinates so unrelated edges do not visually merge"
+      ]
+    }
+  ],
+  "diagnosticSummary": {
+    "total": 10,
+    "shown": 8,
+    "truncated": true
+  },
+  "evidence": {
+    "receipt": "/Users/vqd/SUDO_PROJECT_MAIN/evaluation/output/archify-evaluation/evaluation.finalize.json",
+    "summaryReceipt": "/Users/vqd/SUDO_PROJECT_MAIN/evaluation/output/archify-evaluation/evaluation.finalize-summary.json"
+  },
+  "update": {
+    "status": "unavailable",
+    "installedVersion": null,
+    "availableVersion": null,
+    "releaseNotes": null,
+    "checkedAt": null,
+    "source": null,
+    "noticeRequired": false,
+    "noticeText": null,
+    "reason": "cache-unavailable"
+  },
+  "visualReview": "not-requested",
+  "durationMs": 408,
+  "nextAction": {
+    "action": "edit-in-place",
+    "candidate": "/Users/vqd/SUDO_PROJECT_MAIN/evaluation/output/archify-evaluation/evaluation.workflow.json",
+    "constraint": "Preserve unaffected semantics and geometry; do not replace the whole candidate.",
+    "then": "finalize-once"
+  }
+}

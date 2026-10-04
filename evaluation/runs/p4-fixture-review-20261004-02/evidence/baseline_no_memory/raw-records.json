@@ -1,0 +1,1040 @@
+[
+  {
+    "recorded_at": "2026-10-04T13:23:44.576342+00:00",
+    "kind": "adapter_message",
+    "context": null,
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "binding",
+    "data": {
+      "type": "bound",
+      "capabilities": [
+        "after_call_barrier",
+        "briefs",
+        "business_tools",
+        "memory_isolation",
+        "memory_read_gate",
+        "snapshots",
+        "timestamps",
+        "usage"
+      ],
+      "retry": {
+        "agent": 0,
+        "tool": 0
+      },
+      "code_sha256": "4edbd47919f9eb486cde5680f61041ec1b90c8a53aff84f590067290308975ab",
+      "pid": 55283
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.578045+00:00",
+    "kind": "hook_request",
+    "context": null,
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "open_scenario",
+    "data": {
+      "hook": "open_scenario",
+      "args": [
+        {
+          "run_id": "FIXTURE-R0",
+          "config": "baseline_no_memory",
+          "scenario_id": "FIXTURE-M1",
+          "namespace": "fixture/baseline/FIXTURE-R0/FIXTURE-M1",
+          "reference_date": "2026-10-15",
+          "timezone": "Asia/Ho_Chi_Minh",
+          "memory_read_previous": false,
+          "seed_history": [],
+          "configuration": {
+            "model": "fixture-no-model",
+            "parameters": {
+              "temperature": 0
+            },
+            "hardware": "fixture",
+            "prompt": {
+              "path": "sources/btc/policy/playbook-telesale.md",
+              "sha256": "ca74b496676a1bf88c7d0caf36cfaada69c9f9003045c98055426f259a0fae0d",
+              "pointer": ""
+            },
+            "tools": {
+              "path": "sources/btc/schemas/tools.schema.json",
+              "sha256": "4cc8935e3e7f1a37b43eab0d68d85e8383037e52423e9f7cc022da916c97d4e0",
+              "pointer": ""
+            },
+            "kb": {
+              "path": "sources/btc/policy/faq.md",
+              "sha256": "1c9874be840123bf19c30f87d29ab0ededdfd1b1a50c6d7417d1acadea4f1f60",
+              "pointer": ""
+            }
+          },
+          "resources": {
+            "prompt": "# Playbook telesale — xử lý phản đối & quy tắc phát ngôn (Shop BTC, 10/2026)\n\nPlaybook là hướng dẫn cho nhân viên và agent. Nó **không** chứa giá/chính sách; các con số phải lấy từ catalog và tài liệu chính sách.\n\n## [PB-01] Nguyên tắc mở đầu với khách gọi lại\nChào bằng tên và xưng hô đã lưu; nhắc lại tối đa **2 thông tin** liên quan nhất của phiên trước (sản phẩm + rào cản) dưới dạng câu xác nhận; không đọc lại toàn bộ hồ sơ. Nếu Call Brief không khớp với điều khách đang nói (khách hỏi ngành hàng khác, xưng tên khác), hỏi xác nhận danh tính một câu trước khi tiếp tục.\n\n## [PB-02] Phản đối \"đắt quá\"\nKhông so giá với đối thủ, không xác nhận hay phủ nhận giá đối thủ khách nêu. Trả lời bằng giá trị đi kèm có trong tài liệu: bảo hành, đổi trả, quà tặng, giao lắp, chính hãng. Nếu khách vẫn muốn giảm: nêu chương trình hiện hành (nếu có); không hứa mức giảm ngoài chương trình; đơn số lượng lớn → \"em xin phép chuyển quản lý xem xét và báo lại trong ngày\".\n\n## [PB-03] Phản đối \"để hỏi người nhà\"\nXác nhận thời điểm gọi lại cụ thể (ngày + khung giờ), ghi lịch bằng `schedule.callback`; nhắc thời hạn khuyến mãi nếu có (chỉ chương trình đang hiệu lực). Không tạo áp lực giả (\"chỉ còn 1 máy\") khi tồn kho không xác nhận điều đó.\n\n## [PB-04] Phản đối \"bên kia rẻ hơn\"\nNhư PB-02. Tuyệt đối không nói xấu đối thủ, không nói \"hàng bên đó là hàng giả\".\n\n## [PB-05] Khách hỏi ngoài tài liệu\nTrả lời \"hiện em chưa có thông tin về…\", ghi nhận câu hỏi, hẹn phản hồi qua kênh khách chọn. Không suy đoán thông số, xuất xứ, tác dụng y tế.\n\n## [PB-06] Câu hỏi y tế / an toàn cho trẻ / thuốc\nKhông tư vấn. Chuyển máy cho dược sĩ/nhân viên phụ trách với handoff brief. Với sản phẩm mẹ & bé, chỉ nêu thông số hãng công bố.\n\n## [PB-07] Khách hỏi \"em là người hay máy?\"\nTrả lời trung thực là trợ lý ảo/AI của shop, có thể chuyển người thật nếu khách muốn. Không né tránh, không nói \"em là nhân viên\".\n\n## [PB-08] Thông tin cá nhân\nKhông đọc lại đầy đủ SĐT/địa chỉ/CCCD của khách ngoài mục đích xác nhận giao hàng; số CCCD, số tài khoản chỉ nhập vào biểu mẫu hệ thống, không nhắc lại thành lời, không ghi vào ghi chú. Khi khách yêu cầu xóa dữ liệu → làm theo QT-06.\n\n## [PB-09] Chốt đơn\nTrước khi gọi `order.create`: đọc lại một lần: sản phẩm (đúng biến thể), số lượng, giá cuối sau khuyến mãi, địa chỉ, phương thức thanh toán, thời gian giao dự kiến theo VC-01 (tính cả ngày nghỉ). Đơn trên 10 triệu không COD.\n\n## [PB-10] Khách giận / hết kiên nhẫn\nXin lỗi ngắn, đi thẳng vào việc, không hỏi thêm quá 1 câu xác nhận; nếu lỗi do shop (báo giá sai giữa các kênh) thì thừa nhận và giải thích ngắn gọn lý do (khuyến mãi theo thời điểm), không đổ lỗi cho khách.\n\n## [PB-11] Khách nhiều lần không mua\nSau 3 phiên không chốt: không gọi lại chủ động nữa trừ khi khách hẹn; ghi nhận \"pending queue\" và chỉ liên hệ khi có chương trình mới liên quan sản phẩm khách quan tâm.\n",
+            "tools": "{\n  \"description\": \"Schema chuẩn cho các tool mock. Nhóm PHẢI giữ đúng tên tool và tên tham số bắt buộc để script chấm của BTC đối chiếu được success_if (args_match). Được thêm tham số tùy chọn. Tool đánh dấu M2 không bắt buộc ở M1. Logic tham chiếu (giá sau KM, điều kiện KM, tồn kho theo ngày, giới hạn COD, dời lịch ngày nghỉ) nằm trong eval/mock_tools.py — kết quả của nhóm phải khớp trên cùng đầu vào. Mọi tool nhận thêm `on` (YYYY-MM-DD, ngày của cuộc gọi).\",\n  \"tools\": [\n    {\n      \"name\": \"crm.get_customer\",\n      \"level\": \"M1\",\n      \"description\": \"Tra khách theo SĐT hoặc định danh kênh. Trả về customer + danh sách session/order trước.\",\n      \"input\": {\n        \"phone\": \"string?\",\n        \"zalo_id\": \"string?\",\n        \"fb_id\": \"string?\"\n      },\n      \"output\": {\n        \"found\": \"boolean\",\n        \"customer_id\": \"string?\",\n        \"name\": \"string?\",\n        \"honorific\": \"string?\",\n        \"phone\": \"string?\",\n        \"identities\": \"object\",\n        \"orders\": \"array\",\n        \"ambiguous\": \"boolean — true khi SĐT thuộc ≥2 hồ sơ, kèm candidates[]\",\n        \"sessions\": \"array (phiên cũ, có date để xét TTL)\"\n      }\n    },\n    {\n      \"name\": \"catalog.search\",\n      \"level\": \"M1\",\n      \"description\": \"Tìm sản phẩm trong catalog/products.json.\",\n      \"input\": {\n        \"query\": \"string?\",\n        \"category\": \"string?\",\n        \"sku\": \"string?\",\n        \"max_price_vnd\": \"int?\",\n        \"min_room_area_m2\": \"int?\"\n      },\n      \"output\": {\n        \"items\": [\n          {\n            \"sku\": \"string\",\n            \"name\": \"string\",\n            \"list_price_vnd\": \"int\",\n            \"attributes\": \"object\",\n            \"variants\": \"array\"\n          }\n        ]\n      }\n    },\n    {\n      \"name\": \"inventory.check\",\n      \"level\": \"M1\",\n      \"description\": \"Kiểm tra tồn kho của SKU hoặc variant_sku.\",\n      \"input\": {\n        \"sku\": \"string\",\n        \"on\": \"date?\"\n      },\n      \"output\": {\n        \"sku\": \"string\",\n        \"in_stock\": \"boolean\",\n        \"qty\": \"int\",\n        \"restock_expected\": \"date? (khi hết hàng và có lịch về)\",\n        \"discontinued\": \"boolean?\",\n        \"successor_sku\": \"string?\"\n      }\n    },\n    {\n      \"name\": \"order.create\",\n      \"level\": \"M1\",\n      \"description\": \"Tạo đơn. args_match trong kịch bản đối chiếu sku và price_vnd (giá SAU khuyến mãi hợp lệ).\",\n      \"input\": {\n        \"customer_phone\": \"string\",\n        \"sku\": \"string\",\n        \"qty\": \"int\",\n        \"price_vnd\": \"int\",\n        \"promo_code\": \"string?\",\n        \"payment\": \"COD|bank|momo|zalopay\",\n        \"address\": \"string?\"\n      },\n      \"output\": {\n        \"order_id\": \"string\",\n        \"status\": \"created\",\n        \"error\": \"out_of_stock | price_mismatch | cod_limit_exceeded\",\n        \"estimated_delivery\": \"date (đã trừ CN + ngày nghỉ)\"\n      }\n    },\n    {\n      \"name\": \"pricing.get_quote\",\n      \"level\": \"M1 (khuyến nghị) / M2\",\n      \"description\": \"Trả giá cuối kèm KM còn hiệu lực tại ngày `on` (mặc định hôm nay). Ở M1 nhóm có thể gộp logic này vào catalog.search + promotions.json.\",\n      \"input\": {\n        \"sku\": \"string\",\n        \"on\": \"date?\",\n        \"qty\": \"int?\",\n        \"customer_phone\": \"string? (xét once_per_customer, requires_owned_sku)\",\n        \"address\": \"string? (xét region)\",\n        \"basket_skus\": \"array? (xét AIR-2ND-50)\"\n      },\n      \"output\": {\n        \"list_price_vnd\": \"int\",\n        \"final_price_vnd\": \"int\",\n        \"applied_promos\": \"array\",\n        \"expired_promos\": \"array\",\n        \"ineligible_promos\": \"array [{promo_code, reason}]\",\n        \"not_applied_exclusive\": \"array\",\n        \"freeship\": \"boolean\"\n      }\n    },\n    {\n      \"name\": \"order.status\",\n      \"level\": \"M2\",\n      \"input\": {\n        \"order_id\": \"string?\",\n        \"customer_phone\": \"string?\"\n      },\n      \"output\": {\n        \"orders\": \"array\"\n      }\n    },\n    {\n      \"name\": \"order.update\",\n      \"level\": \"M1 (bắt buộc với persona đổi size) / M2\",\n      \"description\": \"Đổi size/sản phẩm hoặc trả hàng theo chính sách DT-03/DT-07.\",\n      \"input\": {\n        \"order_id\": \"string\",\n        \"action\": \"exchange_size|exchange_product|return|update_address\",\n        \"new_variant_sku\": \"string?\",\n        \"reason\": \"string?\"\n      },\n      \"output\": {\n        \"order_id\": \"string\",\n        \"status\": \"string\",\n        \"fee_vnd\": \"int\"\n      }\n    },\n    {\n      \"name\": \"schedule.callback\",\n      \"level\": \"M1\",\n      \"description\": \"Đặt lịch gọi lại theo thời điểm khách nêu.\",\n      \"input\": {\n        \"customer_phone\": \"string\",\n        \"callback_at\": \"datetime\",\n        \"note\": \"string?\"\n      },\n      \"output\": {\n        \"callback_id\": \"string\",\n        \"moved_from\": \"datetime? — khi lịch rơi vào ngày nghỉ/ngoài giờ, mock tự dời và agent PHẢI báo khách\"\n      }\n    },\n    {\n      \"name\": \"handoff.transfer\",\n      \"level\": \"M1\",\n      \"description\": \"Chuyển máy cho người thật kèm HandoffBrief đúng schemas/handoff_brief.schema.json. Không cần routing thật; mock trả về ticket_id.\",\n      \"input\": {\n        \"brief\": \"HandoffBrief\"\n      },\n      \"output\": {\n        \"ticket_id\": \"string\",\n        \"status\": \"queued\"\n      }\n    },\n    {\n      \"name\": \"memory.read / memory.write\",\n      \"level\": \"M1 (qua mcp-memory)\",\n      \"description\": \"Đọc/ghi các tầng bộ nhớ. Không quy định schema; nhóm tự thiết kế nhưng phải log được provenance (fact đến từ session nào).\"\n    }\n  ]\n}",
+            "kb": "# FAQ tư vấn sản phẩm — Shop BTC (phiên bản 2026-10)\n\nĐây là tài liệu nghiệp vụ cho telesale. Agent chỉ được trả lời những gì có trong tài liệu này, catalog và promotions; câu hỏi ngoài phạm vi phải nói \"chưa có thông tin\" và ghi nhận lại.\n\n## [FAQ-01] Chọn máy lọc không khí theo diện tích phòng\nChọn máy có `room_area_m2` trong catalog **lớn hơn hoặc bằng** diện tích phòng thực tế. Phòng 20–25m²: AirPure X, AirPure Y, XM-4L (tối đa 43m² nhưng giá thấp hơn). Phòng 30–45m²: AirPure Pro, Xiaomi 4 Pro, Samsung AX40. Phòng dưới 15m² hoặc để bàn: AirPure Mini.\n\n## [FAQ-02] Nhà có trẻ nhỏ nên chọn máy nào\nƯu tiên máy có **khóa trẻ em** (`child_safe_lock: true`): AirPure Y, AirPure Pro, Samsung AX40. AirPure X không có khóa trẻ em nhưng có chế độ ngủ êm. Không có bằng chứng máy lọc không khí chữa bệnh; **không được** tư vấn máy có tác dụng y tế.\n\n## [FAQ-03] Máy lọc không khí lọc được gì\nHEPA H13 lọc bụi mịn PM2.5, phấn hoa, lông thú, vi khuẩn bám bụi. Than hoạt tính (AirPure Y, Samsung AX40) khử mùi, khói bếp, VOC nhẹ. Tài liệu **không có thông tin** về khí radon, formaldehyde ở nồng độ công nghiệp, hay xuất xứ màng lọc — agent phải nói không có thông tin.\n\n## [FAQ-04] Máy lọc không khí khác nhau giữa AirPure X và Y\nY có thêm than hoạt tính, app điều khiển, khóa trẻ em; giá cao hơn X 310.000đ theo catalog. Cùng dùng màng lọc thay thế SKU-AP-FLT-X.\n\n## [FAQ-05] Chọn máy lọc nước theo nguồn nước\nNước máy thành phố: RO 9 lõi (Karofi) hoặc UF Sunhouse là đủ. **Nước giếng khoan** hoặc nước nhiễm phèn/đá vôi: bắt buộc RO, khuyến nghị **RO 10 lõi (Kangaroo)** vì có lõi tiền xử lý bổ sung. Gia đình 4–6 người: RO công suất tiêu chuẩn đều đáp ứng.\n\n## [FAQ-06] Máy lọc nước RO có tốn điện, tốn nước không\nRO thải nước theo tỷ lệ khoảng 1:1 đến 1:2 (1 lít nước sạch thải 1–2 lít). Công suất điện 24–36W, chỉ chạy khi lọc. Máy UF không thải nước, không cần điện.\n\n## [FAQ-07] Nồi chiên không dầu: chọn dung tích\n2–3 người: 4L (Lock&Lock, Xiaomi 4.5L). 4–6 người: 6.2L (Philips). Nồi Philips có chế độ nướng bánh và sấy hoa quả; Xiaomi điều khiển qua app.\n\n## [FAQ-08] Quạt DC inverter khác gì quạt thường\nQuạt DC (Panasonic F-409) tiết kiệm điện 50–60%, êm hơn, có nhiều mức gió và điều khiển từ xa. Quạt Senko là quạt AC giá rẻ, không có remote.\n\n## [FAQ-09] Chọn size giày\nSize giày theo chiều dài bàn chân: 38 ↔ 24cm, 39 ↔ 24.5cm, 40 ↔ 25cm, 41 ↔ 25.5cm, 42 ↔ 26cm, 43 ↔ 26.5cm. Giày chạy bộ RunLite nên chọn **lớn hơn nửa size** so với giày thường. Giày trekking HikePro form rộng, chọn đúng size.\n\n## [FAQ-10] Giày còn size không\nKiểm tra bằng tool `inventory.check` với `variant_sku` (ví dụ `SKU-SN-RUN1-41-DEN`). **Không được** hứa còn hàng khi chưa gọi tool.\n\n## [FAQ-11] Máy hút sữa: chọn Spectra S1 hay Medela Swing Maxi\nSpectra S1 có pin sạc, hút đôi, êm, giá thấp hơn. Medela Swing Maxi nhỏ gọn, công nghệ 2-phase, phụ kiện dễ mua hơn. Cả hai đều hút đôi. Tài liệu không có thông tin y tế về sữa mẹ, thuốc, bệnh lý — mọi câu hỏi y tế phải **chuyển máy** cho nhân viên/dược sĩ phụ trách.\n\n## [FAQ-12] Xe đẩy Joie Pact và Combi Sugocal\nJoie Pact: gấp gọn một tay, nặng 6kg, chịu tải 22kg, dùng từ sơ sinh đến ~4 tuổi, có màu đen và xám. Combi Sugocal: 2 chiều (bé nhìn mẹ hoặc nhìn đường), chịu tải 15kg (~3 tuổi), nặng 5.2kg, màu navy và be. Cả hai đủ tiêu chuẩn lên máy bay hành lý xách tay theo hãng.\n\n## [FAQ-13] Ghế ngồi ô tô Chicco\nDùng cho bé 0–4 tuổi (đến 18kg), lắp bằng dây an toàn hoặc ISOFIX. Không có thông tin về khả năng tương thích với từng dòng xe cụ thể.\n\n## [FAQ-14] Khuyến mãi\nChỉ áp dụng khuyến mãi có trong `promotions.json` và **còn hiệu lực tại ngày báo giá**. Khuyến mãi đã hết hạn không được áp dụng lại dù khách đã được báo trước đó; nhân viên xin lỗi, giải thích, và giới thiệu khuyến mãi hiện hành nếu có. Không được tiết lộ khuyến mãi chưa bắt đầu (ví dụ 11/11). Khuyến mãi ghi `stackable: false` không cộng dồn với nhau; `stackable: true` (freeship, COD-0) cộng dồn với mọi khuyến mãi khác.\n\n## [FAQ-16] Sản phẩm ngừng bán\nAirPure X bản 2024 và RunLite 1 (2025) đã ngừng bán từ 01/06/2026 (changelog CL-05). Khách hỏi mua lại → giới thiệu sản phẩm thay thế (`successor_sku` trong catalog); khách đang dùng bản cũ vẫn mua được màng lọc SKU-AP-FLT-X và được tham gia thu cũ đổi mới TRADE-IN-AP (KM-09).\n\n## [FAQ-17] Hết hàng\nKhi tool `inventory.check` trả `in_stock: false`: không tạo đơn chờ, không hứa ngày về trừ khi có trong ghi chú nhập hàng (chỉ được nói **ngày dự kiến**, không nói số lượng hay nhà cung cấp); đề xuất sản phẩm tương đương còn hàng hoặc đặt lịch báo lại khi có hàng.\n\n## [FAQ-18] Combo\nCombo (SKU-BDL-*) là một SKU riêng, giá đã gồm tiết kiệm (`saving_vnd`); không áp thêm khuyến mãi của sản phẩm thành phần; bảo hành theo từng thành phần. Không tách combo để đổi trả một phần.\n\n## [FAQ-19] Mua nhiều máy lọc không khí\nHai máy trở lên trong cùng đơn: AIR-2ND-50 giảm 50% máy rẻ hơn (KM-05). Tổng đơn trên 10 triệu không COD (VC-03) → hướng dẫn chuyển khoản hoặc tách đơn theo QT-01.\n\n## [FAQ-15] Phạm vi tư vấn của agent\nAgent không tư vấn y tế, không so sánh với giá cụ thể của đối thủ (chỉ được nêu giá trị đi kèm: bảo hành, giao nhanh, đổi trả), không hứa thời gian giao ngoài chính sách VC-01, không tự tạo giảm giá. Nếu khách hỏi agent có phải người thật không: trả lời trung thực là trợ lý AI.\n"
+          },
+          "retry": {
+            "agent": 0,
+            "tool": 0
+          }
+        }
+      ]
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.578465+00:00",
+    "kind": "adapter_message",
+    "context": null,
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "open_scenario",
+    "data": {
+      "type": "result",
+      "hook": "open_scenario",
+      "result": null
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.578630+00:00",
+    "kind": "business_snapshot",
+    "context": null,
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "open_scenario",
+    "data": {
+      "phase": "seeded",
+      "state": {
+        "_ORDERS": {},
+        "_CALLBACKS": [],
+        "_TICKETS": [],
+        "_ONCE_USED": []
+      }
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.578693+00:00",
+    "kind": "hook_request",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_1",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "start_call",
+    "data": {
+      "hook": "start_call",
+      "args": [
+        {
+          "run_id": "FIXTURE-R0",
+          "config": "baseline_no_memory",
+          "scenario_id": "FIXTURE-M1",
+          "call": "call_1",
+          "turn": 1,
+          "on": "2026-10-15",
+          "timezone": "Asia/Ho_Chi_Minh",
+          "memory_read_previous": false,
+          "input_mode": "customer_turns",
+          "customer_phone": "0900000000",
+          "customer_name": "Khách mẫu",
+          "honorific": "chị"
+        }
+      ]
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.578870+00:00",
+    "kind": "adapter_message",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_1",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "start_call",
+    "data": {
+      "type": "tool",
+      "name": "crm.get_customer",
+      "args": {
+        "phone": "0900000000"
+      }
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.578889+00:00",
+    "kind": "tool_request",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_1",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "start_call",
+    "data": {
+      "type": "tool",
+      "name": "crm.get_customer",
+      "args": {
+        "phone": "0900000000"
+      }
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.579897+00:00",
+    "kind": "tool_audit",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_1",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "start_call",
+    "data": {
+      "raw_request": {
+        "op": "invoke",
+        "request": {
+          "name": "crm.get_customer",
+          "args": {
+            "phone": "0900000000"
+          }
+        },
+        "context": {
+          "run_id": "FIXTURE-R0",
+          "config": "baseline_no_memory",
+          "scenario_id": "FIXTURE-M1",
+          "call": "call_1",
+          "turn": 1
+        },
+        "on": "2026-10-15",
+        "event_id": "FIXTURE-R0/baseline_no_memory/FIXTURE-M1/call_1/1/1"
+      },
+      "event": {
+        "schema_version": "1.0.0",
+        "artifact_id": "FIXTURE-R0/baseline_no_memory/FIXTURE-M1/call_1/1/1",
+        "run_id": "FIXTURE-R0",
+        "context": {
+          "run_id": "FIXTURE-R0",
+          "config": "baseline_no_memory",
+          "scenario_id": "FIXTURE-M1",
+          "call": "call_1",
+          "turn": 1
+        },
+        "evidence_refs": [],
+        "event_id": "FIXTURE-R0/baseline_no_memory/FIXTURE-M1/call_1/1/1",
+        "request": {
+          "name": "crm.get_customer",
+          "args": {
+            "phone": "0900000000"
+          }
+        },
+        "on": "2026-10-15",
+        "started_at": "2026-10-04T13:23:44.579487+00:00",
+        "finished_at": "2026-10-04T13:23:44.579570+00:00",
+        "outcome": "success",
+        "result": {
+          "found": false
+        },
+        "error": null,
+        "side_effect": false,
+        "attempt": 1
+      },
+      "visible_result": {
+        "found": false
+      },
+      "effective_args": {
+        "phone": "0900000000"
+      },
+      "state_before": {
+        "_ORDERS": {},
+        "_CALLBACKS": [],
+        "_TICKETS": [],
+        "_ONCE_USED": []
+      },
+      "state_after": {
+        "_ORDERS": {},
+        "_CALLBACKS": [],
+        "_TICKETS": [],
+        "_ONCE_USED": []
+      },
+      "elapsed_ms": 0.0075830030255019665
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.579982+00:00",
+    "kind": "adapter_message",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_1",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "start_call",
+    "data": {
+      "type": "result",
+      "hook": "start_call",
+      "result": {
+        "customer_id": "FIXTURE-PROFILE-ONLY",
+        "memory_snapshot": {
+          "customer_id": "FIXTURE-PROFILE-ONLY",
+          "namespace": "fixture/baseline/FIXTURE-R0/FIXTURE-M1",
+          "facts": [],
+          "writes": []
+        },
+        "call_brief": null,
+        "identified_at": "2026-10-04T13:23:44.578754+00:00",
+        "brief_ready_at": "2026-10-04T13:23:44.579932+00:00"
+      }
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.580055+00:00",
+    "kind": "business_snapshot",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_1",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "start_call",
+    "data": {
+      "phase": "before_call",
+      "state": {
+        "_ORDERS": {},
+        "_CALLBACKS": [],
+        "_TICKETS": [],
+        "_ONCE_USED": []
+      }
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.580068+00:00",
+    "kind": "customer_input",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_1",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "run_turn",
+    "data": {
+      "text": "Chị cần máy cho phòng 25 m2.",
+      "input_field": "customer_turns"
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.580081+00:00",
+    "kind": "hook_request",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_1",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "run_turn",
+    "data": {
+      "hook": "run_turn",
+      "args": [
+        "Chị cần máy cho phòng 25 m2."
+      ]
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.580246+00:00",
+    "kind": "adapter_message",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_1",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "run_turn",
+    "data": {
+      "type": "result",
+      "hook": "run_turn",
+      "result": {
+        "agent_text": "Phòng chị bao nhiêu m²? Máy giá 5000000 đồng, giao 2 ngày.",
+        "mode": "nonstream",
+        "request_at": "2026-10-04T13:23:44.580108+00:00",
+        "first_token_at": "2026-10-04T13:23:44.580184+00:00",
+        "completed_at": "2026-10-04T13:23:44.580184+00:00",
+        "memory_snapshot": {
+          "customer_id": "FIXTURE-PROFILE-ONLY",
+          "namespace": "fixture/baseline/FIXTURE-R0/FIXTURE-M1",
+          "facts": [
+            {
+              "key": "room_area_m2",
+              "value": 25,
+              "customer_id": "FIXTURE-PROFILE-ONLY",
+              "source": {
+                "context": {
+                  "run_id": "FIXTURE-R0",
+                  "config": "baseline_no_memory",
+                  "scenario_id": "FIXTURE-M1",
+                  "call": "call_1",
+                  "turn": 1
+                },
+                "field": "customer_text"
+              },
+              "valid_from": "2026-10-15T00:00:00+07:00",
+              "valid_until": null,
+              "state": "active"
+            }
+          ],
+          "writes": [
+            {
+              "key": "room_area_m2",
+              "value": 25,
+              "customer_id": "FIXTURE-PROFILE-ONLY",
+              "source": {
+                "context": {
+                  "run_id": "FIXTURE-R0",
+                  "config": "baseline_no_memory",
+                  "scenario_id": "FIXTURE-M1",
+                  "call": "call_1",
+                  "turn": 1
+                },
+                "field": "customer_text"
+              },
+              "op": "set"
+            }
+          ]
+        },
+        "usage": null,
+        "usage_missing_reason": "Scripted fixture has no model billing measurements"
+      }
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.580272+00:00",
+    "kind": "hook_request",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_1",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "end_call",
+    "data": {
+      "hook": "end_call",
+      "args": []
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.580425+00:00",
+    "kind": "adapter_message",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_1",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "end_call",
+    "data": {
+      "type": "result",
+      "hook": "end_call",
+      "result": {
+        "completed": true,
+        "barrier_complete": true,
+        "memory_snapshot": {
+          "customer_id": "FIXTURE-PROFILE-ONLY",
+          "namespace": "fixture/baseline/FIXTURE-R0/FIXTURE-M1",
+          "facts": [
+            {
+              "key": "room_area_m2",
+              "value": 25,
+              "customer_id": "FIXTURE-PROFILE-ONLY",
+              "source": {
+                "context": {
+                  "run_id": "FIXTURE-R0",
+                  "config": "baseline_no_memory",
+                  "scenario_id": "FIXTURE-M1",
+                  "call": "call_1",
+                  "turn": 1
+                },
+                "field": "customer_text"
+              },
+              "valid_from": "2026-10-15T00:00:00+07:00",
+              "valid_until": null,
+              "state": "active"
+            }
+          ],
+          "writes": [
+            {
+              "key": "room_area_m2",
+              "value": 25,
+              "customer_id": "FIXTURE-PROFILE-ONLY",
+              "source": {
+                "context": {
+                  "run_id": "FIXTURE-R0",
+                  "config": "baseline_no_memory",
+                  "scenario_id": "FIXTURE-M1",
+                  "call": "call_1",
+                  "turn": 1
+                },
+                "field": "customer_text"
+              },
+              "op": "set"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.580480+00:00",
+    "kind": "business_snapshot",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_1",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "end_call",
+    "data": {
+      "phase": "after_call",
+      "state": {
+        "_ORDERS": {},
+        "_CALLBACKS": [],
+        "_TICKETS": [],
+        "_ONCE_USED": []
+      }
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.580499+00:00",
+    "kind": "hook_request",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_2",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "start_call",
+    "data": {
+      "hook": "start_call",
+      "args": [
+        {
+          "run_id": "FIXTURE-R0",
+          "config": "baseline_no_memory",
+          "scenario_id": "FIXTURE-M1",
+          "call": "call_2",
+          "turn": 1,
+          "on": "2026-10-17",
+          "timezone": "Asia/Ho_Chi_Minh",
+          "memory_read_previous": false,
+          "input_mode": "customer_turns",
+          "customer_phone": "0900000000",
+          "customer_name": "Khách mẫu",
+          "honorific": "chị"
+        }
+      ]
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.580552+00:00",
+    "kind": "adapter_message",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_2",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "start_call",
+    "data": {
+      "type": "tool",
+      "name": "crm.get_customer",
+      "args": {
+        "phone": "0900000000"
+      }
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.580561+00:00",
+    "kind": "tool_request",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_2",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "start_call",
+    "data": {
+      "type": "tool",
+      "name": "crm.get_customer",
+      "args": {
+        "phone": "0900000000"
+      }
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.581295+00:00",
+    "kind": "tool_audit",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_2",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "start_call",
+    "data": {
+      "raw_request": {
+        "op": "invoke",
+        "request": {
+          "name": "crm.get_customer",
+          "args": {
+            "phone": "0900000000"
+          }
+        },
+        "context": {
+          "run_id": "FIXTURE-R0",
+          "config": "baseline_no_memory",
+          "scenario_id": "FIXTURE-M1",
+          "call": "call_2",
+          "turn": 1
+        },
+        "on": "2026-10-17",
+        "event_id": "FIXTURE-R0/baseline_no_memory/FIXTURE-M1/call_2/1/2"
+      },
+      "event": {
+        "schema_version": "1.0.0",
+        "artifact_id": "FIXTURE-R0/baseline_no_memory/FIXTURE-M1/call_2/1/2",
+        "run_id": "FIXTURE-R0",
+        "context": {
+          "run_id": "FIXTURE-R0",
+          "config": "baseline_no_memory",
+          "scenario_id": "FIXTURE-M1",
+          "call": "call_2",
+          "turn": 1
+        },
+        "evidence_refs": [],
+        "event_id": "FIXTURE-R0/baseline_no_memory/FIXTURE-M1/call_2/1/2",
+        "request": {
+          "name": "crm.get_customer",
+          "args": {
+            "phone": "0900000000"
+          }
+        },
+        "on": "2026-10-17",
+        "started_at": "2026-10-04T13:23:44.580990+00:00",
+        "finished_at": "2026-10-04T13:23:44.580999+00:00",
+        "outcome": "success",
+        "result": {
+          "found": false
+        },
+        "error": null,
+        "side_effect": false,
+        "attempt": 1
+      },
+      "visible_result": {
+        "found": false
+      },
+      "effective_args": {
+        "phone": "0900000000"
+      },
+      "state_before": {
+        "_ORDERS": {},
+        "_CALLBACKS": [],
+        "_TICKETS": [],
+        "_ONCE_USED": []
+      },
+      "state_after": {
+        "_ORDERS": {},
+        "_CALLBACKS": [],
+        "_TICKETS": [],
+        "_ONCE_USED": []
+      },
+      "elapsed_ms": 0.0034999975468963385
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.581365+00:00",
+    "kind": "adapter_message",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_2",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "start_call",
+    "data": {
+      "type": "result",
+      "hook": "start_call",
+      "result": {
+        "customer_id": "FIXTURE-PROFILE-ONLY",
+        "memory_snapshot": {
+          "customer_id": "FIXTURE-PROFILE-ONLY",
+          "namespace": "fixture/baseline/FIXTURE-R0/FIXTURE-M1",
+          "facts": [],
+          "writes": []
+        },
+        "call_brief": null,
+        "identified_at": "2026-10-04T13:23:44.580534+00:00",
+        "brief_ready_at": "2026-10-04T13:23:44.581311+00:00"
+      }
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.581426+00:00",
+    "kind": "business_snapshot",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_2",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "start_call",
+    "data": {
+      "phase": "before_call",
+      "state": {
+        "_ORDERS": {},
+        "_CALLBACKS": [],
+        "_TICKETS": [],
+        "_ONCE_USED": []
+      }
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.581440+00:00",
+    "kind": "customer_input",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_2",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "run_turn",
+    "data": {
+      "text": "Chị gọi lại nhé.",
+      "input_field": "customer_turns"
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.581453+00:00",
+    "kind": "hook_request",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_2",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "run_turn",
+    "data": {
+      "hook": "run_turn",
+      "args": [
+        "Chị gọi lại nhé."
+      ]
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.581530+00:00",
+    "kind": "adapter_message",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_2",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "run_turn",
+    "data": {
+      "type": "result",
+      "hook": "run_turn",
+      "result": {
+        "agent_text": "Vẫn phòng 30 m² đúng không ạ? Vẫn phòng 30 m² đúng không ạ?",
+        "mode": "nonstream",
+        "request_at": "2026-10-04T13:23:44.581479+00:00",
+        "first_token_at": "2026-10-04T13:23:44.581483+00:00",
+        "completed_at": "2026-10-04T13:23:44.581483+00:00",
+        "memory_snapshot": {
+          "customer_id": "FIXTURE-PROFILE-ONLY",
+          "namespace": "fixture/baseline/FIXTURE-R0/FIXTURE-M1",
+          "facts": [
+            {
+              "key": "room_area_m2",
+              "value": 25,
+              "customer_id": "FIXTURE-PROFILE-ONLY",
+              "source": {
+                "context": {
+                  "run_id": "FIXTURE-R0",
+                  "config": "baseline_no_memory",
+                  "scenario_id": "FIXTURE-M1",
+                  "call": "call_1",
+                  "turn": 1
+                },
+                "field": "customer_text"
+              },
+              "valid_from": "2026-10-15T00:00:00+07:00",
+              "valid_until": null,
+              "state": "active"
+            }
+          ],
+          "writes": []
+        },
+        "usage": null,
+        "usage_missing_reason": "Scripted fixture has no model billing measurements"
+      }
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.581565+00:00",
+    "kind": "hook_request",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_2",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "end_call",
+    "data": {
+      "hook": "end_call",
+      "args": []
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.581665+00:00",
+    "kind": "adapter_message",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_2",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "end_call",
+    "data": {
+      "type": "result",
+      "hook": "end_call",
+      "result": {
+        "completed": true,
+        "barrier_complete": true,
+        "memory_snapshot": {
+          "customer_id": "FIXTURE-PROFILE-ONLY",
+          "namespace": "fixture/baseline/FIXTURE-R0/FIXTURE-M1",
+          "facts": [
+            {
+              "key": "room_area_m2",
+              "value": 25,
+              "customer_id": "FIXTURE-PROFILE-ONLY",
+              "source": {
+                "context": {
+                  "run_id": "FIXTURE-R0",
+                  "config": "baseline_no_memory",
+                  "scenario_id": "FIXTURE-M1",
+                  "call": "call_1",
+                  "turn": 1
+                },
+                "field": "customer_text"
+              },
+              "valid_from": "2026-10-15T00:00:00+07:00",
+              "valid_until": null,
+              "state": "active"
+            }
+          ],
+          "writes": []
+        }
+      }
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.581713+00:00",
+    "kind": "business_snapshot",
+    "context": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1",
+      "call": "call_2",
+      "turn": 1
+    },
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "end_call",
+    "data": {
+      "phase": "after_call",
+      "state": {
+        "_ORDERS": {},
+        "_CALLBACKS": [],
+        "_TICKETS": [],
+        "_ONCE_USED": []
+      }
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.581725+00:00",
+    "kind": "hook_request",
+    "context": null,
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "close_scenario",
+    "data": {
+      "hook": "close_scenario",
+      "args": []
+    }
+  },
+  {
+    "recorded_at": "2026-10-04T13:23:44.581760+00:00",
+    "kind": "adapter_message",
+    "context": null,
+    "scope": {
+      "run_id": "FIXTURE-R0",
+      "config": "baseline_no_memory",
+      "scenario_id": "FIXTURE-M1"
+    },
+    "phase": "close_scenario",
+    "data": {
+      "type": "result",
+      "hook": "close_scenario",
+      "result": null
+    }
+  }
+]

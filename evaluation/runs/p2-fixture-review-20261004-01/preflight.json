@@ -1,0 +1,124 @@
+{
+  "notice": "Planned-input validation only; no Agent/runner/A11 end-to-end PASS",
+  "asset_root": "/Users/vqd/SUDO_PROJECT_MAIN/evaluation/evaluation-contracts",
+  "validation": {
+    "schema_version": "1.0.0",
+    "artifact_id": "FIXTURE-R0/preflight",
+    "run_id": "FIXTURE-R0",
+    "status": {
+      "verdict": "PASS",
+      "completeness": "COMPLETE",
+      "reason_codes": []
+    },
+    "issues": [],
+    "coverage_refs": []
+  },
+  "manifest": {
+    "path": "fixtures/p2-manifest.json",
+    "sha256": "e9a0209c3ca08ebf704c581fe2cd8a64bf15174b4766672c944323fe341e2bf0",
+    "pointer": ""
+  },
+  "scope": {
+    "path": "fixtures/p1-scope.json",
+    "sha256": "a13d45792f07003f5287189c7b8583f9072ecb41408088402a813015aca087bd",
+    "pointer": ""
+  },
+  "configuration": {
+    "model": "fixture-no-model",
+    "parameters": {
+      "temperature": 0
+    },
+    "prompt": {
+      "path": "sources/btc/policy/playbook-telesale.md",
+      "sha256": "ca74b496676a1bf88c7d0caf36cfaada69c9f9003045c98055426f259a0fae0d",
+      "pointer": ""
+    },
+    "tools": {
+      "path": "sources/btc/schemas/tools.schema.json",
+      "sha256": "4cc8935e3e7f1a37b43eab0d68d85e8383037e52423e9f7cc022da916c97d4e0",
+      "pointer": ""
+    },
+    "kb": {
+      "path": "sources/btc/policy/faq.md",
+      "sha256": "1c9874be840123bf19c30f87d29ab0ededdfd1b1a50c6d7417d1acadea4f1f60",
+      "pointer": ""
+    },
+    "hardware": "fixture",
+    "extractor_version": "fixture-v1",
+    "judge_version": null
+  },
+  "warnings": [
+    "Below official dataset scale; development/fixture only, not official acceptance"
+  ],
+  "adapter": {
+    "kind": "test",
+    "entrypoint": "p2_fixture:factory",
+    "code": {
+      "path": "fixtures/p2-adapter.py",
+      "sha256": "17089d34d727e48f3189d2f87bb330c792cb4612bab67ad4f40c2ae142012ad1",
+      "pointer": ""
+    },
+    "capabilities": [
+      "after_call_barrier",
+      "briefs",
+      "business_tools",
+      "memory_isolation",
+      "memory_read_gate",
+      "snapshots",
+      "timestamps",
+      "usage"
+    ]
+  },
+  "execution_gate": {
+    "allowed": true,
+    "blocking_codes": [],
+    "nonblocking_dispute_codes": [],
+    "binding_verified": false,
+    "runtime_checks": "NOT_RUN_PREFLIGHT_ONLY",
+    "notice": "Input gate only; does not certify Agent/criteria or permit test fallback"
+  },
+  "coverage_plan": {
+    "calls": [
+      {
+        "scenario_id": "FIXTURE-M1",
+        "call": "call_1",
+        "on": "2026-10-15",
+        "expected_turns": 1,
+        "input_field": "customer_turns"
+      },
+      {
+        "scenario_id": "FIXTURE-M1",
+        "call": "call_2",
+        "on": "2026-10-17",
+        "expected_turns": 1,
+        "input_field": "customer_turns"
+      }
+    ],
+    "expected_trace_ids": [
+      "FIXTURE-R0/full/FIXTURE-M1/call_1/1",
+      "FIXTURE-R0/full/FIXTURE-M1/call_2/1",
+      "FIXTURE-R0/baseline_no_memory/FIXTURE-M1/call_1/1",
+      "FIXTURE-R0/baseline_no_memory/FIXTURE-M1/call_2/1"
+    ],
+    "asr_ids": [],
+    "rag_ids": []
+  },
+  "disputes": [],
+  "capabilities": {
+    "btc_worker": "IMPLEMENTED_COMPONENT_TESTS",
+    "runtime_memory_access_gate": "NOT_RUN",
+    "after_call_barrier": "NOT_BOUND_PREFLIGHT_ONLY",
+    "runtime_adapter": "NOT_BOUND_PREFLIGHT_ONLY"
+  },
+  "deferred": [
+    {
+      "id": "btc.validator",
+      "reason": "DEFERRED_BY_USER_2026_10_04"
+    },
+    {
+      "id": "btc.audio_segments",
+      "reason": "DEFERRED_BY_USER_2026_10_04"
+    }
+  ],
+  "btc_full_readiness": "INCOMPLETE"
+}

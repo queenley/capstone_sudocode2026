@@ -1,0 +1,66 @@
+{
+  "context": {
+    "run_id": "FIXTURE-R0",
+    "config": "full",
+    "scenario_id": "FIXTURE-M1",
+    "call": "call_1",
+    "turn": 1
+  },
+  "customer_text": "Chị cần máy cho phòng 25 m2.",
+  "agent_text": "Phòng chị bao nhiêu m²? Máy giá 5000000 đồng, giao 2 ngày.",
+  "customer_id": "FIXTURE-PROFILE-ONLY",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "FIXTURE-R0/full/FIXTURE-M1/call_1/1/1",
+      "run_id": "FIXTURE-R0",
+      "context": {
+        "run_id": "FIXTURE-R0",
+        "config": "full",
+        "scenario_id": "FIXTURE-M1",
+        "call": "call_1",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "ecfd9eac0f6ddbb29296c511458cd078ecc68a79a7d13a4d06eeb5ec38f6628e",
+          "pointer": "/7"
+        }
+      ],
+      "event_id": "FIXTURE-R0/full/FIXTURE-M1/call_1/1/1",
+      "request": {
+        "name": "crm.get_customer",
+        "args": {
+          "phone": "0900000000"
+        }
+      },
+      "on": "2026-10-15",
+      "started_at": "2026-10-04T13:23:43.974320+00:00",
+      "finished_at": "2026-10-04T13:23:43.974392+00:00",
+      "outcome": "success",
+      "result": {
+        "found": false
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"phone\": \"0900000000\"}, \"name\": \"crm.get_customer\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "ecfd9eac0f6ddbb29296c511458cd078ecc68a79a7d13a4d06eeb5ec38f6628e",
+      "pointer": "/10"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "ecfd9eac0f6ddbb29296c511458cd078ecc68a79a7d13a4d06eeb5ec38f6628e",
+      "pointer": "/12"
+    }
+  ]
+}

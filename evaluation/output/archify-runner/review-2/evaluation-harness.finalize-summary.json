@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "command": "finalize",
+  "status": "fail",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "/Users/vqd/SUDO_PROJECT_MAIN/evaluation/output/archify-runner/evaluation-harness.architecture.json",
+    "sha256": "4824cf64a1d13423217d2640b24e4da88587afd9b68ef33cf234750944dad12a",
+    "bytes": 11572
+  },
+  "artifact": {
+    "path": "/Users/vqd/SUDO_PROJECT_MAIN/evaluation/output/archify-runner/evaluation-harness.html",
+    "sha256": "6276aa6180211f17b348ef5b2104743b0875ab1de4935fff2ade8f70c59889cb",
+    "bytes": 792493
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "fail"
+  },
+  "failedStage": "browser-check",
+  "diagnostics": [
+    {
+      "code": "viewer/browser-check-runtime",
+      "severity": "error",
+      "message": "browser-check could not complete its Chrome inspection.",
+      "subject": {
+        "artifact": "/Users/vqd/SUDO_PROJECT_MAIN/evaluation/output/archify-runner/evaluation-harness.html"
+      },
+      "evidence": {
+        "reason": "Chrome DevTools read pipe failed: stream ended\nChrome process: still running.\nChrome transport: Node v20.20.2, libuv 1.46.0, darwin; pid=28416, exitCode=null, signalCode=null.\nChrome read pipe: readable=false, ended=true, destroyed=false, receivedBytes=0, messages=0, bufferedBytes=0.\nChrome write pipe: writable=true, ended=false, destroyed=false, completedWrites=1, writtenBytes=50, bufferedBytes=0."
+      },
+      "supportedFixes": [
+        "resolve the reported Chrome inspection error, then rerun browser-check"
+      ]
+    }
+  ],
+  "diagnosticSummary": {
+    "total": 1,
+    "shown": 1,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/Users/vqd/SUDO_PROJECT_MAIN/evaluation/output/archify-runner/review-2/evaluation-harness.finalize.json",
+    "summaryReceipt": "/Users/vqd/SUDO_PROJECT_MAIN/evaluation/output/archify-runner/review-2/evaluation-harness.finalize-summary.json",
+    "browserCheckReceipt": "/Users/vqd/SUDO_PROJECT_MAIN/evaluation/output/archify-runner/review-2/evaluation-harness.browser-check.json"
+  },
+  "update": {
+    "status": "unavailable",
+    "installedVersion": null,
+    "availableVersion": null,
+    "releaseNotes": null,
+    "checkedAt": null,
+    "source": null,
+    "noticeRequired": false,
+    "noticeText": null,
+    "reason": "cache-unavailable"
+  },
+  "visualReview": "not-requested",
+  "durationMs": 762
+}

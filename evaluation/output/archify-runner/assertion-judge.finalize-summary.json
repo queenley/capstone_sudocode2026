@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "command": "finalize",
+  "status": "fail",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "/Users/vqd/SUDO_PROJECT_MAIN/evaluation/output/archify-runner/assertion-judge.architecture.json",
+    "sha256": "10ba82c3b34567a73f507cac952f5b136fa55984493c5c09e00a06ece8f967d8",
+    "bytes": 10705
+  },
+  "artifact": {
+    "path": "/Users/vqd/SUDO_PROJECT_MAIN/evaluation/output/archify-runner/assertion-judge.html",
+    "sha256": "67ce3a271ecbb4b2e2abd9bb56098ef40492edfec1a936a1e461ce9f40f811e0",
+    "bytes": 784173
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "fail"
+  },
+  "failedStage": "browser-check",
+  "diagnostics": [
+    {
+      "code": "viewer/browser-check-runtime",
+      "severity": "error",
+      "message": "browser-check could not complete its Chrome inspection.",
+      "subject": {
+        "artifact": "/Users/vqd/SUDO_PROJECT_MAIN/evaluation/output/archify-runner/assertion-judge.html"
+      },
+      "evidence": {
+        "reason": "Chrome DevTools read pipe failed: stream ended\nChrome process: still running.\nChrome transport: Node v20.20.2, libuv 1.46.0, darwin; pid=28633, exitCode=null, signalCode=null.\nChrome read pipe: readable=false, ended=true, destroyed=false, receivedBytes=0, messages=0, bufferedBytes=0.\nChrome write pipe: writable=true, ended=false, destroyed=false, completedWrites=1, writtenBytes=50, bufferedBytes=0."
+      },
+      "supportedFixes": [
+        "resolve the reported Chrome inspection error, then rerun browser-check"
+      ]
+    }
+  ],
+  "diagnosticSummary": {
+    "total": 1,
+    "shown": 1,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/Users/vqd/SUDO_PROJECT_MAIN/evaluation/output/archify-runner/assertion-judge.finalize.json",
+    "summaryReceipt": "/Users/vqd/SUDO_PROJECT_MAIN/evaluation/output/archify-runner/assertion-judge.finalize-summary.json",
+    "browserCheckReceipt": "/Users/vqd/SUDO_PROJECT_MAIN/evaluation/output/archify-runner/assertion-judge.browser-check.json"
+  },
+  "update": {
+    "status": "unavailable",
+    "installedVersion": null,
+    "availableVersion": null,
+    "releaseNotes": null,
+    "checkedAt": null,
+    "source": null,
+    "noticeRequired": false,
+    "noticeText": null,
+    "reason": "cache-unavailable"
+  },
+  "visualReview": "not-requested",
+  "durationMs": 900
+}
