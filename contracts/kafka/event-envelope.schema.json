@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Telesales domain event",
+  "type": "object",
+  "required": ["id", "event_type", "aggregate_id", "payload", "version"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {"type": "string", "format": "uuid"},
+    "aggregate_id": {"type": "string", "format": "uuid"},
+    "event_type": {"enum": ["order.created", "order.cancelled", "identity.customer.verified", "identity.customer.deleted", "identity.staff.created", "identity.staff.disabled", "conversation.created", "conversation.ended", "conversation.claimed", "conversation.transferred", "handoff.requested", "feedback.created", "improvement.reviewed", "knowledge_gap.created"]},
+    "payload": {"type": "object"},
+    "version": {"const": 1}
+  }
+}

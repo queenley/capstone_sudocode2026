@@ -1,0 +1,235 @@
+name: telesales-ai
+x-runtime: &runtime
+  build:
+    context: .
+    dockerfile: packages/backend-common/Dockerfile
+  environment: &environment
+    DATABASE_URL: postgresql+psycopg://postgres:${POSTGRES_PASSWORD:-local-postgres-change-me}@postgres:5432/app_db
+    REDIS_URL: redis://redis:6379/0
+    APP_SECRET: ${APP_SECRET:-local-development-secret-change-before-deploy}
+    ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
+    ENVIRONMENT: ${ENVIRONMENT:-development}
+    ADMIN_TOKEN: ${ADMIN_TOKEN:-local-admin-change-me}
+    AGENT_TOKEN: ${AGENT_TOKEN:-local-agent-change-me}
+    SELLER_TOKEN: ${SELLER_TOKEN:-local-seller-change-me}
+    DEVELOPER_TOKEN: ${DEVELOPER_TOKEN:-local-developer-change-me}
+    TYPESAFE_API_KEY: ${TYPESAFE_API_KEY:-}
+    JEV_URL: ${JEV_URL:-https://api.typesafe.ai/v1/systemone}
+    LLM_API_KEY: ${LLM_API_KEY:-}
+    LLM_URL: ${LLM_URL:-}
+    LLM_MODEL: ${LLM_MODEL:-}
+    OTP_DELIVERY_URL: ${OTP_DELIVERY_URL:-}
+    OTP_DELIVERY_TOKEN: ${OTP_DELIVERY_TOKEN:-}
+    KAFKA_BROKERS: ${KAFKA_BROKERS:-}
+    KAFKA_LEGACY_TOPIC_MIRROR: ${KAFKA_LEGACY_TOPIC_MIRROR:-true}
+    QDRANT_URL: ${QDRANT_URL:-}
+    QDRANT_API_KEY: ${QDRANT_API_KEY:-}
+    EMBEDDING_URL: ${EMBEDDING_URL:-}
+    EMBEDDING_API_KEY: ${EMBEDDING_API_KEY:-}
+    EMBEDDING_MODEL: ${EMBEDDING_MODEL:-}
+    OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: app_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-postgres-change-me}
+    ports: ["127.0.0.1:5432:5432"]
+    volumes: ["postgres-data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d app_db"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  redis:
+    image: redis:7-alpine
+    ports: ["127.0.0.1:6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  seed:
+    <<: *runtime
+    command: ["python", "-m", "scripts.seed.catalog", "--dataset", "/app/data"]
+    restart: "no"
+  commerce-service:
+    build:
+      context: .
+      dockerfile: apps/commerce-service/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:${POSTGRES_PASSWORD:-local-postgres-change-me}@postgres:5432/app_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8100/health/ready')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  identity-service:
+    build:
+      context: .
+      dockerfile: apps/identity-service/Dockerfile
+    environment: *environment
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8200/health/ready')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  sales-service:
+    build:
+      context: .
+      dockerfile: apps/sales-service/Dockerfile
+    environment: *environment
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8300/health/ready')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  ai-agent-service:
+    build:
+      context: .
+      dockerfile: apps/ai-agent-service/Dockerfile
+    environment:
+      <<: *environment
+      # Models and routing are in apps/ai-agent-service/config/models.yaml;
+      # a provider is offered only when its key is set.
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      NVIDIA_API_KEY: ${NVIDIA_API_KEY:-}
+      AI_GATEWAY_API_KEY: ${AI_GATEWAY_API_KEY:-}
+      AGENT_DB_SCHEMA: ${AGENT_DB_SCHEMA:-agent}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+      LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL:-}
+      MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI:-}
+      MLFLOW_EXPERIMENT_NAME: ${MLFLOW_EXPERIMENT_NAME:-telesales-agent}
+    volumes:
+      - voice-models:/app/models
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8400/health/ready')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  api-gateway:
+    build:
+      context: .
+      dockerfile: apps/api-gateway/Dockerfile
+    environment:
+      COMMERCE_SERVICE_URL: http://commerce-service:8100
+      IDENTITY_SERVICE_URL: http://identity-service:8200
+      SALES_SERVICE_URL: http://sales-service:8300
+      AI_AGENT_SERVICE_URL: http://ai-agent-service:8400
+      REDIS_URL: redis://redis:6379/0
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+    ports: ["127.0.0.1:8000:8000"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+      commerce-service:
+        condition: service_healthy
+      identity-service:
+        condition: service_healthy
+      sales-service:
+        condition: service_healthy
+      ai-agent-service:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  commerce-events:
+    <<: *runtime
+    command: ["python", "-m", "src.messaging.worker", "--service", "commerce"]
+    restart: unless-stopped
+  identity-events:
+    <<: *runtime
+    command: ["python", "-m", "src.messaging.worker", "--service", "identity"]
+    restart: unless-stopped
+  sales-events:
+    <<: *runtime
+    command: ["python", "-m", "src.messaging.worker", "--service", "sales"]
+    restart: unless-stopped
+  ai-agent-events:
+    <<: *runtime
+    command: ["python", "-m", "src.messaging.worker", "--service", "ai-agent"]
+    restart: unless-stopped
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    environment:
+      BACKEND_URL: http://api-gateway:8000
+    ports: ["127.0.0.1:3000:3000"]
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+  kafka:
+    profiles: ["async"]
+    image: apache/kafka:3.9.1
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+  qdrant:
+    profiles: ["retrieval"]
+    image: qdrant/qdrant:v1.15.4
+    ports: ["127.0.0.1:6333:6333"]
+    volumes: ["qdrant-data:/qdrant/storage"]
+  mlflow:
+    profiles: ["tracking"]
+    image: ghcr.io/mlflow/mlflow:v3.16.1
+    command:
+      ["server", "--host", "0.0.0.0", "--port", "5000", "--backend-store-uri", "sqlite:////mlflow/mlflow.db", "--default-artifact-root", "file:///mlflow/artifacts", "--allowed-hosts", "mlflow:5000,localhost:5000,127.0.0.1:5000"]
+    ports: ["127.0.0.1:5000:5000"]
+    volumes: ["mlflow-data:/mlflow"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  postgres-data:
+  qdrant-data:
+  mlflow-data:
+  voice-models:

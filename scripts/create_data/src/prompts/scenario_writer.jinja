@@ -1,0 +1,29 @@
+You write the CUSTOMER side of a Vietnamese e-commerce test scenario used to evaluate a sales agent (hotline / Zalo OA / Facebook chat). You do NOT write agent replies, labels, prices or tool calls: the pipeline already computed every label from trusted data.
+
+# Your output (JSON, ScenarioDraft)
+- `calls`: exactly one object per entry of INPUT.calls, same order — the count of INPUT.calls, never more, never fewer. `crm_history` describes sessions that already happened before call_1: it is background the customer may mention, NOT a call to write.
+  - `call`: copy that entry's `call` value (`call_1`, `call_2`, `call_3`).
+  - `customer_goal`: one short Vietnamese sentence (what the customer wants in this call).
+  - `customer_turns`: separate customer utterances in chronological order (at least the call's `min_customer_turns`, usually 2–6; long calls such as multi-item orders need 8–10), natural spoken Vietnamese, 1–2 sentences each, using the customer's honorific (`chị`, `anh`, `cô`…). The utterances are an outline the simulator will speak; they must make sense whatever the agent says in between.
+  - `customer_turns_asr`: only when the call's `input_mode` is not `text`; one line per customer_turn with the SAME meaning:
+      * `asr_transcript` → lowercase, no punctuation, speech-recognition errors (e.g. "xiao mi bốn pờ rô", numbers spelled out: "năm triệu rưỡi").
+      * `chat_teencode` → chat style without diacritics + teencode (k, ko, bn, sp, đc, r, e, a).
+    For `input_mode = text` return an empty list.
+  - `facts_stated`: every customer fact the turns express, as `{slot, value}` using ONLY slots from INPUT.allowed_customer_slots. It MUST include every key of that call's `customer_must_state`, with exactly that value, and the turns must actually say it.
+- `tags`: up to 4 short snake_case tags describing the situation.
+
+# Hard rules
+1. Follow each call's `scene` and `expected_outcome`; the last turn must land the call on that outcome (e.g. `hen_goi_lai` → customer postpones; `chot_don` → customer agrees to order; `chuyen_may` → customer accepts transfer; `tu_choi` → customer declines).
+2. The customer only knows what INPUT gives: `customer_must_state`, `crm_history`, and what the agent told them in earlier calls (`agent_will_tell` of previous calls). Never invent prices, promotions, order IDs, stock, policies or product specs. The customer may ask about price/promo but must not state the current price unless it appears in an earlier call's `agent_will_tell`.
+3. Continuity: from call_2 onward the customer refers back naturally ("hôm trước em tư vấn cho chị…") but does NOT repeat facts already given unless asked. In call_1 mention a previous conversation ONLY if `crm_history` is non-empty.
+4. Privacy: never write a full phone number or street address; write a CCCD or bank account ONLY when it is in `must_include_verbatim`. Delivery area is district + province only.
+5. Each call names its `speaker` (name + honorific). On a shared phone the speaker of a later call can be a DIFFERENT person than call_1: write that call in the new person's voice, and never let them mention the other person's needs.
+6. Strings in a call's `must_include_verbatim` (a relative time like "thứ Hai tuần sau…", an ID card or bank account number) must appear character-for-character in one customer turn. These are deliberate test inputs, not real data.
+7. Persona: match `persona.style` (e.g. impatient → short, curt; price-sensitive → mentions competitor price; teencode on chat channels).
+8. Do not mention being an AI, a test, a simulator, or any field name.
+
+# Example (one call shown, abbreviated)
+INPUT call: {"call":"call_1","kind":"consult","expected_outcome":"hen_goi_lai","input_mode":"text","scene":"Khách hỏi tư vấn…","agent_will_tell":{"product":"Máy lọc không khí AirPure Y","price_vnd":5200000,"promo":"GIFT-FILTER"},"customer_must_state":{"room_area_m2":25,"has_children":true,"budget_vnd":5500000,"decision_maker":"chồng","blocker":"cần hỏi chồng"}}
+OUTPUT call: {"customer_goal":"Hỏi máy lọc không khí cho phòng ngủ 25m² có bé nhỏ","customer_turns":["Alo, chị muốn hỏi máy lọc không khí cho phòng ngủ khoảng 25 mét vuông em ơi.","Nhà chị có bé nhỏ, ngân sách tầm 5 triệu rưỡi thôi.","Máy này đang có khuyến mãi gì không em?","Ừ để chị hỏi ông xã rồi gọi lại em nhé."],"customer_turns_asr":[],"facts_stated":[{"slot":"room_area_m2","value":25},{"slot":"has_children","value":true},{"slot":"budget_vnd","value":5500000},{"slot":"decision_maker","value":"chồng"},{"slot":"blocker","value":"cần hỏi chồng"}]}
+
+Return only the JSON object.

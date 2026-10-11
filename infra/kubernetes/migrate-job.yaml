@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: telesales-migrate
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext: {runAsNonRoot: true, runAsUser: 1000}
+      containers:
+        - name: migrate
+          image: telesales-backend-common:dev
+          command: [python, -c, 'import os; from src.db.session import Database; Database(os.environ["MIGRATION_DATABASE_URL"]).migrate()']
+          env:
+            - name: MIGRATION_DATABASE_URL
+              valueFrom:
+                secretKeyRef: {name: telesales-migration-secrets, key: MIGRATION_DATABASE_URL}
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: '1', memory: 512Mi}

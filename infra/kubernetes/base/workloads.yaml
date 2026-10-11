@@ -1,0 +1,341 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: commerce-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: telesales-commerce}
+  template:
+    metadata:
+      labels: {app: telesales-commerce}
+    spec:
+      securityContext: {runAsNonRoot: true, runAsUser: 1000, fsGroup: 1000}
+      containers:
+        - name: commerce-service
+          image: telesales-commerce:dev
+          ports: [{containerPort: 8100}]
+          envFrom:
+            - configMapRef: {name: telesales-config}
+            - secretRef: {name: telesales-secrets}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 100m, memory: 192Mi}
+            limits: {cpu: '1', memory: 512Mi}
+          readinessProbe:
+            httpGet: {path: /health/ready, port: 8100}
+          livenessProbe:
+            httpGet: {path: /health, port: 8100}
+          volumeMounts: [{name: tmp, mountPath: /tmp}]
+      volumes: [{name: tmp, emptyDir: {}}]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: telesales-gateway}
+  template:
+    metadata:
+      labels: {app: telesales-gateway}
+    spec:
+      securityContext: {runAsNonRoot: true, runAsUser: 1000, fsGroup: 1000}
+      containers:
+        - name: api-gateway
+          image: telesales-gateway:dev
+          ports: [{containerPort: 8000}]
+          envFrom:
+            - configMapRef: {name: telesales-config}
+          env:
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef: {name: telesales-secrets, key: REDIS_URL}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: '1', memory: 384Mi}
+          readinessProbe:
+            httpGet: {path: /health/ready, port: 8000}
+          livenessProbe:
+            httpGet: {path: /health, port: 8000}
+          volumeMounts: [{name: tmp, mountPath: /tmp}]
+      volumes: [{name: tmp, emptyDir: {}}]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: identity-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: telesales-identity}
+  template:
+    metadata:
+      labels: {app: telesales-identity}
+    spec:
+      securityContext: {runAsNonRoot: true, runAsUser: 1000, fsGroup: 1000}
+      containers:
+        - name: identity-service
+          image: telesales-identity:dev
+          ports: [{containerPort: 8200}]
+          envFrom:
+            - configMapRef: {name: telesales-config}
+            - secretRef: {name: telesales-secrets}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 100m, memory: 192Mi}
+            limits: {cpu: '1', memory: 512Mi}
+          readinessProbe:
+            httpGet: {path: /health/ready, port: 8200}
+          livenessProbe:
+            httpGet: {path: /health, port: 8200}
+          volumeMounts: [{name: tmp, mountPath: /tmp}]
+      volumes: [{name: tmp, emptyDir: {}}]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sales-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: telesales-sales}
+  template:
+    metadata:
+      labels: {app: telesales-sales}
+    spec:
+      securityContext: {runAsNonRoot: true, runAsUser: 1000, fsGroup: 1000}
+      containers:
+        - name: sales-service
+          image: telesales-sales:dev
+          ports: [{containerPort: 8300}]
+          envFrom:
+            - configMapRef: {name: telesales-config}
+            - secretRef: {name: telesales-secrets}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 100m, memory: 192Mi}
+            limits: {cpu: '1', memory: 512Mi}
+          readinessProbe:
+            httpGet: {path: /health/ready, port: 8300}
+          livenessProbe:
+            httpGet: {path: /health, port: 8300}
+          volumeMounts: [{name: tmp, mountPath: /tmp}]
+      volumes: [{name: tmp, emptyDir: {}}]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-agent-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: telesales-ai-agent}
+  template:
+    metadata:
+      labels: {app: telesales-ai-agent}
+    spec:
+      securityContext: {runAsNonRoot: true, runAsUser: 1000, fsGroup: 1000}
+      containers:
+        - name: ai-agent-service
+          image: telesales-ai-agent:dev
+          ports: [{containerPort: 8400}]
+          envFrom:
+            - configMapRef: {name: telesales-config}
+            - secretRef: {name: telesales-secrets}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          # The API process plus its five MCP server subprocesses; voice models add ~1.5Gi.
+          resources:
+            requests: {cpu: 500m, memory: 1Gi}
+            limits: {cpu: '2', memory: 3Gi}
+          readinessProbe:
+            httpGet: {path: /health/ready, port: 8400}
+          livenessProbe:
+            httpGet: {path: /health, port: 8400}
+            initialDelaySeconds: 20
+          # The root filesystem is read-only: voice weights (downloaded once at
+          # start) and call recordings need writable mounts. Use a PVC for
+          # voice-models in production so pods do not re-download on restart.
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+            - {name: voice-models, mountPath: /app/models}
+            - {name: runs, mountPath: /app/agent/runs}
+      volumes:
+        - {name: tmp, emptyDir: {}}
+        - {name: voice-models, emptyDir: {}}
+        - {name: runs, emptyDir: {}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: commerce-events
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: telesales-commerce-events}
+  template:
+    metadata:
+      labels: {app: telesales-commerce-events}
+    spec:
+      securityContext: {runAsNonRoot: true, runAsUser: 1000, fsGroup: 1000}
+      containers:
+        - name: commerce-events
+          image: telesales-backend-common:dev
+          command: [python, -m, src.messaging.worker, --service, commerce]
+          envFrom:
+            - configMapRef: {name: telesales-config}
+            - secretRef: {name: telesales-secrets}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits: {cpu: '1', memory: 512Mi}
+          volumeMounts: [{name: tmp, mountPath: /tmp}]
+      volumes: [{name: tmp, emptyDir: {}}]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: identity-events
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: telesales-identity-events}
+  template:
+    metadata:
+      labels: {app: telesales-identity-events}
+    spec:
+      securityContext: {runAsNonRoot: true, runAsUser: 1000, fsGroup: 1000}
+      containers:
+        - name: identity-events
+          image: telesales-backend-common:dev
+          command: [python, -m, src.messaging.worker, --service, identity]
+          envFrom:
+            - configMapRef: {name: telesales-config}
+            - secretRef: {name: telesales-secrets}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 100m, memory: 192Mi}
+            limits: {cpu: '1', memory: 512Mi}
+          volumeMounts: [{name: tmp, mountPath: /tmp}]
+      volumes: [{name: tmp, emptyDir: {}}]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sales-events
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: telesales-sales-events}
+  template:
+    metadata:
+      labels: {app: telesales-sales-events}
+    spec:
+      securityContext: {runAsNonRoot: true, runAsUser: 1000, fsGroup: 1000}
+      containers:
+        - name: sales-events
+          image: telesales-backend-common:dev
+          command: [python, -m, src.messaging.worker, --service, sales]
+          envFrom:
+            - configMapRef: {name: telesales-config}
+            - secretRef: {name: telesales-secrets}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 100m, memory: 192Mi}
+            limits: {cpu: '1', memory: 512Mi}
+          volumeMounts: [{name: tmp, mountPath: /tmp}]
+      volumes: [{name: tmp, emptyDir: {}}]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-agent-events
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: telesales-ai-agent-events}
+  template:
+    metadata:
+      labels: {app: telesales-ai-agent-events}
+    spec:
+      securityContext: {runAsNonRoot: true, runAsUser: 1000, fsGroup: 1000}
+      containers:
+        - name: ai-agent-events
+          image: telesales-backend-common:dev
+          command: [python, -m, src.messaging.worker, --service, ai-agent]
+          envFrom:
+            - configMapRef: {name: telesales-config}
+            - secretRef: {name: telesales-secrets}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 100m, memory: 192Mi}
+            limits: {cpu: '1', memory: 512Mi}
+          volumeMounts: [{name: tmp, mountPath: /tmp}]
+      volumes: [{name: tmp, emptyDir: {}}]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: telesales-web}
+  template:
+    metadata:
+      labels: {app: telesales-web}
+    spec:
+      securityContext: {runAsNonRoot: true, runAsUser: 1000, fsGroup: 1000}
+      containers:
+        - name: web
+          image: telesales-web:dev
+          ports: [{containerPort: 3000}]
+          env:
+            - name: BACKEND_URL
+              value: http://api-gateway:8000
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: '1', memory: 512Mi}
+          readinessProbe:
+            httpGet: {path: /, port: 3000}
+          livenessProbe:
+            httpGet: {path: /, port: 3000}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+            - {name: cache, mountPath: /app/.next/cache}
+      volumes:
+        - {name: tmp, emptyDir: {}}
+        - {name: cache, emptyDir: {}}

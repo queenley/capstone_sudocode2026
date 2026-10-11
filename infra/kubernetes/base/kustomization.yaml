@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - workloads.yaml
+  - services.yaml
+configMapGenerator:
+  - name: telesales-config
+    literals:
+      - ENVIRONMENT=production
+      - AUTO_MIGRATE=false
+      - BACKEND_URL=http://api-gateway:8000
+      - COMMERCE_SERVICE_URL=http://commerce-service:8100
+      - IDENTITY_SERVICE_URL=http://identity-service:8200
+      - SALES_SERVICE_URL=http://sales-service:8300
+      - AI_AGENT_SERVICE_URL=http://ai-agent-service:8400
+      - AGENT_DB_SCHEMA=agent
+      - KAFKA_LEGACY_TOPIC_MIRROR=true
+      - CORS_ORIGINS=https://example.invalid
