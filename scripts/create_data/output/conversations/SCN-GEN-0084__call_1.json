@@ -1,0 +1,101 @@
+{
+  "conversation_id": "SCN-GEN-0084__call_1",
+  "scenario_id": "SCN-GEN-0084",
+  "call": "call_1",
+  "customer_id": "C008",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-31",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chào anh Long! Em là trợ lý ảo của shop BTC. Anh muốn hỏi về xe đẩy gấp gọn Joie Pact, đúng không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Xe đẩy Joie Pact hiện có giá là 3.490.000đ ạ. Anh có muốn biết thêm thông tin gì khác không?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Hiện tại, sản phẩm này có khuyến mãi miễn phí vận chuyển với mã MOM-FREESHIP, nhưng không có khuyến mãi nào khác đang áp dụng ạ. Nếu anh cần thêm thông tin gì, em sẵn lòng hỗ trợ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em hiểu ạ, anh đang chờ cuối tháng nhận lương để mua. Anh có muốn em hẹn gọi lại cho anh sau không ạ?",
+      "questions": [
+        {
+          "slot": "callback_time",
+          "type": "open",
+          "text": "Anh muốn hẹn lại lúc nào ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": {
+      "date": "2026-11-01",
+      "time": "09:00"
+    },
+    "order": null
+  }
+}

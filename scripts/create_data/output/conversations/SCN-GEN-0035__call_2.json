@@ -1,0 +1,130 @@
+{
+  "conversation_id": "SCN-GEN-0035__call_2",
+  "scenario_id": "SCN-GEN-0035",
+  "call": "call_2",
+  "customer_id": "SYN-C002",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-18",
+  "region": "trung",
+  "category": "unknown",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào Ms. Trần Thị B, em gọi lại về đơn hàng của chị ạ. Chị muốn đổi địa chỉ giao hàng cho đơn hàng O004 đúng không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Chị muốn đổi địa chỉ giao hàng cho đơn hàng O004 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "O004"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, em.",
+      "facts_stated": {
+        "order_id": "O004"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị đã xác nhận. Chị muốn chuyển địa chỉ tới Hải Châu, Đà Nẵng, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Chị muốn chuyển địa chỉ tới Hải Châu, Đà Nẵng đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi.",
+      "facts_stated": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận địa chỉ mới là Hải Châu, Đà Nẵng cho đơn hàng O004. Em sẽ tiến hành cập nhật ngay ạ.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "delivery_area",
+          "value": "Hải Châu, Đà Nẵng"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "O004",
+            "action": "update_address",
+            "on": "2026-10-18"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Hải Châu, Đà Nẵng"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Đổi địa chỉ giao hàng cho đơn hàng",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

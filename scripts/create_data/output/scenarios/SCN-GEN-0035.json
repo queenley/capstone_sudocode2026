@@ -1,0 +1,195 @@
+{
+  "scenario_id": "SCN-GEN-0035",
+  "level": "M2",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "customer_id": "SYN-C002",
+  "customer_phone": "0998000002",
+  "customer_name": "Trần Thị B",
+  "honorific": "Ms.",
+  "region": "trung",
+  "category": "unknown",
+  "difficulty": "normal",
+  "tags": [
+    "address_change",
+    "customer_service",
+    "hotline",
+    "order",
+    "order_status",
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=chuan; session_index=1",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-16",
+      "input_mode": "text",
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C002",
+          "session_id": "SYN-002-S1",
+          "date": "2026-09-01",
+          "channel": "hotline",
+          "summary": "Hỏi về sản phẩm thời trang",
+          "outcome": "successful",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C002",
+          "session_id": "SYN-002-S2",
+          "date": "2026-09-02",
+          "channel": "zalo_oa",
+          "summary": "Phản hồi về đơn hàng",
+          "outcome": "successful",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C002",
+          "order_id": "O003",
+          "date": "2026-03-12",
+          "sku": "FAS001",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "O003"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C002",
+          "order_id": "O004",
+          "date": "2026-09-10",
+          "sku": "FAS002",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "FAS002"
+          }
+        }
+      ],
+      "customer_goal": "Hỏi tình trạng đơn hàng FAS002",
+      "customer_turns": [
+        "Alo, chị muốn hỏi tình trạng đơn hàng FAS002 của chị.",
+        "Chị không nhớ rõ đơn hàng đang ở đâu, em có thể kiểm tra giúp chị không?"
+      ],
+      "expected_outcome": "cap_nhat_don",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "order_id": "O004",
+        "order_status": "delivered",
+        "call_date": "2026-10-16"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000002",
+        "customer_id": "SYN-C002",
+        "is_returning": true,
+        "n_previous_sessions": 2,
+        "last_session": {
+          "date": "2026-09-02",
+          "channel": "zalo_oa",
+          "outcome": "successful",
+          "summary": "Phản hồi về đơn hàng"
+        },
+        "products_advised": [
+          "FAS002"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Ms. Trần Thị B, em gọi lại về FAS002 Ms. đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-16T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "O004"
+        },
+        "must_say_any": [
+          "đã giao",
+          "giao thành công"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-10-18",
+      "days_later": 2,
+      "input_mode": "text",
+      "customer_goal": "Đổi địa chỉ giao hàng cho đơn hàng",
+      "customer_turns": [
+        "Chào em, chị muốn đổi địa chỉ giao hàng cho đơn hàng của mình.",
+        "Chị muốn chuyển địa chỉ tới Hải Châu, Đà Nẵng."
+      ],
+      "facts_established": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "expected_outcome": "cap_nhat_don",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "order_id": "O004",
+        "order_status": "delivered",
+        "call_date": "2026-10-18"
+      },
+      "memory_expectation": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000002",
+        "customer_id": "SYN-C002",
+        "is_returning": true,
+        "n_previous_sessions": 3,
+        "last_session": {
+          "date": "2026-10-16",
+          "channel": "hotline",
+          "outcome": "cap_nhat_don"
+        },
+        "products_advised": [
+          "FAS002"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Ms. Trần Thị B, em gọi lại về FAS002 Ms. đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-18T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "O004",
+          "action": "update_address"
+        }
+      }
+    }
+  }
+}

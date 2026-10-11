@@ -1,0 +1,126 @@
+{
+  "conversation_id": "SCN-GEN-0119__call_2",
+  "scenario_id": "SCN-GEN-0119",
+  "call": "call_2",
+  "customer_id": "SYN-C007",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-31",
+  "region": "bac",
+  "category": "unknown",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Mr. Lê Văn G, em gọi lại về đơn hàng của Mr. ạ. Hiện tại đơn hàng có mã O014 đang trong trạng thái giao hàng. Em thấy Mr. muốn thay đổi địa chỉ giao hàng phải không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Ông có đúng đơn hàng mã O014 không?"
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "O014"
+        },
+        {
+          "field": "order_status",
+          "value": "shipping"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã xác nhận mã đơn là O014. Ông cho em biết địa chỉ mới mà ông muốn chuyển đến là gì ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Địa chỉ mới của ông là gì ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn ông đã cung cấp địa chỉ mới là Long Biên, Hà Nội. Em sẽ tiến hành cập nhật địa chỉ giao hàng cho đơn O014 của ông ngay bây giờ. Ông có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "delivery_area",
+          "value": "Long Biên, Hà Nội"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "O014",
+            "action": "update_address",
+            "on": "2026-10-31"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã cập nhật địa chỉ giao hàng cho đơn hàng O014 thành công. Đơn hàng của ông sẽ được giao đến Long Biên, Hà Nội. Nếu ông cần thêm thông tin gì, xin vui lòng cho em biết ạ. Cảm ơn ông và chúc ông một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Long Biên, Hà Nội"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "conversation_id": "SCN-GEN-0138__call_2",
+  "scenario_id": "SCN-GEN-0138",
+  "call": "call_2",
+  "customer_id": "SYN-C009",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-27",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Nguyễn Thị I, em gọi lại để xác nhận đơn hàng máy lọc không khí chị đã đặt ạ. Chị đã chọn sản phẩm AirPure Y với giá là 5.200.000đ. Chị có muốn xác nhận lại thông tin giao hàng ở Thủ Đức, TP.HCM không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Chị có muốn xác nhận lại thông tin giao hàng ở Thủ Đức, TP.HCM không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-AP-Y"
+        },
+        {
+          "field": "price_vnd",
+          "value": 5200000
+        },
+        {
+          "field": "delivery_area",
+          "value": "Thủ Đức, TP.HCM"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, chị xác nhận lại như vậy ạ.",
+      "facts_stated": {
+        "delivery_area": "Thủ Đức, TP.HCM"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, chị đã chọn phương thức thanh toán chuyển khoản ạ. Em sẽ tiến hành tạo đơn cho chị ngay bây giờ ạ.",
+      "questions": [],
+      "facts_used": [
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "payment",
+          "value": "chuyen_khoan"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mong em lên đơn giúp chị nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em sẽ đọc lại thông tin đơn hàng của chị trước khi tạo đơn ạ. Sản phẩm: AirPure Y, số lượng: 1, giá cuối: 5.200.000đ, địa chỉ giao hàng: Thủ Đức, TP.HCM, phương thức thanh toán: chuyển khoản. Dự kiến giao hàng vào ngày 29 tháng 10 ạ. Em bắt đầu tạo đơn ngay nhé!",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5200000
+        },
+        {
+          "field": "delivery_area",
+          "value": "Thủ Đức, TP.HCM"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000009",
+            "sku": "SKU-AP-Y",
+            "qty": 1,
+            "price_vnd": 5200000,
+            "payment": "chuyen_khoan",
+            "address": "Thủ Đức, TP.HCM",
+            "on": "2026-10-27"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Đơn hàng đã được tạo thành công với mã đơn là OD600001. Cảm ơn chị đã tin tưởng đặt hàng tại shop ạ! Chị có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận đơn hàng máy lọc không khí.",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001"
+    }
+  }
+}

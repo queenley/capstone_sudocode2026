@@ -1,0 +1,80 @@
+{
+  "conversation_id": "SCN-GEN-0094__call_2",
+  "scenario_id": "SCN-GEN-0094",
+  "call": "call_2",
+  "customer_id": "C016",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-31",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_ngoai_pham_vi_chuyen_may",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Phúc, em gọi lại về sản phẩm Máy tiệt trùng sấy khô Moaz Bebe mà anh đang quan tâm ạ. Anh có câu hỏi gì về sự an toàn của sản phẩm không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Anh có đang cần suy nghĩ thêm về sản phẩm không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu rằng anh có câu hỏi về an toàn sản phẩm cho bé. Tuy nhiên, em không có thông tin y tế về việc này. Em sẽ chuyển máy cho dược sĩ phụ trách để được tư vấn chi tiết hơn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "handoff.transfer",
+          "args": {
+            "brief": {
+              "customer_phone": "0920525898",
+              "customer_name": "Phúc",
+              "escalation_reason": "cau_hoi_y_te_ngoai_pham_vi",
+              "conversation_summary": "Khách hỏi Máy tiệt trùng sấy khô Moaz Bebe, có câu hỏi y tế/an toàn cần chuyên môn.",
+              "product_advised": "SKU-MB-STER",
+              "price_quoted_vnd": 1890000,
+              "open_questions": [
+                "câu hỏi y tế của khách"
+              ],
+              "next_action": "Dược sĩ/nhân viên phụ trách gọi lại tư vấn",
+              "generated_at": "2026-10-31T10:00:00"
+            }
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi về sự an toàn của sản phẩm",
+    "outcome": "chuyen_may",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

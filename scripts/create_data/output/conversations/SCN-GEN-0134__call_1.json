@@ -1,0 +1,182 @@
+{
+  "conversation_id": "SCN-GEN-0134__call_1",
+  "scenario_id": "SCN-GEN-0134",
+  "call": "call_1",
+  "customer_id": "SYN-C008",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Mr. Trần Văn H, em gọi lại về sản phẩm máy lọc không khí Xiaomi Smart 4 Pro mà Mr. đã quan tâm ạ. Em xác nhận lại là phòng của Mr. có diện tích khoảng 30 mét vuông và trong nhà có trẻ nhỏ đúng không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Phòng của Mr. có diện tích khoảng 30 mét vuông đúng không ạ?"
+        },
+        {
+          "slot": "has_children",
+          "type": "confirm",
+          "text": "Trong nhà có trẻ nhỏ đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "room_area_m2",
+        "has_children"
+      ],
+      "claims": [
+        {
+          "field": "room_area_m2",
+          "value": 30
+        },
+        {
+          "field": "has_children",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, em.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn Mr đã xác nhận. Ngân sách Mr cho máy là khoảng 6 triệu, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của Mr cho máy là khoảng 6 triệu đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "budget_vnd",
+          "value": 6000000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Vâng, đúng rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy lọc không khí Xiaomi Smart 4 Pro hiện có giá 5.490.000đ và đang có khuyến mãi với mã XM-COMBO, có hiệu lực đến ngày 14 tháng 11 ạ. Em cũng muốn hỏi là Mr có muốn biết thêm về chương trình khuyến mãi này không ạ?",
+      "questions": [
+        {
+          "slot": "promo_code",
+          "type": "confirm",
+          "text": "Mr có muốn biết thêm về chương trình khuyến mãi này không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "promo_code",
+          "value": "XM-COMBO"
+        },
+        {
+          "field": "promo_expiry",
+          "value": "2026-11-14"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại máy lọc không khí Xiaomi Smart 4 Pro có khuyến mãi với mã XM-COMBO, Mr có thể sử dụng để được giảm giá. Nếu Mr cần thêm thông tin gì, em sẵn sàng hỗ trợ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ bàn với gia đình rồi gọi lại nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu ạ. Mr hãy bàn với gia đình và gọi lại cho em khi có quyết định nhé. Em rất mong được phục vụ Mr ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,156 @@
+{
+  "conversation_id": "SCN-GEN-0138__call_1",
+  "scenario_id": "SCN-GEN-0138",
+  "call": "call_1",
+  "customer_id": "SYN-C009",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-20",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Ms. Nguyễn Thị I. Em thấy chị đã quan tâm đến máy lọc không khí cho phòng khoảng 30 mét vuông và có sản phẩm MAB005 ở đơn hàng trước. Chị có trẻ nhỏ, ngân sách tầm 5 triệu rưỡi, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Chị có cần máy cho phòng 30 mét vuông không?"
+        },
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của chị là khoảng 5 triệu rưỡi đúng không?"
+        }
+      ],
+      "facts_used": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "room_area_m2",
+          "value": 30
+        },
+        {
+          "field": "has_children",
+          "value": true
+        },
+        {
+          "field": "budget_vnd",
+          "value": 5500000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện em có sản phẩm máy lọc không khí AirPure Y phù hợp với diện tích phòng của chị. Giá của sản phẩm là 5.200.000đ, và có chương trình khuyến mãi đang áp dụng cho chị. Chị có muốn em ghi nhận lại để gọi lại thông tin chi tiết không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Em muốn xác nhận rằng sản phẩm chị quan tâm là AirPure Y đúng không?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-AP-Y"
+        },
+        {
+          "field": "price_vnd",
+          "value": 5200000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu là chị chưa quyết định ngay bây giờ. Em sẽ ghi nhận lịch hẹn gọi lại vào thứ Hai tuần sau, tức là ngày 26 tháng 10, vào lúc 9 giờ sáng ạ. Chị có muốn em gọi lại vào ngày nào khác không ạ?",
+      "questions": [
+        {
+          "slot": "callback_at",
+          "type": "open",
+          "text": "Chị có muốn em thay đổi lịch hẹn gọi lại không?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0998000009",
+            "callback_at": "2026-10-26T09:00",
+            "note": "khách hẹn gọi lại"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận lịch hẹn gọi lại vào 9 giờ sáng ngày 26 tháng 10 rồi ạ. Nếu chị cần thêm thông tin gì, xin vui lòng cho em biết. Em cảm ơn chị đã liên hệ với cửa hàng. Chúc chị một ngày vui vẻ ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ gọi lại vào thứ Hai tuần sau nhé. Em chưa có thông tin gì thêm để cung cấp cho chị lúc này. Chúc chị một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": {
+      "customer_phone": "0998000009",
+      "callback_at": "2026-10-26T09:00",
+      "note": "khách hẹn gọi lại"
+    },
+    "order": null
+  }
+}

@@ -1,0 +1,183 @@
+{
+  "conversation_id": "SCN-GEN-0072__call_2",
+  "scenario_id": "SCN-GEN-0072",
+  "call": "call_2",
+  "customer_id": "SYN-C009",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-25",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào Ms. Nguyễn Thị I, em gọi lại về xe đẩy Joie Pact mà Ms. đã quan tâm ạ. Em nhớ là chị cần hỏi vợ trước khi quyết định đặt hàng, không biết giờ chị đã có thông tin chưa ạ?",
+      "questions": [
+        {
+          "slot": "decision_maker",
+          "type": "confirm",
+          "text": "Chị cần hỏi vợ trước khi quyết định đặt hàng, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "decision_maker",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Dạ, em có hỏi rồi, giờ chị muốn đặt hàng luôn.",
+      "facts_stated": {
+        "decision_maker": "vợ"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn chị đã quyết định đặt hàng ạ. Tuy nhiên, hiện tại xe đẩy Joie Pact vẫn đang hết hàng, em không thể thông báo ngày có hàng cụ thể cho chị ạ. Chị có muốn em ghi nhận lại thông tin để gọi lại khi có hàng không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "open",
+          "text": "Chị có muốn em ghi nhận lại thông tin để gọi lại khi có hàng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Dạ, chị muốn đặt hàng, nhưng cần biết ngày có hàng cụ thể để quyết định.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu ạ. Hiện giờ em chưa có thông tin chính xác về ngày có hàng, nhưng em có thể ghi nhận đơn hàng của chị và gọi lại sớm nhất khi có thông tin ạ. Chị có đồng ý không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Chị có đồng ý để em ghi nhận đơn hàng và gọi lại khi có hàng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Dạ, chị đồng ý.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn chị. Em sẽ ghi nhận lại đơn hàng cho chị. Chị có muốn em lưu lại số điện thoại để liên hệ lại không ạ?",
+      "questions": [
+        {
+          "slot": "customer_phone",
+          "type": "open",
+          "text": "Chị có muốn em lưu số điện thoại để gọi lại không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "customer_phone",
+          "value": "0998000009"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Dạ, số điện thoại của chị là 0998000009.",
+      "facts_stated": {
+        "customer_phone": "0998000009"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã lưu lại số điện thoại của chị là 0998000009. Em sẽ gọi lại ngay khi có hàng ạ. Cảm ơn chị đã liên hệ, chào chị!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "O018"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

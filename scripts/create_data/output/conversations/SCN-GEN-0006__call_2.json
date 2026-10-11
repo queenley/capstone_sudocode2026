@@ -1,0 +1,158 @@
+{
+  "conversation_id": "SCN-GEN-0006__call_2",
+  "scenario_id": "SCN-GEN-0006",
+  "call": "call_2",
+  "customer_id": "C002",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-18",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào anh Tuấn. Em gọi lại về đơn hàng giày chạy bộ size 38 màu đen mà anh đã quan tâm ạ. Anh đã quyết định hình thức thanh toán là chuyển khoản đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Hình thức thanh toán của anh là chuyển khoản đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "payment",
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "payment",
+          "value": "chuyen_khoan"
+        },
+        {
+          "field": "size",
+          "value": 38
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-SN-RUN1"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, chuyển khoản ạ.",
+      "facts_stated": {
+        "payment": "chuyen_khoan"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn anh. Địa chỉ giao hàng của anh là Ninh Kiều, Cần Thơ phải không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Địa chỉ giao hàng của anh là Ninh Kiều, Cần Thơ phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "delivery_area",
+          "value": "Ninh Kiều, Cần Thơ"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, Ninh Kiều, Cần Thơ ạ.",
+      "facts_stated": {
+        "delivery_area": "Ninh Kiều, Cần Thơ"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin xác nhận lại đơn hàng cho anh nhé. Anh đặt 1 đôi giày chạy bộ size 38 màu đen với giá 1.161.000đ, thanh toán bằng chuyển khoản, địa chỉ giao hàng là Ninh Kiều, Cần Thơ. Dự kiến giao hàng vào ngày 22 tháng 10 ạ. Em sẽ tiến hành tạo đơn hàng ngay ạ!",
+      "questions": [],
+      "facts_used": [
+        "variant_sku",
+        "price_quoted_vnd",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "variant_sku",
+          "value": "SKU-SN-RUN1-38-DEN"
+        },
+        {
+          "field": "price_vnd",
+          "value": 1161000
+        },
+        {
+          "field": "delivery_area",
+          "value": "Ninh Kiều, Cần Thơ"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0936270107",
+            "sku": "SKU-SN-RUN1-38-DEN",
+            "qty": 1,
+            "price_vnd": 1161000,
+            "payment": "chuyen_khoan",
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-10-18"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận mua giày chạy bộ.",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

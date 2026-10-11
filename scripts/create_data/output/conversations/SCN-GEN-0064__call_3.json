@@ -1,0 +1,173 @@
+{
+  "conversation_id": "SCN-GEN-0064__call_3",
+  "scenario_id": "SCN-GEN-0064",
+  "call": "call_3",
+  "customer_id": "SYN-C004",
+  "session_index": 3,
+  "channel": "hotline",
+  "date": "2026-10-27",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_kenh_mau_thuan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào Ms. Phạm Thị D, em gọi lại về đơn hàng giày chạy bộ size 42 màu đen mà chị đã quan tâm ạ. Chị xác nhận hình thức thanh toán là COD đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Chị xác nhận hình thức thanh toán là COD đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "variant_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, thanh toán COD.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị đã xác nhận. Để em ghi nhận, chị muốn giao hàng đến Long Biên, Hà Nội đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Chị muốn giao hàng đến Long Biên, Hà Nội đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, giao đến Long Biên.",
+      "facts_stated": {
+        "delivery_area": "Long Biên, Hà Nội"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận địa chỉ giao hàng là Long Biên, Hà Nội. Sản phẩm giày chạy bộ size 42 màu đen sẽ có giá 1.690.000đ. Chị đã sẵn sàng để em chốt đơn chưa ạ?",
+      "questions": [],
+      "facts_used": [
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chốt đơn cho chị đi em.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ chốt đơn cho chị ngay bây giờ. Đơn hàng của chị gồm giày chạy bộ size 42 màu đen, giá 1.690.000đ, thanh toán COD, giao đến Long Biên, Hà Nội, và thời gian giao hàng dự kiến là vào ngày 29 tháng 10 năm 2026 ạ. Em xin phép tạo đơn hàng ngay ạ.",
+      "questions": [],
+      "facts_used": [
+        "price_quoted_vnd",
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000004",
+            "sku": "SKU-SN-RUN2-42-DEN",
+            "qty": 1,
+            "price_vnd": 1690000,
+            "payment": "COD",
+            "address": "Long Biên, Hà Nội",
+            "on": "2026-10-27"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, đơn hàng của chị đã được tạo thành công. Mã đơn hàng của chị là OD600001. Cảm ơn chị đã đặt hàng tại shop. Chúc chị một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận đặt mua giày chạy bộ size 42 màu đen",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001"
+    }
+  }
+}

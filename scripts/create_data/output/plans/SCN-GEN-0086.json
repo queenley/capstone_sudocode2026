@@ -1,0 +1,348 @@
+{
+  "scenario_id": "SCN-GEN-0086",
+  "level": "M2",
+  "persona": "khach_cap_nhat_thong_tin",
+  "hard_case": "ba_phien_doi_thong_tin",
+  "customer_id": "C021",
+  "customer_phone": "0901304118",
+  "customer_name": "Yến",
+  "honorific": "chị",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "difficulty": "hard",
+  "tags": [
+    "hard_case",
+    "order_status",
+    "supersede",
+    "variant:ba_phien_doi_thong_tin"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=ba_phien_doi_thong_tin; session_index=2",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-30",
+      "days_later": null,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker)."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "size": 39,
+        "color": "xam",
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-39-XAM"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [],
+      "must_not_ask": [],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1690000,
+        "list_price_vnd": 1690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-30"
+      },
+      "memory_expectation": {
+        "size": 39,
+        "color": "xam",
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-39-XAM"
+      },
+      "expected_call_brief": null,
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 4
+    },
+    "call_2": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-11-03",
+      "days_later": 4,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] order",
+      "customer_turns": [
+        "[plan-only] Khách xác nhận muốn mua, nêu hình thức thanh toán và khu vực giao hàng (chỉ quận/tỉnh), đồng ý lên đơn."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "delivery_area": "Hải Châu, Đà Nẵng",
+        "budget_vnd": 2000000,
+        "payment": "COD",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-39-XAM",
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-RUN2-39-XAM",
+          "price_vnd": 1690000,
+          "payment": "COD"
+        },
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1690000,
+        "list_price_vnd": 1690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "estimated_delivery": "2026-11-05",
+        "call_date": "2026-11-03"
+      },
+      "memory_expectation": {
+        "delivery_area": "Hải Châu, Đà Nẵng",
+        "budget_vnd": 2000000,
+        "payment": "COD",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-39-XAM",
+        "order_id": "OD600001"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0901304118",
+        "customer_id": "C021",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-30",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-SN-RUN2"
+        ],
+        "open_blockers": [
+          "cần suy nghĩ thêm"
+        ],
+        "must_not_ask": [
+          "size",
+          "color",
+          "product_advised",
+          "variant_sku"
+        ],
+        "suggested_opening": "Dạ em chào chị Yến, em gọi lại về SKU-SN-RUN2 chị đang quan tâm ạ, không biết cần suy nghĩ thêm chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-03T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0901304118",
+            "sku": "SKU-SN-RUN2-39-XAM",
+            "qty": 1,
+            "price_vnd": 1690000,
+            "payment": "COD",
+            "address": "Hải Châu, Đà Nẵng",
+            "on": "2026-11-03"
+          },
+          "result": {
+            "order_id": "OD600001",
+            "status": "created",
+            "total_vnd": 1690000,
+            "needs_confirmation_call": false,
+            "estimated_delivery": "2026-11-05"
+          }
+        }
+      ],
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 3
+    },
+    "call_3": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-11-05",
+      "days_later": 2,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] order_status",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tình trạng đơn hàng hiện có; không tự đọc mã đơn trừ khi được hỏi xác nhận."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {},
+      "expected_outcome": "cap_nhat_don",
+      "must_carry_over": [
+        "size",
+        "payment",
+        "delivery_area",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "order_id"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "size",
+        "color",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "variant_sku",
+        "order_id"
+      ],
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD600001"
+        },
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [
+          "đã tạo",
+          "đang xử lý",
+          "đang chuẩn bị",
+          "đã ghi nhận"
+        ],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "order_id": "OD600001",
+        "order_status": "created",
+        "call_date": "2026-11-05"
+      },
+      "memory_expectation": {},
+      "expected_call_brief": {
+        "customer_phone": "0901304118",
+        "customer_id": "C021",
+        "is_returning": true,
+        "n_previous_sessions": 2,
+        "last_session": {
+          "date": "2026-11-03",
+          "channel": "hotline",
+          "outcome": "chot_don"
+        },
+        "products_advised": [
+          "SKU-SN-RUN2"
+        ],
+        "open_blockers": [
+          "cần suy nghĩ thêm"
+        ],
+        "must_not_ask": [
+          "budget_vnd",
+          "size",
+          "color",
+          "payment",
+          "delivery_area",
+          "product_advised",
+          "variant_sku",
+          "order_id"
+        ],
+        "suggested_opening": "Dạ em chào chị Yến, em gọi lại về SKU-SN-RUN2 chị đang quan tâm ạ, không biết cần suy nghĩ thêm chưa ạ?",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-05T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD600001"
+          },
+          "result": {
+            "orders": [
+              {
+                "order_id": "OD600001",
+                "customer_phone": "0901304118",
+                "sku": "SKU-SN-RUN2-39-XAM",
+                "qty": 1,
+                "price_vnd": 1690000,
+                "total_vnd": 1690000,
+                "promos": [
+                  "COD-0"
+                ],
+                "payment": "COD",
+                "address": "Hải Châu, Đà Nẵng",
+                "created_on": "2026-11-03",
+                "status": "created"
+              }
+            ]
+          }
+        }
+      ],
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 2
+    }
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "conversation_id": "SCN-GEN-0127__call_2",
+  "scenario_id": "SCN-GEN-0127",
+  "call": "call_2",
+  "customer_id": "SYN-C001",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-14",
+  "region": "bac",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_da_kenh_fb_hotline",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Mr. Nguyễn Văn A, em gọi lại về nồi chiên không dầu Philips 6.2L mà anh đang quan tâm ạ. Em đã ghi nhận anh sẽ thanh toán bằng hình thức chuyển khoản và giao hàng tới Long Biên, Hà Nội đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Anh sẽ thanh toán bằng hình thức chuyển khoản đúng không ạ?"
+        },
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Giao hàng cho anh ở Long Biên, Hà Nội đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "payment",
+        "delivery_area",
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "payment",
+          "value": "chuyen_khoan"
+        },
+        {
+          "field": "delivery_area",
+          "value": "Long Biên, Hà Nội"
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-AF-6L"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn anh đã xác nhận. Giá nồi chiên không dầu Philips 6.2L là 3.990.000đ. Em sẽ nhanh chóng lên đơn cho anh, và dự kiến giao hàng vào ngày 17 tháng 11 ạ.",
+      "questions": [],
+      "facts_used": [
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3990000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-17"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Trước khi em tạo đơn, em xin đọc lại thông tin đơn hàng: Nồi chiên không dầu Philips 6.2L, số lượng 1, giá 3.990.000đ, phương thức thanh toán là chuyển khoản, địa chỉ giao hàng là Long Biên, Hà Nội. Anh có xác nhận không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Anh có xác nhận thông tin đơn hàng như em vừa đọc không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn anh đã xác nhận. Em sẽ tiến hành tạo đơn hàng cho anh ngay bây giờ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000001",
+            "sku": "SKU-AF-6L",
+            "qty": 1,
+            "price_vnd": 3990000,
+            "payment": "chuyen_khoan",
+            "address": "Long Biên, Hà Nội",
+            "on": "2026-11-14"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Đơn hàng đã được tạo thành công với mã đơn OD600001. Dự kiến giao hàng vào ngày 17 tháng 11. Cảm ơn anh đã đặt hàng tại shop, em chúc anh có những món ăn ngon từ nồi chiên không dầu ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận mua nồi chiên không dầu.",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001"
+    }
+  }
+}

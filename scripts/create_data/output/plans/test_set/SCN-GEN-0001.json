@@ -1,0 +1,227 @@
+{
+  "scenario_id": "SCN-GEN-0001",
+  "level": "M2",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "hard_case": "quay_lai_8_thang_ttl_trade_in",
+  "customer_id": "C031",
+  "customer_phone": "0985003703",
+  "customer_name": "Oanh",
+  "honorific": "chị",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "hard",
+  "tags": [
+    "discontinued",
+    "hard_case",
+    "trade_in",
+    "ttl",
+    "variant:c031_ttl_trade_in"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=c031_ttl_trade_in; session_index=1",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-15",
+      "input_mode": "text",
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "C031",
+          "session_id": "S-OLD-1",
+          "date": "2026-02-17",
+          "channel": "hotline",
+          "summary": "Mua AirPure X bản 2024 giá 4.290.000đ, phòng 20m², địa chỉ giao: 12 ngõ 38 Hoàng Cầu, Đống Đa, Hà Nội",
+          "outcome": "chot_don",
+          "stale": true,
+          "facts": {
+            "owned_sku": "SKU-AP-X-2024",
+            "room_area_m2": 20,
+            "delivery_area": "Đống Đa, Hà Nội"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "C031",
+          "order_id": "OD188213",
+          "date": "2026-02-17",
+          "sku": "SKU-AP-X-2024",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AP-X-2024"
+          }
+        }
+      ],
+      "customer_goal": "[plan-only] order",
+      "customer_turns": [
+        "[plan-only] Khách cũ (mua AirPure X bản 2024 cách đây 8 tháng) gọi muốn mua lại \"đúng mẫu cũ\"; được báo mẫu cũ ngừng bán, chuyển sang mẫu thay thế, được thu cũ đổi mới; xác nhận lại địa chỉ giao (địa chỉ cũ có thể đã đổi) rồi chốt đơn."
+      ],
+      "facts_established": {
+        "room_area_m2": 25,
+        "has_children": false,
+        "budget_vnd": 5000000,
+        "payment": "COD",
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "product_advised": "SKU-AP-X",
+        "price_quoted_vnd": 4490000,
+        "promo_code": "TRADE-IN-AP",
+        "promo_expiry": "2026-12-14",
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 4490000,
+        "list_price_vnd": 4890000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_TRADE-IN-AP_active": true,
+        "promo_AP-SEP_active": false,
+        "promo_AIR-2ND-50_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "estimated_delivery": "2026-10-17",
+        "successor_sku": "SKU-AP-X",
+        "call_date": "2026-10-15"
+      },
+      "memory_expectation": {
+        "room_area_m2": 25,
+        "has_children": false,
+        "budget_vnd": 5000000,
+        "payment": "COD",
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "product_advised": "SKU-AP-X",
+        "price_quoted_vnd": 4490000,
+        "promo_code": "TRADE-IN-AP",
+        "order_id": "OD600001",
+        "superseded": {
+          "room_area_m2": 20,
+          "delivery_area": "Đống Đa, Hà Nội"
+        },
+        "address_ttl_check": true
+      },
+      "expected_call_brief": {
+        "customer_phone": "0985003703",
+        "customer_id": "C031",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-02-17",
+          "channel": "hotline",
+          "outcome": "chot_don",
+          "summary": "Mua AirPure X bản 2024 giá 4.290.000đ, phòng 20m², địa chỉ giao: 12 ngõ 38 Hoàng Cầu, Đống Đa, Hà Nội"
+        },
+        "products_advised": [
+          "SKU-AP-X-2024"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào chị Oanh, em gọi lại về SKU-AP-X-2024 chị đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-15T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AP-X",
+          "price_vnd": 4490000,
+          "payment": "COD"
+        }
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-10-17",
+      "days_later": 2,
+      "input_mode": "text",
+      "customer_goal": "[plan-only] order_status",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tình trạng đơn hàng hiện có; không tự đọc mã đơn trừ khi được hỏi xác nhận."
+      ],
+      "expected_outcome": "cap_nhat_don",
+      "must_carry_over": [
+        "room_area_m2",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "order_id": "OD600001",
+        "order_status": "created",
+        "call_date": "2026-10-17"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0985003703",
+        "customer_id": "C031",
+        "is_returning": true,
+        "n_previous_sessions": 2,
+        "last_session": {
+          "date": "2026-10-15",
+          "channel": "hotline",
+          "outcome": "chot_don"
+        },
+        "products_advised": [
+          "SKU-AP-X",
+          "SKU-AP-X-2024"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "room_area_m2",
+          "has_children",
+          "budget_vnd",
+          "payment",
+          "delivery_area",
+          "product_advised",
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào chị Oanh, em gọi lại về SKU-AP-X chị đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-17T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD600001"
+        },
+        "must_say_any": [
+          "đã tạo",
+          "đang xử lý",
+          "đang chuẩn bị",
+          "đã ghi nhận"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "conversation_id": "SCN-GEN-0035__call_1",
+  "scenario_id": "SCN-GEN-0035",
+  "call": "call_1",
+  "customer_id": "SYN-C002",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-16",
+  "region": "trung",
+  "category": "unknown",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào Ms. Trần Thị B, em gọi lại về đơn hàng FAS002 của Ms. đang quan tâm ạ. Em thấy đơn hàng này đã được giao thành công ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "O004"
+        },
+        {
+          "field": "order_status",
+          "value": "delivered"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "O004"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Vậy là đơn hàng của tôi đã giao rồi đúng không?",
+      "facts_stated": {
+        "order_id": "O004"
+      },
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "O004",
+          "spoken": "FAS002"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi ạ, đơn hàng FAS002 của Ms. đã được giao thành công vào ngày 10 tháng 9 ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "O004"
+        },
+        {
+          "field": "order_status",
+          "value": "delivered"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cảm ơn em!",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

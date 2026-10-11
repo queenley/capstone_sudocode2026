@@ -1,0 +1,93 @@
+{
+  "conversation_id": "SCN-GEN-0116__call_2",
+  "scenario_id": "SCN-GEN-0116",
+  "call": "call_2",
+  "customer_id": "C031",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-12-14",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Oanh, em là trợ lý ảo từ shop BTC ạ. Chị gọi để hỏi tình trạng đơn hàng, đúng không ạ? Chị đã đặt hàng vào ngày 11 tháng 12, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Chị đã đặt hàng vào ngày 11 tháng 12, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin phép kiểm tra tình trạng đơn hàng của chị một chút ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD600001"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, đơn hàng của chị có mã là OD600001. Hiện tại, đơn hàng đã được ghi nhận và đang trong trạng thái đang xử lý ạ. Chị có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "order_status"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "created"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi tình trạng đơn hàng",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

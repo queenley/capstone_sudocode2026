@@ -1,0 +1,354 @@
+{
+  "scenario_id": "SCN-GEN-0003",
+  "level": "M2",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "hard_case": null,
+  "customer_id": "C033",
+  "customer_phone": "0977879432",
+  "customer_name": "Loan",
+  "honorific": "chị",
+  "region": "trung",
+  "category": "gia-dung/noi-chien",
+  "difficulty": "normal",
+  "tags": [
+    "Xiaomi",
+    "chốt_đơn",
+    "impatience",
+    "nồi_chiên",
+    "thanh_toán_COD",
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "ESC"
+  ],
+  "notes": "variant=chuan; session_index=1",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-17",
+      "days_later": null,
+      "input_mode": "text",
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "C033",
+          "session_id": "S-OLD-2",
+          "date": "2026-03-29",
+          "channel": "zalo_oa",
+          "summary": "Hỏi nồi chiên Xiaomi 4.5L, báo giá 1.590.000đ, khách nói 'để tết mua'",
+          "outcome": "hen_goi_lai",
+          "stale": true,
+          "facts": {
+            "product_advised": "SKU-AF-XM",
+            "price_quoted_vnd": 1590000,
+            "blocker": "để Tết mua"
+          }
+        }
+      ],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "Hỏi nồi chiên không dầu Xiaomi cho gia đình.",
+      "customer_turns": [
+        "Alo, chị Loan đây, hôm trước có hỏi nồi chiên không dầu Xiaomi 4.5L, giờ chị muốn biết thêm thông tin.",
+        "Chị đang cần dùng cho gia đình, ngân sách khoảng 2 triệu thôi.",
+        "Có khuyến mãi gì không em?",
+        "Chị sẽ chờ cuối tháng nhận lương rồi gọi lại nhé."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "usage_need": "dùng cho gia đình",
+        "budget_vnd": 2000000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-AF-XM",
+        "price_quoted_vnd": 1590000
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [],
+      "must_not_ask": [],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1590000,
+        "list_price_vnd": 1590000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "usage_need": "dùng cho gia đình",
+        "budget_vnd": 2000000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-AF-XM",
+        "price_quoted_vnd": 1590000,
+        "superseded": {
+          "blocker": "để Tết mua"
+        }
+      },
+      "expected_call_brief": {
+        "customer_phone": "0977879432",
+        "customer_id": "C033",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-03-29",
+          "channel": "zalo_oa",
+          "outcome": "hen_goi_lai",
+          "summary": "Hỏi nồi chiên Xiaomi 4.5L, báo giá 1.590.000đ, khách nói 'để tết mua'"
+        },
+        "products_advised": [
+          "SKU-AF-XM"
+        ],
+        "open_blockers": [
+          "để Tết mua"
+        ],
+        "must_not_ask": [],
+        "suggested_opening": "Dạ em chào chị Loan, em gọi lại về SKU-AF-XM chị đang quan tâm ạ, không biết để Tết mua chưa ạ?",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-17T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "khach_goi_lan_3_het_kien_nhan",
+      "patience_start": 3
+    },
+    "call_2": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-20",
+      "days_later": 3,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "Hỏi thêm thông tin về nồi chiên không dầu.",
+      "customer_turns": [
+        "Alo, chị Loan đây, chị muốn hỏi lại về nồi chiên không dầu Xiaomi.",
+        "Chị vẫn cần dùng cho gia đình, có gì mới không em?",
+        "Chị vẫn chưa chốt, sẽ gọi lại sau."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "product_advised": "SKU-AF-XM",
+        "price_quoted_vnd": 1590000
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1590000,
+        "list_price_vnd": 1590000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-20"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-AF-XM",
+        "price_quoted_vnd": 1590000
+      },
+      "expected_call_brief": {
+        "customer_phone": "0977879432",
+        "customer_id": "C033",
+        "is_returning": true,
+        "n_previous_sessions": 2,
+        "last_session": {
+          "date": "2026-10-17",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-AF-XM"
+        ],
+        "open_blockers": [
+          "chờ cuối tháng nhận lương"
+        ],
+        "must_not_ask": [
+          "budget_vnd",
+          "usage_need",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào chị Loan, em gọi lại về SKU-AF-XM chị đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-20T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "khach_goi_lan_3_het_kien_nhan",
+      "patience_start": 2
+    },
+    "call_3": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-21",
+      "days_later": 1,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "Xác nhận mua nồi chiên không dầu.",
+      "customer_turns": [
+        "Alo, chị muốn chốt đơn nồi chiên không dầu Xiaomi 4.5L.",
+        "Hình thức thanh toán là COD, xin giao hàng cho chị ở Nha Trang, Khánh Hòa.",
+        "Chị đồng ý lên đơn."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "payment": "COD",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "product_advised": "SKU-AF-XM",
+        "price_quoted_vnd": 1590000,
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AF-XM",
+          "price_vnd": 1590000,
+          "payment": "COD"
+        },
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": 2
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1590000,
+        "list_price_vnd": 1590000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "estimated_delivery": "2026-10-27",
+        "call_date": "2026-10-21"
+      },
+      "memory_expectation": {
+        "payment": "COD",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "product_advised": "SKU-AF-XM",
+        "price_quoted_vnd": 1590000,
+        "order_id": "OD600001"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0977879432",
+        "customer_id": "C033",
+        "is_returning": true,
+        "n_previous_sessions": 3,
+        "last_session": {
+          "date": "2026-10-20",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-AF-XM"
+        ],
+        "open_blockers": [
+          "chờ cuối tháng nhận lương"
+        ],
+        "must_not_ask": [
+          "budget_vnd",
+          "usage_need",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào chị Loan, em gọi lại về SKU-AF-XM chị đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-21T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0977879432",
+            "sku": "SKU-AF-XM",
+            "qty": 1,
+            "price_vnd": 1590000,
+            "payment": "COD",
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-10-21"
+          },
+          "result": {
+            "order_id": "OD600001",
+            "status": "created",
+            "total_vnd": 1590000,
+            "needs_confirmation_call": false,
+            "estimated_delivery": "2026-10-27"
+          }
+        }
+      ],
+      "simulator_persona_key": "khach_goi_lan_3_het_kien_nhan",
+      "patience_start": 1
+    }
+  }
+}

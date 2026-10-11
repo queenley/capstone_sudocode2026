@@ -1,0 +1,135 @@
+{
+  "conversation_id": "SCN-GEN-0063__call_2",
+  "scenario_id": "SCN-GEN-0063",
+  "call": "call_2",
+  "customer_id": "SYN-C003",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-02",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_hoi_ngoai_tai_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chào Mr. Lê Văn C, em gọi lại về MAB002 Mr. đang quan tâm ạ, không biết cần suy nghĩ thêm chưa ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, hôm trước em có đọc trên web là có chính sách đổi trả trong 14 ngày đúng không?",
+      "facts_stated": {
+        "return_days": 14
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": "tò mò",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chính sách đổi trả là trong 7 ngày từ ngày nhận hàng ạ. Ngoài ra, phí đổi size là miễn phí lần đầu tiên, từ lần thứ hai thì sẽ mất 30.000đ cho phí vận chuyển ạ.",
+      "questions": [
+        {
+          "slot": "return_days",
+          "type": "confirm",
+          "text": "Chính sách đổi trả là trong 7 ngày đúng không ạ?"
+        },
+        {
+          "slot": "exchange_fee_vnd",
+          "type": "confirm",
+          "text": "Phí đổi size là 20 nghìn phải không em?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "exchange_fee_vnd",
+          "value": 0
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Và phí đổi size là 20 nghìn phải không em?",
+      "facts_stated": {
+        "exchange_fee_vnd": 20000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": "tò mò",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, phí đổi size là miễn phí lần đầu tiên ạ, từ lần thứ hai thì sẽ mất phí vận chuyển 30.000đ ạ. Em muốn chắc chắn lại thông tin này.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em muốn chắc chắn lại thông tin này.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": "tò mò",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã xác nhận lại thông tin về chính sách đổi trả cho Mr. ạ. Nếu còn thắc mắc gì thêm, Mr. có thể gọi lại cho em bất cứ lúc nào nhé!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "thong_tin",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

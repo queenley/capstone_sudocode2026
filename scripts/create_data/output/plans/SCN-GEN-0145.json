@@ -1,0 +1,182 @@
+{
+  "scenario_id": "SCN-GEN-0145",
+  "level": "M2",
+  "persona": "khach_hoi_ngoai_tai_lieu",
+  "hard_case": null,
+  "customer_id": "C005",
+  "customer_phone": "0979298416",
+  "customer_name": "Hương",
+  "honorific": "chị",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "normal",
+  "tags": [
+    "unknown_fact",
+    "variant:ngoai_tai_lieu"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=ngoai_tai_lieu; session_index=3",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-11-12",
+      "days_later": null,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker)."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "room_area_m2": 15,
+        "has_children": false,
+        "budget_vnd": 2500000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AP-MINI",
+        "price_quoted_vnd": 1861500,
+        "promo_code": "11-11",
+        "promo_expiry": "2026-11-12"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [],
+      "must_not_ask": [],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1861500,
+        "list_price_vnd": 2190000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_11-11_active": true,
+        "promo_AIR-2ND-50_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-12"
+      },
+      "memory_expectation": {
+        "room_area_m2": 15,
+        "has_children": false,
+        "budget_vnd": 2500000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AP-MINI",
+        "price_quoted_vnd": 1861500,
+        "promo_code": "11-11"
+      },
+      "expected_call_brief": null,
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "khach_hoi_ngoai_tai_lieu",
+      "patience_start": 4
+    },
+    "call_2": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-11-15",
+      "days_later": 3,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] unknown_fact",
+      "customer_turns": [
+        "[plan-only] Khách hỏi một chi tiết KHÔNG có trong tài liệu: máy có lọc được khí radon không. Khách chấp nhận khi được nói là chưa có thông tin và sẽ kiểm tra."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {},
+      "expected_outcome": "thong_tin",
+      "must_carry_over": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [
+          "không có thông tin",
+          "chưa có thông tin",
+          "em chưa rõ",
+          "em không chắc",
+          "em sẽ kiểm tra",
+          "chưa nắm được"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "unknown_topic": "máy có lọc được khí radon không",
+        "call_date": "2026-11-15"
+      },
+      "memory_expectation": {},
+      "expected_call_brief": {
+        "customer_phone": "0979298416",
+        "customer_id": "C005",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-11-12",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-AP-MINI"
+        ],
+        "open_blockers": [
+          "để bàn với gia đình"
+        ],
+        "must_not_ask": [
+          "room_area_m2",
+          "has_children",
+          "budget_vnd",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào chị Hương, em gọi lại về SKU-AP-MINI chị đang quan tâm ạ, không biết để bàn với gia đình chưa ạ?",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-15T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "khach_hoi_ngoai_tai_lieu",
+      "patience_start": 3
+    }
+  }
+}

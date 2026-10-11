@@ -1,0 +1,112 @@
+{
+  "conversation_id": "SCN-GEN-0110__call_1",
+  "scenario_id": "SCN-GEN-0110",
+  "call": "call_1",
+  "customer_id": "C045",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, xin chào anh Lâm, em là trợ lý ảo của shop. Anh muốn hỏi về máy lọc không khí AirPure Pro đúng không ạ? Anh có nhà không có trẻ nhỏ và ngân sách khoảng 8 triệu đồng phải không ạ?",
+      "questions": [
+        {
+          "slot": "has_children",
+          "type": "confirm",
+          "text": "Anh có nhà không có trẻ nhỏ phải không ạ?"
+        },
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của anh khoảng 8 triệu đồng phải không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Máy lọc không khí AirPure Pro có giá là 7.690.000đ. Hiện tại, sản phẩm này đang có khuyến mãi 300.000đ cho chương trình AIR-OCT, nên giá sau khuyến mãi là 7.390.000đ. Anh có muốn đặt hàng ngay không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "promo_code",
+          "value": "AIR-OCT"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại anh có thể yên tâm vì máy lọc không khí AirPure Pro đang có sẵn hàng. Tuy nhiên, nếu anh chờ đến cuối tháng nhận lương rồi gọi lại, em cũng không vấn đề gì cả. Nhưng hãy nhớ rằng khuyến mãi này sẽ hết hạn vào hôm nay ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_expiry",
+          "value": "2026-10-30"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Vậy em sẽ ghi nhận lại cho anh là anh sẽ gọi lại sau khi nhận lương nhé. Nếu anh có cần thêm thông tin gì về sản phẩm hoặc khuyến mãi, hãy cho em biết nhé. Cảm ơn anh đã gọi!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "conversation_id": "SCN-GEN-0079__call_1",
+  "scenario_id": "SCN-GEN-0079",
+  "call": "call_1",
+  "customer_id": "C005",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-29",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_hoi_ngoai_tai_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Alo, chị Hương! Dạ, em đã ghi nhận chị muốn hỏi về xe đẩy gấp gọn Joie Pact. Chị có thể cho em biết ngân sách của mình khoảng bao nhiêu không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Chị có thể cho em biết ngân sách của mình khoảng bao nhiêu không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có ngân sách khoảng 4 triệu thôi.",
+      "facts_stated": {
+        "budget_vnd": 4000000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn chị đã chia sẻ. Xe đẩy Joie Pact hiện có giá 3.490.000đ. Ngoài ra, sản phẩm này đang có khuyến mãi miễn phí vận chuyển. Chị có muốn biết thêm thông tin gì về sản phẩm không ạ?",
+      "questions": [
+        {
+          "slot": "promo_code",
+          "type": "confirm",
+          "text": "Chị có muốn biết thêm thông tin gì về sản phẩm không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Xe này có khuyến mãi gì không em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, xe đẩy Joie Pact đang áp dụng khuyến mãi miễn phí vận chuyển cho đơn hàng này, nhưng hiện tại sản phẩm chưa có sẵn hàng. Chị muốn em ghi nhận lại thông tin để gọi lại sau khi hàng về không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Chị muốn em ghi nhận lại thông tin để gọi lại sau khi hàng về không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đang chờ cuối tháng nhận lương nên chưa thể quyết định ngay.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu. Vậy em sẽ ghi nhận lại thông tin của chị và sẽ gọi lại vào cuối tháng để cập nhật tình hình nhé. Cảm ơn chị đã quan tâm đến sản phẩm của em!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi về xe đẩy gấp gọn Joie Pact",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

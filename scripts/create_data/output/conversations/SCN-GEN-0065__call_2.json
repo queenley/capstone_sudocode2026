@@ -1,0 +1,165 @@
+{
+  "conversation_id": "SCN-GEN-0065__call_2",
+  "scenario_id": "SCN-GEN-0065",
+  "call": "call_2",
+  "customer_id": "C035",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-29",
+  "region": "trung",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị Dung ạ! Chị muốn đặt hàng máy lọc không khí AirPure Mini hôm nay đúng không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị đã xác nhận. Máy lọc không khí AirPure Mini có giá là 2.190.000đ, chị muốn giao hàng đến Thủ Đức, TP.HCM và phương thức thanh toán là COD đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Chị muốn giao hàng đến Thủ Đức, TP.HCM đúng không?"
+        },
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Chị muốn thanh toán bằng COD đúng không?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Để chốt đơn, chị cho em xin diện tích phòng của mình để xác nhận máy lọc không khí phù hợp ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "open",
+          "text": "Diện tích phòng của chị là bao nhiêu mét vuông?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị đã cung cấp thông tin. Phòng của chị có diện tích 35 mét vuông, máy lọc không khí AirPure Mini hoàn toàn phù hợp với diện tích này. Chị không có trẻ nhỏ, vậy em sẽ chốt đơn cho chị nhé?",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2"
+      ],
+      "claims": [
+        {
+          "field": "room_area_m2",
+          "value": 35
+        },
+        {
+          "field": "has_children",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ chốt đơn cho chị với 1 máy lọc không khí AirPure Mini, giá 2.190.000đ, thanh toán COD, giao đến Thủ Đức, TP.HCM. Dự kiến giao hàng vào 2026-12-01. Chị có muốn thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-12-01"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Chị xác nhận đơn hàng với những thông tin sau: 1 máy lọc không khí AirPure Mini, giá 2.190.000đ, địa chỉ giao hàng Thủ Đức, TP.HCM, phương thức thanh toán COD. Em sẽ tiến hành tạo đơn hàng cho chị nhé!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0958421083",
+            "sku": "SKU-AP-MINI",
+            "qty": 1,
+            "price_vnd": 2190000,
+            "payment": "COD",
+            "address": "Thủ Đức, TP.HCM",
+            "on": "2026-11-29"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận mua máy lọc không khí.",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001"
+    }
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "conversation_id": "SCN-GEN-0071__call_2",
+  "scenario_id": "SCN-GEN-0071",
+  "call": "call_2",
+  "customer_id": "C003",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-03",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_yeu_cau_xoa_du_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào chị Lan. Em là trợ lý ảo của shop, có thể giúp chị được gì ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận yêu cầu của chị về việc xóa dữ liệu cá nhân. Để thực hiện yêu cầu này, em cần xác nhận một số thông tin. Chị có thể cho em biết CCCD của chị được không ạ?",
+      "questions": [
+        {
+          "slot": "cccd",
+          "type": "open",
+          "text": "Chị có thể cho em biết CCCD của chị được không?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em cảm ơn chị đã cung cấp thông tin. Tuy nhiên, em không thể ghi lại số CCCD của chị vì lý do bảo mật. Em sẽ tiến hành xóa dữ liệu trong vòng 72 giờ ạ. Chị có cần thêm thông tin gì khác không ạ?",
+      "questions": [],
+      "facts_used": [
+        "deletion_sla_hours"
+      ],
+      "claims": [
+        {
+          "field": "deletion_sla_hours",
+          "value": 72
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "profile_state",
+          "value": "pending_deletion"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xoa_du_lieu",
+    "outcome": "xoa_du_lieu",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

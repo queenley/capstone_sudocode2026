@@ -1,0 +1,133 @@
+{
+  "conversation_id": "SCN-GEN-0024__call_2",
+  "scenario_id": "SCN-GEN-0024",
+  "call": "call_2",
+  "customer_id": "C015",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-21",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_mua_doi_size",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Vy, em gọi lại về đơn hàng của chị với sản phẩm giày sneaker Urban Classic size 42 màu đen ạ. Chị đã đổi sang sản phẩm này và lựa chọn phương thức thanh toán là chuyển khoản đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Chị đã lựa chọn phương thức thanh toán là chuyển khoản đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "payment",
+        "product_advised",
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "size",
+          "value": 42
+        },
+        {
+          "field": "payment",
+          "value": "chuyen_khoan"
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-SN-RUN2"
+        },
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Dạ đúng rồi.",
+      "facts_stated": {
+        "payment": "chuyen_khoan"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị đã xác nhận, em sẽ cập nhật đơn hàng của chị với sản phẩm giày mới. Chi phí chênh lệch sẽ là 631.000đ ạ. Mình sẽ hoàn tiền số tiền này về tài khoản ngân hàng của chị trong thời gian 3-5 ngày làm việc ạ. Chị có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "refund_vnd",
+          "value": 631000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Không, chị chỉ cần thông tin đó thôi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em cảm ơn chị Vy. Em sẽ tiến hành cập nhật đơn hàng ngay bây giờ. Chúc chị một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD600001",
+            "action": "exchange_product",
+            "new_variant_sku": "SKU-SN-CAS-42-DEN",
+            "on": "2026-10-21"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "chuyen_khoan"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

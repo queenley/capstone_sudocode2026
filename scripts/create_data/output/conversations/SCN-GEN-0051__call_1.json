@@ -1,0 +1,137 @@
+{
+  "conversation_id": "SCN-GEN-0051__call_1",
+  "scenario_id": "SCN-GEN-0051",
+  "call": "call_1",
+  "customer_id": "SYN-C003",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "nam",
+  "category": "unknown",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Mr. Lê Văn C. Em gọi lại để hỗ trợ thông tin về đơn hàng của mình. Anh đã từng đặt hàng sản phẩm MAB002, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "owned_sku",
+          "type": "confirm",
+          "text": "Anh đã từng đặt hàng sản phẩm MAB002, đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, tôi đã đặt hàng MAB002.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn anh đã xác nhận. Em sẽ kiểm tra tình trạng đơn hàng MAB002 của anh ngay bây giờ ạ.",
+      "questions": [],
+      "facts_used": [
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "O006"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cảm ơn bạn.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, theo thông tin từ hệ thống, đơn hàng MAB002 của anh đã được giao thành công vào ngày 05 tháng 09 năm 2026. Anh có cần thêm thông tin gì khác không ạ?",
+      "questions": [
+        {
+          "slot": "order_status",
+          "type": "confirm",
+          "text": "Anh có cần thêm thông tin gì khác không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "delivered"
+        },
+        {
+          "field": "order_id",
+          "value": "O006"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Không, cảm ơn bạn đã hỗ trợ.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em rất vui khi được giúp đỡ anh. Nếu có bất kỳ câu hỏi nào trong tương lai, hãy gọi cho em nhé. Chúc anh một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi tình trạng đơn hàng",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

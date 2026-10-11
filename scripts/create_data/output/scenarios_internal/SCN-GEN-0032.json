@@ -1,0 +1,213 @@
+{
+  "scenario_id": "SCN-GEN-0032",
+  "level": "M2",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "hard_case": null,
+  "customer_id": "C038",
+  "customer_phone": "0932448452",
+  "customer_name": "Diệp",
+  "honorific": "chị",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "difficulty": "normal",
+  "tags": [
+    "giày_trekking",
+    "hẹn_gọi_lại",
+    "thanh_toán_chuyển_khoản",
+    "ttl",
+    "variant:quay_lai_sau_8_thang",
+    "xác_nhận_mua"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=quay_lai_sau_8_thang; session_index=1",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-16",
+      "days_later": null,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "Xác nhận mua giày trekking HikePro size 38 màu trắng.",
+      "customer_turns": [
+        "Alo, chị gọi để xác nhận mua giày trekking HikePro size 38 màu trắng.",
+        "Chị sẽ thanh toán bằng hình thức chuyển khoản.",
+        "Giao hàng chị muốn đến TP Huế nhé.",
+        "Em lên đơn giúp chị nhé."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "size": 38,
+        "color": "trang",
+        "payment": "chuyen_khoan",
+        "delivery_area": "TP Huế",
+        "product_advised": "SKU-SN-TRK",
+        "price_quoted_vnd": 1990000,
+        "variant_sku": "SKU-SN-TRK-38-TRANG",
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [],
+      "must_not_ask": [],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-TRK-38-TRANG",
+          "price_vnd": 1990000,
+          "payment": "chuyen_khoan"
+        },
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1990000,
+        "list_price_vnd": 1990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "freeship": false,
+        "estimated_delivery": "2026-10-21",
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "size": 38,
+        "color": "trang",
+        "payment": "chuyen_khoan",
+        "delivery_area": "TP Huế",
+        "product_advised": "SKU-SN-TRK",
+        "price_quoted_vnd": 1990000,
+        "variant_sku": "SKU-SN-TRK-38-TRANG",
+        "order_id": "OD600001"
+      },
+      "expected_call_brief": null,
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0932448452",
+            "sku": "SKU-SN-TRK-38-TRANG",
+            "qty": 1,
+            "price_vnd": 1990000,
+            "payment": "chuyen_khoan",
+            "address": "TP Huế",
+            "on": "2026-10-16"
+          },
+          "result": {
+            "order_id": "OD600001",
+            "status": "created",
+            "total_vnd": 1990000,
+            "needs_confirmation_call": false,
+            "estimated_delivery": "2026-10-21"
+          }
+        }
+      ],
+      "simulator_persona_key": "khach_quay_lai_sau_8_thang",
+      "patience_start": 4
+    },
+    "call_2": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2027-06-13",
+      "days_later": 240,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "Hỏi về giày trekking HikePro size 38.",
+      "customer_turns": [
+        "Alo, chị muốn hỏi lại về giày trekking HikePro size 38 mà chị đã hỏi trước đây.",
+        "Giá em nói là bao nhiêu và có khuyến mãi gì không?",
+        "Chị chưa quyết định được, nên hẹn lại nhé."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "product_advised": "SKU-SN-TRK",
+        "price_quoted_vnd": 1990000,
+        "variant_sku": "SKU-SN-TRK-38-TRANG"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [
+        "order_id"
+      ],
+      "must_not_ask": [
+        "order_id"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1990000,
+        "list_price_vnd": 1990000,
+        "promo_active": false,
+        "promo_COD-0_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "call_date": "2027-06-13"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-SN-TRK",
+        "price_quoted_vnd": 1990000,
+        "variant_sku": "SKU-SN-TRK-38-TRANG"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0932448452",
+        "customer_id": "C038",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-16",
+          "channel": "hotline",
+          "outcome": "chot_don"
+        },
+        "products_advised": [
+          "SKU-SN-TRK"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id"
+        ],
+        "suggested_opening": "Dạ em chào chị Diệp, em gọi lại về SKU-SN-TRK chị đang quan tâm ạ",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [
+            "COD-0"
+          ],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2027-06-13T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "khach_quay_lai_sau_8_thang",
+      "patience_start": 3
+    }
+  }
+}

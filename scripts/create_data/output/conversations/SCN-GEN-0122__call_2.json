@@ -1,0 +1,163 @@
+{
+  "conversation_id": "SCN-GEN-0122__call_2",
+  "scenario_id": "SCN-GEN-0122",
+  "call": "call_2",
+  "customer_id": "C050",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-02",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào chị Thủy, em gọi lại về đơn đặt giày chạy bộ size 41 màu đen ạ. Chị xác nhận lại là mình đã quyết định đặt hàng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Chị xác nhận lại là size 41 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "size",
+          "value": 41
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-SN-RUN2"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị. Hình thức thanh toán chị chọn là COD và địa chỉ giao hàng ở Nha Trang, Khánh Hòa đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Chị xác nhận hình thức thanh toán là COD đúng không ạ?"
+        },
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Chị xác nhận địa chỉ giao hàng là Nha Trang, Khánh Hòa đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "payment",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "payment",
+          "value": "COD"
+        },
+        {
+          "field": "delivery_area",
+          "value": "Nha Trang, Khánh Hòa"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị đã xác nhận. Em sẽ tiến hành tạo đơn hàng cho giày chạy bộ size 41 màu đen với giá 1.690.000đ ạ. Chị có muốn em đọc lại thông tin đơn hàng không ạ?",
+      "questions": [],
+      "facts_used": [
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin đọc lại thông tin đơn hàng: Sản phẩm là giày chạy bộ size 41 màu đen, giá 1.690.000đ, thanh toán COD, giao hàng tại Nha Trang, Khánh Hòa. Chị có đồng ý để em tạo đơn hàng không ạ?",
+      "questions": [],
+      "facts_used": [
+        "variant_sku",
+        "price_quoted_vnd",
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị. Em sẽ tạo đơn hàng ngay bây giờ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0956517883",
+            "sku": "SKU-SN-RUN2-41-DEN",
+            "qty": 1,
+            "price_vnd": 1690000,
+            "payment": "COD",
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-11-02"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận đặt hàng giày chạy bộ",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001"
+    }
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "conversation_id": "SCN-GEN-0129__call_1",
+  "scenario_id": "SCN-GEN-0129",
+  "call": "call_1",
+  "customer_id": "SYN-C003",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-14",
+  "region": "nam",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_hoi_ngoai_tai_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Mr. Lê Văn C, em gọi lại về nồi chiên không dầu Xiaomi mà Mr. đã hỏi trong phiên trước ạ. Mr. cần thay đồ cũ đã hỏng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "usage_need",
+          "type": "confirm",
+          "text": "Mr. cần thay đồ cũ đã hỏng đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "usage_need",
+          "value": "thay đồ cũ đã hỏng"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, nồi chiên không dầu Xiaomi 4.5L có giá là 1.590.000đ ạ. Mr. cho em hỏi ngân sách của mình khoảng bao nhiêu ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Mr. cho em hỏi ngân sách của mình khoảng bao nhiêu ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1590000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn Mr. đã cung cấp thông tin. Với ngân sách khoảng 2 triệu, nồi chiên không dầu Xiaomi 4.5L là sự lựa chọn hợp lý ạ. Nồi này hiện tại không có khuyến mãi nào, nhưng vẫn là sản phẩm rất đáng để xem xét ạ.",
+      "questions": [],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu Mr. chờ cuối tháng để nhận lương. Khi nào Mr. sẵn sàng, em sẽ gọi lại để hỗ trợ thêm ạ. Chúc Mr. một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ ghi nhận lại lịch gọi lại cho Mr. vào cuối tháng. Cảm ơn Mr. đã gọi đến, hẹn gặp lại ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ ghi nhận lại lịch gọi lại cho Mr. vào cuối tháng. Cảm ơn Mr. đã gọi đến, hẹn gặp lại ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "conversation_id": "SCN-GEN-0006__call_1",
+  "scenario_id": "SCN-GEN-0006",
+  "call": "call_1",
+  "customer_id": "C002",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, xin chào anh Tuấn. Anh gọi đến để hỏi về giày chạy bộ size 38 màu đen đúng không ạ?",
+      "questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Anh có hỏi về size 38 không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giày chạy bộ size 38 màu đen hiện có giá 1.161.000đ và có khuyến mãi 10% cho đơn hàng này. Anh có muốn biết thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1161000
+        },
+        {
+          "field": "promo_ACTIVE",
+          "value": true
+        },
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu ạ. Anh cần hỏi vợ trước khi quyết định mua. Vậy em sẽ ghi nhớ và hẹn anh gọi lại sau nhé. Anh có thể cho em biết thời gian anh sẽ gọi lại không ạ?",
+      "questions": [
+        {
+          "slot": "decision_maker",
+          "type": "open",
+          "text": "Khi nào anh sẽ gọi lại sau?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần hỏi vợ"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

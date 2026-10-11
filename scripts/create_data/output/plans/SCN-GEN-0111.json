@@ -1,0 +1,197 @@
+{
+  "scenario_id": "SCN-GEN-0111",
+  "level": "M2",
+  "persona": "khach_da_kenh_fb_hotline",
+  "hard_case": "teencode_da_kenh",
+  "customer_id": "C036",
+  "customer_phone": "0949066882",
+  "customer_name": "Phương",
+  "honorific": "chị",
+  "region": "nam",
+  "category": "gia-dung/quat",
+  "difficulty": "hard",
+  "tags": [
+    "cross_channel",
+    "hard_case",
+    "teencode",
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "HR"
+  ],
+  "notes": "variant=chuan; session_index=2; call_2: out of stock at decision time -> hen_goi_lai",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.c036",
+      "call_date": "2026-10-31",
+      "days_later": null,
+      "input_mode": "chat_teencode",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker)."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "usage_need": "dùng cho gia đình",
+        "budget_vnd": 2000000,
+        "phone_provided": true,
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "product_advised": "SKU-FAN-TWR",
+        "price_quoted_vnd": 1790000
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [],
+      "must_not_ask": [],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_stock",
+            "value": true
+          }
+        ],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1790000,
+        "list_price_vnd": 1790000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": false,
+        "call_date": "2026-10-31"
+      },
+      "memory_expectation": {
+        "usage_need": "dùng cho gia đình",
+        "budget_vnd": 2000000,
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "product_advised": "SKU-FAN-TWR",
+        "price_quoted_vnd": 1790000
+      },
+      "expected_call_brief": null,
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "khach_da_kenh_fb_hotline",
+      "patience_start": 4
+    },
+    "call_2": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-11-02",
+      "days_later": 2,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Sản phẩm HẾT HÀNG đúng lúc khách quyết mua. Khách muốn mua, được báo ngày dự kiến có hàng (nếu có) và đồng ý hẹn lại; khách không đặt được đơn."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "product_advised": "SKU-FAN-TWR",
+        "price_quoted_vnd": 1790000,
+        "promo_code": "NAM-SHIP0",
+        "promo_expiry": "2026-11-05"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "phone_provided",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_stock",
+            "value": true
+          }
+        ],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1790000,
+        "list_price_vnd": 1790000,
+        "promo_active": true,
+        "promo_NAM-SHIP0_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": false,
+        "freeship": true,
+        "call_date": "2026-11-02"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-FAN-TWR",
+        "price_quoted_vnd": 1790000,
+        "promo_code": "NAM-SHIP0"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0949066882",
+        "customer_id": "C036",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-31",
+          "channel": "chat_fanpage",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-FAN-TWR"
+        ],
+        "open_blockers": [
+          "muốn gọi hotline hỏi thêm"
+        ],
+        "must_not_ask": [
+          "budget_vnd",
+          "usage_need",
+          "phone_provided",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào chị Phương, em gọi lại về SKU-FAN-TWR chị đang quan tâm ạ, không biết muốn gọi hotline hỏi thêm chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": false
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-02T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "khach_da_kenh_fb_hotline",
+      "patience_start": 3
+    }
+  }
+}

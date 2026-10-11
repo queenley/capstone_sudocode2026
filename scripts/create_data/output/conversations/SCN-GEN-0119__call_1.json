@@ -1,0 +1,149 @@
+{
+  "conversation_id": "SCN-GEN-0119__call_1",
+  "scenario_id": "SCN-GEN-0119",
+  "call": "call_1",
+  "customer_id": "SYN-C007",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "bac",
+  "category": "unknown",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Mr. Lê Văn G, em gọi lại về đơn hàng của anh ạ. Đơn hàng O014 của anh hiện tại đang ở trạng thái \"đang vận chuyển\" và dự kiến sẽ được giao sớm thôi ạ. Anh có cần thêm thông tin gì không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Đơn hàng O014 của anh đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "owned_sku",
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "O014"
+        },
+        {
+          "field": "order_status",
+          "value": "shipping"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "O014"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, vậy bao giờ thì tôi nhận được hàng?",
+      "facts_stated": {
+        "order_id": "O014"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, đơn hàng của anh sẽ được giao trong khoảng từ 1 đến 3 ngày làm việc tùy thuộc vào địa chỉ giao hàng ạ. Anh có muốn kiểm tra theo dõi đơn hàng không ạ?",
+      "questions": [
+        {
+          "slot": "tracking",
+          "type": "open",
+          "text": "Anh có muốn tôi cung cấp thông tin theo dõi đơn hàng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có, cho tôi biết thông tin theo dõi đơn hàng.",
+      "facts_stated": {
+        "order_id": "O014"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, mã theo dõi của đơn hàng O014 là TRACK101112. Anh có thể sử dụng mã này để tra cứu tình trạng đơn hàng ạ. Còn gì em có thể giúp cho anh không ạ?",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "tracking",
+          "value": "TRACK101112"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Không, cảm ơn bạn.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em cảm ơn anh đã gọi đến Shop BTC. Chúc anh một ngày vui vẻ ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi tình trạng đơn hàng",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

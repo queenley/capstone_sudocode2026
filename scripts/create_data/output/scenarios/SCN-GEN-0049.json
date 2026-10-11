@@ -1,0 +1,186 @@
+{
+  "scenario_id": "SCN-GEN-0049",
+  "level": "M2",
+  "persona": "khach_mua_nhieu_mon",
+  "hard_case": "16_luot_4_san_pham_vuot_cod",
+  "customer_id": "C029",
+  "customer_phone": "0930048764",
+  "customer_name": "Hà",
+  "honorific": "chị",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "hard",
+  "tags": [
+    "budget",
+    "cod_limit",
+    "hard_case",
+    "hẹn_gọi_lại",
+    "khách_hàng",
+    "multi_item",
+    "máy_lọc_không_khí",
+    "tư_vấn",
+    "variant:bon_san_pham_vuot_cod"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR"
+  ],
+  "notes": "variant=bon_san_pham_vuot_cod; session_index=1; call_2: out of stock at decision time -> hen_goi_lai",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-15",
+      "input_mode": "text",
+      "customer_goal": "Hỏi về máy lọc không khí cho phòng 30m² có trẻ nhỏ",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về máy lọc không khí cho phòng khoảng 30 mét vuông.",
+        "Nhà chị có trẻ nhỏ, ngân sách tầm 8 triệu rưỡi thôi.",
+        "Máy này có khuyến mãi gì không em?",
+        "Chị cần suy nghĩ thêm rồi sẽ gọi lại nhé."
+      ],
+      "facts_established": {
+        "room_area_m2": 30,
+        "has_children": true,
+        "budget_vnd": 8500000,
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT",
+        "promo_expiry": "2026-10-30"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "ground_truth_facts": {
+        "price_vnd": 7690000,
+        "list_price_vnd": 7990000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": true,
+        "promo_AIR-2ND-50_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-15"
+      },
+      "memory_expectation": {
+        "room_area_m2": 30,
+        "has_children": true,
+        "budget_vnd": 8500000,
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-10-18",
+      "days_later": 3,
+      "input_mode": "text",
+      "customer_goal": "Hỏi về máy lọc không khí AirPure Pro đã có hàng chưa",
+      "customer_turns": [
+        "Alo, chị gọi lại để hỏi về máy lọc không khí AirPure Pro.",
+        "Hôm trước em nói máy hết hàng, giờ có hàng chưa em?",
+        "Chị rất muốn mua cái này cho phòng của chị.",
+        "Nếu có hàng thì chị sẽ đặt ngay.",
+        "Em có biết ngày nào máy sẽ có hàng không?",
+        "Chị đã chuẩn bị ngân sách rồi, khoảng 8 triệu rưỡi.",
+        "Chị cần máy này sớm để dùng cho con.",
+        "Nếu không có hàng thì chị sẽ chờ thêm."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT",
+        "promo_expiry": "2026-10-30"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 7690000,
+        "list_price_vnd": 7990000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": true,
+        "promo_AIR-2ND-50_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": false,
+        "restock_date": "2026-10-21",
+        "freeship": true,
+        "call_date": "2026-10-18"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0930048764",
+        "customer_id": "C029",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-15",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-AP-PRO"
+        ],
+        "open_blockers": [
+          "cần suy nghĩ thêm"
+        ],
+        "must_not_ask": [
+          "room_area_m2",
+          "has_children",
+          "budget_vnd",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào chị Hà, em gọi lại về SKU-AP-PRO chị đang quan tâm ạ, không biết cần suy nghĩ thêm chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": false
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-18T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "21/10",
+          "ngày 21"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_stock",
+            "value": true
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "conversation_id": "SCN-GEN-0125__call_2",
+  "scenario_id": "SCN-GEN-0125",
+  "call": "call_2",
+  "customer_id": "SYN-C002",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-17",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Ms. Trần Thị B, em gọi lại về sản phẩm máy tiệt trùng mà Ms. đã quan tâm ạ. Em thấy Ms. đã xem xét kỹ rồi nhưng không mua nữa, phải không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Chị có muốn so sánh thêm không?"
+        }
+      ],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu ạ. Giá của máy tiệt trùng này là 1.890.000đ, và hiện tại có khuyến mãi miễn phí vận chuyển nếu Ms. sử dụng mã MOM-FREESHIP, mã này sẽ hết hạn vào ngày 29/11 ạ.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "promo_expiry",
+          "value": "2026-11-29"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, nếu Ms. có bất kỳ câu hỏi nào khác hoặc cần thêm thông tin, đừng ngần ngại cho em biết ạ. Em cảm ơn Ms. đã dành thời gian tư vấn hôm nay.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu rằng chị sẽ tìm hiểu thêm và quay lại sau nếu cần ạ. Chúc chị có một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_choi",
+    "outcome": "tu_choi",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

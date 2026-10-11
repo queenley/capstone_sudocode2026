@@ -1,0 +1,106 @@
+{
+  "conversation_id": "SCN-GEN-0084__call_2",
+  "scenario_id": "SCN-GEN-0084",
+  "call": "call_2",
+  "customer_id": "C008",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-03",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Long, em gọi lại về xe đẩy gấp gọn Joie Pact anh đang quan tâm ạ. Trước đây anh có nói là chờ cuối tháng nhận lương đúng không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Anh có phải đang chờ cuối tháng nhận lương không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, xe đẩy Joie Pact hiện vẫn chưa có hàng. Giá của xe này là 3.490.000đ. Em sẽ báo lại cho anh ngay khi có hàng nhé.",
+      "questions": [],
+      "facts_used": [
+        "price_quoted_vnd",
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Ngoài ra, anh cũng có thể sử dụng mã khuyến mãi MOM-FREESHIP để được miễn phí vận chuyển khi mua hàng khác trong thời gian này ạ.",
+      "questions": [],
+      "facts_used": [
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ báo lại cho anh khi có hàng nha. Anh có cần hỗ trợ gì thêm không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

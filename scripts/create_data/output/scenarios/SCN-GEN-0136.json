@@ -1,0 +1,332 @@
+{
+  "scenario_id": "SCN-GEN-0136",
+  "level": "M2",
+  "persona": "khach_cap_nhat_thong_tin",
+  "hard_case": "ba_phien_doi_thong_tin",
+  "customer_id": "SYN-C010",
+  "customer_phone": "0998000010",
+  "customer_name": "Đinh Văn J",
+  "honorific": "Mr.",
+  "region": "bac",
+  "category": "gia-dung/combo",
+  "difficulty": "hard",
+  "tags": [
+    "cap_nhat_thong_tin",
+    "dat_hang",
+    "hard_case",
+    "ho_tro_khach_hang",
+    "order_status",
+    "supersede",
+    "tu_van_san_pham",
+    "variant:ba_phien_doi_thong_tin"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=ba_phien_doi_thong_tin; session_index=2",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-29",
+      "input_mode": "text",
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C010",
+          "session_id": "SYN-010-S1",
+          "date": "2026-09-01",
+          "channel": "hotline",
+          "summary": "Hỏi về chương trình khuyến mãi",
+          "outcome": "successful",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C010",
+          "session_id": "SYN-010-S2",
+          "date": "2026-09-02",
+          "channel": "zalo_oa",
+          "summary": "Tìm hiểu về sản phẩm mới",
+          "outcome": "successful",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C010",
+          "order_id": "O019",
+          "date": "2026-06-30",
+          "sku": "HAP007",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "O019"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C010",
+          "order_id": "O020",
+          "date": "2026-09-28",
+          "sku": "HAP008",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "HAP008"
+          }
+        }
+      ],
+      "customer_goal": "Hỏi về sản phẩm Combo AirPure Y cho gia đình",
+      "customer_turns": [
+        "Alo, em chào chị, hôm trước chị có hỏi về sản phẩm mới đúng không?",
+        "Chị muốn mua Combo AirPure Y cho gia đình, giá cả thế nào em?",
+        "Chị dự định ngân sách khoảng 6 triệu rưỡi thôi.",
+        "Chị đang chờ cuối tháng nhận lương mới quyết định, nên có thể gọi lại không em?"
+      ],
+      "facts_established": {
+        "usage_need": "dùng cho gia đình",
+        "budget_vnd": 6500000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-BDL-AIR",
+        "price_quoted_vnd": 6390000
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 6390000,
+        "list_price_vnd": 6390000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-29"
+      },
+      "memory_expectation": {
+        "usage_need": "dùng cho gia đình",
+        "budget_vnd": 6500000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-BDL-AIR",
+        "price_quoted_vnd": 6390000
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000010",
+        "customer_id": "SYN-C010",
+        "is_returning": true,
+        "n_previous_sessions": 2,
+        "last_session": {
+          "date": "2026-09-02",
+          "channel": "zalo_oa",
+          "outcome": "successful",
+          "summary": "Tìm hiểu về sản phẩm mới"
+        },
+        "products_advised": [
+          "HAP008"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Mr. Đinh Văn J, em gọi lại về HAP008 Mr. đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-29T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-11-02",
+      "days_later": 4,
+      "input_mode": "text",
+      "customer_goal": "Xác nhận mua sản phẩm và thông tin giao hàng",
+      "customer_turns": [
+        "Alo, em, hôm trước chị đã hỏi về Combo AirPure Y rồi, giờ chị muốn đặt hàng.",
+        "Chị sẽ thanh toán COD, khu vực giao hàng là Cầu Giấy, Hà Nội.",
+        "Ngân sách của chị bây giờ khoảng 7 triệu rưỡi, em có thể lên đơn cho chị không?",
+        "Chị đồng ý, làm ơn giúp chị đặt hàng nhé."
+      ],
+      "facts_established": {
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "budget_vnd": 7700000,
+        "payment": "COD",
+        "product_advised": "SKU-BDL-AIR",
+        "price_quoted_vnd": 6390000,
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 6390000,
+        "list_price_vnd": 6390000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "estimated_delivery": "2026-11-04",
+        "call_date": "2026-11-02"
+      },
+      "memory_expectation": {
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "budget_vnd": 7700000,
+        "payment": "COD",
+        "product_advised": "SKU-BDL-AIR",
+        "price_quoted_vnd": 6390000,
+        "order_id": "OD600001",
+        "superseded": {
+          "budget_vnd": 6500000,
+          "order_id": "O019"
+        }
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000010",
+        "customer_id": "SYN-C010",
+        "is_returning": true,
+        "n_previous_sessions": 3,
+        "last_session": {
+          "date": "2026-10-29",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "HAP008",
+          "SKU-BDL-AIR"
+        ],
+        "open_blockers": [
+          "chờ cuối tháng nhận lương"
+        ],
+        "must_not_ask": [
+          "budget_vnd",
+          "usage_need",
+          "product_advised",
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Mr. Đinh Văn J, em gọi lại về HAP008 Mr. đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-02T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-BDL-AIR",
+          "price_vnd": 6390000,
+          "payment": "COD"
+        }
+      }
+    },
+    "call_3": {
+      "channel": "hotline",
+      "call_date": "2026-11-04",
+      "days_later": 2,
+      "input_mode": "text",
+      "customer_goal": "Hỏi tình trạng đơn hàng đã đặt",
+      "customer_turns": [
+        "Alo, em ơi, cho chị hỏi tình trạng đơn hàng chị đã đặt hôm trước.",
+        "Chị không nhớ mã đơn hàng, em có thể kiểm tra giúp chị không?",
+        "Chị chỉ muốn biết đơn hàng của chị đã được xử lý chưa."
+      ],
+      "expected_outcome": "cap_nhat_don",
+      "must_carry_over": [
+        "payment",
+        "delivery_area",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "order_id": "OD600001",
+        "order_status": "created",
+        "call_date": "2026-11-04"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000010",
+        "customer_id": "SYN-C010",
+        "is_returning": true,
+        "n_previous_sessions": 4,
+        "last_session": {
+          "date": "2026-11-02",
+          "channel": "hotline",
+          "outcome": "chot_don"
+        },
+        "products_advised": [
+          "HAP008",
+          "SKU-BDL-AIR"
+        ],
+        "open_blockers": [
+          "chờ cuối tháng nhận lương"
+        ],
+        "must_not_ask": [
+          "budget_vnd",
+          "usage_need",
+          "payment",
+          "delivery_area",
+          "product_advised",
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Mr. Đinh Văn J, em gọi lại về HAP008 Mr. đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-04T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD600001"
+        },
+        "must_say_any": [
+          "đã tạo",
+          "đang xử lý",
+          "đang chuẩn bị",
+          "đã ghi nhận"
+        ]
+      }
+    }
+  }
+}

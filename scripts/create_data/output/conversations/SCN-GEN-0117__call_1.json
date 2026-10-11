@@ -1,0 +1,101 @@
+{
+  "conversation_id": "SCN-GEN-0117__call_1",
+  "scenario_id": "SCN-GEN-0117",
+  "call": "call_1",
+  "customer_id": "C040",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-31",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_mua_nhieu_mon",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị Quỳnh, em chào chị ạ! Chị đang quan tâm đến máy lọc không khí AirPure Pro, đúng không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị đã xác nhận. Với phòng khoảng 40 mét vuông và không có trẻ nhỏ như nhà chị, máy lọc không khí AirPure Pro rất phù hợp ạ. Giá của sản phẩm này là 7.990.000đ.",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2",
+        "has_children"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Chị có cho em biết ngân sách của mình là 8 triệu đồng, như vậy chị có thể mua máy này mà không lo về giá. Hiện tại, máy AirPure Pro không có khuyến mãi nào áp dụng ạ.",
+      "questions": [],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em hiểu chị cần bàn với gia đình trước khi quyết định. Chị có muốn hẹn lại thời gian để em gọi lại không ạ?",
+      "questions": [
+        {
+          "slot": "callback_time",
+          "type": "open",
+          "text": "Chị muốn hẹn lại vào thời gian nào?"
+        }
+      ],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

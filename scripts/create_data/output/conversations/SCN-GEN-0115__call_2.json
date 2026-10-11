@@ -1,0 +1,143 @@
+{
+  "conversation_id": "SCN-GEN-0115__call_2",
+  "scenario_id": "SCN-GEN-0115",
+  "call": "call_2",
+  "customer_id": "C035",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-12-26",
+  "region": "trung",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị Dung đúng không ạ? Hôm trước cô Loan đã hỏi mua máy lọc không khí cho phòng 20 mét vuông. Chị có muốn xác nhận thông tin này không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Chị có xác nhận phòng chị cần máy lọc không khí là 20 mét vuông không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị Dung đã xác nhận. Em thấy chị muốn thanh toán bằng chuyển khoản, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Chị muốn thanh toán bằng chuyển khoản đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Chị đã chọn giao hàng ở Quận 7, TP.HCM, đúng không ạ? Em sẽ ghi nhận địa chỉ này để tiến hành đơn hàng.",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Chị có xác nhận giao hàng ở Quận 7, TP.HCM không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Chị Dung, em đã ghi nhận thông tin đơn hàng. Chị muốn đặt 1 máy lọc không khí AirPure Mini với giá 2.190.000đ, thanh toán chuyển khoản, giao hàng ở Quận 7. Chị có muốn chốt đơn ngay bây giờ không ạ?",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-AP-MINI"
+        },
+        {
+          "field": "payment",
+          "value": "chuyen_khoan"
+        },
+        {
+          "field": "delivery_area",
+          "value": "Quận 7, TP.HCM"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0958421083",
+            "sku": "SKU-AP-MINI",
+            "qty": 1,
+            "price_vnd": 2190000,
+            "payment": "chuyen_khoan",
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-12-26"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận mua máy lọc không khí",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001",
+      "status": "created",
+      "total_vnd": 2190000,
+      "needs_confirmation_call": false,
+      "estimated_delivery": "2026-12-29"
+    }
+  }
+}

@@ -1,0 +1,300 @@
+{
+  "scenario_id": "SCN-GEN-0066",
+  "level": "M2",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "hard_case": "doi_khuyen_mai_het_han",
+  "customer_id": "SYN-C006",
+  "customer_phone": "0998000006",
+  "customer_name": "Nguyễn Thị F",
+  "honorific": "Ms.",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "hard",
+  "tags": [
+    "hard_case",
+    "ttl",
+    "variant:quay_lai_sau_8_thang"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR"
+  ],
+  "notes": "variant=quay_lai_sau_8_thang; session_index=1; call_2: promotion NAM-SHIP0 no longer applies",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-17",
+      "days_later": null,
+      "input_mode": "text",
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C006",
+          "session_id": "SYN-006-S1",
+          "date": "2026-09-01",
+          "channel": "hotline",
+          "summary": "Tìm hiểu sản phẩm cho trẻ sơ sinh",
+          "outcome": "successful",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C006",
+          "session_id": "SYN-006-S2",
+          "date": "2026-09-02",
+          "channel": "zalo_oa",
+          "summary": "Phản hồi về chất lượng sản phẩm",
+          "outcome": "successful",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C006",
+          "order_id": "O011",
+          "date": "2026-08-20",
+          "sku": "MAB003",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "O011"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C006",
+          "order_id": "O012",
+          "date": "2026-09-30",
+          "sku": "MAB004",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "MAB004"
+          }
+        }
+      ],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] order",
+      "customer_turns": [
+        "[plan-only] Khách xác nhận muốn mua, nêu hình thức thanh toán và khu vực giao hàng (chỉ quận/tỉnh), đồng ý lên đơn."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "room_area_m2": 40,
+        "has_children": true,
+        "budget_vnd": 6500000,
+        "payment": "COD",
+        "delivery_area": "Thủ Đức, TP.HCM",
+        "product_advised": "SKU-SS-AX40",
+        "price_quoted_vnd": 6490000,
+        "promo_code": "NAM-SHIP0",
+        "promo_expiry": "2026-11-05",
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SS-AX40",
+          "price_vnd": 6490000,
+          "payment": "COD"
+        },
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 6490000,
+        "list_price_vnd": 6490000,
+        "promo_active": true,
+        "promo_NAM-SHIP0_active": true,
+        "promo_COD-0_active": true,
+        "promo_AIR-2ND-50_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "estimated_delivery": "2026-10-20",
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "room_area_m2": 40,
+        "has_children": true,
+        "budget_vnd": 6500000,
+        "payment": "COD",
+        "delivery_area": "Thủ Đức, TP.HCM",
+        "product_advised": "SKU-SS-AX40",
+        "price_quoted_vnd": 6490000,
+        "promo_code": "NAM-SHIP0",
+        "order_id": "OD600001",
+        "superseded": {
+          "order_id": "O011"
+        }
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000006",
+        "customer_id": "SYN-C006",
+        "is_returning": true,
+        "n_previous_sessions": 2,
+        "last_session": {
+          "date": "2026-09-02",
+          "channel": "zalo_oa",
+          "outcome": "successful",
+          "summary": "Phản hồi về chất lượng sản phẩm"
+        },
+        "products_advised": [
+          "MAB004"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Ms. Nguyễn Thị F, em gọi lại về MAB004 Ms. đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-17T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000006",
+            "sku": "SKU-SS-AX40",
+            "qty": 1,
+            "price_vnd": 6490000,
+            "payment": "COD",
+            "address": "Thủ Đức, TP.HCM",
+            "on": "2026-10-17"
+          },
+          "result": {
+            "order_id": "OD600001",
+            "status": "created",
+            "total_vnd": 6490000,
+            "needs_confirmation_call": true,
+            "estimated_delivery": "2026-10-20"
+          }
+        }
+      ],
+      "simulator_persona_key": "khach_quay_lai_sau_8_thang",
+      "patience_start": 4
+    },
+    "call_2": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2027-06-14",
+      "days_later": 240,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker)."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "product_advised": "SKU-SS-AX40",
+        "price_quoted_vnd": 6490000
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "promo_NAM-SHIP0_active",
+            "value": true
+          }
+        ],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 6490000,
+        "list_price_vnd": 6490000,
+        "promo_active": false,
+        "promo_AIR-2ND-50_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "promo_COD-0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "call_date": "2027-06-14"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-SS-AX40",
+        "price_quoted_vnd": 6490000
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000006",
+        "customer_id": "SYN-C006",
+        "is_returning": true,
+        "n_previous_sessions": 3,
+        "last_session": {
+          "date": "2026-10-17",
+          "channel": "hotline",
+          "outcome": "chot_don"
+        },
+        "products_advised": [
+          "MAB004",
+          "SKU-SS-AX40"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Ms. Nguyễn Thị F, em gọi lại về MAB004 Ms. đang quan tâm ạ",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [
+            "COD-0",
+            "NAM-SHIP0"
+          ],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2027-06-14T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "khach_quay_lai_sau_8_thang",
+      "patience_start": 3
+    }
+  }
+}

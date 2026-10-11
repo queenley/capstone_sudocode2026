@@ -1,0 +1,264 @@
+{
+  "scenario_id": "SCN-GEN-0108",
+  "level": "M1",
+  "persona": "khach_da_mua_doi_size",
+  "hard_case": "km_loai_tru_size",
+  "customer_id": "C030",
+  "customer_phone": "0991280845",
+  "customer_name": "Việt",
+  "honorific": "anh",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "difficulty": "hard",
+  "tags": [
+    "chuyển_khoản",
+    "exchange",
+    "giày_chạy_bộ",
+    "hard_case",
+    "variant:size_43_loai_tru_km",
+    "variant_surcharge",
+    "xác_nhận_don",
+    "đổi_size"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR"
+  ],
+  "notes": "variant=size_43_loai_tru_km; session_index=2",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-15",
+      "days_later": null,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "Xác nhận đơn hàng giày chạy bộ.",
+      "customer_turns": [
+        "Alo, anh muốn xác nhận đơn hàng giày chạy bộ size 43 màu đen.",
+        "Hình thức thanh toán của anh sẽ là chuyển khoản.",
+        "Khu vực giao hàng là Quận 7, TP.HCM nhé.",
+        "Cho anh hỏi là giày này còn hàng không em?",
+        "Ok, anh đồng ý lên đơn."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "size": 43,
+        "color": "den",
+        "payment": "chuyen_khoan",
+        "delivery_area": "Quận 7, TP.HCM",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1740000,
+        "variant_sku": "SKU-SN-RUN2-43-DEN",
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [],
+      "must_not_ask": [],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-RUN2-43-DEN",
+          "price_vnd": 1740000,
+          "payment": "chuyen_khoan"
+        },
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1740000,
+        "list_price_vnd": 1740000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN2-SALE_active": false,
+        "promo_RUN-10_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "estimated_delivery": "2026-10-17",
+        "call_date": "2026-10-15"
+      },
+      "memory_expectation": {
+        "size": 43,
+        "color": "den",
+        "payment": "chuyen_khoan",
+        "delivery_area": "Quận 7, TP.HCM",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1740000,
+        "variant_sku": "SKU-SN-RUN2-43-DEN",
+        "order_id": "OD600001"
+      },
+      "expected_call_brief": null,
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0991280845",
+            "sku": "SKU-SN-RUN2-43-DEN",
+            "qty": 1,
+            "price_vnd": 1740000,
+            "payment": "chuyen_khoan",
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-10-15"
+          },
+          "result": {
+            "order_id": "OD600001",
+            "status": "created",
+            "total_vnd": 1740000,
+            "needs_confirmation_call": false,
+            "estimated_delivery": "2026-10-17"
+          }
+        }
+      ],
+      "simulator_persona_key": "khach_da_mua_doi_size",
+      "patience_start": 4
+    },
+    "call_2": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-20",
+      "days_later": 5,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "Đổi size giày.",
+      "customer_turns": [
+        "Alo, anh vừa nhận giày nhưng bị chật quá.",
+        "Anh muốn đổi sang size 42.",
+        "Làm ơn cho anh biết có đổi được không?",
+        "Anh không nhớ mã đơn nhưng đã đặt giày chạy bộ màu đen.",
+        "Cảm ơn em, anh chờ phản hồi từ bên em."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "size": 42
+      },
+      "expected_outcome": "cap_nhat_don",
+      "must_carry_over": [
+        "size",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "order_id"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "variant_sku",
+        "order_id"
+      ],
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "OD600001",
+          "new_variant_sku": "SKU-SN-RUN2-42-DEN",
+          "action": "exchange_size"
+        },
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [
+          "219.000",
+          "219000"
+        ],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [
+          {
+            "field": "exchange_fee_vnd",
+            "value": 30000
+          }
+        ],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "order_id": "OD600001",
+        "new_variant_sku": "SKU-SN-RUN2-42-DEN",
+        "exchange_fee_vnd": 0,
+        "refund_vnd": 219000,
+        "extra_payment_vnd": 0,
+        "new_size_in_stock": true,
+        "return_days": 7,
+        "call_date": "2026-10-20"
+      },
+      "memory_expectation": {
+        "size": 42,
+        "superseded": {
+          "size": 43
+        }
+      },
+      "expected_call_brief": {
+        "customer_phone": "0991280845",
+        "customer_id": "C030",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-15",
+          "channel": "hotline",
+          "outcome": "chot_don"
+        },
+        "products_advised": [
+          "SKU-SN-RUN2"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "size",
+          "color",
+          "payment",
+          "delivery_area",
+          "product_advised",
+          "variant_sku",
+          "order_id"
+        ],
+        "suggested_opening": "Dạ em chào anh Việt, em gọi lại về SKU-SN-RUN2 anh đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-20T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD600001",
+            "action": "exchange_size",
+            "new_variant_sku": "SKU-SN-RUN2-42-DEN",
+            "on": "2026-10-20"
+          },
+          "result": {
+            "order_id": "OD600001",
+            "action": "exchange_size",
+            "new_variant_sku": "SKU-SN-RUN2-42-DEN",
+            "fee_vnd": 0,
+            "price_diff_vnd": -219000,
+            "refund_vnd": 219000,
+            "extra_payment_vnd": 0,
+            "refund_days": "3-5 ngày làm việc",
+            "status": "pickup_scheduled"
+          }
+        }
+      ],
+      "simulator_persona_key": "khach_da_mua_doi_size",
+      "patience_start": 3
+    }
+  }
+}

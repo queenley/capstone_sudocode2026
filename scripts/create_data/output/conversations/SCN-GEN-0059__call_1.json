@@ -1,0 +1,209 @@
+{
+  "conversation_id": "SCN-GEN-0059__call_1",
+  "scenario_id": "SCN-GEN-0059",
+  "call": "call_1",
+  "customer_id": "SYN-C002",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "trung",
+  "category": "thoi-trang/ao-khoac",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Ms. Trần Thị B. Em gọi lại về sản phẩm áo phao lông vũ Warmly size L màu navy mà chị đang quan tâm ạ. Chị có nhớ là mình đã hỏi về sản phẩm này trong lần trước không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Chị có còn muốn so sánh thêm sản phẩm không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "O003"
+        },
+        {
+          "field": "owned_sku",
+          "value": "FAS002"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, em ạ.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn chị đã xác nhận ạ. Sản phẩm áo phao này hiện có màu navy và giá của nó là 1.490.000đ. Chị muốn biết thêm màu sắc nào khác không ạ?",
+      "questions": [
+        {
+          "slot": "color",
+          "type": "open",
+          "text": "Chị có muốn biết thêm về màu sắc khác không ạ?"
+        }
+      ],
+      "facts_used": [
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Áo này có màu nào khác không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, áo phao lông vũ Warmly size L hiện chỉ có màu navy thôi chị ạ. Nếu chị quan tâm đến màu khác, em có thể giới thiệu sản phẩm khác cho chị xem ạ. Chị có muốn tham khảo thêm không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Chị có muốn xem sản phẩm khác không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn so sánh thêm trước khi quyết định.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu ạ. Chị hãy cho em biết những sản phẩm nào chị muốn so sánh, em sẽ giúp chị tìm thông tin ạ. Chị cần thông tin gì thêm không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "open",
+          "text": "Chị muốn so sánh với sản phẩm nào khác không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chưa có, nhưng chị sẽ cân nhắc.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu ạ. Nếu chị cần thêm thông tin hoặc quyết định, chị có thể để lại số điện thoại để em gọi lại cho chị vào lúc khác nhé. Em sẽ ghi nhận lại để gọi lại cho chị ạ. Chị có muốn để lại số điện thoại không ạ?",
+      "questions": [
+        {
+          "slot": "customer_phone",
+          "type": "open",
+          "text": "Chị có muốn để lại số điện thoại không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "muốn so sánh thêm"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Số điện thoại của chị là 0998000002.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn chị Trần Thị B đã cung cấp số điện thoại ạ. Em sẽ gọi lại cho chị sớm để hỗ trợ thêm ạ. Chúc chị một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [
+        "customer_phone"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": {
+      "customer_phone": "0998000002"
+    },
+    "order": null
+  }
+}

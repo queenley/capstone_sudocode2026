@@ -1,0 +1,195 @@
+{
+  "scenario_id": "SCN-GEN-0135",
+  "level": "M2",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "customer_id": "SYN-C008",
+  "customer_phone": "0998000008",
+  "customer_name": "Trần Văn H",
+  "honorific": "Mr.",
+  "region": "trung",
+  "category": "unknown",
+  "difficulty": "normal",
+  "tags": [
+    "address_change",
+    "customer_inquiry",
+    "delivery",
+    "order",
+    "order_status",
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=chuan; session_index=3",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-11-14",
+      "input_mode": "text",
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C008",
+          "session_id": "SYN-008-S1",
+          "date": "2026-09-01",
+          "channel": "hotline",
+          "summary": "Hỏi về giày dép nam",
+          "outcome": "successful",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C008",
+          "session_id": "SYN-008-S2",
+          "date": "2026-09-02",
+          "channel": "zalo_oa",
+          "summary": "Tìm hiểu về chất liệu sản phẩm",
+          "outcome": "successful",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C008",
+          "order_id": "O015",
+          "date": "2026-05-05",
+          "sku": "FAS005",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "O015"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C008",
+          "order_id": "O016",
+          "date": "2026-09-15",
+          "sku": "FAS006",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "FAS006"
+          }
+        }
+      ],
+      "customer_goal": "Hỏi tình trạng đơn hàng FAS006",
+      "customer_turns": [
+        "Alo, em chào chị, chị muốn hỏi tình trạng đơn hàng FAS006 mà chị đặt hôm trước.",
+        "Chị thấy hôm nay đã gần ngày giao hàng mà không thấy cập nhật gì cả, em có thông tin gì không?"
+      ],
+      "expected_outcome": "cap_nhat_don",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "order_id": "O016",
+        "order_status": "delivered",
+        "call_date": "2026-11-14"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000008",
+        "customer_id": "SYN-C008",
+        "is_returning": true,
+        "n_previous_sessions": 2,
+        "last_session": {
+          "date": "2026-09-02",
+          "channel": "zalo_oa",
+          "outcome": "successful",
+          "summary": "Tìm hiểu về chất liệu sản phẩm"
+        },
+        "products_advised": [
+          "FAS006"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Mr. Trần Văn H, em gọi lại về FAS006 Mr. đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-14T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "O016"
+        },
+        "must_say_any": [
+          "đã giao",
+          "giao thành công"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-11-16",
+      "days_later": 2,
+      "input_mode": "text",
+      "customer_goal": "Đổi địa chỉ giao hàng cho đơn hàng",
+      "customer_turns": [
+        "Chào em, chị muốn đổi địa chỉ giao hàng cho đơn hàng chị đã đặt.",
+        "Chị muốn chuyển địa chỉ giao hàng sang Hải Châu, Đà Nẵng."
+      ],
+      "facts_established": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "expected_outcome": "cap_nhat_don",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "order_id": "O016",
+        "order_status": "delivered",
+        "call_date": "2026-11-16"
+      },
+      "memory_expectation": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000008",
+        "customer_id": "SYN-C008",
+        "is_returning": true,
+        "n_previous_sessions": 3,
+        "last_session": {
+          "date": "2026-11-14",
+          "channel": "hotline",
+          "outcome": "cap_nhat_don"
+        },
+        "products_advised": [
+          "FAS006"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Mr. Trần Văn H, em gọi lại về FAS006 Mr. đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-16T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "O016",
+          "action": "update_address"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,276 @@
+{
+  "conversation_id": "SCN-GEN-0036__call_2",
+  "scenario_id": "SCN-GEN-0036",
+  "call": "call_2",
+  "customer_id": "C030",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-19",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_cap_nhat_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào anh Việt. Em gọi lại về sản phẩm xe đẩy 2 chiều Combi Sugocal anh đang quan tâm ạ. Em thấy anh có nhu cầu đặt hàng, không biết anh đã sẵn sàng chưa ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Anh còn cần suy nghĩ thêm về việc đặt hàng không?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-MB-STR2"
+        },
+        {
+          "field": "price_vnd",
+          "value": 6790000
+        },
+        {
+          "field": "promo_code",
+          "value": "MOM-FREESHIP"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn đặt xe đẩy 2 chiều Combi Sugocal.",
+      "facts_stated": {
+        "product_advised": "SKU-MB-STR2"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận anh đặt xe đẩy Combi Sugocal với giá 6.790.000đ. Anh có muốn thanh toán bằng hình thức nào ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "open",
+          "text": "Hình thức thanh toán của anh là gì?"
+        }
+      ],
+      "facts_used": [
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6790000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán là chuyển khoản.",
+      "facts_stated": {
+        "payment": "chuyen_khoan"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận anh sẽ thanh toán bằng hình thức chuyển khoản ạ. Anh cho em xin khu vực giao hàng của mình nhé?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Khu vực giao hàng của anh là gì?"
+        }
+      ],
+      "facts_used": [
+        "payment"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là Thủ Đức, TP.HCM.",
+      "facts_stated": {
+        "delivery_area": "Thủ Đức, TP.HCM"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận khu vực giao hàng là Thủ Đức, TP.HCM. Tổng giá đơn hàng là 6.790.000đ, anh có muốn em đọc lại thông tin đơn hàng không ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh có muốn em đọc lại thông tin đơn hàng không?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6790000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có, đọc lại thông tin đơn hàng.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, thông tin đơn hàng của anh là: sản phẩm xe đẩy 2 chiều Combi Sugocal, giá 6.790.000đ, thanh toán bằng chuyển khoản và giao hàng tại Thủ Đức, TP.HCM. Em sẽ tiến hành tạo đơn hàng cho anh ạ!",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "price_quoted_vnd",
+        "payment",
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6790000
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-MB-STR2"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0991280845",
+            "sku": "SKU-MB-STR2",
+            "qty": 1,
+            "price_vnd": 6790000,
+            "payment": "chuyen_khoan",
+            "address": "Thủ Đức, TP.HCM",
+            "on": "2026-10-19"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, đơn hàng đã được tạo thành công với mã đơn là OD600001, dự kiến giao hàng vào ngày 21 tháng 10 ạ. Cảm ơn anh đã đặt hàng, có gì thắc mắc xin vui lòng liên hệ lại với em ạ!",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "price_quoted_vnd",
+        "payment",
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6790000
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-MB-STR2"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cảm ơn em!",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em cảm ơn anh! Chúc anh một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Đặt hàng",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "id": "OD600001",
+      "status": "created",
+      "total_vnd": 6790000
+    }
+  }
+}

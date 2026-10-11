@@ -1,0 +1,138 @@
+{
+  "conversation_id": "SCN-GEN-0070__call_1",
+  "scenario_id": "SCN-GEN-0070",
+  "call": "call_1",
+  "customer_id": "SYN-C010",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-15",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_cap_nhat_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Mr. Đinh Văn J, hôm trước Mr. có hỏi về máy hút sữa điện đôi Spectra S1 đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Hôm trước Mr. có hỏi về máy hút sữa điện đôi Spectra S1 đúng không?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy hút sữa này có giá là 4.290.000đ và hiện tại đang có chương trình khuyến mãi freeship ạ. Không biết Mr. có muốn biết thêm thông tin gì về sản phẩm không ạ?",
+      "questions": [
+        {
+          "slot": "price_vnd",
+          "type": "confirm",
+          "text": "Giá của máy hút sữa là 4.290.000đ đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "price_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4290000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em thấy Mr. có ngân sách khoảng 4 triệu rưỡi. Sản phẩm này nằm trong ngân sách của Mr. ạ. Mr. có cần tìm hiểu về các phương thức thanh toán không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Mr. có ngân sách khoảng 4 triệu rưỡi đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu rằng Mr. đang chờ cuối tháng nhận lương để quyết định. Không biết Mr. có muốn em gọi lại vào thời điểm đó không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Mr. đang chờ cuối tháng nhận lương để quyết định đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ ghi nhận lại và gọi lại cho Mr. vào cuối tháng nhé. Nếu có bất kỳ thông tin gì khác mà Mr. cần thêm, Mr. cứ liên hệ với em ạ. Cảm ơn Mr. đã dành thời gian, chúc Mr. một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

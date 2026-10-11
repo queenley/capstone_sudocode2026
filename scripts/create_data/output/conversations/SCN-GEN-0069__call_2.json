@@ -1,0 +1,105 @@
+{
+  "conversation_id": "SCN-GEN-0069__call_2",
+  "scenario_id": "SCN-GEN-0069",
+  "call": "call_2",
+  "customer_id": "SYN-C004",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-02",
+  "region": "bac",
+  "category": "unknown",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Ms. Phạm Thị D, em gọi lại về đơn hàng của chị ạ. Chị muốn thay đổi địa chỉ giao hàng cho đơn hàng O008 phải không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Chị muốn thay đổi địa chỉ giao hàng cho đơn hàng O008 phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị muốn chuyển địa chỉ giao hàng sang Long Biên, Hà Nội đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Chị muốn chuyển địa chỉ giao hàng sang Long Biên, Hà Nội đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận thay đổi địa chỉ giao hàng sang Long Biên, Hà Nội cho đơn hàng O008. Em sẽ cập nhật ngay ạ. Xin chị một chút thời gian.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "delivery_area",
+          "value": "Long Biên, Hà Nội"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "O008",
+            "action": "update_address",
+            "on": "2026-11-02"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Long Biên, Hà Nội"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Thay đổi địa chỉ giao hàng",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

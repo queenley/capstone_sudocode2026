@@ -1,0 +1,215 @@
+{
+  "conversation_id": "SCN-GEN-0020__call_2",
+  "scenario_id": "SCN-GEN-0020",
+  "call": "call_2",
+  "customer_id": "C019",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-20",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_cap_nhat_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào chị Linh, em gọi lại để xác nhận đơn hàng máy lọc không khí SKU-AP-Y mà hôm trước em tư vấn ạ. Chị còn cần suy nghĩ thêm không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Chị còn cần suy nghĩ thêm không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "blocker"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-AP-Y"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo em, chị gọi lại để xác nhận mua máy lọc không khí mà hôm trước em tư vấn.",
+      "facts_stated": {
+        "product_advised": "SKU-AP-Y"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận chị xác nhận mua máy lọc không khí SKU-AP-Y. Chị thanh toán bằng phương thức nào ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "open",
+          "text": "Chị thanh toán bằng phương thức nào ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thanh toán bằng COD và khu vực giao hàng là Hải Châu, Đà Nẵng.",
+      "facts_stated": {
+        "payment": "COD",
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Hải Châu, Đà Nẵng",
+          "spoken": "Hải Châu, Đà Nẵng"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận chị thanh toán bằng COD và khu vực giao hàng là Hải Châu, Đà Nẵng. Giá cả vẫn như hôm trước, chỉ 5.200.000đ ạ. Chị có muốn em lên đơn ngay không ạ?",
+      "questions": [
+        {
+          "slot": "price_vnd",
+          "type": "confirm",
+          "text": "Giá cả vẫn như hôm trước, chỉ 5.200.000đ ạ. Chị có muốn em lên đơn ngay không ạ?"
+        }
+      ],
+      "facts_used": [
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5200000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá cả vẫn như hôm trước chứ em?",
+      "facts_stated": {
+        "price": "5.200.000đ"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, đúng rồi ạ, giá vẫn là 5.200.000đ. Chị đồng ý lên đơn cho chị nhé?",
+      "questions": [
+        {
+          "slot": "order_confirmation",
+          "type": "confirm",
+          "text": "Chị đồng ý lên đơn cho chị nhé?"
+        }
+      ],
+      "facts_used": [
+        "price_quoted_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đồng ý lên đơn cho chị nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn chị Linh đã đồng ý. Em sẽ tiến hành tạo đơn hàng cho chị ngay bây giờ. Đơn hàng sẽ được giao đến Hải Châu, Đà Nẵng, dự kiến giao vào 22/10/2026 ạ. Em sẽ xác nhận lại cho chị ngay sau khi tạo đơn.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0905218549",
+            "sku": "SKU-AP-Y",
+            "qty": 1,
+            "price_vnd": 5200000,
+            "payment": "COD",
+            "address": "Hải Châu, Đà Nẵng",
+            "on": "2026-10-20"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận đơn hàng máy lọc không khí",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "type": "order",
+        "id": "OD600001"
+      }
+    ],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "customer_phone": "0905218549",
+      "sku": "SKU-AP-Y",
+      "qty": 1,
+      "price_vnd": 5200000,
+      "payment": "COD",
+      "address": "Hải Châu, Đà Nẵng"
+    }
+  }
+}

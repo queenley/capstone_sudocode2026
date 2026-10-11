@@ -1,0 +1,128 @@
+{
+  "conversation_id": "SCN-GEN-0067__call_1",
+  "scenario_id": "SCN-GEN-0067",
+  "call": "call_1",
+  "customer_id": "SYN-C007",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-15",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_mua_nhieu_mon",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Mr. Lê Văn G, rất vui được gặp lại anh ạ. Hôm nay anh có hỏi về máy lọc không khí cho phòng khoảng 30 mét vuông và có trẻ nhỏ đúng không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Anh có phòng khoảng 30 mét vuông phải không ạ?"
+        },
+        {
+          "slot": "has_children",
+          "type": "confirm",
+          "text": "Nhà anh có trẻ nhỏ đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "room_area_m2",
+        "has_children"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em có thông tin về sản phẩm máy lọc không khí phù hợp với diện tích phòng của anh ạ. Sản phẩm mà em muốn giới thiệu là AirPure Pro, giá 7.690.000đ ạ. Anh có ngân sách khoảng 9 triệu nên sản phẩm này sẽ đáp ứng được ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Máy này hiện đang có khuyến mãi với mã AIR-OCT, giảm 300.000đ, nên giá cuối cùng sẽ là 7.690.000đ ạ. Khuyến mãi này sẽ hết hạn vào ngày 30 tháng 10 năm 2026 ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "promo_code",
+          "value": "AIR-OCT"
+        },
+        {
+          "field": "promo_expiry",
+          "value": "2026-10-30"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em cũng xin nhắc là máy lọc không khí này có tính năng khóa trẻ em, rất an toàn cho gia đình có trẻ nhỏ ạ. Anh có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Nếu anh cần bàn với gia đình, em rất mong anh sẽ gọi lại sớm ạ. Em sẽ ghi nhận lại thông tin này để chúng ta có thể tiếp tục cuộc trò chuyện ạ. Có thể em sẽ gọi lại sau cho anh để kiểm tra tình hình ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

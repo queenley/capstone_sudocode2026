@@ -1,0 +1,125 @@
+{
+  "conversation_id": "SCN-GEN-0044__call_2",
+  "scenario_id": "SCN-GEN-0044",
+  "call": "call_2",
+  "customer_id": "C044",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-19",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_ngoai_pham_vi_chuyen_may",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào chị Hiền, em gọi lại về sản phẩm xe đẩy Joie Pact mà chị đang quan tâm ạ. Em thấy chị có thắc mắc về an toàn sản phẩm, không biết chị có thể nói rõ hơn về vấn đề mà chị đang lo lắng không ạ?",
+      "questions": [
+        {
+          "slot": "open_questions",
+          "type": "open",
+          "text": "Chị có thể cho em biết rõ hơn về vấn đề chị lo lắng với xe đẩy này không?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em rất hiểu cảm giác lo lắng của chị khi có người thân đang dùng thuốc. Tuy nhiên, em không phải là chuyên gia y tế, nên em không thể tư vấn về vấn đề này. Em có thể chuyển máy cho bác sĩ để tư vấn cụ thể hơn cho chị ạ.",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-MB-STR1"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin xác nhận lại thông tin trước khi chuyển máy. Chị tên Hiền, số điện thoại là 0979511174, và chị đang có câu hỏi về an toàn sản phẩm cho người thân đang dùng thuốc, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "customer_name",
+          "type": "confirm",
+          "text": "Chị tên Hiền, đúng không ạ?"
+        },
+        {
+          "slot": "customer_phone",
+          "type": "confirm",
+          "text": "Số điện thoại của chị là 0979511174, đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận thông tin của chị. Bây giờ em sẽ tiến hành chuyển máy cho bác sĩ phụ trách ạ. Cảm ơn chị đã gọi đến shop. Em chúc chị một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "handoff.transfer",
+          "args": {
+            "brief": {
+              "customer_phone": "0979511174",
+              "customer_name": "Hiền",
+              "escalation_reason": "cau_hoi_y_te_ngoai_pham_vi",
+              "conversation_summary": "Khách hỏi Xe đẩy gấp gọn Joie Pact, có câu hỏi y tế/an toàn cần chuyên môn.",
+              "product_advised": "SKU-MB-STR1",
+              "price_quoted_vnd": 3490000,
+              "open_questions": [
+                "câu hỏi y tế của khách"
+              ],
+              "next_action": "Dược sĩ/nhân viên phụ trách gọi lại tư vấn",
+              "generated_at": "2026-10-19T10:00:00"
+            }
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi về an toàn sản phẩm cho người thân",
+    "outcome": "chuyen_may",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,172 @@
+{
+  "conversation_id": "SCN-GEN-0150__call_2",
+  "scenario_id": "SCN-GEN-0150",
+  "call": "call_2",
+  "customer_id": "C008",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-17",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào anh Long, em gọi lại về xe đẩy Joie Pact mà anh đã hỏi hôm trước ạ. Anh có cần thêm thông tin gì không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Anh còn cần suy nghĩ thêm không?"
+        },
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Xe đẩy Joie Pact đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "blocker",
+          "value": "cần suy nghĩ thêm"
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-MB-STR1"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em biết xe đẩy Joie Pact hiện tại đã hết hàng. Giá của xe đẩy này là 3.490.000đ và chương trình freeship vẫn còn áp dụng ạ. Anh có muốn đặt lịch gọi lại khi có hàng không ạ?",
+      "questions": [
+        {
+          "slot": "price_quoted_vnd",
+          "type": "confirm",
+          "text": "Giá xe đẩy Joie Pact là 3.490.000đ đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, về thời gian có hàng lại thì hiện tại em chưa có thông tin chính xác. Tuy nhiên, em sẽ ghi nhận lại để gọi cho anh ngay khi có thông tin mới ạ. Anh có muốn hẹn giờ cụ thể để em gọi lại không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "open",
+          "text": "Anh muốn hẹn giờ gọi lại vào lúc nào ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ hẹn gọi lại cho anh vào thời gian anh đã chỉ định. Cảm ơn anh đã gọi cho shop, chúc anh một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào anh Long, em gọi lại về xe đẩy Joie Pact mà anh đã hỏi hôm trước ạ. Anh có cần thêm thông tin gì không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Anh còn cần suy nghĩ thêm không?"
+        },
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Xe đẩy Joie Pact đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "blocker",
+          "value": "cần suy nghĩ thêm"
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-MB-STR1"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

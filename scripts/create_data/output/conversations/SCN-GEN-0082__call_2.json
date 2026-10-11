@@ -1,0 +1,94 @@
+{
+  "conversation_id": "SCN-GEN-0082__call_2",
+  "scenario_id": "SCN-GEN-0082",
+  "call": "call_2",
+  "customer_id": "C031",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-28",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào chị Oanh. Cảm ơn chị đã gọi lại. Chị đã đặt máy lọc không khí SKU-AP-X hôm trước, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị đã đặt máy lọc không khí SKU-AP-X hôm trước, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin phép kiểm tra tình trạng đơn hàng của chị. Chị đã không nhớ mã đơn hàng, nhưng theo hệ thống, đơn hàng của chị có mã là OD600001. Em sẽ kiểm tra thông tin ngay ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD600001"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị Oanh. Đơn hàng OD600001 đã được tạo và hiện tại đang trong trạng thái \"đã ghi nhận\". Em xin lỗi vì sự chờ đợi, đơn hàng của chị sẽ được xử lý sớm ạ. Chị có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "order_status"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "order_status",
+          "value": "created"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi tình trạng đơn hàng",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

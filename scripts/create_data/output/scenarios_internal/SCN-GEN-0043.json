@@ -1,0 +1,224 @@
+{
+  "scenario_id": "SCN-GEN-0043",
+  "level": "M2",
+  "persona": "khach_da_kenh_fb_hotline",
+  "hard_case": "teencode_da_kenh",
+  "customer_id": "C027",
+  "customer_phone": "0992566636",
+  "customer_name": "Chi",
+  "honorific": "chị",
+  "region": "bac",
+  "category": "me-be",
+  "difficulty": "hard",
+  "tags": [
+    "cross_channel",
+    "hard_case",
+    "teencode",
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=chuan; session_index=1",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.c027",
+      "call_date": "2026-10-15",
+      "days_later": null,
+      "input_mode": "chat_teencode",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "Hỏi về máy hâm sữa Fatz.",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về máy hâm sữa Fatz 4 chức năng.",
+        "Chị đang có ngân sách khoảng một triệu thôi.",
+        "Con chị 17 tháng rồi, không biết máy này có khuyến mãi gì không?",
+        "Chị muốn gọi hotline hỏi thêm rồi sẽ quyết định sau."
+      ],
+      "customer_turns_asr": [
+        "alo chi muon hoi ve may ham sua fatz bon chuc nang",
+        "chi dang co ngan sach khoang mot trieu thoi",
+        "con chi muoi bay thang roi khong biet may nay co khuyen mai gi khong",
+        "chi muon goi hotline hoi them roi se quyet dinh sau"
+      ],
+      "facts_established": {
+        "child_age_months": 17,
+        "budget_vnd": 1000000,
+        "phone_provided": true,
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [],
+      "must_not_ask": [],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 490000,
+        "list_price_vnd": 490000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_MOM-FREESHIP_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-15"
+      },
+      "memory_expectation": {
+        "child_age_months": 17,
+        "budget_vnd": 1000000,
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000
+      },
+      "expected_call_brief": null,
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "khach_da_kenh_fb_hotline",
+      "patience_start": 4
+    },
+    "call_2": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-16",
+      "days_later": 1,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "Xác nhận đặt máy hâm sữa Fatz.",
+      "customer_turns": [
+        "Chị gọi lại để đặt máy hâm sữa Fatz 4 chức năng.",
+        "Chị sẽ thanh toán bằng chuyển khoản.",
+        "Khu vực giao hàng là Lê Chân, Hải Phòng nhé."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "payment": "chuyen_khoan",
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000,
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "phone_provided",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-MB-MON",
+          "price_vnd": 490000,
+          "payment": "chuyen_khoan"
+        },
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 490000,
+        "list_price_vnd": 490000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_MOM-FREESHIP_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "estimated_delivery": "2026-10-21",
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "payment": "chuyen_khoan",
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000,
+        "order_id": "OD600001"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0992566636",
+        "customer_id": "C027",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-15",
+          "channel": "chat_fanpage",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-MB-MON"
+        ],
+        "open_blockers": [
+          "muốn gọi hotline hỏi thêm"
+        ],
+        "must_not_ask": [
+          "child_age_months",
+          "budget_vnd",
+          "phone_provided",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào chị Chi, em gọi lại về SKU-MB-MON chị đang quan tâm ạ, không biết muốn gọi hotline hỏi thêm chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-16T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0992566636",
+            "sku": "SKU-MB-MON",
+            "qty": 1,
+            "price_vnd": 490000,
+            "payment": "chuyen_khoan",
+            "address": "Lê Chân, Hải Phòng",
+            "on": "2026-10-16"
+          },
+          "result": {
+            "order_id": "OD600001",
+            "status": "created",
+            "total_vnd": 490000,
+            "needs_confirmation_call": false,
+            "estimated_delivery": "2026-10-21"
+          }
+        }
+      ],
+      "simulator_persona_key": "khach_da_kenh_fb_hotline",
+      "patience_start": 3
+    }
+  }
+}

@@ -1,0 +1,145 @@
+{
+  "scenario_id": "SCN-GEN-0019",
+  "level": "M2",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "customer_id": "C032",
+  "customer_phone": "0965384535",
+  "customer_name": "Tâm",
+  "honorific": "chị",
+  "region": "trung",
+  "category": "me-be",
+  "difficulty": "normal",
+  "tags": [
+    "order",
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=chuan; session_index=2",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-29",
+      "input_mode": "text",
+      "seed_history": [
+        {
+          "source": "crm_order",
+          "customer_id": "C032",
+          "order_id": "OD301177",
+          "date": "2026-10-03",
+          "sku": "SKU-MB-PUMP1",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD301177"
+          }
+        }
+      ],
+      "customer_goal": "[plan-only] order_status",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tình trạng đơn hàng hiện có; không tự đọc mã đơn trừ khi được hỏi xác nhận."
+      ],
+      "expected_outcome": "cap_nhat_don",
+      "must_carry_over": [
+        "order_id"
+      ],
+      "must_not_ask": [
+        "order_id"
+      ],
+      "ground_truth_facts": {
+        "order_id": "OD301177",
+        "order_status": "shipping",
+        "tracking": "GHN7781234",
+        "call_date": "2026-10-29"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0965384535",
+        "customer_id": "C032",
+        "is_returning": true,
+        "n_previous_sessions": 0,
+        "last_session": null,
+        "products_advised": [],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id"
+        ],
+        "suggested_opening": "Dạ em chào chị Tâm, em gọi lại về sản phẩm chị đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-29T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD301177"
+        },
+        "must_say_any": [
+          "đang giao",
+          "đang vận chuyển",
+          "đã bàn giao"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-10-30",
+      "days_later": 1,
+      "input_mode": "text",
+      "customer_goal": "[plan-only] address_change",
+      "customer_turns": [
+        "[plan-only] Khách muốn đổi địa chỉ giao cho đơn đang xử lý/đang giao sang khu vực trong customer_must_state."
+      ],
+      "facts_established": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "expected_outcome": "cap_nhat_don",
+      "must_carry_over": [
+        "order_id"
+      ],
+      "must_not_ask": [
+        "order_id"
+      ],
+      "ground_truth_facts": {
+        "order_id": "OD301177",
+        "order_status": "shipping",
+        "tracking": "GHN7781234",
+        "call_date": "2026-10-30"
+      },
+      "memory_expectation": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0965384535",
+        "customer_id": "C032",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-29",
+          "channel": "hotline",
+          "outcome": "cap_nhat_don"
+        },
+        "products_advised": [],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id"
+        ],
+        "suggested_opening": "Dạ em chào chị Tâm, em gọi lại về sản phẩm chị đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-30T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "OD301177",
+          "action": "update_address"
+        }
+      }
+    }
+  }
+}

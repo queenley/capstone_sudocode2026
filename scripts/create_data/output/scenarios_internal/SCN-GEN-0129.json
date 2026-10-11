@@ -1,0 +1,270 @@
+{
+  "scenario_id": "SCN-GEN-0129",
+  "level": "M2",
+  "persona": "khach_hoi_ngoai_tai_lieu",
+  "hard_case": "phien_ban_chinh_sach_cu",
+  "customer_id": "SYN-C003",
+  "customer_phone": "0998000003",
+  "customer_name": "Lê Văn C",
+  "honorific": "Mr.",
+  "region": "nam",
+  "category": "gia-dung/noi-chien",
+  "difficulty": "hard",
+  "tags": [
+    "chinh_sach",
+    "doi_tra",
+    "hard_case",
+    "khach_hang",
+    "tu_van",
+    "variant:chinh_sach_cu",
+    "version_conflict"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR"
+  ],
+  "notes": "variant=chinh_sach_cu; session_index=3",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-11-14",
+      "days_later": null,
+      "input_mode": "text",
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C003",
+          "session_id": "SYN-003-S1",
+          "date": "2026-09-01",
+          "channel": "hotline",
+          "summary": "Tìm hiểu về đồ dùng cho trẻ em",
+          "outcome": "successful",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C003",
+          "session_id": "SYN-003-S2",
+          "date": "2026-09-02",
+          "channel": "zalo_oa",
+          "summary": "Yêu cầu hỗ trợ đơn hàng",
+          "outcome": "successful",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C003",
+          "order_id": "O005",
+          "date": "2026-07-22",
+          "sku": "MAB001",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "O005"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C003",
+          "order_id": "O006",
+          "date": "2026-09-05",
+          "sku": "MAB002",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "MAB002"
+          }
+        }
+      ],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "Hỏi về nồi chiên không dầu Xiaomi.",
+      "customer_turns": [
+        "Alo, em muốn hỏi về nồi chiên không dầu Xiaomi 4.5L.",
+        "Em cần thay đồ cũ đã hỏng, ngân sách của em khoảng 2 triệu thôi.",
+        "Nồi này có khuyến mãi gì không em?",
+        "À, em chờ cuối tháng nhận lương rồi sẽ gọi lại nhé."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "usage_need": "thay đồ cũ đã hỏng",
+        "budget_vnd": 2000000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-AF-XM",
+        "price_quoted_vnd": 1590000
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1590000,
+        "list_price_vnd": 1590000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-14"
+      },
+      "memory_expectation": {
+        "usage_need": "thay đồ cũ đã hỏng",
+        "budget_vnd": 2000000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-AF-XM",
+        "price_quoted_vnd": 1590000
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000003",
+        "customer_id": "SYN-C003",
+        "is_returning": true,
+        "n_previous_sessions": 2,
+        "last_session": {
+          "date": "2026-09-02",
+          "channel": "zalo_oa",
+          "outcome": "successful",
+          "summary": "Yêu cầu hỗ trợ đơn hàng"
+        },
+        "products_advised": [
+          "MAB002"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Mr. Lê Văn C, em gọi lại về MAB002 Mr. đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-14T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "khach_hoi_ngoai_tai_lieu",
+      "patience_start": 4
+    },
+    "call_2": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-11-16",
+      "days_later": 2,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "Xác nhận chính sách đổi trả hàng.",
+      "customer_turns": [
+        "Alo, hôm trước em có đọc trên web thấy là được đổi trả trong 14 ngày đúng không?",
+        "Và phí đổi size là 20 nghìn, chính sách này còn hiệu lực không em?",
+        "Em chỉ muốn chắc chắn là mình không bị mất phí khi đổi hàng thôi."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {},
+      "expected_outcome": "thong_tin",
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [
+          "7 ngày",
+          "bảy ngày"
+        ],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [
+          {
+            "field": "return_days",
+            "value": 14
+          },
+          {
+            "field": "exchange_fee_vnd",
+            "value": 20000
+          }
+        ],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "return_days": 7,
+        "exchange_fee_vnd": 0,
+        "policy_version": "2026-10",
+        "call_date": "2026-11-16"
+      },
+      "memory_expectation": {},
+      "expected_call_brief": {
+        "customer_phone": "0998000003",
+        "customer_id": "SYN-C003",
+        "is_returning": true,
+        "n_previous_sessions": 3,
+        "last_session": {
+          "date": "2026-11-14",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "MAB002",
+          "SKU-AF-XM"
+        ],
+        "open_blockers": [
+          "chờ cuối tháng nhận lương"
+        ],
+        "must_not_ask": [
+          "budget_vnd",
+          "usage_need",
+          "product_advised",
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Mr. Lê Văn C, em gọi lại về MAB002 Mr. đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-16T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "khach_hoi_ngoai_tai_lieu",
+      "patience_start": 3
+    }
+  }
+}

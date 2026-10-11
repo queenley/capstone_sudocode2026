@@ -1,0 +1,108 @@
+{
+  "conversation_id": "SCN-GEN-0026__call_1",
+  "scenario_id": "SCN-GEN-0026",
+  "call": "call_1",
+  "customer_id": "C024",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-16",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, anh Kiên, em xin chào anh ạ. Anh muốn hỏi về giày chạy bộ RunLite 2 Pro size 41 màu đen đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh muốn hỏi về giày chạy bộ RunLite 2 Pro size 41 màu đen đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Giá của đôi giày này là 1.521.000đ ạ. Anh có muốn biết thêm thông tin nào khác không ạ?",
+      "questions": [
+        {
+          "slot": "price_vnd",
+          "type": "confirm",
+          "text": "Giá của đôi giày này là 1.521.000đ ạ."
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1521000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Hiện tại, giày RunLite 2 Pro đang có khuyến mãi 10% cho đơn hàng này, tức là anh sẽ được giảm thêm 152.100đ nếu đặt hàng ạ. Khuyến mãi này sẽ hết hạn vào ngày 25 tháng 10 năm 2026 ạ. Anh có muốn đặt hàng ngay không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        },
+        {
+          "field": "promo_expiry",
+          "value": "2026-10-25"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ nếu anh cần thêm thời gian suy nghĩ thì cũng không sao ạ. Anh có thể gọi lại cho em bất cứ lúc nào ạ. Cảm ơn anh đã gọi đến shop. Chúc anh một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi giày chạy bộ RunLite 2 Pro size 41 màu đen",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

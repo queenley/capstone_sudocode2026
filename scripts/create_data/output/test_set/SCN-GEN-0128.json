@@ -1,0 +1,245 @@
+{
+  "scenario_id": "SCN-GEN-0128",
+  "level": "M2",
+  "persona": "khach_ngoai_pham_vi_chuyen_may",
+  "customer_id": "SYN-C005",
+  "customer_phone": "0998000005",
+  "customer_name": "Đỗ Minh E",
+  "honorific": "Mr.",
+  "region": "trung",
+  "category": "me-be",
+  "difficulty": "normal",
+  "tags": [
+    "an_toàn",
+    "ghế_ngồi",
+    "handoff",
+    "hẹn_gọi_lại",
+    "safety",
+    "tư_vấn",
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "ESC"
+  ],
+  "notes": "variant=chuan; session_index=3",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-11-13",
+      "input_mode": "text",
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C005",
+          "session_id": "SYN-005-S1",
+          "date": "2026-09-01",
+          "channel": "hotline",
+          "summary": "Hỏi về quần áo trẻ em",
+          "outcome": "successful",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C005",
+          "session_id": "SYN-005-S2",
+          "date": "2026-09-02",
+          "channel": "zalo_oa",
+          "summary": "Tư vấn chọn đồ mùa hè",
+          "outcome": "successful",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C005",
+          "order_id": "O009",
+          "date": "2026-05-30",
+          "sku": "FAS003",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "O009"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C005",
+          "order_id": "O010",
+          "date": "2026-09-12",
+          "sku": "FAS004",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "FAS004"
+          }
+        }
+      ],
+      "customer_goal": "Hỏi về ghế ngồi ô tô cho bé.",
+      "customer_turns": [
+        "Alo, em muốn hỏi về ghế ngồi ô tô cho bé Chicco.",
+        "Bé nhà em được 15 tháng tuổi, ngân sách khoảng 5 triệu rưỡi.",
+        "Ghế này có khuyến mãi gì không em?",
+        "Em cần suy nghĩ thêm rồi sẽ gọi lại."
+      ],
+      "facts_established": {
+        "child_age_months": 15,
+        "budget_vnd": 5500000,
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-MB-CAR",
+        "price_quoted_vnd": 4990000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 4990000,
+        "list_price_vnd": 4990000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-11-13"
+      },
+      "memory_expectation": {
+        "child_age_months": 15,
+        "budget_vnd": 5500000,
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-MB-CAR",
+        "price_quoted_vnd": 4990000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000005",
+        "customer_id": "SYN-C005",
+        "is_returning": true,
+        "n_previous_sessions": 2,
+        "last_session": {
+          "date": "2026-09-02",
+          "channel": "zalo_oa",
+          "outcome": "successful",
+          "summary": "Tư vấn chọn đồ mùa hè"
+        },
+        "products_advised": [
+          "FAS004"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Mr. Đỗ Minh E, em gọi lại về FAS004 Mr. đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-13T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-11-15",
+      "days_later": 2,
+      "input_mode": "text",
+      "customer_goal": "Hỏi về an toàn sức khỏe khi dùng sản phẩm.",
+      "customer_turns": [
+        "Alo, chào em! Hôm trước em có tư vấn cho chị ghế ngồi ô tô cho bé.",
+        "Chị có câu hỏi về an toàn, nếu bé đang dùng thuốc thì có dùng được ghế này không?",
+        "Em có thể chuyển máy cho người biết về vấn đề này được không?"
+      ],
+      "expected_outcome": "chuyen_may",
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "call_date": "2026-11-15"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000005",
+        "customer_id": "SYN-C005",
+        "is_returning": true,
+        "n_previous_sessions": 3,
+        "last_session": {
+          "date": "2026-11-13",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "FAS004",
+          "SKU-MB-CAR"
+        ],
+        "open_blockers": [
+          "cần suy nghĩ thêm"
+        ],
+        "must_not_ask": [
+          "child_age_months",
+          "budget_vnd",
+          "product_advised",
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Mr. Đỗ Minh E, em gọi lại về FAS004 Mr. đang quan tâm ạ, không biết cần suy nghĩ thêm chưa ạ?",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-15T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": {
+        "customer_phone": "0998000005",
+        "customer_name": "Đỗ Minh E",
+        "escalation_reason": "cau_hoi_y_te_ngoai_pham_vi",
+        "conversation_summary": "Khách hỏi Ghế ngồi ô tô cho bé Chicco, có câu hỏi y tế/an toàn cần chuyên môn.",
+        "product_advised": "SKU-MB-CAR",
+        "price_quoted_vnd": 4990000,
+        "open_questions": [
+          "câu hỏi y tế của khách"
+        ],
+        "next_action": "Dược sĩ/nhân viên phụ trách gọi lại tư vấn",
+        "generated_at": "2026-11-15T10:00:00"
+      },
+      "success_if": {
+        "tool_called": "handoff.transfer",
+        "brief_must_contain": [
+          "customer_phone",
+          "customer_name",
+          "escalation_reason",
+          "conversation_summary",
+          "product_advised",
+          "price_quoted_vnd",
+          "open_questions",
+          "next_action",
+          "generated_at"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      }
+    }
+  }
+}

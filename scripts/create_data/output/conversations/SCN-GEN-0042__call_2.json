@@ -1,0 +1,132 @@
+{
+  "conversation_id": "SCN-GEN-0042__call_2",
+  "scenario_id": "SCN-GEN-0042",
+  "call": "call_2",
+  "customer_id": "C037",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-18",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào anh Toàn. Em gọi lại về máy lọc không khí SKU-AP-PRO mà anh đang quan tâm ạ. Anh còn nhớ là mình đang chờ cuối tháng để nhận lương không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Anh còn nhớ là mình đang chờ cuối tháng để nhận lương không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin xác nhận là anh đang quan tâm đến máy lọc không khí cho phòng 35 mét vuông ạ. Hiện tại, máy SKU-AP-PRO có giá là 7.690.000đ, và có khuyến mãi đến ngày 30 tháng 10 với mã AIR-OCT ạ.",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        },
+        {
+          "field": "promo_expiry",
+          "value": "2026-10-30"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin lỗi nhưng hiện tại máy SKU-AP-PRO đã hết hàng. Ngày dự kiến về hàng là ngày 21 tháng 10 ạ. Anh có muốn em ghi chú lại để gọi lại sau không ạ?",
+      "questions": [
+        {
+          "slot": "callback",
+          "type": "open",
+          "text": "Anh có muốn em ghi chú lại để gọi lại sau không ạ?"
+        }
+      ],
+      "facts_used": [
+        "in_stock",
+        "restock_date"
+      ],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        },
+        {
+          "field": "restock_date",
+          "value": "2026-10-21"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, nếu anh vẫn cần thêm thông tin, em sẽ gọi lại vào ngày 21 tháng 10 để cập nhật ạ. Cảm ơn anh đã dành thời gian cho em hôm nay! Chúc anh có một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "type": "callback",
+        "date": "2026-10-21"
+      }
+    ],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

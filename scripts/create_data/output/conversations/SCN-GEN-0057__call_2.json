@@ -1,0 +1,187 @@
+{
+  "conversation_id": "SCN-GEN-0057__call_2",
+  "scenario_id": "SCN-GEN-0057",
+  "call": "call_2",
+  "customer_id": "C046",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-31",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_so_gia",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào chị Xuân, em gọi lại về việc chị xác nhận mua máy lọc không khí AirPure Pro ạ. Em thấy chị đã chọn thanh toán bằng chuyển khoản và địa chỉ giao hàng là Ninh Kiều, Cần Thơ đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Địa chỉ giao hàng là Ninh Kiều, Cần Thơ đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "payment",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-AP-PRO"
+        },
+        {
+          "field": "payment",
+          "value": "chuyen_khoan"
+        },
+        {
+          "field": "delivery_area",
+          "value": "Ninh Kiều, Cần Thơ"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, chị sẽ thanh toán bằng chuyển khoản.",
+      "facts_stated": {
+        "payment": "chuyen_khoan"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị đã xác nhận ạ. Máy lọc không khí AirPure Pro có giá 7.990.000đ. Em cũng muốn nhắc chị là chương trình khuyến mãi NAM-SHIP0 sẽ hết hạn vào ngày 05 tháng 11 ạ. Chị có muốn chốt đơn không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        },
+        {
+          "field": "promo_code",
+          "value": "NAM-SHIP0"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chốt đơn luôn đi em.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ chốt đơn cho chị. Em xin đọc lại thông tin đơn hàng: sản phẩm là máy lọc không khí AirPure Pro, số lượng 1, tổng giá 7.990.000đ, phương thức thanh toán chuyển khoản, địa chỉ giao hàng là Ninh Kiều, Cần Thơ. Dự kiến giao hàng vào ngày 05 tháng 11 ạ. Chị có xác nhận không ạ?",
+      "questions": [
+        {
+          "slot": "order_confirmation",
+          "type": "confirm",
+          "text": "Chị có xác nhận thông tin đơn hàng như trên không ạ?"
+        }
+      ],
+      "facts_used": [
+        "price_quoted_vnd",
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Xác nhận.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn chị Xuân. Em sẽ tiến hành tạo đơn hàng ngay bây giờ ạ. Một chút thời gian nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0965237355",
+            "sku": "SKU-AP-PRO",
+            "qty": 1,
+            "price_vnd": 7990000,
+            "payment": "chuyen_khoan",
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-10-31"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Đơn hàng đã được tạo thành công với mã đơn là OD600001. Cảm ơn chị đã đặt hàng và hẹn gặp lại chị vào lần sau ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận mua máy lọc không khí",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001",
+      "sku": "SKU-AP-PRO",
+      "qty": 1,
+      "price_vnd": 7990000,
+      "payment": "chuyen_khoan",
+      "delivery_area": "Ninh Kiều, Cần Thơ",
+      "estimated_delivery": "2026-11-05"
+    }
+  }
+}

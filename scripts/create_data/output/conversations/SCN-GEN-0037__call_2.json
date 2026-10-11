@@ -1,0 +1,104 @@
+{
+  "conversation_id": "SCN-GEN-0037__call_2",
+  "scenario_id": "SCN-GEN-0037",
+  "call": "call_2",
+  "customer_id": "C023",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-19",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_yeu_cau_xoa_du_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào chị Thu, em gọi lại về SKU-XM-4L chị đang quan tâm ạ, không biết chị còn chờ cuối tháng nhận lương không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Chị còn chờ cuối tháng nhận lương không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em là trợ lý ảo của shop ạ. Chị muốn xóa dữ liệu cá nhân của mình đúng không ạ?",
+      "questions": [
+        {
+          "slot": "customer_goal",
+          "type": "confirm",
+          "text": "Chị muốn xóa dữ liệu cá nhân của mình đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị đã cung cấp số CCCD là 079188285084, em sẽ xác minh thông tin này ạ. Chị vui lòng chờ em một chút.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị ơi, yêu cầu xóa dữ liệu cá nhân của chị đã được ghi nhận và sẽ được thực hiện trong vòng 72 giờ ạ. Em sẽ xóa hồ sơ của chị và giữ lại lịch sử đơn hàng theo yêu cầu kế toán ạ. Chị có cần hỗ trợ gì thêm không ạ?",
+      "questions": [],
+      "facts_used": [
+        "deletion_sla_hours"
+      ],
+      "claims": [
+        {
+          "field": "deletion_sla_hours",
+          "value": 72
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "profile_state",
+          "value": "pending_deletion"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xoa_du_lieu",
+    "outcome": "xoa_du_lieu",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

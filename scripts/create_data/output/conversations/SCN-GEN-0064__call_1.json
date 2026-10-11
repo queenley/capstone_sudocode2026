@@ -1,0 +1,158 @@
+{
+  "conversation_id": "SCN-GEN-0064__call_1",
+  "scenario_id": "SCN-GEN-0064",
+  "call": "call_1",
+  "customer_id": "SYN-C004",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-05",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_kenh_mau_thuan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào Ms. Phạm Thị D, em gọi lại về sản phẩm giày chạy bộ size 42 màu đen mà chị đang quan tâm ạ. Em thấy ở lần gọi trước chị có nhắc đến việc giá ở bên khác có cao hơn đúng không ạ?",
+      "questions": [
+        {
+          "slot": "objection",
+          "type": "confirm",
+          "text": "Chị có nhắc đến việc giá ở bên khác có cao hơn đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "owned_sku",
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "owned_sku",
+          "value": "HAP003"
+        },
+        {
+          "field": "order_id",
+          "value": "O008"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, giá bên kia là 1 triệu 190 ngàn.",
+      "facts_stated": {
+        "competitor_price_vnd": 1190000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "1 triệu 190 ngàn",
+          "spoken": "một triệu một trăm chín mươi ngàn"
+        }
+      ],
+      "pause_before_ms": 200,
+      "emotion": "neutral",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị ơi, sản phẩm giày chạy bộ bên em có giá 1.352.000đ ạ. Tuy giá có cao hơn một chút nhưng bên em có khuyến mãi hiện hành với mã giảm giá là RUN2-SALE, chị có thể được giảm thêm. Khuyến mãi này sẽ hết hạn vào ngày 07 tháng 10 năm 2026 ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1352000
+        },
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "promo_RUN2-SALE_active",
+          "value": true
+        },
+        {
+          "field": "promo_code",
+          "value": "RUN2-SALE"
+        },
+        {
+          "field": "promo_expiry",
+          "value": "2026-10-07"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 200,
+      "emotion": "neutral",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, bên em có khuyến mãi với mã RUN2-SALE, giúp chị tiết kiệm thêm một khoản khi mua sản phẩm. Chị có muốn đặt hàng ngay không ạ?",
+      "questions": [
+        {
+          "slot": "objection",
+          "type": "open",
+          "text": "Chị có muốn đặt hàng ngay không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ nghĩ thêm và gọi lại nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 200,
+      "emotion": "neutral",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu ạ. Chị cứ suy nghĩ kỹ nhé. Nếu cần thêm thông tin gì, chị có thể gọi lại cho em bất cứ lúc nào. Em chờ tin từ chị ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

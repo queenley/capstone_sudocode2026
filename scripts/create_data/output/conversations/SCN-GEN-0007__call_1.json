@@ -1,0 +1,113 @@
+{
+  "conversation_id": "SCN-GEN-0007__call_1",
+  "scenario_id": "SCN-GEN-0007",
+  "call": "call_1",
+  "customer_id": "C001",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-15",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_so_gia",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chào chị Hoa. Em là trợ lý ảo của shop BTC. Chị muốn hỏi về máy lọc không khí cho phòng khoảng 20 mét vuông đúng không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Chị muốn hỏi về máy lọc không khí cho phòng khoảng 20 mét vuông đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Máy lọc không khí mà em muốn giới thiệu cho chị là AirPure X, phù hợp cho diện tích phòng của chị. Giá của máy này là 4.890.000đ, chị có muốn biết thêm thông tin gì khác không ạ?",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-AP-X"
+        },
+        {
+          "field": "price_vnd",
+          "value": 4890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin lỗi vì giá của máy này cao hơn giá mà chị đã thấy ở chỗ khác là 4.300.000đ. Nhưng máy này được bảo hành 24 tháng, và em có thể đảm bảo chất lượng cho chị. Chị có muốn em lưu lại thông tin để gọi lại cho chị sau không ạ?",
+      "questions": [
+        {
+          "slot": "objection",
+          "type": "confirm",
+          "text": "Chị có muốn em lưu lại thông tin để gọi lại cho chị sau không ạ?"
+        }
+      ],
+      "facts_used": [
+        "competitor_price_vnd"
+      ],
+      "claims": [
+        {
+          "field": "objection",
+          "value": "giá cao hơn chỗ khác"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ lưu lại thông tin của chị để gọi lại vào ngày khác. Chị nhớ kiểm tra lại chương trình khuyến mãi của shop, có thể sẽ có ưu đãi cho chị trong thời gian tới. Cảm ơn chị đã gọi đến shop BTC, chúc chị một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "objection",
+          "value": "giá cao hơn chỗ khác"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

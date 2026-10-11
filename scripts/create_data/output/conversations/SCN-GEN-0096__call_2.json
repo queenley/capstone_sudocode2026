@@ -1,0 +1,120 @@
+{
+  "conversation_id": "SCN-GEN-0096__call_2",
+  "scenario_id": "SCN-GEN-0096",
+  "call": "call_2",
+  "customer_id": "C017",
+  "session_index": 2,
+  "channel": "zalo_oa",
+  "date": "2026-10-15",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_kenh_mau_thuan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Hạnh, em gọi lại về SKU-SN-RUN2 chị đang quan tâm ạ. Em xin xác nhận lại, chị đã hỏi về giày chạy bộ RunLite 2 Pro size 42 màu đen và có thắc mắc về giá cả ạ.",
+      "questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Chị đã hỏi về size 42 phải không?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "product_advised",
+        "price_quoted_vnd",
+        "variant_sku"
+      ],
+      "claims": [
+        {
+          "field": "variant_sku",
+          "value": "SKU-SN-RUN2-42-DEN"
+        },
+        {
+          "field": "price_quoted_vnd",
+          "value": 1521000
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-SN-RUN2"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Giá hiện tại cho giày chạy bộ RunLite 2 Pro size 42 màu đen là 1.521.000đ ạ. Chị có thấy khuyến mãi nào không?",
+      "questions": [
+        {
+          "slot": "promo_code",
+          "type": "confirm",
+          "text": "Chị có thấy khuyến mãi RUN-10 không?"
+        }
+      ],
+      "facts_used": [
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1521000
+        },
+        {
+          "field": "promo_ACTIVE",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Nếu chị quyết định mua, em có thể giúp chị đặt hàng ngay. Nếu không, không sao cả, chị có thể gọi lại khi nào chị sẵn sàng ạ. Em cũng xin lưu ý rằng khuyến mãi này sẽ hết hạn vào ngày 25 tháng 10 này ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em chưa có thông tin về các khuyến mãi khác nhưng chị có thể gọi lại khi có quyết định ạ. Cảm ơn chị đã quan tâm đến sản phẩm của shop ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "conversation_id": "SCN-GEN-0109__call_1",
+  "scenario_id": "SCN-GEN-0109",
+  "call": "call_1",
+  "customer_id": "C027",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-29",
+  "region": "bac",
+  "category": "gia-dung/quat",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chào chị Chi! Em là trợ lý ảo của shop. Chị muốn hỏi về quạt đứng Senko TS16 mà chị đã nghe giới thiệu, đúng không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em thấy chị dự định dùng cho gia đình, đúng không ạ? Em xin xác nhận ngân sách của chị là khoảng 1 triệu đồng, phải không ạ?",
+      "questions": [
+        {
+          "slot": "usage_need",
+          "type": "confirm",
+          "text": "Chị dự định dùng cho gia đình, đúng không ạ?"
+        },
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của chị là khoảng 1 triệu đồng, phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "usage_need",
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "usage_need",
+          "value": "dùng cho gia đình"
+        },
+        {
+          "field": "budget_vnd",
+          "value": 1000000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Hiện tại, quạt đứng Senko TS16 có giá 590.000đ. Chị có muốn biết thêm về các chương trình khuyến mãi không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 590000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em rất tiếc, nhưng hiện tại không có chương trình khuyến mãi nào cho sản phẩm này. Tuy nhiên, quạt đứng Senko TS16 có thể đáp ứng tốt nhu cầu sử dụng của gia đình chị với mức giá này. Chị có cần thêm thông tin gì về sản phẩm khác không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu. Nếu chị cần so sánh thêm một số sản phẩm khác, chị có thể gọi lại cho em vào lúc nào ạ? Em sẽ ghi lại thông tin để tiếp tục hỗ trợ chị ạ.",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "open",
+          "text": "Chị cần so sánh thêm một số sản phẩm khác, chị sẽ gọi lại sau. Chị có thể cho em biết chị sẽ gọi lại vào lúc nào không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em rất cảm ơn chị đã gọi đến shop. Chúc chị một ngày tốt lành và hẹn gặp lại trong cuộc gọi tiếp theo!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ ghi nhận lại rằng chị sẽ gọi lại để so sánh các sản phẩm khác ạ. Hẹn gặp lại chị!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "muốn so sánh thêm"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi về quạt đứng Senko TS16 cho gia đình",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "scenario_id": "SCN-GEN-0043",
+  "level": "M2",
+  "persona": "khach_da_kenh_fb_hotline",
+  "hard_case": "teencode_da_kenh",
+  "customer_id": "C027",
+  "customer_phone": "0992566636",
+  "customer_name": "Chi",
+  "honorific": "chị",
+  "region": "bac",
+  "category": "me-be",
+  "difficulty": "hard",
+  "tags": [
+    "cross_channel",
+    "hard_case",
+    "teencode",
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=chuan; session_index=1",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.c027",
+      "call_date": "2026-10-15",
+      "input_mode": "chat_teencode",
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker)."
+      ],
+      "facts_established": {
+        "child_age_months": 17,
+        "budget_vnd": 1000000,
+        "phone_provided": true,
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000
+      },
+      "expected_outcome": "hen_goi_lai",
+      "ground_truth_facts": {
+        "price_vnd": 490000,
+        "list_price_vnd": 490000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_MOM-FREESHIP_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-15"
+      },
+      "memory_expectation": {
+        "child_age_months": 17,
+        "budget_vnd": 1000000,
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-10-16",
+      "days_later": 1,
+      "input_mode": "text",
+      "customer_goal": "[plan-only] order",
+      "customer_turns": [
+        "[plan-only] Khách xác nhận muốn mua, nêu hình thức thanh toán và khu vực giao hàng (chỉ quận/tỉnh), đồng ý lên đơn."
+      ],
+      "facts_established": {
+        "payment": "chuyen_khoan",
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000,
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "phone_provided",
+        "product_advised"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 490000,
+        "list_price_vnd": 490000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_MOM-FREESHIP_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "estimated_delivery": "2026-10-21",
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "payment": "chuyen_khoan",
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000,
+        "order_id": "OD600001"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0992566636",
+        "customer_id": "C027",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-15",
+          "channel": "chat_fanpage",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-MB-MON"
+        ],
+        "open_blockers": [
+          "muốn gọi hotline hỏi thêm"
+        ],
+        "must_not_ask": [
+          "child_age_months",
+          "budget_vnd",
+          "phone_provided",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào chị Chi, em gọi lại về SKU-MB-MON chị đang quan tâm ạ, không biết muốn gọi hotline hỏi thêm chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-16T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-MB-MON",
+          "price_vnd": 490000,
+          "payment": "chuyen_khoan"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "conversation_id": "SCN-GEN-0026__call_3",
+  "scenario_id": "SCN-GEN-0026",
+  "call": "call_3",
+  "customer_id": "C024",
+  "session_index": 3,
+  "channel": "hotline",
+  "date": "2026-10-20",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào anh Kiên, em gọi lại về giày chạy bộ RunLite 2 Pro size 41 màu đen anh đang quan tâm ạ. Anh có nhắc là cần suy nghĩ thêm, không biết bây giờ anh đã quyết định chưa ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Anh còn cần suy nghĩ thêm không?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin lỗi anh, hiện tại giày RunLite 2 Pro size 41 màu đen đang hết hàng và dự kiến sẽ có lại vào ngày 24/10 ạ. Nếu anh muốn, em có thể hẹn gọi lại vào ngày đó để thông báo khi có hàng ạ?",
+      "questions": [],
+      "facts_used": [
+        "restock_date"
+      ],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        },
+        {
+          "field": "restock_date",
+          "value": "2026-10-24"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận hẹn gọi lại vào ngày 24/10 để thông báo cho anh khi có giày chạy bộ RunLite 2 Pro size 41 màu đen ạ. Cảm ơn anh đã gọi cho shop, chúc anh một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi lại về giày chạy bộ RunLite 2 Pro",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

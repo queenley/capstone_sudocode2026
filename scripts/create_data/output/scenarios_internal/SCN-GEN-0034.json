@@ -1,0 +1,261 @@
+{
+  "scenario_id": "SCN-GEN-0034",
+  "level": "M2",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "hard_case": "asr_loi_tool_timeout",
+  "customer_id": "C020",
+  "customer_phone": "0924410646",
+  "customer_name": "Sơn",
+  "honorific": "anh",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "hard",
+  "tags": [
+    "asr",
+    "chuyen_khoan",
+    "dat_hang",
+    "hard_case",
+    "may_loc_khong_khi",
+    "robustness",
+    "tu_van",
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR"
+  ],
+  "notes": "variant=chuan; session_index=1",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-15",
+      "days_later": null,
+      "input_mode": "asr_transcript",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": {
+        "tool": "inventory.check",
+        "mode": "timeout"
+      },
+      "customer_goal": "Hỏi về máy lọc không khí Xiaomi Smart 4 Pro",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về máy lọc không khí Xiaomi Smart 4 Pro.",
+        "Phòng anh khoảng 30 mét vuông, và nhà có trẻ nhỏ.",
+        "Ngân sách của anh tầm 6 triệu rưỡi thôi.",
+        "Máy này đang có khuyến mãi gì không em?",
+        "Anh sẽ chờ cuối tháng nhận lương rồi gọi lại nhé."
+      ],
+      "customer_turns_asr": [
+        "alo anh muon hoi ve may loc khong khi xiaomi smart bon pro",
+        "phong anh khoang ba muoi met vuong va nha co tre nho",
+        "ngan sach cua anh tam sau trieu roi",
+        "may nay dang co khuyen mai gi khong em",
+        "anh se cho cuoi thang nhan luong roi goi lai nhe"
+      ],
+      "facts_established": {
+        "room_area_m2": 30,
+        "has_children": true,
+        "budget_vnd": 6500000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "promo_code": "XM-COMBO",
+        "promo_expiry": "2026-11-14"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [],
+      "must_not_ask": [],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [
+          "19/10",
+          "ngày 19"
+        ],
+        "agent_must_say": [],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_stock",
+            "value": true
+          }
+        ],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5490000,
+        "list_price_vnd": 5490000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_XM-COMBO_active": true,
+        "gift_sku": "SKU-XM-FLT",
+        "promo_AIR-2ND-50_active": false,
+        "in_stock": false,
+        "restock_date": "2026-10-19",
+        "call_date": "2026-10-15"
+      },
+      "memory_expectation": {
+        "room_area_m2": 30,
+        "has_children": true,
+        "budget_vnd": 6500000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "promo_code": "XM-COMBO"
+      },
+      "expected_call_brief": null,
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "khach_asr_nhiem_tool_timeout",
+      "patience_start": 3
+    },
+    "call_2": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-19",
+      "days_later": 4,
+      "input_mode": "asr_transcript",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "Xác nhận mua máy lọc không khí",
+      "customer_turns": [
+        "Alo, anh gọi lại để xác nhận mua máy lọc không khí Xiaomi.",
+        "Anh thanh toán bằng chuyển khoản.",
+        "Khu vực giao hàng là Cầu Giấy, Hà Nội."
+      ],
+      "customer_turns_asr": [
+        "alo anh goi lai de xac nhan mua may loc khong khi xiaomi",
+        "anh thanh toan bang chuyen khoan",
+        "khu vuc giao hang la cau giay ha noi"
+      ],
+      "facts_established": {
+        "payment": "chuyen_khoan",
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "promo_code": "XM-COMBO",
+        "promo_expiry": "2026-11-14",
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-XM-4P",
+          "price_vnd": 5490000,
+          "payment": "chuyen_khoan"
+        },
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5490000,
+        "list_price_vnd": 5490000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_XM-COMBO_active": true,
+        "gift_sku": "SKU-XM-FLT",
+        "promo_AIR-2ND-50_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "estimated_delivery": "2026-10-21",
+        "call_date": "2026-10-19"
+      },
+      "memory_expectation": {
+        "payment": "chuyen_khoan",
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "promo_code": "XM-COMBO",
+        "order_id": "OD600001"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0924410646",
+        "customer_id": "C020",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-15",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-XM-4P"
+        ],
+        "open_blockers": [
+          "chờ cuối tháng nhận lương"
+        ],
+        "must_not_ask": [
+          "room_area_m2",
+          "has_children",
+          "budget_vnd",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào anh Sơn, em gọi lại về SKU-XM-4P anh đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-19T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0924410646",
+            "sku": "SKU-XM-4P",
+            "qty": 1,
+            "price_vnd": 5490000,
+            "payment": "chuyen_khoan",
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-19"
+          },
+          "result": {
+            "order_id": "OD600001",
+            "status": "created",
+            "total_vnd": 5490000,
+            "needs_confirmation_call": false,
+            "estimated_delivery": "2026-10-21"
+          }
+        }
+      ],
+      "simulator_persona_key": "khach_asr_nhiem_tool_timeout",
+      "patience_start": 2
+    }
+  }
+}

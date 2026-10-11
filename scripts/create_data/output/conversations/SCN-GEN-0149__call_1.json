@@ -1,0 +1,91 @@
+{
+  "conversation_id": "SCN-GEN-0149__call_1",
+  "scenario_id": "SCN-GEN-0149",
+  "call": "call_1",
+  "customer_id": "C019",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-13",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_mua_nhieu_mon",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chào chị Linh! Em rất vui được tư vấn cho chị về máy lọc không khí AirPure Pro. Chị có chia sẻ là phòng chị khoảng 25 mét vuông và nhà có bé nhỏ nữa, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Chị có chia sẻ là phòng chị khoảng 25 mét vuông và nhà có bé nhỏ nữa, đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Máy lọc không khí AirPure Pro rất phù hợp cho diện tích phòng của chị, có khả năng lọc không khí hiệu quả cho không gian lên đến 45 mét vuông. Máy này đang có giá 7.990.000đ, và hiện tại không có khuyến mãi nào đang diễn ra. Tuy nhiên, chị có thể thanh toán khi nhận hàng (COD) nếu đơn hàng không vượt quá 10 triệu đồng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em hiểu rằng chị cần thời gian để bàn với gia đình trước khi quyết định. Vậy chị muốn em ghi chú lại và gọi lại cho chị vào lúc nào ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "open",
+          "text": "Vậy chị muốn em ghi chú lại và gọi lại cho chị vào lúc nào ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi tư vấn về máy lọc không khí cho gia đình.",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

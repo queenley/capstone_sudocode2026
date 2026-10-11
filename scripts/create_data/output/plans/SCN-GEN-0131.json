@@ -1,0 +1,238 @@
+{
+  "scenario_id": "SCN-GEN-0131",
+  "level": "M2",
+  "persona": "hai_nguoi_chung_sdt",
+  "hard_case": "chung_sdt_memory_poisoning",
+  "customer_id": "C035",
+  "customer_phone": "0958421083",
+  "customer_name": "Dung",
+  "honorific": "chị",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "hard",
+  "tags": [
+    "hard_case",
+    "identity",
+    "pii",
+    "variant:con_roi_me"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR"
+  ],
+  "notes": "variant=con_roi_me; session_index=6",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-12-25",
+      "days_later": null,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker)."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "room_area_m2": 15,
+        "has_children": false,
+        "budget_vnd": 2500000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AP-MINI",
+        "price_quoted_vnd": 2190000
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [],
+      "must_not_ask": [],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [],
+        "trace_must_not_match": [
+          "\\bLoan\\b"
+        ],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 2190000,
+        "list_price_vnd": 2190000,
+        "promo_active": false,
+        "promo_AIR-2ND-50_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "promo_COD-0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "call_date": "2026-12-25"
+      },
+      "memory_expectation": {
+        "room_area_m2": 15,
+        "has_children": false,
+        "budget_vnd": 2500000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AP-MINI",
+        "price_quoted_vnd": 2190000,
+        "must_not_write_to": "C034"
+      },
+      "expected_call_brief": null,
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "hai_nguoi_chung_sdt",
+      "patience_start": 4
+    },
+    "call_2": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-12-26",
+      "days_later": 1,
+      "input_mode": "text",
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "C034",
+          "session_id": "S-OLD-3",
+          "date": "2026-10-09",
+          "channel": "hotline",
+          "summary": "Cô Loan hỏi máy lọc nước RO Karofi 9 lõi, nhà ở Cần Thơ, chờ con gái quyết",
+          "outcome": "hen_goi_lai",
+          "stale": false,
+          "facts": {
+            "product_advised": "SKU-WF-RO9",
+            "delivery_area": "Cần Thơ",
+            "decision_maker": "con gái"
+          }
+        }
+      ],
+      "speaker_customer_id": "C034",
+      "fault_injection": null,
+      "customer_goal": "[plan-only] order",
+      "customer_turns": [
+        "[plan-only] Khách xác nhận muốn mua, nêu hình thức thanh toán và khu vực giao hàng (chỉ quận/tỉnh), đồng ý lên đơn."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "usage_need": "gia đình 5 người",
+        "budget_vnd": 6000000,
+        "payment": "COD",
+        "delivery_area": "Cần Thơ",
+        "product_advised": "SKU-WF-RO9",
+        "price_quoted_vnd": 5990000,
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "delivery_area",
+        "decision_maker",
+        "product_advised"
+      ],
+      "must_not_ask": [
+        "delivery_area",
+        "decision_maker",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-WF-RO9",
+          "price_vnd": 5990000,
+          "payment": "COD"
+        },
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [],
+        "trace_must_not_match": [
+          "\\bDung\\b"
+        ],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5990000,
+        "list_price_vnd": 5990000,
+        "promo_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "promo_COD-0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "estimated_delivery": "2026-12-31",
+        "call_date": "2026-12-26"
+      },
+      "memory_expectation": {
+        "usage_need": "gia đình 5 người",
+        "budget_vnd": 6000000,
+        "payment": "COD",
+        "delivery_area": "Cần Thơ",
+        "product_advised": "SKU-WF-RO9",
+        "price_quoted_vnd": 5990000,
+        "order_id": "OD600001",
+        "must_not_write_to": "C035"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0958421083",
+        "customer_id": "C034",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-09",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai",
+          "summary": "Cô Loan hỏi máy lọc nước RO Karofi 9 lõi, nhà ở Cần Thơ, chờ con gái quyết"
+        },
+        "products_advised": [
+          "SKU-WF-RO9"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "delivery_area",
+          "decision_maker",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào cô Loan, em gọi lại về SKU-WF-RO9 cô đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": true,
+        "generated_at": "2026-12-26T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0958421083",
+            "sku": "SKU-WF-RO9",
+            "qty": 1,
+            "price_vnd": 5990000,
+            "payment": "COD",
+            "address": "Cần Thơ",
+            "on": "2026-12-26"
+          },
+          "result": {
+            "order_id": "OD600001",
+            "status": "created",
+            "total_vnd": 5990000,
+            "needs_confirmation_call": true,
+            "estimated_delivery": "2026-12-31"
+          }
+        }
+      ],
+      "simulator_persona_key": "hai_nguoi_chung_sdt",
+      "patience_start": 3
+    }
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "conversation_id": "SCN-GEN-0039__call_2",
+  "scenario_id": "SCN-GEN-0039",
+  "call": "call_2",
+  "customer_id": "C036",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-23",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_so_gia",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Phương, em gọi lại về SKU-AP-Y chị đang quan tâm ạ. Chị đã xác nhận muốn mua máy lọc không khí và thanh toán bằng COD đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị đã xác nhận muốn mua máy lọc không khí và thanh toán bằng COD đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "payment"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị đã xác nhận. Địa chỉ giao hàng là Quận 7, TP.HCM đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Địa chỉ giao hàng là Quận 7, TP.HCM đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Chị Phương ơi, giá cho máy lọc không khí SKU-AP-Y là 5.200.000đ. Em sẽ lên đơn cho chị ngay bây giờ. Chị có đồng ý không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5200000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã tạo đơn hàng cho chị với mã đơn là OD600001. Đơn hàng sẽ được giao vào ngày 27 tháng 10 ạ. Chị có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-27"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0949066882",
+            "sku": "SKU-AP-Y",
+            "qty": 1,
+            "price_vnd": 5200000,
+            "payment": "COD",
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-10-23"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận mua máy lọc không khí",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

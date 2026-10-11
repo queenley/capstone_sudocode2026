@@ -1,0 +1,121 @@
+{
+  "conversation_id": "SCN-GEN-0106__call_1",
+  "scenario_id": "SCN-GEN-0106",
+  "call": "call_1",
+  "customer_id": "C025",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-15",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị Nhung, em sẽ hỗ trợ chị về xe đẩy gấp gọn Joie Pact cho bé 6 tháng. Chị có thể cho em biết ngân sách của chị được không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Chị có thể cho em biết ngân sách của chị được không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ngân sách của chị là 4 triệu thôi, có khuyến mãi gì không em?",
+      "facts_stated": {
+        "budget_vnd": 4000000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, sản phẩm xe đẩy Joie Pact có giá 3.490.000đ. Hiện tại có chương trình khuyến mãi miễn phí vận chuyển chị nhé. Chị có muốn đặt hàng không ạ?",
+      "questions": [],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần hỏi ý kiến chồng trước đã, nên sẽ gọi lại sau.",
+      "facts_stated": {
+        "decision_maker": "chồng",
+        "blocker": "cần hỏi chồng"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị đừng lo, em hiểu ạ. Chị hãy hỏi ý kiến chồng và gọi lại khi nào chị sẵn sàng nhé. Em luôn sẵn sàng hỗ trợ chị. Chúc chị một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [
+        "decision_maker",
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần hỏi chồng"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

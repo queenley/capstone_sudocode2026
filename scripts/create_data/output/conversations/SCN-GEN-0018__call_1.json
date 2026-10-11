@@ -1,0 +1,97 @@
+{
+  "conversation_id": "SCN-GEN-0018__call_1",
+  "scenario_id": "SCN-GEN-0018",
+  "call": "call_1",
+  "customer_id": "C010",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, xin chào anh Đức! Em là trợ lý ảo của shop BTC. Anh đang quan tâm đến xe đẩy gấp gọn cho bé 6 tháng tuổi, đúng không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Xe đẩy gấp gọn mà anh hỏi có giá 3.490.000đ. Anh có muốn biết thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Hiện tại sản phẩm có khuyến mãi MOM-FREESHIP, giúp anh tiết kiệm phí vận chuyển. Khuyến mãi này sẽ hết hạn vào ngày 29 tháng 11 năm 2026. Anh có muốn đặt hàng ngay không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "promo_expiry",
+          "value": "2026-11-29"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em hiểu rằng anh cần thêm thời gian để suy nghĩ. Không sao cả! Anh có thể gọi lại cho em bất cứ lúc nào. Em sẽ ghi nhận lại thông tin này. Cảm ơn anh đã gọi đến shop BTC!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi xe đẩy gấp gọn cho bé 6 tháng",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

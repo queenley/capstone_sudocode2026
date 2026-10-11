@@ -1,0 +1,112 @@
+{
+  "conversation_id": "SCN-GEN-0048__call_2",
+  "scenario_id": "SCN-GEN-0048",
+  "call": "call_2",
+  "customer_id": "C031",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-16",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào chị Oanh, em gọi lại về đơn hàng của chị ngày hôm trước ạ. Chị đã đặt hàng SKU-AP-X với mã đơn là OD600001 đúng không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Chị đã đặt hàng SKU-AP-X với mã đơn là OD600001 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã kiểm tra thông tin đơn hàng của chị. Mã đơn OD600001 đang trong trạng thái \"đã tạo\" và sẽ được xử lý trong thời gian sớm nhất ạ. Chị yên tâm nhé!",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "order_status",
+          "value": "created"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD600001"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Chị Oanh ơi, đơn hàng của chị có sản phẩm SKU-AP-X và được thanh toán bằng hình thức COD. Địa chỉ giao hàng là Cầu Giấy, Hà Nội ạ. Thời gian giao hàng dự kiến sẽ trong vòng 1-2 ngày làm việc ạ. Chị có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "payment",
+          "value": "COD"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Nếu chị không còn thắc mắc gì, em xin phép kết thúc cuộc gọi ở đây. Cảm ơn chị đã gọi đến shop, chúc chị một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi tình trạng đơn hàng",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "conversation_id": "SCN-GEN-0101__call_2",
+  "scenario_id": "SCN-GEN-0101",
+  "call": "call_2",
+  "customer_id": "SYN-C006",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-31",
+  "region": "nam",
+  "category": "unknown",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào Ms. Nguyễn Thị F, em gọi lại về đơn hàng của chị ạ. Em đã ghi nhận địa chỉ giao hàng mới là Quận 7, TP.HCM, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Em đã ghi nhận địa chỉ giao hàng mới là Quận 7, TP.HCM, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "O011"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã xác nhận địa chỉ giao hàng mới là Quận 7, TP.HCM. Chị cần hàng sớm, em sẽ hỗ trợ chị cập nhật ngay cho đơn hàng O012 ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "O012"
+        },
+        {
+          "field": "delivery_area",
+          "value": "Quận 7, TP.HCM"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "O012",
+            "action": "update_address",
+            "on": "2026-10-31"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Quận 7, TP.HCM"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Đổi địa chỉ giao hàng",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

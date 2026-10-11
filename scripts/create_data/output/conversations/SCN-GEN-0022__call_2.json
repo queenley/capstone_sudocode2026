@@ -1,0 +1,103 @@
+{
+  "conversation_id": "SCN-GEN-0022__call_2",
+  "scenario_id": "SCN-GEN-0022",
+  "call": "call_2",
+  "customer_id": "C006",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-27",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào anh Nam, em gọi lại về việc xác nhận mua giày sneaker Urban Classic size 38 màu trắng mà anh đã quan tâm ạ. Em xác nhận lại thông tin là anh chọn thanh toán COD và khu vực giao hàng là Lê Chân, Hải Phòng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Em xác nhận lại thông tin là anh chọn thanh toán COD và khu vực giao hàng là Lê Chân, Hải Phòng đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "decision_maker",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "size",
+          "value": 38
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-SN-CAS"
+        },
+        {
+          "field": "variant_sku",
+          "value": "SKU-SN-CAS-38-TRANG"
+        },
+        {
+          "field": "price_vnd",
+          "value": 890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn anh đã xác nhận. Em sẽ tiến hành tạo đơn hàng cho anh với giày sneaker Urban Classic size 38 màu trắng. Đơn hàng sẽ được giao đến Lê Chân, Hải Phòng và hình thức thanh toán là COD. Tổng giá cho đơn hàng này là 890.000đ. Dự kiến giao hàng vào ngày 31 tháng 10 năm 2026. Anh có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0929486628",
+            "sku": "SKU-SN-CAS-38-TRANG",
+            "qty": 1,
+            "price_vnd": 890000,
+            "payment": "COD",
+            "address": "Lê Chân, Hải Phòng",
+            "on": "2026-10-27"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận mua giày sneaker Urban Classic.",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "id": "OD600001",
+      "status": "created"
+    }
+  }
+}

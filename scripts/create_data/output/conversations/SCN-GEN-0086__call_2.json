@@ -1,0 +1,150 @@
+{
+  "conversation_id": "SCN-GEN-0086__call_2",
+  "scenario_id": "SCN-GEN-0086",
+  "call": "call_2",
+  "customer_id": "C021",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-03",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_cap_nhat_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào chị Yến, chị gọi lại để xác nhận mua giày chạy bộ size 39 màu xám, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Chị xác nhận size 39 nhé?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị đã xác nhận. Hình thức thanh toán là COD, khu vực giao hàng là Hải Châu, Đà Nẵng, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Chị xác nhận thanh toán COD nhé?"
+        },
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Chị xác nhận giao hàng ở Hải Châu, Đà Nẵng nhé?"
+        }
+      ],
+      "facts_used": [
+        "payment",
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Giá của giày chạy bộ chị chọn là 1.690.000đ, chị có đồng ý đặt hàng không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Chị xác nhận ngân sách của mình là 2 triệu đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em sẽ chốt đơn cho chị nhé. Để em đọc lại thông tin đơn hàng: sản phẩm giày chạy bộ size 39 màu xám, giá 1.690.000đ, thanh toán COD, giao hàng tại Hải Châu, Đà Nẵng. Dự kiến giao hàng vào ngày 05 tháng 11 2026. Chị có đồng ý không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã tạo đơn hàng cho chị với thông tin như sau: sản phẩm giày chạy bộ size 39 màu xám, giá 1.690.000đ, thanh toán COD, giao hàng tại Hải Châu, Đà Nẵng. Mã đơn hàng của chị là OD600001, dự kiến giao hàng vào ngày 05 tháng 11 2026. Em cảm ơn chị đã đặt hàng tại shop ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0901304118",
+            "sku": "SKU-SN-RUN2-39-XAM",
+            "qty": 1,
+            "price_vnd": 1690000,
+            "payment": "COD",
+            "address": "Hải Châu, Đà Nẵng",
+            "on": "2026-11-03"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận mua giày và thông tin giao hàng.",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001"
+    }
+  }
+}

@@ -1,0 +1,184 @@
+{
+  "conversation_id": "SCN-GEN-0034__call_2",
+  "scenario_id": "SCN-GEN-0034",
+  "call": "call_2",
+  "customer_id": "C020",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-19",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Sơn, em gọi lại về máy lọc không khí Xiaomi anh đang quan tâm, không biết anh có còn chờ cuối tháng nhận lương không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Anh có còn chờ cuối tháng nhận lương không?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-XM-4P"
+        },
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh gọi lại để xác nhận mua máy lọc không khí Xiaomi.",
+      "facts_stated": {
+        "product_advised": "SKU-XM-4P"
+      },
+      "entities": [],
+      "pause_before_ms": 200,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận anh muốn xác nhận mua máy lọc không khí Xiaomi. Anh sẽ thanh toán bằng phương thức nào ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "open",
+          "text": "Anh sẽ thanh toán bằng phương thức nào ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh thanh toán bằng chuyển khoản.",
+      "facts_stated": {
+        "payment": "chuyen_khoan"
+      },
+      "entities": [],
+      "pause_before_ms": 200,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận anh sẽ thanh toán bằng chuyển khoản. Khu vực giao hàng của anh là ở đâu ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Khu vực giao hàng của anh là ở đâu ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là Cầu Giấy, Hà Nội.",
+      "facts_stated": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "entities": [],
+      "pause_before_ms": 200,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận khu vực giao hàng là Cầu Giấy, Hà Nội. Em sẽ tiến hành xác nhận đơn hàng cho anh nhé. Đơn hàng của anh sẽ bao gồm máy lọc không khí Xiaomi với giá 5.490.000đ, thanh toán chuyển khoản, giao đến Cầu Giấy. Dự kiến giao hàng vào ngày 21 tháng 10 năm 2026. Anh có đồng ý không ạ?",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "payment",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "delivery_area",
+          "value": "Cầu Giấy, Hà Nội"
+        },
+        {
+          "field": "payment",
+          "value": "chuyen_khoan"
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-XM-4P"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0924410646",
+            "sku": "SKU-XM-4P",
+            "qty": 1,
+            "price_vnd": 5490000,
+            "payment": "chuyen_khoan",
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-19"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận mua máy lọc không khí",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001"
+    }
+  }
+}

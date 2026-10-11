@@ -1,0 +1,131 @@
+{
+  "conversation_id": "SCN-GEN-0090__call_2",
+  "scenario_id": "SCN-GEN-0090",
+  "call": "call_2",
+  "customer_id": "C011",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-04",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_mua_doi_size",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào chị Mai, em gọi lại về sản phẩm giày chị đã đặt, mã đơn hàng là OD600001 ạ. Chị muốn đổi sang sản phẩm khác rẻ hơn, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Chị có mã đơn hàng là OD600001 phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị đã xác nhận mã đơn hàng. Chị muốn đổi sang sản phẩm mới, mã SKU là SKU-SN-CAS-42-DEN, đúng không ạ? Phí hoàn lại chênh lệch cho chị sẽ là 800.000đ.",
+      "questions": [
+        {
+          "slot": "new_variant_sku",
+          "type": "confirm",
+          "text": "Sản phẩm mới chị chọn là SKU-SN-CAS-42-DEN phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "new_variant_sku",
+          "value": "SKU-SN-CAS-42-DEN"
+        },
+        {
+          "field": "refund_vnd",
+          "value": 800000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị đã xác nhận sản phẩm mới là SKU-SN-CAS-42-DEN. Về hoàn tiền, chị có thể cung cấp số tài khoản ngân hàng để chị nhận hoàn tiền được không ạ?",
+      "questions": [
+        {
+          "slot": "bank_account",
+          "type": "open",
+          "text": "Số tài khoản ngân hàng của chị là gì ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị đã cung cấp thông tin. Tuy nhiên, em xin lỗi nhưng em chưa có thông tin chi tiết về cách hoàn tiền. Về đơn hàng của chị, em sẽ cập nhật lại ngay.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "new_variant_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "new_variant_sku",
+          "value": "SKU-SN-CAS-42-DEN"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD600001",
+            "action": "exchange_product",
+            "new_variant_sku": "SKU-SN-CAS-42-DEN",
+            "on": "2026-11-04"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

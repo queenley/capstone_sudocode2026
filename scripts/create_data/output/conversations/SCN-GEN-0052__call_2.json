@@ -1,0 +1,171 @@
+{
+  "conversation_id": "SCN-GEN-0052__call_2",
+  "scenario_id": "SCN-GEN-0052",
+  "call": "call_2",
+  "customer_id": "C039",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-18",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Cường, em gọi lại về bình sữa Pigeon mà anh đang quan tâm ạ, không biết anh đã hỏi vợ chưa ạ?",
+      "questions": [
+        {
+          "slot": "decision_maker",
+          "type": "confirm",
+          "text": "Anh đã hỏi vợ chưa?"
+        }
+      ],
+      "facts_used": [
+        "decision_maker",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh đã hỏi vợ và muốn mua bình sữa Pigeon đó.",
+      "facts_stated": {
+        "product_advised": "SKU-MB-BOT"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, sản phẩm bình sữa Pigeon có giá 289.000đ ạ. Anh chọn hình thức thanh toán là COD đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Anh chọn hình thức thanh toán là COD đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 289000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán là COD nhé.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn anh đã xác nhận. Địa chỉ giao hàng của anh là Cầu Giấy, Hà Nội đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Địa chỉ giao hàng của anh là Cầu Giấy, Hà Nội đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giao hàng ở Cầu Giấy, Hà Nội.",
+      "facts_stated": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ tạo đơn hàng cho anh. Đơn hàng bao gồm 1 bình sữa Pigeon với giá 289.000đ, hình thức thanh toán COD, giao hàng tại Cầu Giấy, Hà Nội. Dự kiến giao hàng vào ngày 20 tháng 10 năm 2026 ạ. Em sẽ tiến hành tạo đơn ngay bây giờ!",
+      "questions": [],
+      "facts_used": [
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-20"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0930976582",
+            "sku": "SKU-MB-BOT",
+            "qty": 1,
+            "price_vnd": 289000,
+            "payment": "COD",
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-18"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận mua bình sữa Pigeon",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001"
+    }
+  }
+}

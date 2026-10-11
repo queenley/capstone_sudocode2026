@@ -1,0 +1,148 @@
+{
+  "conversation_id": "SCN-GEN-0008__call_2",
+  "scenario_id": "SCN-GEN-0008",
+  "call": "call_2",
+  "customer_id": "C003",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-19",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_mua_doi_size",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Lan, em gọi lại về đơn hàng giày chị đã nhận ạ. Chị đã nhận giày nhưng thấy hơi chật, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Chị đã nhận giày nhưng thấy hơi chật, đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, chị muốn đổi sang size 42 nhé.",
+      "facts_stated": {
+        "size": 42
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã xác nhận. Em sẽ tiến hành đổi giày sang size 42 cho chị ngay ạ. Đơn hàng của chị là mã OD600001, đúng không ạ? Giá của sản phẩm là 1.740.000đ.",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Đơn hàng của chị là mã OD600001, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "price_quoted_vnd",
+          "value": 1740000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, chị muốn đổi sang size 42.",
+      "facts_stated": {
+        "size": 42
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị. Em sẽ cập nhật đơn hàng với biến thể mới SKU-SN-RUN2-42-DEN cho chị và không có phí đổi trả ạ. Chị sẽ nhận được giày mới trong 3-5 ngày làm việc tới. Em sẽ tiến hành ngay ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "new_variant_sku",
+          "value": "SKU-SN-RUN2-42-DEN"
+        },
+        {
+          "field": "exchange_fee_vnd",
+          "value": 0
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD600001",
+            "action": "exchange_size",
+            "new_variant_sku": "SKU-SN-RUN2-42-DEN",
+            "on": "2026-10-19"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "size",
+          "value": 42
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN2-42-DEN"
+        },
+        {
+          "key": "exchange_fee_vnd",
+          "value": 0
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

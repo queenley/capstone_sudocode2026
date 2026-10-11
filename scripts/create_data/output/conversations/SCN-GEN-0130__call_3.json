@@ -1,0 +1,230 @@
+{
+  "conversation_id": "SCN-GEN-0130__call_3",
+  "scenario_id": "SCN-GEN-0130",
+  "call": "call_3",
+  "customer_id": "SYN-C004",
+  "session_index": 3,
+  "channel": "hotline",
+  "date": "2026-10-27",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_kenh_mau_thuan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào Ms. Phạm Thị D, em gọi lại về giày chạy bộ mà chị đang quan tâm. Chị muốn đặt giày chạy bộ size 42 màu đen, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Chị muốn đặt giày chạy bộ size 42 màu đen, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "size",
+          "value": 42
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-SN-RUN2"
+        },
+        {
+          "field": "variant_sku",
+          "value": "SKU-SN-RUN2-42-DEN"
+        },
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, đúng rồi.",
+      "facts_stated": {
+        "size": 42
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị ạ! Chị sẽ thanh toán bằng phương thức nào?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "open",
+          "text": "Chị sẽ thanh toán bằng phương thức nào?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ thanh toán bằng chuyển khoản.",
+      "facts_stated": {
+        "payment": "chuyen_khoan"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị sẽ thanh toán bằng chuyển khoản. Giao hàng cho chị ở đâu ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Giao hàng cho chị ở đâu ạ?"
+        }
+      ],
+      "facts_used": [
+        "payment"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giao hàng cho chị ở Cầu Giấy, Hà Nội nhé.",
+      "facts_stated": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giao hàng cho chị ở Cầu Giấy, Hà Nội. Hàng sẽ được giao vào ngày 29 tháng 10. Mong là hàng sẽ về sớm ạ!",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-29"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mong là hàng sẽ về sớm.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Giờ em sẽ tiến hành xác nhận đơn hàng cho chị nhé. Đơn hàng của chị là giày chạy bộ size 42 màu đen với giá 1.690.000đ, thanh toán chuyển khoản, giao tại Cầu Giấy, Hà Nội. Em sẽ tiến hành tạo đơn ngay.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000004",
+            "sku": "SKU-SN-RUN2-42-DEN",
+            "qty": 1,
+            "price_vnd": 1690000,
+            "payment": "chuyen_khoan",
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-27"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Đơn hàng đã được xác nhận với mã đơn là OD600001. Cảm ơn chị đã đặt hàng, em chúc chị một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001"
+    }
+  }
+}

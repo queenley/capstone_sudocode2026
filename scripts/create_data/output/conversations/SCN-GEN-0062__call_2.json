@@ -1,0 +1,142 @@
+{
+  "conversation_id": "SCN-GEN-0062__call_2",
+  "scenario_id": "SCN-GEN-0062",
+  "call": "call_2",
+  "customer_id": "SYN-C005",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-18",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_ngoai_pham_vi_chuyen_may",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Mr. Đỗ Minh E, em gọi lại về sản phẩm xe đẩy 2 chiều Combi Sugocal mà Mr. đang quan tâm ạ. Không biết Mr. có câu hỏi gì liên quan đến an toàn sản phẩm không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Mr. có câu hỏi gì liên quan đến an toàn sản phẩm không?"
+        }
+      ],
+      "facts_used": [
+        "product_advised"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, tôi có một câu hỏi về an toàn sản phẩm.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu ạ. Mr. có thể cho em biết thêm về câu hỏi cụ thể liên quan đến sản phẩm không ạ? Em sẽ ghi nhận và chuyển máy cho nhân viên chuyên môn tư vấn ạ.",
+      "questions": [
+        {
+          "slot": "open_questions",
+          "type": "open",
+          "text": "Mr. có thể cho em biết thêm về câu hỏi cụ thể liên quan đến sản phẩm không?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Người thân của tôi đang dùng thuốc, liệu có dùng được xe đẩy này không?",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin lỗi nhưng em chưa có thông tin về việc sử dụng xe đẩy với thuốc ạ. Em sẽ ghi nhận câu hỏi này và chuyển máy cho nhân viên tư vấn ạ. Cảm ơn Mr. đã thông cảm!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Tôi có thể chuyển máy để hỏi thêm không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ chuyển máy ngay cho nhân viên dược sĩ để tư vấn cho Mr. Đỗ Minh E ạ. Cảm ơn Mr. đã gọi tới ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "handoff.transfer",
+          "args": {
+            "brief": {
+              "customer_phone": "0998000005",
+              "customer_name": "Đỗ Minh E",
+              "escalation_reason": "cau_hoi_y_te_ngoai_pham_vi",
+              "conversation_summary": "Khách hỏi Xe đẩy 2 chiều Combi Sugocal, có câu hỏi y tế/an toàn cần chuyên môn.",
+              "product_advised": "SKU-MB-STR2",
+              "price_quoted_vnd": 6790000,
+              "open_questions": [
+                "câu hỏi y tế của khách"
+              ],
+              "next_action": "Dược sĩ/nhân viên phụ trách gọi lại tư vấn",
+              "generated_at": "2026-10-18T10:00:00"
+            }
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chuyen_may",
+    "outcome": "chuyen_may",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

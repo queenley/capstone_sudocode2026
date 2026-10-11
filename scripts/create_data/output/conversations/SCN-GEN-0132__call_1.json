@@ -1,0 +1,118 @@
+{
+  "conversation_id": "SCN-GEN-0132__call_1",
+  "scenario_id": "SCN-GEN-0132",
+  "call": "call_1",
+  "customer_id": "SYN-C006",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-14",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào Ms. Nguyễn Thị F, em gọi lại về đơn hàng giày sneaker size 39 màu trắng mà chị đã xác nhận ạ. Chị vẫn giữ ý định thanh toán bằng COD và giao ở Ninh Kiều, Cần Thơ đúng không ạ?",
+      "questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Chị xác nhận size 39 đúng không ạ?"
+        },
+        {
+          "slot": "color",
+          "type": "confirm",
+          "text": "Chị xác nhận màu trắng đúng không ạ?"
+        },
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Chị vẫn thanh toán bằng COD đúng không ạ?"
+        },
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Chị vẫn giao ở Ninh Kiều, Cần Thơ đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn chị đã xác nhận. Đơn hàng giày sneaker size 39 màu trắng sẽ có giá là 890.000đ. Dự kiến giao hàng vào ngày 19/11/2026. Em sẽ lên đơn ngay bây giờ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 890000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-19"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000006",
+            "sku": "SKU-SN-CAS-39-TRANG",
+            "qty": 1,
+            "price_vnd": 890000,
+            "payment": "COD",
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-11-14"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, đơn hàng đã được tạo thành công với mã đơn là OD600001. Chị sẽ nhận hàng vào khoảng ngày 19/11/2026 ạ. Chị có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001"
+    }
+  }
+}

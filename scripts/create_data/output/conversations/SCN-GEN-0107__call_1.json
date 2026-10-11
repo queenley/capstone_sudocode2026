@@ -1,0 +1,125 @@
+{
+  "conversation_id": "SCN-GEN-0107__call_1",
+  "scenario_id": "SCN-GEN-0107",
+  "call": "call_1",
+  "customer_id": "C044",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_so_gia",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chào chị Hiền. Em thấy chị có nhu cầu hỏi về máy lọc không khí cho phòng khoảng 20 mét vuông, đúng không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Máy lọc không khí phù hợp cho diện tích đó có thể kể đến như AirPure Pro, với giá hiện tại là 7.690.000đ. Em thấy chị có ngân sách khoảng 9 triệu, như vậy rất ổn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Về chương trình khuyến mãi, chị có thể sử dụng mã giảm giá AIR-OCT, nhưng mã này sẽ hết hạn vào hôm nay. Chị có muốn đặt hàng ngay không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_code",
+          "value": "AIR-OCT"
+        },
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "promo_expiry",
+          "value": "2026-10-30"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em hiểu chị có thắc mắc về giá cao hơn chỗ khác. Hiện tại, giá niêm yết là 7.990.000đ, nhưng với mã khuyến mãi, chị có thể tiết kiệm 300.000đ. Em sẽ hỗ trợ chị tốt nhất có thể.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "list_price_vnd",
+          "value": 7990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, nếu chị cần thêm thời gian để xem xét, em rất vui lòng ghi nhận lại và gọi lại cho chị sau. Chị có thể cho em biết thời gian chị muốn gọi lại không ạ?",
+      "questions": [
+        {
+          "slot": "callback",
+          "type": "open",
+          "text": "Chị muốn gọi lại vào thời gian nào?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "objection",
+          "value": "giá cao hơn chỗ khác"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

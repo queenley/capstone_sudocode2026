@@ -1,0 +1,158 @@
+{
+  "conversation_id": "SCN-GEN-0019__call_2",
+  "scenario_id": "SCN-GEN-0019",
+  "call": "call_2",
+  "customer_id": "SYN-C001",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-16",
+  "region": "bac",
+  "category": "unknown",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Mr. Nguyễn Văn A, em gọi lại về đơn hàng của Mr. ạ. Em xác nhận đơn hàng của Mr. có mã là O002 và sản phẩm là HAP001 đúng không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Đơn hàng của Mr. có mã là O002 đúng không ạ?"
+        },
+        {
+          "slot": "owned_sku",
+          "type": "confirm",
+          "text": "Sản phẩm của Mr. là HAP001 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "O002"
+        },
+        {
+          "field": "owned_sku",
+          "value": "HAP001"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi đó em.",
+      "facts_stated": {
+        "order_id": "O002",
+        "owned_sku": "HAP001"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn Mr. đã xác nhận ạ. Anh muốn đổi địa chỉ giao hàng cho đơn hàng này đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Anh muốn đổi địa chỉ giao hàng cho đơn hàng này đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, địa chỉ mới là Cầu Giấy, Hà Nội nhé.",
+      "facts_stated": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận địa chỉ mới là Cầu Giấy, Hà Nội. Em sẽ tiến hành cập nhật địa chỉ giao hàng cho đơn hàng O002 ngay ạ. Xin cho em một chút thời gian.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "delivery_area",
+          "value": "Cầu Giấy, Hà Nội"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "O002",
+            "action": "update_address",
+            "on": "2026-10-16"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Cầu Giấy, Hà Nội"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, địa chỉ giao hàng đã được cập nhật thành công. Đơn hàng của Mr. sẽ được giao đến Cầu Giấy, Hà Nội. Cảm ơn Mr. đã liên hệ với shop. Chúc Mr. một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

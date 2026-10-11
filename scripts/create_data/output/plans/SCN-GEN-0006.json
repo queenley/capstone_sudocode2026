@@ -1,0 +1,228 @@
+{
+  "scenario_id": "SCN-GEN-0006",
+  "level": "M1",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "hard_case": null,
+  "customer_id": "C002",
+  "customer_phone": "0936270107",
+  "customer_name": "Tuấn",
+  "honorific": "anh",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "difficulty": "normal",
+  "tags": [
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=chuan; session_index=1",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-17",
+      "days_later": null,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker)."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "size": 38,
+        "color": "den",
+        "decision_maker": "vợ",
+        "blocker": "cần hỏi vợ",
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1161000,
+        "variant_sku": "SKU-SN-RUN1-38-DEN",
+        "promo_code": "RUN-10",
+        "promo_expiry": "2026-10-25"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [],
+      "must_not_ask": [],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1161000,
+        "list_price_vnd": 1290000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "size": 38,
+        "color": "den",
+        "decision_maker": "vợ",
+        "blocker": "cần hỏi vợ",
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1161000,
+        "variant_sku": "SKU-SN-RUN1-38-DEN",
+        "promo_code": "RUN-10"
+      },
+      "expected_call_brief": null,
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "khach_do_du_hoi_nguoi_nha",
+      "patience_start": 4
+    },
+    "call_2": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-18",
+      "days_later": 1,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] order",
+      "customer_turns": [
+        "[plan-only] Khách xác nhận muốn mua, nêu hình thức thanh toán và khu vực giao hàng (chỉ quận/tỉnh), đồng ý lên đơn."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "payment": "chuyen_khoan",
+        "delivery_area": "Ninh Kiều, Cần Thơ",
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1161000,
+        "variant_sku": "SKU-SN-RUN1-38-DEN",
+        "promo_code": "RUN-10",
+        "promo_expiry": "2026-10-25",
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "size",
+        "decision_maker",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "decision_maker",
+        "product_advised",
+        "variant_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-RUN1-38-DEN",
+          "price_vnd": 1161000,
+          "payment": "chuyen_khoan"
+        },
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1161000,
+        "list_price_vnd": 1290000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": true,
+        "in_stock": true,
+        "freeship": false,
+        "estimated_delivery": "2026-10-22",
+        "call_date": "2026-10-18"
+      },
+      "memory_expectation": {
+        "payment": "chuyen_khoan",
+        "delivery_area": "Ninh Kiều, Cần Thơ",
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1161000,
+        "variant_sku": "SKU-SN-RUN1-38-DEN",
+        "promo_code": "RUN-10",
+        "order_id": "OD600001"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0936270107",
+        "customer_id": "C002",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-17",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-SN-RUN1"
+        ],
+        "open_blockers": [
+          "cần hỏi vợ"
+        ],
+        "must_not_ask": [
+          "size",
+          "color",
+          "decision_maker",
+          "product_advised",
+          "variant_sku"
+        ],
+        "suggested_opening": "Dạ em chào anh Tuấn, em gọi lại về SKU-SN-RUN1 anh đang quan tâm ạ, không biết cần hỏi vợ chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-18T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0936270107",
+            "sku": "SKU-SN-RUN1-38-DEN",
+            "qty": 1,
+            "price_vnd": 1161000,
+            "payment": "chuyen_khoan",
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-10-18"
+          },
+          "result": {
+            "order_id": "OD600001",
+            "status": "created",
+            "total_vnd": 1161000,
+            "needs_confirmation_call": false,
+            "estimated_delivery": "2026-10-22"
+          }
+        }
+      ],
+      "simulator_persona_key": "khach_do_du_hoi_nguoi_nha",
+      "patience_start": 3
+    }
+  }
+}

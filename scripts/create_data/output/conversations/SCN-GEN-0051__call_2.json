@@ -1,0 +1,144 @@
+{
+  "conversation_id": "SCN-GEN-0051__call_2",
+  "scenario_id": "SCN-GEN-0051",
+  "call": "call_2",
+  "customer_id": "SYN-C003",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-19",
+  "region": "nam",
+  "category": "unknown",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Mr. Lê Văn C, em gọi lại về đơn hàng của mình ạ. Ông đã có đơn hàng với mã số là O005, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Ông đã có đơn hàng với mã số là O005, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "O005"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn ông đã xác nhận. Em thấy ông muốn đổi địa chỉ giao hàng cho đơn hàng O005 của mình. Địa chỉ mới là Thủ Đức, TP.HCM đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Địa chỉ mới là Thủ Đức, TP.HCM đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area",
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "delivery_area",
+          "value": "Thủ Đức, TP.HCM"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn ông đã xác nhận địa chỉ. Em sẽ tiến hành cập nhật địa chỉ giao hàng cho đơn hàng O005 của ông ngay bây giờ. Xin vui lòng một chút nhé!",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "O006",
+            "action": "update_address",
+            "on": "2026-10-19"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã cập nhật địa chỉ giao hàng cho đơn hàng O006 thành công! Địa chỉ mới là Thủ Đức, TP.HCM. Ông có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "O006"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Nếu không còn câu hỏi nào, em xin phép khép lại cuộc gọi. Cảm ơn ông đã gọi đến shop BTC, chúc ông một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "O006"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Thủ Đức, TP.HCM"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Đổi địa chỉ giao hàng cho đơn hàng",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

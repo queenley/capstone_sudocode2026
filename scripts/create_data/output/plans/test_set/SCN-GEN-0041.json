@@ -1,0 +1,143 @@
+{
+  "scenario_id": "SCN-GEN-0041",
+  "level": "M1",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "customer_id": "C043",
+  "customer_phone": "0994157718",
+  "customer_name": "Tiến",
+  "honorific": "anh",
+  "region": "trung",
+  "category": "thoi-trang/ao-khoac",
+  "difficulty": "normal",
+  "tags": [
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR"
+  ],
+  "notes": "variant=chuan; session_index=1",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-16",
+      "input_mode": "text",
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker)."
+      ],
+      "facts_established": {
+        "size": "L",
+        "color": "navy",
+        "blocker": "muốn so sánh thêm",
+        "product_advised": "SKU-JK-WND",
+        "price_quoted_vnd": 690000,
+        "variant_sku": "SKU-JK-WND-L-NAVY"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "ground_truth_facts": {
+        "price_vnd": 690000,
+        "list_price_vnd": 690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "size": "L",
+        "color": "navy",
+        "blocker": "muốn so sánh thêm",
+        "product_advised": "SKU-JK-WND",
+        "price_quoted_vnd": 690000,
+        "variant_sku": "SKU-JK-WND-L-NAVY"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-10-23",
+      "days_later": 7,
+      "input_mode": "text",
+      "customer_goal": "[plan-only] decline",
+      "customer_turns": [
+        "[plan-only] Khách hỏi thêm vài chi tiết rồi từ chối lịch sự, không mua nữa."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-JK-WND",
+        "price_quoted_vnd": 690000,
+        "variant_sku": "SKU-JK-WND-L-NAVY"
+      },
+      "expected_outcome": "tu_choi",
+      "must_carry_over": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 690000,
+        "list_price_vnd": 690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-23"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-JK-WND",
+        "price_quoted_vnd": 690000,
+        "variant_sku": "SKU-JK-WND-L-NAVY"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0994157718",
+        "customer_id": "C043",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-16",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-JK-WND"
+        ],
+        "open_blockers": [
+          "muốn so sánh thêm"
+        ],
+        "must_not_ask": [
+          "size",
+          "color",
+          "product_advised",
+          "variant_sku"
+        ],
+        "suggested_opening": "Dạ em chào anh Tiến, em gọi lại về SKU-JK-WND anh đang quan tâm ạ, không biết muốn so sánh thêm chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-23T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "max_agent_questions": 4
+      }
+    }
+  }
+}

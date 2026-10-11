@@ -1,0 +1,346 @@
+{
+  "scenario_id": "SCN-GEN-0068",
+  "level": "M2",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "hard_case": "asr_loi_tool_timeout",
+  "customer_id": "SYN-C008",
+  "customer_phone": "0998000008",
+  "customer_name": "Trần Văn H",
+  "honorific": "Mr.",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "hard",
+  "tags": [
+    "asr",
+    "hard_case",
+    "khách_hàng",
+    "máy_lọc_không_khí",
+    "robustness",
+    "tư_vấn",
+    "variant:chuan",
+    "đặt_hàng"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR"
+  ],
+  "notes": "variant=chuan; session_index=1",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-16",
+      "days_later": null,
+      "input_mode": "asr_transcript",
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C008",
+          "session_id": "SYN-008-S1",
+          "date": "2026-09-01",
+          "channel": "hotline",
+          "summary": "Hỏi về giày dép nam",
+          "outcome": "successful",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C008",
+          "session_id": "SYN-008-S2",
+          "date": "2026-09-02",
+          "channel": "zalo_oa",
+          "summary": "Tìm hiểu về chất liệu sản phẩm",
+          "outcome": "successful",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C008",
+          "order_id": "O015",
+          "date": "2026-05-05",
+          "sku": "FAS005",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "O015"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C008",
+          "order_id": "O016",
+          "date": "2026-09-15",
+          "sku": "FAS006",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "FAS006"
+          }
+        }
+      ],
+      "speaker_customer_id": null,
+      "fault_injection": {
+        "tool": "inventory.check",
+        "mode": "timeout"
+      },
+      "customer_goal": "Hỏi về máy lọc không khí Xiaomi Smart 4 Pro",
+      "customer_turns": [
+        "Alo, em muốn hỏi về máy lọc không khí Xiaomi Smart 4 Pro.",
+        "Phòng em khoảng 35 mét vuông, có trẻ nhỏ nữa.",
+        "Ngân sách của em tầm 6 triệu thôi.",
+        "Máy này có khuyến mãi gì không em?",
+        "Em cần suy nghĩ thêm rồi sẽ gọi lại."
+      ],
+      "customer_turns_asr": [
+        "alo em muon hoi ve may loc khong khi xiaomi smart 4 pro",
+        "phong em khoang ba muoi lam met vuong co tre nho nua",
+        "ngan sach cua em tam sau trieu thoi",
+        "may nay co khuyen mai gi khong em",
+        "em can suy nghi them roi se goi lai"
+      ],
+      "facts_established": {
+        "room_area_m2": 35,
+        "has_children": true,
+        "budget_vnd": 6000000,
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "promo_code": "XM-COMBO",
+        "promo_expiry": "2026-11-14"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [
+          "19/10",
+          "ngày 19"
+        ],
+        "agent_must_say": [],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_stock",
+            "value": true
+          }
+        ],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5490000,
+        "list_price_vnd": 5490000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_XM-COMBO_active": true,
+        "gift_sku": "SKU-XM-FLT",
+        "promo_AIR-2ND-50_active": false,
+        "in_stock": false,
+        "restock_date": "2026-10-19",
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "room_area_m2": 35,
+        "has_children": true,
+        "budget_vnd": 6000000,
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "promo_code": "XM-COMBO"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000008",
+        "customer_id": "SYN-C008",
+        "is_returning": true,
+        "n_previous_sessions": 2,
+        "last_session": {
+          "date": "2026-09-02",
+          "channel": "zalo_oa",
+          "outcome": "successful",
+          "summary": "Tìm hiểu về chất liệu sản phẩm"
+        },
+        "products_advised": [
+          "FAS006"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Mr. Trần Văn H, em gọi lại về FAS006 Mr. đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-16T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "khach_asr_nhiem_tool_timeout",
+      "patience_start": 3
+    },
+    "call_2": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-19",
+      "days_later": 3,
+      "input_mode": "asr_transcript",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "Xác nhận mua máy lọc không khí",
+      "customer_turns": [
+        "Alo, em gọi lại để đặt máy lọc không khí.",
+        "Em muốn thanh toán bằng chuyển khoản.",
+        "Khu vực giao hàng là Nha Trang, Khánh Hòa."
+      ],
+      "customer_turns_asr": [
+        "alo em goi lai de dat may loc khong khi",
+        "em muon thanh toan bang chuyen khoan",
+        "khu vuc giao hang la nha trang khanh hoa"
+      ],
+      "facts_established": {
+        "payment": "chuyen_khoan",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "promo_code": "XM-COMBO",
+        "promo_expiry": "2026-11-14",
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-XM-4P",
+          "price_vnd": 5490000,
+          "payment": "chuyen_khoan"
+        },
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5490000,
+        "list_price_vnd": 5490000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_XM-COMBO_active": true,
+        "gift_sku": "SKU-XM-FLT",
+        "promo_AIR-2ND-50_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "estimated_delivery": "2026-10-23",
+        "call_date": "2026-10-19"
+      },
+      "memory_expectation": {
+        "payment": "chuyen_khoan",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "promo_code": "XM-COMBO",
+        "order_id": "OD600001",
+        "superseded": {
+          "order_id": "O015"
+        }
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000008",
+        "customer_id": "SYN-C008",
+        "is_returning": true,
+        "n_previous_sessions": 3,
+        "last_session": {
+          "date": "2026-10-16",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "FAS006",
+          "SKU-XM-4P"
+        ],
+        "open_blockers": [
+          "cần suy nghĩ thêm"
+        ],
+        "must_not_ask": [
+          "room_area_m2",
+          "has_children",
+          "budget_vnd",
+          "product_advised",
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Mr. Trần Văn H, em gọi lại về FAS006 Mr. đang quan tâm ạ, không biết cần suy nghĩ thêm chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-19T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000008",
+            "sku": "SKU-XM-4P",
+            "qty": 1,
+            "price_vnd": 5490000,
+            "payment": "chuyen_khoan",
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-10-19"
+          },
+          "result": {
+            "order_id": "OD600001",
+            "status": "created",
+            "total_vnd": 5490000,
+            "needs_confirmation_call": false,
+            "estimated_delivery": "2026-10-23"
+          }
+        }
+      ],
+      "simulator_persona_key": "khach_asr_nhiem_tool_timeout",
+      "patience_start": 2
+    }
+  }
+}

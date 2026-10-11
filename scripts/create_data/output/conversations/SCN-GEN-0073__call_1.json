@@ -1,0 +1,151 @@
+{
+  "conversation_id": "SCN-GEN-0073__call_1",
+  "scenario_id": "SCN-GEN-0073",
+  "call": "call_1",
+  "customer_id": "C001",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-29",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_so_gia",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chào chị Hoa! Chị muốn hỏi về máy lọc không khí AirPure Y cho phòng 40 mét vuông phải không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Chị muốn hỏi về máy lọc không khí AirPure Y cho phòng 40 mét vuông phải không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị cho em hỏi thêm một chút, nhà chị không có trẻ nhỏ và ngân sách tầm khoảng 6 triệu đúng không ạ?",
+      "questions": [
+        {
+          "slot": "has_children",
+          "type": "confirm",
+          "text": "Nhà chị không có trẻ nhỏ đúng không ạ?"
+        },
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách tầm khoảng 6 triệu đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giá của máy lọc không khí AirPure Y bên em là 5.200.000đ. Em hiểu rằng giá này cao hơn bên khác, nhưng máy lọc của em được bảo hành 24 tháng và có chính sách đổi trả rõ ràng ạ. Chị có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [
+        "price_vnd",
+        "list_price_vnd",
+        "has_children",
+        "budget_vnd",
+        "objection"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5200000
+        },
+        {
+          "field": "list_price_vnd",
+          "value": 5200000
+        },
+        {
+          "field": "has_children",
+          "value": false
+        },
+        {
+          "field": "budget_vnd",
+          "value": 6000000
+        },
+        {
+          "field": "objection",
+          "value": "giá cao hơn chỗ khác"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu rồi. Chị cần suy nghĩ thêm và sẽ gọi lại sau ạ. Em sẽ ghi nhớ thông tin này và chờ cuộc gọi của chị ạ. Chúc chị một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "room_area_m2",
+          "value": 40
+        },
+        {
+          "key": "has_children",
+          "value": false
+        },
+        {
+          "key": "budget_vnd",
+          "value": 6000000
+        },
+        {
+          "key": "competitor_price_vnd",
+          "value": 4580000
+        },
+        {
+          "key": "objection",
+          "value": "giá cao hơn chỗ khác"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-Y"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5200000
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

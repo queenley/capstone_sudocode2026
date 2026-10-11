@@ -1,0 +1,135 @@
+{
+  "conversation_id": "SCN-GEN-0015__call_2",
+  "scenario_id": "SCN-GEN-0015",
+  "call": "call_2",
+  "customer_id": "C035",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-01",
+  "region": "trung",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị Dung. Chị đã gọi về máy lọc không khí hôm qua phải không ạ? Em xin xác nhận là chị muốn đặt hàng cho sản phẩm máy lọc không khí mà cô Loan đã tư vấn cho chị đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn xác nhận máy lọc không khí mà cô Loan đã tư vấn cho chị đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị đã xác nhận. Em thấy chị muốn thanh toán bằng chuyển khoản và giao hàng ở Ninh Kiều, Cần Thơ phải không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Chị muốn thanh toán bằng chuyển khoản và giao hàng ở Ninh Kiều, Cần Thơ phải không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Rất tốt ạ! Em cũng đã ghi nhận là diện tích phòng của chị khoảng 40 mét vuông và nhà không có trẻ nhỏ, phù hợp với sản phẩm em tư vấn. Giờ em sẽ chốt đơn hàng cho chị nhé!",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2",
+        "has_children"
+      ],
+      "claims": [
+        {
+          "field": "room_area_m2",
+          "value": 40
+        },
+        {
+          "field": "has_children",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị Dung, em xin đọc lại thông tin đơn hàng của chị: sản phẩm là máy lọc không khí, số lượng 1, giá 2.190.000đ, phương thức thanh toán là chuyển khoản, địa chỉ giao hàng là Ninh Kiều, Cần Thơ, và dự kiến giao hàng vào ngày 05/11/2026. Em sẽ tiến hành tạo đơn hàng cho chị nhé!",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "payment",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-05"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0958421083",
+            "sku": "SKU-AP-MINI",
+            "qty": 1,
+            "price_vnd": 2190000,
+            "payment": "chuyen_khoan",
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-11-01"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận mua máy lọc không khí.",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001"
+    }
+  }
+}

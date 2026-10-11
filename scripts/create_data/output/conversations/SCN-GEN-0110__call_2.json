@@ -1,0 +1,146 @@
+{
+  "conversation_id": "SCN-GEN-0110__call_2",
+  "scenario_id": "SCN-GEN-0110",
+  "call": "call_2",
+  "customer_id": "C045",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-03",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào anh Lâm, em gọi lại về máy lọc không khí SKU-AP-PRO mà anh đang quan tâm ạ. Không biết anh còn chờ cuối tháng nhận lương không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Không biết anh còn chờ cuối tháng nhận lương không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh gọi lại để hỏi về máy lọc không khí hôm trước.",
+      "facts_stated": {
+        "product_advised": "SKU-AP-PRO"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu ạ. Giá của máy lọc không khí SKU-AP-PRO là 7.990.000đ, không biết giá có thay đổi gì không ạ?",
+      "questions": [
+        {
+          "slot": "price_quoted_vnd",
+          "type": "confirm",
+          "text": "Không biết giá có thay đổi gì không ạ?"
+        }
+      ],
+      "facts_used": [
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá có thay đổi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giá vẫn giữ nguyên là 7.990.000đ ạ. Em xin xác nhận là anh vẫn chưa chốt được đơn hàng, chờ lương thôi đúng không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Em xin xác nhận là anh vẫn chưa chốt được đơn hàng, chờ lương thôi đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh vẫn chưa chốt được, chờ lương thôi.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận lại rằng anh đang chờ lương. Em sẽ gọi lại cho anh sau để hỗ trợ thêm ạ. Cảm ơn anh đã gọi đến shop, chúc anh một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

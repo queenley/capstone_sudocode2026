@@ -1,0 +1,135 @@
+{
+  "conversation_id": "SCN-GEN-0065__call_1",
+  "scenario_id": "SCN-GEN-0065",
+  "call": "call_1",
+  "customer_id": "C034",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-27",
+  "region": "trung",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào cô Loan, em gọi lại về sản phẩm máy lọc nước RO Karofi 9 lõi mà cô đang quan tâm ạ. Cô ở Cần Thơ đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Cô ở Cần Thơ đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area",
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "delivery_area",
+          "value": "Cần Thơ"
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-WF-RO9"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn cô đã xác nhận. Em được biết cô có nhu cầu cho gia đình 4 người và ngân sách khoảng 6 triệu ạ. Em xin thông tin thêm là sản phẩm này hiện có giá 5.990.000đ và không có khuyến mãi nào đang áp dụng. Cô có muốn đặt hàng không ạ?",
+      "questions": [],
+      "facts_used": [
+        "usage_need",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "usage_need",
+          "value": "gia đình 4 người"
+        },
+        {
+          "field": "budget_vnd",
+          "value": 6000000
+        },
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em hiểu rằng cô cần chờ đến cuối tháng để quyết định. Em sẽ ghi nhận lại thông tin này và hẹn gọi lại cho cô vào đầu tháng tới. Cô có muốn em ghi chú thời gian cụ thể không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "open",
+          "text": "Cô có muốn em ghi chú thời gian cụ thể không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [
+        {
+          "field": "blocker",
+          "value": "chờ cuối tháng nhận lương"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ ghi chú lại và gọi lại cho cô vào đầu tháng tới ạ. Cảm ơn cô Loan đã gọi, chúc cô một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

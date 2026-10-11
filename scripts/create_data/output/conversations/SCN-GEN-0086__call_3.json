@@ -1,0 +1,140 @@
+{
+  "conversation_id": "SCN-GEN-0086__call_3",
+  "scenario_id": "SCN-GEN-0086",
+  "call": "call_3",
+  "customer_id": "C021",
+  "session_index": 3,
+  "channel": "hotline",
+  "date": "2026-11-05",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_cap_nhat_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào chị Yến, em gọi lại về đơn hàng chị đã đặt hôm 03/11 với mã đơn là OD600001. Chị có cần thêm thông tin gì về đơn hàng không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Mã đơn hàng của chị là OD600001 đúng không?"
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Vâng, đúng rồi.",
+      "facts_stated": {
+        "order_id": "OD600001"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em cảm ơn chị đã xác nhận. Hiện tại đơn hàng của chị đang trong trạng thái \"đã tạo\" và sẽ được xử lý trong thời gian sớm nhất. Chị có muốn biết thêm về sản phẩm không ạ?",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "created"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD600001"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mình chưa nhận được thông tin gì về đơn hàng cả.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin lỗi vì sự bất tiện này. Em sẽ kiểm tra lại thông tin đơn hàng của chị ngay. Chị vui lòng cho em một chút thời gian nhé!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD600001"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã kiểm tra. Đơn hàng của chị được tạo vào ngày 03/11 với mã đơn OD600001 và đang trong quá trình xử lý. Chị sẽ nhận được thông tin giao hàng sớm nhất có thể. Cảm ơn chị đã kiên nhẫn ạ!",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "order_status"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "created"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi tình trạng đơn hàng đã đặt.",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

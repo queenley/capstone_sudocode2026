@@ -1,0 +1,120 @@
+{
+  "conversation_id": "SCN-GEN-0002__call_2",
+  "scenario_id": "SCN-GEN-0002",
+  "call": "call_2",
+  "customer_id": "C032",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-18",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Tâm, em là trợ lý ảo của shop. Em thấy chị có một đơn hàng với mã OD301177. Chị muốn em cập nhật địa chỉ giao hàng từ địa chỉ cũ sang Hải Châu, Đà Nẵng phải không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Chị muốn em cập nhật địa chỉ giao hàng từ địa chỉ cũ sang Hải Châu, Đà Nẵng phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD301177"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, em làm giúp chị nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn chị Tâm đã xác nhận. Em sẽ tiến hành cập nhật địa chỉ giao hàng của đơn hàng OD301177 sang Hải Châu, Đà Nẵng ngay bây giờ ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD301177",
+            "action": "update_address",
+            "on": "2026-10-18"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, đơn hàng của chị đã được cập nhật thành công. Địa chỉ giao hàng đã được chuyển sang Hải Châu, Đà Nẵng. Chị có cần thêm thông tin gì khác không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Không, cảm ơn em nhiều!",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, không có gì ạ. Chúc chị Tâm một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "conversation_id": "SCN-GEN-0072__call_1",
+  "scenario_id": "SCN-GEN-0072",
+  "call": "call_1",
+  "customer_id": "SYN-C009",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-15",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào Ms. Nguyễn Thị I, em gọi lại về sản phẩm xe đẩy gấp gọn Joie Pact mà Ms. đang quan tâm ạ. Chị đã hỏi vợ về sản phẩm chưa ạ?",
+      "questions": [
+        {
+          "slot": "decision_maker",
+          "type": "confirm",
+          "text": "Chị đã hỏi vợ về sản phẩm chưa ạ?"
+        }
+      ],
+      "facts_used": [
+        "decision_maker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, xe đẩy Joie Pact có giá 3.490.000đ và hiện tại đang có khuyến mãi miễn phí vận chuyển ạ. Chị có dự định mua ngay không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Nếu chị cần thêm thời gian để hỏi vợ, em hoàn toàn hiểu ạ. Chị có thể gọi lại cho em sau khi đã trao đổi với gia đình nhé. Em cũng muốn nhắc rằng khuyến mãi miễn phí vận chuyển này sẽ hết hạn vào ngày 29 tháng 11 năm 2026 ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_expiry",
+          "value": "2026-11-29"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận lại lịch gọi lại cho chị ạ. Khi nào chị gọi lại, em sẽ hỗ trợ tiếp tục tư vấn cho chị về xe đẩy này nhé. Cảm ơn chị đã gọi đến shop, chúc chị có một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần hỏi vợ"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

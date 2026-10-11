@@ -1,0 +1,134 @@
+{
+  "conversation_id": "SCN-GEN-0102__call_1",
+  "scenario_id": "SCN-GEN-0102",
+  "call": "call_1",
+  "customer_id": "C022",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-20",
+  "region": "nam",
+  "category": "gia-dung/quat",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chào anh Bảo! Cảm ơn anh đã gọi đến shop. Anh muốn hỏi về quạt đứng DC inverter Panasonic F-409, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh muốn hỏi về quạt đứng DC inverter Panasonic F-409, đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Quạt Panasonic F-409 rất phù hợp để thay thế cho quạt cũ của anh. Với mức giá 2.450.000đ, quạt này tiết kiệm điện và có nhiều mức gió linh hoạt. Anh cho em hỏi, quạt cũ của anh có kích thước như thế nào ạ?",
+      "questions": [
+        {
+          "slot": "usage_need",
+          "type": "open",
+          "text": "Quạt cũ của anh có kích thước như thế nào ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2450000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em cũng lưu ý là quạt này hiện đang có hàng, rất phù hợp với ngân sách của anh. Anh đã cho em biết ngân sách của mình là 3 triệu đúng không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của anh là 3 triệu đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "budget_vnd",
+          "value": 3000000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Nếu anh cần thêm thời gian để tham khảo với vợ thì em hoàn toàn hiểu. Anh có thể gọi lại cho em vào thứ Hai tuần sau tầm 9 giờ sáng, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "decision_maker",
+          "type": "confirm",
+          "text": "Anh có thể gọi lại cho em vào thứ Hai tuần sau tầm 9 giờ sáng, đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0957990659",
+            "callback_at": "2026-10-26T09:00",
+            "note": "khách hẹn gọi lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần hỏi vợ"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi tư vấn về quạt đứng mới.",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": {
+      "customer_phone": "0957990659",
+      "callback_at": "2026-10-26T09:00",
+      "note": "khách hẹn gọi lại"
+    },
+    "order": null
+  }
+}

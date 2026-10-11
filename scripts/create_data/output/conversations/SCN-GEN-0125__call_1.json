@@ -1,0 +1,159 @@
+{
+  "conversation_id": "SCN-GEN-0125__call_1",
+  "scenario_id": "SCN-GEN-0125",
+  "call": "call_1",
+  "customer_id": "SYN-C002",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-13",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Ms. Trần Thị B, em gọi lại về sản phẩm máy tiệt trùng sấy khô cho bé mà Ms. đang quan tâm ạ. Em thấy Ms. có bé mới được 3 tháng tuổi và ngân sách khoảng 2 triệu đúng không ạ?",
+      "questions": [
+        {
+          "slot": "child_age_months",
+          "type": "confirm",
+          "text": "Bé nhà chị mới được 3 tháng tuổi."
+        },
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của chị khoảng 2 triệu thôi."
+        }
+      ],
+      "facts_used": [
+        "child_age_months",
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "child_age_months",
+          "value": 3
+        },
+        {
+          "field": "budget_vnd",
+          "value": 2500000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Vâng, đúng rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn Ms. đã xác nhận ạ. Hiện tại, sản phẩm máy tiệt trùng mà em muốn giới thiệu có giá là 1.890.000đ và đang có khuyến mãi freeship cho đơn hàng này. Chị có muốn tìm hiểu thêm về tính năng của máy không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Máy này có khuyến mãi gì không em?"
+        }
+      ],
+      "facts_used": [
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn so sánh thêm trước khi quyết định.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu ạ. Nếu chị cần thêm thông tin nào khác hoặc muốn em gọi lại sau khi chị đã quyết định, em sẽ ghi nhận lại ạ. Khi nào chị muốn em gọi lại ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "open",
+          "text": "Chị muốn so sánh thêm trước khi quyết định."
+        }
+      ],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "muốn so sánh thêm"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ quyết định sau 1 tuần.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ gọi lại cho chị vào tuần sau để kiểm tra tình hình ạ. Cảm ơn chị đã dành thời gian cho cuộc gọi này, em chúc chị một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

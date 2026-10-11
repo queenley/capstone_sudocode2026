@@ -1,0 +1,120 @@
+{
+  "conversation_id": "SCN-GEN-0074__call_2",
+  "scenario_id": "SCN-GEN-0074",
+  "call": "call_2",
+  "customer_id": "C009",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-19",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_mua_doi_size",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào chị Ngọc, em gọi lại về đơn hàng giày chị đã nhận ạ. Chị đã cho biết muốn đổi sang size 42 màu đen đúng không ạ?",
+      "questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Chị đã cho biết muốn đổi sang size 42 màu đen đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã xác nhận size 42 còn hàng và có thể đổi ngay ạ. Về phí đổi, chị sẽ không phải trả thêm phí nào cả. Vậy em sẽ tiến hành cập nhật đơn hàng cho chị nhé?",
+      "questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Vậy em sẽ tiến hành cập nhật đơn hàng cho chị nhé?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "new_size_in_stock",
+          "value": true
+        },
+        {
+          "field": "exchange_fee_vnd",
+          "value": 0
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã cập nhật đơn hàng với mã đơn là OD600001, đổi sang size 42 màu đen. Tổng giá trị hoàn trả cho chị là 219.000đ, sẽ được hoàn lại vào tài khoản trong 3-5 ngày làm việc ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "refund_vnd"
+      ],
+      "claims": [
+        {
+          "field": "refund_vnd",
+          "value": 219000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD600001",
+            "action": "exchange_size",
+            "new_variant_sku": "SKU-SN-RUN2-42-DEN",
+            "on": "2026-10-19"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "size",
+          "value": 42
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Đổi giày sang size 42",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

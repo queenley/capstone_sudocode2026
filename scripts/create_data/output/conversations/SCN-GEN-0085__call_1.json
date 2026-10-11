@@ -1,0 +1,118 @@
+{
+  "conversation_id": "SCN-GEN-0085__call_1",
+  "scenario_id": "SCN-GEN-0085",
+  "call": "call_1",
+  "customer_id": "SYN-C005",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-29",
+  "region": "trung",
+  "category": "unknown",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Mr. Đỗ Minh E, em gọi lại về đơn hàng của Mr. ạ. Ông đã đặt sản phẩm FAS004 và đơn hàng này đã được giao thành công vào ngày 12 tháng 9 vừa qua. Ông có cần thêm thông tin gì về đơn hàng này không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Đơn hàng của ông là O010 phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "O010"
+        },
+        {
+          "field": "order_status",
+          "value": "delivered"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "O010"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Vâng, đúng rồi, em muốn biết tình trạng đơn hàng.",
+      "facts_stated": {
+        "order_id": "O010"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, đơn hàng của ông FAS004 đã được giao thành công. Nếu ông cần hỗ trợ gì thêm về sản phẩm hoặc đơn hàng, em luôn sẵn sàng giúp ạ!",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "delivered"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cảm ơn em, không có gì thêm nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn ông đã liên hệ với shop. Nếu có gì cần hỗ trợ, ông hãy gọi lại cho em nhé! Chúc ông một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi tình trạng đơn hàng đã đặt.",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,135 @@
+{
+  "conversation_id": "SCN-GEN-0091__call_2",
+  "scenario_id": "SCN-GEN-0091",
+  "call": "call_2",
+  "customer_id": "C012",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-03",
+  "region": "bac",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Khoa, em gọi lại về sản phẩm SKU-WF-RO10 anh đang quan tâm ạ. Anh có muốn hỏi thêm chi tiết nào không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "open",
+          "text": "Anh còn muốn so sánh thêm không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-WF-RO10"
+        },
+        {
+          "field": "price_vnd",
+          "value": 6890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh gọi lại để hỏi thêm một số chi tiết.",
+      "facts_stated": {
+        "blocker": "muốn so sánh thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn anh đã gọi lại. Về sản phẩm SKU-WF-RO10, giá là 6.890.000đ, và hiện tại sản phẩm này vẫn đang có sẵn hàng ạ. Anh có cần thêm thông tin gì về sản phẩm không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Anh còn muốn so sánh thêm không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhưng sau khi xem xét, anh không muốn mua nữa.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ, nếu anh cần thêm thông tin gì trong tương lai, đừng ngần ngại gọi lại cho em nhé. Cảm ơn anh rất nhiều và chúc anh một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cảm ơn em đã tư vấn, nhưng anh sẽ không mua sản phẩm này.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_choi",
+    "outcome": "tu_choi",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

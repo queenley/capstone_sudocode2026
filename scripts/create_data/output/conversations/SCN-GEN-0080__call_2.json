@@ -1,0 +1,145 @@
+{
+  "conversation_id": "SCN-GEN-0080__call_2",
+  "scenario_id": "SCN-GEN-0080",
+  "call": "call_2",
+  "customer_id": "C014",
+  "session_index": 2,
+  "channel": "zalo_oa",
+  "date": "2026-10-15",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_kenh_mau_thuan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Huy, em gọi lại về giày chạy bộ RunLite 2 Pro size 42 màu đen anh đang quan tâm ạ. Anh hỏi hôm nay giá là 1521000đ và có chương trình khuyến mãi giảm 10% nữa ạ, khuyến mãi này còn hiệu lực đến 25/10/2026 ạ.",
+      "questions": [
+        {
+          "slot": "price_quoted_vnd",
+          "type": "confirm",
+          "text": "Giá hôm nay là 1521000đ phải không ạ?"
+        },
+        {
+          "slot": "promo_code",
+          "type": "confirm",
+          "text": "Khuyến mãi RUN-10 còn hiệu lực đến 25/10/2026 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1521000
+        },
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        },
+        {
+          "field": "promo_expiry",
+          "value": "2026-10-25"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin phép hỏi thêm một chút, anh có quan tâm đến khuyến mãi hay chương trình nào khác không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu rồi ạ. Nếu anh cần thêm thông tin gì nữa, đừng ngần ngại gọi lại cho em nhé. Chúc anh một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin phép ghi nhận lại để gọi lại cho anh sau nhé. Cảm ơn anh đã quan tâm đến sản phẩm của chúng em ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào anh Huy, em gọi lại về giày chạy bộ RunLite 2 Pro size 42 màu đen anh đang quan tâm ạ. Giá hôm nay là 1521000đ và khuyến mãi RUN-10 còn hiệu lực đến 25/10/2026. Anh có muốn em ghi nhận lại thông tin để gọi lại sau không ạ?",
+      "questions": [
+        {
+          "slot": "objection",
+          "type": "confirm",
+          "text": "Anh có cần thêm thời gian để suy nghĩ không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "objection"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1521000
+        },
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        },
+        {
+          "field": "promo_expiry",
+          "value": "2026-10-25"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi lại giá giày chạy bộ",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

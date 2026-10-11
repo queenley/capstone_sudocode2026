@@ -1,0 +1,133 @@
+{
+  "conversation_id": "SCN-GEN-0101__call_1",
+  "scenario_id": "SCN-GEN-0101",
+  "call": "call_1",
+  "customer_id": "SYN-C006",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "nam",
+  "category": "unknown",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Nguyễn Thị F, em gọi lại về đơn hàng chị đã đặt hôm 30 tháng 9 ạ. Chị có đặt sản phẩm MAB004 phải không ạ?",
+      "questions": [
+        {
+          "slot": "owned_sku",
+          "type": "confirm",
+          "text": "Chị có đặt sản phẩm MAB004 phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, chị muốn hỏi tình trạng đơn hàng của mình.",
+      "facts_stated": {
+        "owned_sku": "MAB004"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin phép kiểm tra tình trạng đơn hàng O012 cho chị ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "O012"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị không nhớ mã đơn hàng, nhưng đơn hàng này chị đã đặt hôm 30 tháng 9.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, đơn hàng của chị MAB004 đã giao thành công, chị sẽ nhận hàng trong thời gian tới ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "delivered"
+        },
+        {
+          "field": "order_id",
+          "value": "O012"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn biết khi nào hàng sẽ được giao?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hàng đã được giao thành công rồi ạ, chị có thể kiểm tra lại nhé. Nếu cần thêm thông tin gì, chị cứ cho em biết ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi tình trạng đơn hàng",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

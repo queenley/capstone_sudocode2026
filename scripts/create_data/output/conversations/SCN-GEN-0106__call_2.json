@@ -1,0 +1,146 @@
+{
+  "conversation_id": "SCN-GEN-0106__call_2",
+  "scenario_id": "SCN-GEN-0106",
+  "call": "call_2",
+  "customer_id": "C025",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-25",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào chị Nhung. Em gọi lại về xe đẩy Joie Pact mà chị đã quan tâm, không biết chị đã hỏi chồng chưa ạ?",
+      "questions": [
+        {
+          "slot": "decision_maker",
+          "type": "confirm",
+          "text": "Chị đã hỏi chồng chưa ạ?"
+        }
+      ],
+      "facts_used": [
+        "decision_maker",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hôm trước chị gọi hỏi xe đẩy Joie Pact, giờ có hàng chưa em?",
+      "facts_stated": {
+        "product_advised": "SKU-MB-STR1"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại xe đẩy Joie Pact vẫn chưa có hàng, xin lỗi chị về sự bất tiện này ạ. Em sẽ ghi nhận lại để gọi lại cho chị khi có hàng nhé.",
+      "questions": [],
+      "facts_used": [
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đã quyết định mua rồi, nhưng nghe nói xe hết hàng thì sao?",
+      "facts_stated": {
+        "blocker": "cần hỏi chồng"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu chị đã quyết định mua. Hiện tại xe đẩy Joie Pact hết hàng, nhưng em sẽ thông báo cho chị ngay khi có hàng lại. Chị có muốn em ghi lại ngày gọi lại không ạ?",
+      "questions": [
+        {
+          "slot": "callback",
+          "type": "open",
+          "text": "Chị có muốn em ghi lại ngày gọi lại không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có dự kiến ngày nào có hàng lại không? Chị sẽ gọi lại sau nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại em chưa có thông tin cụ thể về ngày có hàng lại, nhưng sẽ gọi lại cho chị ngay khi cập nhật được ạ. Cảm ơn chị đã quan tâm và hẹn gặp lại ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần hỏi chồng"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

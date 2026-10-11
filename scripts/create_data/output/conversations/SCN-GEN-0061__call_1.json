@@ -1,0 +1,115 @@
+{
+  "conversation_id": "SCN-GEN-0061__call_1",
+  "scenario_id": "SCN-GEN-0061",
+  "call": "call_1",
+  "customer_id": "SYN-C001",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-29",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_da_kenh_fb_hotline",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Mr. Nguyễn Văn A, em gọi lại để tư vấn về combo Spectra S1 và máy hâm sữa Fatz mà Mr. đã hỏi ạ. Chị có bé 4 tháng, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "child_age_months",
+          "type": "confirm",
+          "text": "Chị có bé 4 tháng, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "child_age_months"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Combo này có giá là 4.790.000đ, nằm trong ngân sách của chị là 5 triệu rưỡi. Hiện tại có chương trình khuyến mãi MOM-FREESHIP, chị sẽ được miễn phí vận chuyển ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4790000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em cũng xin thông báo là sản phẩm này hiện đang có sẵn hàng và sẽ được giao trong vòng 2-4 ngày làm việc ạ. Chị có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "call_date",
+          "value": "2026-10-29"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, nếu chị muốn gọi hotline để hỏi thêm thông tin, em sẽ ghi nhận lại và hẹn gọi lại cho chị sau ạ. Chị có muốn em ghi lại thời gian cụ thể không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "open",
+          "text": "Chị có muốn em ghi lại thời gian cụ thể không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "muốn gọi hotline hỏi thêm"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi về combo sản phẩm cho bé.",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

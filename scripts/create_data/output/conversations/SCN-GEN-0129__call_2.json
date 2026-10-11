@@ -1,0 +1,107 @@
+{
+  "conversation_id": "SCN-GEN-0129__call_2",
+  "scenario_id": "SCN-GEN-0129",
+  "call": "call_2",
+  "customer_id": "SYN-C003",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-16",
+  "region": "nam",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_hoi_ngoai_tai_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chào Mr. Lê Văn C, em gọi lại về sản phẩm MAB002 mà Mr. đang quan tâm ạ. Hôm trước Mr. có hỏi về chính sách đổi trả, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Mr. có hỏi về sản phẩm MAB002 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Theo chính sách hiện tại, Mr. có thể đổi trả sản phẩm trong vòng 7 ngày ạ. Phí đổi size là miễn phí cho lần đầu tiên, sau đó sẽ là 30.000đ cho những lần đổi tiếp theo. Mr. có cần thêm thông tin gì không ạ?",
+      "questions": [
+        {
+          "slot": "return_days",
+          "type": "confirm",
+          "text": "Thời hạn đổi trả hiện tại là 7 ngày đúng không ạ?"
+        },
+        {
+          "slot": "exchange_fee_vnd",
+          "type": "confirm",
+          "text": "Phí đổi size là miễn phí cho lần đầu tiên đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "exchange_fee_vnd",
+          "value": 0
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin xác nhận là Mr. sẽ không mất phí khi đổi hàng lần đầu tiên ạ. Nếu có thêm câu hỏi nào khác, Mr. cứ thoải mái hỏi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Nếu cần thêm thông tin gì khác, em sẵn sàng hỗ trợ ạ. Cảm ơn Mr. đã quan tâm đến sản phẩm của shop. Chúc Mr. một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "thong_tin",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

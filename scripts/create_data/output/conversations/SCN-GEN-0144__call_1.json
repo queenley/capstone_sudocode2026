@@ -1,0 +1,112 @@
+{
+  "conversation_id": "SCN-GEN-0144__call_1",
+  "scenario_id": "SCN-GEN-0144",
+  "call": "call_1",
+  "customer_id": "C007",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-14",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_ngoai_pham_vi_chuyen_may",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị Thảo, em là trợ lý ảo của shop. Chị đang quan tâm đến combo sản phẩm cho bé 12 tháng, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "child_age_months",
+          "type": "confirm",
+          "text": "Chị đang quan tâm đến combo sản phẩm cho bé 12 tháng, đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em rất cảm ơn chị đã gọi đến shop. Giá của combo sản phẩm này là 4.790.000đ, chị có ngân sách khoảng 5 triệu rưỡi như đã chia sẻ, rất phù hợp ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4790000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Chị ơi, hiện tại combo này đang có khuyến mãi Mã miễn phí vận chuyển, rất thuận lợi cho chị. Khuyến mãi này sẽ hết hạn vào ngày 29 tháng 11 năm 2026. Chị có muốn biết thêm chi tiết nào không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "promo_expiry",
+          "value": "2026-11-29"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Nếu chị cần thêm thời gian để suy nghĩ, không sao cả. Chị có thể gọi lại cho em khi nào chị sẵn sàng nhé. Em sẽ ghi nhận lại rằng chị cần suy nghĩ thêm.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "blocker",
+          "value": "cần suy nghĩ thêm"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi về combo sản phẩm dành cho bé 12 tháng.",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

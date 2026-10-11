@@ -1,0 +1,125 @@
+{
+  "conversation_id": "SCN-GEN-0001__call_2",
+  "scenario_id": "SCN-GEN-0001",
+  "call": "call_2",
+  "customer_id": "C031",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Oanh, em gọi lại về đơn hàng của chị ạ. Chị đã đặt hàng SKU-AP-X với giá 4.490.000đ, giao đến địa chỉ Cầu Giấy, Hà Nội. Đơn hàng của chị hiện tại đang ở trạng thái đã tạo. Chị có cần thêm thông tin gì không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Đơn hàng của chị là OD600001 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "delivery_area",
+        "price_quoted_vnd",
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "price_quoted_vnd",
+          "value": 4490000
+        },
+        {
+          "field": "delivery_area",
+          "value": "Cầu Giấy, Hà Nội"
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-AP-X"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD600001"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ừ, đúng rồi.",
+      "facts_stated": {
+        "order_id": "OD600001"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã xác nhận. Hiện tại đơn hàng của chị vẫn đang trong quá trình xử lý. Chị có cần em hỗ trợ gì thêm về đơn hàng này không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "created"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Không, cảm ơn em.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, không có gì ạ. Nếu chị cần thêm thông tin gì, cứ gọi cho em nhé. Chúc chị một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

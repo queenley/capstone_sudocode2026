@@ -1,0 +1,339 @@
+{
+  "scenario_id": "SCN-GEN-0120",
+  "level": "M2",
+  "persona": "khach_cap_nhat_thong_tin",
+  "hard_case": "ba_phien_doi_thong_tin",
+  "customer_id": "C041",
+  "customer_phone": "0905154382",
+  "customer_name": "Thắng",
+  "honorific": "anh",
+  "region": "nam",
+  "category": "gia-dung/noi-chien",
+  "difficulty": "hard",
+  "tags": [
+    "hard_case",
+    "order_status",
+    "supersede",
+    "variant:ba_phien_doi_thong_tin"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=ba_phien_doi_thong_tin; session_index=2",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-31",
+      "days_later": null,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker)."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "usage_need": "thay đồ cũ đã hỏng",
+        "budget_vnd": 2000000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AF-4L",
+        "price_quoted_vnd": 1890000
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [],
+      "must_not_ask": [],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1890000,
+        "list_price_vnd": 1890000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-31"
+      },
+      "memory_expectation": {
+        "usage_need": "thay đồ cũ đã hỏng",
+        "budget_vnd": 2000000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AF-4L",
+        "price_quoted_vnd": 1890000
+      },
+      "expected_call_brief": null,
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 4
+    },
+    "call_2": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-11-03",
+      "days_later": 3,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] order",
+      "customer_turns": [
+        "[plan-only] Khách xác nhận muốn mua, nêu hình thức thanh toán và khu vực giao hàng (chỉ quận/tỉnh), đồng ý lên đơn."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "delivery_area": "Thủ Đức, TP.HCM",
+        "budget_vnd": 2300000,
+        "payment": "chuyen_khoan",
+        "product_advised": "SKU-AF-4L",
+        "price_quoted_vnd": 1890000,
+        "promo_code": "NAM-SHIP0",
+        "promo_expiry": "2026-11-05",
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AF-4L",
+          "price_vnd": 1890000,
+          "payment": "chuyen_khoan"
+        },
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1890000,
+        "list_price_vnd": 1890000,
+        "promo_active": true,
+        "promo_NAM-SHIP0_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "freeship": true,
+        "estimated_delivery": "2026-11-05",
+        "call_date": "2026-11-03"
+      },
+      "memory_expectation": {
+        "delivery_area": "Thủ Đức, TP.HCM",
+        "budget_vnd": 2300000,
+        "payment": "chuyen_khoan",
+        "product_advised": "SKU-AF-4L",
+        "price_quoted_vnd": 1890000,
+        "promo_code": "NAM-SHIP0",
+        "order_id": "OD600001",
+        "superseded": {
+          "budget_vnd": 2000000
+        }
+      },
+      "expected_call_brief": {
+        "customer_phone": "0905154382",
+        "customer_id": "C041",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-31",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-AF-4L"
+        ],
+        "open_blockers": [
+          "để bàn với gia đình"
+        ],
+        "must_not_ask": [
+          "budget_vnd",
+          "usage_need",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào anh Thắng, em gọi lại về SKU-AF-4L anh đang quan tâm ạ, không biết để bàn với gia đình chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-03T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0905154382",
+            "sku": "SKU-AF-4L",
+            "qty": 1,
+            "price_vnd": 1890000,
+            "payment": "chuyen_khoan",
+            "address": "Thủ Đức, TP.HCM",
+            "on": "2026-11-03"
+          },
+          "result": {
+            "order_id": "OD600001",
+            "status": "created",
+            "total_vnd": 1890000,
+            "needs_confirmation_call": false,
+            "estimated_delivery": "2026-11-05"
+          }
+        }
+      ],
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 3
+    },
+    "call_3": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-11-05",
+      "days_later": 2,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] order_status",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tình trạng đơn hàng hiện có; không tự đọc mã đơn trừ khi được hỏi xác nhận."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {},
+      "expected_outcome": "cap_nhat_don",
+      "must_carry_over": [
+        "payment",
+        "delivery_area",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "order_id"
+      ],
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD600001"
+        },
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [
+          "đã tạo",
+          "đang xử lý",
+          "đang chuẩn bị",
+          "đã ghi nhận"
+        ],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "order_id": "OD600001",
+        "order_status": "created",
+        "call_date": "2026-11-05"
+      },
+      "memory_expectation": {},
+      "expected_call_brief": {
+        "customer_phone": "0905154382",
+        "customer_id": "C041",
+        "is_returning": true,
+        "n_previous_sessions": 2,
+        "last_session": {
+          "date": "2026-11-03",
+          "channel": "hotline",
+          "outcome": "chot_don"
+        },
+        "products_advised": [
+          "SKU-AF-4L"
+        ],
+        "open_blockers": [
+          "để bàn với gia đình"
+        ],
+        "must_not_ask": [
+          "budget_vnd",
+          "usage_need",
+          "payment",
+          "delivery_area",
+          "product_advised",
+          "order_id"
+        ],
+        "suggested_opening": "Dạ em chào anh Thắng, em gọi lại về SKU-AF-4L anh đang quan tâm ạ, không biết để bàn với gia đình chưa ạ?",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-05T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD600001"
+          },
+          "result": {
+            "orders": [
+              {
+                "order_id": "OD600001",
+                "customer_phone": "0905154382",
+                "sku": "SKU-AF-4L",
+                "qty": 1,
+                "price_vnd": 1890000,
+                "total_vnd": 1890000,
+                "promos": [
+                  "NAM-SHIP0",
+                  "COD-0"
+                ],
+                "payment": "chuyen_khoan",
+                "address": "Thủ Đức, TP.HCM",
+                "created_on": "2026-11-03",
+                "status": "created"
+              }
+            ]
+          }
+        }
+      ],
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 2
+    }
+  }
+}

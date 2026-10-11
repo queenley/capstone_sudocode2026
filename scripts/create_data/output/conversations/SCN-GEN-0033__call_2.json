@@ -1,0 +1,114 @@
+{
+  "conversation_id": "SCN-GEN-0033__call_2",
+  "scenario_id": "SCN-GEN-0033",
+  "call": "call_2",
+  "customer_id": "C022",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-20",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_mua_nhieu_mon",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào anh Bảo, em gọi lại về máy lọc không khí SKU-AP-PRO anh đang quan tâm ạ. Anh có nhớ hôm trước mình đã nói về việc cần cân nhắc thêm không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Anh có cần cân nhắc thêm không?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-AP-PRO"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin lỗi, máy lọc không khí SKU-AP-PRO hiện tại đã hết hàng ạ. Dự kiến, hàng sẽ về lại vào ngày 21/10 này ạ. Anh có muốn em gọi lại cho anh khi có hàng không ạ?",
+      "questions": [
+        {
+          "slot": "restock_date",
+          "type": "confirm",
+          "text": "Anh có muốn em gọi lại cho anh khi có hàng không?"
+        }
+      ],
+      "facts_used": [
+        "restock_date"
+      ],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        },
+        {
+          "field": "restock_date",
+          "value": "2026-10-21"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ gọi lại cho anh ngay khi có hàng. Giá của máy lọc không khí SKU-AP-PRO là 7.690.000đ. Anh có câu hỏi gì thêm không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn anh Bảo đã gọi cho em. Nếu mà có hàng thì em gọi cho anh ngay nhé! Chúc anh một ngày vui vẻ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "conversation_id": "SCN-GEN-0130__call_1",
+  "scenario_id": "SCN-GEN-0130",
+  "call": "call_1",
+  "customer_id": "SYN-C004",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-05",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_kenh_mau_thuan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào Ms. Phạm Thị D, em gọi lại về sản phẩm giày chạy bộ size 42 màu đen mà chị đang quan tâm ạ. Chị có lưu ý gì về sản phẩm không ạ?",
+      "questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Chị có xác nhận là chị đang hỏi về giày chạy bộ size 42 không?"
+        },
+        {
+          "slot": "color",
+          "type": "confirm",
+          "text": "Chị có cần thông tin về màu đen không?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "color"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin lỗi vì giá bên em hiện tại là 1.352.000đ, có thể cao hơn so với bên chị thấy là 1.240.000đ. Tuy nhiên, sản phẩm của bên em được bảo hành và có chính sách đổi trả rõ ràng ạ. Chị có muốn biết thêm thông tin gì khác không ạ?",
+      "questions": [
+        {
+          "slot": "competitor_price_vnd",
+          "type": "confirm",
+          "text": "Chị có đúng là đã thấy giá bên khác là 1.240.000đ không?"
+        }
+      ],
+      "facts_used": [
+        "competitor_price_vd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1352000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại bên em có khuyến mãi với mã RUN2-SALE giúp chị được giảm giá. Khuyến mãi này sẽ hết hạn vào ngày 07 tháng 10 ạ. Chị có muốn sử dụng mã này không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_RUN2-SALE_active",
+          "value": true
+        },
+        {
+          "field": "promo_expiry",
+          "value": "2026-10-07"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em hiểu chị cần thời gian để suy nghĩ. Nếu chị cần thêm thông tin hoặc muốn hỏi lại, chị có thể gọi lại cho em bất cứ lúc nào ạ. Dạ, em sẽ ghi nhận lại để gọi lại cho chị sau nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "O008"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi về giày chạy bộ size 42 màu đen.",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

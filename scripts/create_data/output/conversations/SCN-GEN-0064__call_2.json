@@ -1,0 +1,140 @@
+{
+  "conversation_id": "SCN-GEN-0064__call_2",
+  "scenario_id": "SCN-GEN-0064",
+  "call": "call_2",
+  "customer_id": "SYN-C004",
+  "session_index": 2,
+  "channel": "zalo_oa",
+  "date": "2026-10-15",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_kenh_mau_thuan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Ms. Phạm Thị D, em gọi lại về giày chạy bộ size 42 màu đen mà chị đã hỏi hôm trước ạ. Chị có biết giá hôm nay là 1.521.000đ không ạ?",
+      "questions": [
+        {
+          "slot": "price_quoted_vnd",
+          "type": "confirm",
+          "text": "Giá hôm nay là 1.521.000đ đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1521000
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-SN-RUN2"
+        },
+        {
+          "field": "variant_sku",
+          "value": "SKU-SN-RUN2-42-DEN"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Ngoài ra, chị có biết là hiện tại em có khuyến mãi giảm 10% với mã RUN-10 áp dụng cho sản phẩm này không ạ? Khuyến mãi này còn hiệu lực đến ngày 25/10 nha chị.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_code",
+          "value": "RUN-10"
+        },
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        },
+        {
+          "field": "promo_expiry",
+          "value": "2026-10-25"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em thấy chị có hỏi về khuyến mãi, nhưng khuyến mãi RUN2-SALE đã hết hiệu lực từ ngày 07/10 rồi ạ. Chị có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_RUN2-SALE_active",
+          "value": false
+        },
+        {
+          "field": "promo_expiry",
+          "value": "2026-10-07"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em cảm ơn chị đã gọi lại và nếu chị cần thêm thông tin hay có câu hỏi nào khác, chị cứ gọi cho em nhé. Em chúc chị một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào chị một lần nữa và hy vọng sẽ gặp lại chị sớm ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

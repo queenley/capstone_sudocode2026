@@ -1,0 +1,231 @@
+{
+  "conversation_id": "SCN-GEN-0016__call_1",
+  "scenario_id": "SCN-GEN-0016",
+  "call": "call_1",
+  "customer_id": "C031",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-29",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào chị Oanh ạ. Em gọi lại về máy lọc không khí AirPure X bản 2024 mà chị đã mua hồi tháng 2. Chị đã từng mua máy này với giá 4.290.000đ, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "owned_sku",
+          "type": "confirm",
+          "text": "Chị đã từng mua máy này với giá 4.290.000đ, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "owned_sku",
+          "value": "SKU-AP-X-2024"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, em.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị ạ. Hiện tại mẫu AirPure X đã ngừng sản xuất từ tháng 6 và chúng em có sản phẩm thay thế là AirPure X mới hơn. Sản phẩm này có giá 4.490.000đ và phù hợp cho diện tích phòng lên tới 25m². Chị có muốn biết thêm thông tin về sản phẩm này không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "open",
+          "text": "Chị có muốn biết thêm thông tin về sản phẩm này không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4490000
+        },
+        {
+          "field": "successor_sku",
+          "value": "SKU-AP-X"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nghe có vẻ ổn, nhưng chị có thể đổi máy cũ lấy máy mới không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị có thể tham gia chương trình thu cũ đổi mới với mã khuyến mãi TRADE-IN-AP, chị sẽ được giảm 400.000đ khi mua máy mới ạ. Chị có muốn em tạo đơn hàng cho sản phẩm AirPure X mới với giảm giá này không ạ?",
+      "questions": [
+        {
+          "slot": "promo_code",
+          "type": "open",
+          "text": "Chị có muốn em tạo đơn hàng cho sản phẩm AirPure X mới với giảm giá này không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_TRADE-IN-AP_active",
+          "value": true
+        },
+        {
+          "field": "promo_code",
+          "value": "TRADE-IN-AP"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Vâng, chị muốn mua hàng.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, trước khi em tạo đơn, cho em xác nhận lại một số thông tin với chị ạ. Chị muốn mua 1 máy AirPure X mới với giá 4.490.000đ, địa chỉ giao hàng là Cầu Giấy, Hà Nội và phương thức thanh toán là chuyển khoản đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Địa chỉ giao hàng là Cầu Giấy, Hà Nội đúng không ạ?"
+        },
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Phương thức thanh toán là chuyển khoản đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị ạ! Em sẽ tạo đơn hàng cho chị ngay bây giờ. Dạ, em đã tạo đơn hàng cho chị với sản phẩm AirPure X mới, số lượng 1, giá 4.490.000đ, địa chỉ giao hàng là Cầu Giấy, Hà Nội, phương thức thanh toán là chuyển khoản. Dự kiến giao hàng vào ngày 31 tháng 10 ạ. Chị có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0985003703",
+            "sku": "SKU-AP-X",
+            "qty": 1,
+            "price_vnd": 4490000,
+            "payment": "chuyen_khoan",
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-29"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Không, cảm ơn em.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn chị rất nhiều ạ. Nếu có bất kỳ câu hỏi nào khác, chị đừng ngần ngại gọi lại cho em nha. Chúc chị một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001"
+    }
+  }
+}

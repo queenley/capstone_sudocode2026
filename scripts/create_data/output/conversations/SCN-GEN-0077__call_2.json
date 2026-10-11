@@ -1,0 +1,163 @@
+{
+  "conversation_id": "SCN-GEN-0077__call_2",
+  "scenario_id": "SCN-GEN-0077",
+  "call": "call_2",
+  "customer_id": "C013",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-02",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_kenh_fb_hotline",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Trang, em gọi lại về đôi giày chạy bộ size 42 màu xám mà chị đã quan tâm ạ. Em đã ghi nhận chị sẽ thanh toán bằng COD và giao hàng đến Nha Trang, Khánh Hòa đúng không ạ?",
+      "questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Em đã ghi nhận chị sẽ đặt size 42 đúng không ạ?"
+        },
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Giao hàng đến Nha Trang, Khánh Hòa đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "size",
+          "value": 42
+        },
+        {
+          "field": "blocker",
+          "value": "muốn gọi hotline hỏi thêm"
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-SN-RUN1"
+        },
+        {
+          "field": "variant_sku",
+          "value": "SKU-SN-RUN1-42-XAM"
+        },
+        {
+          "field": "price_vnd",
+          "value": 1290000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Dạ đúng rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị đã xác nhận ạ. Em sẽ tiến hành tạo đơn hàng cho chị ngay bây giờ. Để xác nhận, đơn hàng sẽ có sản phẩm giày chạy bộ size 42 màu xám, giá 1.290.000đ, thanh toán bằng COD, giao đến Nha Trang, Khánh Hòa. Em sẽ tiến hành tạo đơn ngay ạ.",
+      "questions": [],
+      "facts_used": [
+        "size",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "size",
+          "value": 42
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-SN-RUN1"
+        },
+        {
+          "field": "variant_sku",
+          "value": "SKU-SN-RUN1-42-XAM"
+        },
+        {
+          "field": "price_vnd",
+          "value": 1290000
+        },
+        {
+          "field": "delivery_area",
+          "value": "Nha Trang, Khánh Hòa"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0964252477",
+            "sku": "SKU-SN-RUN1-42-XAM",
+            "qty": 1,
+            "price_vnd": 1290000,
+            "payment": "COD",
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-11-02"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Đơn hàng của chị đã được tạo thành công với mã đơn là OD600001. Sản phẩm sẽ được giao đến chị vào ngày 06 tháng 11 năm 2026 ạ. Em còn điều gì có thể giúp chị không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-06"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận mua giày chạy bộ.",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001"
+    }
+  }
+}

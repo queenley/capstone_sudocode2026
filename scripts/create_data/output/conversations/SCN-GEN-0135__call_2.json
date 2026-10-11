@@ -1,0 +1,99 @@
+{
+  "conversation_id": "SCN-GEN-0135__call_2",
+  "scenario_id": "SCN-GEN-0135",
+  "call": "call_2",
+  "customer_id": "SYN-C008",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-16",
+  "region": "trung",
+  "category": "unknown",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào Mr. Trần Văn H, em gọi lại về đơn hàng của anh hôm trước. Anh đã đặt hàng với mã đơn O015, và em thấy anh muốn thay đổi địa chỉ giao hàng sang Hải Châu, Đà Nẵng phải không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Anh đã đặt hàng với mã đơn O015, và em thấy anh muốn thay đổi địa chỉ giao hàng sang Hải Châu, Đà Nẵng phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn anh đã xác nhận. Em sẽ cập nhật địa chỉ giao hàng cho đơn hàng O015 của anh đến Hải Châu, Đà Nẵng ngay nhé. Xin anh vui lòng cho em chút thời gian ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "O016",
+            "action": "update_address",
+            "on": "2026-11-16"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã cập nhật thành công địa chỉ giao hàng cho đơn hàng O016 của anh đến Hải Châu, Đà Nẵng. Cảm ơn anh đã gọi điện và nếu có thêm thắc mắc gì, anh cứ liên hệ với em nhé!",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "O016"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Hải Châu, Đà Nẵng"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

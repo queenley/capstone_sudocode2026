@@ -1,0 +1,120 @@
+{
+  "conversation_id": "SCN-GEN-0070__call_3",
+  "scenario_id": "SCN-GEN-0070",
+  "call": "call_3",
+  "customer_id": "SYN-C010",
+  "session_index": 3,
+  "channel": "hotline",
+  "date": "2026-10-19",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_cap_nhat_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Mr. Đinh Văn J, em gọi lại về tình trạng đơn hàng máy hút sữa của anh ạ. Anh đã đặt hàng hôm trước, mã đơn hàng của anh là OD600001 đúng không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Anh đã đặt hàng hôm trước, mã đơn hàng của anh là OD600001 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD600001"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn anh đã xác nhận ạ. Hiện tại đơn hàng của anh với mã OD600001 đã được tạo và đang trong tình trạng xử lý ạ. Giá sản phẩm là 4.290.000đ và phương thức thanh toán là chuyển khoản ạ. Địa chỉ giao hàng là Cầu Giấy, Hà Nội, dự kiến giao trong 1-2 ngày làm việc ạ. Anh có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "price_quoted_vnd",
+        "payment",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "created"
+        },
+        {
+          "field": "price_vnd",
+          "value": 4290000
+        },
+        {
+          "field": "payment",
+          "value": "chuyen_khoan"
+        },
+        {
+          "field": "delivery_area",
+          "value": "Cầu Giấy, Hà Nội"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em chưa có thông tin về thời gian giao hàng chính xác hơn, nhưng sẽ cố gắng giao nhanh nhất có thể ạ. Nếu anh có yêu cầu gì thêm hoặc cần thay đổi thông tin, anh cứ cho em biết nhé!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Nếu mọi thứ đều ổn, em sẽ ghi nhận lại thông tin này và kết thúc cuộc gọi nhé. Cảm ơn anh đã gọi đến Shop BTC! Chúc anh một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

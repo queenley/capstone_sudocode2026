@@ -1,0 +1,128 @@
+{
+  "conversation_id": "SCN-GEN-0047__call_1",
+  "scenario_id": "SCN-GEN-0047",
+  "call": "call_1",
+  "customer_id": "C034",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-13",
+  "region": "trung",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào cô Loan, em gọi lại về máy lọc nước RO Karofi 9 lõi mà cô đã quan tâm ạ. Cô ở Cần Thơ và đã nói là chờ con gái quyết định, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Cô ở Cần Thơ, đúng không ạ?"
+        },
+        {
+          "slot": "decision_maker",
+          "type": "confirm",
+          "text": "Cô đang chờ con gái quyết định, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area",
+        "decision_maker"
+      ],
+      "claims": [
+        {
+          "field": "delivery_area",
+          "value": "Cần Thơ"
+        },
+        {
+          "field": "decision_maker",
+          "value": "con gái"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Máy lọc nước RO Karofi 9 lõi hiện có giá 5.990.000đ. Cô cho em hỏi ngân sách của cô là tầm 7 triệu, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của cô là tầm 7 triệu, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "budget_vnd",
+          "value": 7000000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Máy này hiện không có khuyến mãi nào, nhưng giá 5.990.000đ đã là mức giá tốt rồi. Cô có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Nếu cô cần thêm thời gian suy nghĩ, không sao ạ. Em sẽ ghi nhận lại và chờ cô gọi lại khi đã quyết định. Cô có thể gọi lại bất cứ lúc nào ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi về máy lọc nước RO cho gia đình 6 người.",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

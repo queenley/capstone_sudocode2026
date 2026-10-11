@@ -1,0 +1,105 @@
+{
+  "conversation_id": "SCN-GEN-0085__call_2",
+  "scenario_id": "SCN-GEN-0085",
+  "call": "call_2",
+  "customer_id": "SYN-C005",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "trung",
+  "category": "unknown",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào Mr. Đỗ Minh E, em gọi lại về đơn hàng mà Mr. đã hỏi hôm qua ạ. Theo thông tin em ghi nhận, đơn hàng của Mr. có mã là O009. Em có thể giúp Mr. cập nhật địa chỉ giao hàng sang Hải Châu, Đà Nẵng được không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Mã đơn hàng của Mr. là O009 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "O009"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, em muốn đổi địa chỉ giao hàng sang Hải Châu, Đà Nẵng.",
+      "facts_stated": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Hải Châu, Đà Nẵng",
+          "spoken": "Hải Châu, Đà Nẵng"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận yêu cầu của Mr. về việc đổi địa chỉ giao hàng sang Hải Châu, Đà Nẵng. Em sẽ tiến hành cập nhật địa chỉ cho đơn hàng O010. Em xin phép xác nhận lại thông tin: đơn hàng O010 sẽ được giao đến Hải Châu, Đà Nẵng ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "delivery_area",
+          "value": "Hải Châu, Đà Nẵng"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "O010",
+            "action": "update_address",
+            "on": "2026-10-30"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Hải Châu, Đà Nẵng"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Muốn đổi địa chỉ giao hàng cho đơn hàng.",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

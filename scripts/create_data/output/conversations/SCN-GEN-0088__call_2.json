@@ -1,0 +1,153 @@
+{
+  "conversation_id": "SCN-GEN-0088__call_2",
+  "scenario_id": "SCN-GEN-0088",
+  "call": "call_2",
+  "customer_id": "C006",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-01",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào anh Nam, em gọi lại về SKU-MB-STR2 anh đang quan tâm ạ. Anh đã sẵn sàng để chốt đơn xe đẩy chưa ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Sản phẩm anh quan tâm là xe đẩy SKU-MB-STR2 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-MB-STR2"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin xác nhận lại thông tin thanh toán của anh là chuyển khoản đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Anh sẽ thanh toán bằng chuyển khoản đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "payment",
+          "value": "chuyen_khoan"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn anh đã xác nhận. Khu vực giao hàng của anh là Long Biên, Hà Nội đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Khu vực giao hàng của anh là Long Biên, Hà Nội đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "delivery_area",
+          "value": "Long Biên, Hà Nội"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã xác nhận được thông tin của anh. Giá xe đẩy là 6.790.000đ, và anh sẽ được miễn phí vận chuyển theo chương trình MOM-FREESHIP còn hiệu lực ạ. Em sẽ tiến hành tạo đơn hàng cho anh nhé.",
+      "questions": [],
+      "facts_used": [
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6790000
+        },
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0929486628",
+            "sku": "SKU-MB-STR2",
+            "qty": 1,
+            "price_vnd": 6790000,
+            "payment": "chuyen_khoan",
+            "address": "Long Biên, Hà Nội",
+            "on": "2026-11-01"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận mua xe đẩy và thông tin giao hàng",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001"
+    }
+  }
+}

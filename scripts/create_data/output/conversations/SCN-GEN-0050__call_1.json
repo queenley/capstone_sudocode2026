@@ -1,0 +1,121 @@
+{
+  "conversation_id": "SCN-GEN-0050__call_1",
+  "scenario_id": "SCN-GEN-0050",
+  "call": "call_1",
+  "customer_id": "C045",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-16",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chào anh Lâm. Anh muốn hỏi về xe đẩy gấp gọn cho bé 14 tháng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "child_age_months",
+          "type": "confirm",
+          "text": "Anh muốn hỏi về xe đẩy gấp gọn cho bé 14 tháng đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn anh đã chia sẻ thông tin về ngân sách của mình. Xe đẩy mà em muốn giới thiệu có giá 3.490.000đ, anh có thấy hợp lý không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Xe đẩy mà em muốn giới thiệu có giá 3.490.000đ, anh có thấy hợp lý không ạ?"
+        }
+      ],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Về khuyến mãi, hiện tại xe đẩy này đang có chương trình miễn phí vận chuyển, anh có muốn biết thêm chi tiết không ạ?",
+      "questions": [
+        {
+          "slot": "promo_code",
+          "type": "open",
+          "text": "Anh có muốn biết thêm chi tiết về chương trình miễn phí vận chuyển không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu rằng anh cần bàn với gia đình trước khi quyết định. Vậy em có thể hẹn gọi lại cho anh vào thời điểm nào ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "open",
+          "text": "Em có thể hẹn gọi lại cho anh vào thời điểm nào ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

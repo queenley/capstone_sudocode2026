@@ -1,0 +1,130 @@
+{
+  "conversation_id": "SCN-GEN-0127__call_1",
+  "scenario_id": "SCN-GEN-0127",
+  "call": "call_1",
+  "customer_id": "SYN-C001",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-11-12",
+  "region": "bac",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_da_kenh_fb_hotline",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Mr. Nguyễn Văn A, em gọi lại về sản phẩm nồi chiên không dầu Philips 6.2L mà Mr. đang quan tâm ạ. Mr. đã từng hỏi về nồi chiên không dầu cho gia đình và ngân sách khoảng 4 triệu rưỡi đúng không ạ?",
+      "questions": [
+        {
+          "slot": "usage_need",
+          "type": "confirm",
+          "text": "Mr. đã hỏi về nồi chiên không dầu cho gia đình đúng không ạ?"
+        },
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Mr. đã có ngân sách khoảng 4 triệu rưỡi đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "usage_need",
+        "budget_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, nồi chiên không dầu Philips 6.2L hiện có giá 3.391.500đ. Hơn nữa, sản phẩm này còn có khuyến mãi 11-11 đang diễn ra, giúp Mr. tiết kiệm rất nhiều. Khuyến mãi này sẽ hết hạn hôm nay ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3391500
+        },
+        {
+          "field": "promo_11-11_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, sản phẩm này hiện đang có sẵn hàng và có thể giao tới gia đình Mr. trong khoảng 2-3 ngày làm việc. Mr. có muốn đặt hàng ngay không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, nếu Mr. chưa quyết định đặt hàng ngay thì em có thể ghi nhận lại thông tin và gọi lại sau cho Mr. để hỏi thêm ạ. Mr. có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, nếu Mr. muốn gọi hotline để hỏi thêm thông tin thì em sẽ ghi nhận lại và gọi lại cho Mr. vào thời gian phù hợp. Mr. có muốn hẹn giờ cụ thể không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "open",
+          "text": "Mr. có muốn hẹn giờ cụ thể không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "muốn gọi hotline hỏi thêm"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

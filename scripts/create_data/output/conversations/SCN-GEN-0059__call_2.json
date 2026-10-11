@@ -1,0 +1,107 @@
+{
+  "conversation_id": "SCN-GEN-0059__call_2",
+  "scenario_id": "SCN-GEN-0059",
+  "call": "call_2",
+  "customer_id": "SYN-C002",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-04",
+  "region": "trung",
+  "category": "thoi-trang/ao-khoac",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Ms. Trần Thị B, em gọi lại về sản phẩm áo phao lông vũ mà chị đang quan tâm ạ. Chị đã xem xét sản phẩm này nhưng vẫn chưa quyết định đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị đã xem xét sản phẩm này nhưng vẫn chưa quyết định đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu rồi ạ. Chị cho em hỏi, giá của áo phao này là 1.490.000đ, có phù hợp với ngân sách của chị không ạ?",
+      "questions": [
+        {
+          "slot": "price_quoted_vnd",
+          "type": "confirm",
+          "text": "Có phù hợp với ngân sách của chị không ạ?"
+        }
+      ],
+      "facts_used": [
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em rất tiếc khi nghe rằng chị không mua áo phao này nữa. Chị có thể cho em biết lý do cụ thể hơn được không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "open",
+          "text": "Chị có thể cho em biết lý do cụ thể hơn được không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em cảm ơn chị đã chia sẻ. Em hiểu rằng giá cả là một yếu tố quan trọng. Em xin lỗi vì không thể đáp ứng mong muốn của chị lần này. Nếu có bất cứ câu hỏi nào khác, chị cứ thoải mái liên hệ với em nhé!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_choi",
+    "outcome": "tu_choi",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

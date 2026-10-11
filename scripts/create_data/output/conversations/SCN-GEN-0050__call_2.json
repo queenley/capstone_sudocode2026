@@ -1,0 +1,155 @@
+{
+  "conversation_id": "SCN-GEN-0050__call_2",
+  "scenario_id": "SCN-GEN-0050",
+  "call": "call_2",
+  "customer_id": "C045",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-25",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Lâm, em gọi lại về xe đẩy gấp gọn Joie Pact mà anh đang quan tâm ạ. Hôm trước anh có nói là anh đang để bàn với gia đình, không biết bây giờ anh đã quyết định chưa ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Hôm trước anh có nói là anh đang để bàn với gia đình, không biết bây giờ anh đã quyết định chưa ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hôm trước em nói xe này đang hết hàng mà.",
+      "facts_stated": {
+        "in_stock": false
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, đúng rồi anh ạ, xe đẩy Joie Pact hiện tại đang hết hàng. Em rất tiếc vì sự bất tiện này. Anh có muốn em ghi lại để gọi lại cho anh khi có hàng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh có muốn em ghi lại để gọi lại cho anh khi có hàng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khi nào thì có hàng lại vậy em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại em chưa có thông tin cụ thể về ngày có hàng lại của xe đẩy Joie Pact. Tuy nhiên, em sẽ ghi lại thông tin của anh và gọi lại ngay khi có hàng ạ. Anh có muốn đặt hàng ngay khi có hàng không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Anh có muốn đặt hàng ngay khi có hàng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh muốn đặt ngay khi có hàng.",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận đơn đặt hàng của anh. Em sẽ liên hệ lại ngay khi xe đẩy Joie Pact có hàng. Cảm ơn anh đã quan tâm đến sản phẩm của shop ạ!",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "conversation_id": "SCN-GEN-0049__call_1",
+  "scenario_id": "SCN-GEN-0049",
+  "call": "call_1",
+  "customer_id": "C029",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-15",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_mua_nhieu_mon",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị Hà, cảm ơn chị đã gọi đến shop. Chị muốn hỏi về máy lọc không khí cho phòng 30 mét vuông, đúng không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Máy lọc không khí AirPure Pro là sản phẩm phù hợp cho diện tích đó. Máy có khóa trẻ em, rất an toàn cho nhà có trẻ nhỏ như nhà mình. Giá hiện tại là 7.690.000đ, chị có thấy hợp lý không ạ?",
+      "questions": [
+        {
+          "slot": "price_vnd",
+          "type": "confirm",
+          "text": "Chị có thấy giá 7.690.000đ hợp lý không ạ?"
+        }
+      ],
+      "facts_used": [
+        "room_area_m2",
+        "has_children"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-AP-PRO"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Ngoài ra, máy lọc này đang có khuyến mãi với mã AIR-OCT, giúp chị tiết kiệm thêm 300.000đ, chỉ còn 7.390.000đ ạ. Chị có muốn biết thêm chi tiết về khuyến mãi không?",
+      "questions": [
+        {
+          "slot": "promo_code",
+          "type": "confirm",
+          "text": "Chị có muốn biết thêm chi tiết về khuyến mãi không?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_code",
+          "value": "AIR-OCT"
+        },
+        {
+          "field": "promo_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Khuyến mãi này sẽ kết thúc vào ngày 30 tháng 10, nên chị nên quyết định sớm nhé. Nếu cần thêm thời gian để suy nghĩ, không sao ạ, khi nào sẵn sàng gọi lại cho em nhé. Chúc chị một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi về máy lọc không khí",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

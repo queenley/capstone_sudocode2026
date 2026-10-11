@@ -1,0 +1,95 @@
+{
+  "conversation_id": "SCN-GEN-0071__call_1",
+  "scenario_id": "SCN-GEN-0071",
+  "call": "call_1",
+  "customer_id": "C003",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_yeu_cau_xoa_du_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị Lan ạ. Em là trợ lý ảo của shop BTC. Chị gọi để hỏi về máy hút sữa điện đôi Medela Swing Maxi, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn hỏi về máy hút sữa điện đôi Medela Swing Maxi, đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Máy hút sữa Medela Swing Maxi có giá 5.990.000đ ạ. Hiện tại, sản phẩm này đang có khuyến mãi miễn phí vận chuyển áp dụng đến ngày 29 tháng 11 năm 2026. Chị có muốn biết thêm thông tin gì khác về sản phẩm không ạ?",
+      "questions": [],
+      "facts_used": [
+        "price_vnd",
+        "promo_code",
+        "promo_expiry"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "promo_expiry",
+          "value": "2026-11-29"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận là chị sẽ bàn với gia đình trước. Chị có thể gọi lại cho em bất cứ lúc nào nhé. Em xin lỗi nếu có gì chưa rõ. Chúc chị một ngày vui vẻ!",
+      "questions": [],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

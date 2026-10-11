@@ -1,0 +1,146 @@
+{
+  "conversation_id": "SCN-GEN-0087__call_2",
+  "scenario_id": "SCN-GEN-0087",
+  "call": "call_2",
+  "customer_id": "C010",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-02",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_yeu_cau_xoa_du_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào anh Đức, em gọi lại về SKU-SN-CAS anh đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Không biết chờ cuối tháng nhận lương chưa ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em là người thật hay máy vậy?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": "neutral",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em là trợ lý ảo của shop ạ. Anh muốn xóa dữ liệu cá nhân của mình đúng không ạ?",
+      "questions": [
+        {
+          "slot": "customer_goal",
+          "type": "confirm",
+          "text": "Anh muốn xóa dữ liệu cá nhân của mình đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng vậy.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": "neutral",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, anh cho em xin số CCCD của anh để tiến hành xóa ạ.",
+      "questions": [
+        {
+          "slot": "cccd",
+          "type": "open",
+          "text": "Cho em xin số CCCD của anh để tiến hành xóa ạ."
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Số CCCD của anh là 079188681034.",
+      "facts_stated": {
+        "cccd": "079188681034"
+      },
+      "entities": [
+        {
+          "type": "cccd",
+          "value": "079188681034",
+          "spoken": "079188681034"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": "neutral",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận số CCCD 079188681034 của anh. Yêu cầu xóa dữ liệu cá nhân sẽ được xử lý trong vòng 72 giờ ạ. Anh có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [
+        "deletion_sla_hours"
+      ],
+      "claims": [
+        {
+          "field": "deletion_sla_hours",
+          "value": 72
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "profile_state",
+          "value": "pending_deletion"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xoa_du_lieu",
+    "outcome": "xoa_du_lieu",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

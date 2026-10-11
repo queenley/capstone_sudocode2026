@@ -1,0 +1,117 @@
+{
+  "conversation_id": "SCN-GEN-0030__call_3",
+  "scenario_id": "SCN-GEN-0030",
+  "call": "call_3",
+  "customer_id": "C018",
+  "session_index": 3,
+  "channel": "hotline",
+  "date": "2026-10-27",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_kenh_mau_thuan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào anh Quân, em gọi lại về đơn đặt giày chạy bộ RunLite 2 Pro size 42 màu đen của anh ạ. Chúng ta đã xác nhận hình thức thanh toán là COD và địa chỉ giao hàng ở Quận 7, TP.HCM đúng không ạ?",
+      "questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Size giày của anh là 42 đúng không ạ?"
+        },
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Địa chỉ giao hàng của anh là Quận 7, TP.HCM đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "size",
+          "value": 42
+        },
+        {
+          "field": "delivery_area",
+          "value": "Quận 7, TP.HCM"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giày chạy bộ RunLite 2 Pro size 42 màu đen có giá là 1.690.000đ. Thời gian giao hàng dự kiến là vào ngày 29 tháng 10 ạ. Anh có muốn chốt đơn không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-29"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, để em xác nhận lại đơn hàng của anh nhé. Anh đặt giày chạy bộ RunLite 2 Pro size 42 màu đen với giá 1.690.000đ, hình thức thanh toán COD và địa chỉ giao hàng là Quận 7, TP.HCM. Em sẽ tiến hành tạo đơn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0982141621",
+            "sku": "SKU-SN-RUN2-42-DEN",
+            "qty": 1,
+            "price_vnd": 1690000,
+            "payment": "COD",
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-10-27"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận đơn hàng",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001"
+    }
+  }
+}

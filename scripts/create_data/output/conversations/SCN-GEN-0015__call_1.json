@@ -1,0 +1,171 @@
+{
+  "conversation_id": "SCN-GEN-0015__call_1",
+  "scenario_id": "SCN-GEN-0015",
+  "call": "call_1",
+  "customer_id": "C034",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-31",
+  "region": "trung",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào cô Loan, em gọi lại về SKU-WF-RO9 cô đang quan tâm ạ. Cô ở Cần Thơ và có con gái là người quyết định mua, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Cô có hỏi về máy lọc nước RO Karofi 9 lõi, đúng không ạ?"
+        },
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Cô sống ở Cần Thơ, đúng không ạ?"
+        },
+        {
+          "slot": "decision_maker",
+          "type": "confirm",
+          "text": "Con gái sẽ là người quyết định mua, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area",
+        "decision_maker",
+        "product_advised"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, cô muốn hỏi về máy lọc nước RO Karofi 9 lõi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy lọc nước RO Karofi 9 lõi hiện đang có giá 5.990.000đ ạ. Cô có ngân sách tầm 6 triệu, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Cô có ngân sách tầm 6 triệu, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, giá đó nằm trong ngân sách của cô.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, nhưng hiện tại máy này không có chương trình khuyến mãi nào ạ. Cô có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cô cần bàn với gia đình rồi sẽ gọi lại.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu ạ. Em sẽ ghi chú lại để gọi lại cho cô sau. Cô có thể cho em biết thời điểm nào cô sẽ quyết định không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "open",
+          "text": "Cô có thể cho em biết thời điểm nào cô sẽ quyết định không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cô sẽ bàn với gia đình và gọi lại.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em cảm ơn cô Loan đã dành thời gian. Em sẽ chờ cuộc gọi của cô nhé! Chúc cô có một ngày vui vẻ ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

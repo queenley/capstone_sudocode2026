@@ -1,0 +1,153 @@
+{
+  "conversation_id": "SCN-GEN-0137__call_1",
+  "scenario_id": "SCN-GEN-0137",
+  "call": "call_1",
+  "customer_id": "C003",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-13",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_yeu_cau_xoa_du_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Alo, chị Lan, em là trợ lý ảo của shop. Chị muốn hỏi về máy lọc không khí cho phòng 40 mét vuông đúng không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Chị muốn hỏi về máy lọc không khí cho phòng 40 mét vuông đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, chị muốn hỏi về máy lọc không khí cho phòng 40 mét vuông.",
+      "facts_stated": {
+        "room_area_m2": 40
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin xác nhận là nhà chị có trẻ nhỏ và ngân sách khoảng 5 triệu đúng không ạ?",
+      "questions": [
+        {
+          "slot": "has_children",
+          "type": "confirm",
+          "text": "Nhà chị có trẻ nhỏ đúng không ạ?"
+        },
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách khoảng 5 triệu đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, nhà chị có trẻ nhỏ, ngân sách khoảng 5 triệu thôi.",
+      "facts_stated": {
+        "has_children": true,
+        "budget_vnd": 5000000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị đã xác nhận. Em muốn thông báo rằng máy lọc không khí AirPure X có giá 4.890.000đ, hiện tại không có khuyến mãi nào. Em có thể giúp gì thêm cho chị không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4890000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại máy AirPure X không có khuyến mãi nào, chị có thể tham khảo thêm. Chị sẽ chờ cuối tháng nhận lương rồi gọi lại em nhé?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Chị sẽ chờ cuối tháng nhận lương rồi gọi lại em nhé?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ chờ cuối tháng nhận lương rồi gọi lại em nhé.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

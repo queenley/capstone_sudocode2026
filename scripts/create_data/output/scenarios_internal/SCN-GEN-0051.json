@@ -1,0 +1,268 @@
+{
+  "scenario_id": "SCN-GEN-0051",
+  "level": "M2",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "hard_case": null,
+  "customer_id": "SYN-C003",
+  "customer_phone": "0998000003",
+  "customer_name": "Lê Văn C",
+  "honorific": "Mr.",
+  "region": "nam",
+  "category": "unknown",
+  "difficulty": "normal",
+  "tags": [
+    "address_change",
+    "customer_inquiry",
+    "hotline",
+    "order",
+    "order_status",
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=chuan; session_index=1",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-17",
+      "days_later": null,
+      "input_mode": "text",
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C003",
+          "session_id": "SYN-003-S1",
+          "date": "2026-09-01",
+          "channel": "hotline",
+          "summary": "Tìm hiểu về đồ dùng cho trẻ em",
+          "outcome": "successful",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C003",
+          "session_id": "SYN-003-S2",
+          "date": "2026-09-02",
+          "channel": "zalo_oa",
+          "summary": "Yêu cầu hỗ trợ đơn hàng",
+          "outcome": "successful",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C003",
+          "order_id": "O005",
+          "date": "2026-07-22",
+          "sku": "MAB001",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "O005"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C003",
+          "order_id": "O006",
+          "date": "2026-09-05",
+          "sku": "MAB002",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "MAB002"
+          }
+        }
+      ],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "Hỏi tình trạng đơn hàng đã đặt",
+      "customer_turns": [
+        "Alo, cho tôi hỏi tình trạng đơn hàng của tôi hiện giờ như thế nào?",
+        "Mã đơn hàng của tôi là MAB002, đơn này đã được giao chưa?",
+        "Tôi muốn xác nhận là đơn hàng đã được giao chưa?"
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {},
+      "expected_outcome": "cap_nhat_don",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "O006"
+        },
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [
+          "đã giao",
+          "giao thành công"
+        ],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "order_id": "O006",
+        "order_status": "delivered",
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {},
+      "expected_call_brief": {
+        "customer_phone": "0998000003",
+        "customer_id": "SYN-C003",
+        "is_returning": true,
+        "n_previous_sessions": 2,
+        "last_session": {
+          "date": "2026-09-02",
+          "channel": "zalo_oa",
+          "outcome": "successful",
+          "summary": "Yêu cầu hỗ trợ đơn hàng"
+        },
+        "products_advised": [
+          "MAB002"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Mr. Lê Văn C, em gọi lại về MAB002 Mr. đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-17T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "O006"
+          },
+          "result": {
+            "orders": [
+              {
+                "order_id": "O006",
+                "sku": "MAB002",
+                "price_vnd": 950000,
+                "date": "2026-09-05",
+                "status": "delivered",
+                "tracking": null
+              }
+            ]
+          }
+        }
+      ],
+      "simulator_persona_key": "khach_co_don_chua_co_lich_su",
+      "patience_start": 4
+    },
+    "call_2": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-19",
+      "days_later": 2,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "Đổi địa chỉ giao hàng cho đơn hàng",
+      "customer_turns": [
+        "Chào bạn, tôi muốn đổi địa chỉ giao hàng cho đơn hàng của mình.",
+        "Địa chỉ mới là Thủ Đức, TP.HCM, bạn có thể cập nhật cho tôi không?",
+        "Tôi cần đảm bảo rằng đơn hàng của mình sẽ được giao đến địa chỉ này. Cảm ơn!"
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "delivery_area": "Thủ Đức, TP.HCM"
+      },
+      "expected_outcome": "cap_nhat_don",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "O006",
+          "action": "update_address"
+        },
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "order_id": "O006",
+        "order_status": "delivered",
+        "call_date": "2026-10-19"
+      },
+      "memory_expectation": {
+        "delivery_area": "Thủ Đức, TP.HCM"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000003",
+        "customer_id": "SYN-C003",
+        "is_returning": true,
+        "n_previous_sessions": 3,
+        "last_session": {
+          "date": "2026-10-17",
+          "channel": "hotline",
+          "outcome": "cap_nhat_don"
+        },
+        "products_advised": [
+          "MAB002"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Mr. Lê Văn C, em gọi lại về MAB002 Mr. đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-19T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "O006",
+            "action": "update_address",
+            "on": "2026-10-19"
+          },
+          "result": {
+            "order_id": "O006",
+            "action": "update_address",
+            "status": "updated"
+          }
+        }
+      ],
+      "simulator_persona_key": "khach_co_don_chua_co_lich_su",
+      "patience_start": 3
+    }
+  }
+}

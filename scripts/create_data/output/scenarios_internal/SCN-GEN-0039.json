@@ -1,0 +1,263 @@
+{
+  "scenario_id": "SCN-GEN-0039",
+  "level": "M1",
+  "persona": "khach_so_gia",
+  "hard_case": "doi_khuyen_mai_het_han",
+  "customer_id": "C036",
+  "customer_phone": "0949066882",
+  "customer_name": "Phương",
+  "honorific": "chị",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "hard",
+  "tags": [
+    "hard_case",
+    "máy_lọc_không_khí",
+    "price_objection",
+    "thanh_toán_COD",
+    "tư_vấn",
+    "variant:km_het_han",
+    "xác_nhận_mua"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR",
+    "ESC"
+  ],
+  "notes": "variant=km_het_han; session_index=1; call_2: promotion GIFT-FILTER no longer applies",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-17",
+      "days_later": null,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "Hỏi về máy lọc không khí và giá cả",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về máy lọc không khí AirPure Y.",
+        "Chị thấy giá bên mình là 5 triệu 2 nhưng bên khác bán chỉ 4 triệu 7.",
+        "Máy này có khuyến mãi gì không em?",
+        "Chị ngân sách tối đa là 5 triệu rưỡi nên cần cân nhắc.",
+        "Chị không có trẻ nhỏ, nhưng giá cao hơn chỗ khác làm chị hơi băn khoăn.",
+        "Chị sẽ xem xét rồi gọi lại cho em nhé."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "room_area_m2": 15,
+        "has_children": false,
+        "budget_vnd": 5500000,
+        "competitor_price_vnd": 4780000,
+        "objection": "giá cao hơn chỗ khác",
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "promo_code": "GIFT-FILTER",
+        "promo_expiry": "2026-10-22"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [],
+      "must_not_ask": [],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5200000,
+        "list_price_vnd": 5200000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_GIFT-FILTER_active": true,
+        "gift_sku": "SKU-AP-FLT-X",
+        "promo_AIR-2ND-50_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "room_area_m2": 15,
+        "has_children": false,
+        "budget_vnd": 5500000,
+        "competitor_price_vnd": 4780000,
+        "objection": "giá cao hơn chỗ khác",
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "promo_code": "GIFT-FILTER"
+      },
+      "expected_call_brief": null,
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "khach_so_gia",
+      "patience_start": 3
+    },
+    "call_2": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-23",
+      "days_later": 6,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "Xác nhận mua máy lọc không khí",
+      "customer_turns": [
+        "Alo, chị gọi lại để xác nhận mua máy lọc không khí.",
+        "Chị muốn thanh toán bằng COD.",
+        "Khu vực giao hàng là Quận 7, TP.HCM nhé.",
+        "Chị đồng ý lên đơn cho máy này."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "payment": "COD",
+        "delivery_area": "Quận 7, TP.HCM",
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "promo_code": "NAM-SHIP0",
+        "promo_expiry": "2026-11-05",
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "room_area_m2",
+        "objection",
+        "competitor_price_vnd",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AP-Y",
+          "price_vnd": 5200000,
+          "payment": "COD"
+        },
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [
+          {
+            "field": "promo_GIFT-FILTER_active",
+            "value": true
+          },
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5200000,
+        "list_price_vnd": 5200000,
+        "promo_active": true,
+        "promo_NAM-SHIP0_active": true,
+        "promo_COD-0_active": true,
+        "promo_GIFT-FILTER_active": false,
+        "promo_AIR-2ND-50_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "estimated_delivery": "2026-10-27",
+        "call_date": "2026-10-23"
+      },
+      "memory_expectation": {
+        "payment": "COD",
+        "delivery_area": "Quận 7, TP.HCM",
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "promo_code": "NAM-SHIP0",
+        "order_id": "OD600001",
+        "superseded": {
+          "promo_code": "GIFT-FILTER",
+          "promo_expiry": "2026-10-22"
+        }
+      },
+      "expected_call_brief": {
+        "customer_phone": "0949066882",
+        "customer_id": "C036",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-17",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-AP-Y"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "room_area_m2",
+          "has_children",
+          "budget_vnd",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào chị Phương, em gọi lại về SKU-AP-Y chị đang quan tâm ạ",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [
+            "GIFT-FILTER"
+          ],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-23T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0949066882",
+            "sku": "SKU-AP-Y",
+            "qty": 1,
+            "price_vnd": 5200000,
+            "payment": "COD",
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-10-23"
+          },
+          "result": {
+            "order_id": "OD600001",
+            "status": "created",
+            "total_vnd": 5200000,
+            "needs_confirmation_call": true,
+            "estimated_delivery": "2026-10-27"
+          }
+        }
+      ],
+      "simulator_persona_key": "khach_so_gia",
+      "patience_start": 3
+    }
+  }
+}

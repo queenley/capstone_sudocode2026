@@ -1,0 +1,141 @@
+{
+  "scenario_id": "SCN-GEN-0098",
+  "level": "M2",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "customer_id": "C045",
+  "customer_phone": "0932568855",
+  "customer_name": "Lâm",
+  "honorific": "anh",
+  "region": "trung",
+  "category": "me-be",
+  "difficulty": "normal",
+  "tags": [
+    "ttl",
+    "variant:quay_lai_sau_8_thang"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=quay_lai_sau_8_thang; session_index=2",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-30",
+      "input_mode": "text",
+      "customer_goal": "[plan-only] order",
+      "customer_turns": [
+        "[plan-only] Khách xác nhận muốn mua, nêu hình thức thanh toán và khu vực giao hàng (chỉ quận/tỉnh), đồng ý lên đơn."
+      ],
+      "facts_established": {
+        "child_age_months": 2,
+        "budget_vnd": 1000000,
+        "payment": "chuyen_khoan",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000,
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "ground_truth_facts": {
+        "price_vnd": 490000,
+        "list_price_vnd": 490000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_MOM-FREESHIP_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "estimated_delivery": "2026-11-04",
+        "call_date": "2026-10-30"
+      },
+      "memory_expectation": {
+        "child_age_months": 2,
+        "budget_vnd": 1000000,
+        "payment": "chuyen_khoan",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000,
+        "order_id": "OD600001"
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-MB-MON",
+          "price_vnd": 490000,
+          "payment": "chuyen_khoan"
+        }
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2027-06-27",
+      "days_later": 240,
+      "input_mode": "text",
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker)."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [
+        "order_id"
+      ],
+      "must_not_ask": [
+        "order_id"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 490000,
+        "list_price_vnd": 490000,
+        "promo_active": false,
+        "promo_MOM-FREESHIP_active": false,
+        "promo_COD-0_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "call_date": "2027-06-27"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000
+      },
+      "expected_call_brief": {
+        "customer_phone": "0932568855",
+        "customer_id": "C045",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-30",
+          "channel": "hotline",
+          "outcome": "chot_don"
+        },
+        "products_advised": [
+          "SKU-MB-MON"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id"
+        ],
+        "suggested_opening": "Dạ em chào anh Lâm, em gọi lại về SKU-MB-MON anh đang quan tâm ạ",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [
+            "COD-0"
+          ],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2027-06-27T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      }
+    }
+  }
+}

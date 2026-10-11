@@ -1,0 +1,148 @@
+{
+  "scenario_id": "SCN-GEN-0095",
+  "level": "M2",
+  "persona": "khach_hoi_ngoai_tai_lieu",
+  "hard_case": "phien_ban_chinh_sach_cu",
+  "customer_id": "C038",
+  "customer_phone": "0932448452",
+  "customer_name": "Diệp",
+  "honorific": "chị",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "difficulty": "hard",
+  "tags": [
+    "hard_case",
+    "thong_tin",
+    "tu_khoan",
+    "variant:chinh_sach_cu",
+    "version_conflict"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR"
+  ],
+  "notes": "variant=chinh_sach_cu; session_index=2",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-30",
+      "input_mode": "text",
+      "customer_goal": "Hỏi giày trekking size 39 màu xám",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về giày trekking size 39 màu xám.",
+        "Em cho chị biết giá và khuyến mãi có gì không?",
+        "Chị cần suy nghĩ thêm rồi sẽ gọi lại sau."
+      ],
+      "facts_established": {
+        "size": 39,
+        "color": "xam",
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-SN-TRK",
+        "price_quoted_vnd": 1990000,
+        "variant_sku": "SKU-SN-TRK-39-XAM"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "ground_truth_facts": {
+        "price_vnd": 1990000,
+        "list_price_vnd": 1990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-30"
+      },
+      "memory_expectation": {
+        "size": 39,
+        "color": "xam",
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-SN-TRK",
+        "price_quoted_vnd": 1990000,
+        "variant_sku": "SKU-SN-TRK-39-XAM"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-11-02",
+      "days_later": 3,
+      "input_mode": "text",
+      "customer_goal": "Xác nhận chính sách đổi trả giày",
+      "customer_turns": [
+        "Chị đọc trên web thấy có chính sách đổi trả trong 14 ngày phải không em?",
+        "Em có thể cho chị biết phí đổi size là bao nhiêu không?",
+        "Chị chỉ muốn chắc chắn lại thôi."
+      ],
+      "expected_outcome": "thong_tin",
+      "must_carry_over": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku"
+      ],
+      "ground_truth_facts": {
+        "return_days": 7,
+        "exchange_fee_vnd": 0,
+        "policy_version": "2026-10",
+        "call_date": "2026-11-02"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0932448452",
+        "customer_id": "C038",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-30",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-SN-TRK"
+        ],
+        "open_blockers": [
+          "cần suy nghĩ thêm"
+        ],
+        "must_not_ask": [
+          "size",
+          "color",
+          "product_advised",
+          "variant_sku"
+        ],
+        "suggested_opening": "Dạ em chào chị Diệp, em gọi lại về SKU-SN-TRK chị đang quan tâm ạ, không biết cần suy nghĩ thêm chưa ạ?",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-02T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "7 ngày",
+          "bảy ngày"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "return_days",
+            "value": 14
+          },
+          {
+            "field": "exchange_fee_vnd",
+            "value": 20000
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,250 @@
+{
+  "scenario_id": "SCN-GEN-0107",
+  "level": "M1",
+  "persona": "khach_so_gia",
+  "hard_case": "doi_khuyen_mai_het_han",
+  "customer_id": "C044",
+  "customer_phone": "0979511174",
+  "customer_name": "Hiền",
+  "honorific": "chị",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "hard",
+  "tags": [
+    "hard_case",
+    "price_objection",
+    "variant:km_het_han"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR",
+    "ESC"
+  ],
+  "notes": "variant=km_het_han; session_index=2; call_2: price changed 7690000 -> 7990000; call_2: promotion AIR-OCT no longer applies",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-30",
+      "days_later": null,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker)."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "room_area_m2": 20,
+        "has_children": true,
+        "budget_vnd": 9000000,
+        "competitor_price_vnd": 6770000,
+        "objection": "giá cao hơn chỗ khác",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT",
+        "promo_expiry": "2026-10-30"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [],
+      "must_not_ask": [],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 7690000,
+        "list_price_vnd": 7990000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": true,
+        "promo_AIR-2ND-50_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-30"
+      },
+      "memory_expectation": {
+        "room_area_m2": 20,
+        "has_children": true,
+        "budget_vnd": 9000000,
+        "competitor_price_vnd": 6770000,
+        "objection": "giá cao hơn chỗ khác",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT"
+      },
+      "expected_call_brief": null,
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "khach_so_gia",
+      "patience_start": 3
+    },
+    "call_2": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-31",
+      "days_later": 1,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] order",
+      "customer_turns": [
+        "[plan-only] Khách xác nhận muốn mua, nêu hình thức thanh toán và khu vực giao hàng (chỉ quận/tỉnh), đồng ý lên đơn."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "payment": "chuyen_khoan",
+        "delivery_area": "Hải Châu, Đà Nẵng",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000,
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "room_area_m2",
+        "objection",
+        "competitor_price_vnd",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AP-PRO",
+          "price_vnd": 7990000,
+          "payment": "chuyen_khoan"
+        },
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [
+          {
+            "field": "price_vnd",
+            "value": 7690000
+          },
+          {
+            "field": "promo_AIR-OCT_active",
+            "value": true
+          },
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 7990000,
+        "list_price_vnd": 7990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": false,
+        "promo_AIR-2ND-50_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "estimated_delivery": "2026-11-03",
+        "call_date": "2026-10-31"
+      },
+      "memory_expectation": {
+        "payment": "chuyen_khoan",
+        "delivery_area": "Hải Châu, Đà Nẵng",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000,
+        "order_id": "OD600001",
+        "superseded": {
+          "price_quoted_vnd": 7690000
+        }
+      },
+      "expected_call_brief": {
+        "customer_phone": "0979511174",
+        "customer_id": "C044",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-30",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-AP-PRO"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "room_area_m2",
+          "has_children",
+          "budget_vnd",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào chị Hiền, em gọi lại về SKU-AP-PRO chị đang quan tâm ạ",
+        "freshness_checks": {
+          "price_changed": true,
+          "promos_no_longer_active": [
+            "AIR-OCT"
+          ],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-31T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0979511174",
+            "sku": "SKU-AP-PRO",
+            "qty": 1,
+            "price_vnd": 7990000,
+            "payment": "chuyen_khoan",
+            "address": "Hải Châu, Đà Nẵng",
+            "on": "2026-10-31"
+          },
+          "result": {
+            "order_id": "OD600001",
+            "status": "created",
+            "total_vnd": 7990000,
+            "needs_confirmation_call": false,
+            "estimated_delivery": "2026-11-03"
+          }
+        }
+      ],
+      "simulator_persona_key": "khach_so_gia",
+      "patience_start": 3
+    }
+  }
+}

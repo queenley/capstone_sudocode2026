@@ -1,0 +1,107 @@
+{
+  "conversation_id": "SCN-GEN-0112__call_2",
+  "scenario_id": "SCN-GEN-0112",
+  "call": "call_2",
+  "customer_id": "C028",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_ngoai_pham_vi_chuyen_may",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào anh Tú. Em gọi lại về bình sữa Pigeon mà anh đang quan tâm, không biết anh có chờ cuối tháng nhận lương chưa ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Anh có còn chờ cuối tháng nhận lương không?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "blocker",
+          "value": "chờ cuối tháng nhận lương"
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-MB-BOT"
+        },
+        {
+          "field": "price_quoted_vnd",
+          "value": 289000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, về sản phẩm bình sữa Pigeon, anh có thể yên tâm là sản phẩm an toàn cho trẻ nhỏ. Tuy nhiên, về câu hỏi y tế cụ thể, em chưa có thông tin chính xác. Em có thể chuyển máy cho dược sĩ để tư vấn chi tiết hơn cho anh ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ chuyển máy cho dược sĩ ngay bây giờ, tổng đài sẽ hỗ trợ anh ạ. Cảm ơn anh đã gọi đến shop BTC, chúc anh một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "handoff.transfer",
+          "args": {
+            "brief": {
+              "customer_phone": "0922808864",
+              "customer_name": "Tú",
+              "escalation_reason": "cau_hoi_y_te_ngoai_pham_vi",
+              "conversation_summary": "Khách hỏi Bình sữa Pigeon PPSU 240ml, có câu hỏi y tế/an toàn cần chuyên môn.",
+              "product_advised": "SKU-MB-BOT",
+              "price_quoted_vnd": 289000,
+              "open_questions": [
+                "câu hỏi y tế của khách"
+              ],
+              "next_action": "Dược sĩ/nhân viên phụ trách gọi lại tư vấn",
+              "generated_at": "2026-10-30T10:00:00"
+            }
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chuyen_may",
+    "outcome": "chuyen_may",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

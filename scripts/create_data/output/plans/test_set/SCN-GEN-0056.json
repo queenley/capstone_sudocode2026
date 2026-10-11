@@ -1,0 +1,182 @@
+{
+  "scenario_id": "SCN-GEN-0056",
+  "level": "M1",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "hard_case": "hen_goi_lai_ngay_nghi",
+  "customer_id": "C050",
+  "customer_phone": "0956517883",
+  "customer_name": "Thủy",
+  "honorific": "chị",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "hard",
+  "tags": [
+    "hard_case",
+    "holiday",
+    "itn",
+    "variant:hen_ngay_nghi"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=hen_ngay_nghi; session_index=1",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-20",
+      "input_mode": "text",
+      "customer_goal": "[plan-only] consult_callback_holiday",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn, chưa quyết và hẹn: \"thứ Hai tuần sau tầm 9 giờ sáng em gọi lại chị nhé\" (đúng nguyên văn thời gian tương đối này, không nói ngày cụ thể)."
+      ],
+      "facts_established": {
+        "room_area_m2": 20,
+        "has_children": false,
+        "budget_vnd": 6500000,
+        "decision_maker": "chồng",
+        "blocker": "cần hỏi chồng",
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "promo_code": "XM-COMBO",
+        "promo_expiry": "2026-11-14"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "ground_truth_facts": {
+        "price_vnd": 5490000,
+        "list_price_vnd": 5490000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_XM-COMBO_active": true,
+        "gift_sku": "SKU-XM-FLT",
+        "promo_AIR-2ND-50_active": false,
+        "in_stock": true,
+        "callback_at": "2026-10-27T09:00",
+        "call_date": "2026-10-20"
+      },
+      "memory_expectation": {
+        "room_area_m2": 20,
+        "has_children": false,
+        "budget_vnd": 6500000,
+        "decision_maker": "chồng",
+        "blocker": "cần hỏi chồng",
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "promo_code": "XM-COMBO"
+      },
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-10-26T09:00"
+        },
+        "must_say_any": [
+          "27/10",
+          "thứ Ba",
+          "Thứ Ba"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-10-27",
+      "days_later": 7,
+      "input_mode": "text",
+      "customer_goal": "[plan-only] order",
+      "customer_turns": [
+        "[plan-only] Khách xác nhận muốn mua, nêu hình thức thanh toán và khu vực giao hàng (chỉ quận/tỉnh), đồng ý lên đơn."
+      ],
+      "facts_established": {
+        "payment": "COD",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "promo_code": "XM-COMBO",
+        "promo_expiry": "2026-11-14",
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "room_area_m2",
+        "decision_maker",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "decision_maker",
+        "product_advised"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 5490000,
+        "list_price_vnd": 5490000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_XM-COMBO_active": true,
+        "gift_sku": "SKU-XM-FLT",
+        "promo_AIR-2ND-50_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "estimated_delivery": "2026-10-31",
+        "call_date": "2026-10-27"
+      },
+      "memory_expectation": {
+        "payment": "COD",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "promo_code": "XM-COMBO",
+        "order_id": "OD600001"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0956517883",
+        "customer_id": "C050",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-20",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-XM-4P"
+        ],
+        "open_blockers": [
+          "cần hỏi chồng"
+        ],
+        "must_not_ask": [
+          "room_area_m2",
+          "has_children",
+          "budget_vnd",
+          "decision_maker",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào chị Thủy, em gọi lại về SKU-XM-4P chị đang quan tâm ạ, không biết cần hỏi chồng chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-27T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-XM-4P",
+          "price_vnd": 5490000,
+          "payment": "COD"
+        }
+      }
+    }
+  }
+}

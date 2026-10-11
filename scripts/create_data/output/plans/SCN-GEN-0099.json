@@ -1,0 +1,300 @@
+{
+  "scenario_id": "SCN-GEN-0099",
+  "level": "M2",
+  "persona": "khach_mua_nhieu_mon",
+  "hard_case": "16_luot_4_san_pham_vuot_cod",
+  "customer_id": "C018",
+  "customer_phone": "0982141621",
+  "customer_name": "Quân",
+  "honorific": "anh",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "hard",
+  "tags": [
+    "budget",
+    "cod_limit",
+    "hard_case",
+    "multi_item",
+    "variant:bon_san_pham_vuot_cod"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=bon_san_pham_vuot_cod; session_index=2",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-10-31",
+      "days_later": null,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker)."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "room_area_m2": 35,
+        "has_children": false,
+        "budget_vnd": 8000000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [],
+      "must_not_ask": [],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 7990000,
+        "list_price_vnd": 7990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": false,
+        "promo_AIR-2ND-50_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-31"
+      },
+      "memory_expectation": {
+        "room_area_m2": 35,
+        "has_children": false,
+        "budget_vnd": 8000000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000
+      },
+      "expected_call_brief": null,
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "khach_mua_nhieu_mon",
+      "patience_start": 5
+    },
+    "call_2": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-11-03",
+      "days_later": 3,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] order_multi",
+      "customer_turns": [
+        "[plan-only] Khách mua nhiều món cho nhà mới, nói lan man, lần lượt chốt TẤT CẢ sản phẩm trong agent_will_tell.items, hỏi tổng tiền, muốn trả COD và nhắc ngân sách của mình."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "payment": "chuyen_khoan",
+        "budget_vnd": 8500000,
+        "quantity": 4,
+        "delivery_area": "Quận 7, TP.HCM",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000,
+        "promo_code": "NAM-SHIP0",
+        "promo_expiry": "2026-11-05",
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AP-PRO",
+          "price_vnd": 7990000
+        },
+        "also_ordered": [
+          "SKU-AF-XM",
+          "SKU-FAN-SEN",
+          "SKU-AP-FLT-P"
+        ],
+        "total_match_vnd": 11160000,
+        "brief_must_contain": [],
+        "must_say_any": [
+          "10 triệu",
+          "10.000.000",
+          "chuyển khoản"
+        ],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 7990000,
+        "list_price_vnd": 7990000,
+        "promo_active": true,
+        "promo_NAM-SHIP0_active": true,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": false,
+        "promo_AIR-2ND-50_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "price_vnd:SKU-AP-PRO": 7990000,
+        "price_vnd:SKU-AF-XM": 1590000,
+        "price_vnd:SKU-FAN-SEN": 590000,
+        "price_vnd:SKU-AP-FLT-P": 990000,
+        "total_vnd": 11160000,
+        "cod_allowed": false,
+        "call_date": "2026-11-03"
+      },
+      "memory_expectation": {
+        "payment": "chuyen_khoan",
+        "budget_vnd": 8500000,
+        "delivery_area": "Quận 7, TP.HCM",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000,
+        "promo_code": "NAM-SHIP0",
+        "order_id": "OD600001",
+        "superseded": {
+          "budget_vnd": 8000000
+        }
+      },
+      "expected_call_brief": {
+        "customer_phone": "0982141621",
+        "customer_id": "C018",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-31",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-AP-PRO"
+        ],
+        "open_blockers": [
+          "để bàn với gia đình"
+        ],
+        "must_not_ask": [
+          "room_area_m2",
+          "has_children",
+          "budget_vnd",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào anh Quân, em gọi lại về SKU-AP-PRO anh đang quan tâm ạ, không biết để bàn với gia đình chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-03T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0982141621",
+            "sku": "SKU-AP-PRO",
+            "qty": 1,
+            "price_vnd": 7990000,
+            "payment": "chuyen_khoan",
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-11-03"
+          },
+          "result": {
+            "order_id": "OD600001",
+            "status": "created",
+            "total_vnd": 7990000,
+            "needs_confirmation_call": false,
+            "estimated_delivery": "2026-11-05"
+          }
+        },
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0982141621",
+            "sku": "SKU-AF-XM",
+            "qty": 1,
+            "price_vnd": 1590000,
+            "payment": "chuyen_khoan",
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-11-03"
+          },
+          "result": {
+            "order_id": "OD600002",
+            "status": "created",
+            "total_vnd": 1590000,
+            "needs_confirmation_call": false,
+            "estimated_delivery": "2026-11-05"
+          }
+        },
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0982141621",
+            "sku": "SKU-FAN-SEN",
+            "qty": 1,
+            "price_vnd": 590000,
+            "payment": "chuyen_khoan",
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-11-03"
+          },
+          "result": {
+            "order_id": "OD600003",
+            "status": "created",
+            "total_vnd": 590000,
+            "needs_confirmation_call": false,
+            "estimated_delivery": "2026-11-05"
+          }
+        },
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0982141621",
+            "sku": "SKU-AP-FLT-P",
+            "qty": 1,
+            "price_vnd": 990000,
+            "payment": "chuyen_khoan",
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-11-03"
+          },
+          "result": {
+            "order_id": "OD600004",
+            "status": "created",
+            "total_vnd": 990000,
+            "needs_confirmation_call": false,
+            "estimated_delivery": "2026-11-05"
+          }
+        }
+      ],
+      "simulator_persona_key": "khach_mua_nhieu_mon",
+      "patience_start": 4
+    }
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "conversation_id": "SCN-GEN-0031__call_1",
+  "scenario_id": "SCN-GEN-0031",
+  "call": "call_1",
+  "customer_id": "C035",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-29",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chào chị Dung! Em là trợ lý ảo của shop. Chị muốn tư vấn về máy lọc không khí cho phòng tầm 15 mét vuông phải không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Chị muốn tư vấn về máy lọc không khí cho phòng tầm 15 mét vuông phải không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn chị đã xác nhận. Chị cho em hỏi thêm, nhà chị không có trẻ nhỏ và ngân sách khoảng 2 triệu rưỡi, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "has_children",
+          "type": "confirm",
+          "text": "Nhà chị không có trẻ nhỏ và ngân sách khoảng 2 triệu rưỡi, đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em có một sản phẩm máy lọc không khí rất phù hợp với nhu cầu của chị. Sản phẩm mà em muốn giới thiệu là AirPure Mini, giá chỉ 2.190.000đ. Máy này không có chương trình khuyến mãi nào hiện tại nhưng rất đáng để chị xem xét ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị có cần thêm thông tin nào khác về sản phẩm này không ạ? Nếu không, chị có thể gọi lại khi nào phù hợp với chị nhé!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em hiểu rồi ạ, chị sẽ chờ đến cuối tháng nhận lương rồi gọi lại. Em ghi nhận lại thông tin này và hẹn gặp lại chị vào cuối tháng nhé!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "blocker",
+          "value": "chờ cuối tháng nhận lương"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

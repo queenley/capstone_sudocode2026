@@ -1,0 +1,153 @@
+{
+  "conversation_id": "SCN-GEN-0057__call_1",
+  "scenario_id": "SCN-GEN-0057",
+  "call": "call_1",
+  "customer_id": "C046",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_so_gia",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị Xuân ạ. Em xin xác nhận, chị muốn hỏi về máy lọc không khí AirPure Pro phải không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn hỏi về máy lọc không khí AirPure Pro phải không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị đã cung cấp thông tin. Chị cần máy cho phòng khoảng 40 mét vuông, không có trẻ nhỏ đúng không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Chị cần máy cho phòng khoảng 40 mét vuông, không có trẻ nhỏ đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy AirPure Pro rất phù hợp cho phòng 40 mét vuông. Giá của máy là 7.690.000đ, hiện tại đang có khuyến mãi là 300.000đ giảm cho mã AIR-OCT, giá sau khuyến mãi là 7.390.000đ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        },
+        {
+          "field": "promo_code",
+          "value": "AIR-OCT"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Chị nói là ngân sách của chị tầm 8 triệu rưỡi, vậy nên giá này hoàn toàn trong tầm tay của chị. Chị có cần thêm thông tin gì về sản phẩm không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em rất tiếc nhưng hiện tại bên em không có khuyến mãi nào khác ngoài mã AIR-OCT. Giá bên em có cao hơn một chút so với giá bên cạnh là 6 triệu 7, nhưng sản phẩm của em được bảo hành 24 tháng và có chính sách đổi trả trong vòng 7 ngày ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "competitor_price_vnd",
+          "value": 6770000
+        },
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "list_price_vnd",
+          "value": 7990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em hiểu rằng chị cần thời gian để suy nghĩ ạ. Vậy em có thể hẹn chị gọi lại vào lúc nào ạ?",
+      "questions": [
+        {
+          "slot": "callback",
+          "type": "open",
+          "text": "Vậy em có thể hẹn chị gọi lại vào lúc nào ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "objection",
+          "value": "giá cao hơn chỗ khác"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi về máy lọc không khí AirPure Pro",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

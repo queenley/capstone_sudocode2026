@@ -1,0 +1,183 @@
+{
+  "conversation_id": "SCN-GEN-0098__call_1",
+  "scenario_id": "SCN-GEN-0098",
+  "call": "call_1",
+  "customer_id": "C042",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chào chị Nga! Em là trợ lý ảo của shop. Chị muốn xác nhận đơn hàng mua máy hâm sữa Fatz đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn xác nhận mua máy hâm sữa Fatz đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, chị muốn xác nhận mua máy hâm sữa Fatz.",
+      "facts_stated": {
+        "product_advised": "SKU-MB-MON"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị! Về phương thức thanh toán, chị sẽ thanh toán qua chuyển khoản, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Chị sẽ thanh toán qua chuyển khoản, đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, chị sẽ thanh toán qua chuyển khoản.",
+      "facts_stated": {
+        "payment": "chuyen_khoan"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Rất tốt ạ! Khu vực giao hàng của chị là Nha Trang, Khánh Hòa phải không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Khu vực giao hàng của chị là Nha Trang, Khánh Hòa phải không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, khu vực giao hàng là Nha Trang, Khánh Hòa.",
+      "facts_stated": {
+        "delivery_area": "Nha Trang, Khánh Hòa"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị Nga! Em đã ghi nhận thông tin. Sản phẩm máy hâm sữa Fatz có giá 490.000đ. Em sẽ tạo đơn hàng với thông tin như sau: sản phẩm máy hâm sữa, số lượng 1, giá 490.000đ, địa chỉ giao hàng là Nha Trang, Khánh Hòa, và phương thức thanh toán là chuyển khoản. Dự kiến giao hàng vào ngày 04 tháng 11 năm 2026. Chị có xác nhận không ạ?",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 490000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-04"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0932157116",
+            "sku": "SKU-MB-MON",
+            "qty": 1,
+            "price_vnd": 490000,
+            "payment": "chuyen_khoan",
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-10-30"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Dạ, chị xác nhận thông tin như vậy.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em cảm ơn chị Nga! Đơn hàng của chị đã được tạo thành công. Mã đơn hàng là OD600001. Nếu có bất kỳ câu hỏi nào, chị hãy gọi lại cho em nhé!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận mua máy hâm sữa",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001"
+    }
+  }
+}

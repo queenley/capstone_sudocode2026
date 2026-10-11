@@ -1,0 +1,154 @@
+{
+  "conversation_id": "SCN-GEN-0128__call_2",
+  "scenario_id": "SCN-GEN-0128",
+  "call": "call_2",
+  "customer_id": "SYN-C005",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-15",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_ngoai_pham_vi_chuyen_may",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào Mr. Đỗ Minh E, em gọi lại về ghế ngồi ô tô cho bé mà Mr. đang quan tâm ạ, không biết Mr. cần suy nghĩ thêm chưa ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Mr. còn cần suy nghĩ thêm không?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "blocker",
+          "value": "cần suy nghĩ thêm"
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-MB-CAR"
+        },
+        {
+          "field": "price_quoted_vnd",
+          "value": 4990000
+        },
+        {
+          "field": "promo_code",
+          "value": "MOM-FREESHIP"
+        },
+        {
+          "field": "order_id",
+          "value": "O009"
+        },
+        {
+          "field": "owned_sku",
+          "value": "FAS004"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chào em! Hôm trước em có tư vấn cho chị ghế ngồi ô tô cho bé.",
+      "facts_stated": {
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-MB-CAR",
+        "price_quoted_vnd": 4990000,
+        "promo_code": "MOM-FREESHIP",
+        "order_id": "O009",
+        "owned_sku": "FAS004"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em cảm ơn Mr. đã gọi lại. Em ghi nhận câu hỏi về an toàn sức khỏe khi sử dụng sản phẩm. Nếu bé đang dùng thuốc thì tốt nhất nên hỏi ý kiến bác sĩ ạ. Em sẽ chuyển máy đến người có chuyên môn để tư vấn cho Mr. ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có câu hỏi về an toàn, nếu bé đang dùng thuốc thì có dùng được ghế này không?",
+      "facts_stated": {
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-MB-CAR",
+        "price_quoted_vnd": 4990000,
+        "promo_code": "MOM-FREESHIP",
+        "order_id": "O009",
+        "owned_sku": "FAS004"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ chuyển máy cho người có thể tư vấn chính xác cho Mr. về câu hỏi y tế này. Em xin phép chuyển máy ngay bây giờ ạ. Cảm ơn Mr. đã kiên nhẫn chờ ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "handoff.transfer",
+          "args": {
+            "brief": {
+              "customer_phone": "0998000005",
+              "customer_name": "Đỗ Minh E",
+              "escalation_reason": "cau_hoi_y_te_ngoai_pham_vi",
+              "conversation_summary": "Khách hỏi Ghế ngồi ô tô cho bé Chicco, có câu hỏi y tế/an toàn cần chuyên môn.",
+              "product_advised": "SKU-MB-CAR",
+              "price_quoted_vnd": 4990000,
+              "open_questions": [
+                "câu hỏi y tế của khách"
+              ],
+              "next_action": "Dược sĩ/nhân viên phụ trách gọi lại tư vấn",
+              "generated_at": "2026-11-15T10:00:00"
+            }
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chuyen_may",
+    "outcome": "chuyen_may",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "conversation_id": "SCN-GEN-0136__call_2",
+  "scenario_id": "SCN-GEN-0136",
+  "call": "call_2",
+  "customer_id": "SYN-C010",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-02",
+  "region": "bac",
+  "category": "gia-dung/combo",
+  "persona": "khach_cap_nhat_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào chị Đinh Văn J. Hôm trước chị đã hỏi về Combo AirPure Y, em xin xác nhận lại là chị muốn đặt hàng sản phẩm này đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị đã hỏi về Combo AirPure Y, em xin xác nhận lại là chị muốn đặt hàng sản phẩm này đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị đã xác nhận. Chị sẽ thanh toán COD và khu vực giao hàng là Cầu Giấy, Hà Nội phải không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Khu vực giao hàng là Cầu Giấy, Hà Nội phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em thấy ngân sách của chị là 7 triệu rưỡi, trong khi giá của Combo AirPure Y là 6.390.000đ. Em có thể giúp chị đặt hàng ngay ạ! Chị có đồng ý không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Chị có đồng ý không ạ?"
+        }
+      ],
+      "facts_used": [
+        "budget_vnd",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6390000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận thông tin đơn hàng của chị. Để xác nhận, em sẽ đọc lại: sản phẩm là Combo AirPure Y, số lượng 1, giá 6.390.000đ, khu vực giao hàng là Cầu Giấy, Hà Nội, phương thức thanh toán là COD. Thời gian giao dự kiến là 2026-11-04. Em tiến hành đặt hàng cho chị nhé?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-04"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000010",
+            "sku": "SKU-BDL-AIR",
+            "qty": 1,
+            "price_vnd": 6390000,
+            "payment": "COD",
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-11-02"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận đơn hàng",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001"
+    }
+  }
+}

@@ -1,0 +1,156 @@
+{
+  "scenario_id": "SCN-GEN-0029",
+  "level": "M2",
+  "persona": "khach_hoi_ngoai_tai_lieu",
+  "hard_case": "phien_ban_chinh_sach_cu",
+  "customer_id": "C026",
+  "customer_phone": "0910285940",
+  "customer_name": "Dũng",
+  "honorific": "anh",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "hard",
+  "tags": [
+    "hard_case",
+    "hẹn_gọi_lại",
+    "tư_vấn",
+    "variant:chinh_sach_cu",
+    "version_conflict",
+    "đổi_trả"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR"
+  ],
+  "notes": "variant=chinh_sach_cu; session_index=1",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-16",
+      "input_mode": "text",
+      "customer_goal": "Hỏi về máy lọc không khí AirPure Pro",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro.",
+        "Diện tích phòng mình khoảng 30 mét vuông, không có trẻ nhỏ.",
+        "Ngân sách của mình tầm 8 triệu, không biết có khuyến mãi gì không?",
+        "Để anh bàn với gia đình rồi gọi lại nhé."
+      ],
+      "facts_established": {
+        "room_area_m2": 30,
+        "has_children": false,
+        "budget_vnd": 8000000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT",
+        "promo_expiry": "2026-10-30"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "ground_truth_facts": {
+        "price_vnd": 7690000,
+        "list_price_vnd": 7990000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": true,
+        "promo_AIR-2ND-50_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "room_area_m2": 30,
+        "has_children": false,
+        "budget_vnd": 8000000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-10-18",
+      "days_later": 2,
+      "input_mode": "text",
+      "customer_goal": "Xác nhận thông tin đổi trả",
+      "customer_turns": [
+        "Alo, anh muốn xác nhận lại thông tin đổi trả.",
+        "Trên web có ghi là đổi trả trong 14 ngày và phí đổi size 20 nghìn đúng không?",
+        "Chắc chắn là chính sách cũ đã hết hiệu lực rồi phải không?"
+      ],
+      "expected_outcome": "thong_tin",
+      "must_carry_over": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "ground_truth_facts": {
+        "return_days": 7,
+        "exchange_fee_vnd": 0,
+        "policy_version": "2026-10",
+        "call_date": "2026-10-18"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0910285940",
+        "customer_id": "C026",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-16",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-AP-PRO"
+        ],
+        "open_blockers": [
+          "để bàn với gia đình"
+        ],
+        "must_not_ask": [
+          "room_area_m2",
+          "has_children",
+          "budget_vnd",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào anh Dũng, em gọi lại về SKU-AP-PRO anh đang quan tâm ạ, không biết để bàn với gia đình chưa ạ?",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-18T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "7 ngày",
+          "bảy ngày"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "return_days",
+            "value": 14
+          },
+          {
+            "field": "exchange_fee_vnd",
+            "value": 20000
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "conversation_id": "SCN-GEN-0120__call_1",
+  "scenario_id": "SCN-GEN-0120",
+  "call": "call_1",
+  "customer_id": "C041",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-31",
+  "region": "nam",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_cap_nhat_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, xin chào anh Thắng. Em hiểu anh đang muốn hỏi về nồi chiên không dầu Lock&Lock 4L. Anh có thể cho em biết anh cần thay đồ cũ đã hỏng và ngân sách của mình khoảng bao nhiêu không ạ?",
+      "questions": [
+        {
+          "slot": "usage_need",
+          "type": "confirm",
+          "text": "Anh cần thay đồ cũ đã hỏng đúng không ạ?"
+        },
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của anh khoảng 2 triệu đồng đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, nồi chiên không dầu Lock&Lock 4L có giá 1.890.000đ. Hiện tại, sản phẩm này không có khuyến mãi nào đang áp dụng. Anh có muốn biết thêm thông tin gì về sản phẩm không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em rất tiếc nhưng sản phẩm này hiện có khuyến mãi COD miễn phí khi thanh toán, nhưng không có khuyến mãi nào khác. Nếu anh cần thêm thông tin gì về sản phẩm khác hoặc cần hỗ trợ thêm, em rất sẵn lòng ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, nếu anh có ngân sách khoảng 2 triệu đồng và cần thay đồ cũ đã hỏng, em có thể tư vấn thêm cho anh về các sản phẩm khác trong tầm giá này. Anh có muốn gọi lại sau khi đã bàn với gia đình không ạ? Em có thể ghi chú lại thời gian gọi lại cho anh nếu cần.",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "open",
+          "text": "Anh có thể cho em biết anh dự định gọi lại vào khoảng thời gian nào không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ ghi chú lại rằng anh sẽ gọi lại sau khi bàn với gia đình. Nếu có gì cần hỗ trợ thêm, anh có thể gọi cho em bất cứ lúc nào. Cảm ơn anh đã gọi đến shop, chúc anh một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi về nồi chiên không dầu Lock&Lock.",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

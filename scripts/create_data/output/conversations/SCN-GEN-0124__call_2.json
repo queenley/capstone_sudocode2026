@@ -1,0 +1,140 @@
+{
+  "conversation_id": "SCN-GEN-0124__call_2",
+  "scenario_id": "SCN-GEN-0124",
+  "call": "call_2",
+  "customer_id": "C047",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-02",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_mua_doi_size",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Đạt, em gọi lại về đơn hàng OD600001 của anh ạ. Anh đã muốn đổi sang giày sneaker Urban Classic size 42 màu đen, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Anh đã muốn đổi sang giày sneaker Urban Classic size 42 màu đen, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "size",
+        "variant_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "size",
+          "value": 42
+        },
+        {
+          "field": "variant_sku",
+          "value": "SKU-SN-RUN2-42-DEN"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin xác nhận là anh sẽ nhận hoàn tiền chênh lệch là 800.000đ ạ. Anh có muốn biết thêm về thời gian hoàn tiền không ạ?",
+      "questions": [
+        {
+          "slot": "refund_vnd",
+          "type": "confirm",
+          "text": "Anh có muốn biết thêm về thời gian hoàn tiền không ạ?"
+        }
+      ],
+      "facts_used": [
+        "refund_vnd"
+      ],
+      "claims": [
+        {
+          "field": "refund_vnd",
+          "value": 800000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, thời gian hoàn tiền sẽ là từ 3 đến 5 ngày làm việc sau khi shop nhận lại hàng ạ. Anh cho em xin số tài khoản ngân hàng để tiến hành hoàn tiền được không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "open",
+          "text": "Anh cho em xin số tài khoản ngân hàng để tiến hành hoàn tiền được không ạ?"
+        }
+      ],
+      "facts_used": [
+        "payment"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em cảm ơn anh đã cung cấp thông tin. Tuy nhiên, thông tin tài khoản ngân hàng của anh em không thể ghi lại, em sẽ tiến hành hoàn tiền ngay cho anh ạ. Anh có cần hỗ trợ gì thêm không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Anh có cần hỗ trợ gì thêm không ạ?"
+        }
+      ],
+      "facts_used": [
+        "payment"
+      ],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD600001",
+            "action": "exchange_product",
+            "new_variant_sku": "SKU-SN-CAS-42-DEN",
+            "on": "2026-11-02"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

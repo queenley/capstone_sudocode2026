@@ -1,0 +1,177 @@
+{
+  "conversation_id": "SCN-GEN-0003__call_1",
+  "scenario_id": "SCN-GEN-0003",
+  "call": "call_1",
+  "customer_id": "C033",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "trung",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Loan, em gọi lại về nồi chiên không dầu Xiaomi 4.5L chị đã hỏi trước đó ạ. Chị có còn dự định mua cho dịp Tết không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Chị có còn dự định mua cho dịp Tết không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Loan đây, hôm trước có hỏi nồi chiên không dầu Xiaomi 4.5L, giờ chị muốn biết thêm thông tin.",
+      "facts_stated": {
+        "product_advised": "SKU-AF-XM"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn chị đã gọi lại ạ. Nồi chiên không dầu Xiaomi 4.5L hiện có giá 1.590.000đ ạ. Chị có cần thêm thông tin gì về sản phẩm không ạ?",
+      "questions": [
+        {
+          "slot": "price_vnd",
+          "type": "confirm",
+          "text": "Chị có cần thêm thông tin gì về sản phẩm không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1590000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đang cần dùng cho gia đình, ngân sách khoảng 2 triệu thôi.",
+      "facts_stated": {
+        "usage_need": "dùng cho gia đình",
+        "budget_vnd": 2000000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, nồi chiên này rất phù hợp để dùng cho gia đình ạ. Với ngân sách 2 triệu của chị, em nghĩ chị có thể mua được nồi này. Có khuyến mãi gì không em?",
+      "questions": [
+        {
+          "slot": "promo_active",
+          "type": "open",
+          "text": "Có khuyến mãi gì không em?"
+        }
+      ],
+      "facts_used": [
+        "usage_need",
+        "budget_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại sản phẩm này không có khuyến mãi nào ạ. Giá vẫn giữ nguyên là 1.590.000đ ạ. Chị có muốn đặt hàng không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ chờ cuối tháng nhận lương rồi gọi lại nhé.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, không sao ạ. Chị cứ gọi lại khi nào có thời gian, em sẵn sàng hỗ trợ chị bất cứ lúc nào. Em cảm ơn chị đã gọi ạ!",
+      "questions": [],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cảm ơn em!",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

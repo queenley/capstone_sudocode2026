@@ -1,0 +1,174 @@
+{
+  "conversation_id": "SCN-GEN-0118__call_1",
+  "scenario_id": "SCN-GEN-0118",
+  "call": "call_1",
+  "customer_id": "C029",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-29",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Alo, chị Hà. Em là trợ lý ảo của shop BTC. Chị muốn hỏi về xe đẩy gấp gọn cho bé 17 tháng tuổi, đúng không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, chị muốn hỏi về xe đẩy gấp gọn cho bé 17 tháng tuổi.",
+      "facts_stated": {
+        "child_age_months": 17
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn chị đã xác nhận thông tin. Em có sản phẩm xe đẩy gấp gọn, giá là 3.490.000đ. Chị có ngân sách khoảng bao nhiêu ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Chị có ngân sách khoảng bao nhiêu ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ngân sách của chị là 3 triệu rưỡi thôi.",
+      "facts_stated": {
+        "budget_vnd": 3500000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị có ngân sách là 3 triệu rưỡi, vậy rất phù hợp với sản phẩm em đang đề xuất. Xe đẩy này có khuyến mãi miễn phí vận chuyển nữa ạ. Chị có muốn biết thêm về khuyến mãi không ạ?",
+      "questions": [
+        {
+          "slot": "promo_code",
+          "type": "open",
+          "text": "Chị có muốn biết thêm về khuyến mãi không ạ?"
+        }
+      ],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Xe này có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, sản phẩm hiện tại đang có khuyến mãi miễn phí vận chuyển. Khuyến mãi này sẽ kết thúc vào ngày 29 tháng 11 2026. Chị có cần thêm thông tin gì khác không ạ?",
+      "questions": [
+        {
+          "slot": "promo_expiry",
+          "type": "confirm",
+          "text": "Chị có cần thêm thông tin gì khác không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_expiry",
+          "value": "2026-11-29"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần suy nghĩ thêm rồi sẽ gọi lại nhé.",
+      "facts_stated": {
+        "blocker": "cần suy nghĩ thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu ạ. Nếu chị cần thêm bất kỳ thông tin nào, chị cứ gọi lại nhé. Em sẽ ghi nhận lịch gọi lại cho chị. Chúc chị một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi về xe đẩy gấp gọn cho bé 17 tháng tuổi",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

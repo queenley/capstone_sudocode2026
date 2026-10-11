@@ -1,0 +1,204 @@
+{
+  "conversation_id": "SCN-GEN-0097__call_2",
+  "scenario_id": "SCN-GEN-0097",
+  "call": "call_2",
+  "customer_id": "C035",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-12-13",
+  "region": "trung",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, xin chào chị Dung, em là trợ lý ảo của shop. Hôm nay chị muốn đặt hàng máy lọc không khí đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn đặt hàng máy lọc không khí đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, cô muốn đặt hàng máy lọc không khí.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng ạ. Chị chọn thanh toán COD và giao hàng ở Quận 7, TP.HCM nhé?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Chị chọn thanh toán COD và giao hàng ở Quận 7, TP.HCM đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, cô chọn COD và giao ở Quận 7.",
+      "facts_stated": {
+        "delivery_area": "Quận 7, TP.HCM"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Quận 7, TP.HCM",
+          "spoken": "Quận 7, TP.HCM"
+        }
+      ],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận thông tin là giao hàng ở Quận 7. Diện tích phòng của chị là bao nhiêu mét vuông ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "open",
+          "text": "Diện tích phòng của chị là bao nhiêu mét vuông ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Diện tích phòng của cô là 25 mét vuông và nhà không có trẻ nhỏ.",
+      "facts_stated": {
+        "room_area_m2": 25,
+        "has_children": false
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "25",
+          "spoken": "25 mét vuông"
+        }
+      ],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận diện tích phòng là 25 mét vuông và nhà không có trẻ nhỏ. Chị có đồng ý lên đơn cho chị không ạ?",
+      "questions": [
+        {
+          "slot": "confirm_order",
+          "type": "confirm",
+          "text": "Chị có đồng ý lên đơn cho chị không ạ?"
+        }
+      ],
+      "facts_used": [
+        "room_area_m2",
+        "has_children"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cô đồng ý lên đơn cho cô nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ tiến hành tạo đơn cho chị. Sản phẩm mà chị chọn là máy lọc không khí với giá 2.190.000đ, thanh toán COD. Đơn hàng sẽ được giao đến Quận 7, TP.HCM trong vòng 2-4 ngày làm việc. Em sẽ xác nhận lại thông tin đơn hàng trước khi giao nhé!",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        },
+        {
+          "field": "payment",
+          "value": "COD"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0958421083",
+            "sku": "SKU-AP-MINI",
+            "qty": 1,
+            "price_vnd": 2190000,
+            "payment": "COD",
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-12-13"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận mua máy lọc không khí.",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001"
+    }
+  }
+}

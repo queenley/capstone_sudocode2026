@@ -1,0 +1,139 @@
+{
+  "conversation_id": "SCN-GEN-0070__call_2",
+  "scenario_id": "SCN-GEN-0070",
+  "call": "call_2",
+  "customer_id": "SYN-C010",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_cap_nhat_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chào Mr. Đinh Văn J, em gọi lại về máy hút sữa điện đôi Spectra S1 mà Mr. đang quan tâm ạ. Em xác nhận lại một chút thông tin: địa chỉ giao hàng là Cầu Giấy, Hà Nội, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Địa chỉ giao hàng là Cầu Giấy, Hà Nội, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi ạ.",
+      "facts_stated": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn Mr. đã xác nhận. Giá của máy hút sữa điện đôi Spectra S1 là 4.290.000đ. Mr. sẽ thanh toán bằng chuyển khoản, phải không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Mr. sẽ thanh toán bằng chuyển khoản, phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4290000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Vâng, đúng rồi ạ.",
+      "facts_stated": {
+        "payment": "chuyen_khoan"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em cảm ơn Mr. đã xác nhận. Về địa chỉ giao hàng, em sẽ ghi nhận là Cầu Giấy, Hà Nội ạ. Em sẽ tiến hành tạo đơn hàng cho Mr. với thông tin sau: máy hút sữa điện đôi Spectra S1, số lượng 1, giá 4.290.000đ, thanh toán bằng chuyển khoản, và địa chỉ giao hàng là Cầu Giấy, Hà Nội. Thời gian giao dự kiến là 20/10/2026 ạ. Em sẽ tạo đơn ngay ạ.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "product_advised",
+        "price_quoted_vnd",
+        "payment"
+      ],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000010",
+            "sku": "SKU-MB-PUMP1",
+            "qty": 1,
+            "price_vnd": 4290000,
+            "payment": "chuyen_khoan",
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-17"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận mua máy hút sữa điện đôi Spectra S1.",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001",
+      "sku": "SKU-MB-PUMP1",
+      "qty": 1,
+      "price_vnd": 4290000,
+      "payment": "chuyen_khoan",
+      "address": "Cầu Giấy, Hà Nội",
+      "on": "2026-10-17"
+    }
+  }
+}

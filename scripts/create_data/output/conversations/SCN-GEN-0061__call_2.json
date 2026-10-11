@@ -1,0 +1,192 @@
+{
+  "conversation_id": "SCN-GEN-0061__call_2",
+  "scenario_id": "SCN-GEN-0061",
+  "call": "call_2",
+  "customer_id": "SYN-C001",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_da_kenh_fb_hotline",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào Mr. Nguyễn Văn A, em gọi lại về combo sản phẩm mà Mr. đang quan tâm ạ. Hôm qua chị đã hỏi về combo đó đúng không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Chị muốn gọi hotline hỏi thêm không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, chị đã hỏi về combo đó.",
+      "facts_stated": {
+        "blocker": "muốn gọi hotline hỏi thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em thông báo rằng combo sản phẩm này giá là 4.790.000đ ạ. Chị muốn thanh toán COD và giao hàng ở Long Biên, Hà Nội phải không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Chị muốn thanh toán COD đúng không ạ?"
+        },
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Chị muốn giao hàng ở Long Biên, Hà Nội đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4790000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, chị muốn thanh toán COD và giao hàng ở Long Biên, Hà Nội.",
+      "facts_stated": {
+        "payment": "COD",
+        "delivery_area": "Long Biên, Hà Nội"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã xác nhận thông tin thanh toán COD và địa chỉ giao hàng là Long Biên, Hà Nội. Chị có muốn em lên đơn cho sản phẩm này không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Chị đồng ý lên đơn cho sản phẩm này nhé!"
+        }
+      ],
+      "facts_used": [
+        "payment",
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có, chị đồng ý lên đơn cho sản phẩm này nhé!",
+      "facts_stated": {
+        "order_id": "OD600001"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ tạo đơn hàng cho sản phẩm combo này. Thông tin đơn hàng như sau: sản phẩm là combo giá 4.790.000đ, thanh toán COD, địa chỉ giao hàng là Long Biên, Hà Nội, dự kiến giao vào ngày 02/11/2026 ạ. Em sẽ tiến hành xác nhận đơn hàng ngay bây giờ ạ!",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-02"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000001",
+            "sku": "SKU-BDL-MOM",
+            "qty": 1,
+            "price_vnd": 4790000,
+            "payment": "COD",
+            "address": "Long Biên, Hà Nội",
+            "on": "2026-10-30"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, đơn hàng của chị đã được tạo thành công với mã đơn là OD600001. Cảm ơn chị đã chọn sản phẩm của chúng em! Nếu cần thêm thông tin gì, chị cứ liên hệ với shop nhé!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận đơn hàng cho combo sản phẩm.",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001"
+    }
+  }
+}

@@ -1,0 +1,209 @@
+{
+  "conversation_id": "SCN-GEN-0038__call_1",
+  "scenario_id": "SCN-GEN-0038",
+  "call": "call_1",
+  "customer_id": "C042",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-15",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, xin chào chị Nga. Chị muốn hỏi về xe đẩy gấp gọn Joie Pact cho bé 4 tháng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "child_age_months",
+          "type": "confirm",
+          "text": "Chị có bé 4 tháng đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, chị muốn hỏi về xe đẩy gấp gọn Joie Pact cho bé của chị.",
+      "facts_stated": {
+        "child_age_months": 4
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, xe đẩy Joie Pact có giá là 3.490.000đ. Chị có dự kiến ngân sách khoảng bao nhiêu cho sản phẩm này ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Chị dự kiến ngân sách khoảng bao nhiêu cho sản phẩm này ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ngân sách chị dự kiến là khoảng 3 triệu rưỡi.",
+      "facts_stated": {
+        "budget_vnd": 3500000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị có ngân sách khoảng 3 triệu rưỡi. Chị có muốn biết thêm về các khuyến mãi hiện có không ạ?",
+      "questions": [
+        {
+          "slot": "promo_code",
+          "type": "confirm",
+          "text": "Chị có muốn biết thêm về các khuyến mãi hiện có không ạ?"
+        }
+      ],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Xe này có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, xe đẩy Joie Pact hiện đang có khuyến mãi miễn phí vận chuyển với mã MOM-FREESHIP và khuyến mãi này sẽ hết hạn vào 29 tháng 11 năm 2026. Chị có cần hỏi thêm gì nữa không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "promo_expiry",
+          "value": "2026-11-29"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần hỏi ông xã một chút rồi em sẽ gọi lại nhé.",
+      "facts_stated": {
+        "blocker": "cần hỏi chồng",
+        "decision_maker": "chồng"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, không sao ạ. Em sẽ ghi nhớ lại thông tin và chờ chị gọi lại. Chị có muốn hẹn thời gian gọi lại không ạ?",
+      "questions": [
+        {
+          "slot": "callback",
+          "type": "open",
+          "text": "Chị có muốn hẹn thời gian gọi lại không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Để em hỏi thử rồi sẽ gọi lại cho em sau.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em cảm ơn chị đã gọi đến. Em sẽ chờ tin từ chị. Chúc chị một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cảm ơn em.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

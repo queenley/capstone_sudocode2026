@@ -1,0 +1,121 @@
+{
+  "conversation_id": "SCN-GEN-0043__call_1",
+  "scenario_id": "SCN-GEN-0043",
+  "call": "call_1",
+  "customer_id": "C027",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-15",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_da_kenh_fb_hotline",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị Chi, em là trợ lý ảo của shop. Chị đang hỏi về máy hâm sữa Fatz 4 chức năng phải không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị đang hỏi về máy hâm sữa Fatz 4 chức năng phải không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Chị có ngân sách khoảng một triệu đúng không ạ? Máy hâm sữa Fatz có giá 490.000đ, chị có thấy phù hợp không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Chị có ngân sách khoảng một triệu đúng không ạ?"
+        },
+        {
+          "slot": "price_quoted_vnd",
+          "type": "confirm",
+          "text": "Máy hâm sữa Fatz có giá 490.000đ, chị có thấy phù hợp không ạ?"
+        }
+      ],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Máy này không có khuyến mãi gì hiện tại, nhưng em sẽ ghi nhận lại câu hỏi của chị về khuyến mãi nhé. Chị muốn gọi hotline để hỏi thêm thông tin phải không ạ?",
+      "questions": [
+        {
+          "slot": "promo_active",
+          "type": "confirm",
+          "text": "Máy này không có khuyến mãi gì hiện tại, nhưng em sẽ ghi nhận lại câu hỏi của chị về khuyến mãi nhé."
+        },
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Chị muốn gọi hotline để hỏi thêm thông tin phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "promo_active",
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị Chi, em sẽ ghi nhận lại yêu cầu của chị. Nếu chị cần thêm thông tin, đừng ngần ngại gọi lại cho shop nhé. Em chúc chị một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "muốn gọi hotline hỏi thêm"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

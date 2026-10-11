@@ -1,0 +1,318 @@
+{
+  "scenario_id": "SCN-GEN-0127",
+  "level": "M2",
+  "persona": "khach_da_kenh_fb_hotline",
+  "hard_case": "teencode_da_kenh",
+  "customer_id": "SYN-C001",
+  "customer_phone": "0998000001",
+  "customer_name": "Nguyễn Văn A",
+  "honorific": "Mr.",
+  "region": "bac",
+  "category": "gia-dung/noi-chien",
+  "difficulty": "hard",
+  "tags": [
+    "cross_channel",
+    "hard_case",
+    "teencode",
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR"
+  ],
+  "notes": "variant=chuan; session_index=3; call_2: price changed 3391500 -> 3990000; call_2: promotion 11-11 no longer applies",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.syn-c001",
+      "call_date": "2026-11-12",
+      "days_later": null,
+      "input_mode": "chat_teencode",
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C001",
+          "session_id": "SYN-001-S1",
+          "date": "2026-09-01",
+          "channel": "hotline",
+          "summary": "Hỗ trợ mua máy hút bụi",
+          "outcome": "successful",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C001",
+          "session_id": "SYN-001-S2",
+          "date": "2026-09-02",
+          "channel": "zalo_oa",
+          "summary": "Tư vấn về máy giặt",
+          "outcome": "successful",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C001",
+          "order_id": "O001",
+          "date": "2026-01-15",
+          "sku": "HAP001",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "HAP001"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C001",
+          "order_id": "O002",
+          "date": "2026-05-20",
+          "sku": "HAP002",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "O002"
+          }
+        }
+      ],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker)."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "usage_need": "dùng cho gia đình",
+        "budget_vnd": 4500000,
+        "phone_provided": true,
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "product_advised": "SKU-AF-6L",
+        "price_quoted_vnd": 3391500,
+        "promo_code": "11-11",
+        "promo_expiry": "2026-11-12"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "args_match": {},
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 3391500,
+        "list_price_vnd": 3990000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_11-11_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-12"
+      },
+      "memory_expectation": {
+        "usage_need": "dùng cho gia đình",
+        "budget_vnd": 4500000,
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "product_advised": "SKU-AF-6L",
+        "price_quoted_vnd": 3391500,
+        "promo_code": "11-11"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000001",
+        "customer_id": "SYN-C001",
+        "is_returning": true,
+        "n_previous_sessions": 2,
+        "last_session": {
+          "date": "2026-09-02",
+          "channel": "zalo_oa",
+          "outcome": "successful",
+          "summary": "Tư vấn về máy giặt"
+        },
+        "products_advised": [
+          "HAP001"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Mr. Nguyễn Văn A, em gọi lại về HAP001 Mr. đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-12T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [],
+      "simulator_persona_key": "khach_da_kenh_fb_hotline",
+      "patience_start": 4
+    },
+    "call_2": {
+      "channel": "hotline",
+      "channel_identity": null,
+      "call_date": "2026-11-14",
+      "days_later": 2,
+      "input_mode": "text",
+      "seed_history": [],
+      "speaker_customer_id": null,
+      "fault_injection": null,
+      "customer_goal": "[plan-only] order",
+      "customer_turns": [
+        "[plan-only] Khách xác nhận muốn mua, nêu hình thức thanh toán và khu vực giao hàng (chỉ quận/tỉnh), đồng ý lên đơn."
+      ],
+      "customer_turns_asr": [],
+      "facts_established": {
+        "payment": "chuyen_khoan",
+        "delivery_area": "Long Biên, Hà Nội",
+        "product_advised": "SKU-AF-6L",
+        "price_quoted_vnd": 3990000,
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "phone_provided",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AF-6L",
+          "price_vnd": 3990000,
+          "payment": "chuyen_khoan"
+        },
+        "also_ordered": [],
+        "total_match_vnd": null,
+        "brief_must_contain": [],
+        "must_say_any": [],
+        "agent_must_say": [],
+        "must_not_call_tools": [],
+        "forbidden_claims": [
+          {
+            "field": "price_vnd",
+            "value": 3391500
+          },
+          {
+            "field": "promo_11-11_active",
+            "value": true
+          }
+        ],
+        "trace_must_not_match": [],
+        "max_agent_questions": null
+      },
+      "ground_truth_facts": {
+        "price_vnd": 3990000,
+        "list_price_vnd": 3990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "estimated_delivery": "2026-11-17",
+        "call_date": "2026-11-14"
+      },
+      "memory_expectation": {
+        "payment": "chuyen_khoan",
+        "delivery_area": "Long Biên, Hà Nội",
+        "product_advised": "SKU-AF-6L",
+        "price_quoted_vnd": 3990000,
+        "order_id": "OD600001",
+        "superseded": {
+          "price_quoted_vnd": 3391500,
+          "order_id": "O002"
+        }
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000001",
+        "customer_id": "SYN-C001",
+        "is_returning": true,
+        "n_previous_sessions": 3,
+        "last_session": {
+          "date": "2026-11-12",
+          "channel": "chat_fanpage",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "HAP001",
+          "SKU-AF-6L"
+        ],
+        "open_blockers": [
+          "muốn gọi hotline hỏi thêm"
+        ],
+        "must_not_ask": [
+          "budget_vnd",
+          "usage_need",
+          "phone_provided",
+          "product_advised",
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Mr. Nguyễn Văn A, em gọi lại về HAP001 Mr. đang quan tâm ạ, không biết muốn gọi hotline hỏi thêm chưa ạ?",
+        "freshness_checks": {
+          "price_changed": true,
+          "promos_no_longer_active": [
+            "11-11"
+          ],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-14T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": null,
+      "oracle_tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000001",
+            "sku": "SKU-AF-6L",
+            "qty": 1,
+            "price_vnd": 3990000,
+            "payment": "chuyen_khoan",
+            "address": "Long Biên, Hà Nội",
+            "on": "2026-11-14"
+          },
+          "result": {
+            "order_id": "OD600001",
+            "status": "created",
+            "total_vnd": 3990000,
+            "needs_confirmation_call": false,
+            "estimated_delivery": "2026-11-17"
+          }
+        }
+      ],
+      "simulator_persona_key": "khach_da_kenh_fb_hotline",
+      "patience_start": 3
+    }
+  }
+}

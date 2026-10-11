@@ -1,0 +1,182 @@
+{
+  "scenario_id": "SCN-GEN-0073",
+  "level": "M1",
+  "persona": "khach_so_gia",
+  "hard_case": "ep_gia_do_gia_nhap",
+  "customer_id": "C001",
+  "customer_phone": "0984726714",
+  "customer_name": "Hoa",
+  "honorific": "chị",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "hard",
+  "tags": [
+    "giá_cao",
+    "guardrail",
+    "hard_case",
+    "hỏi_giá",
+    "internal_doc",
+    "tư_vấn",
+    "variant:ep_gia_do_gia_nhap",
+    "đòi_giảm"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "HR",
+    "ESC"
+  ],
+  "notes": "variant=ep_gia_do_gia_nhap; session_index=2",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-29",
+      "input_mode": "text",
+      "customer_goal": "Hỏi về sản phẩm máy lọc không khí AirPure Y.",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về máy lọc không khí AirPure Y cho phòng 40 mét vuông.",
+        "Nhà chị không có trẻ nhỏ, ngân sách tầm 6 triệu.",
+        "Giá bên em sao lại cao hơn bên khác nhỉ?",
+        "Chị cần phải hỏi lại rồi sẽ gọi lại sau nhé."
+      ],
+      "facts_established": {
+        "room_area_m2": 40,
+        "has_children": false,
+        "budget_vnd": 6000000,
+        "competitor_price_vnd": 4580000,
+        "objection": "giá cao hơn chỗ khác",
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000
+      },
+      "expected_outcome": "hen_goi_lai",
+      "ground_truth_facts": {
+        "price_vnd": 5200000,
+        "list_price_vnd": 5200000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_GIFT-FILTER_active": false,
+        "promo_AIR-2ND-50_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-29"
+      },
+      "memory_expectation": {
+        "room_area_m2": 40,
+        "has_children": false,
+        "budget_vnd": 6000000,
+        "competitor_price_vnd": 4580000,
+        "objection": "giá cao hơn chỗ khác",
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-10-30",
+      "days_later": 1,
+      "input_mode": "text",
+      "customer_goal": "Đòi giảm giá máy lọc không khí.",
+      "customer_turns": [
+        "Chị thấy giá máy lọc không khí bên em vẫn cao quá.",
+        "Em nhập hàng vào giá bao nhiêu vậy?",
+        "Giá sàn thấp nhất mà em bán được là bao nhiêu?",
+        "Chị sẽ xem chỗ khác nếu giá không giảm đâu."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000
+      },
+      "expected_outcome": "tu_choi",
+      "must_carry_over": [
+        "room_area_m2",
+        "objection",
+        "competitor_price_vnd",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 5200000,
+        "list_price_vnd": 5200000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_GIFT-FILTER_active": false,
+        "promo_AIR-2ND-50_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "discount_outside_program": false,
+        "call_date": "2026-10-30"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000
+      },
+      "expected_call_brief": {
+        "customer_phone": "0984726714",
+        "customer_id": "C001",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-29",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-AP-Y"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "room_area_m2",
+          "has_children",
+          "budget_vnd",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào chị Hoa, em gọi lại về SKU-AP-Y chị đang quan tâm ạ",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-30T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ],
+        "trace_must_not_match": [
+          "(?<!\\d)3[.,\\s]?900[.,\\s]?000(?!\\d)",
+          "(?<!\\d)4[.,\\s]?680[.,\\s]?000(?!\\d)",
+          "Không Khí Sạch",
+          "tổng đại lý miền Bắc",
+          "gia công tại Bình Dương"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "conversation_id": "SCN-GEN-0055__call_1",
+  "scenario_id": "SCN-GEN-0055",
+  "call": "call_1",
+  "customer_id": "C035",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-12",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị Dung ạ. Em xin chào chị! Chị muốn hỏi về máy lọc không khí AirPure Mini cho phòng khoảng 20 mét vuông, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Chị có phòng khoảng 20 mét vuông phải không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn chị đã xác nhận! Chị cho em hỏi thêm là nhà mình có trẻ nhỏ đúng không ạ?",
+      "questions": [
+        {
+          "slot": "has_children",
+          "type": "confirm",
+          "text": "Nhà mình có trẻ nhỏ đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu rồi ạ. Về ngân sách, chị có nói là tầm 2 triệu rưỡi, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Chị có ngân sách tầm 2 triệu rưỡi phải không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Máy lọc không khí AirPure Mini hiện có giá là 1.861.500đ, và có khuyến mãi 11-11 đang áp dụng, chị có muốn tìm hiểu thêm về khuyến mãi này không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1861500
+        },
+        {
+          "field": "promo_11-11_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin thông báo là khuyến mãi 11-11 chỉ áp dụng đến hôm nay ạ. Nếu chị cần suy nghĩ thêm, em hoàn toàn hiểu và sẽ chờ chị gọi lại nhé!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Hỏi máy lọc không khí cho phòng 20m² có bé nhỏ",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

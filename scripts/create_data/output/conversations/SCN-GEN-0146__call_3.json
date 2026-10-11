@@ -1,0 +1,184 @@
+{
+  "conversation_id": "SCN-GEN-0146__call_3",
+  "scenario_id": "SCN-GEN-0146",
+  "call": "call_3",
+  "customer_id": "C014",
+  "session_index": 3,
+  "channel": "hotline",
+  "date": "2026-10-27",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_kenh_mau_thuan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Huy, em gọi lại về giày chạy bộ RunLite 2 Pro size 42 màu đen ạ. Em có thông tin là anh chọn hình thức thanh toán là COD, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Em có thông tin là anh chọn hình thức thanh toán là COD, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "payment",
+        "product_advised",
+        "variant_sku"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-SN-RUN2"
+        },
+        {
+          "field": "variant_sku",
+          "value": "SKU-SN-RUN2-42-DEN"
+        },
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, COD.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn anh ạ. Khu vực giao hàng của anh là Hải Châu, Đà Nẵng phải không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Khu vực giao hàng của anh là Hải Châu, Đà Nẵng phải không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, Hải Châu, Đà Nẵng.",
+      "facts_stated": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn anh đã xác nhận. Em sẽ lên đơn cho anh. Tổng giá cho giày chạy bộ RunLite 2 Pro size 42 màu đen là 1.690.000đ ạ. Anh có muốn kiểm tra lại thông tin đơn hàng không ạ?",
+      "questions": [
+        {
+          "slot": "order_confirmation",
+          "type": "open",
+          "text": "Anh có muốn kiểm tra lại thông tin đơn hàng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Không, làm ơn lên đơn cho tôi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ tạo đơn hàng cho anh ngay bây giờ. Một chút thời gian nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0925877188",
+            "sku": "SKU-SN-RUN2-42-DEN",
+            "qty": 1,
+            "price_vnd": 1690000,
+            "payment": "COD",
+            "address": "Hải Châu, Đà Nẵng",
+            "on": "2026-10-27"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Đơn hàng của anh đã được tạo thành công với mã đơn là OD600001. Dự kiến giao hàng vào ngày 29 tháng 10 ạ. Cảm ơn anh đã đặt hàng. Em chúc anh một ngày vui vẻ ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "Xác nhận mua giày chạy bộ RunLite 2 Pro size 42 màu đen.",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001"
+    }
+  }
+}

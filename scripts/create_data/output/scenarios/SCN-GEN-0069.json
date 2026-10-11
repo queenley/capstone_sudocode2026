@@ -1,0 +1,195 @@
+{
+  "scenario_id": "SCN-GEN-0069",
+  "level": "M2",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "customer_id": "SYN-C004",
+  "customer_phone": "0998000004",
+  "customer_name": "Phạm Thị D",
+  "honorific": "Ms.",
+  "region": "bac",
+  "category": "unknown",
+  "difficulty": "normal",
+  "tags": [
+    "address_change",
+    "customer_support",
+    "hotline",
+    "order",
+    "order_status",
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=chuan; session_index=2",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-31",
+      "input_mode": "text",
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C004",
+          "session_id": "SYN-004-S1",
+          "date": "2026-09-01",
+          "channel": "hotline",
+          "summary": "Khách hàng hỏi về máy xay sinh tố",
+          "outcome": "successful",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C004",
+          "session_id": "SYN-004-S2",
+          "date": "2026-09-02",
+          "channel": "zalo_oa",
+          "summary": "Hỗ trợ đổi trả hàng",
+          "outcome": "successful",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C004",
+          "order_id": "O007",
+          "date": "2026-02-25",
+          "sku": "HAP003",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "HAP003"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C004",
+          "order_id": "O008",
+          "date": "2026-06-18",
+          "sku": "HAP004",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "O008"
+          }
+        }
+      ],
+      "customer_goal": "Hỏi tình trạng đơn hàng của mình.",
+      "customer_turns": [
+        "Alo, chị D đây, em ơi cho chị hỏi đơn hàng của mình đang ở đâu rồi?",
+        "Đơn hàng chị đặt hôm 18 tháng 6, có thông tin gì không em?"
+      ],
+      "expected_outcome": "cap_nhat_don",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "order_id": "O008",
+        "order_status": "processing",
+        "call_date": "2026-10-31"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000004",
+        "customer_id": "SYN-C004",
+        "is_returning": true,
+        "n_previous_sessions": 2,
+        "last_session": {
+          "date": "2026-09-02",
+          "channel": "zalo_oa",
+          "outcome": "successful",
+          "summary": "Hỗ trợ đổi trả hàng"
+        },
+        "products_advised": [
+          "HAP003"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Ms. Phạm Thị D, em gọi lại về HAP003 Ms. đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-31T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "O008"
+        },
+        "must_say_any": [
+          "đang xử lý",
+          "đang chuẩn bị"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-11-02",
+      "days_later": 2,
+      "input_mode": "text",
+      "customer_goal": "Thay đổi địa chỉ giao hàng cho đơn hàng.",
+      "customer_turns": [
+        "Chào em, chị muốn đổi địa chỉ giao hàng cho đơn hàng đang xử lý.",
+        "Chị muốn chuyển sang Long Biên, Hà Nội nhé."
+      ],
+      "facts_established": {
+        "delivery_area": "Long Biên, Hà Nội"
+      },
+      "expected_outcome": "cap_nhat_don",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "order_id": "O008",
+        "order_status": "processing",
+        "call_date": "2026-11-02"
+      },
+      "memory_expectation": {
+        "delivery_area": "Long Biên, Hà Nội"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000004",
+        "customer_id": "SYN-C004",
+        "is_returning": true,
+        "n_previous_sessions": 3,
+        "last_session": {
+          "date": "2026-10-31",
+          "channel": "hotline",
+          "outcome": "cap_nhat_don"
+        },
+        "products_advised": [
+          "HAP003"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào Ms. Phạm Thị D, em gọi lại về HAP003 Ms. đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-02T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "O008",
+          "action": "update_address"
+        }
+      }
+    }
+  }
+}
