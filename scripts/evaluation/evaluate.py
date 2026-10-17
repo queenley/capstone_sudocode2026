@@ -1,11 +1,13 @@
 """Offline evaluation of the AI agent's parts that need no model and no database.
 
-Today: knowledge retrieval (Phụ lục A, M2). The agent's own retriever,
-``mcp/servers/knowledge.py`` (BM25 over the organisers' policy corpus, one
+Today: knowledge retrieval (Phụ lục A, M2). The agent's own knowledge base,
+``components/knowledge`` as the calls use it (BM25 and a local embedding
+fused by Reciprocal Rank Fusion, over the organisers' policy corpus, one
 chunk per ``## [XX-nn]``), answers every question in
 ``data/btc/rag/qa_labeled.json``; the organisers' ``reference_eval.rag_eval``
-scores it (Recall@3/@5, multi-hop, abstain rates). The agent "abstains" the
-way the advisor is told to: no hit, or the best hit is restricted.
+scores it (Recall@3/@5, multi-hop, abstain rates). The agent abstains as its
+search decides: the best passage is restricted, says there is no
+information, or scores under θ (``config/knowledge.yaml``).
 
 End-to-end scores (CCR, RQR, TSR, HR, over-escalation) need the agent running
 against a model: generate scenarios and grade traces with ``scripts/create_data``
@@ -25,7 +27,8 @@ ROOT = Path(__file__).resolve().parents[2]
 AGENT = ROOT / "apps" / "ai-agent-service"
 sys.path.insert(0, str(AGENT / "src"))
 
-from ai_agent_service.mcp.servers.knowledge import bm25, corpus  # noqa: E402
+from ai_agent_service.components import knowledge  # noqa: E402
+from ai_agent_service.mcp.servers import btc  # noqa: E402
 
 BTC = AGENT / "data" / "btc"
 QA_PATH = BTC / "rag" / "qa_labeled.json"
@@ -39,15 +42,14 @@ def reference_eval():
 
 
 def agent_results(questions: list[dict], k: int) -> dict[str, dict]:
-    chunks = corpus()
+    base = knowledge.build()
     results = {}
     for question in questions:
-        ranked = bm25(question["question"], chunks)[:k]
-        abstained = not ranked or ranked[0][1].restricted
+        found = base.search(question["question"], k=k, on=btc.reference_date())
         results[question["qid"]] = {
-            "retrieved_chunk_ids": [chunk.chunk_id for _, chunk in ranked],
-            "scores": [round(score, 3) for score, _ in ranked],
-            "abstained": abstained,
+            "retrieved_chunk_ids": [hit.chunk.chunk_id for hit in found.hits],
+            "scores": [hit.score for hit in found.hits],
+            "abstained": found.abstain,
         }
     return results
 
@@ -66,7 +68,8 @@ def main() -> None:
         scores = reference_eval().rag_eval(str(QA_PATH), str(results_path))
 
     report = {
-        "retrieval": {"retriever": "agent kb_search (BM25, policy corpus)", "n_questions": len(questions), **scores},
+        "retrieval": {"retriever": "agent knowledge base (BM25 + embedding, RRF)", "n_questions": len(questions),
+                      **scores},
         "results": results,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)

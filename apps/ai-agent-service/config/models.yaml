@@ -85,6 +85,36 @@ agents:
       # is a parse failure and a wasted regeneration, not a shorter answer.
       max_tokens: 2048
 
+  # docs/design.md section 9.4 and Appendix C: the evaluation's extractor of
+  # questions, claims and fact use (ai_agent_service/pipeline/eval/extract_command.py,
+  # and scripts/evaluation/agent/extract_command.py for the team's harness). Not
+  # an agent of the product; named here so
+  # its model is one line of config like theirs. On the advisor's Gemini key;
+  # its thinking tokens share the same budget.
+  extractor:
+    provider: google_genai
+    model: gemini-3.5-flash-lite
+    generation:
+      max_tokens: 2048
+
+  # docs/design.md section 5.4: the MemoryAgent reads the customer's words
+  # with one structured-output call after the call; its rules stand in when
+  # this model cannot answer. Off the hot path, so chosen for reading
+  # Vietnamese rather than for speed.
+  memory:
+    provider: google_genai
+    model: gemini-3.5-flash-lite
+    generation:
+      max_tokens: 2048
+
+  # Section 4.4: folds the turns of a long call into working_summary. On the
+  # hot path, but only once a call passes sixteen messages.
+  compactor:
+    provider: google_genai
+    model: gemini-3.5-flash-lite
+    generation:
+      max_tokens: 1024
+
 providers:
   google_genai:
     label: Google AI Studio
@@ -241,3 +271,10 @@ voice:
       ea pua: AirPure
       lõi lộc: lõi lọc
       sai z eo: size L
+      # How spoken Vietnamese spells the catalogue's names; recognisers
+      # write them down the same way.
+      e pia: AirPure
+      run lai: RunLite
+      ka rô phi: Karofi
+      pờ rô: Pro
+      cê ô đê: COD

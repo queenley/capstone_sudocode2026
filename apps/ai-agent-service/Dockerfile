@@ -10,7 +10,8 @@ ARG WITH_VOICE=0
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
     AGENT_HOME=/app/agent \
     PYTHONPATH=/app/shared:/app/service \
-    VOICE_MODELS_DIR=/app/models
+    VOICE_MODELS_DIR=/app/models \
+    EMBEDDING_MODELS_DIR=/app/models/embedding
 
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends libsndfile1 ffmpeg \
@@ -26,6 +27,7 @@ COPY packages/backend-common/src/ /app/shared/src/
 COPY apps/ai-agent-service/src/ /app/service/
 COPY apps/ai-agent-service/config/ /app/agent/config/
 COPY apps/ai-agent-service/data/btc/ /app/agent/data/btc/
+COPY apps/ai-agent-service/data/kb/ /app/agent/data/kb/
 
 RUN useradd --create-home app && mkdir -p /app/models /app/agent/runs \
     && chown -R app:app /app

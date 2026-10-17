@@ -2,9 +2,12 @@
 
 A ReAct loop, ``langchain.agents.create_agent``: a model node calls the
 lane's tools, a tool node runs them, until the model answers without a tool
-call, at most three tool rounds a turn. The model comes from config through
-:class:`~src.agents.base.BaseAgent`; the tools from MCP under the ``advisor``
-role.
+call, at most six tool calls and eight model calls a turn (an order of
+several items needs a quote, a stock check and an order each). The model
+comes from config through :class:`~src.agents.base.BaseAgent`; the tools from
+MCP under the ``advisor`` role. The knowledge base is not one of them: the
+harness retrieves the turn's passages before the advisor runs (section 4.2)
+and they arrive in the context.
 
 **Stateless** (principle 2). The agent holds no checkpointer and nothing
 between calls: the hot graph hands it a slice of its state (section 3.2) as
@@ -38,7 +41,7 @@ import logging
 import time
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Mapping, Sequence
+from typing import Any, AsyncIterator, Literal, Mapping, Sequence
 
 from langchain.agents import create_agent
 from langchain.agents.middleware import (
@@ -48,7 +51,8 @@ from langchain.agents.middleware import (
     ModelRetryMiddleware,
     ToolCallLimitMiddleware,
 )
-from langchain_core.messages import AIMessage, SystemMessage, ToolMessage
+from langchain_core.language_models import BaseChatModel
+from langchain_core.messages import AIMessage, AIMessageChunk, SystemMessage, ToolMessage
 from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import BaseTool
 
@@ -102,9 +106,32 @@ class AgentContext:
     known_orders: frozenset[str] = frozenset()
     #: The customer's phone, raw. Filled into tools by the harness; never shown to the model.
     customer_phone: str | None = None
+    #: This call's address tokens and the addresses behind them, raw, the
+    #: latest last: filled into the tools that take an address (section 4.4).
+    addresses: Mapping[str, str] = field(default_factory=dict)
     #: What the harness fills into a Handoff Brief.
     handoff_defaults: Mapping[str, Any] = field(default_factory=dict)
     switches: Mapping[str, Any] = field(default_factory=dict)
+    #: This turn, for the idempotency key of a write tool (section 6.1).
+    turn_id: str | None = None
+    #: The turn's passages from the knowledge base, already filtered by the
+    #: harness: a restricted one carries no text, a superseded one its dates.
+    knowledge: tuple[Mapping[str, Any], ...] = ()
+    #: What the search found when no passage is shown: that none was relevant.
+    knowledge_note: str | None = None
+    #: What ``route`` adds to the lane's instruction (PB-10, PB-11, a spoken channel).
+    notes: tuple[str, ...] = ()
+    #: Why the lane is CONFIRM_IDENTITY: "probable" (a shared number's question is the harness's own).
+    confirm_reason: str | None = None
+    #: Product codes this call may order, from the brief; codes in this
+    #: turn's tool results are added by the before-write check itself.
+    trusted_skus: frozenset[str] = frozenset()
+    #: The turn's flags from intake (a request for a person, a complaint, ...).
+    flags: Mapping[str, Any] = field(default_factory=dict)
+    #: The customer's words this turn and the agent's last reply, tokenised:
+    #: what the before-write checks read (a deletion needs both).
+    customer_said: str | None = None
+    last_agent_said: str | None = None
 
 
 @dataclass
@@ -118,46 +145,80 @@ class Draft:
     seconds: float
 
 
+@dataclass(frozen=True)
+class AdvisorEvent:
+    """One thing a streamed run produced: a chunk of the answer, a tool round starting, its results, or the end."""
+
+    kind: Literal["text", "tool_started", "tools", "done"]
+    text: str = ""
+    draft: Draft | None = None
+    #: For ``tools``: every tool call of the run so far, as :attr:`Draft.tool_results` lists them.
+    results: tuple[dict[str, Any], ...] = ()
+
+
+#: Section 4.4, "Luật làm đúng từ đầu": every rule the organisers' documents
+#: and grader make knowable is in the first release (principle 8), each
+#: also enforced in code where code can (the guard, the before-write check).
+#: The codes in brackets are the policy sections the rule comes from.
 HARD_RULES = """\
-Bạn là trợ lý bán hàng tự động của một cửa hàng Việt Nam, nói chuyện với khách qua điện thoại hoặc tin nhắn.
+Bạn là trợ lý ảo bán hàng của một cửa hàng Việt Nam, trả lời khách qua điện thoại hoặc tin nhắn. Xưng "em", gọi khách theo danh xưng của khách.
 
-Quy tắc bắt buộc:
-1. Giá, khuyến mãi, tồn kho, thời gian giao, trạng thái đơn: chỉ nói con số vừa có trong kết quả tool của lượt này. Không nhớ giá, không suy ra giá, không làm tròn giá. Giá trong Call Brief là lịch sử: chỉ được nói kiểu "hôm trước bên em báo", còn giá hôm nay phải gọi pricing_get_quote.
-2. Chính sách đổi trả, vận chuyển, bảo hành, thanh toán: tra kb_search rồi mới trả lời. Đoạn bị đánh dấu restricted là nội bộ: từ chối, nói đây là thông tin em không cung cấp được. Đoạn superseded chỉ áp cho đơn tạo trước khi chính sách đổi.
-3. Không bao giờ nhận mình là người thật. Khách hỏi thẳng thì nói thật đây là trợ lý tự động, rồi tiếp tục hỗ trợ.
-4. Không biết thì nói không biết trước ("Dạ phần này em chưa có thông tin chính xác"), rồi mới đề nghị chuyển người phụ trách. Câu hỏi y tế luôn chuyển người (handoff_transfer).
-5. Danh tính chưa xác minh thì không đọc giá đã báo, địa chỉ, mã đơn.
-6. Không hứa điều tool và chính sách không xác nhận. Không bình luận giá của cửa hàng khác. Không tạo áp lực giả khi tồn kho chưa được xác nhận.
-7. Câu chào, câu hỏi làm rõ, điều khách vừa nói thì trả lời ngay, không gọi tool. Có kết quả tool rồi thì không gọi lại cùng tool với cùng tham số.
-8. Số điện thoại, ngày gọi của khách do hệ thống điền vào tool; không hỏi lại số điện thoại khách đã cho. Chuỗi dạng <PHONE_1> là số của khách đã được che, giữ nguyên nếu cần nhắc.
+Nguồn sự thật:
+1. Giá, khuyến mãi, tồn kho, thời gian giao, trạng thái đơn: chỉ nói con số có trong kết quả tool của lượt này (pricing_get_quote, inventory_check, delivery_estimate, order_status, order_create, order_update). Không nhớ, không suy, không làm tròn, không tự cộng tổng. Giá trong Call Brief là lịch sử, chỉ nói kiểu "hôm trước bên em báo"; giá hôm nay phải gọi pricing_get_quote.
+2. Mã sản phẩm (sku, variant_sku) chỉ dùng mã có nguyên văn trong kết quả tool của cuộc gọi này hoặc trong Call Brief; muốn đúng size, màu thì lấy variant_sku từ catalog_search. Không tự ghép mã từ tên.
+3. Chính sách đổi trả, vận chuyển, bảo hành, thanh toán, giờ làm việc: chỉ dựa vào mục "Tài liệu liên quan". Đoạn hết hiệu lực chỉ áp cho đơn tạo trước ngày chính sách đổi. Đoạn nội bộ thì từ chối, không nói gì về giá nhập, nhà cung cấp, giá sàn, biên lợi nhuận (KM-06).
+4. Điều không có trong tài liệu hay kết quả tool: nói ngay "Dạ hiện em chưa có thông tin về …", không đoán, ghi nhận và hẹn phản hồi (PB-05). Không chuyển máy chỉ vì thiếu thông tin.
 
-Cách trả lời: tiếng Việt tự nhiên của nhân viên bán hàng, lịch sự, ngắn gọn, tối đa 3 câu (trừ khi tổng kết đơn). Câu trả lời có thể được đọc thành tiếng: viết văn xuôi thường, không markdown, không in đậm, không gạch đầu dòng. Dùng dạ, vâng, ạ; xưng em. Khi dùng một dòng Call Brief, đánh dấu mã dòng ngay sau ý đó, ví dụ [B2]. Không hỏi lại điều Call Brief đã có."""
+Cách xử lý:
+5. Không bao giờ nhận là người. Khách hỏi người hay máy thì nói thật em là trợ lý ảo của shop và đề nghị chuyển nhân viên nếu khách muốn (PB-07).
+6. Chỉ gọi handoff_transfer khi: câu hỏi về sức khỏe, y tế, thuốc, thai sản, an toàn của trẻ (nói "chưa có thông tin" trước rồi mới chuyển, PB-06); khách đòi gặp người; khiếu nại nghiêm trọng.
+7. Không hỏi lại điều Call Brief đã có. Cần kiểm lại thì hỏi dạng xác nhận ("vẫn … đúng không ạ?"), mỗi thông tin xác nhận tối đa một lần trong cuộc (PB-01).
+8. Khách chê đắt hoặc so giá: không bình luận, không xác nhận hay phủ nhận giá bên khác, không tự giảm giá; nêu quyền lợi có trong tool hoặc tài liệu như bảo hành, quà tặng, đổi trả (PB-02, PB-04).
+9. Khách cần hỏi người nhà: không ép, đề nghị hẹn giờ gọi lại; chỉ nhắc khuyến mãi còn hiệu lực; không tạo khan hiếm giả (PB-03).
+10. Khuyến mãi đã hết hạn thì nói thẳng là đã hết và báo giá hiện tại, không giữ giá cũ (KM-01). Không nhắc khuyến mãi chưa bắt đầu (KM-02).
+11. Chưa gọi inventory_check thì không hứa còn hàng. Hết hàng thì không tạo đơn: nói ngày dự kiến có lại nếu tool có, gợi ý sản phẩm khác hoặc hẹn báo lại (FAQ-10, FAQ-17).
+12. Khách đồng ý mua: ngay trong lượt đó gọi pricing_get_quote (đúng biến thể, số lượng, địa chỉ nếu có), delivery_estimate, rồi order_create với đúng giá cuối; câu trả lời đọc lại đơn một lần: sản phẩm, biến thể, số lượng, giá cuối, thanh toán, thời gian giao (PB-09). Thiếu địa chỉ vẫn tạo đơn được. COD quá 10.000.000đ thì đề nghị chuyển khoản hoặc tách đơn (VC-03).
+13. Hẹn gọi lại: callback_at theo ISO có +07:00, trong giờ làm việc, thứ Hai đến thứ Bảy 08:00–21:00, Chủ nhật 09:00–18:00 (LN-01); tool trả moved_from thì báo khách giờ mới.
+14. Khách muốn xóa dữ liệu: hỏi xác nhận một câu; khách đồng ý thì gọi memory_request_deletion và nói hệ thống sẽ xóa trong 72 giờ (QT-06).
+15. Danh tính chưa xác minh: không đọc giá đã báo, địa chỉ, mã đơn, không nói về lần tư vấn trước.
+16. Không đọc lại đầy đủ số điện thoại, địa chỉ, CCCD, số tài khoản. Chuỗi dạng <PHONE_1>, <ADDR_1> có trong lời khách là thông tin đã che: giữ nguyên nếu cần nhắc lại, không tự tạo chuỗi như vậy. CCCD, số tài khoản không nhận qua hội thoại (PB-08, QT-04).
+17. Xưng hô theo cách khách tự xưng trong cuộc; danh xưng và tên trong hồ sơ chỉ dùng khi khách chưa tự xưng. Hồ sơ và Call Brief là của người đứng tên số điện thoại hay tài khoản này: nếu lời khách cho thấy người đang nói có thể là người khác (tự xưng hoặc nói tên khác hồ sơ, nói mình là người nhà), chưa nhắc thông tin riêng trong brief cho tới khi khách xác nhận qua một câu hỏi (PB-01).
+18. Khách nói đã từng mua hay được tư vấn mà em chưa có Call Brief: xin số điện thoại khách đã dùng lần trước để tra lại.
+19. Gợi ý sản phẩm: đối chiếu từng nhu cầu khách đã nêu với thuộc tính (attributes) của sản phẩm trong kết quả catalog_search, như diện tích phòng (room_area_m2), nhà có trẻ nhỏ (child_safe_lock), rồi mới gợi ý. Ngân sách khách nói "tầm", "khoảng" là ước chừng: khi tìm thì nới chừng 10% thay vì đặt làm mức trần, và nói rõ phần chênh nếu mẫu hợp nhu cầu nhỉnh hơn.
+20. Khách nhắc một thông tin cũ hoặc sai (chính sách cũ, giá cũ): chỉ nói thông tin đang đúng, kèm ngày cập nhật nếu tài liệu có, không nhắc lại con số sai.
+
+Cách trả lời: tiếng Việt tự nhiên của nhân viên bán hàng, có dạ, vâng, ạ; tối đa 3 câu, trừ khi đọc lại đơn; văn xuôi, không markdown, không gạch đầu dòng. Mọi số tiền, số ngày, số tháng viết bằng chữ số: 5.200.000đ, 7 ngày, 24 tháng. Khi dùng một dòng Call Brief, đánh dấu mã dòng ngay sau ý đó, ví dụ [B2] hoặc [B2][B5]; không ghi mã tài liệu như [DT-03] vào câu trả lời."""
 
 LANE_NOTES = {
     "CONTINUITY": (
-        "Khách quen, đã có Call Brief. Mở đầu bằng xác nhận tiếp nối, nhắc tối đa hai thông tin "
-        "(sản phẩm, việc còn dở), không đọc vẹt cả hồ sơ. Không hỏi mở lại: {must_not_ask}."
+        "Khách quen, có Call Brief. Câu đầu tiên của cuộc: chào bằng tên và danh xưng, một câu xác nhận tiếp nối "
+        "nhắc tối đa hai thông tin (sản phẩm, việc còn dở) có đánh dấu [Bn], rồi hỏi khách muốn tiếp tục thế nào; "
+        "không đọc vẹt cả hồ sơ. Sau đó dùng thông tin trong brief đúng lúc cần và đánh dấu [Bn]. "
+        "Không hỏi mở lại: {must_not_ask}."
     ),
-    "NEW": "Khách mới hoặc chưa có gì để tiếp nối. Hỏi nhu cầu từng ý một, tư vấn dựa trên catalog.",
-    "CONFIRM_IDENTITY": (
-        "Danh tính chưa chắc chắn ({tier}). Hỏi đúng MỘT câu xác nhận. Nếu có Call Brief, hỏi về sản phẩm "
-        "đã tư vấn lần trước, không nêu giá, địa chỉ hay mã đơn. Nếu số này thuộc nhiều người, hỏi tên "
-        "của khách mà không nhắc thông tin của ai: \"Dạ cho em xin tên của mình để em xem đúng thông tin ạ?\" "
-        "Lượt này không có tool: không nói sẽ kiểm tra, không bảo khách chờ; câu trả lời kết thúc bằng câu hỏi xác nhận đó."
-    ),
+    "NEW": "Khách mới hoặc chưa có gì để tiếp nối. Hỏi nhu cầu còn thiếu, mỗi lượt một câu hỏi, rồi tư vấn từ catalog_search.",
     "ORDER_SERVICE": (
-        "Khách hỏi về đơn đã đặt. Tra order_status, đổi size hoặc sản phẩm bằng order_update, và báo đúng "
-        "phí, chênh lệch, thời gian hoàn tiền mà tool trả về."
+        "Khách hỏi về đơn đã đặt. Tra order_status; đổi size, đổi sản phẩm, trả hàng, đổi địa chỉ bằng order_update; "
+        "báo đúng phí, chênh lệch, số tiền và thời gian hoàn tiền mà tool trả về."
     ),
     "OUT_OF_SCOPE": (
-        "Câu hỏi này nằm ngoài tài liệu. Thừa nhận trước là em chưa có thông tin chính xác. Chỉ gọi "
-        "handoff_transfer khi khách muốn gặp người hoặc chủ đề bắt buộc chuyển (câu hỏi y tế); còn lại "
-        "dừng ở lời thừa nhận và hỏi khách cần gì thêm."
+        "Câu hỏi ngoài tài liệu hoặc phải chuyển người. Câu đầu tiên là \"Dạ hiện em chưa có thông tin về …\". "
+        "Câu hỏi về sức khỏe, y tế, thuốc, thai sản, an toàn của trẻ, hoặc khách muốn gặp người: gọi handoff_transfer "
+        "với escalation_reason đúng. Còn lại: ghi nhận câu hỏi, hẹn phản hồi, không gọi tool."
     ),
     "CLARIFY": "Em nghe chưa rõ. Hỏi lại đúng một câu ngắn, không đoán nội dung, không gọi tool.",
     "HANDOFF": (
-        "Hệ thống đang gặp trục trặc hoặc đã phải dùng câu an toàn nhiều lần. Xin lỗi ngắn gọn rồi gọi "
+        "Hệ thống đang trục trặc hoặc đã phải dùng câu an toàn nhiều lần. Xin lỗi ngắn gọn rồi gọi "
         "handoff_transfer với escalation_reason loi_he_thong."
+    ),
+}
+
+#: CONFIRM_IDENTITY by its reason (section 4.2): one question, nothing private before it is answered.
+#: A shared number has no note: its question is the harness's fixed line, and no model is called.
+CONFIRM_NOTES = {
+    "probable": (
+        "Khách vừa đọc một số điện thoại có trong hồ sơ nhưng chưa xác nhận. Hỏi đúng MỘT câu xác nhận về sản phẩm "
+        "đã tư vấn lần trước; không nêu giá, địa chỉ, mã đơn."
     ),
 }
 
@@ -188,26 +249,48 @@ SPOKEN_NOTE = (
 )
 
 
-def system_prompt(context: AgentContext, *, max_tokens: int = 3000) -> tuple[str, tuple[str, ...]]:
-    """The system message in section 4.4's order, and the sections that were cut."""
-    lane = LANE_NOTES.get(context.lane, "").format(
-        must_not_ask=", ".join(context.must_not_ask) or "không có", tier=context.tier
-    )
+#: Passages shown to the model per turn (section 4.2: five retrieved, three allowed in).
+KNOWLEDGE_SHOWN = 3
+
+
+def lane_instruction(context: AgentContext) -> str:
+    """The lane's instruction with the notes ``route`` and the channel add."""
+    if context.lane == "CONFIRM_IDENTITY":
+        text = CONFIRM_NOTES.get(context.confirm_reason or "probable", CONFIRM_NOTES["probable"])
+    else:
+        text = LANE_NOTES.get(context.lane, "").format(must_not_ask=", ".join(context.must_not_ask) or "không có")
+    extra = list(context.notes)
     if context.mode == "copilot":
-        lane = f"{lane}\n{COPILOT_NOTE}"
+        extra.append(COPILOT_NOTE)
     if context.channel == "hotline":
-        lane = f"{lane}\n{SPOKEN_NOTE}"
+        extra.append(SPOKEN_NOTE)
+    return "\n".join([text, *extra]).strip()
+
+
+def system_prompt(context: AgentContext, *, max_tokens: int = 3000) -> tuple[str, tuple[str, ...]]:
+    """The system message in section 4.4's order, and the sections that were cut.
+
+    1 rules, 2 warnings (both never cut), 3 the lane, 4 the brief lines the
+    tier allows, 5 the summary of older turns (the last four travel as
+    messages), 6 the turn's knowledge passages, 7 the playbook entries of the
+    situation, 8 tool results already gathered (a regeneration), 9 why the
+    previous draft was blocked. Cut from the bottom when over budget.
+    """
     brief = "\n".join(f"{line.id}. {line.text}" for line in context.brief_lines)
+    policy, playbook = shown_passages(context.knowledge)
     sections = [
         Section("rules", HARD_RULES),
         Section("warnings", "\n".join(f"CẢNH BÁO: {w}" for w in context.warnings)),
         Section("lane", (
             f"Lane: {context.lane}. Mức xác minh danh tính: {context.tier}. Kênh: {context.channel}."
-            + (f" Gọi khách là {context.address_as}." if context.address_as else " Chưa biết tên khách: gọi anh/chị.")
-            + f"\n{lane}"
+            + (f" Hồ sơ đứng tên: {context.address_as}." if context.address_as
+               else " Chưa biết khách là ai: gọi anh/chị cho tới khi khách tự xưng.")
+            + f"\n{lane_instruction(context)}"
         ).strip()),
         Section("brief", f"Call Brief:\n{brief}" if brief else ""),
         Section("summary", f"Tóm tắt các lượt trước:\n{context.working_summary}" if context.working_summary else ""),
+        Section("knowledge", _knowledge_block("Tài liệu liên quan", policy) or context.knowledge_note or ""),
+        Section("playbook", _knowledge_block("Kinh nghiệm xử lý đã được duyệt", playbook)),
         Section("tool_results", _tool_block(context.tool_results)),
         Section("opening", OPENING[bool(context.brief_lines)] if context.phase == "opening" else ""),
         Section("blocked", (
@@ -217,6 +300,33 @@ def system_prompt(context: AgentContext, *, max_tokens: int = 3000) -> tuple[str
     ]
     pack = assemble(sections, max_tokens=max_tokens)
     return pack.text, pack.cut
+
+
+def shown_passages(knowledge: Sequence[Mapping[str, Any]]) -> tuple[list[Mapping[str, Any]], list[Mapping[str, Any]]]:
+    """What the model reads of a turn's passages: the first three from the documents, and the playbook entries.
+
+    The guard checks a reply against these and no others: a number from a
+    passage the model never saw cannot be a number it read (section 4.5).
+    """
+    policy = [p for p in knowledge if p.get("source") != "playbook"][:KNOWLEDGE_SHOWN]
+    playbook = [p for p in knowledge if p.get("source") == "playbook"]
+    return policy, playbook
+
+
+def _knowledge_block(heading: str, passages: Sequence[Mapping[str, Any]]) -> str:
+    """Passages as the model reads them: a restricted one as a refusal, a superseded one with its dates."""
+    if not passages:
+        return ""
+    lines = []
+    for passage in passages:
+        code = passage.get("chunk_id") or "?"
+        title = passage.get("title") or ""
+        if passage.get("restricted"):
+            lines.append(passage.get("instruction") or f"Đoạn [{code}] là thông tin nội bộ: không đọc, không trích.")
+            continue
+        validity = f" (đoạn này {passage['validity']})" if passage.get("superseded") and passage.get("validity") else ""
+        lines.append(f"[{code}] {title}{validity}: {str(passage.get('text') or '').strip()}")
+    return f"{heading}:\n" + "\n".join(lines)
 
 
 def _tool_block(results: Sequence[Mapping[str, Any]]) -> str:
@@ -262,10 +372,14 @@ class ActionGuardMiddleware(AgentMiddleware):
         args = dict(call.get("args") or {})
         if name == "handoff_transfer":
             args["brief"] = actions.fill_handoff(args.get("brief") or {}, context.handoff_defaults)
-        quotes = {**context.quotes, **_quotes_in(getattr(request, "state", None) or {})}
+        state = getattr(request, "state", None) or {}
+        quotes = {**context.quotes, **_quotes_in(state)}
+        codes, orders = _seen_in(state, context.tool_results)
         verdict = actions.check(
             name, args, tier=context.tier, mode=context.mode, has_phone=bool(context.customer_phone),
-            quotes=quotes, orders=context.known_orders,
+            quotes=quotes, orders=context.known_orders | orders, trusted=context.trusted_skus | codes | set(quotes),
+            lane=context.lane, flags=context.flags, now=context.now,
+            last_agent_said=context.last_agent_said, customer_said=context.customer_said,
         )
         if not verdict.passed:
             envelope = {"ok": False, "error": {"code": "PRECONDITION", "retryable": False, "message": " ".join(verdict.reasons)}}
@@ -274,6 +388,32 @@ class ActionGuardMiddleware(AgentMiddleware):
                 additional_kwargs={"args": args, "blocked_by": "guardrail"},
             )
         return await handler(request.override(tool_call={**call, "args": args}))
+
+
+def _seen_in(state: Mapping[str, Any], earlier: Sequence[Mapping[str, Any]]) -> tuple[frozenset[str], frozenset[str]]:
+    """Product codes and order ids the tools showed in this run and earlier in this turn: what may be acted on."""
+    envelopes = [envelope_of(m) for m in state.get("messages") or [] if isinstance(m, ToolMessage)]
+    envelopes += [r.get("result") for r in earlier]
+    codes: set[str] = set()
+    orders: set[str] = set()
+
+    def walk(value: Any) -> None:
+        if isinstance(value, dict):
+            for key in ("sku", "variant_sku", "successor_sku", "new_variant_sku"):
+                if isinstance(value.get(key), str):
+                    codes.add(value[key])
+            if isinstance(value.get("order_id"), str):
+                orders.add(value["order_id"])
+            for item in value.values():
+                walk(item)
+        elif isinstance(value, list):
+            for item in value:
+                walk(item)
+
+    for envelope in envelopes:
+        if isinstance(envelope, dict) and envelope.get("ok"):
+            walk(envelope.get("data"))
+    return frozenset(codes), frozenset(orders)
 
 
 def _quotes_in(state: Mapping[str, Any]) -> dict[str, int]:
@@ -291,10 +431,9 @@ def _quotes_in(state: Mapping[str, Any]) -> dict[str, int]:
 class AdvisorAgent(BaseAgent):
     """Drafts the reply for one turn, from the slice of state it is given."""
 
-    #: At most three tool rounds a turn; one model call per round, one for the
-    #: answer, and one more to act on the tool cap's notice.
-    TOOL_CALLS_PER_RUN = 3
-    MODEL_CALLS_PER_RUN = TOOL_CALLS_PER_RUN + 2
+    #: Section 4.4: at most six tool calls and eight model calls a turn.
+    TOOL_CALLS_PER_RUN = 6
+    MODEL_CALLS_PER_RUN = 8
 
     def __init__(
         self,
@@ -303,21 +442,28 @@ class AdvisorAgent(BaseAgent):
         model: str | None = None,
         tools: Sequence[BaseTool] | None = None,
         generation: Mapping[str, Any] | None = None,
+        retries: int = 1,
+        llm: BaseChatModel | None = None,
     ) -> None:
-        super().__init__("advisor", provider=provider, model=model, generation=generation)
+        """``retries`` is the one retry of a failed model call and of a
+        retryable tool failure (sections 4.9 and 6.1). An evaluation harness
+        that must see every attempt sets it to 0. ``llm`` replaces the model
+        from config, for offline tests."""
+        super().__init__("advisor", provider=provider, model=model, generation=generation, llm=llm)
         self._tools = list(tools or ())
         names = [tool.name for tool in self._tools]
+        retry = [ModelRetryMiddleware(max_retries=retries, initial_delay=1.0, on_failure="error")] if retries else []
         self._graph = create_agent(
             model=self.llm,
             tools=self._tools,
             middleware=[
                 ContextPromptMiddleware(),
-                ModelRetryMiddleware(max_retries=1, initial_delay=1.0, on_failure="error"),
+                *retry,
                 ModelCallLimitMiddleware(run_limit=self.MODEL_CALLS_PER_RUN, exit_behavior="error"),
                 ToolCallLimitMiddleware(run_limit=self.TOOL_CALLS_PER_RUN, exit_behavior="continue"),
                 LaneToolsMiddleware(get_lanes(), names),
                 ActionGuardMiddleware(),
-                ToolGuardMiddleware(names),
+                ToolGuardMiddleware(names, retries=retries),
             ],
             context_schema=AgentContext,
             name=self.name,
@@ -353,6 +499,52 @@ class AdvisorAgent(BaseAgent):
             {"messages": messages}, config=self.run_config(context, user_id=user_id), context=context
         )
         produced = result["messages"][len(messages):]
+        return self._draft_of(produced, started)
+
+    async def stream(
+        self, messages: list[Any], context: AgentContext, *, user_id: str | None = None
+    ) -> AsyncIterator[AdvisorEvent]:
+        """Run the loop once over *messages*, yielding the answer as it is written.
+
+        Text arrives in chunks from the model node; a model call that turns
+        out to call tools says so with ``tool_started``, once per call, and
+        ``tools`` follows when they have answered, with every result so far,
+        so a sentence can be checked against them before the run ends. The
+        last event is ``done`` with the whole :class:`Draft`, as :meth:`draft`
+        would return it. Closing the iterator early stops the run: that is how
+        the harness abandons a draft whose sentence the guard blocked
+        (section 4.8).
+        """
+        started = time.perf_counter()
+        produced: list[Any] = []
+        announced: set[str] = set()
+        async for mode, chunk in self._graph.astream(
+            {"messages": messages}, config=self.run_config(context, user_id=user_id), context=context,
+            stream_mode=["messages", "updates"],
+        ):
+            if mode == "updates":
+                fresh = [m for update in chunk.values() if isinstance(update, dict) for m in update.get("messages") or []]
+                produced.extend(fresh)
+                if any(isinstance(m, ToolMessage) for m in fresh):
+                    yield AdvisorEvent("tools", results=tuple(tool_results_of(produced)))
+                continue
+            message, meta = chunk
+            # A model that streams sends chunks; one that does not sends its
+            # whole message once, which is a chunk's parent class.
+            if meta.get("langgraph_node") != "model" or not isinstance(message, AIMessage):
+                continue
+            calls = message.tool_call_chunks if isinstance(message, AIMessageChunk) else message.tool_calls
+            if calls:
+                if message.id not in announced:
+                    announced.add(message.id or "")
+                    yield AdvisorEvent("tool_started")
+                continue
+            text = text_of(message, strip=False)
+            if text:
+                yield AdvisorEvent("text", text=text)
+        yield AdvisorEvent("done", draft=self._draft_of(produced, started))
+
+    def _draft_of(self, produced: Sequence[Any], started: float) -> Draft:
         return Draft(
             text=_final_text(produced),
             tool_results=tool_results_of(produced),

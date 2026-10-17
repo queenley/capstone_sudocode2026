@@ -31,14 +31,14 @@ flowchart LR
     API -->|transcript đã che PII,<br/>handoff của agent| PDB
 ```
 
-1. **perceive**: chuẩn hóa văn bản (teencode, ký tự ẩn), đổi số nói thành số ("mười tám triệu" → 18.000.000đ), thay số điện thoại/CCCD/số tài khoản bằng token `<PHONE_1>`. Giá trị thật nằm trong vault mã hóa AES-GCM. Model, Jev, trace và checkpoint chỉ thấy token.
-2. **load_context**: xác định khách (tier `VERIFIED` / `PROBABLE` / `AMBIGUOUS` / `UNKNOWN`) và dựng CallBrief từ fact ledger.
+1. **perceive**: chuẩn hóa văn bản (teencode, ký tự ẩn), sửa tên sản phẩm ASR nghe sai, đổi số nói thành số ("mười tám triệu" → 18.000.000đ, "tối mai 8 giờ" → giờ ISO), thay số điện thoại/CCCD/số tài khoản/địa chỉ bằng token `<PHONE_1>`, `<ADDR_1>`. Giá trị thật nằm trong vault mã hóa AES-GCM. Model, Jev, trace và checkpoint chỉ thấy token; tool cần địa chỉ thì harness điền lại địa chỉ thật.
+2. **load_context**: xác định khách (tier `VERIFIED` / `PROBABLE` / `AMBIGUOUS` / `UNKNOWN`), dựng CallBrief từ fact ledger, rồi tra kho tri thức bằng lời khách (`kb_search`: BM25 + embedding local, gộp RRF, chọn đúng phiên bản chính sách theo ngày đặt đơn).
 3. **route**: chọn lane bằng luật (bảng dưới). Lane quyết định advisor được thấy tool nào.
-4. **advisor**: model trong `config/models.yaml` (mặc định Gemini) gọi tool kiểu ReAct qua MCP.
-5. **guard**:
-   - Hard guard kiểm tra: mọi số tiền phải có trong kết quả tool, lời khách hoặc chính sách; mã đơn chỉ đọc cho khách đã xác minh; không lộ PII thô hay giá nhập; không nhận là người; trả lời tiếng Việt và ngắn gọn.
-   - Sau đó Jev (PolicyAgent) chấm theo chính sách.
-   - Nếu trượt, advisor viết lại tối đa 2 lần; sau đó agent dùng câu an toàn.
+4. **advisor**: model trong `config/models.yaml` gọi tool kiểu ReAct qua MCP. Câu trả lời được stream và cắt theo câu; mỗi câu qua guard rồi mới phát (SSE `delta`). Câu đệm khi đang gọi tool không tính là câu trả lời.
+5. **guard** (từng câu khi stream, cả bản nháp khi ở chế độ copilot):
+   - Hard guard kiểm tra: mọi số tiền (cả viết bằng chữ) phải có trong kết quả tool, lời khách hoặc tài liệu đã đưa cho model; thời hạn ngày/tháng, tồn kho, mã khuyến mãi phải có nguồn; không nhắc khuyến mãi chưa bắt đầu; mã đơn chỉ đọc cho khách đã xác minh; không lộ PII thô hay giá nhập; không nhận là người; câu thừa nhận thiếu thông tin dùng đúng cụm BTC chấm; trả lời tiếng Việt và ngắn gọn.
+   - Sau đó Jev (PolicyAgent) chấm theo chính sách, chỉ với câu có tín hiệu rủi ro.
+   - Chặn trước khi phát thì advisor viết lại tối đa 2 lần; chặn khi đã phát một phần thì dừng và nói câu an toàn.
 6. **respond / persist**: giải token (khách thấy lại số của mình), lưu lượt và checkpoint.
 
 Giao diện trên web:
@@ -55,13 +55,15 @@ Khi cuộc gọi kết thúc, after_call chạy MemoryAgent (ghi fact ledger) v�
 |---|---|---|
 | 1 | `HANDOFF` | ≥ 2 lỗi tool hoặc ≥ 2 câu an toàn trong cuộc gọi |
 | 2 | `CLARIFY` | ASR không chắc |
-| 3 | `CONFIRM_IDENTITY` | tier `PROBABLE` / `AMBIGUOUS` |
+| 3 | `CONFIRM_IDENTITY` | tier `PROBABLE` / `AMBIGUOUS`, khi câu hỏi xác nhận duy nhất còn chờ trả lời |
 | 4 | `ORDER_SERVICE` | khách có đơn và đang nói về đơn |
 | 5 | `OUT_OF_SCOPE` | chủ đề phải chuyển người (PB-06), ví dụ khiếu nại pháp lý |
 | 6 | `CONTINUITY` | khách `VERIFIED` quay lại, đã có brief |
 | 7 | `NEW` | mặc định |
 
 Luật khớp đầu tiên thắng. Khách xin gặp nhân viên ở lane `NEW` thì advisor tự gọi `handoff.transfer`.
+
+Những gì cần đọc hiểu lời khách không nằm trong luật mà nằm trong instruction của advisor (`agents/advisor.py`): tài liệu có trả lời được câu hỏi không, người đang nói có đúng là người trong hồ sơ không (xưng hô khác, tên khác), xử lý khách chê đắt hay so giá. Số dùng chung: câu hỏi tên do harness nói nguyên văn, hỏi đúng một lần. Khách khai số giữa cuộc mà chưa xác nhận rõ thì sau cuộc gọi MemoryAgent đọc cả cuộc để quyết định có ghi vào hồ sơ đó không; không chắc thì không ghi vào ai.
 
 ### Khi thiếu cấu hình
 
@@ -91,18 +93,19 @@ Luật khớp đầu tiên thắng. Khách xin gặp nhân viên ở lane `NEW` 
 
 Thư mục ngoài `src/`:
 
-- `config/`: `models.yaml` (agent → provider/model, rate limit), `lanes.yaml`, `situations.yaml`.
+- `config/`: `models.yaml` (agent → provider/model, rate limit), `lanes.yaml`, `situations.yaml`, `knowledge.yaml` (phiên bản tri thức, tham số truy hồi, ngưỡng θ, model embedding).
 - `data/btc/`: gói của BTC gồm catalog, CRM, chính sách, `mock_tools.py`, `reference_eval.py`, test set.
+- `data/kb/v<N>.jsonl`: các mục FAQ/playbook đã duyệt của từng phiên bản tri thức; `v0` chưa có mục nào.
 
 ### MCP tools
 
 | Server | Tool |
 |---|---|
-| catalog | `catalog_search`, `inventory_check`, `pricing_get_quote` |
+| catalog | `catalog_search`, `inventory_check`, `pricing_get_quote`, `delivery_estimate` |
 | crm | `crm_get_customer`, `order_create`, `schedule_callback`, `handoff_transfer` |
 | order | `order_status`, `order_update` |
-| memory | `identity_find`, `identity_link_provisional`, `memory_get_profile`, `memory_get_episodes`, `memory_get_open_items`, `memory_commit_*`, `memory_confirm_identity`, `memory_delete_customer` |
-| knowledge | `kb_search`, `kb_upsert` (chỉ admin) |
+| memory | `identity_find`, `identity_link_provisional`, `memory_get_profile`, `memory_get_episodes`, `memory_get_open_items`, `memory_commit_*`, `memory_confirm_identity`, `memory_request_deletion`, `memory_delete_customer` |
+| knowledge | `kb_search` (harness, admin), `kb_upsert` (chỉ admin) |
 
 Catalog, CRM và order bọc `mock_tools.py` của BTC. Trạng thái mock (đơn đã tạo, lịch gọi lại, khuyến mãi đã dùng) lưu ở một dòng `mock_state` có khóa advisory, nên ba tiến trình thấy cùng một trạng thái và vẫn còn sau restart. Nhờ vậy giá, khuyến mãi, tồn kho và giới hạn COD luôn khớp với cách BTC chấm. Trên dây, tên tool dùng dấu chấm (`catalog.search`) như trong đề.
 
@@ -142,6 +145,7 @@ Test `tests/agent/test_btc_contract.py` giữ các điểm trên. Mọi tên slo
 | `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_BASE_URL` | tracing (đã che PII), tùy chọn |
 | `MLFLOW_TRACKING_URI` | metric tổng hợp theo lượt, tùy chọn |
 | `VOICE_MODELS_DIR` | weights voice, tải một lần (image: `/app/models`, volume) |
+| `EMBEDDING_MODELS_DIR` | model embedding của kho tri thức (multilingual-e5-small, 118 MB), knowledge server tự tải lần đầu (image: `/app/models/embedding`); không có mạng thì chỉ tra theo từ khóa |
 | `AGENT_HOME` | nơi chứa `config/` và `data/btc` (image: `/app/agent`) |
 
 Đổi model hoặc provider của advisor: sửa `config/models.yaml`, hoặc chọn tạm trong Agent Console (`/developer`); lựa chọn tạm mất khi restart.
@@ -166,13 +170,21 @@ Docker: `docker compose up --build ai-agent-service`. Thêm voice bằng `--buil
 - `python -m pytest -q` (từ root):
   - `tests/agent/` kiểm tra lane, hard guard, PII, ITN;
   - `tests/test_agent_turns.py` kiểm tra route với agent giả lập.
-- `python -m scripts.evaluation.evaluate`: Recall@k của `kb_search` trên `data/btc/rag/qa_labeled.json`.
+- `python -m scripts.evaluation.evaluate`: Recall@k của kho tri thức trên `data/btc/rag/qa_labeled.json`.
+- Lệnh đánh giá dạng BTC, `run_eval.py` ở thư mục gốc repo: chạy agent thật trên kịch bản định dạng BTC, ghi trace, chấm bằng `reference_eval.py`, kèm bảng RAG. Cần PostgreSQL và key model; tự dùng database `<tên>_eval`. Từ thư mục gốc:
+
+  ```powershell
+  apps/ai-agent-service/.venv/Scripts/python run_eval.py --scenarios apps/ai-agent-service/data/btc/test_set/public_sample --only SAMPLE-01 --provider google_genai --model gemini-3.5-flash-lite
+  ```
+
+  `--config full --out full.jsonl` chỉ ghi một trace, đúng dạng lệnh BTC yêu cầu. Kết quả ở `apps/ai-agent-service/runs/<thời-điểm>/`: `full.jsonl`, `baseline.jsonl`, `report.json`, `table.txt`, `diagnostics.jsonl`, `errors.jsonl`, `manifest.json`, `rag/`.
+- `python -m ai_agent_service.pipeline.eval.rag --calibrate`: chỉ đo truy hồi và đề xuất θ từ nửa câu hỏi dùng để dò.
 - Chỉ số Chương A: `scripts/create_data` + `data/btc/eval/reference_eval.py`. Xem [docs/evaluation](../../docs/evaluation/README.md).
 
 ## Giới hạn (kế thừa từ agent tham chiếu)
 
-- `pipeline/eval/runner.py`, `components/improvement/*`, `components/evaluation/*`, `agents/simulator.py` mới là stub (`NotImplementedError`). Không file nào nằm trên đường chạy của một lượt.
-- `kb_search` chỉ từ chối khi không tìm thấy gì: từ chối 0% câu không có đáp án, trong khi baseline của `scripts/create_data` từ chối 87,5%. Nên port luật `should_abstain`.
-- Địa chỉ chưa được mã hóa thành token (`<ADDR_n>` đã giữ chỗ). Số điện thoại, CCCD và số tài khoản thì đã có.
+- `components/improvement/*`, `components/evaluation/rubric.py`, `agents/simulator.py` mới là stub (`NotImplementedError`). Không file nào nằm trên đường chạy của một lượt.
+- Truy hồi trên 60 câu có nhãn của BTC (`rag_eval`): Recall@3 91,5, Recall@5 93,2, từ chối đúng 75% câu không có đáp án và 60% câu nội bộ, không từ chối nhầm câu nào.
+- WER/CER của ASR chưa có lệnh xuất `hypotheses.json`: gói BTC chưa kèm audio.
 - Lệnh xóa dữ liệu khách của platform chưa xóa `pii_vault` và fact ledger của agent.
 - Thay đổi runtime (model, voice, ngày nghiệp vụ) nằm trong bộ nhớ tiến trình: mỗi replica giữ giá trị riêng và mất khi restart.

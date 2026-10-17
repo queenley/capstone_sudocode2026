@@ -37,6 +37,7 @@ ROOT = Path(os.environ.get("AGENT_HOME") or Path(__file__).resolve().parents[3])
 CONFIG_DIR = ROOT / "config"
 MODELS_YAML = CONFIG_DIR / "models.yaml"
 LANES_YAML = CONFIG_DIR / "lanes.yaml"
+KNOWLEDGE_YAML = CONFIG_DIR / "knowledge.yaml"
 
 # Loaded once, here. override=False leaves a variable that is already set
 # alone, so an IDE run configuration, the shell and CI can each override .env
@@ -55,6 +56,19 @@ def btc_data_dir() -> Path:
     """
     raw = os.environ.get("BTC_DATA_DIR")
     return Path(raw).expanduser().resolve() if raw else ROOT / "data" / "btc"
+
+
+def kb_dir() -> Path:
+    """The approved knowledge versions, ``data/kb/v<N>.jsonl`` (``docs/design.md`` section 7.5)."""
+    return ROOT / "data" / "kb"
+
+
+def embedding_dir() -> Path:
+    """Where the embedding model's files live: ``models/embedding`` under the
+    service home, or ``EMBEDDING_MODELS_DIR`` (a volume in the container, as
+    for the voice models, so a restart does not download it again)."""
+    raw = os.environ.get("EMBEDDING_MODELS_DIR")
+    return Path(raw).expanduser().resolve() if raw else ROOT / "models" / "embedding"
 
 # Provider id -> the environment variable holding its key. For the chat
 # providers it is the one each LangChain integration reads by itself; the
@@ -217,6 +231,46 @@ class VoiceConfig(BaseModel):
     false_interruption_ms: int = Field(default=2500, ge=500, le=10000)
     tts: str = "vieneu:"
     lexicon: dict[str, Any] = Field(default_factory=dict)
+
+
+class KnowledgeRetrieval(BaseModel):
+    """How the knowledge base searches (``docs/design.md`` section 7.3)."""
+
+    model_config = {"extra": "forbid"}
+
+    top_k: int = Field(default=5, ge=1, le=10)
+    fusion_k: int = Field(default=60, ge=1)
+    k1: float = Field(default=1.2, gt=0)
+    b: float = Field(default=0.75, ge=0, le=1)
+    accents: bool = True
+    #: θ on the best passage's cosine, with an embedding model.
+    abstain_cosine: float = Field(default=0.0, ge=0, le=1)
+    #: θ on the best passage's share of the question, keyword-only.
+    abstain_coverage: float = Field(default=0.0, ge=0, le=1)
+
+
+class KnowledgeEmbedding(BaseModel):
+    """The local embedding model: where it comes from and how it runs."""
+
+    model_config = {"extra": "forbid"}
+
+    repo: str
+    #: The folder under :func:`embedding_dir` that holds it.
+    name: str
+    model_file: str
+    threads: int = Field(default=2, ge=1, le=16)
+
+
+class KnowledgeConfig(BaseModel):
+    """All of ``config/knowledge.yaml``."""
+
+    model_config = {"extra": "forbid"}
+
+    #: The approved entries in force: ``data/kb/v<version>.jsonl``.
+    version: int = Field(ge=0)
+    retrieval: KnowledgeRetrieval = Field(default_factory=KnowledgeRetrieval)
+    #: None runs keyword-only.
+    embedding: KnowledgeEmbedding | None = None
 
 
 class ModelsConfig(BaseModel):
@@ -392,6 +446,12 @@ def _load_yaml(path: Path) -> Any:
 def get_models_config() -> ModelsConfig:
     """Parse ``config/models.yaml``, validating its shape."""
     return ModelsConfig.model_validate(_load_yaml(MODELS_YAML))
+
+
+@lru_cache(maxsize=1)
+def get_knowledge_config() -> KnowledgeConfig:
+    """Parse ``config/knowledge.yaml``, validating its shape."""
+    return KnowledgeConfig.model_validate(_load_yaml(KNOWLEDGE_YAML))
 
 
 @lru_cache(maxsize=1)

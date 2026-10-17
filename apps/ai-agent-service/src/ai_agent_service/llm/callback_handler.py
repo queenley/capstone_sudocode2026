@@ -146,7 +146,7 @@ class TokenTrackingCallback(BaseCallbackHandler):
 _THINKING_TYPES = {"thinking", "reasoning", "redacted_thinking", "reasoning_content"}
 
 
-def text_of(message: BaseMessage) -> str:
+def text_of(message: BaseMessage, *, strip: bool = True) -> str:
     """The answer as a plain string, whatever shape the provider used.
 
     ``message.content`` is a string for most providers, but Gemini 3.x returns
@@ -159,10 +159,13 @@ def text_of(message: BaseMessage) -> str:
     flags ``thought``. A ``signature`` alone does not make a block thinking:
     Gemini 3.5 attaches a thought signature to the answer's own text block
     too, and dropping it left every reply empty (2026-09-26).
+
+    ``strip=False`` keeps the whitespace, for a streamed chunk: the space
+    between two tokens is part of the answer.
     """
     content = getattr(message, "content", "")
     if isinstance(content, str):
-        return content.strip()
+        return content.strip() if strip else content
 
     parts: list[str] = []
     for block in content or []:
@@ -178,4 +181,5 @@ def text_of(message: BaseMessage) -> str:
         text = block.get("text")
         if text:
             parts.append(text)
-    return "".join(parts).strip()
+    joined = "".join(parts)
+    return joined.strip() if strip else joined

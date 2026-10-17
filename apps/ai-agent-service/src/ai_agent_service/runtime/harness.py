@@ -13,9 +13,9 @@ through.
 :func:`run_turn` is the one way a turn is taken, whether it came as a chat
 message over SSE or as speech over the voice WebSocket. It times the turn
 the organisers' way (``eval/huong-dan-do-latency.md``): from the request
-reaching the API to the answer being ready to emit, in integer
-milliseconds. Not streaming, so TTFT equals Total (their rule 7). A filler
-line is never counted.
+reaching the API, in integer milliseconds. The answer streams a checked
+sentence at a time (``docs/design.md`` section 4.8): TTFT is the first
+sentence said, Total the end of the turn. A filler line is never counted.
 
 :func:`remember` runs ``after_call`` once a call has ended.
 """
@@ -28,11 +28,12 @@ import logging
 import time
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any
+from typing import Any, Awaitable, Callable
 
 from langchain_core.messages import AIMessage, HumanMessage
 
 from ..agents.advisor import AdvisorAgent
+from ..agents.base import model_for
 from ..agents.memory import MemoryAgent
 from ..agents.policy import PolicyAgent
 from ..agents.qa import QaAgent
@@ -67,12 +68,16 @@ class Collaborators:
     memory: MemoryAgent = field(default_factory=MemoryAgent)
     qa: QaAgent = field(default_factory=QaAgent)
     writer: ToolBox | None = None
+    #: Folds a long call into ``working_summary``; None folds extractively.
+    compactor: Any = None
 
 
 _built: Collaborators | None = None
 _lock = asyncio.Lock()
 _turns_timed = 0
 _background: set[asyncio.Task[Any]] = set()
+#: The ``admin`` role, opened the first time a call must carry out a deletion (QT-06).
+_admin = mcp_client.lazy_toolbox("admin", timeout=10.0)
 
 
 async def ready() -> Collaborators:
@@ -90,6 +95,7 @@ async def ready() -> Collaborators:
                 advisor=_advisor(advisor_tools),
                 policy=PolicyAgent(),
                 harness=ToolBox(harness_tools),
+                compactor=model_for("compactor"),
             )
     return _built
 
@@ -177,12 +183,22 @@ async def run_turn(
     input_mode: str | None = None,
     asr_confidence: float | None = None,
     memory: bool = True,
+    emit: Callable[[str, str], Awaitable[None]] | None = None,
 ) -> Outcome:
-    """Take one turn through the hot graph; the caller holds the call's lease."""
+    """Take one turn through the hot graph; the caller holds the call's lease.
+
+    *emit* hears each sentence the moment the guard lets it be said, its
+    tokens already restored for the customer (section 4.8); the whole reply
+    still comes back in the outcome.
+    """
     global _turns_timed
     built = await ready()
     call_id = int(row["id"])
     vault = await vaults.load(call_id)
+
+    async def say(kind: str, text: str) -> None:
+        if emit is not None:
+            await emit(kind, pii.detokenize(text, vault))
     now = clock.at(row.get("business_day") or options.business_day())
     turn_no = await _customer_turns(call_id) + (0 if content is None else 1)
     context = HotContext(
@@ -197,7 +213,10 @@ async def run_turn(
         advisor=built.advisor,
         policy=built.policy,
         harness=built.harness,
+        compactor=built.compactor,
         store=CallStore(call_id, vault),
+        arrived=arrived,
+        emit=say if emit is not None else None,
     )
     turn_input: dict[str, Any] = {
         "call_id": str(call_id),
@@ -210,9 +229,10 @@ async def run_turn(
         "phase": "opening" if content is None else "turn",
         "turn_id": turn_id,
         "turn_no": turn_no,
+        # Every turn, None included, so a mode one turn detected (teencode)
+        # does not stay in the checkpoint and label the turns after it.
+        "input_mode": input_mode,
     }
-    if input_mode:
-        turn_input["input_mode"] = input_mode
     try:
         state = await built.graph.ainvoke(turn_input, config=thread(call_id), context=context)
     except Exception as error:  # noqa: BLE001 - the page and the call both need to hear about it
@@ -225,13 +245,16 @@ async def run_turn(
 
     total_ms = int((time.perf_counter() - arrived) * 1000)
     _turns_timed += 1
+    timing = state.get("latency") or {}
+    first = timing.get("first_token_ms")
     latency = {
-        "ttft_ms": total_ms,
+        "ttft_ms": int(first) if first is not None else total_ms,
         "total_ms": total_ms,
         "ttfa_ms": None,
+        "filler_ms": timing.get("filler_ms"),
         "call_brief_latency_ms": state.get("call_brief_latency_ms"),
         "warmup": _turns_timed <= WARMUP_TURNS,
-        "streaming": False,
+        "streaming": bool((state.get("draft") or {}).get("streamed")),
     }
     suggestion = state.get("suggestion")
     if (row.get("mode") or "speak") == "copilot":
@@ -416,9 +439,11 @@ async def remember(call_id: int) -> None:
                 "tier": state.get("tier"),
                 "customer_id": state.get("customer_id"),
                 "keys_seen": state.get("keys_seen") or [],
+                "provisional": state.get("provisional"),
                 "returning": bool((state.get("brief") or {}).get("is_returning")),
             }
-            result = await after_call(call, transcript, tool_log, writer=await writer(), memory=built.memory, qa=built.qa)
+            result = await after_call(call, transcript, tool_log, writer=await writer(), memory=built.memory, qa=built.qa,
+                                      admin=_admin)
         status = result.get("status", "done")
     except Exception as error:  # noqa: BLE001 - marked, and run again at the next start
         logger.exception("after_call failed on call %s", call_id)

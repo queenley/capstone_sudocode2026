@@ -227,18 +227,16 @@ def apply_schema(sql: str) -> None:
     Synchronous and at startup, not lazily on first use: the API may read a
     server's table before that server has had a reason to create it.
     """
-    from ..config.database import get_settings
+    from ..config.database import ensure_schema, get_settings
 
-    from ..config.database import ensure_schema
-
-    ensure_schema()
     url, _ = get_settings().require_database_url()
     with psycopg.connect(url, autocommit=True) as conn:
-        # Servers start together, one per role, and CREATE TABLE IF NOT
-        # EXISTS is not atomic: without the lock two of them race on the same
-        # type name and the loser dies. One at a time, then.
+        # Servers start together, one per role, and neither CREATE SCHEMA nor
+        # CREATE TABLE IF NOT EXISTS is atomic: without the lock two of them
+        # race on the same name and the loser dies. One at a time, then.
         conn.execute("SELECT pg_advisory_lock(%s)", (SCHEMA_LOCK,))
         try:
+            ensure_schema()
             conn.execute(sql)
         finally:
             conn.execute("SELECT pg_advisory_unlock(%s)", (SCHEMA_LOCK,))

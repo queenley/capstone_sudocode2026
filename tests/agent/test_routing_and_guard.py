@@ -3,13 +3,16 @@
 import pytest
 
 from ai_agent_service.components.guardrails import hard
+from ai_agent_service.components.intake import signals
 from ai_agent_service.components.orchestration.rules import RouteInput, decide
 
 
 def route(**changes):
-    view = dict(tier="UNKNOWN", has_brief=False, brief_mismatch=False, has_order=False,
+    view = dict(tier="UNKNOWN", has_brief=False, has_order=False,
                 asr_low_conf=False, tool_failures=0, safe_lines=0, customer_said="xin chào")
     view.update(changes)
+    # As perceive reads it: a PB-06 topic is a signal of the customer's words.
+    view.setdefault("must_transfer", signals.read(view["customer_said"]).must_transfer)
     return decide(RouteInput(**view))
 
 

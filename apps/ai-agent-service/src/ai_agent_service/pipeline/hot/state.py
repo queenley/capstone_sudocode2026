@@ -28,7 +28,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Annotated, Any, Literal, TypedDict
+from typing import Annotated, Any, Awaitable, Callable, Literal, TypedDict
 
 from langchain_core.messages import AnyMessage
 from langgraph.graph.message import add_messages
@@ -79,14 +79,21 @@ class HotState(TurnInput, total=False):
     phone_last4: str | None
     #: The vault token of the customer's phone, never the number.
     phone_token: str | None
-    #: A confirming question is out: "confirm" (PROBABLE) or "name" (AMBIGUOUS).
+    #: The one confirming question of section 4.2 is out, and the next words
+    #: settle it: "confirm" (PROBABLE) or "name" (AMBIGUOUS). Settled either
+    #: way, it is not asked again.
     awaiting: str | None
+    #: The customer a number the caller gave belongs to, ``{customer_id, name,
+    #: honorific}``, kept after an unclear answer: ``after_call`` decides on it.
+    provisional: dict[str, Any] | None
     brief: dict[str, Any] | None
     brief_lines: list[dict[str, Any]]
     freshness: list[str]
     #: Set on the turn the brief was built, cleared on every other.
     call_brief_latency_ms: int | None
     known_orders: list[str]
+    #: The turn's passages from the knowledge base: ``{hits, top_score, threshold, abstain}``.
+    knowledge: dict[str, Any] | None
 
     # perceive, respond (and the API, for a consultant's words)
     messages: Annotated[list[AnyMessage], add_messages]
@@ -98,6 +105,8 @@ class HotState(TurnInput, total=False):
     lane: Lane
     route_rule: int
     route_reason: str
+    #: Notes the lane's instruction gains this turn (PB-10, PB-11).
+    route_notes: list[str]
 
     # advisor
     tool_results: list[dict[str, Any]]
@@ -120,6 +129,10 @@ class HotState(TurnInput, total=False):
     handoff: dict[str, Any] | None
     suggestion: dict[str, Any] | None
 
+    # advisor and respond: ``{first_token_ms, filler_ms}`` from the request's
+    # arrival, on the monotonic clock (section 4.8)
+    latency: dict[str, Any]
+
     # perceive
     flags: dict[str, Any]
 
@@ -135,6 +148,8 @@ TURN_KEYS: dict[str, Any] = {
     "reply": None,
     "suggestion": None,
     "call_brief_latency_ms": None,
+    "knowledge": None,
+    "latency": {},
 }
 
 
@@ -161,10 +176,20 @@ class HotContext:
     #: The secret keys are hashed with (section 4.2).
     identity_secret: str = ""
     user_id: str | None = None
+    #: When the turn's request reached the backend (``time.perf_counter``):
+    #: where TTFT starts (section 4.8). ``perceive`` stamps it when the caller did not.
+    arrived: float | None = None
+    #: Where a checked sentence goes the moment it may be said: ``emit(kind,
+    #: text)`` with kind ``sentence`` or ``filler``, the text tokenised. The
+    #: API streams it to the page; None when nobody listens live (the
+    #: evaluation runner), the timing is kept all the same.
+    emit: Callable[[str, str], Awaitable[None]] | None = None
 
     # Collaborators, typed loosely to keep this module free of their imports.
     advisor: Any = None
     policy: Any = None
+    #: The small model that folds a long call into ``working_summary``; None folds extractively.
+    compactor: Any = None
     #: The harness's tools (``src.mcp.tools.ToolBox``, role ``harness``).
     harness: Any = None
     #: Where ``persist`` writes: the API's store, or the evaluation runner's.

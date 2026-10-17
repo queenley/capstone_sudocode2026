@@ -46,7 +46,9 @@ def returning_brief():
                    "summary": "tư vấn SKU-AP-Y 5.200.000đ", "outcome": "hen_goi_lai"}],
         orders=[],
         products=[{"sku": "SKU-AP-Y", "name": "AirPure Y", "price_quoted_vnd": 5_200_000, "promo_code": "GIFT-FILTER",
-                   "promo_still_active": True, "quoted_on": dt.date(2026, 10, 13), "fact_ids": ["f4"]}],
+                   "promo_still_active": True, "quoted_on": dt.date(2026, 10, 13),
+                   # Slot to fact, as recall.advised gives it: each line rests on its own facts.
+                   "fact_ids": {"product_advised": "f4"}}],
         warnings=[], now=NOW, latency_ms=410,
     )
 
@@ -112,7 +114,7 @@ def test_memory_agent_writes_the_organisers_slot_names():
             "Bé nhà chị 8 tháng", "Số chị là <PHONE_1>, nhắn qua zalo nhé"]
     transcript = [{"speaker": "customer", "text": t, "turn": i + 1} for i, t in enumerate(said)]
     tools = [{"name": "crm.get_customer", "turn": 1, "result": {"ok": True, "data": {"orders": [{"sku": "SKU-AP-X-2024"}]}}}]
-    found = {c.slot: c.value for c in asyncio.run(MemoryAgent().extract(transcript, tools, on="2026-10-15"))}
+    found = {c.slot: c.value for c in asyncio.run(MemoryAgent(use_model=False).extract(transcript, tools, on="2026-10-15"))}
     assert found == {
         "owned_sku": "SKU-AP-X-2024", "objection": "so_sanh_gia", "competitor_price_vnd": 4_500_000,
         "delivery_area": "quận Cầu Giấy, Hà Nội", "quantity": 2, "child_age_months": 8,
@@ -136,6 +138,9 @@ def stored_call_2():
     vault = pii.Vault()
     phone = vault.put("PHONE", "0984726714")
     built, lines = returning_brief()
+    # The brief lines the room's and the product's facts are on, whatever their numbers.
+    room = next(line.id for line in lines if "f1" in line.fact_ids)
+    product = next(line.id for line in lines if "f4" in line.fact_ids)
     call = {"brief": [l.as_dict() for l in lines], "brief_object": as_json(built), "business_day": "2026-10-15",
             "after_call": {"memory_writes": [{"key": "outcome", "value": "chot_don", "op": "set", "source": "call_2#turn3",
                                               "customer_id": "C001", "fact_id": "F-1"}]}}
@@ -150,11 +155,12 @@ def stored_call_2():
          "meta": {"tool_calls": []}},
         {"turn_id": "t1", "speaker": "customer", "content": "Alo, hôm trước chị có gọi hỏi máy lọc không khí đó em.", "meta": {}},
         {"turn_id": "t1", "speaker": "agent", "content": "Dạ vẫn là phòng 25 m² của chị đúng không ạ?",
-         "meta": {"used_brief_lines": ["B4"], "tool_calls": [], "latency": latency}},
+         "meta": {"used_brief_lines": [room], "tool_calls": [], "latency": latency}},
         {"turn_id": "t2", "speaker": "customer", "content": "Ông xã chị đồng ý rồi, giá vẫn như hôm trước đúng không?", "meta": {}},
         {"turn_id": "t2", "speaker": "agent",
          "content": "Dạ giá hôm nay vẫn là 5.200.000đ, kèm GIFT-FILTER còn hiệu lực, máy còn hàng và giao trong 2 ngày ạ.",
-         "meta": {"tool_calls": [quote], "latency": {**latency, "call_brief_latency_ms": None}}},
+         "meta": {"used_brief_lines": [product], "tool_calls": [quote],
+                  "latency": {**latency, "call_brief_latency_ms": None}}},
         {"turn_id": "t3", "speaker": "customer", "content": "Ừ em lên đơn cho chị đi, giao về địa chỉ cũ nhé.", "meta": {}},
         {"turn_id": "t3", "speaker": "agent", "content": f"Dạ em đã lên đơn OD00001 cho số {phone} ạ.",
          "meta": {"tool_calls": [order], "latency": latency}},

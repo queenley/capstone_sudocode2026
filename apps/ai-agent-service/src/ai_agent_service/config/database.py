@@ -65,6 +65,16 @@ def database_url() -> tuple[str, str]:
     )
 
 
+def configured_url() -> tuple[str | None, str | None]:
+    """The PostgreSQL URL configured for the agent, in libpq form and without the
+    schema option, and the variable it came from; ``(None, None)`` when there is none."""
+    for variable in URL_VARIABLES:
+        raw = os.environ.get(variable, "")
+        if raw and raw.lower().startswith(("postgres", "jdbc:postgres")):
+            return _libpq_url(raw), variable
+    return None, None
+
+
 def ensure_schema() -> None:
     """Create the agent schema if it is missing. Safe to run on every start."""
     url, _ = database_url()
