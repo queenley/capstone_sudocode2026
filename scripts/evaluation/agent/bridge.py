@@ -50,7 +50,7 @@ from ai_agent_service.llm import jev, token_ledger  # noqa: E402
 from ai_agent_service.mcp import client as mcp_client  # noqa: E402
 from ai_agent_service.mcp.server_base import ToolFailure, database, failure, ok  # noqa: E402
 from ai_agent_service.mcp.servers import btc  # noqa: E402
-from ai_agent_service.mcp.servers.catalog import _rank  # noqa: E402
+from ai_agent_service.mcp.servers.btc import rank as _rank  # noqa: E402
 from ai_agent_service.pipeline.hot import nodes  # noqa: E402
 from ai_agent_service.pipeline.hot.state import HotContext  # noqa: E402
 
@@ -129,7 +129,9 @@ class Bridge:
             # The harness never retries and neither do we: an unknown outcome stays unknown.
             return failure("TOOL_ERROR", f"{name}: {reply['error']}", retryable=False)
         try:
-            return ok(btc.unwrap(name, reply["result"]))
+            # Our additions to a mock answer, as the MCP servers make them: a
+            # quote's promotions carry their last day (``btc.enrich``).
+            return ok(btc.enrich(name, btc.unwrap(name, reply["result"])))
         except ToolFailure as fail:
             return failure(fail.code, fail.message, retryable=fail.retryable, details=fail.details)
 

@@ -12,10 +12,16 @@ and adds the past sessions and orders the organisers' CRM holds for them.
 :func:`refresh` asks the tools, for the day of the call, whether what the
 brief cites still holds: the price and promotion of every product advised
 (``pricing.get_quote``), its stock (``inventory.check``), the state of every
-order (``order.status``). What changed becomes a warning, which is never cut
-from the prompt. It runs at identification, inside the Call Brief's latency,
-as the organisers require; only the episodic summary is computed ahead, at
-the end of the previous call, and declared in ``precomputed_parts``.
+order (``order.status``), and whether the customer has spoken to the shop
+on another channel since the last contact on this one. What changed becomes
+a warning, which is never cut from the prompt. It runs at identification,
+inside the Call Brief's latency, as the organisers require; only the
+episodic summary is computed ahead, at the end of the previous call, and
+declared in ``precomputed_parts``.
+
+A customer who asked to be forgotten (QT-06) is read as a new one: the
+ledger has nothing on them, and the history the organisers' CRM still holds
+is not shown either.
 """
 
 from __future__ import annotations
@@ -26,6 +32,7 @@ from typing import Any, Mapping, Sequence
 
 from ..clock import day_label
 from ..intake.itn import format_vnd
+from .brief import CHANNELS
 
 #: An episode older than this is reported as stale (section 5.3, the address TTL).
 STALE_DAYS = 180
@@ -40,7 +47,8 @@ async def retrieve(customer_id: str, on: str, tools: Any, *, crm: Mapping[str, A
         tools.data("memory_get_episodes", customer_id=customer_id, n=3),
     )
     episodes = list((history or {}).get("episodes") or [])
-    crm = crm or {}
+    # Forgotten on request: whatever the CRM's seed still says about them is not memory to use.
+    crm = {} if (profile or {}).get("deleted_at") else (crm or {})
     for session in crm.get("sessions") or []:
         episodes.append({
             "call_id": session.get("session_id"),
@@ -67,7 +75,9 @@ def advised(facts: Sequence[Mapping[str, Any]], orders: Sequence[Mapping[str, An
     products = []
     if "product_advised" in held:
         sku = str(held["product_advised"]["value"])
-        ids = [held[s]["fact_id"] for s in ("product_advised", "price_quoted_vnd", "quoted_on", "promo_code") if s in held]
+        # Slot -> fact id, so each brief line can cite only the facts it states.
+        ids = {s: held[s]["fact_id"] for s in ("product_advised", "price_quoted_vnd", "quoted_on", "promo_code", "promo_expiry")
+               if s in held}
         products.append({
             "sku": sku,
             "price_quoted_vnd": held.get("price_quoted_vnd", {}).get("value"),
@@ -87,9 +97,17 @@ async def refresh(
     tools: Any,
     *,
     customer_phone: str | None,
+    channel: str | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[str]]:
-    """Products and orders as they stand today, and the warnings for what changed."""
+    """Products and orders as they stand today, and the warnings for what changed.
+
+    *channel* is this call's channel; with it, a contact on another channel
+    newer than the last one on this channel becomes a warning (section 4.2):
+    the customer may be calling about what they were told there.
+    """
     warnings: list[str] = []
+    if channel and episodes:
+        warnings += _elsewhere(episodes, channel)
 
     async def one(product: dict[str, Any]) -> dict[str, Any]:
         sku = product["sku"]
@@ -153,3 +171,23 @@ async def refresh(
                 f"Lần liên hệ gần nhất đã hơn 6 tháng ({day_label(newest)}): địa chỉ và nhu cầu có thể đã đổi, hỏi lại là hợp lý."
             )
     return checked, list(orders), warnings
+
+
+def _elsewhere(episodes: Sequence[Mapping[str, Any]], channel: str) -> list[str]:
+    """A warning when the newest contact is on another channel than this call's,
+    and newer than the last contact on this one; nothing otherwise."""
+    def kind(value: Any) -> str:
+        return CHANNELS.get(str(value), str(value))
+
+    newest = episodes[0]
+    if kind(newest.get("channel")) == kind(channel):
+        return []
+    here = next((e for e in episodes if kind(e.get("channel")) == kind(channel)), None)
+    if here is not None and str(here.get("date") or "")[:10] >= str(newest.get("date") or "")[:10]:
+        return []
+    summary = str(newest.get("summary") or "").strip()
+    return [
+        f"Lần liên hệ gần nhất là qua {kind(newest.get('channel'))} ngày {day_label(newest['date'])}"
+        + (f": {summary}" if summary else "")
+        + ". Khách có thể đang gọi tiếp chuyện đó; xác nhận tiếp nối theo lần này."
+    ]

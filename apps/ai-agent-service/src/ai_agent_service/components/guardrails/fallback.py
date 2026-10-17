@@ -10,11 +10,18 @@ from __future__ import annotations
 
 SAFE_LINE = "Dạ để em kiểm tra kỹ rồi phản hồi anh/chị ngay ạ."
 
+#: Section 4.2: a number two customers share. The first thing the agent says,
+#: by the harness and not by a model, asked once, and revealing nobody.
+AMBIGUOUS_QUESTION = "Dạ cho em xin tên của mình để em xem đúng thông tin ạ?"
+
 LINES = {
     "tool_down": "Dạ hệ thống bên em đang tra cứu hơi chậm, em xin phép nhắn lại anh/chị trong ít phút ạ.",
     "asr_unclear": "Dạ em nghe chưa rõ, anh/chị nói lại giúp em được không ạ?",
     "model_error": "Dạ em xin lỗi, em chưa trả lời được ngay. Anh/chị cho em một chút để kiểm tra lại ạ.",
     "bridging": "Dạ em kết nối anh/chị với đồng nghiệp phụ trách ngay ạ, anh/chị chờ em một chút.",
+    # Section 4.8: said once as a tool round starts, so the line is not silent;
+    # never the answer, never in the transcript, never counted as the first token.
+    "filler": "Dạ {who} chờ em một xíu ạ.",
 }
 
 #: Per lane; a lane not listed gets SAFE_LINE.

@@ -5,7 +5,9 @@ request ``{message, selected_sku?, memory_enabled?}``; ``/stream`` emits
 ``start``, ``delta`` (the reply), ``done`` (the TurnResult) or ``error``.
 Behind it every turn goes through the hot graph (``runtime.harness.run_turn``)
 under the call's lease, as a task that survives a dropped connection, with a
-keepalive comment while the model works.
+keepalive comment while the model works. A ``delta`` is a sentence the guard
+has passed, sent the moment it may be said (``docs/design.md`` section 4.8);
+a reply that did not stream comes as one ``delta`` at the end.
 """
 
 from __future__ import annotations
@@ -15,7 +17,7 @@ import json
 import logging
 import time
 import uuid
-from typing import Any, AsyncIterator
+from typing import Any, AsyncIterator, Awaitable, Callable
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Request
@@ -43,7 +45,8 @@ class TurnRequest(BaseModel):
     turn_id: str | None = Field(default=None, min_length=1, max_length=64)
 
 
-async def _turn(request: Request, conversation_id: str, data: TurnRequest) -> dict[str, Any]:
+async def _turn(request: Request, conversation_id: str, data: TurnRequest,
+                emit: Callable[[str, str], Awaitable[None]] | None = None) -> dict[str, Any]:
     """Authorise, open or find the call, run the turn, project it to the platform."""
     arrived = getattr(request.state, "arrived", None) or time.perf_counter()
     token = bearer(request)
@@ -69,7 +72,7 @@ async def _turn(request: Request, conversation_id: str, data: TurnRequest) -> di
         message = f"{message}\n(Khách đang xem sản phẩm {data.selected_sku})"
     try:
         outcome = await harness.spawn(calls.take_turn(row, content=message, turn_id=turn_id, arrived=arrived,
-                                                      actor=actor, memory=data.memory_enabled))
+                                                      actor=actor, memory=data.memory_enabled, emit=emit))
     except CallError as error:
         raise HTTPException(error.status, str(error)) from error
     if outcome.kind == "error":
@@ -163,15 +166,32 @@ async def turn(conversation_id: UUID, data: TurnRequest, request: Request) -> di
 async def stream(conversation_id: UUID, data: TurnRequest, request: Request) -> StreamingResponse:
     # Authorise before the stream opens, so a bad token is a plain 404, not an SSE error.
     await platform.authorize(request.app, str(conversation_id), bearer(request))
-    task = harness.spawn(_turn(request, str(conversation_id), data))
+    said: asyncio.Queue[str] = asyncio.Queue()
+
+    async def emit(kind: str, text: str) -> None:
+        # The filler line said while tools run is for a voice line; the chat shows typing instead.
+        if kind == "sentence":
+            said.put_nowait(text)
+
+    task = harness.spawn(_turn(request, str(conversation_id), data, emit=emit))
 
     async def events() -> AsyncIterator[str]:
         yield "event: start\ndata: {}\n\n"
+        streamed = False
         while True:
-            done, _ = await asyncio.wait({task}, timeout=HEARTBEAT_SECONDS)
-            if done:
+            getter = asyncio.ensure_future(said.get())
+            done, _ = await asyncio.wait({task, getter}, timeout=HEARTBEAT_SECONDS, return_when=asyncio.FIRST_COMPLETED)
+            if getter in done:
+                yield _event("delta", {"text": (" " if streamed else "") + getter.result()})
+                streamed = True
+                continue
+            getter.cancel()
+            if task in done:
                 break
             yield ": keepalive\n\n"
+        while not said.empty():
+            yield _event("delta", {"text": (" " if streamed else "") + said.get_nowait()})
+            streamed = True
         try:
             result = task.result()
         except HTTPException as error:
@@ -181,8 +201,9 @@ async def stream(conversation_id: UUID, data: TurnRequest, request: Request) -> 
             logger.exception("Turn failed on conversation %s", conversation_id)
             yield _event("error", {"message": "Turn failed; retry or request staff help"})
             return
-        for line in (result["reply"] or "").splitlines(keepends=True):
-            yield _event("delta", {"text": line})
+        if not streamed:
+            for line in (result["reply"] or "").splitlines(keepends=True):
+                yield _event("delta", {"text": line})
         yield _event("done", result)
 
     return StreamingResponse(events(), media_type="text/event-stream",

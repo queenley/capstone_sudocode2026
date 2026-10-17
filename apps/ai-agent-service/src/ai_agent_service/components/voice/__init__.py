@@ -8,8 +8,11 @@ were compared; the lab stays as the place to try the next ones.
 
 - :mod:`.turns`: when the caller has finished, and when they cut the agent off;
 - :mod:`.asr`: the local recognisers behind one call;
-- :mod:`.lexicon`: brand names as hints, and fixes for words misheard;
 - :mod:`.tts`: speech, streamed per sentence.
+
+The dictionary of brand names and words misheard is
+``components/intake/lexicon.py``, shared with the recognised text a
+scenario hands in.
 
 The packages are in ``requirements.txt``, so every machine, the deployment
 included, has them. The weights (about 1 GB, and VieNeu's own 1.4 GB in the

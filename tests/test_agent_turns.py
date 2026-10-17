@@ -108,6 +108,17 @@ def test_stream_emits_start_delta_done(client):
     assert deltas == done["reply"]
 
 
+def test_stream_sends_each_checked_sentence_once_as_it_is_said(client, streaming_agent):
+    c, h = conversation(client)
+    response = client.post(f"/api/conversations/{c}/stream", headers=h, json={"message": "Tư vấn giúp em"})
+    assert response.status_code == 200
+    events = [block.split("\n") for block in response.text.strip().split("\n\n")]
+    deltas = [json.loads(lines[1].removeprefix("data: "))["text"] for lines in events if lines[0] == "event: delta"]
+    done = json.loads(events[-1][1].removeprefix("data: "))
+    assert deltas == ["Dạ, bên em có mẫu này ạ.", " Anh/chị muốn xem thêm không?"], "no filler, no repeat"
+    assert "".join(deltas) == done["reply"]
+
+
 def test_consultant_reply_from_the_call_console_reaches_the_chat(client, agent, monkeypatch):
     from ai_agent_service.runtime import calls
 

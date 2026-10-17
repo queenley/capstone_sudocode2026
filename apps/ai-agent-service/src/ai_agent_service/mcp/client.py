@@ -31,7 +31,7 @@ import sys
 import warnings
 from contextlib import AsyncExitStack
 from pathlib import Path
-from typing import Any
+from typing import Any, Awaitable, Callable
 
 from langchain_core._api import LangChainBetaWarning
 
@@ -45,6 +45,7 @@ from langchain_core.tools import BaseTool  # noqa: E402
 
 from ..config.config_manager import ROOT  # noqa: E402
 from .server_base import ROLE_ENV, ROLE_HEADER, ROLES  # noqa: E402
+from .tools import ToolBox  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
@@ -92,10 +93,16 @@ def transport_mode() -> str:
 
 
 def client_group(role: str, *, mode: str | None = None) -> ClientGroup:
-    """A client for every server, all carrying *role*."""
+    """A client for every server, all carrying *role*.
+
+    Over stdio a server logs to the parent's stderr, or to the file
+    ``MCP_LOG_FILE`` names: the evaluation command sets it, so fifteen
+    servers do not drown its progress lines.
+    """
     if role not in ROLES:
         raise ValueError(f"Unknown role {role!r}; known: {sorted(ROLES)}")
     mode = mode or transport_mode()
+    log_file = os.environ.get("MCP_LOG_FILE")
 
     clients: dict[str, Client] = {}
     for name, module in SERVERS.items():
@@ -111,6 +118,7 @@ def client_group(role: str, *, mode: str | None = None) -> ClientGroup:
                 # One subprocess for the life of this client, not one per
                 # call. Each tool call opens a session over it.
                 keep_alive=True,
+                log_file=Path(log_file) if log_file else None,
             )
         elif mode == "http":
             variable, port = HTTP_URLS[name]
@@ -167,6 +175,22 @@ def _unprefixed(tool: BaseTool) -> BaseTool:
             tool.name = tool.name[len(prefix):]
             break
     return tool
+
+
+def lazy_toolbox(role: str, *, timeout: float = 3.0) -> Callable[[], Awaitable[ToolBox]]:
+    """A function opening *role*'s :class:`~.tools.ToolBox` on its first call, the same one after.
+
+    For a role rarely needed (``admin``, to carry out a deletion): its
+    servers start only when it is used, not with every run.
+    """
+    opened: list[ToolBox] = []
+
+    async def open_box() -> ToolBox:
+        if not opened:
+            opened.append(ToolBox(await tools_for(role), timeout=timeout))
+        return opened[0]
+
+    return open_box
 
 
 async def close_all() -> None:

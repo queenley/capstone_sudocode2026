@@ -21,3 +21,11 @@ langfuse==4.15.4
 mlflow-skinny==3.16.1
 # Validates briefs and trace rows against the organisers' schemas (data/btc/schemas).
 jsonschema==4.26.0
+
+# The knowledge base's local embedding model (docs/design.md section 7.3): ONNX
+# on CPU, its tokenizer, and the download of its weights at the knowledge
+# server's first start. Same pins as requirements-voice.txt.
+numpy==2.2.6
+onnxruntime==1.23.2
+tokenizers==0.23.2
+huggingface_hub==1.32.0

@@ -18,6 +18,16 @@ already produce the tools; what is ours is the policy around them.
   Business outcomes such as a price mismatch are ``ok: false`` too, but they
   are answers, not failures: they never count against the breaker.
 
+A tool with an effect (:data:`WRITE_TOOLS`) is never retried, whatever the
+server says: a timeout leaves its outcome unknown, and a second attempt is
+how one order becomes two. Each of its calls carries an idempotency key
+instead, ``call:turn:tool:hash of the arguments``, which the server keeps
+with the first result and answers again on a repeat (section 6.1; Stripe
+does the same for every request that creates or changes something). Its
+declared defaults (``qty``, ``payment``) are written into the arguments, so
+the trace records the order that was actually placed, not only what the
+model typed (section 9.3).
+
 Both are shared by every request that runs through one compiled agent, so
 the only mutable state is the breaker's, and it is meant to be shared: a
 server that is down is down for everyone.
@@ -26,8 +36,10 @@ server that is down is down for everyone.
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import logging
+import re
 import time
 from typing import Any, Iterable, Mapping
 
@@ -39,6 +51,15 @@ logger = logging.getLogger(__name__)
 #: Error codes that mean the tool could not be reached or ran no business
 #: logic. Only these count against the circuit breaker.
 INFRASTRUCTURE_CODES = frozenset({"TIMEOUT", "TOOL_ERROR", "INTERNAL", "CIRCUIT_OPEN"})
+
+#: Tools with an effect on the business, by wire name (section 6.1): never
+#: retried, each call keyed for idempotency, their defaults made explicit.
+WRITE_TOOLS = frozenset({
+    "order_create", "order_update", "schedule_callback", "handoff_transfer", "memory_request_deletion",
+})
+
+#: The argument a write tool's server keeps its first result under.
+IDEMPOTENCY_ARG = "idempotency_key"
 
 
 def _tool_name(tool: Any) -> str | None:
@@ -169,13 +190,17 @@ class ToolGuardMiddleware(AgentMiddleware):
     # ── policy ────────────────────────────────────────────────────────────
 
     def _settle(self, name: str, result: Any, attempt: int) -> bool:
-        """Decide whether *result* is final. Updates the breaker."""
+        """Decide whether *result* is final. Updates the breaker.
+
+        A write tool's failure is always final: its outcome may be unknown,
+        and the idempotency key, not a retry, is what makes a repeat safe.
+        """
         envelope = envelope_of(result)
         if envelope is None or envelope.get("ok", True):
             self._failures[name] = 0
             return True
         error = envelope.get("error") or {}
-        if error.get("retryable") and attempt <= self._retries:
+        if error.get("retryable") and attempt <= self._retries and name not in WRITE_TOOLS:
             logger.info("Tool %s failed with %s; retrying once", name, error.get("code"))
             return False
         if error.get("code") in INFRASTRUCTURE_CODES:
@@ -204,8 +229,11 @@ class ToolGuardMiddleware(AgentMiddleware):
 
         The day of the call goes into any tool that takes ``on``, the
         customer's phone into any that takes ``customer_phone`` (except the
-        lookup, whose phone is the question), and the customer id into any
-        that takes ``customer_id``. Each overrides whatever the model wrote.
+        lookup, whose phone is the question), the customer id into any that
+        takes ``customer_id`` and the call into any that takes ``call_id``.
+        Each overrides whatever the model wrote.
+        A write tool also gets its declared defaults written out and its
+        idempotency key.
         """
         context = getattr(getattr(request, "runtime", None), "context", None)
         tool = getattr(request, "tool", None)
@@ -213,20 +241,32 @@ class ToolGuardMiddleware(AgentMiddleware):
         if context is None or not isinstance(accepted, dict):
             return request
         name = request.tool_call["name"]
-        extra: dict[str, Any] = {}
+        args = dict(request.tool_call.get("args") or {})
+        args.pop(IDEMPOTENCY_ARG, None)  # the harness's to set, never the model's
+        if name in WRITE_TOOLS:
+            args = {**declared_defaults(accepted, exclude=(IDEMPOTENCY_ARG,)), **args}
         on = getattr(context, "on", None)
         if on and "on" in accepted:
-            extra["on"] = on
+            args["on"] = on
         phone = getattr(context, "customer_phone", None)
         if phone and "customer_phone" in accepted and name != "crm_get_customer":
-            extra["customer_phone"] = phone
+            args["customer_phone"] = phone
+        addresses = getattr(context, "addresses", None) or {}
+        if addresses and "address" in accepted:
+            args["address"] = with_addresses(args.get("address"), addresses)
         customer = getattr(context, "customer_id", None)
         if customer and "customer_id" in accepted:
-            extra["customer_id"] = customer
-        if not extra:
+            args["customer_id"] = customer
+        call_id = getattr(context, "call_id", None)
+        if call_id and "call_id" in accepted:
+            args["call_id"] = str(call_id)
+        if name in WRITE_TOOLS and IDEMPOTENCY_ARG in accepted:
+            key = idempotency_key(context, name, args)
+            if key:
+                args[IDEMPOTENCY_ARG] = key
+        if args == request.tool_call.get("args"):
             return request
-        call = request.tool_call
-        return request.override(tool_call={**call, "args": {**call.get("args", {}), **extra}})
+        return request.override(tool_call={**request.tool_call, "args": args})
 
     @staticmethod
     def _envelope_message(
@@ -238,6 +278,48 @@ class ToolGuardMiddleware(AgentMiddleware):
             tool_call_id=call["id"],
             name=call["name"],
         )
+
+
+ADDRESS_TOKEN = re.compile(r"<ADDR_\d+>")
+
+
+def with_addresses(value: Any, addresses: Mapping[str, str]) -> Any:
+    """An ``address`` argument with the call's real addresses: tokens replaced, the latest one when it is empty.
+
+    The model only ever sees ``<ADDR_1>``; the regional promotions and the
+    delivery time are decided by the real address (KM-08, section 4.4).
+    """
+    if not value:
+        return list(addresses.values())[-1]
+    if isinstance(value, str):
+        return ADDRESS_TOKEN.sub(lambda m: addresses.get(m.group(0), m.group(0)), value)
+    return value
+
+
+def declared_defaults(schema: Mapping[str, Any], *, exclude: Iterable[str] = ()) -> dict[str, Any]:
+    """The defaults a tool's schema declares, by argument; a None default is no default."""
+    skip = set(exclude)
+    return {
+        field: spec["default"]
+        for field, spec in schema.items()
+        if field not in skip and isinstance(spec, Mapping) and spec.get("default") is not None
+    }
+
+
+def idempotency_key(context: Any, name: str, args: Mapping[str, Any]) -> str | None:
+    """``<call>:<turn>:<tool>:<hash of the arguments>``, or None without a call and a turn.
+
+    The same call repeated in the same turn gets the same key, so the server
+    answers it with the first result; any change of argument is a new key.
+    """
+    call_id = getattr(context, "call_id", None)
+    turn_id = getattr(context, "turn_id", None)
+    if not call_id or not turn_id:
+        return None
+    payload = json.dumps({k: v for k, v in args.items() if k != IDEMPOTENCY_ARG},
+                         ensure_ascii=False, sort_keys=True, default=str)
+    digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
+    return f"{call_id}:{turn_id}:{name}:{digest}"
 
 
 def with_args(result: Any, args: Mapping[str, Any]) -> Any:

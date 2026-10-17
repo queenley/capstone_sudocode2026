@@ -7,25 +7,32 @@ what the customer said and what the guardrail reads are counted the same way.
 
 - "bốn triệu tám" is 4.800.000, not 4.000.008; "hai trăm bốn chín k" is
   249.000; "một củ hai" is 1.200.000; "hai triệu rưỡi" is 2.500.000;
-- a run of nine or more bare digits is a digit string: "không chín tám bốn
+- a run of three or more bare digits is a digit string: "không chín tám bốn
   ..." is a phone number, 0984...;
-- "ngày mai", "thứ tư tuần sau" get the date they mean appended, computed
-  from the virtual clock, never the system clock, because the evaluator runs
-  scenarios days apart; "bảy giờ tối" becomes 19:00.
+- "ô đê" followed by a number is an order code: "ô đê ba trăm mười hai
+  nghìn bốn trăm năm mươi sáu" is OD312456, not money (catalogue case D13);
+- a time with its part of the day before or after it, and a day if one is
+  said ("tối mai 8 giờ", "8 giờ tối mai", "chiều thứ bảy 3 giờ rưỡi"), gets
+  the moment it means appended in ISO 8601 with +07:00, the form
+  ``schedule.callback`` takes (G01); a day alone ("ngày mai", "thứ tư tuần
+  sau") gets its date; "bảy giờ tối" gets 19:00 today. Always from the
+  virtual clock, never the system clock, because the evaluator runs
+  scenarios days apart.
+
+The canonical value goes next to the words it came from, so the model reads
+both (section 4.1, step 4); a number replaces its words.
 
 :func:`money_spans`, written to value, for a reply on its way out: every
 amount in 5.200.000đ, 5,2 triệu, 5 triệu 2, 4tr890, 249k form, with its value
-in VND, so the guard can check each against the tools.
-
-Mock: the rules cover the forms in the organisers' scenarios and ASR ground
-truth; the test suite the design asks for (Entity Accuracy on money and
-phone numbers) is still to be written against ``asr/ground_truth.json``.
+in VND, so the guard can check each against the tools. :func:`amounts` reads
+the same and the spoken forms too ("năm triệu hai trăm nghìn"), through the
+same code the customer's words go through.
 """
 
 from __future__ import annotations
 
 import re
-from datetime import datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from typing import NamedTuple
 
 from ..clock import day_label
@@ -142,11 +149,17 @@ def _bare(token: str) -> str:
     return token.lower().strip(".,!?;:")
 
 
+#: Words after which a weak number word ("ba", "năm") is a count, not a word.
+UNITS = {"giờ", "h", "phút", "tháng", "tuổi", "ngày", "tuần", "mét", "m2", "m²", "người", "cái", "chiếc", "đôi",
+         "size", "lần"}
+
+
 def _runs(tokens: list[str]) -> list[tuple[int, int]]:
-    """Index ranges of maximal runs of number words."""
+    """Index ranges of maximal runs of number words; "thứ hai" is a weekday, not a two."""
     runs, start = [], None
     for i, token in enumerate(tokens + [""]):
-        if token and _bare(token) in NUMBER_WORDS:
+        weekday = start is None and i > 0 and _bare(tokens[i - 1]) == "thứ"
+        if token and _bare(token) in NUMBER_WORDS and not weekday:
             start = i if start is None else start
             if token[-1] in ".,!?;:":
                 # Punctuation closes the run after this word.
@@ -170,16 +183,20 @@ def _spoken_numbers(text: str) -> str:
             start += 1
             words = words[1:]
         has_digit = any(w in DIGITS or w == "mười" for w in words)
-        if not has_digit or (all(w in WEAK for w in words) and len(words) < 3):
+        unit_follows = end < len(tokens) and _bare(tokens[end]) in UNITS
+        if not has_digit or (all(w in WEAK for w in words) and len(words) < 3 and not unit_follows):
             continue
-        out.extend(tokens[cursor:start])
+        code = start >= 2 and [_bare(t) for t in tokens[start - 2:start]] in (["ô", "đê"], ["o", "đê"], ["ô", "đe"])
+        out.extend(tokens[cursor:start - 2 if code else start])
         trailing = tokens[end - 1][len(tokens[end - 1].rstrip(".,!?;:")):]
         if bare and len(words) >= 3:
-            out.append("".join(str(DIGITS[w]) for w in words) + trailing)
+            out.append(("OD" if code else "") + "".join(str(DIGITS[w]) for w in words) + trailing)
         else:
             value = parse_number(words)
             if value is None:
-                out.extend(tokens[start:end])
+                out.extend(tokens[start - 2 if code else start:end])
+            elif code:
+                out.append(f"OD{value}{trailing}")
             else:
                 money = any(w in SCALES for w in words)
                 out.append((format_vnd(value) if money else str(value)) + trailing)
@@ -191,57 +208,89 @@ def _spoken_numbers(text: str) -> str:
 # ── dates and times ───────────────────────────────────────────────────────
 
 WEEKDAYS = {"thứ hai": 0, "thứ ba": 1, "thứ tư": 2, "thứ năm": 3, "thứ sáu": 4, "thứ bảy": 5, "chủ nhật": 6}
-RELATIVE_DAYS = {"hôm nay": 0, "ngày mai": 1, "mai": 1, "ngày kia": 2, "ngày mốt": 2, "tuần sau": 7}
-DATE_PHRASE = re.compile(
-    r"\b(thứ hai|thứ ba|thứ tư|thứ năm|thứ sáu|thứ bảy|chủ nhật)( tuần sau| tuần tới| tuần này)?|\b(hôm nay|ngày mai|ngày kia|ngày mốt)\b",
+RELATIVE_DAYS = {"hôm nay": 0, "nay": 0, "ngày mai": 1, "mai": 1, "ngày kia": 2, "ngày mốt": 2, "mốt": 2}
+_DAY = r"thứ hai|thứ ba|thứ tư|thứ năm|thứ sáu|thứ bảy|chủ nhật|hôm nay|ngày mai|ngày kia|ngày mốt"
+_PART = r"sáng|trưa|chiều|tối|đêm"
+_WEEK = r"(?:\s+tuần\s+(?:sau|tới|này))"
+DATE_PHRASE = re.compile(rf"\b({_DAY})({_WEEK})?\b", re.IGNORECASE)
+#: A time with its part of the day and day on either side: "tối mai 8 giờ",
+#: "8 giờ tối mai", "chiều thứ bảy 3 giờ rưỡi", "tối nay lúc 8h30".
+MOMENT = re.compile(
+    rf"(?:\b(?P<part1>{_PART})\s+)?(?:\b(?P<day1>{_DAY}|mai|nay|mốt)(?P<week1>{_WEEK})?\s+)?(?:lúc\s+)?"
+    rf"\b(?P<hour>\d{{1,2}})\s*(?:giờ|h)(?:\s*(?P<minute>\d{{1,2}}|rưỡi)\b)?"
+    rf"(?:\s+(?P<part2>{_PART})\b)?(?:\s+(?P<day2>{_DAY}|mai|nay|mốt)\b(?P<week2>{_WEEK})?)?",
     re.IGNORECASE,
 )
-HOUR = re.compile(r"\b(\d{1,2})\s*(?:giờ|h)(?:\s*(\d{1,2}))?\s*(sáng|trưa|chiều|tối)?", re.IGNORECASE)
+def _day(phrase: str, week: str | None, today: date) -> date:
+    """The day a day phrase means, counted from *today*."""
+    lower = phrase.lower()
+    if lower in RELATIVE_DAYS:
+        return today + timedelta(days=RELATIVE_DAYS[lower])
+    weekday = WEEKDAYS[lower]
+    if week and week.split()[-1] in ("sau", "tới"):
+        return today + timedelta(days=7 - today.weekday() + weekday)
+    if week and week.split()[-1] == "này":
+        return today + timedelta(days=weekday - today.weekday())
+    return today + timedelta(days=(weekday - today.weekday()) % 7 or 7)
+
+
+def _clock(hour: int, minute: str | None, part: str | None) -> tuple[int, int] | None:
+    """24-hour time from what was said: "3 giờ rưỡi chiều" is 15:30."""
+    minutes = 30 if (minute or "").lower() == "rưỡi" else int(minute or 0)
+    part = (part or "").lower()
+    if part in ("chiều", "tối") and hour < 12:
+        hour += 12
+    elif part == "đêm" and 6 <= hour < 12:
+        hour += 12
+    elif part == "trưa" and hour < 6:
+        hour += 12
+    if hour > 23 or minutes > 59:
+        return None
+    return hour, minutes
+
+
+def _moments(text: str, now: datetime) -> tuple[str, list[tuple[int, int]]]:
+    """Each time said, with the moment it means appended; and the spans consumed, for :func:`_dates`."""
+    today = now.date()
+    spans: list[tuple[int, int]] = []
+
+    def replace(match: re.Match[str]) -> str:
+        clock = _clock(int(match.group("hour")), match.group("minute"), match.group("part1") or match.group("part2"))
+        if clock is None:
+            return match.group(0)
+        phrase, week = (match.group("day1"), match.group("week1")) if match.group("day1") else (
+            match.group("day2"), match.group("week2"))
+        day = _day(phrase, week, today) if phrase else today
+        moment = datetime.combine(day, time(*clock), tzinfo=now.tzinfo)
+        spans.append(match.span())
+        return f"{match.group(0)} ({moment.isoformat(timespec='minutes')})"
+
+    return MOMENT.sub(replace, text), spans
 
 
 def _dates(text: str, now: datetime) -> str:
+    """A day said without a time gets its date; one inside a moment already has it."""
     today = now.date()
 
     def replace(match: re.Match[str]) -> str:
-        phrase = match.group(0)
-        lower = phrase.lower()
-        if match.group(3):
-            day = today + timedelta(days=RELATIVE_DAYS[lower])
-        else:
-            weekday = WEEKDAYS[match.group(1).lower()]
-            ahead = (weekday - today.weekday()) % 7 or 7
-            if match.group(2) and match.group(2).strip() in ("tuần sau", "tuần tới"):
-                start_next = today + timedelta(days=7 - today.weekday())
-                day = start_next + timedelta(days=weekday)
-            else:
-                day = today + timedelta(days=ahead)
-        return f"{phrase} ({day_label(day)})"
+        after = text[match.end():match.end() + 40]
+        if re.match(r"[^()]*\(\d{4}-\d{2}-\d{2}T", after):
+            return match.group(0)
+        return f"{match.group(0)} ({day_label(_day(match.group(1), match.group(2), today))})"
 
     return DATE_PHRASE.sub(replace, text)
 
 
-def _hours(text: str) -> str:
-    def replace(match: re.Match[str]) -> str:
-        hour = int(match.group(1))
-        minute = int(match.group(2) or 0)
-        part = (match.group(3) or "").lower()
-        if part in ("chiều", "tối") and hour < 12:
-            hour += 12
-        if part == "trưa" and hour < 11:
-            hour += 12
-        if hour > 23 or minute > 59:
-            return match.group(0)
-        return f"{hour:02d}:{minute:02d}"
-
-    return HOUR.sub(replace, text)
-
-
 def normalise(text: str, now: datetime) -> str:
-    """Money, phone numbers, dates and times in *text*, spoken form to written."""
-    # Dates first: "thứ hai" is a weekday before it is the number two.
-    written = _dates(text, now)
-    written = _spoken_numbers(written)
-    return _hours(written)
+    """Money, phone numbers, order codes, dates and times in *text*, spoken form to written."""
+    written = _spoken_numbers(text)
+    written, _ = _moments(written, now)
+    return _dates(written, now)
+
+
+def amounts(text: str) -> list[int]:
+    """Every amount of money in *text*, written or spoken, in VND: what the guard checks."""
+    return [span.value for span in money_spans(_spoken_numbers(text))]
 
 
 # ── written money, read back ──────────────────────────────────────────────

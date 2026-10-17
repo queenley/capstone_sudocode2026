@@ -59,7 +59,7 @@ class ScriptedAgent:
         content = self.replies.get((call_id, turn_id))
         return {"content": content} if content is not None else None
 
-    async def take_turn(self, row, *, content, turn_id, arrived, actor, memory):
+    async def take_turn(self, row, *, content, turn_id, arrived, actor, memory, emit=None):
         self.turns.append({"call_id": row["id"], "content": content, "memory": memory})
         if row.get("mode") == "copilot":
             return harness.Outcome(kind="waiting", turn_id=turn_id, state={"lane": "HANDOFF", "mode": "copilot"})
@@ -105,12 +105,41 @@ def create_test_app(settings: Settings, database: Database) -> FastAPI:
     return app
 
 
-@pytest.fixture
-def agent(monkeypatch) -> ScriptedAgent:
-    scripted = ScriptedAgent()
+class StreamingAgent(ScriptedAgent):
+    """As :class:`ScriptedAgent`, but the reply is said a checked sentence at a
+    time through ``emit``, as the real graph does (``docs/design.md`` 4.8)."""
+
+    SENTENCES = ("Dạ, bên em có mẫu này ạ.", "Anh/chị muốn xem thêm không?")
+
+    async def take_turn(self, row, *, content, turn_id, arrived, actor, memory, emit=None):
+        outcome = await super().take_turn(row, content=content, turn_id=turn_id, arrived=arrived, actor=actor,
+                                          memory=memory)
+        if emit is None or outcome.kind != "message":
+            return outcome
+        # The line said while tools run comes first; the chat shows typing instead of it.
+        await emit("filler", "Dạ anh/chị chờ em một xíu ạ.")
+        for sentence in self.SENTENCES:
+            await emit("sentence", sentence)
+        reply = " ".join(self.SENTENCES)
+        self.replies[(row["id"], turn_id)] = reply
+        return harness.Outcome(kind="message", turn_id=turn_id, content=reply, latency=outcome.latency,
+                               state=outcome.state)
+
+
+def _scripted(monkeypatch, scripted: ScriptedAgent) -> ScriptedAgent:
     for name in ("call_for_conversation", "stored_reply", "take_turn"):
         monkeypatch.setattr(calls, name, getattr(scripted, name))
     return scripted
+
+
+@pytest.fixture
+def agent(monkeypatch) -> ScriptedAgent:
+    return _scripted(monkeypatch, ScriptedAgent())
+
+
+@pytest.fixture
+def streaming_agent(monkeypatch) -> StreamingAgent:
+    return _scripted(monkeypatch, StreamingAgent())
 
 
 @pytest.fixture
