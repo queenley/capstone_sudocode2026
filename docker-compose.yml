@@ -64,8 +64,10 @@ services:
     build:
       context: .
       dockerfile: apps/commerce-service/Dockerfile
-    environment:
-      DATABASE_URL: postgresql+psycopg://postgres:${POSTGRES_PASSWORD:-local-postgres-change-me}@postgres:5432/app_db
+    # The shared block, as identity and sales: without it the staff tokens
+    # here are the built-in defaults and the admin and seller routes refuse
+    # the tokens set in .env.
+    environment: *environment
     depends_on:
       postgres:
         condition: service_healthy
@@ -114,7 +116,8 @@ services:
       <<: *environment
       # Models and routing are in apps/ai-agent-service/config/models.yaml;
       # a provider is offered only when its key is set.
-      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-${GEMINI_API_KEY:-}}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       GROQ_API_KEY: ${GROQ_API_KEY:-}
       NVIDIA_API_KEY: ${NVIDIA_API_KEY:-}
       AI_GATEWAY_API_KEY: ${AI_GATEWAY_API_KEY:-}
@@ -219,8 +222,11 @@ services:
     profiles: ["tracking"]
     image: ghcr.io/mlflow/mlflow:v3.16.1
     command:
-      ["server", "--host", "0.0.0.0", "--port", "5000", "--backend-store-uri", "sqlite:////mlflow/mlflow.db", "--default-artifact-root", "file:///mlflow/artifacts", "--allowed-hosts", "mlflow:5000,localhost:5000,127.0.0.1:5000"]
-    ports: ["127.0.0.1:5000:5000"]
+      # Artifacts go through the server (--artifacts-destination), so a client
+      # outside the container uploads them instead of writing to its own disk.
+      ["mlflow", "server", "--host", "0.0.0.0", "--port", "5000", "--backend-store-uri", "sqlite:////mlflow/mlflow.db", "--artifacts-destination", "/mlflow/artifacts", "--allowed-hosts", "mlflow:5000,localhost:${MLFLOW_PORT:-5500},127.0.0.1:${MLFLOW_PORT:-5500}"]
+    # 5500 on the host: Windows reserves port 5000 (and macOS uses it for AirPlay).
+    ports: ["127.0.0.1:${MLFLOW_PORT:-5500}:5000"]
     volumes: ["mlflow-data:/mlflow"]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]

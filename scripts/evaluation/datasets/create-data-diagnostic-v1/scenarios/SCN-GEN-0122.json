@@ -1,0 +1,171 @@
+{
+  "scenario_id": "SCN-GEN-0122",
+  "level": "M1",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "customer_id": "C050",
+  "customer_phone": "0956517883",
+  "customer_name": "Thủy",
+  "honorific": "chị",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "difficulty": "normal",
+  "tags": [
+    "dat_hang",
+    "giay_chay_bo",
+    "hen_goi_lai",
+    "tu_van",
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=chuan; session_index=2",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-30",
+      "input_mode": "text",
+      "customer_goal": "Hỏi tư vấn giày chạy bộ size 41 màu đen",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về giày chạy bộ size 41 màu đen.",
+        "Chị đang cần một đôi giày chạy bộ, không biết có khuyến mãi gì không em?",
+        "Chị sẽ hỏi ông xã rồi gọi lại nhé."
+      ],
+      "facts_established": {
+        "size": 41,
+        "color": "den",
+        "decision_maker": "chồng",
+        "blocker": "cần hỏi chồng",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-41-DEN"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "ground_truth_facts": {
+        "price_vnd": 1690000,
+        "list_price_vnd": 1690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-30"
+      },
+      "memory_expectation": {
+        "size": 41,
+        "color": "den",
+        "decision_maker": "chồng",
+        "blocker": "cần hỏi chồng",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-41-DEN"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-11-02",
+      "days_later": 3,
+      "input_mode": "text",
+      "customer_goal": "Xác nhận đặt hàng giày chạy bộ",
+      "customer_turns": [
+        "Chị muốn đặt giày chạy bộ size 41 màu đen.",
+        "Hình thức thanh toán là COD và giao hàng ở Nha Trang, Khánh Hòa.",
+        "Chị đồng ý lên đơn nhé."
+      ],
+      "facts_established": {
+        "payment": "COD",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-41-DEN",
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "size",
+        "decision_maker",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "decision_maker",
+        "product_advised",
+        "variant_sku"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 1690000,
+        "list_price_vnd": 1690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "estimated_delivery": "2026-11-06",
+        "call_date": "2026-11-02"
+      },
+      "memory_expectation": {
+        "payment": "COD",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-41-DEN",
+        "order_id": "OD600001"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0956517883",
+        "customer_id": "C050",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-30",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-SN-RUN2"
+        ],
+        "open_blockers": [
+          "cần hỏi chồng"
+        ],
+        "must_not_ask": [
+          "size",
+          "color",
+          "decision_maker",
+          "product_advised",
+          "variant_sku"
+        ],
+        "suggested_opening": "Dạ em chào chị Thủy, em gọi lại về SKU-SN-RUN2 chị đang quan tâm ạ, không biết cần hỏi chồng chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-02T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-RUN2-41-DEN",
+          "price_vnd": 1690000,
+          "payment": "COD"
+        }
+      }
+    }
+  },
+  "hard_case": null
+}

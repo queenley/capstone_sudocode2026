@@ -63,6 +63,7 @@ PROVIDER_ENV_VAR = {
     "google_genai": "GOOGLE_API_KEY",
     "groq": "GROQ_API_KEY",
     "nvidia": "NVIDIA_API_KEY",
+    "openai": "OPENAI_API_KEY",
     "vercel_gateway": "AI_GATEWAY_API_KEY",
 }
 
@@ -79,6 +80,7 @@ class Secrets(BaseSettings):
     google_api_key: str | None = None
     groq_api_key: str | None = None
     nvidia_api_key: str | None = None
+    openai_api_key: str | None = None
     ai_gateway_api_key: str | None = None
 
 

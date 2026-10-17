@@ -80,7 +80,9 @@ async def inventory_check(sku: str, on: str | None = None) -> dict[str, Any]:
     discontinued product names its successor_sku.
 
     Args:
-        sku: A product sku or a variant_sku.
+        sku: A catalogue code such as SKU-AP-X, or a variant_sku, as
+            catalog_search returned it. Never a product name: with only a
+            name, call catalog_search first and wait for its result.
         on: The day of the call, YYYY-MM-DD. Set by the system; leave it out.
     """
     m = btc.mock()
@@ -105,7 +107,9 @@ async def pricing_get_quote(
     state to a customer.
 
     Args:
-        sku: A product sku or a variant_sku; a bigger size may cost more.
+        sku: A catalogue code such as SKU-AP-X, or a variant_sku, as
+            catalog_search returned it; never a product name. A bigger size
+            may cost more.
         on: The day of the call, YYYY-MM-DD. Set by the system; leave it out.
         qty: How many units the customer is buying.
         customer_phone: Set by the system; leave it out.

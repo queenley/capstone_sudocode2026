@@ -1,0 +1,163 @@
+{
+  "scenario_id": "SCN-GEN-0052",
+  "level": "M1",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "customer_id": "C039",
+  "customer_phone": "0930976582",
+  "customer_name": "Cường",
+  "honorific": "anh",
+  "region": "bac",
+  "category": "me-be",
+  "difficulty": "normal",
+  "tags": [
+    "bình_sữa",
+    "khách_hàng",
+    "tư_vấn",
+    "variant:chuan",
+    "đặt_hàng"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=chuan; session_index=1",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-15",
+      "input_mode": "text",
+      "customer_goal": "Hỏi về bình sữa Pigeon cho bé 18 tháng",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về bình sữa Pigeon PPSU 240ml cho bé nhà anh.",
+        "Bé nhà anh 18 tháng rồi, ngân sách khoảng 500 nghìn thôi.",
+        "Bình này có khuyến mãi gì không em?",
+        "Anh cần hỏi vợ rồi sẽ gọi lại nhé."
+      ],
+      "facts_established": {
+        "child_age_months": 18,
+        "budget_vnd": 500000,
+        "decision_maker": "vợ",
+        "blocker": "cần hỏi vợ",
+        "product_advised": "SKU-MB-BOT",
+        "price_quoted_vnd": 289000
+      },
+      "expected_outcome": "hen_goi_lai",
+      "ground_truth_facts": {
+        "price_vnd": 289000,
+        "list_price_vnd": 289000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_MOM-FREESHIP_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-15"
+      },
+      "memory_expectation": {
+        "child_age_months": 18,
+        "budget_vnd": 500000,
+        "decision_maker": "vợ",
+        "blocker": "cần hỏi vợ",
+        "product_advised": "SKU-MB-BOT",
+        "price_quoted_vnd": 289000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-10-18",
+      "days_later": 3,
+      "input_mode": "text",
+      "customer_goal": "Xác nhận mua bình sữa Pigeon",
+      "customer_turns": [
+        "Alo, anh đã hỏi vợ và muốn mua bình sữa Pigeon đó.",
+        "Hình thức thanh toán là COD nhé.",
+        "Giao hàng ở Cầu Giấy, Hà Nội.",
+        "Mong sản phẩm sớm về tay anh."
+      ],
+      "facts_established": {
+        "payment": "COD",
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "product_advised": "SKU-MB-BOT",
+        "price_quoted_vnd": 289000,
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "decision_maker",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "decision_maker",
+        "product_advised"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 289000,
+        "list_price_vnd": 289000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_MOM-FREESHIP_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "estimated_delivery": "2026-10-20",
+        "call_date": "2026-10-18"
+      },
+      "memory_expectation": {
+        "payment": "COD",
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "product_advised": "SKU-MB-BOT",
+        "price_quoted_vnd": 289000,
+        "order_id": "OD600001"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0930976582",
+        "customer_id": "C039",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-15",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-MB-BOT"
+        ],
+        "open_blockers": [
+          "cần hỏi vợ"
+        ],
+        "must_not_ask": [
+          "child_age_months",
+          "budget_vnd",
+          "decision_maker",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào anh Cường, em gọi lại về SKU-MB-BOT anh đang quan tâm ạ, không biết cần hỏi vợ chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-18T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-MB-BOT",
+          "price_vnd": 289000,
+          "payment": "COD"
+        }
+      }
+    }
+  },
+  "hard_case": null
+}

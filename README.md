@@ -1,160 +1,196 @@
 # capstone_sudocode2026
-=======
-# Tiếp Nối — SUDO CODE 2026
 
-Nền tảng telesales có AI agent tư vấn bán hàng qua chat và cuộc gọi. Agent nhớ khách giữa các cuộc gọi (CallBrief), tra giá, tồn kho và chính sách bằng tool, tự kiểm tra câu trả lời trước khi nói, và chuyển cho nhân viên khi cần.
+Một cửa hàng online có **nhân viên tư vấn là AI**. Khách vào trang web, xem sản phẩm và chat (hoặc gọi thoại) với AI. AI trả lời giá, tồn kho, chính sách, tra đơn hàng, và **nhớ khách** ở lần liên hệ sau. Khi khách cần người thật (khiếu nại, câu hỏi khó), AI chuyển cuộc trò chuyện cho nhân viên.
 
-Hệ thống gồm giao diện Next.js, API Gateway và bốn service FastAPI (Commerce, Identity, Sales, AI Agent). Các service dùng chung PostgreSQL, có thêm Redis và Kafka (tùy chọn).
+---
 
-> **Trạng thái:** đây là giai đoạn chuyển tiếp. Mỗi service chạy thành tiến trình riêng nhưng vẫn dùng chung database, outbox và code trong `packages/backend-common`. Riêng AI Agent đã có schema `agent` của mình. Xem [kế hoạch sở hữu dữ liệu](docs/architecture/data-ownership-migration.md) trước khi tách database.
+## 1. Chạy thử trong 5 bước
 
-## Kiến trúc
+Cần: **Docker Desktop** đang chạy.
 
-```mermaid
-flowchart LR
-    B[Trình duyệt<br/>khách · nhân viên · admin] --> WEB[web :3000<br/>Next.js]
-    WEB --> GW[api-gateway :8000<br/>CORS · rate limit · proxy · WS voice]
-    GW --> ID[identity :8200]
-    GW --> SA[sales :8300]
-    GW --> CO[commerce :8100]
-    GW --> AI[ai-agent :8400]
-    AI <-->|stdio MCP| MCP[5 MCP servers<br/>catalog · crm · order · memory · knowledge]
-    ID & SA & CO & AI --> PG[(PostgreSQL<br/>schema domain + schema agent)]
-    ID & SA & CO --> R[(Redis)]
-    PG -.outbox.-> W[event workers] -.-> K[(Kafka, tùy chọn)]
-    AI -.-> LLM[Gemini / Groq / NVIDIA<br/>Jev qua AI Gateway]
-```
-
-| Thành phần | Trách nhiệm | Cổng |
-|---|---|---:|
-| `apps/web` | Trang mua hàng + chat + gọi thoại, workspace nhân viên/admin/seller, console cuộc gọi của agent (`/calls`), Agent Console (`/developer`) | 3000 |
-| `apps/api-gateway` | CORS, rate limit 120 req/phút/IP, định tuyến HTTP, relay WebSocket voice | 8000 |
-| `apps/identity-service` | Đăng nhập staff, xác minh khách (OTP), dữ liệu cá nhân | 8200 |
-| `apps/sales-service` | Conversation, inbox nhân viên, handoff, feedback, proposal | 8300 |
-| `apps/commerce-service` | Catalog/SKU, báo giá, tồn kho, khuyến mãi, order | 8100 |
-| `apps/ai-agent-service` | Lượt chat/stream/voice của agent, console cuộc gọi, developer API | 8400 |
-| PostgreSQL / Redis / Kafka | Dữ liệu giao dịch / rate limit + working state / domain events | 5432 / 6379 / 9092 |
-
-Lượt chat của khách đi theo đường: trình duyệt → gateway → AI Agent → đồ thị 7 bước (`perceive → load_context → route → advisor → guard → respond → persist`). Agent hoạt động mà không cần Kafka. Chi tiết agent xem [apps/ai-agent-service/README.md](apps/ai-agent-service/README.md).
-
-## Cấu trúc repo
-
-```text
-apps/
-  web/                    Next.js
-  api-gateway/            gateway công khai (src/main.py: bảng định tuyến)
-  identity-service/  sales-service/  commerce-service/
-                          FastAPI; còn import handler/persistence từ backend-common
-  ai-agent-service/       agent telesales: config/, data/btc/, src/ai_agent_service/
-packages/backend-common/  models, migrations, security, handler dùng chung (chuyển tiếp)
-contracts/                OpenAPI theo service, Kafka envelope/topics
-data/seed/catalog/        catalog demo được seed vào Compose
-infra/                    kubernetes/ (Kustomize), terraform/gcp/, argocd/
-scripts/                  seed, migration, evaluation, contracts, deployment, dev,
-                          create_data/ (sinh dữ liệu kiểm thử theo format BTC)
-tests/                    pytest: workflow nền tảng, route agent, tests/agent/ (logic agent)
-notebooks/                phân tích dữ liệu BTC
-docs/                     tài liệu (xem docs/README.md)
-```
-
-## Chạy nhanh bằng Docker Compose
-
-Yêu cầu Docker Desktop (Linux containers).
+**Bước 1. Tạo file cấu hình**
 
 ```powershell
 Copy-Item .env.example .env
-# Điền ít nhất một key model cho agent: GOOGLE_API_KEY (mặc định advisor dùng Gemini).
-# AI_GATEWAY_API_KEY bật soft guard Jev; thiếu thì agent chỉ chạy hard guard.
+```
+
+**Bước 2. Điền key AI vào `.env`**
+
+Mở `.env`, điền ít nhất:
+
+```
+OPENAI_API_KEY=sk-...
+```
+
+AI mặc định dùng OpenAI `gpt-4.1-mini`. Muốn dùng Gemini thì điền `GEMINI_API_KEY` (hoặc `GOOGLE_API_KEY`), rồi đổi model trong trang Developer.
+
+**Bước 3. Bật hệ thống**
+
+```powershell
 docker compose up --build -d
+```
+
+Lần đầu mất vài phút để build. Kiểm tra đã chạy xong chưa:
+
+```powershell
+curl http://localhost:8000/health/ready
+```
+
+Thấy `"status":"ready"` là được.
+
+**Bước 4. Tạo tài khoản nhân viên (admin)**
+
+```powershell
 docker compose run --rm identity-service python /app/scripts/admin/create_admin.py
 ```
 
-- Ứng dụng: `http://localhost:3000`. Đăng nhập staff ở `/login`.
-- Health: `http://localhost:8000/health` và `/health/ready` (gateway kiểm tra mọi service).
-- Log: `docker compose logs -f ai-agent-service api-gateway`.
+Lệnh sẽ hỏi tên đăng nhập và mật khẩu (ít nhất 12 ký tự).
 
-Compose chờ PostgreSQL/Redis, chạy `seed` (migration + catalog demo) rồi mới bật các service. Dữ liệu nằm trong volume `postgres-data`. Weights voice nằm trong volume `voice-models`. Lệnh `docker compose down` giữ dữ liệu; `down -v` xóa sạch.
+**Bước 5. Mở trình duyệt**
 
-Khi thiếu key model, agent vẫn trả lời bằng câu an toàn và sau hai câu như vậy sẽ chuyển cho nhân viên. Để bật kênh gọi thoại, build image với `--build-arg WITH_VOICE=1`.
+Vào **http://localhost:3000** và chat thử, ví dụ: *"Máy lọc không khí AirPure X giá bao nhiêu, còn hàng không?"*
 
-### Profile tùy chọn
+Tắt hệ thống: `docker compose down` (giữ dữ liệu) hoặc `docker compose down -v` (xóa sạch dữ liệu).
 
-| Profile | Bật | Ghi chú |
+---
+
+## 2. Các trang trong ứng dụng
+
+| Trang | Ai dùng | Làm gì |
 |---|---|---|
-| `async` | Kafka + event workers | đặt `KAFKA_BROKERS=kafka:9092` trong `.env` |
-| `tracking` | MLflow `:5000` | đặt `MLFLOW_TRACKING_URI=http://mlflow:5000`; mỗi lượt agent ghi một run (lane, model, tool, latency), không ghi prompt hay PII |
-| `retrieval` | Qdrant | agent hiện **không** dùng Qdrant: tra chính sách bằng BM25 trên `data/btc/policy` |
+| `/` | Khách | Xem sản phẩm, chat với AI, xác minh số điện thoại (OTP), đặt hàng |
+| `/login` | Nhân viên | Đăng nhập bằng tài khoản tạo ở bước 4 |
+| `/calls` | Nhân viên tư vấn | Xem các cuộc chat đang diễn ra, nhận cuộc AI chuyển sang, trả lời khách |
+| `/agent` | Nhân viên tư vấn | Hộp thư các cuộc trò chuyện |
+| `/seller` | Nhân viên bán hàng | Xem và hủy đơn hàng |
+| `/admin` | Quản trị | Tạo tài khoản, sửa tồn kho, tạo khuyến mãi |
+| `/developer` | Lập trình viên | Đổi model AI, xem trace từng lượt, đo độ trễ, đổi "ngày kinh doanh" |
 
-```powershell
-docker compose --profile async --profile tracking up --build -d
+Khi chạy local, mã OTP không gửi SMS mà hiện ngay trên màn hình (chế độ phát triển).
+
+---
+
+## 3. Một tin nhắn đi qua hệ thống thế nào
+
+```mermaid
+flowchart LR
+    U[Khách<br/>trình duyệt] --> W[web :3000]
+    W --> G[api-gateway :8000]
+    G --> S[sales :8300<br/>cuộc trò chuyện]
+    G --> AI[ai-agent :8400<br/>AI tư vấn]
+    G --> C[commerce :8100<br/>sản phẩm, đơn]
+    G --> I[identity :8200<br/>đăng nhập, OTP]
+    AI --> T[Tool: catalog, CRM,<br/>đơn hàng, bộ nhớ, chính sách]
+    AI --> M[OpenAI / Gemini]
+    S & C & I & AI --> DB[(PostgreSQL)]
 ```
 
-## Phát triển
+1. Khách gõ tin nhắn trên **web**.
+2. **api-gateway** nhận và chuyển đến đúng service (chat → ai-agent, sản phẩm → commerce, đăng nhập → identity, ...).
+3. **ai-agent** xử lý qua 7 bước: hiểu câu khách → nhận diện khách → chọn hướng xử lý → AI soạn câu trả lời (gọi tool tra giá, tồn kho, đơn hàng) → kiểm tra câu trả lời → gửi → lưu lại.
+4. Khi khách cần người thật, AI chuyển cuộc trò chuyện; nhân viên thấy nó ở trang `/calls`.
+5. Sau mỗi cuộc, AI ghi nhớ thông tin quan trọng của khách để lần sau không phải hỏi lại.
 
-Frontend với hot reload, backend chạy trong Compose:
+> **Lưu ý:** trang mua hàng đang hiển thị 5 sản phẩm demo (`data/seed/catalog`), còn AI tư vấn theo catalog của BTC (`apps/ai-agent-service/data/btc`: máy lọc không khí, giày, đồ mẹ bé, ...). Hỏi AI về sản phẩm của BTC sẽ có câu trả lời chính xác nhất.
+
+---
+
+## 4. Gặp lỗi thường gặp
+
+| Hiện tượng | Nguyên nhân hay gặp | Cách xử lý |
+|---|---|---|
+| AI chỉ trả lời câu an toàn rồi chuyển nhân viên | Thiếu key AI hoặc key hết hạn mức | Kiểm tra `OPENAI_API_KEY` trong `.env`, rồi `docker compose up -d ai-agent-service` |
+| Lỗi 402 / `RESOURCE_EXHAUSTED` từ Gemini | Tài khoản Google AI Studio hết tiền trả trước | Dùng OpenAI, hoặc nạp thêm tiền |
+| Không đăng nhập được trang nhân viên | Chưa tạo tài khoản | Làm bước 4 |
+| Trang admin/seller báo 403 | Token trong `.env` khác token service đang dùng | Sau khi sửa `.env`, chạy lại `docker compose up -d` |
+| `health/ready` báo `degraded` | Một service chưa khởi động xong hoặc bị lỗi | Đợi thêm, hoặc xem log: `docker compose logs -f <tên-service>` |
+| Đã sửa code nhưng không thấy thay đổi | Image cũ | `docker compose up -d --build <tên-service>` |
+
+---
+
+## 5. Cấu trúc thư mục
+
+```text
+apps/
+  web/                  Giao diện (Next.js)
+  api-gateway/          Cổng vào duy nhất, định tuyến request (src/main.py)
+  identity-service/     Đăng nhập nhân viên, OTP khách
+  sales-service/        Cuộc trò chuyện, chuyển nhân viên, phản hồi
+  commerce-service/     Sản phẩm, báo giá, tồn kho, đơn hàng
+  ai-agent-service/     AI tư vấn (xem README riêng)
+packages/backend-common/  Code dùng chung cho các service
+data/seed/catalog/      Sản phẩm demo của trang mua hàng
+scripts/                Seed dữ liệu, tạo admin, đánh giá AI, sinh dữ liệu test
+tests/                  Test tự động (pytest)
+docs/                   Tài liệu chi tiết
+infra/                  Triển khai lên cloud (Kubernetes, Terraform)
+```
+
+---
+
+## 6. Dành cho lập trình viên
+
+### Chạy frontend có hot reload
 
 ```powershell
 docker compose up -d postgres redis seed commerce-service identity-service sales-service ai-agent-service api-gateway
 Set-Location apps/web; npm ci; npm run dev
 ```
 
-Chạy Python trực tiếp (Python 3.12). Các service dùng namespace `src` của backend-common, nên cần đặt `PYTHONPATH`:
+### Chạy test
 
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt -r apps/api-gateway/requirements.txt
-$env:DATABASE_URL="postgresql+psycopg://postgres:local-postgres-change-me@localhost:5432/app_db"
+# Test backend (không cần database hay key AI)
+$env:PYTHONPATH="apps/ai-agent-service/src;packages/backend-common"
+apps/ai-agent-service/.venv/Scripts/python -m pytest -q
 
-# Commerce (đổi thư mục/cổng cho identity 8200, sales 8300)
-$env:PYTHONPATH="$PWD/packages/backend-common;$PWD/apps/commerce-service/src"
-.\.venv\Scripts\python.exe -m uvicorn main:app --app-dir apps/commerce-service/src --port 8100
-
-# AI Agent
-$env:PYTHONPATH="$PWD/packages/backend-common;$PWD/apps/ai-agent-service/src"
-.\.venv\Scripts\python.exe -m uvicorn ai_agent_service.main:app --port 8400
-
-# Gateway
-.\.venv\Scripts\python.exe -m uvicorn main:app --app-dir apps/api-gateway/src --port 8000
-```
-
-Khi chạy ngoài Compose, đổi hostname `postgres`/`redis` thành `localhost`.
-
-## Kiểm tra và đánh giá
-
-```powershell
-.\.venv\Scripts\python.exe -m pytest -q                      # 64 test, không cần DB hay model
-.\.venv\Scripts\python.exe -m scripts.evaluation.evaluate    # Recall@k của retriever agent (rag_eval của BTC)
+# Kiểm tra frontend
 Set-Location apps/web; npm run typecheck; npm run build
 ```
 
-Các chỉ số bắt buộc của Chương A (CCR, RQR, TSR, HR, over-escalation) được chấm bằng `reference_eval.py` của BTC trên dữ liệu do `scripts/create_data` sinh. Xem [docs/evaluation](docs/evaluation/README.md).
+### Đánh giá chất lượng AI
 
-Test PostgreSQL dùng database riêng `telesales_test` qua `TEST_DATABASE_URL`, không trỏ vào database thật. Playwright: `npx playwright install chromium` rồi `npx playwright test` khi ứng dụng đang chạy.
+Bộ chấm điểm (so sánh AI có nhớ khách và không nhớ khách, dùng scorer của BTC) nằm ở `scripts/evaluation`. Xem [scripts/evaluation/README.md](scripts/evaluation/README.md).
 
-## Biến môi trường
+```powershell
+apps/ai-agent-service/.venv/Scripts/python scripts/evaluation/run_eval.py evaluate --advisor openai:gpt-4.1-mini
+```
+
+### Chạy service Python không qua Docker
+
+Đặt `PYTHONPATH` gồm `packages/backend-common` và thư mục `src` của service, trỏ `DATABASE_URL` vào `localhost` (dùng `127.0.0.1` trên Windows), rồi chạy `uvicorn`. Hướng dẫn chi tiết cho AI agent: [apps/ai-agent-service/README.md](apps/ai-agent-service/README.md).
+
+### Biến môi trường quan trọng
 
 Bắt đầu từ [.env.example](.env.example).
 
-| Nhóm | Biến |
+| Biến | Dùng để |
 |---|---|
-| Nền tảng | `DATABASE_URL`, `REDIS_URL`, `APP_SECRET`, `ENCRYPTION_KEY`, `ENVIRONMENT`, `CORS_ORIGINS` |
-| Role token (dev) | `ADMIN_TOKEN`, `AGENT_TOKEN`, `SELLER_TOKEN`, `DEVELOPER_TOKEN` |
-| AI Agent | `GOOGLE_API_KEY`, `GROQ_API_KEY`, `NVIDIA_API_KEY`, `AI_GATEWAY_API_KEY`, `AGENT_DB_SCHEMA`, `LANGFUSE_*`, `MLFLOW_TRACKING_URI` |
-| Khác | `OTP_DELIVERY_URL`/`OTP_DELIVERY_TOKEN`, `KAFKA_BROKERS`, `QDRANT_URL`, embedding |
+| `OPENAI_API_KEY`, `GEMINI_API_KEY` / `GOOGLE_API_KEY` | Key cho AI (cần ít nhất một) |
+| `ADMIN_TOKEN`, `AGENT_TOKEN`, `SELLER_TOKEN`, `DEVELOPER_TOKEN` | Token theo vai trò, chỉ dùng khi phát triển |
+| `POSTGRES_PASSWORD`, `APP_SECRET`, `ENCRYPTION_KEY` | Database và mã hóa dữ liệu |
+| `AI_GATEWAY_API_KEY` | Bật lớp kiểm tra câu trả lời thứ hai (Jev); không có thì chỉ chạy lớp kiểm tra cơ bản |
+| `OTP_DELIVERY_URL` | Gửi OTP thật; để trống thì mã hiện trên màn hình |
 
-Model của từng agent được khai báo trong [`apps/ai-agent-service/config/models.yaml`](apps/ai-agent-service/config/models.yaml), không qua biến môi trường. Token demo và mật khẩu trong `.env.example` chỉ dùng cho máy local. Production yêu cầu `APP_SECRET` dài ít nhất 32 byte, `ENCRYPTION_KEY`, các role token mạnh và khác nhau, và `REDIS_URL`.
+Model AI của từng thành phần cấu hình trong [`apps/ai-agent-service/config/models.yaml`](apps/ai-agent-service/config/models.yaml). Khi deploy thật: `APP_SECRET` dài ít nhất 32 ký tự, token mạnh và khác nhau.
 
-## Triển khai
+### Tính năng tùy chọn
 
-Repo có Terraform (GCP: GKE Autopilot, Cloud SQL, Memorystore, Artifact Registry), manifest Kustomize và ví dụ ArgoCD. Các công cụ này **không tự triển khai ứng dụng** và có phát sinh chi phí. Từng bước (build image, secret, migration, rollout) xem [docs/deployment](docs/deployment/README.md).
+| Lệnh thêm | Bật |
+|---|---|
+| `--profile async` | Kafka (sự kiện giữa các service); đặt `KAFKA_BROKERS=kafka:9092` |
+| `--profile tracking` | MLflow tại http://localhost:5500 (đổi bằng `MLFLOW_PORT`): theo dõi từng lượt AI và **chi phí của mỗi lần đánh giá**; đặt `MLFLOW_TRACKING_URI=http://mlflow:5000` |
+| `--build-arg WITH_VOICE=1` | Gọi thoại (nhận dạng và tổng hợp giọng nói chạy local) |
 
-## Tài liệu
+---
 
-- [Mục lục docs](docs/README.md): [HTTP API](docs/api.md), [kiến trúc](docs/architecture/microservices-target-structure.md), [Kafka](docs/kafka.md), [đánh giá](docs/evaluation/README.md), [triển khai](docs/deployment/README.md)
-- [AI Agent](apps/ai-agent-service/README.md) · [backend-common](packages/backend-common/README.md) · [scripts](scripts/README.md) · [sinh dữ liệu test](scripts/create_data/README.md)
+## 7. Giới hạn hiện tại
 
-## Giới hạn hiện tại
+- Các service vẫn dùng chung một database ([kế hoạch tách](docs/architecture/data-ownership-migration.md)).
+- Xác minh OTP trên web chưa được báo cho AI: AI chỉ nhận ra khách khi khách nói số điện thoại trong lúc chat.
+- Trang mua hàng và AI dùng hai catalog khác nhau (xem lưu ý ở mục 3).
+- Chưa có CI build/push image, chưa có HTTPS tự động khi deploy.
 
-- Các service vẫn dùng chung database và outbox. Việc tách cần API/event contract và saga cho order và xóa dữ liệu ([kế hoạch](docs/architecture/data-ownership-migration.md)).
-- Agent: retriever chính sách chưa biết từ chối khi không có tài liệu; địa chỉ chưa được mã hóa PII; eval runner và vòng cải tiến (playbook, FAQ gap) mới là stub. Xem mục *Giới hạn* trong [README agent](apps/ai-agent-service/README.md).
-- CI chưa build, scan và push image; chưa có ingress/TLS tự động.
+## Tài liệu thêm
+
+[Mục lục docs](docs/README.md) · [HTTP API](docs/api.md) · [Kiến trúc](docs/architecture/microservices-target-structure.md) · [AI Agent](apps/ai-agent-service/README.md) · [Scripts](scripts/README.md) · [Sinh dữ liệu test](scripts/create_data/README.md) · [Triển khai](docs/deployment/README.md)

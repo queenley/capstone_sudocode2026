@@ -73,8 +73,11 @@ agents:
   # chosen on time to first token rather than throughput, which is what the
   # provider comparison of 2026-09-17 recommended.
   advisor:
-    provider: google_genai
-    model: gemini-3.5-flash-lite
+    # OpenAI since 2026-10-17: the Google AI Studio key's prepaid credits are
+    # depleted (402 RESOURCE_EXHAUSTED). gemini-3.5-flash-lite stays listed
+    # below and can be chosen again in the Agent Console.
+    provider: openai
+    model: gpt-4.1-mini
     generation:
       # gemini-3.5-flash-lite produces reasoning output, and thinking tokens
       # count against this budget before a single character of the reply does.
@@ -129,6 +132,26 @@ providers:
       requests_per_minute: 40
       input_tokens_per_minute: 100000
       output_tokens_per_minute: 50000
+
+  openai:
+    label: OpenAI
+    models_url: https://api.openai.com/v1/models
+    # gpt-4.1-mini is the default of the offline evaluation (scripts/evaluation);
+    # it takes temperature 0, which the gpt-5 reasoning models refuse.
+    models:
+      - gpt-4.1-mini
+      - gpt-4o-mini
+      - gpt-4.1-nano
+    rate_limits:
+      # Cautious guesses for a tier-1 key; replace with what is measured.
+      requests_per_minute: 60
+      input_tokens_per_minute: 200000
+      output_tokens_per_minute: 50000
+      # USD per million tokens, gpt-4.1-mini's list price (openai.com/api/pricing);
+      # the evaluation's MLflow spend is computed from these. One price per
+      # provider: update it when the advisor moves to another OpenAI model.
+      input_token_price_per_million: 0.40
+      output_token_price_per_million: 1.60
 
 # ── Evaluation models ────────────────────────────────────────────────────────
 # An evaluation model reads a piece of state and answers typed questions: a

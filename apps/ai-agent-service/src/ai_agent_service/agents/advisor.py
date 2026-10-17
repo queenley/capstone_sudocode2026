@@ -142,7 +142,8 @@ LANE_NOTES = {
     "CONFIRM_IDENTITY": (
         "Danh tính chưa chắc chắn ({tier}). Hỏi đúng MỘT câu xác nhận. Nếu có Call Brief, hỏi về sản phẩm "
         "đã tư vấn lần trước, không nêu giá, địa chỉ hay mã đơn. Nếu số này thuộc nhiều người, hỏi tên "
-        "của khách mà không nhắc thông tin của ai: \"Dạ cho em xin tên của mình để em xem đúng thông tin ạ?\""
+        "của khách mà không nhắc thông tin của ai: \"Dạ cho em xin tên của mình để em xem đúng thông tin ạ?\" "
+        "Lượt này không có tool: không nói sẽ kiểm tra, không bảo khách chờ; câu trả lời kết thúc bằng câu hỏi xác nhận đó."
     ),
     "ORDER_SERVICE": (
         "Khách hỏi về đơn đã đặt. Tra order_status, đổi size hoặc sản phẩm bằng order_update, và báo đúng "

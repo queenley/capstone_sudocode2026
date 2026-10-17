@@ -37,6 +37,7 @@ SUPPORTED_PROVIDERS = {
     "google_genai": "langchain-google-genai",
     "groq": "langchain-groq",
     "nvidia": "langchain-nvidia-ai-endpoints",
+    "openai": "langchain-openai",
 }
 
 # The parameters of one model call. Their values are not here: they come from

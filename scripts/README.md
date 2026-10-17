@@ -7,7 +7,7 @@ Chạy từ root repo, trừ `create_data/` (có venv và README riêng).
 | `seed/` | Nạp catalog, SKU variant, chính sách, khuyến mãi vào DB platform. Không nạp transcript hay khách | `python -m scripts.seed.catalog --dataset <dataset>` |
 | `migration/` | Kiểm tra dataset trước khi nạp (chỉ đọc); tạo role DB runtime | `python scripts/migration/validate_dataset.py <dataset>` · `python scripts/migration/provision_db_role.py` |
 | `admin/` | Tạo tài khoản admin đầu tiên | `python scripts/admin/create_admin.py` |
-| `evaluation/` | Recall@k của retriever agent, chấm bằng `rag_eval` của BTC → `reports/generated/evaluation.json` | `python -m scripts.evaluation.evaluate` |
+| `evaluation/` | Harness đánh giá agent end-to-end (full vs baseline, scorer BTC), dữ liệu `create_data`, RAG Recall; xem [evaluation/README.md](evaluation/README.md). Recall@k nhanh của BM25: `python -m scripts.evaluation.evaluate` | `apps/ai-agent-service/.venv/Scripts/python scripts/evaluation/run_eval.py evaluate --advisor openai:gpt-4.1-mini` |
 | `create_data/` | Sinh kịch bản test theo format BTC, ground truth, audio, bộ ASR, đánh giá RAG/ASR | xem [create_data/README.md](create_data/README.md) |
 | `contracts/` | Xuất OpenAPI từng service → `contracts/api/openapi/<service>.json` | `python -m scripts.contracts.export_contracts` |
 | `deployment/` | Render manifest Kubernetes theo image tag (không apply) | `python scripts/deployment/render_deployment.py --help` |
