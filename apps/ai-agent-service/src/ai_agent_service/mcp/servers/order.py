@@ -4,7 +4,8 @@
 reference mock (:mod:`.btc`): an exchange checks the new variant's stock,
 the first size change is free and later ones cost 60.000đ both ways, a
 cheaper replacement is refunded in 3 to 5 working days. The lane
-ORDER_SERVICE offers these two (section 4.3).
+ORDER_SERVICE offers these two (section 4.3). ``order.update`` takes the
+``idempotency_key`` the harness sets, as every write tool does (section 6.1).
 """
 
 from __future__ import annotations
@@ -36,6 +37,7 @@ async def order_update(
     new_variant_sku: str | None = None,
     reason: str | None = None,
     on: str | None = None,
+    idempotency_key: str | None = None,
 ) -> dict[str, Any]:
     """Change an order: another size or product, a return, a new address.
 
@@ -48,10 +50,11 @@ async def order_update(
         new_variant_sku: The variant or product wanted instead, for an exchange.
         reason: Why, in the customer's words.
         on: The day of the call. Set by the system; leave it out.
+        idempotency_key: Set by the system; leave it out.
     """
     m = btc.mock()
     return await btc.call(
-        "order.update", m.order_update,
+        "order.update", m.order_update, idempotency_key=idempotency_key,
         order_id=order_id, action=action, new_variant_sku=new_variant_sku, reason=reason,
         on=on or btc.reference_date(),
     )

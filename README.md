@@ -156,6 +156,8 @@ Bộ chấm điểm (so sánh AI có nhớ khách và không nhớ khách, dùng
 apps/ai-agent-service/.venv/Scripts/python scripts/evaluation/run_eval.py evaluate --advisor openai:gpt-4.1-mini
 ```
 
+Lệnh dạng BTC (`--scenarios`, `--config`, `--out`) chạy agent trên kịch bản của BTC và chấm luôn bằng `reference_eval.py`, kèm bảng truy hồi: xem [README của AI agent](apps/ai-agent-service/README.md#test-và-đánh-giá).
+
 ### Chạy service Python không qua Docker
 
 Đặt `PYTHONPATH` gồm `packages/backend-common` và thư mục `src` của service, trỏ `DATABASE_URL` vào `localhost` (dùng `127.0.0.1` trên Windows), rồi chạy `uvicorn`. Hướng dẫn chi tiết cho AI agent: [apps/ai-agent-service/README.md](apps/ai-agent-service/README.md).

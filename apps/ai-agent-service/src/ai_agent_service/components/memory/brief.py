@@ -10,8 +10,11 @@ behind it. The result is two things:
   and ``precomputed_parts``;
 - numbered lines ``B1..Bn`` for the advisor's prompt, each with the
   ``fact_ids`` it rests on, so that ``[B3]`` in a reply traces back to a fact,
-  a call and a turn (section 5.5). A line carrying a price, an address or an
-  order code is ``sensitive``: withheld from the model below VERIFIED.
+  a call and a turn (section 5.5). One line states one slot, so citing a line
+  names exactly the facts used: the evaluation's ``facts_used`` follows that
+  chain, and a line that bundled four needs would credit all four whenever
+  one was used. A line carrying a price, an address or an order code is
+  ``sensitive``: withheld from the model below VERIFIED.
 
 A line is something the advisor may rely on and cite. A warning is something
 that has stopped being true: it comes first and is never cut.
@@ -24,10 +27,24 @@ from typing import Any, Mapping, NamedTuple, Sequence
 
 from ..clock import day_label
 from ..intake.itn import format_vnd, money_spans
-from .ontology import NEEDS, PROTECTED, slot
+from .ontology import ASKED_ONCE, NEEDS, NOTE_SLOT, is_sensitive, slot
 
 CHANNELS = {"hotline": "hotline", "zalo": "Zalo", "zalo_oa": "Zalo", "facebook": "Facebook",
-            "chat_fanpage": "Facebook", "web": "chat trên web"}
+            "chat_fanpage": "Facebook", "web": "chat trên web", "web_chat": "chat trên web"}
+
+#: The catalogue's colour codes as a person says them.
+COLOURS = {"den": "đen", "trang": "trắng", "do": "đỏ", "hong": "hồng", "xam": "xám", "nau": "nâu",
+           "vang": "vàng", "xanh": "xanh", "be": "be", "kem": "kem", "tim": "tím", "cam": "cam"}
+
+OBJECTIONS = {"dat_qua": "chê đắt", "so_sanh_gia": "so sánh giá với nơi khác", "can_hoi_nguoi_nha": "cần hỏi người nhà",
+              "chua_tin_tuong": "chưa tin tưởng", "chua_can": "chưa cần", "khac": "khác"}
+
+#: One line each, in this order, after the products. Needs first: they are
+#: what the brief exists to stop the advisor asking again.
+LINE_ORDER: tuple[str, ...] = NEEDS + (
+    "variant_sku", "size", "color", "payment", "decision_maker", "blocker", "objection",
+    "competitor_price_vnd", "callback_at", "order_id", "address_token",
+)
 
 
 class BriefLine(NamedTuple):
@@ -41,20 +58,49 @@ class BriefLine(NamedTuple):
 
 
 def _value(value: Any, name: str) -> str:
-    if name.endswith("_vnd") and isinstance(value, (int, float)):
+    if name.endswith("_vnd") and isinstance(value, (int, float)) and not isinstance(value, bool):
         return format_vnd(int(value))
     if isinstance(value, bool):
         return "có" if value else "không"
     if name == "room_area_m2":
         return f"{value} m²"
+    if name == "color":
+        return COLOURS.get(str(value), str(value))
+    if name == "objection":
+        return OBJECTIONS.get(str(value), str(value))
     return str(value)
 
 
+def _line(name: str, fact: Mapping[str, Any]) -> str:
+    """The sentence for one held slot: its value, and how the advisor may use it."""
+    value = _value(fact["value"], name)
+    if name in NEEDS:
+        return f"{_label(name).capitalize()}: {value} (đã biết, không hỏi lại)."
+    return {
+        "variant_sku": f"Biến thể khách đã chọn: {value}.",
+        "size": f"Size khách đã chọn: {value}.",
+        "color": f"Màu khách đã chọn: {value}.",
+        "payment": f"Cách thanh toán khách chọn: {value}.",
+        "decision_maker": f"Người quyết định mua: {value}.",
+        "blocker": f"Việc còn dở: {value}.",
+        "objection": f"Lần trước khách phản đối: {value}.",
+        "competitor_price_vnd": f"Khách từng nêu giá ở nơi khác: {value}; không bình luận giá đối thủ.",
+        "callback_at": f"Đã hẹn gọi lại: {value}.",
+        "order_id": f"Mã đơn đã tạo: {value}.",
+        "address_token": "Đã có địa chỉ giao hàng của khách.",
+    }.get(name, f"{_label(name).capitalize()}: {value}.")
+
+
+def _label(name: str) -> str:
+    spec = slot(name)
+    return spec.label if spec else name
+
+
 def _current(facts: Sequence[Mapping[str, Any]]) -> dict[str, Mapping[str, Any]]:
-    """The live fact per slot: the last active one."""
+    """The live fact per slot: the last active one. Notes are listed apart."""
     out: dict[str, Mapping[str, Any]] = {}
     for fact in facts:
-        if fact.get("status") == "active":
+        if fact.get("status") == "active" and fact["slot"] != NOTE_SLOT:
             out[fact["slot"]] = fact
     return out
 
@@ -69,12 +115,14 @@ def render(
     warnings: Sequence[str],
     now: datetime,
     latency_ms: int,
+    channel: str | None = None,
 ) -> tuple[dict[str, Any], tuple[BriefLine, ...]]:
     """The CallBrief object and its numbered lines.
 
     ``customer`` is ``{customer_id, name, honorific, phone_last4}``;
     ``episodes`` newest first, from the ledger and the CRM's past sessions;
-    ``products`` the advised products as ``refresh`` re-checked them today.
+    ``products`` the advised products as ``refresh`` re-checked them today;
+    ``channel`` the channel of this call, for the last session's line.
     """
     held = _current(facts)
     honorific = customer.get("honorific") or "anh/chị"
@@ -84,23 +132,23 @@ def render(
 
     if episodes:
         last = episodes[0]
-        channel = CHANNELS.get(str(last.get("channel")), str(last.get("channel")))
         lines.append((f"Khách quen: {who}, đã liên hệ {len(episodes)} lần trước.", False, ()))
         summary = str(last.get("summary") or "").strip()
         lines.append((
-            f"Lần gần nhất {day_label(last['date'])} qua {channel}: {summary}",
+            f"Lần gần nhất {day_label(last['date'])} qua {_channel(last.get('channel'))}: {summary}",
             bool(money_spans(summary)) or "địa chỉ" in summary.lower(),
             (),
         ))
-        others = {str(e.get("channel")) for e in episodes[1:]} - {str(last.get("channel"))}
+        others = {str(e.get("channel")) for e in episodes} - {str(last.get("channel")), str(channel)}
         if others:
-            names = ", ".join(sorted(CHANNELS.get(c, c) for c in others))
+            names = ", ".join(sorted({_channel(c) for c in others}))
             lines.append((f"Khách cũng từng liên hệ qua {names}.", False, ()))
 
     for product in products:
-        ids = tuple(product.get("fact_ids") or ())
+        # Each line rests on the facts it states, and only those (section 5.5).
+        ids = product.get("fact_ids") or {}
         label = product.get("name") or product["sku"]
-        lines.append((f"Đã tư vấn {label} ({product['sku']}).", False, ids))
+        lines.append((f"Đã tư vấn {label} ({product['sku']}).", False, _ids(ids, "product_advised")))
         if product.get("price_quoted_vnd"):
             promo = f", kèm khuyến mãi {product['promo_code']}" if product.get("promo_code") else ""
             quoted = f" ngày {day_label(product['quoted_on'])}" if product.get("quoted_on") else ""
@@ -108,20 +156,16 @@ def render(
                 f"Đã báo giá {product['sku']}: {format_vnd(product['price_quoted_vnd'])}{quoted}{promo}. "
                 "Đây là lịch sử; giá hôm nay phải lấy lại bằng pricing_get_quote.",
                 True,
-                ids,
+                _ids(ids, "price_quoted_vnd", "quoted_on", "promo_code", "promo_expiry"),
             ))
+    if "alt_suggested" in held:
+        fact = held["alt_suggested"]
+        lines.append((f"Đã gợi ý thêm sản phẩm {fact['value']}.", False, (fact["fact_id"],)))
 
-    needs = [(n, f) for n, f in held.items() if n in NEEDS]
-    if needs:
-        parts = [f"{slot(n).label if slot(n) else n}: {_value(f['value'], n)}" for n, f in needs]
-        lines.append(("Nhu cầu đã biết, không hỏi lại: " + "; ".join(parts) + ".", False, tuple(f["fact_id"] for _, f in needs)))
-
-    blockers = [f for n, f in held.items() if n == "blocker"]
-    for fact in blockers:
-        lines.append((f"Việc còn dở: {fact['value']}.", False, (fact["fact_id"],)))
-    if "callback_at" in held:
-        fact = held["callback_at"]
-        lines.append((f"Đã hẹn gọi lại: {fact['value']}.", False, (fact["fact_id"],)))
+    for slot_name in LINE_ORDER:
+        if slot_name in held:
+            fact = held[slot_name]
+            lines.append((_line(slot_name, fact), is_sensitive(slot_name), (fact["fact_id"],)))
 
     for order in orders:
         lines.append((
@@ -131,21 +175,21 @@ def render(
             (),
         ))
 
-    if "address_token" in held:
-        fact = held["address_token"]
-        lines.append(("Đã có địa chỉ giao hàng của khách.", True, (fact["fact_id"],)))
-
     for fact in facts:
         if fact.get("status") == "disputed":
-            label = slot(fact["slot"]).label if slot(fact["slot"]) else fact["slot"]
+            label = _label(fact["slot"])
             lines.append((
                 f"Cần xác nhận lại {label}: khách từng nói {_value(fact['value'], fact['slot'])}, "
                 "khác với hệ thống. Hỏi xác nhận, không tự chọn bên.",
                 True,
                 (fact["fact_id"],),
             ))
+    for fact in facts:
+        if fact.get("status") == "active" and fact["slot"] == NOTE_SLOT:
+            lines.append((f"Ghi chú về khách: {fact['value']}.", False, (fact["fact_id"],)))
 
     numbered = tuple(BriefLine(f"B{i}", text, sensitive, ids) for i, (text, sensitive, ids) in enumerate(lines, 1))
+    blockers = [f for n, f in held.items() if n == "blocker"]
     last_session = None
     if episodes:
         last = episodes[0]
@@ -169,21 +213,34 @@ def render(
             {k: p.get(k) for k in ("sku", "price_quoted_vnd", "promo_code", "promo_still_active", "quoted_on")}
             for p in products
         ],
+        # The day an order was placed decides which returns policy it keeps (CL-01, section 7.2).
         "orders": [
-            {"order_id": o.get("order_id"), "variant_sku": o.get("sku") or o.get("variant_sku"), "status": o.get("status")}
+            {"order_id": o.get("order_id"), "variant_sku": o.get("sku") or o.get("variant_sku"), "status": o.get("status"),
+             "date": o.get("date") or o.get("created_at")}
             for o in orders
         ],
         "open_blockers": [str(f["value"]) for f in blockers],
         "open_questions": [],
-        "must_not_ask": sorted(n for n in held if n in PROTECTED),
+        "must_not_ask": sorted(n for n in held if n in ASKED_ONCE),
         "stale_warnings": list(warnings),
         "suggested_opening": opening(who, products, blockers, bool(episodes)),
         "suggested_next_action": next_action(products, blockers, warnings),
         "generated_at": now.isoformat(),
         "latency_ms": int(latency_ms),
-        "precomputed_parts": ["episodic_summary"] if episodes else [],
+        # Only the ledger's episode lines are written at the end of the
+        # previous call; a CRM session is the organisers' seed, read as it is.
+        "precomputed_parts": ["episodic_summary"] if any(e.get("source") != "crm" for e in episodes) else [],
     }
     return brief, numbered
+
+
+def _channel(value: Any) -> str:
+    return CHANNELS.get(str(value), str(value))
+
+
+def _ids(by_slot: Mapping[str, str], *slots: str) -> tuple[str, ...]:
+    """The fact ids behind *slots*, in that order, for the ones the product has."""
+    return tuple(by_slot[name] for name in slots if name in by_slot)
 
 
 def opening(who: str, products: Sequence[Mapping[str, Any]], blockers: Sequence[Mapping[str, Any]], returning: bool) -> str:

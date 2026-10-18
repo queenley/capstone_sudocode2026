@@ -6,6 +6,10 @@
 # is a real answer: CLARIFY and CONFIRM_IDENTITY bind nothing, so "the agent
 # called no tool" is mechanically true.
 #
+# The knowledge base is not a tool of any lane: load_context retrieves the
+# turn's passages before the advisor runs (section 4.2), which saves a model
+# round on every policy question and lets route read the retrieval score.
+#
 # Names are the wire names, the organisers' names with the dot as an
 # underscore (inventory.check -> inventory_check); src/mcp/client.py turns
 # them back for the trace.
@@ -17,16 +21,19 @@ lanes:
   ORDER_SERVICE:
     - order_status
     - order_update
+    - delivery_estimate
     - crm_get_customer
     - handoff_transfer
+    - memory_request_deletion
   OUT_OF_SCOPE:
     - handoff_transfer
   CONTINUITY: &sales
     - catalog_search
     - inventory_check
     - pricing_get_quote
+    - delivery_estimate
     - order_create
     - schedule_callback
-    - kb_search
     - handoff_transfer
+    - memory_request_deletion
   NEW: *sales

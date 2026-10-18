@@ -1,12 +1,14 @@
 """The advisor's context, in priority order, cut from the bottom. ``docs/design.md`` section 4.4.
 
-1. hard rules and tone;
+1. hard rules and tone (never cut);
 2. ``stale_warnings`` (never cut);
 3. the lane's instruction;
 4. the brief lines;
 5. ``working_summary`` (the last four turns travel as messages);
-6. knowledge passages (the advisor fetches them with ``kb_search``);
-7. the playbook entries in play.
+6. the turn's knowledge passages, retrieved by ``load_context``;
+7. the playbook entries of the situation;
+8. tool results already gathered, when a draft is regenerated;
+9. why the previous draft was blocked.
 
 Tokens are estimated at four characters each, which errs long for
 Vietnamese and so errs towards cutting.

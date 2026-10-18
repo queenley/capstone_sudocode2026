@@ -6,6 +6,10 @@ required arguments, each wrapping the reference mock (:mod:`.btc`): the COD
 limit, a price that must equal the quote of the day, a callback moved off a
 holiday, a Handoff Brief that must carry every required field.
 
+Each write tool takes an ``idempotency_key`` the harness sets: a write is
+never retried (section 6.1), and the same key seen twice returns the first
+outcome rather than a second order.
+
 The three write tools are the advisor's alone. Before any of them runs, the
 harness has already checked its arguments (section 4.4, the guardrail before
 act); the mock checks again, so a price that slipped past one is refused by
@@ -53,6 +57,7 @@ async def order_create(
     address: str | None = None,
     customer_phone: str | None = None,
     on: str | None = None,
+    idempotency_key: str | None = None,
 ) -> dict[str, Any]:
     """Place an order once the customer has agreed to buy.
 
@@ -69,10 +74,11 @@ async def order_create(
         address: The delivery address the customer gave.
         customer_phone: Set by the system; leave it out.
         on: The day of the call. Set by the system; leave it out.
+        idempotency_key: Set by the system; leave it out.
     """
     m = btc.mock()
     return await btc.call(
-        "order.create", m.order_create,
+        "order.create", m.order_create, idempotency_key=idempotency_key,
         customer_phone=customer_phone, sku=sku, qty=qty, price_vnd=price_vnd,
         promo_code=promo_code, payment=payment, address=address, on=on or btc.reference_date(),
     )
@@ -83,6 +89,7 @@ async def schedule_callback(
     callback_at: str,
     note: str | None = None,
     customer_phone: str | None = None,
+    idempotency_key: str | None = None,
 ) -> dict[str, Any]:
     """Book a call back at the time the customer asked for.
 
@@ -93,16 +100,17 @@ async def schedule_callback(
         callback_at: ISO 8601 date and time with +07:00, e.g. 2026-10-17T19:00+07:00.
         note: What the call back is about.
         customer_phone: Set by the system; leave it out.
+        idempotency_key: Set by the system; leave it out.
     """
     m = btc.mock()
     return await btc.call(
-        "schedule.callback", m.schedule_callback,
+        "schedule.callback", m.schedule_callback, idempotency_key=idempotency_key,
         customer_phone=customer_phone, callback_at=callback_at, note=note,
     )
 
 
 @server.tool(roles={"advisor"}, name="handoff_transfer")
-async def handoff_transfer(brief: dict[str, Any]) -> dict[str, Any]:
+async def handoff_transfer(brief: dict[str, Any], idempotency_key: str | None = None) -> dict[str, Any]:
     """Hand the call to a person, with a brief they can act on in ten seconds.
 
     Use when the customer asks for a person, or the question is one that must
@@ -117,9 +125,10 @@ async def handoff_transfer(brief: dict[str, Any]) -> dict[str, Any]:
             conversation_summary (2 to 5 sentences); open_questions (the
             questions not yet answered); next_action (what the person should
             do first).
+        idempotency_key: Set by the system; leave it out.
     """
     m = btc.mock()
-    return await btc.call("handoff.transfer", m.handoff_transfer, brief=brief)
+    return await btc.call("handoff.transfer", m.handoff_transfer, idempotency_key=idempotency_key, brief=brief)
 
 
 if __name__ == "__main__":

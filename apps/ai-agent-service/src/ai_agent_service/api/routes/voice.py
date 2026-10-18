@@ -124,7 +124,7 @@ class Session:
         import soxr
 
         from ...components.voice import tts
-        from ...components.voice.lexicon import Lexicon
+        from ...components.intake.lexicon import lexicon as shared_lexicon
         from ...components.voice.turns import TurnDetector, config_for
 
         self.ws = ws
@@ -134,7 +134,7 @@ class Session:
         self.settings = options.voice()
         self.detector = TurnDetector(config_for(self.settings.endpointing, self.settings.barge_in_ms))
         self.voice = tts.voice(self.settings.tts)
-        self.lexicon = Lexicon()
+        self.lexicon = shared_lexicon()
         self.resampler = soxr.ResampleStream(sample_rate, 16_000, 1, dtype="float32")
         self.timings: dict[str, dict[str, Any]] = {}
         self.spoken: dict[str, list[str]] = {}

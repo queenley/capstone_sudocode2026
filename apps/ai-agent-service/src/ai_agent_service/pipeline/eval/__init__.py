@@ -1,15 +1,20 @@
-"""The offline test: scenarios through the real graph. ``docs/design.md`` section 9, figure H.
+"""The agent under evaluation. ``docs/design.md`` section 9, figure H.
 
-Its own composition root. It reads the organisers' scenario format as is,
-drives the hot graph turn by turn with the scenario's written customer turns
-(the ASR version when there is one), runs ``after_call`` synchronously
-between calls (call 2 needs what call 1 wrote), moves the virtual clock by
-``days_later``, resets the organisers' mock per scenario, and writes one
-trace line per turn in their schema. The same run with the memory switch
-off is the baseline.
+The organisers' command, ``python -m ai_agent_service.pipeline.eval.cli``
+(:mod:`.cli`), runs scenarios in their format through the agent, writes their
+trace and prints their table, with retrieval measured on their labelled
+questions (:mod:`.rag`). The team's analysis harness in
+``scripts/evaluation`` drives the same agent through its own bridge.
 
-- :mod:`.runner`: ``run`` (one command), ``compare`` (refuses different
-  manifests), ``replay`` (no API call).
+The modules:
 
-Status: not built.
+- :mod:`.scenarios`: a scenario in the organisers' format, planned call by
+  call: days, keys, turns, prior sessions;
+- :mod:`.runner`: the agent assembled for a run, its database, and one call
+  through it (:class:`~.runner.CallSession`), connect to hang-up;
+- :mod:`.trace`: one line of the organisers' trace per agent turn;
+- :mod:`.report`: what voids a run, its manifest, the organisers' grader, the
+  failures to analyse;
+- :mod:`.cli`: the organisers' command;
+- :mod:`.rag`: retrieval on the organisers' 60 labelled questions, and θ.
 """

@@ -26,13 +26,33 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
+from ..components.intake.text import plain
 from ..llm.jev import Boolean, JevUnavailable
 from .base import BaseAgent
 
 logger = logging.getLogger(__name__)
+
+#: Section 4.5: what makes a sentence worth the soft check. Money, a
+#: promotion, stock or scarcity, another shop, a promise. Matched on text
+#: without diacritics, so "mien phi" and "miễn phí" are the same word. A
+#: greeting or a clarifying question carries none and costs no Jev call.
+RISK = re.compile(
+    r"\d"
+    r"|\b(trieu|nghin|ngan|dong|k)\b"
+    r"|khuyen mai|\bkm\b|\bgiam\b|\btang\b|qua tang|freeship|mien phi|uu dai|voucher"
+    r"|con hang|het hang|chi con|sap het|co han|duy nhat|cuoi cung"
+    r"|ben kia|shop khac|cho khac|cua hang khac|doi thu|re hon|dat hon"
+    r"|chac chan|cam ket|dam bao|\bhua\b|bao hanh|doi tra|hoan tien"
+)
+
+
+def needs_review(text: str) -> bool:
+    """Whether a sentence carries a risk signal and goes to the PolicyAgent."""
+    return bool(RISK.search(plain(text)))
 
 QUESTIONS = {
     "over_promise": Boolean(

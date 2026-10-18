@@ -16,6 +16,7 @@ principle 2). Each builds the rest from ``src/components`` and the framework.
 
 from __future__ import annotations
 
+import logging
 from typing import Any, Mapping
 
 from langchain_core.language_models import BaseChatModel
@@ -23,6 +24,24 @@ from langchain_core.language_models import BaseChatModel
 from ..config.config_manager import get_models_config
 from ..llm import jev
 from ..llm.factory import LLMFactory
+
+logger = logging.getLogger(__name__)
+
+
+def model_for(name: str) -> BaseChatModel | None:
+    """The chat model ``agents.<name>`` names in ``config/models.yaml``, for a helper that is not an agent.
+
+    None when the file names none, or its provider's key is missing: the
+    caller then does without (the compactor folds extractively).
+    """
+    models = get_models_config()
+    if name not in models.agents:
+        return None
+    try:
+        return LLMFactory.create_llm(models.agent_llm_config(name), agent_name=name)
+    except RuntimeError as error:
+        logger.warning("No model for %s: %s", name, str(error).splitlines()[0])
+        return None
 
 
 class BaseAgent:
@@ -35,6 +54,7 @@ class BaseAgent:
         provider: str | None = None,
         model: str | None = None,
         generation: Mapping[str, Any] | None = None,
+        llm: BaseChatModel | None = None,
     ) -> None:
         """Resolve the agent's chat model, if it has one.
 
@@ -48,12 +68,17 @@ class BaseAgent:
         else is refused, so the file stays the one place a model's parameters
         are defined.
 
+        ``llm`` is a model built elsewhere, used as it is: a scripted model in
+        an offline test, never a way around the file in the product.
+
         An agent with no entry under ``agents`` and no override has no chat
         model (``llm`` is None): the Policy asks Jev and nothing else.
         """
         self.name = name
-        self.llm: BaseChatModel | None = None
-        self.model_name: str | None = None
+        self.llm: BaseChatModel | None = llm
+        self.model_name: str | None = (getattr(llm, "model_name", None) or type(llm).__name__) if llm else None
+        if llm is not None:
+            return
 
         models = get_models_config()
         if not (provider or model or name in models.agents):

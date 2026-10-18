@@ -1,0 +1,33 @@
+# The knowledge base, docs/design.md section 7. No secrets; read once at startup.
+
+# The approved FAQ and playbook entries in force: data/kb/v<version>.jsonl
+# (section 7.5). Version 0 holds none: the organisers' corpus alone.
+version: 0
+
+# Section 7.3. On rag/qa_labeled.json with reference_eval's rag_eval,
+# 2026-10-17, all 60 questions: keyword-only Recall@3 83, Recall@5 88; hybrid
+# with the model below Recall@3 91.5, Recall@5 93.2, abstaining right on 75%
+# of unanswerable and 60% of restricted questions, 0% false abstains.
+retrieval:
+  top_k: 5
+  fusion_k: 60
+  k1: 1.2
+  b: 0.75
+  accents: true
+  # θ on the best passage's cosine: below it the documents do not cover the
+  # question. The lowest answerable score of the tuning half less 0.005, from
+  #   .venv/bin/python -m src.pipeline.eval.rag --calibrate
+  abstain_cosine: 0.829
+  # θ when the model is missing and retrieval is keyword-only: the share of the
+  # question's information the best passage holds. Coverage does not separate
+  # answerable questions from the others on qa_labeled, so it stays off.
+  abstain_coverage: 0.0
+
+# multilingual-e5-small, int8 ONNX: 118 MB, about 13 ms a query on a laptop
+# CPU. Fetched into models/embedding/<name> when missing; bge-m3, the other
+# candidate of section 7.3, is 2.2 GB and does not fit the deployment's B1.
+embedding:
+  repo: Xenova/multilingual-e5-small
+  name: multilingual-e5-small
+  model_file: onnx/model_quantized.onnx
+  threads: 2

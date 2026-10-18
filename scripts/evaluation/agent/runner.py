@@ -20,7 +20,6 @@ The capstone's port of the reference project's ``pipeline/eval/runner.py``.
 from __future__ import annotations
 
 import asyncio
-import functools
 import hashlib
 import json
 import logging
@@ -32,7 +31,6 @@ from langchain_core.messages import HumanMessage
 from langchain_core.tools import BaseTool, StructuredTool
 from langgraph.checkpoint.memory import InMemorySaver
 
-from ai_agent_service.agents import advisor as advisor_module
 from ai_agent_service.agents.advisor import AdvisorAgent
 from ai_agent_service.agents.memory import MemoryAgent
 from ai_agent_service.agents.policy import PolicyAgent
@@ -69,7 +67,7 @@ BUSINESS_TOOLS = frozenset({
 Business = Callable[[str, dict[str, Any]], Awaitable[dict[str, Any]]]
 
 #: Emptied before every scenario and configuration, in a schema named ``*_eval`` only.
-RESET_TABLES = ("mock_state", "facts", "episodes", "identities")
+RESET_TABLES = ("mock_state", "facts", "episodes", "identities", "deletion_requests")
 
 
 def connection(scenario: dict[str, Any], spec: dict[str, Any]) -> tuple[str, dict[str, str | None]]:
@@ -115,24 +113,11 @@ class Rig:
 def _advisor(tools: list[BaseTool], *, provider: str | None, model: str | None, retries: int) -> AdvisorAgent:
     """``AdvisorAgent`` as the API builds it, with *retries* in place of its one retry.
 
-    The capstone's advisor has no ``retries`` argument: its middleware retries
-    a failed model call and a retryable tool failure once. The harness must see
-    every attempt (``retry: {agent: 0, tool: 0}``), so for this construction
-    only the two middlewares are given ``retries`` instead.
+    The harness must see every attempt (``retry: {agent: 0, tool: 0}``), so it
+    passes ``retries=0``: no retry of a failed model call or of a retryable
+    tool failure.
     """
-    if retries == 1:
-        return AdvisorAgent(tools=tools, provider=provider, model=model)
-    model_retry, tool_guard = advisor_module.ModelRetryMiddleware, advisor_module.ToolGuardMiddleware
-
-    def no_model_retry(*args: Any, **kwargs: Any) -> Any:
-        return model_retry(*args, **{**kwargs, "max_retries": retries})
-
-    advisor_module.ModelRetryMiddleware = no_model_retry
-    advisor_module.ToolGuardMiddleware = functools.partial(tool_guard, retries=retries)
-    try:
-        return AdvisorAgent(tools=tools, provider=provider, model=model)
-    finally:
-        advisor_module.ModelRetryMiddleware, advisor_module.ToolGuardMiddleware = model_retry, tool_guard
+    return AdvisorAgent(tools=tools, provider=provider, model=model, retries=retries)
 
 
 async def build(
@@ -255,6 +240,7 @@ async def remember(rig: Rig, *, thread: str, channel: str, now: datetime, state:
         "tier": state.get("tier"),
         "customer_id": state.get("customer_id"),
         "keys_seen": state.get("keys_seen") or [],
+        "provisional": state.get("provisional"),
         "returning": bool((state.get("brief") or {}).get("is_returning")),
     }
     try:
