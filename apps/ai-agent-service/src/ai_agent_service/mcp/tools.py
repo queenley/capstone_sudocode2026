@@ -45,6 +45,7 @@ from typing import Any, Iterable, Mapping
 
 from langchain.agents.middleware import AgentMiddleware
 from langchain_core.messages import ToolMessage
+from ..components.intake import pii
 
 logger = logging.getLogger(__name__)
 
@@ -160,7 +161,7 @@ class ToolGuardMiddleware(AgentMiddleware):
                     call, "TOOL_ERROR", f"{type(error).__name__}: {error}", retryable=True
                 )
             if self._settle(name, result, attempt):
-                return with_args(result, request.tool_call.get("args") or {})
+                return visible_result(with_args(result, request.tool_call.get("args") or {}), request)
 
     def wrap_tool_call(self, request: Any, handler: Any) -> Any:
         """The sync path, for scripts: same policy without the timeout."""
@@ -185,7 +186,7 @@ class ToolGuardMiddleware(AgentMiddleware):
                     call, "TOOL_ERROR", f"{type(error).__name__}: {error}", retryable=True
                 )
             if self._settle(name, result, attempt):
-                return result
+                return visible_result(with_args(result, request.tool_call.get("args") or {}), request)
 
     # ── policy ────────────────────────────────────────────────────────────
 
@@ -249,9 +250,17 @@ class ToolGuardMiddleware(AgentMiddleware):
         if on and "on" in accepted:
             args["on"] = on
         phone = getattr(context, "customer_phone", None)
+        if (name == "crm_get_customer" and phone and "phone" in accepted
+                and getattr(context, "tier", None) == "VERIFIED"
+                and getattr(context, "lane", None) == "ORDER_SERVICE"):
+            # Order lookup stays on the verified caller, never a model-supplied identity.
+            args = {"phone": phone}
         if phone and "customer_phone" in accepted and name != "crm_get_customer":
             args["customer_phone"] = phone
         addresses = getattr(context, "addresses", None) or {}
+        vault = getattr(context, "vault", None)
+        if vault is not None and args.get("address"):
+            addresses = {**addresses, **{token: value for token, (kind, value) in vault.entries.items() if kind == "ADDR"}}
         if addresses and "address" in accepted:
             args["address"] = with_addresses(args.get("address"), addresses)
         customer = getattr(context, "customer_id", None)
@@ -309,8 +318,8 @@ def declared_defaults(schema: Mapping[str, Any], *, exclude: Iterable[str] = ())
 def idempotency_key(context: Any, name: str, args: Mapping[str, Any]) -> str | None:
     """``<call>:<turn>:<tool>:<hash of the arguments>``, or None without a call and a turn.
 
-    The same call repeated in the same turn gets the same key, so the server
-    answers it with the first result; any change of argument is a new key.
+    Repeated order creation has one key across the call; other writes are
+    scoped to the turn. Any change of argument is a new key.
     """
     call_id = getattr(context, "call_id", None)
     turn_id = getattr(context, "turn_id", None)
@@ -319,7 +328,9 @@ def idempotency_key(context: Any, name: str, args: Mapping[str, Any]) -> str | N
     payload = json.dumps({k: v for k, v in args.items() if k != IDEMPOTENCY_ARG},
                          ensure_ascii=False, sort_keys=True, default=str)
     digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
-    return f"{call_id}:{turn_id}:{name}:{digest}"
+    # shortcut: identical orders in one call are one purchase; add intent IDs for separate identical purchases.
+    scope = call_id if name == "order_create" else f"{call_id}:{turn_id}"
+    return f"{scope}:{name}:{digest}"
 
 
 def with_args(result: Any, args: Mapping[str, Any]) -> Any:
@@ -331,6 +342,30 @@ def with_args(result: Any, args: Mapping[str, Any]) -> Any:
     if not isinstance(result, ToolMessage):
         return result
     return result.model_copy(update={"additional_kwargs": {**result.additional_kwargs, "args": dict(args)}})
+
+
+def visible_result(result: Any, request: Any) -> Any:
+    """The tool sees raw inputs; model messages and persisted state carry vault tokens."""
+    context = getattr(getattr(request, "runtime", None), "context", None)
+    vault = getattr(context, "vault", None)
+    if vault is None or not isinstance(result, ToolMessage):
+        return result
+    content = envelope_of(result)
+    customer_id = getattr(context, "customer_id", None)
+    if request.tool_call["name"] == "crm_get_customer" and customer_id and content and content.get("ok"):
+        data = content.get("data") or {}
+        if data.get("ambiguous"):
+            data = next((c for c in data.get("candidates") or [] if c.get("customer_id") == customer_id), {})
+        content = ({"ok": True, "data": {**data, "found": True, "ambiguous": False}}
+                   if data.get("customer_id") == customer_id else
+                   {"ok": False, "error": {"code": "PROFILE_SCOPE", "retryable": False,
+                    "message": "The lookup did not identify the verified customer's profile."}})
+    if content is not None:
+        shown = json.dumps(pii.tokenise_data(content, vault), ensure_ascii=False)
+    else:
+        shown = pii.tokenise(str(result.content), vault)
+    return result.model_copy(update={"content": shown,
+        "additional_kwargs": pii.tokenise_data(result.additional_kwargs, vault)})
 
 
 def without_internal(value: Any) -> Any:

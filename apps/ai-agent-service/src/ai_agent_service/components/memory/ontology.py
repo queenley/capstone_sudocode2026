@@ -34,7 +34,7 @@ Kind = Literal["preference", "business_event", "past_event", "open_note"]
 #: diacritics, the catalogue's spelling of a colour (``den``); ``size`` is a
 #: number for shoes and letters for clothes; ``token`` is a vault token, never
 #: the raw value.
-ValueType = Literal["str", "int", "bool", "date", "code", "plain", "size", "token"]
+ValueType = Literal["str", "int", "bool", "date", "code", "plain", "size", "token", "str_list"]
 
 #: The slot open notes are stored under (section 5.2's "ghi chú mở").
 NOTE_SLOT = "note"
@@ -72,6 +72,7 @@ CORE: dict[str, Slot] = {
                              hint="Chỉ khi KHÁCH nói giá họ nhớ đã được báo trước đây "
                                   "(\"hôm trước em báo 4 triệu rưỡi\" là 4500000)."),
     "quoted_on": Slot("business_event", None, False, "ngày báo giá", "date"),
+    "quoted_sku": Slot("business_event", None, False, "sản phẩm của báo giá đã lưu"),
     "promo_code": Slot("business_event", None, False, "khuyến mãi"),
     "promo_expiry": Slot("business_event", None, False, "hạn khuyến mãi", "date"),
     "budget_vnd": Slot("preference", None, False, "ngân sách", "int",
@@ -87,6 +88,7 @@ CORE: dict[str, Slot] = {
     "callback_at": Slot("past_event", 30, False, "hẹn gọi lại", "str"),
     "outcome": Slot("past_event", 30, False, "kết quả", "code", OUTCOMES),
     "order_id": Slot("past_event", None, True, "mã đơn"),
+    "order_ids": Slot("past_event", None, True, "các đơn đã tạo", "str_list"),
     "payment": Slot("preference", None, False, "thanh toán", "code", PAYMENTS,
                     hint="Cách thanh toán khách chọn: COD (nhận hàng trả tiền), bank (chuyển khoản), momo, zalopay."),
     "address_token": Slot("preference", 180, True, "địa chỉ", "token",
@@ -188,6 +190,9 @@ def coerce(name: str, raw: Any) -> tuple[bool, Any]:
     if spec is None or raw is None:
         return False, raw
     kind = spec.value_type
+    if kind == "str_list":
+        valid = isinstance(raw, list) and all(isinstance(v, str) and 0 < len(v.strip()) <= 160 for v in raw)
+        return (True, list(dict.fromkeys(raw))) if valid else (False, raw)
     if kind == "int":
         return _integer(raw, money=name.endswith("_vnd"))
     if kind == "bool":

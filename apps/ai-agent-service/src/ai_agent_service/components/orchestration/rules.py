@@ -45,6 +45,7 @@ ORDER_TALK = re.compile(
     r"doi sang|doi mau|doi san pham|tra hang|hoan tien|doi dia chi|sua dia chi|trang thai don|nhan hang|"
     r"van don|chat qua|rong qua|bi loi)\b"
 )
+ORDER_LOOKUP = re.compile(r"\b(?:tinh trang don|trang thai don|don hang\b[^.!?]*\b(?:o dau|den dau|toi dau|giao chua))\b")
 
 #: The notes a lane's instruction gains, in the advisor's language.
 NOTES = {
@@ -109,7 +110,7 @@ def _table(view: RouteInput) -> tuple[Lane, int, str]:
         return "CLARIFY", 2, "the recognition was unclear"
     if view.tier in ("PROBABLE", "AMBIGUOUS") and view.awaiting_identity:
         return "CONFIRM_IDENTITY", 3, f"identity {view.tier.lower()}"
-    if view.has_order and ORDER_TALK.search(said):
+    if (view.has_order and ORDER_TALK.search(said)) or (view.tier == "VERIFIED" and ORDER_LOOKUP.search(said)):
         return "ORDER_SERVICE", 4, "about an existing order"
     if view.must_transfer:
         return "OUT_OF_SCOPE", 5, "a topic that must go to a person (PB-06)"

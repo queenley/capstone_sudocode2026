@@ -41,6 +41,7 @@ from ..components import clock
 from ..components.handoff.render import REASONS
 from ..components.intake import itn, pii
 from ..components.intake import text as intake_text
+from ..components.memory.brief import used_slots
 from ..mcp import client as mcp_client
 from ..mcp.tools import ToolBox
 from ..pipeline.cold.after_call import after_call
@@ -265,6 +266,8 @@ async def run_turn(
     await _patch_meta(call_id, turn_id, "agent", {"latency": latency})
     shown = pii.detokenize(text, vault)
     meta = {"lane": state.get("lane"), "tier": state.get("tier"), "used_brief_lines": reply.get("used_lines") or [],
+            "facts_used": used_slots(reply.get("used_lines") or [], state.get("brief_lines") or [],
+                                     (state.get("brief") or {}).get("profile_facts") or {}),
             "model": (state.get("draft") or {}).get("model"), "latency": latency}
     return Outcome("message", turn_id, content=shown, meta=meta, latency=latency, spoken=shown, state=state)
 
@@ -342,6 +345,9 @@ class CallStore:
             "tier": state.get("tier"), "model": draft.get("model"), "model_calls": draft.get("model_calls"),
             "advisor_seconds": draft.get("seconds"), "fallback": bool(draft.get("fallback")), "error": draft.get("error"),
             "used_brief_lines": (state.get("reply") or {}).get("used_lines") or [],
+            "facts_used": used_slots((state.get("reply") or {}).get("used_lines") or [],
+                                     state.get("brief_lines") or [], (state.get("brief") or {}).get("profile_facts") or {}),
+            "provenance_version": "strict-cited-slots-v1",
             "tool_calls": [self._tool(r) for r in state.get("tool_results") or []],
             "guard": state.get("guard") or {}, "blocked_drafts": state.get("blocked_drafts") or [],
             "regenerations": state.get("regen_count") or 0,
@@ -352,7 +358,7 @@ class CallStore:
 
     def _tool(self, result: dict[str, Any]) -> dict[str, Any]:
         """A tool call for the console and for after_call, with the phone tokenised."""
-        args = json.loads(pii.tokenise(json.dumps(result.get("args") or {}, ensure_ascii=False), self.vault))
+        args = pii.tokenise_data(result.get("args") or {}, self.vault)
         envelope = result.get("result") or {}
         if result.get("name") not in FULL_RESULTS and envelope.get("ok"):
             data = envelope.get("data") or {}
@@ -395,7 +401,7 @@ class CallStore:
                 "handoff": handoff.get("status") == "pending",
                 "reason": _reason_label(handoff.get("reason")),
                 # Tokenised like the transcript: the brief carries the phone.
-                "handoff_brief": pii.tokenise(json.dumps(handoff.get("brief"), ensure_ascii=False, default=str), self.vault)
+                "handoff_brief": json.dumps(pii.tokenise_data(handoff.get("brief"), self.vault), ensure_ascii=False, default=str)
                 if handoff else None,
             },
         )

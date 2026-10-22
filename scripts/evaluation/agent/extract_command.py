@@ -47,6 +47,7 @@ from pydantic import BaseModel, Field  # noqa: E402
 
 from ai_agent_service.llm import token_ledger  # noqa: E402
 from ai_agent_service.llm.factory import LLMFactory  # noqa: E402
+from ai_agent_service.llm.callback_handler import error_usage  # noqa: E402
 
 from . import spend  # noqa: E402
 
@@ -83,7 +84,9 @@ def main() -> int:
     try:
         labels: Items = labeller.invoke([HumanMessage(content=request["prompt"])])
     except Exception as error:  # noqa: BLE001 - the harness keeps the failed attempt
-        print(json.dumps({"raw": None, "error_type": type(error).__name__, "message": str(error)[:300]}))
+        known = error_usage(error)
+        print(json.dumps({"raw": None, "error_type": type(error).__name__, "message": str(error)[:300],
+                          "usage": spend.usage(config["provider"], *known) if known is not None else None}))
         return 2
     source = json.loads(request["prompt"].split(MARKER, 1)[1])
     items, dropped = spanned([item.model_dump() for item in labels.items], source)
@@ -165,17 +168,24 @@ def pace(config: dict[str, Any]) -> None:
     allowed = max(1, int(limit * 0.9))
     folder = Path(tempfile.gettempdir())
     stamps_path = folder / f"agent-eval-extractor-{config['provider']}.json"
-    with (folder / f"agent-eval-extractor-{config['provider']}.lock").open("a+") as lock, locked(lock):
+    with (folder / f"agent-eval-extractor-{config['provider']}.lock").open("a+") as lock, locked(lock), stamps_path.open("a+", encoding="utf-8") as state:
+        state.seek(0)
         try:
-            stamps = [s for s in json.loads(stamps_path.read_text() or "[]") if isinstance(s, (int, float))]
-        except (OSError, ValueError):
-            stamps = []
+            stamps = json.loads(state.read() or "[]")
+        except ValueError as error:
+            raise RuntimeError("Extractor pacing state is invalid; inspect it before another paid call") from error
+        if not isinstance(stamps, list) or any(type(s) not in (int, float) for s in stamps):
+            raise RuntimeError("Extractor pacing state must contain only timestamps")
         stamps = [s for s in stamps if time.time() - s < 60]
         if len(stamps) >= allowed:
             time.sleep(max(0.0, 60 - (time.time() - stamps[0])) + 0.5)
             stamps = [s for s in stamps if time.time() - s < 60]
         stamps.append(time.time())
-        stamps_path.write_text(json.dumps(stamps))
+        # Keep one handle under the lock; Windows rejected reopening this file with O_TRUNC.
+        state.seek(0)
+        state.truncate()
+        state.write(json.dumps(stamps))
+        state.flush()
 
 
 if __name__ == "__main__":

@@ -38,11 +38,15 @@ from pathlib import Path
 from typing import Any, Literal
 
 from langchain_core.language_models import BaseChatModel
+from openai import LengthFinishReasonError
 from pydantic import BaseModel, Field
 
 from ..memory.ontology import CORE, INDUSTRIES
+from ..guardrails.hard import HUMAN
 
 logger = logging.getLogger(__name__)
+GROUNDING_VERSION = "claim-grounding-v1"
+AUTOMATED = re.compile(r"\b(?:em|tôi|mình)\s+là\s+(?:một\s+)?(?:trợ lý (?:ảo|tự động)|(?:chat)?bot|AI)\b", re.IGNORECASE)
 
 #: Section 5.2: what a question may be about, with the label the brief uses.
 SLOT_LABELS: dict[str, str] = {name: spec.label for name, spec in sorted(
@@ -165,6 +169,7 @@ class Extractor:
         self.hits = 0
         self.calls = 0
         self.failures = 0
+        self.retries = 0
 
     async def label(self, *, customer_text: str, agent_text: str) -> dict[str, Any]:
         """``{"questions", "claims", "set_aside"}`` in the trace's shapes, plus ``error`` when the call failed.
@@ -180,23 +185,37 @@ class Extractor:
         raw = self._cache.get(key)
         if raw is not None:
             self.hits += 1
-            return shape(raw)
-        self.calls += 1
-        try:
-            labels: TurnLabels = await self._labeller.ainvoke(
-                f"{prompt()}\n\nCUSTOMER: {customer_text}\nAGENT: {agent_text}"
-            )
-        except Exception as error:  # noqa: BLE001 - the run counts it and refuses to print a table
-            self.failures += 1
-            logger.warning("Extractor failed: %s", type(error).__name__)
-            return {"questions": [], "claims": [], "set_aside": [], "error": f"{type(error).__name__}: {error}"[:300]}
+            return shape(raw, agent_text=agent_text)
+        request = f"{prompt()}\n\nCUSTOMER: {customer_text}\nAGENT: {agent_text}"
+        errors = []
+        for attempt in range(2):
+            self.calls += 1
+            try:
+                labels: TurnLabels = await self._labeller.ainvoke(request)
+                break
+            except Exception as error:  # noqa: BLE001 - failed attempts remain visible even after recovery
+                self.failures += 1
+                errors.append(f"{type(error).__name__}: {error}"[:300])
+                logger.warning("Extractor failed: %s", type(error).__name__)
+                if attempt == 0 and isinstance(error, LengthFinishReasonError):
+                    self.retries += 1
+                    request += ("\nRETRY: The previous output exceeded the token limit. Label each statement once; "
+                                "keep value_json to a single scalar JSON literal and quote only the relevant words. "
+                                "Do not repeat entries or add explanations.")
+                    continue
+                return {"questions": [], "claims": [], "set_aside": [], "error": errors[-1],
+                        "attempt_errors": errors}
         raw = labels.model_dump()
+        if errors:
+            raw["recovered_errors"] = errors
         self._cache[key] = raw
         self._save()
-        return shape(raw)
+        return shape(raw, agent_text=agent_text)
 
-    def stats(self) -> dict[str, int]:
-        return {"calls": self.calls, "cache_hits": self.hits, "failures": self.failures}
+    def stats(self) -> dict[str, Any]:
+        return {"calls": self.calls, "cache_hits": self.hits, "failures": self.failures,
+                "retries": self.retries, "extractor_version": "turn-labels-recovery-v1",
+                "normalizer_version": GROUNDING_VERSION}
 
     def _save(self) -> None:
         """Write the whole cache to a temporary file and swap it in, so a run
@@ -225,7 +244,7 @@ def _load_cache(path: Path | None) -> dict[str, dict[str, Any]]:
     return {}
 
 
-def shape(raw: dict[str, Any]) -> dict[str, Any]:
+def shape(raw: dict[str, Any], *, agent_text: str | None = None) -> dict[str, Any]:
     """The model's labels in the trace's shapes, every claim value coerced to its field's type."""
     questions = [
         {"slot": q["slot"] if q["slot"] in SLOT_LABELS else OTHER, "type": q["type"], "text": q["text"]}
@@ -243,10 +262,25 @@ def shape(raw: dict[str, Any]) -> dict[str, Any]:
         if not ok:
             set_aside.append(entry)
             continue
+        quote = claim["text"]
+        reason = None
+        if agent_text is not None and (not quote or quote not in agent_text):
+            reason = "quote_not_in_reply"
+        elif claim["field"] == "is_human" and not (HUMAN.search(quote) if value else AUTOMATED.search(quote)):
+            reason = "unsupported_human_claim"
+        elif claim["field"] == "delivery_days" and "xóa" in quote.lower():
+            reason = "deletion_is_not_delivery"
+        elif (claim["field"] == "price_vnd" and "phụ thu" in quote.lower()
+              and not re.search(r"giá (?:bán|cuối|sau|là)|thanh toán", quote, re.IGNORECASE)):
+            reason = "surcharge_is_not_product_price"
+        if reason:
+            set_aside.append({**entry, "reason": reason})
+            continue
         claims.append(entry)
         if named:
             claims.append({**entry, "field": "promo_active"})
-    return {"questions": questions, "claims": _unique(claims), "set_aside": set_aside}
+    return {"questions": questions, "claims": _unique(claims), "set_aside": set_aside,
+            **({"recovered_errors": raw["recovered_errors"]} if raw.get("recovered_errors") else {})}
 
 
 def _unique(claims: list[dict[str, Any]]) -> list[dict[str, Any]]:

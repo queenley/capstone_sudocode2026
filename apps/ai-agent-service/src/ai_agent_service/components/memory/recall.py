@@ -33,6 +33,7 @@ from typing import Any, Mapping, Sequence
 from ..clock import day_label
 from ..intake.itn import format_vnd
 from .brief import CHANNELS
+from .ontology import coerce
 
 #: An episode older than this is reported as stale (section 5.3, the address TTL).
 STALE_DAYS = 180
@@ -59,10 +60,23 @@ async def retrieve(customer_id: str, on: str, tools: Any, *, crm: Mapping[str, A
             "source": "crm",
         })
     episodes.sort(key=lambda e: str(e.get("date") or ""), reverse=True)
+    facts = list((profile or {}).get("facts") or [])
+    orders = list(crm.get("orders") or [])
+    known = {o.get("order_id") for o in orders}
+    for fact in facts:
+        if fact.get("status") != "active" or fact.get("slot") not in ("order_id", "order_ids"):
+            continue
+        valid, ids = coerce("order_ids", fact["value"] if fact["slot"] == "order_ids" else [fact["value"]])
+        if not valid:
+            continue
+        for order_id in ids:
+            if order_id and order_id not in known:
+                orders.append({"order_id": order_id})
+                known.add(order_id)
     return {
-        "facts": list((profile or {}).get("facts") or []),
+        "facts": facts,
         "episodes": episodes,
-        "orders": list(crm.get("orders") or []),
+        "orders": orders,
     }
 
 
@@ -75,15 +89,17 @@ def advised(facts: Sequence[Mapping[str, Any]], orders: Sequence[Mapping[str, An
     products = []
     if "product_advised" in held:
         sku = str(held["product_advised"]["value"])
+        linked = held.get("quoted_sku", {}).get("value") == sku
         # Slot -> fact id, so each brief line can cite only the facts it states.
         ids = {s: held[s]["fact_id"] for s in ("product_advised", "price_quoted_vnd", "quoted_on", "promo_code", "promo_expiry")
                if s in held}
         products.append({
             "sku": sku,
-            "price_quoted_vnd": held.get("price_quoted_vnd", {}).get("value"),
-            "quoted_on": held.get("quoted_on", {}).get("value"),
-            "promo_code": held.get("promo_code", {}).get("value"),
-            "promo_expiry": held.get("promo_expiry", {}).get("value"),
+            "price_quoted_vnd": held.get("price_quoted_vnd", {}).get("value") if linked else None,
+            "quoted_on": held.get("quoted_on", {}).get("value") if linked else None,
+            "promo_code": held.get("promo_code", {}).get("value") if linked else None,
+            "promo_expiry": held.get("promo_expiry", {}).get("value") if linked else None,
+            "quote_unlinked": not linked and "price_quoted_vnd" in held,
             "fact_ids": ids,
         })
     return products
@@ -111,6 +127,8 @@ async def refresh(
 
     async def one(product: dict[str, Any]) -> dict[str, Any]:
         sku = product["sku"]
+        if product.get("quote_unlinked"):
+            warnings.append(f"Giá/KM lịch sử của {sku} thiếu liên kết sản phẩm; không khẳng định giá cũ, tra giá hôm nay.")
         quote, stock, found = await asyncio.gather(
             tools.data("pricing_get_quote", sku=sku, on=on, customer_phone=customer_phone),
             tools.data("inventory_check", sku=sku, on=on),

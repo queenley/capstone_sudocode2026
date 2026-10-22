@@ -28,9 +28,10 @@ from __future__ import annotations
 import json
 import re
 from typing import Any, Iterable, Mapping, Sequence
+from ..components.memory.brief import used_slots
 
 from ..components.intake import pii
-from ..components.intake.itn import format_vnd, money_spans
+from ..components.intake.itn import money_spans
 from ..mcp.client import dotted
 
 #: A sentence ends at . ! ? … followed by a space or the end: "5.200.000đ" is one number, not three sentences.
@@ -156,30 +157,14 @@ def extract_claims(text: str, *, year: int = 2026) -> list[dict[str, Any]]:
 
 def facts_used(text: str, cited: Iterable[str], brief_lines: Sequence[Mapping[str, Any]],
                profile: Mapping[str, Mapping[str, Any]]) -> list[str]:
-    """Slots behind the cited brief lines, and brief facts whose value the reply repeats."""
-    slot_of = {str(f.get("fact_id")): name for name, f in profile.items()}
-    used: list[str] = []
-    cited = set(cited)
-    for line in brief_lines:
-        if line.get("id") in cited:
-            used += [slot_of[i] for i in line.get("fact_ids") or [] if i in slot_of]
-    lowered = (text or "").lower()
-    for name, fact in profile.items():
-        value = fact.get("value")
-        if value in (None, "", True, False):
-            continue
-        shown = [str(value)]
-        if isinstance(value, int) and name.endswith("_vnd"):
-            shown.append(format_vnd(value))
-        if any(s.lower() in lowered for s in shown if len(s) >= 2):
-            used.append(name)
-    return list(dict.fromkeys(used))
+    """Legacy fallback: explicit cited lines only; new turns store their resolved slots."""
+    return used_slots(list(cited), brief_lines, profile)
 
 
 def _tool(call: Mapping[str, Any], vault: pii.Vault) -> dict[str, Any]:
-    args = json.loads(pii.detokenize(json.dumps(call.get("args") or {}, ensure_ascii=False), vault))
+    args = pii.detokenize_data(call.get("args") or {}, vault)
     envelope = call.get("result") or {}
-    result = envelope.get("data") if envelope.get("ok") else {"error": (envelope.get("error") or {}).get("code") or "failed"}
+    result = pii.detokenize_data(envelope.get("data"), vault) if envelope.get("ok") else {"error": (envelope.get("error") or {}).get("code") or "failed"}
     name = str(call.get("name") or "")
     return {"name": name if "." in name else dotted(name), "args": args, "result": result}
 
@@ -217,6 +202,7 @@ def build_rows(
     rows: list[dict[str, Any]] = []
     carry_text: list[str] = []
     carry_tools: list[dict[str, Any]] = []
+    carry_facts: list[str] = []
     for turn_id in order:
         entry = by_turn[turn_id]
         agent = entry["agent"]
@@ -224,7 +210,9 @@ def build_rows(
             # The opening: no customer words, so it rides on the next row.
             if agent is not None:
                 carry_text.append(pii.detokenize(agent["content"], vault))
-                carry_tools += [_tool(c, vault) for c in (agent.get("meta") or {}).get("tool_calls") or []]
+                carry_tools += [_tool(c, vault) for c in (agent.get("meta") or {}).get("tool_calls") or []
+                                if not c.get("blocked_by") and c.get("result") is not None]
+                carry_facts += (agent.get("meta") or {}).get("facts_used") or []
             continue
         customer = entry["customer"]
         meta = (agent or {}).get("meta") or {}
@@ -240,9 +228,11 @@ def build_rows(
             "customer_text": pii.detokenize(customer["content"], vault),
             "agent_text": agent_text,
             "questions": extract_questions(agent_text),
-            "facts_used": facts_used(said, meta.get("used_brief_lines") or [], brief_lines, profile),
+            "facts_used": sorted(set(carry_facts + (meta["facts_used"] if "facts_used" in meta else
+                facts_used(said, meta.get("used_brief_lines") or [], brief_lines, profile)))),
             "claims": extract_claims(agent_text, year=year),
-            "tool_calls": carry_tools + [_tool(c, vault) for c in meta.get("tool_calls") or []],
+            "tool_calls": carry_tools + [_tool(c, vault) for c in meta.get("tool_calls") or []
+                                         if not c.get("blocked_by") and c.get("result") is not None],
             "latency": {
                 "ttft_ms": int(latency.get("ttft_ms") or 0),
                 "total_ms": int(latency.get("total_ms") or 0),
@@ -254,7 +244,7 @@ def build_rows(
         if not rows and latency.get("call_brief_latency_ms") is not None and call_label != "call_1":
             row["call_brief_latency_ms"] = int(latency["call_brief_latency_ms"])
         rows.append(row)
-        carry_text, carry_tools = [], []
+        carry_text, carry_tools, carry_facts = [], [], []
 
     # What after_call wrote belongs to the call; it goes on its last line.
     writes = list(((call.get("after_call") or {}).get("memory_writes")) or [])

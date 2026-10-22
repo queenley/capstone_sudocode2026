@@ -223,7 +223,7 @@ def record(state: dict[str, Any], turn_no: int, text: str, now: datetime, vault:
     if reply:
         transcript.append({"speaker": "agent", "text": reply, "turn": turn_no})
     for result in state.get("tool_results") or []:
-        args = json.loads(pii.tokenise(json.dumps(result.get("args") or {}, ensure_ascii=False), vault))
+        args = pii.tokenise_data(result.get("args") or {}, vault)
         tool_log.append({"name": result.get("name"), "args": args, "result": result.get("result"),
                          "turn": result.get("turn") or turn_no, "blocked_by": result.get("blocked_by")})
 

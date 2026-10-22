@@ -82,7 +82,7 @@ provider, model = pick(os.environ.get("EVAL_ADVISOR"), a.provider + ":" + a.mode
 default = os.environ.get("EVAL_EXTRACTOR") or ("openai:gpt-4.1-mini" if has_api_key("openai") else provider + ":" + model)
 xp, xm = pick(default, default)
 print(json.dumps({"provider": provider, "model": model, "parameters": parameters(provider, model),
-                  "extractor": m.llm_config(xp, xm)}))
+                  "extractor": m.llm_config(xp, xm, agent="extractor")}))
 """
 
 

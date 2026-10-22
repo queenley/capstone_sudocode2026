@@ -25,6 +25,7 @@ from __future__ import annotations
 from typing import Any, Literal, Mapping, NamedTuple, Sequence
 
 from .ontology import coerce, slot
+from ..intake import pii
 
 Door = Literal["noise", "under_cap", "valid_format", "wins"]
 
@@ -85,6 +86,9 @@ def settle(candidates: Sequence[Candidate]) -> list[Candidate]:
     claims: dict[tuple[str, str], Candidate] = {}
     notes: dict[str, Candidate] = {}
     for candidate in ordered:
+        quality = check(candidate, [], open_notes=0)
+        if not quality.passed and quality.stopped_at != "wins":
+            continue
         if candidate.slot is None:
             notes[str(candidate.value)] = candidate
             continue
@@ -92,7 +96,11 @@ def settle(candidates: Sequence[Candidate]) -> list[Candidate]:
         if spec is not None and spec.kind in RECORDS and candidate.said_by == "customer":
             claims[(candidate.slot, repr(candidate.value))] = candidate
             continue
-        winners[candidate.slot] = candidate
+        previous = winners.get(candidate.slot)
+        priority = ({"tool": 3, "system": 2, "agent": 1} if spec and spec.kind in RECORDS
+                    else {"customer": 3, "tool": 2, "system": 1, "agent": 0})
+        if previous is None or priority.get(candidate.said_by, 0) >= priority.get(previous.said_by, 0):
+            winners[candidate.slot] = candidate
     contrary = [c for (name, _), c in claims.items() if name not in winners or winners[name].value != c.value]
     return [*winners.values(), *contrary, *notes.values()]
 
@@ -111,6 +119,8 @@ def check(
     about a record is measured when the ledger has nothing yet.
     """
     if candidate.value in (None, "", [], {}) or candidate.confidence < MIN_CONFIDENCE:
+        return Verdict(False, "noise")
+    if candidate.said_by != "tool" and isinstance(candidate.value, str) and pii.mask(candidate.value) != candidate.value:
         return Verdict(False, "noise")
     if candidate.slot is None:
         return Verdict(open_notes < OPEN_NOTE_CAP, None if open_notes < OPEN_NOTE_CAP else "under_cap")

@@ -42,6 +42,7 @@ AFFIRMATION = re.compile(r"\b(đúng|phải|chuẩn|chính xác|vâng|ok|okay|�
 NEGATION = re.compile(r"\b(không|sai|nhầm|chưa|đâu có)\b")
 #: A denial that contains an affirming word: "không phải", "không đúng".
 DENIAL = re.compile(r"\b(không phải|không đúng|sai rồi|nhầm rồi|nhầm số|không có|chưa từng|chưa hề)\b")
+PROXY = re.compile(r"\b(?:toi|anh|chi|em|minh) (?:dang )?(?:goi (?:ho|thay)|la (?:vo|chong|con|chau|nguoi nha) cua)\b")
 
 
 class Key(NamedTuple):
@@ -97,7 +98,7 @@ def decide(matches: Sequence[Match], *, from_connection: bool) -> Tier:
 def confirms(answer: str) -> bool | None:
     """True when *answer* confirms, False when it denies, None when it says neither."""
     text = answer.lower()
-    if DENIAL.search(text):
+    if DENIAL.search(text) or PROXY.search(plain(text)):
         return False
     yes = bool(AFFIRMATION.search(text))
     no = bool(NEGATION.search(text))
@@ -110,8 +111,18 @@ def confirms(answer: str) -> bool | None:
 
 def pick_by_name(text: str, candidates: Sequence[Match]) -> Match | None:
     """The one candidate whose name the customer said, if exactly one."""
-    words = set(re.findall(r"\w+", plain(text)))
-    hits = [c for c in candidates if c.name and plain(c.name) in words]
+    words = " ".join(re.findall(r"\w+", plain(text)))
+    if PROXY.search(words):
+        return None
+    hits = []
+    for candidate in candidates:
+        if not candidate.name:
+            continue
+        name = re.escape(plain(candidate.name))
+        introduced = re.search(r"\b(?:toi|anh|chi|em|minh|co|chu|bac) (?:la|ten(?: la)?) " + name + r"\b", words)
+        bare = re.fullmatch(r"(?:(?:da|vang) )?(?:(?:anh|chi|em|co|chu|bac) )?" + name + r"(?: day| ne| a| nhe| nghe)*", words)
+        if introduced or bare:
+            hits.append(candidate)
     return hits[0] if len(hits) == 1 else None
 
 

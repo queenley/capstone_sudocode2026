@@ -2,7 +2,7 @@
 
 A ReAct loop, ``langchain.agents.create_agent``: a model node calls the
 lane's tools, a tool node runs them, until the model answers without a tool
-call, at most six tool calls and eight model calls a turn (an order of
+call, at most twenty tool calls and eight model calls a turn (an order of
 several items needs a quote, a stock check and an order each). The model
 comes from config through :class:`~src.agents.base.BaseAgent`; the tools from
 MCP under the ``advisor`` role. The knowledge base is not one of them: the
@@ -59,6 +59,7 @@ from langchain_core.tools import BaseTool
 from ..components.context.budget import Section, assemble
 from ..components.guardrails import actions
 from ..components.memory.brief import BriefLine
+from ..components.intake import pii
 from ..config.config_manager import get_lanes
 from ..llm import tracing
 from ..llm.callback_handler import text_of
@@ -106,6 +107,8 @@ class AgentContext:
     known_orders: frozenset[str] = frozenset()
     #: The customer's phone, raw. Filled into tools by the harness; never shown to the model.
     customer_phone: str | None = None
+    shared_phone: bool = False
+    vault: pii.Vault = field(default_factory=pii.Vault, repr=False, compare=False)
     #: This call's address tokens and the addresses behind them, raw, the
     #: latest last: filled into the tools that take an address (section 4.4).
     addresses: Mapping[str, str] = field(default_factory=dict)
@@ -143,6 +146,15 @@ class Draft:
     model: str | None
     model_calls: int
     seconds: float
+
+
+class AdvisorFailure(RuntimeError):
+    """A failed model must not erase tools that already executed."""
+
+    def __init__(self, error: Exception, partial: Draft) -> None:
+        super().__init__(type(error).__name__)
+        self.error = error
+        self.partial = partial
 
 
 @dataclass(frozen=True)
@@ -199,7 +211,9 @@ LANE_NOTES = {
     "NEW": "Khách mới hoặc chưa có gì để tiếp nối. Hỏi nhu cầu còn thiếu, mỗi lượt một câu hỏi, rồi tư vấn từ catalog_search.",
     "ORDER_SERVICE": (
         "Khách hỏi về đơn đã đặt. Tra order_status; đổi size, đổi sản phẩm, trả hàng, đổi địa chỉ bằng order_update; "
-        "báo đúng phí, chênh lệch, số tiền và thời gian hoàn tiền mà tool trả về."
+        "báo đúng phí, chênh lệch, số tiền và thời gian hoàn tiền mà tool trả về. "
+        "Chưa có mã đơn thì tra crm_get_customer bằng hồ sơ đã xác minh; nếu vẫn không thấy đơn, xin mã đơn, "
+        "không tạo đơn mới và không đoán mã hoặc trạng thái."
     ),
     "OUT_OF_SCOPE": (
         "Câu hỏi ngoài tài liệu hoặc phải chuyển người. Câu đầu tiên là \"Dạ hiện em chưa có thông tin về …\". "
@@ -274,7 +288,8 @@ def system_prompt(context: AgentContext, *, max_tokens: int = 3000) -> tuple[str
     tier allows, 5 the summary of older turns (the last four travel as
     messages), 6 the turn's knowledge passages, 7 the playbook entries of the
     situation, 8 tool results already gathered (a regeneration), 9 why the
-    previous draft was blocked. Cut from the bottom when over budget.
+    previous draft was blocked. Required evidence survives the soft budget;
+    optional sections are admitted in priority order.
     """
     brief = "\n".join(f"{line.id}. {line.text}" for line in context.brief_lines)
     policy, playbook = shown_passages(context.knowledge)
@@ -333,7 +348,7 @@ def _tool_block(results: Sequence[Mapping[str, Any]]) -> str:
     if not results:
         return ""
     lines = [f"- {r['name']}({json.dumps(r.get('args') or {}, ensure_ascii=False)}) -> "
-             f"{json.dumps(r.get('result'), ensure_ascii=False)[:800]}" for r in results]
+             f"{json.dumps(r.get('result'), ensure_ascii=False)}" for r in results]
     return "Kết quả tool đã có trong lượt này (dùng lại, không cần gọi lại):\n" + "\n".join(lines)
 
 
@@ -344,11 +359,21 @@ class ContextPromptMiddleware(AgentMiddleware):
     from the other, and the service is async.
     """
 
+    def __init__(self, model_limit: int = 8) -> None:
+        super().__init__()
+        self.model_limit = model_limit
+
     def _with_prompt(self, request: ModelRequest) -> ModelRequest:
         context = getattr(getattr(request, "runtime", None), "context", None)
         if not isinstance(context, AgentContext):
             return request
         prompt, _ = system_prompt(context)
+        prompt = pii.tokenise(prompt, context.vault)
+        if request.state.get("run_model_call_count", 0) >= self.model_limit - 1:
+            prompt += ("\nĐây là lượt model cuối: không gọi thêm tool. Trả lời ngắn từ kết quả đã có; "
+                       "thiếu dữ liệu thì nói chưa kiểm tra được và xin đúng thông tin còn thiếu. "
+                       "Không khẳng định thao tác thành công nếu chưa có kết quả tool thành công.")
+            return request.override(system_message=SystemMessage(content=prompt), tools=[])
         return request.override(system_message=SystemMessage(content=prompt))
 
     def wrap_model_call(self, request: ModelRequest, handler: Any) -> Any:
@@ -364,11 +389,13 @@ class ActionGuardMiddleware(AgentMiddleware):
     async def awrap_tool_call(self, request: Any, handler: Any) -> Any:
         call = request.tool_call
         name = call["name"]
-        if name not in actions.WRITE_TOOLS:
+        if name not in actions.WRITE_TOOLS | actions.SKU_READ_TOOLS | actions.CUSTOMER_READ_TOOLS:
             return await handler(request)
-        context = getattr(request.runtime, "context", None)
+        context = getattr(getattr(request, "runtime", None), "context", None)
         if not isinstance(context, AgentContext):
-            return await handler(request)
+            return ToolMessage(content=json.dumps({"ok": False, "error": {"code": "PRECONDITION",
+                "retryable": False, "message": "Missing trusted runtime context."}}),
+                tool_call_id=call["id"], name=name, additional_kwargs={"blocked_by": "guardrail"})
         args = dict(call.get("args") or {})
         if name == "handoff_transfer":
             args["brief"] = actions.fill_handoff(args.get("brief") or {}, context.handoff_defaults)
@@ -380,6 +407,7 @@ class ActionGuardMiddleware(AgentMiddleware):
             quotes=quotes, orders=context.known_orders | orders, trusted=context.trusted_skus | codes | set(quotes),
             lane=context.lane, flags=context.flags, now=context.now,
             last_agent_said=context.last_agent_said, customer_said=context.customer_said,
+            shared_phone=context.shared_phone,
         )
         if not verdict.passed:
             envelope = {"ok": False, "error": {"code": "PRECONDITION", "retryable": False, "message": " ".join(verdict.reasons)}}
@@ -431,8 +459,8 @@ def _quotes_in(state: Mapping[str, Any]) -> dict[str, int]:
 class AdvisorAgent(BaseAgent):
     """Drafts the reply for one turn, from the slice of state it is given."""
 
-    #: Section 4.4: at most six tool calls and eight model calls a turn.
-    TOOL_CALLS_PER_RUN = 6
+    #: Four items need catalogue, quote, stock and order each, plus delivery.
+    TOOL_CALLS_PER_RUN = 20
     MODEL_CALLS_PER_RUN = 8
 
     def __init__(
@@ -457,7 +485,7 @@ class AdvisorAgent(BaseAgent):
             model=self.llm,
             tools=self._tools,
             middleware=[
-                ContextPromptMiddleware(),
+                ContextPromptMiddleware(self.MODEL_CALLS_PER_RUN),
                 *retry,
                 ModelCallLimitMiddleware(run_limit=self.MODEL_CALLS_PER_RUN, exit_behavior="error"),
                 ToolCallLimitMiddleware(run_limit=self.TOOL_CALLS_PER_RUN, exit_behavior="continue"),
@@ -494,12 +522,10 @@ class AdvisorAgent(BaseAgent):
 
     async def draft(self, messages: list[Any], context: AgentContext, *, user_id: str | None = None) -> Draft:
         """Run the loop once over *messages* and return the draft."""
-        started = time.perf_counter()
-        result = await self._graph.ainvoke(
-            {"messages": messages}, config=self.run_config(context, user_id=user_id), context=context
-        )
-        produced = result["messages"][len(messages):]
-        return self._draft_of(produced, started)
+        async for event in self.stream(messages, context, user_id=user_id):
+            if event.kind == "done":
+                return event.draft
+        raise RuntimeError("Advisor stream ended without a draft")
 
     async def stream(
         self, messages: list[Any], context: AgentContext, *, user_id: str | None = None
@@ -518,30 +544,33 @@ class AdvisorAgent(BaseAgent):
         started = time.perf_counter()
         produced: list[Any] = []
         announced: set[str] = set()
-        async for mode, chunk in self._graph.astream(
-            {"messages": messages}, config=self.run_config(context, user_id=user_id), context=context,
-            stream_mode=["messages", "updates"],
-        ):
-            if mode == "updates":
-                fresh = [m for update in chunk.values() if isinstance(update, dict) for m in update.get("messages") or []]
-                produced.extend(fresh)
-                if any(isinstance(m, ToolMessage) for m in fresh):
-                    yield AdvisorEvent("tools", results=tuple(tool_results_of(produced)))
-                continue
-            message, meta = chunk
-            # A model that streams sends chunks; one that does not sends its
-            # whole message once, which is a chunk's parent class.
-            if meta.get("langgraph_node") != "model" or not isinstance(message, AIMessage):
-                continue
-            calls = message.tool_call_chunks if isinstance(message, AIMessageChunk) else message.tool_calls
-            if calls:
-                if message.id not in announced:
-                    announced.add(message.id or "")
-                    yield AdvisorEvent("tool_started")
-                continue
-            text = text_of(message, strip=False)
-            if text:
-                yield AdvisorEvent("text", text=text)
+        try:
+            async for mode, chunk in self._graph.astream(
+                {"messages": messages}, config=self.run_config(context, user_id=user_id), context=context,
+                stream_mode=["messages", "updates"],
+            ):
+                if mode == "updates":
+                    fresh = [m for update in chunk.values() if isinstance(update, dict) for m in update.get("messages") or []]
+                    produced.extend(fresh)
+                    if any(isinstance(m, ToolMessage) for m in fresh):
+                        yield AdvisorEvent("tools", results=tuple(tool_results_of(produced)))
+                    continue
+                message, meta = chunk
+                # A model that streams sends chunks; one that does not sends its
+                # whole message once, which is a chunk's parent class.
+                if meta.get("langgraph_node") != "model" or not isinstance(message, AIMessage):
+                    continue
+                calls = message.tool_call_chunks if isinstance(message, AIMessageChunk) else message.tool_calls
+                if calls:
+                    if message.id not in announced:
+                        announced.add(message.id or "")
+                        yield AdvisorEvent("tool_started")
+                    continue
+                text = text_of(message, strip=False)
+                if text:
+                    yield AdvisorEvent("text", text=text)
+        except Exception as error:
+            raise AdvisorFailure(error, self._draft_of(produced, started)) from error
         yield AdvisorEvent("done", draft=self._draft_of(produced, started))
 
     def _draft_of(self, produced: Sequence[Any], started: float) -> Draft:
@@ -571,10 +600,20 @@ def tool_results_of(produced: Sequence[Any]) -> list[dict[str, Any]]:
         for call in message.tool_calls:
             answer = answers.get(call["id"])
             envelope = parse_envelope(answer.content) if answer is not None else None
+            blocked_by = answer.additional_kwargs.get("blocked_by") if answer is not None else None
+            if answer is None:
+                envelope = {"ok": False, "error": {"code": "TOOL_RESULT_MISSING", "retryable": False,
+                                                   "message": "No result received; execution outcome is unknown."}}
+                blocked_by = "missing_result"
+            if (answer is not None and answer.status == "error" and isinstance(answer.content, str)
+                    and answer.content.startswith("Tool call limit exceeded.")):
+                envelope = {"ok": False, "error": {"code": "TOOL_CALL_LIMIT", "retryable": False,
+                                                   "message": answer.content}}
+                blocked_by = "framework"
             results.append({
                 "name": dotted(call["name"]),
                 "args": (answer.additional_kwargs.get("args") if answer is not None else None) or call["args"],
                 "result": envelope,
-                "blocked_by": answer.additional_kwargs.get("blocked_by") if answer is not None else None,
+                "blocked_by": blocked_by,
             })
     return results

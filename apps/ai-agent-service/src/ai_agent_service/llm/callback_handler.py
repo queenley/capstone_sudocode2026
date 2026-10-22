@@ -56,6 +56,16 @@ def extract_usage(message: BaseMessage) -> tuple[int, int]:
     return _from_response_metadata(message.response_metadata or {})
 
 
+def error_usage(error: BaseException) -> tuple[int, int] | None:
+    """OpenAI truncation includes billed usage even though structured parsing failed."""
+    usage = getattr(getattr(error, "completion", None), "usage", None)
+    input_tokens = getattr(usage, "prompt_tokens", None)
+    output_tokens = getattr(usage, "completion_tokens", None)
+    if input_tokens is None or output_tokens is None:
+        return None
+    return int(input_tokens), int(output_tokens)
+
+
 def _from_response_metadata(metadata: dict) -> tuple[int, int]:
     """Parse (input_tokens, output_tokens) from any provider's metadata dict.
 
@@ -136,7 +146,10 @@ class TokenTrackingCallback(BaseCallbackHandler):
         triggers a cooldown instead of letting a retry run straight back into
         the same wall.
         """
-        if is_rate_limit_error(error):
+        if (usage := error_usage(error)) is not None:
+            self.rate_limiter.record_request(*usage)
+            token_ledger.record(self.agent_name, *usage)
+        elif is_rate_limit_error(error):
             self.rate_limiter.record_rate_limited(retry_after_seconds(error))
         else:
             self.rate_limiter.record_failure()

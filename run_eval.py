@@ -15,7 +15,10 @@ harness is a different command, ``scripts/evaluation/run_eval.py``.
 import sys
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 ROOT = Path(__file__).resolve().parent
+load_dotenv(ROOT / ".env", override=False)
 sys.path[:0] = [str(ROOT / "apps" / "ai-agent-service" / "src"), str(ROOT / "packages" / "backend-common")]
 
 from ai_agent_service.pipeline.eval.cli import main  # noqa: E402  (the path above first)

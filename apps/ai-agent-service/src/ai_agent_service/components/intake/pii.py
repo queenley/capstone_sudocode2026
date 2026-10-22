@@ -28,6 +28,7 @@ from __future__ import annotations
 import re
 import unicodedata
 from dataclasses import dataclass, field
+from typing import Any
 
 #: Order matters: a 12-digit ID card before a 9-14 digit account, a phone before both.
 #: A mobile number as people type and ASR writes it: "0901 234 567",
@@ -167,6 +168,26 @@ def tokenise(text: str, vault: Vault) -> str:
 
         text = pattern.sub(swap, text)
     return text
+
+
+def tokenise_data(value: Any, vault: Vault) -> Any:
+    """Mask JSON values before they enter model messages or checkpoint state."""
+    if isinstance(value, dict):
+        return {k: (vault.put("ADDR", v) if k in ("address", "delivery_address", "shipping_address")
+                    and isinstance(v, str) and v and not TOKEN.fullmatch(v) else tokenise_data(v, vault))
+                for k, v in value.items()}
+    if isinstance(value, list):
+        return [tokenise_data(v, vault) for v in value]
+    return tokenise(value, vault) if isinstance(value, str) else value
+
+
+def detokenize_data(value: Any, vault: Vault, *, reveal_phone: bool = True) -> Any:
+    """Restore JSON values only at an authorized output boundary, without string substitution into JSON."""
+    if isinstance(value, dict):
+        return {k: detokenize_data(v, vault, reveal_phone=reveal_phone) for k, v in value.items()}
+    if isinstance(value, list):
+        return [detokenize_data(v, vault, reveal_phone=reveal_phone) for v in value]
+    return detokenize(value, vault, reveal_phone=reveal_phone) if isinstance(value, str) else value
 
 
 def detokenize(text: str, vault: Vault, *, reveal_phone: bool = True) -> str:

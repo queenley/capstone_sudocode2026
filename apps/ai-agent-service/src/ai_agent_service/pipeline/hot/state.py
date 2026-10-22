@@ -113,6 +113,8 @@ class HotState(TurnInput, total=False):
     draft: dict[str, Any] | None
     #: Today's price per sku from every quote this call.
     quotes: dict[str, int]
+    #: Public catalogue codes seen in this call, retained across turn resets.
+    trusted_skus: list[str]
     #: Consecutive infrastructure failures of tools; route rule 1.
     tool_failures: int
 

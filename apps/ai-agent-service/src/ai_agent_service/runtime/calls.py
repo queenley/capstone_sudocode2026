@@ -327,8 +327,7 @@ async def call_turns(call_id: int, *, reveal_phone: bool) -> tuple[dict[str, Any
         )
         turns = await cursor.fetchall()
     if row.get("handoff_brief"):
-        row = {**row, "handoff_brief": json.loads(pii.detokenize(json.dumps(row["handoff_brief"], ensure_ascii=False),
-                                                                  vault, reveal_phone=reveal_phone))}
+        row = {**row, "handoff_brief": pii.detokenize_data(row["handoff_brief"], vault, reveal_phone=reveal_phone)}
     shown = [{**t, "content": pii.detokenize(t["content"], vault, reveal_phone=reveal_phone)} for t in turns]
     return row, shown
 

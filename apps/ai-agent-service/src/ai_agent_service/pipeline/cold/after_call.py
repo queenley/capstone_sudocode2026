@@ -5,10 +5,8 @@ call confirmed. VERIFIED writes to that customer and confirms the keys seen.
 UNKNOWN with a key (a new caller, a Zalo identity, a number they typed that
 matched nobody) creates a customer on those keys. A caller who gave a number
 that belongs to a customer and never clearly answered the confirming question
-is that customer only if the MemoryAgent, reading the whole call, finds they
-said so (section 4.2, step 4); otherwise, as for AMBIGUOUS at hang-up,
-nothing is written to anyone, since a guess would put one person's facts in
-another's file.
+stays unconfirmed. As for AMBIGUOUS at hang-up, nothing is written to anyone:
+a model opinion cannot grant permission to update another person's memory.
 
 A call in which the customer asked to be forgotten (QT-06) writes nothing
 either: the request recorded during the call is carried out here, under the
@@ -57,11 +55,12 @@ async def after_call(
     a ``ToolBox`` holding the ``memory_writer`` role; ``admin`` opens the
     ``admin`` role's ``ToolBox`` when a deletion must be carried out.
     """
-    candidates = await memory.extract(transcript, tool_log, on=call["on"])
     if requested_deletion(tool_log):
+        candidates = []
         remembered = await _forget(call, admin)
     else:
-        settled = await _settle_identity(call, transcript, writer=writer, memory=memory)
+        candidates = await memory.extract(transcript, tool_log, on=call["on"])
+        settled = _settle_identity(call)
         remembered = await _remember(settled, candidates, writer=writer, memory=memory)
     tags = await qa.tag(candidates, returning=bool(call.get("returning")))
     score = await qa.score(transcript, tool_log)
@@ -88,34 +87,27 @@ async def _forget(call: dict[str, Any], admin: AdminTools | None) -> dict[str, A
     return {"status": "deleted", "customer_id": customer_id, "memory_writes": [], "deleted": deleted.get("deleted")}
 
 
-async def _settle_identity(call: dict[str, Any], transcript: Sequence[dict[str, Any]], *, writer: Any,
-                           memory: MemoryAgent) -> dict[str, Any]:
-    """The call as it is remembered: a caller who gave a customer's number and never clearly answered becomes
-    that customer when the whole call shows it, and nobody otherwise (section 4.2, step 4).
-
-    Nobody, not a new customer: a new identity on a number that already
-    belongs to someone would make every later call from it ambiguous.
-    """
-    provisional = call.get("provisional")
-    if call.get("tier") == "VERIFIED" or not provisional or not provisional.get("customer_id"):
-        return call
-    profile = await writer.data("memory_get_profile", customer_id=provisional["customer_id"], on=call["on"])
-    advised = [str(f.get("value")) for f in (profile or {}).get("facts") or []
-               if f.get("slot") in ("product_advised", "order_id") and f.get("status") == "active"]
-    who = " ".join(x for x in (provisional.get("honorific"), provisional.get("name")) if x) or "chưa rõ tên"
-    described = who + (f"; trước đây: {', '.join(advised)}" if advised else "")
-    if await memory.same_person(transcript, profile=described) is True:
-        logger.info("after_call %s: the call shows the caller is %s", call["call_id"], provisional["customer_id"])
-        return {**call, "tier": "VERIFIED", "customer_id": provisional["customer_id"]}
-    return {**call, "tier": "PROBABLE"}
+def _settle_identity(call: dict[str, Any]) -> dict[str, Any]:
+    """Only the identity flow may verify a caller; an extraction model cannot grant write access."""
+    if call.get("tier") != "VERIFIED" and (call.get("provisional") or {}).get("customer_id"):
+        return {**call, "tier": "PROBABLE", "customer_id": None}
+    return call
 
 
 async def _remember(call: dict[str, Any], candidates: list[gate.Candidate], *, writer: Any, memory: MemoryAgent) -> dict[str, Any]:
     tier = call.get("tier") or "UNKNOWN"
-    keys = [{"key_type": k["kind"], "key_hash": k["digest"]} for k in call.get("keys_seen") or []]
     if tier in ("PROBABLE", "AMBIGUOUS"):
         return {"status": "skipped", "reason": f"identity still {tier.lower()} at hang-up", "memory_writes": []}
     customer_id = call.get("customer_id") if tier == "VERIFIED" else None
+    eligible = []
+    for key in call.get("keys_seen") or []:
+        matches = key.get("customer_ids") or []
+        if (customer_id is not None and customer_id not in matches) or (customer_id is None and matches):
+            continue
+        eligible.append(key)
+    if customer_id is None:
+        eligible = [key for key in eligible if key.get("from_connection")] or eligible[:1]
+    keys = [{"key_type": key["kind"], "key_hash": key["digest"]} for key in eligible]
     if customer_id is None and not keys:
         return {"status": "skipped", "reason": "anonymous: no key to remember them by", "memory_writes": []}
     if keys or customer_id is None:
@@ -160,6 +152,9 @@ def plan_writes(candidates: Sequence[gate.Candidate], current: list[dict[str, An
     notes = sum(1 for f in current if f.get("slot") == NOTE_SLOT and f.get("status") == "active")
     decisions = []
     for candidate in settled:
+        if candidate.slot == "order_ids" and candidate.said_by == "tool":
+            previous = next((f["value"] for f in current if f["slot"] == "order_ids" and f["status"] == "active"), [])
+            candidate = candidate._replace(value=list(dict.fromkeys([*previous, *candidate.value])))
         verdict = gate.check(candidate, current, open_notes=notes, settled=recorded)
         if not verdict.passed:
             continue
@@ -169,6 +164,25 @@ def plan_writes(candidates: Sequence[gate.Candidate], current: list[dict[str, An
         decisions.append(decision)
         if candidate.slot is None:
             notes += 1
+    # A fresh quote is one snapshot: missing promotion fields must not survive from an older one.
+    snapshot = {c.slot: c for c in settled if c.said_by == "tool"}
+    if all(s in snapshot for s in ("product_advised", "price_quoted_vnd", "quoted_on")):
+        quoted = snapshot["quoted_on"]
+        for name in ("promo_code", "promo_expiry"):
+            if name in snapshot:
+                continue
+            for held in current:
+                if held["slot"] == name and held["status"] == "active":
+                    origin = {**source, "turn": quoted.turn, "said_by": "tool", "extractor_version": quoted.extractor}
+                    decisions.append(ledger.Decision("invalidate", name, held["value"], held["kind"], origin,
+                                                     replaces=held["fact_id"]))
+        old_product = next((f["value"] for f in current if f["slot"] == "product_advised" and f["status"] == "active"), None)
+        if old_product != snapshot["product_advised"].value and "variant_sku" not in snapshot:
+            for held in current:
+                if held["slot"] == "variant_sku" and held["status"] == "active":
+                    origin = {**source, "turn": quoted.turn, "said_by": "tool", "extractor_version": quoted.extractor}
+                    decisions.append(ledger.Decision("invalidate", "variant_sku", held["value"], held["kind"], origin,
+                                                     replaces=held["fact_id"]))
     return decisions
 
 

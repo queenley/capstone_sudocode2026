@@ -233,7 +233,8 @@ def _extractor() -> Any:
 async def _label(run: ConfigRun, extractor: Any) -> None:
     """Fill ``questions`` and ``claims`` of every row, after the turns ran, so no extractor call ever
     queues in front of a timed turn."""
-    gate = asyncio.Semaphore(EXTRACTOR_CONCURRENCY)
+    # A burst can reserve the remaining cap before any in-flight usage settles.
+    gate = asyncio.Semaphore(1 if os.environ.get("EVAL_BUDGET_DB") else EXTRACTOR_CONCURRENCY)
 
     async def one(row: dict[str, Any], diagnosis: dict[str, Any]) -> None:
         async with gate:
@@ -243,6 +244,10 @@ async def _label(run: ConfigRun, extractor: Any) -> None:
             diagnosis["claims_set_aside"] = labels["set_aside"]
         if labels.get("error"):
             diagnosis["extraction_error"] = labels["error"]
+        if labels.get("attempt_errors"):
+            diagnosis["extraction_attempt_errors"] = labels["attempt_errors"]
+        if labels.get("recovered_errors"):
+            diagnosis["extraction_recovered_errors"] = labels["recovered_errors"]
 
     await asyncio.gather(*(one(row, diagnosis) for row, diagnosis in zip(run.rows, run.diagnostics)))
     print(f"  labelled {len(run.rows)} turns ({extractor.stats()})")

@@ -10,8 +10,8 @@
 8. tool results already gathered, when a draft is regenerated;
 9. why the previous draft was blocked.
 
-Tokens are estimated at four characters each, which errs long for
-Vietnamese and so errs towards cutting.
+Tokens use a four-character estimate, not the provider's billed count.
+The target is soft: required evidence survives; optional text uses the remainder.
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ from __future__ import annotations
 from typing import NamedTuple, Sequence
 
 #: Sections that are never cut, whatever the allowance.
-PROTECTED = frozenset({"rules", "warnings"})
+PROTECTED = frozenset({"rules", "warnings", "lane", "brief", "tool_results", "opening", "blocked"})
 
 
 class Section(NamedTuple):
@@ -43,14 +43,15 @@ def assemble(sections: Sequence[Section], *, max_tokens: int) -> ContextPack:
     """Keep what fits, top first; protected sections always."""
     kept: list[Section] = []
     cut: list[str] = []
-    used = 0
+    used = sum(tokens(s.text) for s in sections if s.name in PROTECTED and s.text.strip())
     for section in sections:
         if not section.text.strip():
             continue
         cost = tokens(section.text)
         if section.name in PROTECTED or used + cost <= max_tokens:
             kept.append(section)
-            used += cost
+            if section.name not in PROTECTED:
+                used += cost
         else:
             cut.append(section.name)
     return ContextPack("\n\n".join(s.text for s in kept), used, tuple(s.name for s in kept), tuple(cut))

@@ -1,4 +1,14 @@
+Revision kiến trúc hiện tại: [bằng chứng, sửa đổi và kiểm chứng](2026-10-22-architecture-fixes.md).
+
+Sửa từ log sau khi đóng run: [revision offline](2026-10-22-log-fixes.md).
+
+Kết quả ngày 22/10/2026: [báo cáo và giới hạn](2026-10-22-results.md).
+
 # Đánh giá
+
+Lịch sử chọn case và run mới: [RUN-LEDGER.md](RUN-LEDGER.md). Trước khi chạy thêm, kiểm danh sách đã chạy và holdout để tránh trùng.
+
+Main hiện có runner BTC ở gốc repo (`run_eval.py`) và harness phân tích tại `scripts/evaluation/run_eval.py`. Xem [bản đồ hiện tại](system-map.md) và [đợt kiểm ngày 22/10/2026](2026-10-22-worklog.md). Các bảng số liệu và ghi chú runner stub bên dưới là tài liệu lịch sử, không phải readiness mới nhất.
 
 Mọi con số dùng trong báo cáo đều được tính bằng code chấm của BTC: `apps/ai-agent-service/data/btc/eval/reference_eval.py`. Repo có ba tầng đánh giá, xếp từ rẻ đến đầy đủ:
 

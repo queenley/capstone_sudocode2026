@@ -21,6 +21,7 @@ them is another ``init_chat_model``-style call in this same file.
 
 from __future__ import annotations
 
+import os
 from threading import Lock
 from typing import Any
 
@@ -116,6 +117,10 @@ class LLMFactory:
 
         kwargs: dict[str, Any] = {}
         callbacks: list[Any] = []
+        if os.environ.get("EVAL_BUDGET_DB"):
+            from .evaluation_budget import BudgetCallback
+
+            callbacks.append(BudgetCallback(config, agent_name))
 
         if rate_limited:
             limiter = limiter_for(provider, config.get("rate_limits") or {})

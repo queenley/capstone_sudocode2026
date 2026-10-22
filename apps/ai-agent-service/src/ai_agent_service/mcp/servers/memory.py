@@ -336,6 +336,8 @@ async def _apply(conn: Any, customer_id: str, decision: dict[str, Any], day: dat
             (customer_id, slot, json.dumps(value, ensure_ascii=False)) if kind == "open_note" else (customer_id, slot),
         )
         current = await cursor.fetchone()
+        if current is not None and slot == "order_ids":
+            value = list(dict.fromkeys([*current["value"], *value]))
         if current is not None and current["value"] == value:
             return None  # held already, whether noted or as the slot's value
     new_id = f"F-{uuid.uuid4().hex[:12]}"

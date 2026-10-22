@@ -30,6 +30,8 @@ from ..intake.text import plain
 from . import Verdict
 
 WRITE_TOOLS = frozenset({"order_create", "order_update", "schedule_callback", "handoff_transfer", "memory_request_deletion"})
+SKU_READ_TOOLS = frozenset({"pricing_get_quote", "inventory_check"})
+CUSTOMER_READ_TOOLS = frozenset({"order_status", "crm_get_customer"})
 
 COD_LIMIT_VND = 10_000_000
 
@@ -56,6 +58,7 @@ def check(
     now: datetime | None = None,
     last_agent_said: str | None = None,
     customer_said: str | None = None,
+    shared_phone: bool = False,
 ) -> Verdict:
     """Whether a write tool may run with *args*; the reasons if not.
 
@@ -63,13 +66,33 @@ def check(
     brief; None skips that check (a caller without the call's history).
     *flags* are the turn's signals (``components.intake.signals``).
     """
+    if name in CUSTOMER_READ_TOOLS:
+        if tier != "VERIFIED":
+            return Verdict(False, ("Xác nhận danh tính khách trước khi đọc thông tin riêng.",))
+        if name == "order_status":
+            order_id = args.get("order_id")
+            if order_id and order_id not in orders:
+                return Verdict(False, ("Mã đơn chưa được xác minh cho khách này; tra order_status theo số đã xác minh trước, không đoán mã.",))
+            if not order_id and shared_phone:
+                return Verdict(False, ("Số dùng chung: chỉ tra mã đơn đã xác minh thuộc khách đang nói; không liệt kê đơn của cả số.",))
+            if order_id:
+                return Verdict(True)
+        if not has_phone:
+            return Verdict(False, ("Chưa có số đã xác minh để tra hồ sơ hoặc danh sách đơn.",))
+        return Verdict(True)
+    if name in SKU_READ_TOOLS:
+        sku = args.get("sku")
+        if trusted is not None and (not sku or sku not in trusted):
+            return Verdict(False, ("Mã sản phẩm chưa được xác nhận; tra catalog_search và dùng đúng sku hoặc variant_sku trả về.",))
+        return Verdict(True)
     if name not in WRITE_TOOLS:
         return Verdict(True)
     if mode == "copilot":
         return Verdict(False, ("Chế độ copilot: tư vấn viên thực hiện thao tác này, trợ lý chỉ gợi ý.",))
     checks = {
         "order_create": lambda: _order_create(args, tier=tier, has_phone=has_phone, quotes=quotes, trusted=trusted),
-        "order_update": lambda: _order_update(args, orders=orders, trusted=trusted),
+        "order_update": lambda: (["Xác nhận danh tính trước khi sửa đơn."] if tier != "VERIFIED"
+                                 else _order_update(args, orders=orders, trusted=trusted)),
         "schedule_callback": lambda: _schedule_callback(args, now=now),
         "handoff_transfer": lambda: _handoff(args, lane=lane, flags=flags or {}),
         "memory_request_deletion": lambda: _deletion(tier=tier, last_agent_said=last_agent_said, customer_said=customer_said),

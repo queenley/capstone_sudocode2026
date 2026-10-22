@@ -41,6 +41,7 @@ from typing import Any, Iterable, Mapping
 from jsonschema import Draft202012Validator
 
 from ...components.intake import pii
+from ...components.memory.brief import used_slots
 from ...config.config_manager import btc_data_dir
 
 #: Arguments that steer how a call is made rather than what it does.
@@ -55,19 +56,15 @@ def tool_calls(results: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
     return [
         {"name": r["name"], "args": {k: v for k, v in (r.get("args") or {}).items() if k not in TRANSPORT_ARGS},
          "result": r.get("result")}
-        for r in results if not r.get("blocked_by")
+        for r in results if not r.get("blocked_by") and r.get("result") is not None
     ]
 
 
 def facts_used(state: Mapping[str, Any]) -> list[str]:
     """Slots of the facts behind the brief lines the reply cited (section 5.5)."""
     brief = state.get("brief") or {}
-    slot_of = {fact["fact_id"]: slot for slot, fact in (brief.get("profile_facts") or {}).items()
-               if isinstance(fact, Mapping) and fact.get("fact_id")}
-    lines = {line["id"]: line for line in state.get("brief_lines") or []}
     cited = (state.get("reply") or {}).get("used_lines") or []
-    return sorted({slot_of[fact_id] for line_id in cited
-                   for fact_id in (lines.get(line_id) or {}).get("fact_ids") or [] if fact_id in slot_of})
+    return used_slots(cited, state.get("brief_lines") or [], brief.get("profile_facts") or {})
 
 
 def memory_writes(writes: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
@@ -105,7 +102,7 @@ def turn_row(
         "questions": [],
         "claims": [],
         "facts_used": facts_used(state),
-        "tool_calls": tool_calls(state.get("tool_results") or []),
+        "tool_calls": pii.detokenize_data(tool_calls(state.get("tool_results") or []), vault),
         "latency": {"ttft_ms": first_token_ms if first_token_ms is not None else total_ms,
                     "total_ms": total_ms, "ttfa_ms": None},
         "memory_writes": [],

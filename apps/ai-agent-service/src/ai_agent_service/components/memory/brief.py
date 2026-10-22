@@ -57,6 +57,14 @@ class BriefLine(NamedTuple):
         return {"id": self.id, "text": self.text, "sensitive": self.sensitive, "fact_ids": list(self.fact_ids)}
 
 
+def used_slots(cited: Sequence[str], lines: Sequence[Mapping[str, Any]],
+               profile: Mapping[str, Mapping[str, Any]]) -> list[str]:
+    """Explicit brief references only; a repeated substring is not evidence of memory use."""
+    slot_of = {str(f["fact_id"]): name for name, f in profile.items() if isinstance(f, Mapping) and f.get("fact_id")}
+    return sorted({slot_of[i] for line in lines if line.get("id") in cited
+                   for i in line.get("fact_ids") or [] if i in slot_of})
+
+
 def _value(value: Any, name: str) -> str:
     if name.endswith("_vnd") and isinstance(value, (int, float)) and not isinstance(value, bool):
         return format_vnd(int(value))

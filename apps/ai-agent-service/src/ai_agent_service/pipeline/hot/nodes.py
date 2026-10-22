@@ -20,7 +20,7 @@ from typing import Any, Mapping, Sequence
 from langchain_core.messages import AIMessage, HumanMessage, RemoveMessage
 from langgraph.runtime import Runtime
 
-from ...agents.advisor import AgentContext, shown_passages
+from ...agents.advisor import AdvisorFailure, AgentContext, shown_passages, _seen_in
 from ...agents.policy import PolicyInput, needs_review
 from ...components.context import compact
 from ...components.guardrails import fallback
@@ -175,14 +175,14 @@ async def _identify(state: HotState, context: HotContext) -> dict[str, Any]:
     keys = _keys(state, context, connection=unidentified)
     if not keys:
         return {}
-    keys_seen = list(state.get("keys_seen") or []) + [
-        {"kind": k.kind, "digest": k.digest, "last4": k.last4, "from_connection": k.from_connection} for k in keys
-    ]
     if tier == "VERIFIED":
-        return {"keys_seen": keys_seen}
-
-    matches, crm_by_customer = await _look_up(keys, context)
-    from_connection = any(k.from_connection for k in keys)
+        return {}  # A number mentioned for shipping or another person is not a newly confirmed identity.
+    matches, crm_by_customer, key_matches = await _look_up(keys, context)
+    keys_seen = list(state.get("keys_seen") or []) + [
+        {"kind": k.kind, "digest": k.digest, "last4": k.last4, "from_connection": k.from_connection,
+         "customer_ids": key_matches.get(k.digest, [])} for k in keys
+    ]
+    from_connection = any(k.from_connection and key_matches.get(k.digest) for k in keys)
     tier = resolver.decide(matches, from_connection=from_connection)
     phone = next((k.value for k in keys if k.kind == "phone"), None)
     update: dict[str, Any] = {"keys_seen": keys_seen, "tier": tier}
@@ -214,6 +214,8 @@ async def _identify(state: HotState, context: HotContext) -> dict[str, Any]:
         update["provisional"] = {"customer_id": match.customer_id, "name": match.name, "honorific": match.honorific}
         if context.harness is not None:
             for key in keys:
+                if match.customer_id not in key_matches.get(key.digest, []):
+                    continue
                 await context.harness.call("identity_link_provisional", customer_id=match.customer_id,
                                            key_type=key.kind, key_hash=key.digest)
     merged = {**state, **update, "crm": crm_by_customer.get(match.customer_id) or {}}
@@ -225,6 +227,7 @@ async def _identify(state: HotState, context: HotContext) -> dict[str, Any]:
 STRANGER: dict[str, Any] = {
     "tier": "UNKNOWN", "customer_id": None, "customer_name": None, "honorific": None, "awaiting": None,
     "brief": None, "brief_lines": [], "freshness": [], "known_orders": [],
+    "phone_token": None, "phone_last4": None, "quotes": {}, "provisional": None,
 }
 
 
@@ -269,11 +272,11 @@ def _keys(state: HotState, context: HotContext, *, connection: bool) -> list[res
     return keys
 
 
-async def _look_up(keys: list[resolver.Key], context: HotContext) -> tuple[list[resolver.Match], dict[str, dict]]:
+async def _look_up(keys: list[resolver.Key], context: HotContext) -> tuple[list[resolver.Match], dict[str, dict], dict[str, list[str]]]:
     """The organisers' CRM and the ledger's identities, in parallel."""
     harness = context.harness
     if harness is None:
-        return [], {}
+        return [], {}, {}
     lookups = []
     for key in keys:
         lookups.append(harness.data("crm_get_customer", **{key.kind: key.value}))
@@ -281,11 +284,13 @@ async def _look_up(keys: list[resolver.Key], context: HotContext) -> tuple[list[
     answers = await asyncio.gather(*lookups)
     matches: dict[str, resolver.Match] = {}
     crm: dict[str, dict] = {}
+    key_matches: dict[str, list[str]] = {k.digest: [] for k in keys}
     for index, answer in enumerate(answers):
         if not answer:
             continue
         if index % 2 == 0:
             for match in resolver.matches_from_crm(answer):
+                key_matches[keys[index // 2].digest].append(match.customer_id)
                 matches[match.customer_id] = match
                 if not answer.get("ambiguous"):
                     crm[match.customer_id] = answer
@@ -294,8 +299,11 @@ async def _look_up(keys: list[resolver.Key], context: HotContext) -> tuple[list[
                     crm[match.customer_id] = candidate
         else:
             for row in answer.get("matches") or []:
+                if row.get("status") != "confirmed":
+                    continue
+                key_matches[keys[index // 2].digest].append(row["customer_id"])
                 matches.setdefault(row["customer_id"], resolver.Match(row["customer_id"], source="ledger"))
-    return list(matches.values()), crm
+    return list(matches.values()), crm, key_matches
 
 
 async def _brief(state: dict[str, Any], context: HotContext, started: float) -> dict[str, Any]:
@@ -331,9 +339,9 @@ async def _brief(state: dict[str, Any], context: HotContext, started: float) -> 
     brief["sessions_without_close"] = next(
         (i for i, e in enumerate(found["episodes"]) if e.get("outcome") == "chot_don"), len(found["episodes"]))
     return {
-        "brief": brief,
-        "brief_lines": [line.as_dict() for line in lines],
-        "freshness": warnings,
+        "brief": pii.tokenise_data(brief, context.vault),
+        "brief_lines": pii.tokenise_data([line.as_dict() for line in lines], context.vault),
+        "freshness": pii.tokenise_data(warnings, context.vault),
         "call_brief_latency_ms": latency_ms if brief["is_returning"] else None,
         "known_orders": [o.get("order_id") for o in orders if o.get("order_id")],
     }
@@ -403,6 +411,8 @@ async def advisor(state: HotState, runtime: Runtime[HotContext]) -> dict[str, An
         draft = await context.advisor.draft(turn_messages, agent_context, user_id=context.user_id)
     except Exception as error:  # noqa: BLE001 - section 4.9: a failure is never silence
         logger.exception("Advisor failed on call %s", state.get("call_id"))
+        if isinstance(error, AdvisorFailure):
+            update.update(_absorb(state, error.partial.tool_results))
         update["draft"] = {"text": fallback.LINES["model_error"], "fallback": True, "error": _readable(error)}
         return update
     update.update(_absorb(state, draft.tool_results))
@@ -424,10 +434,10 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
     products = brief.get("products_advised") or []
     # Codes the brief stands behind; codes in this turn's tool results are
     # trusted by the before-write check itself (section 4.4, "mã tin cậy").
-    trusted = frozenset(
+    trusted = frozenset(state.get("trusted_skus") or []) | (frozenset(
         [p["sku"] for p in products if p.get("sku")]
         + [o[key] for o in brief.get("orders") or [] for key in ("variant_sku", "sku") if o.get(key)]
-    ) if tier == "VERIFIED" else frozenset()
+    ) if tier == "VERIFIED" else frozenset())
     return AgentContext(
         call_id=str(state["call_id"]),
         customer_id=state.get("customer_id") if tier == "VERIFIED" else None,
@@ -448,6 +458,9 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
         quotes=dict(state.get("quotes") or {}),
         known_orders=frozenset(state.get("known_orders") or []),
         customer_phone=phone,
+        vault=context.vault,
+        shared_phone=any(k.get("kind") == "phone" and len(set(k.get("customer_ids") or [])) > 1
+                         for k in state.get("keys_seen") or []),
         addresses={token: value for token, (kind, value) in context.vault.entries.items() if kind == "ADDR"},
         handoff_defaults={
             "customer_phone": phone or "",
@@ -481,6 +494,7 @@ def _address_as(state: HotState) -> str | None:
 def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     """A run's tool results added to the turn's, with today's quotes, the orders seen and the failure count."""
     new_results = [{**r, "turn": state.get("turn_no") or 0} for r in produced]
+    codes, _ = _seen_in({}, new_results)
     quotes = dict(state.get("quotes") or {})
     orders = list(state.get("known_orders") or [])
     failures = int(state.get("tool_failures") or 0)
@@ -497,7 +511,8 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
         elif (envelope.get("error") or {}).get("code") in INFRASTRUCTURE_CODES:
             failures += 1
     return {"tool_results": list(state.get("tool_results") or []) + new_results, "quotes": quotes,
-            "known_orders": orders, "tool_failures": failures}
+            "known_orders": orders, "tool_failures": failures,
+            "trusted_skus": sorted(set(state.get("trusted_skus") or []) | codes)}
 
 
 # ── 4b. the streamed answer, section 4.8 ──────────────────────────────────
@@ -508,6 +523,7 @@ class _Attempt:
     """One streamed run: what was said, what the tools returned, and why it stopped, if a sentence was blocked."""
 
     said: list[str] = field(default_factory=list)
+    last_spoken: bool = False
     results: list[dict[str, Any]] = field(default_factory=list)
     reasons: list[str] = field(default_factory=list)
     blocked: str = ""
@@ -535,7 +551,8 @@ async def _streamed(state: HotState, context: HotContext, messages: list[Any], a
     try:
         while True:
             # A retry is checked against every tool result of the turn, the abandoned runs' included.
-            attempt = await _stream_once(state, context, messages, view, earlier + tuple(produced), timing)
+            attempt = _Attempt()
+            await _stream_once(state, context, messages, view, earlier + tuple(produced), timing, attempt)
             produced += [r for r in attempt.results if r not in produced]
             if not attempt.reasons:
                 break
@@ -547,6 +564,8 @@ async def _streamed(state: HotState, context: HotContext, messages: list[Any], a
             view = replace(view, block_reasons=tuple(reasons), tool_results=earlier + tuple(produced))
     except Exception as error:  # noqa: BLE001 - section 4.9: a failure is never silence
         logger.exception("Advisor failed on call %s", state.get("call_id"))
+        pending = error.partial.tool_results if isinstance(error, AdvisorFailure) else attempt.results
+        produced += [r for r in pending if r not in produced]
         absorbed = _absorb(state, produced)
         if attempt.said:
             line = fallback.safe_line(state.get("lane") or "NEW")
@@ -586,8 +605,8 @@ async def _streamed(state: HotState, context: HotContext, messages: list[Any], a
 async def _stream_once(
     state: HotState, context: HotContext, messages: list[Any], view: AgentContext,
     earlier: tuple[dict[str, Any], ...], timing: dict[str, int | None],
+    attempt: _Attempt,
 ) -> _Attempt:
-    attempt = _Attempt()
     splitter = SentenceSplitter()
     streamed_text = False
     stream = context.advisor.stream(messages, view, user_id=context.user_id)
@@ -623,9 +642,14 @@ async def _stream_once(
 async def _offer(state: HotState, context: HotContext, sentence: str, results: tuple[dict[str, Any], ...],
                  attempt: _Attempt, timing: dict[str, int | None]) -> bool:
     """Check one sentence and say it; False when it was blocked."""
-    if len(attempt.said) >= MAX_SENTENCES and not ORDER_SUMMARY.search(" ".join([*attempt.said, sentence])):
-        return True  # past the length the rules allow: not said, the stream goes on to its end
     spoken = unmarked(sentence)
+    if not spoken and attempt.said:
+        if attempt.last_spoken:
+            attempt.said[-1] += " " + sentence
+        return True  # A citation arriving after speech is metadata, not an empty reply.
+    if len(attempt.said) >= MAX_SENTENCES and not ORDER_SUMMARY.search(" ".join([*attempt.said, sentence])):
+        attempt.last_spoken = False
+        return True  # past the length the rules allow: not said, the stream goes on to its end
     view = guard_input(state, context, spoken, results)
     reasons = list(check(view).reasons)
     if not reasons and context.policy is not None and needs_review(spoken):
@@ -637,6 +661,7 @@ async def _offer(state: HotState, context: HotContext, sentence: str, results: t
         return False
     await _say(context, spoken, timing)
     attempt.said.append(sentence)
+    attempt.last_spoken = True
     return True
 
 
@@ -853,6 +878,8 @@ def _last_agent_text(state: HotState) -> str | None:
 
 
 def _readable(error: Exception) -> str:
+    if isinstance(error, AdvisorFailure):
+        error = error.error
     text = f"{type(error).__name__}: {error}".lower()
     if any(m in text for m in ("429", "rate limit", "quota", "resource_exhausted")):
         return "The model hit its rate limit."

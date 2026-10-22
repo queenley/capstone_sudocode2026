@@ -46,7 +46,7 @@ import httpx
 from pydantic import BaseModel, Field
 
 from ..config.config_manager import get_models_config, has_api_key, require_api_key
-from . import token_ledger
+from . import token_ledger, evaluation_budget
 from .factory import limiter_for
 
 logger = logging.getLogger(__name__)
@@ -192,6 +192,8 @@ async def evaluate(
         body["providerOptions"] = {"gateway": {"zeroDataRetention": True}}
 
     started = time.perf_counter()
+    # Jev accepts at most 32k input tokens; failed requests keep the reservation.
+    reservation = evaluation_budget.reserve(f"{caller}:{config['model']}", 32_000 * 0.042 / 1_000_000)
     try:
         response = await _http().post(
             f"{config['base_url']}/evaluate",
@@ -221,6 +223,8 @@ async def evaluate(
     output_tokens = int(usage.get("outputTokens") or 0)
     limiter.record_request(input_tokens, output_tokens)
     token_ledger.record(f"{caller}:{config['model']}", input_tokens, output_tokens)
+    if "inputTokens" in usage:
+        evaluation_budget.settle(reservation, input_tokens * 0.042 / 1_000_000)
 
     confidence = ((payload.get("providerMetadata") or {}).get("typesafe") or {}).get(
         "confidence"
