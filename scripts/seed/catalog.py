@@ -148,11 +148,17 @@ def seed(db, dataset=None):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", type=Path)
+    parser.add_argument("--btc", type=Path, help="The organisers' data folder (catalog/, eval/): the storefront then sells the BTC catalogue")
     args = parser.parse_args()
     database = Database(Settings().database_url)
     database.migrate()
     with database.sessions() as session:
         seed(session, args.dataset)
+        if args.btc:
+            from scripts.seed.btc_catalog import seed_btc
+
+            print("BTC catalogue:", seed_btc(session, args.btc))
+            session.commit()
     print(
         "Catalog seed complete; customer transcripts and gold labels were not imported into live memory."
     )

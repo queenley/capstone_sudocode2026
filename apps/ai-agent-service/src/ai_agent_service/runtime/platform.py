@@ -19,11 +19,12 @@ own state is in its schema (``runtime.db``) and never written here.
 from __future__ import annotations
 
 import asyncio
+import secrets
 from dataclasses import dataclass
 from typing import Any
 
 from sqlalchemy import func, select
-from src.db.models import Conversation, Handoff, Message, Outbox
+from src.db.models import Conversation, CustomerIdentity, Handoff, Message, Outbox
 from src.security.service import mask
 
 
@@ -44,6 +45,53 @@ def _authorize(app: Any, conversation_id: str, token: str) -> ConversationView:
 async def authorize(app: Any, conversation_id: str, token: str) -> ConversationView:
     """The conversation, if the token opens it (404 otherwise, from ``Security``)."""
     return await asyncio.to_thread(_authorize, app, conversation_id, token)
+
+
+def _open_channel(app: Any, channel: str) -> str:
+    with app.state.database.sessions() as db:
+        # No browser holds this conversation: its token is never handed out,
+        # only its digest is stored (as Sales does for a web conversation).
+        conv = Conversation(customer_id=None, channel=channel,
+                            anonymous_session_digest=app.state.security.digest(secrets.token_urlsafe(32)))
+        db.add(conv)
+        db.flush()
+        db.add(Outbox(event_type="conversation.created", aggregate_id=conv.id,
+                      payload={"conversation_id": str(conv.id), "channel": channel}))
+        db.commit()
+        return str(conv.id)
+
+
+async def open_channel_conversation(app: Any, channel: str) -> str:
+    """A new platform conversation for a channel the agent serves itself (Zalo)."""
+    return await asyncio.to_thread(_open_channel, app, channel)
+
+
+def _view(app: Any, conversation_id: str) -> ConversationView | None:
+    with app.state.database.sessions() as db:
+        conv = db.get(Conversation, conversation_id)
+        return ConversationView(str(conv.id), conv.status, conv.channel, conv.customer_id) if conv else None
+
+
+async def view(app: Any, conversation_id: str) -> ConversationView | None:
+    """The conversation by id, without a token: only for channels the agent owns."""
+    return await asyncio.to_thread(_view, app, conversation_id)
+
+
+def _verified_phone(app: Any, customer_id: str) -> str | None:
+    with app.state.database.sessions() as db:
+        identity = db.scalar(
+            select(CustomerIdentity)
+            .where(CustomerIdentity.customer_id == customer_id, CustomerIdentity.kind == "phone",
+                   CustomerIdentity.verified_at.is_not(None), CustomerIdentity.revoked_at.is_(None),
+                   CustomerIdentity.encrypted_value.is_not(None))
+            .order_by(CustomerIdentity.verified_at.desc())
+        )
+        return app.state.security.decrypt(identity.encrypted_value) if identity else None
+
+
+async def verified_phone(app: Any, customer_id: str) -> str | None:
+    """The phone number the customer proved with a one-time code (Identity), if any."""
+    return await asyncio.to_thread(_verified_phone, app, customer_id)
 
 
 def _append(app: Any, conversation_id: str, lines: list[tuple[str, str]]) -> None:

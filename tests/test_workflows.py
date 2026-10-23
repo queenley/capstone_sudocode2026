@@ -308,3 +308,68 @@ def test_delete_revokes_access_and_memory(client):
     assert client.get(f"/api/conversations/{c}", headers=h).status_code == 404
     with client.app.state.database.sessions() as db:
         assert db.scalars(select(ProfileFact)).all() == []
+
+
+def lines_body(client, lines, key="basket-0001", **extra):
+    """A several-line order: lines as (sku, quantity)."""
+    quotes = [client.get(f"/api/catalog/{sku}/quote?quantity={qty}").json() for sku, qty in lines]
+    return {
+        "items": [
+            {"sku_code": q["sku_code"], "quantity": qty, "expected_unit_price": q["sale_price"]}
+            for q, (_, qty) in zip(quotes, lines)
+        ],
+        "shipping_address": "123 Test Street",
+        "expected_total": str(sum(Decimal(q["total"]) for q in quotes)),
+        "confirmed": True,
+        "idempotency_key": key,
+        **extra,
+    }
+
+
+def test_basket_is_one_order_of_several_lines(client):
+    c, h = conversation(client)
+    identify(client, c, h)
+    body = lines_body(client, [("ASUS-V16-BLACK", 1), ("LENOVO-S5-SILVER", 2)])
+    first = client.post(f"/api/conversations/{c}/orders", headers=h, json=body)
+    assert first.status_code == 201, first.text
+    order = first.json()
+    assert sorted((i["sku_code"], i["quantity"]) for i in order["items"]) == [
+        ("ASUS-V16-BLACK", 1), ("LENOVO-S5-SILVER", 2)]
+    assert Decimal(order["total"]) == Decimal(body["expected_total"])
+    assert (order["payment_method"], order["payment_status"]) == ("cod", "unpaid")
+    repeat = client.post(f"/api/conversations/{c}/orders", headers=h, json=body)
+    assert repeat.json()["id"] == order["id"]
+    assert client.get("/api/catalog/ASUS-V16-BLACK").json()["available"] == 11
+    assert client.get("/api/catalog/LENOVO-S5-SILVER").json()["available"] == 6
+
+
+def test_one_line_short_of_stock_reserves_nothing(client):
+    c, h = conversation(client)
+    identify(client, c, h)
+    body = lines_body(client, [("ASUS-V16-BLACK", 1), ("LENOVO-S5-SILVER", 50)])
+    assert client.post(f"/api/conversations/{c}/orders", headers=h, json=body).status_code == 409
+    assert client.get("/api/catalog/ASUS-V16-BLACK").json()["available"] == 12
+    assert client.get("/api/seller/orders", headers=SELLER).json() == []
+
+
+def test_cod_limit_and_bank_transfer(client):
+    from dataclasses import replace
+
+    c, h = conversation(client)
+    identify(client, c, h)
+    cod = lines_body(client, [("ASUS-V16-BLACK", 1)], payment_method="cod")
+    assert client.post(f"/api/conversations/{c}/orders", headers=h, json=cod).status_code == 422
+    transfer = lines_body(client, [("ASUS-V16-BLACK", 1)], key="basket-0002", payment_method="bank_transfer")
+    # No shop account configured: bank transfer is not offered.
+    assert client.post(f"/api/conversations/{c}/orders", headers=h, json=transfer).status_code == 422
+    security = client.app.state.security
+    security.settings = replace(security.settings, bank_bin="970436", bank_name="Vietcombank",
+                                bank_account_no="0123456789", bank_account_name="TIEP NOI")
+    created = client.post(f"/api/conversations/{c}/orders", headers=h, json=transfer)
+    assert created.status_code == 201, created.text
+    order = created.json()
+    assert (order["payment_method"], order["payment_status"]) == ("bank_transfer", "awaiting_transfer")
+    assert order["transfer"]["account_no"] == "0123456789"
+    assert order["transfer"]["qr_url"].startswith("https://img.vietqr.io/image/970436-0123456789")
+    paid = client.post(f"/api/seller/orders/{order['id']}/paid", headers=SELLER, json={})
+    assert paid.status_code == 200 and paid.json()["payment_status"] == "paid"

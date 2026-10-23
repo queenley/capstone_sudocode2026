@@ -55,6 +55,14 @@ class ScriptedAgent:
         })
         return row
 
+    async def set_caller(self, call_id, number):
+        """As ``calls.set_caller``: the call now knows the number (kept in clear here, for the tests)."""
+        row = next(r for r in self.calls.values() if r["id"] == call_id)
+        row.update(caller_token="<PHONE_1>", caller_phone=number, phone_last4=number[-4:])
+
+    async def call_row(self, call_id):
+        return next(r for r in self.calls.values() if r["id"] == call_id)
+
     async def stored_reply(self, call_id, turn_id):
         content = self.replies.get((call_id, turn_id))
         return {"content": content} if content is not None else None
@@ -87,7 +95,7 @@ def create_test_app(settings: Settings, database: Database) -> FastAPI:
     app.state.database = database
     app.state.security = Security(settings)
     app.state.working = WorkingMemory(settings.redis_url)
-    app.state.mlflow_tracker = None
+    app.state.turn_tracker = None
     for module in (auth, admin, staff, seller, customer, catalog, conversations):
         app.include_router(module.router)
     app.include_router(agent_turns.router)
@@ -127,7 +135,7 @@ class StreamingAgent(ScriptedAgent):
 
 
 def _scripted(monkeypatch, scripted: ScriptedAgent) -> ScriptedAgent:
-    for name in ("call_for_conversation", "stored_reply", "take_turn"):
+    for name in ("call_for_conversation", "stored_reply", "take_turn", "set_caller", "call_row"):
         monkeypatch.setattr(calls, name, getattr(scripted, name))
     return scripted
 

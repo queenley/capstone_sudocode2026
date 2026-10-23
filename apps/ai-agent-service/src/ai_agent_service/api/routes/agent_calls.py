@@ -13,7 +13,9 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 from src.api.routes.shared import staff
 
-from ...runtime import calls, platform
+from ...mcp.servers import btc
+from ...runtime import calls, platform, zalo
+from ...runtime.db import connection
 from ...runtime.calls import Actor, CallError
 
 router = APIRouter(prefix="/api/agent", tags=["agent-console"])
@@ -71,6 +73,34 @@ async def list_calls(request: Request, open_only: bool = Query(default=False),
     return [_call(row) for row in await calls.list_calls(open_only=open_only, limit=limit)]
 
 
+@router.get("/callbacks")
+async def list_callbacks(request: Request) -> list[dict[str, Any]]:
+    """Call-backs the assistant booked (``schedule.callback``), soonest first.
+
+    As on a call, staff see the last four digits of the number, and the
+    customer's name only when the number belongs to one CRM customer (a
+    shared number names nobody)."""
+    _actor(request)
+    async with connection() as conn:
+        state = await btc._read_state(conn)
+    mock = btc.mock()
+    rows = []
+    for cb in state.get("callbacks") or []:
+        phone = str(cb.get("customer_phone") or "")
+        crm = mock.crm_get_customer(phone=phone) if phone else {"found": False}
+        named = crm.get("found") and not crm.get("ambiguous")
+        rows.append({
+            "callback_id": cb.get("callback_id"),
+            "callback_at": cb.get("callback_at"),
+            "moved_from": cb.get("moved_from"),
+            "note": cb.get("note"),
+            "phone_last4": phone[-4:] if phone else None,
+            "customer_name": crm.get("name") if named else None,
+            "customer_id": crm.get("customer_id") if named else None,
+        })
+    return sorted(rows, key=lambda row: row["callback_at"] or "")
+
+
 @router.get("/calls/{call_id}")
 async def get_call(call_id: int, request: Request) -> dict[str, Any]:
     """The call and its transcript; staff see only the last four digits of a phone number."""
@@ -123,6 +153,9 @@ async def consultant_reply(call_id: int, body: ConsultantReply, request: Request
     if sent and row.get("conversation_id"):
         # The customer reads the chat on the platform, not the agent's transcript.
         await platform.append_staff_message(request.app, str(row["conversation_id"]), body.content.strip())
+    if sent and row.get("channel") == "zalo" and row.get("channel_ref"):
+        # A Zalo customer reads it in Zalo.
+        await zalo.send(str(row["channel_ref"]), body.content.strip(), str(row.get("conversation_id") or ""))
     return {"sent": sent, "warnings": warnings, "call": _call(row) if sent else None}
 
 

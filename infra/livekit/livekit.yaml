@@ -1,0 +1,14 @@
+# LiveKit server for the phone hotline (docker compose --profile hotline).
+# API keys come from LIVEKIT_KEYS (set in docker-compose.yml from .env).
+port: 7880
+rtc:
+  tcp_port: 7881
+  # Below 49152: Windows hands out ports from there up to other programs at random.
+  port_range_start: 40000
+  port_range_end: 40100
+  # Local testing. On a server, set use_external_ip: true (or node_ip to the public IP).
+  use_external_ip: false
+redis:
+  address: redis:6379
+logging:
+  level: info

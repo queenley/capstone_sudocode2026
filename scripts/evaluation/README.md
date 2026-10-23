@@ -102,29 +102,28 @@ Thư mục `runs/` có thể chứa dữ liệu khách nên **không đưa lên 
 
 ---
 
-## 4. Theo dõi chi phí trên MLflow
+## 4. Theo dõi chi phí trên Langfuse
 
-Mỗi lần `evaluate` chạy xong, số token và **số tiền (USD)** được tự động ghi lên MLflow, kèm điểm TSR/CCR/RQR/HR. Chỉ ghi con số, không ghi nội dung hội thoại hay dữ liệu khách.
+Mỗi lần `evaluate` chạy xong, số token và **số tiền (USD)** được tự động ghi lên Langfuse, kèm điểm TSR/CCR/RQR/HR. Chỉ ghi con số, không ghi nội dung hội thoại hay dữ liệu khách.
 
-1. Bật MLflow (một lần): `docker compose --profile tracking up -d mlflow`
-2. Mở **http://localhost:5500**, chọn experiment **telesales-evaluation**.
+1. Đặt khóa trong `.env` (một lần): `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_BASE_URL` (ví dụ `https://cloud.langfuse.com`). Đây cũng là khóa mà AI dùng để trace.
+2. Mở Langfuse → **Tracing**, lọc theo tên trace **evaluation-run** (môi trường `evaluation`). Các lần chạy cùng bộ dữ liệu nằm chung session `eval:<dataset>`.
 
-Mỗi lần chạy là một dòng, với các cột chính:
+Mỗi lần chạy là một trace:
 
-| Metric | Nghĩa |
+| Trong trace | Nghĩa |
 |---|---|
-| `total_cost_usd` | Tổng tiền của lần chạy (AI + chấm) |
-| `full_cost_usd`, `baseline_cost_usd` | Tiền của AI ở từng cấu hình |
-| `extractor_cost_usd` | Tiền của model chấm (đọc câu trả lời) |
-| `cost_per_turn_usd` | Tiền trung bình mỗi lượt chat |
-| `*_input_tokens`, `*_output_tokens` | Số token |
-| `full_tsr`, `baseline_tsr`, ... | Điểm, để so chi phí với chất lượng |
-
-File `spend_by_scenario.json` (tab Artifacts) chia chi phí theo từng kịch bản.
+| Generation `agent:full:<kịch bản>`, `agent:baseline:<kịch bản>` | Token và tiền của AI theo từng kịch bản và cấu hình — Langfuse tự cộng vào cột Cost |
+| Generation `extractor` | Token và tiền của model chấm (đọc câu trả lời) |
+| Score `total_cost_usd` | Tổng tiền của lần chạy (AI + chấm) |
+| Score `full_cost_usd`, `baseline_cost_usd`, `extractor_cost_usd` | Tiền theo từng phần |
+| Score `cost_per_turn_usd` | Tiền trung bình mỗi lượt chat |
+| Score `*_input_tokens`, `*_output_tokens` | Số token |
+| Score `full_tsr`, `baseline_tsr`, ... | Điểm, để so chi phí với chất lượng |
 
 - **Giá** lấy từ `apps/ai-agent-service/config/models.yaml` (`input_token_price_per_million`, `output_token_price_per_million` của từng provider). Hiện đã đặt giá OpenAI `gpt-4.1-mini`; Gemini chưa có giá nên chỉ ghi token (`agent_priced = 0`). Đổi model thì cập nhật giá ở đó.
-- **Ghi lại lần chạy cũ** (hoặc khi MLflow chưa bật lúc chạy): `& $PY scripts/evaluation/run_eval.py mlflow-log --run scripts/evaluation/runs/<tên>`. Mỗi lần chạy chỉ được ghi một lần; thêm `--force` để ghi lại.
-- Địa chỉ MLflow lấy từ `MLFLOW_TRACKING_URI` trong `.env`; `http://mlflow:5000` (tên trong Docker) được tự đổi thành `http://127.0.0.1:5500` khi chạy từ máy bạn.
+- **Ghi lại lần chạy cũ** (hoặc khi lúc chạy chưa có khóa / mất mạng): `& $PY scripts/evaluation/run_eval.py langfuse-log --run scripts/evaluation/runs/<tên>`. Mỗi lần chạy chỉ được ghi một lần; thêm `--force` để ghi lại.
+- Trong lúc chạy, từng lời gọi model của AI cũng tự lên Langfuse (trace của LangChain), nếu muốn xem chi tiết.
 
 ---
 
@@ -154,7 +153,7 @@ File `spend_by_scenario.json` (tab Artifacts) chia chi phí theo từng kịch b
 | `The selection mixes levels` | Thêm `--level M1` hoặc `--level M2` |
 | `Choose a new run directory` | `--out` đã tồn tại; chọn tên khác |
 | Nhiều lượt chấm báo `OpenAIConnectionError` | Đã xử lý tự động trên Windows (dùng bộ chứng chỉ `certifi`). Nếu vẫn gặp, giảm `EVAL_EXTRACT_WORKERS` |
-| `MLflow not reachable` | Bật `docker compose --profile tracking up -d mlflow`, rồi ghi lại bằng `run_eval.py mlflow-log --run ...` |
+| `Langfuse not reachable` / `Langfuse keys not set` | Kiểm tra mạng và khóa `LANGFUSE_*` trong `.env`, rồi ghi lại bằng `run_eval.py langfuse-log --run ...` |
 | `The agent's code changed after preparation` | Đã sửa code AI sau bước `prepare`; chạy lại `evaluate` từ đầu |
 
 ---
@@ -171,7 +170,7 @@ agent/                    Khởi động AI thật của repo cho bộ chấm
   runner.py               Lắp ráp AI giống như khi chạy thật
   extract_command.py      Gọi model để trích câu hỏi/khẳng định trong câu trả lời
   spend.py                Tính tiền từ số token và giá trong models.yaml
-  mlflow_log.py           Ghi chi phí và điểm của một lần chạy lên MLflow
+  langfuse_log.py         Ghi chi phí và điểm của một lần chạy lên Langfuse
 normalize_create_data.py  Chuyển dữ liệu create_data thành bộ dữ liệu chấm
 datasets/                 Các bộ kịch bản (registry.json là danh sách)
 eval_harness/             Code chấm

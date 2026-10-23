@@ -25,7 +25,7 @@ def main(argv=None):
         sub.add_argument("--advisor", metavar="PROVIDER:MODEL", help="Advisor model, e.g. openai:gpt-4.1-mini (default: config/models.yaml)")
         sub.add_argument("--extractor", metavar="PROVIDER:MODEL", help="Extraction model (default: openai:gpt-4.1-mini when OPENAI_API_KEY is set)")
     commands.add_parser("history", help="Show every product evaluation run from evaluation/runs; no Agent/model")
-    spend = commands.add_parser("mlflow-log", help="Log a finished run's spend (tokens, USD) and scores to MLflow")
+    spend = commands.add_parser("langfuse-log", help="Log a finished run's spend (tokens, USD) and scores to Langfuse")
     spend.add_argument("--run", required=True, type=Path, help="The run folder, e.g. scripts/evaluation/runs/<run>")
     spend.add_argument("--force", action="store_true", help="Log again even if already logged")
     data = commands.add_parser("data-check", help="Inspect the single team dataset registry without an Agent")
@@ -166,7 +166,7 @@ def main(argv=None):
         except (OSError, ValueError, KeyError, TypeError) as exc:
             print("Knowledge gap review error:", exc)
             return 3
-    if args.command == "mlflow-log":
+    if args.command == "langfuse-log":
         from product import log_spend
         print(log_spend(args.run, force=args.force))
         return 0

@@ -21,7 +21,9 @@ const CHANNEL: Record<string, string> = { web: "Web chat", zalo: "Zalo", hotline
 type Warning = { content: string; action: string; reasons: string[] };
 type Faq = { question: string; answer: string; saved: string | null };
 
-export default function CallConsole() {
+/** ``embedded``: inside the sales workspace (/ban-hang), which has already signed the person in:
+ * connect at once with that token and leave out this page's own header and token form. */
+export default function CallConsole({ embedded = false }: { embedded?: boolean }) {
   const [token, setToken] = useState("");
   const [connected, setConnected] = useState(false);
   const [openOnly, setOpenOnly] = useState(false);
@@ -36,7 +38,9 @@ export default function CallConsole() {
   const [faq, setFaq] = useState<Faq | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
 
-  useEffect(() => setToken(sessionStorage.getItem("staff-token") || ""), []);
+  useEffect(() => {
+    setToken(sessionStorage.getItem("staff-token") || "");
+  }, []);
 
   const refreshQueue = useCallback(async () => {
     try {
@@ -61,6 +65,10 @@ export default function CallConsole() {
     },
     [token],
   );
+
+  useEffect(() => {
+    if (embedded && token && !connected) void refreshQueue();
+  }, [embedded, token, connected, refreshQueue]);
 
   useEffect(() => {
     if (!connected) return;
@@ -145,7 +153,8 @@ export default function CallConsole() {
   const waiting = calls.filter((c) => c.handoff_status === "pending" && !c.ended_at).length;
 
   return (
-    <main className="shell workspace call-console">
+    <main className={"shell workspace call-console" + (embedded ? " embedded" : "")}>
+      {!embedded && (
       <header className="topbar">
         <Link className="logo" href="/">
           tiếp nối
@@ -158,6 +167,7 @@ export default function CallConsole() {
           <Link href="/developer">Developer</Link>
         </nav>
       </header>
+      )}
       <div className="section-heading console-heading">
         <div>
           <p className="eyebrow">AI AGENT · CONSULTANT CONSOLE</p>
@@ -170,6 +180,7 @@ export default function CallConsole() {
           <span className={"status-dot" + (connected ? "" : " off")} /> {waiting} chờ nhận
         </div>
       </div>
+      {!embedded && (
       <form
         className="authbar"
         onSubmit={(e) => {
@@ -193,6 +204,7 @@ export default function CallConsole() {
         </label>
         <button type="submit">{connected ? "Làm mới" : "Kết nối"}</button>
       </form>
+      )}
       {error && (
         <div role="alert" className="alert">
           {error}

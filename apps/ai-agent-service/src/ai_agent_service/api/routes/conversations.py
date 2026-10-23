@@ -47,19 +47,41 @@ class TurnRequest(BaseModel):
 
 async def _turn(request: Request, conversation_id: str, data: TurnRequest,
                 emit: Callable[[str, str], Awaitable[None]] | None = None) -> dict[str, Any]:
-    """Authorise, open or find the call, run the turn, project it to the platform."""
+    """Authorise with the conversation token, then :func:`answer_turn`."""
     arrived = getattr(request.state, "arrived", None) or time.perf_counter()
     token = bearer(request)
     conversation = await platform.authorize(request.app, conversation_id, token)
+    return await answer_turn(request.app, conversation, data, arrived=arrived, emit=emit)
+
+
+async def answer_turn(app: Any, conversation: platform.ConversationView, data: TurnRequest, *, arrived: float,
+                      emit: Callable[[str, str], Awaitable[None]] | None = None,
+                      channel_ref: str | None = None) -> dict[str, Any]:
+    """Open or find the call, run the turn, project it to the platform.
+
+    Shared by the web routes (after the token check) and the channels that own
+    their conversations (Zalo: ``channel_ref`` is the sender's Zalo user id,
+    the key the agent identifies them by).
+    """
+    conversation_id = conversation.id
     if conversation.status not in ("open", "handed_off"):
         raise HTTPException(409, "Conversation is closed")
     actor = Actor(id=f"conversation:{conversation_id}", is_staff=False)
-    row = await calls.call_for_conversation(conversation_id, conversation.channel, actor=actor)
+    # Only channels that know the customer's id there pass it (web chat does not).
+    extra = {"channel_ref": channel_ref} if channel_ref else {}
+    row = await calls.call_for_conversation(conversation_id, conversation.channel, actor=actor, **extra)
+    if conversation.customer_id and not row.get("caller_token"):
+        # The customer proved this number with a one-time code: it identifies
+        # them as a caller id does on the hotline (tier VERIFIED on one match).
+        phone = await platform.verified_phone(app, conversation.customer_id)
+        if phone:
+            await calls.set_caller(int(row["id"]), phone)
+            row = await calls.call_row(int(row["id"]))
     turn_id = data.turn_id or uuid.uuid4().hex
     if conversation.status == "handed_off" and row.get("mode") != "copilot":
         # A person has the conversation and the agent is not drafting for
         # them (Sales handed it over, not the agent): only record the words.
-        await platform.append_messages(request.app, conversation_id, customer=data.message, assistant=None)
+        await platform.append_messages(app, conversation_id, customer=data.message, assistant=None)
         return {**_result(row, turn_id, None, ""), "route": "HUMAN", "waiting": True}
 
     stored = await calls.stored_reply(row["id"], turn_id)
@@ -82,19 +104,19 @@ async def _turn(request: Request, conversation_id: str, data: TurnRequest,
     waiting = outcome.kind == "waiting"
 
     state = outcome.state or {}
-    await platform.append_messages(request.app, conversation_id, customer=data.message, assistant=outcome.content)
+    await platform.append_messages(app, conversation_id, customer=data.message, assistant=outcome.content)
     handoff = state.get("handoff") or {}
     if handoff.get("status") == "pending" and conversation.status == "open":
-        await platform.record_handoff(request.app, conversation_id,
+        await platform.record_handoff(app, conversation_id,
                                       reason=handoff.get("reason") or "assistant_handoff", brief=handoff.get("brief") or {})
     result = {**_result(row, turn_id, outcome, outcome.content or ""), "waiting": waiting}
-    tracker = getattr(request.app.state, "mlflow_tracker", None)
+    tracker = getattr(app.state, "turn_tracker", None)
     if tracker is not None:
         tracker.log_turn(
-            trace_id=result["trace_id"], route=result["route"], confidence=result["confidence"],
+            trace_id=result["trace_id"], session_id=str(row["id"]), route=result["route"], confidence=result["confidence"],
             latency_ms=int(outcome.latency.get("total_ms") or 0), tool_calls=result["tool_calls"],
             usage={"model_calls": (state.get("draft") or {}).get("model_calls") or 0},
-            environment=request.app.state.settings.environment, router="rules",
+            environment=app.state.settings.environment, router="rules",
             model=str((state.get("draft") or {}).get("model") or "unknown"), stage_timings={},
             guard_blocked=not bool((state.get("guard") or {}).get("passed", True)),
             error_count=1 if (state.get("draft") or {}).get("error") else 0,

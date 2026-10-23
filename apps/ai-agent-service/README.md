@@ -142,8 +142,7 @@ Test `tests/agent/test_btc_contract.py` giữ các điểm trên. Mọi tên slo
 | `APP_SECRET` | ≥ 32 byte ở production; sinh khóa vault PII và khóa định danh. Đổi giá trị thì vault cũ không đọc được |
 | `GOOGLE_API_KEY`, `GROQ_API_KEY`, `NVIDIA_API_KEY` | provider của advisor; model chỉ được đề xuất khi có key |
 | `AI_GATEWAY_API_KEY` | Jev qua Vercel AI Gateway |
-| `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_BASE_URL` | tracing (đã che PII), tùy chọn |
-| `MLFLOW_TRACKING_URI` | metric tổng hợp theo lượt, tùy chọn |
+| `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_BASE_URL` | tracing (đã che PII) và trace `agent-turn` tổng hợp mỗi lượt, tùy chọn |
 | `VOICE_MODELS_DIR` | weights voice, tải một lần (image: `/app/models`, volume) |
 | `EMBEDDING_MODELS_DIR` | model embedding của kho tri thức (multilingual-e5-small, 118 MB), knowledge server tự tải lần đầu (image: `/app/models/embedding`); không có mạng thì chỉ tra theo từ khóa |
 | `AGENT_HOME` | nơi chứa `config/` và `data/btc` (image: `/app/agent`) |

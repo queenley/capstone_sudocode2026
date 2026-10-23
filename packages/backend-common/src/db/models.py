@@ -250,6 +250,10 @@ class Order(Base):
     confirmed_at = Column(DateTime(timezone=True), nullable=False)
     created_at = Column(DateTime(timezone=True), default=now)
     updated_at = Column(DateTime(timezone=True), default=now, onupdate=now)
+    #: cod | bank_transfer; and unpaid (COD: paid on delivery) | awaiting_transfer | paid.
+    payment_method = Column(String, nullable=False, default="cod")
+    payment_status = Column(String, nullable=False, default="unpaid")
+    paid_at = Column(DateTime(timezone=True))
 
 
 class OrderItem(Base):

@@ -58,15 +58,24 @@ Tắt hệ thống: `docker compose down` (giữ dữ liệu) hoặc `docker com
 
 | Trang | Ai dùng | Làm gì |
 |---|---|---|
-| `/` | Khách | Xem sản phẩm, chat với AI, xác minh số điện thoại (OTP), đặt hàng |
+| `/` | Khách | Trang chủ cửa hàng: danh mục, khuyến mãi, sản phẩm nổi bật |
+| `/danh-muc/...`, `/tim-kiem`, `/khuyen-mai` | Khách | Danh sách sản phẩm có lọc (thương hiệu, giá, còn hàng) và sắp xếp |
+| `/san-pham/<mã>` | Khách | Chi tiết sản phẩm, chọn size/màu, ưu đãi, thông số, "Hỏi trợ lý về sản phẩm này" |
+| `/gio-hang`, `/thanh-toan` | Khách | Giỏ hàng; đặt hàng một đơn cho cả giỏ: xác minh số điện thoại (OTP) → địa chỉ → COD hoặc chuyển khoản VietQR → xác nhận |
+| `/don-hang` | Khách | Đơn hàng của tôi, xóa dữ liệu cá nhân |
+| `/chinh-sach` | Khách | Tóm tắt chính sách đổi trả, giao hàng, thanh toán, bảo hành |
+| Khung chat (mọi trang) | Khách | Chat với AI, nút ☏ gọi thoại trên trình duyệt, link Zalo |
 | `/login` | Nhân viên | Đăng nhập bằng tài khoản tạo ở bước 4 |
-| `/calls` | Nhân viên tư vấn | Xem các cuộc chat đang diễn ra, nhận cuộc AI chuyển sang, trả lời khách |
+| `/ban-hang` | Bán hàng, tư vấn viên | **Trang bán hàng**: tổng quan, hội thoại & chuyển máy (web, Zalo, hotline), đơn hàng, hẹn gọi lại |
+| `/calls` | Nhân viên tư vấn | Console tư vấn viên riêng (cùng nội dung mục "Hội thoại" của `/ban-hang`) |
 | `/agent` | Nhân viên tư vấn | Hộp thư các cuộc trò chuyện |
 | `/seller` | Nhân viên bán hàng | Xem và hủy đơn hàng |
 | `/admin` | Quản trị | Tạo tài khoản, sửa tồn kho, tạo khuyến mãi |
 | `/developer` | Lập trình viên | Đổi model AI, xem trace từng lượt, đo độ trễ, đổi "ngày kinh doanh" |
 
-Khi chạy local, mã OTP không gửi SMS mà hiện ngay trên màn hình (chế độ phát triển).
+Khi chạy local, mã OTP không gửi SMS mà hiện ngay trên màn hình (chế độ phát triển). Khách đã xác minh số điện thoại được AI nhận ra ngay (như số người gọi trên hotline), không cần nói lại số.
+
+**Kênh liên hệ.** Ngoài website, khách có thể nhắn **Zalo OA** và gọi **hotline** (LiveKit + SIP); cả ba dùng chung một trợ lý và hồ sơ khách. Cách kết nối từng kênh: [docs/channels.md](docs/channels.md).
 
 ---
 
@@ -88,10 +97,10 @@ flowchart LR
 1. Khách gõ tin nhắn trên **web**.
 2. **api-gateway** nhận và chuyển đến đúng service (chat → ai-agent, sản phẩm → commerce, đăng nhập → identity, ...).
 3. **ai-agent** xử lý qua 7 bước: hiểu câu khách → nhận diện khách → chọn hướng xử lý → AI soạn câu trả lời (gọi tool tra giá, tồn kho, đơn hàng) → kiểm tra câu trả lời → gửi → lưu lại.
-4. Khi khách cần người thật, AI chuyển cuộc trò chuyện; nhân viên thấy nó ở trang `/calls`.
+4. Khi khách cần người thật, AI chuyển cuộc trò chuyện; nhân viên thấy nó ở trang `/ban-hang` (mục Hội thoại).
 5. Sau mỗi cuộc, AI ghi nhớ thông tin quan trọng của khách để lần sau không phải hỏi lại.
 
-> **Lưu ý:** trang mua hàng đang hiển thị 5 sản phẩm demo (`data/seed/catalog`), còn AI tư vấn theo catalog của BTC (`apps/ai-agent-service/data/btc`: máy lọc không khí, giày, đồ mẹ bé, ...). Hỏi AI về sản phẩm của BTC sẽ có câu trả lời chính xác nhất.
+> **Sản phẩm:** cửa hàng bán đúng catalog BTC mà AI tư vấn (`apps/ai-agent-service/data/btc`: máy lọc không khí, giày, đồ mẹ bé, ...). Giá bán và tồn kho trên web được tính bằng chính mock của BTC vào ngày kinh doanh, nên khớp với giá AI báo (`scripts/seed/btc_catalog.py`).
 
 ---
 
@@ -181,7 +190,7 @@ Model AI của từng thành phần cấu hình trong [`apps/ai-agent-service/co
 | Lệnh thêm | Bật |
 |---|---|
 | `--profile async` | Kafka (sự kiện giữa các service); đặt `KAFKA_BROKERS=kafka:9092` |
-| `--profile tracking` | MLflow tại http://localhost:5500 (đổi bằng `MLFLOW_PORT`): theo dõi từng lượt AI và **chi phí của mỗi lần đánh giá**; đặt `MLFLOW_TRACKING_URI=http://mlflow:5000` |
+| Langfuse (không cần profile) | Đặt `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_BASE_URL` trong `.env`: theo dõi từng lời gọi model, từng lượt AI và **chi phí của mỗi lần đánh giá** trên Langfuse Cloud |
 | `--build-arg WITH_VOICE=1` | Gọi thoại (nhận dạng và tổng hợp giọng nói chạy local) |
 
 ---
@@ -189,10 +198,10 @@ Model AI của từng thành phần cấu hình trong [`apps/ai-agent-service/co
 ## 7. Giới hạn hiện tại
 
 - Các service vẫn dùng chung một database ([kế hoạch tách](docs/architecture/data-ownership-migration.md)).
-- Xác minh OTP trên web chưa được báo cho AI: AI chỉ nhận ra khách khi khách nói số điện thoại trong lúc chat.
-- Trang mua hàng và AI dùng hai catalog khác nhau (xem lưu ý ở mục 3).
+- Thanh toán: COD (đơn dưới 10 triệu) và chuyển khoản VietQR (điền `BANK_*` trong `.env`); nhân viên bấm "Đã nhận tiền" sau khi đối soát. Chưa tích hợp cổng thanh toán online (MoMo, VNPAY, thẻ) vì cần tài khoản merchant.
+- Hotline nhận cuộc gọi từ số điện thoại thật khi có SIP trunk của nhà mạng ([docs/channels.md](docs/channels.md)); trước đó gọi thử bằng `scripts/dev/hotline_test_call.py` hoặc nút ☏ trên web.
 - Chưa có CI build/push image, chưa có HTTPS tự động khi deploy.
 
 ## Tài liệu thêm
 
-[Mục lục docs](docs/README.md) · [HTTP API](docs/api.md) · [Kiến trúc](docs/architecture/microservices-target-structure.md) · [AI Agent](apps/ai-agent-service/README.md) · [Scripts](scripts/README.md) · [Sinh dữ liệu test](scripts/create_data/README.md) · [Triển khai](docs/deployment/README.md)
+[Mục lục docs](docs/README.md) · [Kênh Zalo & Hotline](docs/channels.md) · [HTTP API](docs/api.md) · [Kiến trúc](docs/architecture/microservices-target-structure.md) · [AI Agent](apps/ai-agent-service/README.md) · [Scripts](scripts/README.md) · [Sinh dữ liệu test](scripts/create_data/README.md) · [Triển khai](docs/deployment/README.md)

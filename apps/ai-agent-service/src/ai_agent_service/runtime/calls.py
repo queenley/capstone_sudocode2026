@@ -62,8 +62,13 @@ class Actor:
 # ── opening and finding a call ────────────────────────────────────────────
 
 
-async def call_for_conversation(conversation_id: str, platform_channel: str, *, actor: Actor) -> dict[str, Any]:
-    """The open call of a platform conversation, opened on its first turn."""
+async def call_for_conversation(conversation_id: str, platform_channel: str, *, actor: Actor,
+                                channel_ref: str | None = None) -> dict[str, Any]:
+    """The open call of a platform conversation, opened on its first turn.
+
+    *channel_ref* is the customer's identity on the channel (a Zalo user id):
+    the agent looks the customer up by it (``harness.run_turn``).
+    """
     async with connection() as conn:
         cursor = await conn.execute(
             "SELECT * FROM calls WHERE conversation_id = %s AND ended_at IS NULL ORDER BY id DESC LIMIT 1",
@@ -73,13 +78,40 @@ async def call_for_conversation(conversation_id: str, platform_channel: str, *, 
         if row is not None:
             return row
         cursor = await conn.execute(
-            "INSERT INTO calls (conversation_id, channel, tier, lane, opened_by, business_day) "
-            "VALUES (%s, %s, 'UNKNOWN', 'NEW', %s, %s) RETURNING *",
-            (conversation_id, CHANNELS.get(platform_channel, "web"), actor.id, options.business_day()),
+            "INSERT INTO calls (conversation_id, channel, channel_ref, tier, lane, opened_by, business_day) "
+            "VALUES (%s, %s, %s, 'UNKNOWN', 'NEW', %s, %s) RETURNING *",
+            (conversation_id, CHANNELS.get(platform_channel, "web"), channel_ref, actor.id, options.business_day()),
         )
         row = await cursor.fetchone()
     logger.info("Call %s opened for conversation %s over %s", row["id"], conversation_id, row["channel"])
     return row
+
+
+def national_phone(number: str) -> str:
+    """A caller id as the shop writes numbers: ``+84 98 500 3703`` -> ``0985003703``."""
+    digits = "".join(ch for ch in number if ch.isdigit() or ch == "+")
+    if digits.startswith("+84"):
+        return "0" + digits[3:]
+    if digits.startswith("84") and len(digits) == 11:
+        return "0" + digits[2:]
+    return digits.lstrip("+")
+
+
+async def set_caller(call_id: int, number: str) -> None:
+    """Record the number a phone call came from: in the call's vault (sealed),
+    with only its last four digits in clear. The agent identifies the caller by
+    it on the next turn (``harness.run_turn``: ``caller_phone``)."""
+    phone = national_phone(number)
+    if len(phone) < 9:
+        return
+    vault = await vaults.load(call_id)
+    token = pii.tokenise(phone, vault).strip()
+    if not token.startswith("<PHONE_"):
+        return
+    await vaults.save(call_id, vault)
+    async with connection() as conn:
+        await conn.execute("UPDATE calls SET caller_token = %s, phone_last4 = %s WHERE id = %s",
+                           (token, phone[-4:], call_id))
 
 
 async def call_row(call_id: int) -> dict[str, Any]:

@@ -42,6 +42,7 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import hmac
 import json
 import logging
 import os
@@ -101,6 +102,13 @@ async def voice_call(ws: WebSocket, conversation_id: str) -> None:
     actor = Actor(id=f"conversation:{conversation_id}", is_staff=False)
     # A spoken conversation is a hotline call whatever page opened it.
     row = await calls.call_for_conversation(conversation_id, "call", actor=actor)
+    # The phone hotline's bridge (apps/hotline-bridge) says which number is
+    # calling; only it holds HOTLINE_BRIDGE_KEY, so a browser cannot claim one.
+    bridge_key = os.environ.get("HOTLINE_BRIDGE_KEY", "")
+    caller = str(hello.get("caller_phone") or "")
+    if caller and bridge_key and hmac.compare_digest(str(hello.get("bridge_key") or ""), bridge_key):
+        await calls.set_caller(int(row["id"]), caller)
+        row = await calls.call_row(int(row["id"]))
     ready = voice_component.status()
     if ready["status"] != "ok":
         await ws.send_text(json.dumps({"type": "error", "text": f"Voice is not ready here: {ready['hint']}"}))
@@ -108,7 +116,7 @@ async def voice_call(ws: WebSocket, conversation_id: str) -> None:
         return
     # The browser matters: its echo canceller decides how much of the caller
     # survives while the assistant is speaking.
-    logger.info("Call %s: voice from %s, %s Hz", call_id, ws.headers.get("user-agent", "?")[:160], hello.get("sample_rate"))
+    logger.info("Call %s: voice from %s, %s Hz", row["id"], ws.headers.get("user-agent", "?")[:160], hello.get("sample_rate"))
     session = Session(ws, row, user_id=actor.id, sample_rate=float(hello.get("sample_rate") or 48_000))
     try:
         await session.run()

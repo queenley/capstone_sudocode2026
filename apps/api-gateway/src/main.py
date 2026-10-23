@@ -104,7 +104,7 @@ def upstream_for(path: str) -> str:
         if path.startswith(("api/admin/proposals", "api/staff/")):
             return SALES_SERVICE_URL
         return COMMERCE_SERVICE_URL
-    if path.startswith(("api/developer/", "api/agent/")):
+    if path.startswith(("api/developer/", "api/agent/", "api/channels/")):
         return AI_AGENT_SERVICE_URL
     return None
 
@@ -194,7 +194,8 @@ async def proxy(path: str, request: Request):
     headers = {
         key: value
         for key, value in request.headers.items()
-        if key.lower() in {"authorization", "content-type", "accept", "x-request-id"}
+        # x-zevent-signature: Zalo signs its webhooks (api/channels/zalo/webhook).
+        if key.lower() in {"authorization", "content-type", "accept", "x-request-id", "x-zevent-signature"}
     }
     client = request.app.state.http
     try:

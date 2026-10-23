@@ -8,6 +8,10 @@ COPY apps/web/ ./
 # handlers cannot proxy WebSockets); empty means ws(s)://<page host>:8000.
 ARG NEXT_PUBLIC_VOICE_URL=""
 ENV NEXT_PUBLIC_VOICE_URL=$NEXT_PUBLIC_VOICE_URL
+# The shop's hotline number and Zalo Official Account (src/lib/contact.ts).
+ARG NEXT_PUBLIC_HOTLINE="1900 6868"
+ARG NEXT_PUBLIC_ZALO_OA_ID=""
+ENV NEXT_PUBLIC_HOTLINE=$NEXT_PUBLIC_HOTLINE NEXT_PUBLIC_ZALO_OA_ID=$NEXT_PUBLIC_ZALO_OA_ID
 RUN npm run build
 
 FROM node:22-alpine AS runtime

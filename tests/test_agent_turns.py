@@ -137,3 +137,15 @@ def test_consultant_reply_from_the_call_console_reaches_the_chat(client, agent, 
     assert sent.status_code == 200 and sent.json()["sent"]
     messages = client.get(f"/api/conversations/{c}", headers=h).json()["messages"]
     assert (messages[-1]["speaker"], messages[-1]["text"]) == ("agent", "Dạ em là nhân viên, em hỗ trợ anh ạ.")
+
+
+def test_a_phone_verified_by_one_time_code_identifies_the_caller(client, agent):
+    """After OTP verification the agent gets the verified number, as a hotline caller id."""
+    from conftest import identify
+
+    c, h = conversation(client)
+    assert turn(client, c, h, "Chào shop").status_code == 200
+    assert "caller_phone" not in agent.calls[c]  # anonymous: no number to identify by
+    identify(client, c, h, phone="0901234567")
+    assert turn(client, c, h, "Tư vấn laptop giúp em").status_code == 200
+    assert agent.calls[c]["caller_phone"] in ("0901234567", "+84901234567")

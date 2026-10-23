@@ -27,11 +27,11 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from src.core.service_runtime import configure_service, database_ready
 
-from .api.routes import agent_calls, conversations, developer, voice
+from .api.routes import agent_calls, channels, conversations, developer, voice
 from .components import voice as voice_component
 from .llm import tracing
 from .mcp import client as mcp_client
-from .observability.mlflow import MlflowTurnTracker
+from .observability.turns import TurnTracker
 from .runtime import calls, db, harness, platform
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
@@ -86,7 +86,7 @@ async def _reconcile_forever(app: FastAPI) -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     database = configure_service(app)
-    app.state.mlflow_tracker = MlflowTurnTracker()
+    app.state.turn_tracker = TurnTracker()
     app.state.startup_error = None
     try:
         await db.init_db()
@@ -105,7 +105,7 @@ async def lifespan(app: FastAPI):
     if not voice_component.status()["missing_packages"]:
         harness.spawn(_prepare_voice())
     yield
-    app.state.mlflow_tracker.close()
+    app.state.turn_tracker.close()
     tracing.flush()
     await mcp_client.close_all()
     await db.close_pool()
@@ -118,6 +118,7 @@ app.include_router(conversations.router)
 app.include_router(voice.router)
 app.include_router(agent_calls.router)
 app.include_router(developer.router)
+app.include_router(channels.router)
 
 
 @app.get("/health")

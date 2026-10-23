@@ -609,6 +609,9 @@ async def _stream_once(
 ) -> _Attempt:
     splitter = SentenceSplitter()
     streamed_text = False
+    # Text written after a tool round is a new model message: it must not run on
+    # into the last sentence before the tools ("…chờ chút nhé.Dạ đơn hàng…").
+    new_message = False
     stream = context.advisor.stream(messages, view, user_id=context.user_id)
     try:
         async for event in stream:
@@ -618,6 +621,7 @@ async def _stream_once(
                     timing["filler_ms"] = _since(context)
             elif event.kind == "tools":
                 attempt.results = list(event.results)
+                new_message = True
             elif event.kind == "done":
                 attempt.draft = event.draft
                 attempt.results = list(event.draft.tool_results)
@@ -628,7 +632,9 @@ async def _stream_once(
                             return attempt
             else:
                 streamed_text = True
-                for sentence in splitter.feed(event.text):
+                text = (" " + event.text) if new_message else event.text
+                new_message = False
+                for sentence in splitter.feed(text):
                     if not await _offer(state, context, sentence, earlier + tuple(attempt.results), attempt, timing):
                         return attempt
         rest = splitter.flush()

@@ -6,7 +6,7 @@ class CatalogRepository:
     def __init__(self, db):
         self.db = db
 
-    def search(self, query="", budget=None):
+    def search(self, query="", budget=None, category=None, limit=50):
         stmt = (
             select(Product, SKU, Inventory)
             .join(SKU, SKU.product_id == Product.id)
@@ -27,8 +27,12 @@ class CatalogRepository:
             )
         if budget is not None:
             stmt = stmt.where(SKU.sale_price <= budget)
+        if category:
+            # A slug or a prefix of one: "gia-dung" matches "gia-dung/quat".
+            escaped = category.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+            stmt = stmt.where(Product.category.like(escaped + "%", escape="\\"))
         return self.db.execute(
-            stmt.order_by(Product.name, SKU.sku_code).limit(50)
+            stmt.order_by(Product.name, SKU.sku_code).limit(limit)
         ).all()
 
     def get(self, code):
@@ -56,6 +60,8 @@ def catalog_row(row):
     product, sku, inventory = row
     return {
         "id": str(product.id),
+        # The product's own code (variants share it), e.g. SKU-SN-RUN2.
+        "product_ref": product.external_id,
         "name": product.name,
         "brand": product.brand,
         "category": product.category,

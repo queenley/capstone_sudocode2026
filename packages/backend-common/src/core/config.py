@@ -30,6 +30,11 @@ class Settings:
     embedding_url: str = os.getenv("EMBEDDING_URL", "")
     embedding_key: str = os.getenv("EMBEDDING_API_KEY", "")
     embedding_model: str = os.getenv("EMBEDDING_MODEL", "")
+    # The shop's bank account for transfers (VietQR). Empty: bank transfer is not offered.
+    bank_bin: str = os.getenv("BANK_BIN", "")  # the bank's VietQR id or BIN, e.g. "970436" (Vietcombank)
+    bank_name: str = os.getenv("BANK_NAME", "")
+    bank_account_no: str = os.getenv("BANK_ACCOUNT_NO", "")
+    bank_account_name: str = os.getenv("BANK_ACCOUNT_NAME", "")
     origins: tuple[str, ...] = tuple(
         os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
     )
