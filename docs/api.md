@@ -147,6 +147,7 @@ Giao diện: trang `/calls` của web (`src/features/call-console.tsx`).
 | POST | `/api/agent/calls/{call_id}/handoff` | `{"reason"}`: yêu cầu chuyển nhân viên |
 | POST | `/api/agent/calls/{call_id}/accept` | Nhân viên nhận cuộc gọi |
 | POST | `/api/agent/calls/{call_id}/reply` | `{"content","action":"used"\|"edited"\|"own","force"}`; cùng hard guard như agent, trả `warnings` nếu không `force`. Khi gửi được, câu trả lời hiện trong chat của khách (speaker `agent`) |
+| POST | `/api/agent/calls/{call_id}/suggestion-feedback` | `{"thumb":"up"\|"down","reason?"}`: 👍/👎 của tư vấn viên đang giữ cuộc gọi trên gợi ý hiện tại; ghi thành tín hiệu `consultant` (`data/improvement/signals.jsonl`). 409 nếu cuộc đã kết thúc, người khác đang giữ, hoặc chưa có gợi ý |
 | POST | `/api/agent/calls/{call_id}/faq` | `{"question","answer"}`: lưu FAQ vào kho tri thức của agent |
 | POST | `/api/agent/calls/{call_id}/end` | Kết thúc (idempotent) và chạy after_call một lần |
 

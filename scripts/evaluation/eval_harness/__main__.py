@@ -24,6 +24,15 @@ def main(argv=None):
         sub.add_argument("--limit", type=int, help="The first N selected scenarios of a registered dataset")
         sub.add_argument("--advisor", metavar="PROVIDER:MODEL", help="Advisor model, e.g. openai:gpt-4.1-mini (default: config/models.yaml)")
         sub.add_argument("--extractor", metavar="PROVIDER:MODEL", help="Extraction model (default: openai:gpt-4.1-mini when OPENAI_API_KEY is set)")
+    sim = commands.add_parser("simulate", help="The BTC customer simulator (patience rules) drives the agent; full vs baseline, 3 seeds")
+    sim.add_argument("--out", type=Path, help="A new run directory (default: runs/<date-time>-simulate)")
+    sim.add_argument("--only", action="append", default=[], metavar="SCENARIO_ID", help="Simulate one scenario; repeat for more")
+    sim.add_argument("--dataset-id", required=True, help="Registered dataset ID from datasets/registry.json")
+    sim.add_argument("--level", choices=("M1", "M2"), required=True, help="One level per run")
+    sim.add_argument("--limit", type=int, help="The first N selected scenarios")
+    sim.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2], help="Seeds (the organisers' check pins three)")
+    sim.add_argument("--advisor", metavar="PROVIDER:MODEL", help="Advisor model (default: config/models.yaml)")
+    sim.add_argument("--simulator-model", help="Model that plays the customer (default: gpt-4.1-mini)")
     commands.add_parser("history", help="Show every product evaluation run from evaluation/runs; no Agent/model")
     spend = commands.add_parser("langfuse-log", help="Log a finished run's spend (tokens, USD) and scores to Langfuse")
     spend.add_argument("--run", required=True, type=Path, help="The run folder, e.g. scripts/evaluation/runs/<run>")
@@ -170,6 +179,19 @@ def main(argv=None):
         from product import log_spend
         print(log_spend(args.run, force=args.force))
         return 0
+    if args.command == "simulate":
+        from datetime import datetime
+        from simulate import simulate
+        out = args.out or Path(__file__).resolve().parents[1] / "runs" / (datetime.now().strftime("%Y%m%d-%H%M%S") + "-simulate")
+        try:
+            report = simulate(out, only=set(args.only), dataset_id=args.dataset_id, level=args.level, limit=args.limit,
+                              seeds=tuple(args.seeds), advisor=args.advisor, model=args.simulator_model)
+        except (OSError, ValueError, KeyError, TypeError, RuntimeError) as exc:
+            print(f"Simulate error: {type(exc).__name__}: {exc}")
+            return 3
+        print(report["table"])
+        print("Run written to", Path(report["out"]).resolve())
+        return 0 if report["summary"]["execution_complete"] else 2
     if args.command == "history":
         from .history import render_history
         print(render_history(Path(__file__).resolve().parents[1] / "runs"))

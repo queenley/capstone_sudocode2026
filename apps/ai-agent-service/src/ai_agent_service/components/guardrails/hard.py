@@ -13,6 +13,7 @@ guarantee, and it can be shown live.
 | personal data | no raw phone, ID or account number; no run of 10 to 14 digits; no token that is not this call's |
 | tier | below VERIFIED, no price the brief holds, no order code |
 | human | no claim to be a person |
+| handoff | a sentence promising to put the caller through to a person needs ``handoff.transfer`` to have run in this turn |
 | abstaining | a sentence saying the information is missing uses one of the six phrases the organisers' grader reads |
 | shape | not empty, at most three sentences unless reading an order back, Vietnamese, no markup |
 
@@ -46,6 +47,11 @@ HUMAN = re.compile(
     r"em là con người|không phải trợ lý ảo đâu)",
     re.IGNORECASE,
 )
+#: "em sẽ chuyển máy cho nhân viên", "em kết nối anh với đồng nghiệp": a promise, not an offer.
+TRANSFER_PROMISE = re.compile(
+    r"\bem\b[^.?!]*?\b(chuyển|kết nối|nối máy)\b[^.?!]*?\b(máy|cuộc gọi|nhân viên|đồng nghiệp|bộ phận|tư vấn viên)\b", re.IGNORECASE)
+#: Words that make it an offer or a question rather than a promise.
+TRANSFER_OFFER = re.compile(r"(nếu|muốn|có thể|được không|có cần|\?|hay là|để em hỏi)", re.IGNORECASE)
 ORDER_CODE = re.compile(r"\bOD\d{5,}\b")
 ORDER_SUMMARY = re.compile(r"(tổng (cộng|đơn|tiền)|xác nhận đơn|lên đơn|mã đơn|đặt hàng)", re.IGNORECASE)
 VIETNAMESE = re.compile(r"[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]", re.IGNORECASE)
@@ -85,6 +91,8 @@ class GuardInput:
     #: Every promotion the shop runs, code to ``(start, end)``, and the day of the call (KM-02).
     promotions: Mapping[str, tuple[str, str]] = field(default_factory=dict)
     on: str | None = None
+    #: False for a consultant's text: they are the person, so there is no tool to wait for.
+    check_handoff: bool = True
 
 
 def numbers_in(value: Any) -> set[int]:
@@ -147,6 +155,7 @@ def check(view: GuardInput) -> Verdict:
     reasons += _durations(text, view)
     reasons += _stock(text, view)
     reasons += _promotions(text, view)
+    reasons += _transfer(text, view)
     if INTERNAL.search(text):
         reasons.append("Nhắc tới thông tin nội bộ (giá nhập, biên lợi nhuận, nhà cung cấp, giá sàn).")
     for kind, pattern in PATTERNS:
@@ -213,6 +222,19 @@ def _stock(text: str, view: GuardInput) -> list[str]:
     return ["Nói về tồn kho mà kết quả tool của lượt này không nói vậy; gọi inventory_check trước."]
 
 
+def _transfer(text: str, view: GuardInput) -> list[str]:
+    """Saying the call is being put through is a claim about what the system did: ``handoff.transfer`` must have run."""
+    if not view.check_handoff:
+        return []
+    promised = [s for s in SENTENCE.split(text) if TRANSFER_PROMISE.search(s) and not TRANSFER_OFFER.search(s)]
+    if not promised:
+        return []
+    for result in view.tool_results:
+        if str(result.get("name", "")).replace("_", ".") == "handoff.transfer" and (result.get("result") or {}).get("ok"):
+            return []
+    return ["Nói sẽ chuyển máy cho nhân viên mà chưa gọi handoff_transfer; gọi handoff_transfer trước rồi mới báo khách."]
+
+
 def _availability(results: Iterable[Mapping[str, Any]]) -> list[bool]:
     """Whether each product a tool of the turn reported on is in stock."""
     found: list[bool] = []
@@ -262,4 +284,4 @@ def _shape(text: str) -> list[str]:
 
 def warnings_for(texts: Iterable[str], view: GuardInput) -> list[str]:
     """The same checks on a consultant's text, as warnings rather than a block."""
-    return [reason for text in texts for reason in check(GuardInput(**{**view.__dict__, "text": text})).reasons]
+    return [reason for text in texts for reason in check(GuardInput(**{**view.__dict__, "text": text, "check_handoff": False})).reasons]

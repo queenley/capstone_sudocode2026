@@ -1,0 +1,201 @@
+{
+  "scenario_id": "SCN-GEN-0051",
+  "level": "M2",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "customer_id": "SYN-C003",
+  "customer_phone": "0998000003",
+  "customer_name": "Lê Văn C",
+  "honorific": "anh",
+  "region": "nam",
+  "category": "me-be",
+  "difficulty": "normal",
+  "tags": [
+    "address_change",
+    "hotline",
+    "order",
+    "order_status",
+    "shipping",
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=chuan; session_index=1",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-17",
+      "input_mode": "text",
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C003",
+          "session_id": "SYN-003-S1",
+          "date": "2026-05-07",
+          "channel": "hotline",
+          "summary": "Mua Xe đẩy gấp gọn Joie Pact giá 3.490.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C003",
+          "session_id": "SYN-003-S2",
+          "date": "2026-10-03",
+          "channel": "zalo_oa",
+          "summary": "Đặt Xe đẩy 2 chiều Combi Sugocal giá 6.790.000đ, đơn OD900302 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C003",
+          "order_id": "OD900301",
+          "date": "2026-05-07",
+          "sku": "SKU-MB-STR1",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-MB-STR1"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C003",
+          "order_id": "OD900302",
+          "date": "2026-10-03",
+          "sku": "SKU-MB-STR2",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900302"
+          }
+        }
+      ],
+      "customer_goal": "Hỏi tình trạng đơn hàng đang giao.",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về tình trạng đơn hàng của mình.",
+        "Đơn hàng xe đẩy Combi Sugocal anh đặt hôm 3 tháng 10 giờ ra sao?",
+        "Anh đã nhận được thông báo gì chưa?"
+      ],
+      "expected_outcome": "khac",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "order_id": "OD900302",
+        "order_status": "shipping",
+        "tracking": "VN0032TRK",
+        "call_date": "2026-10-17"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000003",
+        "customer_id": "SYN-C003",
+        "is_returning": true,
+        "n_previous_sessions": 2,
+        "last_session": {
+          "date": "2026-10-03",
+          "channel": "zalo_oa",
+          "outcome": "chot_don",
+          "summary": "Đặt Xe đẩy 2 chiều Combi Sugocal giá 6.790.000đ, đơn OD900302 đang giao."
+        },
+        "products_advised": [
+          "SKU-MB-STR1"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào anh Lê Văn C, em gọi lại về SKU-MB-STR1 anh đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-17T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD900302"
+        },
+        "must_say_any": [
+          "đang giao",
+          "đang vận chuyển",
+          "đã bàn giao"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-10-19",
+      "days_later": 2,
+      "input_mode": "text",
+      "customer_goal": "Thay đổi địa chỉ giao hàng cho đơn hàng.",
+      "customer_turns": [
+        "Alo, anh muốn đổi địa chỉ giao hàng cho đơn hàng xe đẩy.",
+        "Địa chỉ mới là Thủ Đức, TP.HCM.",
+        "Anh cần điều chỉnh ngay vì đơn hàng đang giao mà."
+      ],
+      "facts_established": {
+        "delivery_area": "Thủ Đức, TP.HCM"
+      },
+      "expected_outcome": "khac",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "order_id": "OD900302",
+        "order_status": "shipping",
+        "tracking": "VN0032TRK",
+        "call_date": "2026-10-19"
+      },
+      "memory_expectation": {
+        "delivery_area": "Thủ Đức, TP.HCM"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000003",
+        "customer_id": "SYN-C003",
+        "is_returning": true,
+        "n_previous_sessions": 3,
+        "last_session": {
+          "date": "2026-10-17",
+          "channel": "hotline",
+          "outcome": "cap_nhat_don"
+        },
+        "products_advised": [
+          "SKU-MB-STR1"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào anh Lê Văn C, em gọi lại về SKU-MB-STR1 anh đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-19T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "OD900302",
+          "action": "update_address"
+        }
+      }
+    }
+  },
+  "hard_case": null
+}

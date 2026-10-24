@@ -36,6 +36,8 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
   const [sending, setSending] = useState(false);
   const [warning, setWarning] = useState<Warning | null>(null);
   const [faq, setFaq] = useState<Faq | null>(null);
+  // The 👍/👎 the consultant gave the suggestion on screen, keyed by its text so a new suggestion starts unrated.
+  const [rated, setRated] = useState<{ text: string; thumb: "up" | "down" } | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -107,6 +109,13 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
       setSelectedId(id);
       await refreshQueue();
       await refreshCall(id);
+    });
+
+  const rate = (thumb: "up" | "down") =>
+    run(async () => {
+      if (!detail?.suggestion) return;
+      await api(`/api/agent/calls/${detail.id}/suggestion-feedback`, token, { thumb });
+      setRated({ text: detail.suggestion.text, thumb });
     });
 
   async function send(content: string, action: string, force = false) {
@@ -345,7 +354,26 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
                         >
                           Sửa trước khi gửi
                         </button>
+                        <span className="thumbs" role="group" aria-label="Đánh giá gợi ý">
+                          <button
+                            className="secondary"
+                            aria-label="Gợi ý tốt"
+                            aria-pressed={rated?.text === suggestion.text && rated.thumb === "up"}
+                            onClick={() => rate("up")}
+                          >
+                            👍
+                          </button>
+                          <button
+                            className="secondary"
+                            aria-label="Gợi ý chưa tốt"
+                            aria-pressed={rated?.text === suggestion.text && rated.thumb === "down"}
+                            onClick={() => rate("down")}
+                          >
+                            👎
+                          </button>
+                        </span>
                       </div>
+                      {rated?.text === suggestion.text && <small>Đã ghi nhận đánh giá của bạn.</small>}
                     </div>
                   )}
                   <form

@@ -1,0 +1,291 @@
+{
+  "scenario_id": "SCN-GEN-0068",
+  "level": "M2",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "hard_case": "asr_loi_tool_timeout",
+  "customer_id": "SYN-C008",
+  "customer_phone": "0998000008",
+  "customer_name": "Trần Văn H",
+  "honorific": "anh",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "hard",
+  "tags": [
+    "asr",
+    "hard_case",
+    "robustness",
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR"
+  ],
+  "notes": "variant=chuan; session_index=1",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-16",
+      "input_mode": "asr_transcript",
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C008",
+          "session_id": "SYN-008-S1",
+          "date": "2026-05-22",
+          "channel": "hotline",
+          "summary": "Mua Giày chạy bộ RunLite 1 giá 1.290.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C008",
+          "session_id": "SYN-008-S2",
+          "date": "2026-10-08",
+          "channel": "zalo_oa",
+          "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD900802 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C008",
+          "order_id": "OD900801",
+          "date": "2026-05-22",
+          "sku": "SKU-SN-RUN1-40-TRANG",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-SN-RUN1-40-TRANG"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C008",
+          "order_id": "OD900802",
+          "date": "2026-10-08",
+          "sku": "SKU-SN-CAS-40-TRANG",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900802"
+          }
+        }
+      ],
+      "fault_injection": {
+        "tool": "inventory.check",
+        "mode": "timeout"
+      },
+      "customer_goal": "Hỏi về máy lọc không khí Xiaomi Smart 4 Pro",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về máy lọc không khí Xiaomi Smart 4 Pro.",
+        "Diện tích phòng của anh khoảng 35 mét vuông.",
+        "Nhà anh có trẻ nhỏ, ngân sách tầm 6 triệu thôi.",
+        "Máy này có khuyến mãi gì không em?",
+        "Anh cần suy nghĩ thêm rồi sẽ gọi lại."
+      ],
+      "customer_turns_asr": [
+        "alo anh muon hoi ve may loc khong khi xiaomi smart 4 pro",
+        "dien tich phong cua anh khoang 35 met vuong",
+        "nha anh co tre nho ngan sach tam 6 trieu thoi",
+        "may nay co khuyen mai gi khong em",
+        "anh can suy nghi them roi se goi lai"
+      ],
+      "facts_established": {
+        "room_area_m2": 35,
+        "has_children": true,
+        "budget_vnd": 6000000,
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "promo_code": "XM-COMBO",
+        "promo_expiry": "2026-11-14"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 5490000,
+        "list_price_vnd": 5490000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_XM-COMBO_active": true,
+        "gift_sku": "SKU-XM-FLT",
+        "promo_AIR-2ND-50_active": false,
+        "in_stock": false,
+        "restock_date": "2026-10-19",
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "room_area_m2": 35,
+        "has_children": true,
+        "budget_vnd": 6000000,
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "promo_code": "XM-COMBO"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000008",
+        "customer_id": "SYN-C008",
+        "is_returning": true,
+        "n_previous_sessions": 2,
+        "last_session": {
+          "date": "2026-10-08",
+          "channel": "zalo_oa",
+          "outcome": "chot_don",
+          "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD900802 đang xử lý."
+        },
+        "products_advised": [
+          "SKU-SN-RUN1-40-TRANG"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào anh Trần Văn H, em gọi lại về SKU-SN-RUN1-40-TRANG anh đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-16T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "19/10",
+          "ngày 19"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_stock",
+            "value": true
+          }
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-10-19",
+      "days_later": 3,
+      "input_mode": "asr_transcript",
+      "customer_goal": "Xác nhận mua máy lọc không khí",
+      "customer_turns": [
+        "Alo, anh gọi lại để đặt máy lọc không khí.",
+        "Anh sẽ thanh toán bằng chuyển khoản.",
+        "Khu vực giao hàng là Nha Trang, Khánh Hòa."
+      ],
+      "customer_turns_asr": [
+        "alo anh goi lai de dat may loc khong khi",
+        "anh se thanh toan bang chuyen khoan",
+        "khu vuc giao hang la nha trang khanh hoa"
+      ],
+      "facts_established": {
+        "payment": "bank",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "promo_code": "XM-COMBO",
+        "promo_expiry": "2026-11-14",
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 5490000,
+        "list_price_vnd": 5490000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_XM-COMBO_active": true,
+        "gift_sku": "SKU-XM-FLT",
+        "promo_AIR-2ND-50_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "estimated_delivery": "2026-10-23",
+        "call_date": "2026-10-19"
+      },
+      "memory_expectation": {
+        "payment": "bank",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "promo_code": "XM-COMBO",
+        "order_id": "OD600001",
+        "superseded": {
+          "order_id": "OD900802"
+        }
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000008",
+        "customer_id": "SYN-C008",
+        "is_returning": true,
+        "n_previous_sessions": 3,
+        "last_session": {
+          "date": "2026-10-16",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-SN-RUN1-40-TRANG",
+          "SKU-XM-4P"
+        ],
+        "open_blockers": [
+          "cần suy nghĩ thêm"
+        ],
+        "must_not_ask": [
+          "room_area_m2",
+          "has_children",
+          "budget_vnd",
+          "product_advised",
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào anh Trần Văn H, em gọi lại về SKU-SN-RUN1-40-TRANG anh đang quan tâm ạ, không biết cần suy nghĩ thêm chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-19T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-XM-4P",
+          "price_vnd": 5490000,
+          "payment": "bank"
+        }
+      }
+    }
+  }
+}

@@ -41,7 +41,7 @@ from ai_agent_service.components.intake import text as intake_text
 from ai_agent_service.config.config_manager import get_models_config
 from ai_agent_service.mcp import client as mcp_client
 from ai_agent_service.mcp.server_base import database
-from ai_agent_service.mcp.tools import ToolBox
+from ai_agent_service.mcp.tools import IDEMPOTENCY_ARG, ToolBox
 from ai_agent_service.pipeline.cold.after_call import after_call
 from ai_agent_service.pipeline.hot.graph import build_graph
 from ai_agent_service.pipeline.hot.state import HotContext
@@ -158,7 +158,9 @@ def _routed(tools: list[BaseTool], business: Business) -> list[BaseTool]:
             continue
 
         async def call(_name: str = name, **args: Any) -> str:
-            envelope = await business(_name, {k: v for k, v in args.items() if v is not None})
+            # The idempotency key is the MCP servers' transport argument; the organisers' mock
+            # rejects it ("unexpected keyword argument"), which failed every write.
+            envelope = await business(_name, {k: v for k, v in args.items() if v is not None and k != IDEMPOTENCY_ARG})
             return json.dumps(envelope, ensure_ascii=False, default=str)
 
         routed.append(StructuredTool.from_function(

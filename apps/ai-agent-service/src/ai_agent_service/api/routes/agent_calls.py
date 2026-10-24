@@ -61,6 +61,13 @@ class ConsultantReply(BaseModel):
     force: bool = False
 
 
+class SuggestionFeedback(BaseModel):
+    """The consultant's 👍/👎 on the assistant's current suggestion."""
+
+    thumb: Literal["up", "down"]
+    reason: str | None = Field(default=None, max_length=300)
+
+
 class FaqEntry(BaseModel):
     question: str = Field(min_length=3, max_length=500)
     answer: str = Field(min_length=3, max_length=2000)
@@ -157,6 +164,15 @@ async def consultant_reply(call_id: int, body: ConsultantReply, request: Request
         # A Zalo customer reads it in Zalo.
         await zalo.send(str(row["channel_ref"]), body.content.strip(), str(row.get("conversation_id") or ""))
     return {"sent": sent, "warnings": warnings, "call": _call(row) if sent else None}
+
+
+@router.post("/calls/{call_id}/suggestion-feedback")
+async def suggestion_feedback(call_id: int, body: SuggestionFeedback, request: Request) -> dict[str, Any]:
+    """Rate the current suggestion; kept as a ``consultant`` signal for the improvement loop."""
+    try:
+        return await calls.suggestion_feedback(call_id, actor=_actor(request), thumb=body.thumb, reason=body.reason)
+    except CallError as error:
+        raise _http(error) from error
 
 
 @router.post("/calls/{call_id}/faq")

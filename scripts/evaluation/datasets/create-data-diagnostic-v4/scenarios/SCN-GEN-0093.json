@@ -1,0 +1,173 @@
+{
+  "scenario_id": "SCN-GEN-0093",
+  "level": "M2",
+  "persona": "khach_da_kenh_fb_hotline",
+  "hard_case": "teencode_da_kenh",
+  "customer_id": "C015",
+  "customer_phone": "0913301756",
+  "customer_name": "Vy",
+  "honorific": "chị",
+  "region": "nam",
+  "category": "gia-dung/may-loc-nuoc",
+  "difficulty": "hard",
+  "tags": [
+    "cross_channel",
+    "gọi_hotline",
+    "hard_case",
+    "máy_lọc_nước",
+    "teencode",
+    "tư_vấn",
+    "variant:chuan",
+    "đặt_hàng"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=chuan; session_index=2",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.c015",
+      "call_date": "2026-10-31",
+      "input_mode": "chat_teencode",
+      "customer_goal": "Hỏi máy lọc nước UF cho gia đình 5 người",
+      "customer_turns": [
+        "Chào em, chị muốn hỏi về máy lọc nước UF cho gia đình chị, có 5 người.",
+        "Ngân sách của chị là 3 triệu rưỡi, không biết sản phẩm này có khuyến mãi gì không?",
+        "Chị đã cung cấp số điện thoại rồi, nhưng chị muốn gọi hotline để hỏi thêm.",
+        "Chị sẽ gọi lại sau khi hỏi thêm nhé."
+      ],
+      "customer_turns_asr": [
+        "chao em chi muon hoi ve may loc nuoc uf cho gia dinh chi co 5 nguoi",
+        "ngan sach cua chi la 3 trieu rưỡi khong biet san pham nay co khuyen mai gi khong",
+        "chi da cung cap so dien thoai roi nhung chi muon goi hotline de hoi them",
+        "chi se goi lai sau khi hoi them nhe"
+      ],
+      "facts_established": {
+        "usage_need": "gia đình 5 người",
+        "budget_vnd": 3500000,
+        "phone_provided": true,
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "product_advised": "SKU-WF-UF",
+        "price_quoted_vnd": 3290000
+      },
+      "expected_outcome": "hen_goi_lai",
+      "ground_truth_facts": {
+        "price_vnd": 3290000,
+        "list_price_vnd": 3290000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-31"
+      },
+      "memory_expectation": {
+        "usage_need": "gia đình 5 người",
+        "budget_vnd": 3500000,
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "product_advised": "SKU-WF-UF",
+        "price_quoted_vnd": 3290000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-11-03",
+      "days_later": 3,
+      "input_mode": "text",
+      "customer_goal": "Xác nhận đơn hàng máy lọc nước",
+      "customer_turns": [
+        "Alo, em ơi, chị muốn xác nhận đơn hàng máy lọc nước UF.",
+        "Chị sẽ thanh toán bằng chuyển khoản.",
+        "Khu vực giao hàng là quận 7, TP.HCM.",
+        "Chị đồng ý lên đơn nhé."
+      ],
+      "facts_established": {
+        "payment": "bank",
+        "delivery_area": "Quận 7, TP.HCM",
+        "product_advised": "SKU-WF-UF",
+        "price_quoted_vnd": 3290000,
+        "promo_code": "NAM-SHIP0",
+        "promo_expiry": "2026-11-05",
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "phone_provided",
+        "product_advised"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 3290000,
+        "list_price_vnd": 3290000,
+        "promo_active": true,
+        "promo_NAM-SHIP0_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "freeship": true,
+        "estimated_delivery": "2026-11-05",
+        "call_date": "2026-11-03"
+      },
+      "memory_expectation": {
+        "payment": "bank",
+        "delivery_area": "Quận 7, TP.HCM",
+        "product_advised": "SKU-WF-UF",
+        "price_quoted_vnd": 3290000,
+        "promo_code": "NAM-SHIP0",
+        "order_id": "OD600001"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0913301756",
+        "customer_id": "C015",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-31",
+          "channel": "chat_fanpage",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-WF-UF"
+        ],
+        "open_blockers": [
+          "muốn gọi hotline hỏi thêm"
+        ],
+        "must_not_ask": [
+          "budget_vnd",
+          "usage_need",
+          "phone_provided",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào chị Vy, em gọi lại về SKU-WF-UF chị đang quan tâm ạ, không biết muốn gọi hotline hỏi thêm chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-03T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-WF-UF",
+          "price_vnd": 3290000,
+          "payment": "bank"
+        }
+      }
+    }
+  }
+}

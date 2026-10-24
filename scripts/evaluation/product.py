@@ -319,17 +319,17 @@ def prepare(out, *, only=None, extractor_calls=None, dataset_id=None, level=None
 
 
 def log_spend(run, *, force=False):
-    """Log *run*'s spend and scores to MLflow (``agent/mlflow_log.py``), with the
-    agent's interpreter, which has MLflow. Never fails the evaluation."""
-    command = [str(PYTHON), "-B", "-m", "agent.mlflow_log", str(Path(run).resolve())] + (["--force"] if force else [])
+    """Log *run*'s spend and scores to Langfuse (``agent/langfuse_log.py``), with the
+    agent's interpreter, which has Langfuse. Never fails the evaluation."""
+    command = [str(PYTHON), "-B", "-m", "agent.langfuse_log", str(Path(run).resolve())] + (["--force"] if force else [])
     try:
         result = subprocess.run(command, cwd=EVALUATION, capture_output=True, text=True, encoding="utf-8",
                                 timeout=300, env={**os.environ, "PYTHONUTF8": "1"})
     except (OSError, subprocess.TimeoutExpired) as exc:
-        return f"MLflow logging failed: {type(exc).__name__}: {exc}"
+        return f"Langfuse logging failed: {type(exc).__name__}: {exc}"
     lines = (result.stdout or "").strip().splitlines()
     if result.returncode or not lines:
-        return "MLflow logging failed: " + ((result.stderr or "").strip().splitlines() or ["no output"])[-1]
+        return "Langfuse logging failed: " + ((result.stderr or "").strip().splitlines() or ["no output"])[-1]
     return lines[-1]
 
 
@@ -378,7 +378,7 @@ def evaluate(out, *, only=None, extractor_calls=None, dataset_id=None, level=Non
         report["pipeline_error"] = (report["pipeline_error"] + "; " if report["pipeline_error"] else "") + f"Case trace: {type(exc).__name__}: {exc}"
     _write(out / "execution-report.json", report)
     close_output(out)
-    say("Logging spend to MLflow")
+    say("Logging spend to Langfuse")
     report["mlflow"] = log_spend(out)
     say(report["mlflow"])
     return report

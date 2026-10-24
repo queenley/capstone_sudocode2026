@@ -12,6 +12,11 @@ Một scenario chạy cả full/baseline vẫn là một scenario mới về đ�
 | 20261022-205443 / development-r0 | 22/10/2026 | R0 sau sửa guard smoke | 10 | full + baseline, hard guard | Xong; 168 lượt, 0 lỗi extractor; nhãn diagnostic |
 | 20261022-211242 / development-r1 | 22/10/2026 | Retest cùng 10 case của R0 | 10 | full + baseline, hard guard | INCOMPLETE; 168 lượt, 1 lỗi model-call cap, không xuất điểm tổng |
 | 20261022-212808 / holdout-final | 22/10/2026 | Case giữ riêng, chỉ chạy sau chốt sửa | 10 | full + baseline, hard guard | INCOMPLETE scoring; 172/172 lượt product, 30 lượt thiếu nhãn |
+| 20261024-work / development-r0 | 24/10/2026 | R0 dev, Jev bật (TypeSafe), v3 | 16 (12 M2 + 4 M1) | full + baseline | Xong nhưng bị lỗi hạ tầng `idempotency_key` làm mọi lệnh ghi bị mock từ chối; TSR M2 16,7%; giữ làm bằng chứng gỡ lỗi |
+| 20261024-work / development-r1 | 24/10/2026 | Retest cùng cohort sau sửa nối tool (`scripts/evaluation/agent/runner.py`) | 16 | full + baseline | Xong; TSR M2 25,0% (v3) |
+| 20261024-work / development-r2-v4 | 24/10/2026 | Retest, nhãn `chuyen_khoan` → `bank` (dataset v4); agent không đổi so với R1 | 16 | full + baseline | Xong; TSR M2 33,3%, HR giá/KM 25% |
+| 20261024-work / development-r3-v4 | 24/10/2026 | Retest sau thêm quy tắc prompt | 16 | full + baseline | INCOMPLETE: 3 scenario hết thời gian khởi động adapter (78/104 lượt); không dùng điểm |
+| 20261024-work / simulator-final | 24/10/2026 | Customer simulator BTC, 3 seed (0,1,2) | 5 M2 (SCN-GEN-0003, 0032, 0062, 0066, 0069) | full + baseline | Xong; TSR full 40% / 40% / 40%, baseline 20% / 0% / 20%; biên độ 0 (full), 20 (baseline) |
 
 ## Chi tiết từng lượt
 
@@ -87,3 +92,12 @@ Chi tiết evidence → root cause → test: [2026-10-22-log-fixes.md](2026-10-2
 ### Revision kiến trúc sau yêu cầu sửa toàn diện
 
 Không có run model mới. Đã kiểm offline các đường identity, business memory, multi-order, tool privacy, streaming và provenance; thêm test graph và kiểm PostgreSQL trong schema tạm riêng. [Chi tiết revision](2026-10-22-architecture-fixes.md). Đây là sửa product/measurement sau thí nghiệm đã đóng, không có delta metrics mới. Danh sách 30 scenario đã dùng và trần API 20 USD giữ nguyên.
+
+## Ngày 24/10/2026 (sổ riêng, trần 50 USD)
+
+Sổ `scripts/evaluation/runs/20261024-work/budget.sqlite`, tạo mới; không reset sổ 22/10. Đã dùng khoảng **41,6 USD** gồm dự phòng cho request thiếu usage; không phải hóa đơn đã đối soát. Cohort dev (16 case) đã dùng để gỡ lỗi nên **không còn là đo độc lập**. **Holdout 10 case chưa chạy.** Lần chạy 24/10 bật Jev nên không so trực tiếp với 22/10 (hard guard).
+
+- Dev M2 (12): SCN-GEN-0003, 0148, 0028, 0150, 0032, 0060, 0069, 0066, 0062, 0118, 0126, 0146. Dev M1 (4): 0075, 0089, 0088, 0072.
+- Holdout chưa chạy (10): M2 0145, 0105, 0002, 0071, 0035, 0121, 0019; M1 0091, 0138, 0052.
+- Thay đổi giữa các lần chạy: R0→R1 chỉ sửa lỗi nối tool; R1→R2 chỉ đổi nhãn (v4); R2→R3 đổi prompt agent (R3 chưa hoàn chỉnh). Mọi nhãn là diagnostic, chưa người duyệt.
+- Ba lần chạy simulator trước `simulator-final` (`simulator-main`, `simulator-main3`, các lần smoke) dùng để sửa lỗi simulator; không lấy số liệu từ đó.

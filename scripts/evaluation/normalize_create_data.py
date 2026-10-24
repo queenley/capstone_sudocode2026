@@ -51,6 +51,9 @@ from eval_harness.contracts import ROOT as CONTRACTS, validate  # noqa: E402
 ROOT = Path(__file__).resolve().parent
 DATASETS = ROOT / "datasets"
 SOURCE = ROOT.parent / "create_data" / "output" / "scenarios"
+#: The generator's payment words by the organisers' (``tools.schema.json``: ``COD|bank|momo|zalopay``).
+#: Only revisions from v4 on apply it; v1-v3 keep the generator's word.
+PAYMENT_VOCABULARY = {"chuyen_khoan": "bank"}
 OUTCOMES = {"hen_goi_lai", "chot_don", "chuyen_may", "tu_choi", "khac"}
 SYNTHETIC_CRM = ROOT.parent.parent / "apps/ai-agent-service/data/btc/catalog/crm_seed_synthetic.json"
 
@@ -63,7 +66,7 @@ def official_customers():
     return {c["customer_id"] for c in customers}
 
 
-def convert(source, customers):
+def convert(source, customers, payment_vocabulary=False):
     """``(scenario, changes, None)``, or ``(None, [], reason)`` when it cannot run."""
     scenario = copy.deepcopy(source)
     sid = scenario.get("scenario_id")
@@ -79,6 +82,14 @@ def convert(source, customers):
         if outcome is not None and outcome not in OUTCOMES:
             spec["expected_outcome"] = "khac"
             changes.append({"call": name, "field": "expected_outcome", "before": outcome, "after": "khac"})
+        if payment_vocabulary:
+            for field in ("success_if/args_match", "memory_expectation", "facts_established"):
+                holder = spec.get("success_if", {}).get("args_match") if field.startswith("success_if") else spec.get(field)
+                word = (holder or {}).get("payment")
+                if word in PAYMENT_VOCABULARY:
+                    holder["payment"] = PAYMENT_VOCABULARY[word]
+                    changes.append({"call": name, "field": f"{field}/payment", "before": word,
+                                    "after": holder["payment"], "evidence": "BTC schemas/tools.schema.json payment enum"})
         success = spec.get("success_if") or {}
         if isinstance(success.get("agent_must_say"), list):
             joined = " | ".join(success["agent_must_say"])
@@ -109,6 +120,8 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--source", type=Path, default=SOURCE)
     parser.add_argument("--name", default="create-data-diagnostic-v3")
+    parser.add_argument("--payment-vocabulary", action="store_true",
+                        help="Write chuyen_khoan as the organisers' bank (a label revision, v4 on)")
     args = parser.parse_args(argv)
     source, target = args.source.resolve(), DATASETS / args.name
     registry_path = DATASETS / "registry.json"
@@ -124,7 +137,7 @@ def main(argv=None):
     prepared, labels, files, excluded = {}, {}, [], []
     for path in sorted(source.glob("*.json")):
         raw = path.read_bytes()
-        scenario, changes, reason = convert(json.loads(raw), customers)
+        scenario, changes, reason = convert(json.loads(raw), customers, payment_vocabulary=args.payment_vocabulary)
         record = {"source": path.relative_to(ROOT.parent).as_posix() if path.is_relative_to(ROOT.parent) else str(path),
                   "source_sha256": hashlib.sha256(raw).hexdigest()}
         if reason:

@@ -1,0 +1,201 @@
+{
+  "scenario_id": "SCN-GEN-0119",
+  "level": "M2",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "customer_id": "SYN-C007",
+  "customer_phone": "0998000007",
+  "customer_name": "Lê Văn G",
+  "honorific": "anh",
+  "region": "bac",
+  "category": "gia-dung/may-loc-nuoc",
+  "difficulty": "normal",
+  "tags": [
+    "address_change",
+    "customer_support",
+    "hotline",
+    "order",
+    "order_status",
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=chuan; session_index=2",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-30",
+      "input_mode": "text",
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C007",
+          "session_id": "SYN-007-S1",
+          "date": "2026-04-19",
+          "channel": "hotline",
+          "summary": "Mua Máy lọc không khí Samsung AX40 giá 6.490.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C007",
+          "session_id": "SYN-007-S2",
+          "date": "2026-10-07",
+          "channel": "zalo_oa",
+          "summary": "Đặt Máy lọc nước RO Karofi 9 lõi giá 5.990.000đ, đơn OD900702 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C007",
+          "order_id": "OD900701",
+          "date": "2026-04-19",
+          "sku": "SKU-SS-AX40",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-SS-AX40"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C007",
+          "order_id": "OD900702",
+          "date": "2026-10-07",
+          "sku": "SKU-WF-RO9",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900702"
+          }
+        }
+      ],
+      "customer_goal": "Hỏi tình trạng đơn hàng của mình.",
+      "customer_turns": [
+        "Alo, anh muốn hỏi tình trạng đơn hàng của mình.",
+        "Đơn hàng của anh đang giao phải không?",
+        "Có thông tin gì mới về đơn hàng này không?"
+      ],
+      "expected_outcome": "khac",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "order_id": "OD900702",
+        "order_status": "shipping",
+        "tracking": "VN0072TRK",
+        "call_date": "2026-10-30"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000007",
+        "customer_id": "SYN-C007",
+        "is_returning": true,
+        "n_previous_sessions": 2,
+        "last_session": {
+          "date": "2026-10-07",
+          "channel": "zalo_oa",
+          "outcome": "chot_don",
+          "summary": "Đặt Máy lọc nước RO Karofi 9 lõi giá 5.990.000đ, đơn OD900702 đang giao."
+        },
+        "products_advised": [
+          "SKU-SS-AX40"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào anh Lê Văn G, em gọi lại về SKU-SS-AX40 anh đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-30T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD900702"
+        },
+        "must_say_any": [
+          "đang giao",
+          "đang vận chuyển",
+          "đã bàn giao"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-10-31",
+      "days_later": 1,
+      "input_mode": "text",
+      "customer_goal": "Muốn đổi địa chỉ giao hàng cho đơn hàng.",
+      "customer_turns": [
+        "Alo, anh cần đổi địa chỉ giao cho đơn hàng đang giao.",
+        "Địa chỉ mới là Long Biên, Hà Nội.",
+        "Anh muốn cập nhật ngay để đơn hàng không bị chậm trễ."
+      ],
+      "facts_established": {
+        "delivery_area": "Long Biên, Hà Nội"
+      },
+      "expected_outcome": "khac",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "order_id": "OD900702",
+        "order_status": "shipping",
+        "tracking": "VN0072TRK",
+        "call_date": "2026-10-31"
+      },
+      "memory_expectation": {
+        "delivery_area": "Long Biên, Hà Nội"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000007",
+        "customer_id": "SYN-C007",
+        "is_returning": true,
+        "n_previous_sessions": 3,
+        "last_session": {
+          "date": "2026-10-30",
+          "channel": "hotline",
+          "outcome": "cap_nhat_don"
+        },
+        "products_advised": [
+          "SKU-SS-AX40"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào anh Lê Văn G, em gọi lại về SKU-SS-AX40 anh đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-31T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "OD900702",
+          "action": "update_address"
+        }
+      }
+    }
+  },
+  "hard_case": null
+}

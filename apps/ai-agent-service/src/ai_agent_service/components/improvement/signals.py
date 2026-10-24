@@ -14,21 +14,49 @@ promise, a leak) waits for nothing: branch B alerts QA at once.
 
 Every row keeps ``call_id`` and ``turn_id`` (section 5.5).
 
-Status: not built.
+Status: **partly built.** Rows are appended to ``signals.jsonl`` in ``IMPROVEMENT_DIR`` (default
+``data/improvement``; the evaluation clears database tables per scenario, a file survives). Built and fed
+today: ``consultant`` (the explicit 👍/👎 on a suggestion and the used/edited/own choice, from the console),
+``outcome``, ``score`` and ``repeat`` (``harvest`` of an evaluation run, not yet written). Not built: the
+Reflection and Gap Loop readers that consume these rows.
 """
 
 from __future__ import annotations
 
+import json
+import os
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Literal
 
 Kind = Literal["outcome", "score", "consultant", "repeat", "oos_early", "oos_late", "violation", "eval_error"]
 
+DEFAULT_DIR = Path(__file__).resolve().parents[4] / "data" / "improvement"
+
+
+def store() -> Path:
+    """``signals.jsonl`` in ``IMPROVEMENT_DIR``."""
+    return Path(os.environ.get("IMPROVEMENT_DIR") or DEFAULT_DIR) / "signals.jsonl"
+
 
 async def record(kind: Kind, *, call_id: str, turn_id: str | None, value: Any) -> None:
-    """Append one signal."""
-    raise NotImplementedError("improvement.signals: docs/design.md section 10.1")
+    """Append one signal; a row is one line, never rewritten."""
+    row = {"at": datetime.now(timezone.utc).isoformat(), "kind": kind, "call_id": str(call_id), "turn_id": turn_id, "value": value}
+    path = store()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as stream:
+        stream.write(json.dumps(row, ensure_ascii=False, default=str) + "\n")
+
+
+def read(kind: Kind | None = None) -> list[dict[str, Any]]:
+    """Every row (of *kind*), oldest first."""
+    path = store()
+    if not path.is_file():
+        return []
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    return [row for row in rows if kind is None or row["kind"] == kind]
 
 
 async def alert_qa(call_id: str, turn_id: str | None, reason: str) -> None:
-    """A violation: tell QA now, not in a batch."""
-    raise NotImplementedError("improvement.signals: docs/design.md section 10.1")
+    """A violation: tell QA now, not in a batch (here: a ``violation`` row QA's page reads)."""
+    await record("violation", call_id=call_id, turn_id=turn_id, value={"reason": reason, "alerted": True})

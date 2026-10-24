@@ -1,0 +1,150 @@
+{
+  "scenario_id": "SCN-GEN-0098",
+  "level": "M2",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "customer_id": "C042",
+  "customer_phone": "0932157116",
+  "customer_name": "Nga",
+  "honorific": "chị",
+  "region": "trung",
+  "category": "me-be",
+  "difficulty": "normal",
+  "tags": [
+    "giao_hàng",
+    "máy_hâm_sữa",
+    "thanh_toán",
+    "ttl",
+    "variant:quay_lai_sau_8_thang",
+    "xác_nhận_mua"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=quay_lai_sau_8_thang; session_index=2",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-30",
+      "input_mode": "text",
+      "customer_goal": "Xác nhận mua máy hâm sữa",
+      "customer_turns": [
+        "Alo, chị Nga đây, chị muốn xác nhận mua máy hâm sữa Fatz.",
+        "Chị sẽ thanh toán qua chuyển khoản.",
+        "Khu vực giao hàng là Nha Trang, Khánh Hòa nhé."
+      ],
+      "facts_established": {
+        "child_age_months": 2,
+        "budget_vnd": 1000000,
+        "payment": "bank",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000,
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "ground_truth_facts": {
+        "price_vnd": 490000,
+        "list_price_vnd": 490000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_MOM-FREESHIP_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "estimated_delivery": "2026-11-04",
+        "call_date": "2026-10-30"
+      },
+      "memory_expectation": {
+        "child_age_months": 2,
+        "budget_vnd": 1000000,
+        "payment": "bank",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000,
+        "order_id": "OD600001"
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-MB-MON",
+          "price_vnd": 490000,
+          "payment": "bank"
+        }
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2027-06-27",
+      "days_later": 240,
+      "input_mode": "text",
+      "customer_goal": "Hỏi về máy hâm sữa",
+      "customer_turns": [
+        "Chị muốn hỏi về máy hâm sữa đó, hồi trước em tư vấn cho chị.",
+        "Giá hiện tại là bao nhiêu và có khuyến mãi gì không em?",
+        "Chị cần suy nghĩ thêm, có thể gọi lại sau nhé."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [
+        "order_id"
+      ],
+      "must_not_ask": [
+        "order_id"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 490000,
+        "list_price_vnd": 490000,
+        "promo_active": false,
+        "promo_MOM-FREESHIP_active": false,
+        "promo_COD-0_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "call_date": "2027-06-27"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000
+      },
+      "expected_call_brief": {
+        "customer_phone": "0932157116",
+        "customer_id": "C042",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-30",
+          "channel": "hotline",
+          "outcome": "chot_don"
+        },
+        "products_advised": [
+          "SKU-MB-MON"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id"
+        ],
+        "suggested_opening": "Dạ em chào chị Nga, em gọi lại về SKU-MB-MON chị đang quan tâm ạ",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [
+            "COD-0"
+          ],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2027-06-27T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      }
+    }
+  },
+  "hard_case": null
+}

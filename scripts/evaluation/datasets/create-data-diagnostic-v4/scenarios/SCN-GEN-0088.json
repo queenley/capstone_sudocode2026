@@ -1,0 +1,169 @@
+{
+  "scenario_id": "SCN-GEN-0088",
+  "level": "M1",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "customer_id": "C006",
+  "customer_phone": "0929486628",
+  "customer_name": "Nam",
+  "honorific": "anh",
+  "region": "bac",
+  "category": "me-be",
+  "difficulty": "normal",
+  "tags": [
+    "chot_don",
+    "giao_hang",
+    "tu_van",
+    "variant:chuan",
+    "xe_day"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=chuan; session_index=2",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-29",
+      "input_mode": "text",
+      "customer_goal": "Hỏi về xe đẩy cho bé 7 tháng tuổi",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về xe đẩy cho bé 7 tháng tuổi.",
+        "Ngân sách của anh khoảng 7 triệu thôi.",
+        "Xe này hiện có khuyến mãi gì không em?",
+        "Để anh hỏi vợ rồi sẽ gọi lại nhé."
+      ],
+      "facts_established": {
+        "child_age_months": 7,
+        "budget_vnd": 7000000,
+        "decision_maker": "vợ",
+        "blocker": "cần hỏi vợ",
+        "product_advised": "SKU-MB-STR2",
+        "price_quoted_vnd": 6790000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "ground_truth_facts": {
+        "price_vnd": 6790000,
+        "list_price_vnd": 6790000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-29"
+      },
+      "memory_expectation": {
+        "child_age_months": 7,
+        "budget_vnd": 7000000,
+        "decision_maker": "vợ",
+        "blocker": "cần hỏi vợ",
+        "product_advised": "SKU-MB-STR2",
+        "price_quoted_vnd": 6790000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-11-01",
+      "days_later": 3,
+      "input_mode": "text",
+      "customer_goal": "Xác nhận mua xe đẩy và thông tin giao hàng",
+      "customer_turns": [
+        "Alo, anh gọi lại để chốt đơn xe đẩy.",
+        "Anh sẽ thanh toán bằng chuyển khoản.",
+        "Khu vực giao hàng là Long Biên, Hà Nội."
+      ],
+      "facts_established": {
+        "payment": "bank",
+        "delivery_area": "Long Biên, Hà Nội",
+        "product_advised": "SKU-MB-STR2",
+        "price_quoted_vnd": 6790000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29",
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "decision_maker",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "decision_maker",
+        "product_advised"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 6790000,
+        "list_price_vnd": 6790000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "freeship": true,
+        "estimated_delivery": "2026-11-03",
+        "call_date": "2026-11-01"
+      },
+      "memory_expectation": {
+        "payment": "bank",
+        "delivery_area": "Long Biên, Hà Nội",
+        "product_advised": "SKU-MB-STR2",
+        "price_quoted_vnd": 6790000,
+        "promo_code": "MOM-FREESHIP",
+        "order_id": "OD600001"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0929486628",
+        "customer_id": "C006",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-29",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-MB-STR2"
+        ],
+        "open_blockers": [
+          "cần hỏi vợ"
+        ],
+        "must_not_ask": [
+          "child_age_months",
+          "budget_vnd",
+          "decision_maker",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào anh Nam, em gọi lại về SKU-MB-STR2 anh đang quan tâm ạ, không biết cần hỏi vợ chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-01T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-MB-STR2",
+          "price_vnd": 6790000,
+          "payment": "bank"
+        }
+      }
+    }
+  },
+  "hard_case": null
+}

@@ -225,8 +225,14 @@ def _output_path(path, assets):
     return path
 
 
-def run_fixed(settings_path, out, *, config=None, scenarios_dir=None, round_name=None):
-    """Run pinned M1 fixed turns. Returned evaluation status intentionally stays incomplete."""
+def run_fixed(settings_path, out, *, config=None, scenarios_dir=None, round_name=None, simulator=None):
+    """Run pinned M1 fixed turns. Returned evaluation status intentionally stays incomplete.
+
+    With *simulator* (``simulate.Simulation``) the customer's lines come from it instead of the
+    scenario's ``customer_turns``: ``simulator.session(scenario, call, spec, config)`` returns an object
+    with ``first()``, ``reply(agent_text, tool_events)`` and ``log()``. The number of turns is then
+    decided by the customer, so coverage of the planned turn ids is not required.
+    """
     report = preflight(settings_path, scenarios_dir)
     assets = Assets(report["asset_root"])
     manifest = assets.resolve(report["manifest"])
@@ -305,7 +311,10 @@ def run_fixed(settings_path, out, *, config=None, scenarios_dir=None, round_name
                                       "data": data}, ensure_ascii=False, allow_nan=False) + "\n")
                 raw.flush()  # Partial survives worker cancellation; never rewrite raw.
 
+            turn_tools = []
+
             def tool_record(event):
+                turn_tools.append(event)
                 tools.write(json.dumps(event, ensure_ascii=False, allow_nan=False) + "\n")
                 tools.flush()
 
@@ -361,11 +370,18 @@ def run_fixed(settings_path, out, *, config=None, scenarios_dir=None, round_name
                             raise ValueError("start_call must return raw memory_snapshot and call_brief (object or null)")
                         record("business_snapshot", {"phase": "before_call", "state": environment.snapshot()}, context)
                         say(f"[{current_config}] {sid} {name} ({plan['on']}): {plan['expected_turns']} turns")
-                        for turn, text in enumerate(spec[plan["input_field"]], 1):
+                        session = simulator.session(scenario, name, spec, current_config) if simulator else None
+                        scripted = iter(spec[plan["input_field"]])
+                        text = session.first() if session else next(scripted, None)
+                        turn = 0
+                        while text is not None:
+                            turn += 1
                             context["turn"] = turn
                             phase = "run_turn"
                             current_phase[0] = phase
-                            record("customer_input", {"text": text, "input_field": plan["input_field"]}, context)
+                            turn_tools.clear()
+                            record("customer_input", {"text": text, "input_field": plan["input_field"],
+                                                      **({"simulated": True} if session else {})}, context)
                             started = time.monotonic()
                             result = adapter.invoke(phase, [text], times["agent"] / 1000)
                             if not isinstance(result, dict) or not isinstance(result.get("agent_text"), str):
@@ -380,6 +396,9 @@ def run_fixed(settings_path, out, *, config=None, scenarios_dir=None, round_name
                             say(f"      khách: {short(text)}")
                             say(f"      agent: {short(result['agent_text'], 110)}")
                             observed.append(f"{manifest['run_id']}/{current_config}/{sid}/{name}/{turn}")
+                            text = session.reply(result["agent_text"], list(turn_tools)) if session else next(scripted, None)
+                        if session:
+                            record("simulator_log", session.log(), context)
                         phase = "end_call"
                         current_phase[0] = phase
                         after = adapter.invoke(phase, [], times["after_call"] / 1000)
@@ -425,7 +444,8 @@ def run_fixed(settings_path, out, *, config=None, scenarios_dir=None, round_name
                 "missing_ids": sorted(set(expected) - set(observed)),
                 "duplicate_ids": sorted(key for key, count in counts.items() if count > 1),
                 "unknown_ids": sorted(set(observed) - set(expected))}
-    execution_complete = not errors and not any(coverage[key] for key in ("missing_ids", "duplicate_ids", "unknown_ids"))
+    execution_complete = not errors and (simulator is not None or not any(
+        coverage[key] for key in ("missing_ids", "duplicate_ids", "unknown_ids")))
     summary = {"notice": "P2 execution only; not BTC trace, scorer, runtime isolation proof or quality acceptance",
                "run_id": manifest["run_id"], "fixture": manifest["fixture"], "configs": configs,
                "execution_complete": execution_complete, "bindings": bindings, "calls": calls,

@@ -26,6 +26,7 @@ from langchain_core.messages import AIMessage
 from ..components.guardrails.fallback import LINES
 from ..components.guardrails.hard import GuardInput, check
 from ..components.handoff import copilot
+from ..components.improvement import signals
 from ..components.intake import pii
 from ..mcp import client as mcp_client
 from ..mcp.tools import ToolBox
@@ -319,7 +320,36 @@ async def consultant_reply(call_id: int, *, actor: Actor, content: str, action: 
         row = await cursor.fetchone()
     await vaults.save(call_id, vault)
     await harness.add_spoken(call_id, AIMessage(content=tokenised, id=f"human_agent-{turn_id}", name="human_agent"))
+    await _record_signal(call_id, turn_id, {**signal, "consultant": actor.label or actor.id})
     return True, warnings, row
+
+
+async def _record_signal(call_id: int, turn_id: str | None, value: dict[str, Any]) -> None:
+    """File the feedback signal; losing it must never stop a reply reaching the customer."""
+    try:
+        await signals.record("consultant", call_id=str(call_id), turn_id=turn_id, value=value)
+    except OSError:
+        logger.warning("Could not record the consultant signal for call %s", call_id)
+
+
+async def suggestion_feedback(call_id: int, *, actor: Actor, thumb: str, reason: str | None) -> dict[str, Any]:
+    """The consultant's explicit 👍/👎 on the assistant's current suggestion (the brief's third feedback source)."""
+    row = await call_row(call_id)
+    if row["ended_at"] is not None:
+        raise CallError(409, "This session has ended.")
+    if row["accepted_by"] != actor.id:
+        raise CallError(409, "Only the consultant holding this conversation can rate its suggestion.")
+    suggestion = row["suggestion"] or {}
+    if not suggestion.get("text"):
+        raise CallError(409, "There is no suggestion to rate.")
+    async with connection() as conn:
+        cursor = await conn.execute(
+            "SELECT turn_id FROM turns WHERE call_id = %s AND speaker = 'customer' ORDER BY id DESC LIMIT 1", (call_id,))
+        last = await cursor.fetchone()
+    value = {"action": "thumb", "thumb": thumb, "suggestion": suggestion["text"], "reason": (reason or "").strip() or None,
+             "consultant": actor.label or actor.id}
+    await signals.record("consultant", call_id=str(call_id), turn_id=last["turn_id"] if last else None, value=value)
+    return {"recorded": True, "thumb": thumb}
 
 
 async def save_faq(call_id: int, *, actor: Actor, question: str, answer: str) -> dict[str, Any]:

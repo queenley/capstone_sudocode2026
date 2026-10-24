@@ -1,0 +1,235 @@
+{
+  "scenario_id": "SCN-GEN-0129",
+  "level": "M2",
+  "persona": "khach_hoi_ngoai_tai_lieu",
+  "hard_case": "phien_ban_chinh_sach_cu",
+  "customer_id": "SYN-C003",
+  "customer_phone": "0998000003",
+  "customer_name": "Lê Văn C",
+  "honorific": "anh",
+  "region": "nam",
+  "category": "gia-dung/noi-chien",
+  "difficulty": "hard",
+  "tags": [
+    "chinh_sach",
+    "doi_tra",
+    "hard_case",
+    "nồi_chien_khong_dau",
+    "tu_van",
+    "variant:chinh_sach_cu",
+    "version_conflict"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR"
+  ],
+  "notes": "variant=chinh_sach_cu; session_index=3",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-11-14",
+      "input_mode": "text",
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C003",
+          "session_id": "SYN-003-S1",
+          "date": "2026-05-07",
+          "channel": "hotline",
+          "summary": "Mua Xe đẩy gấp gọn Joie Pact giá 3.490.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C003",
+          "session_id": "SYN-003-S2",
+          "date": "2026-10-03",
+          "channel": "zalo_oa",
+          "summary": "Đặt Xe đẩy 2 chiều Combi Sugocal giá 6.790.000đ, đơn OD900302 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C003",
+          "order_id": "OD900301",
+          "date": "2026-05-07",
+          "sku": "SKU-MB-STR1",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-MB-STR1"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C003",
+          "order_id": "OD900302",
+          "date": "2026-10-03",
+          "sku": "SKU-MB-STR2",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900302"
+          }
+        }
+      ],
+      "customer_goal": "Hỏi về nồi chiên không dầu Xiaomi.",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về nồi chiên không dầu Xiaomi 4.5L.",
+        "Giá của sản phẩm này là bao nhiêu vậy em?",
+        "Anh có ngân sách khoảng 2 triệu thôi.",
+        "Anh cần thay cái nồi cũ đã hỏng.",
+        "Anh sẽ chờ cuối tháng nhận lương rồi gọi lại nhé."
+      ],
+      "facts_established": {
+        "usage_need": "thay đồ cũ đã hỏng",
+        "budget_vnd": 2000000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-AF-XM",
+        "price_quoted_vnd": 1590000
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 1590000,
+        "list_price_vnd": 1590000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-14"
+      },
+      "memory_expectation": {
+        "usage_need": "thay đồ cũ đã hỏng",
+        "budget_vnd": 2000000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-AF-XM",
+        "price_quoted_vnd": 1590000
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000003",
+        "customer_id": "SYN-C003",
+        "is_returning": true,
+        "n_previous_sessions": 2,
+        "last_session": {
+          "date": "2026-10-03",
+          "channel": "zalo_oa",
+          "outcome": "chot_don",
+          "summary": "Đặt Xe đẩy 2 chiều Combi Sugocal giá 6.790.000đ, đơn OD900302 đang giao."
+        },
+        "products_advised": [
+          "SKU-MB-STR1"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào anh Lê Văn C, em gọi lại về SKU-MB-STR1 anh đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-14T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-11-16",
+      "days_later": 2,
+      "input_mode": "text",
+      "customer_goal": "Xác nhận chính sách đổi trả.",
+      "customer_turns": [
+        "Alo, anh vừa đọc trên web thấy có chính sách đổi trả trong 14 ngày đúng không?",
+        "Và phí đổi size là 20 nghìn đúng không em?",
+        "Anh chỉ muốn chắc chắn là chính sách này vẫn còn hiệu lực.",
+        "Cảm ơn em, anh sẽ theo dõi thêm."
+      ],
+      "expected_outcome": "khac",
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "return_days": 7,
+        "exchange_fee_vnd": 0,
+        "policy_version": "2026-10",
+        "call_date": "2026-11-16"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000003",
+        "customer_id": "SYN-C003",
+        "is_returning": true,
+        "n_previous_sessions": 3,
+        "last_session": {
+          "date": "2026-11-14",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-AF-XM",
+          "SKU-MB-STR1"
+        ],
+        "open_blockers": [
+          "chờ cuối tháng nhận lương"
+        ],
+        "must_not_ask": [
+          "budget_vnd",
+          "usage_need",
+          "product_advised",
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào anh Lê Văn C, em gọi lại về SKU-AF-XM anh đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-11-16T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "7 ngày",
+          "bảy ngày"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "return_days",
+            "value": 14
+          },
+          {
+            "field": "exchange_fee_vnd",
+            "value": 20000
+          }
+        ]
+      }
+    }
+  }
+}
