@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoMark } from "@/components/brand/Logo";
 import { categoryName, DEPARTMENTS } from "@/lib/catalog";
 import { HOTLINE, ZALO_URL } from "@/lib/contact";
 
@@ -7,10 +8,11 @@ export default function Footer() {
     <footer className="s-footer">
       <div className="s-wrap s-footer-grid">
         <div>
-          <div className="s-logo s-logo-light">
-            <span className="s-logo-mark">t</span>
-            <span>
-              tiếp<b>nối</b>
+          <div className="s-logo">
+            <LogoMark className="s-logo-mark" />
+            <span className="s-logo-text">
+              <strong>Tiếp Nối</strong>
+              <small>Trợ lý mua sắm AI</small>
             </span>
           </div>
           <p>

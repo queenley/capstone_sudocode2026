@@ -12,106 +12,18 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào Ms. Phạm Thị D, em gọi lại về sản phẩm giày chạy bộ size 42 màu đen mà chị đang quan tâm ạ. Em thấy ở lần gọi trước chị có nhắc đến việc giá ở bên khác có cao hơn đúng không ạ?",
+      "text": "Dạ, em chào chị Phạm Thị D, em gọi lại về giày chạy bộ RunLite 2 Pro mà chị đang quan tâm ạ. Chị có hỏi về size giày 42 màu đen đúng không ạ?",
       "questions": [
         {
-          "slot": "objection",
+          "slot": "size",
           "type": "confirm",
-          "text": "Chị có nhắc đến việc giá ở bên khác có cao hơn đúng không ạ?"
+          "text": "Chị có hỏi về size giày 42 màu đen đúng không ạ?"
         }
       ],
       "facts_used": [
-        "owned_sku",
-        "order_id"
+        "size",
+        "color"
       ],
-      "claims": [
-        {
-          "field": "owned_sku",
-          "value": "HAP003"
-        },
-        {
-          "field": "order_id",
-          "value": "O008"
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Đúng rồi, giá bên kia là 1 triệu 190 ngàn.",
-      "facts_stated": {
-        "competitor_price_vnd": 1190000
-      },
-      "entities": [
-        {
-          "type": "money",
-          "value": "1 triệu 190 ngàn",
-          "spoken": "một triệu một trăm chín mươi ngàn"
-        }
-      ],
-      "pause_before_ms": 200,
-      "emotion": "neutral",
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, chị ơi, sản phẩm giày chạy bộ bên em có giá 1.352.000đ ạ. Tuy giá có cao hơn một chút nhưng bên em có khuyến mãi hiện hành với mã giảm giá là RUN2-SALE, chị có thể được giảm thêm. Khuyến mãi này sẽ hết hạn vào ngày 07 tháng 10 năm 2026 ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1352000
-        },
-        {
-          "field": "promo_active",
-          "value": true
-        },
-        {
-          "field": "promo_RUN2-SALE_active",
-          "value": true
-        },
-        {
-          "field": "promo_code",
-          "value": "RUN2-SALE"
-        },
-        {
-          "field": "promo_expiry",
-          "value": "2026-10-07"
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Có khuyến mãi gì không em?",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 200,
-      "emotion": "neutral",
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, bên em có khuyến mãi với mã RUN2-SALE, giúp chị tiết kiệm thêm một khoản khi mua sản phẩm. Chị có muốn đặt hàng ngay không ạ?",
-      "questions": [
-        {
-          "slot": "objection",
-          "type": "open",
-          "text": "Chị có muốn đặt hàng ngay không ạ?"
-        }
-      ],
-      "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
@@ -121,17 +33,48 @@
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Chị sẽ nghĩ thêm và gọi lại nhé.",
-      "facts_stated": {},
+      "speaker": "agent_ai",
+      "text": "Giày chạy bộ RunLite 2 Pro size 42 màu đen có giá là 1.352.000đ ạ. Chị có muốn biết thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1352000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 200,
-      "emotion": "neutral",
+      "pause_before_ms": 0,
+      "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em hiểu ạ. Chị cứ suy nghĩ kỹ nhé. Nếu cần thêm thông tin gì, chị có thể gọi lại cho em bất cứ lúc nào. Em chờ tin từ chị ạ!",
+      "text": "Em thấy chị đã thấy giá bên khác là 1.190.000đ. Dạ, bên em có những giá trị đi kèm như bảo hành 24 tháng và chính sách đổi trả trong vòng 7 ngày. Chị có cần thêm thông tin về chính sách không ạ?",
+      "questions": [
+        {
+          "slot": "objection",
+          "type": "open",
+          "text": "Chị có cần thêm thông tin về chính sách không ạ?"
+        }
+      ],
+      "facts_used": [
+        "competitor_price_vnd",
+        "objection"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu chị cần thời gian suy nghĩ thêm. Nếu chị có thêm câu hỏi nào, chị có thể gọi lại cho em bất cứ lúc nào. Em chúc chị một ngày tốt lành ạ!",
       "questions": [],
       "facts_used": [],
       "claims": [],

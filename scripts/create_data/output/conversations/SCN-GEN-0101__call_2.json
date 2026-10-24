@@ -7,17 +7,17 @@
   "channel": "hotline",
   "date": "2026-10-31",
   "region": "nam",
-  "category": "unknown",
+  "category": "me-be",
   "persona": "khach_co_don_chua_co_lich_su",
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào Ms. Nguyễn Thị F, em gọi lại về đơn hàng của chị ạ. Em đã ghi nhận địa chỉ giao hàng mới là Quận 7, TP.HCM, đúng không ạ?",
+      "text": "Dạ, em chào chị Nguyễn Thị F. Em thấy chị đang có đơn hàng với mã OD900602, sản phẩm là Bình sữa Pigeon. Chị muốn đổi địa chỉ giao hàng đúng không ạ?",
       "questions": [
         {
-          "slot": "delivery_area",
+          "slot": "order_id",
           "type": "confirm",
-          "text": "Em đã ghi nhận địa chỉ giao hàng mới là Quận 7, TP.HCM, đúng không ạ?"
+          "text": "Chị muốn đổi địa chỉ giao hàng cho đơn hàng mã OD900602 đúng không ạ?"
         }
       ],
       "facts_used": [
@@ -27,7 +27,7 @@
       "claims": [
         {
           "field": "order_id",
-          "value": "O011"
+          "value": "OD900602"
         }
       ],
       "tool_calls": [],
@@ -39,39 +39,75 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em đã xác nhận địa chỉ giao hàng mới là Quận 7, TP.HCM. Chị cần hàng sớm, em sẽ hỗ trợ chị cập nhật ngay cho đơn hàng O012 ạ.",
-      "questions": [],
+      "text": "Cảm ơn chị đã xác nhận. Dạ, địa chỉ mới của chị là Quận 7, TP.HCM đúng không ạ? Em sẽ tiến hành cập nhật địa chỉ cho chị ngay.",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Địa chỉ mới của chị là Quận 7, TP.HCM đúng không ạ?"
+        }
+      ],
       "facts_used": [
-        "order_id",
-        "owned_sku",
         "delivery_area"
       ],
       "claims": [
-        {
-          "field": "order_id",
-          "value": "O012"
-        },
         {
           "field": "delivery_area",
           "value": "Quận 7, TP.HCM"
         }
       ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã cập nhật địa chỉ giao hàng của chị thành Quận 7, TP.HCM cho đơn hàng OD900602. Em sẽ thực hiện cập nhật ngay bây giờ. Một chút thời gian nhé!",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
       "tool_calls": [
         {
           "name": "order.update",
           "args": {
-            "order_id": "O012",
+            "order_id": "OD900602",
             "action": "update_address",
             "on": "2026-10-31"
           }
         }
       ],
-      "memory_writes": [
-        {
-          "key": "delivery_area",
-          "value": "Quận 7, TP.HCM"
-        }
-      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, quá trình cập nhật địa chỉ đã thành công. Chị sẽ nhận hàng tại địa chỉ mới trong thời gian sớm nhất ạ. Cảm ơn chị đã liên hệ với shop, chúc chị một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em chưa có thông tin về sản phẩm khác nếu chị cần thêm ạ. Nếu có bất kỳ thắc mắc nào, chị cứ gọi cho em nhé!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -79,7 +115,7 @@
     }
   ],
   "gold": {
-    "intent": "Đổi địa chỉ giao hàng",
+    "intent": "cap_nhat_don",
     "outcome": "cap_nhat_don",
     "objection_type": null,
     "objection_handling": null,

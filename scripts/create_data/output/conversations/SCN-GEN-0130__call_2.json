@@ -12,30 +12,17 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào chị Phạm Thị D, em gọi lại về giày chạy bộ size 42 màu đen mà chị đã quan tâm ạ. Chị có còn nhớ sản phẩm là giày chạy bộ SKU-SN-RUN2 không ạ?",
+      "text": "Dạ, em chào chị Phạm Thị D, em gọi lại về giày chạy bộ size 42 màu đen mà chị đã hỏi ạ. Chị có nhớ là giá trước đây là 1.521.000đ không ạ?",
       "questions": [
         {
-          "slot": "product_advised",
+          "slot": "price_quoted_vnd",
           "type": "confirm",
-          "text": "Chị có còn nhớ sản phẩm là giày chạy bộ SKU-SN-RUN2 không ạ?"
+          "text": "Chị có nhớ giá trước đây là 1.521.000đ không ạ?"
         }
       ],
       "facts_used": [
-        "product_advised"
-      ],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, giá hôm nay của sản phẩm giày chạy bộ size 42 màu đen là 1.521.000đ ạ. Chị có muốn biết thêm thông tin gì không ạ?",
-      "questions": [],
-      "facts_used": [
+        "size",
+        "product_advised",
         "price_quoted_vnd"
       ],
       "claims": [
@@ -53,13 +40,22 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, sản phẩm này hiện đang có khuyến mãi giảm 10% với mã khuyến mãi RUN-10, áp dụng đến ngày 25 tháng 10 ạ. Chị có cần thêm thời gian để quyết định không ạ?",
-      "questions": [],
+      "text": "Dạ chị, hiện tại giá của sản phẩm này đã tăng lên 1.521.000đ ạ. Chị có muốn biết thêm thông tin khuyến mãi nào không ạ?",
+      "questions": [
+        {
+          "slot": "promo_code",
+          "type": "open",
+          "text": "Chị có muốn biết thêm thông tin khuyến mãi nào không ạ?"
+        }
+      ],
       "facts_used": [
-        "promo_code",
-        "promo_expiry"
+        "price_quoted_vnd"
       ],
       "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1521000
+        },
         {
           "field": "promo_RUN-10_active",
           "value": true
@@ -74,16 +70,32 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em hiểu ạ. Chị cần thêm thời gian để quyết định về giày chạy bộ size 42 màu đen. Chị có thể gọi lại cho em vào thời gian nào ạ?",
+      "text": "Dạ, chị có thể dùng mã khuyến mãi RUN-10 để được giảm 10% cho đơn hàng này, và mã này còn hiệu lực đến ngày 25 tháng 10 ạ. Chị có cần thêm thông tin gì không ạ?",
       "questions": [
         {
-          "slot": "callback",
-          "type": "open",
-          "text": "Chị có thể gọi lại cho em vào thời gian nào ạ?"
+          "slot": "promo_expiry",
+          "type": "confirm",
+          "text": "Chị có cần thêm thông tin gì không ạ?"
         }
       ],
-      "facts_used": [],
-      "claims": [],
+      "facts_used": [
+        "promo_code",
+        "promo_expiry"
+      ],
+      "claims": [
+        {
+          "field": "promo_code",
+          "value": "RUN-10"
+        },
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "promo_expiry",
+          "value": "2026-10-25"
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -93,15 +105,15 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em sẽ ghi nhận lại thông tin này ạ. Cảm ơn chị đã gọi đến shop ạ. Chúc chị một ngày tốt lành!",
+      "text": "Dạ, em hiểu là chị cần thời gian để xem xét thêm ạ. Nếu có bất kỳ câu hỏi nào, chị có thể gọi lại cho em bất cứ lúc nào ạ. Hẹn gặp lại chị lần sau!",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [
         {
-          "key": "callback",
-          "value": "không có thời gian cụ thể"
+          "key": "objection",
+          "value": "cần thời gian xem xét"
         }
       ],
       "entities": [],

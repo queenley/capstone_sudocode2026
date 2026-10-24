@@ -6,7 +6,7 @@
   "customer_id": "SYN-C003",
   "customer_phone": "0998000003",
   "customer_name": "Lê Văn C",
-  "honorific": "Mr.",
+  "honorific": "anh",
   "region": "nam",
   "category": "me-be",
   "difficulty": "hard",
@@ -38,55 +38,55 @@
           "source": "crm_session",
           "customer_id": "SYN-C003",
           "session_id": "SYN-003-S1",
-          "date": "2026-09-01",
+          "date": "2026-05-07",
           "channel": "hotline",
-          "summary": "Tìm hiểu về đồ dùng cho trẻ em",
-          "outcome": "successful",
+          "summary": "Mua Xe đẩy gấp gọn Joie Pact giá 3.490.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_session",
           "customer_id": "SYN-C003",
           "session_id": "SYN-003-S2",
-          "date": "2026-09-02",
+          "date": "2026-10-03",
           "channel": "zalo_oa",
-          "summary": "Yêu cầu hỗ trợ đơn hàng",
-          "outcome": "successful",
+          "summary": "Đặt Xe đẩy 2 chiều Combi Sugocal giá 6.790.000đ, đơn OD900302 đang giao.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C003",
-          "order_id": "O005",
-          "date": "2026-07-22",
-          "sku": "MAB001",
-          "status": "shipping",
+          "order_id": "OD900301",
+          "date": "2026-05-07",
+          "sku": "SKU-MB-STR1",
+          "status": "delivered",
           "stale": false,
           "facts": {
-            "order_id": "O005"
+            "owned_sku": "SKU-MB-STR1"
           }
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C003",
-          "order_id": "O006",
-          "date": "2026-09-05",
-          "sku": "MAB002",
-          "status": "delivered",
+          "order_id": "OD900302",
+          "date": "2026-10-03",
+          "sku": "SKU-MB-STR2",
+          "status": "shipping",
           "stale": false,
           "facts": {
-            "owned_sku": "MAB002"
+            "order_id": "OD900302"
           }
         }
       ],
       "speaker_customer_id": null,
       "fault_injection": null,
-      "customer_goal": "Hỏi về túi trữ sữa cho bé 5 tháng tuổi",
+      "customer_goal": "Hỏi về túi trữ sữa Sunmum.",
       "customer_turns": [
-        "Alo, em muốn hỏi về túi trữ sữa Sunmum cho bé nhà em 5 tháng tuổi.",
-        "Ngân sách của em khoảng 500 ngàn, không biết giá thế nào?",
-        "Có khuyến mãi gì không em?",
-        "Em cần suy nghĩ thêm rồi sẽ gọi lại."
+        "Alo, anh muốn hỏi về túi trữ sữa Sunmum 50 túi.",
+        "Giá của túi này là bao nhiêu vậy em?",
+        "Có khuyến mãi gì không?",
+        "Anh cần suy nghĩ thêm rồi sẽ gọi lại."
       ],
       "customer_turns_asr": [],
       "facts_established": {
@@ -142,20 +142,20 @@
         "is_returning": true,
         "n_previous_sessions": 2,
         "last_session": {
-          "date": "2026-09-02",
+          "date": "2026-10-03",
           "channel": "zalo_oa",
-          "outcome": "successful",
-          "summary": "Yêu cầu hỗ trợ đơn hàng"
+          "outcome": "chot_don",
+          "summary": "Đặt Xe đẩy 2 chiều Combi Sugocal giá 6.790.000đ, đơn OD900302 đang giao."
         },
         "products_advised": [
-          "MAB002"
+          "SKU-MB-STR1"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Lê Văn C, em gọi lại về MAB002 Mr. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào anh Lê Văn C, em gọi lại về SKU-MB-STR1 anh đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-10-31T08:00:00",
@@ -175,11 +175,12 @@
       "seed_history": [],
       "speaker_customer_id": null,
       "fault_injection": null,
-      "customer_goal": "Xác nhận chính sách đổi trả",
+      "customer_goal": "Xác nhận chính sách đổi trả.",
       "customer_turns": [
-        "Alo, hôm trước em có đọc trên web là có chính sách đổi trả trong 14 ngày đúng không?",
-        "Và phí đổi size là 20 nghìn phải không em?",
-        "Em muốn chắc chắn lại thông tin này."
+        "Alo, anh đã đọc trên web là được đổi trả trong 14 ngày đúng không?",
+        "Phí đổi size là 20 nghìn phải không em?",
+        "Chắc chắn là chính sách này vẫn còn hiệu lực chứ?",
+        "Anh cần thông tin rõ ràng để quyết định."
       ],
       "customer_turns_asr": [],
       "facts_established": {},
@@ -241,8 +242,8 @@
           "outcome": "hen_goi_lai"
         },
         "products_advised": [
-          "MAB002",
-          "SKU-MB-BAG"
+          "SKU-MB-BAG",
+          "SKU-MB-STR1"
         ],
         "open_blockers": [
           "cần suy nghĩ thêm"
@@ -254,7 +255,7 @@
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Lê Văn C, em gọi lại về MAB002 Mr. đang quan tâm ạ, không biết cần suy nghĩ thêm chưa ạ?",
+        "suggested_opening": "Dạ em chào anh Lê Văn C, em gọi lại về SKU-MB-BAG anh đang quan tâm ạ, không biết cần suy nghĩ thêm chưa ạ?",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-11-02T08:00:00",

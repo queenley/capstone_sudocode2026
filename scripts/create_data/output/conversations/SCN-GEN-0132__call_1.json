@@ -12,33 +12,57 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào Ms. Nguyễn Thị F, em gọi lại về đơn hàng giày sneaker size 39 màu trắng mà chị đã xác nhận ạ. Chị vẫn giữ ý định thanh toán bằng COD và giao ở Ninh Kiều, Cần Thơ đúng không ạ?",
+      "text": "Dạ em chào chị Nguyễn Thị F, em gọi lại về đơn hàng giày sneaker Urban Classic màu trắng size 39 của chị ạ. Chị cũng đã đặt trước một đơn hàng khác với mã OD900602, đơn đó hiện đang xử lý. Em xin xác nhận lại là chị muốn xác nhận đơn hàng này đúng không ạ?",
       "questions": [
         {
-          "slot": "size",
+          "slot": "order_id",
           "type": "confirm",
-          "text": "Chị xác nhận size 39 đúng không ạ?"
-        },
-        {
-          "slot": "color",
-          "type": "confirm",
-          "text": "Chị xác nhận màu trắng đúng không ạ?"
-        },
-        {
-          "slot": "payment",
-          "type": "confirm",
-          "text": "Chị vẫn thanh toán bằng COD đúng không ạ?"
-        },
-        {
-          "slot": "delivery_area",
-          "type": "confirm",
-          "text": "Chị vẫn giao ở Ninh Kiều, Cần Thơ đúng không ạ?"
+          "text": "Chị cũng đã đặt trước một đơn hàng khác với mã OD900602, đơn đó hiện đang xử lý. Em xin xác nhận lại là chị muốn xác nhận đơn hàng này đúng không ạ?"
         }
       ],
       "facts_used": [
         "order_id",
         "owned_sku"
       ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900602"
+        },
+        {
+          "field": "owned_sku",
+          "value": "SKU-MB-STER"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, em muốn xác nhận đơn hàng đó.",
+      "facts_stated": {
+        "order_id": "OD900602"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn chị đã xác nhận. Về hình thức thanh toán, chị chọn COD đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Về hình thức thanh toán, chị chọn COD đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
@@ -48,18 +72,55 @@
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Đúng rồi, hình thức thanh toán là COD.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ, cảm ơn chị đã xác nhận. Đơn hàng giày sneaker size 39 màu trắng sẽ có giá là 890.000đ. Dự kiến giao hàng vào ngày 19/11/2026. Em sẽ lên đơn ngay bây giờ ạ.",
+      "text": "Dạ cảm ơn chị. Địa chỉ giao hàng là Ninh Kiều, Cần Thơ đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Địa chỉ giao hàng là Ninh Kiều, Cần Thơ đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, giao hàng tới Ninh Kiều, Cần Thơ.",
+      "facts_stated": {
+        "delivery_area": "Ninh Kiều, Cần Thơ"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã xác nhận thông tin. Em sẽ lên đơn hàng giày sneaker Urban Classic màu trắng size 39 với giá 890.000đ, thanh toán COD và giao tới Ninh Kiều, Cần Thơ. Chị vui lòng cho em một chút thời gian để hoàn tất đơn hàng ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 890000
-        },
-        {
-          "field": "estimated_delivery",
-          "value": "2026-11-19"
         }
       ],
       "tool_calls": [
@@ -76,7 +137,12 @@
           }
         }
       ],
-      "memory_writes": [],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD600001"
+        }
+      ],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -84,13 +150,13 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, đơn hàng đã được tạo thành công với mã đơn là OD600001. Chị sẽ nhận hàng vào khoảng ngày 19/11/2026 ạ. Chị có cần thêm thông tin gì không ạ?",
+      "text": "Dạ, đơn hàng đã được tạo thành công với mã OD600001. Dự kiến giao hàng vào ngày 19/11/2026 ạ. Cảm ơn chị đã đặt hàng tại shop. Nếu có thắc mắc gì, chị hãy liên hệ với shop nhé!",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "order_id",
-          "value": "OD600001"
+          "field": "estimated_delivery",
+          "value": "2026-11-19"
         }
       ],
       "tool_calls": [],
@@ -102,7 +168,7 @@
     }
   ],
   "gold": {
-    "intent": "chot_don",
+    "intent": "Xác nhận đơn hàng",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
@@ -112,7 +178,12 @@
     "supersedes": [],
     "callback": null,
     "order": {
-      "order_id": "OD600001"
+      "order_id": "OD600001",
+      "sku": "SKU-SN-CAS-39-TRANG",
+      "qty": 1,
+      "price_vnd": 890000,
+      "payment": "COD",
+      "address": "Ninh Kiều, Cần Thơ"
     }
   }
 }

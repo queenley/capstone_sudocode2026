@@ -12,33 +12,19 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Nguyễn Văn A, em gọi lại về nồi chiên không dầu Philips 6.2L mà anh đang quan tâm ạ. Em đã ghi nhận anh sẽ thanh toán bằng hình thức chuyển khoản và giao hàng tới Long Biên, Hà Nội đúng không ạ?",
+      "text": "Dạ em chào anh Nguyễn Văn A, em gọi lại về nồi chiên không dầu Philips 6.2L anh đang quan tâm ạ, không biết anh đã chuẩn bị thông tin gì chưa ạ?",
       "questions": [
         {
-          "slot": "payment",
-          "type": "confirm",
-          "text": "Anh sẽ thanh toán bằng hình thức chuyển khoản đúng không ạ?"
-        },
-        {
-          "slot": "delivery_area",
-          "type": "confirm",
-          "text": "Giao hàng cho anh ở Long Biên, Hà Nội đúng không ạ?"
+          "slot": "blocker",
+          "type": "open",
+          "text": "Mình có muốn gọi hotline hỏi thêm không?"
         }
       ],
       "facts_used": [
-        "payment",
-        "delivery_area",
+        "blocker",
         "product_advised"
       ],
       "claims": [
-        {
-          "field": "payment",
-          "value": "chuyen_khoan"
-        },
-        {
-          "field": "delivery_area",
-          "value": "Long Biên, Hà Nội"
-        },
         {
           "field": "product_advised",
           "value": "SKU-AF-6L"
@@ -52,56 +38,119 @@
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Alo, anh muốn đặt nồi chiên không dầu Philips 6.2L.",
+      "facts_stated": {
+        "product_advised": "SKU-AF-6L"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Cảm ơn anh đã xác nhận. Giá nồi chiên không dầu Philips 6.2L là 3.990.000đ. Em sẽ nhanh chóng lên đơn cho anh, và dự kiến giao hàng vào ngày 17 tháng 11 ạ.",
+      "text": "Dạ, nồi chiên không dầu Philips 6.2L có giá 3.990.000đ ạ. Anh có muốn chốt đơn không ạ?",
       "questions": [],
-      "facts_used": [
-        "price_quoted_vnd"
-      ],
+      "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 3990000
-        },
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán là chuyển khoản.",
+      "facts_stated": {
+        "payment": "chuyen_khoan"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận lại, hình thức thanh toán sẽ là chuyển khoản ạ. Khu vực giao hàng của anh là ở đâu ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Khu vực giao hàng của anh là ở đâu ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là Long Biên, Hà Nội.",
+      "facts_stated": {
+        "delivery_area": "Long Biên, Hà Nội"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận khu vực giao hàng là Long Biên, Hà Nội. Anh mong muốn nhận hàng vào thời gian nào ạ?",
+      "questions": [
+        {
+          "slot": "estimated_delivery",
+          "type": "open",
+          "text": "Anh mong muốn nhận hàng vào thời gian nào ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mong sớm nhận được hàng nhé!",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em sẽ tiến hành tạo đơn hàng cho anh ngay bây giờ. Để em đọc lại cho anh nhé: nồi chiên không dầu Philips 6.2L, giá 3.990.000đ, thanh toán chuyển khoản, địa chỉ giao hàng là Long Biên, Hà Nội. Thời gian giao hàng dự kiến là 17/11/2026 ạ. Em sẽ tiến hành tạo đơn ngay bây giờ ạ!",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "payment",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
         {
           "field": "estimated_delivery",
           "value": "2026-11-17"
         }
       ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Trước khi em tạo đơn, em xin đọc lại thông tin đơn hàng: Nồi chiên không dầu Philips 6.2L, số lượng 1, giá 3.990.000đ, phương thức thanh toán là chuyển khoản, địa chỉ giao hàng là Long Biên, Hà Nội. Anh có xác nhận không ạ?",
-      "questions": [
-        {
-          "slot": "order_id",
-          "type": "confirm",
-          "text": "Anh có xác nhận thông tin đơn hàng như em vừa đọc không ạ?"
-        }
-      ],
-      "facts_used": [
-        "order_id"
-      ],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Cảm ơn anh đã xác nhận. Em sẽ tiến hành tạo đơn hàng cho anh ngay bây giờ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
       "tool_calls": [
         {
           "name": "order.create",
@@ -129,9 +178,11 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Đơn hàng đã được tạo thành công với mã đơn OD600001. Dự kiến giao hàng vào ngày 17 tháng 11. Cảm ơn anh đã đặt hàng tại shop, em chúc anh có những món ăn ngon từ nồi chiên không dầu ạ!",
+      "text": "Dạ, đơn hàng của anh đã được tạo thành công, mã đơn là OD600001, và dự kiến giao hàng vào ngày 17/11/2026 ạ. Cảm ơn anh đã đặt hàng!",
       "questions": [],
-      "facts_used": [],
+      "facts_used": [
+        "order_id"
+      ],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
@@ -142,7 +193,7 @@
     }
   ],
   "gold": {
-    "intent": "Xác nhận mua nồi chiên không dầu.",
+    "intent": "Xác nhận mua nồi chiên không dầu Philips.",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,

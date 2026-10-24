@@ -7,13 +7,19 @@
   "channel": "hotline",
   "date": "2026-10-15",
   "region": "bac",
-  "category": "unknown",
+  "category": "gia-dung/may-loc-khong-khi",
   "persona": "khach_co_don_chua_co_lich_su",
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào Mr. Nguyễn Văn A, em gọi lại về tình trạng đơn hàng của anh ạ. Em thấy anh đã đặt một cái máy hút bụi HAP002, hiện tại đơn hàng này đang trong trạng thái đang vận chuyển ạ.",
-      "questions": [],
+      "text": "Dạ, em chào anh Nguyễn Văn A, em gọi lại về đơn hàng của anh ạ. Anh đã đặt đơn hàng mã OD900102 cho sản phẩm Máy lọc không khí AirPure Y, hiện tại đơn hàng đang trong trạng thái đang giao ạ. Anh có thể theo dõi tình trạng đơn hàng qua mã vận đơn VN0012TRK. Anh có cần thêm thông tin gì về đơn hàng không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Đơn hàng mã OD900102 phải không ạ?"
+        }
+      ],
       "facts_used": [
         "order_id",
         "owned_sku"
@@ -21,18 +27,22 @@
       "claims": [
         {
           "field": "order_id",
-          "value": "O002"
+          "value": "OD900102"
         },
         {
           "field": "order_status",
           "value": "shipping"
+        },
+        {
+          "field": "tracking",
+          "value": "VN0012TRK"
         }
       ],
       "tool_calls": [
         {
           "name": "order.status",
           "args": {
-            "order_id": "O002"
+            "order_id": "OD900102"
           }
         }
       ],
@@ -44,15 +54,10 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Đơn hàng của anh có mã vận đơn là TRACK123, anh có thể theo dõi tình trạng giao hàng qua mã này nhé. Khi nào có thông tin mới, em sẽ cập nhật đến anh ngay ạ.",
+      "text": "Dạ, đơn hàng của anh vẫn đang trong quá trình giao. Nếu anh cần hỗ trợ gì thêm, em sẵn sàng giúp đỡ ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "tracking",
-          "value": "TRACK123"
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -62,7 +67,20 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Nếu anh cần thêm thông tin gì, hoặc có câu hỏi nào khác, xin cứ cho em biết nhé!",
+      "text": "Em chưa có thông tin gì thêm về trạng thái đơn hàng hiện tại ngoài việc nó đang giao. Nếu có thay đổi gì, em sẽ thông báo cho anh ngay ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn anh đã gọi đến, chúc anh một ngày tốt lành ạ!",
       "questions": [],
       "facts_used": [],
       "claims": [],

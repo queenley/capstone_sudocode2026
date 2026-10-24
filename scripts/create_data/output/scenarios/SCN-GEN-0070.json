@@ -6,7 +6,7 @@
   "customer_id": "SYN-C010",
   "customer_phone": "0998000010",
   "customer_name": "Đinh Văn J",
-  "honorific": "Mr.",
+  "honorific": "anh",
   "region": "bac",
   "category": "me-be",
   "difficulty": "hard",
@@ -36,53 +36,53 @@
           "source": "crm_session",
           "customer_id": "SYN-C010",
           "session_id": "SYN-010-S1",
-          "date": "2026-09-01",
+          "date": "2026-07-01",
           "channel": "hotline",
-          "summary": "Hỏi về chương trình khuyến mãi",
-          "outcome": "successful",
+          "summary": "Mua Máy lọc nước UF Sunhouse giá 3.290.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_session",
           "customer_id": "SYN-C010",
           "session_id": "SYN-010-S2",
-          "date": "2026-09-02",
+          "date": "2026-10-10",
           "channel": "zalo_oa",
-          "summary": "Tìm hiểu về sản phẩm mới",
-          "outcome": "successful",
+          "summary": "Đặt Quạt đứng DC inverter Panasonic F-409 giá 2.450.000đ, đơn OD901002 đang xử lý.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C010",
-          "order_id": "O019",
-          "date": "2026-06-30",
-          "sku": "HAP007",
-          "status": "processing",
+          "order_id": "OD901001",
+          "date": "2026-07-01",
+          "sku": "SKU-WF-UF",
+          "status": "delivered",
           "stale": false,
           "facts": {
-            "order_id": "O019"
+            "owned_sku": "SKU-WF-UF"
           }
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C010",
-          "order_id": "O020",
-          "date": "2026-09-28",
-          "sku": "HAP008",
-          "status": "delivered",
+          "order_id": "OD901002",
+          "date": "2026-10-10",
+          "sku": "SKU-FAN-DC1",
+          "status": "processing",
           "stale": false,
           "facts": {
-            "owned_sku": "HAP008"
+            "order_id": "OD901002"
           }
         }
       ],
       "customer_goal": "Hỏi về máy hút sữa điện đôi Spectra S1.",
       "customer_turns": [
-        "Alo, em chào chị, hôm trước chị có hỏi về máy hút sữa điện đôi Spectra S1 đúng không?",
-        "Chị muốn biết giá và có khuyến mãi gì không?",
-        "Chị có ngân sách khoảng 4 triệu rưỡi thôi.",
-        "Chị đang chờ cuối tháng nhận lương mới quyết định được."
+        "Alo, anh muốn hỏi về máy hút sữa điện đôi Spectra S1.",
+        "Giá của máy này là bao nhiêu em?",
+        "Có khuyến mãi gì không?",
+        "Anh đang chờ cuối tháng nhận lương mới quyết định được."
       ],
       "facts_established": {
         "child_age_months": 6,
@@ -126,20 +126,20 @@
         "is_returning": true,
         "n_previous_sessions": 2,
         "last_session": {
-          "date": "2026-09-02",
+          "date": "2026-10-10",
           "channel": "zalo_oa",
-          "outcome": "successful",
-          "summary": "Tìm hiểu về sản phẩm mới"
+          "outcome": "chot_don",
+          "summary": "Đặt Quạt đứng DC inverter Panasonic F-409 giá 2.450.000đ, đơn OD901002 đang xử lý."
         },
         "products_advised": [
-          "HAP008"
+          "SKU-WF-UF"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Đinh Văn J, em gọi lại về HAP008 Mr. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào anh Đinh Văn J, em gọi lại về SKU-WF-UF anh đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-10-15T08:00:00",
@@ -157,11 +157,11 @@
       "call_date": "2026-10-17",
       "days_later": 2,
       "input_mode": "text",
-      "customer_goal": "Xác nhận mua máy hút sữa điện đôi Spectra S1.",
+      "customer_goal": "Xác nhận mua máy hút sữa.",
       "customer_turns": [
-        "Chị muốn đặt máy hút sữa điện đôi Spectra S1.",
-        "Chị sẽ thanh toán bằng chuyển khoản.",
-        "Địa chỉ giao hàng là Cầu Giấy, Hà Nội."
+        "Alo, anh gọi lại để xác nhận mua máy hút sữa điện đôi Spectra S1.",
+        "Anh sẽ thanh toán bằng hình thức chuyển khoản.",
+        "Khu vực giao hàng là Cầu Giấy, Hà Nội."
       ],
       "facts_established": {
         "delivery_area": "Cầu Giấy, Hà Nội",
@@ -211,7 +211,7 @@
         "order_id": "OD600001",
         "superseded": {
           "budget_vnd": 4500000,
-          "order_id": "O019"
+          "order_id": "OD901002"
         }
       },
       "expected_call_brief": {
@@ -225,8 +225,8 @@
           "outcome": "hen_goi_lai"
         },
         "products_advised": [
-          "HAP008",
-          "SKU-MB-PUMP1"
+          "SKU-MB-PUMP1",
+          "SKU-WF-UF"
         ],
         "open_blockers": [
           "chờ cuối tháng nhận lương"
@@ -238,7 +238,7 @@
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Đinh Văn J, em gọi lại về HAP008 Mr. đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+        "suggested_opening": "Dạ em chào anh Đinh Văn J, em gọi lại về SKU-MB-PUMP1 anh đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
         "freshness_checks": {
           "price_changed": false,
           "promos_no_longer_active": [],
@@ -262,10 +262,10 @@
       "call_date": "2026-10-19",
       "days_later": 2,
       "input_mode": "text",
-      "customer_goal": "Hỏi tình trạng đơn hàng máy hút sữa.",
+      "customer_goal": "Hỏi tình trạng đơn hàng của máy hút sữa.",
       "customer_turns": [
-        "Chị muốn hỏi tình trạng đơn hàng máy hút sữa của chị.",
-        "Chị không nhớ mã đơn hàng, nhưng chị đã đặt hôm trước."
+        "Alo, anh muốn hỏi tình trạng đơn hàng máy hút sữa điện đôi Spectra S1.",
+        "Đơn hàng của anh đã được xử lý chưa?"
       ],
       "expected_outcome": "cap_nhat_don",
       "must_carry_over": [
@@ -303,8 +303,8 @@
           "outcome": "chot_don"
         },
         "products_advised": [
-          "HAP008",
-          "SKU-MB-PUMP1"
+          "SKU-MB-PUMP1",
+          "SKU-WF-UF"
         ],
         "open_blockers": [
           "chờ cuối tháng nhận lương"
@@ -318,7 +318,7 @@
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Đinh Văn J, em gọi lại về HAP008 Mr. đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+        "suggested_opening": "Dạ em chào anh Đinh Văn J, em gọi lại về SKU-MB-PUMP1 anh đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-10-19T08:00:00",

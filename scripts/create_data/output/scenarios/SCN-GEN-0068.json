@@ -6,19 +6,15 @@
   "customer_id": "SYN-C008",
   "customer_phone": "0998000008",
   "customer_name": "Trần Văn H",
-  "honorific": "Mr.",
+  "honorific": "anh",
   "region": "trung",
   "category": "gia-dung/may-loc-khong-khi",
   "difficulty": "hard",
   "tags": [
     "asr",
     "hard_case",
-    "khách_hàng",
-    "máy_lọc_không_khí",
     "robustness",
-    "tư_vấn",
-    "variant:chuan",
-    "đặt_hàng"
+    "variant:chuan"
   ],
   "metric_focus": [
     "CCR",
@@ -37,44 +33,44 @@
           "source": "crm_session",
           "customer_id": "SYN-C008",
           "session_id": "SYN-008-S1",
-          "date": "2026-09-01",
+          "date": "2026-05-22",
           "channel": "hotline",
-          "summary": "Hỏi về giày dép nam",
-          "outcome": "successful",
+          "summary": "Mua Giày chạy bộ RunLite 1 giá 1.290.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_session",
           "customer_id": "SYN-C008",
           "session_id": "SYN-008-S2",
-          "date": "2026-09-02",
+          "date": "2026-10-08",
           "channel": "zalo_oa",
-          "summary": "Tìm hiểu về chất liệu sản phẩm",
-          "outcome": "successful",
+          "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD900802 đang xử lý.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C008",
-          "order_id": "O015",
-          "date": "2026-05-05",
-          "sku": "FAS005",
-          "status": "processing",
+          "order_id": "OD900801",
+          "date": "2026-05-22",
+          "sku": "SKU-SN-RUN1-40-TRANG",
+          "status": "delivered",
           "stale": false,
           "facts": {
-            "order_id": "O015"
+            "owned_sku": "SKU-SN-RUN1-40-TRANG"
           }
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C008",
-          "order_id": "O016",
-          "date": "2026-09-15",
-          "sku": "FAS006",
-          "status": "delivered",
+          "order_id": "OD900802",
+          "date": "2026-10-08",
+          "sku": "SKU-SN-CAS-40-TRANG",
+          "status": "processing",
           "stale": false,
           "facts": {
-            "owned_sku": "FAS006"
+            "order_id": "OD900802"
           }
         }
       ],
@@ -84,18 +80,18 @@
       },
       "customer_goal": "Hỏi về máy lọc không khí Xiaomi Smart 4 Pro",
       "customer_turns": [
-        "Alo, em muốn hỏi về máy lọc không khí Xiaomi Smart 4 Pro.",
-        "Phòng em khoảng 35 mét vuông, có trẻ nhỏ nữa.",
-        "Ngân sách của em tầm 6 triệu thôi.",
+        "Alo, anh muốn hỏi về máy lọc không khí Xiaomi Smart 4 Pro.",
+        "Diện tích phòng của anh khoảng 35 mét vuông.",
+        "Nhà anh có trẻ nhỏ, ngân sách tầm 6 triệu thôi.",
         "Máy này có khuyến mãi gì không em?",
-        "Em cần suy nghĩ thêm rồi sẽ gọi lại."
+        "Anh cần suy nghĩ thêm rồi sẽ gọi lại."
       ],
       "customer_turns_asr": [
-        "alo em muon hoi ve may loc khong khi xiaomi smart 4 pro",
-        "phong em khoang ba muoi lam met vuong co tre nho nua",
-        "ngan sach cua em tam sau trieu thoi",
+        "alo anh muon hoi ve may loc khong khi xiaomi smart 4 pro",
+        "dien tich phong cua anh khoang 35 met vuong",
+        "nha anh co tre nho ngan sach tam 6 trieu thoi",
         "may nay co khuyen mai gi khong em",
-        "em can suy nghi them roi se goi lai"
+        "anh can suy nghi them roi se goi lai"
       ],
       "facts_established": {
         "room_area_m2": 35,
@@ -143,20 +139,20 @@
         "is_returning": true,
         "n_previous_sessions": 2,
         "last_session": {
-          "date": "2026-09-02",
+          "date": "2026-10-08",
           "channel": "zalo_oa",
-          "outcome": "successful",
-          "summary": "Tìm hiểu về chất liệu sản phẩm"
+          "outcome": "chot_don",
+          "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD900802 đang xử lý."
         },
         "products_advised": [
-          "FAS006"
+          "SKU-SN-RUN1-40-TRANG"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Trần Văn H, em gọi lại về FAS006 Mr. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào anh Trần Văn H, em gọi lại về SKU-SN-RUN1-40-TRANG anh đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-10-16T08:00:00",
@@ -186,13 +182,13 @@
       "input_mode": "asr_transcript",
       "customer_goal": "Xác nhận mua máy lọc không khí",
       "customer_turns": [
-        "Alo, em gọi lại để đặt máy lọc không khí.",
-        "Em muốn thanh toán bằng chuyển khoản.",
+        "Alo, anh gọi lại để đặt máy lọc không khí.",
+        "Anh sẽ thanh toán bằng chuyển khoản.",
         "Khu vực giao hàng là Nha Trang, Khánh Hòa."
       ],
       "customer_turns_asr": [
-        "alo em goi lai de dat may loc khong khi",
-        "em muon thanh toan bang chuyen khoan",
+        "alo anh goi lai de dat may loc khong khi",
+        "anh se thanh toan bang chuyen khoan",
         "khu vuc giao hang la nha trang khanh hoa"
       ],
       "facts_established": {
@@ -244,7 +240,7 @@
         "promo_code": "XM-COMBO",
         "order_id": "OD600001",
         "superseded": {
-          "order_id": "O015"
+          "order_id": "OD900802"
         }
       },
       "expected_call_brief": {
@@ -258,7 +254,7 @@
           "outcome": "hen_goi_lai"
         },
         "products_advised": [
-          "FAS006",
+          "SKU-SN-RUN1-40-TRANG",
           "SKU-XM-4P"
         ],
         "open_blockers": [
@@ -272,7 +268,7 @@
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Trần Văn H, em gọi lại về FAS006 Mr. đang quan tâm ạ, không biết cần suy nghĩ thêm chưa ạ?",
+        "suggested_opening": "Dạ em chào anh Trần Văn H, em gọi lại về SKU-SN-RUN1-40-TRANG anh đang quan tâm ạ, không biết cần suy nghĩ thêm chưa ạ?",
         "freshness_checks": {
           "price_changed": false,
           "promos_no_longer_active": [],

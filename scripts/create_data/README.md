@@ -124,7 +124,7 @@ flowchart TD
 | # | Stage | API cost | Main output |
 |---|---|---|---|
 | 1 | `build_catalog` | none | input validation |
-| 2 | `generate_synthetic_customers` | `customer` role | `data/catalog/crm_seed_synthetic.json` (more distinct customers for M2). **Copy it to `apps/ai-agent-service/data/btc/catalog/`** after regenerating, so the agent's CRM knows the same callers |
+| 2 | `generate_synthetic_customers` | `customer` role | `data/catalog/crm_seed_synthetic.json` (more distinct customers for M2): names by the model; orders (catalogue SKUs, list prices) and sessions by the pipeline; `--resume` keeps the names and re-derives the rest. **Copy it to `apps/ai-agent-service/data/btc/catalog/`** after regenerating, so the agent's CRM (and the evaluation harness's mock) knows the same callers |
 | 3 | `generate_scenarios` | `scenario` role, 1 per scenario | `output/scenarios_internal/`, `output/scenarios/`, `output/scenarios_all.json` |
 | 4 | `generate_dialogue` | `dialogue` role, 1 per call | `output/conversations/<id>__call_<n>.json` |
 | 5 | `simulate_replays` | none (`--llm`: `simulator` role) | `output/simulations/replay.jsonl` |

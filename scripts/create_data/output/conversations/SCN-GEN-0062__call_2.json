@@ -12,15 +12,16 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Đỗ Minh E, em gọi lại về sản phẩm xe đẩy 2 chiều Combi Sugocal mà Mr. đang quan tâm ạ. Không biết Mr. có câu hỏi gì liên quan đến an toàn sản phẩm không ạ?",
+      "text": "Dạ, em chào anh Đỗ Minh E, em gọi lại về SKU-JK-WND-M-NAVY anh đang quan tâm ạ. Anh có câu hỏi liên quan đến an toàn khi sử dụng xe đẩy cho bé, đúng không ạ?",
       "questions": [
         {
-          "slot": "product_advised",
+          "slot": "blocker",
           "type": "confirm",
-          "text": "Mr. có câu hỏi gì liên quan đến an toàn sản phẩm không?"
+          "text": "Anh còn đang chờ cuối tháng nhận lương phải không ạ?"
         }
       ],
       "facts_used": [
+        "blocker",
         "product_advised"
       ],
       "claims": [],
@@ -32,74 +33,24 @@
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Alo, tôi có một câu hỏi về an toàn sản phẩm.",
-      "facts_stated": {
-        "blocker": "chờ cuối tháng nhận lương"
-      },
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
       "speaker": "agent_ai",
-      "text": "Dạ, em hiểu ạ. Mr. có thể cho em biết thêm về câu hỏi cụ thể liên quan đến sản phẩm không ạ? Em sẽ ghi nhận và chuyển máy cho nhân viên chuyên môn tư vấn ạ.",
-      "questions": [
+      "text": "Dạ, em xin xác nhận là bé nhà anh Đỗ Minh E đang dùng thuốc. Với những câu hỏi y tế như vậy, em sẽ chuyển máy cho dược sĩ phụ trách để tư vấn chính xác hơn cho anh ạ. Sản phẩm xe đẩy mà anh đang quan tâm là SKU-MB-STR2, giá là 6.790.000đ, và có chương trình vận chuyển miễn phí ạ.",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
         {
-          "slot": "open_questions",
-          "type": "open",
-          "text": "Mr. có thể cho em biết thêm về câu hỏi cụ thể liên quan đến sản phẩm không?"
+          "field": "price_quoted_vnd",
+          "value": 6790000
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-MB-STR2"
         }
       ],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Người thân của tôi đang dùng thuốc, liệu có dùng được xe đẩy này không?",
-      "facts_stated": {
-        "blocker": "chờ cuối tháng nhận lương"
-      },
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em xin lỗi nhưng em chưa có thông tin về việc sử dụng xe đẩy với thuốc ạ. Em sẽ ghi nhận câu hỏi này và chuyển máy cho nhân viên tư vấn ạ. Cảm ơn Mr. đã thông cảm!",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Tôi có thể chuyển máy để hỏi thêm không?",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em sẽ chuyển máy ngay cho nhân viên dược sĩ để tư vấn cho Mr. Đỗ Minh E ạ. Cảm ơn Mr. đã gọi tới ạ!",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
       "tool_calls": [
         {
           "name": "handoff.transfer",
@@ -125,10 +76,23 @@
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã chuyển máy cho dược sĩ. Họ sẽ gọi lại để tư vấn cho anh về câu hỏi y tế của bé. Cảm ơn anh đã liên hệ với chúng em, chúc anh một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
     }
   ],
   "gold": {
-    "intent": "chuyen_may",
+    "intent": "Hỏi về an toàn khi sử dụng sản phẩm cho bé",
     "outcome": "chuyen_may",
     "objection_type": null,
     "objection_handling": null,

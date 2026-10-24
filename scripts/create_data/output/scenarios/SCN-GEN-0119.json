@@ -5,16 +5,16 @@
   "customer_id": "SYN-C007",
   "customer_phone": "0998000007",
   "customer_name": "Lê Văn G",
-  "honorific": "Mr.",
+  "honorific": "anh",
   "region": "bac",
-  "category": "unknown",
+  "category": "gia-dung/may-loc-nuoc",
   "difficulty": "normal",
   "tags": [
     "address_change",
-    "customer_service",
+    "customer_support",
+    "hotline",
     "order",
     "order_status",
-    "shipping",
     "variant:chuan"
   ],
   "metric_focus": [
@@ -33,52 +33,52 @@
           "source": "crm_session",
           "customer_id": "SYN-C007",
           "session_id": "SYN-007-S1",
-          "date": "2026-09-01",
+          "date": "2026-04-19",
           "channel": "hotline",
-          "summary": "Tư vấn về máy lạnh",
-          "outcome": "successful",
-          "stale": false
+          "summary": "Mua Máy lọc không khí Samsung AX40 giá 6.490.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
         },
         {
           "source": "crm_session",
           "customer_id": "SYN-C007",
           "session_id": "SYN-007-S2",
-          "date": "2026-09-02",
+          "date": "2026-10-07",
           "channel": "zalo_oa",
-          "summary": "Hỗ trợ đổi hàng",
-          "outcome": "successful",
+          "summary": "Đặt Máy lọc nước RO Karofi 9 lõi giá 5.990.000đ, đơn OD900702 đang giao.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C007",
-          "order_id": "O013",
-          "date": "2026-02-12",
-          "sku": "HAP005",
+          "order_id": "OD900701",
+          "date": "2026-04-19",
+          "sku": "SKU-SS-AX40",
           "status": "delivered",
           "stale": false,
           "facts": {
-            "owned_sku": "HAP005"
+            "owned_sku": "SKU-SS-AX40"
           }
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C007",
-          "order_id": "O014",
-          "date": "2026-07-14",
-          "sku": "HAP006",
+          "order_id": "OD900702",
+          "date": "2026-10-07",
+          "sku": "SKU-WF-RO9",
           "status": "shipping",
           "stale": false,
           "facts": {
-            "order_id": "O014"
+            "order_id": "OD900702"
           }
         }
       ],
       "customer_goal": "Hỏi tình trạng đơn hàng của mình.",
       "customer_turns": [
-        "Alo, tôi là Lê Văn G, muốn hỏi tình trạng đơn hàng của mình.",
-        "Đơn hàng của tôi hiện tại đang ở đâu vậy?",
-        "Tôi đã đặt hàng mấy hôm rồi mà chưa thấy giao."
+        "Alo, anh muốn hỏi tình trạng đơn hàng của mình.",
+        "Đơn hàng của anh đang giao phải không?",
+        "Có thông tin gì mới về đơn hàng này không?"
       ],
       "expected_outcome": "cap_nhat_don",
       "must_carry_over": [
@@ -90,9 +90,9 @@
         "owned_sku"
       ],
       "ground_truth_facts": {
-        "order_id": "O014",
+        "order_id": "OD900702",
         "order_status": "shipping",
-        "tracking": "TRACK101112",
+        "tracking": "VN0072TRK",
         "call_date": "2026-10-30"
       },
       "expected_call_brief": {
@@ -101,20 +101,20 @@
         "is_returning": true,
         "n_previous_sessions": 2,
         "last_session": {
-          "date": "2026-09-02",
+          "date": "2026-10-07",
           "channel": "zalo_oa",
-          "outcome": "successful",
-          "summary": "Hỗ trợ đổi hàng"
+          "outcome": "chot_don",
+          "summary": "Đặt Máy lọc nước RO Karofi 9 lõi giá 5.990.000đ, đơn OD900702 đang giao."
         },
         "products_advised": [
-          "HAP005"
+          "SKU-SS-AX40"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Lê Văn G, em gọi lại về HAP005 Mr. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào anh Lê Văn G, em gọi lại về SKU-SS-AX40 anh đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-10-30T08:00:00",
@@ -123,7 +123,7 @@
       "success_if": {
         "tool_called": "order.status",
         "args_match": {
-          "order_id": "O014"
+          "order_id": "OD900702"
         },
         "must_say_any": [
           "đang giao",
@@ -137,11 +137,11 @@
       "call_date": "2026-10-31",
       "days_later": 1,
       "input_mode": "text",
-      "customer_goal": "Muốn đổi địa chỉ giao hàng cho đơn hàng đang xử lý.",
+      "customer_goal": "Muốn đổi địa chỉ giao hàng cho đơn hàng.",
       "customer_turns": [
-        "Chào, tôi muốn thay đổi địa chỉ giao hàng cho đơn hàng của mình.",
+        "Alo, anh cần đổi địa chỉ giao cho đơn hàng đang giao.",
         "Địa chỉ mới là Long Biên, Hà Nội.",
-        "Tôi cần đảm bảo đơn hàng sẽ được giao đến địa chỉ mới này."
+        "Anh muốn cập nhật ngay để đơn hàng không bị chậm trễ."
       ],
       "facts_established": {
         "delivery_area": "Long Biên, Hà Nội"
@@ -156,9 +156,9 @@
         "owned_sku"
       ],
       "ground_truth_facts": {
-        "order_id": "O014",
+        "order_id": "OD900702",
         "order_status": "shipping",
-        "tracking": "TRACK101112",
+        "tracking": "VN0072TRK",
         "call_date": "2026-10-31"
       },
       "memory_expectation": {
@@ -175,14 +175,14 @@
           "outcome": "cap_nhat_don"
         },
         "products_advised": [
-          "HAP005"
+          "SKU-SS-AX40"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Lê Văn G, em gọi lại về HAP005 Mr. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào anh Lê Văn G, em gọi lại về SKU-SS-AX40 anh đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-10-31T08:00:00",
@@ -191,7 +191,7 @@
       "success_if": {
         "tool_called": "order.update",
         "args_match": {
-          "order_id": "O014",
+          "order_id": "OD900702",
           "action": "update_address"
         }
       }

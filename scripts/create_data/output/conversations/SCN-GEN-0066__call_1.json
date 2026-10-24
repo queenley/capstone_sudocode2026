@@ -12,18 +12,51 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Ms. Nguyễn Thị F, em gọi lại về đơn hàng máy lọc không khí Samsung AX40 mà chị quan tâm ạ. Chị có xác nhận là mình sẽ thanh toán bằng COD và giao hàng ở Thủ Đức, TP.HCM, đúng không ạ?",
+      "text": "Dạ em chào chị Nguyễn Thị F, em gọi lại về đơn hàng máy lọc không khí Samsung AX40 chị đang quan tâm ạ. Em thấy chị muốn thanh toán COD và giao hàng ở Thủ Đức, TP.HCM đúng không ạ?",
       "questions": [
         {
-          "slot": "payment",
+          "slot": "delivery_area",
           "type": "confirm",
-          "text": "Chị có xác nhận là mình sẽ thanh toán bằng COD và giao hàng ở Thủ Đức, TP.HCM, đúng không ạ?"
+          "text": "Chị muốn giao hàng ở Thủ Đức, TP.HCM đúng không ạ?"
         }
       ],
       "facts_used": [
         "order_id",
         "owned_sku"
       ],
+      "claims": [
+        {
+          "field": "delivery_area",
+          "value": "Thủ Đức, TP.HCM"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, chị muốn như vậy.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị muốn cho diện tích phòng khoảng 40m² và có bé nhỏ ở nhà đúng không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Chị muốn cho diện tích phòng khoảng 40m² và có bé nhỏ ở nhà đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
@@ -33,52 +66,53 @@
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Đúng rồi, chị có 1 bé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Cảm ơn chị đã xác nhận ạ. Máy lọc không khí Samsung AX40 có giá là 6.490.000đ, và chị sẽ nhận hàng vào ngày 20 tháng 10 2026. Diện tích phòng của chị là 40 mét vuông, rất phù hợp với sản phẩm này ạ.",
+      "text": "Dạ, em xác nhận thông tin của chị. Ngân sách của chị là dưới 6 triệu rưỡi đúng không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của chị là dưới 6 triệu rưỡi đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Vâng, đúng rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy lọc không khí Samsung AX40 có giá 6.490.000đ, phù hợp với ngân sách của chị ạ. Em sẽ tạo đơn cho chị ngay bây giờ nhé?",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 6490000
-        },
-        {
-          "field": "estimated_delivery",
-          "value": "2026-10-20"
         }
       ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Trước khi chốt đơn, em xin đọc lại thông tin ạ: 1 máy lọc không khí Samsung AX40, giá 6.490.000đ, phương thức thanh toán COD, và địa chỉ giao hàng là Thủ Đức, TP.HCM. Chị có đồng ý không ạ?",
-      "questions": [
-        {
-          "slot": "order_confirmation",
-          "type": "confirm",
-          "text": "Chị có đồng ý không ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em cảm ơn chị đã xác nhận. Em sẽ tiến hành tạo đơn hàng cho chị ngay bây giờ ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
       "tool_calls": [
         {
           "name": "order.create",
@@ -101,13 +135,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Đơn hàng đã được tạo thành công với mã đơn là OD600001. Chị sẽ nhận hàng vào ngày 20 tháng 10 2026. Nếu có bất kỳ câu hỏi nào, chị cứ liên hệ với em ạ. Em cảm ơn chị và chúc chị một ngày tốt lành!",
+      "text": "Dạ em đã tạo đơn hàng với mã đơn OD600001 cho chị. Tổng giá trị đơn hàng là 6.490.000đ, sẽ giao hàng vào ngày 20 tháng 10 ạ. Chị có cần thêm thông tin gì không ạ?",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "order_id",
           "value": "OD600001"
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-20"
         }
       ],
       "tool_calls": [],
@@ -124,7 +162,7 @@
     }
   ],
   "gold": {
-    "intent": "Mua máy lọc không khí Samsung AX40",
+    "intent": "chot_don",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,

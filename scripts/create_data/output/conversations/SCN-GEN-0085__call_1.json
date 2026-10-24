@@ -7,38 +7,37 @@
   "channel": "hotline",
   "date": "2026-10-29",
   "region": "trung",
-  "category": "unknown",
+  "category": "thoi-trang/ao-khoac",
   "persona": "khach_co_don_chua_co_lich_su",
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Đỗ Minh E, em gọi lại về đơn hàng của Mr. ạ. Ông đã đặt sản phẩm FAS004 và đơn hàng này đã được giao thành công vào ngày 12 tháng 9 vừa qua. Ông có cần thêm thông tin gì về đơn hàng này không ạ?",
+      "text": "Dạ, em chào anh Đỗ Minh E, em gọi lại về đơn hàng áo phao lông vũ của anh ạ. Theo hệ thống, đơn hàng OD900502 của anh đang ở trạng thái đang giao ạ. Anh có cần thêm thông tin gì không ạ?",
       "questions": [
         {
           "slot": "order_id",
           "type": "confirm",
-          "text": "Đơn hàng của ông là O010 phải không ạ?"
+          "text": "Đơn hàng của anh là OD900502 phải không ạ?"
         }
       ],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
       "claims": [
         {
           "field": "order_id",
-          "value": "O010"
+          "value": "OD900502"
         },
         {
           "field": "order_status",
-          "value": "delivered"
+          "value": "shipping"
         }
       ],
       "tool_calls": [
         {
           "name": "order.status",
           "args": {
-            "order_id": "O010"
+            "order_id": "OD900502"
           }
         }
       ],
@@ -49,28 +48,16 @@
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Vâng, đúng rồi, em muốn biết tình trạng đơn hàng.",
-      "facts_stated": {
-        "order_id": "O010"
-      },
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
       "speaker": "agent_ai",
-      "text": "Dạ, đơn hàng của ông FAS004 đã được giao thành công. Nếu ông cần hỗ trợ gì thêm về sản phẩm hoặc đơn hàng, em luôn sẵn sàng giúp ạ!",
+      "text": "Dạ, đơn hàng OD900502 của anh đang được vận chuyển và dự kiến sẽ đến trong 2-3 ngày làm việc ạ. Anh có cần em hỗ trợ thêm gì không ạ?",
       "questions": [],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
       "claims": [
         {
           "field": "order_status",
-          "value": "delivered"
+          "value": "shipping"
         }
       ],
       "tool_calls": [],
@@ -81,17 +68,8 @@
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Cảm ơn em, không có gì thêm nhé.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
       "speaker": "agent_ai",
-      "text": "Dạ, cảm ơn ông đã liên hệ với shop. Nếu có gì cần hỗ trợ, ông hãy gọi lại cho em nhé! Chúc ông một ngày tốt lành!",
+      "text": "Dạ, em xin lỗi anh, hiện em chưa có thông tin chính xác về thời gian giao hàng cụ thể ạ. Tuy nhiên, anh có thể theo dõi đơn hàng thông qua mã vận đơn VN0052TRK ạ. Anh có cần thêm thông tin nào khác không ạ?",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -104,11 +82,11 @@
     }
   ],
   "gold": {
-    "intent": "Hỏi tình trạng đơn hàng đã đặt.",
+    "intent": "Hỏi tình trạng đơn hàng áo phao.",
     "outcome": "cap_nhat_don",
     "objection_type": null,
     "objection_handling": null,
-    "sentiment": "positive",
+    "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],
     "supersedes": [],

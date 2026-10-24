@@ -7,32 +7,29 @@
   "channel": "hotline",
   "date": "2026-10-16",
   "region": "trung",
-  "category": "unknown",
+  "category": "thoi-trang/giay",
   "persona": "khach_co_don_chua_co_lich_su",
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào Ms. Trần Thị B, em gọi lại về đơn hàng FAS002 của Ms. đang quan tâm ạ. Em thấy đơn hàng này đã được giao thành công ạ.",
-      "questions": [],
+      "text": "Dạ, em chào chị Trần Thị B. Em gọi lại để cập nhật tình trạng đơn hàng của chị ạ. Chị đang hỏi về đơn hàng giày sneaker Urban Classic, mã đơn OD900202, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Chị đang hỏi về đơn hàng giày sneaker Urban Classic, mã đơn OD900202, đúng không ạ?"
+        }
+      ],
       "facts_used": [
         "order_id",
         "owned_sku"
       ],
-      "claims": [
-        {
-          "field": "order_id",
-          "value": "O004"
-        },
-        {
-          "field": "order_status",
-          "value": "delivered"
-        }
-      ],
+      "claims": [],
       "tool_calls": [
         {
           "name": "order.status",
           "args": {
-            "order_id": "O004"
+            "order_id": "OD900202"
           }
         }
       ],
@@ -43,38 +40,16 @@
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Vậy là đơn hàng của tôi đã giao rồi đúng không?",
-      "facts_stated": {
-        "order_id": "O004"
-      },
-      "entities": [
-        {
-          "type": "order_id",
-          "value": "O004",
-          "spoken": "FAS002"
-        }
-      ],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
       "speaker": "agent_ai",
-      "text": "Dạ đúng rồi ạ, đơn hàng FAS002 của Ms. đã được giao thành công vào ngày 10 tháng 9 ạ.",
+      "text": "Dạ, đơn hàng giày sneaker Urban Classic mà chị đặt hôm trước hiện tại đang trong trạng thái đang xử lý ạ. Chị có cần thêm thông tin gì không ạ?",
       "questions": [],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
       "claims": [
         {
-          "field": "order_id",
-          "value": "O004"
-        },
-        {
           "field": "order_status",
-          "value": "delivered"
+          "value": "processing"
         }
       ],
       "tool_calls": [],
@@ -85,9 +60,15 @@
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Cảm ơn em!",
-      "facts_stated": {},
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin nhắc lại thông tin đơn hàng của chị: Giày sneaker Urban Classic, mã đơn OD900202, hiện đang trong trạng thái đang xử lý. Chị có muốn em giúp gì thêm không ạ?",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -95,11 +76,11 @@
     }
   ],
   "gold": {
-    "intent": "cap_nhat_don",
+    "intent": "Hỏi tình trạng đơn hàng đang xử lý",
     "outcome": "cap_nhat_don",
     "objection_type": null,
     "objection_handling": null,
-    "sentiment": "positive",
+    "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],
     "supersedes": [],

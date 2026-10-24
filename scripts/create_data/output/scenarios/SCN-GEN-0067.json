@@ -6,7 +6,7 @@
   "customer_id": "SYN-C007",
   "customer_phone": "0998000007",
   "customer_name": "Lê Văn G",
-  "honorific": "Mr.",
+  "honorific": "anh",
   "region": "bac",
   "category": "gia-dung/may-loc-khong-khi",
   "difficulty": "hard",
@@ -17,9 +17,9 @@
     "mua_sắm",
     "multi_item",
     "máy_lọc_không_khí",
+    "nhà_mới",
     "tư_vấn",
-    "variant:bon_san_pham_vuot_cod",
-    "đặt_hàng"
+    "variant:bon_san_pham_vuot_cod"
   ],
   "metric_focus": [
     "CCR",
@@ -37,53 +37,53 @@
           "source": "crm_session",
           "customer_id": "SYN-C007",
           "session_id": "SYN-007-S1",
-          "date": "2026-09-01",
+          "date": "2026-04-19",
           "channel": "hotline",
-          "summary": "Tư vấn về máy lạnh",
-          "outcome": "successful",
+          "summary": "Mua Máy lọc không khí Samsung AX40 giá 6.490.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_session",
           "customer_id": "SYN-C007",
           "session_id": "SYN-007-S2",
-          "date": "2026-09-02",
+          "date": "2026-10-07",
           "channel": "zalo_oa",
-          "summary": "Hỗ trợ đổi hàng",
-          "outcome": "successful",
+          "summary": "Đặt Máy lọc nước RO Karofi 9 lõi giá 5.990.000đ, đơn OD900702 đang giao.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C007",
-          "order_id": "O013",
-          "date": "2026-02-12",
-          "sku": "HAP005",
+          "order_id": "OD900701",
+          "date": "2026-04-19",
+          "sku": "SKU-SS-AX40",
           "status": "delivered",
           "stale": false,
           "facts": {
-            "owned_sku": "HAP005"
+            "owned_sku": "SKU-SS-AX40"
           }
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C007",
-          "order_id": "O014",
-          "date": "2026-07-14",
-          "sku": "HAP006",
+          "order_id": "OD900702",
+          "date": "2026-10-07",
+          "sku": "SKU-WF-RO9",
           "status": "shipping",
           "stale": false,
           "facts": {
-            "order_id": "O014"
+            "order_id": "OD900702"
           }
         }
       ],
-      "customer_goal": "Hỏi về máy lọc không khí cho phòng 30m² có trẻ nhỏ",
+      "customer_goal": "Hỏi về máy lọc không khí AirPure Pro.",
       "customer_turns": [
-        "Alo, em chào chị, hôm nay chị muốn hỏi về máy lọc không khí cho phòng khoảng 30 mét vuông.",
-        "Nhà chị có trẻ nhỏ, ngân sách tầm 9 triệu thôi.",
-        "Máy này có khuyến mãi gì không em?",
-        "Chị cần bàn với gia đình rồi sẽ gọi lại em nhé."
+        "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro mà em đã tư vấn hôm trước.",
+        "Diện tích phòng nhà anh khoảng 30 mét vuông, và nhà có trẻ nhỏ.",
+        "Ngân sách của anh tầm 9 triệu thôi, máy này có khuyến mãi gì không?",
+        "Anh cần bàn với gia đình rồi sẽ gọi lại em nhé."
       ],
       "facts_established": {
         "room_area_m2": 30,
@@ -130,20 +130,20 @@
         "is_returning": true,
         "n_previous_sessions": 2,
         "last_session": {
-          "date": "2026-09-02",
+          "date": "2026-10-07",
           "channel": "zalo_oa",
-          "outcome": "successful",
-          "summary": "Hỗ trợ đổi hàng"
+          "outcome": "chot_don",
+          "summary": "Đặt Máy lọc nước RO Karofi 9 lõi giá 5.990.000đ, đơn OD900702 đang giao."
         },
         "products_advised": [
-          "HAP005"
+          "SKU-SS-AX40"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Lê Văn G, em gọi lại về HAP005 Mr. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào anh Lê Văn G, em gọi lại về SKU-SS-AX40 anh đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-10-15T08:00:00",
@@ -161,16 +161,16 @@
       "call_date": "2026-10-17",
       "days_later": 2,
       "input_mode": "text",
-      "customer_goal": "Mua nhiều món cho nhà mới và chốt đơn",
+      "customer_goal": "Mua nhiều sản phẩm cho nhà mới.",
       "customer_turns": [
-        "Alo, em ơi, hôm trước chị đã hỏi về máy lọc không khí, giờ chị muốn mua luôn.",
-        "Chị cũng cần thêm một nồi chiên không dầu và quạt đứng nữa.",
-        "Máy lọc không khí giá bao nhiêu em nhỉ?",
-        "Nồi chiên không dầu giá sao, có khuyến mãi gì không?",
-        "Quạt đứng có giá là bao nhiêu vậy?",
-        "Chị muốn mua 4 món này, tổng tiền là bao nhiêu?",
-        "Chị muốn thanh toán bằng chuyển khoản.",
-        "Địa chỉ giao hàng là Long Biên, Hà Nội nhé."
+        "Alo, anh gọi lại để chốt đơn hàng.",
+        "Anh muốn mua máy lọc không khí AirPure Pro, nồi chiên không dầu Xiaomi 4.5L, quạt đứng Senko TS16 và màng lọc thay thế.",
+        "Tổng tiền cho tất cả sản phẩm là bao nhiêu em nhỉ?",
+        "Anh muốn trả bằng hình thức chuyển khoản.",
+        "Ngân sách của anh chỉ khoảng 8 triệu rưỡi thôi, có cách nào giảm giá không?",
+        "Anh cần 4 món này, giao hàng ở Long Biên, Hà Nội nhé.",
+        "Em có thể cho anh biết chi tiết từng món không?",
+        "Chốt đơn cho anh nhé, cảm ơn em!"
       ],
       "facts_established": {
         "payment": "chuyen_khoan",
@@ -230,7 +230,7 @@
         "order_id": "OD600001",
         "superseded": {
           "budget_vnd": 9000000,
-          "order_id": "O014"
+          "order_id": "OD900702"
         }
       },
       "expected_call_brief": {
@@ -244,8 +244,8 @@
           "outcome": "hen_goi_lai"
         },
         "products_advised": [
-          "HAP005",
-          "SKU-AP-PRO"
+          "SKU-AP-PRO",
+          "SKU-SS-AX40"
         ],
         "open_blockers": [
           "để bàn với gia đình"
@@ -258,7 +258,7 @@
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Lê Văn G, em gọi lại về HAP005 Mr. đang quan tâm ạ, không biết để bàn với gia đình chưa ạ?",
+        "suggested_opening": "Dạ em chào anh Lê Văn G, em gọi lại về SKU-AP-PRO anh đang quan tâm ạ, không biết để bàn với gia đình chưa ạ?",
         "freshness_checks": {
           "price_changed": false,
           "promos_no_longer_active": [],

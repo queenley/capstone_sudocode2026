@@ -5,14 +5,14 @@
   "customer_id": "SYN-C005",
   "customer_phone": "0998000005",
   "customer_name": "Đỗ Minh E",
-  "honorific": "Mr.",
+  "honorific": "anh",
   "region": "trung",
-  "category": "unknown",
+  "category": "thoi-trang/ao-khoac",
   "difficulty": "normal",
   "tags": [
     "address_change",
     "customer_inquiry",
-    "delivery_update",
+    "hotline",
     "order",
     "order_status",
     "variant:chuan"
@@ -33,51 +33,52 @@
           "source": "crm_session",
           "customer_id": "SYN-C005",
           "session_id": "SYN-005-S1",
-          "date": "2026-09-01",
+          "date": "2026-07-13",
           "channel": "hotline",
-          "summary": "Hỏi về quần áo trẻ em",
-          "outcome": "successful",
+          "summary": "Mua Áo khoác gió Windbreak giá 690.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_session",
           "customer_id": "SYN-C005",
           "session_id": "SYN-005-S2",
-          "date": "2026-09-02",
+          "date": "2026-10-05",
           "channel": "zalo_oa",
-          "summary": "Tư vấn chọn đồ mùa hè",
-          "outcome": "successful",
+          "summary": "Đặt Áo phao lông vũ Warmly giá 1.490.000đ, đơn OD900502 đang giao.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C005",
-          "order_id": "O009",
-          "date": "2026-05-30",
-          "sku": "FAS003",
-          "status": "shipping",
+          "order_id": "OD900501",
+          "date": "2026-07-13",
+          "sku": "SKU-JK-WND-M-NAVY",
+          "status": "delivered",
           "stale": false,
           "facts": {
-            "order_id": "O009"
+            "owned_sku": "SKU-JK-WND-M-NAVY"
           }
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C005",
-          "order_id": "O010",
-          "date": "2026-09-12",
-          "sku": "FAS004",
-          "status": "delivered",
+          "order_id": "OD900502",
+          "date": "2026-10-05",
+          "sku": "SKU-JK-DWN-M-NAVY",
+          "status": "shipping",
           "stale": false,
           "facts": {
-            "owned_sku": "FAS004"
+            "order_id": "OD900502"
           }
         }
       ],
-      "customer_goal": "Hỏi tình trạng đơn hàng đã đặt.",
+      "customer_goal": "Hỏi tình trạng đơn hàng áo phao.",
       "customer_turns": [
-        "Alo, em muốn hỏi tình trạng đơn hàng của em.",
-        "Mới hôm trước em có đặt một đơn hàng mà chưa thấy giao."
+        "Alo, anh muốn hỏi về tình trạng đơn hàng áo phao lông vũ của anh.",
+        "Đơn OD900502 đang ở đâu rồi em?",
+        "Có thể cho anh biết khi nào hàng sẽ đến không?"
       ],
       "expected_outcome": "cap_nhat_don",
       "must_carry_over": [
@@ -89,8 +90,9 @@
         "owned_sku"
       ],
       "ground_truth_facts": {
-        "order_id": "O010",
-        "order_status": "delivered",
+        "order_id": "OD900502",
+        "order_status": "shipping",
+        "tracking": "VN0052TRK",
         "call_date": "2026-10-29"
       },
       "expected_call_brief": {
@@ -99,20 +101,20 @@
         "is_returning": true,
         "n_previous_sessions": 2,
         "last_session": {
-          "date": "2026-09-02",
+          "date": "2026-10-05",
           "channel": "zalo_oa",
-          "outcome": "successful",
-          "summary": "Tư vấn chọn đồ mùa hè"
+          "outcome": "chot_don",
+          "summary": "Đặt Áo phao lông vũ Warmly giá 1.490.000đ, đơn OD900502 đang giao."
         },
         "products_advised": [
-          "FAS004"
+          "SKU-JK-WND-M-NAVY"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Đỗ Minh E, em gọi lại về FAS004 Mr. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào anh Đỗ Minh E, em gọi lại về SKU-JK-WND-M-NAVY anh đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-10-29T08:00:00",
@@ -121,11 +123,12 @@
       "success_if": {
         "tool_called": "order.status",
         "args_match": {
-          "order_id": "O010"
+          "order_id": "OD900502"
         },
         "must_say_any": [
-          "đã giao",
-          "giao thành công"
+          "đang giao",
+          "đang vận chuyển",
+          "đã bàn giao"
         ]
       }
     },
@@ -134,11 +137,11 @@
       "call_date": "2026-10-30",
       "days_later": 1,
       "input_mode": "text",
-      "customer_goal": "Muốn đổi địa chỉ giao hàng cho đơn hàng.",
+      "customer_goal": "Đổi địa chỉ giao hàng cho đơn hàng.",
       "customer_turns": [
-        "Chào em, hôm qua em đã hỏi về đơn hàng của mình.",
-        "Giờ em muốn đổi địa chỉ giao hàng sang Hải Châu, Đà Nẵng.",
-        "Có được không em?"
+        "Alo, anh muốn thay đổi địa chỉ giao hàng cho đơn hàng áo phao.",
+        "Địa chỉ mới là Hải Châu, Đà Nẵng.",
+        "Mong em cập nhật giúp anh nhé."
       ],
       "facts_established": {
         "delivery_area": "Hải Châu, Đà Nẵng"
@@ -153,8 +156,9 @@
         "owned_sku"
       ],
       "ground_truth_facts": {
-        "order_id": "O010",
-        "order_status": "delivered",
+        "order_id": "OD900502",
+        "order_status": "shipping",
+        "tracking": "VN0052TRK",
         "call_date": "2026-10-30"
       },
       "memory_expectation": {
@@ -171,14 +175,14 @@
           "outcome": "cap_nhat_don"
         },
         "products_advised": [
-          "FAS004"
+          "SKU-JK-WND-M-NAVY"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Đỗ Minh E, em gọi lại về FAS004 Mr. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào anh Đỗ Minh E, em gọi lại về SKU-JK-WND-M-NAVY anh đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-10-30T08:00:00",
@@ -187,7 +191,7 @@
       "success_if": {
         "tool_called": "order.update",
         "args_match": {
-          "order_id": "O010",
+          "order_id": "OD900502",
           "action": "update_address"
         }
       }

@@ -12,22 +12,21 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào chị Nguyễn Thị F, em gọi lại về máy lọc không khí Samsung AX40 mà chị đã quan tâm ạ. Chị có nhớ hôm trước em đã báo giá là 6.490.000đ không ạ?",
+      "text": "Dạ, em chào chị Nguyễn Thị F, em gọi lại về máy lọc không khí Samsung AX40 mà chị đã hỏi hôm trước ạ. Chị đã từng quan tâm đến máy lọc không khí này và em thấy chị sở hữu máy lọc không khí khác là SKU-MB-STER, đúng không ạ?",
       "questions": [
         {
-          "slot": "price_vnd",
+          "slot": "owned_sku",
           "type": "confirm",
-          "text": "Chị có nhớ hôm trước em đã báo giá là 6.490.000đ không ạ?"
+          "text": "Chị đã sở hữu máy lọc không khí khác là SKU-MB-STER phải không ạ?"
         }
       ],
       "facts_used": [
-        "product_advised",
-        "price_quoted_vnd"
+        "owned_sku"
       ],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 6490000
+          "field": "product_advised",
+          "value": "SKU-SS-AX40"
         }
       ],
       "tool_calls": [],
@@ -39,16 +38,14 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Chị muốn hỏi thêm về khuyến mãi nào ạ? Hiện tại sản phẩm này không có khuyến mãi nào đang áp dụng, nhưng em có thể tư vấn thêm về các thông tin khác nếu chị cần.",
-      "questions": [
-        {
-          "slot": "promo_active",
-          "type": "confirm",
-          "text": "Chị có muốn hỏi thêm về khuyến mãi nào không?"
-        }
-      ],
+      "text": "Máy lọc không khí Samsung AX40 hiện tại không có khuyến mãi nào chị nhé. Giá của máy này là 6.490.000đ. Nếu chị cần thêm thông tin gì khác, em sẵn sàng hỗ trợ ạ.",
+      "questions": [],
       "facts_used": [],
       "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6490000
+        },
         {
           "field": "promo_active",
           "value": false
@@ -63,27 +60,25 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Em hiểu rồi, chị cần thời gian để suy nghĩ thêm. Chị có muốn em gọi lại vào thời gian nào không ạ?",
-      "questions": [
-        {
-          "slot": "callback",
-          "type": "open",
-          "text": "Chị có muốn em gọi lại vào thời gian nào không ạ?"
-        }
-      ],
+      "text": "Giá của máy vẫn giữ nguyên là 6.490.000đ và sẽ không thay đổi trong thời gian tới. Chị có cần giúp đỡ gì thêm trước khi quyết định không ạ?",
+      "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
-      "memory_writes": [
-        {
-          "key": "order_id",
-          "value": "OD600001"
-        },
-        {
-          "key": "owned_sku",
-          "value": "MAB004"
-        }
-      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị có thể gọi lại khi chị đã sẵn sàng nhé! Em cảm ơn chị đã quan tâm đến sản phẩm của chúng em. Chúc chị một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -91,7 +86,7 @@
     }
   ],
   "gold": {
-    "intent": "hen_goi_lai",
+    "intent": "Hỏi thêm thông tin về máy lọc không khí",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,

@@ -89,29 +89,29 @@ agents:
   # questions, claims and fact use (ai_agent_service/pipeline/eval/extract_command.py,
   # and scripts/evaluation/agent/extract_command.py for the team's harness). Not
   # an agent of the product; named here so
-  # its model is one line of config like theirs. On the advisor's Gemini key;
-  # its thinking tokens share the same budget.
+  # its model is one line of config like theirs, on the advisor's OpenAI key.
   extractor:
-    provider: google_genai
-    model: gemini-3.5-flash-lite
+    provider: openai
+    model: gpt-4.1-mini
     generation:
-      max_tokens: 2048
+      # Per-item quotes and spans exceed 1024 tokens on long turns (Oct 17 run).
+      max_tokens: 4096
 
   # docs/design.md section 5.4: the MemoryAgent reads the customer's words
   # with one structured-output call after the call; its rules stand in when
   # this model cannot answer. Off the hot path, so chosen for reading
   # Vietnamese rather than for speed.
   memory:
-    provider: google_genai
-    model: gemini-3.5-flash-lite
+    provider: openai
+    model: gpt-4.1-mini
     generation:
       max_tokens: 2048
 
   # Section 4.4: folds the turns of a long call into working_summary. On the
   # hot path, but only once a call passes sixteen messages.
   compactor:
-    provider: google_genai
-    model: gemini-3.5-flash-lite
+    provider: openai
+    model: gpt-4.1-mini
     generation:
       max_tokens: 1024
 
@@ -204,7 +204,8 @@ evaluation_providers:
     models:
       # TypeSafe AI's Jev. $0.042 per million input tokens, output free, since
       # 2026-09-25. The gateway refuses every call until the Vercel team has a
-      # card on file (customer_verification_required).
+      # card on file (customer_verification_required), and a free-tier team
+      # until it buys credits (403 no_providers_available, 2026-10-24).
       - typesafe-ai/jev
     # Off because the gateway refuses it on the Hobby plan (permission_denied,
     # "only available for Pro and Enterprise plans", 2026-09-23). The provider
@@ -217,14 +218,40 @@ evaluation_providers:
       input_tokens_per_minute: 100000
       output_tokens_per_minute: 100000
       input_token_price_per_million: 0.042
+  typesafe:
+    label: TypeSafe (direct)
+    # TypeSafe's own API, POST <base_url>/systemone with TYPESAFE_API_KEY
+    # (https://api.typesafe.ai/docs). JEV_URL, when set, is the whole endpoint.
+    # Same model as through the gateway: a 3-question check took 1.1 s and was
+    # answered by jev-1.14.0 (2026-10-24).
+    api: typesafe
+    base_url: https://api.typesafe.ai/v1
+    url_env: JEV_URL
+    models_url: https://api.typesafe.ai/v1/models
+    models:
+      - jev-latest
+      # "should be better in most ways" (GET /v1/models); not tried here yet.
+      - jev-preview
+    # TypeSafe states no retention policy for this API; as with the gateway,
+    # only tokenised text is sent.
+    zero_data_retention: false
+    rate_limits:
+      # Unpublished; the gateway's guess until measured.
+      requests_per_minute: 30
+      input_tokens_per_minute: 100000
+      output_tokens_per_minute: 100000
+      # Assumed equal to the gateway's price; not confirmed with TypeSafe.
+      input_token_price_per_million: 0.042
 
 # Agent -> evaluation model. `timeout` is how long the caller waits before
 # going on without an answer: the PolicyAgent sits on the hot path inside the
 # 3 s TTFT budget, and its measured median was 0.6 s (architecture notes 8.5).
 evaluators:
   policy:
-    provider: vercel_gateway
-    model: typesafe-ai/jev
+    # Direct, because the gateway refuses Jev to a free-tier Vercel team.
+    # Through the gateway instead: provider vercel_gateway, model typesafe-ai/jev.
+    provider: typesafe
+    model: jev-latest
     timeout: 1.5
 
 # ── Voice ────────────────────────────────────────────────────────────────────

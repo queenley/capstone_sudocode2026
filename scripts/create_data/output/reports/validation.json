@@ -1330,7 +1330,7 @@
     "errors": [
       "ccr_missing:order_id",
       "ccr_missing:owned_sku",
-      "customer_script_not_followed:0/2",
+      "customer_script_not_followed:0/3",
       "tsr:không có tool call order.status khớp args_match",
       "tsr:thiếu must_say_any: đang giao | đang vận chuyển | đã bàn giao"
     ],
@@ -1364,21 +1364,24 @@
     "hard_case": null,
     "validator_pass": false,
     "errors": [
-      "customer_script_not_followed:0/2"
+      "ccr_missing:order_id",
+      "ccr_missing:owned_sku",
+      "customer_script_not_followed:0/3",
+      "tsr:không có tool call order.update khớp args_match"
     ],
     "metrics": {
-      "tsr": true,
+      "tsr": false,
       "rqr": [
         0,
-        3
+        0
       ],
       "ccr": [
-        2,
+        0,
         2
       ],
       "hr": [
         0,
-        1
+        0
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -2554,21 +2557,25 @@
     "hard_case": null,
     "validator_pass": false,
     "errors": [
-      "customer_script_not_followed:0/2"
+      "ccr_missing:order_id",
+      "ccr_missing:owned_sku",
+      "customer_script_not_followed:0/2",
+      "tsr:không có tool call order.status khớp args_match",
+      "tsr:thiếu must_say_any: đang xử lý | đang chuẩn bị"
     ],
     "metrics": {
-      "tsr": true,
+      "tsr": false,
       "rqr": [
         0,
         0
       ],
       "ccr": [
-        2,
+        0,
         2
       ],
       "hr": [
         0,
-        4
+        0
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -2586,17 +2593,16 @@
     "hard_case": null,
     "validator_pass": false,
     "errors": [
-      "ccr_missing:owned_sku",
       "customer_script_not_followed:0/2"
     ],
     "metrics": {
       "tsr": true,
       "rqr": [
         0,
-        2
+        1
       ],
       "ccr": [
-        1,
+        2,
         2
       ],
       "hr": [
@@ -3764,13 +3770,14 @@
     "hard_case": null,
     "validator_pass": false,
     "errors": [
-      "customer_script_not_followed:0/3"
+      "customer_script_not_followed:1/3",
+      "tsr:thiếu must_say_any: đang giao | đang vận chuyển | đã bàn giao"
     ],
     "metrics": {
-      "tsr": true,
+      "tsr": false,
       "rqr": [
         0,
-        2
+        1
       ],
       "ccr": [
         2,
@@ -3778,7 +3785,7 @@
       ],
       "hr": [
         0,
-        2
+        3
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -4304,22 +4311,23 @@
     "hard_case": null,
     "validator_pass": false,
     "errors": [
-      "customer_script_not_followed:2/4",
-      "redundant_question:blocker:confirm"
+      "ccr_missing:order_id",
+      "ccr_missing:owned_sku",
+      "customer_script_not_followed:0/4"
     ],
     "metrics": {
       "tsr": true,
       "rqr": [
-        1,
-        5
+        0,
+        0
       ],
       "ccr": [
-        2,
+        0,
         2
       ],
       "hr": [
         0,
-        1
+        0
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -4337,28 +4345,25 @@
     "hard_case": null,
     "validator_pass": false,
     "errors": [
-      "ccr_missing:blocker",
       "ccr_missing:order_id",
       "ccr_missing:owned_sku",
-      "ccr_missing:price_quoted_vnd",
-      "ccr_missing:product_advised",
       "ccr_missing:size",
       "ccr_missing:variant_sku",
-      "customer_script_not_followed:0/3"
+      "redundant_question:product_advised:open"
     ],
     "metrics": {
       "tsr": true,
       "rqr": [
-        0,
-        0
+        1,
+        4
       ],
       "ccr": [
-        0,
+        3,
         7
       ],
       "hr": [
         0,
-        0
+        2
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -4486,24 +4491,22 @@
     "hard_case": "teencode_da_kenh",
     "validator_pass": false,
     "errors": [
-      "ccr_missing:order_id",
-      "ccr_missing:owned_sku",
-      "customer_script_not_followed:0/4",
+      "customer_script_not_followed:0/5",
       "unverified_spoken_price:5000000"
     ],
     "metrics": {
       "tsr": true,
       "rqr": [
         0,
-        0
+        4
       ],
       "ccr": [
-        0,
+        2,
         2
       ],
       "hr": [
         0,
-        0
+        2
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -4521,21 +4524,22 @@
     "hard_case": "teencode_da_kenh",
     "validator_pass": false,
     "errors": [
-      "customer_script_not_followed:0/4"
+      "ccr_missing:order_id",
+      "ccr_missing:owned_sku"
     ],
     "metrics": {
       "tsr": true,
       "rqr": [
         0,
-        4
+        3
       ],
       "ccr": [
-        6,
+        4,
         6
       ],
       "hr": [
         0,
-        2
+        3
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -4592,16 +4596,19 @@
       "ccr_missing:order_id",
       "ccr_missing:owned_sku",
       "ccr_missing:price_quoted_vnd",
-      "ccr_missing:promo_code"
+      "ccr_missing:product_advised",
+      "ccr_missing:promo_code",
+      "customer_script_not_followed:0/3",
+      "tsr:không gọi handoff.transfer"
     ],
     "metrics": {
-      "tsr": true,
+      "tsr": false,
       "rqr": [
         0,
-        2
+        0
       ],
       "ccr": [
-        1,
+        0,
         6
       ],
       "hr": [
@@ -4658,16 +4665,18 @@
     "hard_case": "phien_ban_chinh_sach_cu",
     "validator_pass": false,
     "errors": [
-      "unverified_spoken_price:30000"
+      "ccr_missing:order_id",
+      "ccr_missing:owned_sku",
+      "ccr_missing:price_quoted_vnd"
     ],
     "metrics": {
       "tsr": true,
       "rqr": [
         0,
-        2
+        3
       ],
       "ccr": [
-        5,
+        2,
         5
       ],
       "hr": [
@@ -4690,21 +4699,23 @@
     "hard_case": "ba_kenh_bao_gia_lech",
     "validator_pass": false,
     "errors": [
-      "customer_script_not_followed:2/5"
+      "ccr_missing:order_id",
+      "ccr_missing:owned_sku",
+      "customer_script_not_followed:0/4"
     ],
     "metrics": {
       "tsr": true,
       "rqr": [
         0,
-        2
+        0
       ],
       "ccr": [
-        2,
+        0,
         2
       ],
       "hr": [
         0,
-        3
+        0
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -4765,24 +4776,25 @@
     "errors": [
       "ccr_missing:competitor_price_vnd",
       "ccr_missing:objection",
+      "ccr_missing:order_id",
       "ccr_missing:owned_sku",
       "ccr_missing:promo_code",
       "ccr_missing:size",
-      "customer_script_not_followed:1/4"
+      "customer_script_not_followed:0/4"
     ],
     "metrics": {
       "tsr": true,
       "rqr": [
         0,
-        2
+        3
       ],
       "ccr": [
-        4,
+        3,
         9
       ],
       "hr": [
         0,
-        1
+        0
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -4868,24 +4880,22 @@
     "hard_case": "doi_khuyen_mai_het_han",
     "validator_pass": false,
     "errors": [
-      "ccr_missing:order_id",
-      "ccr_missing:owned_sku",
-      "customer_script_not_followed:0/3",
-      "tsr:không có tool call order.create khớp args_match"
+      "customer_script_not_followed:0/4",
+      "unverified_spoken_price:6000000"
     ],
     "metrics": {
-      "tsr": false,
+      "tsr": true,
       "rqr": [
         0,
-        0
+        3
       ],
       "ccr": [
-        0,
+        2,
         2
       ],
       "hr": [
         0,
-        0
+        2
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -4905,7 +4915,7 @@
     "errors": [
       "ccr_missing:order_id",
       "ccr_missing:owned_sku",
-      "customer_script_not_followed:0/3"
+      "customer_script_not_followed:0/4"
     ],
     "metrics": {
       "tsr": true,
@@ -4940,7 +4950,8 @@
       "ccr_missing:order_id",
       "ccr_missing:owned_sku",
       "customer_script_not_followed:0/4",
-      "unverified_spoken_price:300000"
+      "unverified_spoken_price:300000",
+      "unverified_spoken_price:7390000"
     ],
     "metrics": {
       "tsr": true,
@@ -4972,26 +4983,33 @@
     "hard_case": "16_luot_4_san_pham_vuot_cod",
     "validator_pass": false,
     "errors": [
+      "ccr_missing:blocker",
       "ccr_missing:order_id",
       "ccr_missing:owned_sku",
+      "ccr_missing:price_quoted_vnd",
+      "ccr_missing:product_advised",
+      "ccr_missing:promo_code",
       "ccr_missing:room_area_m2",
-      "customer_script_not_followed:2/8",
-      "tsr:thiếu sản phẩm trong also_ordered",
-      "unverified_spoken_price:300000"
+      "customer_script_not_followed:0/8",
+      "tsr:không có tool call order.create khớp args_match",
+      "tsr:thiếu must_say_any: 10 triệu | 10.000.000 | chuyển khoản",
+      "unverified_spoken_price:10000000",
+      "unverified_spoken_price:8000000",
+      "unverified_spoken_price:860000"
     ],
     "metrics": {
       "tsr": false,
       "rqr": [
         0,
-        3
+        0
       ],
       "ccr": [
-        4,
+        0,
         7
       ],
       "hr": [
         0,
-        5
+        0
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -5009,24 +5027,23 @@
     "hard_case": "asr_loi_tool_timeout",
     "validator_pass": false,
     "errors": [
-      "ccr_missing:order_id",
-      "ccr_missing:owned_sku",
       "customer_script_not_followed:0/5",
-      "tsr:thiếu must_say_any: 19/10 | ngày 19"
+      "unverified_spoken_price:50000",
+      "unverified_spoken_price:890000"
     ],
     "metrics": {
-      "tsr": false,
+      "tsr": true,
       "rqr": [
         0,
-        0
+        3
       ],
       "ccr": [
-        0,
+        2,
         2
       ],
       "hr": [
         0,
-        0
+        3
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -5047,23 +5064,26 @@
       "ccr_missing:blocker",
       "ccr_missing:order_id",
       "ccr_missing:owned_sku",
+      "ccr_missing:price_quoted_vnd",
+      "ccr_missing:product_advised",
       "ccr_missing:promo_code",
       "ccr_missing:room_area_m2",
-      "customer_script_not_followed:0/3"
+      "customer_script_not_followed:0/3",
+      "tsr:không có tool call order.create khớp args_match"
     ],
     "metrics": {
-      "tsr": true,
+      "tsr": false,
       "rqr": [
         0,
-        3
+        0
       ],
       "ccr": [
-        2,
+        0,
         7
       ],
       "hr": [
         0,
-        2
+        0
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -5081,22 +5101,25 @@
     "hard_case": null,
     "validator_pass": false,
     "errors": [
+      "ccr_missing:order_id",
+      "ccr_missing:owned_sku",
       "customer_script_not_followed:0/2",
+      "tsr:không có tool call order.status khớp args_match",
       "tsr:thiếu must_say_any: đang xử lý | đang chuẩn bị"
     ],
     "metrics": {
       "tsr": false,
       "rqr": [
         0,
-        1
+        0
       ],
       "ccr": [
-        2,
+        0,
         2
       ],
       "hr": [
         0,
-        2
+        0
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -5151,8 +5174,7 @@
     "errors": [
       "ccr_missing:order_id",
       "ccr_missing:owned_sku",
-      "customer_script_not_followed:0/4",
-      "unverified_spoken_price:4000000"
+      "customer_script_not_followed:0/4"
     ],
     "metrics": {
       "tsr": true,
@@ -5184,25 +5206,21 @@
     "hard_case": "ba_phien_doi_thong_tin",
     "validator_pass": false,
     "errors": [
-      "ccr_missing:blocker",
-      "ccr_missing:order_id",
-      "ccr_missing:owned_sku",
-      "ccr_missing:promo_code",
-      "customer_script_not_followed:0/3"
+      "ccr_missing:owned_sku"
     ],
     "metrics": {
       "tsr": true,
       "rqr": [
         0,
-        2
+        3
       ],
       "ccr": [
-        2,
+        5,
         6
       ],
       "hr": [
         0,
-        1
+        3
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -5333,13 +5351,13 @@
     "errors": [
       "ccr_missing:order_id",
       "ccr_missing:owned_sku",
-      "customer_script_not_followed:0/3"
+      "customer_script_not_followed:1/4"
     ],
     "metrics": {
       "tsr": true,
       "rqr": [
         0,
-        0
+        4
       ],
       "ccr": [
         0,
@@ -5347,7 +5365,7 @@
       ],
       "hr": [
         0,
-        0
+        4
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -5365,24 +5383,28 @@
     "hard_case": "het_hang_luc_khach_quyet",
     "validator_pass": false,
     "errors": [
+      "ccr_missing:blocker",
+      "ccr_missing:decision_maker",
       "ccr_missing:order_id",
       "ccr_missing:owned_sku",
-      "customer_script_not_followed:0/3",
-      "redundant_question:order_id:open"
+      "ccr_missing:price_quoted_vnd",
+      "ccr_missing:product_advised",
+      "ccr_missing:promo_code",
+      "customer_script_not_followed:0/4"
     ],
     "metrics": {
       "tsr": true,
       "rqr": [
-        1,
-        4
+        0,
+        0
       ],
       "ccr": [
-        5,
+        0,
         7
       ],
       "hr": [
         0,
-        2
+        0
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -6290,21 +6312,25 @@
     "hard_case": null,
     "validator_pass": false,
     "errors": [
-      "customer_script_not_followed:0/2"
+      "ccr_missing:order_id",
+      "ccr_missing:owned_sku",
+      "customer_script_not_followed:0/3",
+      "tsr:không có tool call order.status khớp args_match",
+      "tsr:thiếu must_say_any: đang giao | đang vận chuyển | đã bàn giao"
     ],
     "metrics": {
-      "tsr": true,
+      "tsr": false,
       "rqr": [
         0,
-        1
+        0
       ],
       "ccr": [
-        2,
+        0,
         2
       ],
       "hr": [
         0,
-        3
+        0
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -6322,22 +6348,24 @@
     "hard_case": null,
     "validator_pass": false,
     "errors": [
+      "ccr_missing:order_id",
+      "ccr_missing:owned_sku",
       "customer_script_not_followed:0/3",
-      "hallucination:order_id=O009!=O010"
+      "tsr:không có tool call order.update khớp args_match"
     ],
     "metrics": {
-      "tsr": true,
+      "tsr": false,
       "rqr": [
         0,
-        1
+        0
       ],
       "ccr": [
-        2,
+        0,
         2
       ],
       "hr": [
-        1,
-        1
+        0,
+        0
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -7503,8 +7531,10 @@
     "call": "call_1",
     "conversation_id": "SCN-GEN-0101__call_1",
     "hard_case": null,
-    "validator_pass": true,
-    "errors": [],
+    "validator_pass": false,
+    "errors": [
+      "customer_script_not_followed:0/2"
+    ],
     "metrics": {
       "tsr": true,
       "rqr": [
@@ -7526,7 +7556,7 @@
         "forbidden_pattern": 0
       }
     },
-    "needs_manual_review": false
+    "needs_manual_review": true
   },
   {
     "scenario_id": "SCN-GEN-0101",
@@ -7537,7 +7567,7 @@
     "errors": [
       "ccr_missing:order_id",
       "ccr_missing:owned_sku",
-      "customer_script_not_followed:0/3",
+      "customer_script_not_followed:0/2",
       "tsr:không có tool call order.update khớp args_match"
     ],
     "metrics": {
@@ -8813,21 +8843,25 @@
     "hard_case": null,
     "validator_pass": false,
     "errors": [
-      "customer_script_not_followed:0/3"
+      "ccr_missing:order_id",
+      "ccr_missing:owned_sku",
+      "customer_script_not_followed:0/3",
+      "tsr:không có tool call order.status khớp args_match",
+      "tsr:thiếu must_say_any: đang giao | đang vận chuyển | đã bàn giao"
     ],
     "metrics": {
-      "tsr": true,
+      "tsr": false,
       "rqr": [
         0,
-        2
+        0
       ],
       "ccr": [
-        2,
+        0,
         2
       ],
       "hr": [
         0,
-        3
+        0
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -9271,14 +9305,13 @@
     "errors": [
       "ccr_missing:order_id",
       "ccr_missing:owned_sku",
-      "customer_script_not_followed:1/5",
-      "unverified_spoken_price:2000000"
+      "customer_script_not_followed:0/4"
     ],
     "metrics": {
       "tsr": true,
       "rqr": [
         0,
-        4
+        0
       ],
       "ccr": [
         0,
@@ -9286,7 +9319,7 @@
       ],
       "hr": [
         0,
-        2
+        0
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -9304,27 +9337,23 @@
     "hard_case": null,
     "validator_pass": false,
     "errors": [
-      "ccr_missing:blocker",
       "ccr_missing:order_id",
       "ccr_missing:owned_sku",
-      "ccr_missing:price_quoted_vnd",
-      "ccr_missing:product_advised",
-      "ccr_missing:promo_code",
-      "customer_script_not_followed:0/4"
+      "ccr_missing:promo_code"
     ],
     "metrics": {
       "tsr": true,
       "rqr": [
         0,
-        0
+        3
       ],
       "ccr": [
-        0,
+        3,
         6
       ],
       "hr": [
         0,
-        0
+        3
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -9484,28 +9513,22 @@
     "hard_case": "teencode_da_kenh",
     "validator_pass": false,
     "errors": [
-      "ccr_missing:blocker",
-      "ccr_missing:order_id",
       "ccr_missing:owned_sku",
-      "ccr_missing:price_quoted_vnd",
-      "ccr_missing:product_advised",
-      "ccr_missing:promo_code",
-      "customer_script_not_followed:0/4",
-      "tsr:không có tool call order.create khớp args_match"
+      "ccr_missing:promo_code"
     ],
     "metrics": {
-      "tsr": false,
+      "tsr": true,
       "rqr": [
         0,
-        0
+        3
       ],
       "ccr": [
-        0,
+        4,
         6
       ],
       "hr": [
         0,
-        0
+        2
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -9525,14 +9548,14 @@
     "errors": [
       "ccr_missing:order_id",
       "ccr_missing:owned_sku",
-      "customer_script_not_followed:2/4",
+      "customer_script_not_followed:0/4",
       "unverified_spoken_price:5000000"
     ],
     "metrics": {
       "tsr": true,
       "rqr": [
         0,
-        2
+        0
       ],
       "ccr": [
         0,
@@ -9540,7 +9563,7 @@
       ],
       "hr": [
         0,
-        5
+        0
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -9556,16 +9579,25 @@
     "call": "call_2",
     "conversation_id": "SCN-GEN-0128__call_2",
     "hard_case": null,
-    "validator_pass": true,
-    "errors": [],
+    "validator_pass": false,
+    "errors": [
+      "ccr_missing:blocker",
+      "ccr_missing:order_id",
+      "ccr_missing:owned_sku",
+      "ccr_missing:price_quoted_vnd",
+      "ccr_missing:product_advised",
+      "ccr_missing:promo_code",
+      "customer_script_not_followed:0/3",
+      "tsr:không gọi handoff.transfer"
+    ],
     "metrics": {
-      "tsr": true,
+      "tsr": false,
       "rqr": [
         0,
-        1
+        0
       ],
       "ccr": [
-        6,
+        0,
         6
       ],
       "hr": [
@@ -9579,7 +9611,7 @@
         "forbidden_pattern": 0
       }
     },
-    "needs_manual_review": false
+    "needs_manual_review": true
   },
   {
     "scenario_id": "SCN-GEN-0129",
@@ -9588,23 +9620,21 @@
     "hard_case": "phien_ban_chinh_sach_cu",
     "validator_pass": false,
     "errors": [
-      "ccr_missing:order_id",
-      "ccr_missing:owned_sku",
-      "customer_script_not_followed:0/4"
+      "customer_script_not_followed:2/5"
     ],
     "metrics": {
       "tsr": true,
       "rqr": [
         0,
-        0
+        3
       ],
       "ccr": [
-        0,
+        2,
         2
       ],
       "hr": [
         0,
-        0
+        2
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -9622,28 +9652,26 @@
     "hard_case": "phien_ban_chinh_sach_cu",
     "validator_pass": false,
     "errors": [
-      "ccr_missing:blocker",
       "ccr_missing:order_id",
       "ccr_missing:owned_sku",
       "ccr_missing:price_quoted_vnd",
       "ccr_missing:product_advised",
-      "customer_script_not_followed:0/3",
-      "tsr:thiếu must_say_any: 7 ngày | bảy ngày",
+      "customer_script_not_followed:1/4",
       "unverified_spoken_price:30000"
     ],
     "metrics": {
-      "tsr": false,
+      "tsr": true,
       "rqr": [
         0,
-        0
+        3
       ],
       "ccr": [
-        0,
+        1,
         5
       ],
       "hr": [
         0,
-        0
+        2
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -9669,7 +9697,7 @@
       "tsr": true,
       "rqr": [
         0,
-        0
+        3
       ],
       "ccr": [
         0,
@@ -9677,7 +9705,7 @@
       ],
       "hr": [
         0,
-        0
+        2
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -9738,22 +9766,25 @@
     "errors": [
       "ccr_missing:competitor_price_vnd",
       "ccr_missing:objection",
+      "ccr_missing:order_id",
       "ccr_missing:owned_sku",
-      "ccr_missing:promo_code"
+      "ccr_missing:price_quoted_vnd",
+      "ccr_missing:promo_code",
+      "customer_script_not_followed:0/4"
     ],
     "metrics": {
       "tsr": true,
       "rqr": [
         0,
-        3
+        2
       ],
       "ccr": [
-        5,
+        3,
         9
       ],
       "hr": [
         0,
-        3
+        2
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -9840,24 +9871,21 @@
     "hard_case": null,
     "validator_pass": false,
     "errors": [
-      "ccr_missing:order_id",
-      "ccr_missing:owned_sku",
-      "customer_script_not_followed:0/3",
-      "tsr:không có tool call order.create khớp args_match"
+      "customer_script_not_followed:0/4"
     ],
     "metrics": {
-      "tsr": false,
+      "tsr": true,
       "rqr": [
         0,
-        0
+        3
       ],
       "ccr": [
-        0,
+        2,
         2
       ],
       "hr": [
         0,
-        0
+        2
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -9986,13 +10014,13 @@
     "errors": [
       "ccr_missing:order_id",
       "ccr_missing:owned_sku",
-      "customer_script_not_followed:0/5"
+      "customer_script_not_followed:0/4"
     ],
     "metrics": {
       "tsr": true,
       "rqr": [
         0,
-        4
+        0
       ],
       "ccr": [
         0,
@@ -10000,7 +10028,7 @@
       ],
       "hr": [
         0,
-        1
+        0
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -10025,7 +10053,7 @@
       "ccr_missing:product_advised",
       "ccr_missing:promo_code",
       "ccr_missing:room_area_m2",
-      "customer_script_not_followed:0/4",
+      "customer_script_not_followed:0/3",
       "tsr:không có tool call order.create khớp args_match"
     ],
     "metrics": {
@@ -10060,9 +10088,9 @@
     "errors": [
       "ccr_missing:order_id",
       "ccr_missing:owned_sku",
-      "customer_script_not_followed:0/2",
+      "customer_script_not_followed:0/3",
       "tsr:không có tool call order.status khớp args_match",
-      "tsr:thiếu must_say_any: đã giao | giao thành công"
+      "tsr:thiếu must_say_any: đang xử lý | đang chuẩn bị"
     ],
     "metrics": {
       "tsr": false,
@@ -10096,7 +10124,7 @@
     "errors": [
       "ccr_missing:order_id",
       "ccr_missing:owned_sku",
-      "customer_script_not_followed:0/2",
+      "customer_script_not_followed:0/3",
       "tsr:không có tool call order.update khớp args_match"
     ],
     "metrics": {
@@ -10169,9 +10197,8 @@
       "ccr_missing:owned_sku",
       "ccr_missing:price_quoted_vnd",
       "ccr_missing:product_advised",
-      "customer_script_not_followed:0/4",
-      "tsr:không có tool call order.create khớp args_match",
-      "unverified_spoken_price:7000000"
+      "customer_script_not_followed:0/3",
+      "tsr:không có tool call order.create khớp args_match"
     ],
     "metrics": {
       "tsr": false,
@@ -10205,28 +10232,26 @@
     "errors": [
       "ccr_missing:blocker",
       "ccr_missing:delivery_area",
-      "ccr_missing:order_id",
       "ccr_missing:owned_sku",
       "ccr_missing:payment",
       "ccr_missing:price_quoted_vnd",
       "ccr_missing:product_advised",
-      "customer_script_not_followed:0/3",
-      "tsr:không có tool call order.status khớp args_match",
+      "customer_script_not_followed:0/2",
       "tsr:thiếu must_say_any: đã tạo | đang xử lý | đang chuẩn bị"
     ],
     "metrics": {
       "tsr": false,
       "rqr": [
         0,
-        0
+        1
       ],
       "ccr": [
-        0,
+        1,
         7
       ],
       "hr": [
         0,
-        0
+        5
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,
@@ -10315,7 +10340,7 @@
     "errors": [
       "ccr_missing:order_id",
       "ccr_missing:owned_sku",
-      "customer_script_not_followed:0/3",
+      "customer_script_not_followed:0/4",
       "tsr:không có tool call schedule.callback khớp args_match",
       "tsr:thiếu must_say_any: 27/10 | thứ Ba | Thứ Ba",
       "unverified_spoken_price:5000000"
@@ -10354,23 +10379,26 @@
       "ccr_missing:decision_maker",
       "ccr_missing:order_id",
       "ccr_missing:owned_sku",
+      "ccr_missing:price_quoted_vnd",
+      "ccr_missing:product_advised",
       "ccr_missing:promo_code",
       "ccr_missing:room_area_m2",
-      "customer_script_not_followed:1/3"
+      "customer_script_not_followed:0/4",
+      "tsr:không có tool call order.create khớp args_match"
     ],
     "metrics": {
-      "tsr": true,
+      "tsr": false,
       "rqr": [
         0,
-        1
+        0
       ],
       "ccr": [
-        2,
+        0,
         8
       ],
       "hr": [
         0,
-        2
+        0
       ],
       "guardrails": {
         "pii_in_memory_or_text": 0,

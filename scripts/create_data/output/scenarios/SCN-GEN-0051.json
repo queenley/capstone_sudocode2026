@@ -5,16 +5,16 @@
   "customer_id": "SYN-C003",
   "customer_phone": "0998000003",
   "customer_name": "Lê Văn C",
-  "honorific": "Mr.",
+  "honorific": "anh",
   "region": "nam",
-  "category": "unknown",
+  "category": "me-be",
   "difficulty": "normal",
   "tags": [
     "address_change",
-    "customer_inquiry",
     "hotline",
     "order",
     "order_status",
+    "shipping",
     "variant:chuan"
   ],
   "metric_focus": [
@@ -33,52 +33,52 @@
           "source": "crm_session",
           "customer_id": "SYN-C003",
           "session_id": "SYN-003-S1",
-          "date": "2026-09-01",
+          "date": "2026-05-07",
           "channel": "hotline",
-          "summary": "Tìm hiểu về đồ dùng cho trẻ em",
-          "outcome": "successful",
+          "summary": "Mua Xe đẩy gấp gọn Joie Pact giá 3.490.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_session",
           "customer_id": "SYN-C003",
           "session_id": "SYN-003-S2",
-          "date": "2026-09-02",
+          "date": "2026-10-03",
           "channel": "zalo_oa",
-          "summary": "Yêu cầu hỗ trợ đơn hàng",
-          "outcome": "successful",
+          "summary": "Đặt Xe đẩy 2 chiều Combi Sugocal giá 6.790.000đ, đơn OD900302 đang giao.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C003",
-          "order_id": "O005",
-          "date": "2026-07-22",
-          "sku": "MAB001",
-          "status": "shipping",
+          "order_id": "OD900301",
+          "date": "2026-05-07",
+          "sku": "SKU-MB-STR1",
+          "status": "delivered",
           "stale": false,
           "facts": {
-            "order_id": "O005"
+            "owned_sku": "SKU-MB-STR1"
           }
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C003",
-          "order_id": "O006",
-          "date": "2026-09-05",
-          "sku": "MAB002",
-          "status": "delivered",
+          "order_id": "OD900302",
+          "date": "2026-10-03",
+          "sku": "SKU-MB-STR2",
+          "status": "shipping",
           "stale": false,
           "facts": {
-            "owned_sku": "MAB002"
+            "order_id": "OD900302"
           }
         }
       ],
-      "customer_goal": "Hỏi tình trạng đơn hàng đã đặt",
+      "customer_goal": "Hỏi tình trạng đơn hàng đang giao.",
       "customer_turns": [
-        "Alo, cho tôi hỏi tình trạng đơn hàng của tôi hiện giờ như thế nào?",
-        "Mã đơn hàng của tôi là MAB002, đơn này đã được giao chưa?",
-        "Tôi muốn xác nhận là đơn hàng đã được giao chưa?"
+        "Alo, anh muốn hỏi về tình trạng đơn hàng của mình.",
+        "Đơn hàng xe đẩy Combi Sugocal anh đặt hôm 3 tháng 10 giờ ra sao?",
+        "Anh đã nhận được thông báo gì chưa?"
       ],
       "expected_outcome": "cap_nhat_don",
       "must_carry_over": [
@@ -90,8 +90,9 @@
         "owned_sku"
       ],
       "ground_truth_facts": {
-        "order_id": "O006",
-        "order_status": "delivered",
+        "order_id": "OD900302",
+        "order_status": "shipping",
+        "tracking": "VN0032TRK",
         "call_date": "2026-10-17"
       },
       "expected_call_brief": {
@@ -100,20 +101,20 @@
         "is_returning": true,
         "n_previous_sessions": 2,
         "last_session": {
-          "date": "2026-09-02",
+          "date": "2026-10-03",
           "channel": "zalo_oa",
-          "outcome": "successful",
-          "summary": "Yêu cầu hỗ trợ đơn hàng"
+          "outcome": "chot_don",
+          "summary": "Đặt Xe đẩy 2 chiều Combi Sugocal giá 6.790.000đ, đơn OD900302 đang giao."
         },
         "products_advised": [
-          "MAB002"
+          "SKU-MB-STR1"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Lê Văn C, em gọi lại về MAB002 Mr. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào anh Lê Văn C, em gọi lại về SKU-MB-STR1 anh đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-10-17T08:00:00",
@@ -122,11 +123,12 @@
       "success_if": {
         "tool_called": "order.status",
         "args_match": {
-          "order_id": "O006"
+          "order_id": "OD900302"
         },
         "must_say_any": [
-          "đã giao",
-          "giao thành công"
+          "đang giao",
+          "đang vận chuyển",
+          "đã bàn giao"
         ]
       }
     },
@@ -135,11 +137,11 @@
       "call_date": "2026-10-19",
       "days_later": 2,
       "input_mode": "text",
-      "customer_goal": "Đổi địa chỉ giao hàng cho đơn hàng",
+      "customer_goal": "Thay đổi địa chỉ giao hàng cho đơn hàng.",
       "customer_turns": [
-        "Chào bạn, tôi muốn đổi địa chỉ giao hàng cho đơn hàng của mình.",
-        "Địa chỉ mới là Thủ Đức, TP.HCM, bạn có thể cập nhật cho tôi không?",
-        "Tôi cần đảm bảo rằng đơn hàng của mình sẽ được giao đến địa chỉ này. Cảm ơn!"
+        "Alo, anh muốn đổi địa chỉ giao hàng cho đơn hàng xe đẩy.",
+        "Địa chỉ mới là Thủ Đức, TP.HCM.",
+        "Anh cần điều chỉnh ngay vì đơn hàng đang giao mà."
       ],
       "facts_established": {
         "delivery_area": "Thủ Đức, TP.HCM"
@@ -154,8 +156,9 @@
         "owned_sku"
       ],
       "ground_truth_facts": {
-        "order_id": "O006",
-        "order_status": "delivered",
+        "order_id": "OD900302",
+        "order_status": "shipping",
+        "tracking": "VN0032TRK",
         "call_date": "2026-10-19"
       },
       "memory_expectation": {
@@ -172,14 +175,14 @@
           "outcome": "cap_nhat_don"
         },
         "products_advised": [
-          "MAB002"
+          "SKU-MB-STR1"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Lê Văn C, em gọi lại về MAB002 Mr. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào anh Lê Văn C, em gọi lại về SKU-MB-STR1 anh đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-10-19T08:00:00",
@@ -188,7 +191,7 @@
       "success_if": {
         "tool_called": "order.update",
         "args_match": {
-          "order_id": "O006",
+          "order_id": "OD900302",
           "action": "update_address"
         }
       }

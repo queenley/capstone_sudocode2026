@@ -7,22 +7,21 @@
   "channel": "hotline",
   "date": "2026-11-16",
   "region": "trung",
-  "category": "unknown",
+  "category": "thoi-trang/giay",
   "persona": "khach_co_don_chua_co_lich_su",
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào Mr. Trần Văn H, em gọi lại về đơn hàng của anh hôm trước. Anh đã đặt hàng với mã đơn O015, và em thấy anh muốn thay đổi địa chỉ giao hàng sang Hải Châu, Đà Nẵng phải không ạ?",
+      "text": "Dạ, em chào anh Trần Văn H, em gọi lại về đơn hàng của anh. Anh có mã đơn là OD900802, phải không ạ?",
       "questions": [
         {
           "slot": "order_id",
           "type": "confirm",
-          "text": "Anh đã đặt hàng với mã đơn O015, và em thấy anh muốn thay đổi địa chỉ giao hàng sang Hải Châu, Đà Nẵng phải không ạ?"
+          "text": "Anh có mã đơn là OD900802, phải không ạ?"
         }
       ],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
       "claims": [],
       "tool_calls": [],
@@ -34,44 +33,43 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, cảm ơn anh đã xác nhận. Em sẽ cập nhật địa chỉ giao hàng cho đơn hàng O015 của anh đến Hải Châu, Đà Nẵng ngay nhé. Xin anh vui lòng cho em chút thời gian ạ.",
+      "text": "Cảm ơn anh đã xác nhận. Anh muốn đổi địa chỉ giao hàng cho đơn giày sneaker Urban Classic sang Hải Châu, Đà Nẵng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Anh muốn đổi địa chỉ giao hàng cho đơn giày sneaker Urban Classic sang Hải Châu, Đà Nẵng đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ giữ lại địa chỉ cũ cho đơn hàng của anh. Em sẽ cập nhật địa chỉ giao hàng sang Hải Châu, Đà Nẵng ngay bây giờ ạ. Một chút thời gian nhé!",
       "questions": [],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "delivery_area"
       ],
       "claims": [],
       "tool_calls": [
         {
           "name": "order.update",
           "args": {
-            "order_id": "O016",
+            "order_id": "OD900802",
             "action": "update_address",
             "on": "2026-11-16"
           }
         }
       ],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em đã cập nhật thành công địa chỉ giao hàng cho đơn hàng O016 của anh đến Hải Châu, Đà Nẵng. Cảm ơn anh đã gọi điện và nếu có thêm thắc mắc gì, anh cứ liên hệ với em nhé!",
-      "questions": [],
-      "facts_used": [
-        "order_id",
-        "owned_sku"
-      ],
-      "claims": [
-        {
-          "field": "order_id",
-          "value": "O016"
-        }
-      ],
-      "tool_calls": [],
       "memory_writes": [
         {
           "key": "delivery_area",
@@ -82,14 +80,32 @@
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã cập nhật địa chỉ giao hàng thành công cho đơn hàng OD900802. Địa chỉ mới sẽ là Hải Châu, Đà Nẵng. Anh có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900802"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
     }
   ],
   "gold": {
-    "intent": "cap_nhat_don",
+    "intent": "Đổi địa chỉ giao hàng",
     "outcome": "cap_nhat_don",
     "objection_type": null,
     "objection_handling": null,
-    "sentiment": "positive",
+    "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],
     "supersedes": [],

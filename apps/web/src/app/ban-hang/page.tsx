@@ -8,6 +8,8 @@
 // admins everything.
 import Link from "next/link";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { LogoMark } from "@/components/brand/Logo";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 import CallConsole from "@/features/call-console";
 import { api, AgentCall } from "@/services/api";
 import { colorName, money } from "@/lib/catalog";
@@ -34,11 +36,26 @@ type Callback = {
 };
 type Tab = "overview" | "conversations" | "orders" | "callbacks";
 
-const TABS: { id: Tab; label: string; needs: "calls" | "orders" | null }[] = [
-  { id: "overview", label: "Tổng quan", needs: null },
-  { id: "conversations", label: "Hội thoại & chuyển máy", needs: "calls" },
-  { id: "orders", label: "Đơn hàng", needs: "orders" },
-  { id: "callbacks", label: "Hẹn gọi lại", needs: "calls" },
+const svg = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true };
+const ICONS = {
+  overview: <path d="M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z" />,
+  conversations: <path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12zM8 11h.01M12 11h.01M16 11h.01" />,
+  orders: <path d="M6 2h12l2 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6zM4 6h16M9 11h6M9 15h4" />,
+  callbacks: <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z" />,
+  console: <path d="M4 17l6-6-6-6M12 19h8" />,
+  admin: <path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6zM9 12l2 2 4-4" />,
+  logout: <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />,
+  money: <path d="M2 7h20v10H2zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 12h.01M18 12h.01" />,
+  clock: <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2" />,
+  alert: <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01" />,
+};
+const Icon = ({ name }: { name: keyof typeof ICONS }) => <svg {...svg}>{ICONS[name]}</svg>;
+
+const TABS: { id: Tab; label: string; hint: string; needs: "calls" | "orders" | null }[] = [
+  { id: "overview", label: "Tổng quan", hint: "Số liệu hôm nay của cả cửa hàng", needs: null },
+  { id: "conversations", label: "Hội thoại & chuyển máy", hint: "Web, Zalo, hotline: nhận cuộc AI chuyển cho nhân viên", needs: "calls" },
+  { id: "orders", label: "Đơn hàng", hint: "Xác nhận, đối soát thanh toán, hủy đơn", needs: "orders" },
+  { id: "callbacks", label: "Hẹn gọi lại", hint: "Lịch do trợ lý AI đặt với khách", needs: "calls" },
 ];
 const STATUS: Record<string, string> = { confirmed: "Chờ xử lý", cancelled: "Đã hủy", shipping: "Đang giao", delivered: "Đã giao" };
 const CHANNEL: Record<string, string> = { web: "Web", zalo: "Zalo", hotline: "Hotline", facebook: "Facebook" };
@@ -97,47 +114,82 @@ export default function SalesPage() {
   if (!token)
     return (
       <div className="sl-gate">
-        <h1>Trang bán hàng</h1>
-        <p>Đăng nhập bằng tài khoản nhân viên để xem hội thoại, đơn hàng và lịch gọi lại.</p>
-        <Link className="sl-btn" href="/login?next=/ban-hang">
-          Đăng nhập
-        </Link>
+        <div className="sl-gate-card">
+          <LogoMark />
+          <h1>Trang bán hàng</h1>
+          <p>Đăng nhập bằng tài khoản nhân viên để xem hội thoại, đơn hàng và lịch gọi lại.</p>
+          <Link className="sl-btn" href="/login?next=/ban-hang">
+            Đăng nhập
+          </Link>
+        </div>
       </div>
     );
 
   const visible = TABS.filter((t) => !t.needs || access[t.needs]);
+  const current = TABS.find((t) => t.id === tab) || TABS[0];
   const waiting = (calls || []).filter((c) => c.handoff_status === "pending" && !c.ended_at);
 
   return (
     <div className="sl-app">
       <aside className="sl-side">
         <Link href="/" className="sl-logo">
-          <span>t</span> tiếp<b>nối</b>
+          <LogoMark />
+          <span>
+            <strong>Tiếp Nối</strong>
+            <small>Bán hàng & chăm sóc khách</small>
+          </span>
         </Link>
         <span className="sl-side-label">Bán hàng</span>
         <nav>
           {visible.map((t) => (
-            <button key={t.id} className={tab === t.id ? "active" : ""} onClick={() => go(t.id)}>
-              {t.label}
+            <button
+              key={t.id}
+              className={tab === t.id ? "active" : ""}
+              onClick={() => go(t.id)}
+              aria-current={tab === t.id ? "page" : undefined}
+            >
+              <Icon name={t.id} />
+              <span>{t.label}</span>
               {t.id === "conversations" && waiting.length > 0 && <span className="sl-dot">{waiting.length}</span>}
               {t.id === "callbacks" && (callbacks?.length || 0) > 0 && <span className="sl-count">{callbacks!.length}</span>}
             </button>
           ))}
         </nav>
+        <span className="sl-side-label">Hệ thống</span>
         <div className="sl-side-foot">
-          <Link href="/developer">Agent Console</Link>
-          <Link href="/admin">Quản trị</Link>
+          <Link href="/developer">
+            <Icon name="console" /> Agent Console
+          </Link>
+          <Link href="/admin">
+            <Icon name="admin" /> Quản trị
+          </Link>
           <button
             onClick={() => {
               sessionStorage.removeItem("staff-token");
               setToken("");
             }}
           >
-            Đăng xuất
+            <Icon name="logout" /> Đăng xuất
           </button>
+          <div className="sl-side-status">
+            <b>Đang trực</b>
+            <span>{waiting.length ? waiting.length + " khách chờ" : "Không ai chờ"}</span>
+          </div>
         </div>
       </aside>
       <main className="sl-main">
+        <div className="sl-topbar">
+          <div className="sl-topbar-title">
+            <h1>{current.label}</h1>
+            <small>{current.hint}</small>
+          </div>
+          <div className="sl-topbar-actions">
+            <span className="sl-live" title="Trang tự tải lại dữ liệu mỗi 10 giây">
+              Cập nhật mỗi 10 giây
+            </span>
+            <ThemeToggle />
+          </div>
+        </div>
         {error && <div className="sl-alert">{error}</div>}
         {!checked ? (
           <p className="sl-muted">Đang tải…</p>
@@ -182,10 +234,12 @@ function Overview({
 
   return (
     <>
-      <h1>Tổng quan hôm nay</h1>
       <div className="sl-kpis">
         {calls && (
           <button className="sl-kpi" onClick={() => go("conversations")}>
+            <i>
+              <Icon name="conversations" />
+            </i>
             <span>Đang trò chuyện</span>
             <b>{open.length}</b>
             <small>{Object.entries(byChannel).map(([ch, n]) => `${CHANNEL[ch] || ch} ${n}`).join(" · ") || "—"}</small>
@@ -193,6 +247,9 @@ function Overview({
         )}
         {calls && (
           <button className={`sl-kpi ${waiting.length ? "sl-kpi-hot" : ""}`} onClick={() => go("conversations")}>
+            <i>
+              <Icon name="alert" />
+            </i>
             <span>Chờ nhân viên</span>
             <b>{waiting.length}</b>
             <small>Khách AI đã chuyển máy</small>
@@ -200,13 +257,19 @@ function Overview({
         )}
         {orders && (
           <button className="sl-kpi" onClick={() => go("orders")}>
+            <i>
+              <Icon name="money" />
+            </i>
             <span>Đơn hôm nay</span>
             <b>{todayOrders.length}</b>
             <small>Doanh thu {money(revenue)}</small>
           </button>
         )}
         {orders && (
-          <button className="sl-kpi" onClick={() => go("orders")}>
+          <button className="sl-kpi sl-kpi-warn" onClick={() => go("orders")}>
+            <i>
+              <Icon name="orders" />
+            </i>
             <span>Đơn chờ xử lý</span>
             <b>{pending.length}</b>
             <small>Cần gọi xác nhận đơn trên 2 triệu</small>
@@ -214,6 +277,9 @@ function Overview({
         )}
         {callbacks && (
           <button className="sl-kpi" onClick={() => go("callbacks")}>
+            <i>
+              <Icon name="clock" />
+            </i>
             <span>Hẹn gọi lại</span>
             <b>{callbacks.length}</b>
             <small>Do trợ lý AI đặt lịch</small>
@@ -261,7 +327,7 @@ function Overview({
               orders.slice(0, 6).map((o) => (
                 <div key={o.id} className="sl-row">
                   <div>
-                    <b>#{o.id.slice(0, 8).toUpperCase()}</b>
+                    <b className="sl-code">#{o.id.slice(0, 8).toUpperCase()}</b>
                     <small>{o.items.map((i) => `${i.name} × ${i.quantity}`).join(", ")}</small>
                   </div>
                   <div className="sl-right">
@@ -323,7 +389,6 @@ function Orders({ orders, token, onChange }: { orders: Order[]; token: string; o
 
   return (
     <>
-      <h1>Đơn hàng</h1>
       <div className="sl-toolbar">
         <input placeholder="Tìm mã đơn, sản phẩm, SKU…" value={query} onChange={(e) => setQuery(e.target.value)} />
         <select value={status} onChange={(e) => setStatus(e.target.value)}>
@@ -354,7 +419,7 @@ function Orders({ orders, token, onChange }: { orders: Order[]; token: string; o
             <Fragment key={o.id}>
               <tr className={open === o.id ? "open" : ""} onClick={() => setOpen(open === o.id ? null : o.id)}>
                 <td>
-                  <b>#{o.id.slice(0, 8).toUpperCase()}</b>
+                  <b className="sl-code">#{o.id.slice(0, 8).toUpperCase()}</b>
                 </td>
                 <td>{o.created_at ? new Date(o.created_at).toLocaleString("vi-VN") : "—"}</td>
                 <td>{o.items.map((i) => `${i.name} × ${i.quantity}`).join(", ")}</td>
@@ -444,7 +509,6 @@ function Orders({ orders, token, onChange }: { orders: Order[]; token: string; o
 function Callbacks({ callbacks }: { callbacks: Callback[] }) {
   return (
     <>
-      <h1>Hẹn gọi lại</h1>
       <p className="sl-muted">
         Lịch do trợ lý AI đặt khi khách hẹn gọi lại (giờ đã được dời khỏi ngày nghỉ và ngoài giờ làm việc). Số điện thoại
         đầy đủ xem trong hồ sơ cuộc gọi.

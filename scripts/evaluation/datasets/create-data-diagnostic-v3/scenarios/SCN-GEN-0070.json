@@ -1,0 +1,341 @@
+{
+  "scenario_id": "SCN-GEN-0070",
+  "level": "M2",
+  "persona": "khach_cap_nhat_thong_tin",
+  "hard_case": "ba_phien_doi_thong_tin",
+  "customer_id": "SYN-C010",
+  "customer_phone": "0998000010",
+  "customer_name": "Đinh Văn J",
+  "honorific": "anh",
+  "region": "bac",
+  "category": "me-be",
+  "difficulty": "hard",
+  "tags": [
+    "cập_nhật_thông_tin",
+    "hard_case",
+    "máy_hút_sữa",
+    "order_status",
+    "supersede",
+    "tình_trạng_đơn_hàng",
+    "variant:ba_phien_doi_thong_tin",
+    "đặt_hàng"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=ba_phien_doi_thong_tin; session_index=1",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-15",
+      "input_mode": "text",
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C010",
+          "session_id": "SYN-010-S1",
+          "date": "2026-07-01",
+          "channel": "hotline",
+          "summary": "Mua Máy lọc nước UF Sunhouse giá 3.290.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C010",
+          "session_id": "SYN-010-S2",
+          "date": "2026-10-10",
+          "channel": "zalo_oa",
+          "summary": "Đặt Quạt đứng DC inverter Panasonic F-409 giá 2.450.000đ, đơn OD901002 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C010",
+          "order_id": "OD901001",
+          "date": "2026-07-01",
+          "sku": "SKU-WF-UF",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-WF-UF"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C010",
+          "order_id": "OD901002",
+          "date": "2026-10-10",
+          "sku": "SKU-FAN-DC1",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901002"
+          }
+        }
+      ],
+      "customer_goal": "Hỏi về máy hút sữa điện đôi Spectra S1.",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về máy hút sữa điện đôi Spectra S1.",
+        "Giá của máy này là bao nhiêu em?",
+        "Có khuyến mãi gì không?",
+        "Anh đang chờ cuối tháng nhận lương mới quyết định được."
+      ],
+      "facts_established": {
+        "child_age_months": 6,
+        "budget_vnd": 4500000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 4290000,
+        "list_price_vnd": 4290000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "promo_PUMP-GIFT_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-15"
+      },
+      "memory_expectation": {
+        "child_age_months": 6,
+        "budget_vnd": 4500000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000010",
+        "customer_id": "SYN-C010",
+        "is_returning": true,
+        "n_previous_sessions": 2,
+        "last_session": {
+          "date": "2026-10-10",
+          "channel": "zalo_oa",
+          "outcome": "chot_don",
+          "summary": "Đặt Quạt đứng DC inverter Panasonic F-409 giá 2.450.000đ, đơn OD901002 đang xử lý."
+        },
+        "products_advised": [
+          "SKU-WF-UF"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào anh Đinh Văn J, em gọi lại về SKU-WF-UF anh đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-15T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-10-17",
+      "days_later": 2,
+      "input_mode": "text",
+      "customer_goal": "Xác nhận mua máy hút sữa.",
+      "customer_turns": [
+        "Alo, anh gọi lại để xác nhận mua máy hút sữa điện đôi Spectra S1.",
+        "Anh sẽ thanh toán bằng hình thức chuyển khoản.",
+        "Khu vực giao hàng là Cầu Giấy, Hà Nội."
+      ],
+      "facts_established": {
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "budget_vnd": 5100000,
+        "payment": "chuyen_khoan",
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29",
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 4290000,
+        "list_price_vnd": 4290000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "promo_PUMP-GIFT_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "estimated_delivery": "2026-10-20",
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "budget_vnd": 5100000,
+        "payment": "chuyen_khoan",
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000,
+        "promo_code": "MOM-FREESHIP",
+        "order_id": "OD600001",
+        "superseded": {
+          "budget_vnd": 4500000,
+          "order_id": "OD901002"
+        }
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000010",
+        "customer_id": "SYN-C010",
+        "is_returning": true,
+        "n_previous_sessions": 3,
+        "last_session": {
+          "date": "2026-10-15",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-MB-PUMP1",
+          "SKU-WF-UF"
+        ],
+        "open_blockers": [
+          "chờ cuối tháng nhận lương"
+        ],
+        "must_not_ask": [
+          "child_age_months",
+          "budget_vnd",
+          "product_advised",
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào anh Đinh Văn J, em gọi lại về SKU-MB-PUMP1 anh đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+        "freshness_checks": {
+          "price_changed": false,
+          "promos_no_longer_active": [],
+          "in_stock": true
+        },
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-17T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-MB-PUMP1",
+          "price_vnd": 4290000,
+          "payment": "chuyen_khoan"
+        }
+      }
+    },
+    "call_3": {
+      "channel": "hotline",
+      "call_date": "2026-10-19",
+      "days_later": 2,
+      "input_mode": "text",
+      "customer_goal": "Hỏi tình trạng đơn hàng của máy hút sữa.",
+      "customer_turns": [
+        "Alo, anh muốn hỏi tình trạng đơn hàng máy hút sữa điện đôi Spectra S1.",
+        "Đơn hàng của anh đã được xử lý chưa?"
+      ],
+      "expected_outcome": "khac",
+      "must_carry_over": [
+        "payment",
+        "delivery_area",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "order_id": "OD600001",
+        "order_status": "created",
+        "call_date": "2026-10-19"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000010",
+        "customer_id": "SYN-C010",
+        "is_returning": true,
+        "n_previous_sessions": 4,
+        "last_session": {
+          "date": "2026-10-17",
+          "channel": "hotline",
+          "outcome": "chot_don"
+        },
+        "products_advised": [
+          "SKU-MB-PUMP1",
+          "SKU-WF-UF"
+        ],
+        "open_blockers": [
+          "chờ cuối tháng nhận lương"
+        ],
+        "must_not_ask": [
+          "child_age_months",
+          "budget_vnd",
+          "payment",
+          "delivery_area",
+          "product_advised",
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào anh Đinh Văn J, em gọi lại về SKU-MB-PUMP1 anh đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-19T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD600001"
+        },
+        "must_say_any": [
+          "đã tạo",
+          "đang xử lý",
+          "đang chuẩn bị",
+          "đã ghi nhận"
+        ]
+      }
+    }
+  }
+}

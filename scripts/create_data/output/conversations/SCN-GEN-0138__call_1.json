@@ -12,67 +12,48 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Ms. Nguyễn Thị I. Em thấy chị đã quan tâm đến máy lọc không khí cho phòng khoảng 30 mét vuông và có sản phẩm MAB005 ở đơn hàng trước. Chị có trẻ nhỏ, ngân sách tầm 5 triệu rưỡi, đúng không ạ?",
+      "text": "Dạ em chào chị Nguyễn Thị I, em gọi lại về máy lọc không khí AirPure Y mà chị đang quan tâm ạ. Chị có phòng khoảng 30 mét vuông và có trẻ nhỏ, đúng không ạ?",
       "questions": [
         {
           "slot": "room_area_m2",
           "type": "confirm",
-          "text": "Chị có cần máy cho phòng 30 mét vuông không?"
-        },
-        {
-          "slot": "budget_vnd",
-          "type": "confirm",
-          "text": "Ngân sách của chị là khoảng 5 triệu rưỡi đúng không?"
+          "text": "Chị có phòng khoảng 30 mét vuông và có trẻ nhỏ, đúng không ạ?"
         }
       ],
       "facts_used": [
         "room_area_m2",
-        "has_children",
+        "has_children"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Máy lọc không khí AirPure Y rất phù hợp với diện tích phòng của chị, nó có giá 5.200.000đ và đang có chương trình khuyến mãi, chị có thể sử dụng mã GIFT-FILTER để được ưu đãi ạ. Chị có ngân sách khoảng 5 triệu rưỡi, như vậy vẫn nằm trong khả năng của mình đúng không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Chị có ngân sách khoảng 5 triệu rưỡi, như vậy vẫn nằm trong khả năng của mình đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "price_quoted_vnd",
         "budget_vnd"
       ],
       "claims": [
         {
-          "field": "room_area_m2",
-          "value": 30
-        },
-        {
-          "field": "has_children",
-          "value": true
-        },
-        {
-          "field": "budget_vnd",
-          "value": 5500000
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, hiện em có sản phẩm máy lọc không khí AirPure Y phù hợp với diện tích phòng của chị. Giá của sản phẩm là 5.200.000đ, và có chương trình khuyến mãi đang áp dụng cho chị. Chị có muốn em ghi nhận lại để gọi lại thông tin chi tiết không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Em muốn xác nhận rằng sản phẩm chị quan tâm là AirPure Y đúng không?"
-        }
-      ],
-      "facts_used": [
-        "product_advised",
-        "price_quoted_vnd"
-      ],
-      "claims": [
-        {
-          "field": "product_advised",
-          "value": "SKU-AP-Y"
-        },
-        {
           "field": "price_vnd",
           "value": 5200000
+        },
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
         }
       ],
       "tool_calls": [],
@@ -84,14 +65,27 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em hiểu là chị chưa quyết định ngay bây giờ. Em sẽ ghi nhận lịch hẹn gọi lại vào thứ Hai tuần sau, tức là ngày 26 tháng 10, vào lúc 9 giờ sáng ạ. Chị có muốn em gọi lại vào ngày nào khác không ạ?",
+      "text": "Chị cần tham khảo ý kiến chồng, không vấn đề gì ạ. Em sẽ ghi lại lịch hẹn gọi lại vào thứ Hai tuần sau lúc 9 giờ sáng để hỗ trợ chị thêm ạ. Chị có thể cho em số điện thoại của mình không ạ?",
       "questions": [
         {
-          "slot": "callback_at",
+          "slot": "customer_phone",
           "type": "open",
-          "text": "Chị có muốn em thay đổi lịch hẹn gọi lại không?"
+          "text": "Chị có thể cho em số điện thoại của mình không ạ?"
         }
       ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận hẹn gọi lại vào thứ Hai tuần sau lúc 9 giờ sáng. Cảm ơn chị đã cho em biết, em sẽ gọi lại để hỗ trợ chị. Em chúc chị một ngày vui vẻ ạ!",
+      "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [
@@ -104,33 +98,12 @@
           }
         }
       ],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em đã ghi nhận lịch hẹn gọi lại vào 9 giờ sáng ngày 26 tháng 10 rồi ạ. Nếu chị cần thêm thông tin gì, xin vui lòng cho em biết. Em cảm ơn chị đã liên hệ với cửa hàng. Chúc chị một ngày vui vẻ ạ!",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em sẽ gọi lại vào thứ Hai tuần sau nhé. Em chưa có thông tin gì thêm để cung cấp cho chị lúc này. Chúc chị một ngày tốt lành ạ!",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần hỏi chồng"
+        }
+      ],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,

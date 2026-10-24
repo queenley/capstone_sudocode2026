@@ -12,18 +12,18 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Ms. Phạm Thị D, em gọi lại về giày chạy bộ size 42 màu đen mà chị đã hỏi hôm trước ạ. Chị có biết giá hôm nay là 1.521.000đ không ạ?",
+      "text": "Dạ em chào chị Phạm Thị D, em gọi lại về giày chạy bộ RunLite 2 Pro mà chị đã hỏi hôm trước ạ. Hiện tại giày này còn hàng và giá là 1.521.000đ ạ.",
       "questions": [
         {
           "slot": "price_quoted_vnd",
           "type": "confirm",
-          "text": "Giá hôm nay là 1.521.000đ đúng không ạ?"
+          "text": "Chị xác nhận giá giày chạy bộ RunLite 2 Pro là 1.521.000đ đúng không?"
         }
       ],
       "facts_used": [
         "product_advised",
-        "variant_sku",
-        "price_quoted_vnd"
+        "price_quoted_vnd",
+        "variant_sku"
       ],
       "claims": [
         {
@@ -48,9 +48,18 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Ngoài ra, chị có biết là hiện tại em có khuyến mãi giảm 10% với mã RUN-10 áp dụng cho sản phẩm này không ạ? Khuyến mãi này còn hiệu lực đến ngày 25/10 nha chị.",
-      "questions": [],
-      "facts_used": [],
+      "text": "Dạ, chị cũng muốn biết về chương trình khuyến mãi hiện tại đúng không ạ? Hiện tại có mã khuyến mãi RUN-10, giúp chị tiết kiệm 10% cho đơn hàng này. Mã này có hiệu lực đến 25/10/2026 ạ.",
+      "questions": [
+        {
+          "slot": "promo_code",
+          "type": "confirm",
+          "text": "Chị có muốn sử dụng mã khuyến mãi RUN-10 không?"
+        }
+      ],
+      "facts_used": [
+        "promo_code",
+        "promo_expiry"
+      ],
       "claims": [
         {
           "field": "promo_code",
@@ -59,14 +68,6 @@
         {
           "field": "promo_active",
           "value": true
-        },
-        {
-          "field": "promo_RUN-10_active",
-          "value": true
-        },
-        {
-          "field": "promo_expiry",
-          "value": "2026-10-25"
         }
       ],
       "tool_calls": [],
@@ -78,42 +79,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Em thấy chị có hỏi về khuyến mãi, nhưng khuyến mãi RUN2-SALE đã hết hiệu lực từ ngày 07/10 rồi ạ. Chị có cần thêm thông tin gì không ạ?",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "promo_RUN2-SALE_active",
-          "value": false
-        },
-        {
-          "field": "promo_expiry",
-          "value": "2026-10-07"
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em cảm ơn chị đã gọi lại và nếu chị cần thêm thông tin hay có câu hỏi nào khác, chị cứ gọi cho em nhé. Em chúc chị một ngày tốt lành ạ!",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em chào chị một lần nữa và hy vọng sẽ gặp lại chị sớm ạ!",
+      "text": "Dạ, rất vui vì chị quan tâm. Nếu chị quyết định đặt hàng, em sẽ ghi nhận lại thông tin và chờ chị gọi lại sau khi xem xét nhé. Chị có cần em ghi chú gì không ạ?",
       "questions": [],
       "facts_used": [],
       "claims": [],

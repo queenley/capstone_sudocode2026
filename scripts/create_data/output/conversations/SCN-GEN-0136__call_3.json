@@ -12,12 +12,12 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Đinh Văn J, em gọi lại về đơn hàng của Mr. hôm trước ạ, không biết Mr. có nhớ mã đơn hàng không ạ?",
+      "text": "Dạ, em chào anh Đinh Văn J, em gọi lại về đơn hàng của anh. Anh đã đặt hàng với mã đơn là OD600001 và hiện tại đơn hàng đã được **tạo**. Anh có cần thông tin gì thêm về trạng thái đơn hàng không ạ?",
       "questions": [
         {
           "slot": "order_id",
           "type": "confirm",
-          "text": "Không biết Mr. có nhớ mã đơn hàng không ạ?"
+          "text": "Mã đơn hàng của anh là OD600001 đúng không?"
         }
       ],
       "facts_used": [
@@ -27,34 +27,12 @@
         {
           "field": "order_id",
           "value": "OD600001"
+        },
+        {
+          "field": "order_status",
+          "value": "created"
         }
       ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em xin lỗi Mr. Đinh Văn J, không có thông tin cụ thể về tình trạng đơn hàng nếu không có mã đơn. Nhưng em có thể kiểm tra giúp Mr. nếu Mr. cung cấp mã đơn hàng ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, cảm ơn Mr. đã cung cấp thông tin. Em sẽ kiểm tra tình trạng đơn hàng mã OD600001 ngay ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
       "tool_calls": [
         {
           "name": "order.status",
@@ -70,27 +48,60 @@
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Đơn hàng của tôi đã được tạo chưa?",
+      "facts_stated": {
+        "order_id": "OD600001"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ, đơn hàng của Mr. đã được tạo với mã OD600001, sản phẩm là SKU-BDL-AIR, số lượng 1, giá là 6.390.000đ, và phương thức thanh toán là COD ạ. Hiện tại đơn hàng đang trong trạng thái \"đã tạo\" ạ. Ông có cần thêm thông tin gì không ạ?",
+      "text": "Dạ, đơn hàng của anh đã được **tạo** và đang trong trạng thái xử lý. Anh có cần thêm thông tin gì không ạ?",
       "questions": [],
       "facts_used": [
-        "order_id",
-        "owned_sku",
-        "price_quoted_vnd",
-        "payment"
+        "order_id"
       ],
       "claims": [
         {
           "field": "order_status",
           "value": "created"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Vâng, xin cho tôi biết tình trạng đơn hàng.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, đơn hàng của anh với mã OD600001 đã được ghi nhận. Hiện tại đơn hàng của anh đang trong quá trình xử lý và dự kiến sẽ được giao trong thời gian sớm nhất. Nếu anh có thêm câu hỏi nào khác, em sẵn lòng hỗ trợ ạ!",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
         },
         {
-          "field": "price_quoted_vnd",
-          "value": 6390000
-        },
-        {
-          "field": "payment",
-          "value": "COD"
+          "field": "order_status",
+          "value": "created"
         }
       ],
       "tool_calls": [],
@@ -102,7 +113,7 @@
     }
   ],
   "gold": {
-    "intent": "Hỏi tình trạng đơn hàng đã đặt",
+    "intent": "Hỏi tình trạng đơn hàng.",
     "outcome": "cap_nhat_don",
     "objection_type": null,
     "objection_handling": null,

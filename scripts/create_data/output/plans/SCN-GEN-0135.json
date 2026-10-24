@@ -6,9 +6,9 @@
   "customer_id": "SYN-C008",
   "customer_phone": "0998000008",
   "customer_name": "Trần Văn H",
-  "honorific": "Mr.",
+  "honorific": "anh",
   "region": "trung",
-  "category": "unknown",
+  "category": "thoi-trang/giay",
   "difficulty": "normal",
   "tags": [
     "order",
@@ -32,44 +32,44 @@
           "source": "crm_session",
           "customer_id": "SYN-C008",
           "session_id": "SYN-008-S1",
-          "date": "2026-09-01",
+          "date": "2026-05-22",
           "channel": "hotline",
-          "summary": "Hỏi về giày dép nam",
-          "outcome": "successful",
+          "summary": "Mua Giày chạy bộ RunLite 1 giá 1.290.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_session",
           "customer_id": "SYN-C008",
           "session_id": "SYN-008-S2",
-          "date": "2026-09-02",
+          "date": "2026-10-08",
           "channel": "zalo_oa",
-          "summary": "Tìm hiểu về chất liệu sản phẩm",
-          "outcome": "successful",
+          "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD900802 đang xử lý.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C008",
-          "order_id": "O015",
-          "date": "2026-05-05",
-          "sku": "FAS005",
-          "status": "processing",
+          "order_id": "OD900801",
+          "date": "2026-05-22",
+          "sku": "SKU-SN-RUN1-40-TRANG",
+          "status": "delivered",
           "stale": false,
           "facts": {
-            "order_id": "O015"
+            "owned_sku": "SKU-SN-RUN1-40-TRANG"
           }
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C008",
-          "order_id": "O016",
-          "date": "2026-09-15",
-          "sku": "FAS006",
-          "status": "delivered",
+          "order_id": "OD900802",
+          "date": "2026-10-08",
+          "sku": "SKU-SN-CAS-40-TRANG",
+          "status": "processing",
           "stale": false,
           "facts": {
-            "owned_sku": "FAS006"
+            "order_id": "OD900802"
           }
         }
       ],
@@ -93,14 +93,14 @@
       "success_if": {
         "tool_called": "order.status",
         "args_match": {
-          "order_id": "O016"
+          "order_id": "OD900802"
         },
         "also_ordered": [],
         "total_match_vnd": null,
         "brief_must_contain": [],
         "must_say_any": [
-          "đã giao",
-          "giao thành công"
+          "đang xử lý",
+          "đang chuẩn bị"
         ],
         "agent_must_say": [],
         "must_not_call_tools": [],
@@ -109,8 +109,8 @@
         "max_agent_questions": null
       },
       "ground_truth_facts": {
-        "order_id": "O016",
-        "order_status": "delivered",
+        "order_id": "OD900802",
+        "order_status": "processing",
         "call_date": "2026-11-14"
       },
       "memory_expectation": {},
@@ -120,20 +120,20 @@
         "is_returning": true,
         "n_previous_sessions": 2,
         "last_session": {
-          "date": "2026-09-02",
+          "date": "2026-10-08",
           "channel": "zalo_oa",
-          "outcome": "successful",
-          "summary": "Tìm hiểu về chất liệu sản phẩm"
+          "outcome": "chot_don",
+          "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD900802 đang xử lý."
         },
         "products_advised": [
-          "FAS006"
+          "SKU-SN-RUN1-40-TRANG"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Trần Văn H, em gọi lại về FAS006 Mr. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào anh Trần Văn H, em gọi lại về SKU-SN-RUN1-40-TRANG anh đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-11-14T08:00:00",
@@ -144,16 +144,16 @@
         {
           "name": "order.status",
           "args": {
-            "order_id": "O016"
+            "order_id": "OD900802"
           },
           "result": {
             "orders": [
               {
-                "order_id": "O016",
-                "sku": "FAS006",
-                "price_vnd": 950000,
-                "date": "2026-09-15",
-                "status": "delivered",
+                "order_id": "OD900802",
+                "sku": "SKU-SN-CAS-40-TRANG",
+                "price_vnd": 890000,
+                "date": "2026-10-08",
+                "status": "processing",
                 "tracking": null
               }
             ]
@@ -192,7 +192,7 @@
       "success_if": {
         "tool_called": "order.update",
         "args_match": {
-          "order_id": "O016",
+          "order_id": "OD900802",
           "action": "update_address"
         },
         "also_ordered": [],
@@ -206,8 +206,8 @@
         "max_agent_questions": null
       },
       "ground_truth_facts": {
-        "order_id": "O016",
-        "order_status": "delivered",
+        "order_id": "OD900802",
+        "order_status": "processing",
         "call_date": "2026-11-16"
       },
       "memory_expectation": {
@@ -224,14 +224,14 @@
           "outcome": "cap_nhat_don"
         },
         "products_advised": [
-          "FAS006"
+          "SKU-SN-RUN1-40-TRANG"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Trần Văn H, em gọi lại về FAS006 Mr. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào anh Trần Văn H, em gọi lại về SKU-SN-RUN1-40-TRANG anh đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-11-16T08:00:00",
@@ -242,12 +242,12 @@
         {
           "name": "order.update",
           "args": {
-            "order_id": "O016",
+            "order_id": "OD900802",
             "action": "update_address",
             "on": "2026-11-16"
           },
           "result": {
-            "order_id": "O016",
+            "order_id": "OD900802",
             "action": "update_address",
             "status": "updated"
           }

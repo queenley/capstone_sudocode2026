@@ -12,22 +12,16 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Nguyễn Văn A, em gọi lại về sản phẩm nồi chiên không dầu Philips 6.2L mà Mr. đang quan tâm ạ. Mr. đã từng hỏi về nồi chiên không dầu cho gia đình và ngân sách khoảng 4 triệu rưỡi đúng không ạ?",
+      "text": "Dạ em chào anh Nguyễn Văn A, em gọi lại về nồi chiên không dầu Philips 6.2L anh đang quan tâm ạ. Anh cần dùng cho gia đình đúng không ạ?",
       "questions": [
         {
           "slot": "usage_need",
           "type": "confirm",
-          "text": "Mr. đã hỏi về nồi chiên không dầu cho gia đình đúng không ạ?"
-        },
-        {
-          "slot": "budget_vnd",
-          "type": "confirm",
-          "text": "Mr. đã có ngân sách khoảng 4 triệu rưỡi đúng không ạ?"
+          "text": "Anh cần dùng cho gia đình đúng không ạ?"
         }
       ],
       "facts_used": [
-        "usage_need",
-        "budget_vnd"
+        "usage_need"
       ],
       "claims": [],
       "tool_calls": [],
@@ -39,17 +33,21 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, nồi chiên không dầu Philips 6.2L hiện có giá 3.391.500đ. Hơn nữa, sản phẩm này còn có khuyến mãi 11-11 đang diễn ra, giúp Mr. tiết kiệm rất nhiều. Khuyến mãi này sẽ hết hạn hôm nay ạ.",
-      "questions": [],
-      "facts_used": [],
+      "text": "Cảm ơn anh đã xác nhận. Em thấy anh có ngân sách khoảng 4 triệu rưỡi, nhưng giá nồi chiên không dầu Philips 6.2L hiện tại là 3.391.500đ. Anh có thấy phù hợp không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Anh có thấy phù hợp không ạ?"
+        }
+      ],
+      "facts_used": [
+        "budget_vnd"
+      ],
       "claims": [
         {
           "field": "price_vnd",
           "value": 3391500
-        },
-        {
-          "field": "promo_11-11_active",
-          "value": true
         }
       ],
       "tool_calls": [],
@@ -61,13 +59,25 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, sản phẩm này hiện đang có sẵn hàng và có thể giao tới gia đình Mr. trong khoảng 2-3 ngày làm việc. Mr. có muốn đặt hàng ngay không ạ?",
+      "text": "Nồi chiên này đang có khuyến mãi 11-11, giảm giá từ 3.990.000đ xuống còn 3.391.500đ, anh có muốn đặt hàng ngay không ạ?",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "in_stock",
+          "field": "promo_code",
+          "value": "11-11"
+        },
+        {
+          "field": "promo_active",
           "value": true
+        },
+        {
+          "field": "list_price_vnd",
+          "value": 3990000
+        },
+        {
+          "field": "price_vnd",
+          "value": 3391500
         }
       ],
       "tool_calls": [],
@@ -79,7 +89,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, nếu Mr. chưa quyết định đặt hàng ngay thì em có thể ghi nhận lại thông tin và gọi lại sau cho Mr. để hỏi thêm ạ. Mr. có cần thêm thông tin gì không ạ?",
+      "text": "Nếu anh chỉ muốn hỏi thêm thông tin, em có thể ghi nhận lại và hẹn gọi lại sau cho anh được không ạ?",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -92,14 +102,21 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, nếu Mr. muốn gọi hotline để hỏi thêm thông tin thì em sẽ ghi nhận lại và gọi lại cho Mr. vào thời gian phù hợp. Mr. có muốn hẹn giờ cụ thể không ạ?",
-      "questions": [
-        {
-          "slot": "blocker",
-          "type": "open",
-          "text": "Mr. có muốn hẹn giờ cụ thể không ạ?"
-        }
-      ],
+      "text": "Dạ vậy thì em sẽ ghi nhận lại và hẹn gọi lại cho anh sau nhé. Cảm ơn anh đã quan tâm đến sản phẩm của shop ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em sẽ ghi nhận lại và hẹn gọi lại cho anh vào ngày mai ạ. Chúc anh một ngày tốt lành!",
+      "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],

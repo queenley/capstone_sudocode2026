@@ -2,9 +2,13 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
+import { LogoMark } from "@/components/brand/Logo";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 import { categoryName, DEPARTMENTS } from "@/lib/catalog";
 import { useCart } from "@/lib/cart";
 import { HOTLINE, ZALO_URL } from "@/lib/contact";
+
+const icon = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true };
 
 export default function Header() {
   const lines = useCart();
@@ -24,11 +28,16 @@ export default function Header() {
     if (q) router.push(`/tim-kiem?q=${encodeURIComponent(q)}`);
   }
 
+  const active = (href: string) => (pathname === href || pathname.startsWith(href + "/") ? "active" : undefined);
+
   return (
     <header className="s-header">
       <div className="s-topline">
         <div className="s-wrap s-topline-inner">
-          <span>Miễn phí giao hàng cho đơn từ 2.000.000₫ · Đổi trả theo chính sách cửa hàng</span>
+          <span className="s-topline-promo">
+            <span className="s-topline-tag">Ưu đãi</span>
+            <span>Miễn phí giao hàng cho đơn từ 2.000.000₫ · Đổi trả theo chính sách cửa hàng</span>
+          </span>
           <span className="s-topline-links">
             <a href={`tel:${HOTLINE.replace(/\s/g, "")}`}>☏ Hotline {HOTLINE}</a>
             {ZALO_URL && (
@@ -36,7 +45,6 @@ export default function Header() {
                 Zalo
               </a>
             )}
-            <Link href="/don-hang">Đơn hàng của tôi</Link>
             <Link href="/login">Nhân viên</Link>
           </span>
         </div>
@@ -46,33 +54,55 @@ export default function Header() {
           ☰
         </button>
         <Link href="/" className="s-logo" aria-label="Tiếp Nối, trang chủ">
-          <span className="s-logo-mark">t</span>
-          <span>
-            tiếp<b>nối</b>
+          <LogoMark className="s-logo-mark" />
+          <span className="s-logo-text">
+            <strong>Tiếp Nối</strong>
+            <small>Trợ lý mua sắm AI</small>
           </span>
         </Link>
         <form className="s-search" role="search" onSubmit={search}>
+          <svg {...icon}>
+            <circle cx="11" cy="11" r="7" />
+            <path d="m20 20-3.5-3.5" />
+          </svg>
           <input
             aria-label="Tìm sản phẩm"
             placeholder="Tìm máy lọc không khí, giày chạy bộ, đồ cho bé…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <button type="submit" aria-label="Tìm">
-            Tìm
-          </button>
+          <button type="submit">Tìm</button>
         </form>
-        <Link href="/gio-hang" className="s-cart-link" aria-label={`Giỏ hàng, ${count} sản phẩm`}>
-          <span className="s-cart-icon">🛒</span>
-          <span className="s-cart-text">Giỏ hàng</span>
-          {count > 0 && <span className="s-cart-count">{count}</span>}
-        </Link>
+        <div className="s-header-actions">
+          <Link href="/don-hang" className="s-header-link" aria-label="Đơn hàng của tôi">
+            <svg {...icon}>
+              <path d="M6 2h12l2 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6z" />
+              <path d="M4 6h16M9 11h6M9 15h4" />
+            </svg>
+            <span>Đơn hàng</span>
+          </Link>
+          <ThemeToggle />
+          <Link href="/gio-hang" className="s-cart-link" aria-label={`Giỏ hàng, ${count} sản phẩm`}>
+            <svg {...icon}>
+              <circle cx="9" cy="20" r="1.5" />
+              <circle cx="18" cy="20" r="1.5" />
+              <path d="M2 3h3l2.6 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.5L21 8H6" />
+            </svg>
+            <span className="s-cart-text">Giỏ hàng</span>
+            {count > 0 && <span className="s-cart-count">{count}</span>}
+          </Link>
+        </div>
       </div>
       <nav className={`s-nav ${menu ? "open" : ""}`} aria-label="Danh mục sản phẩm">
         <div className="s-wrap s-nav-inner">
+          <Link href="/" className={pathname === "/" ? "active" : undefined}>
+            Trang chủ
+          </Link>
           {DEPARTMENTS.map((dept) => (
             <div className="s-nav-item" key={dept.slug}>
-              <Link href={`/danh-muc/${dept.slug}`}>{categoryName(dept.slug)}</Link>
+              <Link href={`/danh-muc/${dept.slug}`} className={active(`/danh-muc/${dept.slug}`)}>
+                {categoryName(dept.slug)}
+              </Link>
               {dept.children.length > 0 && (
                 <div className="s-nav-drop">
                   {dept.children.map((child) => (
@@ -84,10 +114,12 @@ export default function Header() {
               )}
             </div>
           ))}
-          <Link href="/khuyen-mai" className="s-nav-hot">
+          <Link href="/khuyen-mai" className={"s-nav-hot " + (active("/khuyen-mai") || "")}>
             Khuyến mãi
           </Link>
-          <Link href="/chinh-sach">Chính sách</Link>
+          <Link href="/chinh-sach" className={active("/chinh-sach")}>
+            Chính sách
+          </Link>
         </div>
       </nav>
     </header>

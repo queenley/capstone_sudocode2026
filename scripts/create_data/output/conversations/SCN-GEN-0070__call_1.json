@@ -12,17 +12,22 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Đinh Văn J, hôm trước Mr. có hỏi về máy hút sữa điện đôi Spectra S1 đúng không ạ?",
+      "text": "Dạ, em chào anh Đinh Văn J, em gọi lại về máy hút sữa điện đôi Spectra S1 anh đang quan tâm ạ. Em thấy anh đã từng mua máy lọc nước UF Sunhouse và hiện tại đang có đơn hàng quạt đứng Panasonic F-409, đúng không ạ?",
       "questions": [
         {
-          "slot": "product_advised",
+          "slot": "owned_sku",
           "type": "confirm",
-          "text": "Hôm trước Mr. có hỏi về máy hút sữa điện đôi Spectra S1 đúng không?"
+          "text": "Anh đã từng mua máy lọc nước UF Sunhouse?"
+        },
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Đơn hàng quạt đứng Panasonic F-409 của anh là OD901002 phải không ạ?"
         }
       ],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "owned_sku",
+        "order_id"
       ],
       "claims": [],
       "tool_calls": [],
@@ -34,16 +39,11 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, máy hút sữa này có giá là 4.290.000đ và hiện tại đang có chương trình khuyến mãi freeship ạ. Không biết Mr. có muốn biết thêm thông tin gì về sản phẩm không ạ?",
-      "questions": [
-        {
-          "slot": "price_vnd",
-          "type": "confirm",
-          "text": "Giá của máy hút sữa là 4.290.000đ đúng không ạ?"
-        }
-      ],
+      "text": "Máy hút sữa điện đôi Spectra S1 hiện đang có giá 4.290.000đ ạ. Anh có thể cân nhắc trong khoảng ngân sách 4.500.000đ của mình.",
+      "questions": [],
       "facts_used": [
-        "price_vnd"
+        "budget_vnd",
+        "price_quoted_vnd"
       ],
       "claims": [
         {
@@ -51,8 +51,34 @@
           "value": 4290000
         },
         {
+          "field": "list_price_vnd",
+          "value": 4290000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Hiện tại máy hút sữa này đang có chương trình khuyến mãi miễn phí vận chuyển với mã MOM-FREESHIP, còn hiệu lực đến ngày 29/11/2026. Anh có muốn biết thêm thông tin không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
           "field": "promo_MOM-FREESHIP_active",
           "value": true
+        },
+        {
+          "field": "promo_expiry",
+          "value": "2026-11-29"
         }
       ],
       "tool_calls": [],
@@ -64,51 +90,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em thấy Mr. có ngân sách khoảng 4 triệu rưỡi. Sản phẩm này nằm trong ngân sách của Mr. ạ. Mr. có cần tìm hiểu về các phương thức thanh toán không ạ?",
+      "text": "Em rất hiểu, anh đang chờ cuối tháng nhận lương để quyết định. Nếu anh cần thêm thời gian suy nghĩ, em có thể gọi lại cho anh vào đầu tháng tới. Anh có muốn hẹn lịch gọi lại không ạ?",
       "questions": [
         {
-          "slot": "budget_vnd",
-          "type": "confirm",
-          "text": "Mr. có ngân sách khoảng 4 triệu rưỡi đúng không ạ?"
-        }
-      ],
-      "facts_used": [
-        "budget_vnd"
-      ],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em hiểu rằng Mr. đang chờ cuối tháng nhận lương để quyết định. Không biết Mr. có muốn em gọi lại vào thời điểm đó không ạ?",
-      "questions": [
-        {
-          "slot": "blocker",
-          "type": "confirm",
-          "text": "Mr. đang chờ cuối tháng nhận lương để quyết định đúng không ạ?"
+          "slot": "callback",
+          "type": "open",
+          "text": "Anh có muốn hẹn lịch gọi lại không ạ?"
         }
       ],
       "facts_used": [
         "blocker"
       ],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em sẽ ghi nhận lại và gọi lại cho Mr. vào cuối tháng nhé. Nếu có bất kỳ thông tin gì khác mà Mr. cần thêm, Mr. cứ liên hệ với em ạ. Cảm ơn Mr. đã dành thời gian, chúc Mr. một ngày tốt lành!",
-      "questions": [],
-      "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [
@@ -132,7 +124,10 @@
     "decision_maker": null,
     "commitments": [],
     "supersedes": [],
-    "callback": null,
+    "callback": {
+      "date": "2026-11-01",
+      "time": "10:00"
+    },
     "order": null
   }
 }

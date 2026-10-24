@@ -135,6 +135,10 @@ services:
       ZALO_REFRESH_TOKEN: ${ZALO_REFRESH_TOKEN:-}
       # 1 only for scripts/dev/zalo_simulator.py without keys: accepts unsigned webhooks.
       ZALO_WEBHOOK_INSECURE: ${ZALO_WEBHOOK_INSECURE:-0}
+      # Local mock platform only (scripts/dev/zalo_mock.py), e.g. http://host.docker.internal:8090.
+      # Empty: Zalo's own openapi.zalo.me / oauth.zaloapp.com. Never set in production.
+      ZALO_OPENAPI_URL: ${ZALO_OPENAPI_URL:-}
+      ZALO_OAUTH_URL: ${ZALO_OAUTH_URL:-}
       GROQ_API_KEY: ${GROQ_API_KEY:-}
       NVIDIA_API_KEY: ${NVIDIA_API_KEY:-}
       AI_GATEWAY_API_KEY: ${AI_GATEWAY_API_KEY:-}

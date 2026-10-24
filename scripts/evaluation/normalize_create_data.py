@@ -1,6 +1,6 @@
 """Create a diagnostic revision of ``scripts/create_data`` output; never edit its source.
 
-    python normalize_create_data.py [--source ../create_data/output/scenarios] [--name create-data-diagnostic-v2]
+    python normalize_create_data.py [--source ../create_data/output/scenarios] [--name create-data-diagnostic-v3]
 
 Writes ``datasets/<name>/`` (refusing to overwrite) and registers it in
 ``datasets/registry.json`` with status ``diagnostic``:
@@ -22,9 +22,11 @@ Conversions (each recorded per call):
 
 Exclusions, never silent drops (``datasets/ground-truth-review/SKILL.md``):
 
-- ``CUSTOMER_NOT_IN_PINNED_CRM``: a ``customer_id`` outside the organisers'
-  ``crm_seed.json``; the harness's mock does not know the synthetic customers
-  ``create_data`` added, so CRM-derived GT would not hold;
+- ``CUSTOMER_NOT_IN_PINNED_CRM``: a ``customer_id`` neither in the organisers'
+  ``crm_seed.json`` nor in the synthetic CRM the agent and the harness's mock
+  add (``apps/ai-agent-service/data/btc/catalog/crm_seed_synthetic.json``,
+  pinned by each run), so CRM-derived GT would not hold. The report records
+  that file's hash: a synthetic scenario holds only with the file it was made from.
 - ``SCHEMA_INVALID``: anything else the contract still rejects.
 
 The labels are the generator's, not a human's: ``official_gt_approved`` is
@@ -50,11 +52,15 @@ ROOT = Path(__file__).resolve().parent
 DATASETS = ROOT / "datasets"
 SOURCE = ROOT.parent / "create_data" / "output" / "scenarios"
 OUTCOMES = {"hen_goi_lai", "chot_don", "chuyen_may", "tu_choi", "khac"}
+SYNTHETIC_CRM = ROOT.parent.parent / "apps/ai-agent-service/data/btc/catalog/crm_seed_synthetic.json"
 
 
 def official_customers():
-    crm = json.loads((CONTRACTS / "sources/btc/catalog/crm_seed.json").read_text(encoding="utf-8"))
-    return {c["customer_id"] for c in crm["customers"]}
+    """The customers a run's mock knows: the organisers' 50, then the synthetic ones."""
+    customers = json.loads((CONTRACTS / "sources/btc/catalog/crm_seed.json").read_text(encoding="utf-8"))["customers"]
+    if SYNTHETIC_CRM.exists():
+        customers += json.loads(SYNTHETIC_CRM.read_text(encoding="utf-8"))["customers"]
+    return {c["customer_id"] for c in customers}
 
 
 def convert(source, customers):
@@ -102,7 +108,7 @@ def tool_labels(scenario):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--source", type=Path, default=SOURCE)
-    parser.add_argument("--name", default="create-data-diagnostic-v2")
+    parser.add_argument("--name", default="create-data-diagnostic-v3")
     args = parser.parse_args(argv)
     source, target = args.source.resolve(), DATASETS / args.name
     registry_path = DATASETS / "registry.json"
@@ -141,6 +147,9 @@ def main(argv=None):
         "schema_version": "create-data-diagnostic-v1", "official_gt_approved": False,
         "scope": f"{len(files)} of {len(files) + len(excluded)} generated scenarios; JSON only; labels from the generator",
         "tool_labels": "success_if.tool_called/args_match of each call; pending independent QA",
+        "synthetic_crm": ({"path": SYNTHETIC_CRM.relative_to(ROOT.parent.parent).as_posix(),
+                           "sha256": hashlib.sha256(SYNTHETIC_CRM.read_bytes()).hexdigest()}
+                          if SYNTHETIC_CRM.exists() else None),
         "files": files, "excluded": excluded,
     }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
     registry["sets"].append({"id": args.name, "split": "development", "path": f"{args.name}/scenarios",

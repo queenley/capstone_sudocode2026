@@ -7,24 +7,32 @@
   "channel": "hotline",
   "date": "2026-11-02",
   "region": "bac",
-  "category": "unknown",
+  "category": "gia-dung/may-loc-khong-khi",
   "persona": "khach_co_don_chua_co_lich_su",
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Ms. Phạm Thị D, em gọi lại về đơn hàng của chị ạ. Chị muốn thay đổi địa chỉ giao hàng cho đơn hàng O008 phải không ạ?",
+      "text": "Dạ, em chào chị Phạm Thị D, cảm ơn chị đã gọi lại về đơn hàng của mình ạ. Chị có đơn hàng mã OD900402 đang trong trạng thái xử lý phải không ạ?",
       "questions": [
         {
           "slot": "order_id",
           "type": "confirm",
-          "text": "Chị muốn thay đổi địa chỉ giao hàng cho đơn hàng O008 phải không ạ?"
+          "text": "Chị có đơn hàng mã OD900402 đang trong trạng thái xử lý phải không ạ?"
         }
       ],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
-      "claims": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900402"
+        },
+        {
+          "field": "order_status",
+          "value": "processing"
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -34,17 +42,16 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, chị muốn chuyển địa chỉ giao hàng sang Long Biên, Hà Nội đúng không ạ?",
+      "text": "Dạ, chị muốn thay đổi địa chỉ giao hàng cho đơn hàng OD900402, em đã ghi nhận yêu cầu này ạ. Chị muốn giao hàng đến quận Long Biên, Hà Nội đúng không ạ?",
       "questions": [
         {
           "slot": "delivery_area",
           "type": "confirm",
-          "text": "Chị muốn chuyển địa chỉ giao hàng sang Long Biên, Hà Nội đúng không ạ?"
+          "text": "Chị muốn giao hàng đến quận Long Biên, Hà Nội đúng không ạ?"
         }
       ],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
       "claims": [],
       "tool_calls": [],
@@ -56,28 +63,42 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em đã ghi nhận thay đổi địa chỉ giao hàng sang Long Biên, Hà Nội cho đơn hàng O008. Em sẽ cập nhật ngay ạ. Xin chị một chút thời gian.",
+      "text": "Dạ, cảm ơn chị đã xác nhận. Em sẽ cập nhật địa chỉ giao hàng đến quận Long Biên, Hà Nội cho đơn hàng OD900402 ngay bây giờ ạ. Một chút thời gian nhé!",
       "questions": [],
-      "facts_used": [
-        "order_id",
-        "owned_sku"
-      ],
-      "claims": [
-        {
-          "field": "delivery_area",
-          "value": "Long Biên, Hà Nội"
-        }
-      ],
+      "facts_used": [],
+      "claims": [],
       "tool_calls": [
         {
           "name": "order.update",
           "args": {
-            "order_id": "O008",
+            "order_id": "OD900402",
             "action": "update_address",
             "on": "2026-11-02"
           }
         }
       ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã cập nhật địa chỉ giao hàng cho đơn hàng OD900402 thành công. Chị sẽ nhận hàng tại quận Long Biên, Hà Nội. Cảm ơn chị đã tin tưởng và sử dụng dịch vụ của shop ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900402"
+        },
+        {
+          "field": "delivery_area",
+          "value": "Long Biên, Hà Nội"
+        }
+      ],
+      "tool_calls": [],
       "memory_writes": [
         {
           "key": "delivery_area",
@@ -91,11 +112,11 @@
     }
   ],
   "gold": {
-    "intent": "Thay đổi địa chỉ giao hàng",
+    "intent": "cap_nhat_don",
     "outcome": "cap_nhat_don",
     "objection_type": null,
     "objection_handling": null,
-    "sentiment": "neutral",
+    "sentiment": "positive",
     "decision_maker": null,
     "commitments": [],
     "supersedes": [],

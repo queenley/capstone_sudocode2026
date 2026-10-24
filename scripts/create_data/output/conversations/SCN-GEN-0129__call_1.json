@@ -12,12 +12,12 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Lê Văn C, em gọi lại về nồi chiên không dầu Xiaomi mà Mr. đã hỏi trong phiên trước ạ. Mr. cần thay đồ cũ đã hỏng đúng không ạ?",
+      "text": "Dạ, em chào anh Lê Văn C. Em gọi lại về sản phẩm Xe đẩy gấp gọn Joie Pact mà anh đã quan tâm ạ. Anh đã hỏi về việc thay cái nồi đã hỏng phải không ạ?",
       "questions": [
         {
           "slot": "usage_need",
           "type": "confirm",
-          "text": "Mr. cần thay đồ cũ đã hỏng đúng không ạ?"
+          "text": "Anh đã hỏi về việc thay cái nồi đã hỏng phải không ạ?"
         }
       ],
       "facts_used": [
@@ -26,8 +26,12 @@
       ],
       "claims": [
         {
-          "field": "usage_need",
-          "value": "thay đồ cũ đã hỏng"
+          "field": "order_id",
+          "value": "OD900302"
+        },
+        {
+          "field": "owned_sku",
+          "value": "SKU-MB-STR1"
         }
       ],
       "tool_calls": [],
@@ -38,22 +42,36 @@
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Đúng rồi, anh cần thay cái nồi cũ đã hỏng.",
+      "facts_stated": {
+        "usage_need": "thay đồ cũ đã hỏng"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ, nồi chiên không dầu Xiaomi 4.5L có giá là 1.590.000đ ạ. Mr. cho em hỏi ngân sách của mình khoảng bao nhiêu ạ?",
+      "text": "Dạ, cảm ơn anh đã xác nhận. Hiện tại, nồi chiên không dầu Xiaomi 4.5L có giá 1.590.000đ ạ. Anh có ngân sách khoảng bao nhiêu để lựa chọn sản phẩm này ạ?",
       "questions": [
         {
           "slot": "budget_vnd",
           "type": "open",
-          "text": "Mr. cho em hỏi ngân sách của mình khoảng bao nhiêu ạ?"
+          "text": "Anh có ngân sách khoảng bao nhiêu để lựa chọn sản phẩm này ạ?"
         }
       ],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "price_quoted_vnd"
       ],
       "claims": [
         {
           "field": "price_vnd",
+          "value": 1590000
+        },
+        {
+          "field": "list_price_vnd",
           "value": 1590000
         }
       ],
@@ -65,18 +83,30 @@
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Anh có ngân sách khoảng 2 triệu thôi.",
+      "facts_stated": {
+        "budget_vnd": 2000000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Cảm ơn Mr. đã cung cấp thông tin. Với ngân sách khoảng 2 triệu, nồi chiên không dầu Xiaomi 4.5L là sự lựa chọn hợp lý ạ. Nồi này hiện tại không có khuyến mãi nào, nhưng vẫn là sản phẩm rất đáng để xem xét ạ.",
-      "questions": [],
+      "text": "Dạ, với ngân sách đó, nồi chiên không dầu Xiaomi 4.5L hoàn toàn phù hợp với anh ạ. Anh có muốn đặt hàng ngay hôm nay không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Anh có muốn đặt hàng ngay hôm nay không ạ?"
+        }
+      ],
       "facts_used": [
         "budget_vnd"
       ],
-      "claims": [
-        {
-          "field": "promo_active",
-          "value": false
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -85,8 +115,19 @@
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Anh sẽ chờ cuối tháng nhận lương rồi gọi lại nhé.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ, em hiểu Mr. chờ cuối tháng để nhận lương. Khi nào Mr. sẵn sàng, em sẽ gọi lại để hỗ trợ thêm ạ. Chúc Mr. một ngày tốt lành!",
+      "text": "Dạ, em hiểu rồi ạ. Anh vui lòng gọi lại cho em vào cuối tháng nhé. Cảm ơn anh Lê Văn C đã dành thời gian, chúc anh một ngày tốt lành ạ!",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -98,26 +139,9 @@
       "barge_in": false
     },
     {
-      "speaker": "agent_ai",
-      "text": "Dạ, em sẽ ghi nhận lại lịch gọi lại cho Mr. vào cuối tháng. Cảm ơn Mr. đã gọi đến, hẹn gặp lại ạ!",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em sẽ ghi nhận lại lịch gọi lại cho Mr. vào cuối tháng. Cảm ơn Mr. đã gọi đến, hẹn gặp lại ạ!",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
+      "speaker": "customer",
+      "text": "Cảm ơn em.",
+      "facts_stated": {},
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,

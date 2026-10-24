@@ -21,6 +21,10 @@ Configuration (``.env``):
   use, so the newest pair is kept in ``zalo_tokens`` and refreshed before expiry.
 - ``ZALO_WEBHOOK_INSECURE=1``: accept unsigned events, for the local simulator
   (``scripts/dev/zalo_simulator.py``) only. Never in production.
+- ``ZALO_OPENAPI_URL``, ``ZALO_OAUTH_URL``: where the OA API and OAuth live,
+  ``https://openapi.zalo.me`` and ``https://oauth.zaloapp.com`` unless set.
+  The local mock platform (``scripts/dev/zalo_mock.py``) stands in for both, so
+  replies are really sent, without an OA. Never set them in production.
 
 Without send credentials, replies are logged in ``zalo_messages`` with status
 ``not_sent`` (visible to staff), so the whole flow can be tried without an OA.
@@ -43,8 +47,10 @@ from .db import connection
 
 logger = logging.getLogger(__name__)
 
-SEND_URL = "https://openapi.zalo.me/v3.0/oa/message/cs"
-TOKEN_URL = "https://oauth.zaloapp.com/v4/oa/access_token"
+OPENAPI_URL = "https://openapi.zalo.me"
+OAUTH_URL = "https://oauth.zaloapp.com"
+SEND_PATH = "/v3.0/oa/message/cs"
+TOKEN_PATH = "/v4/oa/access_token"
 #: Zalo's limit for one text message.
 MAX_TEXT = 2000
 #: Text events the agent answers; other events (images, stickers, follows) get a short note or nothing.
@@ -102,6 +108,10 @@ def _env(name: str) -> str:
     return os.environ.get(name, "").strip()
 
 
+def _url(variable: str, default: str, path: str) -> str:
+    return (_env(variable) or default).rstrip("/") + path
+
+
 def configured() -> dict[str, bool]:
     """What is set up, for the staff status view (never the secrets themselves)."""
     return {
@@ -109,6 +119,8 @@ def configured() -> dict[str, bool]:
         "insecure_webhook": _env("ZALO_WEBHOOK_INSECURE") == "1",
         "can_send": bool(_env("ZALO_ACCESS_TOKEN") or (_env("ZALO_REFRESH_TOKEN") and _env("ZALO_APP_SECRET"))),
         "oa_id": bool(_env("ZALO_OA_ID")),
+        # Replies go to another platform than Zalo's own: the local mock.
+        "mock_platform": bool(_env("ZALO_OPENAPI_URL") or _env("ZALO_OAUTH_URL")),
     }
 
 
@@ -207,7 +219,7 @@ async def _token() -> str | None:
     if refresh and _env("ZALO_APP_SECRET") and _env("ZALO_APP_ID"):
         async with httpx.AsyncClient(timeout=10) as client:
             response = await client.post(
-                TOKEN_URL,
+                _url("ZALO_OAUTH_URL", OAUTH_URL, TOKEN_PATH),
                 headers={"secret_key": _env("ZALO_APP_SECRET")},
                 data={"refresh_token": refresh, "app_id": _env("ZALO_APP_ID"), "grant_type": "refresh_token"},
             )
@@ -239,7 +251,8 @@ async def send(user_id: str, text: str, conversation_id: str | None = None) -> d
         async with httpx.AsyncClient(timeout=10) as client:
             for chunk in chunks:
                 try:
-                    response = await client.post(SEND_URL, headers={"access_token": token},
+                    response = await client.post(_url("ZALO_OPENAPI_URL", OPENAPI_URL, SEND_PATH),
+                                                 headers={"access_token": token},
                                                  json={"recipient": {"user_id": user_id}, "message": {"text": chunk}})
                     body = response.json() if response.content else {}
                     if not response.is_success or body.get("error", 0) != 0:

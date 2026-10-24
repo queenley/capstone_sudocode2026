@@ -11,6 +11,8 @@ import time
 from .contracts import ROOT, checker, validate
 
 STATE = ("_ORDERS", "_CALLBACKS", "_TICKETS", "_ONCE_USED")
+#: The manifest source, ``{"customers": [...]}``, whose customers a run adds to the BTC mock's CRM.
+CRM_EXTENSION = "crm-extension.json"
 
 
 def _state(module):
@@ -29,13 +31,18 @@ def _visible(result, config):
     return result
 
 
-def _worker(connection, config):
+def _worker(connection, config, customers=()):
     sys.dont_write_bytecode = True
     try:
         checker.verify_sources()
         spec = importlib.util.spec_from_file_location("isolated_btc_mock", ROOT / "sources/btc/eval/mock_tools.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
+        # The run's pinned CRM extension, as the agent's mock adds it (``mcp/servers/btc.py``):
+        # in memory, never over an official customer's id or phone.
+        known = {c["customer_id"] for c in module.CRM} | {c["phone"] for c in module.CRM}
+        module.CRM.extend(c for c in copy.deepcopy(list(customers))
+                          if c["customer_id"] not in known and c["phone"] not in known)
         # Seed once. Function globals/indexes remain coherent inside this worker.
         for name in ("PRODUCTS", "PROMOS", "CRM", "INV") + STATE:
             setattr(module, name, copy.deepcopy(getattr(module, name)))
@@ -98,7 +105,7 @@ class MockEnvironment:
     No ledger/brief/cache routes exist here. Runtime P2 must gate those separately.
     On timeout the worker is killed, with unknown side effects; no retry/restart.
     """
-    def __init__(self, run_id, scenario_id, config, *, timeout=30):
+    def __init__(self, run_id, scenario_id, config, *, timeout=30, customers=()):
         if config not in ("full", "baseline_no_memory") or not run_id or not scenario_id or timeout <= 0:
             raise ValueError("Invalid worker identity/config/timeout")
         checker.verify_sources()
@@ -107,7 +114,7 @@ class MockEnvironment:
         self.closed = False
         context = multiprocessing.get_context("spawn")
         self.connection, child = context.Pipe()
-        self.process = context.Process(target=_worker, args=(child, config))
+        self.process = context.Process(target=_worker, args=(child, config, list(customers)))
         self.process.start()
         child.close()
         ready = self._receive()

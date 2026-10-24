@@ -66,7 +66,8 @@ Tạo secret `telesales-secrets` trong namespace, qua Secret Manager và secret 
 | `ENCRYPTION_KEY` | khóa Fernet |
 | `ADMIN_TOKEN`, `AGENT_TOKEN`, `SELLER_TOKEN`, `DEVELOPER_TOKEN` | mạnh, khác nhau, ≥ 32 ký tự |
 | `GOOGLE_API_KEY` / `GROQ_API_KEY` / `NVIDIA_API_KEY` | ít nhất key của provider advisor đang dùng trong `config/models.yaml` |
-| `AI_GATEWAY_API_KEY` | Jev (soft guard); thiếu thì agent chỉ chạy hard guard |
+| `TYPESAFE_API_KEY` | Jev (soft guard), gọi thẳng TypeSafe; thiếu thì agent chỉ chạy hard guard |
+| `AI_GATEWAY_API_KEY` | Jev qua Vercel AI Gateway, nếu `evaluators.policy` trỏ về `vercel_gateway` |
 | `LANGFUSE_*`, `OTP_DELIVERY_URL`/`OTP_DELIVERY_TOKEN` | tùy chọn |
 
 Tạo thêm `telesales-migration-secrets` với `MIGRATION_DATABASE_URL`, là credential có quyền DDL. Role runtime của AI Agent cần quyền `CREATE` trên database, hoặc schema `agent` phải được tạo sẵn với owner là role đó, vì agent tự tạo bảng khi khởi động.

@@ -12,24 +12,28 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào Ms. Phạm Thị D, em gọi lại về sản phẩm giày chạy bộ size 42 màu đen mà chị đang quan tâm ạ. Chị có lưu ý gì về sản phẩm không ạ?",
+      "text": "Dạ, em chào chị Phạm Thị D, em gọi lại về giày chạy bộ RunLite 2 Pro size 42 màu đen mà chị đang quan tâm ạ. Chị có nhớ trước đây đã hỏi về sản phẩm này không ạ?",
       "questions": [
         {
           "slot": "size",
           "type": "confirm",
-          "text": "Chị có xác nhận là chị đang hỏi về giày chạy bộ size 42 không?"
-        },
-        {
-          "slot": "color",
-          "type": "confirm",
-          "text": "Chị có cần thông tin về màu đen không?"
+          "text": "Chị có đang quan tâm đến size 42 không?"
         }
       ],
       "facts_used": [
         "size",
         "color"
       ],
-      "claims": [],
+      "claims": [
+        {
+          "field": "size",
+          "value": 42
+        },
+        {
+          "field": "color",
+          "value": "den"
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -38,44 +42,39 @@
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Vâng, đúng rồi.",
+      "facts_stated": {
+        "size": 42,
+        "color": "den"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ, em xin lỗi vì giá bên em hiện tại là 1.352.000đ, có thể cao hơn so với bên chị thấy là 1.240.000đ. Tuy nhiên, sản phẩm của bên em được bảo hành và có chính sách đổi trả rõ ràng ạ. Chị có muốn biết thêm thông tin gì khác không ạ?",
+      "text": "Dạ, sản phẩm này bên em có giá 1.352.000đ và hiện tại có khuyến mãi áp dụng cho sản phẩm này ạ. Chị có muốn biết thêm chi tiết về chương trình khuyến mãi không ạ?",
       "questions": [
         {
-          "slot": "competitor_price_vnd",
-          "type": "confirm",
-          "text": "Chị có đúng là đã thấy giá bên khác là 1.240.000đ không?"
+          "slot": "promo_code",
+          "type": "open",
+          "text": "Chị có muốn biết thêm về chương trình khuyến mãi không?"
         }
       ],
       "facts_used": [
-        "competitor_price_vd"
+        "price_quoted_vnd",
+        "promo_code"
       ],
       "claims": [
         {
           "field": "price_vnd",
           "value": 1352000
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, hiện tại bên em có khuyến mãi với mã RUN2-SALE giúp chị được giảm giá. Khuyến mãi này sẽ hết hạn vào ngày 07 tháng 10 ạ. Chị có muốn sử dụng mã này không ạ?",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
+        },
         {
           "field": "promo_RUN2-SALE_active",
           "value": true
-        },
-        {
-          "field": "promo_expiry",
-          "value": "2026-10-07"
         }
       ],
       "tool_calls": [],
@@ -86,18 +85,56 @@
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Em thấy giá bên chỗ khác là 1 triệu 240 ngàn.",
+      "facts_stated": {
+        "competitor_price_vnd": 1240000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Em hiểu chị cần thời gian để suy nghĩ. Nếu chị cần thêm thông tin hoặc muốn hỏi lại, chị có thể gọi lại cho em bất cứ lúc nào ạ. Dạ, em sẽ ghi nhận lại để gọi lại cho chị sau nhé.",
+      "text": "Dạ, em hiểu rằng giá bên em cao hơn một chút nhưng sản phẩm bên em có bảo hành 12 tháng và chính sách đổi trả trong 7 ngày. Chị có cần thêm thời gian để suy nghĩ không ạ?",
+      "questions": [
+        {
+          "slot": "objection",
+          "type": "confirm",
+          "text": "Chị có cần thêm thời gian để suy nghĩ không?"
+        }
+      ],
+      "facts_used": [
+        "objection"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần suy nghĩ thêm rồi gọi lại nhé.",
+      "facts_stated": {
+        "objection": "giá cao hơn chỗ khác"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ ghi chú lại. Chị hãy gọi lại cho em khi nào sẵn sàng nhé. Cảm ơn chị đã dành thời gian cho em ạ!",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
-      "memory_writes": [
-        {
-          "key": "order_id",
-          "value": "O008"
-        }
-      ],
+      "memory_writes": [],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -105,7 +142,7 @@
     }
   ],
   "gold": {
-    "intent": "Hỏi về giày chạy bộ size 42 màu đen.",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,

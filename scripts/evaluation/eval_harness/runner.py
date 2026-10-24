@@ -15,7 +15,7 @@ import time
 from .assets import Assets
 from .progress import say, short
 from .contracts import ROOT, checker
-from .environment import MockEnvironment
+from .environment import CRM_EXTENSION, MockEnvironment
 from .preflight import ADAPTER_CAPABILITIES, call_plan, preflight
 
 HOOKS = {"open_scenario": 1, "start_call": 1, "run_turn": 1,
@@ -289,6 +289,9 @@ def run_fixed(settings_path, out, *, config=None, scenarios_dir=None, round_name
     if not allowed:
         errors.append({"code": "INPUT_GATE_BLOCKED", "blocking_codes": report["execution_gate"]["blocking_codes"]})
     scenarios = [assets.resolve(ref) for ref in manifest["scenarios"]] if allowed else []
+    # Customers the run adds to the BTC mock's CRM, pinned among its sources (``product.prepare``).
+    extension = [ref for ref in manifest["sources"] if ref["path"] == CRM_EXTENSION] if allowed else []
+    customers = [c for ref in extension for c in assets.resolve(ref)["customers"]]
     times = manifest["timeouts_ms"]
     for current_config in configs:
         folder = out / current_config
@@ -313,7 +316,8 @@ def run_fixed(settings_path, out, *, config=None, scenarios_dir=None, round_name
                 environment = adapter = None
                 phase, context = "binding", None
                 try:
-                    environment = MockEnvironment(manifest["run_id"], sid, current_config, timeout=times["tool"] / 1000)
+                    environment = MockEnvironment(manifest["run_id"], sid, current_config, timeout=times["tool"] / 1000,
+                                                  customers=customers)
                     adapter = AdapterProcess(report["adapter"], assets, environment, record, tool_record,
                                              folder / f"adapter-{scenario_index}.log")
                     binding = adapter.receive(times["agent"] / 1000)

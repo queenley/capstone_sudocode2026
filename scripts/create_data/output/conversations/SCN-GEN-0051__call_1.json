@@ -7,50 +7,36 @@
   "channel": "hotline",
   "date": "2026-10-17",
   "region": "nam",
-  "category": "unknown",
+  "category": "me-be",
   "persona": "khach_co_don_chua_co_lich_su",
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Lê Văn C. Em gọi lại để hỗ trợ thông tin về đơn hàng của mình. Anh đã từng đặt hàng sản phẩm MAB002, đúng không ạ?",
-      "questions": [
-        {
-          "slot": "owned_sku",
-          "type": "confirm",
-          "text": "Anh đã từng đặt hàng sản phẩm MAB002, đúng không ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Đúng rồi, tôi đã đặt hàng MAB002.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, cảm ơn anh đã xác nhận. Em sẽ kiểm tra tình trạng đơn hàng MAB002 của anh ngay bây giờ ạ.",
+      "text": "Dạ em chào anh Lê Văn C, em gọi lại về đơn hàng xe đẩy Combi Sugocal của anh, mã đơn OD900302 ạ. Hiện tại đơn hàng của anh đang trong trạng thái giao hàng, anh có thể theo dõi bằng mã vận đơn VN0032TRK ạ.",
       "questions": [],
       "facts_used": [
+        "order_id",
         "owned_sku"
       ],
-      "claims": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900302"
+        },
+        {
+          "field": "order_status",
+          "value": "shipping"
+        },
+        {
+          "field": "tracking",
+          "value": "VN0032TRK"
+        }
+      ],
       "tool_calls": [
         {
           "name": "order.status",
           "args": {
-            "order_id": "O006"
+            "order_id": "OD900302"
           }
         }
       ],
@@ -62,36 +48,36 @@
     },
     {
       "speaker": "customer",
-      "text": "Cảm ơn bạn.",
-      "facts_stated": {},
-      "entities": [],
+      "text": "Đơn hàng xe đẩy Combi Sugocal anh đặt hôm 3 tháng 10 giờ ra sao?",
+      "facts_stated": {
+        "order_id": "OD900302"
+      },
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD900302",
+          "spoken": "OD900302"
+        }
+      ],
       "pause_before_ms": 0,
-      "emotion": null,
+      "emotion": "neutral",
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, theo thông tin từ hệ thống, đơn hàng MAB002 của anh đã được giao thành công vào ngày 05 tháng 09 năm 2026. Anh có cần thêm thông tin gì khác không ạ?",
+      "text": "Dạ, đơn hàng của anh đang trong quá trình giao hàng ạ. Anh có nhận được thông báo gì từ bên giao hàng chưa ạ?",
       "questions": [
         {
-          "slot": "order_status",
+          "slot": "order_id",
           "type": "confirm",
-          "text": "Anh có cần thêm thông tin gì khác không ạ?"
+          "text": "Anh có nhận được thông báo gì từ bên giao hàng chưa ạ?"
         }
       ],
       "facts_used": [
-        "order_id"
+        "order_id",
+        "owned_sku"
       ],
-      "claims": [
-        {
-          "field": "order_status",
-          "value": "delivered"
-        },
-        {
-          "field": "order_id",
-          "value": "O006"
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -101,8 +87,31 @@
     },
     {
       "speaker": "customer",
-      "text": "Không, cảm ơn bạn đã hỗ trợ.",
+      "text": "Chưa nhận được thông báo gì cả.",
       "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": "neutral",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xin lỗi về sự bất tiện này ạ. Em sẽ kiểm tra lại tình trạng đơn hàng cho anh ngay ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900302"
+          }
+        }
+      ],
+      "memory_writes": [],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -110,7 +119,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em rất vui khi được giúp đỡ anh. Nếu có bất kỳ câu hỏi nào trong tương lai, hãy gọi cho em nhé. Chúc anh một ngày tốt lành ạ!",
+      "text": "Dạ, em đã kiểm tra lại và xác nhận đơn hàng của anh vẫn đang trong trạng thái giao hàng ạ. Anh có cần hỗ trợ thêm gì không ạ?",
       "questions": [],
       "facts_used": [],
       "claims": [],

@@ -12,17 +12,17 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Trần Văn H, em gọi lại về sản phẩm máy lọc không khí Xiaomi Smart 4 Pro mà Mr. đã quan tâm ạ. Em xác nhận lại là phòng của Mr. có diện tích khoảng 30 mét vuông và trong nhà có trẻ nhỏ đúng không ạ?",
+      "text": "Dạ, em chào anh Trần Văn H, em gọi lại về sản phẩm Giày sneaker Urban Classic anh đã đặt với mã đơn OD900802 đang xử lý ạ. Anh có thể xác nhận lại cho em về diện tích phòng của mình là 30 mét vuông và nhà có trẻ nhỏ đúng không ạ?",
       "questions": [
         {
           "slot": "room_area_m2",
           "type": "confirm",
-          "text": "Phòng của Mr. có diện tích khoảng 30 mét vuông đúng không ạ?"
+          "text": "Diện tích phòng của anh là 30 mét vuông đúng không ạ?"
         },
         {
           "slot": "has_children",
           "type": "confirm",
-          "text": "Trong nhà có trẻ nhỏ đúng không ạ?"
+          "text": "Anh có trẻ nhỏ đúng không ạ?"
         }
       ],
       "facts_used": [
@@ -47,22 +47,13 @@
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Đúng rồi, em.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
       "speaker": "agent_ai",
-      "text": "Dạ, cảm ơn Mr đã xác nhận. Ngân sách Mr cho máy là khoảng 6 triệu, đúng không ạ?",
+      "text": "Cảm ơn anh đã xác nhận. Máy lọc không khí Xiaomi Smart 4 Pro rất phù hợp với diện tích phòng của anh và có tính năng khóa trẻ em. Hiện tại, giá của máy là 5.490.000đ. Anh có ngân sách tầm 6 triệu, vậy anh có muốn biết về khuyến mãi hiện tại không ạ?",
       "questions": [
         {
           "slot": "budget_vnd",
           "type": "confirm",
-          "text": "Ngân sách của Mr cho máy là khoảng 6 triệu đúng không ạ?"
+          "text": "Ngân sách của anh tầm 6 triệu đúng không ạ?"
         }
       ],
       "facts_used": [
@@ -70,8 +61,12 @@
       ],
       "claims": [
         {
-          "field": "budget_vnd",
-          "value": 6000000
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "promo_active",
+          "value": true
         }
       ],
       "tool_calls": [],
@@ -82,30 +77,11 @@
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Vâng, đúng rồi.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
       "speaker": "agent_ai",
-      "text": "Dạ, máy lọc không khí Xiaomi Smart 4 Pro hiện có giá 5.490.000đ và đang có khuyến mãi với mã XM-COMBO, có hiệu lực đến ngày 14 tháng 11 ạ. Em cũng muốn hỏi là Mr có muốn biết thêm về chương trình khuyến mãi này không ạ?",
-      "questions": [
-        {
-          "slot": "promo_code",
-          "type": "confirm",
-          "text": "Mr có muốn biết thêm về chương trình khuyến mãi này không ạ?"
-        }
-      ],
+      "text": "Dạ, máy Xiaomi Smart 4 Pro hiện đang có chương trình khuyến mãi với mã XM-COMBO, áp dụng đến ngày 14/11/2026. Anh có muốn đặt hàng ngay không ạ?",
+      "questions": [],
       "facts_used": [],
       "claims": [
-        {
-          "field": "price_vnd",
-          "value": 5490000
-        },
         {
           "field": "promo_code",
           "value": "XM-COMBO"
@@ -123,44 +99,24 @@
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Máy này có khuyến mãi gì không em?",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
       "speaker": "agent_ai",
-      "text": "Dạ, hiện tại máy lọc không khí Xiaomi Smart 4 Pro có khuyến mãi với mã XM-COMBO, Mr có thể sử dụng để được giảm giá. Nếu Mr cần thêm thông tin gì, em sẵn sàng hỗ trợ ạ.",
-      "questions": [],
+      "text": "Nếu anh cần thêm thời gian để bàn với gia đình, em hoàn toàn hiểu. Khi nào anh sẵn sàng, anh có thể gọi lại cho em, em sẽ ghi nhận lịch hẹn gọi lại cho anh. Anh có muốn hẹn lại thời gian cụ thể không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "open",
+          "text": "Anh có muốn hẹn lại thời gian cụ thể không ạ?"
+        }
+      ],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Chị sẽ bàn với gia đình rồi gọi lại nhé.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em hiểu ạ. Mr hãy bàn với gia đình và gọi lại cho em khi có quyết định nhé. Em rất mong được phục vụ Mr ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình"
+        }
+      ],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,

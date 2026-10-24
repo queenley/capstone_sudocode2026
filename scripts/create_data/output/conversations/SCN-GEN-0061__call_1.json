@@ -12,16 +12,17 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Nguyễn Văn A, em gọi lại để tư vấn về combo Spectra S1 và máy hâm sữa Fatz mà Mr. đã hỏi ạ. Chị có bé 4 tháng, đúng không ạ?",
+      "text": "Dạ em chào anh Nguyễn Văn A, em gọi lại về đơn hàng SKU-AP-Y anh đang quan tâm ạ. Anh đã đặt hàng vào ngày 01/10 và đơn OD900102 đang được giao, đúng không ạ?",
       "questions": [
         {
-          "slot": "child_age_months",
+          "slot": "order_id",
           "type": "confirm",
-          "text": "Chị có bé 4 tháng, đúng không ạ?"
+          "text": "Đơn OD900102 đang được giao, đúng không ạ?"
         }
       ],
       "facts_used": [
-        "child_age_months"
+        "order_id",
+        "owned_sku"
       ],
       "claims": [],
       "tool_calls": [],
@@ -32,9 +33,24 @@
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Đúng rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Combo này có giá là 4.790.000đ, nằm trong ngân sách của chị là 5 triệu rưỡi. Hiện tại có chương trình khuyến mãi MOM-FREESHIP, chị sẽ được miễn phí vận chuyển ạ.",
-      "questions": [],
+      "text": "Cảm ơn anh đã xác nhận ạ. Hôm nay em có một số thông tin về combo Spectra S1 và máy hâm sữa Fatz mà anh đã hỏi. Giá combo này là 4.790.000đ và hiện tại đang có khuyến mãi miễn phí giao hàng ạ. Anh có muốn biết thêm chi tiết nào không ạ?",
+      "questions": [
+        {
+          "slot": "price_vnd",
+          "type": "confirm",
+          "text": "Giá combo này là 4.790.000đ và hiện tại đang có khuyến mãi miễn phí giao hàng, đúng không ạ?"
+        }
+      ],
       "facts_used": [],
       "claims": [
         {
@@ -42,7 +58,7 @@
           "value": 4790000
         },
         {
-          "field": "promo_MOM-FREESHIP_active",
+          "field": "promo_active",
           "value": true
         }
       ],
@@ -54,18 +70,33 @@
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Có khuyến mãi gì không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Em cũng xin thông báo là sản phẩm này hiện đang có sẵn hàng và sẽ được giao trong vòng 2-4 ngày làm việc ạ. Chị có cần thêm thông tin gì không ạ?",
-      "questions": [],
+      "text": "Dạ, anh có thể sử dụng mã khuyến mãi MOM-FREESHIP để được miễn phí giao hàng cho đơn hàng này. Mã khuyến mãi này có hiệu lực đến ngày 29 tháng 11 năm 2026 ạ. Anh có muốn đặt hàng ngay bây giờ không ạ?",
+      "questions": [
+        {
+          "slot": "promo_code",
+          "type": "confirm",
+          "text": "Mã khuyến mãi MOM-FREESHIP có hiệu lực đến 29/11/2026, anh có muốn đặt hàng không ạ?"
+        }
+      ],
       "facts_used": [],
       "claims": [
         {
-          "field": "in_stock",
-          "value": true
+          "field": "promo_code",
+          "value": "MOM-FREESHIP"
         },
         {
-          "field": "call_date",
-          "value": "2026-10-29"
+          "field": "promo_expiry",
+          "value": "2026-11-29"
         }
       ],
       "tool_calls": [],
@@ -76,24 +107,52 @@
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Tôi có ngân sách khoảng 5 triệu rưỡi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ, nếu chị muốn gọi hotline để hỏi thêm thông tin, em sẽ ghi nhận lại và hẹn gọi lại cho chị sau ạ. Chị có muốn em ghi lại thời gian cụ thể không ạ?",
+      "text": "Dạ, với ngân sách của anh khoảng 5 triệu rưỡi, anh hoàn toàn có thể đặt combo Spectra S1 và máy hâm sữa Fatz với mức giá 4.790.000đ. Phí giao hàng sẽ được miễn phí với mã khuyến mãi anh đã có ạ. Anh có muốn đặt hàng ngay bây giờ không ạ?",
       "questions": [
         {
-          "slot": "blocker",
-          "type": "open",
-          "text": "Chị có muốn em ghi lại thời gian cụ thể không ạ?"
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Anh có ngân sách khoảng 5 triệu rưỡi, đúng không ạ?"
         }
       ],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Tôi muốn gọi hotline để hỏi thêm trước khi quyết định.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ. Anh có thể gọi hotline để hỏi thêm thông tin. Em sẽ ghi nhận lại thông tin này và sẽ gọi lại cho anh sau ạ. Cảm ơn anh Nguyễn Văn A đã quan tâm đến sản phẩm của chúng em. Chúc anh một ngày tốt lành!",
+      "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
-      "memory_writes": [
-        {
-          "key": "blocker",
-          "value": "muốn gọi hotline hỏi thêm"
-        }
-      ],
+      "memory_writes": [],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -101,7 +160,7 @@
     }
   ],
   "gold": {
-    "intent": "Hỏi về combo sản phẩm cho bé.",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,

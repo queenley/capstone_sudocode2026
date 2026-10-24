@@ -6,7 +6,7 @@
   "customer_id": "SYN-C001",
   "customer_phone": "0998000001",
   "customer_name": "Nguyễn Văn A",
-  "honorific": "Mr.",
+  "honorific": "anh",
   "region": "bac",
   "category": "gia-dung/noi-chien",
   "difficulty": "hard",
@@ -35,44 +35,44 @@
           "source": "crm_session",
           "customer_id": "SYN-C001",
           "session_id": "SYN-001-S1",
-          "date": "2026-09-01",
+          "date": "2026-03-01",
           "channel": "hotline",
-          "summary": "Hỗ trợ mua máy hút bụi",
-          "outcome": "successful",
-          "stale": false
+          "summary": "Mua Máy lọc không khí AirPure X giá 4.890.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
         },
         {
           "source": "crm_session",
           "customer_id": "SYN-C001",
           "session_id": "SYN-001-S2",
-          "date": "2026-09-02",
+          "date": "2026-10-01",
           "channel": "zalo_oa",
-          "summary": "Tư vấn về máy giặt",
-          "outcome": "successful",
+          "summary": "Đặt Máy lọc không khí AirPure Y giá 5.200.000đ, đơn OD900102 đang giao.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C001",
-          "order_id": "O001",
-          "date": "2026-01-15",
-          "sku": "HAP001",
+          "order_id": "OD900101",
+          "date": "2026-03-01",
+          "sku": "SKU-AP-X",
           "status": "delivered",
           "stale": false,
           "facts": {
-            "owned_sku": "HAP001"
+            "owned_sku": "SKU-AP-X"
           }
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C001",
-          "order_id": "O002",
-          "date": "2026-05-20",
-          "sku": "HAP002",
+          "order_id": "OD900102",
+          "date": "2026-10-01",
+          "sku": "SKU-AP-Y",
           "status": "shipping",
           "stale": false,
           "facts": {
-            "order_id": "O002"
+            "order_id": "OD900102"
           }
         }
       ],
@@ -141,20 +141,20 @@
         "is_returning": true,
         "n_previous_sessions": 2,
         "last_session": {
-          "date": "2026-09-02",
+          "date": "2026-10-01",
           "channel": "zalo_oa",
-          "outcome": "successful",
-          "summary": "Tư vấn về máy giặt"
+          "outcome": "chot_don",
+          "summary": "Đặt Máy lọc không khí AirPure Y giá 5.200.000đ, đơn OD900102 đang giao."
         },
         "products_advised": [
-          "HAP001"
+          "SKU-AP-X"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Nguyễn Văn A, em gọi lại về HAP001 Mr. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào anh Nguyễn Văn A, em gọi lại về SKU-AP-X anh đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-11-12T08:00:00",
@@ -249,7 +249,7 @@
         "order_id": "OD600001",
         "superseded": {
           "price_quoted_vnd": 3391500,
-          "order_id": "O002"
+          "order_id": "OD900102"
         }
       },
       "expected_call_brief": {
@@ -263,8 +263,8 @@
           "outcome": "hen_goi_lai"
         },
         "products_advised": [
-          "HAP001",
-          "SKU-AF-6L"
+          "SKU-AF-6L",
+          "SKU-AP-X"
         ],
         "open_blockers": [
           "muốn gọi hotline hỏi thêm"
@@ -277,7 +277,7 @@
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Nguyễn Văn A, em gọi lại về HAP001 Mr. đang quan tâm ạ, không biết muốn gọi hotline hỏi thêm chưa ạ?",
+        "suggested_opening": "Dạ em chào anh Nguyễn Văn A, em gọi lại về SKU-AF-6L anh đang quan tâm ạ, không biết muốn gọi hotline hỏi thêm chưa ạ?",
         "freshness_checks": {
           "price_changed": true,
           "promos_no_longer_active": [

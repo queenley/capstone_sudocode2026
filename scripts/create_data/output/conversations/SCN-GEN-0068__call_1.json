@@ -12,48 +12,71 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Trần Văn H, em gọi lại về đơn hàng FAS006 mà Mr. đang quan tâm ạ. Phòng của Mr. khoảng 35 mét vuông, và Mr. có trẻ nhỏ đúng không ạ?",
+      "text": "Dạ, em chào anh Trần Văn H, em gọi lại về đơn hàng trước đó là Giày sneaker Urban Classic giá 890.000đ, đơn OD900802 đang xử lý ạ. Anh có còn nhớ diện tích phòng của mình khoảng 35 mét vuông và nhà có trẻ nhỏ không ạ?",
       "questions": [
         {
           "slot": "room_area_m2",
           "type": "confirm",
-          "text": "Phòng của Mr. khoảng 35 mét vuông đúng không ạ?"
+          "text": "Diện tích phòng của anh khoảng 35 mét vuông không?"
         },
         {
           "slot": "has_children",
           "type": "confirm",
-          "text": "Mr. có trẻ nhỏ đúng không ạ?"
+          "text": "Nhà anh có trẻ nhỏ không?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "owned_sku",
+          "value": "SKU-SN-RUN1-40-TRANG"
+        },
+        {
+          "field": "order_id",
+          "value": "OD900802"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, cái đó đúng.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn anh. Anh muốn tìm hiểu về máy lọc không khí Xiaomi Smart 4 Pro, đúng không ạ? Em có thể cho anh biết diện tích phòng của anh là 35 mét vuông ạ. Còn về ngân sách, anh có đề cập là khoảng 6 triệu đúng không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của anh khoảng 6 triệu đúng không?"
         }
       ],
       "facts_used": [
         "room_area_m2",
-        "has_children"
+        "budget_vnd"
       ],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Máy lọc không khí Xiaomi Smart 4 Pro có giá 5.490.000đ và hiện có chương trình khuyến mãi với mã giảm giá là XM-COMBO, có hiệu lực đến ngày 19/10 ạ. Em thấy Mr. có ngân sách khoảng 6 triệu, như vậy là phù hợp ạ.",
-      "questions": [],
-      "facts_used": [],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 5490000
+          "field": "room_area_m2",
+          "value": 35
         },
         {
-          "field": "promo_code",
-          "value": "XM-COMBO"
-        },
-        {
-          "field": "promo_expiry",
-          "value": "2026-10-19"
+          "field": "budget_vnd",
+          "value": 6000000
         }
       ],
       "tool_calls": [],
@@ -64,8 +87,17 @@
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Đúng rồi, ngân sách 6 triệu.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Tuy nhiên, sản phẩm này hiện tại không có hàng sẵn, dự kiến sẽ về vào ngày 19/10 ạ. Nếu Mr. cần thêm thông tin gì, em rất sẵn lòng hỗ trợ.",
+      "text": "Dạ, em xin lỗi vì máy lọc không khí Xiaomi Smart 4 Pro hiện tại không có hàng. Dự kiến sẽ về lại vào ngày 19/10 ạ. Anh có muốn biết thêm thông tin khác về máy lọc không khí khác không ạ?",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -86,8 +118,52 @@
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Vậy máy này có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Mr. có cần thêm thời gian để suy nghĩ không ạ? Nếu cần, em có thể gọi lại cho Mr. sau một thời gian ngắn ạ.",
+      "text": "Dạ, máy lọc không khí Xiaomi Smart 4 Pro có khuyến mãi combo đi kèm là 50.000đ, nhưng khuyến mãi này chỉ áp dụng khi sản phẩm còn hàng ạ. Hiện tại khuyến mãi vẫn còn hiệu lực đến ngày 14/11 ạ. Anh có cần thêm thông tin gì khác không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "promo_code",
+          "value": "XM-COMBO"
+        },
+        {
+          "field": "promo_expiry",
+          "value": "2026-11-14"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh cần suy nghĩ thêm rồi sẽ gọi lại.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu ạ. Anh cứ suy nghĩ thoải mái, khi nào cần thêm thông tin hay quyết định đặt hàng thì hãy gọi lại cho em nhé. Em cảm ơn anh đã dành thời gian hôm nay ạ!",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -97,28 +173,10 @@
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em đã ghi nhận lại là Mr. cần suy nghĩ thêm rồi sẽ gọi lại. Cảm ơn Mr. đã quan tâm đến sản phẩm của shop. Chúc Mr. một ngày tốt lành ạ!",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [
-        {
-          "key": "blocker",
-          "value": "cần suy nghĩ thêm"
-        }
-      ],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
     }
   ],
   "gold": {
-    "intent": "Hỏi về máy lọc không khí Xiaomi Smart 4 Pro",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,

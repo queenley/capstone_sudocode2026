@@ -180,7 +180,8 @@ Bắt đầu từ [.env.example](.env.example).
 | `OPENAI_API_KEY`, `GEMINI_API_KEY` / `GOOGLE_API_KEY` | Key cho AI (cần ít nhất một) |
 | `ADMIN_TOKEN`, `AGENT_TOKEN`, `SELLER_TOKEN`, `DEVELOPER_TOKEN` | Token theo vai trò, chỉ dùng khi phát triển |
 | `POSTGRES_PASSWORD`, `APP_SECRET`, `ENCRYPTION_KEY` | Database và mã hóa dữ liệu |
-| `AI_GATEWAY_API_KEY` | Bật lớp kiểm tra câu trả lời thứ hai (Jev); không có thì chỉ chạy lớp kiểm tra cơ bản |
+| `TYPESAFE_API_KEY` | Bật lớp kiểm tra câu trả lời thứ hai (Jev, gọi thẳng TypeSafe); không có thì chỉ chạy lớp kiểm tra cơ bản |
+| `AI_GATEWAY_API_KEY` | Jev qua Vercel AI Gateway thay cho TypeSafe (cần nạp credits; đổi `evaluators.policy` trong `models.yaml`) |
 | `OTP_DELIVERY_URL` | Gửi OTP thật; để trống thì mã hiện trên màn hình |
 
 Model AI của từng thành phần cấu hình trong [`apps/ai-agent-service/config/models.yaml`](apps/ai-agent-service/config/models.yaml). Khi deploy thật: `APP_SECRET` dài ít nhất 32 ký tự, token mạnh và khác nhau.

@@ -5,17 +5,17 @@
   "customer_id": "SYN-C005",
   "customer_phone": "0998000005",
   "customer_name": "Đỗ Minh E",
-  "honorific": "Mr.",
+  "honorific": "anh",
   "region": "trung",
   "category": "me-be",
   "difficulty": "normal",
   "tags": [
-    "an_toàn",
-    "ghế_ngồi",
+    "an_toan",
     "handoff",
-    "hẹn_gọi_lại",
+    "hen_goi_lai",
+    "khach_hang",
     "safety",
-    "tư_vấn",
+    "tu_van",
     "variant:chuan"
   ],
   "metric_focus": [
@@ -35,53 +35,53 @@
           "source": "crm_session",
           "customer_id": "SYN-C005",
           "session_id": "SYN-005-S1",
-          "date": "2026-09-01",
+          "date": "2026-07-13",
           "channel": "hotline",
-          "summary": "Hỏi về quần áo trẻ em",
-          "outcome": "successful",
+          "summary": "Mua Áo khoác gió Windbreak giá 690.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_session",
           "customer_id": "SYN-C005",
           "session_id": "SYN-005-S2",
-          "date": "2026-09-02",
+          "date": "2026-10-05",
           "channel": "zalo_oa",
-          "summary": "Tư vấn chọn đồ mùa hè",
-          "outcome": "successful",
+          "summary": "Đặt Áo phao lông vũ Warmly giá 1.490.000đ, đơn OD900502 đang giao.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C005",
-          "order_id": "O009",
-          "date": "2026-05-30",
-          "sku": "FAS003",
-          "status": "shipping",
+          "order_id": "OD900501",
+          "date": "2026-07-13",
+          "sku": "SKU-JK-WND-M-NAVY",
+          "status": "delivered",
           "stale": false,
           "facts": {
-            "order_id": "O009"
+            "owned_sku": "SKU-JK-WND-M-NAVY"
           }
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C005",
-          "order_id": "O010",
-          "date": "2026-09-12",
-          "sku": "FAS004",
-          "status": "delivered",
+          "order_id": "OD900502",
+          "date": "2026-10-05",
+          "sku": "SKU-JK-DWN-M-NAVY",
+          "status": "shipping",
           "stale": false,
           "facts": {
-            "owned_sku": "FAS004"
+            "order_id": "OD900502"
           }
         }
       ],
       "customer_goal": "Hỏi về ghế ngồi ô tô cho bé.",
       "customer_turns": [
-        "Alo, em muốn hỏi về ghế ngồi ô tô cho bé Chicco.",
-        "Bé nhà em được 15 tháng tuổi, ngân sách khoảng 5 triệu rưỡi.",
+        "Alo, anh muốn hỏi về ghế ngồi ô tô cho bé, anh có một bé 15 tháng tuổi.",
+        "Ngân sách của anh là 5 triệu rưỡi, không biết có ghế nào phù hợp không?",
         "Ghế này có khuyến mãi gì không em?",
-        "Em cần suy nghĩ thêm rồi sẽ gọi lại."
+        "Anh cần suy nghĩ thêm rồi sẽ gọi lại."
       ],
       "facts_established": {
         "child_age_months": 15,
@@ -124,20 +124,20 @@
         "is_returning": true,
         "n_previous_sessions": 2,
         "last_session": {
-          "date": "2026-09-02",
+          "date": "2026-10-05",
           "channel": "zalo_oa",
-          "outcome": "successful",
-          "summary": "Tư vấn chọn đồ mùa hè"
+          "outcome": "chot_don",
+          "summary": "Đặt Áo phao lông vũ Warmly giá 1.490.000đ, đơn OD900502 đang giao."
         },
         "products_advised": [
-          "FAS004"
+          "SKU-JK-WND-M-NAVY"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Đỗ Minh E, em gọi lại về FAS004 Mr. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào anh Đỗ Minh E, em gọi lại về SKU-JK-WND-M-NAVY anh đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-11-13T08:00:00",
@@ -155,11 +155,11 @@
       "call_date": "2026-11-15",
       "days_later": 2,
       "input_mode": "text",
-      "customer_goal": "Hỏi về an toàn sức khỏe khi dùng sản phẩm.",
+      "customer_goal": "Hỏi về an toàn sản phẩm cho bé.",
       "customer_turns": [
-        "Alo, chào em! Hôm trước em có tư vấn cho chị ghế ngồi ô tô cho bé.",
-        "Chị có câu hỏi về an toàn, nếu bé đang dùng thuốc thì có dùng được ghế này không?",
-        "Em có thể chuyển máy cho người biết về vấn đề này được không?"
+        "Alo, anh có câu hỏi về sản phẩm ghế ngồi ô tô cho bé.",
+        "Bé nhà anh đang dùng thuốc, không biết có dùng ghế này được không?",
+        "Nếu không được thì anh có thể chuyển máy cho bác sĩ không?"
       ],
       "expected_outcome": "chuyen_may",
       "must_carry_over": [
@@ -191,7 +191,7 @@
           "outcome": "hen_goi_lai"
         },
         "products_advised": [
-          "FAS004",
+          "SKU-JK-WND-M-NAVY",
           "SKU-MB-CAR"
         ],
         "open_blockers": [
@@ -204,7 +204,7 @@
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Đỗ Minh E, em gọi lại về FAS004 Mr. đang quan tâm ạ, không biết cần suy nghĩ thêm chưa ạ?",
+        "suggested_opening": "Dạ em chào anh Đỗ Minh E, em gọi lại về SKU-JK-WND-M-NAVY anh đang quan tâm ạ, không biết cần suy nghĩ thêm chưa ạ?",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-11-15T08:00:00",

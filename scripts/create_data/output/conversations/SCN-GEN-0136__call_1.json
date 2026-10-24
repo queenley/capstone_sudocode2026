@@ -12,18 +12,33 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Đinh Văn J, hôm trước chị có hỏi về sản phẩm mới đúng không ạ?",
+      "text": "Dạ, em chào anh Đinh Văn J. Em gọi lại để hỏi về bộ sản phẩm AirPure Y mà anh đang quan tâm ạ. Anh có nhu cầu sử dụng cho gia đình và ngân sách của anh là khoảng 6 triệu rưỡi phải không ạ?",
       "questions": [
         {
           "slot": "usage_need",
           "type": "confirm",
-          "text": "Chị muốn dùng cho gia đình đúng không?"
+          "text": "Anh có nhu cầu sử dụng cho gia đình không?"
+        },
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của anh là khoảng 6 triệu rưỡi phải không ạ?"
         }
       ],
       "facts_used": [
-        "usage_need"
+        "usage_need",
+        "budget_vnd"
       ],
-      "claims": [],
+      "claims": [
+        {
+          "field": "usage_need",
+          "value": "dùng cho gia đình"
+        },
+        {
+          "field": "budget_vnd",
+          "value": 6500000
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -33,25 +48,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Combo AirPure Y có giá là 6.390.000đ ạ. Chị có ngân sách khoảng 6 triệu rưỡi đúng không ạ?",
-      "questions": [
-        {
-          "slot": "budget_vnd",
-          "type": "confirm",
-          "text": "Chị dự định ngân sách khoảng 6 triệu rưỡi đúng không?"
-        }
-      ],
-      "facts_used": [
-        "budget_vnd"
-      ],
+      "text": "Dạ, bộ sản phẩm AirPure Y có giá 6.390.000đ. Hiện tại không có khuyến mãi nào áp dụng cho sản phẩm này, nhưng anh có thể nhận hàng ngay nếu đặt hôm nay. Anh có muốn đặt hàng không ạ?",
+      "questions": [],
+      "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 6390000
         },
         {
-          "field": "list_price_vnd",
-          "value": 6390000
+          "field": "promo_active",
+          "value": false
         }
       ],
       "tool_calls": [],
@@ -63,38 +70,25 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Em thấy giá này nằm trong ngân sách của chị, nên rất hợp lý ạ. Chị đang chờ cuối tháng nhận lương mới quyết định, vậy chị có muốn em gọi lại không ạ?",
-      "questions": [
-        {
-          "slot": "blocker",
-          "type": "confirm",
-          "text": "Chị đang chờ cuối tháng nhận lương mới đúng không?"
-        }
-      ],
-      "facts_used": [
-        "blocker"
-      ],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em sẽ gọi lại cho chị vào đầu tháng sau nhé. Cảm ơn chị đã dành thời gian, chúc chị một ngày tốt lành ạ!",
+      "text": "Dạ, em hiểu anh cần thời gian để quyết định. Nếu anh cần thêm thông tin gì, em có thể giúp đỡ ạ. Em sẽ gọi lại cho anh vào cuối tháng để kiểm tra xem anh đã có quyết định chưa nhé?",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
-      "memory_writes": [
-        {
-          "key": "blocker",
-          "value": "chờ cuối tháng nhận lương"
-        }
-      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cảm ơn anh Đinh Văn J vì đã dành thời gian. Em sẽ gọi lại vào cuối tháng. Chúc anh một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,

@@ -6,7 +6,7 @@
   "customer_id": "SYN-C010",
   "customer_phone": "0998000010",
   "customer_name": "Đinh Văn J",
-  "honorific": "Mr.",
+  "honorific": "anh",
   "region": "bac",
   "category": "gia-dung/combo",
   "difficulty": "hard",
@@ -14,10 +14,10 @@
     "cap_nhat_thong_tin",
     "dat_hang",
     "hard_case",
-    "ho_tro_khach_hang",
     "order_status",
     "supersede",
-    "tu_van_san_pham",
+    "trang_thai_don_hang",
+    "tu_van",
     "variant:ba_phien_doi_thong_tin"
   ],
   "metric_focus": [
@@ -38,55 +38,55 @@
           "source": "crm_session",
           "customer_id": "SYN-C010",
           "session_id": "SYN-010-S1",
-          "date": "2026-09-01",
+          "date": "2026-07-01",
           "channel": "hotline",
-          "summary": "Hỏi về chương trình khuyến mãi",
-          "outcome": "successful",
+          "summary": "Mua Máy lọc nước UF Sunhouse giá 3.290.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_session",
           "customer_id": "SYN-C010",
           "session_id": "SYN-010-S2",
-          "date": "2026-09-02",
+          "date": "2026-10-10",
           "channel": "zalo_oa",
-          "summary": "Tìm hiểu về sản phẩm mới",
-          "outcome": "successful",
+          "summary": "Đặt Quạt đứng DC inverter Panasonic F-409 giá 2.450.000đ, đơn OD901002 đang xử lý.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C010",
-          "order_id": "O019",
-          "date": "2026-06-30",
-          "sku": "HAP007",
-          "status": "processing",
+          "order_id": "OD901001",
+          "date": "2026-07-01",
+          "sku": "SKU-WF-UF",
+          "status": "delivered",
           "stale": false,
           "facts": {
-            "order_id": "O019"
+            "owned_sku": "SKU-WF-UF"
           }
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C010",
-          "order_id": "O020",
-          "date": "2026-09-28",
-          "sku": "HAP008",
-          "status": "delivered",
+          "order_id": "OD901002",
+          "date": "2026-10-10",
+          "sku": "SKU-FAN-DC1",
+          "status": "processing",
           "stale": false,
           "facts": {
-            "owned_sku": "HAP008"
+            "order_id": "OD901002"
           }
         }
       ],
       "speaker_customer_id": null,
       "fault_injection": null,
-      "customer_goal": "Hỏi về sản phẩm Combo AirPure Y cho gia đình",
+      "customer_goal": "Hỏi về bộ sản phẩm AirPure Y cho gia đình.",
       "customer_turns": [
-        "Alo, em chào chị, hôm trước chị có hỏi về sản phẩm mới đúng không?",
-        "Chị muốn mua Combo AirPure Y cho gia đình, giá cả thế nào em?",
-        "Chị dự định ngân sách khoảng 6 triệu rưỡi thôi.",
-        "Chị đang chờ cuối tháng nhận lương mới quyết định, nên có thể gọi lại không em?"
+        "Alo, anh muốn hỏi về bộ sản phẩm AirPure Y cho gia đình.",
+        "Ngân sách của anh khoảng 6 triệu rưỡi.",
+        "Có khuyến mãi gì không em?",
+        "Anh cần chờ cuối tháng nhận lương mới quyết định được."
       ],
       "customer_turns_asr": [],
       "facts_established": {
@@ -141,20 +141,20 @@
         "is_returning": true,
         "n_previous_sessions": 2,
         "last_session": {
-          "date": "2026-09-02",
+          "date": "2026-10-10",
           "channel": "zalo_oa",
-          "outcome": "successful",
-          "summary": "Tìm hiểu về sản phẩm mới"
+          "outcome": "chot_don",
+          "summary": "Đặt Quạt đứng DC inverter Panasonic F-409 giá 2.450.000đ, đơn OD901002 đang xử lý."
         },
         "products_advised": [
-          "HAP008"
+          "SKU-WF-UF"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Đinh Văn J, em gọi lại về HAP008 Mr. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào anh Đinh Văn J, em gọi lại về SKU-WF-UF anh đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-10-29T08:00:00",
@@ -174,12 +174,11 @@
       "seed_history": [],
       "speaker_customer_id": null,
       "fault_injection": null,
-      "customer_goal": "Xác nhận mua sản phẩm và thông tin giao hàng",
+      "customer_goal": "Xác nhận mua bộ sản phẩm AirPure Y.",
       "customer_turns": [
-        "Alo, em, hôm trước chị đã hỏi về Combo AirPure Y rồi, giờ chị muốn đặt hàng.",
-        "Chị sẽ thanh toán COD, khu vực giao hàng là Cầu Giấy, Hà Nội.",
-        "Ngân sách của chị bây giờ khoảng 7 triệu rưỡi, em có thể lên đơn cho chị không?",
-        "Chị đồng ý, làm ơn giúp chị đặt hàng nhé."
+        "Alo, anh muốn đặt bộ sản phẩm AirPure Y.",
+        "Hình thức thanh toán là COD.",
+        "Giao hàng cho anh ở Cầu Giấy, Hà Nội."
       ],
       "customer_turns_asr": [],
       "facts_established": {
@@ -242,7 +241,7 @@
         "order_id": "OD600001",
         "superseded": {
           "budget_vnd": 6500000,
-          "order_id": "O019"
+          "order_id": "OD901002"
         }
       },
       "expected_call_brief": {
@@ -256,8 +255,8 @@
           "outcome": "hen_goi_lai"
         },
         "products_advised": [
-          "HAP008",
-          "SKU-BDL-AIR"
+          "SKU-BDL-AIR",
+          "SKU-WF-UF"
         ],
         "open_blockers": [
           "chờ cuối tháng nhận lương"
@@ -269,7 +268,7 @@
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Đinh Văn J, em gọi lại về HAP008 Mr. đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+        "suggested_opening": "Dạ em chào anh Đinh Văn J, em gọi lại về SKU-BDL-AIR anh đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
         "freshness_checks": {
           "price_changed": false,
           "promos_no_longer_active": [],
@@ -313,11 +312,10 @@
       "seed_history": [],
       "speaker_customer_id": null,
       "fault_injection": null,
-      "customer_goal": "Hỏi tình trạng đơn hàng đã đặt",
+      "customer_goal": "Hỏi tình trạng đơn hàng.",
       "customer_turns": [
-        "Alo, em ơi, cho chị hỏi tình trạng đơn hàng chị đã đặt hôm trước.",
-        "Chị không nhớ mã đơn hàng, em có thể kiểm tra giúp chị không?",
-        "Chị chỉ muốn biết đơn hàng của chị đã được xử lý chưa."
+        "Alo, anh muốn hỏi tình trạng đơn hàng của mình.",
+        "Đơn hàng của anh đã được tạo chưa?"
       ],
       "customer_turns_asr": [],
       "facts_established": {},
@@ -377,8 +375,8 @@
           "outcome": "chot_don"
         },
         "products_advised": [
-          "HAP008",
-          "SKU-BDL-AIR"
+          "SKU-BDL-AIR",
+          "SKU-WF-UF"
         ],
         "open_blockers": [
           "chờ cuối tháng nhận lương"
@@ -392,7 +390,7 @@
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Đinh Văn J, em gọi lại về HAP008 Mr. đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+        "suggested_opening": "Dạ em chào anh Đinh Văn J, em gọi lại về SKU-BDL-AIR anh đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-11-04T08:00:00",

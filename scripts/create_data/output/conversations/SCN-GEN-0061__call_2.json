@@ -12,21 +12,64 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào Mr. Nguyễn Văn A, em gọi lại về combo sản phẩm mà Mr. đang quan tâm ạ. Hôm qua chị đã hỏi về combo đó đúng không ạ?",
+      "text": "Dạ, em chào anh Nguyễn Văn A, em gọi lại về combo mà hôm qua em đã tư vấn cho anh, bao gồm máy hút sữa Spectra S1 và máy hâm sữa Fatz ạ. Anh có muốn xác nhận đặt hàng không ạ?",
       "questions": [
         {
           "slot": "blocker",
           "type": "confirm",
-          "text": "Chị muốn gọi hotline hỏi thêm không ạ?"
+          "text": "Anh có muốn xác nhận đặt hàng không?"
         }
       ],
       "facts_used": [
         "blocker",
         "product_advised",
         "price_quoted_vnd",
-        "promo_code",
-        "order_id",
-        "owned_sku"
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-BDL-MOM"
+        },
+        {
+          "field": "price_vnd",
+          "value": 4790000
+        },
+        {
+          "field": "promo_code",
+          "value": "MOM-FREESHIP"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh muốn đặt hàng, thanh toán COD nhé.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận anh muốn thanh toán COD ạ. Khu vực giao hàng của anh là ở đâu ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Khu vực giao hàng của anh là ở đâu ạ?"
+        }
+      ],
+      "facts_used": [
+        "payment"
       ],
       "claims": [],
       "tool_calls": [],
@@ -38,32 +81,33 @@
     },
     {
       "speaker": "customer",
-      "text": "Đúng rồi, chị đã hỏi về combo đó.",
+      "text": "Khu vực giao hàng là Long Biên, Hà Nội.",
       "facts_stated": {
-        "blocker": "muốn gọi hotline hỏi thêm"
+        "delivery_area": "Long Biên, Hà Nội"
       },
-      "entities": [],
+      "entities": [
+        {
+          "type": "address",
+          "value": "Long Biên, Hà Nội",
+          "spoken": "Long Biên, Hà Nội"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em thông báo rằng combo sản phẩm này giá là 4.790.000đ ạ. Chị muốn thanh toán COD và giao hàng ở Long Biên, Hà Nội phải không ạ?",
+      "text": "Cảm ơn anh, em đã ghi nhận khu vực giao hàng là Long Biên, Hà Nội. Bây giờ em sẽ gửi cho anh đơn hàng với những thông tin sau: sản phẩm là máy hút sữa Spectra S1 và máy hâm sữa Fatz, số lượng 1, tổng giá 4.790.000đ, phương thức thanh toán COD và địa chỉ giao hàng là Long Biên, Hà Nội. Anh có muốn em tạo đơn hàng ngay không ạ?",
       "questions": [
         {
-          "slot": "payment",
+          "slot": "order",
           "type": "confirm",
-          "text": "Chị muốn thanh toán COD đúng không ạ?"
-        },
-        {
-          "slot": "delivery_area",
-          "type": "confirm",
-          "text": "Chị muốn giao hàng ở Long Biên, Hà Nội đúng không ạ?"
+          "text": "Anh có muốn em tạo đơn hàng ngay không ạ?"
         }
       ],
       "facts_used": [
-        "price_quoted_vnd"
+        "delivery_area"
       ],
       "claims": [
         {
@@ -80,11 +124,8 @@
     },
     {
       "speaker": "customer",
-      "text": "Đúng rồi, chị muốn thanh toán COD và giao hàng ở Long Biên, Hà Nội.",
-      "facts_stated": {
-        "payment": "COD",
-        "delivery_area": "Long Biên, Hà Nội"
-      },
+      "text": "Vậy gửi cho anh đơn hàng luôn nhé.",
+      "facts_stated": {},
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -92,45 +133,14 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em đã xác nhận thông tin thanh toán COD và địa chỉ giao hàng là Long Biên, Hà Nội. Chị có muốn em lên đơn cho sản phẩm này không ạ?",
-      "questions": [
-        {
-          "slot": "order_id",
-          "type": "confirm",
-          "text": "Chị đồng ý lên đơn cho sản phẩm này nhé!"
-        }
-      ],
-      "facts_used": [
-        "payment",
-        "delivery_area"
-      ],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Có, chị đồng ý lên đơn cho sản phẩm này nhé!",
-      "facts_stated": {
-        "order_id": "OD600001"
-      },
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em sẽ tạo đơn hàng cho sản phẩm combo này. Thông tin đơn hàng như sau: sản phẩm là combo giá 4.790.000đ, thanh toán COD, địa chỉ giao hàng là Long Biên, Hà Nội, dự kiến giao vào ngày 02/11/2026 ạ. Em sẽ tiến hành xác nhận đơn hàng ngay bây giờ ạ!",
+      "text": "Dạ, em sẽ tiến hành tạo đơn hàng ngay ạ. Xin phép anh cho em chút thời gian ạ. Đơn hàng sẽ được tạo với mã đơn là OD600001 ạ. Thời gian giao hàng dự kiến là ngày 02 tháng 11 năm 2026 ạ. Cảm ơn anh đã đặt hàng tại shop, em chúc anh một ngày tốt lành!",
       "questions": [],
-      "facts_used": [
-        "order_id"
-      ],
+      "facts_used": [],
       "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
         {
           "field": "estimated_delivery",
           "value": "2026-11-02"
@@ -160,23 +170,10 @@
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, đơn hàng của chị đã được tạo thành công với mã đơn là OD600001. Cảm ơn chị đã chọn sản phẩm của chúng em! Nếu cần thêm thông tin gì, chị cứ liên hệ với shop nhé!",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
     }
   ],
   "gold": {
-    "intent": "Xác nhận đơn hàng cho combo sản phẩm.",
+    "intent": "Xác nhận mua combo và thông tin giao hàng",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
@@ -186,7 +183,8 @@
     "supersedes": [],
     "callback": null,
     "order": {
-      "order_id": "OD600001"
+      "order_id": "OD600001",
+      "payment": "COD"
     }
   }
 }

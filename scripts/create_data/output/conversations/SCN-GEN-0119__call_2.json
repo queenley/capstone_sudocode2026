@@ -7,51 +7,22 @@
   "channel": "hotline",
   "date": "2026-10-31",
   "region": "bac",
-  "category": "unknown",
+  "category": "gia-dung/may-loc-nuoc",
   "persona": "khach_co_don_chua_co_lich_su",
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Lê Văn G, em gọi lại về đơn hàng của Mr. ạ. Hiện tại đơn hàng có mã O014 đang trong trạng thái giao hàng. Em thấy Mr. muốn thay đổi địa chỉ giao hàng phải không ạ?",
-      "questions": [
-        {
-          "slot": "order_id",
-          "type": "confirm",
-          "text": "Ông có đúng đơn hàng mã O014 không?"
-        }
-      ],
-      "facts_used": [
-        "order_id"
-      ],
-      "claims": [
-        {
-          "field": "order_id",
-          "value": "O014"
-        },
-        {
-          "field": "order_status",
-          "value": "shipping"
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em đã xác nhận mã đơn là O014. Ông cho em biết địa chỉ mới mà ông muốn chuyển đến là gì ạ?",
+      "text": "Dạ, em chào anh Lê Văn G. Em đã ghi nhận yêu cầu đổi địa chỉ giao hàng cho đơn hàng của anh ạ. Hiện tại, địa chỉ giao hàng là Long Biên, Hà Nội đúng không ạ?",
       "questions": [
         {
           "slot": "delivery_area",
-          "type": "open",
-          "text": "Địa chỉ mới của ông là gì ạ?"
+          "type": "confirm",
+          "text": "Địa chỉ giao hàng là Long Biên, Hà Nội đúng không ạ?"
         }
       ],
       "facts_used": [
-        "order_id"
+        "order_id",
+        "owned_sku"
       ],
       "claims": [],
       "tool_calls": [],
@@ -63,22 +34,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, cảm ơn ông đã cung cấp địa chỉ mới là Long Biên, Hà Nội. Em sẽ tiến hành cập nhật địa chỉ giao hàng cho đơn O014 của ông ngay bây giờ. Ông có cần thêm thông tin gì không ạ?",
+      "text": "Cảm ơn anh đã xác nhận. Em sẽ tiến hành cập nhật địa chỉ giao hàng ngay bây giờ cho đơn hàng mã OD900702 của anh ạ. Xin anh chờ một chút ạ.",
       "questions": [],
       "facts_used": [
         "order_id"
       ],
-      "claims": [
-        {
-          "field": "delivery_area",
-          "value": "Long Biên, Hà Nội"
-        }
-      ],
+      "claims": [],
       "tool_calls": [
         {
           "name": "order.update",
           "args": {
-            "order_id": "O014",
+            "order_id": "OD900702",
             "action": "update_address",
             "on": "2026-10-31"
           }
@@ -92,12 +58,15 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em đã cập nhật địa chỉ giao hàng cho đơn hàng O014 thành công. Đơn hàng của ông sẽ được giao đến Long Biên, Hà Nội. Nếu ông cần thêm thông tin gì, xin vui lòng cho em biết ạ. Cảm ơn ông và chúc ông một ngày tốt lành!",
+      "text": "Dạ, em đã cập nhật địa chỉ giao hàng thành công cho đơn hàng OD900702 của anh. Địa chỉ mới là Long Biên, Hà Nội. Nếu anh cần thêm thông tin gì khác, xin hãy cho em biết ạ. Cảm ơn anh đã gọi đến shop.",
       "questions": [],
-      "facts_used": [
-        "delivery_area"
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900702"
+        }
       ],
-      "claims": [],
       "tool_calls": [],
       "memory_writes": [
         {

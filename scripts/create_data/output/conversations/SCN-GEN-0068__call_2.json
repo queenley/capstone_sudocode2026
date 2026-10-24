@@ -12,15 +12,22 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Trần Văn H, rất vui được gặp lại anh. Em gọi lại về máy lọc không khí mà anh đã quan tâm, không biết anh đã quyết định chưa ạ?",
+      "text": "Dạ, em chào anh Trần Văn H, em gọi lại vì anh đã đặt máy lọc không khí SKU-XM-4P. Em xác nhận anh sẽ thanh toán bằng chuyển khoản và khu vực giao hàng là Nha Trang, Khánh Hòa, đúng không ạ?",
       "questions": [
         {
-          "slot": "product_advised",
+          "slot": "payment",
           "type": "confirm",
-          "text": "Anh có muốn đặt máy lọc không khí không ạ?"
+          "text": "Anh sẽ thanh toán bằng chuyển khoản?"
+        },
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Khu vực giao hàng là Nha Trang, Khánh Hòa, đúng không ạ?"
         }
       ],
       "facts_used": [
+        "payment",
+        "delivery_area",
         "product_advised"
       ],
       "claims": [],
@@ -32,84 +39,11 @@
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Em gọi lại để đặt máy lọc không khí.",
-      "facts_stated": {
-        "product_advised": "SKU-XM-4P"
-      },
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
       "speaker": "agent_ai",
-      "text": "Dạ, em đã ghi nhận anh muốn đặt máy lọc không khí SKU-XM-4P ạ. Anh dự định thanh toán bằng phương thức nào ạ?",
-      "questions": [
-        {
-          "slot": "payment",
-          "type": "open",
-          "text": "Anh dự định thanh toán bằng phương thức nào ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Em muốn thanh toán bằng chuyển khoản.",
-      "facts_stated": {
-        "payment": "chuyen_khoan"
-      },
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em xin xác nhận là anh sẽ thanh toán bằng chuyển khoản. Khu vực giao hàng của anh là ở đâu vậy ạ?",
-      "questions": [
-        {
-          "slot": "delivery_area",
-          "type": "open",
-          "text": "Khu vực giao hàng của anh là ở đâu vậy ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Khu vực giao hàng là Nha Trang, Khánh Hòa.",
-      "facts_stated": {
-        "delivery_area": "Nha Trang, Khánh Hòa"
-      },
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em xin xác nhận lại đơn hàng: máy lọc không khí SKU-XM-4P với giá 5.490.000đ, thanh toán bằng chuyển khoản, và địa chỉ giao hàng là Nha Trang, Khánh Hòa. Dự kiến giao hàng vào ngày 23/10/2026 ạ. Em sẽ tiến hành tạo đơn hàng ngay bây giờ ạ!",
+      "text": "Cảm ơn anh đã xác nhận. Giá của máy lọc không khí SKU-XM-4P là 5.490.000đ. Ngày giao hàng dự kiến là 23/10/2026. Em sẽ tiến hành xác nhận đơn hàng cho anh ngay bây giờ ạ.",
       "questions": [],
       "facts_used": [
-        "price_quoted_vnd",
-        "payment",
-        "delivery_area"
+        "price_quoted_vnd"
       ],
       "claims": [
         {
@@ -135,24 +69,6 @@
           }
         }
       ],
-      "memory_writes": [
-        {
-          "key": "order_id",
-          "value": "OD600001"
-        }
-      ],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Đơn hàng đã được tạo thành công với mã đơn là OD600001 ạ. Cảm ơn anh đã đặt hàng, nếu cần thêm thông tin gì, anh cứ liên hệ với em nhé!",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
       "memory_writes": [],
       "entities": [],
       "pause_before_ms": 0,
@@ -160,20 +76,16 @@
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Cảm ơn em.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
       "speaker": "agent_ai",
-      "text": "Dạ, em cũng cảm ơn anh. Chúc anh có một ngày tốt lành!",
+      "text": "Đơn hàng đã được tạo thành công, mã đơn hàng của anh là OD600001. Em có thể giúp gì thêm cho anh không ạ?",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -187,13 +99,17 @@
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
-    "sentiment": "positive",
+    "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],
     "supersedes": [],
     "callback": null,
     "order": {
-      "order_id": "OD600001"
+      "order_id": "OD600001",
+      "status": "created",
+      "total_vnd": 5490000,
+      "needs_confirmation_call": false,
+      "estimated_delivery": "2026-10-23"
     }
   }
 }

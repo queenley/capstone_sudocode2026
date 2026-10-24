@@ -12,78 +12,43 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Đỗ Minh E, em gọi lại về ghế ngồi ô tô Chicco mà Mr. đã quan tâm ạ. Bé nhà mình đã được 15 tháng tuổi và ngân sách khoảng 5 triệu rưỡi đúng không ạ?",
+      "text": "Dạ, em chào anh Đỗ Minh E, em gọi lại về SKU-JK-WND-M-NAVY anh đang quan tâm ạ. Anh có một bé 15 tháng tuổi, đúng không ạ?",
       "questions": [
         {
           "slot": "child_age_months",
           "type": "confirm",
-          "text": "Bé nhà mình đã được 15 tháng tuổi đúng không ạ?"
-        },
-        {
-          "slot": "budget_vnd",
-          "type": "confirm",
-          "text": "Ngân sách khoảng 5 triệu rưỡi đúng không ạ?"
+          "text": "Anh có một bé 15 tháng tuổi, đúng không ạ?"
         }
       ],
       "facts_used": [
         "child_age_months",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận rằng ngân sách của anh là 5 triệu rưỡi. Với mức ngân sách này, em xin giới thiệu ghế ngồi ô tô Chicco với giá 4.990.000đ. Anh có muốn biết thêm thông tin về sản phẩm không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của anh là 5 triệu rưỡi, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
         "budget_vnd"
       ],
       "claims": [
         {
-          "field": "child_age_months",
-          "value": 15
-        },
-        {
-          "field": "budget_vnd",
-          "value": 5500000
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Đúng rồi, em cần hỏi về ghế ngồi ô tô cho bé Chicco.",
-      "facts_stated": {
-        "product_advised": "SKU-MB-CAR"
-      },
-      "entities": [
-        {
-          "type": "phone",
-          "value": "0998000005",
-          "spoken": "0998000005"
-        }
-      ],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, ghế Chicco này có giá là 4.990.000đ và hiện đang có khuyến mãi miễn phí vận chuyển ạ. Khuyến mãi này sẽ kết thúc vào ngày 29 tháng 11 năm 2026. Mr. có muốn đặt hàng ngay bây giờ không ạ?",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
-        {
           "field": "price_vnd",
           "value": 4990000
-        },
-        {
-          "field": "promo_active",
-          "value": true
-        },
-        {
-          "field": "promo_MOM-FREESHIP_active",
-          "value": true
-        },
-        {
-          "field": "promo_expiry",
-          "value": "2026-11-29"
         }
       ],
       "tool_calls": [],
@@ -94,17 +59,8 @@
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Ghế này có khuyến mãi gì không em?",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
       "speaker": "agent_ai",
-      "text": "Dạ, hiện tại ghế Chicco đang có khuyến mãi miễn phí vận chuyển ạ. Khuyến mãi này sẽ hết hạn vào ngày 29 tháng 11 năm 2026. Mr. có muốn đặt hàng ngay không ạ?",
+      "text": "Dạ, sản phẩm này hiện đang có khuyến mãi miễn phí vận chuyển với mã MOM-FREESHIP, áp dụng đến ngày 29 tháng 11 ạ. Anh có muốn em đặt hàng cho anh không ạ?",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -129,31 +85,21 @@
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Em cần suy nghĩ thêm rồi sẽ gọi lại.",
-      "facts_stated": {
-        "blocker": "cần suy nghĩ thêm"
-      },
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
       "speaker": "agent_ai",
-      "text": "Dạ, em hiểu ạ. Nếu Mr. có bất kỳ thắc mắc nào hay quyết định đặt hàng, hãy gọi lại cho em bất cứ lúc nào nhé. Em xin chào và cảm ơn Mr. Đỗ Minh E nhiều ạ!",
-      "questions": [],
+      "text": "Dạ, em hiểu rằng anh cần suy nghĩ thêm trước khi quyết định. Khi nào anh muốn gọi lại để tiếp tục trao đổi ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "open",
+          "text": "Khi nào anh muốn gọi lại để tiếp tục trao đổi ạ?"
+        }
+      ],
       "facts_used": [
         "blocker"
       ],
       "claims": [],
       "tool_calls": [],
-      "memory_writes": [
-        {
-          "key": "blocker",
-          "value": "cần suy nghĩ thêm"
-        }
-      ],
+      "memory_writes": [],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -161,7 +107,7 @@
     }
   ],
   "gold": {
-    "intent": "hen_goi_lai",
+    "intent": "Hỏi về ghế ngồi ô tô cho bé.",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,

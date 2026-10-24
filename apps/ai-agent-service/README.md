@@ -70,7 +70,7 @@ Những gì cần đọc hiểu lời khách không nằm trong luật mà nằm
 | Thiếu | Hành vi |
 |---|---|
 | Key của provider advisor | advisor lỗi, agent nói câu an toàn; sau hai câu như vậy, lane `HANDOFF` chuyển cho nhân viên |
-| `AI_GATEWAY_API_KEY` (Jev) | bỏ qua soft guard, hard guard vẫn chạy |
+| `TYPESAFE_API_KEY` (Jev) | bỏ qua soft guard, hard guard vẫn chạy |
 | Database | service vẫn khởi động; `/health` báo `degraded` kèm lý do, `/health/ready` trả 503 |
 | Gói voice | chat chạy bình thường; cuộc gọi voice nhận thông báo lỗi nêu rõ gói còn thiếu |
 
@@ -141,7 +141,8 @@ Test `tests/agent/test_btc_contract.py` giữ các điểm trên. Mọi tên slo
 | `AGENT_DB_SCHEMA` | mặc định `agent` |
 | `APP_SECRET` | ≥ 32 byte ở production; sinh khóa vault PII và khóa định danh. Đổi giá trị thì vault cũ không đọc được |
 | `GOOGLE_API_KEY`, `GROQ_API_KEY`, `NVIDIA_API_KEY` | provider của advisor; model chỉ được đề xuất khi có key |
-| `AI_GATEWAY_API_KEY` | Jev qua Vercel AI Gateway |
+| `TYPESAFE_API_KEY`, `JEV_URL` | Jev gọi thẳng TypeSafe (`POST /v1/systemone`), mặc định của `evaluators.policy` |
+| `AI_GATEWAY_API_KEY` | Jev qua Vercel AI Gateway (gói miễn phí bị từ chối: phải nạp credits) |
 | `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_BASE_URL` | tracing (đã che PII) và trace `agent-turn` tổng hợp mỗi lượt, tùy chọn |
 | `VOICE_MODELS_DIR` | weights voice, tải một lần (image: `/app/models`, volume) |
 | `EMBEDDING_MODELS_DIR` | model embedding của kho tri thức (multilingual-e5-small, 118 MB), knowledge server tự tải lần đầu (image: `/app/models/embedding`); không có mạng thì chỉ tra theo từ khóa |

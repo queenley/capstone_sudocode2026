@@ -6,15 +6,15 @@
   "customer_id": "SYN-C001",
   "customer_phone": "0998000001",
   "customer_name": "Nguyễn Văn A",
-  "honorific": "Mr.",
+  "honorific": "anh",
   "region": "bac",
   "category": "me-be",
   "difficulty": "hard",
   "tags": [
-    "combo_sản_phẩm",
+    "combo",
     "cross_channel",
-    "giao_hàng",
     "hard_case",
+    "hâm_sữa",
     "teencode",
     "tư_vấn",
     "variant:chuan",
@@ -38,61 +38,63 @@
           "source": "crm_session",
           "customer_id": "SYN-C001",
           "session_id": "SYN-001-S1",
-          "date": "2026-09-01",
+          "date": "2026-03-01",
           "channel": "hotline",
-          "summary": "Hỗ trợ mua máy hút bụi",
-          "outcome": "successful",
-          "stale": false
+          "summary": "Mua Máy lọc không khí AirPure X giá 4.890.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
         },
         {
           "source": "crm_session",
           "customer_id": "SYN-C001",
           "session_id": "SYN-001-S2",
-          "date": "2026-09-02",
+          "date": "2026-10-01",
           "channel": "zalo_oa",
-          "summary": "Tư vấn về máy giặt",
-          "outcome": "successful",
+          "summary": "Đặt Máy lọc không khí AirPure Y giá 5.200.000đ, đơn OD900102 đang giao.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C001",
-          "order_id": "O001",
-          "date": "2026-01-15",
-          "sku": "HAP001",
+          "order_id": "OD900101",
+          "date": "2026-03-01",
+          "sku": "SKU-AP-X",
           "status": "delivered",
           "stale": false,
           "facts": {
-            "owned_sku": "HAP001"
+            "owned_sku": "SKU-AP-X"
           }
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C001",
-          "order_id": "O002",
-          "date": "2026-05-20",
-          "sku": "HAP002",
+          "order_id": "OD900102",
+          "date": "2026-10-01",
+          "sku": "SKU-AP-Y",
           "status": "shipping",
           "stale": false,
           "facts": {
-            "order_id": "O002"
+            "order_id": "OD900102"
           }
         }
       ],
       "speaker_customer_id": null,
       "fault_injection": null,
-      "customer_goal": "Hỏi về combo sản phẩm cho bé.",
+      "customer_goal": "Hỏi về Combo Spectra S1 và máy hâm sữa Fatz",
       "customer_turns": [
-        "Alo, chị muốn hỏi về combo Spectra S1 với máy hâm sữa Fatz.",
-        "Ngân sách của chị là 5 triệu rưỡi, không biết có khuyến mãi gì không em?",
-        "Chị có bé 4 tháng, nên cần sản phẩm phù hợp.",
-        "Chị muốn gọi hotline hỏi thêm một số thông tin nữa."
+        "Alo em, anh muốn hỏi về combo Spectra S1 và máy hâm sữa Fatz.",
+        "Giá combo này là bao nhiêu và có khuyến mãi gì không?",
+        "Anh có ngân sách khoảng 5 triệu rưỡi.",
+        "Nhà anh có bé 4 tháng tuổi, vậy có cần gì đặc biệt không?",
+        "Anh muốn gọi hotline để hỏi thêm trước khi quyết định."
       ],
       "customer_turns_asr": [
-        "alo chi muon hoi ve combo spectra s1 voi may ham sua fatz",
-        "ngan sach cua chi la 5 trieu rưỡi khong biet co khuyen mai gi khong em",
-        "chi co be 4 thang nen can san pham phu hop",
-        "chi muon goi hotline hoi them mot so thong tin nua"
+        "alo em anh muon hoi ve combo spectra s1 va may ham sua fatz",
+        "gia combo nay la bao nhieu va co khuyen mai gi khong",
+        "anh co ngan sach khoang 5 trieu rưỡi",
+        "nha anh co be 4 thang tuoi vay co can gi dac biet khong",
+        "anh muon goi hotline de hoi them truoc khi quyet dinh"
       ],
       "facts_established": {
         "child_age_months": 4,
@@ -151,20 +153,20 @@
         "is_returning": true,
         "n_previous_sessions": 2,
         "last_session": {
-          "date": "2026-09-02",
+          "date": "2026-10-01",
           "channel": "zalo_oa",
-          "outcome": "successful",
-          "summary": "Tư vấn về máy giặt"
+          "outcome": "chot_don",
+          "summary": "Đặt Máy lọc không khí AirPure Y giá 5.200.000đ, đơn OD900102 đang giao."
         },
         "products_advised": [
-          "HAP001"
+          "SKU-AP-X"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Nguyễn Văn A, em gọi lại về HAP001 Mr. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào anh Nguyễn Văn A, em gọi lại về SKU-AP-X anh đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-10-29T08:00:00",
@@ -184,12 +186,12 @@
       "seed_history": [],
       "speaker_customer_id": null,
       "fault_injection": null,
-      "customer_goal": "Xác nhận đơn hàng cho combo sản phẩm.",
+      "customer_goal": "Xác nhận mua combo và thông tin giao hàng",
       "customer_turns": [
-        "Chào em, hôm qua chị đã hỏi về combo đó.",
-        "Chị muốn thanh toán COD và giao hàng ở Long Biên, Hà Nội.",
-        "Chị đồng ý lên đơn cho sản phẩm này nhé!",
-        "Có gì cần thêm thông tin không em?"
+        "Alo, hôm qua em tư vấn cho anh combo Spectra S1 và máy hâm sữa Fatz.",
+        "Anh muốn đặt hàng, thanh toán COD nhé.",
+        "Khu vực giao hàng là Long Biên, Hà Nội.",
+        "Vậy gửi cho anh đơn hàng luôn nhé."
       ],
       "customer_turns_asr": [],
       "facts_established": {
@@ -254,7 +256,7 @@
         "promo_code": "MOM-FREESHIP",
         "order_id": "OD600001",
         "superseded": {
-          "order_id": "O002"
+          "order_id": "OD900102"
         }
       },
       "expected_call_brief": {
@@ -268,7 +270,7 @@
           "outcome": "hen_goi_lai"
         },
         "products_advised": [
-          "HAP001",
+          "SKU-AP-X",
           "SKU-BDL-MOM"
         ],
         "open_blockers": [
@@ -282,7 +284,7 @@
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Nguyễn Văn A, em gọi lại về HAP001 Mr. đang quan tâm ạ, không biết muốn gọi hotline hỏi thêm chưa ạ?",
+        "suggested_opening": "Dạ em chào anh Nguyễn Văn A, em gọi lại về SKU-AP-X anh đang quan tâm ạ, không biết muốn gọi hotline hỏi thêm chưa ạ?",
         "freshness_checks": {
           "price_changed": false,
           "promos_no_longer_active": [],

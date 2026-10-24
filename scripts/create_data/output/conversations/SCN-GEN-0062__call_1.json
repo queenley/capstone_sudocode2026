@@ -12,23 +12,18 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Đỗ Minh E, em gọi lại về sản phẩm ông đã hỏi trước đó là xe đẩy cho bé 5 tháng tuổi ạ. Ông có nhớ là ngân sách mình khoảng 7 triệu đồng không ạ?",
+      "text": "Dạ em chào anh Đỗ Minh E, em gọi lại về chiếc xe đẩy cho bé 5 tháng tuổi mà anh đang quan tâm ạ. Anh có nhớ là mình đã hỏi về xe đẩy có giá khoảng 7 triệu không ạ?",
       "questions": [
         {
           "slot": "budget_vnd",
           "type": "confirm",
-          "text": "Ông có nhớ là ngân sách mình khoảng 7 triệu đồng không ạ?"
+          "text": "Anh có nhớ là mình đã hỏi về xe đẩy có giá khoảng 7 triệu không ạ?"
         }
       ],
       "facts_used": [
         "budget_vnd"
       ],
-      "claims": [
-        {
-          "field": "budget_vnd",
-          "value": 7500000
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -38,25 +33,27 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Về xe đẩy, em xin giới thiệu mẫu SKU-MB-STR2, giá là 6.790.000đ. Hiện tại sản phẩm này đang có khuyến mãi miễn phí vận chuyển ạ, khuyến mãi này sẽ hết hạn vào ngày 29 tháng 11 năm 2026 ạ.",
-      "questions": [],
-      "facts_used": [],
+      "text": "Dạ, xe đẩy mà em muốn giới thiệu đến anh là mẫu Joie Pact, có giá 6.790.000đ và hiện tại đang có chương trình khuyến mãi miễn phí vận chuyển với mã MOM-FREESHIP. Anh có muốn biết thêm thông tin gì về sản phẩm này không ạ?",
+      "questions": [
+        {
+          "slot": "promo_code",
+          "type": "open",
+          "text": "Anh có muốn biết thêm thông tin gì về sản phẩm này không ạ?"
+        }
+      ],
+      "facts_used": [
+        "child_age_months",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
       "claims": [
         {
           "field": "price_vnd",
           "value": 6790000
         },
         {
-          "field": "promo_active",
-          "value": true
-        },
-        {
           "field": "promo_MOM-FREESHIP_active",
           "value": true
-        },
-        {
-          "field": "promo_expiry",
-          "value": "2026-11-29"
         }
       ],
       "tool_calls": [],
@@ -68,15 +65,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Ông có cần thêm thông tin gì về sản phẩm không ạ? Nếu ông cần thời gian để quyết định, em cũng hiểu ạ, ông có thể cho em biết khi nào ông sẽ quyết định được không ạ?",
+      "text": "Dạ, xe đẩy Joie Pact này rất nhẹ chỉ 6 kg, có thể gập gọn một tay và chịu tải lên đến 22 kg, rất phù hợp cho trẻ từ sơ sinh đến 4 tuổi. Bên cạnh đó, sản phẩm còn có mái che chống nắng UPF 50. Anh thấy mẫu này thế nào ạ?",
       "questions": [
         {
-          "slot": "blocker",
+          "slot": "product_advised",
           "type": "open",
-          "text": "Ông có thể cho em biết khi nào ông sẽ quyết định được không ạ?"
+          "text": "Anh thấy mẫu này thế nào ạ?"
         }
       ],
-      "facts_used": [],
+      "facts_used": [
+        "product_advised"
+      ],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
@@ -87,19 +86,14 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em hiểu, ông cần chờ cuối tháng nhận lương mới quyết định được ạ. Vậy em sẽ gọi lại cho ông vào đầu tháng sau, được không ạ?",
+      "text": "Dạ, em hiểu rằng anh cần thời gian để quyết định, vì anh sẽ chờ cuối tháng nhận lương. Nếu anh có thắc mắc gì thêm về sản phẩm, anh cứ liên hệ với em nhé. Em sẽ ghi chú lại và gọi lại cho anh sau để xem anh có quyết định mua không ạ. Chúc anh có một ngày tốt lành!",
       "questions": [],
       "facts_used": [
         "blocker"
       ],
       "claims": [],
       "tool_calls": [],
-      "memory_writes": [
-        {
-          "key": "blocker",
-          "value": "chờ cuối tháng nhận lương"
-        }
-      ],
+      "memory_writes": [],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,

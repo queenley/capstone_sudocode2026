@@ -12,24 +12,19 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Lê Văn G, em gọi lại về máy lọc không khí AirPure Pro mà Mr. đã quan tâm. Không biết Mr. đã bàn với gia đình về sản phẩm chưa ạ?",
+      "text": "Dạ, em chào anh Lê Văn G, em gọi lại về sản phẩm máy lọc không khí AirPure Pro mà anh đã quan tâm ạ. Anh có thể cho em biết mình đã bàn với gia đình chưa ạ?",
       "questions": [
         {
-          "slot": "blocker",
-          "type": "confirm",
-          "text": "Mr. đã bàn với gia đình chưa?"
+          "slot": "room_area_m2",
+          "type": "open",
+          "text": "Mình đã bàn với gia đình chưa ạ?"
         }
       ],
       "facts_used": [
         "product_advised",
-        "blocker"
+        "owned_sku"
       ],
-      "claims": [
-        {
-          "field": "product_advised",
-          "value": "SKU-AP-PRO"
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -38,24 +33,9 @@
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Chưa đâu, chưa bàn ạ.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
       "speaker": "agent_ai",
-      "text": "Dạ, em hiểu ạ. Mr. có muốn biết giá máy lọc không khí không ạ?",
-      "questions": [
-        {
-          "slot": "price_vnd",
-          "type": "open",
-          "text": "Mr. có muốn biết giá máy lọc không khí không ạ?"
-        }
-      ],
+      "text": "Dạ, cảm ơn anh đã gọi lại. Anh muốn mua máy lọc không khí AirPure Pro, nồi chiên không dầu Xiaomi 4.5L, quạt đứng Senko TS16 và màng lọc thay thế, đúng không ạ?",
+      "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
@@ -66,108 +46,11 @@
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Có, giá bao nhiêu em nhỉ?",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
       "speaker": "agent_ai",
-      "text": "Máy lọc không khí AirPure Pro có giá là 7.690.000đ. Hiện tại đang có khuyến mãi 300.000đ nếu Mr. đặt hàng trong tháng này ạ.",
+      "text": "Tổng tiền cho tất cả sản phẩm mà anh chọn sẽ là 10.860.000đ ạ, bao gồm máy lọc không khí AirPure Pro 7690000đ, nồi chiên không dầu Xiaomi 4.5L 1590000đ, quạt đứng Senko TS16 590000đ và màng lọc thay thế 990000đ. Anh có muốn chốt đơn không ạ?",
       "questions": [],
       "facts_used": [
-        "price_quoted_vnd",
-        "promo_code"
-      ],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 7690000
-        },
-        {
-          "field": "promo_AIR-OCT_active",
-          "value": true
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Thế còn nồi chiên không dầu thì sao, có khuyến mãi gì không?",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, nồi chiên không dầu hiện có giá là 1.590.000đ. Hiện tại chưa có khuyến mãi cho sản phẩm này ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd:SKU-AF-XM",
-          "value": 1590000
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Vậy quạt đứng có giá bao nhiêu?",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Quạt đứng có giá là 590.000đ ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd:SKU-FAN-SEN",
-          "value": 590000
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Chị muốn mua 4 món này, tổng tiền là bao nhiêu?",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, tổng tiền cho 4 món là 10.860.000đ. Mr. có muốn chốt đơn không ạ?",
-      "questions": [],
-      "facts_used": [
-        "total_vnd"
+        "price_quoted_vnd"
       ],
       "claims": [
         {
@@ -183,33 +66,17 @@
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Chị muốn thanh toán bằng chuyển khoản.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
       "speaker": "agent_ai",
-      "text": "Dạ, em đã ghi nhận phương thức thanh toán là chuyển khoản ạ. Địa chỉ giao hàng của Mr. là Long Biên, Hà Nội đúng không ạ?",
+      "text": "Dạ, anh muốn trả bằng hình thức chuyển khoản phải không ạ?",
       "questions": [
         {
-          "slot": "delivery_area",
+          "slot": "payment",
           "type": "confirm",
-          "text": "Địa chỉ giao hàng là Long Biên, Hà Nội đúng không ạ?"
+          "text": "Anh muốn trả bằng hình thức chuyển khoản phải không ạ?"
         }
       ],
-      "facts_used": [
-        "payment"
-      ],
-      "claims": [
-        {
-          "field": "payment",
-          "value": "chuyen_khoan"
-        }
-      ],
+      "facts_used": [],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -218,9 +85,16 @@
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Đúng rồi.",
-      "facts_stated": {},
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu rằng ngân sách của anh chỉ khoảng 8 triệu rưỡi. Hiện tại, tổng tiền là 10 triệu 860 ngàn, anh có muốn áp dụng mã khuyến mãi AIR-OCT để được giảm giá không ạ? Mã này áp dụng đến 30/10/2026 ạ.",
+      "questions": [],
+      "facts_used": [
+        "budget_vnd",
+        "promo_code"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -228,11 +102,28 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em xin phép chốt đơn cho Mr. với các thông tin như sau: máy lọc không khí AirPure Pro, nồi chiên không dầu, quạt đứng, tổng tiền là 10.860.000đ, địa chỉ giao hàng là Long Biên, Hà Nội, phương thức thanh toán là chuyển khoản. Em sẽ tiến hành tạo đơn ngay ạ.",
+      "text": "Dạ, em có thể cho anh biết chi tiết từng món như sau: Máy lọc không khí AirPure Pro giá 7690000đ, nồi chiên không dầu Xiaomi 4.5L giá 1590000đ, quạt đứng Senko TS16 giá 590000đ và màng lọc thay thế giá 990000đ. Tổng cộng là 10 triệu 860 ngàn ạ. Anh có muốn chốt đơn không ạ?",
       "questions": [],
       "facts_used": [
-        "delivery_area",
-        "payment"
+        "price_vnd:SKU-AP-PRO",
+        "price_vnd:SKU-AF-XM",
+        "price_vnd:SKU-FAN-SEN",
+        "price_vnd:SKU-AP-FLT-P"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận đơn hàng của anh với 4 món: máy lọc không khí AirPure Pro, nồi chiên không dầu Xiaomi 4.5L, quạt đứng Senko TS16 và màng lọc thay thế. Tổng tiền là 10 triệu 860 ngàn. Phương thức thanh toán là chuyển khoản và địa chỉ giao hàng là Long Biên, Hà Nội. Dự kiến giao hàng vào ngày 20/10/2026 ạ.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
       ],
       "claims": [],
       "tool_calls": [
@@ -271,6 +162,18 @@
             "address": "Long Biên, Hà Nội",
             "on": "2026-10-17"
           }
+        },
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000007",
+            "sku": "SKU-AP-FLT-P",
+            "qty": 1,
+            "price_vnd": 990000,
+            "payment": "chuyen_khoan",
+            "address": "Long Biên, Hà Nội",
+            "on": "2026-10-17"
+          }
         }
       ],
       "memory_writes": [
@@ -279,19 +182,6 @@
           "value": "OD600001"
         }
       ],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Đơn đã được tạo thành công, dự kiến giao hàng vào ngày 20 tháng 10 ạ. Cảm ơn Mr. đã đặt hàng, chúc Mr. một ngày tốt lành!",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -308,8 +198,6 @@
     "commitments": [],
     "supersedes": [],
     "callback": null,
-    "order": {
-      "order_id": "OD600001"
-    }
+    "order": {}
   }
 }

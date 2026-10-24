@@ -44,6 +44,7 @@ from eval_harness.case_trace import write as write_case_trace
 from eval_harness.collector import collect
 from eval_harness.contracts import ROOT, checker, validate
 from eval_harness.datasets import close_output
+from eval_harness.environment import CRM_EXTENSION
 from eval_harness.preflight import call_plan, preflight
 from eval_harness.runner import _output_path, _write, run_fixed
 from eval_harness.scoring import score
@@ -62,7 +63,11 @@ DATASET = EVALUATION / "datasets/output1-btc-diagnostic-v2/scenarios"
 DATASETS = EVALUATION / "datasets"
 COMMAND = "agent/extract_command.py"
 #: The folders that make the agent a run starts: hashed into the bundle.
-TREE = {"service/src": SERVICE / "src", "service/config": SERVICE / "config", "evaluation/agent": EVALUATION / "agent"}
+TREE = {"service/src": SERVICE / "src", "service/config": SERVICE / "config",
+        "service/catalog": SERVICE / "data/btc/catalog", "evaluation/agent": EVALUATION / "agent"}
+#: The team's synthetic CRM customers the agent's mock adds (``mcp/servers/btc.py``); a run pins
+#: a copy so the harness's mock adds the same ones. ``BTC_SYNTHETIC_CRM=0`` turns both off.
+SYNTHETIC_CRM = SERVICE / "data/btc/catalog/crm_seed_synthetic.json"
 CAPABILITIES = ["business_tools", "memory_isolation", "memory_read_gate", "after_call_barrier",
                 "snapshots", "briefs", "timestamps", "usage"]
 DEFAULT_EXTRACTOR = "openai:gpt-4.1-mini"
@@ -277,6 +282,10 @@ def prepare(out, *, only=None, extractor_calls=None, dataset_id=None, level=None
         target.write_bytes((ROOT / ref["path"]).read_bytes())
         resources.append(ref)
     (out / "metrics-policy.json").write_bytes((ROOT / "fixtures/p6-metrics-policy.json").read_bytes())
+    extension = []
+    if SYNTHETIC_CRM.exists() and os.environ.get("BTC_SYNTHETIC_CRM", "1") != "0":
+        (out / CRM_EXTENSION).write_bytes(SYNTHETIC_CRM.read_bytes())
+        extension.append(assets.ref(CRM_EXTENSION))
 
     # The real extractor: the harness's prompt, the product's command, pinned.
     (out / "extractor-prompt.txt").write_bytes((ROOT.parent / "extractor-prompt.txt").read_bytes())
@@ -297,7 +306,7 @@ def prepare(out, *, only=None, extractor_calls=None, dataset_id=None, level=None
     manifest["sources"] = [assets.ref("fixtures/p1-scope.json"), *resources, *tool_refs, assets.ref("adapter.json"),
                            descriptor["code"], assets.ref("product-bundle.json"), assets.ref("metrics-policy.json"),
                            assets.ref("conversion-report.json"), assets.ref("extractor-prompt.txt"),
-                           assets.ref("extract_command.py"), assets.ref("extractor.json")]
+                           assets.ref("extract_command.py"), assets.ref("extractor.json"), *extension]
     if imported_labels is not None:
         manifest["sources"].append(assets.ref("registered-tool-labels.json"))
     _write(out / "manifest.json", manifest)

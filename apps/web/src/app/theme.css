@@ -1,0 +1,224 @@
+/* Design tokens: one emerald palette for the shop, the staff pages and the
+   sales workspace, in light and dark. Every colour in globals.css, shop.css
+   and sales.css is one of these; nothing else names a colour.
+
+   The theme follows the system unless the person picked one: <html
+   data-theme="light|dark"> (components/theme/ThemeToggle.tsx, remembered in
+   localStorage "theme" and applied before the first paint by the script in
+   app/layout.tsx). */
+
+:root {
+  color-scheme: light;
+  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Surfaces, from the page to the most raised. */
+  --bg: #f4f8f6;
+  --surface: #ffffff;
+  --surface-2: #f7faf9;
+  --surface-3: #edf3f0;
+  --line: #e1eae6;
+  --line-strong: #c9d8d1;
+
+  /* Text. */
+  --ink: #0f1f19;
+  --ink-2: #33433d;
+  --muted: #64746d;
+
+  /* Brand: emerald. --brand-ink is brand-coloured text on a surface. */
+  --brand: #059669;
+  --brand-strong: #047857;
+  --brand-deep: #065f46;
+  --on-brand: #ffffff;
+  --brand-ink: #047857;
+  --brand-soft: #ecfdf5;
+  --brand-soft-2: #d1fae5;
+  --brand-line: #a7f3d0;
+  --accent: #34d399;
+
+  /* States. Solid colours carry white text in both themes. */
+  --danger: #dc2626;
+  --danger-soft: #fef2f2;
+  --danger-line: #fecaca;
+  --danger-ink: #b91c1c;
+  --warn: #d97706;
+  --warn-soft: #fffbeb;
+  --warn-line: #fde68a;
+  --warn-ink: #92400e;
+  --info: #2563eb;
+  --info-soft: #eff6ff;
+  --info-ink: #1d4ed8;
+
+  /* Dark chrome: the staff sidebar, the shop's top line and footer. */
+  --chrome: #065f46;
+  --chrome-2: #054d39;
+  --on-chrome: #ffffff;
+  --on-chrome-muted: rgb(255 255 255 / 0.72);
+  --chrome-label: #6ee7b7;
+  --chrome-active: #ffffff;
+  --on-chrome-active: #065f46;
+
+  --overlay: rgb(6 28 21 / 0.45);
+  --shadow-rgb: 16 48 36;
+  --shadow-sm: 0 1px 2px rgb(var(--shadow-rgb) / 0.06);
+  --shadow: 0 1px 2px rgb(var(--shadow-rgb) / 0.05), 0 8px 24px rgb(var(--shadow-rgb) / 0.07);
+  --shadow-lg: 0 24px 64px rgb(var(--shadow-rgb) / 0.18);
+  --focus: 0 0 0 3px rgb(5 150 105 / 0.28);
+  --skeleton: linear-gradient(90deg, var(--surface-3) 25%, var(--surface-2) 50%, var(--surface-3) 75%);
+
+  /* Names the pages used before the tokens: kept as aliases. */
+  --green: var(--brand);
+  --paper: var(--bg);
+  --lime: var(--brand-soft-2);
+}
+
+/* Dark: written out twice, once for a picked theme and once for the system's
+   (CSS has no way to share a block between a selector and a media query). */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0b1310;
+  --surface: #111b17;
+  --surface-2: #15211c;
+  --surface-3: #1b2a24;
+  --line: #22332c;
+  --line-strong: #31473e;
+  --ink: #e6f1ec;
+  --ink-2: #c3d2cb;
+  --muted: #8fa29a;
+  --brand: #10b981;
+  --brand-strong: #34d399;
+  --brand-deep: #0d3b2e;
+  --on-brand: #032219;
+  --brand-ink: #34d399;
+  --brand-soft: #10271f;
+  --brand-soft-2: #133528;
+  --brand-line: #1f5a46;
+  --accent: #34d399;
+  --danger: #dc2626;
+  --danger-soft: #2a1414;
+  --danger-line: #5a2424;
+  --danger-ink: #fca5a5;
+  --warn: #d97706;
+  --warn-soft: #2a210c;
+  --warn-line: #5a4614;
+  --warn-ink: #fcd34d;
+  --info: #3b82f6;
+  --info-soft: #111d33;
+  --info-ink: #93c5fd;
+  --chrome: #0a1a15;
+  --chrome-2: #0e221b;
+  --chrome-label: #34d399;
+  --chrome-active: #133528;
+  --on-chrome-active: #6ee7b7;
+  --overlay: rgb(0 0 0 / 0.6);
+  --shadow-rgb: 0 0 0;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 24px rgb(0 0 0 / 0.35);
+  --shadow-lg: 0 24px 64px rgb(0 0 0 / 0.6);
+  --focus: 0 0 0 3px rgb(52 211 153 / 0.35);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0b1310;
+    --surface: #111b17;
+    --surface-2: #15211c;
+    --surface-3: #1b2a24;
+    --line: #22332c;
+    --line-strong: #31473e;
+    --ink: #e6f1ec;
+    --ink-2: #c3d2cb;
+    --muted: #8fa29a;
+    --brand: #10b981;
+    --brand-strong: #34d399;
+    --brand-deep: #0d3b2e;
+    --on-brand: #032219;
+    --brand-ink: #34d399;
+    --brand-soft: #10271f;
+    --brand-soft-2: #133528;
+    --brand-line: #1f5a46;
+    --accent: #34d399;
+    --danger: #dc2626;
+    --danger-soft: #2a1414;
+    --danger-line: #5a2424;
+    --danger-ink: #fca5a5;
+    --warn: #d97706;
+    --warn-soft: #2a210c;
+    --warn-line: #5a4614;
+    --warn-ink: #fcd34d;
+    --info: #3b82f6;
+    --info-soft: #111d33;
+    --info-ink: #93c5fd;
+    --chrome: #0a1a15;
+    --chrome-2: #0e221b;
+    --chrome-label: #34d399;
+    --chrome-active: #133528;
+    --on-chrome-active: #6ee7b7;
+    --overlay: rgb(0 0 0 / 0.6);
+    --shadow-rgb: 0 0 0;
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 24px rgb(0 0 0 / 0.35);
+    --shadow-lg: 0 24px 64px rgb(0 0 0 / 0.6);
+    --focus: 0 0 0 3px rgb(52 211 153 / 0.35);
+  }
+}
+
+/* Numbers that line up: prices, timers, counts, codes. */
+.mono,
+code,
+kbd {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The theme switch (components/theme/ThemeToggle.tsx). */
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-2);
+  flex: 0 0 auto;
+}
+.theme-toggle:hover:not(:disabled) {
+  background: var(--surface-3);
+  color: var(--brand-ink);
+  opacity: 1;
+}
+.theme-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+.theme-toggle.on-chrome {
+  border-color: rgb(255 255 255 / 0.2);
+  background: rgb(255 255 255 / 0.08);
+  color: var(--on-chrome);
+}
+.theme-toggle.on-chrome:hover:not(:disabled) {
+  background: rgb(255 255 255 / 0.16);
+  color: var(--on-chrome);
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

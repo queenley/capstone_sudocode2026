@@ -12,12 +12,12 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Lê Văn C, em gọi lại về sản phẩm MAB002 mà Mr. đang quan tâm ạ. Mr. có bé 5 tháng tuổi đúng không ạ?",
+      "text": "Dạ, em chào anh Lê Văn C, em gọi lại về sản phẩm túi trữ sữa Sunmum mà anh đang quan tâm ạ. Anh đã từng đặt hàng Xe đẩy 2 chiều Combi Sugocal trong phiên trước, đúng không ạ?",
       "questions": [
         {
-          "slot": "child_age_months",
+          "slot": "order_id",
           "type": "confirm",
-          "text": "Mr. có bé 5 tháng tuổi đúng không ạ?"
+          "text": "Anh đã từng đặt hàng Xe đẩy 2 chiều Combi Sugocal trong phiên trước, đúng không ạ?"
         }
       ],
       "facts_used": [
@@ -34,18 +34,12 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Về túi trữ sữa Sunmum mà Mr. đã hỏi, giá hiện tại là 119.000đ ạ. Mr. có ngân sách khoảng 500.000đ, vậy mình hoàn toàn có thể mua được sản phẩm này ạ.",
+      "text": "Túi trữ sữa Sunmum có giá 119.000đ cho 50 túi, anh nhé. Em xin thông báo là hiện tại sản phẩm này đang có sẵn trong kho ạ.",
       "questions": [],
-      "facts_used": [
-        "budget_vnd"
-      ],
+      "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
-          "value": 119000
-        },
-        {
-          "field": "list_price_vnd",
           "value": 119000
         }
       ],
@@ -58,7 +52,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Hiện tại không có khuyến mãi nào cho sản phẩm này, nhưng giá đã rất hợp lý rồi ạ. Mr. có cần thêm thông tin gì không ạ?",
+      "text": "Về khuyến mãi, hiện tại không có chương trình nào đang áp dụng cho túi trữ sữa Sunmum. Anh có cần thêm thông tin gì không ạ?",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -76,11 +70,9 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, nếu Mr. cần suy nghĩ thêm thì không sao ạ. Em sẽ ghi nhận lại và Mr. có thể gọi lại khi nào mình quyết định nhé. Chúc Mr. một ngày tốt lành ạ!",
+      "text": "Dạ, không sao ạ. Khi anh cần suy nghĩ thêm, anh có thể gọi lại cho em bất cứ lúc nào. Em cảm ơn anh đã quan tâm đến sản phẩm của shop. Chúc anh một ngày vui vẻ!",
       "questions": [],
-      "facts_used": [
-        "blocker"
-      ],
+      "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
@@ -91,21 +83,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Lê Văn C, em gọi lại về sản phẩm MAB002 mà Mr. đang quan tâm ạ. Mr. có bé 5 tháng tuổi đúng không ạ?",
-      "questions": [
-        {
-          "slot": "child_age_months",
-          "type": "confirm",
-          "text": "Mr. có bé 5 tháng tuổi đúng không ạ?"
-        }
-      ],
-      "facts_used": [
-        "order_id",
-        "owned_sku"
-      ],
+      "text": "Dạ, em sẽ ghi nhận lại thông tin để có thể giúp đỡ anh tốt hơn khi anh gọi lại. Em chào anh!",
+      "questions": [],
+      "facts_used": [],
       "claims": [],
       "tool_calls": [],
-      "memory_writes": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm"
+        }
+      ],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -113,7 +101,7 @@
     }
   ],
   "gold": {
-    "intent": "Hỏi về túi trữ sữa cho bé 5 tháng tuổi",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,

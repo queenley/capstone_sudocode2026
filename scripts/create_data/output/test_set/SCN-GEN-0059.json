@@ -5,14 +5,14 @@
   "customer_id": "SYN-C002",
   "customer_phone": "0998000002",
   "customer_name": "Trần Thị B",
-  "honorific": "Ms.",
+  "honorific": "chị",
   "region": "trung",
   "category": "thoi-trang/ao-khoac",
   "difficulty": "normal",
   "tags": [
-    "không_quyết",
-    "thời_trang",
-    "tư_vấn",
+    "hỏi_nhiều",
+    "không_mua",
+    "so_sánh",
     "từ_chối",
     "variant:chuan"
   ],
@@ -31,52 +31,52 @@
           "source": "crm_session",
           "customer_id": "SYN-C002",
           "session_id": "SYN-002-S1",
-          "date": "2026-09-01",
+          "date": "2026-04-04",
           "channel": "hotline",
-          "summary": "Hỏi về sản phẩm thời trang",
-          "outcome": "successful",
-          "stale": false
+          "summary": "Mua Giày chạy bộ RunLite 2 Pro giá 1.690.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
         },
         {
           "source": "crm_session",
           "customer_id": "SYN-C002",
           "session_id": "SYN-002-S2",
-          "date": "2026-09-02",
+          "date": "2026-10-02",
           "channel": "zalo_oa",
-          "summary": "Phản hồi về đơn hàng",
-          "outcome": "successful",
+          "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD900202 đang xử lý.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C002",
-          "order_id": "O003",
-          "date": "2026-03-12",
-          "sku": "FAS001",
-          "status": "processing",
+          "order_id": "OD900201",
+          "date": "2026-04-04",
+          "sku": "SKU-SN-RUN2-38-TRANG",
+          "status": "delivered",
           "stale": false,
           "facts": {
-            "order_id": "O003"
+            "owned_sku": "SKU-SN-RUN2-38-TRANG"
           }
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C002",
-          "order_id": "O004",
-          "date": "2026-09-10",
-          "sku": "FAS002",
-          "status": "delivered",
+          "order_id": "OD900202",
+          "date": "2026-10-02",
+          "sku": "SKU-SN-CAS-38-TRANG",
+          "status": "processing",
           "stale": false,
           "facts": {
-            "owned_sku": "FAS002"
+            "order_id": "OD900202"
           }
         }
       ],
-      "customer_goal": "Hỏi về áo phao lông vũ Warmly size L màu navy.",
+      "customer_goal": "Hỏi về áo phao lông vũ Warmly size L màu navy",
       "customer_turns": [
-        "Alo, chị muốn hỏi về áo phao lông vũ Warmly size L màu navy.",
-        "Áo này có màu nào khác không em?",
-        "Giá của áo này là bao nhiêu vậy?",
+        "Alo, chị muốn hỏi về áo phao lông vũ Warmly size L màu navy em ơi.",
+        "Áo này có khuyến mãi gì không?",
+        "Chị có thể biết giá không em?",
         "Chị muốn so sánh thêm trước khi quyết định."
       ],
       "facts_established": {
@@ -118,20 +118,20 @@
         "is_returning": true,
         "n_previous_sessions": 2,
         "last_session": {
-          "date": "2026-09-02",
+          "date": "2026-10-02",
           "channel": "zalo_oa",
-          "outcome": "successful",
-          "summary": "Phản hồi về đơn hàng"
+          "outcome": "chot_don",
+          "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD900202 đang xử lý."
         },
         "products_advised": [
-          "FAS002"
+          "SKU-SN-RUN2-38-TRANG"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Ms. Trần Thị B, em gọi lại về FAS002 Ms. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào chị Trần Thị B, em gọi lại về SKU-SN-RUN2-38-TRANG chị đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-10-30T08:00:00",
@@ -149,11 +149,12 @@
       "call_date": "2026-11-04",
       "days_later": 5,
       "input_mode": "text",
-      "customer_goal": "Từ chối không mua áo phao lông vũ.",
+      "customer_goal": "Từ chối mua áo phao lông vũ Warmly",
       "customer_turns": [
-        "Chị đã xem xét nhưng không mua áo phao này nữa.",
-        "Giá hơi cao so với ngân sách của chị.",
-        "Cảm ơn em đã tư vấn, nhưng chị sẽ không mua đâu."
+        "Chị đã xem xét rồi nhưng không mua áo phao nữa.",
+        "Em cho chị xin thêm thông tin về áo phao này được không?",
+        "Chị cảm thấy giá hơi cao, nên chị không mua.",
+        "Cảm ơn em đã tư vấn, chị sẽ không mua áo phao này nữa."
       ],
       "facts_established": {
         "product_advised": "SKU-JK-DWN",
@@ -202,8 +203,8 @@
           "outcome": "hen_goi_lai"
         },
         "products_advised": [
-          "FAS002",
-          "SKU-JK-DWN"
+          "SKU-JK-DWN",
+          "SKU-SN-RUN2-38-TRANG"
         ],
         "open_blockers": [
           "muốn so sánh thêm"
@@ -216,7 +217,7 @@
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Ms. Trần Thị B, em gọi lại về FAS002 Ms. đang quan tâm ạ, không biết muốn so sánh thêm chưa ạ?",
+        "suggested_opening": "Dạ em chào chị Trần Thị B, em gọi lại về SKU-JK-DWN chị đang quan tâm ạ, không biết muốn so sánh thêm chưa ạ?",
         "freshness_checks": {
           "price_changed": false,
           "promos_no_longer_active": [],

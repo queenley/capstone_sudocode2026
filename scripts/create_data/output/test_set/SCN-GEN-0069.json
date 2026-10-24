@@ -5,16 +5,16 @@
   "customer_id": "SYN-C004",
   "customer_phone": "0998000004",
   "customer_name": "Phạm Thị D",
-  "honorific": "Ms.",
+  "honorific": "chị",
   "region": "bac",
-  "category": "unknown",
+  "category": "gia-dung/may-loc-khong-khi",
   "difficulty": "normal",
   "tags": [
     "address_change",
-    "customer_support",
-    "hotline",
+    "customer_inquiry",
     "order",
     "order_status",
+    "order_update",
     "variant:chuan"
   ],
   "metric_focus": [
@@ -33,51 +33,51 @@
           "source": "crm_session",
           "customer_id": "SYN-C004",
           "session_id": "SYN-004-S1",
-          "date": "2026-09-01",
+          "date": "2026-06-10",
           "channel": "hotline",
-          "summary": "Khách hàng hỏi về máy xay sinh tố",
-          "outcome": "successful",
+          "summary": "Mua Máy lọc không khí AirPure Pro giá 7.990.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_session",
           "customer_id": "SYN-C004",
           "session_id": "SYN-004-S2",
-          "date": "2026-09-02",
+          "date": "2026-10-04",
           "channel": "zalo_oa",
-          "summary": "Hỗ trợ đổi trả hàng",
-          "outcome": "successful",
+          "summary": "Đặt Máy lọc không khí Xiaomi Smart 4 Lite giá 2.990.000đ, đơn OD900402 đang xử lý.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C004",
-          "order_id": "O007",
-          "date": "2026-02-25",
-          "sku": "HAP003",
+          "order_id": "OD900401",
+          "date": "2026-06-10",
+          "sku": "SKU-AP-PRO",
           "status": "delivered",
           "stale": false,
           "facts": {
-            "owned_sku": "HAP003"
+            "owned_sku": "SKU-AP-PRO"
           }
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C004",
-          "order_id": "O008",
-          "date": "2026-06-18",
-          "sku": "HAP004",
+          "order_id": "OD900402",
+          "date": "2026-10-04",
+          "sku": "SKU-XM-4L",
           "status": "processing",
           "stale": false,
           "facts": {
-            "order_id": "O008"
+            "order_id": "OD900402"
           }
         }
       ],
-      "customer_goal": "Hỏi tình trạng đơn hàng của mình.",
+      "customer_goal": "Hỏi tình trạng đơn hàng đang xử lý",
       "customer_turns": [
-        "Alo, chị D đây, em ơi cho chị hỏi đơn hàng của mình đang ở đâu rồi?",
-        "Đơn hàng chị đặt hôm 18 tháng 6, có thông tin gì không em?"
+        "Chị chào em, chị gọi để hỏi tình trạng đơn hàng của mình.",
+        "Đơn hàng của chị có mã OD900402, em có thể cho chị biết đang ở đâu không?"
       ],
       "expected_outcome": "cap_nhat_don",
       "must_carry_over": [
@@ -89,7 +89,7 @@
         "owned_sku"
       ],
       "ground_truth_facts": {
-        "order_id": "O008",
+        "order_id": "OD900402",
         "order_status": "processing",
         "call_date": "2026-10-31"
       },
@@ -99,20 +99,20 @@
         "is_returning": true,
         "n_previous_sessions": 2,
         "last_session": {
-          "date": "2026-09-02",
+          "date": "2026-10-04",
           "channel": "zalo_oa",
-          "outcome": "successful",
-          "summary": "Hỗ trợ đổi trả hàng"
+          "outcome": "chot_don",
+          "summary": "Đặt Máy lọc không khí Xiaomi Smart 4 Lite giá 2.990.000đ, đơn OD900402 đang xử lý."
         },
         "products_advised": [
-          "HAP003"
+          "SKU-AP-PRO"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Ms. Phạm Thị D, em gọi lại về HAP003 Ms. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào chị Phạm Thị D, em gọi lại về SKU-AP-PRO chị đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-10-31T08:00:00",
@@ -121,7 +121,7 @@
       "success_if": {
         "tool_called": "order.status",
         "args_match": {
-          "order_id": "O008"
+          "order_id": "OD900402"
         },
         "must_say_any": [
           "đang xử lý",
@@ -134,10 +134,10 @@
       "call_date": "2026-11-02",
       "days_later": 2,
       "input_mode": "text",
-      "customer_goal": "Thay đổi địa chỉ giao hàng cho đơn hàng.",
+      "customer_goal": "Thay đổi địa chỉ giao hàng cho đơn hàng",
       "customer_turns": [
-        "Chào em, chị muốn đổi địa chỉ giao hàng cho đơn hàng đang xử lý.",
-        "Chị muốn chuyển sang Long Biên, Hà Nội nhé."
+        "Chào em, chị muốn thay đổi địa chỉ giao hàng cho đơn hàng đang xử lý.",
+        "Bây giờ chị muốn giao hàng đến quận Long Biên, Hà Nội."
       ],
       "facts_established": {
         "delivery_area": "Long Biên, Hà Nội"
@@ -152,7 +152,7 @@
         "owned_sku"
       ],
       "ground_truth_facts": {
-        "order_id": "O008",
+        "order_id": "OD900402",
         "order_status": "processing",
         "call_date": "2026-11-02"
       },
@@ -170,14 +170,14 @@
           "outcome": "cap_nhat_don"
         },
         "products_advised": [
-          "HAP003"
+          "SKU-AP-PRO"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Ms. Phạm Thị D, em gọi lại về HAP003 Ms. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào chị Phạm Thị D, em gọi lại về SKU-AP-PRO chị đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-11-02T08:00:00",
@@ -186,7 +186,7 @@
       "success_if": {
         "tool_called": "order.update",
         "args_match": {
-          "order_id": "O008",
+          "order_id": "OD900402",
           "action": "update_address"
         }
       }

@@ -7,43 +7,12 @@
   "channel": "hotline",
   "date": "2026-11-14",
   "region": "trung",
-  "category": "unknown",
+  "category": "thoi-trang/giay",
   "persona": "khach_co_don_chua_co_lich_su",
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Trần Văn H, em gọi lại về đơn hàng FAS006 mà Mr. đã đặt ạ. Em xin xác nhận lại là hôm trước Mr. đã đặt hàng và hôm nay là gần ngày giao hàng đúng không ạ?",
-      "questions": [
-        {
-          "slot": "order_id",
-          "type": "confirm",
-          "text": "Hôm trước Mr. đã đặt hàng FAS006 đúng không ạ?"
-        }
-      ],
-      "facts_used": [
-        "order_id",
-        "owned_sku"
-      ],
-      "claims": [
-        {
-          "field": "order_id",
-          "value": "O016"
-        },
-        {
-          "field": "order_status",
-          "value": "delivered"
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em đã kiểm tra tình trạng đơn hàng của Mr. và thông tin cho thấy đơn hàng FAS006 đã được giao thành công vào ngày 15/09/2026 ạ. Mr. có nhận được hàng chưa ạ?",
+      "text": "Dạ, em chào anh Trần Văn H, em gọi lại về đơn hàng giày sneaker Urban Classic anh đã đặt ạ. Đơn hàng này anh đặt hôm 8 tháng 10 và hiện tại vẫn đang xử lý ạ.",
       "questions": [],
       "facts_used": [
         "order_id",
@@ -51,15 +20,19 @@
       ],
       "claims": [
         {
+          "field": "order_id",
+          "value": "OD900802"
+        },
+        {
           "field": "order_status",
-          "value": "delivered"
+          "value": "processing"
         }
       ],
       "tool_calls": [
         {
           "name": "order.status",
           "args": {
-            "order_id": "O016"
+            "order_id": "OD900802"
           }
         }
       ],
@@ -71,7 +44,20 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, nếu Mr. chưa nhận được hàng, em xin lỗi về sự bất tiện này. Em sẽ kiểm tra lại với đơn vị vận chuyển để đảm bảo Mr. nhận được hàng sớm nhất ạ. Mr. có cần thêm thông tin gì khác không ạ?",
+      "text": "Dạ, đơn hàng OD900802 của anh vẫn đang trong trạng thái xử lý. Em xin lỗi vì sự chậm trễ này. Anh có cần thêm thông tin gì khác không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em chưa có thông tin cụ thể về thời gian giao hàng, nhưng em sẽ cập nhật ngay khi có thông tin mới ạ. Cảm ơn anh đã kiên nhẫn chờ đợi ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],

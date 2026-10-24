@@ -15,7 +15,12 @@ PolicyAgent asks Jev rather than prompting a chat model for a verdict: the
 answer is a probability to threshold, not a word to parse.
 
 The call is ``POST <base_url>/evaluate`` with the gateway key, as documented
-at https://vercel.com/docs/ai-gateway/modalities/evaluation. There is no
+at https://vercel.com/docs/ai-gateway/modalities/evaluation, or TypeSafe's
+own API, ``POST https://api.typesafe.ai/v1/systemone`` with
+``TYPESAFE_API_KEY`` (https://api.typesafe.ai/docs), chosen by the provider's
+``api`` in ``config/models.yaml``. The two differ only in names, translated
+here: a yes/no question is ``noul`` there and its answer's probability is
+``noul``; usage is ``input_tokens``; an error is ``{"detail": ...}``. There is no
 LangChain integration for evaluation models, so this module is the whole
 client. What it keeps from the chat path is the discipline that path learned
 the hard way: one shared limiter per provider, a slot reserved before the
@@ -45,7 +50,7 @@ from typing import Any, Literal, Mapping, Sequence, Union
 import httpx
 from pydantic import BaseModel, Field
 
-from ..config.config_manager import get_models_config, has_api_key, require_api_key
+from ..config.config_manager import PROVIDER_ENV_VAR, get_models_config, has_api_key, require_api_key
 from . import token_ledger, evaluation_budget
 from .factory import limiter_for
 
@@ -174,7 +179,8 @@ async def evaluate(
         config = {**config, "timeout": timeout}
     provider = config["provider"]
     if not has_api_key(provider):
-        raise JevUnavailable("NO_KEY", "AI_GATEWAY_API_KEY is not set")
+        raise JevUnavailable("NO_KEY", f"{PROVIDER_ENV_VAR.get(provider, provider)} is not set")
+    typesafe = config.get("api") == "typesafe"
 
     limiter = limiter_for(provider, config["rate_limits"])
     if not await limiter.aacquire(blocking=False):
@@ -184,19 +190,20 @@ async def evaluate(
         "model": config["model"],
         "state": state,
         "questions": {
-            name: question.model_dump(exclude_none=True)
+            name: _question(question, typesafe)
             for name, question in questions.items()
         },
     }
-    if config["zero_data_retention"]:
+    if config["zero_data_retention"] and not typesafe:
         body["providerOptions"] = {"gateway": {"zeroDataRetention": True}}
 
     started = time.perf_counter()
+    price = config["rate_limits"]["input_token_price_per_million"] / 1_000_000
     # Jev accepts at most 32k input tokens; failed requests keep the reservation.
-    reservation = evaluation_budget.reserve(f"{caller}:{config['model']}", 32_000 * 0.042 / 1_000_000)
+    reservation = evaluation_budget.reserve(f"{caller}:{config['model']}", 32_000 * price)
     try:
         response = await _http().post(
-            f"{config['base_url']}/evaluate",
+            config["url"],
             json=body,
             headers={"Authorization": f"Bearer {require_api_key(provider)}"},
             timeout=config["timeout"],
@@ -219,12 +226,12 @@ async def evaluate(
 
     payload = response.json()
     usage = payload.get("usage") or {}
-    input_tokens = int(usage.get("inputTokens") or 0)
-    output_tokens = int(usage.get("outputTokens") or 0)
+    input_tokens = int(usage.get("inputTokens") or usage.get("input_tokens") or 0)
+    output_tokens = int(usage.get("outputTokens") or usage.get("output_tokens") or 0)
     limiter.record_request(input_tokens, output_tokens)
     token_ledger.record(f"{caller}:{config['model']}", input_tokens, output_tokens)
-    if "inputTokens" in usage:
-        evaluation_budget.settle(reservation, input_tokens * 0.042 / 1_000_000)
+    if "inputTokens" in usage or "input_tokens" in usage:
+        evaluation_budget.settle(reservation, input_tokens * price)
 
     confidence = ((payload.get("providerMetadata") or {}).get("typesafe") or {}).get(
         "confidence"
@@ -239,12 +246,30 @@ async def evaluate(
         # The answer carries its own confidence; the gateway's metadata is
         # the fallback for when it does not.
         answers={
-            name: Answer(**{"confidence": confidence.get(name), **raw[name]})
+            name: Answer(**{"confidence": confidence.get(name), **_answer(raw[name])})
             for name in questions
         },
         input_tokens=input_tokens,
         seconds=seconds,
     )
+
+
+def _question(question: Question, typesafe: bool) -> dict[str, Any]:
+    """*question* as the API takes it: TypeSafe calls a yes/no question ``noul``."""
+    dumped = question.model_dump(exclude_none=True)
+    if typesafe and dumped["type"] == "boolean":
+        dumped["type"] = "noul"
+    return dumped
+
+
+def _answer(raw: Mapping[str, Any]) -> dict[str, Any]:
+    """An answer in the gateway's names: TypeSafe's ``noul`` is a boolean's probability.
+
+    Fields :class:`Answer` does not keep (a score's ``legend``) are dropped.
+    """
+    if raw.get("type") == "noul":
+        return {"type": "boolean", "probability": raw.get("noul")}
+    return {key: value for key, value in raw.items() if key in Answer.model_fields}
 
 
 def _retry_after(response: httpx.Response) -> float | None:
@@ -255,11 +280,19 @@ def _retry_after(response: httpx.Response) -> float | None:
 
 
 def _error_of(response: httpx.Response) -> tuple[str, str]:
-    """The gateway's error type and message, or the status when it gave none."""
+    """The API's error type and message, or the status when it gave none."""
     try:
-        error = response.json().get("error")
+        payload = response.json()
     except ValueError:
-        error = None
+        payload = {}
+    error = payload.get("error") if isinstance(payload, dict) else None
+    detail = payload.get("detail") if isinstance(payload, dict) else None
+    if isinstance(detail, dict):  # TypeSafe: {"detail": {"error_type", "message"}}
+        error = {"type": detail.get("error_type"), "message": detail.get("message")}
+    elif isinstance(detail, list) and detail:  # TypeSafe's validation errors
+        first = detail[0] if isinstance(detail[0], dict) else {}
+        error = {"type": "validation_error",
+                 "message": f"{'.'.join(map(str, first.get('loc') or []))}: {first.get('msg')}"}
     if isinstance(error, dict):
         return (
             str(error.get("type") or error.get("code") or f"HTTP_{response.status_code}"),

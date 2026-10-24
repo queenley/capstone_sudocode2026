@@ -1,8 +1,8 @@
 {
   "repeat_question_rate": {
-    "value": 3.3,
-    "redundant": 7,
-    "total_questions": 210,
+    "value": 2.9,
+    "redundant": 6,
+    "total_questions": 207,
     "examples": [
       {
         "scenario": "SCN-GEN-0017",
@@ -30,19 +30,11 @@
       },
       {
         "scenario": "SCN-GEN-0059",
-        "call": "call_1",
-        "turn": 2,
-        "slot": "blocker",
-        "type": "confirm",
-        "text": "Chị có muốn xem sản phẩm khác không ạ?"
-      },
-      {
-        "scenario": "SCN-GEN-0072",
         "call": "call_2",
         "turn": 1,
-        "slot": "order_id",
+        "slot": "product_advised",
         "type": "open",
-        "text": "Chị có muốn em ghi nhận lại thông tin để gọi lại khi có hàng không ạ?"
+        "text": "Chị có cần thêm thông tin nào khác về áo phao không ạ?"
       },
       {
         "scenario": "SCN-GEN-0081",
@@ -63,17 +55,17 @@
     ]
   },
   "context_carryover_rate": {
-    "value": 43.7,
-    "used": 251,
-    "required": 575
+    "value": 42.2,
+    "used": 233,
+    "required": 552
   },
   "task_success_rate": {
-    "value": 63.2,
+    "value": 66.3,
     "passed": 55,
-    "total": 87,
+    "total": 83,
     "hard_cases": {
-      "value": 54.4,
-      "total": 57
+      "value": 58.6,
+      "total": 58
     },
     "failures": [
       {
@@ -118,15 +110,6 @@
         ]
       },
       {
-        "scenario": "SCN-GEN-0019",
-        "call": "call_1",
-        "hard_case": null,
-        "reasons": [
-          "không có tool call order.status khớp args_match",
-          "thiếu must_say_any: đang giao | đang vận chuyển | đã bàn giao"
-        ]
-      },
-      {
         "scenario": "SCN-GEN-0021",
         "call": "call_2",
         "hard_case": "hoi_ai_va_xoa_du_lieu",
@@ -151,6 +134,15 @@
         ]
       },
       {
+        "scenario": "SCN-GEN-0035",
+        "call": "call_1",
+        "hard_case": null,
+        "reasons": [
+          "không có tool call order.status khớp args_match",
+          "thiếu must_say_any: đang xử lý | đang chuẩn bị"
+        ]
+      },
+      {
         "scenario": "SCN-GEN-0036",
         "call": "call_3",
         "hard_case": "ba_phien_doi_thong_tin",
@@ -166,6 +158,14 @@
         "reasons": [
           "không có tool call order.status khớp args_match",
           "thiếu must_say_any: đã tạo | đang xử lý | đang chuẩn bị"
+        ]
+      },
+      {
+        "scenario": "SCN-GEN-0051",
+        "call": "call_1",
+        "hard_case": null,
+        "reasons": [
+          "thiếu must_say_any: đang giao | đang vận chuyển | đã bàn giao"
         ]
       },
       {
@@ -186,35 +186,11 @@
         ]
       },
       {
-        "scenario": "SCN-GEN-0067",
-        "call": "call_2",
-        "hard_case": "16_luot_4_san_pham_vuot_cod",
-        "reasons": [
-          "thiếu sản phẩm trong also_ordered"
-        ]
-      },
-      {
         "scenario": "SCN-GEN-0068",
-        "call": "call_1",
+        "call": "call_2",
         "hard_case": "asr_loi_tool_timeout",
         "reasons": [
-          "thiếu must_say_any: 19/10 | ngày 19"
-        ]
-      },
-      {
-        "scenario": "SCN-GEN-0069",
-        "call": "call_1",
-        "hard_case": null,
-        "reasons": [
-          "thiếu must_say_any: đang xử lý | đang chuẩn bị"
-        ]
-      },
-      {
-        "scenario": "SCN-GEN-0069",
-        "call": "call_2",
-        "hard_case": null,
-        "reasons": [
-          "không có tool call order.update khớp args_match"
+          "không có tool call order.create khớp args_match"
         ]
       },
       {
@@ -285,14 +261,6 @@
         ]
       },
       {
-        "scenario": "SCN-GEN-0119",
-        "call": "call_2",
-        "hard_case": null,
-        "reasons": [
-          "không có tool call order.update khớp args_match"
-        ]
-      },
-      {
         "scenario": "SCN-GEN-0120",
         "call": "call_3",
         "hard_case": "ba_phien_doi_thong_tin",
@@ -302,11 +270,19 @@
         ]
       },
       {
-        "scenario": "SCN-GEN-0134",
+        "scenario": "SCN-GEN-0136",
         "call": "call_2",
-        "hard_case": "asr_loi_tool_timeout",
+        "hard_case": "ba_phien_doi_thong_tin",
         "reasons": [
           "không có tool call order.create khớp args_match"
+        ]
+      },
+      {
+        "scenario": "SCN-GEN-0136",
+        "call": "call_3",
+        "hard_case": "ba_phien_doi_thong_tin",
+        "reasons": [
+          "thiếu must_say_any: đã tạo | đang xử lý | đang chuẩn bị"
         ]
       },
       {
@@ -315,15 +291,6 @@
         "hard_case": "hoi_ai_va_xoa_du_lieu",
         "reasons": [
           "thiếu must_say_any: 72 giờ | 72h | 72 tiếng"
-        ]
-      },
-      {
-        "scenario": "SCN-GEN-0138",
-        "call": "call_1",
-        "hard_case": "hen_goi_lai_ngay_nghi",
-        "reasons": [
-          "không có tool call schedule.callback khớp args_match",
-          "thiếu must_say_any: 27/10 | thứ Ba | Thứ Ba"
         ]
       },
       {
@@ -353,13 +320,13 @@
     ]
   },
   "hallucination_rate": {
-    "value": 1.0,
-    "wrong": 2,
-    "total_claims": 193,
+    "value": 0.5,
+    "wrong": 1,
+    "total_claims": 189,
     "price_promo_only": {
       "value": 0.0,
       "wrong": 0,
-      "total": 109
+      "total": 108
     },
     "examples": [
       {
@@ -369,22 +336,14 @@
         "field": "unknown_topic",
         "claimed": "khí radon",
         "truth": "máy có lọc được khí radon không"
-      },
-      {
-        "scenario": "SCN-GEN-0085",
-        "call": "call_2",
-        "turn": 1,
-        "field": "order_id",
-        "claimed": "O009",
-        "truth": "O010"
       }
     ]
   },
-  "avg_turns_per_call": 3.12,
+  "avg_turns_per_call": 3.13,
   "calls_to_close": {
-    "value": 2,
+    "value": 1.95,
     "n_closed": 39,
-    "n_scenarios": 87
+    "n_scenarios": 83
   },
   "guardrail_violations": {
     "total": 3,
@@ -1022,18 +981,6 @@
       },
       "has_memory_writes": true,
       "verdict": "review"
-    },
-    {
-      "scenario": "SCN-GEN-0019",
-      "call": "call_2",
-      "expected": {
-        "delivery_area": "Cầu Giấy, Hà Nội"
-      },
-      "found_in_memory_writes": {
-        "delivery_area": true
-      },
-      "has_memory_writes": true,
-      "verdict": "likely_ok"
     },
     {
       "scenario": "SCN-GEN-0020",
@@ -1872,14 +1819,14 @@
         "variant_sku": "SKU-JK-DWN-L-NAVY"
       },
       "found_in_memory_writes": {
-        "size": true,
+        "size": false,
         "color": false,
-        "blocker": true,
+        "blocker": false,
         "product_advised": false,
         "price_quoted_vnd": false,
         "variant_sku": false
       },
-      "has_memory_writes": true,
+      "has_memory_writes": false,
       "verdict": "review"
     },
     {
@@ -1895,7 +1842,7 @@
         "price_quoted_vnd": false,
         "variant_sku": false
       },
-      "has_memory_writes": false,
+      "has_memory_writes": true,
       "verdict": "review"
     },
     {
@@ -1917,7 +1864,7 @@
         "price_quoted_vnd": false,
         "promo_code": false
       },
-      "has_memory_writes": false,
+      "has_memory_writes": true,
       "verdict": "review"
     },
     {
@@ -1931,7 +1878,7 @@
         "promo_code": "MOM-FREESHIP",
         "order_id": "OD600001",
         "superseded": {
-          "order_id": "O002"
+          "order_id": "OD900102"
         }
       },
       "found_in_memory_writes": {
@@ -1943,28 +1890,6 @@
         "order_id": true
       },
       "has_memory_writes": true,
-      "verdict": "review"
-    },
-    {
-      "scenario": "SCN-GEN-0062",
-      "call": "call_1",
-      "expected": {
-        "child_age_months": 5,
-        "budget_vnd": 7500000,
-        "blocker": "chờ cuối tháng nhận lương",
-        "product_advised": "SKU-MB-STR2",
-        "price_quoted_vnd": 6790000,
-        "promo_code": "MOM-FREESHIP"
-      },
-      "found_in_memory_writes": {
-        "child_age_months": false,
-        "budget_vnd": false,
-        "blocker": false,
-        "product_advised": false,
-        "price_quoted_vnd": false,
-        "promo_code": false
-      },
-      "has_memory_writes": false,
       "verdict": "review"
     },
     {
@@ -2010,7 +1935,7 @@
         "variant_sku": false,
         "promo_code": false
       },
-      "has_memory_writes": true,
+      "has_memory_writes": false,
       "verdict": "review"
     },
     {
@@ -2048,7 +1973,7 @@
         "order_id": "OD600001",
         "superseded": {
           "price_quoted_vnd": 1521000,
-          "order_id": "O008"
+          "order_id": "OD900402"
         }
       },
       "found_in_memory_writes": {
@@ -2063,48 +1988,27 @@
       "verdict": "review"
     },
     {
-      "scenario": "SCN-GEN-0067",
+      "scenario": "SCN-GEN-0066",
       "call": "call_1",
       "expected": {
-        "room_area_m2": 30,
+        "room_area_m2": 40,
         "has_children": true,
-        "budget_vnd": 9000000,
-        "blocker": "để bàn với gia đình",
-        "product_advised": "SKU-AP-PRO",
-        "price_quoted_vnd": 7690000,
-        "promo_code": "AIR-OCT"
+        "budget_vnd": 6500000,
+        "payment": "COD",
+        "delivery_area": "Thủ Đức, TP.HCM",
+        "product_advised": "SKU-SS-AX40",
+        "price_quoted_vnd": 6490000,
+        "promo_code": "NAM-SHIP0",
+        "order_id": "OD600001",
+        "superseded": {
+          "order_id": "OD900602"
+        }
       },
       "found_in_memory_writes": {
         "room_area_m2": false,
         "has_children": false,
         "budget_vnd": false,
-        "blocker": false,
-        "product_advised": false,
-        "price_quoted_vnd": false,
-        "promo_code": false
-      },
-      "has_memory_writes": false,
-      "verdict": "review"
-    },
-    {
-      "scenario": "SCN-GEN-0067",
-      "call": "call_2",
-      "expected": {
-        "payment": "chuyen_khoan",
-        "budget_vnd": 8500000,
-        "delivery_area": "Long Biên, Hà Nội",
-        "product_advised": "SKU-AP-PRO",
-        "price_quoted_vnd": 7690000,
-        "promo_code": "AIR-OCT",
-        "order_id": "OD600001",
-        "superseded": {
-          "budget_vnd": 9000000,
-          "order_id": "O014"
-        }
-      },
-      "found_in_memory_writes": {
         "payment": false,
-        "budget_vnd": false,
         "delivery_area": false,
         "product_advised": false,
         "price_quoted_vnd": false,
@@ -2112,6 +2016,20 @@
         "order_id": true
       },
       "has_memory_writes": true,
+      "verdict": "review"
+    },
+    {
+      "scenario": "SCN-GEN-0066",
+      "call": "call_2",
+      "expected": {
+        "product_advised": "SKU-SS-AX40",
+        "price_quoted_vnd": 6490000
+      },
+      "found_in_memory_writes": {
+        "product_advised": false,
+        "price_quoted_vnd": false
+      },
+      "has_memory_writes": false,
       "verdict": "review"
     },
     {
@@ -2135,7 +2053,7 @@
         "price_quoted_vnd": false,
         "promo_code": false
       },
-      "has_memory_writes": false,
+      "has_memory_writes": true,
       "verdict": "review"
     },
     {
@@ -2149,7 +2067,7 @@
         "promo_code": "XM-COMBO",
         "order_id": "OD600001",
         "superseded": {
-          "order_id": "O015"
+          "order_id": "OD900802"
         }
       },
       "found_in_memory_writes": {
@@ -2158,19 +2076,7 @@
         "product_advised": false,
         "price_quoted_vnd": false,
         "promo_code": false,
-        "order_id": true
-      },
-      "has_memory_writes": true,
-      "verdict": "review"
-    },
-    {
-      "scenario": "SCN-GEN-0069",
-      "call": "call_2",
-      "expected": {
-        "delivery_area": "Long Biên, Hà Nội"
-      },
-      "found_in_memory_writes": {
-        "delivery_area": false
+        "order_id": false
       },
       "has_memory_writes": false,
       "verdict": "review"
@@ -2210,7 +2116,7 @@
         "order_id": "OD600001",
         "superseded": {
           "budget_vnd": 4500000,
-          "order_id": "O019"
+          "order_id": "OD901002"
         }
       },
       "found_in_memory_writes": {
@@ -2231,8 +2137,8 @@
       "expected": {
         "child_age_months": 11,
         "budget_vnd": 4000000,
-        "decision_maker": "vợ",
-        "blocker": "cần hỏi vợ",
+        "decision_maker": "chồng",
+        "blocker": "cần hỏi chồng",
         "product_advised": "SKU-MB-STR1",
         "price_quoted_vnd": 3490000,
         "promo_code": "MOM-FREESHIP"
@@ -2246,7 +2152,7 @@
         "price_quoted_vnd": false,
         "promo_code": false
       },
-      "has_memory_writes": false,
+      "has_memory_writes": true,
       "verdict": "review"
     },
     {
@@ -2262,7 +2168,7 @@
         "price_quoted_vnd": false,
         "promo_code": false
       },
-      "has_memory_writes": true,
+      "has_memory_writes": false,
       "verdict": "review"
     },
     {
@@ -2503,18 +2409,6 @@
       },
       "has_memory_writes": true,
       "verdict": "review"
-    },
-    {
-      "scenario": "SCN-GEN-0085",
-      "call": "call_2",
-      "expected": {
-        "delivery_area": "Hải Châu, Đà Nẵng"
-      },
-      "found_in_memory_writes": {
-        "delivery_area": true
-      },
-      "has_memory_writes": true,
-      "verdict": "likely_ok"
     },
     {
       "scenario": "SCN-GEN-0086",
@@ -3170,18 +3064,6 @@
       "verdict": "review"
     },
     {
-      "scenario": "SCN-GEN-0119",
-      "call": "call_2",
-      "expected": {
-        "delivery_area": "Long Biên, Hà Nội"
-      },
-      "found_in_memory_writes": {
-        "delivery_area": false
-      },
-      "has_memory_writes": false,
-      "verdict": "review"
-    },
-    {
       "scenario": "SCN-GEN-0120",
       "call": "call_1",
       "expected": {
@@ -3242,12 +3124,12 @@
       "found_in_memory_writes": {
         "child_age_months": false,
         "budget_vnd": false,
-        "blocker": true,
+        "blocker": false,
         "product_advised": false,
         "price_quoted_vnd": false,
         "promo_code": false
       },
-      "has_memory_writes": true,
+      "has_memory_writes": false,
       "verdict": "review"
     },
     {
@@ -3263,27 +3145,71 @@
         "price_quoted_vnd": false,
         "promo_code": false
       },
+      "has_memory_writes": true,
+      "verdict": "review"
+    },
+    {
+      "scenario": "SCN-GEN-0127",
+      "call": "call_1",
+      "expected": {
+        "usage_need": "dùng cho gia đình",
+        "budget_vnd": 4500000,
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "product_advised": "SKU-AF-6L",
+        "price_quoted_vnd": 3391500,
+        "promo_code": "11-11"
+      },
+      "found_in_memory_writes": {
+        "usage_need": false,
+        "budget_vnd": false,
+        "blocker": false,
+        "product_advised": false,
+        "price_quoted_vnd": false,
+        "promo_code": false
+      },
       "has_memory_writes": false,
       "verdict": "review"
     },
     {
-      "scenario": "SCN-GEN-0128",
-      "call": "call_1",
+      "scenario": "SCN-GEN-0127",
+      "call": "call_2",
       "expected": {
-        "child_age_months": 15,
-        "budget_vnd": 5500000,
-        "blocker": "cần suy nghĩ thêm",
-        "product_advised": "SKU-MB-CAR",
-        "price_quoted_vnd": 4990000,
-        "promo_code": "MOM-FREESHIP"
+        "payment": "chuyen_khoan",
+        "delivery_area": "Long Biên, Hà Nội",
+        "product_advised": "SKU-AF-6L",
+        "price_quoted_vnd": 3990000,
+        "order_id": "OD600001",
+        "superseded": {
+          "price_quoted_vnd": 3391500,
+          "order_id": "OD900102"
+        }
       },
       "found_in_memory_writes": {
-        "child_age_months": false,
-        "budget_vnd": false,
-        "blocker": true,
+        "payment": false,
+        "delivery_area": false,
         "product_advised": false,
         "price_quoted_vnd": false,
-        "promo_code": false
+        "order_id": true
+      },
+      "has_memory_writes": true,
+      "verdict": "review"
+    },
+    {
+      "scenario": "SCN-GEN-0129",
+      "call": "call_1",
+      "expected": {
+        "usage_need": "thay đồ cũ đã hỏng",
+        "budget_vnd": 2000000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-AF-XM",
+        "price_quoted_vnd": 1590000
+      },
+      "found_in_memory_writes": {
+        "usage_need": false,
+        "budget_vnd": false,
+        "blocker": false,
+        "product_advised": false,
+        "price_quoted_vnd": false
       },
       "has_memory_writes": true,
       "verdict": "review"
@@ -3311,7 +3237,7 @@
         "variant_sku": false,
         "promo_code": false
       },
-      "has_memory_writes": false,
+      "has_memory_writes": true,
       "verdict": "review"
     },
     {
@@ -3349,7 +3275,7 @@
         "order_id": "OD600001",
         "superseded": {
           "price_quoted_vnd": 1521000,
-          "order_id": "O008"
+          "order_id": "OD900402"
         }
       },
       "found_in_memory_writes": {
@@ -3364,49 +3290,91 @@
       "verdict": "review"
     },
     {
-      "scenario": "SCN-GEN-0134",
+      "scenario": "SCN-GEN-0132",
       "call": "call_1",
       "expected": {
-        "room_area_m2": 30,
-        "has_children": true,
-        "budget_vnd": 6000000,
-        "blocker": "để bàn với gia đình",
-        "product_advised": "SKU-XM-4P",
-        "price_quoted_vnd": 5490000,
-        "promo_code": "XM-COMBO"
+        "size": 39,
+        "color": "trang",
+        "payment": "COD",
+        "delivery_area": "Ninh Kiều, Cần Thơ",
+        "product_advised": "SKU-SN-CAS",
+        "price_quoted_vnd": 890000,
+        "variant_sku": "SKU-SN-CAS-39-TRANG",
+        "order_id": "OD600001",
+        "superseded": {
+          "order_id": "OD900602"
+        }
       },
       "found_in_memory_writes": {
-        "room_area_m2": false,
-        "has_children": false,
-        "budget_vnd": false,
-        "blocker": false,
+        "size": false,
+        "color": false,
+        "payment": false,
+        "delivery_area": false,
         "product_advised": false,
         "price_quoted_vnd": false,
-        "promo_code": false
+        "variant_sku": false,
+        "order_id": true
       },
       "has_memory_writes": true,
       "verdict": "review"
     },
     {
-      "scenario": "SCN-GEN-0134",
+      "scenario": "SCN-GEN-0132",
       "call": "call_2",
       "expected": {
+        "product_advised": "SKU-SN-CAS",
+        "price_quoted_vnd": 890000,
+        "variant_sku": "SKU-SN-CAS-39-TRANG"
+      },
+      "found_in_memory_writes": {
+        "product_advised": false,
+        "price_quoted_vnd": false,
+        "variant_sku": false
+      },
+      "has_memory_writes": false,
+      "verdict": "review"
+    },
+    {
+      "scenario": "SCN-GEN-0136",
+      "call": "call_1",
+      "expected": {
+        "usage_need": "dùng cho gia đình",
+        "budget_vnd": 6500000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-BDL-AIR",
+        "price_quoted_vnd": 6390000
+      },
+      "found_in_memory_writes": {
+        "usage_need": false,
+        "budget_vnd": false,
+        "blocker": false,
+        "product_advised": false,
+        "price_quoted_vnd": false
+      },
+      "has_memory_writes": false,
+      "verdict": "review"
+    },
+    {
+      "scenario": "SCN-GEN-0136",
+      "call": "call_2",
+      "expected": {
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "budget_vnd": 7700000,
         "payment": "COD",
-        "delivery_area": "Nha Trang, Khánh Hòa",
-        "product_advised": "SKU-XM-4P",
-        "price_quoted_vnd": 5490000,
-        "promo_code": "XM-COMBO",
+        "product_advised": "SKU-BDL-AIR",
+        "price_quoted_vnd": 6390000,
         "order_id": "OD600001",
         "superseded": {
-          "order_id": "O015"
+          "budget_vnd": 6500000,
+          "order_id": "OD901002"
         }
       },
       "found_in_memory_writes": {
-        "payment": false,
         "delivery_area": false,
+        "budget_vnd": false,
+        "payment": false,
         "product_advised": false,
         "price_quoted_vnd": false,
-        "promo_code": false,
         "order_id": false
       },
       "has_memory_writes": false,
@@ -3443,59 +3411,6 @@
       "found_in_memory_writes": {},
       "has_memory_writes": false,
       "verdict": "likely_ok"
-    },
-    {
-      "scenario": "SCN-GEN-0138",
-      "call": "call_1",
-      "expected": {
-        "room_area_m2": 30,
-        "has_children": true,
-        "budget_vnd": 5500000,
-        "decision_maker": "vợ",
-        "blocker": "cần hỏi vợ",
-        "product_advised": "SKU-AP-Y",
-        "price_quoted_vnd": 5200000,
-        "promo_code": "GIFT-FILTER"
-      },
-      "found_in_memory_writes": {
-        "room_area_m2": false,
-        "has_children": false,
-        "budget_vnd": false,
-        "decision_maker": false,
-        "blocker": false,
-        "product_advised": false,
-        "price_quoted_vnd": false,
-        "promo_code": false
-      },
-      "has_memory_writes": false,
-      "verdict": "review"
-    },
-    {
-      "scenario": "SCN-GEN-0138",
-      "call": "call_2",
-      "expected": {
-        "payment": "chuyen_khoan",
-        "delivery_area": "Thủ Đức, TP.HCM",
-        "product_advised": "SKU-AP-Y",
-        "price_quoted_vnd": 5200000,
-        "promo_code": "NAM-SHIP0",
-        "order_id": "OD600001",
-        "superseded": {
-          "promo_code": "GIFT-FILTER",
-          "promo_expiry": "2026-10-22",
-          "order_id": "O018"
-        }
-      },
-      "found_in_memory_writes": {
-        "payment": false,
-        "delivery_area": false,
-        "product_advised": false,
-        "price_quoted_vnd": false,
-        "promo_code": false,
-        "order_id": true
-      },
-      "has_memory_writes": true,
-      "verdict": "review"
     },
     {
       "scenario": "SCN-GEN-0139",

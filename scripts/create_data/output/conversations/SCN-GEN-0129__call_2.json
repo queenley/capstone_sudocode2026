@@ -12,16 +12,15 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, chào Mr. Lê Văn C, em gọi lại về sản phẩm MAB002 mà Mr. đang quan tâm ạ. Hôm trước Mr. có hỏi về chính sách đổi trả, đúng không ạ?",
+      "text": "Dạ, em chào anh Lê Văn C, em gọi lại về SKU-AF-XM anh đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
       "questions": [
         {
-          "slot": "product_advised",
+          "slot": "blocker",
           "type": "confirm",
-          "text": "Mr. có hỏi về sản phẩm MAB002 đúng không ạ?"
+          "text": "Anh chờ cuối tháng nhận lương đúng không ạ?"
         }
       ],
       "facts_used": [
-        "product_advised",
         "blocker"
       ],
       "claims": [],
@@ -33,18 +32,29 @@
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Đúng rồi, em.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Theo chính sách hiện tại, Mr. có thể đổi trả sản phẩm trong vòng 7 ngày ạ. Phí đổi size là miễn phí cho lần đầu tiên, sau đó sẽ là 30.000đ cho những lần đổi tiếp theo. Mr. có cần thêm thông tin gì không ạ?",
+      "text": "Cảm ơn anh đã xác nhận. Dạ, chính sách đổi trả hiện tại là trong vòng 7 ngày từ ngày nhận hàng ạ, và phí đổi size lần đầu tiên là miễn phí, từ lần thứ hai trở đi sẽ là 30.000đ ạ.",
       "questions": [
         {
           "slot": "return_days",
           "type": "confirm",
-          "text": "Thời hạn đổi trả hiện tại là 7 ngày đúng không ạ?"
+          "text": "Chính sách đổi trả là 7 ngày đúng không ạ?"
         },
         {
           "slot": "exchange_fee_vnd",
           "type": "confirm",
-          "text": "Phí đổi size là miễn phí cho lần đầu tiên đúng không ạ?"
+          "text": "Và phí đổi size là miễn phí lần đầu tiên đúng không ạ?"
         }
       ],
       "facts_used": [],
@@ -66,8 +76,17 @@
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Vậy là chính sách này vẫn còn hiệu lực đúng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": "tò mò",
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ, em xin xác nhận là Mr. sẽ không mất phí khi đổi hàng lần đầu tiên ạ. Nếu có thêm câu hỏi nào khác, Mr. cứ thoải mái hỏi ạ.",
+      "text": "Dạ, chính sách đổi trả vẫn còn hiệu lực ạ. Anh có cần thêm thông tin gì nữa không ạ?",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -79,8 +98,17 @@
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Cảm ơn em, anh sẽ theo dõi thêm.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": "hài lòng",
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Nếu cần thêm thông tin gì khác, em sẵn sàng hỗ trợ ạ. Cảm ơn Mr. đã quan tâm đến sản phẩm của shop. Chúc Mr. một ngày tốt lành!",
+      "text": "Dạ, em cảm ơn anh Lê Văn C đã gọi đến shop. Nếu cần thêm thông tin gì, đừng ngần ngại liên hệ lại ạ. Chúc anh một ngày tốt lành!",
       "questions": [],
       "facts_used": [],
       "claims": [],

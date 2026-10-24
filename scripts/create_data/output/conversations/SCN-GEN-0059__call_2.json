@@ -12,59 +12,12 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Ms. Trần Thị B, em gọi lại về sản phẩm áo phao lông vũ mà chị đang quan tâm ạ. Chị đã xem xét sản phẩm này nhưng vẫn chưa quyết định đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Chị đã xem xét sản phẩm này nhưng vẫn chưa quyết định đúng không ạ?"
-        }
-      ],
-      "facts_used": [
-        "product_advised"
-      ],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em hiểu rồi ạ. Chị cho em hỏi, giá của áo phao này là 1.490.000đ, có phù hợp với ngân sách của chị không ạ?",
-      "questions": [
-        {
-          "slot": "price_quoted_vnd",
-          "type": "confirm",
-          "text": "Có phù hợp với ngân sách của chị không ạ?"
-        }
-      ],
-      "facts_used": [
-        "price_quoted_vnd"
-      ],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1490000
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em rất tiếc khi nghe rằng chị không mua áo phao này nữa. Chị có thể cho em biết lý do cụ thể hơn được không ạ?",
+      "text": "Dạ em chào chị Trần Thị B, em gọi lại về sản phẩm áo phao lông vũ Warmly mà chị đang quan tâm ạ. Em biết chị đang muốn so sánh thêm đúng không ạ?",
       "questions": [
         {
           "slot": "blocker",
-          "type": "open",
-          "text": "Chị có thể cho em biết lý do cụ thể hơn được không ạ?"
+          "type": "confirm",
+          "text": "Chị đang muốn so sánh thêm đúng không ạ?"
         }
       ],
       "facts_used": [
@@ -79,13 +32,132 @@
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Chị đã xem xét rồi nhưng không mua áo phao nữa.",
+      "facts_stated": {
+        "product_advised": "SKU-JK-DWN"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ, em cảm ơn chị đã chia sẻ. Em hiểu rằng giá cả là một yếu tố quan trọng. Em xin lỗi vì không thể đáp ứng mong muốn của chị lần này. Nếu có bất cứ câu hỏi nào khác, chị cứ thoải mái liên hệ với em nhé!",
+      "text": "Dạ, em hiểu. Không biết chị có cần thêm thông tin nào khác về áo phao không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "open",
+          "text": "Chị có cần thêm thông tin nào khác về áo phao không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em cho chị xin thêm thông tin về áo phao này được không?",
+      "facts_stated": {
+        "product_advised": "SKU-JK-DWN"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, áo phao này có giá là 1.490.000đ ạ. Chị có muốn tìm hiểu thêm về chính sách bảo hành hay đổi trả không ạ?",
+      "questions": [
+        {
+          "slot": "price_quoted_vnd",
+          "type": "confirm",
+          "text": "Chị có muốn tìm hiểu thêm về chính sách bảo hành hay đổi trả không ạ?"
+        }
+      ],
+      "facts_used": [
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1490000
+        },
+        {
+          "field": "list_price_vnd",
+          "value": 1490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cảm thấy giá hơi cao, nên chị không mua.",
+      "facts_stated": {
+        "price_quoted_vnd": 1490000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em hiểu rằng chị thấy giá có phần cao. Tuy nhiên, sản phẩm này có chế độ bảo hành 12 tháng và chính sách đổi trả trong vòng 7 ngày ạ. Chị có cần thêm thông tin gì không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "open",
+          "text": "Chị có cần thêm thông tin gì không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cảm ơn em đã tư vấn, chị sẽ không mua áo phao này nữa.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em cảm ơn chị đã dành thời gian. Nếu chị cần thêm thông tin gì trong tương lai, đừng ngần ngại gọi lại cho em nhé! Chúc chị một ngày tốt lành ạ!",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
-      "memory_writes": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "không mua áo phao"
+        }
+      ],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,

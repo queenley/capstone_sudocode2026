@@ -32,6 +32,33 @@ python scripts/dev/zalo_simulator.py --interactive
 
 Trình giả lập gửi webhook giống hệt Zalo và in câu trả lời. Chưa có access token nên câu trả lời được ghi `not_sent` (không gửi đi). **Không bật `ZALO_WEBHOOK_INSECURE` khi chạy thật.**
 
+### Mock nền tảng Zalo (cả hai chiều, có giao diện chat)
+
+`scripts/dev/zalo_mock.py` đóng cả hai vai mà Zalo đảm nhận: **phía người dùng** (trang chat, mỗi tin được gửi vào webhook kèm chữ ký thật `X-ZEvent-Signature`) và **phía nền tảng** (OA API `POST /v3.0/oa/message/cs` và OAuth `POST /v4/oa/access_token` mà shop gọi để trả lời). Câu trả lời của AI đi qua đúng đường gửi thật, hiện ngay trên trang chat với trạng thái `sent`.
+
+```
+Trình duyệt :8090 ──webhook có chữ ký──► api-gateway :8000 ──► ai-agent-service
+       ▲                                                         │
+       └────── POST /v3.0/oa/message/cs (access_token) ◄─────────┘
+```
+
+1. Thêm vào `.env` (bỏ `ZALO_WEBHOOK_INSECURE=1` nếu có), rồi `docker compose up -d --build ai-agent-service`:
+
+```
+ZALO_APP_ID=mock-app
+ZALO_OA_ID=mock-oa
+ZALO_OA_SECRET_KEY=mock-oa-secret
+ZALO_ACCESS_TOKEN=mock-access-token
+ZALO_OPENAPI_URL=http://host.docker.internal:8090
+ZALO_OAUTH_URL=http://host.docker.internal:8090
+ZALO_WEBHOOK_INSECURE=0
+```
+
+2. Chạy `python scripts/dev/zalo_mock.py` (chỉ cần Python, không cần thư viện), trình duyệt mở `http://127.0.0.1:8090`. `--check` in ra những gì `.env` còn thiếu.
+3. Chọn người dùng ở cột trái: các khách CRM có `zalo_id` (để thử AI nhận ra khách quen) hoặc "Khách mới"; nút **Thêm** tạo người dùng mới. Gõ tin, hoặc gửi ảnh 📷, sticker 😀, theo dõi OA ➕.
+
+Mock kiểm tra như Zalo: access token (`-216`), định dạng và độ dài tin, tối đa 2000 ký tự (`-201`), người nhận có tồn tại (`-213`) và đã nhắn OA trong 7 ngày qua (`-230`). Tin bị từ chối hiện thành dòng cảnh báo trên trang chat, và backend ghi `failed` trong nhật ký. Nếu `.env` có `ZALO_APP_SECRET` và `ZALO_REFRESH_TOKEN`, việc làm mới token cũng đi qua mock. **Không đặt `ZALO_OPENAPI_URL`/`ZALO_OAUTH_URL` khi chạy thật.**
+
 ### Kết nối OA thật
 
 1. Tạo **Zalo Official Account** (oa.zalo.me) và một app trên **Zalo for Developers** (developers.zalo.me), liên kết app với OA.

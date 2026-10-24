@@ -1,0 +1,196 @@
+{
+  "scenario_id": "SCN-GEN-0101",
+  "level": "M2",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "customer_id": "SYN-C006",
+  "customer_phone": "0998000006",
+  "customer_name": "Nguyễn Thị F",
+  "honorific": "chị",
+  "region": "nam",
+  "category": "me-be",
+  "difficulty": "normal",
+  "tags": [
+    "address_change",
+    "customer_inquiry",
+    "hotline",
+    "order",
+    "order_status",
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "notes": "variant=chuan; session_index=2",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-30",
+      "input_mode": "text",
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C006",
+          "session_id": "SYN-006-S1",
+          "date": "2026-03-16",
+          "channel": "hotline",
+          "summary": "Mua Máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C006",
+          "session_id": "SYN-006-S2",
+          "date": "2026-10-06",
+          "channel": "zalo_oa",
+          "summary": "Đặt Bình sữa Pigeon PPSU 240ml giá 289.000đ, đơn OD900602 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C006",
+          "order_id": "OD900601",
+          "date": "2026-03-16",
+          "sku": "SKU-MB-STER",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-MB-STER"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C006",
+          "order_id": "OD900602",
+          "date": "2026-10-06",
+          "sku": "SKU-MB-BOT",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900602"
+          }
+        }
+      ],
+      "customer_goal": "Hỏi tình trạng đơn hàng Bình sữa Pigeon đã đặt",
+      "customer_turns": [
+        "Alo, chị muốn hỏi tình trạng đơn hàng của mình.",
+        "Đơn hàng Bình sữa Pigeon chị đặt hôm 6 tháng 10 giờ sao rồi em?"
+      ],
+      "expected_outcome": "khac",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "order_id": "OD900602",
+        "order_status": "processing",
+        "call_date": "2026-10-30"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000006",
+        "customer_id": "SYN-C006",
+        "is_returning": true,
+        "n_previous_sessions": 2,
+        "last_session": {
+          "date": "2026-10-06",
+          "channel": "zalo_oa",
+          "outcome": "chot_don",
+          "summary": "Đặt Bình sữa Pigeon PPSU 240ml giá 289.000đ, đơn OD900602 đang xử lý."
+        },
+        "products_advised": [
+          "SKU-MB-STER"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào chị Nguyễn Thị F, em gọi lại về SKU-MB-STER chị đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-30T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD900602"
+        },
+        "must_say_any": [
+          "đang xử lý",
+          "đang chuẩn bị"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-10-31",
+      "days_later": 1,
+      "input_mode": "text",
+      "customer_goal": "Đổi địa chỉ giao hàng cho đơn hàng đang xử lý",
+      "customer_turns": [
+        "Chị muốn đổi địa chỉ giao hàng cho đơn hàng Bình sữa Pigeon.",
+        "Địa chỉ mới của chị là Quận 7, TP.HCM."
+      ],
+      "facts_established": {
+        "delivery_area": "Quận 7, TP.HCM"
+      },
+      "expected_outcome": "khac",
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "ground_truth_facts": {
+        "order_id": "OD900602",
+        "order_status": "processing",
+        "call_date": "2026-10-31"
+      },
+      "memory_expectation": {
+        "delivery_area": "Quận 7, TP.HCM"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0998000006",
+        "customer_id": "SYN-C006",
+        "is_returning": true,
+        "n_previous_sessions": 3,
+        "last_session": {
+          "date": "2026-10-30",
+          "channel": "hotline",
+          "outcome": "cap_nhat_don"
+        },
+        "products_advised": [
+          "SKU-MB-STER"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "order_id",
+          "owned_sku"
+        ],
+        "suggested_opening": "Dạ em chào chị Nguyễn Thị F, em gọi lại về SKU-MB-STER chị đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-31T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "OD900602",
+          "action": "update_address"
+        }
+      }
+    }
+  },
+  "hard_case": null
+}

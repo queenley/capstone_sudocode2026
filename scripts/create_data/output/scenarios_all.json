@@ -3660,16 +3660,16 @@
     "customer_id": "SYN-C001",
     "customer_phone": "0998000001",
     "customer_name": "Nguyễn Văn A",
-    "honorific": "Mr.",
+    "honorific": "anh",
     "region": "bac",
-    "category": "unknown",
+    "category": "gia-dung/may-loc-khong-khi",
     "difficulty": "normal",
     "tags": [
       "address_change",
-      "customer_inquiry",
+      "customer_support",
+      "hotline",
       "order",
       "order_status",
-      "shipping",
       "variant:chuan"
     ],
     "metric_focus": [
@@ -3688,51 +3688,52 @@
             "source": "crm_session",
             "customer_id": "SYN-C001",
             "session_id": "SYN-001-S1",
-            "date": "2026-09-01",
+            "date": "2026-03-01",
             "channel": "hotline",
-            "summary": "Hỗ trợ mua máy hút bụi",
-            "outcome": "successful",
-            "stale": false
+            "summary": "Mua Máy lọc không khí AirPure X giá 4.890.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
+            "stale": true
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C001",
             "session_id": "SYN-001-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-01",
             "channel": "zalo_oa",
-            "summary": "Tư vấn về máy giặt",
-            "outcome": "successful",
+            "summary": "Đặt Máy lọc không khí AirPure Y giá 5.200.000đ, đơn OD900102 đang giao.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C001",
-            "order_id": "O001",
-            "date": "2026-01-15",
-            "sku": "HAP001",
+            "order_id": "OD900101",
+            "date": "2026-03-01",
+            "sku": "SKU-AP-X",
             "status": "delivered",
             "stale": false,
             "facts": {
-              "owned_sku": "HAP001"
+              "owned_sku": "SKU-AP-X"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C001",
-            "order_id": "O002",
-            "date": "2026-05-20",
-            "sku": "HAP002",
+            "order_id": "OD900102",
+            "date": "2026-10-01",
+            "sku": "SKU-AP-Y",
             "status": "shipping",
             "stale": false,
             "facts": {
-              "order_id": "O002"
+              "order_id": "OD900102"
             }
           }
         ],
-        "customer_goal": "Hỏi tình trạng đơn hàng hiện tại",
+        "customer_goal": "Hỏi tình trạng đơn hàng đang giao",
         "customer_turns": [
-          "Alo, em chào anh. Anh muốn kiểm tra tình trạng đơn hàng của mình hiện tại.",
-          "Hôm trước anh có đặt một cái máy hút bụi, giờ không biết đang ở đâu rồi."
+          "Alo, anh gọi để hỏi tình trạng đơn hàng của mình.",
+          "Đơn hàng mã OD900102 anh đặt hôm trước giờ sao rồi em?",
+          "Có thông tin gì về đơn hàng này không?"
         ],
         "expected_outcome": "cap_nhat_don",
         "must_carry_over": [
@@ -3744,9 +3745,9 @@
           "owned_sku"
         ],
         "ground_truth_facts": {
-          "order_id": "O002",
+          "order_id": "OD900102",
           "order_status": "shipping",
-          "tracking": "TRACK123",
+          "tracking": "VN0012TRK",
           "call_date": "2026-10-15"
         },
         "expected_call_brief": {
@@ -3755,20 +3756,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-01",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Tư vấn về máy giặt"
+            "outcome": "chot_don",
+            "summary": "Đặt Máy lọc không khí AirPure Y giá 5.200.000đ, đơn OD900102 đang giao."
           },
           "products_advised": [
-            "HAP001"
+            "SKU-AP-X"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Nguyễn Văn A, em gọi lại về HAP001 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Nguyễn Văn A, em gọi lại về SKU-AP-X anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-15T08:00:00",
@@ -3777,7 +3778,7 @@
         "success_if": {
           "tool_called": "order.status",
           "args_match": {
-            "order_id": "O002"
+            "order_id": "OD900102"
           },
           "must_say_any": [
             "đang giao",
@@ -3791,10 +3792,11 @@
         "call_date": "2026-10-16",
         "days_later": 1,
         "input_mode": "text",
-        "customer_goal": "Đổi địa chỉ giao cho đơn hàng",
+        "customer_goal": "Đổi địa chỉ giao hàng cho đơn",
         "customer_turns": [
-          "Chào em, anh muốn đổi địa chỉ giao hàng cho đơn hàng đó.",
-          "Địa chỉ mới là Cầu Giấy, Hà Nội nhé."
+          "Alo em ơi, anh muốn đổi địa chỉ giao hàng cho đơn hàng OD900102.",
+          "Địa chỉ mới là Cầu Giấy, Hà Nội.",
+          "Em có thể cập nhật giúp anh không?"
         ],
         "facts_established": {
           "delivery_area": "Cầu Giấy, Hà Nội"
@@ -3809,9 +3811,9 @@
           "owned_sku"
         ],
         "ground_truth_facts": {
-          "order_id": "O002",
+          "order_id": "OD900102",
           "order_status": "shipping",
-          "tracking": "TRACK123",
+          "tracking": "VN0012TRK",
           "call_date": "2026-10-16"
         },
         "memory_expectation": {
@@ -3828,14 +3830,14 @@
             "outcome": "cap_nhat_don"
           },
           "products_advised": [
-            "HAP001"
+            "SKU-AP-X"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Nguyễn Văn A, em gọi lại về HAP001 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Nguyễn Văn A, em gọi lại về SKU-AP-X anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-16T08:00:00",
@@ -3844,7 +3846,7 @@
         "success_if": {
           "tool_called": "order.update",
           "args_match": {
-            "order_id": "O002",
+            "order_id": "OD900102",
             "action": "update_address"
           }
         }
@@ -6807,13 +6809,13 @@
     "customer_id": "SYN-C002",
     "customer_phone": "0998000002",
     "customer_name": "Trần Thị B",
-    "honorific": "Ms.",
+    "honorific": "chị",
     "region": "trung",
-    "category": "unknown",
+    "category": "thoi-trang/giay",
     "difficulty": "normal",
     "tags": [
       "address_change",
-      "customer_service",
+      "customer_inquiry",
       "hotline",
       "order",
       "order_status",
@@ -6835,51 +6837,51 @@
             "source": "crm_session",
             "customer_id": "SYN-C002",
             "session_id": "SYN-002-S1",
-            "date": "2026-09-01",
+            "date": "2026-04-04",
             "channel": "hotline",
-            "summary": "Hỏi về sản phẩm thời trang",
-            "outcome": "successful",
-            "stale": false
+            "summary": "Mua Giày chạy bộ RunLite 2 Pro giá 1.690.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
+            "stale": true
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C002",
             "session_id": "SYN-002-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-02",
             "channel": "zalo_oa",
-            "summary": "Phản hồi về đơn hàng",
-            "outcome": "successful",
+            "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD900202 đang xử lý.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C002",
-            "order_id": "O003",
-            "date": "2026-03-12",
-            "sku": "FAS001",
-            "status": "processing",
+            "order_id": "OD900201",
+            "date": "2026-04-04",
+            "sku": "SKU-SN-RUN2-38-TRANG",
+            "status": "delivered",
             "stale": false,
             "facts": {
-              "order_id": "O003"
+              "owned_sku": "SKU-SN-RUN2-38-TRANG"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C002",
-            "order_id": "O004",
-            "date": "2026-09-10",
-            "sku": "FAS002",
-            "status": "delivered",
+            "order_id": "OD900202",
+            "date": "2026-10-02",
+            "sku": "SKU-SN-CAS-38-TRANG",
+            "status": "processing",
             "stale": false,
             "facts": {
-              "owned_sku": "FAS002"
+              "order_id": "OD900202"
             }
           }
         ],
-        "customer_goal": "Hỏi tình trạng đơn hàng FAS002",
+        "customer_goal": "Hỏi tình trạng đơn hàng đang xử lý",
         "customer_turns": [
-          "Alo, chị muốn hỏi tình trạng đơn hàng FAS002 của chị.",
-          "Chị không nhớ rõ đơn hàng đang ở đâu, em có thể kiểm tra giúp chị không?"
+          "Alo, chị Trần Thị B đây, chị muốn hỏi tình trạng đơn hàng của mình.",
+          "Đơn hàng giày sneaker Urban Classic chị đặt hôm trước giờ ra sao rồi em?"
         ],
         "expected_outcome": "cap_nhat_don",
         "must_carry_over": [
@@ -6891,8 +6893,8 @@
           "owned_sku"
         ],
         "ground_truth_facts": {
-          "order_id": "O004",
-          "order_status": "delivered",
+          "order_id": "OD900202",
+          "order_status": "processing",
           "call_date": "2026-10-16"
         },
         "expected_call_brief": {
@@ -6901,20 +6903,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-02",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Phản hồi về đơn hàng"
+            "outcome": "chot_don",
+            "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD900202 đang xử lý."
           },
           "products_advised": [
-            "FAS002"
+            "SKU-SN-RUN2-38-TRANG"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Trần Thị B, em gọi lại về FAS002 Ms. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào chị Trần Thị B, em gọi lại về SKU-SN-RUN2-38-TRANG chị đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-16T08:00:00",
@@ -6923,11 +6925,11 @@
         "success_if": {
           "tool_called": "order.status",
           "args_match": {
-            "order_id": "O004"
+            "order_id": "OD900202"
           },
           "must_say_any": [
-            "đã giao",
-            "giao thành công"
+            "đang xử lý",
+            "đang chuẩn bị"
           ]
         }
       },
@@ -6936,10 +6938,10 @@
         "call_date": "2026-10-18",
         "days_later": 2,
         "input_mode": "text",
-        "customer_goal": "Đổi địa chỉ giao hàng cho đơn hàng",
+        "customer_goal": "Đổi địa chỉ giao hàng cho đơn đang xử lý",
         "customer_turns": [
-          "Chào em, chị muốn đổi địa chỉ giao hàng cho đơn hàng của mình.",
-          "Chị muốn chuyển địa chỉ tới Hải Châu, Đà Nẵng."
+          "Chị muốn đổi địa chỉ giao hàng cho đơn giày sneaker Urban Classic.",
+          "Bây giờ địa chỉ giao hàng là Hải Châu, Đà Nẵng nhé."
         ],
         "facts_established": {
           "delivery_area": "Hải Châu, Đà Nẵng"
@@ -6954,8 +6956,8 @@
           "owned_sku"
         ],
         "ground_truth_facts": {
-          "order_id": "O004",
-          "order_status": "delivered",
+          "order_id": "OD900202",
+          "order_status": "processing",
           "call_date": "2026-10-18"
         },
         "memory_expectation": {
@@ -6972,14 +6974,14 @@
             "outcome": "cap_nhat_don"
           },
           "products_advised": [
-            "FAS002"
+            "SKU-SN-RUN2-38-TRANG"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Trần Thị B, em gọi lại về FAS002 Ms. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào chị Trần Thị B, em gọi lại về SKU-SN-RUN2-38-TRANG chị đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-18T08:00:00",
@@ -6988,7 +6990,7 @@
         "success_if": {
           "tool_called": "order.update",
           "args_match": {
-            "order_id": "O004",
+            "order_id": "OD900202",
             "action": "update_address"
           }
         }
@@ -9964,16 +9966,16 @@
     "customer_id": "SYN-C003",
     "customer_phone": "0998000003",
     "customer_name": "Lê Văn C",
-    "honorific": "Mr.",
+    "honorific": "anh",
     "region": "nam",
-    "category": "unknown",
+    "category": "me-be",
     "difficulty": "normal",
     "tags": [
       "address_change",
-      "customer_inquiry",
       "hotline",
       "order",
       "order_status",
+      "shipping",
       "variant:chuan"
     ],
     "metric_focus": [
@@ -9992,52 +9994,52 @@
             "source": "crm_session",
             "customer_id": "SYN-C003",
             "session_id": "SYN-003-S1",
-            "date": "2026-09-01",
+            "date": "2026-05-07",
             "channel": "hotline",
-            "summary": "Tìm hiểu về đồ dùng cho trẻ em",
-            "outcome": "successful",
+            "summary": "Mua Xe đẩy gấp gọn Joie Pact giá 3.490.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C003",
             "session_id": "SYN-003-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-03",
             "channel": "zalo_oa",
-            "summary": "Yêu cầu hỗ trợ đơn hàng",
-            "outcome": "successful",
+            "summary": "Đặt Xe đẩy 2 chiều Combi Sugocal giá 6.790.000đ, đơn OD900302 đang giao.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C003",
-            "order_id": "O005",
-            "date": "2026-07-22",
-            "sku": "MAB001",
-            "status": "shipping",
+            "order_id": "OD900301",
+            "date": "2026-05-07",
+            "sku": "SKU-MB-STR1",
+            "status": "delivered",
             "stale": false,
             "facts": {
-              "order_id": "O005"
+              "owned_sku": "SKU-MB-STR1"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C003",
-            "order_id": "O006",
-            "date": "2026-09-05",
-            "sku": "MAB002",
-            "status": "delivered",
+            "order_id": "OD900302",
+            "date": "2026-10-03",
+            "sku": "SKU-MB-STR2",
+            "status": "shipping",
             "stale": false,
             "facts": {
-              "owned_sku": "MAB002"
+              "order_id": "OD900302"
             }
           }
         ],
-        "customer_goal": "Hỏi tình trạng đơn hàng đã đặt",
+        "customer_goal": "Hỏi tình trạng đơn hàng đang giao.",
         "customer_turns": [
-          "Alo, cho tôi hỏi tình trạng đơn hàng của tôi hiện giờ như thế nào?",
-          "Mã đơn hàng của tôi là MAB002, đơn này đã được giao chưa?",
-          "Tôi muốn xác nhận là đơn hàng đã được giao chưa?"
+          "Alo, anh muốn hỏi về tình trạng đơn hàng của mình.",
+          "Đơn hàng xe đẩy Combi Sugocal anh đặt hôm 3 tháng 10 giờ ra sao?",
+          "Anh đã nhận được thông báo gì chưa?"
         ],
         "expected_outcome": "cap_nhat_don",
         "must_carry_over": [
@@ -10049,8 +10051,9 @@
           "owned_sku"
         ],
         "ground_truth_facts": {
-          "order_id": "O006",
-          "order_status": "delivered",
+          "order_id": "OD900302",
+          "order_status": "shipping",
+          "tracking": "VN0032TRK",
           "call_date": "2026-10-17"
         },
         "expected_call_brief": {
@@ -10059,20 +10062,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-03",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Yêu cầu hỗ trợ đơn hàng"
+            "outcome": "chot_don",
+            "summary": "Đặt Xe đẩy 2 chiều Combi Sugocal giá 6.790.000đ, đơn OD900302 đang giao."
           },
           "products_advised": [
-            "MAB002"
+            "SKU-MB-STR1"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Lê Văn C, em gọi lại về MAB002 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Lê Văn C, em gọi lại về SKU-MB-STR1 anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-17T08:00:00",
@@ -10081,11 +10084,12 @@
         "success_if": {
           "tool_called": "order.status",
           "args_match": {
-            "order_id": "O006"
+            "order_id": "OD900302"
           },
           "must_say_any": [
-            "đã giao",
-            "giao thành công"
+            "đang giao",
+            "đang vận chuyển",
+            "đã bàn giao"
           ]
         }
       },
@@ -10094,11 +10098,11 @@
         "call_date": "2026-10-19",
         "days_later": 2,
         "input_mode": "text",
-        "customer_goal": "Đổi địa chỉ giao hàng cho đơn hàng",
+        "customer_goal": "Thay đổi địa chỉ giao hàng cho đơn hàng.",
         "customer_turns": [
-          "Chào bạn, tôi muốn đổi địa chỉ giao hàng cho đơn hàng của mình.",
-          "Địa chỉ mới là Thủ Đức, TP.HCM, bạn có thể cập nhật cho tôi không?",
-          "Tôi cần đảm bảo rằng đơn hàng của mình sẽ được giao đến địa chỉ này. Cảm ơn!"
+          "Alo, anh muốn đổi địa chỉ giao hàng cho đơn hàng xe đẩy.",
+          "Địa chỉ mới là Thủ Đức, TP.HCM.",
+          "Anh cần điều chỉnh ngay vì đơn hàng đang giao mà."
         ],
         "facts_established": {
           "delivery_area": "Thủ Đức, TP.HCM"
@@ -10113,8 +10117,9 @@
           "owned_sku"
         ],
         "ground_truth_facts": {
-          "order_id": "O006",
-          "order_status": "delivered",
+          "order_id": "OD900302",
+          "order_status": "shipping",
+          "tracking": "VN0032TRK",
           "call_date": "2026-10-19"
         },
         "memory_expectation": {
@@ -10131,14 +10136,14 @@
             "outcome": "cap_nhat_don"
           },
           "products_advised": [
-            "MAB002"
+            "SKU-MB-STR1"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Lê Văn C, em gọi lại về MAB002 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Lê Văn C, em gọi lại về SKU-MB-STR1 anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-19T08:00:00",
@@ -10147,7 +10152,7 @@
         "success_if": {
           "tool_called": "order.update",
           "args_match": {
-            "order_id": "O006",
+            "order_id": "OD900302",
             "action": "update_address"
           }
         }
@@ -11453,14 +11458,14 @@
     "customer_id": "SYN-C002",
     "customer_phone": "0998000002",
     "customer_name": "Trần Thị B",
-    "honorific": "Ms.",
+    "honorific": "chị",
     "region": "trung",
     "category": "thoi-trang/ao-khoac",
     "difficulty": "normal",
     "tags": [
-      "không_quyết",
-      "thời_trang",
-      "tư_vấn",
+      "hỏi_nhiều",
+      "không_mua",
+      "so_sánh",
       "từ_chối",
       "variant:chuan"
     ],
@@ -11479,52 +11484,52 @@
             "source": "crm_session",
             "customer_id": "SYN-C002",
             "session_id": "SYN-002-S1",
-            "date": "2026-09-01",
+            "date": "2026-04-04",
             "channel": "hotline",
-            "summary": "Hỏi về sản phẩm thời trang",
-            "outcome": "successful",
-            "stale": false
+            "summary": "Mua Giày chạy bộ RunLite 2 Pro giá 1.690.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
+            "stale": true
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C002",
             "session_id": "SYN-002-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-02",
             "channel": "zalo_oa",
-            "summary": "Phản hồi về đơn hàng",
-            "outcome": "successful",
+            "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD900202 đang xử lý.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C002",
-            "order_id": "O003",
-            "date": "2026-03-12",
-            "sku": "FAS001",
-            "status": "processing",
+            "order_id": "OD900201",
+            "date": "2026-04-04",
+            "sku": "SKU-SN-RUN2-38-TRANG",
+            "status": "delivered",
             "stale": false,
             "facts": {
-              "order_id": "O003"
+              "owned_sku": "SKU-SN-RUN2-38-TRANG"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C002",
-            "order_id": "O004",
-            "date": "2026-09-10",
-            "sku": "FAS002",
-            "status": "delivered",
+            "order_id": "OD900202",
+            "date": "2026-10-02",
+            "sku": "SKU-SN-CAS-38-TRANG",
+            "status": "processing",
             "stale": false,
             "facts": {
-              "owned_sku": "FAS002"
+              "order_id": "OD900202"
             }
           }
         ],
-        "customer_goal": "Hỏi về áo phao lông vũ Warmly size L màu navy.",
+        "customer_goal": "Hỏi về áo phao lông vũ Warmly size L màu navy",
         "customer_turns": [
-          "Alo, chị muốn hỏi về áo phao lông vũ Warmly size L màu navy.",
-          "Áo này có màu nào khác không em?",
-          "Giá của áo này là bao nhiêu vậy?",
+          "Alo, chị muốn hỏi về áo phao lông vũ Warmly size L màu navy em ơi.",
+          "Áo này có khuyến mãi gì không?",
+          "Chị có thể biết giá không em?",
           "Chị muốn so sánh thêm trước khi quyết định."
         ],
         "facts_established": {
@@ -11566,20 +11571,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-02",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Phản hồi về đơn hàng"
+            "outcome": "chot_don",
+            "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD900202 đang xử lý."
           },
           "products_advised": [
-            "FAS002"
+            "SKU-SN-RUN2-38-TRANG"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Trần Thị B, em gọi lại về FAS002 Ms. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào chị Trần Thị B, em gọi lại về SKU-SN-RUN2-38-TRANG chị đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-30T08:00:00",
@@ -11597,11 +11602,12 @@
         "call_date": "2026-11-04",
         "days_later": 5,
         "input_mode": "text",
-        "customer_goal": "Từ chối không mua áo phao lông vũ.",
+        "customer_goal": "Từ chối mua áo phao lông vũ Warmly",
         "customer_turns": [
-          "Chị đã xem xét nhưng không mua áo phao này nữa.",
-          "Giá hơi cao so với ngân sách của chị.",
-          "Cảm ơn em đã tư vấn, nhưng chị sẽ không mua đâu."
+          "Chị đã xem xét rồi nhưng không mua áo phao nữa.",
+          "Em cho chị xin thêm thông tin về áo phao này được không?",
+          "Chị cảm thấy giá hơi cao, nên chị không mua.",
+          "Cảm ơn em đã tư vấn, chị sẽ không mua áo phao này nữa."
         ],
         "facts_established": {
           "product_advised": "SKU-JK-DWN",
@@ -11650,8 +11656,8 @@
             "outcome": "hen_goi_lai"
           },
           "products_advised": [
-            "FAS002",
-            "SKU-JK-DWN"
+            "SKU-JK-DWN",
+            "SKU-SN-RUN2-38-TRANG"
           ],
           "open_blockers": [
             "muốn so sánh thêm"
@@ -11664,7 +11670,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Trần Thị B, em gọi lại về FAS002 Ms. đang quan tâm ạ, không biết muốn so sánh thêm chưa ạ?",
+          "suggested_opening": "Dạ em chào chị Trần Thị B, em gọi lại về SKU-JK-DWN chị đang quan tâm ạ, không biết muốn so sánh thêm chưa ạ?",
           "freshness_checks": {
             "price_changed": false,
             "promos_no_longer_active": [],
@@ -11984,15 +11990,15 @@
     "customer_id": "SYN-C001",
     "customer_phone": "0998000001",
     "customer_name": "Nguyễn Văn A",
-    "honorific": "Mr.",
+    "honorific": "anh",
     "region": "bac",
     "category": "me-be",
     "difficulty": "hard",
     "tags": [
-      "combo_sản_phẩm",
+      "combo",
       "cross_channel",
-      "giao_hàng",
       "hard_case",
+      "hâm_sữa",
       "teencode",
       "tư_vấn",
       "variant:chuan",
@@ -12015,59 +12021,61 @@
             "source": "crm_session",
             "customer_id": "SYN-C001",
             "session_id": "SYN-001-S1",
-            "date": "2026-09-01",
+            "date": "2026-03-01",
             "channel": "hotline",
-            "summary": "Hỗ trợ mua máy hút bụi",
-            "outcome": "successful",
-            "stale": false
+            "summary": "Mua Máy lọc không khí AirPure X giá 4.890.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
+            "stale": true
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C001",
             "session_id": "SYN-001-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-01",
             "channel": "zalo_oa",
-            "summary": "Tư vấn về máy giặt",
-            "outcome": "successful",
+            "summary": "Đặt Máy lọc không khí AirPure Y giá 5.200.000đ, đơn OD900102 đang giao.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C001",
-            "order_id": "O001",
-            "date": "2026-01-15",
-            "sku": "HAP001",
+            "order_id": "OD900101",
+            "date": "2026-03-01",
+            "sku": "SKU-AP-X",
             "status": "delivered",
             "stale": false,
             "facts": {
-              "owned_sku": "HAP001"
+              "owned_sku": "SKU-AP-X"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C001",
-            "order_id": "O002",
-            "date": "2026-05-20",
-            "sku": "HAP002",
+            "order_id": "OD900102",
+            "date": "2026-10-01",
+            "sku": "SKU-AP-Y",
             "status": "shipping",
             "stale": false,
             "facts": {
-              "order_id": "O002"
+              "order_id": "OD900102"
             }
           }
         ],
-        "customer_goal": "Hỏi về combo sản phẩm cho bé.",
+        "customer_goal": "Hỏi về Combo Spectra S1 và máy hâm sữa Fatz",
         "customer_turns": [
-          "Alo, chị muốn hỏi về combo Spectra S1 với máy hâm sữa Fatz.",
-          "Ngân sách của chị là 5 triệu rưỡi, không biết có khuyến mãi gì không em?",
-          "Chị có bé 4 tháng, nên cần sản phẩm phù hợp.",
-          "Chị muốn gọi hotline hỏi thêm một số thông tin nữa."
+          "Alo em, anh muốn hỏi về combo Spectra S1 và máy hâm sữa Fatz.",
+          "Giá combo này là bao nhiêu và có khuyến mãi gì không?",
+          "Anh có ngân sách khoảng 5 triệu rưỡi.",
+          "Nhà anh có bé 4 tháng tuổi, vậy có cần gì đặc biệt không?",
+          "Anh muốn gọi hotline để hỏi thêm trước khi quyết định."
         ],
         "customer_turns_asr": [
-          "alo chi muon hoi ve combo spectra s1 voi may ham sua fatz",
-          "ngan sach cua chi la 5 trieu rưỡi khong biet co khuyen mai gi khong em",
-          "chi co be 4 thang nen can san pham phu hop",
-          "chi muon goi hotline hoi them mot so thong tin nua"
+          "alo em anh muon hoi ve combo spectra s1 va may ham sua fatz",
+          "gia combo nay la bao nhieu va co khuyen mai gi khong",
+          "anh co ngan sach khoang 5 trieu rưỡi",
+          "nha anh co be 4 thang tuoi vay co can gi dac biet khong",
+          "anh muon goi hotline de hoi them truoc khi quyet dinh"
         ],
         "facts_established": {
           "child_age_months": 4,
@@ -12111,20 +12119,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-01",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Tư vấn về máy giặt"
+            "outcome": "chot_don",
+            "summary": "Đặt Máy lọc không khí AirPure Y giá 5.200.000đ, đơn OD900102 đang giao."
           },
           "products_advised": [
-            "HAP001"
+            "SKU-AP-X"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Nguyễn Văn A, em gọi lại về HAP001 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Nguyễn Văn A, em gọi lại về SKU-AP-X anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-29T08:00:00",
@@ -12142,12 +12150,12 @@
         "call_date": "2026-10-30",
         "days_later": 1,
         "input_mode": "text",
-        "customer_goal": "Xác nhận đơn hàng cho combo sản phẩm.",
+        "customer_goal": "Xác nhận mua combo và thông tin giao hàng",
         "customer_turns": [
-          "Chào em, hôm qua chị đã hỏi về combo đó.",
-          "Chị muốn thanh toán COD và giao hàng ở Long Biên, Hà Nội.",
-          "Chị đồng ý lên đơn cho sản phẩm này nhé!",
-          "Có gì cần thêm thông tin không em?"
+          "Alo, hôm qua em tư vấn cho anh combo Spectra S1 và máy hâm sữa Fatz.",
+          "Anh muốn đặt hàng, thanh toán COD nhé.",
+          "Khu vực giao hàng là Long Biên, Hà Nội.",
+          "Vậy gửi cho anh đơn hàng luôn nhé."
         ],
         "facts_established": {
           "payment": "COD",
@@ -12194,7 +12202,7 @@
           "promo_code": "MOM-FREESHIP",
           "order_id": "OD600001",
           "superseded": {
-            "order_id": "O002"
+            "order_id": "OD900102"
           }
         },
         "expected_call_brief": {
@@ -12208,7 +12216,7 @@
             "outcome": "hen_goi_lai"
           },
           "products_advised": [
-            "HAP001",
+            "SKU-AP-X",
             "SKU-BDL-MOM"
           ],
           "open_blockers": [
@@ -12222,7 +12230,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Nguyễn Văn A, em gọi lại về HAP001 Mr. đang quan tâm ạ, không biết muốn gọi hotline hỏi thêm chưa ạ?",
+          "suggested_opening": "Dạ em chào anh Nguyễn Văn A, em gọi lại về SKU-AP-X anh đang quan tâm ạ, không biết muốn gọi hotline hỏi thêm chưa ạ?",
           "freshness_checks": {
             "price_changed": false,
             "promos_no_longer_active": [],
@@ -12250,14 +12258,14 @@
     "customer_id": "SYN-C005",
     "customer_phone": "0998000005",
     "customer_name": "Đỗ Minh E",
-    "honorific": "Mr.",
+    "honorific": "anh",
     "region": "trung",
     "category": "me-be",
     "difficulty": "normal",
     "tags": [
-      "benh_an",
-      "chuyen_may",
+      "an_toan",
       "handoff",
+      "hen_goi_lai",
       "safety",
       "tu_van",
       "variant:chuan",
@@ -12280,53 +12288,53 @@
             "source": "crm_session",
             "customer_id": "SYN-C005",
             "session_id": "SYN-005-S1",
-            "date": "2026-09-01",
+            "date": "2026-07-13",
             "channel": "hotline",
-            "summary": "Hỏi về quần áo trẻ em",
-            "outcome": "successful",
+            "summary": "Mua Áo khoác gió Windbreak giá 690.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C005",
             "session_id": "SYN-005-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-05",
             "channel": "zalo_oa",
-            "summary": "Tư vấn chọn đồ mùa hè",
-            "outcome": "successful",
+            "summary": "Đặt Áo phao lông vũ Warmly giá 1.490.000đ, đơn OD900502 đang giao.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C005",
-            "order_id": "O009",
-            "date": "2026-05-30",
-            "sku": "FAS003",
-            "status": "shipping",
+            "order_id": "OD900501",
+            "date": "2026-07-13",
+            "sku": "SKU-JK-WND-M-NAVY",
+            "status": "delivered",
             "stale": false,
             "facts": {
-              "order_id": "O009"
+              "owned_sku": "SKU-JK-WND-M-NAVY"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C005",
-            "order_id": "O010",
-            "date": "2026-09-12",
-            "sku": "FAS004",
-            "status": "delivered",
+            "order_id": "OD900502",
+            "date": "2026-10-05",
+            "sku": "SKU-JK-DWN-M-NAVY",
+            "status": "shipping",
             "stale": false,
             "facts": {
-              "owned_sku": "FAS004"
+              "order_id": "OD900502"
             }
           }
         ],
-        "customer_goal": "Hỏi xe đẩy cho bé 5 tháng tuổi",
+        "customer_goal": "Hỏi về xe đẩy cho bé 5 tháng tuổi",
         "customer_turns": [
-          "Alo, tôi muốn hỏi về xe đẩy cho bé 5 tháng tuổi.",
-          "Ngân sách của tôi khoảng 7 triệu đồng.",
-          "Có khuyến mãi gì không bạn?",
-          "Tôi cần chờ cuối tháng nhận lương mới quyết định được."
+          "Alo, anh muốn hỏi về xe đẩy cho bé 5 tháng tuổi.",
+          "Ngân sách của anh khoảng 7 triệu thôi.",
+          "Xe đẩy này có khuyến mãi gì không em?",
+          "Anh cần chờ cuối tháng nhận lương rồi mới quyết định được."
         ],
         "facts_established": {
           "child_age_months": 5,
@@ -12369,20 +12377,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-05",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Tư vấn chọn đồ mùa hè"
+            "outcome": "chot_don",
+            "summary": "Đặt Áo phao lông vũ Warmly giá 1.490.000đ, đơn OD900502 đang giao."
           },
           "products_advised": [
-            "FAS004"
+            "SKU-JK-WND-M-NAVY"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Đỗ Minh E, em gọi lại về FAS004 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Đỗ Minh E, em gọi lại về SKU-JK-WND-M-NAVY anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-16T08:00:00",
@@ -12400,11 +12408,11 @@
         "call_date": "2026-10-18",
         "days_later": 2,
         "input_mode": "text",
-        "customer_goal": "Hỏi về vấn đề y tế liên quan đến sản phẩm",
+        "customer_goal": "Hỏi về an toàn khi sử dụng sản phẩm cho bé",
         "customer_turns": [
-          "Alo, tôi có một câu hỏi về an toàn sản phẩm.",
-          "Người thân của tôi đang dùng thuốc, liệu có dùng được xe đẩy này không?",
-          "Tôi có thể chuyển máy để hỏi thêm không?"
+          "Alo, anh có câu hỏi về an toàn khi sử dụng xe đẩy cho bé.",
+          "Bé nhà anh đang dùng thuốc, không biết có dùng được xe này không?",
+          "Nếu không được thì anh có thể chuyển máy cho người khác không?"
         ],
         "expected_outcome": "chuyen_may",
         "must_carry_over": [
@@ -12436,7 +12444,7 @@
             "outcome": "hen_goi_lai"
           },
           "products_advised": [
-            "FAS004",
+            "SKU-JK-WND-M-NAVY",
             "SKU-MB-STR2"
           ],
           "open_blockers": [
@@ -12449,7 +12457,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Đỗ Minh E, em gọi lại về FAS004 Mr. đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+          "suggested_opening": "Dạ em chào anh Đỗ Minh E, em gọi lại về SKU-JK-WND-M-NAVY anh đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-18T08:00:00",
@@ -12496,7 +12504,7 @@
     "customer_id": "SYN-C003",
     "customer_phone": "0998000003",
     "customer_name": "Lê Văn C",
-    "honorific": "Mr.",
+    "honorific": "anh",
     "region": "nam",
     "category": "me-be",
     "difficulty": "hard",
@@ -12526,53 +12534,53 @@
             "source": "crm_session",
             "customer_id": "SYN-C003",
             "session_id": "SYN-003-S1",
-            "date": "2026-09-01",
+            "date": "2026-05-07",
             "channel": "hotline",
-            "summary": "Tìm hiểu về đồ dùng cho trẻ em",
-            "outcome": "successful",
+            "summary": "Mua Xe đẩy gấp gọn Joie Pact giá 3.490.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C003",
             "session_id": "SYN-003-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-03",
             "channel": "zalo_oa",
-            "summary": "Yêu cầu hỗ trợ đơn hàng",
-            "outcome": "successful",
+            "summary": "Đặt Xe đẩy 2 chiều Combi Sugocal giá 6.790.000đ, đơn OD900302 đang giao.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C003",
-            "order_id": "O005",
-            "date": "2026-07-22",
-            "sku": "MAB001",
-            "status": "shipping",
+            "order_id": "OD900301",
+            "date": "2026-05-07",
+            "sku": "SKU-MB-STR1",
+            "status": "delivered",
             "stale": false,
             "facts": {
-              "order_id": "O005"
+              "owned_sku": "SKU-MB-STR1"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C003",
-            "order_id": "O006",
-            "date": "2026-09-05",
-            "sku": "MAB002",
-            "status": "delivered",
+            "order_id": "OD900302",
+            "date": "2026-10-03",
+            "sku": "SKU-MB-STR2",
+            "status": "shipping",
             "stale": false,
             "facts": {
-              "owned_sku": "MAB002"
+              "order_id": "OD900302"
             }
           }
         ],
-        "customer_goal": "Hỏi về túi trữ sữa cho bé 5 tháng tuổi",
+        "customer_goal": "Hỏi về túi trữ sữa Sunmum.",
         "customer_turns": [
-          "Alo, em muốn hỏi về túi trữ sữa Sunmum cho bé nhà em 5 tháng tuổi.",
-          "Ngân sách của em khoảng 500 ngàn, không biết giá thế nào?",
-          "Có khuyến mãi gì không em?",
-          "Em cần suy nghĩ thêm rồi sẽ gọi lại."
+          "Alo, anh muốn hỏi về túi trữ sữa Sunmum 50 túi.",
+          "Giá của túi này là bao nhiêu vậy em?",
+          "Có khuyến mãi gì không?",
+          "Anh cần suy nghĩ thêm rồi sẽ gọi lại."
         ],
         "facts_established": {
           "child_age_months": 5,
@@ -12612,20 +12620,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-03",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Yêu cầu hỗ trợ đơn hàng"
+            "outcome": "chot_don",
+            "summary": "Đặt Xe đẩy 2 chiều Combi Sugocal giá 6.790.000đ, đơn OD900302 đang giao."
           },
           "products_advised": [
-            "MAB002"
+            "SKU-MB-STR1"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Lê Văn C, em gọi lại về MAB002 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Lê Văn C, em gọi lại về SKU-MB-STR1 anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-31T08:00:00",
@@ -12643,11 +12651,12 @@
         "call_date": "2026-11-02",
         "days_later": 2,
         "input_mode": "text",
-        "customer_goal": "Xác nhận chính sách đổi trả",
+        "customer_goal": "Xác nhận chính sách đổi trả.",
         "customer_turns": [
-          "Alo, hôm trước em có đọc trên web là có chính sách đổi trả trong 14 ngày đúng không?",
-          "Và phí đổi size là 20 nghìn phải không em?",
-          "Em muốn chắc chắn lại thông tin này."
+          "Alo, anh đã đọc trên web là được đổi trả trong 14 ngày đúng không?",
+          "Phí đổi size là 20 nghìn phải không em?",
+          "Chắc chắn là chính sách này vẫn còn hiệu lực chứ?",
+          "Anh cần thông tin rõ ràng để quyết định."
         ],
         "expected_outcome": "thong_tin",
         "must_carry_over": [
@@ -12681,8 +12690,8 @@
             "outcome": "hen_goi_lai"
           },
           "products_advised": [
-            "MAB002",
-            "SKU-MB-BAG"
+            "SKU-MB-BAG",
+            "SKU-MB-STR1"
           ],
           "open_blockers": [
             "cần suy nghĩ thêm"
@@ -12694,7 +12703,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Lê Văn C, em gọi lại về MAB002 Mr. đang quan tâm ạ, không biết cần suy nghĩ thêm chưa ạ?",
+          "suggested_opening": "Dạ em chào anh Lê Văn C, em gọi lại về SKU-MB-BAG anh đang quan tâm ạ, không biết cần suy nghĩ thêm chưa ạ?",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-11-02T08:00:00",
@@ -12728,18 +12737,18 @@
     "customer_id": "SYN-C004",
     "customer_phone": "0998000004",
     "customer_name": "Phạm Thị D",
-    "honorific": "Ms.",
+    "honorific": "chị",
     "region": "bac",
     "category": "thoi-trang/giay",
     "difficulty": "hard",
     "tags": [
       "cross_channel",
-      "giày_chạy",
+      "giay_chay",
       "hard_case",
-      "khuyến_mãi",
-      "tư_vấn",
+      "hen_goi_lai",
+      "tu_van",
       "variant:ba_kenh_lech_gia",
-      "đặt_hàng"
+      "xac_nhan_mua"
     ],
     "metric_focus": [
       "CCR",
@@ -12760,54 +12769,53 @@
             "source": "crm_session",
             "customer_id": "SYN-C004",
             "session_id": "SYN-004-S1",
-            "date": "2026-09-01",
+            "date": "2026-06-10",
             "channel": "hotline",
-            "summary": "Khách hàng hỏi về máy xay sinh tố",
-            "outcome": "successful",
+            "summary": "Mua Máy lọc không khí AirPure Pro giá 7.990.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C004",
             "session_id": "SYN-004-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-04",
             "channel": "zalo_oa",
-            "summary": "Hỗ trợ đổi trả hàng",
-            "outcome": "successful",
+            "summary": "Đặt Máy lọc không khí Xiaomi Smart 4 Lite giá 2.990.000đ, đơn OD900402 đang xử lý.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C004",
-            "order_id": "O007",
-            "date": "2026-02-25",
-            "sku": "HAP003",
+            "order_id": "OD900401",
+            "date": "2026-06-10",
+            "sku": "SKU-AP-PRO",
             "status": "delivered",
             "stale": false,
             "facts": {
-              "owned_sku": "HAP003"
+              "owned_sku": "SKU-AP-PRO"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C004",
-            "order_id": "O008",
-            "date": "2026-06-18",
-            "sku": "HAP004",
+            "order_id": "OD900402",
+            "date": "2026-10-04",
+            "sku": "SKU-XM-4L",
             "status": "processing",
             "stale": false,
             "facts": {
-              "order_id": "O008"
+              "order_id": "OD900402"
             }
           }
         ],
-        "customer_goal": "Hỏi giày chạy bộ size 42 màu đen và giá cả",
+        "customer_goal": "Hỏi về giày chạy bộ RunLite 2 Pro.",
         "customer_turns": [
-          "Alo, chị muốn hỏi về giày chạy bộ size 42 màu đen.",
-          "Giá ở đây có cao hơn chỗ khác không?",
-          "Chị thấy bên kia giá 1 triệu 190 ngàn.",
-          "Có khuyến mãi gì không em?",
-          "Chị sẽ nghĩ thêm và gọi lại nhé."
+          "Alo, chị muốn hỏi về giày chạy bộ RunLite 2 Pro size 42 màu đen.",
+          "Giá của giày này là bao nhiêu em?",
+          "Chị thấy chỗ khác bán 1 triệu 190 nghìn, sao bên mình lại cao hơn vậy?",
+          "Chị sẽ suy nghĩ thêm rồi gọi lại nhé."
         ],
         "facts_established": {
           "size": 42,
@@ -12854,20 +12862,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-04",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Hỗ trợ đổi trả hàng"
+            "outcome": "chot_don",
+            "summary": "Đặt Máy lọc không khí Xiaomi Smart 4 Lite giá 2.990.000đ, đơn OD900402 đang xử lý."
           },
           "products_advised": [
-            "HAP003"
+            "SKU-AP-PRO"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Phạm Thị D, em gọi lại về HAP003 Ms. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào chị Phạm Thị D, em gọi lại về SKU-AP-PRO chị đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-05T08:00:00",
@@ -12892,12 +12900,12 @@
         "call_date": "2026-10-15",
         "days_later": 10,
         "input_mode": "text",
-        "customer_goal": "Hỏi lại về giày chạy bộ size 42 màu đen và giá",
+        "customer_goal": "Hỏi lại về giày chạy bộ RunLite 2 Pro.",
         "customer_turns": [
-          "Chào em, hôm trước chị đã hỏi về giày chạy bộ size 42 màu đen.",
-          "Giá hôm nay là bao nhiêu vậy?",
-          "Chị nghe nói có khuyến mãi gì đó đúng không?",
-          "Chị sẽ xem lại và gọi lại nhé."
+          "Chào em, hôm trước chị đã hỏi về giày chạy bộ RunLite 2 Pro, em có thông tin gì mới không?",
+          "Nếu chị đặt thì giá bây giờ là bao nhiêu?",
+          "Chị muốn biết có khuyến mãi gì không để quyết định.",
+          "Chị sẽ gọi lại sau khi xem xét."
         ],
         "facts_established": {
           "product_advised": "SKU-SN-RUN2",
@@ -12958,7 +12966,7 @@
             "outcome": "hen_goi_lai"
           },
           "products_advised": [
-            "HAP003",
+            "SKU-AP-PRO",
             "SKU-SN-RUN2"
           ],
           "open_blockers": [],
@@ -12970,7 +12978,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Phạm Thị D, em gọi lại về HAP003 Ms. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào chị Phạm Thị D, em gọi lại về SKU-AP-PRO chị đang quan tâm ạ",
           "freshness_checks": {
             "price_changed": true,
             "promos_no_longer_active": [
@@ -13008,12 +13016,12 @@
         "call_date": "2026-10-27",
         "days_later": 12,
         "input_mode": "text",
-        "customer_goal": "Xác nhận đặt mua giày chạy bộ size 42 màu đen",
+        "customer_goal": "Xác nhận mua giày chạy bộ RunLite 2 Pro.",
         "customer_turns": [
-          "Chào em, chị muốn đặt mua giày chạy bộ size 42 màu đen.",
-          "Hình thức thanh toán là COD.",
-          "Giao hàng đến Long Biên, Hà Nội nhé.",
-          "Chốt đơn cho chị đi em."
+          "Chào em, chị đã quyết định mua giày chạy bộ RunLite 2 Pro.",
+          "Chị muốn thanh toán COD.",
+          "Khu vực giao hàng là Long Biên, Hà Nội.",
+          "Mong em nhanh chóng lên đơn giúp chị."
         ],
         "facts_established": {
           "payment": "COD",
@@ -13064,7 +13072,7 @@
           "order_id": "OD600001",
           "superseded": {
             "price_quoted_vnd": 1521000,
-            "order_id": "O008"
+            "order_id": "OD900402"
           }
         },
         "expected_call_brief": {
@@ -13078,7 +13086,7 @@
             "outcome": "hen_goi_lai"
           },
           "products_advised": [
-            "HAP003",
+            "SKU-AP-PRO",
             "SKU-SN-RUN2"
           ],
           "open_blockers": [],
@@ -13090,7 +13098,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Phạm Thị D, em gọi lại về HAP003 Ms. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào chị Phạm Thị D, em gọi lại về SKU-AP-PRO chị đang quan tâm ạ",
           "freshness_checks": {
             "price_changed": true,
             "promos_no_longer_active": [
@@ -13325,18 +13333,18 @@
     "customer_id": "SYN-C006",
     "customer_phone": "0998000006",
     "customer_name": "Nguyễn Thị F",
-    "honorific": "Ms.",
+    "honorific": "chị",
     "region": "nam",
     "category": "gia-dung/may-loc-khong-khi",
     "difficulty": "hard",
     "tags": [
+      "giao_hàng",
       "hard_case",
-      "may_loc_khong_khi",
-      "mua_hang",
-      "thanh_toan_COD",
       "ttl",
-      "tu_van",
-      "variant:quay_lai_sau_8_thang"
+      "tư_vấn",
+      "variant:quay_lai_sau_8_thang",
+      "xác_nhận",
+      "đơn_hàng"
     ],
     "metric_focus": [
       "CCR",
@@ -13355,52 +13363,53 @@
             "source": "crm_session",
             "customer_id": "SYN-C006",
             "session_id": "SYN-006-S1",
-            "date": "2026-09-01",
+            "date": "2026-03-16",
             "channel": "hotline",
-            "summary": "Tìm hiểu sản phẩm cho trẻ sơ sinh",
-            "outcome": "successful",
-            "stale": false
+            "summary": "Mua Máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
+            "stale": true
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C006",
             "session_id": "SYN-006-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-06",
             "channel": "zalo_oa",
-            "summary": "Phản hồi về chất lượng sản phẩm",
-            "outcome": "successful",
+            "summary": "Đặt Bình sữa Pigeon PPSU 240ml giá 289.000đ, đơn OD900602 đang xử lý.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C006",
-            "order_id": "O011",
-            "date": "2026-08-20",
-            "sku": "MAB003",
-            "status": "processing",
+            "order_id": "OD900601",
+            "date": "2026-03-16",
+            "sku": "SKU-MB-STER",
+            "status": "delivered",
             "stale": false,
             "facts": {
-              "order_id": "O011"
+              "owned_sku": "SKU-MB-STER"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C006",
-            "order_id": "O012",
-            "date": "2026-09-30",
-            "sku": "MAB004",
-            "status": "delivered",
+            "order_id": "OD900602",
+            "date": "2026-10-06",
+            "sku": "SKU-MB-BOT",
+            "status": "processing",
             "stale": false,
             "facts": {
-              "owned_sku": "MAB004"
+              "order_id": "OD900602"
             }
           }
         ],
-        "customer_goal": "Mua máy lọc không khí Samsung AX40",
+        "customer_goal": "Xác nhận đơn hàng máy lọc không khí Samsung AX40",
         "customer_turns": [
-          "Alo, chị muốn xác nhận mua máy lọc không khí Samsung AX40.",
-          "Chị sẽ thanh toán bằng COD và giao hàng ở Thủ Đức, TP.HCM.",
-          "Diện tích phòng chị là 40 mét vuông và nhà có trẻ nhỏ."
+          "Alo, chị gọi lại để xác nhận mua máy lọc không khí Samsung AX40.",
+          "Chị muốn thanh toán COD và giao hàng ở Thủ Đức, TP.HCM.",
+          "Diện tích phòng của chị khoảng 40m² và có bé nhỏ ở nhà.",
+          "Ngân sách của chị là dưới 6 triệu rưỡi."
         ],
         "facts_established": {
           "room_area_m2": 40,
@@ -13446,7 +13455,7 @@
           "promo_code": "NAM-SHIP0",
           "order_id": "OD600001",
           "superseded": {
-            "order_id": "O011"
+            "order_id": "OD900602"
           }
         },
         "expected_call_brief": {
@@ -13455,20 +13464,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-06",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Phản hồi về chất lượng sản phẩm"
+            "outcome": "chot_don",
+            "summary": "Đặt Bình sữa Pigeon PPSU 240ml giá 289.000đ, đơn OD900602 đang xử lý."
           },
           "products_advised": [
-            "MAB004"
+            "SKU-MB-STER"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Nguyễn Thị F, em gọi lại về MAB004 Ms. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào chị Nguyễn Thị F, em gọi lại về SKU-MB-STER chị đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-17T08:00:00",
@@ -13488,11 +13497,12 @@
         "call_date": "2027-06-14",
         "days_later": 240,
         "input_mode": "text",
-        "customer_goal": "Hỏi thêm về máy lọc không khí",
+        "customer_goal": "Hỏi thêm thông tin về máy lọc không khí",
         "customer_turns": [
-          "Chị nhớ hôm trước có nói về máy lọc không khí Samsung AX40.",
-          "Chị muốn hỏi thêm về giá và khuyến mãi.",
-          "Chưa chốt đơn vì cần thời gian suy nghĩ thêm."
+          "Chào em, hôm trước chị đã hỏi về máy lọc không khí Samsung AX40, chị muốn biết thêm một số thông tin.",
+          "Máy này hiện tại có khuyến mãi gì không em?",
+          "Giá có thể thay đổi không? Chị cần hỏi thêm một số thứ trước khi quyết định.",
+          "Chị sẽ gọi lại sau nhé!"
         ],
         "facts_established": {
           "product_advised": "SKU-SS-AX40",
@@ -13534,7 +13544,7 @@
             "outcome": "chot_don"
           },
           "products_advised": [
-            "MAB004",
+            "SKU-MB-STER",
             "SKU-SS-AX40"
           ],
           "open_blockers": [],
@@ -13542,7 +13552,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Nguyễn Thị F, em gọi lại về MAB004 Ms. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào chị Nguyễn Thị F, em gọi lại về SKU-MB-STER chị đang quan tâm ạ",
           "freshness_checks": {
             "price_changed": false,
             "promos_no_longer_active": [
@@ -13578,7 +13588,7 @@
     "customer_id": "SYN-C007",
     "customer_phone": "0998000007",
     "customer_name": "Lê Văn G",
-    "honorific": "Mr.",
+    "honorific": "anh",
     "region": "bac",
     "category": "gia-dung/may-loc-khong-khi",
     "difficulty": "hard",
@@ -13589,9 +13599,9 @@
       "mua_sắm",
       "multi_item",
       "máy_lọc_không_khí",
+      "nhà_mới",
       "tư_vấn",
-      "variant:bon_san_pham_vuot_cod",
-      "đặt_hàng"
+      "variant:bon_san_pham_vuot_cod"
     ],
     "metric_focus": [
       "CCR",
@@ -13609,53 +13619,53 @@
             "source": "crm_session",
             "customer_id": "SYN-C007",
             "session_id": "SYN-007-S1",
-            "date": "2026-09-01",
+            "date": "2026-04-19",
             "channel": "hotline",
-            "summary": "Tư vấn về máy lạnh",
-            "outcome": "successful",
+            "summary": "Mua Máy lọc không khí Samsung AX40 giá 6.490.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C007",
             "session_id": "SYN-007-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-07",
             "channel": "zalo_oa",
-            "summary": "Hỗ trợ đổi hàng",
-            "outcome": "successful",
+            "summary": "Đặt Máy lọc nước RO Karofi 9 lõi giá 5.990.000đ, đơn OD900702 đang giao.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C007",
-            "order_id": "O013",
-            "date": "2026-02-12",
-            "sku": "HAP005",
+            "order_id": "OD900701",
+            "date": "2026-04-19",
+            "sku": "SKU-SS-AX40",
             "status": "delivered",
             "stale": false,
             "facts": {
-              "owned_sku": "HAP005"
+              "owned_sku": "SKU-SS-AX40"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C007",
-            "order_id": "O014",
-            "date": "2026-07-14",
-            "sku": "HAP006",
+            "order_id": "OD900702",
+            "date": "2026-10-07",
+            "sku": "SKU-WF-RO9",
             "status": "shipping",
             "stale": false,
             "facts": {
-              "order_id": "O014"
+              "order_id": "OD900702"
             }
           }
         ],
-        "customer_goal": "Hỏi về máy lọc không khí cho phòng 30m² có trẻ nhỏ",
+        "customer_goal": "Hỏi về máy lọc không khí AirPure Pro.",
         "customer_turns": [
-          "Alo, em chào chị, hôm nay chị muốn hỏi về máy lọc không khí cho phòng khoảng 30 mét vuông.",
-          "Nhà chị có trẻ nhỏ, ngân sách tầm 9 triệu thôi.",
-          "Máy này có khuyến mãi gì không em?",
-          "Chị cần bàn với gia đình rồi sẽ gọi lại em nhé."
+          "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro mà em đã tư vấn hôm trước.",
+          "Diện tích phòng nhà anh khoảng 30 mét vuông, và nhà có trẻ nhỏ.",
+          "Ngân sách của anh tầm 9 triệu thôi, máy này có khuyến mãi gì không?",
+          "Anh cần bàn với gia đình rồi sẽ gọi lại em nhé."
         ],
         "facts_established": {
           "room_area_m2": 30,
@@ -13702,20 +13712,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-07",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Hỗ trợ đổi hàng"
+            "outcome": "chot_don",
+            "summary": "Đặt Máy lọc nước RO Karofi 9 lõi giá 5.990.000đ, đơn OD900702 đang giao."
           },
           "products_advised": [
-            "HAP005"
+            "SKU-SS-AX40"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Lê Văn G, em gọi lại về HAP005 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Lê Văn G, em gọi lại về SKU-SS-AX40 anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-15T08:00:00",
@@ -13733,16 +13743,16 @@
         "call_date": "2026-10-17",
         "days_later": 2,
         "input_mode": "text",
-        "customer_goal": "Mua nhiều món cho nhà mới và chốt đơn",
+        "customer_goal": "Mua nhiều sản phẩm cho nhà mới.",
         "customer_turns": [
-          "Alo, em ơi, hôm trước chị đã hỏi về máy lọc không khí, giờ chị muốn mua luôn.",
-          "Chị cũng cần thêm một nồi chiên không dầu và quạt đứng nữa.",
-          "Máy lọc không khí giá bao nhiêu em nhỉ?",
-          "Nồi chiên không dầu giá sao, có khuyến mãi gì không?",
-          "Quạt đứng có giá là bao nhiêu vậy?",
-          "Chị muốn mua 4 món này, tổng tiền là bao nhiêu?",
-          "Chị muốn thanh toán bằng chuyển khoản.",
-          "Địa chỉ giao hàng là Long Biên, Hà Nội nhé."
+          "Alo, anh gọi lại để chốt đơn hàng.",
+          "Anh muốn mua máy lọc không khí AirPure Pro, nồi chiên không dầu Xiaomi 4.5L, quạt đứng Senko TS16 và màng lọc thay thế.",
+          "Tổng tiền cho tất cả sản phẩm là bao nhiêu em nhỉ?",
+          "Anh muốn trả bằng hình thức chuyển khoản.",
+          "Ngân sách của anh chỉ khoảng 8 triệu rưỡi thôi, có cách nào giảm giá không?",
+          "Anh cần 4 món này, giao hàng ở Long Biên, Hà Nội nhé.",
+          "Em có thể cho anh biết chi tiết từng món không?",
+          "Chốt đơn cho anh nhé, cảm ơn em!"
         ],
         "facts_established": {
           "payment": "chuyen_khoan",
@@ -13802,7 +13812,7 @@
           "order_id": "OD600001",
           "superseded": {
             "budget_vnd": 9000000,
-            "order_id": "O014"
+            "order_id": "OD900702"
           }
         },
         "expected_call_brief": {
@@ -13816,8 +13826,8 @@
             "outcome": "hen_goi_lai"
           },
           "products_advised": [
-            "HAP005",
-            "SKU-AP-PRO"
+            "SKU-AP-PRO",
+            "SKU-SS-AX40"
           ],
           "open_blockers": [
             "để bàn với gia đình"
@@ -13830,7 +13840,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Lê Văn G, em gọi lại về HAP005 Mr. đang quan tâm ạ, không biết để bàn với gia đình chưa ạ?",
+          "suggested_opening": "Dạ em chào anh Lê Văn G, em gọi lại về SKU-AP-PRO anh đang quan tâm ạ, không biết để bàn với gia đình chưa ạ?",
           "freshness_checks": {
             "price_changed": false,
             "promos_no_longer_active": [],
@@ -13869,19 +13879,15 @@
     "customer_id": "SYN-C008",
     "customer_phone": "0998000008",
     "customer_name": "Trần Văn H",
-    "honorific": "Mr.",
+    "honorific": "anh",
     "region": "trung",
     "category": "gia-dung/may-loc-khong-khi",
     "difficulty": "hard",
     "tags": [
       "asr",
       "hard_case",
-      "khách_hàng",
-      "máy_lọc_không_khí",
       "robustness",
-      "tư_vấn",
-      "variant:chuan",
-      "đặt_hàng"
+      "variant:chuan"
     ],
     "metric_focus": [
       "CCR",
@@ -13900,44 +13906,44 @@
             "source": "crm_session",
             "customer_id": "SYN-C008",
             "session_id": "SYN-008-S1",
-            "date": "2026-09-01",
+            "date": "2026-05-22",
             "channel": "hotline",
-            "summary": "Hỏi về giày dép nam",
-            "outcome": "successful",
+            "summary": "Mua Giày chạy bộ RunLite 1 giá 1.290.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C008",
             "session_id": "SYN-008-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-08",
             "channel": "zalo_oa",
-            "summary": "Tìm hiểu về chất liệu sản phẩm",
-            "outcome": "successful",
+            "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD900802 đang xử lý.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C008",
-            "order_id": "O015",
-            "date": "2026-05-05",
-            "sku": "FAS005",
-            "status": "processing",
+            "order_id": "OD900801",
+            "date": "2026-05-22",
+            "sku": "SKU-SN-RUN1-40-TRANG",
+            "status": "delivered",
             "stale": false,
             "facts": {
-              "order_id": "O015"
+              "owned_sku": "SKU-SN-RUN1-40-TRANG"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C008",
-            "order_id": "O016",
-            "date": "2026-09-15",
-            "sku": "FAS006",
-            "status": "delivered",
+            "order_id": "OD900802",
+            "date": "2026-10-08",
+            "sku": "SKU-SN-CAS-40-TRANG",
+            "status": "processing",
             "stale": false,
             "facts": {
-              "owned_sku": "FAS006"
+              "order_id": "OD900802"
             }
           }
         ],
@@ -13947,18 +13953,18 @@
         },
         "customer_goal": "Hỏi về máy lọc không khí Xiaomi Smart 4 Pro",
         "customer_turns": [
-          "Alo, em muốn hỏi về máy lọc không khí Xiaomi Smart 4 Pro.",
-          "Phòng em khoảng 35 mét vuông, có trẻ nhỏ nữa.",
-          "Ngân sách của em tầm 6 triệu thôi.",
+          "Alo, anh muốn hỏi về máy lọc không khí Xiaomi Smart 4 Pro.",
+          "Diện tích phòng của anh khoảng 35 mét vuông.",
+          "Nhà anh có trẻ nhỏ, ngân sách tầm 6 triệu thôi.",
           "Máy này có khuyến mãi gì không em?",
-          "Em cần suy nghĩ thêm rồi sẽ gọi lại."
+          "Anh cần suy nghĩ thêm rồi sẽ gọi lại."
         ],
         "customer_turns_asr": [
-          "alo em muon hoi ve may loc khong khi xiaomi smart 4 pro",
-          "phong em khoang ba muoi lam met vuong co tre nho nua",
-          "ngan sach cua em tam sau trieu thoi",
+          "alo anh muon hoi ve may loc khong khi xiaomi smart 4 pro",
+          "dien tich phong cua anh khoang 35 met vuong",
+          "nha anh co tre nho ngan sach tam 6 trieu thoi",
           "may nay co khuyen mai gi khong em",
-          "em can suy nghi them roi se goi lai"
+          "anh can suy nghi them roi se goi lai"
         ],
         "facts_established": {
           "room_area_m2": 35,
@@ -14006,20 +14012,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-08",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Tìm hiểu về chất liệu sản phẩm"
+            "outcome": "chot_don",
+            "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD900802 đang xử lý."
           },
           "products_advised": [
-            "FAS006"
+            "SKU-SN-RUN1-40-TRANG"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Trần Văn H, em gọi lại về FAS006 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Trần Văn H, em gọi lại về SKU-SN-RUN1-40-TRANG anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-16T08:00:00",
@@ -14049,13 +14055,13 @@
         "input_mode": "asr_transcript",
         "customer_goal": "Xác nhận mua máy lọc không khí",
         "customer_turns": [
-          "Alo, em gọi lại để đặt máy lọc không khí.",
-          "Em muốn thanh toán bằng chuyển khoản.",
+          "Alo, anh gọi lại để đặt máy lọc không khí.",
+          "Anh sẽ thanh toán bằng chuyển khoản.",
           "Khu vực giao hàng là Nha Trang, Khánh Hòa."
         ],
         "customer_turns_asr": [
-          "alo em goi lai de dat may loc khong khi",
-          "em muon thanh toan bang chuyen khoan",
+          "alo anh goi lai de dat may loc khong khi",
+          "anh se thanh toan bang chuyen khoan",
           "khu vuc giao hang la nha trang khanh hoa"
         ],
         "facts_established": {
@@ -14107,7 +14113,7 @@
           "promo_code": "XM-COMBO",
           "order_id": "OD600001",
           "superseded": {
-            "order_id": "O015"
+            "order_id": "OD900802"
           }
         },
         "expected_call_brief": {
@@ -14121,7 +14127,7 @@
             "outcome": "hen_goi_lai"
           },
           "products_advised": [
-            "FAS006",
+            "SKU-SN-RUN1-40-TRANG",
             "SKU-XM-4P"
           ],
           "open_blockers": [
@@ -14135,7 +14141,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Trần Văn H, em gọi lại về FAS006 Mr. đang quan tâm ạ, không biết cần suy nghĩ thêm chưa ạ?",
+          "suggested_opening": "Dạ em chào anh Trần Văn H, em gọi lại về SKU-SN-RUN1-40-TRANG anh đang quan tâm ạ, không biết cần suy nghĩ thêm chưa ạ?",
           "freshness_checks": {
             "price_changed": false,
             "promos_no_longer_active": [],
@@ -14163,16 +14169,16 @@
     "customer_id": "SYN-C004",
     "customer_phone": "0998000004",
     "customer_name": "Phạm Thị D",
-    "honorific": "Ms.",
+    "honorific": "chị",
     "region": "bac",
-    "category": "unknown",
+    "category": "gia-dung/may-loc-khong-khi",
     "difficulty": "normal",
     "tags": [
       "address_change",
-      "customer_support",
-      "hotline",
+      "customer_inquiry",
       "order",
       "order_status",
+      "order_update",
       "variant:chuan"
     ],
     "metric_focus": [
@@ -14191,51 +14197,51 @@
             "source": "crm_session",
             "customer_id": "SYN-C004",
             "session_id": "SYN-004-S1",
-            "date": "2026-09-01",
+            "date": "2026-06-10",
             "channel": "hotline",
-            "summary": "Khách hàng hỏi về máy xay sinh tố",
-            "outcome": "successful",
+            "summary": "Mua Máy lọc không khí AirPure Pro giá 7.990.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C004",
             "session_id": "SYN-004-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-04",
             "channel": "zalo_oa",
-            "summary": "Hỗ trợ đổi trả hàng",
-            "outcome": "successful",
+            "summary": "Đặt Máy lọc không khí Xiaomi Smart 4 Lite giá 2.990.000đ, đơn OD900402 đang xử lý.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C004",
-            "order_id": "O007",
-            "date": "2026-02-25",
-            "sku": "HAP003",
+            "order_id": "OD900401",
+            "date": "2026-06-10",
+            "sku": "SKU-AP-PRO",
             "status": "delivered",
             "stale": false,
             "facts": {
-              "owned_sku": "HAP003"
+              "owned_sku": "SKU-AP-PRO"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C004",
-            "order_id": "O008",
-            "date": "2026-06-18",
-            "sku": "HAP004",
+            "order_id": "OD900402",
+            "date": "2026-10-04",
+            "sku": "SKU-XM-4L",
             "status": "processing",
             "stale": false,
             "facts": {
-              "order_id": "O008"
+              "order_id": "OD900402"
             }
           }
         ],
-        "customer_goal": "Hỏi tình trạng đơn hàng của mình.",
+        "customer_goal": "Hỏi tình trạng đơn hàng đang xử lý",
         "customer_turns": [
-          "Alo, chị D đây, em ơi cho chị hỏi đơn hàng của mình đang ở đâu rồi?",
-          "Đơn hàng chị đặt hôm 18 tháng 6, có thông tin gì không em?"
+          "Chị chào em, chị gọi để hỏi tình trạng đơn hàng của mình.",
+          "Đơn hàng của chị có mã OD900402, em có thể cho chị biết đang ở đâu không?"
         ],
         "expected_outcome": "cap_nhat_don",
         "must_carry_over": [
@@ -14247,7 +14253,7 @@
           "owned_sku"
         ],
         "ground_truth_facts": {
-          "order_id": "O008",
+          "order_id": "OD900402",
           "order_status": "processing",
           "call_date": "2026-10-31"
         },
@@ -14257,20 +14263,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-04",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Hỗ trợ đổi trả hàng"
+            "outcome": "chot_don",
+            "summary": "Đặt Máy lọc không khí Xiaomi Smart 4 Lite giá 2.990.000đ, đơn OD900402 đang xử lý."
           },
           "products_advised": [
-            "HAP003"
+            "SKU-AP-PRO"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Phạm Thị D, em gọi lại về HAP003 Ms. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào chị Phạm Thị D, em gọi lại về SKU-AP-PRO chị đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-31T08:00:00",
@@ -14279,7 +14285,7 @@
         "success_if": {
           "tool_called": "order.status",
           "args_match": {
-            "order_id": "O008"
+            "order_id": "OD900402"
           },
           "must_say_any": [
             "đang xử lý",
@@ -14292,10 +14298,10 @@
         "call_date": "2026-11-02",
         "days_later": 2,
         "input_mode": "text",
-        "customer_goal": "Thay đổi địa chỉ giao hàng cho đơn hàng.",
+        "customer_goal": "Thay đổi địa chỉ giao hàng cho đơn hàng",
         "customer_turns": [
-          "Chào em, chị muốn đổi địa chỉ giao hàng cho đơn hàng đang xử lý.",
-          "Chị muốn chuyển sang Long Biên, Hà Nội nhé."
+          "Chào em, chị muốn thay đổi địa chỉ giao hàng cho đơn hàng đang xử lý.",
+          "Bây giờ chị muốn giao hàng đến quận Long Biên, Hà Nội."
         ],
         "facts_established": {
           "delivery_area": "Long Biên, Hà Nội"
@@ -14310,7 +14316,7 @@
           "owned_sku"
         ],
         "ground_truth_facts": {
-          "order_id": "O008",
+          "order_id": "OD900402",
           "order_status": "processing",
           "call_date": "2026-11-02"
         },
@@ -14328,14 +14334,14 @@
             "outcome": "cap_nhat_don"
           },
           "products_advised": [
-            "HAP003"
+            "SKU-AP-PRO"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Phạm Thị D, em gọi lại về HAP003 Ms. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào chị Phạm Thị D, em gọi lại về SKU-AP-PRO chị đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-11-02T08:00:00",
@@ -14344,7 +14350,7 @@
         "success_if": {
           "tool_called": "order.update",
           "args_match": {
-            "order_id": "O008",
+            "order_id": "OD900402",
             "action": "update_address"
           }
         }
@@ -14359,7 +14365,7 @@
     "customer_id": "SYN-C010",
     "customer_phone": "0998000010",
     "customer_name": "Đinh Văn J",
-    "honorific": "Mr.",
+    "honorific": "anh",
     "region": "bac",
     "category": "me-be",
     "difficulty": "hard",
@@ -14389,53 +14395,53 @@
             "source": "crm_session",
             "customer_id": "SYN-C010",
             "session_id": "SYN-010-S1",
-            "date": "2026-09-01",
+            "date": "2026-07-01",
             "channel": "hotline",
-            "summary": "Hỏi về chương trình khuyến mãi",
-            "outcome": "successful",
+            "summary": "Mua Máy lọc nước UF Sunhouse giá 3.290.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C010",
             "session_id": "SYN-010-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-10",
             "channel": "zalo_oa",
-            "summary": "Tìm hiểu về sản phẩm mới",
-            "outcome": "successful",
+            "summary": "Đặt Quạt đứng DC inverter Panasonic F-409 giá 2.450.000đ, đơn OD901002 đang xử lý.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C010",
-            "order_id": "O019",
-            "date": "2026-06-30",
-            "sku": "HAP007",
-            "status": "processing",
+            "order_id": "OD901001",
+            "date": "2026-07-01",
+            "sku": "SKU-WF-UF",
+            "status": "delivered",
             "stale": false,
             "facts": {
-              "order_id": "O019"
+              "owned_sku": "SKU-WF-UF"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C010",
-            "order_id": "O020",
-            "date": "2026-09-28",
-            "sku": "HAP008",
-            "status": "delivered",
+            "order_id": "OD901002",
+            "date": "2026-10-10",
+            "sku": "SKU-FAN-DC1",
+            "status": "processing",
             "stale": false,
             "facts": {
-              "owned_sku": "HAP008"
+              "order_id": "OD901002"
             }
           }
         ],
         "customer_goal": "Hỏi về máy hút sữa điện đôi Spectra S1.",
         "customer_turns": [
-          "Alo, em chào chị, hôm trước chị có hỏi về máy hút sữa điện đôi Spectra S1 đúng không?",
-          "Chị muốn biết giá và có khuyến mãi gì không?",
-          "Chị có ngân sách khoảng 4 triệu rưỡi thôi.",
-          "Chị đang chờ cuối tháng nhận lương mới quyết định được."
+          "Alo, anh muốn hỏi về máy hút sữa điện đôi Spectra S1.",
+          "Giá của máy này là bao nhiêu em?",
+          "Có khuyến mãi gì không?",
+          "Anh đang chờ cuối tháng nhận lương mới quyết định được."
         ],
         "facts_established": {
           "child_age_months": 6,
@@ -14479,20 +14485,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-10",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Tìm hiểu về sản phẩm mới"
+            "outcome": "chot_don",
+            "summary": "Đặt Quạt đứng DC inverter Panasonic F-409 giá 2.450.000đ, đơn OD901002 đang xử lý."
           },
           "products_advised": [
-            "HAP008"
+            "SKU-WF-UF"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Đinh Văn J, em gọi lại về HAP008 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Đinh Văn J, em gọi lại về SKU-WF-UF anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-15T08:00:00",
@@ -14510,11 +14516,11 @@
         "call_date": "2026-10-17",
         "days_later": 2,
         "input_mode": "text",
-        "customer_goal": "Xác nhận mua máy hút sữa điện đôi Spectra S1.",
+        "customer_goal": "Xác nhận mua máy hút sữa.",
         "customer_turns": [
-          "Chị muốn đặt máy hút sữa điện đôi Spectra S1.",
-          "Chị sẽ thanh toán bằng chuyển khoản.",
-          "Địa chỉ giao hàng là Cầu Giấy, Hà Nội."
+          "Alo, anh gọi lại để xác nhận mua máy hút sữa điện đôi Spectra S1.",
+          "Anh sẽ thanh toán bằng hình thức chuyển khoản.",
+          "Khu vực giao hàng là Cầu Giấy, Hà Nội."
         ],
         "facts_established": {
           "delivery_area": "Cầu Giấy, Hà Nội",
@@ -14564,7 +14570,7 @@
           "order_id": "OD600001",
           "superseded": {
             "budget_vnd": 4500000,
-            "order_id": "O019"
+            "order_id": "OD901002"
           }
         },
         "expected_call_brief": {
@@ -14578,8 +14584,8 @@
             "outcome": "hen_goi_lai"
           },
           "products_advised": [
-            "HAP008",
-            "SKU-MB-PUMP1"
+            "SKU-MB-PUMP1",
+            "SKU-WF-UF"
           ],
           "open_blockers": [
             "chờ cuối tháng nhận lương"
@@ -14591,7 +14597,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Đinh Văn J, em gọi lại về HAP008 Mr. đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+          "suggested_opening": "Dạ em chào anh Đinh Văn J, em gọi lại về SKU-MB-PUMP1 anh đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
           "freshness_checks": {
             "price_changed": false,
             "promos_no_longer_active": [],
@@ -14615,10 +14621,10 @@
         "call_date": "2026-10-19",
         "days_later": 2,
         "input_mode": "text",
-        "customer_goal": "Hỏi tình trạng đơn hàng máy hút sữa.",
+        "customer_goal": "Hỏi tình trạng đơn hàng của máy hút sữa.",
         "customer_turns": [
-          "Chị muốn hỏi tình trạng đơn hàng máy hút sữa của chị.",
-          "Chị không nhớ mã đơn hàng, nhưng chị đã đặt hôm trước."
+          "Alo, anh muốn hỏi tình trạng đơn hàng máy hút sữa điện đôi Spectra S1.",
+          "Đơn hàng của anh đã được xử lý chưa?"
         ],
         "expected_outcome": "cap_nhat_don",
         "must_carry_over": [
@@ -14656,8 +14662,8 @@
             "outcome": "chot_don"
           },
           "products_advised": [
-            "HAP008",
-            "SKU-MB-PUMP1"
+            "SKU-MB-PUMP1",
+            "SKU-WF-UF"
           ],
           "open_blockers": [
             "chờ cuối tháng nhận lương"
@@ -14671,7 +14677,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Đinh Văn J, em gọi lại về HAP008 Mr. đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+          "suggested_opening": "Dạ em chào anh Đinh Văn J, em gọi lại về SKU-MB-PUMP1 anh đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-19T08:00:00",
@@ -14853,16 +14859,14 @@
     "customer_id": "SYN-C009",
     "customer_phone": "0998000009",
     "customer_name": "Nguyễn Thị I",
-    "honorific": "Ms.",
+    "honorific": "chị",
     "region": "nam",
     "category": "me-be",
     "difficulty": "hard",
     "tags": [
       "hard_case",
       "hen_goi_lai",
-      "khach_hang",
       "out_of_stock",
-      "tu_van",
       "variant:het_hang_luc_quyet",
       "xe_day"
     ],
@@ -14882,58 +14886,59 @@
             "source": "crm_session",
             "customer_id": "SYN-C009",
             "session_id": "SYN-009-S1",
-            "date": "2026-09-01",
+            "date": "2026-06-25",
             "channel": "hotline",
-            "summary": "Tư vấn về đồ chơi trẻ em",
-            "outcome": "successful",
+            "summary": "Mua Combo Spectra S1 + máy hâm sữa Fatz + 50 túi trữ sữa giá 4.790.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C009",
             "session_id": "SYN-009-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-09",
             "channel": "zalo_oa",
-            "summary": "Hỗ trợ về đơn hàng",
-            "outcome": "successful",
+            "summary": "Đặt Túi trữ sữa Sunmum 50 túi giá 119.000đ, đơn OD900902 đang giao.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C009",
-            "order_id": "O017",
-            "date": "2026-01-30",
-            "sku": "MAB005",
+            "order_id": "OD900901",
+            "date": "2026-06-25",
+            "sku": "SKU-BDL-MOM",
             "status": "delivered",
             "stale": false,
             "facts": {
-              "owned_sku": "MAB005"
+              "owned_sku": "SKU-BDL-MOM"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C009",
-            "order_id": "O018",
-            "date": "2026-03-22",
-            "sku": "MAB006",
+            "order_id": "OD900902",
+            "date": "2026-10-09",
+            "sku": "SKU-MB-BAG",
             "status": "shipping",
             "stale": false,
             "facts": {
-              "order_id": "O018"
+              "order_id": "OD900902"
             }
           }
         ],
-        "customer_goal": "Hỏi xe đẩy gấp gọn Joie Pact cho bé 11 tháng",
+        "customer_goal": "Hỏi về xe đẩy gấp gọn Joie Pact",
         "customer_turns": [
-          "Alo, chị muốn hỏi về xe đẩy gấp gọn Joie Pact cho bé nhà chị 11 tháng tuổi.",
-          "Ngân sách của chị tầm 4 triệu thôi, không biết có khuyến mãi gì không?",
-          "Chị cần hỏi vợ trước rồi sẽ gọi lại em nhé."
+          "Alo, chị muốn hỏi về xe đẩy gấp gọn Joie Pact cho bé.",
+          "Bé nhà chị 11 tháng tuổi, ngân sách của chị chỉ tầm 4 triệu thôi.",
+          "Xe này có khuyến mãi gì không em?",
+          "Chị cần hỏi ý kiến chồng rồi mới quyết định lại nhé."
         ],
         "facts_established": {
           "child_age_months": 11,
           "budget_vnd": 4000000,
-          "decision_maker": "vợ",
-          "blocker": "cần hỏi vợ",
+          "decision_maker": "chồng",
+          "blocker": "cần hỏi chồng",
           "product_advised": "SKU-MB-STR1",
           "price_quoted_vnd": 3490000,
           "promo_code": "MOM-FREESHIP",
@@ -14960,8 +14965,8 @@
         "memory_expectation": {
           "child_age_months": 11,
           "budget_vnd": 4000000,
-          "decision_maker": "vợ",
-          "blocker": "cần hỏi vợ",
+          "decision_maker": "chồng",
+          "blocker": "cần hỏi chồng",
           "product_advised": "SKU-MB-STR1",
           "price_quoted_vnd": 3490000,
           "promo_code": "MOM-FREESHIP"
@@ -14972,20 +14977,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-09",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Hỗ trợ về đơn hàng"
+            "outcome": "chot_don",
+            "summary": "Đặt Túi trữ sữa Sunmum 50 túi giá 119.000đ, đơn OD900902 đang giao."
           },
           "products_advised": [
-            "MAB005"
+            "SKU-BDL-MOM"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Nguyễn Thị I, em gọi lại về MAB005 Ms. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào chị Nguyễn Thị I, em gọi lại về SKU-BDL-MOM chị đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-15T08:00:00",
@@ -15003,11 +15008,12 @@
         "call_date": "2026-10-25",
         "days_later": 10,
         "input_mode": "text",
-        "customer_goal": "Hỏi tình trạng xe đẩy Joie Pact",
+        "customer_goal": "Hỏi về xe đẩy Joie Pact đã hết hàng",
         "customer_turns": [
-          "Chào em, hôm trước chị có hỏi về xe đẩy Joie Pact, giờ chị muốn đặt hàng.",
-          "Lần trước em bảo xe đang hết hàng, không biết khi nào có lại?",
-          "Chị rất muốn đặt, nhưng cần biết ngày có hàng cụ thể để chị quyết định."
+          "Chào em, chị gọi lại để hỏi về xe đẩy Joie Pact mà hôm trước em tư vấn cho chị.",
+          "Chị quyết định mua rồi nhưng nghe nói xe đẩy đó hết hàng phải không?",
+          "Khi nào có hàng lại vậy em?",
+          "Chị sẽ đợi gọi lại sau nhé."
         ],
         "facts_established": {
           "product_advised": "SKU-MB-STR1",
@@ -15059,11 +15065,11 @@
             "outcome": "hen_goi_lai"
           },
           "products_advised": [
-            "MAB005",
+            "SKU-BDL-MOM",
             "SKU-MB-STR1"
           ],
           "open_blockers": [
-            "cần hỏi vợ"
+            "cần hỏi chồng"
           ],
           "must_not_ask": [
             "child_age_months",
@@ -15073,7 +15079,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Nguyễn Thị I, em gọi lại về MAB005 Ms. đang quan tâm ạ, không biết cần hỏi vợ chưa ạ?",
+          "suggested_opening": "Dạ em chào chị Nguyễn Thị I, em gọi lại về SKU-BDL-MOM chị đang quan tâm ạ, không biết cần hỏi chồng chưa ạ?",
           "freshness_checks": {
             "price_changed": false,
             "promos_no_longer_active": [],
@@ -17510,14 +17516,14 @@
     "customer_id": "SYN-C005",
     "customer_phone": "0998000005",
     "customer_name": "Đỗ Minh E",
-    "honorific": "Mr.",
+    "honorific": "anh",
     "region": "trung",
-    "category": "unknown",
+    "category": "thoi-trang/ao-khoac",
     "difficulty": "normal",
     "tags": [
       "address_change",
       "customer_inquiry",
-      "delivery_update",
+      "hotline",
       "order",
       "order_status",
       "variant:chuan"
@@ -17538,51 +17544,52 @@
             "source": "crm_session",
             "customer_id": "SYN-C005",
             "session_id": "SYN-005-S1",
-            "date": "2026-09-01",
+            "date": "2026-07-13",
             "channel": "hotline",
-            "summary": "Hỏi về quần áo trẻ em",
-            "outcome": "successful",
+            "summary": "Mua Áo khoác gió Windbreak giá 690.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C005",
             "session_id": "SYN-005-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-05",
             "channel": "zalo_oa",
-            "summary": "Tư vấn chọn đồ mùa hè",
-            "outcome": "successful",
+            "summary": "Đặt Áo phao lông vũ Warmly giá 1.490.000đ, đơn OD900502 đang giao.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C005",
-            "order_id": "O009",
-            "date": "2026-05-30",
-            "sku": "FAS003",
-            "status": "shipping",
+            "order_id": "OD900501",
+            "date": "2026-07-13",
+            "sku": "SKU-JK-WND-M-NAVY",
+            "status": "delivered",
             "stale": false,
             "facts": {
-              "order_id": "O009"
+              "owned_sku": "SKU-JK-WND-M-NAVY"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C005",
-            "order_id": "O010",
-            "date": "2026-09-12",
-            "sku": "FAS004",
-            "status": "delivered",
+            "order_id": "OD900502",
+            "date": "2026-10-05",
+            "sku": "SKU-JK-DWN-M-NAVY",
+            "status": "shipping",
             "stale": false,
             "facts": {
-              "owned_sku": "FAS004"
+              "order_id": "OD900502"
             }
           }
         ],
-        "customer_goal": "Hỏi tình trạng đơn hàng đã đặt.",
+        "customer_goal": "Hỏi tình trạng đơn hàng áo phao.",
         "customer_turns": [
-          "Alo, em muốn hỏi tình trạng đơn hàng của em.",
-          "Mới hôm trước em có đặt một đơn hàng mà chưa thấy giao."
+          "Alo, anh muốn hỏi về tình trạng đơn hàng áo phao lông vũ của anh.",
+          "Đơn OD900502 đang ở đâu rồi em?",
+          "Có thể cho anh biết khi nào hàng sẽ đến không?"
         ],
         "expected_outcome": "cap_nhat_don",
         "must_carry_over": [
@@ -17594,8 +17601,9 @@
           "owned_sku"
         ],
         "ground_truth_facts": {
-          "order_id": "O010",
-          "order_status": "delivered",
+          "order_id": "OD900502",
+          "order_status": "shipping",
+          "tracking": "VN0052TRK",
           "call_date": "2026-10-29"
         },
         "expected_call_brief": {
@@ -17604,20 +17612,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-05",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Tư vấn chọn đồ mùa hè"
+            "outcome": "chot_don",
+            "summary": "Đặt Áo phao lông vũ Warmly giá 1.490.000đ, đơn OD900502 đang giao."
           },
           "products_advised": [
-            "FAS004"
+            "SKU-JK-WND-M-NAVY"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Đỗ Minh E, em gọi lại về FAS004 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Đỗ Minh E, em gọi lại về SKU-JK-WND-M-NAVY anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-29T08:00:00",
@@ -17626,11 +17634,12 @@
         "success_if": {
           "tool_called": "order.status",
           "args_match": {
-            "order_id": "O010"
+            "order_id": "OD900502"
           },
           "must_say_any": [
-            "đã giao",
-            "giao thành công"
+            "đang giao",
+            "đang vận chuyển",
+            "đã bàn giao"
           ]
         }
       },
@@ -17639,11 +17648,11 @@
         "call_date": "2026-10-30",
         "days_later": 1,
         "input_mode": "text",
-        "customer_goal": "Muốn đổi địa chỉ giao hàng cho đơn hàng.",
+        "customer_goal": "Đổi địa chỉ giao hàng cho đơn hàng.",
         "customer_turns": [
-          "Chào em, hôm qua em đã hỏi về đơn hàng của mình.",
-          "Giờ em muốn đổi địa chỉ giao hàng sang Hải Châu, Đà Nẵng.",
-          "Có được không em?"
+          "Alo, anh muốn thay đổi địa chỉ giao hàng cho đơn hàng áo phao.",
+          "Địa chỉ mới là Hải Châu, Đà Nẵng.",
+          "Mong em cập nhật giúp anh nhé."
         ],
         "facts_established": {
           "delivery_area": "Hải Châu, Đà Nẵng"
@@ -17658,8 +17667,9 @@
           "owned_sku"
         ],
         "ground_truth_facts": {
-          "order_id": "O010",
-          "order_status": "delivered",
+          "order_id": "OD900502",
+          "order_status": "shipping",
+          "tracking": "VN0052TRK",
           "call_date": "2026-10-30"
         },
         "memory_expectation": {
@@ -17676,14 +17686,14 @@
             "outcome": "cap_nhat_don"
           },
           "products_advised": [
-            "FAS004"
+            "SKU-JK-WND-M-NAVY"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Đỗ Minh E, em gọi lại về FAS004 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Đỗ Minh E, em gọi lại về SKU-JK-WND-M-NAVY anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-30T08:00:00",
@@ -17692,7 +17702,7 @@
         "success_if": {
           "tool_called": "order.update",
           "args_match": {
-            "order_id": "O010",
+            "order_id": "OD900502",
             "action": "update_address"
           }
         }
@@ -20580,13 +20590,13 @@
     "customer_id": "SYN-C006",
     "customer_phone": "0998000006",
     "customer_name": "Nguyễn Thị F",
-    "honorific": "Ms.",
+    "honorific": "chị",
     "region": "nam",
-    "category": "unknown",
+    "category": "me-be",
     "difficulty": "normal",
     "tags": [
       "address_change",
-      "customer_service",
+      "customer_inquiry",
       "hotline",
       "order",
       "order_status",
@@ -20608,52 +20618,51 @@
             "source": "crm_session",
             "customer_id": "SYN-C006",
             "session_id": "SYN-006-S1",
-            "date": "2026-09-01",
+            "date": "2026-03-16",
             "channel": "hotline",
-            "summary": "Tìm hiểu sản phẩm cho trẻ sơ sinh",
-            "outcome": "successful",
-            "stale": false
+            "summary": "Mua Máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
+            "stale": true
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C006",
             "session_id": "SYN-006-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-06",
             "channel": "zalo_oa",
-            "summary": "Phản hồi về chất lượng sản phẩm",
-            "outcome": "successful",
+            "summary": "Đặt Bình sữa Pigeon PPSU 240ml giá 289.000đ, đơn OD900602 đang xử lý.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C006",
-            "order_id": "O011",
-            "date": "2026-08-20",
-            "sku": "MAB003",
-            "status": "processing",
+            "order_id": "OD900601",
+            "date": "2026-03-16",
+            "sku": "SKU-MB-STER",
+            "status": "delivered",
             "stale": false,
             "facts": {
-              "order_id": "O011"
+              "owned_sku": "SKU-MB-STER"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C006",
-            "order_id": "O012",
-            "date": "2026-09-30",
-            "sku": "MAB004",
-            "status": "delivered",
+            "order_id": "OD900602",
+            "date": "2026-10-06",
+            "sku": "SKU-MB-BOT",
+            "status": "processing",
             "stale": false,
             "facts": {
-              "owned_sku": "MAB004"
+              "order_id": "OD900602"
             }
           }
         ],
-        "customer_goal": "Hỏi tình trạng đơn hàng",
+        "customer_goal": "Hỏi tình trạng đơn hàng Bình sữa Pigeon đã đặt",
         "customer_turns": [
           "Alo, chị muốn hỏi tình trạng đơn hàng của mình.",
-          "Chị không nhớ mã đơn hàng, nhưng đơn hàng này chị đã đặt hôm 30 tháng 9.",
-          "Chị muốn biết khi nào hàng sẽ được giao?"
+          "Đơn hàng Bình sữa Pigeon chị đặt hôm 6 tháng 10 giờ sao rồi em?"
         ],
         "expected_outcome": "cap_nhat_don",
         "must_carry_over": [
@@ -20665,8 +20674,8 @@
           "owned_sku"
         ],
         "ground_truth_facts": {
-          "order_id": "O012",
-          "order_status": "delivered",
+          "order_id": "OD900602",
+          "order_status": "processing",
           "call_date": "2026-10-30"
         },
         "expected_call_brief": {
@@ -20675,20 +20684,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-06",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Phản hồi về chất lượng sản phẩm"
+            "outcome": "chot_don",
+            "summary": "Đặt Bình sữa Pigeon PPSU 240ml giá 289.000đ, đơn OD900602 đang xử lý."
           },
           "products_advised": [
-            "MAB004"
+            "SKU-MB-STER"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Nguyễn Thị F, em gọi lại về MAB004 Ms. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào chị Nguyễn Thị F, em gọi lại về SKU-MB-STER chị đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-30T08:00:00",
@@ -20697,11 +20706,11 @@
         "success_if": {
           "tool_called": "order.status",
           "args_match": {
-            "order_id": "O012"
+            "order_id": "OD900602"
           },
           "must_say_any": [
-            "đã giao",
-            "giao thành công"
+            "đang xử lý",
+            "đang chuẩn bị"
           ]
         }
       },
@@ -20710,11 +20719,10 @@
         "call_date": "2026-10-31",
         "days_later": 1,
         "input_mode": "text",
-        "customer_goal": "Đổi địa chỉ giao hàng",
+        "customer_goal": "Đổi địa chỉ giao hàng cho đơn hàng đang xử lý",
         "customer_turns": [
-          "Chị muốn đổi địa chỉ giao cho đơn hàng.",
-          "Địa chỉ giao mới là Quận 7, TP.HCM.",
-          "Chị cần hàng sớm, mong bên em hỗ trợ nhanh nhé."
+          "Chị muốn đổi địa chỉ giao hàng cho đơn hàng Bình sữa Pigeon.",
+          "Địa chỉ mới của chị là Quận 7, TP.HCM."
         ],
         "facts_established": {
           "delivery_area": "Quận 7, TP.HCM"
@@ -20729,8 +20737,8 @@
           "owned_sku"
         ],
         "ground_truth_facts": {
-          "order_id": "O012",
-          "order_status": "delivered",
+          "order_id": "OD900602",
+          "order_status": "processing",
           "call_date": "2026-10-31"
         },
         "memory_expectation": {
@@ -20747,14 +20755,14 @@
             "outcome": "cap_nhat_don"
           },
           "products_advised": [
-            "MAB004"
+            "SKU-MB-STER"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Nguyễn Thị F, em gọi lại về MAB004 Ms. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào chị Nguyễn Thị F, em gọi lại về SKU-MB-STER chị đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-31T08:00:00",
@@ -20763,7 +20771,7 @@
         "success_if": {
           "tool_called": "order.update",
           "args_match": {
-            "order_id": "O012",
+            "order_id": "OD900602",
             "action": "update_address"
           }
         }
@@ -24046,16 +24054,16 @@
     "customer_id": "SYN-C007",
     "customer_phone": "0998000007",
     "customer_name": "Lê Văn G",
-    "honorific": "Mr.",
+    "honorific": "anh",
     "region": "bac",
-    "category": "unknown",
+    "category": "gia-dung/may-loc-nuoc",
     "difficulty": "normal",
     "tags": [
       "address_change",
-      "customer_service",
+      "customer_support",
+      "hotline",
       "order",
       "order_status",
-      "shipping",
       "variant:chuan"
     ],
     "metric_focus": [
@@ -24074,52 +24082,52 @@
             "source": "crm_session",
             "customer_id": "SYN-C007",
             "session_id": "SYN-007-S1",
-            "date": "2026-09-01",
+            "date": "2026-04-19",
             "channel": "hotline",
-            "summary": "Tư vấn về máy lạnh",
-            "outcome": "successful",
-            "stale": false
+            "summary": "Mua Máy lọc không khí Samsung AX40 giá 6.490.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
+            "stale": true
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C007",
             "session_id": "SYN-007-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-07",
             "channel": "zalo_oa",
-            "summary": "Hỗ trợ đổi hàng",
-            "outcome": "successful",
+            "summary": "Đặt Máy lọc nước RO Karofi 9 lõi giá 5.990.000đ, đơn OD900702 đang giao.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C007",
-            "order_id": "O013",
-            "date": "2026-02-12",
-            "sku": "HAP005",
+            "order_id": "OD900701",
+            "date": "2026-04-19",
+            "sku": "SKU-SS-AX40",
             "status": "delivered",
             "stale": false,
             "facts": {
-              "owned_sku": "HAP005"
+              "owned_sku": "SKU-SS-AX40"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C007",
-            "order_id": "O014",
-            "date": "2026-07-14",
-            "sku": "HAP006",
+            "order_id": "OD900702",
+            "date": "2026-10-07",
+            "sku": "SKU-WF-RO9",
             "status": "shipping",
             "stale": false,
             "facts": {
-              "order_id": "O014"
+              "order_id": "OD900702"
             }
           }
         ],
         "customer_goal": "Hỏi tình trạng đơn hàng của mình.",
         "customer_turns": [
-          "Alo, tôi là Lê Văn G, muốn hỏi tình trạng đơn hàng của mình.",
-          "Đơn hàng của tôi hiện tại đang ở đâu vậy?",
-          "Tôi đã đặt hàng mấy hôm rồi mà chưa thấy giao."
+          "Alo, anh muốn hỏi tình trạng đơn hàng của mình.",
+          "Đơn hàng của anh đang giao phải không?",
+          "Có thông tin gì mới về đơn hàng này không?"
         ],
         "expected_outcome": "cap_nhat_don",
         "must_carry_over": [
@@ -24131,9 +24139,9 @@
           "owned_sku"
         ],
         "ground_truth_facts": {
-          "order_id": "O014",
+          "order_id": "OD900702",
           "order_status": "shipping",
-          "tracking": "TRACK101112",
+          "tracking": "VN0072TRK",
           "call_date": "2026-10-30"
         },
         "expected_call_brief": {
@@ -24142,20 +24150,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-07",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Hỗ trợ đổi hàng"
+            "outcome": "chot_don",
+            "summary": "Đặt Máy lọc nước RO Karofi 9 lõi giá 5.990.000đ, đơn OD900702 đang giao."
           },
           "products_advised": [
-            "HAP005"
+            "SKU-SS-AX40"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Lê Văn G, em gọi lại về HAP005 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Lê Văn G, em gọi lại về SKU-SS-AX40 anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-30T08:00:00",
@@ -24164,7 +24172,7 @@
         "success_if": {
           "tool_called": "order.status",
           "args_match": {
-            "order_id": "O014"
+            "order_id": "OD900702"
           },
           "must_say_any": [
             "đang giao",
@@ -24178,11 +24186,11 @@
         "call_date": "2026-10-31",
         "days_later": 1,
         "input_mode": "text",
-        "customer_goal": "Muốn đổi địa chỉ giao hàng cho đơn hàng đang xử lý.",
+        "customer_goal": "Muốn đổi địa chỉ giao hàng cho đơn hàng.",
         "customer_turns": [
-          "Chào, tôi muốn thay đổi địa chỉ giao hàng cho đơn hàng của mình.",
+          "Alo, anh cần đổi địa chỉ giao cho đơn hàng đang giao.",
           "Địa chỉ mới là Long Biên, Hà Nội.",
-          "Tôi cần đảm bảo đơn hàng sẽ được giao đến địa chỉ mới này."
+          "Anh muốn cập nhật ngay để đơn hàng không bị chậm trễ."
         ],
         "facts_established": {
           "delivery_area": "Long Biên, Hà Nội"
@@ -24197,9 +24205,9 @@
           "owned_sku"
         ],
         "ground_truth_facts": {
-          "order_id": "O014",
+          "order_id": "OD900702",
           "order_status": "shipping",
-          "tracking": "TRACK101112",
+          "tracking": "VN0072TRK",
           "call_date": "2026-10-31"
         },
         "memory_expectation": {
@@ -24216,14 +24224,14 @@
             "outcome": "cap_nhat_don"
           },
           "products_advised": [
-            "HAP005"
+            "SKU-SS-AX40"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Lê Văn G, em gọi lại về HAP005 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Lê Văn G, em gọi lại về SKU-SS-AX40 anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-31T08:00:00",
@@ -24232,7 +24240,7 @@
         "success_if": {
           "tool_called": "order.update",
           "args_match": {
-            "order_id": "O014",
+            "order_id": "OD900702",
             "action": "update_address"
           }
         }
@@ -25187,12 +25195,12 @@
     "customer_id": "SYN-C002",
     "customer_phone": "0998000002",
     "customer_name": "Trần Thị B",
-    "honorific": "Ms.",
+    "honorific": "chị",
     "region": "trung",
     "category": "me-be",
     "difficulty": "normal",
     "tags": [
-      "không_mua",
+      "khách_hàng",
       "máy_tiệt_trùng",
       "tư_vấn",
       "từ_chối",
@@ -25213,54 +25221,53 @@
             "source": "crm_session",
             "customer_id": "SYN-C002",
             "session_id": "SYN-002-S1",
-            "date": "2026-09-01",
+            "date": "2026-04-04",
             "channel": "hotline",
-            "summary": "Hỏi về sản phẩm thời trang",
-            "outcome": "successful",
-            "stale": false
+            "summary": "Mua Giày chạy bộ RunLite 2 Pro giá 1.690.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
+            "stale": true
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C002",
             "session_id": "SYN-002-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-02",
             "channel": "zalo_oa",
-            "summary": "Phản hồi về đơn hàng",
-            "outcome": "successful",
+            "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD900202 đang xử lý.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C002",
-            "order_id": "O003",
-            "date": "2026-03-12",
-            "sku": "FAS001",
-            "status": "processing",
+            "order_id": "OD900201",
+            "date": "2026-04-04",
+            "sku": "SKU-SN-RUN2-38-TRANG",
+            "status": "delivered",
             "stale": false,
             "facts": {
-              "order_id": "O003"
+              "owned_sku": "SKU-SN-RUN2-38-TRANG"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C002",
-            "order_id": "O004",
-            "date": "2026-09-10",
-            "sku": "FAS002",
-            "status": "delivered",
+            "order_id": "OD900202",
+            "date": "2026-10-02",
+            "sku": "SKU-SN-CAS-38-TRANG",
+            "status": "processing",
             "stale": false,
             "facts": {
-              "owned_sku": "FAS002"
+              "order_id": "OD900202"
             }
           }
         ],
-        "customer_goal": "Hỏi về máy tiệt trùng sấy khô cho bé",
+        "customer_goal": "Hỏi về máy tiệt trùng sấy khô Moaz Bebe",
         "customer_turns": [
-          "Alo, chị muốn hỏi về máy tiệt trùng sấy khô cho bé.",
-          "Bé nhà chị mới được 3 tháng tuổi.",
-          "Ngân sách của chị khoảng 2 triệu thôi.",
-          "Máy này có khuyến mãi gì không em?",
-          "Chị muốn so sánh thêm trước khi quyết định."
+          "Alo, chị muốn hỏi về máy tiệt trùng sấy khô Moaz Bebe.",
+          "Máy này giá bao nhiêu em nhỉ?",
+          "Có khuyến mãi gì không?",
+          "Chị cần so sánh thêm trước khi quyết định."
         ],
         "facts_established": {
           "child_age_months": 3,
@@ -25303,20 +25310,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-02",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Phản hồi về đơn hàng"
+            "outcome": "chot_don",
+            "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD900202 đang xử lý."
           },
           "products_advised": [
-            "FAS002"
+            "SKU-SN-RUN2-38-TRANG"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Trần Thị B, em gọi lại về FAS002 Ms. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào chị Trần Thị B, em gọi lại về SKU-SN-RUN2-38-TRANG chị đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-11-13T08:00:00",
@@ -25336,10 +25343,9 @@
         "input_mode": "text",
         "customer_goal": "Từ chối mua máy tiệt trùng sấy khô",
         "customer_turns": [
-          "Chị đã xem xét kỹ rồi nhưng không mua nữa.",
-          "Giá có vẻ cao so với những gì chị tìm hiểu.",
-          "Chị cảm ơn em đã tư vấn.",
-          "Chị sẽ tìm hiểu thêm và quay lại sau nếu cần."
+          "Chị đã xem xét kỹ rồi nhưng không mua máy này nữa.",
+          "Giá có vẻ cao so với dự kiến của chị.",
+          "Cảm ơn em đã tư vấn, hẹn lần sau nhé."
         ],
         "facts_established": {
           "product_advised": "SKU-MB-STER",
@@ -25388,8 +25394,8 @@
             "outcome": "hen_goi_lai"
           },
           "products_advised": [
-            "FAS002",
-            "SKU-MB-STER"
+            "SKU-MB-STER",
+            "SKU-SN-RUN2-38-TRANG"
           ],
           "open_blockers": [
             "muốn so sánh thêm"
@@ -25401,7 +25407,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Trần Thị B, em gọi lại về FAS002 Ms. đang quan tâm ạ, không biết muốn so sánh thêm chưa ạ?",
+          "suggested_opening": "Dạ em chào chị Trần Thị B, em gọi lại về SKU-MB-STER chị đang quan tâm ạ, không biết muốn so sánh thêm chưa ạ?",
           "freshness_checks": {
             "price_changed": false,
             "promos_no_longer_active": [],
@@ -25684,18 +25690,18 @@
     "customer_id": "SYN-C001",
     "customer_phone": "0998000001",
     "customer_name": "Nguyễn Văn A",
-    "honorific": "Mr.",
+    "honorific": "anh",
     "region": "bac",
     "category": "gia-dung/noi-chien",
     "difficulty": "hard",
     "tags": [
       "cross_channel",
+      "dat_hang",
       "hard_case",
-      "khuyến_mãi",
-      "mua_hàng",
-      "nồi_chiên",
+      "khách_hàng",
+      "nồi_chiên_không_dầu",
       "teencode",
-      "tư_vấn",
+      "tu_van",
       "variant:chuan"
     ],
     "metric_focus": [
@@ -25716,59 +25722,59 @@
             "source": "crm_session",
             "customer_id": "SYN-C001",
             "session_id": "SYN-001-S1",
-            "date": "2026-09-01",
+            "date": "2026-03-01",
             "channel": "hotline",
-            "summary": "Hỗ trợ mua máy hút bụi",
-            "outcome": "successful",
-            "stale": false
+            "summary": "Mua Máy lọc không khí AirPure X giá 4.890.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
+            "stale": true
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C001",
             "session_id": "SYN-001-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-01",
             "channel": "zalo_oa",
-            "summary": "Tư vấn về máy giặt",
-            "outcome": "successful",
+            "summary": "Đặt Máy lọc không khí AirPure Y giá 5.200.000đ, đơn OD900102 đang giao.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C001",
-            "order_id": "O001",
-            "date": "2026-01-15",
-            "sku": "HAP001",
+            "order_id": "OD900101",
+            "date": "2026-03-01",
+            "sku": "SKU-AP-X",
             "status": "delivered",
             "stale": false,
             "facts": {
-              "owned_sku": "HAP001"
+              "owned_sku": "SKU-AP-X"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C001",
-            "order_id": "O002",
-            "date": "2026-05-20",
-            "sku": "HAP002",
+            "order_id": "OD900102",
+            "date": "2026-10-01",
+            "sku": "SKU-AP-Y",
             "status": "shipping",
             "stale": false,
             "facts": {
-              "order_id": "O002"
+              "order_id": "OD900102"
             }
           }
         ],
-        "customer_goal": "Hỏi về nồi chiên không dầu cho gia đình.",
+        "customer_goal": "Hỏi về nồi chiên không dầu Philips cho gia đình.",
         "customer_turns": [
-          "Alo, em ơi, cho anh hỏi về nồi chiên không dầu Philips 6.2L với.",
-          "Anh định mua cho gia đình, ngân sách khoảng 4 triệu rưỡi.",
-          "Nó có khuyến mãi gì không em?",
-          "Anh muốn gọi hotline để hỏi thêm thông tin nữa."
+          "Alo, anh muốn hỏi về nồi chiên không dầu Philips 6.2L.",
+          "Anh cần dùng cho gia đình, ngân sách khoảng 4 triệu rưỡi thôi.",
+          "Nồi này có khuyến mãi gì không em?",
+          "Anh muốn gọi hotline hỏi thêm rồi sẽ quyết định sau."
         ],
         "customer_turns_asr": [
-          "alo em oi cho anh hoi ve noi chien khong dau philips sau",
-          "anh dinh mua cho gia dinh ngan sach khoang bon trieu roi",
-          "no co khuyen mai gi khong em",
-          "anh muon goi hotline de hoi them thong tin nua"
+          "alo anh muon hoi ve noi chien khong dau philips 6.2l",
+          "anh can dung cho gia dinh ngan sach khoang 4 trieu rưỡi thoi",
+          "noi nay co khuyen mai gi khong em",
+          "anh muon goi hotline hoi them roi se quyet dinh sau"
         ],
         "facts_established": {
           "usage_need": "dùng cho gia đình",
@@ -25813,20 +25819,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-01",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Tư vấn về máy giặt"
+            "outcome": "chot_don",
+            "summary": "Đặt Máy lọc không khí AirPure Y giá 5.200.000đ, đơn OD900102 đang giao."
           },
           "products_advised": [
-            "HAP001"
+            "SKU-AP-X"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Nguyễn Văn A, em gọi lại về HAP001 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Nguyễn Văn A, em gọi lại về SKU-AP-X anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-11-12T08:00:00",
@@ -25844,12 +25850,12 @@
         "call_date": "2026-11-14",
         "days_later": 2,
         "input_mode": "text",
-        "customer_goal": "Xác nhận mua nồi chiên không dầu.",
+        "customer_goal": "Xác nhận mua nồi chiên không dầu Philips.",
         "customer_turns": [
-          "Chào em, anh muốn đặt nồi chiên không dầu Philips 6.2L.",
+          "Alo, anh muốn đặt nồi chiên không dầu Philips 6.2L.",
           "Hình thức thanh toán là chuyển khoản.",
-          "Giao hàng cho anh ở Long Biên, Hà Nội nhé.",
-          "Mong em nhanh chóng lên đơn cho anh."
+          "Khu vực giao hàng là Long Biên, Hà Nội.",
+          "Mong sớm nhận được hàng nhé!"
         ],
         "facts_established": {
           "payment": "chuyen_khoan",
@@ -25895,7 +25901,7 @@
           "order_id": "OD600001",
           "superseded": {
             "price_quoted_vnd": 3391500,
-            "order_id": "O002"
+            "order_id": "OD900102"
           }
         },
         "expected_call_brief": {
@@ -25909,8 +25915,8 @@
             "outcome": "hen_goi_lai"
           },
           "products_advised": [
-            "HAP001",
-            "SKU-AF-6L"
+            "SKU-AF-6L",
+            "SKU-AP-X"
           ],
           "open_blockers": [
             "muốn gọi hotline hỏi thêm"
@@ -25923,7 +25929,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Nguyễn Văn A, em gọi lại về HAP001 Mr. đang quan tâm ạ, không biết muốn gọi hotline hỏi thêm chưa ạ?",
+          "suggested_opening": "Dạ em chào anh Nguyễn Văn A, em gọi lại về SKU-AF-6L anh đang quan tâm ạ, không biết muốn gọi hotline hỏi thêm chưa ạ?",
           "freshness_checks": {
             "price_changed": true,
             "promos_no_longer_active": [
@@ -25963,17 +25969,17 @@
     "customer_id": "SYN-C005",
     "customer_phone": "0998000005",
     "customer_name": "Đỗ Minh E",
-    "honorific": "Mr.",
+    "honorific": "anh",
     "region": "trung",
     "category": "me-be",
     "difficulty": "normal",
     "tags": [
-      "an_toàn",
-      "ghế_ngồi",
+      "an_toan",
       "handoff",
-      "hẹn_gọi_lại",
+      "hen_goi_lai",
+      "khach_hang",
       "safety",
-      "tư_vấn",
+      "tu_van",
       "variant:chuan"
     ],
     "metric_focus": [
@@ -25993,53 +25999,53 @@
             "source": "crm_session",
             "customer_id": "SYN-C005",
             "session_id": "SYN-005-S1",
-            "date": "2026-09-01",
+            "date": "2026-07-13",
             "channel": "hotline",
-            "summary": "Hỏi về quần áo trẻ em",
-            "outcome": "successful",
+            "summary": "Mua Áo khoác gió Windbreak giá 690.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C005",
             "session_id": "SYN-005-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-05",
             "channel": "zalo_oa",
-            "summary": "Tư vấn chọn đồ mùa hè",
-            "outcome": "successful",
+            "summary": "Đặt Áo phao lông vũ Warmly giá 1.490.000đ, đơn OD900502 đang giao.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C005",
-            "order_id": "O009",
-            "date": "2026-05-30",
-            "sku": "FAS003",
-            "status": "shipping",
+            "order_id": "OD900501",
+            "date": "2026-07-13",
+            "sku": "SKU-JK-WND-M-NAVY",
+            "status": "delivered",
             "stale": false,
             "facts": {
-              "order_id": "O009"
+              "owned_sku": "SKU-JK-WND-M-NAVY"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C005",
-            "order_id": "O010",
-            "date": "2026-09-12",
-            "sku": "FAS004",
-            "status": "delivered",
+            "order_id": "OD900502",
+            "date": "2026-10-05",
+            "sku": "SKU-JK-DWN-M-NAVY",
+            "status": "shipping",
             "stale": false,
             "facts": {
-              "owned_sku": "FAS004"
+              "order_id": "OD900502"
             }
           }
         ],
         "customer_goal": "Hỏi về ghế ngồi ô tô cho bé.",
         "customer_turns": [
-          "Alo, em muốn hỏi về ghế ngồi ô tô cho bé Chicco.",
-          "Bé nhà em được 15 tháng tuổi, ngân sách khoảng 5 triệu rưỡi.",
+          "Alo, anh muốn hỏi về ghế ngồi ô tô cho bé, anh có một bé 15 tháng tuổi.",
+          "Ngân sách của anh là 5 triệu rưỡi, không biết có ghế nào phù hợp không?",
           "Ghế này có khuyến mãi gì không em?",
-          "Em cần suy nghĩ thêm rồi sẽ gọi lại."
+          "Anh cần suy nghĩ thêm rồi sẽ gọi lại."
         ],
         "facts_established": {
           "child_age_months": 15,
@@ -26082,20 +26088,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-05",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Tư vấn chọn đồ mùa hè"
+            "outcome": "chot_don",
+            "summary": "Đặt Áo phao lông vũ Warmly giá 1.490.000đ, đơn OD900502 đang giao."
           },
           "products_advised": [
-            "FAS004"
+            "SKU-JK-WND-M-NAVY"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Đỗ Minh E, em gọi lại về FAS004 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Đỗ Minh E, em gọi lại về SKU-JK-WND-M-NAVY anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-11-13T08:00:00",
@@ -26113,11 +26119,11 @@
         "call_date": "2026-11-15",
         "days_later": 2,
         "input_mode": "text",
-        "customer_goal": "Hỏi về an toàn sức khỏe khi dùng sản phẩm.",
+        "customer_goal": "Hỏi về an toàn sản phẩm cho bé.",
         "customer_turns": [
-          "Alo, chào em! Hôm trước em có tư vấn cho chị ghế ngồi ô tô cho bé.",
-          "Chị có câu hỏi về an toàn, nếu bé đang dùng thuốc thì có dùng được ghế này không?",
-          "Em có thể chuyển máy cho người biết về vấn đề này được không?"
+          "Alo, anh có câu hỏi về sản phẩm ghế ngồi ô tô cho bé.",
+          "Bé nhà anh đang dùng thuốc, không biết có dùng ghế này được không?",
+          "Nếu không được thì anh có thể chuyển máy cho bác sĩ không?"
         ],
         "expected_outcome": "chuyen_may",
         "must_carry_over": [
@@ -26149,7 +26155,7 @@
             "outcome": "hen_goi_lai"
           },
           "products_advised": [
-            "FAS004",
+            "SKU-JK-WND-M-NAVY",
             "SKU-MB-CAR"
           ],
           "open_blockers": [
@@ -26162,7 +26168,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Đỗ Minh E, em gọi lại về FAS004 Mr. đang quan tâm ạ, không biết cần suy nghĩ thêm chưa ạ?",
+          "suggested_opening": "Dạ em chào anh Đỗ Minh E, em gọi lại về SKU-JK-WND-M-NAVY anh đang quan tâm ạ, không biết cần suy nghĩ thêm chưa ạ?",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-11-15T08:00:00",
@@ -26209,7 +26215,7 @@
     "customer_id": "SYN-C003",
     "customer_phone": "0998000003",
     "customer_name": "Lê Văn C",
-    "honorific": "Mr.",
+    "honorific": "anh",
     "region": "nam",
     "category": "gia-dung/noi-chien",
     "difficulty": "hard",
@@ -26217,7 +26223,7 @@
       "chinh_sach",
       "doi_tra",
       "hard_case",
-      "khach_hang",
+      "nồi_chien_khong_dau",
       "tu_van",
       "variant:chinh_sach_cu",
       "version_conflict"
@@ -26239,53 +26245,54 @@
             "source": "crm_session",
             "customer_id": "SYN-C003",
             "session_id": "SYN-003-S1",
-            "date": "2026-09-01",
+            "date": "2026-05-07",
             "channel": "hotline",
-            "summary": "Tìm hiểu về đồ dùng cho trẻ em",
-            "outcome": "successful",
-            "stale": false
+            "summary": "Mua Xe đẩy gấp gọn Joie Pact giá 3.490.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
+            "stale": true
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C003",
             "session_id": "SYN-003-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-03",
             "channel": "zalo_oa",
-            "summary": "Yêu cầu hỗ trợ đơn hàng",
-            "outcome": "successful",
+            "summary": "Đặt Xe đẩy 2 chiều Combi Sugocal giá 6.790.000đ, đơn OD900302 đang giao.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C003",
-            "order_id": "O005",
-            "date": "2026-07-22",
-            "sku": "MAB001",
-            "status": "shipping",
+            "order_id": "OD900301",
+            "date": "2026-05-07",
+            "sku": "SKU-MB-STR1",
+            "status": "delivered",
             "stale": false,
             "facts": {
-              "order_id": "O005"
+              "owned_sku": "SKU-MB-STR1"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C003",
-            "order_id": "O006",
-            "date": "2026-09-05",
-            "sku": "MAB002",
-            "status": "delivered",
+            "order_id": "OD900302",
+            "date": "2026-10-03",
+            "sku": "SKU-MB-STR2",
+            "status": "shipping",
             "stale": false,
             "facts": {
-              "owned_sku": "MAB002"
+              "order_id": "OD900302"
             }
           }
         ],
         "customer_goal": "Hỏi về nồi chiên không dầu Xiaomi.",
         "customer_turns": [
-          "Alo, em muốn hỏi về nồi chiên không dầu Xiaomi 4.5L.",
-          "Em cần thay đồ cũ đã hỏng, ngân sách của em khoảng 2 triệu thôi.",
-          "Nồi này có khuyến mãi gì không em?",
-          "À, em chờ cuối tháng nhận lương rồi sẽ gọi lại nhé."
+          "Alo, anh muốn hỏi về nồi chiên không dầu Xiaomi 4.5L.",
+          "Giá của sản phẩm này là bao nhiêu vậy em?",
+          "Anh có ngân sách khoảng 2 triệu thôi.",
+          "Anh cần thay cái nồi cũ đã hỏng.",
+          "Anh sẽ chờ cuối tháng nhận lương rồi gọi lại nhé."
         ],
         "facts_established": {
           "usage_need": "thay đồ cũ đã hỏng",
@@ -26326,20 +26333,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-03",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Yêu cầu hỗ trợ đơn hàng"
+            "outcome": "chot_don",
+            "summary": "Đặt Xe đẩy 2 chiều Combi Sugocal giá 6.790.000đ, đơn OD900302 đang giao."
           },
           "products_advised": [
-            "MAB002"
+            "SKU-MB-STR1"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Lê Văn C, em gọi lại về MAB002 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Lê Văn C, em gọi lại về SKU-MB-STR1 anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-11-14T08:00:00",
@@ -26357,11 +26364,12 @@
         "call_date": "2026-11-16",
         "days_later": 2,
         "input_mode": "text",
-        "customer_goal": "Xác nhận chính sách đổi trả hàng.",
+        "customer_goal": "Xác nhận chính sách đổi trả.",
         "customer_turns": [
-          "Alo, hôm trước em có đọc trên web thấy là được đổi trả trong 14 ngày đúng không?",
-          "Và phí đổi size là 20 nghìn, chính sách này còn hiệu lực không em?",
-          "Em chỉ muốn chắc chắn là mình không bị mất phí khi đổi hàng thôi."
+          "Alo, anh vừa đọc trên web thấy có chính sách đổi trả trong 14 ngày đúng không?",
+          "Và phí đổi size là 20 nghìn đúng không em?",
+          "Anh chỉ muốn chắc chắn là chính sách này vẫn còn hiệu lực.",
+          "Cảm ơn em, anh sẽ theo dõi thêm."
         ],
         "expected_outcome": "thong_tin",
         "must_carry_over": [
@@ -26395,8 +26403,8 @@
             "outcome": "hen_goi_lai"
           },
           "products_advised": [
-            "MAB002",
-            "SKU-AF-XM"
+            "SKU-AF-XM",
+            "SKU-MB-STR1"
           ],
           "open_blockers": [
             "chờ cuối tháng nhận lương"
@@ -26408,7 +26416,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Lê Văn C, em gọi lại về MAB002 Mr. đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+          "suggested_opening": "Dạ em chào anh Lê Văn C, em gọi lại về SKU-AF-XM anh đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-11-16T08:00:00",
@@ -26442,16 +26450,16 @@
     "customer_id": "SYN-C004",
     "customer_phone": "0998000004",
     "customer_name": "Phạm Thị D",
-    "honorific": "Ms.",
+    "honorific": "chị",
     "region": "bac",
     "category": "thoi-trang/giay",
     "difficulty": "hard",
     "tags": [
       "chốt_đơn",
       "cross_channel",
-      "giày_chạy_bộ",
+      "giao_hàng",
       "hard_case",
-      "hẹn_gọi_lại",
+      "khuyến_mãi",
       "tư_vấn",
       "variant:ba_kenh_lech_gia"
     ],
@@ -26474,53 +26482,53 @@
             "source": "crm_session",
             "customer_id": "SYN-C004",
             "session_id": "SYN-004-S1",
-            "date": "2026-09-01",
+            "date": "2026-06-10",
             "channel": "hotline",
-            "summary": "Khách hàng hỏi về máy xay sinh tố",
-            "outcome": "successful",
+            "summary": "Mua Máy lọc không khí AirPure Pro giá 7.990.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C004",
             "session_id": "SYN-004-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-04",
             "channel": "zalo_oa",
-            "summary": "Hỗ trợ đổi trả hàng",
-            "outcome": "successful",
+            "summary": "Đặt Máy lọc không khí Xiaomi Smart 4 Lite giá 2.990.000đ, đơn OD900402 đang xử lý.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C004",
-            "order_id": "O007",
-            "date": "2026-02-25",
-            "sku": "HAP003",
+            "order_id": "OD900401",
+            "date": "2026-06-10",
+            "sku": "SKU-AP-PRO",
             "status": "delivered",
             "stale": false,
             "facts": {
-              "owned_sku": "HAP003"
+              "owned_sku": "SKU-AP-PRO"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C004",
-            "order_id": "O008",
-            "date": "2026-06-18",
-            "sku": "HAP004",
+            "order_id": "OD900402",
+            "date": "2026-10-04",
+            "sku": "SKU-XM-4L",
             "status": "processing",
             "stale": false,
             "facts": {
-              "order_id": "O008"
+              "order_id": "OD900402"
             }
           }
         ],
-        "customer_goal": "Hỏi về giày chạy bộ size 42 màu đen.",
+        "customer_goal": "Hỏi về giày chạy bộ size 42 màu đen, giá cả và khuyến mãi.",
         "customer_turns": [
-          "Alo, chị muốn hỏi về giày chạy bộ size 42 màu đen.",
-          "Chị thấy bên chỗ khác có giá 1 triệu 240 nghìn, sao bên mình lại cao hơn vậy?",
-          "Có khuyến mãi gì không em?",
-          "Chị sẽ cần thời gian để suy nghĩ rồi gọi lại nhé."
+          "Alo, chị muốn hỏi về giày chạy bộ RunLite 2 Pro size 42 màu đen.",
+          "Trước đây chị thấy giá bên chỗ khác là 1 triệu 240 ngàn.",
+          "Giá bên em có khuyến mãi gì không?",
+          "Giá bên em cao hơn chỗ khác, chị cần suy nghĩ thêm rồi gọi lại nhé."
         ],
         "facts_established": {
           "size": 42,
@@ -26567,20 +26575,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-04",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Hỗ trợ đổi trả hàng"
+            "outcome": "chot_don",
+            "summary": "Đặt Máy lọc không khí Xiaomi Smart 4 Lite giá 2.990.000đ, đơn OD900402 đang xử lý."
           },
           "products_advised": [
-            "HAP003"
+            "SKU-AP-PRO"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Phạm Thị D, em gọi lại về HAP003 Ms. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào chị Phạm Thị D, em gọi lại về SKU-AP-PRO chị đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-05T08:00:00",
@@ -26605,12 +26613,12 @@
         "call_date": "2026-10-15",
         "days_later": 10,
         "input_mode": "text",
-        "customer_goal": "Hỏi lại về giày chạy bộ size 42 màu đen.",
+        "customer_goal": "Hỏi lại về giày chạy bộ size 42 màu đen và giá mới.",
         "customer_turns": [
-          "Chào em, hôm trước chị đã hỏi về giày chạy bộ size 42 màu đen rồi.",
-          "Giá hôm nay là bao nhiêu vậy em?",
+          "Chào em, hôm trước chị có hỏi giày chạy bộ size 42 màu đen.",
+          "Mới đây chị thấy giá bên em tăng lên, giờ là bao nhiêu?",
           "Có khuyến mãi gì không?",
-          "Chị cần thêm thời gian để quyết định, sẽ gọi lại sau."
+          "Chị vẫn cần xem xét thêm, hẹn em lần sau nhé."
         ],
         "facts_established": {
           "product_advised": "SKU-SN-RUN2",
@@ -26671,7 +26679,7 @@
             "outcome": "hen_goi_lai"
           },
           "products_advised": [
-            "HAP003",
+            "SKU-AP-PRO",
             "SKU-SN-RUN2"
           ],
           "open_blockers": [],
@@ -26683,7 +26691,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Phạm Thị D, em gọi lại về HAP003 Ms. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào chị Phạm Thị D, em gọi lại về SKU-AP-PRO chị đang quan tâm ạ",
           "freshness_checks": {
             "price_changed": true,
             "promos_no_longer_active": [
@@ -26721,12 +26729,12 @@
         "call_date": "2026-10-27",
         "days_later": 12,
         "input_mode": "text",
-        "customer_goal": "Xác nhận mua giày chạy bộ size 42 màu đen.",
+        "customer_goal": "Xác nhận mua giày chạy bộ size 42 màu đen và thông báo hình thức thanh toán.",
         "customer_turns": [
-          "Chị muốn đặt giày chạy bộ size 42 màu đen.",
+          "Alo, chị muốn đặt giày chạy bộ RunLite 2 Pro size 42 màu đen.",
           "Chị sẽ thanh toán bằng chuyển khoản.",
-          "Giao hàng cho chị ở Cầu Giấy, Hà Nội nhé.",
-          "Mong là hàng sẽ về sớm."
+          "Giao hàng đến Cầu Giấy, Hà Nội nhé.",
+          "Mong sớm nhận được đơn hàng."
         ],
         "facts_established": {
           "payment": "chuyen_khoan",
@@ -26777,7 +26785,7 @@
           "order_id": "OD600001",
           "superseded": {
             "price_quoted_vnd": 1521000,
-            "order_id": "O008"
+            "order_id": "OD900402"
           }
         },
         "expected_call_brief": {
@@ -26791,7 +26799,7 @@
             "outcome": "hen_goi_lai"
           },
           "products_advised": [
-            "HAP003",
+            "SKU-AP-PRO",
             "SKU-SN-RUN2"
           ],
           "open_blockers": [],
@@ -26803,7 +26811,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Phạm Thị D, em gọi lại về HAP003 Ms. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào chị Phạm Thị D, em gọi lại về SKU-AP-PRO chị đang quan tâm ạ",
           "freshness_checks": {
             "price_changed": true,
             "promos_no_longer_active": [
@@ -27039,17 +27047,17 @@
     "customer_id": "SYN-C006",
     "customer_phone": "0998000006",
     "customer_name": "Nguyễn Thị F",
-    "honorific": "Ms.",
+    "honorific": "chị",
     "region": "nam",
     "category": "thoi-trang/giay",
     "difficulty": "normal",
     "tags": [
-      "hen_goi_lai",
-      "khach_cu",
+      "giày_sneaker",
+      "hẹn_gọi_lại",
+      "thanh_toán_COD",
       "ttl",
-      "tu_van_san_pham",
       "variant:quay_lai_sau_8_thang",
-      "xac_nhan_don_hang"
+      "xác_nhận_mua"
     ],
     "metric_focus": [
       "CCR",
@@ -27067,52 +27075,53 @@
             "source": "crm_session",
             "customer_id": "SYN-C006",
             "session_id": "SYN-006-S1",
-            "date": "2026-09-01",
+            "date": "2026-03-16",
             "channel": "hotline",
-            "summary": "Tìm hiểu sản phẩm cho trẻ sơ sinh",
-            "outcome": "successful",
-            "stale": false
+            "summary": "Mua Máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
+            "stale": true
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C006",
             "session_id": "SYN-006-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-06",
             "channel": "zalo_oa",
-            "summary": "Phản hồi về chất lượng sản phẩm",
-            "outcome": "successful",
+            "summary": "Đặt Bình sữa Pigeon PPSU 240ml giá 289.000đ, đơn OD900602 đang xử lý.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C006",
-            "order_id": "O011",
-            "date": "2026-08-20",
-            "sku": "MAB003",
-            "status": "processing",
+            "order_id": "OD900601",
+            "date": "2026-03-16",
+            "sku": "SKU-MB-STER",
+            "status": "delivered",
             "stale": false,
             "facts": {
-              "order_id": "O011"
+              "owned_sku": "SKU-MB-STER"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C006",
-            "order_id": "O012",
-            "date": "2026-09-30",
-            "sku": "MAB004",
-            "status": "delivered",
+            "order_id": "OD900602",
+            "date": "2026-10-06",
+            "sku": "SKU-MB-BOT",
+            "status": "processing",
             "stale": false,
             "facts": {
-              "owned_sku": "MAB004"
+              "order_id": "OD900602"
             }
           }
         ],
-        "customer_goal": "Xác nhận đơn hàng giày sneaker.",
+        "customer_goal": "Xác nhận mua giày sneaker Urban Classic màu trắng.",
         "customer_turns": [
-          "Alo em ơi, chị muốn xác nhận đơn hàng giày sneaker size 39 màu trắng.",
-          "Chị sẽ thanh toán bằng COD và giao ở Ninh Kiều, Cần Thơ.",
-          "Chị đồng ý lên đơn luôn nhé."
+          "Alo, chị muốn xác nhận đơn hàng giày sneaker Urban Classic màu trắng size 39.",
+          "Hình thức thanh toán là COD nhé, em.",
+          "Giao hàng tới Ninh Kiều, Cần Thơ.",
+          "Chị đồng ý lên đơn luôn."
         ],
         "facts_established": {
           "size": 39,
@@ -27153,7 +27162,7 @@
           "variant_sku": "SKU-SN-CAS-39-TRANG",
           "order_id": "OD600001",
           "superseded": {
-            "order_id": "O011"
+            "order_id": "OD900602"
           }
         },
         "expected_call_brief": {
@@ -27162,20 +27171,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-06",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Phản hồi về chất lượng sản phẩm"
+            "outcome": "chot_don",
+            "summary": "Đặt Bình sữa Pigeon PPSU 240ml giá 289.000đ, đơn OD900602 đang xử lý."
           },
           "products_advised": [
-            "MAB004"
+            "SKU-MB-STER"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Nguyễn Thị F, em gọi lại về MAB004 Ms. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào chị Nguyễn Thị F, em gọi lại về SKU-MB-STER chị đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-11-14T08:00:00",
@@ -27195,12 +27204,12 @@
         "call_date": "2027-07-12",
         "days_later": 240,
         "input_mode": "text",
-        "customer_goal": "Hỏi về sản phẩm giày sneaker.",
+        "customer_goal": "Hỏi về giày sneaker Urban Classic.",
         "customer_turns": [
-          "Chào em, lâu quá chị không gọi, hôm nay chị muốn hỏi về giày sneaker Urban Classic.",
-          "Giá của nó hiện tại là bao nhiêu vậy em?",
-          "Chị có cần khuyến mãi gì không?",
-          "Chị đang phân vân một chút, để chị suy nghĩ rồi gọi lại nhé."
+          "Alo em, chị muốn hỏi về giày sneaker Urban Classic màu trắng mà hôm trước em tư vấn cho chị.",
+          "Chị muốn biết giá và có khuyến mãi gì không?",
+          "Chị vẫn chưa quyết định, cần suy nghĩ thêm chút.",
+          "Chị sẽ gọi lại sau nhé."
         ],
         "facts_established": {
           "product_advised": "SKU-SN-CAS",
@@ -27241,7 +27250,7 @@
             "outcome": "chot_don"
           },
           "products_advised": [
-            "MAB004",
+            "SKU-MB-STER",
             "SKU-SN-CAS"
           ],
           "open_blockers": [],
@@ -27249,7 +27258,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Nguyễn Thị F, em gọi lại về MAB004 Ms. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào chị Nguyễn Thị F, em gọi lại về SKU-MB-STER chị đang quan tâm ạ",
           "freshness_checks": {
             "price_changed": false,
             "promos_no_longer_active": [
@@ -27278,7 +27287,7 @@
     "customer_id": "SYN-C007",
     "customer_phone": "0998000007",
     "customer_name": "Lê Văn G",
-    "honorific": "Mr.",
+    "honorific": "anh",
     "region": "bac",
     "category": "gia-dung/may-loc-khong-khi",
     "difficulty": "hard",
@@ -27286,7 +27295,11 @@
       "budget",
       "cod_limit",
       "hard_case",
+      "mua_sắm",
       "multi_item",
+      "máy_lọc_không_khí",
+      "nhà_mới",
+      "tư_vấn",
       "variant:bon_san_pham_vuot_cod"
     ],
     "metric_focus": [
@@ -27306,53 +27319,53 @@
             "source": "crm_session",
             "customer_id": "SYN-C007",
             "session_id": "SYN-007-S1",
-            "date": "2026-09-01",
+            "date": "2026-04-19",
             "channel": "hotline",
-            "summary": "Tư vấn về máy lạnh",
-            "outcome": "successful",
-            "stale": false
+            "summary": "Mua Máy lọc không khí Samsung AX40 giá 6.490.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
+            "stale": true
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C007",
             "session_id": "SYN-007-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-07",
             "channel": "zalo_oa",
-            "summary": "Hỗ trợ đổi hàng",
-            "outcome": "successful",
+            "summary": "Đặt Máy lọc nước RO Karofi 9 lõi giá 5.990.000đ, đơn OD900702 đang giao.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C007",
-            "order_id": "O013",
-            "date": "2026-02-12",
-            "sku": "HAP005",
+            "order_id": "OD900701",
+            "date": "2026-04-19",
+            "sku": "SKU-SS-AX40",
             "status": "delivered",
             "stale": false,
             "facts": {
-              "owned_sku": "HAP005"
+              "owned_sku": "SKU-SS-AX40"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C007",
-            "order_id": "O014",
-            "date": "2026-07-14",
-            "sku": "HAP006",
+            "order_id": "OD900702",
+            "date": "2026-10-07",
+            "sku": "SKU-WF-RO9",
             "status": "shipping",
             "stale": false,
             "facts": {
-              "order_id": "O014"
+              "order_id": "OD900702"
             }
           }
         ],
-        "customer_goal": "Hỏi về máy lọc không khí cho phòng 30m² có trẻ nhỏ.",
+        "customer_goal": "Hỏi về máy lọc không khí AirPure Pro.",
         "customer_turns": [
-          "Alo, em chào chị! Chị muốn hỏi về máy lọc không khí cho phòng khoảng 30 mét vuông.",
-          "Nhà chị có trẻ nhỏ nên cần máy nào an toàn.",
-          "Ngân sách của chị tầm 8 triệu thôi, có khuyến mãi gì không em?",
-          "Chị sẽ chờ cuối tháng nhận lương rồi gọi lại nhé."
+          "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro mà em giới thiệu hôm trước.",
+          "Phòng của anh khoảng 30 mét vuông, có trẻ nhỏ ở nhà.",
+          "Ngân sách của anh tầm 8 triệu thôi, có khuyến mãi gì không em?",
+          "Anh sẽ gọi lại sau vì chờ cuối tháng nhận lương."
         ],
         "facts_established": {
           "room_area_m2": 30,
@@ -27401,20 +27414,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-07",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Hỗ trợ đổi hàng"
+            "outcome": "chot_don",
+            "summary": "Đặt Máy lọc nước RO Karofi 9 lõi giá 5.990.000đ, đơn OD900702 đang giao."
           },
           "products_advised": [
-            "HAP005"
+            "SKU-SS-AX40"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Lê Văn G, em gọi lại về HAP005 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Lê Văn G, em gọi lại về SKU-SS-AX40 anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-11-12T08:00:00",
@@ -27432,16 +27445,16 @@
         "call_date": "2026-11-15",
         "days_later": 3,
         "input_mode": "text",
-        "customer_goal": "Đặt hàng nhiều sản phẩm cho nhà mới.",
+        "customer_goal": "Mua nhiều món cho nhà mới.",
         "customer_turns": [
-          "Alo, em ơi, hôm trước chị đã hỏi về máy lọc không khí, giờ chị muốn đặt hàng luôn.",
-          "Chị muốn mua máy lọc không khí AirPure Pro, nồi chiên không dầu Xiaomi 4.5L và quạt đứng Senko TS16.",
-          "Chị cũng cần thêm màng lọc thay thế cho máy lọc không khí.",
-          "Tổng tiền là bao nhiêu em nhỉ?",
-          "Chị muốn trả bằng chuyển khoản.",
-          "Chị có ngân sách khoảng 8 triệu rưỡi, nhưng nếu cần thì chị có thể điều chỉnh một chút.",
-          "Địa chỉ giao hàng là Lê Chân, Hải Phòng.",
-          "Chị muốn đặt 4 món này nhé, em chốt đơn cho chị đi."
+          "Alo, anh gọi lại để đặt hàng cho nhà mới.",
+          "Anh muốn mua máy lọc không khí AirPure Pro, nồi chiên không dầu Xiaomi và quạt đứng Senko.",
+          "Cho anh hỏi tổng tiền cho tất cả các món này là bao nhiêu?",
+          "Ngân sách của anh là 8 triệu rưỡi, có thể trả bằng chuyển khoản.",
+          "Anh cần 4 món, giao hàng ở Lê Chân, Hải Phòng.",
+          "Máy lọc không khí giá 7 triệu 990, nồi chiên không dầu 1 triệu 590, quạt đứng 590 nghìn.",
+          "Màng lọc thay thế cũng cần mua, giá 990 nghìn.",
+          "Anh đồng ý đặt hàng, vui lòng xác nhận lại cho anh nhé."
         ],
         "facts_established": {
           "payment": "chuyen_khoan",
@@ -27500,7 +27513,7 @@
           "superseded": {
             "budget_vnd": 8000000,
             "price_quoted_vnd": 6791500,
-            "order_id": "O014"
+            "order_id": "OD900702"
           }
         },
         "expected_call_brief": {
@@ -27514,8 +27527,8 @@
             "outcome": "hen_goi_lai"
           },
           "products_advised": [
-            "HAP005",
-            "SKU-AP-PRO"
+            "SKU-AP-PRO",
+            "SKU-SS-AX40"
           ],
           "open_blockers": [
             "chờ cuối tháng nhận lương"
@@ -27528,7 +27541,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Lê Văn G, em gọi lại về HAP005 Mr. đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+          "suggested_opening": "Dạ em chào anh Lê Văn G, em gọi lại về SKU-AP-PRO anh đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
           "freshness_checks": {
             "price_changed": true,
             "promos_no_longer_active": [
@@ -27579,14 +27592,18 @@
     "customer_id": "SYN-C008",
     "customer_phone": "0998000008",
     "customer_name": "Trần Văn H",
-    "honorific": "Mr.",
+    "honorific": "anh",
     "region": "trung",
     "category": "gia-dung/may-loc-khong-khi",
     "difficulty": "hard",
     "tags": [
+      "COD",
       "asr",
       "hard_case",
+      "mua_hàng",
+      "máy_lọc_không_khí",
       "robustness",
+      "tư_vấn",
       "variant:chuan"
     ],
     "metric_focus": [
@@ -27605,44 +27622,44 @@
             "source": "crm_session",
             "customer_id": "SYN-C008",
             "session_id": "SYN-008-S1",
-            "date": "2026-09-01",
+            "date": "2026-05-22",
             "channel": "hotline",
-            "summary": "Hỏi về giày dép nam",
-            "outcome": "successful",
+            "summary": "Mua Giày chạy bộ RunLite 1 giá 1.290.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C008",
             "session_id": "SYN-008-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-08",
             "channel": "zalo_oa",
-            "summary": "Tìm hiểu về chất liệu sản phẩm",
-            "outcome": "successful",
+            "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD900802 đang xử lý.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C008",
-            "order_id": "O015",
-            "date": "2026-05-05",
-            "sku": "FAS005",
-            "status": "processing",
+            "order_id": "OD900801",
+            "date": "2026-05-22",
+            "sku": "SKU-SN-RUN1-40-TRANG",
+            "status": "delivered",
             "stale": false,
             "facts": {
-              "order_id": "O015"
+              "owned_sku": "SKU-SN-RUN1-40-TRANG"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C008",
-            "order_id": "O016",
-            "date": "2026-09-15",
-            "sku": "FAS006",
-            "status": "delivered",
+            "order_id": "OD900802",
+            "date": "2026-10-08",
+            "sku": "SKU-SN-CAS-40-TRANG",
+            "status": "processing",
             "stale": false,
             "facts": {
-              "owned_sku": "FAS006"
+              "order_id": "OD900802"
             }
           }
         ],
@@ -27650,20 +27667,18 @@
           "tool": "inventory.check",
           "mode": "timeout"
         },
-        "customer_goal": "Hỏi về máy lọc không khí Xiaomi Smart 4 Pro.",
+        "customer_goal": "Hỏi về máy lọc không khí Xiaomi Smart 4 Pro",
         "customer_turns": [
-          "Alo, chị muốn hỏi về máy lọc không khí Xiaomi Smart 4 Pro.",
-          "Chị cần máy cho phòng khoảng 30 mét vuông.",
-          "Nhà chị có trẻ nhỏ, ngân sách tầm 6 triệu thôi.",
-          "Máy này có khuyến mãi gì không em?",
-          "Chị sẽ bàn với gia đình rồi gọi lại nhé."
+          "Alo, anh muốn hỏi về máy lọc không khí Xiaomi Smart 4 Pro.",
+          "Diện tích phòng của anh là 30 mét vuông và nhà có trẻ nhỏ.",
+          "Ngân sách của anh tầm 6 triệu, máy này có khuyến mãi gì không?",
+          "Anh cần bàn với gia đình rồi sẽ gọi lại."
         ],
         "customer_turns_asr": [
-          "alo chi muon hoi ve may loc khong khi xiaomi smart 4 pro",
-          "chi can may cho phong khoang 30 met vuong",
-          "nha chi co tre nho ngan sach tam 6 trieu thoi",
-          "may nay co khuyen mai gi khong em",
-          "chi se ban voi gia dinh roi goi lai nhe"
+          "alo anh muon hoi ve may loc khong khi xiaomi smart 4 pro",
+          "dien tich phong cua anh la 30 met vuong va nha co tre nho",
+          "ngan sach cua anh tam 6 trieu may nay co khuyen mai gi khong",
+          "anh can ban voi gia dinh roi se goi lai"
         ],
         "facts_established": {
           "room_area_m2": 30,
@@ -27710,20 +27725,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-08",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Tìm hiểu về chất liệu sản phẩm"
+            "outcome": "chot_don",
+            "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD900802 đang xử lý."
           },
           "products_advised": [
-            "FAS006"
+            "SKU-SN-RUN1-40-TRANG"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Trần Văn H, em gọi lại về FAS006 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Trần Văn H, em gọi lại về SKU-SN-RUN1-40-TRANG anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-30T08:00:00",
@@ -27741,18 +27756,16 @@
         "call_date": "2026-11-01",
         "days_later": 2,
         "input_mode": "asr_transcript",
-        "customer_goal": "Xác nhận mua máy lọc không khí.",
+        "customer_goal": "Xác nhận mua máy lọc không khí",
         "customer_turns": [
-          "Alo, chị gọi lại để đặt máy lọc không khí.",
-          "Chị chọn thanh toán COD.",
-          "Giao hàng cho chị ở Nha Trang, Khánh Hòa nhé.",
-          "Chị đồng ý đặt hàng rồi đấy."
+          "Alo, anh gọi lại để xác nhận mua máy lọc không khí.",
+          "Anh chọn thanh toán COD và giao hàng ở Nha Trang, Khánh Hòa.",
+          "Mong là máy này sẽ giúp không khí trong nhà sạch hơn."
         ],
         "customer_turns_asr": [
-          "alo chi goi lai de dat may loc khong khi",
-          "chi chon thanh toan cod",
-          "giao hang cho chi o nha trang khanh hoa nhe",
-          "chi dong y dat hang roi day"
+          "alo anh goi lai de xac nhan mua may loc khong khi",
+          "anh chon thanh toan cod va giao hang o nha trang khanh hoa",
+          "mong la may nay se giup khong khi trong nha sach hon"
         ],
         "facts_established": {
           "payment": "COD",
@@ -27803,7 +27816,7 @@
           "promo_code": "XM-COMBO",
           "order_id": "OD600001",
           "superseded": {
-            "order_id": "O015"
+            "order_id": "OD900802"
           }
         },
         "expected_call_brief": {
@@ -27817,7 +27830,7 @@
             "outcome": "hen_goi_lai"
           },
           "products_advised": [
-            "FAS006",
+            "SKU-SN-RUN1-40-TRANG",
             "SKU-XM-4P"
           ],
           "open_blockers": [
@@ -27831,7 +27844,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Trần Văn H, em gọi lại về FAS006 Mr. đang quan tâm ạ, không biết để bàn với gia đình chưa ạ?",
+          "suggested_opening": "Dạ em chào anh Trần Văn H, em gọi lại về SKU-SN-RUN1-40-TRANG anh đang quan tâm ạ, không biết để bàn với gia đình chưa ạ?",
           "freshness_checks": {
             "price_changed": false,
             "promos_no_longer_active": [],
@@ -27859,16 +27872,16 @@
     "customer_id": "SYN-C008",
     "customer_phone": "0998000008",
     "customer_name": "Trần Văn H",
-    "honorific": "Mr.",
+    "honorific": "anh",
     "region": "trung",
-    "category": "unknown",
+    "category": "thoi-trang/giay",
     "difficulty": "normal",
     "tags": [
       "address_change",
-      "customer_inquiry",
-      "delivery",
+      "customer_service",
       "order",
       "order_status",
+      "sneaker",
       "variant:chuan"
     ],
     "metric_focus": [
@@ -27887,51 +27900,52 @@
             "source": "crm_session",
             "customer_id": "SYN-C008",
             "session_id": "SYN-008-S1",
-            "date": "2026-09-01",
+            "date": "2026-05-22",
             "channel": "hotline",
-            "summary": "Hỏi về giày dép nam",
-            "outcome": "successful",
+            "summary": "Mua Giày chạy bộ RunLite 1 giá 1.290.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C008",
             "session_id": "SYN-008-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-08",
             "channel": "zalo_oa",
-            "summary": "Tìm hiểu về chất liệu sản phẩm",
-            "outcome": "successful",
+            "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD900802 đang xử lý.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C008",
-            "order_id": "O015",
-            "date": "2026-05-05",
-            "sku": "FAS005",
-            "status": "processing",
+            "order_id": "OD900801",
+            "date": "2026-05-22",
+            "sku": "SKU-SN-RUN1-40-TRANG",
+            "status": "delivered",
             "stale": false,
             "facts": {
-              "order_id": "O015"
+              "owned_sku": "SKU-SN-RUN1-40-TRANG"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C008",
-            "order_id": "O016",
-            "date": "2026-09-15",
-            "sku": "FAS006",
-            "status": "delivered",
+            "order_id": "OD900802",
+            "date": "2026-10-08",
+            "sku": "SKU-SN-CAS-40-TRANG",
+            "status": "processing",
             "stale": false,
             "facts": {
-              "owned_sku": "FAS006"
+              "order_id": "OD900802"
             }
           }
         ],
-        "customer_goal": "Hỏi tình trạng đơn hàng FAS006",
+        "customer_goal": "Hỏi tình trạng đơn hàng giày sneaker Urban Classic.",
         "customer_turns": [
-          "Alo, em chào chị, chị muốn hỏi tình trạng đơn hàng FAS006 mà chị đặt hôm trước.",
-          "Chị thấy hôm nay đã gần ngày giao hàng mà không thấy cập nhật gì cả, em có thông tin gì không?"
+          "Alo, anh muốn hỏi về tình trạng đơn hàng giày sneaker Urban Classic mà anh đã đặt.",
+          "Đơn hàng này anh đặt hôm 8 tháng 10, giờ sao rồi em?",
+          "Mấy hôm trước anh có gọi nhưng chưa được cập nhật gì cả."
         ],
         "expected_outcome": "cap_nhat_don",
         "must_carry_over": [
@@ -27943,8 +27957,8 @@
           "owned_sku"
         ],
         "ground_truth_facts": {
-          "order_id": "O016",
-          "order_status": "delivered",
+          "order_id": "OD900802",
+          "order_status": "processing",
           "call_date": "2026-11-14"
         },
         "expected_call_brief": {
@@ -27953,20 +27967,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-08",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Tìm hiểu về chất liệu sản phẩm"
+            "outcome": "chot_don",
+            "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD900802 đang xử lý."
           },
           "products_advised": [
-            "FAS006"
+            "SKU-SN-RUN1-40-TRANG"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Trần Văn H, em gọi lại về FAS006 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Trần Văn H, em gọi lại về SKU-SN-RUN1-40-TRANG anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-11-14T08:00:00",
@@ -27975,11 +27989,11 @@
         "success_if": {
           "tool_called": "order.status",
           "args_match": {
-            "order_id": "O016"
+            "order_id": "OD900802"
           },
           "must_say_any": [
-            "đã giao",
-            "giao thành công"
+            "đang xử lý",
+            "đang chuẩn bị"
           ]
         }
       },
@@ -27988,10 +28002,11 @@
         "call_date": "2026-11-16",
         "days_later": 2,
         "input_mode": "text",
-        "customer_goal": "Đổi địa chỉ giao hàng cho đơn hàng",
+        "customer_goal": "Đổi địa chỉ giao hàng cho đơn hàng đang xử lý.",
         "customer_turns": [
-          "Chào em, chị muốn đổi địa chỉ giao hàng cho đơn hàng chị đã đặt.",
-          "Chị muốn chuyển địa chỉ giao hàng sang Hải Châu, Đà Nẵng."
+          "Alo, anh Trần Văn H đây.",
+          "Anh muốn đổi địa chỉ giao hàng cho đơn giày sneaker Urban Classic sang Hải Châu, Đà Nẵng.",
+          "Địa chỉ cũ là gì thì em cứ giữ lại nhé."
         ],
         "facts_established": {
           "delivery_area": "Hải Châu, Đà Nẵng"
@@ -28006,8 +28021,8 @@
           "owned_sku"
         ],
         "ground_truth_facts": {
-          "order_id": "O016",
-          "order_status": "delivered",
+          "order_id": "OD900802",
+          "order_status": "processing",
           "call_date": "2026-11-16"
         },
         "memory_expectation": {
@@ -28024,14 +28039,14 @@
             "outcome": "cap_nhat_don"
           },
           "products_advised": [
-            "FAS006"
+            "SKU-SN-RUN1-40-TRANG"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Trần Văn H, em gọi lại về FAS006 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Trần Văn H, em gọi lại về SKU-SN-RUN1-40-TRANG anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-11-16T08:00:00",
@@ -28040,7 +28055,7 @@
         "success_if": {
           "tool_called": "order.update",
           "args_match": {
-            "order_id": "O016",
+            "order_id": "OD900802",
             "action": "update_address"
           }
         }
@@ -28055,7 +28070,7 @@
     "customer_id": "SYN-C010",
     "customer_phone": "0998000010",
     "customer_name": "Đinh Văn J",
-    "honorific": "Mr.",
+    "honorific": "anh",
     "region": "bac",
     "category": "gia-dung/combo",
     "difficulty": "hard",
@@ -28063,10 +28078,10 @@
       "cap_nhat_thong_tin",
       "dat_hang",
       "hard_case",
-      "ho_tro_khach_hang",
       "order_status",
       "supersede",
-      "tu_van_san_pham",
+      "trang_thai_don_hang",
+      "tu_van",
       "variant:ba_phien_doi_thong_tin"
     ],
     "metric_focus": [
@@ -28085,53 +28100,53 @@
             "source": "crm_session",
             "customer_id": "SYN-C010",
             "session_id": "SYN-010-S1",
-            "date": "2026-09-01",
+            "date": "2026-07-01",
             "channel": "hotline",
-            "summary": "Hỏi về chương trình khuyến mãi",
-            "outcome": "successful",
+            "summary": "Mua Máy lọc nước UF Sunhouse giá 3.290.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C010",
             "session_id": "SYN-010-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-10",
             "channel": "zalo_oa",
-            "summary": "Tìm hiểu về sản phẩm mới",
-            "outcome": "successful",
+            "summary": "Đặt Quạt đứng DC inverter Panasonic F-409 giá 2.450.000đ, đơn OD901002 đang xử lý.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C010",
-            "order_id": "O019",
-            "date": "2026-06-30",
-            "sku": "HAP007",
-            "status": "processing",
+            "order_id": "OD901001",
+            "date": "2026-07-01",
+            "sku": "SKU-WF-UF",
+            "status": "delivered",
             "stale": false,
             "facts": {
-              "order_id": "O019"
+              "owned_sku": "SKU-WF-UF"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C010",
-            "order_id": "O020",
-            "date": "2026-09-28",
-            "sku": "HAP008",
-            "status": "delivered",
+            "order_id": "OD901002",
+            "date": "2026-10-10",
+            "sku": "SKU-FAN-DC1",
+            "status": "processing",
             "stale": false,
             "facts": {
-              "owned_sku": "HAP008"
+              "order_id": "OD901002"
             }
           }
         ],
-        "customer_goal": "Hỏi về sản phẩm Combo AirPure Y cho gia đình",
+        "customer_goal": "Hỏi về bộ sản phẩm AirPure Y cho gia đình.",
         "customer_turns": [
-          "Alo, em chào chị, hôm trước chị có hỏi về sản phẩm mới đúng không?",
-          "Chị muốn mua Combo AirPure Y cho gia đình, giá cả thế nào em?",
-          "Chị dự định ngân sách khoảng 6 triệu rưỡi thôi.",
-          "Chị đang chờ cuối tháng nhận lương mới quyết định, nên có thể gọi lại không em?"
+          "Alo, anh muốn hỏi về bộ sản phẩm AirPure Y cho gia đình.",
+          "Ngân sách của anh khoảng 6 triệu rưỡi.",
+          "Có khuyến mãi gì không em?",
+          "Anh cần chờ cuối tháng nhận lương mới quyết định được."
         ],
         "facts_established": {
           "usage_need": "dùng cho gia đình",
@@ -28170,20 +28185,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-10",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Tìm hiểu về sản phẩm mới"
+            "outcome": "chot_don",
+            "summary": "Đặt Quạt đứng DC inverter Panasonic F-409 giá 2.450.000đ, đơn OD901002 đang xử lý."
           },
           "products_advised": [
-            "HAP008"
+            "SKU-WF-UF"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Đinh Văn J, em gọi lại về HAP008 Mr. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào anh Đinh Văn J, em gọi lại về SKU-WF-UF anh đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-29T08:00:00",
@@ -28201,12 +28216,11 @@
         "call_date": "2026-11-02",
         "days_later": 4,
         "input_mode": "text",
-        "customer_goal": "Xác nhận mua sản phẩm và thông tin giao hàng",
+        "customer_goal": "Xác nhận mua bộ sản phẩm AirPure Y.",
         "customer_turns": [
-          "Alo, em, hôm trước chị đã hỏi về Combo AirPure Y rồi, giờ chị muốn đặt hàng.",
-          "Chị sẽ thanh toán COD, khu vực giao hàng là Cầu Giấy, Hà Nội.",
-          "Ngân sách của chị bây giờ khoảng 7 triệu rưỡi, em có thể lên đơn cho chị không?",
-          "Chị đồng ý, làm ơn giúp chị đặt hàng nhé."
+          "Alo, anh muốn đặt bộ sản phẩm AirPure Y.",
+          "Hình thức thanh toán là COD.",
+          "Giao hàng cho anh ở Cầu Giấy, Hà Nội."
         ],
         "facts_established": {
           "delivery_area": "Cầu Giấy, Hà Nội",
@@ -28251,7 +28265,7 @@
           "order_id": "OD600001",
           "superseded": {
             "budget_vnd": 6500000,
-            "order_id": "O019"
+            "order_id": "OD901002"
           }
         },
         "expected_call_brief": {
@@ -28265,8 +28279,8 @@
             "outcome": "hen_goi_lai"
           },
           "products_advised": [
-            "HAP008",
-            "SKU-BDL-AIR"
+            "SKU-BDL-AIR",
+            "SKU-WF-UF"
           ],
           "open_blockers": [
             "chờ cuối tháng nhận lương"
@@ -28278,7 +28292,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Đinh Văn J, em gọi lại về HAP008 Mr. đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+          "suggested_opening": "Dạ em chào anh Đinh Văn J, em gọi lại về SKU-BDL-AIR anh đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
           "freshness_checks": {
             "price_changed": false,
             "promos_no_longer_active": [],
@@ -28302,11 +28316,10 @@
         "call_date": "2026-11-04",
         "days_later": 2,
         "input_mode": "text",
-        "customer_goal": "Hỏi tình trạng đơn hàng đã đặt",
+        "customer_goal": "Hỏi tình trạng đơn hàng.",
         "customer_turns": [
-          "Alo, em ơi, cho chị hỏi tình trạng đơn hàng chị đã đặt hôm trước.",
-          "Chị không nhớ mã đơn hàng, em có thể kiểm tra giúp chị không?",
-          "Chị chỉ muốn biết đơn hàng của chị đã được xử lý chưa."
+          "Alo, anh muốn hỏi tình trạng đơn hàng của mình.",
+          "Đơn hàng của anh đã được tạo chưa?"
         ],
         "expected_outcome": "cap_nhat_don",
         "must_carry_over": [
@@ -28343,8 +28356,8 @@
             "outcome": "chot_don"
           },
           "products_advised": [
-            "HAP008",
-            "SKU-BDL-AIR"
+            "SKU-BDL-AIR",
+            "SKU-WF-UF"
           ],
           "open_blockers": [
             "chờ cuối tháng nhận lương"
@@ -28358,7 +28371,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Mr. Đinh Văn J, em gọi lại về HAP008 Mr. đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
+          "suggested_opening": "Dạ em chào anh Đinh Văn J, em gọi lại về SKU-BDL-AIR anh đang quan tâm ạ, không biết chờ cuối tháng nhận lương chưa ạ?",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-11-04T08:00:00",
@@ -28549,7 +28562,7 @@
     "customer_id": "SYN-C009",
     "customer_phone": "0998000009",
     "customer_name": "Nguyễn Thị I",
-    "honorific": "Ms.",
+    "honorific": "chị",
     "region": "nam",
     "category": "gia-dung/may-loc-khong-khi",
     "difficulty": "hard",
@@ -28580,59 +28593,60 @@
             "source": "crm_session",
             "customer_id": "SYN-C009",
             "session_id": "SYN-009-S1",
-            "date": "2026-09-01",
+            "date": "2026-06-25",
             "channel": "hotline",
-            "summary": "Tư vấn về đồ chơi trẻ em",
-            "outcome": "successful",
+            "summary": "Mua Combo Spectra S1 + máy hâm sữa Fatz + 50 túi trữ sữa giá 4.790.000đ, đã nhận hàng.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_session",
             "customer_id": "SYN-C009",
             "session_id": "SYN-009-S2",
-            "date": "2026-09-02",
+            "date": "2026-10-09",
             "channel": "zalo_oa",
-            "summary": "Hỗ trợ về đơn hàng",
-            "outcome": "successful",
+            "summary": "Đặt Túi trữ sữa Sunmum 50 túi giá 119.000đ, đơn OD900902 đang giao.",
+            "outcome": "chot_don",
             "stale": false
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C009",
-            "order_id": "O017",
-            "date": "2026-01-30",
-            "sku": "MAB005",
+            "order_id": "OD900901",
+            "date": "2026-06-25",
+            "sku": "SKU-BDL-MOM",
             "status": "delivered",
             "stale": false,
             "facts": {
-              "owned_sku": "MAB005"
+              "owned_sku": "SKU-BDL-MOM"
             }
           },
           {
             "source": "crm_order",
             "customer_id": "SYN-C009",
-            "order_id": "O018",
-            "date": "2026-03-22",
-            "sku": "MAB006",
+            "order_id": "OD900902",
+            "date": "2026-10-09",
+            "sku": "SKU-MB-BAG",
             "status": "shipping",
             "stale": false,
             "facts": {
-              "order_id": "O018"
+              "order_id": "OD900902"
             }
           }
         ],
-        "customer_goal": "Hỏi về máy lọc không khí cho phòng 30m².",
+        "customer_goal": "Hỏi về máy lọc không khí AirPure Y.",
         "customer_turns": [
-          "Alo, chị muốn hỏi về máy lọc không khí cho phòng khoảng 30 mét vuông.",
-          "Nhà chị có trẻ nhỏ, ngân sách tầm 5 triệu rưỡi thôi.",
-          "Chị chưa quyết định, thứ Hai tuần sau tầm 9 giờ sáng em gọi lại chị nhé."
+          "Alo, chị muốn hỏi thêm về máy lọc không khí AirPure Y.",
+          "Chị có một phòng khoảng 30 mét vuông và nhà có trẻ nhỏ.",
+          "Ngân sách của chị tầm 5 triệu rưỡi thôi.",
+          "Chị cần hỏi chồng một chút, thứ Hai tuần sau tầm 9 giờ sáng em gọi lại chị nhé."
         ],
         "facts_established": {
           "room_area_m2": 30,
           "has_children": true,
           "budget_vnd": 5500000,
-          "decision_maker": "vợ",
-          "blocker": "cần hỏi vợ",
+          "decision_maker": "chồng",
+          "blocker": "cần hỏi chồng",
           "product_advised": "SKU-AP-Y",
           "price_quoted_vnd": 5200000,
           "promo_code": "GIFT-FILTER",
@@ -28664,8 +28678,8 @@
           "room_area_m2": 30,
           "has_children": true,
           "budget_vnd": 5500000,
-          "decision_maker": "vợ",
-          "blocker": "cần hỏi vợ",
+          "decision_maker": "chồng",
+          "blocker": "cần hỏi chồng",
           "product_advised": "SKU-AP-Y",
           "price_quoted_vnd": 5200000,
           "promo_code": "GIFT-FILTER"
@@ -28676,20 +28690,20 @@
           "is_returning": true,
           "n_previous_sessions": 2,
           "last_session": {
-            "date": "2026-09-02",
+            "date": "2026-10-09",
             "channel": "zalo_oa",
-            "outcome": "successful",
-            "summary": "Hỗ trợ về đơn hàng"
+            "outcome": "chot_don",
+            "summary": "Đặt Túi trữ sữa Sunmum 50 túi giá 119.000đ, đơn OD900902 đang giao."
           },
           "products_advised": [
-            "MAB005"
+            "SKU-BDL-MOM"
           ],
           "open_blockers": [],
           "must_not_ask": [
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Nguyễn Thị I, em gọi lại về MAB005 Ms. đang quan tâm ạ",
+          "suggested_opening": "Dạ em chào chị Nguyễn Thị I, em gọi lại về SKU-BDL-MOM chị đang quan tâm ạ",
           "freshness_checks": {},
           "ambiguous_identity": false,
           "generated_at": "2026-10-20T08:00:00",
@@ -28715,11 +28729,12 @@
         "call_date": "2026-10-27",
         "days_later": 7,
         "input_mode": "text",
-        "customer_goal": "Xác nhận đơn hàng máy lọc không khí.",
+        "customer_goal": "Xác nhận mua máy lọc không khí.",
         "customer_turns": [
-          "Alo, chị gọi lại để xác nhận đơn hàng máy lọc không khí.",
-          "Chị sẽ thanh toán bằng chuyển khoản và giao hàng ở Thủ Đức, TP.HCM.",
-          "Mong em lên đơn giúp chị nhé."
+          "Alo, chị đây, hôm trước em tư vấn cho chị máy lọc không khí.",
+          "Chị muốn đặt máy lọc không khí AirPure Y.",
+          "Hình thức thanh toán là chuyển khoản.",
+          "Giao hàng ở Thủ Đức, TP.HCM nhé."
         ],
         "facts_established": {
           "payment": "chuyen_khoan",
@@ -28774,7 +28789,7 @@
           "superseded": {
             "promo_code": "GIFT-FILTER",
             "promo_expiry": "2026-10-22",
-            "order_id": "O018"
+            "order_id": "OD900902"
           }
         },
         "expected_call_brief": {
@@ -28788,11 +28803,11 @@
             "outcome": "hen_goi_lai"
           },
           "products_advised": [
-            "MAB005",
-            "SKU-AP-Y"
+            "SKU-AP-Y",
+            "SKU-BDL-MOM"
           ],
           "open_blockers": [
-            "cần hỏi vợ"
+            "cần hỏi chồng"
           ],
           "must_not_ask": [
             "room_area_m2",
@@ -28803,7 +28818,7 @@
             "order_id",
             "owned_sku"
           ],
-          "suggested_opening": "Dạ em chào Ms. Nguyễn Thị I, em gọi lại về MAB005 Ms. đang quan tâm ạ, không biết cần hỏi vợ chưa ạ?",
+          "suggested_opening": "Dạ em chào chị Nguyễn Thị I, em gọi lại về SKU-AP-Y chị đang quan tâm ạ, không biết cần hỏi chồng chưa ạ?",
           "freshness_checks": {
             "price_changed": false,
             "promos_no_longer_active": [

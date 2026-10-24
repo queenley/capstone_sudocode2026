@@ -135,7 +135,8 @@ export default function ProductArt({
   return (
     <div
       className={`s-art s-art-${size}`}
-      style={{ background: `linear-gradient(145deg, ${art.from}, ${art.to})` }}
+      // The colours are the category's; shop.css draws them (and tones them down in dark mode).
+      style={{ "--art-from": art.from, "--art-to": art.to } as React.CSSProperties}
       aria-hidden="true"
     >
       <svg viewBox="0 0 120 120" className="s-art-icon">

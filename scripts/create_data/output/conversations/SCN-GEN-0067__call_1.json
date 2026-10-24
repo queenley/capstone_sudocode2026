@@ -12,17 +12,12 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Lê Văn G, rất vui được gặp lại anh ạ. Hôm nay anh có hỏi về máy lọc không khí cho phòng khoảng 30 mét vuông và có trẻ nhỏ đúng không ạ?",
+      "text": "Dạ, em chào anh Lê Văn G, em gọi lại về máy lọc không khí AirPure Pro mà anh đã hỏi hôm trước. Anh có nhắc đến diện tích phòng khoảng 30 mét vuông và nhà có trẻ nhỏ, đúng không ạ?",
       "questions": [
         {
           "slot": "room_area_m2",
           "type": "confirm",
-          "text": "Anh có phòng khoảng 30 mét vuông phải không ạ?"
-        },
-        {
-          "slot": "has_children",
-          "type": "confirm",
-          "text": "Nhà anh có trẻ nhỏ đúng không ạ?"
+          "text": "Anh có nhắc đến diện tích phòng khoảng 30 mét vuông và nhà có trẻ nhỏ, đúng không ạ?"
         }
       ],
       "facts_used": [
@@ -39,13 +34,23 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em có thông tin về sản phẩm máy lọc không khí phù hợp với diện tích phòng của anh ạ. Sản phẩm mà em muốn giới thiệu là AirPure Pro, giá 7.690.000đ ạ. Anh có ngân sách khoảng 9 triệu nên sản phẩm này sẽ đáp ứng được ạ.",
-      "questions": [],
+      "text": "Máy lọc không khí AirPure Pro có giá 7.690.000đ, hiện tại đang có khuyến mãi giảm 300.000đ, còn 7.390.000đ. Anh có muốn biết thêm chi tiết về chương trình khuyến mãi này không ạ?",
+      "questions": [
+        {
+          "slot": "price_quoted_vnd",
+          "type": "confirm",
+          "text": "Máy lọc không khí AirPure Pro có giá 7.690.000đ, hiện tại đang có khuyến mãi giảm 300.000đ, còn 7.390.000đ."
+        }
+      ],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
-          "value": 7690000
+          "value": 7390000
+        },
+        {
+          "field": "promo_active",
+          "value": true
         }
       ],
       "tool_calls": [],
@@ -57,18 +62,10 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Máy này hiện đang có khuyến mãi với mã AIR-OCT, giảm 300.000đ, nên giá cuối cùng sẽ là 7.690.000đ ạ. Khuyến mãi này sẽ hết hạn vào ngày 30 tháng 10 năm 2026 ạ.",
+      "text": "Khuyến mãi này sẽ hết hạn vào ngày 30 tháng 10, 2026 ạ. Anh có ngân sách khoảng 9 triệu, vậy mình có thể đặt hàng ngay bây giờ không ạ?",
       "questions": [],
       "facts_used": [],
       "claims": [
-        {
-          "field": "promo_active",
-          "value": true
-        },
-        {
-          "field": "promo_code",
-          "value": "AIR-OCT"
-        },
         {
           "field": "promo_expiry",
           "value": "2026-10-30"
@@ -83,7 +80,26 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em cũng xin nhắc là máy lọc không khí này có tính năng khóa trẻ em, rất an toàn cho gia đình có trẻ nhỏ ạ. Anh có cần thêm thông tin gì không ạ?",
+      "text": "Nếu anh cần thêm thời gian để bàn với gia đình, em hoàn toàn hiểu. Em có thể hẹn gọi lại cho anh vào thời điểm cụ thể nào không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "open",
+          "text": "Em có thể hẹn gọi lại cho anh vào thời điểm cụ thể nào không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin ghi nhận lại là anh sẽ bàn bạc với gia đình và liên hệ lại. Cảm ơn anh đã dành thời gian cho em, em chúc anh một ngày tốt lành ạ!",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -96,7 +112,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Nếu anh cần bàn với gia đình, em rất mong anh sẽ gọi lại sớm ạ. Em sẽ ghi nhận lại thông tin này để chúng ta có thể tiếp tục cuộc trò chuyện ạ. Có thể em sẽ gọi lại sau cho anh để kiểm tra tình hình ạ.",
+      "text": "Dạ em sẽ ghi nhớ lại thông tin này và hẹn gọi lại cho anh trong thời gian sớm nhất. Nếu có thêm câu hỏi nào, anh cứ gọi cho em nhé!",
       "questions": [],
       "facts_used": [],
       "claims": [],

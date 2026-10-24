@@ -12,21 +12,37 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Đinh Văn J, em gọi lại về tình trạng đơn hàng máy hút sữa của anh ạ. Anh đã đặt hàng hôm trước, mã đơn hàng của anh là OD600001 đúng không ạ?",
+      "text": "Dạ, em chào anh Đinh Văn J. Em xin xác nhận anh đang hỏi về tình trạng đơn hàng máy hút sữa điện đôi Spectra S1, đúng không ạ?",
       "questions": [
         {
-          "slot": "order_id",
+          "slot": "product_advised",
           "type": "confirm",
-          "text": "Anh đã đặt hàng hôm trước, mã đơn hàng của anh là OD600001 đúng không ạ?"
+          "text": "Anh đang hỏi về máy hút sữa điện đôi Spectra S1, đúng không ạ?"
         }
       ],
+      "facts_used": [
+        "product_advised",
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, đơn hàng của anh có mã là OD600001 đã được ghi nhận và hiện tại đang trong tình trạng \"đã tạo\" ạ. Anh sẽ nhận được thông tin cập nhật khi đơn hàng được xử lý tiếp theo.",
+      "questions": [],
       "facts_used": [
         "order_id"
       ],
       "claims": [
         {
-          "field": "order_id",
-          "value": "OD600001"
+          "field": "order_status",
+          "value": "created"
         }
       ],
       "tool_calls": [
@@ -45,57 +61,13 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Cảm ơn anh đã xác nhận ạ. Hiện tại đơn hàng của anh với mã OD600001 đã được tạo và đang trong tình trạng xử lý ạ. Giá sản phẩm là 4.290.000đ và phương thức thanh toán là chuyển khoản ạ. Địa chỉ giao hàng là Cầu Giấy, Hà Nội, dự kiến giao trong 1-2 ngày làm việc ạ. Anh có cần thêm thông tin gì không ạ?",
+      "text": "Dạ, đơn hàng của anh sẽ được giao đến Cầu Giấy, Hà Nội. Phương thức thanh toán là chuyển khoản, và giá của máy hút sữa là 4.290.000đ ạ. Anh có cần thêm thông tin gì nữa không ạ?",
       "questions": [],
       "facts_used": [
-        "order_id",
-        "price_quoted_vnd",
+        "delivery_area",
         "payment",
-        "delivery_area"
+        "price_quoted_vnd"
       ],
-      "claims": [
-        {
-          "field": "order_status",
-          "value": "created"
-        },
-        {
-          "field": "price_vnd",
-          "value": 4290000
-        },
-        {
-          "field": "payment",
-          "value": "chuyen_khoan"
-        },
-        {
-          "field": "delivery_area",
-          "value": "Cầu Giấy, Hà Nội"
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Em chưa có thông tin về thời gian giao hàng chính xác hơn, nhưng sẽ cố gắng giao nhanh nhất có thể ạ. Nếu anh có yêu cầu gì thêm hoặc cần thay đổi thông tin, anh cứ cho em biết nhé!",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Nếu mọi thứ đều ổn, em sẽ ghi nhận lại thông tin này và kết thúc cuộc gọi nhé. Cảm ơn anh đã gọi đến Shop BTC! Chúc anh một ngày tốt lành ạ!",
-      "questions": [],
-      "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
@@ -106,7 +78,7 @@
     }
   ],
   "gold": {
-    "intent": "cap_nhat_don",
+    "intent": "Hỏi tình trạng đơn hàng của máy hút sữa.",
     "outcome": "cap_nhat_don",
     "objection_type": null,
     "objection_handling": null,

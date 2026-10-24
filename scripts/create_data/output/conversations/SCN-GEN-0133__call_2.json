@@ -12,36 +12,16 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào chị Lê Văn G. Em gọi lại về máy lọc không khí chị đã hỏi hôm trước, không biết chị có còn chờ cuối tháng nhận lương không ạ?",
+      "text": "Dạ em chào anh Lê Văn G, em gọi lại về SKU-AP-PRO anh đang quan tâm ạ. Em nhớ anh có nhắc đến rào cản là chờ cuối tháng nhận lương, không biết tình hình đã ổn chưa ạ?",
       "questions": [
         {
           "slot": "blocker",
           "type": "confirm",
-          "text": "Chị có còn chờ cuối tháng nhận lương không?"
+          "text": "Anh còn rào cản nào không?"
         }
       ],
       "facts_used": [
-        "blocker"
-      ],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, chị muốn đặt máy lọc không khí AirPure Pro, nồi chiên không dầu Xiaomi 4.5L và quạt đứng Senko TS16, đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Chị muốn đặt máy lọc không khí AirPure Pro, nồi chiên không dầu Xiaomi 4.5L và quạt đứng Senko TS16, đúng không ạ?"
-        }
-      ],
-      "facts_used": [
+        "blocker",
         "product_advised"
       ],
       "claims": [],
@@ -54,10 +34,29 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em đã ghi nhận thêm chị cần màng lọc thay thế cho máy lọc không khí. Tổng tiền cho 4 món này sẽ là 11.160.000đ ạ.",
+      "text": "Dạ anh muốn mua máy lọc không khí AirPure Pro, nồi chiên không dầu Xiaomi và quạt đứng Senko, đúng không ạ?",
       "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cho em hỏi tổng tiền cho tất cả các món này là 11.160.000đ, có phải anh đã chuẩn bị ngân sách là 8 triệu rưỡi và muốn trả bằng chuyển khoản phải không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của anh là 8 triệu rưỡi phải không?"
+        }
+      ],
       "facts_used": [
-        "price_quoted_vnd"
+        "budget_vnd"
       ],
       "claims": [
         {
@@ -74,14 +73,47 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, tổng tiền cho 4 món là 11.160.000đ. Chị muốn trả bằng phương thức nào ạ?",
+      "text": "Em xin xác nhận, anh cần 4 món: máy lọc không khí AirPure Pro giá 7.990.000đ, nồi chiên không dầu Xiaomi giá 1.590.000đ, quạt đứng Senko giá 590.000đ và màng lọc thay thế giá 990.000đ. Giao hàng ở Lê Chân, Hải Phòng và thanh toán bằng chuyển khoản đúng không ạ?",
       "questions": [
         {
-          "slot": "payment",
-          "type": "open",
-          "text": "Chị muốn trả bằng phương thức nào ạ?"
+          "slot": "quantity",
+          "type": "confirm",
+          "text": "Anh cần 4 món phải không?"
         }
       ],
+      "facts_used": [
+        "delivery_area",
+        "quantity"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-AP-PRO",
+          "value": 7990000
+        },
+        {
+          "field": "price_vnd:SKU-AF-XM",
+          "value": 1590000
+        },
+        {
+          "field": "price_vnd:SKU-FAN-SEN",
+          "value": 590000
+        },
+        {
+          "field": "price_vnd:SKU-AP-FLT-P",
+          "value": 990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em sẽ tiến hành tạo đơn hàng cho anh với các sản phẩm sau: máy lọc không khí AirPure Pro, nồi chiên không dầu Xiaomi, quạt đứng Senko và màng lọc thay thế. Tổng giá trị đơn hàng là 11.160.000đ. Anh có đồng ý không ạ?",
+      "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
@@ -93,68 +125,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, chị muốn trả bằng chuyển khoản, đúng không ạ?",
-      "questions": [
-        {
-          "slot": "payment",
-          "type": "confirm",
-          "text": "Chị muốn trả bằng chuyển khoản, đúng không ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em đã ghi nhận chị có ngân sách khoảng 8 triệu rưỡi, nhưng nếu cần chị có thể điều chỉnh một chút, đúng không ạ?",
-      "questions": [
-        {
-          "slot": "budget_vnd",
-          "type": "confirm",
-          "text": "Chị có ngân sách khoảng 8 triệu rưỡi, nhưng nếu cần chị có thể điều chỉnh một chút, đúng không ạ?"
-        }
-      ],
-      "facts_used": [
-        "budget_vnd"
-      ],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, địa chỉ giao hàng của chị là Lê Chân, Hải Phòng, đúng không ạ?",
-      "questions": [
-        {
-          "slot": "delivery_area",
-          "type": "confirm",
-          "text": "Địa chỉ giao hàng của chị là Lê Chân, Hải Phòng, đúng không ạ?"
-        }
-      ],
-      "facts_used": [
-        "delivery_area"
-      ],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, em đã xác nhận đơn hàng của chị với 4 món: máy lọc không khí AirPure Pro, nồi chiên không dầu Xiaomi 4.5L, quạt đứng Senko TS16 và màng lọc thay thế. Tổng tiền là 11.160.000đ, phương thức thanh toán là chuyển khoản và địa chỉ giao hàng là Lê Chân, Hải Phòng. Em sẽ chốt đơn cho chị ngay ạ.",
+      "text": "Dạ em đã tạo đơn hàng thành công với mã đơn là OD600001. Anh sẽ nhận hàng vào ngày 19/11 ạ. Cảm ơn anh đã đặt hàng tại shop chúng em!",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -221,7 +192,7 @@
     }
   ],
   "gold": {
-    "intent": "Đặt hàng",
+    "intent": "Mua hàng",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,

@@ -1,0 +1,194 @@
+{
+  "scenario_id": "SCN-GEN-0055",
+  "level": "M2",
+  "persona": "hai_nguoi_chung_sdt",
+  "hard_case": "chung_sdt_memory_poisoning",
+  "customer_id": "C035",
+  "customer_phone": "0958421083",
+  "customer_name": "Dung",
+  "honorific": "chị",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "hard",
+  "tags": [
+    "hard_case",
+    "identity",
+    "khách_hàng",
+    "mua_hàng",
+    "máy_lọc_nước",
+    "pii",
+    "tư_vấn",
+    "variant:con_roi_me"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR"
+  ],
+  "notes": "variant=con_roi_me; session_index=3",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-11-12",
+      "input_mode": "text",
+      "customer_goal": "Hỏi máy lọc không khí cho phòng 20m² có bé nhỏ",
+      "customer_turns": [
+        "Alo, chị Dung đây. Chị muốn hỏi về máy lọc không khí AirPure Mini cho phòng khoảng 20 mét vuông.",
+        "Nhà chị có trẻ nhỏ nên cần máy này lắm, ngân sách tầm 2 triệu rưỡi thôi.",
+        "Máy này có khuyến mãi gì không em?",
+        "Chị cần suy nghĩ thêm rồi sẽ gọi lại nhé."
+      ],
+      "facts_established": {
+        "room_area_m2": 20,
+        "has_children": true,
+        "budget_vnd": 2500000,
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-AP-MINI",
+        "price_quoted_vnd": 1861500,
+        "promo_code": "11-11",
+        "promo_expiry": "2026-11-12"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "ground_truth_facts": {
+        "price_vnd": 1861500,
+        "list_price_vnd": 2190000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_11-11_active": true,
+        "promo_AIR-2ND-50_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-12"
+      },
+      "memory_expectation": {
+        "room_area_m2": 20,
+        "has_children": true,
+        "budget_vnd": 2500000,
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-AP-MINI",
+        "price_quoted_vnd": 1861500,
+        "promo_code": "11-11",
+        "must_not_write_to": "C034"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "trace_must_not_match": [
+          "\\bLoan\\b"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-11-15",
+      "days_later": 3,
+      "input_mode": "text",
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "C034",
+          "session_id": "S-OLD-3",
+          "date": "2026-10-09",
+          "channel": "hotline",
+          "summary": "Cô Loan hỏi máy lọc nước RO Karofi 9 lõi, nhà ở Cần Thơ, chờ con gái quyết",
+          "outcome": "hen_goi_lai",
+          "stale": false,
+          "facts": {
+            "product_advised": "SKU-WF-RO9",
+            "delivery_area": "Cần Thơ",
+            "decision_maker": "con gái"
+          }
+        }
+      ],
+      "speaker_customer_id": "C034",
+      "customer_goal": "Xác nhận mua máy lọc nước cho gia đình 3 người",
+      "customer_turns": [
+        "Chào em, chị Loan đây. Hôm trước chị đã xem máy lọc nước RO Karofi 9 lõi rồi.",
+        "Chị xác nhận mua cho gia đình 3 người, thanh toán chuyển khoản.",
+        "Địa chỉ giao hàng là Cần Thơ nhé, mình chốt đơn luôn nha."
+      ],
+      "facts_established": {
+        "usage_need": "gia đình 3 người",
+        "budget_vnd": 6000000,
+        "payment": "chuyen_khoan",
+        "delivery_area": "Cần Thơ",
+        "product_advised": "SKU-WF-RO9",
+        "price_quoted_vnd": 5990000,
+        "order_id": "OD600001"
+      },
+      "expected_outcome": "chot_don",
+      "must_carry_over": [
+        "delivery_area",
+        "decision_maker",
+        "product_advised"
+      ],
+      "must_not_ask": [
+        "delivery_area",
+        "decision_maker",
+        "product_advised"
+      ],
+      "ground_truth_facts": {
+        "price_vnd": 5990000,
+        "list_price_vnd": 5990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "estimated_delivery": "2026-11-19",
+        "call_date": "2026-11-15"
+      },
+      "memory_expectation": {
+        "usage_need": "gia đình 3 người",
+        "budget_vnd": 6000000,
+        "payment": "chuyen_khoan",
+        "delivery_area": "Cần Thơ",
+        "product_advised": "SKU-WF-RO9",
+        "price_quoted_vnd": 5990000,
+        "order_id": "OD600001",
+        "must_not_write_to": "C035"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0958421083",
+        "customer_id": "C034",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-09",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai",
+          "summary": "Cô Loan hỏi máy lọc nước RO Karofi 9 lõi, nhà ở Cần Thơ, chờ con gái quyết"
+        },
+        "products_advised": [
+          "SKU-WF-RO9"
+        ],
+        "open_blockers": [],
+        "must_not_ask": [
+          "delivery_area",
+          "decision_maker",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào cô Loan, em gọi lại về SKU-WF-RO9 cô đang quan tâm ạ",
+        "freshness_checks": {},
+        "ambiguous_identity": true,
+        "generated_at": "2026-11-15T08:00:00",
+        "latency_ms": null
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-WF-RO9",
+          "price_vnd": 5990000,
+          "payment": "chuyen_khoan"
+        },
+        "trace_must_not_match": [
+          "\\bDung\\b"
+        ]
+      }
+    }
+  }
+}

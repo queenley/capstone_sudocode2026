@@ -6,9 +6,9 @@
   "customer_id": "SYN-C003",
   "customer_phone": "0998000003",
   "customer_name": "Lê Văn C",
-  "honorific": "Mr.",
+  "honorific": "anh",
   "region": "nam",
-  "category": "unknown",
+  "category": "me-be",
   "difficulty": "normal",
   "tags": [
     "order",
@@ -32,44 +32,44 @@
           "source": "crm_session",
           "customer_id": "SYN-C003",
           "session_id": "SYN-003-S1",
-          "date": "2026-09-01",
+          "date": "2026-05-07",
           "channel": "hotline",
-          "summary": "Tìm hiểu về đồ dùng cho trẻ em",
-          "outcome": "successful",
+          "summary": "Mua Xe đẩy gấp gọn Joie Pact giá 3.490.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_session",
           "customer_id": "SYN-C003",
           "session_id": "SYN-003-S2",
-          "date": "2026-09-02",
+          "date": "2026-10-03",
           "channel": "zalo_oa",
-          "summary": "Yêu cầu hỗ trợ đơn hàng",
-          "outcome": "successful",
+          "summary": "Đặt Xe đẩy 2 chiều Combi Sugocal giá 6.790.000đ, đơn OD900302 đang giao.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C003",
-          "order_id": "O005",
-          "date": "2026-07-22",
-          "sku": "MAB001",
-          "status": "shipping",
+          "order_id": "OD900301",
+          "date": "2026-05-07",
+          "sku": "SKU-MB-STR1",
+          "status": "delivered",
           "stale": false,
           "facts": {
-            "order_id": "O005"
+            "owned_sku": "SKU-MB-STR1"
           }
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C003",
-          "order_id": "O006",
-          "date": "2026-09-05",
-          "sku": "MAB002",
-          "status": "delivered",
+          "order_id": "OD900302",
+          "date": "2026-10-03",
+          "sku": "SKU-MB-STR2",
+          "status": "shipping",
           "stale": false,
           "facts": {
-            "owned_sku": "MAB002"
+            "order_id": "OD900302"
           }
         }
       ],
@@ -93,14 +93,15 @@
       "success_if": {
         "tool_called": "order.status",
         "args_match": {
-          "order_id": "O006"
+          "order_id": "OD900302"
         },
         "also_ordered": [],
         "total_match_vnd": null,
         "brief_must_contain": [],
         "must_say_any": [
-          "đã giao",
-          "giao thành công"
+          "đang giao",
+          "đang vận chuyển",
+          "đã bàn giao"
         ],
         "agent_must_say": [],
         "must_not_call_tools": [],
@@ -109,8 +110,9 @@
         "max_agent_questions": null
       },
       "ground_truth_facts": {
-        "order_id": "O006",
-        "order_status": "delivered",
+        "order_id": "OD900302",
+        "order_status": "shipping",
+        "tracking": "VN0032TRK",
         "call_date": "2026-10-17"
       },
       "memory_expectation": {},
@@ -120,20 +122,20 @@
         "is_returning": true,
         "n_previous_sessions": 2,
         "last_session": {
-          "date": "2026-09-02",
+          "date": "2026-10-03",
           "channel": "zalo_oa",
-          "outcome": "successful",
-          "summary": "Yêu cầu hỗ trợ đơn hàng"
+          "outcome": "chot_don",
+          "summary": "Đặt Xe đẩy 2 chiều Combi Sugocal giá 6.790.000đ, đơn OD900302 đang giao."
         },
         "products_advised": [
-          "MAB002"
+          "SKU-MB-STR1"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Lê Văn C, em gọi lại về MAB002 Mr. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào anh Lê Văn C, em gọi lại về SKU-MB-STR1 anh đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-10-17T08:00:00",
@@ -144,17 +146,17 @@
         {
           "name": "order.status",
           "args": {
-            "order_id": "O006"
+            "order_id": "OD900302"
           },
           "result": {
             "orders": [
               {
-                "order_id": "O006",
-                "sku": "MAB002",
-                "price_vnd": 950000,
-                "date": "2026-09-05",
-                "status": "delivered",
-                "tracking": null
+                "order_id": "OD900302",
+                "sku": "SKU-MB-STR2",
+                "price_vnd": 6790000,
+                "date": "2026-10-03",
+                "status": "shipping",
+                "tracking": "VN0032TRK"
               }
             ]
           }
@@ -192,7 +194,7 @@
       "success_if": {
         "tool_called": "order.update",
         "args_match": {
-          "order_id": "O006",
+          "order_id": "OD900302",
           "action": "update_address"
         },
         "also_ordered": [],
@@ -206,8 +208,9 @@
         "max_agent_questions": null
       },
       "ground_truth_facts": {
-        "order_id": "O006",
-        "order_status": "delivered",
+        "order_id": "OD900302",
+        "order_status": "shipping",
+        "tracking": "VN0032TRK",
         "call_date": "2026-10-19"
       },
       "memory_expectation": {
@@ -224,14 +227,14 @@
           "outcome": "cap_nhat_don"
         },
         "products_advised": [
-          "MAB002"
+          "SKU-MB-STR1"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Mr. Lê Văn C, em gọi lại về MAB002 Mr. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào anh Lê Văn C, em gọi lại về SKU-MB-STR1 anh đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-10-19T08:00:00",
@@ -242,12 +245,12 @@
         {
           "name": "order.update",
           "args": {
-            "order_id": "O006",
+            "order_id": "OD900302",
             "action": "update_address",
             "on": "2026-10-19"
           },
           "result": {
-            "order_id": "O006",
+            "order_id": "OD900302",
             "action": "update_address",
             "status": "updated"
           }

@@ -7,27 +7,41 @@
   "channel": "hotline",
   "date": "2026-10-31",
   "region": "bac",
-  "category": "unknown",
+  "category": "gia-dung/may-loc-khong-khi",
   "persona": "khach_co_don_chua_co_lich_su",
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào Ms. Phạm Thị D, em gọi lại về đơn hàng của chị ạ. Chị đã đặt hàng HAP004 vào ngày 18 tháng 6, hiện tại đơn hàng đang ở trạng thái xử lý ạ.",
+      "text": "Dạ, em chào chị Phạm Thị D, em gọi lại về đơn hàng của chị ạ. Chị có mã đơn là OD900402 đúng không ạ?",
       "questions": [
         {
           "slot": "order_id",
           "type": "confirm",
-          "text": "Đơn hàng chị đặt hôm 18 tháng 6 phải không ạ?"
+          "text": "Chị có mã đơn là OD900402 đúng không ạ?"
         }
       ],
       "facts_used": [
-        "owned_sku",
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, đơn hàng của chị có mã OD900402 hiện tại đang ở trạng thái \"đang xử lý\" ạ. Chị có cần thêm thông tin gì không ạ?",
+      "questions": [],
+      "facts_used": [
         "order_id"
       ],
       "claims": [
         {
           "field": "order_id",
-          "value": "O008"
+          "value": "OD900402"
         },
         {
           "field": "order_status",
@@ -38,7 +52,7 @@
         {
           "name": "order.status",
           "args": {
-            "order_id": "O008"
+            "order_id": "OD900402"
           }
         }
       ],
@@ -49,22 +63,10 @@
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Vâng, đúng rồi.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
       "speaker": "agent_ai",
-      "text": "Cảm ơn chị đã xác nhận. Đơn hàng của chị đang được xử lý và sẽ được giao trong thời gian sớm nhất. Nếu chị cần thêm thông tin gì, em xin sẵn lòng hỗ trợ ạ.",
+      "text": "Dạ, nếu chị cần theo dõi đơn hàng, em sẽ gửi mã vận đơn qua Zalo cho chị nhé. Chị có cần hỗ trợ gì thêm không ạ?",
       "questions": [],
-      "facts_used": [
-        "order_id",
-        "owned_sku"
-      ],
+      "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
@@ -75,7 +77,7 @@
     }
   ],
   "gold": {
-    "intent": "Hỏi tình trạng đơn hàng của mình.",
+    "intent": "cap_nhat_don",
     "outcome": "cap_nhat_don",
     "objection_type": null,
     "objection_handling": null,

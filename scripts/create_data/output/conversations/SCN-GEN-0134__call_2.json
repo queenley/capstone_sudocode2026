@@ -12,60 +12,47 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em chào Mr. Trần Văn H, em gọi lại để xác nhận về đơn đặt hàng máy lọc không khí mà anh đã quan tâm. Anh đã chọn thanh toán COD phải không ạ?",
+      "text": "Dạ, em chào anh Trần Văn H. Em gọi lại để xác nhận đơn hàng máy lọc không khí SKU-XM-4P với giá 5.490.000đ, đúng không ạ?",
       "questions": [
         {
-          "slot": "payment",
+          "slot": "product_advised",
           "type": "confirm",
-          "text": "Anh đã chọn thanh toán COD phải không ạ?"
+          "text": "Anh có xác nhận muốn mua máy lọc không khí SKU-XM-4P không?"
         }
       ],
-      "facts_used": [
-        "payment",
-        "product_advised"
-      ],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Cảm ơn anh đã xác nhận. Đơn hàng sẽ được giao đến Nha Trang, Khánh Hòa đúng không ạ?",
-      "questions": [
-        {
-          "slot": "delivery_area",
-          "type": "confirm",
-          "text": "Đơn hàng sẽ được giao đến Nha Trang, Khánh Hòa đúng không ạ?"
-        }
-      ],
-      "facts_used": [
-        "delivery_area"
-      ],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Em xin xác nhận lại đơn hàng của anh: máy lọc không khí SKU-XM-4P, giá là 5.490.000đ, thanh toán COD và sẽ giao hàng cho anh ở Nha Trang, Khánh Hòa vào ngày 05/11/2026. Anh có đồng ý không ạ?",
-      "questions": [],
       "facts_used": [
         "product_advised",
-        "price_quoted_vnd",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-XM-4P"
+        },
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Cảm ơn anh đã xác nhận. Đơn hàng sẽ được thanh toán bằng COD và giao hàng đến Nha Trang, Khánh Hòa. Thời gian giao hàng dự kiến là ngày 05 tháng 11 ạ.",
+      "questions": [],
+      "facts_used": [
+        "payment",
         "delivery_area"
       ],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 5490000
+          "field": "payment",
+          "value": "COD"
         },
         {
           "field": "estimated_delivery",
@@ -81,14 +68,34 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em sẽ tiến hành chốt đơn hàng cho anh ngay bây giờ. Một chút thông tin nữa, đơn hàng của anh là máy lọc không khí SKU-XM-4P, giá 5.490.000đ, thanh toán COD và địa chỉ giao hàng là Nha Trang, Khánh Hòa. Em sẽ tạo đơn hàng ngay bây giờ.",
+      "text": "Dạ, em xin đọc lại thông tin đơn hàng để xác nhận: anh đặt 1 máy lọc không khí SKU-XM-4P, giá 5.490.000đ, thanh toán COD và giao hàng ở Nha Trang, Khánh Hòa. Anh có cần thêm thông tin gì không ạ?",
       "questions": [],
       "facts_used": [
-        "product_advised",
         "price_quoted_vnd",
-        "payment",
         "delivery_area"
       ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "delivery_area",
+          "value": "Nha Trang, Khánh Hòa"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ tiến hành tạo đơn hàng cho anh ngay bây giờ.",
+      "questions": [],
+      "facts_used": [],
       "claims": [],
       "tool_calls": [
         {
@@ -117,21 +124,17 @@
     }
   ],
   "gold": {
-    "intent": "Xác nhận mua máy lọc không khí.",
+    "intent": "Xác nhận đơn hàng",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
-    "sentiment": "neutral",
+    "sentiment": "positive",
     "decision_maker": null,
     "commitments": [],
     "supersedes": [],
     "callback": null,
     "order": {
-      "order_id": "OD600001",
-      "status": "created",
-      "total_vnd": 5490000,
-      "needs_confirmation_call": true,
-      "estimated_delivery": "2026-11-05"
+      "order_id": "OD600001"
     }
   }
 }

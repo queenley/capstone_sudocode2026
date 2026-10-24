@@ -1,6 +1,6 @@
 # Data generation report
 
-_Generated 2026-10-11 23:35. Visual version: [validation_report.html](validation_report.html)._
+_Generated 2026-10-24 05:50. Visual version: [validation_report.html](validation_report.html)._
 
 Generated records are not golden until they pass rules and the judge (or a human approves them).
 
@@ -11,18 +11,18 @@ xychart-beta horizontal
     title "Progress toward M2 targets (%, capped at 100)"
     x-axis ["Transcript conversations (one per call)", "Audio calls", "Audio duration (hours)", "Customers with ≥2 sessions", "Customers with ≥2 channels", "Product categories", "Category × region pairs", "SKUs incl. variants", "Noisy audio ratio (known status)", "Scenarios"]
     y-axis "% of requirement" 0 --> 100
-    bar [100, 100, 25, 100, 40, 100, 100, 100, 100, 100]
+    bar [100, 100, 22, 100, 40, 100, 100, 100, 100, 100]
 ```
 
 | Metric | Required | Current | Status |
 |---|---:|---:|---|
 | Transcript conversations (one per call) | 250 | 325 | ✓ PASS |
-| Audio calls | 100 | 218 | ✓ PASS |
-| Audio duration (hours) | 3 | 0.74 | ○ PENDING |
+| Audio calls | 100 | 186 | ✓ PASS |
+| Audio duration (hours) | 3 | 0.65 | ○ PENDING |
 | Customers with ≥2 sessions | 60 | 60 | ✓ PASS |
 | Customers with ≥2 channels | 30 | 12 | ○ PENDING |
 | Product categories | 3 | 3 | ✓ PASS |
-| Category × region pairs | 9 | 12 | ✓ PASS |
+| Category × region pairs | 9 | 9 | ✓ PASS |
 | SKUs incl. variants | 100 | 136 | ✓ PASS |
 | Noisy audio ratio (known status) | 20% | 52% | ✓ PASS |
 | Scenarios | 40 | 150 | ✓ PASS |
@@ -39,10 +39,10 @@ xychart-beta horizontal
 
 | Metric | Calls with labels | Labels | Reference transcript score |
 |---|---:|---:|---|
-| CCR | 210 | 956 | 43.7 |
-| RQR | 210 | 803 | 3.3 |
-| TSR | 165 | 165 | 63.2 |
-| HR | 101 | 306 | 1.0 |
+| CCR | 210 | 956 | 42.2 |
+| RQR | 210 | 803 | 2.9 |
+| TSR | 165 | 165 | 66.3 |
+| HR | 101 | 306 | 0.5 |
 | Over-escalation | 88 | 9 | 3 |
 
 ## Official scores (BTC reference_eval.py)
@@ -50,7 +50,7 @@ xychart-beta horizontal
 | Trace | RQR | CCR | TSR | TSR_hard_cases | HR | HR_price_promo | guardrail_violations |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | oracle | 0.0 | 100.0 | 100.0 | 100.0 | 0.0 | 0.0 | 0 |
-| reference | 3.3 | 43.7 | 63.2 | 54.4 | 1.0 | 0.0 | 3 |
+| reference | 2.9 | 42.2 | 66.3 | 58.6 | 0.5 | 0.0 | 3 |
 
 Oracle perfect (every label satisfiable with BTC mock_tools): **True**. Score the agent with `data/eval/reference_eval.py --scenarios output/test_set --trace <agent trace>`.
 
@@ -99,30 +99,30 @@ Not measured yet: `python -m src.pipeline.judge_agreement --export` then `--inge
 ## Simulator repeatability
 
 - Replays: 975 across 3 seeds.
-- TSR across seeds: 68.3 ± 0.0 points (within the ≤ 10-point BTC tolerance).
+- TSR across seeds: 66.8 ± 0.0 points (within the ≤ 10-point BTC tolerance).
 
 ## Audio analysis
 
 ```mermaid
 xychart-beta horizontal
     title "Audio turns by noise type"
-    x-axis ["clean", "street", "cafe", "weak_signal", "wind", "unknown"]
-    y-axis "turns" 0 --> 423.5
-    bar [385, 110, 108, 101, 99, 2]
+    x-axis ["clean", "cafe", "street", "weak_signal", "wind", "unknown"]
+    y-axis "turns" 0 --> 366.3
+    bar [333, 97, 96, 86, 85, 2]
 ```
 
 ```mermaid
 xychart-beta horizontal
     title "Customers by number of audio calls"
     x-axis ["2 calls", "3 calls", "4 calls", "5 calls", "6 calls", "8 calls", "11 calls"]
-    y-axis "customers" 0 --> 23.1
-    bar [21, 6, 20, 9, 1, 2, 1]
+    y-axis "customers" 0 --> 18.7
+    bar [17, 5, 16, 8, 1, 2, 1]
 ```
 
 
-- **805 customer turns** in **218 calls** from 100 scenarios and 60 customers; **0.74 h** total (mean 3.32 s/turn, 12.27 s/call), 36 distinct voices.
-- Customers with ≥2 audio calls: 60 · with ≥2 channels: 11.
-- Noisy turns: 418/803 with known status (52%); calls with ≥1 noisy turn: 197/218 (90%).
+- **699 customer turns** in **186 calls** from 85 scenarios and 50 customers; **0.65 h** total (mean 3.32 s/turn, 12.5 s/call), 35 distinct voices.
+- Customers with ≥2 audio calls: 50 · with ≥2 channels: 9.
+- Noisy turns: 364/697 with known status (52%); calls with ≥1 noisy turn: 172/186 (92%).
 
 > 2 turns have no TTS metadata (noise/voice unknown). Re-run `synthesize_scenario_audio` for those scenarios to restore it.
 
@@ -130,46 +130,46 @@ xychart-beta horizontal
 
 | Noise | Turns | Share of turns | Minutes |
 |---|---:|---:|---:|
-| clean | 385 | 48% | 21.28 |
-| street | 110 | 14% | 5.92 |
-| cafe | 108 | 13% | 6.03 |
-| weak_signal | 101 | 13% | 5.72 |
-| wind | 99 | 12% | 5.5 |
+| clean | 333 | 48% | 18.4 |
+| cafe | 97 | 14% | 5.45 |
+| street | 96 | 14% | 5.14 |
+| weak_signal | 86 | 12% | 4.92 |
+| wind | 85 | 12% | 4.69 |
 | unknown | 2 | 0% | 0.13 |
 
-SNR (dB) of noisy turns: 6 dB × 418
+SNR (dB) of noisy turns: 6 dB × 364
 
 ### By channel
 
 | Channel | Calls | Turns | Customers | Minutes | Noisy turns | Noise mix |
 |---|---:|---:|---:|---:|---:|---|
-| chat_fanpage | 12 | 49 | 10 | 2.89 | 23/49 (47%) | cafe 4, clean 26, street 5, weak_signal 9, wind 5 |
-| hotline | 199 | 731 | 60 | 40.27 | 380/729 (52%) | cafe 98, clean 349, street 103, unknown 2, weak_signal 87, wind 92 |
+| chat_fanpage | 10 | 40 | 8 | 2.43 | 20/40 (50%) | cafe 4, clean 20, street 4, weak_signal 7, wind 5 |
+| hotline | 170 | 638 | 50 | 35.08 | 332/636 (52%) | cafe 88, clean 304, street 91, unknown 2, weak_signal 74, wind 79 |
 | unknown | 1 | 2 | 1 | 0.13 | 1/2 (50%) | clean 1, weak_signal 1 |
-| zalo_oa | 6 | 23 | 6 | 1.28 | 14/23 (61%) | cafe 6, clean 9, street 2, weak_signal 4, wind 2 |
+| zalo_oa | 5 | 19 | 5 | 1.1 | 11/19 (58%) | cafe 5, clean 8, street 1, weak_signal 4, wind 1 |
 
 ### By input mode
 
 | Mode | Calls | Turns | Customers | Minutes | Noisy turns | Noise mix |
 |---|---:|---:|---:|---:|---:|---|
-| asr_transcript | 12 | 48 | 5 | 2.23 | 22/48 (46%) | cafe 8, clean 26, street 5, weak_signal 4, wind 5 |
-| chat_teencode | 6 | 24 | 6 | 1.41 | 8/24 (33%) | cafe 2, clean 16, street 3, weak_signal 1, wind 2 |
-| text | 200 | 733 | 57 | 40.93 | 388/731 (53%) | cafe 98, clean 343, street 102, unknown 2, weak_signal 96, wind 92 |
+| asr_transcript | 10 | 40 | 4 | 1.84 | 17/40 (42%) | cafe 6, clean 23, street 4, weak_signal 3, wind 4 |
+| chat_teencode | 5 | 20 | 5 | 1.17 | 8/20 (40%) | cafe 2, clean 12, street 3, weak_signal 1, wind 2 |
+| text | 171 | 639 | 48 | 35.73 | 339/637 (53%) | cafe 89, clean 298, street 89, unknown 2, weak_signal 82, wind 79 |
 
 ### Distinct voices by region and gender
 
 | Region | Gender | Voices | Calls | Turns | Customers |
 |---|---|---:|---:|---:|---:|
-| bac | female | 6 | 38 | 140 | 11 |
+| bac | female | 6 | 24 | 90 | 7 |
 | bac | male | 3 | 29 | 108 | 8 |
-| nam | female | 9 | 39 | 141 | 11 |
+| nam | female | 8 | 31 | 116 | 8 |
 | nam | male | 7 | 30 | 118 | 9 |
-| trung | female | 9 | 63 | 221 | 16 |
+| trung | female | 9 | 53 | 190 | 13 |
 | trung | male | 4 | 19 | 77 | 5 |
 
 ### Calls per customer
 
-Distribution — 2 call(s): 21 customers, 3 call(s): 6 customers, 4 call(s): 20 customers, 5 call(s): 9 customers, 6 call(s): 1 customers, 8 call(s): 2 customers, 11 call(s): 1 customers.
+Distribution — 2 call(s): 17 customers, 3 call(s): 5 customers, 4 call(s): 16 customers, 5 call(s): 8 customers, 6 call(s): 1 customers, 8 call(s): 2 customers, 11 call(s): 1 customers.
 
 | Customer | Name | Region | Scenarios | Audio calls | Turns | Minutes | Channels | Noisy turns |
 |---|---|---|---:|---:|---:|---:|---|---:|
@@ -185,7 +185,6 @@ Distribution — 2 call(s): 21 customers, 3 call(s): 6 customers, 4 call(s): 20 
 | C021 | Yến | trung | 2 | 5 | 17 | 1.0 | hotline ×5 | 5/17 |
 | C024 | Kiên | trung | 2 | 5 | 20 | 1.0 | hotline ×5 | 15/20 |
 | C026 | Dũng | trung | 2 | 5 | 18 | 0.9 | hotline ×5 | 10/18 |
-| SYN-C004 | Phạm Thị D | bac | 2 | 5 | 17 | 0.8 | chat_fanpage ×1, zalo_oa ×1, hotline ×3 | 9/17 |
 | C001 | Hoa | bac | 2 | 4 | 15 | 0.8 | hotline ×4 | 7/15 |
 | C002 | Tuấn | nam | 2 | 4 | 13 | 0.7 | hotline ×4 | 4/13 |
 | C003 | Lan | trung | 2 | 4 | 11 | 0.7 | hotline ×4 | 6/11 |
@@ -202,19 +201,20 @@ Distribution — 2 call(s): 21 customers, 3 call(s): 6 customers, 4 call(s): 20 
 | C020 | Sơn | bac | 2 | 4 | 16 | 0.8 | hotline ×4 | 9/16 |
 | C038 | Diệp | trung | 2 | 4 | 13 | 0.7 | hotline ×4 | 6/13 |
 | C042 | Nga | trung | 2 | 4 | 15 | 0.8 | hotline ×4 | 10/15 |
-| SYN-C001 | Nguyễn Văn A | bac | 2 | 4 | 12 | 0.7 | hotline ×3, chat_fanpage ×1 | 3/12 |
-| SYN-C002 | Trần Thị B | trung | 2 | 4 | 11 | 0.6 | hotline ×4 | 6/11 |
-| SYN-C003 | Lê Văn C | nam | 2 | 4 | 13 | 0.8 | hotline ×4 | 9/13 |
-| SYN-C005 | Đỗ Minh E | trung | 2 | 4 | 12 | 0.6 | hotline ×4 | 9/12 |
 | C028 | Tú | bac | 1 | 3 | 11 | 0.6 | chat_fanpage ×1, zalo_oa ×1, hotline ×1 | 7/11 |
 | C030 | Việt | nam | 1 | 3 | 9 | 0.4 | hotline ×3 | 5/9 |
 | C033 | Loan | trung | 1 | 3 | 10 | 0.6 | hotline ×3 | 4/10 |
 | C037 | Toàn | nam | 1 | 3 | 11 | 0.5 | hotline ×3 | 6/11 |
 | C049 | Trung | nam | 1 | 3 | 12 | 0.5 | hotline ×3 | 4/12 |
-| SYN-C010 | Đinh Văn J | bac | 1 | 3 | 9 | 0.5 | hotline ×3 | 2/9 |
 | C022 | Bảo | nam | 1 | 2 | 13 | 0.6 | hotline ×2 | 8/13 |
+| C023 | Thu | bac | 1 | 2 | 8 | 0.5 | hotline ×2 | 4/8 |
+| C025 | Nhung | bac | 1 | 2 | 8 | 0.4 | hotline ×2 | 4/8 |
+| C027 | Chi | bac | 1 | 2 | 7 | 0.4 | chat_fanpage ×1, hotline ×1 | 4/7 |
+| C029 | Hà | bac | 1 | 2 | 12 | 0.6 | hotline ×2 | 10/12 |
+| C032 | Tâm | trung | 1 | 2 | 6 | 0.4 | hotline ×2 | 2/4 |
+| C036 | Phương | nam | 1 | 2 | 10 | 0.5 | hotline ×2 | 7/10 |
 
-_20 more customers in `audio_statistics.json`._
+_10 more customers in `audio_statistics.json`._
 
 ## Review funnel
 
@@ -223,11 +223,11 @@ xychart-beta horizontal
     title "Reference transcripts through the gates"
     x-axis ["Generated", "Rule pass", "Judge pass", "Human approved", "Golden"]
     y-axis "conversations" 0 --> 357.5
-    bar [325, 18, 16, 0, 0]
+    bar [325, 16, 14, 0, 0]
 ```
 
-Generated **325** → Rule pass **18** → Judge pass **16** → Human approved **0** → Golden **0**
+Generated **325** → Rule pass **16** → Judge pass **14** → Human approved **0** → Golden **0**
 
 - CRM profiles: 60 (incl. synthetic when generated)
-- Model API requests: 854 · cache hits: 51 · prompt tokens: 4956552 · output tokens: 315350
+- Model API requests: 1015 · cache hits: 51 · prompt tokens: 5906562 · output tokens: 371992
 - ElevenLabs characters: 36235

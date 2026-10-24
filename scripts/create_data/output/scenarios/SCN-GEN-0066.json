@@ -6,18 +6,18 @@
   "customer_id": "SYN-C006",
   "customer_phone": "0998000006",
   "customer_name": "Nguyễn Thị F",
-  "honorific": "Ms.",
+  "honorific": "chị",
   "region": "nam",
   "category": "gia-dung/may-loc-khong-khi",
   "difficulty": "hard",
   "tags": [
+    "giao_hàng",
     "hard_case",
-    "may_loc_khong_khi",
-    "mua_hang",
-    "thanh_toan_COD",
     "ttl",
-    "tu_van",
-    "variant:quay_lai_sau_8_thang"
+    "tư_vấn",
+    "variant:quay_lai_sau_8_thang",
+    "xác_nhận",
+    "đơn_hàng"
   ],
   "metric_focus": [
     "CCR",
@@ -36,52 +36,53 @@
           "source": "crm_session",
           "customer_id": "SYN-C006",
           "session_id": "SYN-006-S1",
-          "date": "2026-09-01",
+          "date": "2026-03-16",
           "channel": "hotline",
-          "summary": "Tìm hiểu sản phẩm cho trẻ sơ sinh",
-          "outcome": "successful",
-          "stale": false
+          "summary": "Mua Máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
         },
         {
           "source": "crm_session",
           "customer_id": "SYN-C006",
           "session_id": "SYN-006-S2",
-          "date": "2026-09-02",
+          "date": "2026-10-06",
           "channel": "zalo_oa",
-          "summary": "Phản hồi về chất lượng sản phẩm",
-          "outcome": "successful",
+          "summary": "Đặt Bình sữa Pigeon PPSU 240ml giá 289.000đ, đơn OD900602 đang xử lý.",
+          "outcome": "chot_don",
           "stale": false
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C006",
-          "order_id": "O011",
-          "date": "2026-08-20",
-          "sku": "MAB003",
-          "status": "processing",
+          "order_id": "OD900601",
+          "date": "2026-03-16",
+          "sku": "SKU-MB-STER",
+          "status": "delivered",
           "stale": false,
           "facts": {
-            "order_id": "O011"
+            "owned_sku": "SKU-MB-STER"
           }
         },
         {
           "source": "crm_order",
           "customer_id": "SYN-C006",
-          "order_id": "O012",
-          "date": "2026-09-30",
-          "sku": "MAB004",
-          "status": "delivered",
+          "order_id": "OD900602",
+          "date": "2026-10-06",
+          "sku": "SKU-MB-BOT",
+          "status": "processing",
           "stale": false,
           "facts": {
-            "owned_sku": "MAB004"
+            "order_id": "OD900602"
           }
         }
       ],
-      "customer_goal": "Mua máy lọc không khí Samsung AX40",
+      "customer_goal": "Xác nhận đơn hàng máy lọc không khí Samsung AX40",
       "customer_turns": [
-        "Alo, chị muốn xác nhận mua máy lọc không khí Samsung AX40.",
-        "Chị sẽ thanh toán bằng COD và giao hàng ở Thủ Đức, TP.HCM.",
-        "Diện tích phòng chị là 40 mét vuông và nhà có trẻ nhỏ."
+        "Alo, chị gọi lại để xác nhận mua máy lọc không khí Samsung AX40.",
+        "Chị muốn thanh toán COD và giao hàng ở Thủ Đức, TP.HCM.",
+        "Diện tích phòng của chị khoảng 40m² và có bé nhỏ ở nhà.",
+        "Ngân sách của chị là dưới 6 triệu rưỡi."
       ],
       "facts_established": {
         "room_area_m2": 40,
@@ -127,7 +128,7 @@
         "promo_code": "NAM-SHIP0",
         "order_id": "OD600001",
         "superseded": {
-          "order_id": "O011"
+          "order_id": "OD900602"
         }
       },
       "expected_call_brief": {
@@ -136,20 +137,20 @@
         "is_returning": true,
         "n_previous_sessions": 2,
         "last_session": {
-          "date": "2026-09-02",
+          "date": "2026-10-06",
           "channel": "zalo_oa",
-          "outcome": "successful",
-          "summary": "Phản hồi về chất lượng sản phẩm"
+          "outcome": "chot_don",
+          "summary": "Đặt Bình sữa Pigeon PPSU 240ml giá 289.000đ, đơn OD900602 đang xử lý."
         },
         "products_advised": [
-          "MAB004"
+          "SKU-MB-STER"
         ],
         "open_blockers": [],
         "must_not_ask": [
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Ms. Nguyễn Thị F, em gọi lại về MAB004 Ms. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào chị Nguyễn Thị F, em gọi lại về SKU-MB-STER chị đang quan tâm ạ",
         "freshness_checks": {},
         "ambiguous_identity": false,
         "generated_at": "2026-10-17T08:00:00",
@@ -169,11 +170,12 @@
       "call_date": "2027-06-14",
       "days_later": 240,
       "input_mode": "text",
-      "customer_goal": "Hỏi thêm về máy lọc không khí",
+      "customer_goal": "Hỏi thêm thông tin về máy lọc không khí",
       "customer_turns": [
-        "Chị nhớ hôm trước có nói về máy lọc không khí Samsung AX40.",
-        "Chị muốn hỏi thêm về giá và khuyến mãi.",
-        "Chưa chốt đơn vì cần thời gian suy nghĩ thêm."
+        "Chào em, hôm trước chị đã hỏi về máy lọc không khí Samsung AX40, chị muốn biết thêm một số thông tin.",
+        "Máy này hiện tại có khuyến mãi gì không em?",
+        "Giá có thể thay đổi không? Chị cần hỏi thêm một số thứ trước khi quyết định.",
+        "Chị sẽ gọi lại sau nhé!"
       ],
       "facts_established": {
         "product_advised": "SKU-SS-AX40",
@@ -215,7 +217,7 @@
           "outcome": "chot_don"
         },
         "products_advised": [
-          "MAB004",
+          "SKU-MB-STER",
           "SKU-SS-AX40"
         ],
         "open_blockers": [],
@@ -223,7 +225,7 @@
           "order_id",
           "owned_sku"
         ],
-        "suggested_opening": "Dạ em chào Ms. Nguyễn Thị F, em gọi lại về MAB004 Ms. đang quan tâm ạ",
+        "suggested_opening": "Dạ em chào chị Nguyễn Thị F, em gọi lại về SKU-MB-STER chị đang quan tâm ạ",
         "freshness_checks": {
           "price_changed": false,
           "promos_no_longer_active": [

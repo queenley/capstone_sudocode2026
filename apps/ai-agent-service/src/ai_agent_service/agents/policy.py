@@ -125,7 +125,9 @@ class PolicyAgent(BaseAgent):
         try:
             decision = await self.evaluate(json.loads(json.dumps(state, ensure_ascii=False, default=str)), QUESTIONS)
         except JevUnavailable as unavailable:
-            logger.info("Policy check skipped: %s", unavailable.code)
+            # The message, not only the code: the gateway's codes hide the cause
+            # (``no_providers_available`` is its answer to a free-tier account).
+            logger.info("Policy check skipped: %s", unavailable)
             return PolicyVerdict(True, decided_by=f"skipped:{unavailable.code}")
         probabilities = {name: float(answer.probability or 0.0) for name, answer in decision.answers.items()}
         failed = [name for name, p in probabilities.items() if p >= THRESHOLDS[name]]

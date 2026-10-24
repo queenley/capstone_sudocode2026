@@ -21,7 +21,7 @@ import logging
 import os
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import yaml
 from dotenv import load_dotenv
@@ -79,6 +79,7 @@ PROVIDER_ENV_VAR = {
     "nvidia": "NVIDIA_API_KEY",
     "openai": "OPENAI_API_KEY",
     "vercel_gateway": "AI_GATEWAY_API_KEY",
+    "typesafe": "TYPESAFE_API_KEY",
 }
 
 
@@ -96,6 +97,7 @@ class Secrets(BaseSettings):
     nvidia_api_key: str | None = None
     openai_api_key: str | None = None
     ai_gateway_api_key: str | None = None
+    typesafe_api_key: str | None = None
 
 
 class RateLimits(BaseModel):
@@ -202,7 +204,13 @@ class EvaluationProvider(BaseModel):
     model_config = {"extra": "forbid"}
 
     label: str
+    #: The request and answer format: Vercel AI Gateway's ``POST <base_url>/evaluate``,
+    #: or TypeSafe's own ``POST <base_url>/systemone`` (``src/llm/jev.py`` translates).
+    api: Literal["gateway", "typesafe"] = "gateway"
     base_url: str
+    #: An environment variable whose value, when set, is the whole endpoint
+    #: instead of ``base_url`` plus the API's path (``JEV_URL``).
+    url_env: str | None = None
     models_url: str
     models: list[str] = Field(default_factory=list)
     zero_data_retention: bool = True
@@ -311,10 +319,14 @@ class ModelsConfig(BaseModel):
                 f"{MODELS_YAML}: {routing.model!r} is not listed under "
                 f"evaluation_providers.{routing.provider}.models"
             )
+        path = "/systemone" if block.api == "typesafe" else "/evaluate"
+        override = os.environ.get(block.url_env, "").strip() if block.url_env else ""
         return {
             "provider": routing.provider,
             "model": routing.model,
+            "api": block.api,
             "base_url": block.base_url.rstrip("/"),
+            "url": override.rstrip("/") or block.base_url.rstrip("/") + path,
             "timeout": routing.timeout,
             "zero_data_retention": block.zero_data_retention,
             "rate_limits": {

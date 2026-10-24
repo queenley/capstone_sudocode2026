@@ -7,58 +7,22 @@
   "channel": "hotline",
   "date": "2026-10-18",
   "region": "trung",
-  "category": "unknown",
+  "category": "thoi-trang/giay",
   "persona": "khach_co_don_chua_co_lich_su",
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào Ms. Trần Thị B, em gọi lại về đơn hàng của chị ạ. Chị muốn đổi địa chỉ giao hàng cho đơn hàng O004 đúng không ạ?",
+      "text": "Dạ, em chào chị Trần Thị B, em gọi lại về đơn hàng giày sneaker Urban Classic của chị. Chị muốn đổi địa chỉ giao hàng phải không ạ?",
       "questions": [
         {
-          "slot": "order_id",
+          "slot": "owned_sku",
           "type": "confirm",
-          "text": "Chị muốn đổi địa chỉ giao hàng cho đơn hàng O004 đúng không ạ?"
+          "text": "Địa chỉ giao hàng của chị hiện tại là Hải Châu, Đà Nẵng phải không ạ?"
         }
       ],
       "facts_used": [
-        "order_id"
-      ],
-      "claims": [
-        {
-          "field": "order_id",
-          "value": "O004"
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Đúng rồi, em.",
-      "facts_stated": {
-        "order_id": "O004"
-      },
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Cảm ơn chị đã xác nhận. Chị muốn chuyển địa chỉ tới Hải Châu, Đà Nẵng, đúng không ạ?",
-      "questions": [
-        {
-          "slot": "delivery_area",
-          "type": "confirm",
-          "text": "Chị muốn chuyển địa chỉ tới Hải Châu, Đà Nẵng đúng không ạ?"
-        }
-      ],
-      "facts_used": [
-        "order_id"
+        "order_id",
+        "owned_sku"
       ],
       "claims": [],
       "tool_calls": [],
@@ -70,34 +34,41 @@
     },
     {
       "speaker": "customer",
-      "text": "Đúng rồi.",
+      "text": "Dạ đúng rồi, chị muốn đổi địa chỉ giao hàng cho đơn giày sneaker Urban Classic.",
       "facts_stated": {
         "delivery_area": "Hải Châu, Đà Nẵng"
       },
-      "entities": [],
+      "entities": [
+        {
+          "type": "address",
+          "value": "Hải Châu, Đà Nẵng",
+          "spoken": "Hải Châu, Đà Nẵng"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em đã ghi nhận địa chỉ mới là Hải Châu, Đà Nẵng cho đơn hàng O004. Em sẽ tiến hành cập nhật ngay ạ.",
+      "text": "Dạ, cảm ơn chị đã xác nhận. Bây giờ em sẽ cập nhật địa chỉ giao hàng thành Hải Châu, Đà Nẵng cho đơn hàng của chị nhé.",
       "questions": [],
       "facts_used": [
-        "delivery_area",
-        "order_id"
+        "order_id",
+        "owned_sku",
+        "delivery_area"
       ],
       "claims": [
         {
-          "field": "delivery_area",
-          "value": "Hải Châu, Đà Nẵng"
+          "field": "order_id",
+          "value": "OD900202"
         }
       ],
       "tool_calls": [
         {
           "name": "order.update",
           "args": {
-            "order_id": "O004",
+            "order_id": "OD900202",
             "action": "update_address",
             "on": "2026-10-18"
           }
@@ -113,10 +84,27 @@
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, địa chỉ giao hàng đã được cập nhật thành công. Nếu chị cần hỗ trợ gì thêm, xin vui lòng cho em biết ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku",
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
     }
   ],
   "gold": {
-    "intent": "Đổi địa chỉ giao hàng cho đơn hàng",
+    "intent": "Đổi địa chỉ giao hàng cho đơn đang xử lý",
     "outcome": "cap_nhat_don",
     "objection_type": null,
     "objection_handling": null,
