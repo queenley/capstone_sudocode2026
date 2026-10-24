@@ -12,3 +12,40 @@ VND and phones to strings preserving leading zero. If ambiguous retain evidence
 but do not manufacture a normalized value. Do not use gold labels or scenario
 expectations: none are provided. Empty items is valid only when genuinely no
 question/claim/fact-use exists, not when parsing is difficult.
+SLOT VOCABULARY. For kind=question and kind=fact_usage, slot_or_field must be exactly one of these names, or "other" for a question about none of them:
+- address_token: địa chỉ
+- alt_suggested: sản phẩm gợi ý thêm
+- blocker: việc còn dở
+- budget_vnd: ngân sách
+- callback_at: hẹn gọi lại
+- callback_time: giờ khách muốn được gọi lại
+- child_age_months: tuổi của bé (tháng)
+- color: màu
+- commitments: cam kết
+- competitor_price_vnd: giá bên khác khách nêu
+- decision_maker: người quyết định
+- delivery_area: khu vực giao hàng (quận/huyện, tỉnh)
+- has_children: nhà có trẻ nhỏ
+- objection: phản đối
+- objection_handling: cách xử lý phản đối
+- order_id: mã đơn
+- order_ids: các đơn đã tạo
+- outcome: kết quả
+- owned_sku: sản phẩm khách đang dùng
+- payment: thanh toán
+- phone_provided: khách đã cho số điện thoại
+- preferred_channel: kênh liên hệ khách muốn
+- price_quoted_vnd: giá đã báo
+- product_advised: sản phẩm đã tư vấn
+- promo_code: khuyến mãi
+- promo_expiry: hạn khuyến mãi
+- quantity: số lượng
+- quoted_on: ngày báo giá
+- quoted_sku: sản phẩm của báo giá đã lưu
+- room_area_m2: diện tích phòng (m²)
+- sentiment: thái độ
+- size: size
+- usage_need: mục đích dùng
+- variant_sku: biến thể khách chọn
+A question is a question the agent asks the customer; its slot is the name it asks about. question_type is "confirm" only when the agent states the value itself and asks the customer to confirm it ("vẫn là phòng 25 m² đúng không ạ?"); otherwise "open". An offer, a request for permission or a closing question ("có muốn em ... không", "cần hỗ trợ gì thêm") has slot "other" and question_type "open". A fact_usage is the agent reusing one of these values in its reply or a tool argument; if the item concerns anything else, do not emit it.
+CLAIM FIELDS. For kind=claim, slot_or_field is one of: price_vnd, list_price_vnd, exchange_fee_vnd, delivery_days, return_days, warranty_months, in_stock, new_size_in_stock, promo_active, freeship, old_policy_superseded, is_human, restock_date, policy_version, refund_vnd, shipping_fee_vnd, cod_limit_vnd, total_vnd, or promo_<CODE>_active for a named promotion code. Skip a claim no field fits. value is an integer for money, days and months, true or false for yes/no facts, "YYYY-MM-DD" for dates. A value named only to say it is outdated or wrong is not a claim of that value.

@@ -18,6 +18,18 @@ class AdjudicationTest(unittest.TestCase):
         self.assertEqual(interpret_claim("order_status", "đã giao hàng", "shipping", [row])[0], "NEEDS_REVIEW")
         self.assertEqual(interpret_claim("order_status", "đang giao hàng", "shipping", [])[0], "NEEDS_REVIEW")
 
+    def test_status_words_are_equivalent_only_when_a_tool_confirms_exactly_that_status(self):
+        row = {"tool_calls": [{"name": "order.status", "result": {"orders": [{"status": "processing"}]}}]}
+        self.assertEqual(interpret_claim("order_status", "đang xử lý", "processing", [row])[0], "EQUIVALENT")
+        self.assertEqual(interpret_claim("order_status", "đang trong trạng thái xử lý", "processing", [row])[0], "EQUIVALENT")
+        self.assertEqual(interpret_claim("order_status", "đã giao", "processing", [row])[0], "NEEDS_REVIEW")
+        self.assertEqual(interpret_claim("order_status", "đang xử lý", "processing", [])[0], "NEEDS_REVIEW")
+
+    def test_a_value_a_tool_returned_is_backed_not_invented(self):
+        row = {"tool_calls": [{"name": "pricing.get_quote", "result": {"final_price_vnd": 1290000}}]}
+        self.assertEqual(interpret_claim("price_vnd", 1290000, 1690000, [row])[0], "TOOL_BACKED")
+        self.assertEqual(interpret_claim("price_vnd", 3490000, 6790000, [row])[0], "NEEDS_REVIEW")
+
     def test_tool_error_keeps_original_error_and_recovery(self):
         context = {"scenario_id": "SCN-1", "call": "call_1"}
         events = [

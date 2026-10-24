@@ -49,7 +49,7 @@ from ai_agent_service.llm import token_ledger  # noqa: E402
 from ai_agent_service.llm.factory import LLMFactory  # noqa: E402
 from ai_agent_service.llm.callback_handler import error_usage  # noqa: E402
 
-from . import spend  # noqa: E402
+from . import slots, spend  # noqa: E402
 
 MARKER = "\n[INPUT DATA]\n"
 
@@ -90,8 +90,10 @@ def main() -> int:
         return 2
     source = json.loads(request["prompt"].split(MARKER, 1)[1])
     items, dropped = spanned([item.model_dump() for item in labels.items], source)
+    items, out_of_scope = slots.restrict(items)
     spent = token_ledger.snapshot().get("harness-extractor", {})
     print(json.dumps({"raw": json.dumps({"items": items}, ensure_ascii=False), "dropped_items": dropped,
+                      "slots_outside_vocabulary": out_of_scope,
                       "usage": spend.usage(config["provider"], spent.get("input") or 0, spent.get("output") or 0)},
                      ensure_ascii=False))
     return 0

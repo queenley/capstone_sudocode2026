@@ -101,3 +101,11 @@ Sổ `scripts/evaluation/runs/20261024-work/budget.sqlite`, tạo mới; không 
 - Holdout chưa chạy (10): M2 0145, 0105, 0002, 0071, 0035, 0121, 0019; M1 0091, 0138, 0052.
 - Thay đổi giữa các lần chạy: R0→R1 chỉ sửa lỗi nối tool; R1→R2 chỉ đổi nhãn (v4); R2→R3 đổi prompt agent (R3 chưa hoàn chỉnh). Mọi nhãn là diagnostic, chưa người duyệt.
 - Ba lần chạy simulator trước `simulator-final` (`simulator-main`, `simulator-main3`, các lần smoke) dùng để sửa lỗi simulator; không lấy số liệu từ đó.
+
+### Extractor khớp đường chấm chính thức (`product-extractor-v3`, 24/10/2026)
+
+BTC không cung cấp extractor: `trace_log.schema.json` ghi việc trích `questions[]` và `claims[]` là trách nhiệm của team, và BTC chỉ chấm tay ngẫu nhiên 20 lượt để kiểm tra extractor có bỏ sót không. BTC chỉ cố định **tên** qua các kịch bản của họ. Lệnh BTC yêu cầu (`run_eval.py --scenarios`, ở thư mục gốc) chạy extractor riêng của agent (`components/evaluation/scorers.py`) với từ vựng cố định, không đọc từ kịch bản: 34 slot của ontology bộ nhớ (chứa mọi slot `must_not_ask`/`must_carry_over` trong mẫu công khai của BTC, và 1759/1759 lượt dùng slot của dataset v4) và `CLAIM_FIELDS` (khóa `ground_truth_facts` của BTC kèm kiểu giá trị).
+
+Bộ chấm phân tích trước đây để extractor tự đặt tên slot và tên trường claim, nên RQR, CCR và HR lệch khỏi đường chính thức. v3 (`scripts/evaluation/agent/slots.py`) dùng đúng từ vựng, ép kiểu và quy tắc gắn nhãn của đường chính thức: slot ngoài bộ là `other` kiểu `open`, `fact_usage` ngoài bộ bị bỏ, claim phải thuộc trường BTC với giá trị đúng kiểu. Đây là đổi công cụ đo sau khi đã xem điểm, nên chỉ so sánh trên **cùng transcript**; không so với run dùng v2.
+
+Một bản thử trung gian (chỉ 30 slot lấy từ mẫu công khai BTC, trước khi thống nhất với đường chính thức) chấm lại 104 lượt của `development-r2-v4-M2` cho RQR hệ thống 4,1% và baseline 25,3% (v2: 3,8% và 3,7%). Số này **chưa được đo lại** với bản v3 cuối; cần chạy lại `docs/evaluation/rescore_with_scoped_extractor.py`.

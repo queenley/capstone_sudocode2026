@@ -17,6 +17,21 @@ from .extractor import FixtureExtractor, digest, extractor_input
 from .runner import _output_path, _write
 
 
+
+def reported_facts(result):
+    """The memory slots the agent itself says its reply used (``facts_used`` of the turn result), checked for shape."""
+    value = result.get("facts_used", [])
+    if not isinstance(value, list) or not all(isinstance(slot, str) and slot for slot in value):
+        raise ValueError("facts_used of a turn result must be a list of slot names")
+    return sorted(set(value))
+
+
+def merged_facts_used(items, document):
+    """What the extractor saw used (tool arguments and text), then the slots the agent reported using; each once."""
+    seen = [i["slot_or_field"] for i in items if i["kind"] == "fact_usage"]
+    return seen + [slot for slot in document.get("agent_facts_used", []) if slot not in seen]
+
+
 def context_key(context):
     return "/".join(str(context[key]) for key in ("run_id", "config", "scenario_id", "call", "turn"))
 
@@ -290,6 +305,7 @@ def collect(run_dir, out, *, extractor_path=None, audit_seed=0):
                        if isinstance(event, dict) and event.get("role") == "consultant" and isinstance(event.get("text"), str)]
         document = {"context": context, "customer_text": customer["text"], "agent_text": result["agent_text"],
                     "customer_id": before.get("customer_id", before_memory.get("customer_id")), "consultant_texts": consultants,
+                    "agent_facts_used": reported_facts(result),
                     "tools": current_tools, "tool_texts": [json.dumps(e["request"], ensure_ascii=False, sort_keys=True) for e in current_tools],
                     "evidence_refs": [customer_ref, result_ref]}
         ref = write(f"{context['config']}/transcripts/{digest(key)}.json", document)
@@ -498,7 +514,7 @@ def collect(run_dir, out, *, extractor_path=None, audit_seed=0):
                                  for i in items if i["kind"] == "question" and i["speaker"] == "agent"],
                    "claims": [{"field": i["slot_or_field"], "value": i["value"], "text": i["quote"]}
                               for i in items if i["kind"] == "claim" and i["speaker"] == "agent"],
-                   "facts_used": [i["slot_or_field"] for i in items if i["kind"] == "fact_usage"],
+                   "facts_used": merged_facts_used(items, document),
                    "tool_calls": [{**e["request"], "result": e["result"]} for e in document["tools"]], "latency": latency}
             if "customer_turns_asr" in spec:
                 mode = spec.get("input_mode")

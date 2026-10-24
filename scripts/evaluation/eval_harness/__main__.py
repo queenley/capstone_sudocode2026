@@ -233,6 +233,9 @@ def main(argv=None):
             table = out / "scored" / "scorer.stdout.txt"
             if table.is_file():
                 print(table.read_text(encoding="utf-8"))
+            extra = out / "scored" / "run-summary.txt"
+            if extra.is_file():
+                print(extra.read_text(encoding="utf-8"))
             status = (report["stages"][-1].get("status") or {}) if report["stages"] else {}
             codes.append(3 if report["pipeline_error"] else 1 if status.get("verdict") == "FAIL"
                          else 2 if status.get("completeness") == "INCOMPLETE" else 0)

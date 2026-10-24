@@ -12,11 +12,12 @@ from referencing.exceptions import Unresolvable
 from .assets import Assets, parse_json, read_json
 from .adjudication import review_claims, review_tool_errors
 from .gaps import candidates as gap_candidates
-from .collector import context_key, locked_run, status
+from .collector import context_key, locked_run, merged_facts_used, status
 from .contracts import ROOT, checker, validate
 from .extractor import digest
 from .metrics import READ_ONLY_TOOLS, match_tool_calls
 from .preflight import call_plan
+from .supplement import build as build_supplement
 from .runner import _output_path, _write
 
 
@@ -45,6 +46,16 @@ def brief_matches_profile(brief, kind, scenario, spec):
     if kind == "call_brief" and expected_id and actual_id != expected_id:
         return False
     return not (expected_id and actual_id and actual_id != expected_id)
+
+
+
+def reported_document(src, row):
+    """The transcript document of a trace row: it holds the slots the agent reported using (``agent_facts_used``)."""
+    context = {k: row[k] for k in ("run_id", "config", "scenario_id", "call", "turn")}
+    try:
+        return read_json(src.path(f"{row['config']}/transcripts/{digest(context_key(context))}.json"))
+    except (OSError, ValueError, KeyError):
+        return {}
 
 
 def score(run_dir, out):
@@ -296,7 +307,7 @@ def score(run_dir, out):
                           for i in atomics if i["kind"] == "claim" and i["speaker"] == "agent"]
                 questions = [{"slot": i["slot_or_field"], "type": i["question_type"], "text": i["quote"]}
                              for i in atomics if i["kind"] == "question" and i["speaker"] == "agent"]
-                if row["claims"] != claims or row["questions"] != questions or row.get("facts_used", []) != [i["slot_or_field"] for i in atomics if i["kind"] == "fact_usage"]:
+                if row["claims"] != claims or row["questions"] != questions or row.get("facts_used", []) != merged_facts_used(atomics, reported_document(src, row)):
                     call_findings.append(issue("TRACE_EXTRACTION_MISMATCH", call_id, "schema_error"))
             for event in ts:
                 evref = ref(src.ref(config + "/tools.jsonl"))
@@ -531,6 +542,11 @@ def score(run_dir, out):
                   "metrics": metrics, "coverage_refs": [coverage_ref], "official_report": official_ref}
         validate("SupplementalReport", report)
         write("supplemental-report.json", report)
+    if official_ref is not None:
+        timings = {config: rows(config + "/timing.jsonl", "TimingEvidence") for config in configs}
+        extra, text = build_supplement(official, traces, timings, metrics)
+        write("run-summary.json", extra)
+        (target / "run-summary.txt").write_text(text, encoding="utf-8")
     write("claim-adjudication.json", review_claims(traces, scenarios))
     write("tool-business-error-review.json", review_tool_errors(tools))
     write("knowledge-gap-candidates.json", gap_candidates(traces, evidence, source_split=manifest["split"]))

@@ -44,7 +44,7 @@ import logging  # noqa: E402
 import os  # noqa: E402
 import sys  # noqa: E402
 from dataclasses import dataclass, field  # noqa: E402
-from datetime import datetime, timezone  # noqa: E402
+from datetime import datetime, timedelta, timezone  # noqa: E402
 from types import SimpleNamespace  # noqa: E402
 from typing import Any, TextIO  # noqa: E402
 
@@ -58,6 +58,7 @@ from ai_agent_service.mcp.servers import btc  # noqa: E402
 from ai_agent_service.mcp.servers.btc import rank as _rank  # noqa: E402
 from ai_agent_service.pipeline.eval.runner import seed as seed_ledger  # noqa: E402
 from ai_agent_service.pipeline.eval.scenarios import seed_session_id, seed_sessions  # noqa: E402
+from ai_agent_service.pipeline.eval.trace import facts_used  # noqa: E402
 from ai_agent_service.pipeline.hot import nodes  # noqa: E402
 from ai_agent_service.pipeline.hot.state import HotContext  # noqa: E402
 
@@ -233,9 +234,13 @@ class Bridge:
             self.send({"type": "event", "event": {"kind": "advisor_error", "error": state["draft"]["error"]}})
         reply = (state.get("reply") or {}).get("text") or ""
         # The ledger is written after the call, so after a turn it is what it was at the start.
-        return {"agent_text": pii.detokenize(reply, call.vault), "mode": "nonstream", "request_at": request_at,
-                "completed_at": completed_at, "first_token_at": None,
+        first_token_at = first_token_time(request_at, completed_at, (state.get("latency") or {}).get("first_token_ms"))
+        return {"agent_text": pii.detokenize(reply, call.vault), "mode": "stream" if first_token_at else "nonstream",
+                "request_at": request_at, "completed_at": completed_at, "first_token_at": first_token_at,
                 "usage": usage(rig.provider, before, token_ledger.snapshot()),
+                # The slots of the memory facts behind the brief lines this reply cited ([Bn]): the agent's own report,
+                # as the BTC trace_log defines facts_used. Empty when it cited none (and always, with no memory).
+                "facts_used": facts_used(state),
                 "memory_snapshot": await self.snapshot(call.customer_id, [])}
 
     async def end_call(self) -> dict[str, Any]:
@@ -272,6 +277,19 @@ class Bridge:
                                 "customer_id": customer_id, "source": source})
         return {"customer_id": customer_id, "namespace": namespace, "facts": facts, "writes": written}
 
+
+
+def first_token_time(request_at: str, completed_at: str, first_token_ms: Any) -> str | None:
+    """When the first checked sentence of the reply was handed to the channel, as the product's own timer saw it.
+
+    The reply streams sentence by sentence in the product (``pipeline/hot/nodes._say`` stamps the first one);
+    BTC defines TTFT as the first token and allows streaming (``huong-dan-do-latency.md`` rules 1 and 7). Without the
+    stamp, or when it is not a number, TTFT is the total, as for a reply that does not stream.
+    """
+    if type(first_token_ms) not in (int, float) or first_token_ms < 0:
+        return None
+    start, end = datetime.fromisoformat(request_at), datetime.fromisoformat(completed_at)
+    return min(start + timedelta(milliseconds=first_token_ms), end).isoformat()
 
 def origin(source: dict[str, Any], seeds: dict[str, dict[str, Any]] | None = None) -> dict[str, Any] | None:
     """A fact's source as the turn it came from, ``{context, field}``; a seeded

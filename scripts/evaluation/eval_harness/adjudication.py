@@ -2,6 +2,26 @@
 
 import re
 
+#: How a customer-facing sentence says each order status the BTC mock holds.
+STATUS_PHRASES = {
+    "created": re.compile(r"\bđã (?:được )?(?:tạo|ghi nhận)\b|\bmới (?:được )?tạo\b"),
+    "processing": re.compile(r"\bđang (?:được )?(?:trong trạng thái )?(?:xử lý|chuẩn bị)\b"),
+    "shipping": re.compile(r"\bđang (?:ở )?(?:trong )?(?:trạng thái )?giao(?: hàng)?\b"),
+    "delivered": re.compile(r"\b(?:đã giao|giao thành công|đã nhận)\b"),
+    "cancelled": re.compile(r"\b(?:đã hủy|bị hủy|đã huỷ)\b"),
+}
+#: Claims whose value a tool can legitimately return for a different subject than the label's.
+TOOL_BACKED_FIELDS = ("price_vnd", "order_id", "sku", "list_price_vnd", "total_vnd")
+
+
+def values_of(result):
+    """Every scalar inside a tool result."""
+    if isinstance(result, dict):
+        return [v for item in result.values() for v in values_of(item)]
+    if isinstance(result, list):
+        return [v for item in result for v in values_of(item)]
+    return [result]
+
 
 def interpret_claim(field, claimed, expected, call_rows):
     if field == "product_name" and isinstance(claimed, str) and isinstance(expected, str):
@@ -13,14 +33,18 @@ def interpret_claim(field, claimed, expected, call_rows):
                    if len(short.split()) >= 2 and (name.casefold() == short or name.casefold().endswith(" " + short))]
         if len(matches) == 1 and matches[0][1] == expected:
             return "EQUIVALENT", "unique_catalog_name_suffix", [{"sku": matches[0][0], "name": matches[0][1]}]
-    if field == "order_status" and expected == "shipping" and isinstance(claimed, str):
+    if field == "order_status" and isinstance(claimed, str) and expected in STATUS_PHRASES:
         phrase = claimed.casefold()
-        shipping = re.search(r"\bđang (?:ở )?(?:trong )?(?:trạng thái )?giao(?: hàng)?\b", phrase)
-        contradictory = re.search(r"\b(?:đã giao|giao thành công|đã nhận)\b", phrase)
+        said = {status for status, pattern in STATUS_PHRASES.items() if pattern.search(phrase)}
         confirmed = [order.get("status") for row in call_rows for tool in row["tool_calls"]
                      if tool["name"] == "order.status" for order in tool.get("result", {}).get("orders", [])]
-        if shipping and not contradictory and "shipping" in confirmed:
-            return "EQUIVALENT", "shipping_phrase_and_order_tool", [{"tool": "order.status", "status": "shipping"}]
+        # The words say exactly the status the order has, and an order.status result of the call confirms it.
+        if said == {expected} and expected in confirmed:
+            return "EQUIVALENT", f"{expected}_phrase_and_order_tool", [{"tool": "order.status", "status": expected}]
+    if field in TOOL_BACKED_FIELDS and claimed not in (None, "") and any(
+            claimed in values_of(tool.get("result")) for row in call_rows for tool in row["tool_calls"]):
+        # Not invented: a tool of this call returned this very value, about something other than the label expects.
+        return "TOOL_BACKED", "value_returned_by_a_tool_of_this_call", []
     return "NEEDS_REVIEW", "no_verified_equivalence", []
 
 
@@ -41,7 +65,7 @@ def review_claims(traces, scenarios):
                              "field": field, "claimed": claim["value"], "ground_truth": gt[field],
                              "decision": decision, "rule": rule, "evidence": evidence})
     return {"report_kind": "claim-adjudication-v1", "official_score_changed": False,
-            "counts": {key: sum(row["decision"] == key for row in rows) for key in ("EQUIVALENT", "NEEDS_REVIEW")},
+            "counts": {key: sum(row["decision"] == key for row in rows) for key in ("EQUIVALENT", "TOOL_BACKED", "NEEDS_REVIEW")},
             "rows": rows}
 
 

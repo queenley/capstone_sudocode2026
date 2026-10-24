@@ -151,6 +151,9 @@ async def build(
 def _routed(tools: list[BaseTool], business: Business) -> list[BaseTool]:
     """*tools* with each business tool replaced by one that asks *business*."""
     routed: list[BaseTool] = []
+    #: First answer of each write, by the key the harness gave it: the product's MCP servers return it again for a
+    #: repeated key (section 6.1), so a second "tạo đơn" for the same order is not a second order here either.
+    first_answers: dict[str, str] = {}
     for tool in tools:
         name = mcp_client.dotted(tool.name)
         if name not in BUSINESS_TOOLS:
@@ -158,10 +161,16 @@ def _routed(tools: list[BaseTool], business: Business) -> list[BaseTool]:
             continue
 
         async def call(_name: str = name, **args: Any) -> str:
-            # The idempotency key is the MCP servers' transport argument; the organisers' mock
-            # rejects it ("unexpected keyword argument"), which failed every write.
+            key = args.get(IDEMPOTENCY_ARG)
+            if key and key in first_answers:
+                return first_answers[key]
+            # The key is the MCP servers' transport argument; the organisers' mock rejects it
+            # ("unexpected keyword argument"), which failed every write.
             envelope = await business(_name, {k: v for k, v in args.items() if v is not None and k != IDEMPOTENCY_ARG})
-            return json.dumps(envelope, ensure_ascii=False, default=str)
+            answer = json.dumps(envelope, ensure_ascii=False, default=str)
+            if key and envelope.get("ok"):
+                first_answers[key] = answer
+            return answer
 
         routed.append(StructuredTool.from_function(
             coroutine=call, name=tool.name, description=tool.description, args_schema=tool.args_schema,

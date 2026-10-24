@@ -292,7 +292,7 @@ def prepare(out, *, only=None, extractor_calls=None, dataset_id=None, level=None
     (out / "extract_command.py").write_bytes((EVALUATION / COMMAND).read_bytes())
     # One extraction per agent turn and configuration, unless a smaller budget is asked for.
     planned_turns = sum(plan["expected_turns"] for plan in manifest["planned_calls"])
-    extractor = {"kind": "command_model", "version": "product-extractor-v2", "python": str(PYTHON),
+    extractor = {"kind": "command_model", "version": "product-extractor-v3", "python": str(PYTHON),
                  "backend": str(EVALUATION), "code": assets.ref("extract_command.py"), "files": [],
                  "config": agent["extractor"], "prompt": assets.ref("extractor-prompt.txt"),
                  "max_calls": extractor_calls or max(1, planned_turns)}
