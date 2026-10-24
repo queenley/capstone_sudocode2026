@@ -3,6 +3,7 @@ from urllib.parse import urlencode
 from fastapi import HTTPException
 from sqlalchemy import select, update
 from src.commerce.repository import CatalogRepository, catalog_row
+from src.core.regions import region_of
 from src.db.models import (
     Product,
     SKU,
@@ -94,7 +95,7 @@ class OrderService:
     def create(self, customer_id, conversation_id, channel, data):
         """One order of one or more lines, all quoted again and reserved together, or none."""
         # Serialize customer writes; a unique key is an additional duplicate barrier.
-        self.db.scalar(
+        customer = self.db.scalar(
             select(Customer)
             .where(Customer.id == customer_id, Customer.deleted_at.is_(None))
             .with_for_update()
@@ -183,6 +184,10 @@ class OrderService:
         )
         self.db.add(order)
         self.db.flush()
+        # The region of the latest delivery address: the voice that answers their calls (core/regions.py).
+        region = region_of(data.shipping_address)
+        if customer is not None and region:
+            customer.region = region
         for line, sku, quote in priced:
             self.db.add(
                 OrderItem(

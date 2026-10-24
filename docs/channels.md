@@ -118,7 +118,30 @@ docker compose logs -f hotline-bridge     # thấy câu khách nói (transcript)
 
 Script giả làm một cuộc gọi SIP (thuộc tính `sip.phoneNumber`), phát `question.wav` (câu hỏi giá AirPure X, có sẵn trong `scripts/dev`) làm giọng khách và ghi lại tiếng của shop vào `scripts/dev/answer.wav`. Với số của khách CRM C032 như trên, AI chào đúng tên khách và nhắc lại cuộc trò chuyện trước, kể cả khi lần trước khách chat trên web.
 
-Độ trễ hiện tại khoảng 10–15 giây mỗi câu trả lời vì tổng hợp giọng nói chạy trên CPU; cần GPU hoặc TTS nhanh hơn trước khi dùng thật.
+### Nhận dạng giọng nói: service riêng
+
+ASR chạy trong `asr-service` (cổng 8500), không nằm trong AI agent: agent gửi từng câu khách nói sang đó qua `ASR_URL`. Trong Docker nó chạy trên CPU máy này; khi thuê GPU, chạy `apps/asr-service/Dockerfile.gpu` trên máy đó và đặt `ASR_URL`, `ASR_API_KEY`, `ASR_LOCAL=0`. Service có thêm WebSocket realtime `/v1/stream` (chữ hiện dần khi khách đang nói). Chi tiết: [apps/asr-service/README.md](../apps/asr-service/README.md).
+
+### Chọn giọng đọc: cloud hay local
+
+Nhận dạng giọng nói luôn chạy cục bộ. Giọng đọc câu trả lời (TTS) chọn bằng `VOICE_TTS` trong `.env`:
+
+| `VOICE_TTS` | Chạy ở đâu | Tốc độ (Docker 4 CPU) | Chi phí | Tải về |
+|---|---|---|---|---|
+| `openai:coral` (hoặc `nova`, `sage`, `shimmer`…) | API OpenAI, dùng `OPENAI_API_KEY` | khoảng 1–3 giây mỗi câu, các câu đọc song song | trả theo số ký tự | không tải gì |
+| `elevenlabs:` | API ElevenLabs, dùng `ELEVENLABS_API_KEY` | khoảng 0,6 giây mỗi câu (lần đầu 3–5 giây) | trả theo số ký tự, đắt hơn OpenAI | không tải gì |
+| `vieneu:` | CPU trong container | 10–15 giây mỗi câu, chiếm CPU của nhận dạng | miễn phí | ~1,4 GB lần đầu dùng |
+| (để trống) | theo `voice.tts` trong `apps/ai-agent-service/config/models.yaml` (`vieneu:`) | | | |
+
+Với `elevenlabs:`, giọng được chọn theo **miền của khách** trong CRM (`bac`, `trung`, `nam`), lấy từ nhóm `agent` của [scripts/create_data/config/voices.yaml](../scripts/create_data/config/voices.yaml): cùng một khách luôn nghe cùng một giọng; khách chưa nhận ra (hoặc CRM không có miền) nghe giọng **nữ miền Bắc** (`VOICE_DEFAULT_REGION=bac`, `VOICE_GENDER=female`). Hotline nhận ra khách ngay khi nối máy nên lời chào đã đúng giọng miền; trên web, giọng đổi theo miền khi khách được nhận ra, rồi giữ nguyên đến hết cuộc gọi. `elevenlabs:<voice id>` dùng một giọng cố định.
+
+Chỉ giọng được chọn mới được nạp: chọn `openai:` thì model VieNeu không được tải, không được nạp, và gói `vieneu` cũng không được cài vào image. Đổi qua lại thì build lại:
+
+```powershell
+docker compose up -d --build ai-agent-service
+```
+
+Model của bên được chọn nằm trong volume `voice-models` (`HF_HOME=/app/models/huggingface`), nên chỉ tải một lần. Trang Developer vẫn đổi được giọng lúc đang chạy, trong số những giọng image có.
 
 ### Kết nối số điện thoại thật
 

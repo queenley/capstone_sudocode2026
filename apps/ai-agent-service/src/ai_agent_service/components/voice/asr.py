@@ -1,30 +1,34 @@
-"""Local speech recognisers behind one call: ``transcribe(samples) -> text``.
+"""Speech recognition for a call: ``transcribe(model, samples) -> Transcript``.
 
-Two engines, both CPU-only because the brief requires ASR that runs on a
-laptop or a free Colab:
+The recognisers live in the ASR service (``apps/asr-service``), so they can
+run on another machine, a GPU one when there is one. This module is how the
+agent reaches them:
 
-- sherpa-onnx transducers: the Vietnamese Zipformer models. Small, fast on CPU.
-- faster-whisper (CTranslate2): PhoWhisper and Whisper, quantised to int8 when
-  loaded. Greedy decoding, so the timing is the fastest the model can do.
+- ``ASR_URL`` set (``http://asr-service:8500`` in Docker, or a rented GPU):
+  over HTTP, one request per utterance, with ``ASR_API_KEY`` when the service
+  asks for one. ``stream()`` opens the service's realtime WebSocket, for
+  partial transcripts while the caller is still speaking.
+- ``ASR_URL`` unset (a laptop without Docker): the same engines in this
+  process, imported from ``apps/asr-service/src`` (``pip install -r
+  apps/asr-service/requirements.txt``).
 
-A recogniser is loaded once and shared; loading is slow (seconds). Every
-call blocks, so the voice session runs it in a thread. The organisers do not
-count ASR time into TTFT for recordings; on a live call it is inside TTFA.
+The call blocks, so the voice session runs it in a thread, as before.
 """
 
 from __future__ import annotations
 
+import json
 import os
+import sys
 import threading
-import time
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any, AsyncIterator
 
 import numpy as np
 
-from . import models_dir
-
-THREADS = int(os.environ.get("LAB_ASR_THREADS", "4"))
+RATE = 16_000
+TIMEOUT = float(os.environ.get("ASR_TIMEOUT", "30"))
 
 
 @dataclass
@@ -39,106 +43,139 @@ class Transcript:
         return self.seconds / self.audio_seconds if self.audio_seconds else 0.0
 
 
-class SherpaTransducer:
-    def __init__(self, directory: Path) -> None:
-        import sherpa_onnx
-
-        def one(pattern: str) -> str:
-            found = sorted(directory.glob(pattern))
-            if not found:
-                raise FileNotFoundError(f"{pattern} in {directory}")
-            return str(found[0])
-
-        self._recognizer = sherpa_onnx.OfflineRecognizer.from_transducer(
-            encoder=one("encoder*.onnx"),
-            decoder=one("decoder*.onnx"),
-            joiner=one("joiner*.onnx"),
-            tokens=one("tokens.txt"),
-            num_threads=THREADS,
-            sample_rate=16_000,
-            feature_dim=80,
-            decoding_method="greedy_search",
-        )
-
-    def transcribe(self, samples: np.ndarray, hotwords: list[str]) -> str:
-        stream = self._recognizer.create_stream()
-        stream.accept_waveform(16_000, samples)
-        self._recognizer.decode_stream(stream)
-        # The Zipformer vocabularies are upper case; the agent, the lexicon
-        # and the WER bench all read lower case.
-        return stream.result.text.strip().lower()
+def url() -> str:
+    return os.environ.get("ASR_URL", "").strip().rstrip("/")
 
 
-class FasterWhisper:
-    def __init__(self, directory: Path) -> None:
-        from faster_whisper import WhisperModel
-
-        self._model = WhisperModel(str(directory), device="cpu", compute_type="int8", cpu_threads=THREADS)
-
-    def transcribe(self, samples: np.ndarray, hotwords: list[str]) -> str:
-        segments, _ = self._model.transcribe(
-            samples,
-            language="vi",
-            beam_size=1,
-            without_timestamps=True,
-            condition_on_previous_text=False,
-            vad_filter=False,
-            hotwords=", ".join(hotwords) if hotwords else None,
-        )
-        return "".join(segment.text for segment in segments).strip()
+def remote() -> bool:
+    return bool(url())
 
 
-#: name -> (label, engine, directory under ./models)
-CATALOG: dict[str, tuple[str, type, str]] = {
-    "zipformer-30m": (
-        "Zipformer 30M int8 · sherpa-onnx",
-        SherpaTransducer,
-        "sherpa-onnx-zipformer-vi-30M-int8-2026-02-09",
-    ),
-    "zipformer-2025": (
-        "Zipformer vi 2025-04 int8 · sherpa-onnx",
-        SherpaTransducer,
-        "sherpa-onnx-zipformer-vi-int8-2025-04-20",
-    ),
-    "phowhisper-small": (
-        "PhoWhisper small int8 · faster-whisper",
-        FasterWhisper,
-        "phowhisper-small",
-    ),
-    "whisper-turbo": (
-        "Whisper large-v3-turbo int8 · faster-whisper",
-        FasterWhisper,
-        "whisper-large-v3-turbo",
-    ),
-}
-
-_loaded: dict[str, object] = {}
-_locks: dict[str, threading.Lock] = {name: threading.Lock() for name in CATALOG}
+def _headers() -> dict[str, str]:
+    key = os.environ.get("ASR_API_KEY", "").strip()
+    return {"Authorization": f"Bearer {key}"} if key else {}
 
 
-def available() -> list[dict[str, str]]:
-    return [
-        {"name": name, "label": label, "loaded": name in _loaded}
-        for name, (label, _, folder) in CATALOG.items()
-        if (models_dir() / folder).is_dir()
-    ]
+# ── the service ───────────────────────────────────────────────────────────
+
+_client = None
+_client_lock = threading.Lock()
+
+
+def _http():
+    global _client
+    with _client_lock:
+        if _client is None:
+            import httpx
+
+            _client = httpx.Client(base_url=url(), headers=_headers(), timeout=TIMEOUT)
+        return _client
+
+
+def _check(response) -> Any:
+    if response.status_code >= 400:
+        try:
+            detail = response.json().get("detail")
+        except ValueError:
+            detail = response.text[:200]
+        raise RuntimeError(f"ASR service {response.status_code}: {detail}")
+    return response.json()
+
+
+# ── in this process ───────────────────────────────────────────────────────
+
+
+def _engines():
+    """The ASR service's engines, from this repository when not installed."""
+    try:
+        from asr_service import engines
+    except ImportError:
+        here = Path(__file__).resolve()
+        for parent in here.parents:
+            candidate = parent / "asr-service" / "src"
+            if candidate.is_dir():
+                sys.path.insert(0, str(candidate))
+                break
+        try:
+            from asr_service import engines
+        except ImportError as error:
+            raise RuntimeError("No ASR: set ASR_URL to the ASR service, or install "
+                               "apps/asr-service/requirements.txt to recognise in this process") from error
+    return engines
+
+
+# ── the API the voice call uses ───────────────────────────────────────────
+
+
+def available() -> list[dict[str, Any]]:
+    """The recognisers there are (weights present), each with whether it is loaded."""
+    if remote():
+        return _check(_http().get("/v1/models"))
+    return _engines().available()
 
 
 def load(name: str) -> float:
     """Load *name* if needed. Returns the seconds spent loading (0 if cached)."""
-    if name in _loaded:
-        return 0.0
-    with _locks[name]:
-        if name in _loaded:
-            return 0.0
-        _, engine, folder = CATALOG[name]
-        started = time.perf_counter()
-        _loaded[name] = engine(models_dir() / folder)
-        return time.perf_counter() - started
+    if remote():
+        return float(_check(_http().post(f"/v1/models/{name}/load"))["load_seconds"])
+    return _engines().load(name)
 
 
 def transcribe(name: str, samples: np.ndarray, hotwords: list[str] | None = None) -> Transcript:
-    load(name)
-    started = time.perf_counter()
-    text = _loaded[name].transcribe(samples, hotwords or [])
-    return Transcript(name, text, time.perf_counter() - started, len(samples) / 16_000)
+    """One utterance, float32 mono at 16 kHz -> text."""
+    samples = np.ascontiguousarray(samples, dtype="<f4")
+    if remote():
+        result = _check(_http().post(
+            "/v1/transcribe",
+            params={"model": name, "hotwords": ",".join(hotwords or [])},
+            content=samples.tobytes(),
+            headers={"Content-Type": "application/octet-stream"},
+        ))
+        return Transcript(result["model"], result["text"], result["seconds"], result["audio_seconds"])
+    found = _engines().transcribe(name, samples, hotwords)
+    return Transcript(found.model, found.text, found.seconds, found.audio_seconds)
+
+
+async def stream(
+    name: str, chunks: AsyncIterator[np.ndarray], *, sample_rate: int = RATE,
+    hotwords: list[str] | None = None, partial_ms: int = 600,
+) -> AsyncIterator[dict[str, Any]]:
+    """Realtime: send *chunks* (float32 mono at *sample_rate*) as they come and
+    yield the service's messages, ``partial`` while audio arrives and one
+    ``final`` when *chunks* ends. Needs ``ASR_URL``."""
+    import asyncio
+
+    import websockets
+
+    if not remote():
+        raise RuntimeError("Realtime ASR needs the ASR service (ASR_URL)")
+    address = url().replace("http", "ws", 1) + "/v1/stream"
+    async with websockets.connect(address, additional_headers=_headers(), max_size=None) as ws:
+        await ws.send(json.dumps({"model": name, "sample_rate": sample_rate,
+                                  "hotwords": hotwords or [], "partial_ms": partial_ms}))
+        ready = json.loads(await ws.recv())
+        if ready.get("type") != "ready":
+            raise RuntimeError(f"ASR stream refused: {ready}")
+        queue: asyncio.Queue[dict[str, Any] | None] = asyncio.Queue()
+
+        async def read() -> None:
+            async for message in ws:
+                item = json.loads(message)
+                await queue.put(item)
+                if item.get("type") == "final":
+                    break
+            await queue.put(None)
+
+        reader = asyncio.create_task(read())
+        try:
+            async for chunk in chunks:
+                await ws.send(np.ascontiguousarray(chunk, dtype="<f4").tobytes())
+                while not queue.empty():
+                    item = queue.get_nowait()
+                    if item is not None:
+                        yield item
+            await ws.send(json.dumps({"type": "end"}))
+            while (item := await queue.get()) is not None:
+                yield item
+        finally:
+            reader.cancel()

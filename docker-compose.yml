@@ -1,3 +1,10 @@
+# Shared by every way of running the stack; publishes no port of its own.
+#   Local (this machine):  docker compose up -d --build
+#       also reads docker-compose.override.yml: ports on 127.0.0.1, dev defaults.
+#   Cloud (one server):    docker compose -f docker-compose.yml -f infra/compose/docker-compose.cloud.yml up -d --build
+#       HTTPS on DOMAIN through Caddy, secrets required, cloud voice, ASR on a GPU host.
+# The cloud files (compose override, .env template, Caddy) are in infra/compose/;
+# details: docs/deployment/README.md ("Docker Compose").
 name: telesales-ai
 x-runtime: &runtime
   build:
@@ -46,7 +53,6 @@ services:
       POSTGRES_DB: app_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-postgres-change-me}
-    ports: ["127.0.0.1:5432:5432"]
     volumes: ["postgres-data:/var/lib/postgresql/data"]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d app_db"]
@@ -55,7 +61,6 @@ services:
       retries: 20
   redis:
     image: redis:7-alpine
-    ports: ["127.0.0.1:6379:6379"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 3s
@@ -113,6 +118,23 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+  # Speech recognition for calls (apps/asr-service). On this machine's CPU by default;
+  # to use one hosted elsewhere (a rented GPU, Dockerfile.gpu), set ASR_URL (and
+  # ASR_API_KEY) to it and ASR_LOCAL=0 so this container does not start.
+  asr-service:
+    build:
+      context: .
+      dockerfile: apps/asr-service/Dockerfile
+    environment:
+      ASR_DEVICE: cpu
+      ASR_PRELOAD: ${ASR_PRELOAD:-zipformer-30m}
+      ASR_API_KEY: ${ASR_API_KEY:-}
+      ASR_THREADS: ${ASR_THREADS:-4}
+    volumes:
+      # The same volume as the agent: the weights already downloaded are reused.
+      - voice-models:/models
+    deploy:
+      replicas: ${ASR_LOCAL:-1}
   ai-agent-service:
     build:
       context: .
@@ -120,6 +142,8 @@ services:
       args:
         # 1 installs speech recognition and synthesis: needed by the browser call and the phone hotline.
         WITH_VOICE: ${AGENT_WITH_VOICE:-0}
+        # Which voice speaks the calls; a local one (vieneu:) is installed into the image.
+        VOICE_TTS: ${VOICE_TTS:-}
     environment:
       <<: *environment
       # Models and routing are in apps/ai-agent-service/config/models.yaml;
@@ -148,6 +172,20 @@ services:
       LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL:-}
       # Kept on the volume, so the embedding model is downloaded once, not on every container start.
       EMBEDDING_MODELS_DIR: /app/models/embedding
+      # Text to speech for calls: openai:<voice> (cloud: coral, nova, sage, shimmer…; needs
+      # OPENAI_API_KEY) or vieneu: (local CPU, ~1.4 GB of weights on first use). Empty:
+      # voice.tts in apps/ai-agent-service/config/models.yaml. The Admin page can still switch.
+      VOICE_TTS: ${VOICE_TTS:-}
+      OPENAI_TTS_MODEL: ${OPENAI_TTS_MODEL:-gpt-4o-mini-tts}
+      # VOICE_TTS=elevenlabs: speaks with the agent voices of scripts/create_data/config/voices.yaml,
+      # by the caller's region (CRM); unknown callers hear VOICE_DEFAULT_REGION, VOICE_GENDER.
+      ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY:-}
+      ELEVENLABS_TTS_MODEL: ${ELEVENLABS_TTS_MODEL:-eleven_flash_v2_5}
+      VOICE_GENDER: ${VOICE_GENDER:-female}
+      VOICE_DEFAULT_REGION: ${VOICE_DEFAULT_REGION:-bac}
+      # Where calls are recognised: the asr-service container, or a GPU host elsewhere.
+      ASR_URL: ${ASR_URL:-http://asr-service:8500}
+      ASR_API_KEY: ${ASR_API_KEY:-}
       # Phone hotline (profile "hotline"): the bridge proves itself with this key to pass the caller's number.
       HOTLINE_BRIDGE_KEY: ${HOTLINE_BRIDGE_KEY:-local-hotline-bridge-change-me}
       LIVEKIT_URL: ${LIVEKIT_URL:-}
@@ -178,7 +216,6 @@ services:
       AI_AGENT_SERVICE_URL: http://ai-agent-service:8400
       REDIS_URL: redis://redis:6379/0
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
-    ports: ["127.0.0.1:8000:8000"]
     depends_on:
       postgres:
         condition: service_healthy
@@ -224,7 +261,6 @@ services:
         NEXT_PUBLIC_ZALO_OA_ID: ${ZALO_OA_ID:-}
     environment:
       BACKEND_URL: http://api-gateway:8000
-    ports: ["127.0.0.1:3000:3000"]
     depends_on:
       api-gateway:
         condition: service_healthy
@@ -247,7 +283,6 @@ services:
   qdrant:
     profiles: ["retrieval"]
     image: qdrant/qdrant:v1.15.4
-    ports: ["127.0.0.1:6333:6333"]
     volumes: ["qdrant-data:/qdrant/storage"]
   livekit:
     profiles: ["hotline"]
@@ -257,7 +292,6 @@ services:
       LIVEKIT_KEYS: "${LIVEKIT_API_KEY:-devkey}: ${LIVEKIT_API_SECRET:-local-livekit-secret-change-me-32chars}"
     volumes: ["./infra/livekit/livekit.yaml:/etc/livekit.yaml:ro"]
     ports:
-      - "127.0.0.1:7880:7880"
       - "7881:7881"
       - "40000-40100:40000-40100/udp"
     depends_on:

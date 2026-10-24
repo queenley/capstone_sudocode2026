@@ -1,16 +1,13 @@
-# Voice channel (docs/design.md section 4.11): VAD, turn detection, local ASR, TTS on CPU.
+# Voice channel (docs/design.md section 4.11): VAD, turn detection, and the
+# cloud voices (OpenAI's through the openai package of requirements.txt, edge-tts).
+# The local voice, VieNeu-TTS, is requirements-voice-local-tts.txt. Speech recognition
+# is the ASR service's (apps/asr-service/requirements.txt), reached at ASR_URL.
 # Optional: without these the service runs and /health reports which packages are missing.
-# Model weights (~2.5 GB) download on first start into VOICE_MODELS_DIR.
+# Weights (Silero VAD and Smart Turn, ~10 MB) download on first start into VOICE_MODELS_DIR.
 numpy==2.2.6
 soxr==1.0.0
 soundfile==0.13.1
 huggingface_hub==1.32.0
 transformers==5.17.0
 onnxruntime==1.23.2
-sherpa-onnx==1.13.8
-ctranslate2==4.8.2
-faster-whisper==1.2.1
 edge-tts==7.2.8
-vieneu==3.8.1
-numba==0.62.1
-llvmlite==0.45.1

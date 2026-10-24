@@ -1,0 +1,27 @@
+# The one door of the cloud stack (infra/compose/docker-compose.cloud.yml): HTTPS for DOMAIN,
+# with a certificate Caddy obtains and renews by itself (Let's Encrypt; the
+# domain must point at this server and ports 80/443 be open).
+#
+#   /api/*  -> api-gateway: the API, the Zalo webhook (/api/channels/zalo/webhook)
+#              and the browser's voice call (WebSocket /api/conversations/{id}/voice)
+#   else    -> web: the shop and the staff pages (which reach the API themselves
+#              through /backend on the server side)
+{$DOMAIN} {
+	encode zstd gzip
+
+	@api path /api/*
+	handle @api {
+		reverse_proxy api-gateway:8000
+	}
+
+	handle {
+		reverse_proxy web:3000
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+}

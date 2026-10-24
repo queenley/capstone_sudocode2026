@@ -15,6 +15,8 @@ after call 1, the way the evaluation runner does with ``days_later``.
 
 from __future__ import annotations
 
+import os
+
 from dataclasses import dataclass, field, replace
 from datetime import date
 from typing import Any
@@ -56,10 +58,12 @@ def set_advisor(provider: str | None, model: str | None, temperature: float | No
 
 
 def voice() -> Voice:
+    """The Admin page's choice, else the file's, with ``VOICE_TTS`` (set when the
+    container starts, e.g. ``openai:coral`` or ``vieneu:``) over the file's voice."""
     if _options.voice is None:
         config = get_models_config().voice
         return Voice(config.asr, config.endpointing, config.barge_in_ms, config.min_interruption_words,
-                     config.false_interruption_ms, config.tts)
+                     config.false_interruption_ms, os.environ.get("VOICE_TTS", "").strip() or config.tts)
     return _options.voice
 
 

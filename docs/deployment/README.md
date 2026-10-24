@@ -1,12 +1,48 @@
 # Triển khai
 
-Docker Compose dành cho máy local ([README gốc](../../README.md#chạy-nhanh-bằng-docker-compose)). Cloud dùng ba thành phần, và **không thành phần nào tự triển khai ứng dụng**:
+Hai cách chạy:
+
+- **Docker Compose**: máy local, hoặc cả hệ thống trên **một máy chủ cloud (VM)**. Xem mục 0 ngay dưới.
+- **Cloud có quản lý (GKE, Cloud SQL)**: mục 1–4. Gồm ba thành phần, và **không thành phần nào tự triển khai ứng dụng**:
 
 - `infra/terraform/gcp`: GKE Autopilot private node, Cloud SQL PostgreSQL HA có backup, Memorystore Redis HA (TLS), Artifact Registry, một secret rỗng trong Secret Manager, VPC peering và Cloud NAT. **Có phát sinh chi phí.**
 - `infra/kubernetes`: manifest Kustomize, overlay theo môi trường, Job migration.
 - `infra/argocd`: ví dụ GitOps; phải thay repo URL trước khi dùng.
 
 Terraform không tạo giá trị cho secret, user database, Kafka, Qdrant, ingress hay domain.
+
+## 0. Docker Compose: local và cloud
+
+| File | Dùng khi | Nội dung |
+|---|---|---|
+| `docker-compose.yml` | luôn có | Các service, **không mở cổng nào** ra máy chủ |
+| `docker-compose.override.yml` | **local**: `docker compose` tự nạp | Cổng `127.0.0.1` (web 3000, gateway 8000, Postgres 5432, Redis 6379…); secret mặc định cho dev; ASR chạy CPU máy này |
+| `infra/compose/docker-compose.cloud.yml` | **cloud**: chỉ định bằng `-f` | Caddy giữ HTTPS cho `DOMAIN` (80/443), các service khác không mở cổng; bắt buộc secret; giọng cloud; ASR trên máy GPU; tự khởi động lại; log tối đa 50 MB mỗi service |
+
+**Local** (không đổi so với trước):
+
+```powershell
+docker compose up -d --build                      # http://localhost:3000
+docker compose --profile hotline up -d --build    # + tổng đài
+```
+
+**Cloud, một VM** (Ubuntu có Docker; bản ghi DNS A của `DOMAIN` trỏ về IP máy; mở cổng 80, 443, và UDP 5060, 40000–40100, 40200–40300 nếu dùng tổng đài):
+
+```bash
+cp infra/compose/.env.cloud.example .env        # điền DOMAIN và các secret (hướng dẫn tạo ngay trong file)
+docker compose -f docker-compose.yml -f infra/compose/docker-compose.cloud.yml up -d --build
+docker compose -f docker-compose.yml -f infra/compose/docker-compose.cloud.yml --profile hotline up -d   # + tổng đài
+```
+
+Caddy tự lấy và gia hạn chứng chỉ HTTPS (cấu hình: `infra/compose/caddy/Caddyfile`). Mọi thứ dùng chung một địa chỉ: `https://DOMAIN` (shop, trang nhân viên), `https://DOMAIN/api/...` (API, webhook Zalo `https://DOMAIN/api/channels/zalo/webhook`, gọi thoại trên trình duyệt qua WebSocket).
+
+Khác biệt cần biết khi chạy cloud:
+
+- Thiếu `DOMAIN`, `POSTGRES_PASSWORD`, `APP_SECRET`, `ENCRYPTION_KEY`, một trong bốn token vai trò hoặc `HOTLINE_BRIDGE_KEY` thì `docker compose` dừng ngay và báo tên biến thiếu.
+- `ENVIRONMENT=production` (mặc định): backend từ chối secret yếu hoặc trùng nhau, và OTP chỉ gửi qua nhà cung cấp SMS (`OTP_DELIVERY_URL`). Muốn demo khi chưa có SMS: `ENVIRONMENT=staging`, mã OTP hiện trên màn hình như ở local.
+- Giọng đọc mặc định `openai:coral` (`VOICE_TTS`); image AI không cài VieNeu. ASR mặc định ở máy GPU (`ASR_URL`, `ASR_API_KEY`, xem [apps/asr-service/README.md](../../apps/asr-service/README.md)); chưa có GPU thì `ASR_LOCAL=1`, `ASR_URL=` để chạy ASR trên CPU của VM.
+- Chế độ giả lập Zalo (`ZALO_WEBHOOK_INSECURE`, `ZALO_OPENAPI_URL`) luôn tắt, dù `.env` có đặt.
+- Tạo tài khoản nhân viên: `docker compose -f docker-compose.yml -f infra/compose/docker-compose.cloud.yml run --rm identity-service python /app/scripts/admin/create_admin.py`.
 
 ## 1. Nền tảng (Terraform)
 

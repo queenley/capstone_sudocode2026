@@ -11,16 +11,38 @@ Engines:
 - ``vieneu``: VieNeu-TTS on CPU through ONNX Runtime, fully local. Streams:
   on this laptop the first chunk is ready in about 0.35 s and synthesis runs
   faster than playback, so the stream never starves.
+- ``openai``: OpenAI's speech API (``openai:<voice>``, model ``OPENAI_TTS_MODEL``,
+  ``gpt-4o-mini-tts`` unless set) with ``OPENAI_API_KEY``. In the cloud: no
+  weights to download, no CPU taken from the recogniser, about a second per
+  sentence, and every sentence requested at once. Paid per character. One
+  chunk per sentence (mp3), as the browser decodes each message whole.
+- ``elevenlabs``: ElevenLabs (``ELEVENLABS_API_KEY``, model
+  ``ELEVENLABS_TTS_MODEL``, ``eleven_flash_v2_5`` unless set). ``elevenlabs:``
+  picks the agent's voice by the caller's region from ``voices.yaml`` (the
+  file ``scripts/create_data`` voices its test calls with: ``agent.<bac|trung|
+  nam|default>.<female|male>``, gender from ``VOICE_GENDER``, female unless
+  set); one customer always hears the same voice, an unknown caller (or one
+  with no region) a northern one (``VOICE_DEFAULT_REGION``, ``bac`` unless set).
+  ``elevenlabs:<voice id>`` is one fixed voice. Paid per character.
 - ``edge``: Microsoft's neural voices (vi-VN HoaiMy, NamMinh) through the free
   endpoint behind Edge's read-aloud. The same voices Azure Speech sells, but
-  the free endpoint refuses a large share of requests without audio, so it is
-  here to hear the voices, not to time them. One chunk per sentence.
+  the free endpoint refuses a large share of requests without audio (all of
+  them, 403, on 2026-10-24), so it is here to hear the voices, not to time
+  them. One chunk per sentence.
+
+Which one a call uses: ``voice.tts`` in ``config/models.yaml``, unless
+``VOICE_TTS`` is set (``runtime/options.py``), unless the Admin page changed
+it. Only the chosen voice is ever loaded: with ``openai`` VieNeu's weights are
+neither downloaded nor loaded, and its package need not be installed
+(``requirements-voice-local-tts.txt``).
 """
 
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import io
+import os
 import re
 import threading
 import time
@@ -73,6 +95,143 @@ class EdgeVoice:
         yield Speech(b"".join(chunks), "audio/mpeg", time.perf_counter() - started, first)
 
 
+class OpenAIVoice:
+    """OpenAI's speech API: one request per sentence, all sentences at once."""
+
+    parallel = True  # network-bound
+    _client = None
+    VOICES = ("coral", "nova", "sage", "shimmer", "alloy", "ash", "ballad", "echo", "fable", "onyx", "verse")
+    #: Only the gpt-4o voices follow instructions; tts-1 ignores them.
+    INSTRUCTIONS = ("Đọc bằng tiếng Việt tự nhiên, giọng nhân viên chăm sóc khách hàng thân thiện, "
+                    "rõ ràng, tốc độ vừa phải. Đọc số tiền và mã sản phẩm chậm, rõ từng phần.")
+
+    def __init__(self, voice: str | None) -> None:
+        self.voice = voice or "coral"
+        self.model = os.environ.get("OPENAI_TTS_MODEL", "").strip() or "gpt-4o-mini-tts"
+
+    @classmethod
+    def _api(cls):
+        if cls._client is None:
+            from openai import AsyncOpenAI
+
+            from ...config.config_manager import require_api_key
+
+            cls._client = AsyncOpenAI(api_key=require_api_key("openai"), timeout=20.0, max_retries=1)
+        return cls._client
+
+    async def warm(self) -> None:
+        """Nothing to load: only check that the key is there, so a call does not find out."""
+        self._api()
+
+    async def stream(self, text: str) -> AsyncIterator[Speech]:
+        started = time.perf_counter()
+        first: float | None = None
+        chunks: list[bytes] = []
+        extra = {"instructions": self.INSTRUCTIONS} if self.model.startswith("gpt-4o") else {}
+        async with self._api().audio.speech.with_streaming_response.create(
+            model=self.model, voice=self.voice, input=text, response_format="mp3", **extra,
+        ) as response:
+            async for chunk in response.iter_bytes():
+                if first is None:
+                    first = time.perf_counter() - started
+                chunks.append(chunk)
+        yield Speech(b"".join(chunks), "audio/mpeg", time.perf_counter() - started, first)
+
+
+REGIONS = ("bac", "trung", "nam")
+
+
+def voices_file() -> "Path | None":
+    """voices.yaml: ``ELEVENLABS_VOICES`` when set, the agent's config (the image
+    copies it there), else the create_data copy in this repository."""
+    from pathlib import Path
+
+    from ...config.config_manager import ROOT
+
+    candidates = [os.environ.get("ELEVENLABS_VOICES", "").strip(), str(ROOT / "config" / "voices.yaml")]
+    candidates += [str(parent / "scripts" / "create_data" / "config" / "voices.yaml") for parent in Path(__file__).resolve().parents]
+    return next((Path(c) for c in candidates if c and Path(c).is_file()), None)
+
+
+class ElevenLabsVoice:
+    """ElevenLabs, one request per sentence, all sentences at once; the voice by region."""
+
+    parallel = True  # network-bound
+    URL = "https://api.elevenlabs.io/v1/text-to-speech/{voice}/stream"
+    _client = None
+    _agents: dict | None = None
+
+    def __init__(self, voice: str | None) -> None:
+        self.fixed = voice or None
+        self.voice_id = voice or None
+        self.region: str | None = None
+        self.model = os.environ.get("ELEVENLABS_TTS_MODEL", "").strip() or "eleven_flash_v2_5"
+        self.gender = os.environ.get("VOICE_GENDER", "female").strip().lower() or "female"
+
+    @classmethod
+    def agents(cls) -> dict:
+        """The ``agent`` voices of voices.yaml: region -> gender -> [voice ids]."""
+        if cls._agents is None:
+            import yaml
+
+            path = voices_file()
+            data = yaml.safe_load(path.read_text(encoding="utf-8")) if path else {}
+            cls._agents = ((data or {}).get("voices") or {}).get("agent") or {}
+        return cls._agents
+
+    def choose(self, region: str | None, key: str) -> str | None:
+        """The voice for a caller of *region* (None: unknown), stable for *key* (the
+        customer, else the call). Returns the voice id; a fixed voice never changes."""
+        if self.fixed:
+            return self.voice_id
+        agents = self.agents()
+        if region not in REGIONS or region not in agents:
+            # An unknown caller hears the shop's default voice: VOICE_DEFAULT_REGION, northern unless set.
+            region = os.environ.get("VOICE_DEFAULT_REGION", "bac").strip().lower() or "bac"
+            region = region if region in agents else "default"
+        by_gender = agents.get(region) or agents.get("default") or {}
+        pool = by_gender.get(self.gender) or next((ids for ids in by_gender.values() if ids), [])
+        if pool:
+            index = int(hashlib.sha256(key.encode()).hexdigest(), 16) % len(pool)
+            self.voice_id, self.region = pool[index], region
+        return self.voice_id
+
+    @classmethod
+    def _api(cls):
+        if cls._client is None:
+            import httpx
+
+            key = os.environ.get("ELEVENLABS_API_KEY", "").strip()
+            if not key:
+                raise RuntimeError("ELEVENLABS_API_KEY is not set: the elevenlabs voice cannot speak")
+            cls._client = httpx.AsyncClient(headers={"xi-api-key": key}, timeout=20.0)
+        return cls._client
+
+    async def warm(self) -> None:
+        """Nothing to load: check the key and that voices.yaml has an agent voice."""
+        self._api()
+        if not self.fixed and not self.choose(None, "warm"):
+            raise RuntimeError("voices.yaml has no agent voice: set ELEVENLABS_VOICES or VOICE_TTS=elevenlabs:<voice id>")
+
+    async def stream(self, text: str) -> AsyncIterator[Speech]:
+        voice = self.voice_id or self.choose(None, "default")
+        started = time.perf_counter()
+        first: float | None = None
+        chunks: list[bytes] = []
+        body = {"text": text, "model_id": self.model, "language_code": "vi",
+                "voice_settings": {"stability": 0.5, "similarity_boost": 0.75}}
+        async with self._api().stream("POST", self.URL.format(voice=voice), params={"output_format": "mp3_44100_128"},
+                                      json=body) as response:
+            if response.status_code >= 400:
+                detail = (await response.aread()).decode("utf-8", "replace")[:200]
+                raise RuntimeError(f"ElevenLabs {response.status_code}: {detail}")
+            async for chunk in response.aiter_bytes():
+                if first is None:
+                    first = time.perf_counter() - started
+                chunks.append(chunk)
+        yield Speech(b"".join(chunks), "audio/mpeg", time.perf_counter() - started, first)
+
+
 class VieNeuVoice:
     """Local and streaming. One engine per process, used by one sentence at a time."""
 
@@ -85,6 +244,9 @@ class VieNeuVoice:
 
     def _load(self):
         if VieNeuVoice._engine is None:
+            if not _vieneu_installed():
+                raise RuntimeError("VieNeu-TTS is not installed here: build with a local voice "
+                                   "(VOICE_TTS=vieneu:) or choose a cloud voice (VOICE_TTS=openai:coral)")
             from vieneu import Vieneu
 
             VieNeuVoice._engine = Vieneu()
@@ -160,6 +322,12 @@ def voices() -> list[dict[str, str]]:
     offered = []
     if _vieneu_installed():
         offered.append({"name": "vieneu:", "label": "VieNeu-TTS · local CPU, streaming"})
+    from ...config.config_manager import has_api_key
+
+    if os.environ.get("ELEVENLABS_API_KEY", "").strip():
+        offered.append({"name": "elevenlabs:", "label": "ElevenLabs · giọng theo vùng miền của khách, cloud, paid"})
+    if has_api_key("openai"):
+        offered += [{"name": f"openai:{name}", "label": f"OpenAI {name} · cloud, paid"} for name in OpenAIVoice.VOICES[:4]]
     offered += [
         {"name": "edge:vi-VN-HoaiMyNeural", "label": "HoaiMy · Microsoft neural, free endpoint (unreliable)"},
         {"name": "edge:vi-VN-NamMinhNeural", "label": "NamMinh · Microsoft neural, free endpoint (unreliable)"},
@@ -167,8 +335,12 @@ def voices() -> list[dict[str, str]]:
     return offered
 
 
-def voice(name: str) -> EdgeVoice | VieNeuVoice:
+def voice(name: str) -> EdgeVoice | ElevenLabsVoice | OpenAIVoice | VieNeuVoice:
     engine, _, rest = name.partition(":")
+    if engine == "elevenlabs":
+        return ElevenLabsVoice(rest or None)
+    if engine == "openai":
+        return OpenAIVoice(rest or None)
     if engine == "edge":
         return EdgeVoice(rest)
     if engine == "vieneu":

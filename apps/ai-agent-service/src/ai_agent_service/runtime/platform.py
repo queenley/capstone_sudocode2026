@@ -24,7 +24,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from sqlalchemy import func, select
-from src.db.models import Conversation, CustomerIdentity, Handoff, Message, Outbox
+from src.db.models import Conversation, Customer, CustomerIdentity, Handoff, Message, Outbox
 from src.security.service import mask
 
 
@@ -92,6 +92,19 @@ def _verified_phone(app: Any, customer_id: str) -> str | None:
 async def verified_phone(app: Any, customer_id: str) -> str | None:
     """The phone number the customer proved with a one-time code (Identity), if any."""
     return await asyncio.to_thread(_verified_phone, app, customer_id)
+
+
+def _customer_region(app: Any, conversation_id: str) -> str | None:
+    with app.state.database.sessions() as db:
+        conv = db.get(Conversation, conversation_id)
+        customer = db.get(Customer, conv.customer_id) if conv and conv.customer_id else None
+        return customer.region if customer is not None and customer.deleted_at is None else None
+
+
+async def customer_region(app: Any, conversation_id: str) -> str | None:
+    """bac, trung or nam for the conversation's verified customer: from the delivery
+    address of their latest order (Commerce, ``core/regions.py``); None before any."""
+    return await asyncio.to_thread(_customer_region, app, conversation_id)
 
 
 def _append(app: Any, conversation_id: str, lines: list[tuple[str, str]]) -> None:

@@ -142,6 +142,8 @@ class Session:
         self.settings = options.voice()
         self.detector = TurnDetector(config_for(self.settings.endpointing, self.settings.barge_in_ms))
         self.voice = tts.voice(self.settings.tts)
+        #: A regional voice (ElevenLabs) is chosen once the caller is known, then kept for the call.
+        self.voice_locked = False
         self.lexicon = shared_lexicon()
         self.resampler = soxr.ResampleStream(sample_rate, 16_000, 1, dtype="float32")
         self.timings: dict[str, dict[str, Any]] = {}
@@ -378,8 +380,29 @@ class Session:
         text = outcome.content if outcome.kind == "message" else FALLBACK
         await self.send({"type": "reply", "turn": turn_id, "text": text, "meta": outcome.meta,
                          "error": outcome.error})
+        await self._choose_voice(outcome)
         self.speaking.add(turn_id)
         await self.speak(turn_id, text or FALLBACK)
+
+    async def _choose_voice(self, outcome: harness.Outcome) -> None:
+        """For a voice that follows the caller's region: the CRM's region of the
+        customer this call identified, else the region of the web customer who
+        verified on this conversation (their delivery address), else the default
+        voice until someone is known."""
+        choose = getattr(self.voice, "choose", None)
+        if choose is None or self.voice_locked:
+            return
+        customer = (outcome.state or {}).get("customer_id")
+        region = _region_of(customer) if customer else None
+        if region is None and self.row.get("conversation_id"):
+            try:
+                region = await platform.customer_region(self.ws.app, str(self.row["conversation_id"]))
+            except Exception:  # noqa: BLE001 - no region only means the default voice
+                logger.warning("Call %s: could not read the customer's region", self.call_id)
+        voice_id = choose(region, str(customer or f"call-{self.call_id}"))
+        if customer or region:
+            self.voice_locked = True
+            logger.info("Call %s: voice %s for region %s", self.call_id, voice_id, region or "default")
 
     async def speak(self, turn_id: str, text: str) -> None:
         from ...components.voice import tts
@@ -503,6 +526,17 @@ class Session:
         if timing.get("kind") == "turn" and figures.get("ttfa_client_ms") is not None:
             await harness.record_ttfa(self.call_id, turn_id, figures["ttfa_ms"] or 0, {"ttfa_client_ms": figures["ttfa_client_ms"]})
         await self.send({"type": "metrics", "turn": turn_id, **figures})
+
+
+def _region_of(customer_id: str) -> str | None:
+    """The CRM's region for *customer_id* (bac, trung, nam), None when it has none.
+    A web customer's region is the platform's (``platform.customer_region``)."""
+    from ...mcp.servers import btc
+
+    try:
+        return next((c.get("region") for c in btc.mock().CRM if c.get("customer_id") == customer_id), None)
+    except Exception:  # noqa: BLE001 - no region only means the default voice
+        return None
 
 
 def _figures(t: dict[str, Any]) -> dict[str, Any]:

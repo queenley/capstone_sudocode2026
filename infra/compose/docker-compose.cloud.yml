@@ -1,0 +1,178 @@
+# Cloud: the whole stack on one server (a VM), reached at https://DOMAIN.
+#
+#   cp infra/compose/.env.cloud.example .env      # then fill it in
+#   docker compose -f docker-compose.yml -f infra/compose/docker-compose.cloud.yml up -d --build
+#   docker compose -f docker-compose.yml -f infra/compose/docker-compose.cloud.yml --profile hotline up -d   # + phone line
+#
+# What differs from local (docker-compose.override.yml):
+# - only Caddy faces the Internet (80/443), with a certificate for DOMAIN it
+#   gets by itself: the web shop, the API and the voice WebSocket on one origin,
+#   the HTTPS Zalo's webhook and the browser's microphone both require.
+#   PostgreSQL, Redis and the services publish no port;
+# - every secret must be set (the stack refuses to start without them) and
+#   ENVIRONMENT is production unless set: strong distinct tokens, migrations
+#   not run by the services, and OTP only through a real SMS provider
+#   (OTP_DELIVERY_URL). A demo without SMS: ENVIRONMENT=staging;
+# - calls are spoken by a cloud voice (VOICE_TTS, openai:coral unless set; the
+#   local VieNeu is not even installed) and recognised on a GPU host (ASR_URL,
+#   ASR_API_KEY); ASR_LOCAL=1 runs asr-service on this server's CPU instead;
+# - the Zalo simulator switches are off whatever .env says;
+# - every service restarts on failure and keeps its logs to 50 MB.
+#
+# The managed-cloud deployment (GKE, Cloud SQL) is infra/ and docs/deployment.
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+# Merged over the development defaults of docker-compose.yml's x-runtime environment.
+x-secrets: &secrets
+  DATABASE_URL: postgresql+psycopg://postgres:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@postgres:5432/app_db
+  APP_SECRET: ${APP_SECRET:?set APP_SECRET (32+ random bytes; changing it later makes stored PII unreadable)}
+  ENCRYPTION_KEY: ${ENCRYPTION_KEY:?set ENCRYPTION_KEY (a Fernet key)}
+  ENVIRONMENT: ${ENVIRONMENT:-production}
+  ADMIN_TOKEN: ${ADMIN_TOKEN:?set ADMIN_TOKEN}
+  AGENT_TOKEN: ${AGENT_TOKEN:?set AGENT_TOKEN}
+  SELLER_TOKEN: ${SELLER_TOKEN:?set SELLER_TOKEN}
+  DEVELOPER_TOKEN: ${DEVELOPER_TOKEN:?set DEVELOPER_TOKEN}
+
+services:
+  caddy:
+    image: caddy:2.10.2
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN (the public name pointing at this server)}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./infra/compose/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      web:
+        condition: service_started
+      api-gateway:
+        condition: service_healthy
+    restart: unless-stopped
+    logging: *logging
+
+  postgres:
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    restart: unless-stopped
+    logging: *logging
+  redis:
+    restart: unless-stopped
+    logging: *logging
+  seed:
+    environment: *secrets
+    logging: *logging
+  commerce-service:
+    environment: *secrets
+    restart: unless-stopped
+    logging: *logging
+  identity-service:
+    environment: *secrets
+    restart: unless-stopped
+    logging: *logging
+  sales-service:
+    environment: *secrets
+    restart: unless-stopped
+    logging: *logging
+  commerce-events:
+    environment: *secrets
+    logging: *logging
+  identity-events:
+    environment: *secrets
+    logging: *logging
+  sales-events:
+    environment: *secrets
+    logging: *logging
+  ai-agent-events:
+    environment: *secrets
+    logging: *logging
+
+  asr-service:
+    environment:
+      ASR_API_KEY: ${ASR_API_KEY:-}
+    deploy:
+      # On the GPU host by default; ASR_LOCAL=1 runs it on this server's CPU.
+      replicas: ${ASR_LOCAL:-0}
+    restart: unless-stopped
+    logging: *logging
+
+  ai-agent-service:
+    build:
+      args:
+        WITH_VOICE: ${AGENT_WITH_VOICE:-1}
+        # A cloud voice: VieNeu (local CPU) is not installed unless chosen here.
+        VOICE_TTS: ${VOICE_TTS:-openai:coral}
+    environment:
+      <<: *secrets
+      VOICE_TTS: ${VOICE_TTS:-openai:coral}
+      # ASR_LOCAL=0 (default): the GPU host. ASR_LOCAL=1: http://asr-service:8500.
+      ASR_URL: ${ASR_URL:-http://asr-service:8500}
+      ASR_API_KEY: ${ASR_API_KEY:-}
+      HOTLINE_BRIDGE_KEY: ${HOTLINE_BRIDGE_KEY:?set HOTLINE_BRIDGE_KEY}
+      # Never the local simulators in the cloud.
+      ZALO_WEBHOOK_INSECURE: "0"
+      ZALO_OPENAPI_URL: ""
+      ZALO_OAUTH_URL: ""
+    restart: unless-stopped
+    logging: *logging
+
+  api-gateway:
+    environment:
+      CORS_ORIGINS: https://${DOMAIN:?set DOMAIN}
+    restart: unless-stopped
+    logging: *logging
+
+  web:
+    build:
+      args:
+        # The browser's voice WebSocket goes to https://DOMAIN/api/... through Caddy.
+        NEXT_PUBLIC_VOICE_URL: https://${DOMAIN:?set DOMAIN}
+    restart: unless-stopped
+    logging: *logging
+
+  qdrant:
+    restart: unless-stopped
+    logging: *logging
+  kafka:
+    restart: unless-stopped
+    logging: *logging
+
+  # Phone line (--profile hotline): SIP and media must reach this server's public IP.
+  livekit:
+    environment:
+      LIVEKIT_KEYS: "${LIVEKIT_API_KEY:-}: ${LIVEKIT_API_SECRET:-}"
+    restart: unless-stopped
+    logging: *logging
+  livekit-sip:
+    environment:
+      SIP_CONFIG_BODY: |
+        api_key: ${LIVEKIT_API_KEY:-}
+        api_secret: ${LIVEKIT_API_SECRET:-}
+        ws_url: ws://livekit:7880
+        redis:
+          address: redis:6379
+        sip_port: 5060
+        rtp_port: 40200-40300
+        use_external_ip: true
+        logging:
+          level: info
+    restart: unless-stopped
+    logging: *logging
+  hotline-bridge:
+    environment:
+      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY:-}
+      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET:-}
+      HOTLINE_BRIDGE_KEY: ${HOTLINE_BRIDGE_KEY:?set HOTLINE_BRIDGE_KEY}
+    logging: *logging
+
+volumes:
+  caddy-data:
+  caddy-config:

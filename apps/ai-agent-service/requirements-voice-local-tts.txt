@@ -1,0 +1,7 @@
+# The local voice, VieNeu-TTS on CPU (VOICE_TTS=vieneu:). Installed by the image only
+# when that is the voice chosen at build time (Dockerfile, VOICE_TTS); its weights
+# (~1.4 GB) download into HF_HOME the first time it is loaded.
+vieneu==3.8.1
+# librosa's JIT, pinned for vieneu.
+numba==0.62.1
+llvmlite==0.45.1

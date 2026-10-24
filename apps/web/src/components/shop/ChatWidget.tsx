@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { streamTurn } from "@/services/api";
 import { VoiceCall } from "@/services/voice";
 import VoiceCallPanel from "@/features/voice-call";
+import ChatProducts from "@/components/shop/ChatProducts";
 import { loadConversation, newSession, openSession, ShopSession } from "@/lib/session";
 import { shopContext, useShopContext } from "@/lib/shop-context";
 import { HOTLINE, ZALO_URL } from "@/lib/contact";
@@ -170,6 +171,13 @@ export default function ChatWidget() {
               <div key={i} className={`s-msg s-msg-${line.speaker === "customer" ? "me" : line.speaker}`}>
                 {line.speaker !== "customer" && <span className="s-msg-who">{SPEAKER[line.speaker] || line.speaker}</span>}
                 <p>{line.text || (busy && i === lines.length - 1 ? <span className="s-typing">Đang soạn câu trả lời…</span> : "")}</p>
+                {/* Once the reply is complete, the products it names: picture, price, link. */}
+                {line.speaker !== "customer" && line.speaker !== "system" && !(busy && i === lines.length - 1) && (
+                  <ChatProducts
+                    text={line.text}
+                    onShow={i === lines.length - 1 ? () => bottom.current?.scrollIntoView({ behavior: "smooth" }) : undefined}
+                  />
+                )}
               </div>
             ))}
             <div ref={bottom} />

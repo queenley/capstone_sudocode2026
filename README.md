@@ -30,6 +30,8 @@ AI mặc định dùng OpenAI `gpt-4.1-mini`. Muốn dùng Gemini thì điền `
 docker compose up --build -d
 ```
 
+Lệnh này chạy bản **local** (`docker-compose.yml` cùng `docker-compose.override.yml`, mở cổng trên `127.0.0.1`). Chạy trên máy chủ cloud có HTTPS: `infra/compose/` (`docker-compose.cloud.yml`, `.env.cloud.example`), xem [docs/deployment](docs/deployment/README.md#0-docker-compose-local-và-cloud).
+
 Lần đầu mất vài phút để build. Kiểm tra đã chạy xong chưa:
 
 ```powershell

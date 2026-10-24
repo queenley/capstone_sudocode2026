@@ -1,0 +1,35 @@
+# The ASR service on an NVIDIA GPU (a rented one). Build from the repo root:
+#   docker build -f apps/asr-service/Dockerfile.gpu -t telesales-asr:gpu .
+#   docker run --gpus all -p 8500:8500 -e ASR_API_KEY=<long random> \
+#       -e ASR_PRELOAD=phowhisper-small -v asr-models:/models telesales-asr:gpu
+#
+# faster-whisper (CTranslate2) needs CUDA 12 with cuDNN 9, which this base
+# image has; sherpa-onnx's CUDA build runs the Zipformers on the GPU too.
+# Not yet tried on a GPU in this project: check /health (device "cuda") and
+# the rtf of a /v1/transcribe answer after the first deploy.
+FROM nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
+    ASR_MODELS_DIR=/models \
+    HF_HOME=/models/huggingface \
+    ASR_DEVICE=cuda
+RUN apt-get update && apt-get install -y --no-install-recommends python3.11 python3.11-venv python3-pip \
+    && rm -rf /var/lib/apt/lists/* \
+    && python3.11 -m venv /venv
+ENV PATH=/venv/bin:$PATH
+
+WORKDIR /app
+COPY apps/asr-service/requirements.txt ./
+# The same pins, with sherpa-onnx's CUDA wheel in place of the CPU one.
+RUN grep -v '^sherpa-onnx' requirements.txt > requirements-gpu.txt \
+    && pip install --no-cache-dir -r requirements-gpu.txt \
+    && pip install --no-cache-dir "sherpa-onnx==1.13.8+cuda" -f https://k2-fsa.github.io/sherpa/onnx/cuda.html
+COPY apps/asr-service/src/ /app/src/
+
+RUN useradd --create-home app && mkdir -p /models && chown -R app:app /app /models
+USER app
+VOLUME ["/models"]
+EXPOSE 8500
+HEALTHCHECK --interval=10s --timeout=3s --start-period=900s --retries=6 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8500/health/ready')"
+CMD ["uvicorn", "asr_service.main:app", "--app-dir", "/app/src", "--host", "0.0.0.0", "--port", "8500", "--no-access-log"]
