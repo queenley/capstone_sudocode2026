@@ -18,17 +18,16 @@ class DataRegistryAndExemplarTest(unittest.TestCase):
         self.assertFalse(report["execution_gate"]["allowed"])
 
     def test_create_data_revision_has_a_label_per_call(self):
-        root = ROOT / "datasets" / "create-data-diagnostic-v1"
+        root = ROOT / "datasets" / "create-data-diagnostic-v2"
         if not root.is_dir():
             self.skipTest("normalize_create_data.py has not been run")
-        report = inspect(ROOT / "datasets", only="create-data-diagnostic-v1")
+        report = inspect(ROOT / "datasets", only="create-data-diagnostic-v2")
         self.assertEqual(report["issues"], [])
         self.assertFalse(report["execution_gate"]["allowed"])  # diagnostic, never approved by the generator
         labels = json.loads((root / "tool-labels.json").read_text(encoding="utf-8"))
         for path in (root / "scenarios").glob("*.json"):
             scenario = json.loads(path.read_text(encoding="utf-8"))
             self.assertEqual(set(labels[scenario["scenario_id"]]), set(scenario["calls"]))
-            self.assertFalse(any(call.get("seed_history") for call in scenario["calls"].values()))
 
     def test_two_independent_inserted_examples_are_few_shot(self):
         with tempfile.TemporaryDirectory() as tmp:

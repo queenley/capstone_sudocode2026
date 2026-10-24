@@ -214,8 +214,9 @@ def seed_sessions(raw: Any, *, day: str, channel: str) -> tuple[SeedSession, ...
     sessions, one session, or ``{"sessions": [...]}``. A session has
     ``date`` or ``call_date`` (or ``days_before`` the call on *day*), and
     ``facts`` or ``facts_established`` and/or a ``summary``; ``channel``,
-    ``outcome`` and ``session_id`` are optional. Anything else is refused,
-    naming what was found, rather than half-loaded.
+    ``outcome`` and ``session_id`` are optional. A CRM order (``order_id``,
+    ``sku``, ``status``) without a summary is summarised from those. Anything
+    else is refused, naming what was found, rather than half-loaded.
     """
     if isinstance(raw, Mapping) and isinstance(raw.get("sessions"), list):
         raw = raw["sessions"]
@@ -230,14 +231,26 @@ def seed_sessions(raw: Any, *, day: str, channel: str) -> tuple[SeedSession, ...
         if not facts and not item.get("summary"):
             raise ScenarioError(f"seed_history entry {index} has neither facts nor a summary: {sorted(item)}")
         sessions.append(SeedSession(
-            session_id=str(item.get("session_id") or item.get("id") or f"seed-{index}"),
+            session_id=seed_session_id(item, index),
             day=_seed_day(item, day=day, index=index),
             channel=CHANNELS.get(str(item.get("channel")), str(item.get("channel") or channel)),
-            summary=str(item.get("summary") or ""),
+            summary=str(item.get("summary") or _order_summary(item)),
             outcome=str(item.get("outcome") or "khac"),
             facts=dict(facts or {}),
         ))
     return tuple(sorted(sessions, key=lambda s: s.day))
+
+
+def seed_session_id(item: Mapping[str, Any], index: int) -> str:
+    """The id of ``seed_history`` entry *index* (from 1): its own, its order's, else its place."""
+    return str(item.get("session_id") or item.get("id") or item.get("order_id") or f"seed-{index}")
+
+
+def _order_summary(item: Mapping[str, Any]) -> str:
+    if not item.get("order_id"):
+        return ""
+    status = f" ({item['status']})" if item.get("status") else ""
+    return f"Đơn {item['order_id']}: {item.get('sku') or 'sản phẩm'}{status}."
 
 
 def _seed_day(item: Mapping[str, Any], *, day: str, index: int) -> str:

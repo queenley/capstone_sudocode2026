@@ -25,6 +25,11 @@ requires them: nothing is retried (its ``retry: {agent: 0, tool: 0}``), and
 the caller is identified when the call connects, as on the hotline, so the
 Call Brief exists before the first turn. ``catalog.search`` keeps the loose
 match our catalogue server adds when a name finds nothing.
+
+A call's ``seed_history`` (the sessions before it, from the CRM) is written
+to the ledger as the organisers' command writes it (``pipeline/eval/runner.py``
+``seed``), just before that call connects, in both configurations; a fact it
+left points back at its ``seed_history`` entry, as the collector requires.
 """
 
 from __future__ import annotations
@@ -51,6 +56,8 @@ from ai_agent_service.mcp import client as mcp_client  # noqa: E402
 from ai_agent_service.mcp.server_base import ToolFailure, database, failure, ok  # noqa: E402
 from ai_agent_service.mcp.servers import btc  # noqa: E402
 from ai_agent_service.mcp.servers.btc import rank as _rank  # noqa: E402
+from ai_agent_service.pipeline.eval.runner import seed as seed_ledger  # noqa: E402
+from ai_agent_service.pipeline.eval.scenarios import seed_session_id, seed_sessions  # noqa: E402
 from ai_agent_service.pipeline.hot import nodes  # noqa: E402
 from ai_agent_service.pipeline.hot.state import HotContext  # noqa: E402
 
@@ -97,6 +104,9 @@ class Bridge:
         self.protocol = protocol
         self.rig: runner.Rig | None = None
         self.scope: dict[str, Any] = {}
+        #: The harness's ``seed_history`` by call, and each seeded session's ``AssetRef`` by its ledger ``call_id``.
+        self.seeds: dict[str, dict[str, Any]] = {}
+        self.origins: dict[str, dict[str, Any]] = {}
         self.call: Call | None = None
         self.lock = asyncio.Lock()
 
@@ -150,8 +160,8 @@ class Bridge:
 
     async def lifecycle(self, message: dict[str, Any]) -> None:
         context = message["context"]
-        if any(seed.get("history") for seed in context.get("seed_history") or []):
-            raise ValueError("seed_history is not supported: the scenario's past calls would not reach the ledger")
+        self.seeds = {seed["call"]: seed for seed in context.get("seed_history") or [] if seed.get("history")}
+        self.origins = {}
         llm = message["llm"]
         self.rig = await runner.build(provider=llm["provider"], model=llm["model"], business=self.tool, retries=0)
         await runner.reset()
@@ -168,6 +178,7 @@ class Bridge:
             {k: context[k] for k in ("channel", "channel_identity") if k in context},
         )
         at = clock.at(context["on"])
+        await self.seed(context, channel)
         memory = bool(context["memory_read_previous"])
         call = Call(thread, context, channel, keys, at, memory, INPUT_MODES.get(str(context.get("input_mode"))), None)
         self.call = call
@@ -186,6 +197,21 @@ class Bridge:
         brief = update.get("brief") if memory else None
         return {"memory_snapshot": await self.snapshot(call.customer_id, []), "call_brief": brief,
                 "identified_at": identified, "brief_ready_at": ready, "customer_id": call.customer_id or "unidentified"}
+
+    async def seed(self, context: dict[str, Any], channel: str) -> None:
+        """The call's ``seed_history`` on the ledger, before the caller is identified (section 9.2, step 2)."""
+        seed = self.seeds.get(context["call"])
+        if seed is None:
+            return
+        raw, pointer = seed["history"], seed["source"]["pointer"]
+        if isinstance(raw, dict) and isinstance(raw.get("sessions"), list):
+            raw, pointer = raw["sessions"], pointer + "/sessions"
+        for index, item in enumerate(raw if isinstance(raw, list) else [raw], 1):
+            at = f"{pointer}/{index - 1}" if isinstance(raw, list) else pointer
+            self.origins[f"seed:{seed_session_id(item, index)}"] = {**seed["source"], "pointer": at}
+        sessions = seed_sessions(seed["history"], day=str(context["on"])[:10], channel=channel)
+        await seed_ledger(self.rig, sessions, customer_phone=context.get("customer_phone"),
+                          customer_name=context.get("customer_name"))
 
     async def turn(self, text: str) -> dict[str, Any]:
         rig, call = self.rig, self.call
@@ -236,20 +262,24 @@ class Bridge:
             cursor = await conn.execute("SELECT * FROM facts WHERE customer_id = %s ORDER BY created_at", (customer_id,))
             rows = await cursor.fetchall()
         by_id = {row["fact_id"]: row for row in rows}
-        facts = [fact for fact in map(memory_fact, rows) if fact is not None]
+        facts = [fact for fact in (memory_fact(row, self.origins) for row in rows) if fact is not None]
         written = []
         for item in writes:
             row = by_id.get(item.get("fact_id") or "")
-            source = origin(row["source"]) if row else None
+            source = origin(row["source"], self.origins) if row else None
             if source is not None:
                 written.append({"key": item["key"], "value": item["value"], "op": item["op"],
                                 "customer_id": customer_id, "source": source})
         return {"customer_id": customer_id, "namespace": namespace, "facts": facts, "writes": written}
 
 
-def origin(source: dict[str, Any]) -> dict[str, Any] | None:
-    """A fact's source as the turn it came from: ``{context, field}``."""
-    parts = str(source.get("call_id") or "").split("|")
+def origin(source: dict[str, Any], seeds: dict[str, dict[str, Any]] | None = None) -> dict[str, Any] | None:
+    """A fact's source as the turn it came from, ``{context, field}``; a seeded
+    one's as the ``AssetRef`` of its ``seed_history`` entry, from *seeds*."""
+    call_id = str(source.get("call_id") or "")
+    if seeds and call_id in seeds:
+        return seeds[call_id]
+    parts = call_id.split("|")
     if len(parts) != 4:
         return None
     run_id, config, scenario_id, call = parts
@@ -258,11 +288,11 @@ def origin(source: dict[str, Any]) -> dict[str, Any] | None:
     return {"context": context, "field": "customer_text" if source.get("said_by") == "customer" else "agent_text"}
 
 
-def memory_fact(row: dict[str, Any]) -> dict[str, Any] | None:
+def memory_fact(row: dict[str, Any], seeds: dict[str, dict[str, Any]] | None = None) -> dict[str, Any] | None:
     """One ledger row as a ``MemoryFact``; a disputed claim is not a fact the shop holds."""
     if row["status"] == "disputed":
         return None
-    source = origin(row["source"] or {})
+    source = origin(row["source"] or {}, seeds)
     if source is None:
         return None
     state = "active" if row["status"] == "active" else "superseded" if row["superseded_by"] else "deleted"

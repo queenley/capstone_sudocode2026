@@ -1,6 +1,6 @@
 """Create a diagnostic revision of ``scripts/create_data`` output; never edit its source.
 
-    python normalize_create_data.py [--source ../create_data/output/scenarios] [--name create-data-diagnostic-v1]
+    python normalize_create_data.py [--source ../create_data/output/scenarios] [--name create-data-diagnostic-v2]
 
 Writes ``datasets/<name>/`` (refusing to overwrite) and registers it in
 ``datasets/registry.json`` with status ``diagnostic``:
@@ -22,8 +22,6 @@ Conversions (each recorded per call):
 
 Exclusions, never silent drops (``datasets/ground-truth-review/SKILL.md``):
 
-- ``UNSUPPORTED_SEED_HISTORY``: a call with ``seed_history``; the agent's
-  ledger cannot be seeded, so its memory labels would be wrong;
 - ``CUSTOMER_NOT_IN_PINNED_CRM``: a ``customer_id`` outside the organisers'
   ``crm_seed.json``; the harness's mock does not know the synthetic customers
   ``create_data`` added, so CRM-derived GT would not hold;
@@ -63,9 +61,6 @@ def convert(source, customers):
     """``(scenario, changes, None)``, or ``(None, [], reason)`` when it cannot run."""
     scenario = copy.deepcopy(source)
     sid = scenario.get("scenario_id")
-    seeded = [name for name, spec in scenario.get("calls", {}).items() if spec.get("seed_history")]
-    if scenario.get("seed_history") or seeded:
-        return None, [], {"code": "UNSUPPORTED_SEED_HISTORY", "calls": seeded}
     if scenario.get("customer_id") and scenario["customer_id"] not in customers:
         return None, [], {"code": "CUSTOMER_NOT_IN_PINNED_CRM", "customer_id": scenario["customer_id"]}
     changes = []
@@ -107,7 +102,7 @@ def tool_labels(scenario):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--source", type=Path, default=SOURCE)
-    parser.add_argument("--name", default="create-data-diagnostic-v1")
+    parser.add_argument("--name", default="create-data-diagnostic-v2")
     args = parser.parse_args(argv)
     source, target = args.source.resolve(), DATASETS / args.name
     registry_path = DATASETS / "registry.json"

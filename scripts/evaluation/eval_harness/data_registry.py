@@ -50,8 +50,6 @@ def inspect(root, only=None):
             sid = scenario["scenario_id"]
             ids.append(sid)
             fingerprints.append(digest({k: v for k, v in scenario.items() if k not in {"scenario_id", "notes"}}))
-            if scenario.get("seed_history") or any(call.get("seed_history") for call in scenario["calls"].values()):
-                issues.append({"code": "UNSUPPORTED_SEED_HISTORY", "scenario": sid})
             if reviews is not None:
                 expected_review = reviews.get(sid)
                 if not isinstance(expected_review, dict) or set(expected_review) != set(scenario["calls"]):

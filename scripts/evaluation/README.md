@@ -42,12 +42,14 @@ $PY = "apps/ai-agent-service/.venv/Scripts/python"
 & $PY scripts/evaluation/normalize_create_data.py
 ```
 
-Kết quả: 101/150 kịch bản dùng được, lưu ở `datasets/create-data-diagnostic-v1/`. 49 kịch bản bị loại vì cần "lịch sử cuộc gọi cũ" (`seed_history`) mà AI chưa nạp được. Lý do từng kịch bản ghi trong `conversion-report.json`.
+Kết quả: 122/150 kịch bản dùng được, lưu ở `datasets/create-data-diagnostic-v2/`. 28 kịch bản bị loại vì khách là khách tổng hợp (`SYN-C...`) không có trong CRM của BTC, nên đáp án lấy từ CRM không còn đúng. Lý do từng kịch bản ghi trong `conversion-report.json`.
+
+Kịch bản có "lịch sử cuộc gọi cũ" (`seed_history`, 21 kịch bản) chạy được: trước cuộc gọi, `agent/bridge.py` ghi các phiên cũ và đơn cũ vào trí nhớ của khách, giống lệnh chấm của BTC (`pipeline/eval/runner.py`, hàm `seed`). Việc này diễn ra ở cả hai cấu hình; riêng `baseline_no_memory` không đọc lại chúng. Bản cũ `create-data-diagnostic-v1` (101 kịch bản, loại hết kịch bản có `seed_history`) vẫn được giữ.
 
 **Bước 2. Kiểm tra trước, không tốn tiền gọi AI:**
 
 ```powershell
-& $PY scripts/evaluation/run_eval.py prepare --dataset-id create-data-diagnostic-v1 --level M2 --limit 5
+& $PY scripts/evaluation/run_eval.py prepare --dataset-id create-data-diagnostic-v2 --level M2 --limit 5
 ```
 
 Thấy `"allowed": true` là đầu vào hợp lệ.
@@ -55,11 +57,11 @@ Thấy `"allowed": true` là đầu vào hợp lệ.
 **Bước 3. Chạy thật và chấm điểm:**
 
 ```powershell
-& $PY scripts/evaluation/run_eval.py evaluate --dataset-id create-data-diagnostic-v1 --level M2 --limit 5
+& $PY scripts/evaluation/run_eval.py evaluate --dataset-id create-data-diagnostic-v2 --level M2 --limit 5
 ```
 
 - `--level M2` hoặc `M1`: chỉ chạy một cấp độ. **Bỏ `--level`** thì chạy cả hai, mỗi cấp độ thành một lần chạy riêng (thư mục `<tên>-M1` và `<tên>-M2`), vì một lần chạy chỉ chứa được một cấp độ.
-- `--limit 5`: chạy 5 kịch bản đầu (của mỗi cấp độ). **Nên bắt đầu nhỏ**, vì mỗi lượt chat gọi AI nhiều lần, nhân 2 cấu hình. Chạy toàn bộ 101 kịch bản là khoảng 1.700 lượt AI cộng 1.700 lượt chấm, mất nhiều giờ và tốn phí API đáng kể.
+- `--limit 5`: chạy 5 kịch bản đầu (của mỗi cấp độ). **Nên bắt đầu nhỏ**, vì mỗi lượt chat gọi AI nhiều lần, nhân 2 cấu hình. Chạy toàn bộ 122 kịch bản là khoảng 2.000 lượt AI cộng 2.000 lượt chấm, mất nhiều giờ và tốn phí API đáng kể.
 - `--only SCN-GEN-0003`: chạy đúng một kịch bản (lặp lại để chọn nhiều kịch bản).
 - Trong lúc chạy, màn hình in tiến độ: bước đang làm (1/4 → 4/4), từng lượt chat (khách nói gì, AI trả lời gì, mất bao lâu, tốn bao nhiêu tiền, tổng tiền đến lúc đó) và thời gian ước tính. Mỗi kịch bản mất khoảng 1 phút để khởi động AI. Đặt `$env:EVAL_QUIET="1"` để tắt các dòng này.
 - Bước chấm (extract) chạy **song song 6 lượt một lúc**, nhanh hơn khoảng 2 lần. Đổi bằng `$env:EVAL_EXTRACT_WORKERS="4"` (đặt `1` để chạy tuần tự). Không nên đặt quá cao vì OpenAI giới hạn số request mỗi phút.
@@ -132,7 +134,7 @@ Mỗi lần chạy là một trace:
 | Lệnh | Làm gì | Gọi AI? |
 |---|---|---|
 | `run_eval.py history` | Liệt kê mọi lần chạy cũ và điểm của chúng | Không |
-| `run_eval.py data-check --set create-data-diagnostic-v1` | Kiểm tra bộ dữ liệu có hợp lệ không | Không |
+| `run_eval.py data-check --set create-data-diagnostic-v2` | Kiểm tra bộ dữ liệu có hợp lệ không | Không |
 | `run_eval.py rag-recall --out scripts/evaluation/runs/rag-1` | Đo khả năng tìm đúng đoạn chính sách (Recall@3/@5 trên 60 câu BTC) | Không |
 | `python -m scripts.evaluation.evaluate` | Bản đo Recall nhanh, cũ hơn, không cần database | Không |
 
@@ -203,7 +205,8 @@ Biến môi trường có thể đổi: `EVAL_DB_SCHEMA` (mặc định `agent_e
   - không đổi điều kiện chấm sau khi đã xem điểm.
 - Các bộ dữ liệu hiện có:
   - `output1-diagnostic-v2`: 5 kịch bản mẫu, mặc định ([quyết định duyệt](datasets/output1-btc-diagnostic-v2/review-decisions.md));
-  - `create-data-diagnostic-v1`: 101 kịch bản từ `create_data`, nhãn chờ duyệt.
+  - `create-data-diagnostic-v2`: 122 kịch bản từ `create_data`, gồm cả kịch bản có `seed_history`, nhãn chờ duyệt;
+  - `create-data-diagnostic-v1`: bản cũ, 101 kịch bản, không có `seed_history`.
 
 Chạy test của bộ chấm:
 
