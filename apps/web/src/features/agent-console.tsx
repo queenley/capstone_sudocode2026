@@ -139,7 +139,7 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
     <main className="shell workspace agent-console">
       <header className="topbar">
         <Link className="logo" href="/">
-          tiếp nối
+          Quivo
         </Link>
         <nav>
           <Link href="/login">Sign in</Link>

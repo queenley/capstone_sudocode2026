@@ -59,7 +59,7 @@ export default function Workspace({ role }: { role: string }) {
     <main className="shell workspace">
       <header className="topbar">
         <Link className="logo" href="/">
-          tiếp nối
+          Quivo
         </Link>
         <nav>
           <Link href="/login">Sign in</Link>
