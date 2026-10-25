@@ -305,6 +305,76 @@ class SessionEvidence(unittest.TestCase):
         self.assertEqual((seen["questions"], seen["prices"], seen["answered_outline_indices"]), ([], [], []))
 
 
+class PersonaReactions(unittest.TestCase):
+    """The persona decides only where the rules leave the next outline line to be said."""
+
+    def test_follow_says_the_next_line(self):
+        c = customer()
+        c.process({"observed": {}})
+        self.assertEqual(step(c, persona={"reaction": "follow", "line": ""}), "Chị thanh toán COD.")
+
+    def test_hold_says_the_personas_words_and_keeps_the_line_for_later(self):
+        c = customer()
+        c.process({"observed": {}})
+        self.assertEqual(step(c, persona={"reaction": "hold", "line": "Chị vẫn thấy đắt quá."}), "Chị vẫn thấy đắt quá.")
+        self.assertEqual(c.reactions, ["hold"])
+        self.assertEqual(c.history[-1]["reaction"], "hold")
+        self.assertEqual(step(c), "Chị thanh toán COD.")
+
+    def test_challenge_without_words_repeats_the_last_line(self):
+        c = customer()
+        first = c.process({"observed": {}})
+        self.assertEqual(step(c, persona={"reaction": "challenge", "line": ""}), first)
+        self.assertEqual(c.reactions, ["challenge"])
+
+    def test_leave_ends_the_call_as_a_refusal(self):
+        c = customer()
+        c.process({"observed": {}})
+        self.assertIsNone(step(c, persona={"reaction": "leave", "line": "Thôi khỏi."}))
+        self.assertEqual((c.outcome, c.ended_by), ("tu_choi", "customer"))
+
+    def test_the_rules_come_first(self):
+        c = customer()
+        c.process({"observed": {}})
+        line = step(c, offer_matches=True, persona={"reaction": "leave", "line": "Thôi khỏi."})
+        self.assertEqual(line, "Dạ chị đồng ý.")
+        self.assertTrue(c.committed and not c.ended)
+
+    def test_an_unknown_reaction_is_refused(self):
+        c = customer()
+        c.process({"observed": {}})
+        with self.assertRaises(ValueError):
+            step(c, persona={"reaction": "buy", "line": ""})
+
+    def test_persona_never_sees_the_checks_and_its_numbers_come_from_the_call(self):
+        c = customer()
+        model = FakeModel([json.dumps({"reaction": "challenge", "line": "Giảm 500.000 là chương trình gì?"}),
+                           json.dumps({"reaction": "challenge", "line": "Em giảm 10% là chương trình gì?"}),
+                           "not json"])
+        persona = simulate.Persona(model, 0)
+        first = persona.react(c, [], "Em giảm cho chị 10% nhé", "Chị chốt đơn.", 1)
+        self.assertEqual(first, {"reaction": "challenge", "line": ""})
+        second = persona.react(c, [], "Em giảm cho chị 10% nhé", "Chị chốt đơn.", 2)
+        self.assertEqual(second["line"], "Em giảm 10% là chương trình gì?")
+        self.assertEqual(persona.react(c, [], "x", "y", 3), {"reaction": "follow", "line": ""})
+        for system, user, _, _ in model.log:
+            self.assertNotIn("success_if", system + user)
+            self.assertNotIn("must_not_ask", system + user)
+
+    def test_the_session_asks_the_persona_and_records_its_reaction(self):
+        observed = json.dumps({"questions": [], "stated_prices_vnd": [], "off_topic": False,
+                               "answered_outline_indices": []})
+        voice = simulate.Voice(FakeModel(["x"] * 9), 0)
+        voice.say = lambda customer, line, turn: line
+        persona = simulate.Persona(FakeModel([json.dumps({"reaction": "hold", "line": "Chị vẫn thấy đắt."})]), 0)
+        session = simulate.Session(customer(), simulate.Observer(FakeModel([observed]), 0), voice, spec(), "full",
+                                   prior_prices=set(), persona=persona)
+        session.first()
+        self.assertEqual(session.reply("Bên em không giảm được ạ", []), "Chị vẫn thấy đắt.")
+        self.assertEqual(session.trace[-1]["reaction"], "hold")
+        self.assertEqual(session.trace[-1]["observed"]["persona"]["reaction"], "hold")
+
+
 class Statistics(unittest.TestCase):
     def test_money_in_collects_vnd_fields(self):
         self.assertEqual(simulate.money_in({"a": {"final_price_vnd": 5}, "b": [{"total_vnd": 7}], "c": 3}), {5, 7})

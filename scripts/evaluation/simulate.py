@@ -15,6 +15,13 @@ once per seed and per configuration (``full`` and ``baseline_no_memory``):
   already answered. One model call per agent turn. The kernel and the observer see the scenario's
   ``facts_established``, ``customer_turns`` and slot names; the agent sees none of them, only the
   customer's words (specification section 5c).
+- :class:`Persona` is the customer the specification has a model play from the persona prompt. Where
+  the rules leave the customer about to say the next outline line, it reads the agent's reply
+  against its own prompt and follows the line, or reacts as the prompt says it would: ``hold`` (not
+  accepting yet, as the price-comparing customer given no value), ``challenge`` ("chương trình gì?"
+  after a discount no promotion backs) or ``leave``. It never reacts beyond its prompt, adds no fact,
+  and never makes an outcome better than the scenario's: agreement stays rule 5's. One model call
+  per agent turn; it never sees ``success_if`` or ``must_not_ask``.
 - :class:`Voice` says the line the kernel chose in the persona's words (temperature 0.3, the run's
   seed). A rewrite that drops a number of the original is discarded for the original line.
 
@@ -35,7 +42,7 @@ from pathlib import Path
 from typing import Any
 
 from eval_harness.contracts import ROOT, checker
-from eval_harness.simulation import CustomerSimulator, seed_statistics
+from eval_harness.simulation import REACTIONS, CustomerSimulator, seed_statistics
 
 DEFAULT_MODEL = "gpt-4.1-mini"
 TEMPERATURE = 0.3
@@ -243,11 +250,48 @@ class Voice:
                        for other in customer.spec["customer_turns"])
 
 
-class Session:
-    """One simulated call: the kernel, the observer and the voice, and what the check needs afterwards."""
+PERSONA_PROMPT = """Bạn là KHÁCH, không phải nhân viên. Đọc cuộc gọi tới giờ và câu nhân viên vừa nói, rồi trả về MỘT \
+đối tượng JSON: {"reaction": "follow"|"hold"|"challenge"|"leave", "line": "..."}
 
-    def __init__(self, customer, observer, voice, spec, config, prior_prices):
-        self.customer, self.observer, self.voice = customer, observer, voice
+Chọn reaction chỉ theo những gì mô tả nhân vật ở trên quy định:
+- follow: bạn sẽ nói câu tiếp theo trong dàn ý (NEXT_LINE); line để trống.
+- hold: mô tả nhân vật nói bạn CHƯA chấp nhận khi nhân viên làm như vừa rồi; line là điều bạn còn băn khoăn.
+- challenge: mô tả nhân vật nói bạn hỏi lại để kiểm tra khi nhân viên làm như vừa rồi; line là đúng câu đó.
+- leave: mô tả nhân vật nói bạn kết thúc cuộc gọi khi nhân viên làm như vừa rồi; line là câu chào cuối.
+Mô tả nhân vật không nói gì về điều nhân viên vừa làm thì chọn follow. Không thêm thông tin mới, không tự đồng ý mua, \
+đặt hàng hay hẹn điều gì ngoài dàn ý. line 1-2 câu ngắn. Chỉ trả JSON."""
+
+
+class Persona:
+    """The persona's reaction to an agent reply, as its prompt says; ``follow`` when it cannot say."""
+
+    def __init__(self, model: Model, seed: int) -> None:
+        self.model, self.seed = model, seed
+
+    def react(self, customer: Customer, dialogue: list[dict[str, str]], agent_text: str, upcoming: str,
+              turn: int) -> dict[str, Any]:
+        user = json.dumps({"DIALOGUE": dialogue[-8:], "AGENT": agent_text, "NEXT_LINE": upcoming}, ensure_ascii=False)
+        raw = self.model.chat(customer.prompt + "\n\n" + PERSONA_PROMPT, user, seed=self.seed * 1000 + 500 + turn,
+                              as_json=True)
+        try:
+            data = json.loads(raw)
+        except ValueError:
+            data = {}
+        reaction = data.get("reaction") if data.get("reaction") in REACTIONS else "follow"
+        line = str(data.get("line") or "").strip().strip('"«»')
+        if reaction in ("hold", "challenge"):
+            allowed = Counter(numbers_of(" ".join([*customer.spec["customer_turns"], agent_text,
+                                                    *map(str, (customer.spec.get("facts_established") or {}).values())])))
+            if not line or len(line) > 240 or Counter(numbers_of(line)) - allowed:
+                line = ""  # the kernel says the customer's last words again: a number never comes from nowhere
+        return {"reaction": reaction, "line": line if reaction != "follow" else ""}
+
+
+class Session:
+    """One simulated call: the kernel, the persona, the observer and the voice, and what the check needs afterwards."""
+
+    def __init__(self, customer, observer, voice, spec, config, prior_prices, persona=None):
+        self.customer, self.observer, self.voice, self.persona = customer, observer, voice, persona
         self.spec, self.config = spec, config
         self.slots = sorted({*spec.get("facts_established", {}), *spec.get("must_not_ask", [])})
         self.known_prices = set(prior_prices)
@@ -256,10 +300,18 @@ class Session:
         self.turn = 0
         self.last_customer = ""
         self.last_observed: dict[str, Any] = {}
+        self.dialogue: list[dict[str, str]] = []
 
     def first(self) -> str:
         line = self.customer.process({"observed": {}})
         return self._say(line)
+
+    def _upcoming(self, answered: list[int]) -> str | None:
+        """The outline line the kernel would say next, once the lines the agent already answered are skipped."""
+        outline, skip, index = self.spec["customer_turns"], self.customer.answered_outline | set(answered), self.customer.outline_index
+        while index in skip:
+            index += 1
+        return outline[index] if index < len(outline) else None
 
     def reply(self, agent_text: str, tool_events: list[dict[str, Any]]) -> str | None:
         calls = [{"name": e["request"]["name"], "args": e["request"].get("args") or {}} for e in tool_events]
@@ -290,15 +342,21 @@ class Session:
         observed = {"questions": seen["questions"], "wrong_price": wrong, "offer_matches": offer,
                     "silent_or_off_topic": seen["off_topic"] or not agent_text.strip(),
                     "answered_outline_indices": seen["answered_outline_indices"]}
+        self.dialogue.append({"speaker": "agent", "text": agent_text})
+        upcoming = self._upcoming(seen["answered_outline_indices"])
+        if self.persona is not None and upcoming is not None:
+            observed["persona"] = self.persona.react(customer, self.dialogue[:-1], agent_text, upcoming, self.turn)
         line = customer.process({"observed": observed})
         self.trace.append({"turn": self.turn, "customer": self.last_customer, "agent": agent_text,
                            "tools": [c["name"] for c in calls], "observed": {**observed, "stated_prices": seen["prices"]},
-                           "rules": customer.history[-1]["rules"], "patience": customer.patience, "next": line})
+                           "rules": customer.history[-1]["rules"], "reaction": customer.history[-1].get("reaction"),
+                           "patience": customer.patience, "next": line})
         return None if line is None else self._say(line)
 
     def _say(self, line: str) -> str:
         self.turn += 1
         self.last_customer = self.voice.say(self.customer, self.customer.speak(line), self.turn)
+        self.dialogue.append({"speaker": "customer", "text": self.last_customer})
         return self.last_customer
 
     def log(self) -> dict[str, Any]:
@@ -310,7 +368,7 @@ class Simulation:
 
     def __init__(self, seed: int, model: Model) -> None:
         self.seed, self.model = seed, model
-        self.observer, self.voice = Observer(model, seed), Voice(model, seed)
+        self.observer, self.voice, self.persona = Observer(model, seed), Voice(model, seed), Persona(model, seed)
         self.sessions: list[dict[str, Any]] = []
         self.history: dict[tuple[str, str], tuple[set[str], set[int]]] = {}
 
@@ -325,7 +383,7 @@ class Simulation:
                          if type(v) is int}
         customer = Customer(sid, call, scenario["persona"], spec, self.seed, prior_slots,
                             honorific=scenario.get("honorific") or "chị")
-        session = Session(customer, self.observer, self.voice, spec, config, prior_prices)
+        session = Session(customer, self.observer, self.voice, spec, config, prior_prices, persona=self.persona)
         self.sessions.append({"config": config, "scenario_id": sid, "call": call, "spec": spec, "session": session})
         return session
 
@@ -362,6 +420,8 @@ def summarize(per_seed: dict[int, Simulation], scenarios: dict[str, dict[str, An
             "ended_by": dict(Counter(log["ended_by"] for log in logs)),
             "mean_turns": statistics.mean(log["n_turns"] for log in logs) if logs else None,
             "mean_final_patience": statistics.mean(patience) if patience else None,
+            "reactions": dict(Counter(r for simulation in per_seed.values() for item in simulation.sessions
+                                      if item["config"] == config for r in item["session"].customer.reactions)),
             "logs": logs}
     full, base = (summary["configs"][c]["tsr"].get("mean") for c in CONFIGS)
     summary["delta_tsr_full_minus_baseline"] = None if full is None or base is None else round(full - base, 1)
@@ -394,7 +454,7 @@ def table(summary: dict[str, Any]) -> str:
     for config, label in (("baseline_no_memory", "Baseline"), ("full", "Hệ thống")):
         data = summary["configs"][config]
         rows.append(f"{label}: TSR theo seed {[round(v, 1) for v in data['tsr'].get('per_seed', [])]}  "
-                    f"outcome {data['outcomes']}  ended_by {data['ended_by']}")
+                    f"outcome {data['outcomes']}  ended_by {data['ended_by']}  persona {data.get('reactions') or {}}")
     stable = [summary["configs"][c]["tsr"].get("stable") for c in CONFIGS]
     rows.append(f"Ổn định giữa seed (biên độ ≤ 10 điểm): baseline={stable[1]} hệ thống={stable[0]}")
     return "\n".join(rows)
@@ -438,8 +498,8 @@ def simulate(out, *, only=None, dataset_id=None, level=None, limit=None, seeds=S
                    simulator_model={"model": llm.model, "temperature": TEMPERATURE, "calls": llm.calls,
                                     "input_tokens": llm.input_tokens, "output_tokens": llm.output_tokens,
                                     "cost_usd": round(llm.cost, 6)},
-                   notice="Diagnostic labels pending QA; passed = BTC check_call over real tool calls; observer is an "
-                          "unaudited model; non-price forbidden_claims are not checked.")
+                   notice="Diagnostic labels pending QA; passed = BTC check_call over real tool calls; observer and "
+                          "persona are unaudited models; non-price forbidden_claims are not checked.")
     text = table(summary)
     _write(out / "simulator-summary.json", summary)
     _write(out / "simulator-results.json", summary["configs"]["full"]["results"])

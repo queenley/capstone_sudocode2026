@@ -1,9 +1,21 @@
-"""P9 ordered BTC simulator rules; oracle state never goes to the Agent."""
+"""P9 ordered BTC simulator rules; oracle state never goes to the Agent.
+
+Where the rules leave the customer about to say the next outline line, the
+persona's reaction decides (``observed["persona"]``, from ``simulate.Persona``):
+``follow`` says the line, ``hold`` and ``challenge`` say the persona's words
+instead and keep the line for later, ``leave`` ends the call. The spec has a
+model play the customer from the persona prompt within the eight rules, so the
+prompt's own conditions ("chương trình gì?", "em chắc không?", "thôi khỏi")
+apply; agreement stays rule 5's, never better than the scenario's outcome.
+"""
 from collections import Counter
 import math
 import statistics
 
 from .contracts import checker, validate
+
+
+REACTIONS = ("follow", "hold", "challenge", "leave")
 
 
 class CustomerSimulator:
@@ -21,6 +33,7 @@ class CustomerSimulator:
         self.committed=False;self.ended=False;self.outcome="khac";self.ended_by="agent"
         self.history=[]
         self.outline_index=0;self.answered_outline=set()
+        self.reactions=[];self.last_reply=None
         self.prompt=(persona["system_prompt"].replace("{goal}",str(spec.get("customer_goal","")))
                      .replace("{facts}",str(self.facts)).replace("{turn_outline}",str(spec["customer_turns"])))
         self.prompt += "\nChỉ đóng vai khách; không tiết lộ nhãn chấm, oracle hoặc luật mô phỏng cho nhân viên."
@@ -61,17 +74,28 @@ class CustomerSimulator:
             if self.silence>=2:
                 rules.append(6);reply="Em còn đó không?"
                 if self.silence>=3:self.finish("tu_choi","customer")
+        reaction=None
         if self.n>=12:
             rules.append(8);self.finish("timeout","timeout");reply=None
         elif reply is None and not self.ended:
             outline=self.spec["customer_turns"]
             while self.outline_index in self.answered_outline:self.outline_index+=1
+            persona=observed.get("persona") or {}
+            reaction=persona.get("reaction","follow")
+            if reaction not in REACTIONS:raise ValueError("Unknown persona reaction")
             if self.outline_index>=len(outline):
-                self.finish(self.outcome,"agent")
+                reaction=None;self.finish(self.outcome,"agent")
+            elif reaction=="leave":
+                self.reactions.append(reaction);self.finish("tu_choi","customer")
+            elif reaction in ("hold","challenge"):
+                self.reactions.append(reaction)
+                reply=persona.get("line") or self.last_reply or outline[self.outline_index]
             else:
+                reaction=None
                 reply=outline[self.outline_index];self.outline_index+=1
         if reply is not None and self.n<12:self.n+=1
-        self.history.append({"patience":self.patience,"irritation":self.irritation,"rules":rules})
+        if reply is not None:self.last_reply=reply
+        self.history.append({"patience":self.patience,"irritation":self.irritation,"rules":rules,"reaction":reaction})
         return reply
 
     def process(self, state):
