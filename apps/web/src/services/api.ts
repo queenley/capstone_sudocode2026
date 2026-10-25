@@ -36,7 +36,7 @@ export async function api<T = unknown>(
   return result as T;
 }
 
-/** Source catalog shape from scripts/create_data/data/catalog/products.json. */
+/** Source catalog shape from evaluation/data-generation/data/catalog/products.json. */
 export type CatalogProductVariant = {
   variant_sku: string;
   size: string | number;

@@ -13,6 +13,7 @@ ARG VOICE_TTS=""
 # inherited by the MCP servers the agent starts as subprocesses.
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
     AGENT_HOME=/app/agent \
+    PROMPTS_DIR=/app/agent/prompts \
     PYTHONPATH=/app/shared:/app/service \
     VOICE_MODELS_DIR=/app/models \
     EMBEDDING_MODELS_DIR=/app/models/embedding \
@@ -34,8 +35,10 @@ RUN pip install --no-cache-dir -r requirements.txt \
 COPY packages/backend-common/src/ /app/shared/src/
 COPY apps/ai-agent-service/src/ /app/service/
 COPY apps/ai-agent-service/config/ /app/agent/config/
+# The prompts the models are given (config/prompts/agent of the repository).
+COPY config/prompts/agent/ /app/agent/prompts/
 # The agent's voices by region for VOICE_TTS=elevenlabs: (one file, shared with create_data).
-COPY scripts/create_data/config/voices.yaml /app/agent/config/voices.yaml
+COPY evaluation/data-generation/config/voices.yaml /app/agent/config/voices.yaml
 COPY apps/ai-agent-service/data/btc/ /app/agent/data/btc/
 COPY apps/ai-agent-service/data/kb/ /app/agent/data/kb/
 

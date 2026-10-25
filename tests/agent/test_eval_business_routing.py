@@ -7,7 +7,7 @@ from pathlib import Path
 from langchain_core.tools import StructuredTool
 from pydantic import BaseModel
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts" / "evaluation"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "evaluation" / "harness"))
 
 from agent import runner  # noqa: E402
 

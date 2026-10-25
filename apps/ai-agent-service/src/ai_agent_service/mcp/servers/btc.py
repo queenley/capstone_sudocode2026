@@ -97,7 +97,7 @@ def mock() -> ModuleType:
 
 def _add_synthetic_customers(module: ModuleType) -> None:
     """The team's synthetic CRM customers (``catalog/crm_seed_synthetic.json``,
-    written by ``scripts/create_data``), so generated scenarios find their
+    written by ``evaluation/data-generation``), so generated scenarios find their
     callers. Added to the mock's CRM in memory; ``mock_tools.py`` itself stays
     the organisers' file. IDs and phones never collide with the official 50
     (checked here). ``BTC_SYNTHETIC_CRM=0`` turns this off."""

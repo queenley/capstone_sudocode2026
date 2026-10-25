@@ -20,7 +20,7 @@ def truncated():
 @pytest.mark.asyncio
 async def test_truncation_retries_once_and_keeps_attempt_evidence(tmp_path):
     labeller = SimpleNamespace(ainvoke=AsyncMock(side_effect=[truncated(), TurnLabels()]))
-    extractor = Extractor(SimpleNamespace(with_structured_output=lambda _: labeller), model_name="mock",
+    extractor = Extractor(SimpleNamespace(with_structured_output=lambda *_, **__: labeller), model_name="mock",
                           cache_path=tmp_path/'cache.json')
     result = await extractor.label(customer_text="Hỏi giá", agent_text="Em sẽ kiểm tra lại ạ.")
     assert 'error' not in result
@@ -39,7 +39,7 @@ async def test_truncation_retries_once_and_keeps_attempt_evidence(tmp_path):
 async def test_extractor_does_not_loop_or_cache_failure(tmp_path, errors):
     labeller = SimpleNamespace(ainvoke=AsyncMock(side_effect=errors))
     cache = tmp_path/'cache.json'
-    extractor = Extractor(SimpleNamespace(with_structured_output=lambda _: labeller), model_name="mock",cache_path=cache)
+    extractor = Extractor(SimpleNamespace(with_structured_output=lambda *_, **__: labeller), model_name="mock",cache_path=cache)
     result = await extractor.label(customer_text="Hỏi giá", agent_text="Em sẽ kiểm tra lại ạ.")
     assert result.get('error')
     assert labeller.ainvoke.await_count == len(errors)

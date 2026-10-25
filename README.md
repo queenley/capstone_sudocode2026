@@ -131,7 +131,9 @@ apps/
   ai-agent-service/     AI tư vấn (xem README riêng)
 packages/backend-common/  Code dùng chung cho các service
 data/seed/catalog/      Sản phẩm demo của trang mua hàng
-scripts/                Seed dữ liệu, tạo admin, đánh giá AI, sinh dữ liệu test
+config/prompts/         Mọi prompt đưa cho model (agent, evaluation, data-generation)
+scripts/                Vận hành: seed dữ liệu, tạo admin, migration, deploy, dev
+evaluation/             Đánh giá AI: harness chấm điểm và bộ sinh dữ liệu test
 tests/                  Test tự động (pytest)
 docs/                   Tài liệu chi tiết
 infra/                  Triển khai lên cloud (Kubernetes, Terraform)
@@ -161,10 +163,10 @@ Set-Location apps/web; npm run typecheck; npm run build
 
 ### Đánh giá chất lượng AI
 
-Bộ chấm điểm (so sánh AI có nhớ khách và không nhớ khách, dùng scorer của BTC) nằm ở `scripts/evaluation`. Xem [scripts/evaluation/README.md](scripts/evaluation/README.md).
+Bộ chấm điểm (so sánh AI có nhớ khách và không nhớ khách, dùng scorer của BTC) nằm ở `evaluation/harness`. Xem [evaluation/harness/README.md](evaluation/harness/README.md).
 
 ```powershell
-apps/ai-agent-service/.venv/Scripts/python scripts/evaluation/run_eval.py evaluate --advisor openai:gpt-4.1-mini
+apps/ai-agent-service/.venv/Scripts/python evaluation/harness/run_eval.py evaluate --advisor openai:gpt-4.1-mini
 ```
 
 Lệnh dạng BTC (`--scenarios`, `--config`, `--out`) chạy agent trên kịch bản của BTC và chấm luôn bằng `reference_eval.py`, kèm bảng truy hồi: xem [README của AI agent](apps/ai-agent-service/README.md#test-và-đánh-giá).
@@ -207,4 +209,4 @@ Model AI của từng thành phần cấu hình trong [`apps/ai-agent-service/co
 
 ## Tài liệu thêm
 
-[Mục lục docs](docs/README.md) · [Kênh Zalo & Hotline](docs/channels.md) · [HTTP API](docs/api.md) · [Kiến trúc](docs/architecture/microservices-target-structure.md) · [AI Agent](apps/ai-agent-service/README.md) · [Scripts](scripts/README.md) · [Sinh dữ liệu test](scripts/create_data/README.md) · [Triển khai](docs/deployment/README.md)
+[Mục lục docs](docs/README.md) · [Kênh Zalo & Hotline](docs/channels.md) · [HTTP API](docs/api.md) · [Kiến trúc](docs/architecture/microservices-target-structure.md) · [AI Agent](apps/ai-agent-service/README.md) · [Scripts](scripts/README.md) · [Sinh dữ liệu test](evaluation/data-generation/README.md) · [Triển khai](docs/deployment/README.md)

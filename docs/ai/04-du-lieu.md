@@ -12,7 +12,7 @@ Có ba nhóm dữ liệu:
 
 ## 4.1 Gói dữ liệu của BTC
 
-Nằm ở [`apps/ai-agent-service/data/btc/`](../../apps/ai-agent-service/data/btc/) (bản sao ở `scripts/create_data/data/` cho pipeline sinh dữ liệu).
+Nằm ở [`apps/ai-agent-service/data/btc/`](../../apps/ai-agent-service/data/btc/) (bản sao ở `evaluation/data-generation/data/` cho pipeline sinh dữ liệu).
 
 | Thư mục | Nội dung | Agent dùng để |
 |---|---|---|
@@ -73,7 +73,7 @@ Rút gọn từ `SAMPLE-02` (khách so giá):
 
 ## 4.2 Bộ test do nhóm sinh
 
-BTC chỉ cho 7 kịch bản mẫu; bộ test ẩn có 15 loại ca khó. Nhóm tự sinh bộ test **đúng định dạng BTC và chấm bằng code BTC**. Pipeline: [`scripts/create_data`](../../scripts/create_data/README.md).
+BTC chỉ cho 7 kịch bản mẫu; bộ test ẩn có 15 loại ca khó. Nhóm tự sinh bộ test **đúng định dạng BTC và chấm bằng code BTC**. Pipeline: [`evaluation/data-generation`](../../evaluation/data-generation/README.md).
 
 ### Nguyên tắc cốt lõi: tool của BTC tính nhãn, LLM chỉ viết lời
 
@@ -123,7 +123,7 @@ flowchart LR
 
 ### Sinh kịch bản test
 
-Mỗi trong **16 persona** có các **biến thể** ([personas.py](../../scripts/create_data/src/planning/personas.py)); planner đi vòng qua các biến thể nên phủ đủ **15 loại ca khó của BTC**. Một số ví dụ:
+Mỗi trong **16 persona** có các **biến thể** ([personas.py](../../evaluation/data-generation/src/planning/personas.py)); planner đi vòng qua các biến thể nên phủ đủ **15 loại ca khó của BTC**. Một số ví dụ:
 
 | Biến thể (`hard_case`) | Dữ liệu cụ thể | Điều được kiểm |
 |---|---|---|
@@ -137,11 +137,11 @@ Mỗi trong **16 persona** có các **biến thể** ([personas.py](../../script
 | `ep_gia_do_gia_nhap` | khách dò giá nhập | không lộ giá nhập, giá sàn, nhà cung cấp |
 | `het_hang_luc_khach_quyet` | MB-STR1 hết hàng 10 ngày sau | hạ kết quả thành `hen_goi_lai`, ngày có lại |
 
-Danh sách đủ 15 loại: [scripts/create_data/README.md §3](../../scripts/create_data/README.md#3-hard-cases-điều-chỉnh-đề-11-and-other-situations). Với `--limit 120`: 120 kịch bản, 260 cuộc, 83 kịch bản ca khó, phủ đủ 9 cặp ngành hàng × vùng miền và 16 persona.
+Danh sách đủ 15 loại: [evaluation/data-generation/README.md §3](../../evaluation/data-generation/README.md#3-hard-cases-điều-chỉnh-đề-11-and-other-situations). Với `--limit 120`: 120 kịch bản, 260 cuộc, 83 kịch bản ca khó, phủ đủ 9 cặp ngành hàng × vùng miền và 16 persona.
 
 ### Các phiên bản dataset
 
-Bộ chấm đọc dataset đã chuẩn hóa ở [`scripts/evaluation/datasets/`](../../scripts/evaluation/datasets/) (chuyển bằng `normalize_create_data.py`):
+Bộ chấm đọc dataset đã chuẩn hóa ở [`evaluation/harness/datasets/`](../../evaluation/harness/datasets/) (chuyển bằng `normalize_create_data.py`):
 
 | Dataset | Kịch bản | Khác bản trước |
 |---|---:|---|
@@ -159,12 +159,12 @@ Bộ chấm đọc dataset đã chuẩn hóa ở [`scripts/evaluation/datasets/`
 
 ```text
 synthesize_scenario_audio (ElevenLabs)
-  → scripts/create_data/output/audio/scenarios_<id>/call_N/turn_K.wav + .json
+  → evaluation/data-generation/output/audio/scenarios_<id>/call_N/turn_K.wav + .json
   → run_eval.py asr-build    lọc, đổi định dạng BTC, ghi SHA-256 từng file
   → datasets/asr-team-v2/    ground_truth.json + audio/ (không lên Git, ~71 MB)
 ```
 
-- **Đáp án dạng đọc** ([spoken.py](../../scripts/create_data/src/asr/spoken.py)): 5.200.000đ → "năm triệu hai trăm nghìn", OD600001 → "ô đê sáu trăm nghìn không trăm linh một", COD → "cê ô đê". Đúng văn bản này được gửi cho TTS, nên đáp án đúng theo cách dựng.
+- **Đáp án dạng đọc** ([spoken.py](../../evaluation/data-generation/src/asr/spoken.py)): 5.200.000đ → "năm triệu hai trăm nghìn", OD600001 → "ô đê sáu trăm nghìn không trăm linh một", COD → "cê ô đê". Đúng văn bản này được gửi cho TTS, nên đáp án đúng theo cách dựng.
 - **Nhiễu:** một phần ba có nhiễu dải điện thoại + mất gói (BTC: 4/12 có nhiễu); loại `clean`, `cafe`, `street`, `weak_signal`, `wind`, SNR 6 dB.
 - **Entity** (ngân sách, diện tích, thanh toán...) lấy bằng chính ITN của agent.
 - Clip bị loại nếu thiếu WAV, kịch bản đã đổi, là chat teencode (người gọi không nói "ko", "dc"), sai định dạng hay sai độ dài.

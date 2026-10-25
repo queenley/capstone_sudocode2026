@@ -8,15 +8,15 @@ Kết quả ngày 22/10/2026: [báo cáo và giới hạn](2026-10-22-results.md
 
 Lịch sử chọn case và run mới: [RUN-LEDGER.md](RUN-LEDGER.md). Trước khi chạy thêm, kiểm danh sách đã chạy và holdout để tránh trùng.
 
-Main hiện có runner BTC ở gốc repo (`run_eval.py`) và harness phân tích tại `scripts/evaluation/run_eval.py`. Xem [bản đồ hiện tại](system-map.md) và [đợt kiểm ngày 22/10/2026](2026-10-22-worklog.md). Các bảng số liệu và ghi chú runner stub bên dưới là tài liệu lịch sử, không phải readiness mới nhất.
+Main hiện có runner BTC ở gốc repo (`run_eval.py`) và harness phân tích tại `evaluation/harness/run_eval.py`. Xem [bản đồ hiện tại](system-map.md) và [đợt kiểm ngày 22/10/2026](2026-10-22-worklog.md). Các bảng số liệu và ghi chú runner stub bên dưới là tài liệu lịch sử, không phải readiness mới nhất.
 
 Mọi con số dùng trong báo cáo đều được tính bằng code chấm của BTC: `apps/ai-agent-service/data/btc/eval/reference_eval.py`. Repo có ba tầng đánh giá, xếp từ rẻ đến đầy đủ:
 
 | Tầng | Lệnh | Cần gì | Đo gì |
 |---|---|---|---|
 | 1. Test | `python -m pytest -q` | không gì | lane, hard guard, PII, ITN; contract của route agent; workflow nền tảng |
-| 2. Retrieval của agent | `python -m scripts.evaluation.evaluate` | không gì | Recall@3/@5, multi-hop, tỉ lệ từ chối (abstain), `rag_eval` của BTC |
-| 3. End-to-end Chương A | `scripts/create_data` + `reference_eval.py` | stack đang chạy + key model | CCR, RQR, TSR (+ hard case), HR (+ giá/khuyến mãi), guardrails, latency, ASR |
+| 2. Retrieval của agent | `python evaluation/harness/evaluate.py` | không gì | Recall@3/@5, multi-hop, tỉ lệ từ chối (abstain), `rag_eval` của BTC |
+| 3. End-to-end Chương A | `evaluation/data-generation` + `reference_eval.py` | stack đang chạy + key model | CCR, RQR, TSR (+ hard case), HR (+ giá/khuyến mãi), guardrails, latency, ASR |
 
 CI chạy tầng 1 và 2 ở mỗi push. Tầng 2 ghi `reports/generated/evaluation.json`, CI upload file này thành artifact.
 
@@ -28,7 +28,7 @@ CI chạy tầng 1 và 2 ở mỗi push. Tầng 2 ghi `reports/generated/evaluat
 
 ## Tầng 2: retrieval của agent
 
-`scripts/evaluation/evaluate.py` cho chính retriever của agent (`kb_search`: BM25 trên `data/btc/policy`, mỗi mục `## [XX-nn]` là một chunk) trả lời 60 câu trong `data/btc/rag/qa_labeled.json`. Agent được tính là "từ chối" khi không có kết quả nào, hoặc kết quả đầu là tài liệu nội bộ.
+`evaluation/harness/evaluate.py` cho chính retriever của agent (`kb_search`: BM25 trên `data/btc/policy`, mỗi mục `## [XX-nn]` là một chunk) trả lời 60 câu trong `data/btc/rag/qa_labeled.json`. Agent được tính là "từ chối" khi không có kết quả nào, hoặc kết quả đầu là tài liệu nội bộ.
 
 | Chỉ số | Retriever của agent | Baseline `create_data` |
 |---|---:|---:|
@@ -38,11 +38,11 @@ CI chạy tầng 1 và 2 ở mỗi push. Tầng 2 ghi `reports/generated/evaluat
 | Từ chối khi hỏi thông tin nội bộ | 20.0 | 80.0 |
 | Từ chối nhầm | 4.3 | 6.4 |
 
-Việc cần làm tiếp: đưa luật từ chối của baseline (`scripts/create_data/src/rag/retriever.py`, `should_abstain`) vào `kb_search`. Khi agent không biết từ chối, câu hỏi ngoài tài liệu sẽ dẫn tới bịa câu trả lời, làm tăng HR.
+Việc cần làm tiếp: đưa luật từ chối của baseline (`evaluation/data-generation/src/rag/retriever.py`, `should_abstain`) vào `kb_search`. Khi agent không biết từ chối, câu hỏi ngoài tài liệu sẽ dẫn tới bịa câu trả lời, làm tăng HR.
 
 ## Tầng 3: chỉ số bắt buộc Chương A
 
-[`scripts/create_data`](../../scripts/create_data/README.md) sinh kịch bản đúng format `test_set/public_sample`, phủ đủ 15 loại hard case. Nhãn được tính bằng cách **chạy** `mock_tools.py` của BTC, còn LLM chỉ viết lời thoại. Pipeline cũng sinh ground truth `trace_log`, CallBrief/HandoffBrief mong đợi, audio khách và bộ ASR của nhóm. Oracle (một agent lý tưởng) đạt điểm tuyệt đối trên 120 kịch bản / 260 cuộc gọi, nghĩa là mọi nhãn đều khả thi.
+[`evaluation/data-generation`](../../evaluation/data-generation/README.md) sinh kịch bản đúng format `test_set/public_sample`, phủ đủ 15 loại hard case. Nhãn được tính bằng cách **chạy** `mock_tools.py` của BTC, còn LLM chỉ viết lời thoại. Pipeline cũng sinh ground truth `trace_log`, CallBrief/HandoffBrief mong đợi, audio khách và bộ ASR của nhóm. Oracle (một agent lý tưởng) đạt điểm tuyệt đối trên 120 kịch bản / 260 cuộc gọi, nghĩa là mọi nhãn đều khả thi.
 
 | Chỉ số | Nhãn trong kịch bản | Trường trace được đọc |
 |---|---|---|
@@ -55,7 +55,7 @@ Việc cần làm tiếp: đưa luật từ chối của baseline (`scripts/crea
 Quy trình:
 
 ```powershell
-cd scripts/create_data
+cd evaluation/data-generation
 python -m src.pipeline.run_all --plan-only --limit 120     # kịch bản + nhãn + kiểm tra oracle, không tốn API
 # chạy agent trên các kịch bản (chế độ đầy đủ và memory_enabled=false), xuất trace JSONL
 python ../../apps/ai-agent-service/data/btc/eval/reference_eval.py `

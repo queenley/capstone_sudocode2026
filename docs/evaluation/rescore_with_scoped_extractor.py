@@ -2,18 +2,18 @@
 reference_eval; the agent run is unchanged, only the instrument is. Not a replacement for evaluate; costs one extractor
 call per turn (about 0.0006 USD each).
 
-    python docs/evaluation/rescore_with_scoped_extractor.py scripts/evaluation/runs/<run>
+    python docs/evaluation/rescore_with_scoped_extractor.py evaluation/harness/runs/<run>
 """
 import glob, json, subprocess, sys, os, importlib.util
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 REPO=Path(__file__).resolve().parents[2]
-E=REPO/'scripts/evaluation'
+E=REPO/'evaluation/harness'
 sys.path.insert(0,str(E))
 R=Path(sys.argv[1]).resolve()
 spec=importlib.util.spec_from_file_location('ref',E/'evaluation-contracts/sources/btc/eval/reference_eval.py');ref=importlib.util.module_from_spec(spec);spec.loader.exec_module(ref)
 cfg=json.load(open(R/'inputs/extractor.json'))['config']
-prompt=(E/'extractor-prompt.txt').read_text(encoding='utf-8')
+prompt=(REPO/'config/prompts/evaluation/extractor.txt').read_text(encoding='utf-8')
 env={**os.environ,'PYTHONUTF8':'1'}
 def run(doc):
     inp={k:doc[k] for k in ('agent_text','tool_texts','consultant_texts')}

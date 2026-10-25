@@ -3,6 +3,8 @@
 Đọc file này trước khi chọn case. Đây là mục theo dõi chung; raw log/trace giữ local, không commit.
 Một scenario chạy cả full/baseline vẫn là một scenario mới về độ phủ. Chạy R1 cùng cohort là retest có chủ đích, không cộng vào số case mới.
 
+Từ 25/10/2026, `scripts/evaluation/` đổi thành `evaluation/harness/` và `scripts/create_data/` thành `evaluation/data-generation/`. Các mục bên dưới giữ đường dẫn lúc ghi; thư mục bằng chứng `scripts/evaluation/runs/<run>` giờ nằm ở `evaluation/harness/runs/<run>`, nội dung không đổi.
+
 ## Các lượt chạy
 
 | Run | Ngày | Mục đích | Scenario | Cấu hình | Trạng thái |

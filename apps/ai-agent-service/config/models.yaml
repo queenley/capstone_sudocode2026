@@ -87,7 +87,7 @@ agents:
 
   # docs/design.md section 9.4 and Appendix C: the evaluation's extractor of
   # questions, claims and fact use (ai_agent_service/pipeline/eval/extract_command.py,
-  # and scripts/evaluation/agent/extract_command.py for the team's harness). Not
+  # and evaluation/harness/agent/extract_command.py for the team's harness). Not
   # an agent of the product; named here so
   # its model is one line of config like theirs, on the advisor's OpenAI key.
   extractor:
@@ -166,7 +166,7 @@ providers:
   openai:
     label: OpenAI
     models_url: https://api.openai.com/v1/models
-    # gpt-4.1-mini is the default of the offline evaluation (scripts/evaluation);
+    # gpt-4.1-mini is the default of the offline evaluation (evaluation/harness);
     # it takes temperature 0, which the gpt-5 reasoning models refuse.
     models:
       - gpt-4.1-mini

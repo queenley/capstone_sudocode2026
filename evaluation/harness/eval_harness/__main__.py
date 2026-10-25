@@ -1,0 +1,393 @@
+"""Offline contracts, preflight, execution and evidence replay."""
+import argparse
+import json
+from pathlib import Path
+
+
+class Parser(argparse.ArgumentParser):
+    def error(self, message):
+        self.print_usage()
+        self.exit(3, f"{self.prog}: error: {message}\n")
+
+
+def main(argv=None):
+    parser = Parser(description="Offline contracts, text evaluation, evidence replay and metrics")
+    commands = parser.add_subparsers(dest="command", required=True, parser_class=Parser)
+    product = commands.add_parser("evaluate", help="The team's agent through prepare, run, collect and score; output in --out")
+    product_prepare = commands.add_parser("prepare", help="Only the offline gate of evaluate (pinned inputs, preflight); no model")
+    for sub, default in ((product, "runs/<date-time>"), (product_prepare, "runs/<date-time>-prepare")):
+        sub.add_argument("--out", type=Path, help=f"A new run directory (default: {default})")
+        sub.add_argument("--only", action="append", default=[], metavar="SCENARIO_ID", help="Run one scenario; repeat for more")
+        sub.add_argument("--extractor-calls", type=int, help="Budget of extraction calls (default: one per planned turn)")
+        sub.add_argument("--dataset-id", help="Registered dataset ID from datasets/registry.json (default: the 5 diagnostic cases)")
+        sub.add_argument("--level", choices=("M1", "M2"), help="Scenarios of this level only; required when the set mixes levels")
+        sub.add_argument("--limit", type=int, help="The first N selected scenarios of a registered dataset")
+        sub.add_argument("--advisor", metavar="PROVIDER:MODEL", help="Advisor model, e.g. openai:gpt-4.1-mini (default: config/models.yaml)")
+        sub.add_argument("--extractor", metavar="PROVIDER:MODEL", help="Extraction model (default: openai:gpt-4.1-mini when OPENAI_API_KEY is set)")
+    sim = commands.add_parser("simulate", help="The BTC customer simulator (patience rules) drives the agent; full vs baseline, 3 seeds")
+    sim.add_argument("--out", type=Path, help="A new run directory (default: runs/<date-time>-simulate)")
+    sim.add_argument("--only", action="append", default=[], metavar="SCENARIO_ID", help="Simulate one scenario; repeat for more")
+    sim.add_argument("--dataset-id", required=True, help="Registered dataset ID from datasets/registry.json")
+    sim.add_argument("--level", choices=("M1", "M2"), required=True, help="One level per run")
+    sim.add_argument("--limit", type=int, help="The first N selected scenarios")
+    sim.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2], help="Seeds (the organisers' check pins three)")
+    sim.add_argument("--advisor", metavar="PROVIDER:MODEL", help="Advisor model (default: config/models.yaml)")
+    sim.add_argument("--simulator-model", help="Model that plays the customer (default: gpt-4.1-mini)")
+    commands.add_parser("history", help="Show every product evaluation run from evaluation/runs; no Agent/model")
+    spend = commands.add_parser("langfuse-log", help="Log a finished run's spend (tokens, USD) and scores to Langfuse")
+    spend.add_argument("--run", required=True, type=Path, help="The run folder, e.g. evaluation/harness/runs/<run>")
+    spend.add_argument("--force", action="store_true", help="Log again even if already logged")
+    data = commands.add_parser("data-check", help="Inspect the single team dataset registry without an Agent")
+    data.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1] / "datasets")
+    data.add_argument("--set", help="Inspect one registered dataset ID")
+    exemplar = commands.add_parser("exemplar-check", help="Check approved examples and their reported context use")
+    exemplar.add_argument("--bank", required=True, type=Path)
+    exemplar.add_argument("--usage", required=True, type=Path)
+    reflection = commands.add_parser("reflection-support", help="Check independent call support for a lesson candidate")
+    reflection.add_argument("--records", required=True, type=Path)
+    reflection.add_argument("--code", required=True)
+    improvement = commands.add_parser("improvement-compare", help="Compare closed text evaluation rounds, M1 or M2")
+    improvement.add_argument("--run", action="append", required=True, type=Path)
+    improvement.add_argument("--out", required=True, type=Path)
+    gap = commands.add_parser("gap-publish", help="Publish a human-reviewed FAQ and growth-test candidate; never activates KB")
+    gap.add_argument("--candidates", required=True, type=Path)
+    gap.add_argument("--review", required=True, type=Path)
+    gap.add_argument("--out", required=True, type=Path)
+    scan = commands.add_parser("gap-scan", help="Extract gap review candidates from a closed evaluation evidence run")
+    scan.add_argument("--run", required=True, type=Path)
+    scan.add_argument("--out", required=True, type=Path)
+    growth = commands.add_parser("gap-check", help="Check all approved growth cases against supplied agent responses")
+    growth.add_argument("--growth-root", required=True, type=Path)
+    growth.add_argument("--responses", required=True, type=Path)
+    asr_build = commands.add_parser("asr-build", help="Filter create_data's scenario audio into a new ASR set under datasets/; no model")
+    asr_build.add_argument("--set-id", default="asr-team-v2", help="New set directory name under datasets/ (never overwritten)")
+    asr_build.add_argument("--audio", type=Path, help="Clip folder (default: evaluation/data-generation/output/audio)")
+    asr_build.add_argument("--scenarios", type=Path, help="Current scenarios (default: evaluation/data-generation/output/scenarios_internal)")
+    asr_build.add_argument("--restore", action="store_true", help="Copy back the WAVs of an existing set (a fresh clone), hash-checked")
+    asr = commands.add_parser("asr", help="ASR set through the ASR service; BTC wer_cer on raw and lexicon-corrected text")
+    asr.add_argument("--set", default="asr-team-v2", help="ASR set under datasets/")
+    asr.add_argument("--out", type=Path, help="New output directory (default: runs/asr/<time>-<model>)")
+    asr.add_argument("--url", default="http://127.0.0.1:8500", help="ASR service (docker compose publishes it on 127.0.0.1:8500)")
+    asr.add_argument("--model", default="zipformer-30m", help="zipformer-30m, zipformer-2025, phowhisper-small, whisper-turbo")
+    asr.add_argument("--limit", type=int, help="The first N clips only (a smoke test)")
+    asr.add_argument("--no-hotwords", action="store_true", help="Do not send the agent's hotwords")
+    asr.add_argument("--hypotheses", type=Path, help="Score this hypotheses.json instead of calling the service")
+    rag = commands.add_parser("rag-recall", help="Run product kb_search on all 60 BTC questions; retrieval only")
+    rag.add_argument("--out", required=True, type=Path, help="New output directory")
+    rag.add_argument("--on", default="2026-10-15", help="Call date for versioned policy (YYYY-MM-DD)")
+    suite=commands.add_parser("suite-bundle",help="P8–P10 closed producer evidence adapters; no live inference/production activation")
+    suite.add_argument("--inputs",required=True,type=Path)
+    suite.add_argument("--out",required=True,type=Path)
+    release=commands.add_parser("release-gate",help="P7 verified candidate release recommendation; no deployment mutation")
+    release.add_argument("--inputs",required=True,type=Path)
+    release.add_argument("--out",required=True,type=Path)
+    package=commands.add_parser("package",help="P10 immutable handoff/readiness; does not certify missing A01–A18")
+    package.add_argument("--inputs",required=True,type=Path)
+    package.add_argument("--out",required=True,type=Path)
+    rounds = commands.add_parser("compare-rounds", help="P7 diagnostic R0/R1 comparison/readiness; never activates production")
+    rounds.add_argument("--r0", required=True, type=Path)
+    rounds.add_argument("--r1", type=Path)
+    rounds.add_argument("--out", required=True, type=Path)
+    metrics = commands.add_parser("report", help="P6 immutable M1 metric/comparison/table replay; no Agent/model")
+    metrics.add_argument("--run", required=True, type=Path, help="Closed P4 score run")
+    metrics.add_argument("--usage-run", type=Path, help="Closed reconciled billing ledger; never fills missing usage with zero")
+    metrics.add_argument("--casebook-run", type=Path, help="Closed casebook review with independent retest evidence")
+    metrics.add_argument("--out", required=True, type=Path)
+    bench = commands.add_parser("benchmark", help="P6 one-command text evaluation using paired execution")
+    bench.add_argument("--settings", required=True, type=Path)
+    bench.add_argument("--out", required=True, type=Path)
+    pair = commands.add_parser("benchmark-rounds", help="Run pinned R0 and R1 through P2–P7; diagnostic hold")
+    pair.add_argument("--r0-settings", required=True, type=Path)
+    pair.add_argument("--r1-settings", required=True, type=Path)
+    pair.add_argument("--out", required=True, type=Path)
+    pair.add_argument("--max-model-attempts", type=int, help="Required hard cap for runtime rounds; preflight counts both Agent configurations and extractor")
+    pre = commands.add_parser("preflight", help="Validate pinned planned inputs without running an Agent")
+    pre.add_argument("--settings", required=True, type=Path)
+    pre.add_argument("--scenarios", type=Path, help="Optional directory; must exactly match manifest")
+    pre.add_argument("--out", type=Path, help="New JSON report file; never overwrites an existing file")
+    pre.add_argument("--for-execution", action="store_true",
+                     help="Exit by P2 input gate; still does not bind/run an adapter")
+    run = commands.add_parser("run", help="P2 fixed-turn execution only; no quality scoring/trace export")
+    run.add_argument("--settings", required=True, type=Path)
+    run.add_argument("--scenarios", type=Path)
+    run.add_argument("--config", choices=("full", "baseline_no_memory"), help="Default runs both configs")
+    run.add_argument("--round", help="Must match pinned manifest.round, e.g. R0")
+    run.add_argument("--out", required=True, type=Path, help="New raw run directory, NOT a BTC JSONL file")
+    collect = commands.add_parser("collect", help="P3 immutable evidence validation; command_model extractor calls model only when explicitly pinned")
+    collect.add_argument("--run", required=True, type=Path)
+    collect.add_argument("--extractor", help="Descriptor path relative to the run's pinned inputs")
+    collect.add_argument("--audit-seed", type=int, default=0)
+    collect.add_argument("--out", required=True, type=Path)
+    export = commands.add_parser("export-trace", help="Export complete BTC wire cohort, not quality acceptance")
+    export.add_argument("--run", required=True, type=Path)
+    export.add_argument("--config", required=True, choices=("full", "baseline_no_memory"))
+    export.add_argument("--out", required=True, type=Path)
+    scoring = commands.add_parser("score", help="P4 BTC CLI + supplemental checks; no Agent/model/DB")
+    scoring.add_argument("--run", required=True, type=Path)
+    scoring.add_argument("--out", required=True, type=Path)
+    args = parser.parse_args(argv)
+    if args.command == "improvement-compare":
+        from .improvement_compare import compare
+        try:
+            report = compare(args.run, args.out)
+            print(json.dumps(report, ensure_ascii=False, indent=2))
+            return 2 if any(row["issues"] for row in report["rounds"]) else 0
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            print("Improvement comparison error:", exc)
+            return 3
+    if args.command in {"data-check", "exemplar-check", "reflection-support"}:
+        from .assets import read_json
+        from .data_registry import inspect
+        from .exemplars import check
+        from .reflection import lesson_support
+        try:
+            report = (inspect(args.root, only=args.set) if args.command == "data-check" else
+                      check(args.bank, args.usage) if args.command == "exemplar-check" else
+                      lesson_support(read_json(args.records), args.code))
+            print(json.dumps(report, ensure_ascii=False, indent=2))
+            return 2 if report.get("issues") or report.get("status") in {"INCOMPLETE", "pending_evidence"} or report.get("execution_gate", {}).get("allowed") is False else 0
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            print("Offline improvement check error:", exc)
+            return 3
+    if args.command == "asr-build":
+        from .asr_eval import AUDIO_ROOT, SCENARIOS_DIR, build_set, restore_audio
+        try:
+            if args.restore:
+                report = restore_audio(args.set_id, audio_root=args.audio or AUDIO_ROOT)
+                print(json.dumps({**report, "missing_or_changed": report["missing_or_changed"][:20]}, ensure_ascii=False, indent=2))
+                return 2 if report["missing_or_changed"] else 0
+            report = build_set(set_id=args.set_id, audio_root=args.audio or AUDIO_ROOT,
+                               scenarios_dir=args.scenarios or SCENARIOS_DIR)
+            print(json.dumps(report["counts"], ensure_ascii=False, indent=2))
+            print("Set written to", (Path(__file__).resolve().parents[1] / "datasets" / args.set_id))
+            return 0
+        except (OSError, ValueError, KeyError) as exc:
+            print("ASR set not built:", exc)
+            return 3
+    if args.command == "asr":
+        from datetime import datetime
+        from .asr_eval import evaluate
+        out = args.out or (Path(__file__).resolve().parents[1] / "runs" / "asr"
+                           / f"{datetime.now():%Y%m%d-%H%M%S}-{'file' if args.hypotheses else args.model}")
+        try:
+            report = evaluate(out, set_id=args.set, url=args.url, model=args.model, limit=args.limit,
+                              hypotheses=args.hypotheses, hotwords=not args.no_hotwords)
+            print(json.dumps({key: report[key] for key in ("set_id", "engine", "n_clips", "complete", "rtf_mean", "raw", "lexicon")},
+                             ensure_ascii=False, indent=2))
+            print("Report written to", (out / "report.json").resolve())
+            return 0 if report["complete"] else 2
+        except (OSError, ValueError, KeyError, RuntimeError) as exc:
+            print("ASR evaluation incomplete:", exc)
+            return 3
+    if args.command == "rag-recall":
+        from datetime import date
+        from .rag_recall import run
+        try:
+            date.fromisoformat(args.on)
+            result = run(args.out, on=args.on)
+            print(json.dumps({key: value for key, value in result["metrics"].items() if key != "rows"},
+                             ensure_ascii=False, indent=2))
+            print("Report written to", (args.out / "report.json").resolve())
+            return 0
+        except (OSError, ValueError, TypeError, RuntimeError, AssertionError) as exc:
+            print("RAG Recall incomplete:", exc)
+            return 3
+    if args.command == "gap-check":
+        from .gaps import check
+        try:
+            report = check(args.growth_root, args.responses)
+            print(json.dumps(report, ensure_ascii=False, indent=2))
+            return 1 if report["counts"]["FAIL"] else 2 if report["counts"]["MISSING"] or not report["rows"] else 0
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            print("Growth check error:", exc)
+            return 3
+    if args.command == "gap-scan":
+        from .gaps import scan
+        try:
+            report = scan(args.run, args.out)
+            print(json.dumps({"candidates": len(report["candidates"]), "out": str(args.out.resolve())}, ensure_ascii=False))
+            return 0
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            print("Knowledge gap scan error:", exc)
+            return 3
+    if args.command == "gap-publish":
+        from .gaps import publish
+        try:
+            print(json.dumps(publish(args.candidates, args.review, args.out), ensure_ascii=False, indent=2))
+            return 0
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            print("Knowledge gap review error:", exc)
+            return 3
+    if args.command == "langfuse-log":
+        from product import log_spend
+        print(log_spend(args.run, force=args.force))
+        return 0
+    if args.command == "simulate":
+        from datetime import datetime
+        from simulate import simulate
+        out = args.out or Path(__file__).resolve().parents[1] / "runs" / (datetime.now().strftime("%Y%m%d-%H%M%S") + "-simulate")
+        try:
+            report = simulate(out, only=set(args.only), dataset_id=args.dataset_id, level=args.level, limit=args.limit,
+                              seeds=tuple(args.seeds), advisor=args.advisor, model=args.simulator_model)
+        except (OSError, ValueError, KeyError, TypeError, RuntimeError) as exc:
+            print(f"Simulate error: {type(exc).__name__}: {exc}")
+            return 3
+        print(report["table"])
+        print("Run written to", Path(report["out"]).resolve())
+        return 0 if report["summary"]["execution_complete"] else 2
+    if args.command == "history":
+        from .history import render_history
+        print(render_history(Path(__file__).resolve().parents[1] / "runs"))
+        return 0
+    if args.command in ("evaluate", "prepare"):
+        from datetime import datetime
+        from product import evaluate, levels, prepare  # beside run_eval.py; it drives the agent
+        stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        base = args.out or Path(__file__).resolve().parents[1] / "runs" / (stamp + ("-prepare" if args.command == "prepare" else ""))
+        # A run holds one level. Without --level, a set that mixes levels runs
+        # once per level, into sibling folders <out>-M1, <out>-M2.
+        try:
+            selected = [args.level] if args.level else levels(args.dataset_id, set(args.only))
+        except (OSError, ValueError, KeyError) as exc:
+            print(f"{args.command.capitalize()} error: {type(exc).__name__}: {exc}")
+            return 3
+        split = len(selected) > 1
+        codes = []
+        for level in selected:
+            out = base.with_name(f"{base.name}-{level}") if split else base
+            if split:
+                print(f"\n=== Level {level} -> {out.resolve()} ===")
+            options = dict(only=set(args.only), extractor_calls=args.extractor_calls, dataset_id=args.dataset_id,
+                           level=level, limit=args.limit, advisor=args.advisor, extractor_model=args.extractor)
+            if args.command == "prepare":
+                try:
+                    prepared = prepare(out, **options)
+                except (OSError, ValueError, KeyError, TypeError, RuntimeError) as exc:
+                    print(f"Prepare error: {type(exc).__name__}: {exc}")
+                    codes.append(3)
+                    continue
+                print(json.dumps(prepared, ensure_ascii=False, indent=2))
+                print("Prepared inputs in", out.resolve())
+                codes.append(0 if prepared["execution_gate"]["allowed"] else 2)
+                continue
+            report = evaluate(out, **options)
+            print(json.dumps(report, ensure_ascii=False, allow_nan=False, indent=2))
+            print("Run written to", out.resolve())
+            table = out / "scored" / "scorer.stdout.txt"
+            if table.is_file():
+                print(table.read_text(encoding="utf-8"))
+            extra = out / "scored" / "run-summary.txt"
+            if extra.is_file():
+                print(extra.read_text(encoding="utf-8"))
+            status = (report["stages"][-1].get("status") or {}) if report["stages"] else {}
+            codes.append(3 if report["pipeline_error"] else 1 if status.get("verdict") == "FAIL"
+                         else 2 if status.get("completeness") == "INCOMPLETE" else 0)
+        # The worst outcome: an error, then a failed check, then missing evidence.
+        return next((code for code in (3, 1, 2) if code in codes), 0)
+    if args.command in ("suite-bundle","release-gate","package"):
+        from .suite_bundle import evaluate_bundle
+        from .release import release_gate
+        from .package import handoff_package
+        try:
+            report=({"suite-bundle":evaluate_bundle,"release-gate":release_gate,"package":handoff_package}[args.command])(args.inputs,args.out)
+            print(json.dumps(report,ensure_ascii=False,allow_nan=False,indent=2))
+            if args.command=="release-gate":return 0 if report["decision"]=="active" else 2
+            return 1 if report["status"]["verdict"]=="FAIL" else 2 if report["status"]["completeness"]=="INCOMPLETE" else 0
+        except (OSError,ValueError,KeyError,TypeError,AssertionError) as exc:
+            print("Suite/release config or integrity error:",exc)
+            return 3
+    if args.command == "compare-rounds":
+        from .rounds import compare_rounds
+        try:
+            report = compare_rounds(args.r0,args.out,r1_run=args.r1)
+            print(json.dumps(report,ensure_ascii=False,allow_nan=False,indent=2))
+            return 1 if report["status"]["verdict"]=="FAIL" else 2 if report["status"]["completeness"]=="INCOMPLETE" else 0
+        except (OSError,ValueError,KeyError,TypeError,AssertionError) as exception:
+            print(f"P7 config/integrity error: {exception}")
+            return 3
+    if args.command == "benchmark-rounds":
+        from .benchmark import benchmark_rounds
+        try:
+            report = benchmark_rounds(args.r0_settings, args.r1_settings, args.out,
+                                      max_model_attempts=args.max_model_attempts)
+            print(json.dumps(report, ensure_ascii=False, allow_nan=False, indent=2))
+            return 2  # Diagnostic hold is never a release/acceptance success exit.
+        except (OSError, ValueError, KeyError, TypeError, AssertionError) as exception:
+            print(f"R0/R1 benchmark config/integrity error: {exception}")
+            return 3
+    if args.command in ("report", "benchmark"):
+        from .reporting import report_metrics
+        from .benchmark import benchmark
+        try:
+            report = (benchmark(args.settings, args.out) if args.command == "benchmark"
+                      else report_metrics(args.run, args.out, usage_run=args.usage_run, casebook_run=args.casebook_run))
+            print(json.dumps(report, ensure_ascii=False, allow_nan=False, indent=2))
+            if args.command == "benchmark" and report["table_ref"]:
+                print((args.out / report["table_ref"]["path"]).read_text())
+            return 1 if report["status"]["verdict"] == "FAIL" else 2 if report["status"]["completeness"] == "INCOMPLETE" else 0
+        except (OSError, ValueError, KeyError, TypeError, AssertionError) as exception:
+            print(f"P6 config/integrity error: {exception}")
+            return 3
+    if args.command == "score":
+        from .scoring import score
+        try:
+            report = score(args.run, args.out)
+            print(json.dumps(report, ensure_ascii=False, allow_nan=False, indent=2))
+            return 1 if report["status"]["verdict"] == "FAIL" else 2 if report["status"]["completeness"] == "INCOMPLETE" else 0
+        except (OSError, ValueError, KeyError, TypeError, AssertionError) as exception:
+            print(f"Score config/integrity error: {exception}")
+            return 3
+    if args.command == "export-trace":
+        from .collector import export_trace
+        try:
+            report = export_trace(args.run, args.out, args.config)
+            print(json.dumps(report, ensure_ascii=False, indent=2))
+            return 0 if report["exported"] else 2
+        except (OSError, ValueError, KeyError, TypeError) as exception:
+            print(f"Export config/integrity error: {exception}")
+            return 3
+    if args.command == "collect":
+        from .collector import collect
+        try:
+            report = collect(args.run, args.out, extractor_path=args.extractor, audit_seed=args.audit_seed)
+            print(json.dumps(report, ensure_ascii=False, allow_nan=False, indent=2))
+            return 1 if report["status"]["verdict"] == "FAIL" else 2 if report["status"]["completeness"] == "INCOMPLETE" else 0
+        except (OSError, ValueError, KeyError, TypeError, AssertionError) as exception:
+            print(f"Collector config/integrity error: {exception}")
+            return 3
+    if args.command == "run":
+        from .runner import run_fixed
+        try:
+            report = run_fixed(args.settings, args.out, config=args.config,
+                               scenarios_dir=args.scenarios, round_name=args.round)
+            print(json.dumps(report, ensure_ascii=False, allow_nan=False, indent=2))
+            return 2  # P3+ scoring/suites missing even if P2 execution_complete=true.
+        except (OSError, ValueError, KeyError, TypeError, AssertionError) as exception:
+            print(f"Runner config/infra error: {exception}")
+            return 3
+    if args.command == "preflight":
+        from .preflight import preflight
+        from .contracts import ROOT
+        try:
+            if args.out is not None and args.out.exists():
+                raise ValueError("Output already exists; choose a new file")
+            protected = (ROOT / "sources/btc", ROOT.parent / "BTC-Data-Vong1-TEAMS", ROOT.parent.parent / "BTC-Data-Vong1-TEAMS")
+            if args.out is not None and any(args.out.resolve().is_relative_to(path.resolve()) for path in protected):
+                raise ValueError("Never write reports inside protected BTC sources")
+            report = preflight(args.settings, args.scenarios)
+            rendered = json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False)
+            if args.out is not None:
+                with args.out.open("x", encoding="utf-8") as output:
+                    output.write(rendered + "\n")
+            print(rendered)
+            if args.for_execution:
+                return 0 if report["execution_gate"]["allowed"] else 2
+            return 2 if report["validation"]["issues"] else 0
+        except (OSError, ValueError, KeyError, TypeError, AssertionError) as exception:
+            print(f"Preflight config/infra error: {exception}")
+            return 3
+    raise AssertionError("Unhandled evaluation command")
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
