@@ -198,6 +198,20 @@ class AgentModel(BaseModel):
     generation: Generation = Field(default_factory=Generation)
 
 
+class Profile(BaseModel):
+    """One model for a set of agents, chosen by ``AGENT_PROFILE`` (a laptop on a free key)."""
+
+    model_config = {"extra": "forbid"}
+
+    provider: str
+    model: str
+    agents: list[str] = Field(min_length=1)
+
+
+#: Names the profile of ``config/models.yaml`` this process runs under; unset runs the file as written.
+PROFILE_ENV = "AGENT_PROFILE"
+
+
 class EvaluationProvider(BaseModel):
     """A service that hosts evaluation models: typed answers, no text."""
 
@@ -291,6 +305,17 @@ class ModelsConfig(BaseModel):
     evaluation_providers: dict[str, EvaluationProvider] = Field(default_factory=dict)
     evaluators: dict[str, Evaluator] = Field(default_factory=dict)
     voice: VoiceConfig = Field(default_factory=VoiceConfig)
+    profiles: dict[str, Profile] = Field(default_factory=dict)
+
+    def profile(self) -> Profile | None:
+        """The profile ``AGENT_PROFILE`` names, or None; a name the file does not have is an error."""
+        name = os.environ.get(PROFILE_ENV, "").strip()
+        if not name:
+            return None
+        if name not in self.profiles:
+            known = ", ".join(sorted(self.profiles)) or "none"
+            raise KeyError(f"{PROFILE_ENV}={name!r} is not a profile in {MODELS_YAML}. Known: {known}")
+        return self.profiles[name]
 
     def evaluator_config(self, name: str) -> dict[str, Any]:
         """The resolved block for evaluator *name*, ready for ``src.llm.jev``.
@@ -336,14 +361,19 @@ class ModelsConfig(BaseModel):
         }
 
     def agent(self, name: str) -> AgentModel:
+        """The routing of agent *name*, with the active profile's model when the profile lists it."""
         try:
-            return self.agents[name]
+            routing = self.agents[name]
         except KeyError:
             known = ", ".join(sorted(self.agents)) or "none"
             raise KeyError(
                 f"No model configured for agent {name!r} in {MODELS_YAML}. "
                 f"Configured agents: {known}"
             ) from None
+        profile = self.profile()
+        if profile is not None and name in profile.agents:
+            return routing.model_copy(update={"provider": profile.provider, "model": profile.model})
+        return routing
 
     def agent_llm_config(self, name: str) -> dict[str, Any]:
         """The config block for *name*, ready for ``LLMFactory.create_llm``."""

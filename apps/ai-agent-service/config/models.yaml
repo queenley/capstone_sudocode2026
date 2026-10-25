@@ -115,6 +115,36 @@ agents:
     generation:
       max_tokens: 1024
 
+  # Section 10.3: the QaAgent's reflection, which proposes the playbook hints
+  # the exploration tries. Not the evaluation's judge: that one is pinned on
+  # the evaluation side and no improvement round ever changes it.
+  qa:
+    provider: openai
+    model: gpt-4.1-mini
+    generation:
+      max_tokens: 2048
+
+  # The exploration's customer (agents/simulator.py): its persona voice and
+  # its observer of the agent's questions and prices. Offline, on the
+  # learning set only, and never the evaluation's simulator.
+  simulator:
+    provider: openai
+    model: gpt-4.1-mini
+    generation:
+      temperature: 0.3
+      max_tokens: 2048
+
+# AGENT_PROFILE=<name> in .env sends every agent listed under the profile to
+# its model, each keeping its own generation block. `local` is the free key a
+# laptop runs on. The evaluation's extractor is not listed: a measuring
+# instrument does not change with the machine it runs on (add it locally to
+# run without a paid key, and the labels are then not comparable).
+profiles:
+  local:
+    provider: google_genai
+    model: gemini-3.5-flash-lite
+    agents: [advisor, memory, compactor, qa, simulator]
+
 providers:
   google_genai:
     label: Google AI Studio
