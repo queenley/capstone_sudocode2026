@@ -8,6 +8,7 @@ guarantee, and it can be shown live.
 | money | every amount, in digits or in words (read by the ITN the customer's words go through), must come from a valid source: this turn's tool results, today's quotes earlier in the call, the passages read this turn, the customer's own words, a quantity times a unit price, or the difference of two amounts. A price from the brief only as history ("hôm trước bên em báo"), and only when VERIFIED |
 | days, months | "giao trong 2 ngày", "đổi trả 7 ngày", "bảo hành 24 tháng" must match a tool result, a passage of the turn, the customer's words or a rule the prompt states |
 | stock | "còn hàng", "hết hàng", "chỉ còn N" need a tool of the turn saying the same (``inventory.check``, or the stock a search returned), or a warning of the brief saying it |
+| order state | an order said to be in transit, delivered, processing or cancelled ("đơn … đang giao", "đã giao") needs an order tool of the turn (``order.status``, ``order.update``, ``order.create``, ``account.orders``): the brief's state is history, and today's may differ |
 | promotion | a code named must be applied in this turn's quote, said as history, or said to have ended; a promotion not yet started is never named (KM-02) |
 | internal | no purchase price, margin, supplier, price floor |
 | personal data | no raw phone, ID or account number; no run of 10 to 14 digits; no token that is not this call's |
@@ -61,6 +62,12 @@ MARKUP = re.compile(r"(\*\*|__|^\s*[-*•]\s|^\s*#{1,6}\s|```)", re.MULTILINE)
 DURATION = re.compile(r"(\d+)\s*(?:-|–|đến)?\s*(\d+)?\s*(ngày|tháng|tuần|giờ)\b", re.IGNORECASE)
 STOCK = re.compile(r"\b(còn hàng|hết hàng|có sẵn hàng|sẵn hàng|tạm hết|sắp hết hàng|chỉ còn \d+)\b", re.IGNORECASE)
 OUT_OF_STOCK = re.compile(r"\b(hết hàng|tạm hết)\b", re.IGNORECASE)
+#: An order's state said as a fact, in a sentence about an order.
+ORDER_STATE = re.compile(
+    r"\b(đang (?:được )?(?:giao|vận chuyển|xử lý|chuẩn bị)|đang trên đường|đã (?:được )?(?:giao|bàn giao|hủy|huỷ|gửi đi)"
+    r"|chưa (?:được )?giao)\b", re.IGNORECASE)
+ORDER_WORD = re.compile(r"\b(đơn|kiện hàng|gói hàng)\b", re.IGNORECASE)
+ORDER_TOOLS = frozenset({"order.status", "order.update", "order.create", "account.orders"})
 ENDED = re.compile(r"(đã hết|hết hạn|kết thúc|không còn|ngừng)", re.IGNORECASE)
 #: The agent saying it does not know: about itself ("em chưa rõ", "bên em không có thông tin"), not
 #: about the customer ("nếu chị chưa biết chọn mẫu nào").
@@ -154,6 +161,7 @@ def check(view: GuardInput) -> Verdict:
     reasons += _money(text, view)
     reasons += _durations(text, view)
     reasons += _stock(text, view)
+    reasons += _order_state(text, view)
     reasons += _promotions(text, view)
     reasons += _transfer(text, view)
     if INTERNAL.search(text):
@@ -220,6 +228,19 @@ def _stock(text: str, view: GuardInput) -> list[str]:
     if said_out and any("hết hàng" in w for w in view.warnings):
         return []
     return ["Nói về tồn kho mà kết quả tool của lượt này không nói vậy; gọi inventory_check trước."]
+
+
+def _order_state(text: str, view: GuardInput) -> list[str]:
+    """An order's state comes from an order tool of the turn, like a stock claim from ``inventory.check``.
+
+    Not for a consultant's text (``check_handoff`` off): they read the order on their own screen.
+    """
+    if not view.check_handoff or not any(ORDER_STATE.search(s) and ORDER_WORD.search(s) for s in SENTENCE.split(text)):
+        return []
+    for result in view.tool_results:
+        if str(result.get("name", "")).replace("_", ".") in ORDER_TOOLS and (result.get("result") or {}).get("ok"):
+            return []
+    return ["Nói về trạng thái đơn mà chưa tra trong lượt này; gọi order_status trước, rồi nói đúng trạng thái tool trả về."]
 
 
 def _transfer(text: str, view: GuardInput) -> list[str]:

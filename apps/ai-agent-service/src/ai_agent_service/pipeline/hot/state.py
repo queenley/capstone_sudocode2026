@@ -119,6 +119,9 @@ class HotState(TurnInput, total=False):
     #: A turn only sees its own tool results; this is how a later turn still
     #: knows the code of the product the customer now wants to order.
     seen_products: list[dict[str, Any]]
+    #: The orders this call created, ``{order_id, sku}``: what a later turn
+    #: corrects with ``order.update`` instead of booking the product again.
+    created_orders: list[dict[str, Any]]
     #: How a customer not yet known calls themselves (anh, chị, cô, chú, bác),
     #: and whether the agent asked already (``components.intake.honorific``).
     honorific_said: str | None

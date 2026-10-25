@@ -371,6 +371,8 @@ async def route(state: HotState) -> dict[str, Any]:
         impatient=bool(flags.get("impatient")),
         sessions_without_close=int((state.get("brief") or {}).get("sessions_without_close") or 0),
         awaiting_identity=bool(state.get("awaiting")),
+        previous_lane=state.get("lane"),
+        answering="?" in (_last_reply(state) or ""),
     ))
     return {"lane": decision.lane, "route_rule": decision.rule, "route_reason": decision.reason,
             "route_notes": list(decision.notes)}
@@ -419,7 +421,7 @@ async def advisor(state: HotState, runtime: Runtime[HotContext]) -> dict[str, An
         logger.exception("Advisor failed on call %s", state.get("call_id"))
         if isinstance(error, AdvisorFailure):
             update.update(_absorb(state, error.partial.tool_results))
-        update["draft"] = {"text": fallback.LINES["model_error"], "fallback": True, "error": _readable(error)}
+        update["draft"] = {"text": fallback.line("model_error", _who(state)), "fallback": True, "error": _readable(error)}
         return update
     update.update(_absorb(state, draft.tool_results))
     update["draft"] = {"text": draft.text, "model": draft.model, "model_calls": draft.model_calls,
@@ -486,6 +488,7 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
         notes=tuple(state.get("route_notes") or ()),
         trusted_skus=trusted | frozenset(p["sku"] for p in state.get("seen_products") or []),
         seen_products=tuple(state.get("seen_products") or ()),
+        created_orders=tuple(state.get("created_orders") or ()),
         self_called=None if tier == "VERIFIED" else state.get("honorific_said"),
         honorific_asked=bool(state.get("honorific_asked")),
         flags=dict(state.get("flags") or {}),
@@ -542,6 +545,7 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
     codes, _ = _seen_in({}, new_results)
     quotes = dict(state.get("quotes") or {})
     orders = list(state.get("known_orders") or [])
+    created = list(state.get("created_orders") or [])
     failures = int(state.get("tool_failures") or 0)
     for result in new_results:
         envelope = result.get("result") or {}
@@ -550,13 +554,15 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
             failures = 0
             if result["name"] == "pricing.get_quote" and data.get("sku"):
                 quotes[data["sku"]] = int(data["final_price_vnd"])
+            if result["name"] == "order.create" and data.get("order_id"):
+                created.append({"order_id": data["order_id"], "sku": (result.get("args") or {}).get("sku")})
             for order in data.get("orders") or ([data] if data.get("order_id") else []):
                 if order.get("order_id") and order["order_id"] not in orders:
                     orders.append(order["order_id"])
         elif (envelope.get("error") or {}).get("code") in INFRASTRUCTURE_CODES:
             failures += 1
     return {"tool_results": list(state.get("tool_results") or []) + new_results, "quotes": quotes,
-            "known_orders": orders, "tool_failures": failures,
+            "known_orders": orders, "created_orders": created, "tool_failures": failures,
             "trusted_skus": sorted(set(state.get("trusted_skus") or []) | codes),
             "seen_products": _products_in(new_results, state.get("seen_products") or [])}
 
@@ -579,12 +585,14 @@ class _Attempt:
 async def _streamed(state: HotState, context: HotContext, messages: list[Any], agent_context: AgentContext) -> dict[str, Any]:
     """Say the answer a sentence at a time, each checked before it is said.
 
-    A sentence blocked before anything was said is a draft blocked: the run
-    is abandoned and regenerated with the reasons, at most twice, as the
-    ``guard`` node would. Blocked after the first sentence was said, the
-    stream stops there and the lane's safe line follows, since what was said
-    cannot be taken back. More than three sentences, unless reading an order
-    back, are not said.
+    A blocked sentence is a draft blocked: the run is abandoned and
+    regenerated with the reasons, at most twice, as the ``guard`` node would.
+    What was already said cannot be taken back, so a regeneration after the
+    first sentence was said goes on from it: the model is told what the
+    customer heard and why the next sentence was stopped, and may call the
+    tool it lacked ("gọi inventory_check trước"). Only a draft still blocked
+    after that gets the lane's safe line. More than three sentences, unless
+    reading an order back, are not said.
     """
     timing: dict[str, int | None] = {"first_token_ms": None, "filler_ms": None}
     blocked_drafts = list(state.get("blocked_drafts") or [])
@@ -594,32 +602,37 @@ async def _streamed(state: HotState, context: HotContext, messages: list[Any], a
     attempt = _Attempt()
     regenerations = 0
     view = agent_context
+    #: Sentences said by runs whose next sentence was blocked: the next run goes on after them.
+    carried: list[str] = []
     try:
         while True:
             # A retry is checked against every tool result of the turn, the abandoned runs' included.
-            attempt = _Attempt()
+            attempt = _Attempt(said=list(carried), last_spoken=bool(carried))
             await _stream_once(state, context, messages, view, earlier + tuple(produced), timing, attempt)
             produced += [r for r in attempt.results if r not in produced]
             if not attempt.reasons:
                 break
             reasons = attempt.reasons
             blocked_drafts.append({"text": attempt.blocked, "reasons": attempt.reasons})
-            if attempt.said or regenerations >= MAX_REGENERATIONS:
+            if regenerations >= MAX_REGENERATIONS:
                 break
             regenerations += 1
-            view = replace(view, block_reasons=tuple(reasons), tool_results=earlier + tuple(produced))
+            carried = list(attempt.said)
+            view = replace(view, block_reasons=tuple(reasons), tool_results=earlier + tuple(produced),
+                           already_said=tuple(unmarked(s) for s in carried))
     except Exception as error:  # noqa: BLE001 - section 4.9: a failure is never silence
         logger.exception("Advisor failed on call %s", state.get("call_id"))
         pending = error.partial.tool_results if isinstance(error, AdvisorFailure) else attempt.results
         produced += [r for r in pending if r not in produced]
         absorbed = _absorb(state, produced)
         if attempt.said:
-            line = fallback.safe_line(state.get("lane") or "NEW")
+            line = fallback.safe_line(state.get("lane") or "NEW", _who(state))
             await _say(context, line, timing)
             return {**absorbed, "draft": {"text": " ".join([*attempt.said, line]), "streamed": True, "fallback": True,
                                           "error": _readable(error)},
                     "guard": {"passed": True, "streamed": True, "fallback": True}, "latency": timing}
-        return {**absorbed, "draft": {"text": fallback.LINES["model_error"], "fallback": True, "error": _readable(error)},
+        return {**absorbed, "draft": {"text": fallback.line("model_error", _who(state)), "fallback": True,
+                                      "error": _readable(error)},
                 "latency": timing}
 
     update = _absorb(state, produced)
@@ -630,7 +643,7 @@ async def _streamed(state: HotState, context: HotContext, messages: list[Any], a
                                "hard": {"passed": not reasons, "reasons": reasons}}
     text = " ".join(attempt.said)
     if attempt.reasons:
-        line = fallback.safe_line(state.get("lane") or "NEW")
+        line = fallback.safe_line(state.get("lane") or "NEW", _who(state))
         await _say(context, line, timing)
         text = f"{text} {line}".strip()
         verdict["fallback"] = True
@@ -699,6 +712,9 @@ async def _offer(state: HotState, context: HotContext, sentence: str, results: t
         if attempt.last_spoken:
             attempt.said[-1] += " " + sentence
         return True  # A citation arriving after speech is metadata, not an empty reply.
+    if any(intake_text.plain(spoken) == intake_text.plain(unmarked(said)) for said in attempt.said):
+        attempt.last_spoken = False
+        return True  # already said in this answer: a regeneration going on from it repeats its last line
     if len(attempt.said) >= MAX_SENTENCES and not ORDER_SUMMARY.search(" ".join([*attempt.said, sentence])):
         attempt.last_spoken = False
         return True  # past the length the rules allow: not said, the stream goes on to its end
@@ -731,7 +747,10 @@ def _since(context: HotContext) -> int:
 
 
 def _who(state: HotState) -> str:
-    return state.get("honorific") if state.get("tier") == "VERIFIED" and state.get("honorific") else "anh/chị"
+    """How the harness's own lines address the customer: the profile's form, else the one they used, else anh/chị."""
+    if state.get("tier") == "VERIFIED" and state.get("honorific"):
+        return str(state["honorific"])
+    return str(state.get("honorific_said") or "anh/chị")
 
 
 # ── 5. guard ──────────────────────────────────────────────────────────────
@@ -773,7 +792,7 @@ async def guard(state: HotState, runtime: Runtime[HotContext]) -> dict[str, Any]
     regenerations = int(state.get("regen_count") or 0)
     if regenerations < MAX_REGENERATIONS:
         return {"guard": verdict, "block_reasons": reasons, "blocked_drafts": blocked, "regen_count": regenerations + 1}
-    line = fallback.safe_line(state.get("lane") or "NEW")
+    line = fallback.safe_line(state.get("lane") or "NEW", _who(state))
     logger.warning("Call %s: draft blocked %d times, safe line said", state.get("call_id"), regenerations + 1)
     return {
         "guard": {**verdict, "fallback": True},

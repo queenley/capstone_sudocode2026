@@ -6,8 +6,8 @@ a tool error with the reason, and nothing happens in the business.
 
 | Tool | Checked |
 |---|---|
-| ``order.create`` | a phone to order for; the tier allows it; the product code is trusted (it came from a tool this call or from the brief, never made up from a name); the unit price equals today's ``pricing.get_quote`` for that code; COD total at most 10.000.000đ |
-| ``order.update`` | the order is one this customer has, or one a tool showed this call; the new variant is trusted |
+| ``order.create`` | a phone to order for; the tier allows it; the product code is trusted (it came from a tool this call or from the brief, never made up from a name); the unit price equals today's ``pricing.get_quote`` for that code; COD total at most 10.000.000đ; not the same product as an order this call already created, unless the customer asks for more (an address or payment added afterwards is an ``order.update``) |
+| ``order.update`` | the order is one this customer has, or one a tool showed this call; the new variant is trusted. An order this call created may be corrected by its caller whatever the tier |
 | ``schedule.callback`` | an ISO 8601 time with +07:00, inside working hours (LN-01, LN-02) and not in the past; otherwise the nearest working slot, for the model to propose |
 | ``handoff.transfer`` | only in lane HANDOFF, on a PB-06 topic, when the customer asked for a person, or on a serious complaint (a transfer anywhere else is graded ``over_escalation``); the brief validates against ``schemas/handoff_brief.schema.json`` itself (required fields, enums, phone pattern, summary length), after the harness filled in what it knows |
 | ``memory.request_deletion`` | the agent's previous turn asked to confirm the deletion and the customer just agreed (QT-06) |
@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import re
 from datetime import datetime
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 from .. import btc_schemas, clock
 from ..intake.itn import format_vnd
@@ -36,6 +36,12 @@ CUSTOMER_READ_TOOLS = frozenset({"order_status", "crm_get_customer"})
 COD_LIMIT_VND = 10_000_000
 
 UPDATE_ACTIONS = frozenset({"exchange_size", "exchange_product", "return", "update_address"})
+
+#: The customer asks for one more of what was ordered, on the plain (unaccented) text: a second
+#: order of the same product is theirs to ask for, never the agent's way of adding an address.
+ONE_MORE = re.compile(
+    r"\b(mua them|dat them|lay them|them (?:mot|1|hai|2|ba|3) (?:cai|chiec|bo|don)|them (?:cai|chiec|don)|"
+    r"(?:mot|1|hai|2) (?:cai|chiec|don) nua|cai nua|chiec nua|don (?:khac|moi|thu hai|nua))\b")
 
 #: The agent asked to confirm a deletion; the customer agreed (QT-06).
 ASKED_TO_DELETE = re.compile(r"\bxoa\b.*\?|\bxac nhan\b.*\bxoa\b")
@@ -59,13 +65,18 @@ def check(
     last_agent_said: str | None = None,
     customer_said: str | None = None,
     shared_phone: bool = False,
+    created: Sequence[Mapping[str, Any]] = (),
 ) -> Verdict:
     """Whether a write tool may run with *args*; the reasons if not.
 
     *trusted* is every product code this call has seen from a tool or the
     brief; None skips that check (a caller without the call's history).
     *flags* are the turn's signals (``components.intake.signals``).
+    *created* is the orders this call created, ``{order_id, sku}``: the
+    caller may correct those whatever the tier, and is not booked the same
+    product twice unless they ask for more.
     """
+    created_ids = frozenset(str(o["order_id"]) for o in created if o.get("order_id"))
     if name in CUSTOMER_READ_TOOLS:
         if tier != "VERIFIED":
             return Verdict(False, ("Xác nhận danh tính khách trước khi đọc thông tin riêng.",))
@@ -90,9 +101,11 @@ def check(
     if mode == "copilot":
         return Verdict(False, ("Chế độ copilot: tư vấn viên thực hiện thao tác này, trợ lý chỉ gợi ý.",))
     checks = {
-        "order_create": lambda: _order_create(args, tier=tier, has_phone=has_phone, quotes=quotes, trusted=trusted),
-        "order_update": lambda: (["Xác nhận danh tính trước khi sửa đơn."] if tier != "VERIFIED"
-                                 else _order_update(args, orders=orders, trusted=trusted)),
+        "order_create": lambda: _order_create(args, tier=tier, has_phone=has_phone, quotes=quotes, trusted=trusted,
+                                              created=created, customer_said=customer_said),
+        "order_update": lambda: (["Xác nhận danh tính trước khi sửa đơn."]
+                                 if tier != "VERIFIED" and args.get("order_id") not in created_ids
+                                 else _order_update(args, orders=orders | created_ids, trusted=trusted)),
         "schedule_callback": lambda: _schedule_callback(args, now=now),
         "handoff_transfer": lambda: _handoff(args, lane=lane, flags=flags or {}),
         "memory_request_deletion": lambda: _deletion(tier=tier, last_agent_said=last_agent_said, customer_said=customer_said),
@@ -102,7 +115,12 @@ def check(
 
 
 def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes: Mapping[str, int],
-                  trusted: frozenset[str] | None) -> list[str]:
+                  trusted: frozenset[str] | None, created: Sequence[Mapping[str, Any]] = (),
+                  customer_said: str | None = None) -> list[str]:
+    again = [o for o in created if o.get("sku") and o.get("sku") == args.get("sku")]
+    if again and not ONE_MORE.search(plain(customer_said or "")):
+        return [f"Đơn {again[-1]['order_id']} cho {args.get('sku')} đã tạo trong cuộc này. Khách bổ sung hay đổi địa chỉ, "
+                "thanh toán thì gọi order_update trên đơn đó; chỉ tạo đơn mới khi khách muốn mua thêm."]
     reasons = []
     if not has_phone:
         reasons.append("Chưa có số điện thoại của khách để tạo đơn; xin số điện thoại trước.")
