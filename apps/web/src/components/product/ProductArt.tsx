@@ -1,6 +1,8 @@
-// A product's picture, drawn from its category: the catalogue has no photos,
-// so each category gets an illustration on its own colour, with the brand.
+// A product's picture: its photo when the catalogue has one (an openly licensed
+// illustration, credited on the product page), otherwise a drawing of its
+// category on the category's colour, with the brand.
 import React from "react";
+import type { ImageCredit } from "@/services/api";
 
 type Art = { from: string; to: string; icon: React.ReactNode };
 
@@ -126,11 +128,23 @@ export default function ProductArt({
   category,
   brand,
   size = "card",
+  image,
+  alt = "",
 }: {
   category: string;
   brand?: string;
   size?: "card" | "hero" | "thumb";
+  image?: string | null;
+  alt?: string;
 }) {
+  if (image) {
+    return (
+      <div className={`s-art s-art-${size} s-art-photo`}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- small static files, already sized */}
+        <img src={image} alt={alt} loading={size === "hero" ? "eager" : "lazy"} />
+      </div>
+    );
+  }
   const art = artFor(category);
   return (
     <div
@@ -144,5 +158,29 @@ export default function ProductArt({
       </svg>
       {brand && size !== "thumb" && <span className="s-art-brand">{brand}</span>}
     </div>
+  );
+}
+
+const PROVIDERS: Record<string, string> = { flickr: "Flickr", wikimedia: "Wikimedia Commons" };
+
+/** The credit an openly licensed photo asks for: title, author, licence, source. The photo
+ *  illustrates the kind of product, not this exact model, and the line says so. */
+export function PhotoCredit({ credit }: { credit: ImageCredit }) {
+  const link = (href: string, text: string) =>
+    href ? (
+      <a href={href} target="_blank" rel="noopener noreferrer nofollow">
+        {text}
+      </a>
+    ) : (
+      text
+    );
+  return (
+    <p className="s-photo-credit">
+      Ảnh minh họa, không phải ảnh chụp đúng mẫu sản phẩm
+      {credit.title && <> · {link(credit.source_url, `“${credit.title}”`)}</>}
+      {credit.author && <> của {link(credit.author_url, credit.author)}</>}
+      {credit.license && <> · {link(credit.license_url, credit.license)}</>}
+      {credit.provider && <> · {PROVIDERS[credit.provider] || credit.provider}</>}
+    </p>
   );
 }

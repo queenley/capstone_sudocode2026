@@ -33,7 +33,7 @@ export default function ChatProducts({ text, onShow }: { text: string; onShow?: 
         const off = discountPercent(product.price, product.listPrice);
         return (
           <Link key={product.ref} href={`/san-pham/${encodeURIComponent(product.ref)}`} className="s-msg-product">
-            <ProductArt category={product.category} brand={product.brand} size="thumb" />
+            <ProductArt category={product.category} brand={product.brand} size="thumb" image={product.image} alt={product.name} />
             <span className="s-msg-product-name">{product.name}</span>
             <span className="s-msg-product-price">
               {product.variants.length > 1 && <small>Từ </small>}

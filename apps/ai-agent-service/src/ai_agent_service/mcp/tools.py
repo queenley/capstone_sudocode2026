@@ -53,6 +53,9 @@ logger = logging.getLogger(__name__)
 #: logic. Only these count against the circuit breaker.
 INFRASTRUCTURE_CODES = frozenset({"TIMEOUT", "TOOL_ERROR", "INTERNAL", "CIRCUIT_OPEN"})
 
+#: The logged-in shopper's website account (``mcp/servers/account.py``): offered only with an account.
+ACCOUNT_PREFIX = "account_"
+
 #: Tools with an effect on the business, by wire name (section 6.1): never
 #: retried, each call keyed for idempotency, their defaults made explicit.
 WRITE_TOOLS = frozenset({
@@ -93,6 +96,9 @@ class LaneToolsMiddleware(AgentMiddleware):
             allowed = frozenset()
         # Anything that is not an MCP tool — a structured-output tool, for
         # one — is left alone.
+        if not getattr(context, "account_id", None):
+            # The website account's tools are for a logged-in shopper only.
+            allowed = frozenset(name for name in allowed if not name.startswith(ACCOUNT_PREFIX))
         tools = [
             tool
             for tool in request.tools
@@ -266,6 +272,9 @@ class ToolGuardMiddleware(AgentMiddleware):
         customer = getattr(context, "customer_id", None)
         if customer and "customer_id" in accepted:
             args["customer_id"] = customer
+        if "account_id" in accepted:
+            # The logged-in shopper of this conversation, never one the model names.
+            args["account_id"] = getattr(context, "account_id", None)
         call_id = getattr(context, "call_id", None)
         if call_id and "call_id" in accepted:
             args["call_id"] = str(call_id)

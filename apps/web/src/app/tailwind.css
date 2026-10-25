@@ -1,0 +1,52 @@
+/* Tailwind CSS v4, added beside the hand-written styles (theme.css, globals.css,
+   (shop)/shop.css, ban-hang/sales.css), not instead of them.
+
+   - No preflight: Tailwind's reset would restyle every page those files already
+     style. Only the theme variables and the utilities are imported.
+   - Utilities are `important`: `md:hidden` or `w-auto` on an element always beats
+     the element's own class, whatever order Next bundles the CSS files in.
+   - The colours are the design tokens of theme.css, so `bg-surface`, `text-muted`
+     or `border-line` follow light and dark mode like the rest of the site. Radius,
+     shadow and font names already match theme.css (`rounded-lg`, `shadow-sm`, `font-mono`).
+   - Breakpoints: Tailwind's (sm 640, md 768, lg 1024, xl 1280) plus xs 480. */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities) important;
+
+@theme inline {
+  --breakpoint-xs: 30rem;
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-deep: var(--brand-deep);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-soft-2: var(--brand-soft-2);
+  --color-brand-line: var(--brand-line);
+  --color-on-brand: var(--on-brand);
+  --color-accent: var(--accent);
+
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-line: var(--danger-line);
+  --color-danger-ink: var(--danger-ink);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-warn-ink: var(--warn-ink);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+
+  --color-chrome: var(--chrome);
+  --color-chrome-2: var(--chrome-2);
+  --color-on-chrome: var(--on-chrome);
+}

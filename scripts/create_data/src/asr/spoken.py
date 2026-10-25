@@ -13,6 +13,11 @@ LETTERS = {"a": "a", "b": "bê", "c": "xê", "d": "đê", "đ": "đê", "e": "e"
            "i": "i", "j": "gi", "k": "ca", "l": "e lờ", "m": "em mờ", "n": "en nờ", "o": "ô", "p": "pê", "q": "quy",
            "r": "e rờ", "s": "ét", "t": "tê", "u": "u", "v": "vê", "w": "vê kép", "x": "ích", "y": "i dài", "z": "dét"}
 SCALES = ["", "nghìn", "triệu", "tỷ"]
+#: Units read after a number ("4.5L", "1,2m", "3.000mAh").
+UNITS = {"l": "lít", "ml": "mi li lít", "kg": "ki lô gam", "g": "gam", "cm": "xen ti mét", "mm": "mi li mét",
+         "m": "mét", "w": "oát", "mah": "mi li am pe giờ"}
+#: Acronyms said as words rather than letter by letter (BTC's ground truth writes COD as "cê ô đê").
+ACRONYMS = {"COD": "cê ô đê", "RO": "rô", "OK": "ô kê", "HCM": "hồ chí minh"}
 
 
 def _three(n: int, full: bool) -> str:
@@ -87,16 +92,36 @@ def _code(match: re.Match) -> str:
     return " ".join(parts)
 
 
+def _number(raw: str) -> str:
+    """'3.000' -> three thousand; '4.5' / '1,2' -> 'bốn phẩy năm' / 'một phẩy hai'."""
+    if re.fullmatch(r"\d+|\d{1,3}(?:[.,]\d{3})+", raw):
+        return number_words(int(re.sub(r"\D", "", raw)))
+    whole, frac = re.split(r"[.,]", raw, maxsplit=1)
+    return f"{number_words(int(whole))} phẩy {number_words(int(frac))}"
+
+
+def _digits(match: re.Match) -> str:
+    """Phone, ID card and account numbers, one digit at a time (BTC: "không chín một bảy...")."""
+    return " ".join(DIGITS[int(d)] for d in match.group(0))
+
+
 def to_spoken(text: str) -> str:
     """Rewrite digits, money, dates, units and codes as spoken Vietnamese (lowercase)."""
-    t = text
+    t = re.sub(r"\bTP\.?\s*HCM\b", "thành phố hồ chí minh", text)
+    t = re.sub(r"\bTP\.\s*|\bTP\s+(?=[A-ZĐÀ-Ỹ])", "thành phố ", t)  # "TP. Huế", "TP Huế"
+    t = re.sub(r"(\d)([A-Za-zÀ-ỹ])", r"\1 \2", t)  # "4.5L", "3.000mAh": a number, then its unit
     t = re.sub(r"\b(\d{1,2})/(\d{1,2})(?:/(\d{4}))?\b", _date, t)
+    t = re.sub(r"\b0\d{8,}\b|\b\d{9,}\b", _digits, t)
     t = re.sub(r"(\d+)[.,](\d{1,3})\s*(triệu|tr|nghìn|ngàn)\b", _decimal_unit, t, flags=re.IGNORECASE)
     t = re.sub(r"(\d+)\s*k\b", lambda m: number_words(int(m.group(1)) * 1000), t)
-    t = re.sub(r"(\d{1,3}(?:[.,]\d{3})+)\s*(?:đ|đồng|vnd|vnđ)?", _money, t, flags=re.IGNORECASE)
-    t = re.sub(r"\b[A-Z]{1,4}(?:-[A-Z0-9]+)+\b|\b[A-Z]{1,4}\d{3,}\b", _code, t)
-    t = re.sub(r"(\d+)\s*(?:m²|m2)\b", lambda m: f"{number_words(int(m.group(1)))} mét vuông", t)
-    t = re.sub(r"(\d+)\s*%", lambda m: f"{number_words(int(m.group(1)))} phần trăm", t)
-    t = re.sub(r"(\d+)\s*(?:đ|đồng)\b", lambda m: number_words(int(m.group(1))), t)
+    t = re.sub(r"(\d+(?:[.,]\d+)?)\s*(?:m²|m2)(?!\w)", lambda m: f"{_number(m.group(1))} mét vuông", t)
+    t = re.sub(r"(\d+(?:[.,]\d+)?)\s*(" + "|".join(sorted(UNITS, key=len, reverse=True)) + r")\b",
+               lambda m: f"{_number(m.group(1))} {UNITS[m.group(2).lower()]}", t, flags=re.IGNORECASE)
+    t = re.sub(r"(\d{1,3}(?:[.,]\d{3})+)\s*(?:đồng|vnđ|vnd|đ)?(?!\w)", _money, t, flags=re.IGNORECASE)
+    t = re.sub(r"(\d+(?:[.,]\d+)?)\s*%", lambda m: f"{_number(m.group(1))} phần trăm", t)
+    t = re.sub(r"\b\d+[.,]\d+\b", lambda m: _number(m.group(0)), t)
+    t = re.sub(r"\b[A-Z]{1,4}(?:-[A-Z0-9]+)+\b|\b[A-Z]{1,4}\d+\b", _code, t)
+    t = re.sub(r"\b[A-Z]{2,5}\b", lambda m: ACRONYMS.get(m.group(0)) or _code(m), t)
+    t = re.sub(r"(\d+)\s*(?:đồng|đ)\b", lambda m: number_words(int(m.group(1))), t)
     t = re.sub(r"\d+", lambda m: number_words(int(m.group(0))), t)
     return re.sub(r"\s+", " ", t).strip().lower()

@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zalo (mock)</title>
+<!-- The page of scripts/dev/zalo_mock.py: Zalo's web client as a customer sees it,
+     talking to the shop's Official Account. Served by the mock; no build step. -->
+<style>
+:root {
+  --blue: #0068ff; --blue-dark: #0055d4; --nav: #0068ff;
+  --bg: #ffffff; --list: #ffffff; --chat: #e2e9f1; --line: #dfe2e7; --hover: #f3f5f6; --active: #e5efff;
+  --ink: #081c36; --ink-2: #4c5a6b; --muted: #7589a3;
+  --me: #e5efff; --me-line: #c7e0ff; --them: #ffffff; --them-line: #e2e6eb;
+  --pill: rgba(0, 0, 0, .06); --danger: #e5484d; --ok: #1a9e4b; --shadow: 0 1px 2px rgba(0, 0, 0, .08);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --nav: #1c2a3d; --bg: #16191d; --list: #1f2227; --chat: #101316; --line: #2c3036; --hover: #262a30; --active: #23324a;
+    --ink: #e7ebf0; --ink-2: #b8c0cc; --muted: #8592a3; --me: #1e3a66; --me-line: #24467a; --them: #262a30; --them-line: #30353c;
+    --pill: rgba(255, 255, 255, .08); color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; display: flex; font: 14px/1.45 "Segoe UI", Roboto, system-ui, sans-serif; color: var(--ink); background: var(--bg); }
+button { font: inherit; cursor: pointer; border: 0; background: none; color: inherit; }
+input, textarea { font: inherit; color: inherit; }
+svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ── navigation rail ── */
+.rail { width: 64px; background: var(--nav); display: flex; flex-direction: column; align-items: center; padding: 14px 0; gap: 8px; }
+.rail .me { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 700; border: 2px solid rgba(255,255,255,.6); margin-bottom: 14px; }
+.rail button { width: 48px; height: 48px; border-radius: 10px; display: grid; place-items: center; color: rgba(255,255,255,.8); }
+.rail button.on, .rail button:hover { background: rgba(0,0,0,.18); color: #fff; }
+.rail .brand { margin-top: auto; color: rgba(255,255,255,.75); font-size: 10px; text-align: center; line-height: 1.2; }
+
+/* ── conversation list (one per simulated Zalo user) ── */
+.list { width: 340px; background: var(--list); border-right: 1px solid var(--line); display: flex; flex-direction: column; min-width: 0; }
+.list-head { padding: 14px 14px 8px; display: flex; gap: 8px; align-items: center; }
+.search { flex: 1; display: flex; align-items: center; gap: 6px; background: var(--hover); border-radius: 8px; padding: 0 10px; height: 34px; color: var(--muted); }
+.search svg { width: 16px; height: 16px; }
+.search input { border: 0; background: transparent; outline: none; flex: 1; min-width: 0; }
+.icon-btn { width: 34px; height: 34px; border-radius: 8px; display: grid; place-items: center; color: var(--ink-2); }
+.icon-btn:hover { background: var(--hover); }
+.tabs { display: flex; gap: 16px; padding: 4px 16px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.tabs span { padding: 8px 0; color: var(--muted); font-weight: 600; }
+.tabs span.on { color: var(--blue); box-shadow: inset 0 -2px var(--blue); }
+.add { display: none; padding: 10px 14px; gap: 6px; flex-direction: column; border-bottom: 1px solid var(--line); background: var(--hover); }
+.add.open { display: flex; }
+.add input { border: 1px solid var(--line); background: var(--list); border-radius: 6px; padding: 7px 10px; }
+.add .row { display: flex; gap: 6px; }
+.add .row button { flex: 1; }
+.users { flex: 1; overflow-y: auto; }
+.user { display: flex; gap: 12px; align-items: center; padding: 10px 14px; cursor: pointer; }
+.user:hover { background: var(--hover); }
+.user.on { background: var(--active); }
+.user .who { flex: 1; min-width: 0; }
+.user .top { display: flex; justify-content: space-between; gap: 8px; }
+.user b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user time { font-size: 12px; color: var(--muted); flex: 0 0 auto; }
+.user .last { color: var(--muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user .tag { font-size: 11px; color: var(--muted); }
+.avatar { width: 48px; height: 48px; border-radius: 50%; flex: 0 0 auto; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 17px; }
+.avatar.sm { width: 32px; height: 32px; font-size: 12px; }
+.avatar.oa { background: linear-gradient(135deg, #059669, #34d399); }
+
+/* ── chat ── */
+.chat { flex: 1; display: flex; flex-direction: column; min-width: 0; background: var(--chat); }
+.chat-head { height: 68px; flex: 0 0 auto; background: var(--bg); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 12px; padding: 0 16px; }
+.chat-head .title { flex: 1; min-width: 0; }
+.chat-head .name { display: flex; align-items: center; gap: 6px; font-size: 16px; font-weight: 600; }
+.chat-head .badge { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; color: #fff; background: #f5a623; border-radius: 4px; padding: 1px 6px; }
+.chat-head small { color: var(--muted); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.messages { flex: 1; overflow-y: auto; padding: 16px 18px 8px; display: flex; flex-direction: column; gap: 2px; }
+.day { align-self: center; margin: 8px 0 12px; font-size: 12px; color: var(--muted); background: var(--pill); padding: 3px 12px; border-radius: 12px; }
+.row { display: flex; gap: 8px; align-items: flex-end; max-width: 72%; }
+.row.in { align-self: flex-end; }
+.row.out { align-self: flex-start; }
+.row .slot { width: 32px; flex: 0 0 32px; }
+.row + .row.in, .row + .row.out { margin-top: 2px; }
+.row.first { margin-top: 10px; }
+.bubble { padding: 9px 12px 6px; border-radius: 10px; white-space: pre-wrap; word-wrap: break-word; box-shadow: var(--shadow); min-width: 64px; }
+.in .bubble { background: var(--me); border: 1px solid var(--me-line); }
+.out .bubble { background: var(--them); border: 1px solid var(--them-line); }
+.bubble a { color: var(--blue); text-decoration: none; word-break: break-all; }
+.bubble a:hover { text-decoration: underline; }
+.bubble .meta { display: block; margin-top: 3px; font-size: 11px; color: var(--muted); }
+.bubble.sticker { background: transparent; border: 0; box-shadow: none; font-size: 56px; line-height: 1; padding: 0; }
+.bubble.image { padding: 4px; }
+.bubble.image .pic { width: 220px; height: 150px; border-radius: 8px; background: linear-gradient(135deg, #8ec5fc, #e0c3fc); display: grid; place-items: center; color: #fff; font-size: 34px; }
+.bubble.card { border-left: 3px solid var(--blue); }
+.status { align-self: flex-end; font-size: 11px; color: var(--muted); margin: 2px 2px 6px; }
+.status.bad { color: var(--danger); }
+.system { align-self: center; margin: 8px 0; font-size: 12px; color: var(--danger); background: var(--pill); padding: 4px 12px; border-radius: 12px; max-width: 80%; text-align: center; }
+.typing { align-self: flex-start; display: none; align-items: center; gap: 8px; margin: 8px 0 4px 40px; font-size: 12px; color: var(--muted); }
+.typing.on { display: flex; }
+.typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: blink 1.2s infinite; }
+.typing i:nth-child(2) { animation-delay: .2s; } .typing i:nth-child(3) { animation-delay: .4s; }
+@keyframes blink { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
+.empty { margin: auto; text-align: center; color: var(--muted); max-width: 340px; }
+.empty .avatar { margin: 0 auto 12px; width: 72px; height: 72px; font-size: 24px; }
+
+/* ── composer ── */
+.composer { background: var(--bg); border-top: 1px solid var(--line); flex: 0 0 auto; }
+.tools { display: flex; gap: 2px; padding: 6px 10px 0; }
+.tools button { height: 32px; padding: 0 8px; border-radius: 6px; display: flex; align-items: center; gap: 6px; color: var(--ink-2); font-size: 13px; }
+.tools button:hover { background: var(--hover); }
+.tools svg { width: 20px; height: 20px; }
+.write { display: flex; gap: 8px; align-items: flex-end; padding: 6px 12px 12px; }
+.write textarea { flex: 1; border: 0; outline: none; background: transparent; resize: none; max-height: 140px; padding: 8px 4px; }
+.send { width: 40px; height: 40px; border-radius: 8px; display: grid; place-items: center; color: var(--blue); }
+.send:hover { background: var(--active); }
+.share { display: none; margin: 0 12px 8px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--list); gap: 8px; flex-direction: column; }
+.share.open { display: flex; }
+.share p { margin: 0; color: var(--ink-2); font-size: 13px; }
+.share .fields { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.share input { border: 1px solid var(--line); background: var(--bg); border-radius: 6px; padding: 7px 10px; min-width: 0; }
+.share .actions { display: flex; justify-content: flex-end; gap: 8px; }
+.btn { border-radius: 6px; padding: 7px 14px; font-weight: 600; }
+.btn.primary { background: var(--blue); color: #fff; }
+.btn.primary:hover { background: var(--blue-dark); }
+.btn.ghost { background: var(--hover); }
+
+@media (max-width: 860px) {
+  .rail { display: none; }
+  .list { width: 100%; position: absolute; inset: 0; z-index: 2; }
+  body.chatting .list { display: none; }
+  .back { display: grid !important; }
+  .share .fields { grid-template-columns: 1fr; }
+  .row { max-width: 88%; }
+}
+.back { display: none; }
+</style>
+</head>
+<body>
+<nav class="rail" aria-label="Zalo">
+  <div class="me" id="me-avatar">Z</div>
+  <button class="on" title="Tin nhắn"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z"/></svg></button>
+  <button title="Danh bạ"><svg viewBox="0 0 24 24"><path d="M16 20v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 20v-1a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg></button>
+  <div class="brand">Zalo<br>mock</div>
+</nav>
+
+<section class="list">
+  <div class="list-head">
+    <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="filter" placeholder="Tìm kiếm"></label>
+    <button class="icon-btn" id="toggle-add" title="Thêm người dùng giả lập"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM19 8v6M22 11h-6"/></svg></button>
+  </div>
+  <div class="tabs"><span class="on">Tất cả</span><span>Người dùng giả lập</span></div>
+  <form class="add" id="add">
+    <input id="new-name" placeholder="Tên hiển thị trên Zalo (vd. Nguyễn Lan)" autocomplete="off">
+    <input id="new-phone" placeholder="Số điện thoại (để chia sẻ với OA, không bắt buộc)" inputmode="tel" autocomplete="off">
+    <div class="row"><button type="button" class="btn ghost" id="cancel-add">Hủy</button><button class="btn primary">Thêm</button></div>
+  </form>
+  <div class="users" id="users"></div>
+</section>
+
+<main class="chat">
+  <header class="chat-head">
+    <button class="icon-btn back" id="back" title="Danh sách"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="avatar oa" id="oa-avatar">TN</div>
+    <div class="title">
+      <div class="name"><span id="oa-name">Quivo</span><span class="badge">✓ OA</span></div>
+      <small id="who">Chọn một người dùng để bắt đầu</small>
+    </div>
+  </header>
+  <div class="messages" id="messages"></div>
+  <div class="typing" id="typing"><i></i><i></i><i></i><span id="typing-text">đang soạn tin…</span></div>
+  <div class="composer">
+    <form class="share" id="share">
+      <p><b id="share-oa">Quivo</b> muốn biết thông tin của bạn để hỗ trợ tốt hơn. Bạn đồng ý chia sẻ?</p>
+      <div class="fields">
+        <input id="share-name" placeholder="Họ tên">
+        <input id="share-phone" placeholder="Số điện thoại" inputmode="tel">
+        <input id="share-city" placeholder="Tỉnh/thành (không bắt buộc)">
+      </div>
+      <div class="actions"><button type="button" class="btn ghost" id="share-cancel">Từ chối</button><button class="btn primary">Chia sẻ</button></div>
+    </form>
+    <div class="tools">
+      <button type="button" data-kind="sticker" title="Gửi sticker"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg></button>
+      <button type="button" data-kind="image" title="Gửi hình ảnh"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button>
+      <button type="button" id="open-share" title="Chia sẻ tên và số điện thoại với OA"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.5-1.5 1.7-2 3-2s2.5.5 3 2M15 10h3M15 13h3"/></svg><span>Chia sẻ thông tin</span></button>
+      <button type="button" data-kind="follow" title="Quan tâm OA"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg><span>Quan tâm</span></button>
+    </div>
+    <form class="write" id="form">
+      <textarea id="text" rows="1" placeholder="Nhập tin nhắn tới Quivo" autocomplete="off"></textarea>
+      <button class="send" title="Gửi (Enter)"><svg viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg></button>
+    </form>
+  </div>
+</main>
+
+<script>
+// Paths are relative: the page may be served under a prefix (/zalo-mock/ behind Caddy).
+const $ = (id) => document.getElementById(id);
+let state = { users: [], messages: [], webhook: "", oa_name: "Quivo" }, current = null;
+const waiting = {}; // user id -> when the last message went out, until the OA answers
+
+const COLORS = ["#2d88ff", "#f5a623", "#7b61ff", "#00b386", "#ff6b6b", "#14a6c7", "#c06c84", "#4caf50"];
+const color = (id) => COLORS[[...String(id)].reduce((a, c) => a + c.charCodeAt(0), 0) % COLORS.length];
+const initials = (name) => (String(name).replace(/\(.*?\)/g, "").trim().split(/\s+/).slice(-2).map((w) => w[0]).join("") || "?").toUpperCase();
+const escape = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const linkify = (s) => escape(s).replace(/https?:\/\/[^\s<]+/g, (u) => `<a href="${u}" target="_blank" rel="noreferrer">${u}</a>`);
+const avatar = (name, id, cls = "") => `<div class="avatar ${cls}" style="background:${color(id)}">${escape(initials(name))}</div>`;
+const mine = (m) => m.user_id === current || (m.user_id === "OA" && current);
+
+function renderUsers() {
+  const q = $("filter").value.trim().toLowerCase();
+  $("users").innerHTML = "";
+  for (const u of state.users) {
+    if (q && !(u.name + " " + u.id + " " + (u.phone || "")).toLowerCase().includes(q)) continue;
+    const msgs = state.messages.filter((m) => m.user_id === u.id && m.direction !== "system");
+    const last = msgs[msgs.length - 1];
+    const el = document.createElement("div");
+    el.className = "user" + (u.id === current ? " on" : "");
+    el.innerHTML = `${avatar(u.name, u.id)}<div class="who"><div class="top"><b></b><time></time></div>
+      <div class="last"></div><div class="tag"></div></div>`;
+    el.querySelector("b").textContent = u.name;
+    el.querySelector("time").textContent = last ? last.at.slice(0, 5) : "";
+    el.querySelector(".last").textContent = last ? (last.direction === "in" ? "Bạn: " : "") + last.text.split("\n")[0] : "Chưa có tin nhắn";
+    el.querySelector(".tag").textContent = [u.note, u.phone ? "☎ " + u.phone : "chưa có SĐT"].filter(Boolean).join(" · ");
+    el.onclick = () => open(u.id);
+    $("users").appendChild(el);
+  }
+}
+
+function open(id) {
+  current = id;
+  document.body.classList.add("chatting");
+  renderUsers(); renderChat();
+  $("text").focus();
+}
+
+function renderChat() {
+  const user = state.users.find((u) => u.id === current);
+  $("oa-name").textContent = state.oa_name; $("share-oa").textContent = state.oa_name;
+  $("text").placeholder = `Nhập tin nhắn tới ${state.oa_name}`;
+  $("me-avatar").textContent = user ? initials(user.name) : "Z";
+  $("me-avatar").style.background = user ? color(user.id) : "transparent";
+  $("who").textContent = user ? `Bạn là ${user.name} · zalo id ${user.id} · ${user.phone ? "☎ " + user.phone : "chưa chia sẻ SĐT"}` : "Chọn một người dùng để bắt đầu";
+  const box = $("messages");
+  box.innerHTML = "";
+  if (!user) {
+    box.innerHTML = `<div class="empty"><div class="avatar oa">TN</div><b>${escape(state.oa_name)}</b><p>Chọn một người dùng ở cột trái để nhắn tin với Official Account như trên Zalo thật.</p></div>`;
+    return;
+  }
+  const msgs = state.messages.filter(mine);
+  box.insertAdjacentHTML("beforeend", `<div class="day">Hôm nay</div>`);
+  let prev = null;
+  msgs.forEach((m, i) => {
+    if (m.direction === "system") {
+      box.insertAdjacentHTML("beforeend", `<div class="system">${escape(m.text)}</div>`);
+      prev = null; return;
+    }
+    const first = !prev || prev.direction !== m.direction;
+    const next = msgs[i + 1];
+    const lastOfGroup = !next || next.direction !== m.direction;
+    const row = document.createElement("div");
+    row.className = `row ${m.direction}${first ? " first" : ""}`;
+    let kind = m.kind === "sticker" ? " sticker" : m.kind === "image" ? " image" : m.kind === "info" ? " card" : "";
+    let body = kind === " sticker" ? "😊" : kind === " image" ? `<div class="pic">🖼️</div>` : linkify(m.text);
+    const meta = kind === " sticker" ? "" : `<span class="meta">${m.at.slice(0, 5)}</span>`;
+    const slot = m.direction === "out" ? (lastOfGroup ? `<div class="avatar sm oa">TN</div>` : `<div class="slot"></div>`) : "";
+    row.innerHTML = `${slot}<div class="bubble${kind}">${body}${meta}</div>`;
+    box.appendChild(row);
+    if (m.direction === "in" && lastOfGroup) {
+      const ok = String(m.status || "").includes("200");
+      box.insertAdjacentHTML("beforeend", `<div class="status ${ok ? "" : "bad"}">${ok ? "Đã gửi" : escape(m.status || "")}</div>`);
+    }
+    prev = m;
+  });
+  const typing = waiting[current] && Date.now() - waiting[current] < 90000;
+  $("typing").classList.toggle("on", !!typing);
+  $("typing-text").textContent = `${state.oa_name} đang soạn tin…`;
+  box.scrollTop = box.scrollHeight;
+}
+
+async function post(path, body) {
+  const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  return r.json();
+}
+async function send(kind, text = "", info = null) {
+  if (!current) { alert("Chọn một người dùng trước"); return; }
+  waiting[current] = Date.now(); renderChat();
+  await post("api/send", { user_id: current, kind, text, info });
+}
+
+$("form").onsubmit = (e) => { e.preventDefault(); const t = $("text").value.trim(); if (t) { $("text").value = ""; autosize(); send("text", t); } };
+$("text").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("form").requestSubmit(); } });
+const autosize = () => { const t = $("text"); t.style.height = "auto"; t.style.height = Math.min(t.scrollHeight, 140) + "px"; };
+$("text").addEventListener("input", autosize);
+document.querySelectorAll("[data-kind]").forEach((b) => (b.onclick = () => send(b.dataset.kind)));
+$("filter").oninput = renderUsers;
+$("toggle-add").onclick = () => { $("add").classList.toggle("open"); $("new-name").focus(); };
+$("cancel-add").onclick = () => $("add").classList.remove("open");
+$("add").onsubmit = async (e) => {
+  e.preventDefault();
+  const u = await post("api/users", { name: $("new-name").value, phone: $("new-phone").value });
+  $("new-name").value = ""; $("new-phone").value = ""; $("add").classList.remove("open");
+  state.users.unshift(u); open(u.id);
+};
+$("open-share").onclick = () => {
+  if (!current) return alert("Chọn một người dùng trước");
+  const u = state.users.find((x) => x.id === current);
+  $("share-name").value = (u.name || "").replace(/^(anh|chị|cô|chú|bác)\s+/i, "");
+  $("share-phone").value = u.phone || ""; $("share").classList.add("open"); $("share-phone").focus();
+};
+$("share-cancel").onclick = () => $("share").classList.remove("open");
+$("share").onsubmit = async (e) => {
+  e.preventDefault();
+  const info = { name: $("share-name").value, phone: $("share-phone").value, city: $("share-city").value };
+  $("share").classList.remove("open");
+  const u = state.users.find((x) => x.id === current); if (u && info.phone) u.phone = info.phone;
+  await send("info", "", info);
+};
+$("back").onclick = () => { document.body.classList.remove("chatting"); };
+
+fetch("api/state").then((r) => r.json()).then((s) => { state = s; renderUsers(); renderChat(); });
+const events = new EventSource("api/stream");
+events.onmessage = (e) => {
+  const m = JSON.parse(e.data);
+  state.messages.push(m);
+  if (m.direction === "out") delete waiting[m.user_id];
+  renderUsers(); if (mine(m)) renderChat();
+};
+setInterval(() => { if (current && waiting[current]) renderChat(); }, 15000);
+</script>
+</body>
+</html>

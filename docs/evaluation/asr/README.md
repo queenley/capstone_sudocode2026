@@ -1,5 +1,7 @@
 # So sánh 3 mô hình ASR và diarization (24/10/2026)
 
+> Đánh giá trên cả bộ (674 lượt nói của khách, 85 kịch bản) chạy bằng `scripts/evaluation/run_eval.py asr`; cách làm và kết quả ở [scripts/evaluation/README.md](../../../scripts/evaluation/README.md) mục 5. Trang này là thí nghiệm so sánh ban đầu trên 7 clip.
+
 Dữ liệu: audio `scenarios_SCN-GEN-0001/` (7 clip khách hàng, một giọng ElevenLabs; 4 clip có nhiễu quán cà phê/đường phố/sóng yếu, 3 clip sạch). Reference là văn bản gốc đổi sang dạng đọc bằng `scripts/create_data/src/asr/spoken.py` (số thành chữ, giống ground truth ASR của BTC). Chấm bằng `wer_cer` của BTC (`reference_eval.py`). CPU Apple, 4 luồng, lúc đó simulator đang chạy nền nên RTF chỉ để so sánh tương đối.
 
 ## WER

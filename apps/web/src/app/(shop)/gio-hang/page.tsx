@@ -31,7 +31,7 @@ export default function CartPage() {
         <div className="s-cart-lines">
           {(items || lines.map((l) => ({ ...l, row: null }))).map((item) => (
             <div className="s-cart-line" key={item.sku}>
-              <ProductArt category={item.row?.category || ""} size="thumb" />
+              <ProductArt category={item.row?.category || ""} size="thumb" image={item.row?.image_url} alt={item.row?.name || ""} />
               <div className="s-cart-line-info">
                 {item.row ? (
                   <Link href={`/san-pham/${encodeURIComponent(item.row.product_ref || item.sku)}`}>

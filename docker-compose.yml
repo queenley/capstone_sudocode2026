@@ -159,6 +159,8 @@ services:
       ZALO_REFRESH_TOKEN: ${ZALO_REFRESH_TOKEN:-}
       # 1 only for scripts/dev/zalo_simulator.py without keys: accepts unsigned webhooks.
       ZALO_WEBHOOK_INSECURE: ${ZALO_WEBHOOK_INSECURE:-0}
+      # The shop as customers open it: Zalo replies link the products they name to pages here.
+      SHOP_PUBLIC_URL: ${SHOP_PUBLIC_URL:-http://localhost:3000}
       # Local mock platform only (scripts/dev/zalo_mock.py), e.g. http://host.docker.internal:8090.
       # Empty: Zalo's own openapi.zalo.me / oauth.zaloapp.com. Never set in production.
       ZALO_OPENAPI_URL: ${ZALO_OPENAPI_URL:-}

@@ -168,7 +168,7 @@ def caller_number(participant: rtc.RemoteParticipant) -> str:
 
 
 async def handle_room(name: str) -> None:
-    token = (api.AccessToken(LIVEKIT_KEY, LIVEKIT_SECRET).with_identity(IDENTITY).with_name("Tiếp Nối")
+    token = (api.AccessToken(LIVEKIT_KEY, LIVEKIT_SECRET).with_identity(IDENTITY).with_name("Quivo")
              .with_grants(api.VideoGrants(room_join=True, room=name)).to_jwt())
     room = rtc.Room()
     caller: asyncio.Future = asyncio.get_running_loop().create_future()

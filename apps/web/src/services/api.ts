@@ -13,12 +13,25 @@ export async function api<T = unknown>(
     body: body === undefined ? undefined : JSON.stringify(body),
     cache: "no-store",
   });
-  const result = await response.json();
+  // A proxy or a crashed service answers with a text page ("Internal Server Error"), not JSON.
+  const raw = await response.text();
+  let result: { detail?: unknown } & Record<string, unknown>;
+  try {
+    result = raw ? JSON.parse(raw) : {};
+  } catch {
+    throw new Error(
+      response.ok
+        ? "Máy chủ trả về dữ liệu không đọc được. Vui lòng thử lại."
+        : `Máy chủ đang gặp sự cố (${response.status}). Vui lòng thử lại sau ít phút.`,
+    );
+  }
   if (!response.ok)
     throw new Error(
       typeof result.detail === "string"
         ? result.detail
-        : JSON.stringify(result.detail || result),
+        : Array.isArray(result.detail) && typeof result.detail[0]?.msg === "string"
+          ? result.detail[0].msg
+          : JSON.stringify(result.detail || result),
     );
   return result as T;
 }
@@ -66,12 +79,25 @@ export type CreateCatalogSkuInput = {
 };
 
 /** Flattened Commerce API wire item, retained for the current HTTP backend. */
+/** Who made a product photo and under which licence (CC BY asks for this next to the picture). */
+export type ImageCredit = {
+  title: string;
+  author: string;
+  author_url: string;
+  license: string;
+  license_url: string;
+  source_url: string;
+  provider: string;
+};
 export type CommerceCatalogItem = {
   id: string;
   name: string;
   brand: string;
   category: string;
   description: string | null;
+  /** A photo on this site ("/products/<ref>.jpg"), or null: the category's drawing is shown. */
+  image_url?: string | null;
+  image_credit?: ImageCredit | null;
   sku_code: string;
   variant: Record<string, unknown>;
   list_price: string;
@@ -141,11 +167,16 @@ export type AgentTurn = {
 
 export type AgentCallDetail = AgentCall & { held_by_you: boolean; turns: AgentTurn[] };
 
+/** A cart line sent with a chat message: the cart lives in this browser, so the assistant
+ *  only knows it from here. `name` is the product as the shop shows it. */
+export type ChatCartLine = { sku: string; qty: number; name?: string };
+
 export async function streamTurn(
   session: Session,
   message: string,
   selectedSku: string,
   onText: (text: string) => void,
+  cartLines: ChatCartLine[] | null = null,
 ): Promise<TurnResult> {
   const response = await fetch(
     `/backend/api/conversations/${session.conversation_id}/stream`,
@@ -155,7 +186,7 @@ export async function streamTurn(
         "Content-Type": "application/json",
         Authorization: "Bearer " + session.conversation_token,
       },
-      body: JSON.stringify({ message, selected_sku: selectedSku || null }),
+      body: JSON.stringify({ message, selected_sku: selectedSku || null, cart: cartLines }),
     },
   );
   if (!response.ok || !response.body)

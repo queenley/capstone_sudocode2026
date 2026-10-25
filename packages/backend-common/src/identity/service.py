@@ -37,6 +37,10 @@ class IdentityService:
         )
         self.db.add(challenge)
         self.db.flush()
+        return self.deliver(challenge, kind, value, code)
+
+    def deliver(self, challenge, kind, value, code):
+        """Send *code* through the OTP provider; without one (development), hand it back to show on screen."""
         settings = self.security.settings
         if settings.otp_url:
             try:

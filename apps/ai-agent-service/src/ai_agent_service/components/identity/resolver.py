@@ -126,6 +126,25 @@ def pick_by_name(text: str, candidates: Sequence[Match]) -> Match | None:
     return hits[0] if len(hits) == 1 else None
 
 
+def pick_by_account(full_name: str | None, candidates: Sequence[Match]) -> Match | None:
+    """The one candidate a logged-in website account names, if exactly one.
+
+    The account's phone was proved with a code and its owner logged in with a
+    password, so its name stands for the customer's own answer to "cho em xin
+    tên": the candidate whose name is the account's full name, or the given
+    name it ends with ("Trần Thị Oanh" names the CRM's "Oanh").
+    """
+    words = plain(full_name or "").split()
+    if not words:
+        return None
+    hits = []
+    for candidate in candidates:
+        name = plain(candidate.name or "").split()
+        if name and (name == words or name == words[-len(name):]):
+            hits.append(candidate)
+    return hits[0] if len(hits) == 1 else None
+
+
 def matches_from_crm(result: dict[str, Any]) -> list[Match]:
     """``crm.get_customer``'s answer as matches: none, one, or the candidates of a shared number."""
     if not result or not result.get("found"):

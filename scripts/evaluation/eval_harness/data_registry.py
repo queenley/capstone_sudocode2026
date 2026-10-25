@@ -2,6 +2,7 @@
 from collections import Counter
 from pathlib import Path
 
+from .asr_eval import check_set as asr_check
 from .assets import read_json
 from .contracts import validate
 from .extractor import digest
@@ -10,12 +11,28 @@ from .extractor import digest
 def inspect(root, only=None):
     root = Path(root).resolve(strict=True)
     registry = read_json(root / "registry.json")
-    if set(registry) != {"schema_version", "sets"} or registry["schema_version"] != "team-datasets-v1" or not isinstance(registry["sets"], list):
+    if (not {"schema_version", "sets"} <= set(registry) <= {"schema_version", "sets", "asr_sets"}
+            or registry["schema_version"] != "team-datasets-v1" or not isinstance(registry["sets"], list)
+            or not isinstance(registry.get("asr_sets", []), list)):
         raise ValueError("Invalid team dataset registry")
     rows, issues, ids, fingerprints = [], [], [], []
     groups = [group for group in registry["sets"] if only is None or group["id"] == only]
-    if only is not None and len(groups) != 1:
+    audio_groups = [group for group in registry.get("asr_sets", []) if only is None or group["id"] == only]
+    if only is not None and len(groups) + len(audio_groups) != 1:
         raise ValueError("Dataset ID must select exactly one registered set")
+    audio_rows = []
+    for group in audio_groups:
+        # Audio sets (ground_truth.json + audio/, BTC's ASR shape) are scored by `asr`, not by the text gate.
+        if set(group) != {"id", "path", "reviewed_by", "status"} or group["status"] not in {"diagnostic", "approved"}:
+            raise ValueError("Invalid ASR set declaration")
+        path = (root / group["path"]).resolve(strict=True)
+        if not path.is_relative_to(root) or not path.is_dir() or path == root:
+            raise ValueError("Dataset path escapes evaluation/datasets")
+        found, clips = asr_check(path, group["id"])
+        issues += found
+        if group["status"] == "approved" and not group["reviewed_by"]:
+            issues.append({"code": "REVIEW_MISSING", "set": group["id"]})
+        audio_rows.append({"set": group["id"], "status": group["status"], "clips": clips})
     for group in groups:
         if not {"id", "split", "path", "reviewed_by", "status"}.issubset(group) or set(group) - {"id", "split", "path", "reviewed_by", "status", "tool_labels", "gt_review"} or group["split"] not in {"development", "public", "frozen", "growth"} or group["status"] not in {"diagnostic", "approved"}:
             raise ValueError("Invalid dataset set declaration")
@@ -84,6 +101,7 @@ def inspect(root, only=None):
         for value, count in Counter(values).items():
             if count > 1:
                 issues.append({"code": key, "value": value})
-    return {"schema_version": "team-dataset-readiness-v1", "scenarios": rows,
-            "issues": issues, "execution_gate": {"allowed": not issues and bool(rows) and all(row["status"] == "approved" for row in rows)},
+    return {"schema_version": "team-dataset-readiness-v1", "scenarios": rows, **({"asr_sets": audio_rows} if audio_rows else {}),
+            "issues": issues, "execution_gate": {"allowed": not issues and bool(rows or audio_rows) and all(
+                row["status"] == "approved" for row in rows + audio_rows)},
             "notice": "Offline shape/coverage gate; reviewer assertions and business GT must be independently verified against BTC sources."}

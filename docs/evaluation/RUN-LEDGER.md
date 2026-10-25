@@ -17,6 +17,7 @@ Một scenario chạy cả full/baseline vẫn là một scenario mới về đ�
 | 20261024-work / development-r2-v4 | 24/10/2026 | Retest, nhãn `chuyen_khoan` → `bank` (dataset v4); agent không đổi so với R1 | 16 | full + baseline | Xong; TSR M2 33,3%, HR giá/KM 25% |
 | 20261024-work / development-r3-v4 | 24/10/2026 | Retest sau thêm quy tắc prompt | 16 | full + baseline | INCOMPLETE: 3 scenario hết thời gian khởi động adapter (78/104 lượt); không dùng điểm |
 | 20261024-work / simulator-final | 24/10/2026 | Customer simulator BTC, 3 seed (0,1,2) | 5 M2 (SCN-GEN-0003, 0032, 0062, 0066, 0069) | full + baseline | Xong; TSR full 40% / 40% / 40%, baseline 20% / 0% / 20%; biên độ 0 (full), 20 (baseline) |
+| asr/full-zipformer-30m → asr/v2-zipformer-30m | 25/10/2026 | ASR (không LLM): `zipformer-30m` qua `asr-service`, chấm `wer_cer` BTC | 674 lượt nói khách của 85 kịch bản (`asr-team-v2`); không tốn coverage kịch bản text | raw + lexicon | Xong; WER 6,2%, entity 96,0% → 97,1% sau sửa ITN (`v2-zipformer-30m-itnfix`, cùng hypothesis); v1 bỏ vì lỗi đáp án "TP Huế"; evidence `scripts/evaluation/runs/asr/` |
 
 ## Chi tiết từng lượt
 

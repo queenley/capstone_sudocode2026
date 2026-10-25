@@ -3,10 +3,25 @@ import React from "react";
 import { THEME_SCRIPT } from "@/components/theme/ThemeToggle";
 import "./theme.css";
 import "./globals.css";
+import "./tailwind.css";
 
 export const metadata: Metadata = {
-  title: { default: "Tiếp Nối — Gia dụng, thời trang, mẹ & bé", template: "%s · Tiếp Nối" },
-  description: "Mua sắm gia dụng, thời trang và đồ mẹ bé, với trợ lý tư vấn AI 24/7 và đội ngũ nhân viên hỗ trợ.",
+  title: {
+    default: "Quivo — Gia dụng, thời trang, mẹ & bé",
+    template: "%s · Quivo",
+  },
+  description:
+    "Mua sắm gia dụng, thời trang và đồ mẹ bé, với trợ lý tư vấn AI 24/7 và đội ngũ nhân viên hỗ trợ.",
+  applicationName: "Quivo",
+  // favicon.ico sits in src/app (Next serves it); the rest are in public/.
+  icons: {
+    icon: [
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: { url: "/apple-touch-icon.png", sizes: "180x180" },
+  },
+  manifest: "/site.webmanifest",
 };
 
 export const viewport: Viewport = {
@@ -27,9 +42,14 @@ export default function RootLayout({
     // data-theme is set before hydration by THEME_SCRIPT, so React must not compare it.
     <html lang="vi" suppressHydrationWarning>
       <head>
+        {/* The icons come from `metadata.icons` above and src/app/favicon.ico. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin=""
+        />
         {/* Without the network the page falls back to the system fonts in theme.css. */}
         <link
           rel="stylesheet"

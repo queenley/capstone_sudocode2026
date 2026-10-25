@@ -2,15 +2,18 @@
 
     python scripts/dev/zalo_mock.py                 # http://127.0.0.1:8090, opens the browser
     python scripts/dev/zalo_mock.py --port 8091 --no-browser
+    docker compose --profile zalo-mock up -d        # the same, as a container (docker-compose.override.yml)
 
 It plays both parts Zalo plays for the shop's OA, in their formats
 (``apps/ai-agent-service/src/ai_agent_service/runtime/zalo.py``):
 
-- **the users' side**: a chat page where you are any Zalo user (the CRM's
-  customers with a ``zalo_id``, or new ones). Each message is posted to the
-  shop's webhook as Zalo posts it (``user_send_text``, ``user_send_image``,
-  ``user_send_sticker``, ``follow``), signed ``X-ZEvent-Signature: mac=sha256(
-  app_id + body + timestamp + OA secret key)``;
+- **the users' side**: a chat page, laid out like Zalo's, where you are any
+  Zalo user (the CRM's customers with a ``zalo_id``, or new ones, each with a
+  phone). Each message is posted to the shop's webhook as Zalo posts it
+  (``user_send_text``, ``user_send_image``, ``user_send_sticker``, ``follow``,
+  and ``user_submit_info`` when the user shares their name and phone with the
+  OA, as Zalo's "request user info" form lets them), signed
+  ``X-ZEvent-Signature: mac=sha256(app_id + body + timestamp + OA secret key)``;
 - **the platform's side**: Zalo's OA API, which the shop calls to answer,
   ``POST /v3.0/oa/message/cs`` (``access_token`` header), and its OAuth,
   ``POST /v4/oa/access_token`` (refresh a token). Replies appear in the chat as
@@ -30,6 +33,11 @@ The shop uses this platform instead of Zalo's when ``.env`` points it here
 then ``docker compose up -d ai-agent-service``. The keys are read from the same
 ``.env``, so both sides agree; ``--check`` prints what is missing.
 
+Behind a public address (the cloud stack's ``zalo-mock`` profile, at
+``https://DOMAIN/zalo-mock/``) the page asks for ``ZALO_MOCK_PASSWORD`` (HTTP
+Basic, any user name): anyone who opens it chats with the assistant, at the
+shop's cost. The OA API endpoints keep their own check, the access token.
+
 What it checks, as Zalo does: the access token (error -216), the message shape
 and length (-201, at most 2000 characters), that the recipient is a user of
 this platform (-213) who wrote to the OA in the last 7 days (-230; the window
@@ -39,7 +47,9 @@ messages are this mock's. Standard library only; state lives in memory.
 from __future__ import annotations
 
 import argparse
+import base64
 import hashlib
+import hmac
 import json
 import os
 import queue
@@ -61,6 +71,8 @@ REPLY_WINDOW = 7 * 24 * 3600
 MAX_TEXT = 2000
 DEFAULTS = {"ZALO_APP_ID": "mock-app", "ZALO_OA_ID": "mock-oa", "ZALO_OA_SECRET_KEY": "mock-oa-secret",
             "ZALO_ACCESS_TOKEN": "mock-access-token"}
+#: The OA's name on the page (ZALO_OA_NAME).
+OA_NAME = os.environ.get("ZALO_OA_NAME", "").strip() or "Quivo"
 
 
 def load_env() -> dict[str, str]:
@@ -98,12 +110,14 @@ class Platform:
             if path.is_file():
                 for c in json.loads(path.read_text(encoding="utf-8"))["customers"]:
                     if c.get("zalo_id"):
-                        self.add_user(c["zalo_id"], f"{c['honorific']} {c['name']} ({c['customer_id']})")
-        self.add_user("9000000001", "Khách mới (chưa có trong CRM)")
+                        self.add_user(c["zalo_id"], f"{c['honorific']} {c['name']}", phone=c.get("phone"),
+                                      note=f"CRM {c['customer_id']}")
+        self.add_user("9000000001", "Khách mới", note="chưa có trong CRM")
 
-    def add_user(self, user_id: str, name: str) -> dict:
+    def add_user(self, user_id: str, name: str, *, phone: str | None = None, note: str = "") -> dict:
         with self.lock:
-            user = self.users.setdefault(user_id, {"id": user_id, "name": name, "last_message_at": 0.0})
+            user = self.users.setdefault(user_id, {"id": user_id, "name": name, "phone": phone or "", "note": note,
+                                                   "last_message_at": 0.0})
         return user
 
     def note(self, user_id: str, direction: str, text: str, **extra) -> dict:
@@ -122,7 +136,7 @@ class Platform:
 
     # ── the users' side: events to the shop's webhook ──
 
-    def event(self, user_id: str, kind: str, text: str = "") -> dict:
+    def event(self, user_id: str, kind: str, text: str = "", extra: dict | None = None) -> dict:
         """Post one Zalo event for *user_id* to the webhook; returns what the shop answered."""
         config = self.config
         timestamp = str(int(time.time() * 1000))
@@ -132,6 +146,15 @@ class Platform:
             event = {**base, "event_name": "follow", "oa_id": config["ZALO_OA_ID"], "source": "oa_profile",
                      "follower": {"id": user_id}}
             shown = "[theo dõi OA]"
+        elif kind == "info":
+            # Zalo's answer to the OA's "request user info" form: what the user agreed to share.
+            info = {"name": "", "phone": "", "address": "", "ward": "", "district": "", "city": "", **(extra or {})}
+            event = {**base, "event_name": "user_submit_info", "oa_id": config["ZALO_OA_ID"],
+                     "sender": {"id": user_id}, "recipient": {"id": config["ZALO_OA_ID"]}, "info": info}
+            shown = "Đã chia sẻ thông tin: " + ", ".join(v for v in (info["name"], info["phone"], info["city"]) if v)
+            with self.lock:
+                if info["phone"]:
+                    self.users[user_id]["phone"] = info["phone"]
         else:
             message: dict = {"msg_id": msg_id, "text": text}
             if kind == "image":
@@ -159,7 +182,7 @@ class Platform:
         except OSError as error:
             status, answer = 0, f"{type(error).__name__}: {error}"
         webhook = "200" if status == 200 else f"{status or 'không kết nối được'} {answer[:200]}"
-        return self.note(user_id, "in", shown, status=f"webhook {webhook}", msg_id=msg_id, event=event)
+        return self.note(user_id, "in", shown, status=f"webhook {webhook}", msg_id=msg_id, event=event, kind=kind)
 
     # ── the platform's side: the OA API the shop calls ──
 
@@ -223,14 +246,34 @@ def handler(platform: Platform) -> type[BaseHTTPRequestHandler]:
         def body(self) -> bytes:
             return self.rfile.read(int(self.headers.get("Content-Length") or 0))
 
+        def locked(self) -> bool:
+            """The page and its /api/ need ZALO_MOCK_PASSWORD when one is set (HTTP Basic)."""
+            password = os.environ.get("ZALO_MOCK_PASSWORD", "")
+            if not password:
+                return False
+            given = self.headers.get("Authorization", "")
+            try:
+                _, _, secret = base64.b64decode(given.removeprefix("Basic ")).decode().partition(":")
+            except ValueError:
+                secret = ""
+            if given.startswith("Basic ") and hmac.compare_digest(secret.encode(), password.encode()):
+                return False
+            self.send_response(401)
+            self.send_header("WWW-Authenticate", 'Basic realm="Zalo mock", charset="UTF-8"')
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return True
+
         def do_GET(self) -> None:
             path = urllib.parse.urlsplit(self.path).path
+            if (path == "/" or path.startswith("/api/")) and self.locked():
+                return
             if path == "/":
                 self.reply(200, PAGE.encode("utf-8"), "text/html")
             elif path == "/api/state":
                 with platform.lock:
                     self.reply(200, {"users": list(platform.users.values()), "messages": platform.messages,
-                                     "webhook": platform.webhook})
+                                     "webhook": platform.webhook, "oa_name": OA_NAME})
             elif path == "/api/stream":
                 self.stream()
             else:
@@ -262,6 +305,8 @@ def handler(platform: Platform) -> type[BaseHTTPRequestHandler]:
         def do_POST(self) -> None:
             path = urllib.parse.urlsplit(self.path).path
             raw = self.body()
+            if path.startswith("/api/") and self.locked():
+                return
             if path == "/v3.0/oa/message/cs":
                 try:
                     payload = json.loads(raw or b"{}")
@@ -276,15 +321,17 @@ def handler(platform: Platform) -> type[BaseHTTPRequestHandler]:
                 data = json.loads(raw or b"{}")
                 user_id, kind = str(data.get("user_id") or ""), data.get("kind", "text")
                 text = str(data.get("text") or "").strip()
-                if user_id not in platform.users or kind not in ("text", "image", "sticker", "follow") \
+                if user_id not in platform.users or kind not in ("text", "image", "sticker", "follow", "info") \
                         or (kind == "text" and not text):
                     self.reply(400, {"error": "user_id, kind and (for text) text are required"})
                     return
-                self.reply(200, platform.event(user_id, kind, text))
+                info = {k: str(v).strip() for k, v in (data.get("info") or {}).items() if isinstance(v, (str, int))}
+                self.reply(200, platform.event(user_id, kind, text, info if kind == "info" else None))
             elif path == "/api/users":
                 data = json.loads(raw or b"{}")
                 user_id = str(data.get("id") or "").strip() or str(9000000000 + secrets.randbelow(999999))
-                self.reply(200, platform.add_user(user_id, str(data.get("name") or "").strip() or f"Người dùng {user_id}"))
+                self.reply(200, platform.add_user(user_id, str(data.get("name") or "").strip() or f"Người dùng {user_id}",
+                                                  phone=str(data.get("phone") or "").strip(), note="người dùng mới"))
             else:
                 self.reply(404, {"error": "not found"})
 
@@ -292,8 +339,11 @@ def handler(platform: Platform) -> type[BaseHTTPRequestHandler]:
 
 
 def check(config: dict[str, str], port: int) -> list[str]:
-    """What ``.env`` lacks for the shop to talk to this platform."""
-    expected = f"http://host.docker.internal:{port}"
+    """What ``.env`` lacks for the shop to talk to this platform.
+
+    The shop reaches the mock at ``ZALO_MOCK_URL`` when set (``http://zalo-mock:8090``
+    inside the cloud stack), else at this machine's port from Docker."""
+    expected = (os.environ.get("ZALO_MOCK_URL") or f"http://host.docker.internal:{port}").rstrip("/")
     problems = [f"{key}= (not set; this mock uses {value!r}, set the same in .env)"
                 for key, value in DEFAULTS.items() if not config.get(key)]
     for key in ("ZALO_OPENAPI_URL", "ZALO_OAUTH_URL"):
@@ -309,12 +359,18 @@ def main() -> int:
         sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--port", type=int, default=8090)
+    parser.add_argument("--host", default="127.0.0.1", help="0.0.0.0 in a container")
     parser.add_argument("--webhook", help="The shop's webhook (default: GATEWAY_URL or http://127.0.0.1:8000, "
                                           "+ /api/channels/zalo/webhook)")
     parser.add_argument("--no-browser", action="store_true")
     parser.add_argument("--check", action="store_true", help="Print what .env lacks, then exit")
+    parser.add_argument("--require-password", action="store_true",
+                        help="refuse to start without ZALO_MOCK_PASSWORD (a public address)")
     args = parser.parse_args()
 
+    if args.require_password and len(os.environ.get("ZALO_MOCK_PASSWORD", "")) < 12:
+        print("ZALO_MOCK_PASSWORD (12+ characters) is required: this mock is reachable from the Internet.")
+        return 2
     config = load_env()
     problems = check(config, args.port)
     if args.check or problems:
@@ -328,7 +384,7 @@ def main() -> int:
     config = {**DEFAULTS, **{k: v for k, v in config.items() if v}}
     gateway = config.get("GATEWAY_URL", "http://127.0.0.1:8000").rstrip("/")
     platform = Platform(config, args.webhook or gateway + "/api/channels/zalo/webhook")
-    server = ThreadingHTTPServer(("127.0.0.1", args.port), handler(platform))
+    server = ThreadingHTTPServer((args.host, args.port), handler(platform))
     server.daemon_threads = True
     url = f"http://127.0.0.1:{args.port}"
     print(f"Mock Zalo: {url}  → webhook {platform.webhook}  ({len(platform.users)} users). Ctrl+C để dừng.")
@@ -341,86 +397,8 @@ def main() -> int:
     return 0
 
 
-PAGE = """<!doctype html>
-<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mock Zalo</title>
-<style>
-:root{--blue:#0068ff;--bg:#f0f2f5;--panel:#fff;--line:#e4e6eb;--muted:#65676b;--me:#e5efff;--shop:#fff;--warn:#fff4e5}
-*{box-sizing:border-box}body{margin:0;font:15px/1.4 system-ui,sans-serif;background:var(--bg);color:#081c36;height:100vh;display:flex}
-aside{width:300px;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column}
-aside h1{margin:0;padding:14px 16px;font-size:18px;color:var(--blue);border-bottom:1px solid var(--line)}
-#users{flex:1;overflow:auto}.user{padding:10px 16px;cursor:pointer;border-bottom:1px solid var(--line)}
-.user:hover{background:#f5f6f7}.user.on{background:var(--me)}.user small{display:block;color:var(--muted)}
-#add{display:flex;gap:6px;padding:10px;border-top:1px solid var(--line)}#add input{flex:1;min-width:0}
-main{flex:1;display:flex;flex-direction:column;min-width:0}
-header{background:var(--panel);padding:12px 16px;border-bottom:1px solid var(--line)}header small{color:var(--muted);display:block}
-#chat{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:8px}
-.msg{max-width:70%;padding:8px 12px;border-radius:12px;white-space:pre-wrap;word-wrap:break-word}
-.in{align-self:flex-end;background:var(--me)}.out{align-self:flex-start;background:var(--shop);border:1px solid var(--line)}
-.system{align-self:center;background:var(--warn);font-size:13px}.msg small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
-form{display:flex;gap:6px;padding:10px;background:var(--panel);border-top:1px solid var(--line)}
-input{padding:9px 12px;border:1px solid var(--line);border-radius:18px;font:inherit}#text{flex:1}
-button{border:0;border-radius:18px;padding:8px 12px;background:#e4e6eb;cursor:pointer;font:inherit}
-button.primary{background:var(--blue);color:#fff}
-@media (max-width:700px){body{flex-direction:column}aside{width:auto;max-height:35vh}}
-</style></head><body>
-<aside><h1>Mock Zalo</h1><div id="users"></div>
-<div id="add"><input id="newname" placeholder="Tên người dùng mới"><button id="adduser">Thêm</button></div></aside>
-<main><header><b id="who">Chọn một người dùng</b><small id="hint"></small></header>
-<div id="chat"></div>
-<form id="form"><button type="button" data-kind="follow" title="Theo dõi OA">➕</button>
-<button type="button" data-kind="image" title="Gửi ảnh">📷</button><button type="button" data-kind="sticker" title="Gửi sticker">😀</button>
-<input id="text" placeholder="Nhập tin nhắn gửi shop" autocomplete="off"><button class="primary">Gửi</button></form></main>
-<script>
-let state = {users: [], messages: []}, current = null;
-const $ = (id) => document.getElementById(id);
-function renderUsers() {
-  $("users").innerHTML = "";
-  for (const u of state.users) {
-    const el = document.createElement("div");
-    el.className = "user" + (u.id === current ? " on" : "");
-    el.innerHTML = "<b></b><small></small>";
-    el.querySelector("b").textContent = u.name;
-    el.querySelector("small").textContent = "zalo id: " + u.id;
-    el.onclick = () => { current = u.id; renderUsers(); renderChat(); $("text").focus(); };
-    $("users").appendChild(el);
-  }
-}
-function renderChat() {
-  const user = state.users.find((u) => u.id === current);
-  $("who").textContent = user ? user.name : "Chọn một người dùng";
-  $("hint").textContent = user ? "zalo id " + user.id + " · webhook " + state.webhook : "";
-  $("chat").innerHTML = "";
-  for (const m of state.messages.filter((m) => m.user_id === current || (m.user_id === "OA" && current))) {
-    const el = document.createElement("div");
-    el.className = "msg " + m.direction;
-    el.textContent = m.text;
-    const meta = document.createElement("small");
-    meta.textContent = m.at + (m.status ? " · " + m.status : "");
-    el.appendChild(meta);
-    $("chat").appendChild(el);
-  }
-  $("chat").scrollTop = $("chat").scrollHeight;
-}
-async function post(path, body) {
-  const r = await fetch(path, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
-  return r.json();
-}
-async function send(kind, text) {
-  if (!current) { alert("Chọn một người dùng trước"); return; }
-  await post("/api/send", {user_id: current, kind, text});
-}
-$("form").onsubmit = (e) => { e.preventDefault(); const t = $("text").value.trim(); if (t) { $("text").value = ""; send("text", t); } };
-document.querySelectorAll("[data-kind]").forEach((b) => b.onclick = () => send(b.dataset.kind, ""));
-$("adduser").onclick = async () => {
-  const u = await post("/api/users", {name: $("newname").value});
-  $("newname").value = ""; state.users.push(u); current = u.id; renderUsers(); renderChat();
-};
-fetch("/api/state").then((r) => r.json()).then((s) => { state = s; renderUsers(); renderChat(); });
-const events = new EventSource("/api/stream");
-events.onmessage = (e) => { state.messages.push(JSON.parse(e.data)); renderChat(); };
-</script></body></html>
-"""
+#: The chat page, laid out like Zalo's web client (scripts/dev/zalo_mock.html).
+PAGE = (Path(__file__).resolve().with_name("zalo_mock.html")).read_text(encoding="utf-8")
 
 if __name__ == "__main__":
     sys.exit(main())

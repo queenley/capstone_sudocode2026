@@ -115,6 +115,14 @@ class HotState(TurnInput, total=False):
     quotes: dict[str, int]
     #: Public catalogue codes seen in this call, retained across turn resets.
     trusted_skus: list[str]
+    #: The products tools showed this call, latest last: ``{sku, name, price_vnd}``.
+    #: A turn only sees its own tool results; this is how a later turn still
+    #: knows the code of the product the customer now wants to order.
+    seen_products: list[dict[str, Any]]
+    #: How a customer not yet known calls themselves (anh, chị, cô, chú, bác),
+    #: and whether the agent asked already (``components.intake.honorific``).
+    honorific_said: str | None
+    honorific_asked: bool
     #: Consecutive infrastructure failures of tools; route rule 1.
     tool_failures: int
 
@@ -171,6 +179,10 @@ class HotContext:
     asr_confidence: float | None = None
     #: Keys from the connection: the number a call came from, the channel identity.
     caller_phone: str | None = None
+    #: The website account (platform customer id) of a logged-in shopper, for the account tools.
+    account_id: str | None = None
+    #: That account's full name: on a shared number it answers "cho em xin tên" (resolver.pick_by_account).
+    account_name: str | None = None
     zalo_id: str | None = None
     fb_id: str | None = None
     #: This call's personal data, token to value.

@@ -60,6 +60,7 @@ from ..components.context.budget import Section, assemble
 from ..components.guardrails import actions
 from ..components.memory.brief import BriefLine
 from ..components.intake import pii
+from ..components.intake.itn import format_vnd
 from ..config.config_manager import get_lanes
 from ..llm import tracing
 from ..llm.callback_handler import text_of
@@ -82,6 +83,9 @@ class AgentContext:
 
     call_id: str
     customer_id: str | None = None
+    #: The platform customer the web conversation belongs to (logged in or verified), for the
+    #: ``account_*`` tools; filled in by the harness, never shown to the model.
+    account_id: str | None = None
     #: How to address the customer, when the tier allows knowing it: "chị Hoa".
     address_as: str | None = None
     tier: str = "UNKNOWN"
@@ -131,6 +135,11 @@ class AgentContext:
     trusted_skus: frozenset[str] = frozenset()
     #: The turn's flags from intake (a request for a person, a complaint, ...).
     flags: Mapping[str, Any] = field(default_factory=dict)
+    #: The products tools showed earlier in this call: ``{sku, name, price_vnd}``.
+    seen_products: tuple[Mapping[str, Any], ...] = ()
+    #: How an unknown customer calls themselves, and whether the agent asked.
+    self_called: str | None = None
+    honorific_asked: bool = False
     #: The customer's words this turn and the agent's last reply, tokenised:
     #: what the before-write checks read (a deletion needs both).
     customer_said: str | None = None
@@ -176,10 +185,10 @@ HARD_RULES = """\
 Bạn là trợ lý ảo bán hàng của một cửa hàng Việt Nam, trả lời khách qua điện thoại hoặc tin nhắn. Xưng "em", gọi khách theo danh xưng của khách.
 
 Nguồn sự thật:
-1. Giá, khuyến mãi, tồn kho, thời gian giao, trạng thái đơn: chỉ nói con số có trong kết quả tool của lượt này (pricing_get_quote, inventory_check, delivery_estimate, order_status, order_create, order_update). Không nhớ, không suy, không làm tròn, không tự cộng tổng. Giá trong Call Brief là lịch sử, chỉ nói kiểu "hôm trước bên em báo"; giá hôm nay phải gọi pricing_get_quote.
+1. Giá, khuyến mãi, tồn kho, thời gian giao, trạng thái đơn: chỉ nói con số có trong kết quả tool của lượt này (pricing_get_quote, inventory_check, delivery_estimate, order_status, order_create, order_update, account_cart, account_orders). Không nhớ, không suy, không làm tròn, không tự cộng tổng. Giá trong Call Brief là lịch sử, chỉ nói kiểu "hôm trước bên em báo"; giá hôm nay phải gọi pricing_get_quote.
 2. Mã sản phẩm (sku, variant_sku) chỉ dùng mã có nguyên văn trong kết quả tool của cuộc gọi này hoặc trong Call Brief; muốn đúng size, màu thì lấy variant_sku từ catalog_search. Không tự ghép mã từ tên.
 3. Chính sách đổi trả, vận chuyển, bảo hành, thanh toán, giờ làm việc: chỉ dựa vào mục "Tài liệu liên quan". Đoạn hết hiệu lực chỉ áp cho đơn tạo trước ngày chính sách đổi. Đoạn nội bộ thì từ chối, không nói gì về giá nhập, nhà cung cấp, giá sàn, biên lợi nhuận (KM-06).
-4. Điều không có trong tài liệu hay kết quả tool: nói ngay "Dạ hiện em chưa có thông tin về …", không đoán, ghi nhận và hẹn phản hồi (PB-05). Không chuyển máy chỉ vì thiếu thông tin.
+4. Điều không có trong tài liệu hay kết quả tool: nói ngay "Dạ hiện em chưa có thông tin về …", không đoán, ghi nhận và hẹn phản hồi (PB-05). Không chuyển máy chỉ vì thiếu thông tin. Tool báo lỗi hoặc hết giờ (TIMEOUT): gọi lại tool đó một lần trong lượt; vẫn lỗi thì nói thật là em chưa tra được ngay lúc này và mời khách nhắn lại sau ít phút. Không trả lời kiểu "em kiểm tra rồi báo lại, anh/chị chờ chút": em chỉ trả lời khi khách nhắn, không tự nhắn lại sau được.
 
 Cách xử lý:
 5. Không bao giờ nhận là người. Khách hỏi người hay máy thì nói thật em là trợ lý ảo của shop và đề nghị chuyển nhân viên nếu khách muốn (PB-07).
@@ -189,7 +198,7 @@ Cách xử lý:
 9. Khách cần hỏi người nhà: không ép, đề nghị hẹn giờ gọi lại; chỉ nhắc khuyến mãi còn hiệu lực; không tạo khan hiếm giả (PB-03).
 10. Khuyến mãi đã hết hạn thì nói thẳng là đã hết và báo giá hiện tại, không giữ giá cũ (KM-01). Không nhắc khuyến mãi chưa bắt đầu (KM-02).
 11. Chưa gọi inventory_check thì không hứa còn hàng. Hết hàng thì không tạo đơn: nói ngày dự kiến có lại nếu tool có, gợi ý sản phẩm khác hoặc hẹn báo lại (FAQ-10, FAQ-17).
-12. Khách đồng ý mua: ngay trong lượt đó gọi pricing_get_quote (đúng biến thể, số lượng, địa chỉ nếu có), delivery_estimate, rồi order_create với đúng giá cuối; câu trả lời đọc lại đơn một lần: sản phẩm, biến thể, số lượng, giá cuối, thanh toán, thời gian giao (PB-09). Thiếu địa chỉ vẫn tạo đơn được. COD quá 10.000.000đ thì đề nghị chuyển khoản hoặc tách đơn (VC-03). Khách đã nói rõ muốn đặt, chốt hoặc lên đơn (kể cả "làm ơn lên đơn", "chốt đơn cho anh", "xác nhận mua") và đã có sản phẩm cùng hình thức thanh toán: gọi order_create ngay trong lượt, không hỏi lại "muốn em đặt luôn không". Chưa có variant_sku thì tự lấy từ catalog_search, không xin khách mã.
+12. Khách đồng ý mua: ngay trong lượt đó gọi pricing_get_quote (đúng biến thể, số lượng, địa chỉ nếu có), delivery_estimate, rồi order_create với đúng giá cuối; câu trả lời đọc lại đơn một lần: sản phẩm, biến thể, số lượng, giá cuối, thanh toán, thời gian giao (PB-09). Thiếu địa chỉ vẫn tạo đơn được. COD quá 10.000.000đ thì đề nghị chuyển khoản hoặc tách đơn (VC-03). Khách đã nói rõ muốn đặt, chốt hoặc lên đơn (kể cả "làm ơn lên đơn", "chốt đơn cho anh", "xác nhận mua") và đã có sản phẩm cùng hình thức thanh toán: gọi order_create ngay trong lượt, không hỏi lại "muốn em đặt luôn không". Chưa có variant_sku thì tự lấy từ catalog_search, không xin khách mã. order_create trả needs_confirmation_call: true (đơn COD trên 2.000.000đ) thì nói thêm một câu: nhân viên sẽ gọi điện xác nhận đơn trước khi giao.
 13. Hẹn gọi lại: callback_at theo ISO có +07:00, trong giờ làm việc, thứ Hai đến thứ Bảy 08:00–21:00, Chủ nhật 09:00–18:00 (LN-01); tool trả moved_from thì báo khách giờ mới.
 14. Khách muốn xóa dữ liệu: hỏi xác nhận một câu; khách đồng ý thì gọi memory_request_deletion và nói hệ thống sẽ xóa trong 72 giờ (QT-06).
 15. Danh tính chưa xác minh: không đọc giá đã báo, địa chỉ, mã đơn, không nói về lần tư vấn trước.
@@ -199,6 +208,7 @@ Cách xử lý:
 19. Gợi ý sản phẩm: đối chiếu từng nhu cầu khách đã nêu với thuộc tính (attributes) của sản phẩm trong kết quả catalog_search, như diện tích phòng (room_area_m2), nhà có trẻ nhỏ (child_safe_lock), rồi mới gợi ý. Ngân sách khách nói "tầm", "khoảng" là ước chừng: khi tìm thì nới chừng 10% thay vì đặt làm mức trần, và nói rõ phần chênh nếu mẫu hợp nhu cầu nhỉnh hơn.
 20. Khách muốn đổi địa chỉ, đổi hoặc hủy "đơn đang xử lý" mà chưa nêu mã đơn: lấy từ order_status hoặc crm_get_customer; chỉ có một đơn chưa giao thì dùng luôn đơn đó, có nhiều đơn thì đọc danh sách cho khách chọn; không xin khách đọc mã đơn.
 21. Khách nhắc một thông tin cũ hoặc sai (chính sách cũ, giá cũ): chỉ nói thông tin đang đúng, kèm ngày cập nhật nếu tài liệu có, không nhắc lại con số sai.
+22. Khách đăng nhập tài khoản website thì có các tool account_*: hỏi giỏ hàng thì gọi account_cart, tổng tiền giỏ đọc đúng total_vnd; hỏi đơn đã đặt trên website thì gọi account_orders (mã đơn dạng #ABCD1234), đơn qua hotline/Zalo vẫn tra bằng order_status. Không có tool account_* là khách chưa đăng nhập: giỏ hàng chỉ biết qua dòng "(Giỏ hàng trên website …)" dưới lời khách nếu có; không có thì mời khách đăng nhập hoặc cho biết sản phẩm đang quan tâm.
 
 Mỗi lượt tối đa một câu hỏi, và chỉ hỏi khi cần thông tin để làm bước kế tiếp; không kết lượt bằng câu "em có thể hỗ trợ gì thêm không ạ?" hay "anh/chị cần gì nữa không ạ?". Chưa gọi order_create thì không nói đơn đã được tạo.
 
@@ -258,6 +268,12 @@ COPILOT_NOTE = (
 )
 
 
+# A message is read: an amount the customer may compare or copy is written in figures.
+CHAT_NOTE = (
+    "Đây là tin nhắn chat, khách đọc chứ không nghe: viết số tiền bằng chữ số có dấu chấm và đ "
+    "(3.290.000đ), không viết số bằng chữ."
+)
+
 # A phone call is listened to, not read: a long answer is one the caller talks
 # over, and on a laptop's speakers the echo canceller then swallows them.
 SPOKEN_NOTE = (
@@ -281,6 +297,8 @@ def lane_instruction(context: AgentContext) -> str:
         extra.append(COPILOT_NOTE)
     if context.channel == "hotline":
         extra.append(SPOKEN_NOTE)
+    else:
+        extra.append(CHAT_NOTE)
     return "\n".join([text, *extra]).strip()
 
 
@@ -301,10 +319,10 @@ def system_prompt(context: AgentContext, *, max_tokens: int = 3000) -> tuple[str
         Section("warnings", "\n".join(f"CẢNH BÁO: {w}" for w in context.warnings)),
         Section("lane", (
             f"Lane: {context.lane}. Mức xác minh danh tính: {context.tier}. Kênh: {context.channel}."
-            + (f" Hồ sơ đứng tên: {context.address_as}." if context.address_as
-               else " Chưa biết khách là ai: gọi anh/chị cho tới khi khách tự xưng.")
+            + (f" Hồ sơ đứng tên: {context.address_as}." if context.address_as else _address_note(context))
             + f"\n{lane_instruction(context)}"
         ).strip()),
+        Section("products", _products_block(context.seen_products)),
         Section("brief", f"Call Brief:\n{brief}" if brief else ""),
         Section("summary", f"Tóm tắt các lượt trước:\n{context.working_summary}" if context.working_summary else ""),
         Section("knowledge", _knowledge_block("Tài liệu liên quan", policy) or context.knowledge_note or ""),
@@ -345,6 +363,26 @@ def _knowledge_block(heading: str, passages: Sequence[Mapping[str, Any]]) -> str
         validity = f" (đoạn này {passage['validity']})" if passage.get("superseded") and passage.get("validity") else ""
         lines.append(f"[{code}] {title}{validity}: {str(passage.get('text') or '').strip()}")
     return f"{heading}:\n" + "\n".join(lines)
+
+
+def _address_note(context: AgentContext) -> str:
+    """How to address a customer the shop does not know yet."""
+    if context.self_called:
+        return f" Khách tự xưng là {context.self_called}: gọi khách là {context.self_called}, xưng em, dùng nhất quán."
+    if context.honorific_asked:
+        return " Chưa biết danh xưng và em đã hỏi rồi: gọi anh/chị, không hỏi lại."
+    return (" Chưa biết danh xưng: tạm gọi anh/chị. Ở lượt thứ hai, hoặc khi xin thông tin đặt hàng, hỏi đúng một lần, "
+            "gộp vào câu hỏi đang cần hỏi: \"Dạ cho em hỏi mình xưng hô là anh hay chị ạ?\"")
+
+
+def _products_block(products: Sequence[Mapping[str, Any]]) -> str:
+    """The products tools showed earlier in this call, with their codes: what a later turn quotes and orders."""
+    if not products:
+        return ""
+    lines = [f"- {p['sku']}: {p.get('name') or '?'}" + (f", {format_vnd(int(p['price_vnd']))}" if p.get("price_vnd") else "")
+             for p in products]
+    return ("Sản phẩm đã tra trong cuộc này (mã chính xác: báo giá, kiểm kho, đặt đơn dùng đúng mã này; "
+            "giá ở đây có thể đã cũ, đặt đơn vẫn gọi pricing_get_quote):\n" + "\n".join(lines))
 
 
 def _tool_block(results: Sequence[Mapping[str, Any]]) -> str:

@@ -5,6 +5,7 @@ import VerifyPhone from "@/components/shop/VerifyPhone";
 import TransferInfo, { Transfer } from "@/components/shop/TransferInfo";
 import { api } from "@/services/api";
 import { money } from "@/lib/catalog";
+import { account } from "@/lib/account";
 import { customerToken, setCustomerToken } from "@/lib/session";
 import { shopContext } from "@/lib/shop-context";
 
@@ -63,7 +64,7 @@ export default function OrdersPage() {
     if (!window.confirm("Xóa số điện thoại, sở thích và lịch sử tư vấn đã lưu của bạn? Đơn hàng đã đặt vẫn được giữ để giao.")) return;
     try {
       await api("/api/customer/data", token, undefined, "DELETE");
-      setCustomerToken(null);
+      await account.logout();
       setToken("");
       setOrders(null);
     } catch (e) {
@@ -77,7 +78,16 @@ export default function OrdersPage() {
     return (
       <div className="s-wrap s-page s-narrow">
         <h1 className="s-page-title">Đơn hàng của tôi</h1>
-        <p className="s-lead">Xác minh số điện thoại đã dùng khi đặt hàng để xem đơn.</p>
+        <p className="s-lead">Đăng nhập để xem đơn hàng, giỏ hàng và lịch sử mua sắm của bạn.</p>
+        <div className="s-row">
+          <Link className="s-btn" href="/dang-nhap?next=/don-hang">
+            Đăng nhập
+          </Link>
+          <Link className="s-btn s-btn-ghost s-btn-inline" href="/dang-ky?next=/don-hang">
+            Đăng ký
+          </Link>
+        </div>
+        <h2 className="s-subtitle">Hoặc tra cứu nhanh bằng số điện thoại đã đặt hàng</h2>
         {error && <div className="s-alert">{error}</div>}
         <VerifyPhone
           onVerified={() => {
@@ -144,7 +154,7 @@ export default function OrdersPage() {
         </div>
       )}
       <div className="s-account-foot">
-        <button className="s-link-btn" onClick={() => { setCustomerToken(null); setToken(""); setOrders(null); }}>
+        <button className="s-link-btn" onClick={() => account.logout().then(() => { setToken(""); setOrders(null); })}>
           Đăng xuất khỏi thiết bị này
         </button>
         <button className="s-link-btn s-danger" onClick={forget}>

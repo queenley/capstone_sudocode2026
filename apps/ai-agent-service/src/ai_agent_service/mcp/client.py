@@ -56,6 +56,7 @@ SERVERS: dict[str, str] = {
     "crm": "ai_agent_service.mcp.servers.crm",
     "order": "ai_agent_service.mcp.servers.order",
     "knowledge": "ai_agent_service.mcp.servers.knowledge",
+    "account": "ai_agent_service.mcp.servers.account",
 }
 
 #: Server name -> (environment variable naming its URL, default port) over HTTP.
@@ -65,6 +66,7 @@ HTTP_URLS: dict[str, tuple[str, int]] = {
     "crm": ("MCP_CRM_URL", 8803),
     "order": ("MCP_ORDER_URL", 8804),
     "knowledge": ("MCP_KNOWLEDGE_URL", 8805),
+    "account": ("MCP_ACCOUNT_URL", 8806),
 }
 
 

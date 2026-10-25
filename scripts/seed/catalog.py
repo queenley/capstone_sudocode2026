@@ -158,6 +158,10 @@ def main():
             from scripts.seed.btc_catalog import seed_btc
 
             print("BTC catalogue:", seed_btc(session, args.btc))
+            if args.dataset:
+                from scripts.seed.btc_catalog import apply_images
+
+                print("Product photos:", apply_images(session, args.dataset / "catalog/product_images.json"))
             session.commit()
     print(
         "Catalog seed complete; customer transcripts and gold labels were not imported into live memory."

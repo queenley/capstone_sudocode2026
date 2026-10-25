@@ -4,13 +4,31 @@
 // browser (the agent's voice channel), the Zalo link, and the hand-over to a
 // person (the agent hands off; staff reply from /calls or /ban-hang).
 import { useEffect, useRef, useState } from "react";
-import { streamTurn } from "@/services/api";
+import { ChatCartLine, streamTurn } from "@/services/api";
 import { VoiceCall } from "@/services/voice";
 import VoiceCallPanel from "@/features/voice-call";
 import ChatProducts from "@/components/shop/ChatProducts";
 import { loadConversation, newSession, openSession, ShopSession } from "@/lib/session";
 import { shopContext, useShopContext } from "@/lib/shop-context";
 import { HOTLINE, ZALO_URL } from "@/lib/contact";
+import { cart } from "@/lib/cart";
+import { variantLabel } from "@/lib/catalog";
+import { catalogOnce } from "@/lib/mentions";
+
+/** The cart in this browser with the names the shop shows, for the assistant ("giỏ hàng tôi có gì").
+ *  Signed in, the assistant reads the account's cart itself (its account_cart tool): nothing is sent. */
+async function cartForChat(): Promise<ChatCartLine[] | null> {
+  if (cart.signedIn()) return null;
+  const lines = cart.lines();
+  if (!lines.length) return [];
+  const products = await catalogOnce().catch(() => []);
+  const rows = new Map(products.flatMap((p) => p.variants.map((row) => [row.sku_code, row] as const)));
+  return lines.map(({ sku, qty }) => {
+    const row = rows.get(sku);
+    const variant = row ? variantLabel(row) : "";
+    return { sku, qty, ...(row ? { name: variant ? `${row.name} (${variant})` : row.name } : {}) };
+  });
+}
 
 type Line = { speaker: string; text: string };
 
@@ -61,6 +79,23 @@ export default function ChatWidget() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatOpen]);
 
+  // On a phone the open chat covers the page: the page behind it must not scroll.
+  useEffect(() => {
+    document.documentElement.classList.toggle("s-chat-open", chatOpen);
+    return () => document.documentElement.classList.remove("s-chat-open");
+  }, [chatOpen]);
+
+  // Signing in or out starts a new conversation, as the new person (lib/account.ts).
+  useEffect(() => {
+    const reset = () => {
+      setSession(null);
+      setLines([]);
+      setStatus("");
+    };
+    window.addEventListener("shop-conversation-reset", reset);
+    return () => window.removeEventListener("shop-conversation-reset", reset);
+  }, []);
+
   // Braces matter: newer Chromium returns a Promise from scrollIntoView, and an
   // effect may only return a cleanup function.
   useEffect(() => {
@@ -84,8 +119,12 @@ export default function ChatWidget() {
       const s = await ensure();
       const human = status === "handed_off";
       setLines((old) => [...old, { speaker: "customer", text: content }, ...(human ? [] : [{ speaker: "assistant", text: "" }])]);
-      await streamTurn(s, content, sku, (reply) =>
-        setLines((old) => (human ? old : [...old.slice(0, -1), { speaker: "assistant", text: reply }])),
+      await streamTurn(
+        s,
+        content,
+        sku,
+        (reply) => setLines((old) => (human ? old : [...old.slice(0, -1), { speaker: "assistant", text: reply }])),
+        await cartForChat(),
       );
       await refresh(s);
     } catch (e) {
@@ -109,14 +148,18 @@ export default function ChatWidget() {
       {!chatOpen && (
         <button className="s-chat-fab" onClick={() => shopContext.openChat()} aria-label="Chat với trợ lý">
           <span className="s-chat-fab-dot" />
-          Tư vấn ngay
+          <svg className="s-chat-fab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z" />
+            <path d="M8.5 11h.01M12 11h.01M15.5 11h.01" />
+          </svg>
+          <span className="s-chat-fab-label">Tư vấn ngay</span>
         </button>
       )}
       {chatOpen && (
         <section className="s-chat" aria-label="Trò chuyện với cửa hàng">
           <header className="s-chat-head">
             <div>
-              <strong>Trợ lý Tiếp Nối</strong>
+              <strong>Trợ lý Quivo</strong>
               <span>
                 {status === "handed_off"
                   ? "Nhân viên đang hỗ trợ bạn"
@@ -157,7 +200,7 @@ export default function ChatWidget() {
           <div className="s-chat-body" aria-live="polite">
             {lines.length === 0 && (
               <div className="s-chat-welcome">
-                <p>Xin chào! Em là trợ lý tự động của Tiếp Nối. Anh/chị cần tư vấn sản phẩm, giá hay kiểm tra đơn hàng ạ?</p>
+                <p>Xin chào! Em là trợ lý tự động của Quivo. Anh/chị cần tư vấn sản phẩm, giá hay kiểm tra đơn hàng ạ?</p>
                 <div className="s-chips">
                   {SUGGESTIONS.map((s) => (
                     <button key={s} className="s-chip" onClick={() => send(s)} disabled={busy}>

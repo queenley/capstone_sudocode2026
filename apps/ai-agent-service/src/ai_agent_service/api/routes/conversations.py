@@ -36,13 +36,31 @@ router = APIRouter(prefix="/api", tags=["conversations"])
 HEARTBEAT_SECONDS = 15
 
 
+class CartLine(BaseModel):
+    sku: str = Field(min_length=1, max_length=64)
+    qty: int = Field(ge=1, le=99)
+    #: The name the shop shows; from the browser, so only ever context, never trusted as a price or SKU.
+    name: str | None = Field(default=None, max_length=160)
+
+
 class TurnRequest(BaseModel):
     message: str = Field(min_length=1, max_length=4000)
     selected_sku: str | None = Field(default=None, max_length=64)
+    #: The web cart (it lives in the browser); None from channels without one, [] when it is empty.
+    cart: list[CartLine] | None = Field(default=None, max_length=30)
     #: False runs the organisers' baseline: same graph, no memory (docs/design.md 9.5).
     memory_enabled: bool = True
     #: Chosen by the client so a retried turn replays the stored reply.
     turn_id: str | None = Field(default=None, min_length=1, max_length=64)
+
+
+def cart_note(lines: list[CartLine]) -> str:
+    """The web cart as context under the customer's words; prices are quoted by the tools, never from here."""
+    if not lines:
+        return "(Giỏ hàng trên website của khách đang trống)"
+    items = "; ".join(f"{' '.join((line.name or '').split())[:160] or line.sku} [{line.sku}] x{line.qty}"
+                      for line in lines)
+    return f"(Giỏ hàng trên website của khách: {items}. Giá và tồn kho phải tra bằng công cụ.)"
 
 
 async def _turn(request: Request, conversation_id: str, data: TurnRequest,
@@ -92,9 +110,15 @@ async def answer_turn(app: Any, conversation: platform.ConversationView, data: T
     if data.selected_sku:
         # The product the customer has open on the page is context, not their words.
         message = f"{message}\n(Khách đang xem sản phẩm {data.selected_sku})"
+    if data.cart is not None:
+        message = f"{message}\n{cart_note(data.cart)}"
     try:
+        # A web conversation's customer is the shopper who logged in (or verified their phone):
+        # the account tools read their website account. Other channels have no such account.
+        account = conversation.customer_id if conversation.channel == "web" else None
+        signed_in = {"account_id": str(account), "account_name": await platform.account_name(app, account)} if account else {}
         outcome = await harness.spawn(calls.take_turn(row, content=message, turn_id=turn_id, arrived=arrived,
-                                                      actor=actor, memory=data.memory_enabled, emit=emit))
+                                                      actor=actor, memory=data.memory_enabled, emit=emit, **signed_in))
     except CallError as error:
         raise HTTPException(error.status, str(error)) from error
     if outcome.kind == "error":
@@ -109,7 +133,9 @@ async def answer_turn(app: Any, conversation: platform.ConversationView, data: T
     if handoff.get("status") == "pending" and conversation.status == "open":
         await platform.record_handoff(app, conversation_id,
                                       reason=handoff.get("reason") or "assistant_handoff", brief=handoff.get("brief") or {})
-    result = {**_result(row, turn_id, outcome, outcome.content or ""), "waiting": waiting}
+    result = {**_result(row, turn_id, outcome, outcome.content or ""), "waiting": waiting,
+              # The products tools showed this call, for a channel that links them (Zalo).
+              "seen_products": list(state.get("seen_products") or [])}
     tracker = getattr(app.state, "turn_tracker", None)
     if tracker is not None:
         tracker.log_turn(

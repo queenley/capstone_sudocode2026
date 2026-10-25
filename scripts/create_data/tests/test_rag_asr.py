@@ -28,6 +28,12 @@ def test_spoken_form_matches_btc_style():
     assert number_words(25) == "hai mươi lăm" and number_words(21) == "hai mươi mốt" and number_words(105) == "một trăm linh năm"
     assert to_spoken("Giá 4.890.000đ, phòng 25m², hết hạn 22/10") == \
         "giá bốn triệu tám trăm chín mươi nghìn, phòng hai mươi lăm mét vuông, hết hạn hai mươi hai tháng mười"
+    # Decimals, units glued to numbers, model codes, ID numbers and acronyms (team ASR set references).
+    assert to_spoken("Nồi Xiaomi 4.5L, quạt Senko TS16, 2.500.000 đồng") == \
+        "nồi xiaomi bốn phẩy năm lít, quạt senko tê ét mười sáu, hai triệu năm trăm nghìn"
+    assert to_spoken("CCCD 079188158380, thanh toán COD ở TP.HCM") == \
+        "xê xê xê đê không bảy chín một tám tám một năm tám ba tám không, thanh toán cê ô đê ở thành phố hồ chí minh"
+    assert to_spoken("giao tại TP Huế, TP. Đà Nẵng") == "giao tại thành phố huế, thành phố đà nẵng"
 
 
 def test_btc_ground_truth_text_is_already_spoken():

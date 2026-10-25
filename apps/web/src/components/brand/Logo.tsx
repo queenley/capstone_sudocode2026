@@ -1,14 +1,43 @@
-// The shop's mark: a headset on emerald, after the "Harness Emerald Logo".
-// The same in both themes, as a brand mark should be.
-export function LogoMark({ className = "", title }: { className?: string; title?: string }) {
+// Quivo's logo, from the files in public/logo: `full` is the wordmark (its "Q" is the
+// mark), `mark` the "Q" alone, for tight spots.
+//
+// Both files are one flat colour, so they are drawn as a CSS mask filled with
+// `currentColor`: the brand green on light backgrounds (the default, `text-brand`,
+// which turns lighter in dark mode) and white on the dark green chrome of the
+// footer, the staff sidebar and the staff sign-in — set by the parent's `color`.
+import React from "react";
+
+const FILES = {
+  full: { src: "/logo/full-logo.svg", ratio: 1138 / 356 },
+  mark: { src: "/logo/main.svg", ratio: 379 / 356 },
+} as const;
+
+export function Logo({
+  variant = "full",
+  height = 32,
+  className = "",
+  title = "Quivo",
+}: {
+  variant?: keyof typeof FILES;
+  height?: number;
+  className?: string;
+  /** What a screen reader says; "" when the text beside the logo already says it. */
+  title?: string;
+}) {
+  const { src, ratio } = FILES[variant];
+  const mask = `url(${src}) center / contain no-repeat`;
   return (
-    <svg className={className} viewBox="0 0 40 40" role={title ? "img" : undefined} aria-hidden={title ? undefined : true}>
-      {title && <title>{title}</title>}
-      <rect width="40" height="40" rx="10" fill="#059669" />
-      <path d="M11.5 22v-2.5a8.5 8.5 0 0 1 17 0V22" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" />
-      <path d="M28.5 22v2.5a4 4 0 0 1-4 4h-3" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" />
-      <circle cx="12" cy="23" r="3.6" fill="#34d399" />
-      <circle cx="28" cy="23" r="3.6" fill="#34d399" />
-    </svg>
+    <span
+      className={`brand-logo ${className}`}
+      role={title ? "img" : undefined}
+      aria-label={title || undefined}
+      aria-hidden={title ? undefined : true}
+      style={{ height, width: Math.round(height * ratio), mask, WebkitMask: mask }}
+    />
   );
+}
+
+/** The "Q" alone; kept for the places that drew the old square mark. */
+export function LogoMark({ className = "", title = "" }: { className?: string; title?: string }) {
+  return <Logo variant="mark" height={40} className={className} title={title} />;
 }

@@ -54,8 +54,14 @@ ZALO_OAUTH_URL=http://host.docker.internal:8090
 ZALO_WEBHOOK_INSECURE=0
 ```
 
-2. Chạy `python scripts/dev/zalo_mock.py` (chỉ cần Python, không cần thư viện), trình duyệt mở `http://127.0.0.1:8090`. `--check` in ra những gì `.env` còn thiếu.
-3. Chọn người dùng ở cột trái: các khách CRM có `zalo_id` (để thử AI nhận ra khách quen) hoặc "Khách mới"; nút **Thêm** tạo người dùng mới. Gõ tin, hoặc gửi ảnh 📷, sticker 😀, theo dõi OA ➕.
+2. Bật mock, một trong hai cách:
+   - **Trong Docker** (không cần cài gì): `docker compose --profile zalo-mock up -d`, mở `http://127.0.0.1:8090`.
+   - **Trên máy**: `python scripts/dev/zalo_mock.py` (chỉ cần Python), trình duyệt tự mở `http://127.0.0.1:8090`. `--check` in ra những gì `.env` còn thiếu.
+3. Giao diện giống Zalo web: cột trái là các **người dùng Zalo giả lập**: khách CRM có `zalo_id` (để thử AI nhận ra khách quen, kèm số điện thoại trong CRM) và "Khách mới"; nút 👤+ tạo người dùng mới (tên, số điện thoại tùy chọn). Gõ tin và Enter; thanh công cụ gửi sticker, ảnh, **Chia sẻ thông tin**, Quan tâm OA.
+4. **Chia sẻ thông tin** giả lập form "yêu cầu thông tin người dùng" của OA: người dùng đồng ý gửi tên, số điện thoại, tỉnh/thành, Zalo gửi sự kiện `user_submit_info` vào webhook. Agent nhận như khách vừa cho số: nhận diện số đó, nối `zalo_id` với số điện thoại, nên lần sau khách **gọi hotline bằng số này** agent nhận ra và có Call Brief từ cuộc chat Zalo (và ngược lại).
+5. Câu trả lời nhắc sản phẩm có thêm phần "Xem sản phẩm" với tên, giá và liên kết tới trang sản phẩm (`SHOP_PUBLIC_URL`, mặc định `http://localhost:3000`), vì tin Zalo chỉ có chữ.
+
+**Trên máy chủ cloud** (demo khi chưa có OA): mock chạy sau Caddy tại `https://DOMAIN/zalo-mock/`, có mật khẩu. Trong `.env`: `ZALO_MOCK_URL=http://zalo-mock:8090`, `ZALO_MOCK_PASSWORD=<12+ ký tự>` và các khóa `mock-…` ở trên (không cần `ZALO_OPENAPI_URL`), rồi `docker compose -f docker-compose.yml -f infra/compose/docker-compose.cloud.yml --profile zalo-mock up -d`. Trình duyệt hỏi mật khẩu (tên đăng nhập bất kỳ). Bỏ `ZALO_MOCK_URL` thì shop gửi tin tới Zalo thật.
 
 Mock kiểm tra như Zalo: access token (`-216`), định dạng và độ dài tin, tối đa 2000 ký tự (`-201`), người nhận có tồn tại (`-213`) và đã nhắn OA trong 7 ngày qua (`-230`). Tin bị từ chối hiện thành dòng cảnh báo trên trang chat, và backend ghi `failed` trong nhật ký. Nếu `.env` có `ZALO_APP_SECRET` và `ZALO_REFRESH_TOKEN`, việc làm mới token cũng đi qua mock. **Không đặt `ZALO_OPENAPI_URL`/`ZALO_OAUTH_URL` khi chạy thật.**
 

@@ -1,5 +1,7 @@
 import secrets
+from uuid import UUID
 from fastapi import APIRouter, Request
+from pydantic import BaseModel, Field
 from sqlalchemy import select, delete
 from src.commerce.service import OrderService
 from src.db.models import (
@@ -19,10 +21,125 @@ from src.db.models import (
     now,
 )
 from src.memory.service import MemoryService
-from src.db.models import Challenge, ToolExecution
+from src.db.models import CartItem, Challenge, ToolExecution
+from src.identity.accounts import AccountService
 from .shared import bearer, resources
 
 router = APIRouter(prefix="/api")
+
+
+# ── storefront accounts (src.identity.accounts) ────────────────────────
+
+
+class Registration(BaseModel):
+    full_name: str = Field(min_length=1, max_length=120)
+    phone: str = Field(min_length=6, max_length=20)
+    password: str = Field(max_length=128)
+    email: str | None = Field(default=None, max_length=254)
+
+
+class CodeInput(BaseModel):
+    challenge_id: UUID
+    code: str = Field(min_length=4, max_length=10)
+
+
+class LoginInput(BaseModel):
+    phone: str = Field(min_length=1, max_length=20)
+    password: str = Field(max_length=128)
+
+
+class PhoneInput(BaseModel):
+    phone: str = Field(min_length=6, max_length=20)
+
+
+class ResetInput(CodeInput):
+    password: str = Field(max_length=128)
+
+
+class ProfileInput(BaseModel):
+    full_name: str | None = Field(default=None, max_length=120)
+    email: str | None = Field(default=None, max_length=254)
+
+
+class PasswordChange(BaseModel):
+    current_password: str = Field(max_length=128)
+    new_password: str = Field(max_length=128)
+
+
+class CartLineInput(BaseModel):
+    sku: str = Field(min_length=1, max_length=64)
+    qty: int = Field(ge=1, le=99)
+
+
+class CartInput(BaseModel):
+    items: list[CartLineInput] = Field(max_length=60)
+
+
+def _accounts(request, run, *, commit=True):
+    db, security = resources(request)
+    with db:
+        result = run(AccountService(db, security), db, security)
+        if commit:
+            db.commit()
+        return result
+
+
+@router.post("/customer/register/start")
+def register_start(data: Registration, request: Request):
+    return _accounts(request, lambda a, db, s: a.register_start(data.full_name, data.phone, data.password, data.email))
+
+
+@router.post("/customer/register/verify")
+def register_verify(data: CodeInput, request: Request):
+    return _accounts(request, lambda a, db, s: a.register_verify(data.challenge_id, data.code))
+
+
+@router.post("/customer/login")
+def customer_login(data: LoginInput, request: Request):
+    return _accounts(request, lambda a, db, s: a.login(data.phone, data.password))
+
+
+@router.post("/customer/password/reset/start")
+def reset_start(data: PhoneInput, request: Request):
+    return _accounts(request, lambda a, db, s: a.reset_start(data.phone))
+
+
+@router.post("/customer/password/reset/verify")
+def reset_verify(data: ResetInput, request: Request):
+    return _accounts(request, lambda a, db, s: a.reset_verify(data.challenge_id, data.code, data.password))
+
+
+@router.post("/customer/logout")
+def customer_logout(request: Request):
+    return _accounts(request, lambda a, db, s: a.logout(bearer(request)))
+
+
+@router.get("/customer/me")
+def me(request: Request):
+    return _accounts(request, lambda a, db, s: a.me(s.customer(db, bearer(request))), commit=False)
+
+
+@router.patch("/customer/me")
+def update_me(data: ProfileInput, request: Request):
+    return _accounts(request, lambda a, db, s: a.update_me(s.customer(db, bearer(request)), data.full_name, data.email))
+
+
+@router.post("/customer/password")
+def change_password(data: PasswordChange, request: Request):
+    token = bearer(request)
+    return _accounts(request, lambda a, db, s: a.change_password(
+        s.customer(db, token), data.current_password, data.new_password, token))
+
+
+@router.get("/customer/cart")
+def get_cart(request: Request):
+    return _accounts(request, lambda a, db, s: {"items": a.cart(s.customer(db, bearer(request)))}, commit=False)
+
+
+@router.put("/customer/cart")
+def put_cart(data: CartInput, request: Request):
+    return _accounts(request, lambda a, db, s: {"items": a.replace_cart(
+        s.customer(db, bearer(request)), [line.model_dump() for line in data.items])})
 
 
 @router.get("/customer/profile")
@@ -60,6 +177,8 @@ def forget(request: Request):
         customer.full_name = None
         customer.region = None
         customer.deleted_at = now()
+        customer.password_hash = None
+        db.execute(delete(CartItem).where(CartItem.customer_id == customer_id))
         db.execute(delete(ProfileFact).where(ProfileFact.customer_id == customer_id))
         db.execute(delete(Episode).where(Episode.customer_id == customer_id))
         for ident in db.scalars(

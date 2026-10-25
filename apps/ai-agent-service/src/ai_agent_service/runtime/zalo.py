@@ -21,6 +21,9 @@ Configuration (``.env``):
   use, so the newest pair is kept in ``zalo_tokens`` and refreshed before expiry.
 - ``ZALO_WEBHOOK_INSECURE=1``: accept unsigned events, for the local simulator
   (``scripts/dev/zalo_simulator.py``) only. Never in production.
+- ``SHOP_PUBLIC_URL``: the shop's address as customers open it (``https://DOMAIN``;
+  ``http://localhost:3000`` unless set). A reply that names products ends with
+  a link to each one's page there (:func:`product_links`): Zalo shows text only.
 - ``ZALO_OPENAPI_URL``, ``ZALO_OAUTH_URL``: where the OA API and OAuth live,
   ``https://openapi.zalo.me`` and ``https://oauth.zaloapp.com`` unless set.
   The local mock platform (``scripts/dev/zalo_mock.py``) stands in for both, so
@@ -37,12 +40,14 @@ import hmac
 import json
 import logging
 import os
+import re
 import time
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import httpx
 
+from ..components.intake.itn import format_vnd
 from .db import connection
 
 logger = logging.getLogger(__name__)
@@ -55,6 +60,12 @@ TOKEN_PATH = "/v4/oa/access_token"
 MAX_TEXT = 2000
 #: Text events the agent answers; other events (images, stickers, follows) get a short note or nothing.
 TEXT_EVENTS = {"user_send_text"}
+#: The customer tapped "share" on the OA's request for their details: their
+#: name and phone, given by Zalo itself. Answered as a turn that states them,
+#: so identification links this Zalo user to the phone like any number said.
+INFO_EVENTS = {"user_submit_info"}
+#: Links appended to one reply at most.
+LINKED_PRODUCTS = 3
 MEDIA_EVENTS = {"user_send_image", "user_send_sticker", "user_send_gif", "user_send_audio", "user_send_video",
                 "user_send_file", "user_send_location", "user_send_link"}
 
@@ -283,9 +294,16 @@ async def handle(app: Any, event: dict[str, Any]) -> dict[str, Any]:
     user_id = str((event.get("sender") or {}).get("id") or "")
     message = event.get("message") or {}
     msg_id = message.get("msg_id")
-    if not user_id or (name not in TEXT_EVENTS and name not in MEDIA_EVENTS):
+    if name in INFO_EVENTS:
+        user_id = user_id or str((event.get("user_id_by_app") or ""))
+        text = shared_info(event.get("info") or {})
+        msg_id = msg_id or hashlib.sha1(f"{user_id}{event.get('timestamp')}".encode()).hexdigest()
+        if not user_id or not text:
+            return {"status": "ignored", "event": name}
+    elif not user_id or (name not in TEXT_EVENTS and name not in MEDIA_EVENTS):
         return {"status": "ignored", "event": name}
-    text = str(message.get("text") or "").strip() if name in TEXT_EVENTS else f"[{name}]"
+    else:
+        text = str(message.get("text") or "").strip() if name in TEXT_EVENTS else f"[{name}]"
     if not await record_incoming(user_id, text, msg_id):
         return {"status": "duplicate"}
     if name in MEDIA_EVENTS:
@@ -317,5 +335,72 @@ async def handle(app: Any, event: dict[str, Any]) -> dict[str, Any]:
     if result.get("waiting") or not result.get("reply"):
         # A consultant has it: their reply from the console goes to Zalo.
         return {"status": "waiting_for_staff", "conversation_id": conversation.id}
-    sent = await send(user_id, result["reply"], conversation.id)
+    sent = await send(user_id, result["reply"] + product_links(result["reply"], result.get("seen_products") or []),
+                      conversation.id)
     return {"status": sent["status"], "conversation_id": conversation.id}
+
+
+def shared_info(info: dict[str, Any]) -> str:
+    """The details a customer shared through the OA's form, as the turn they make."""
+    parts = []
+    if info.get("name"):
+        parts.append(f"tên {info['name']}")
+    if info.get("phone"):
+        parts.append(f"số điện thoại {info['phone']}")
+    place = ", ".join(str(info[k]) for k in ("address", "ward", "district", "city") if info.get(k))
+    if place:
+        parts.append(f"địa chỉ {place}")
+    return ("Tôi chia sẻ thông tin qua Zalo: " + "; ".join(parts) + ".") if parts else ""
+
+
+#: Accessories and bundles share a model's short name ("Màng lọc thay thế AirPure Pro").
+_SECONDARY = re.compile(r"phu-kien|combo")
+
+
+def product_links(reply: str, seen: list[dict[str, Any]]) -> str:
+    """Lines linking the products *reply* names, among those tools showed this
+    call, to their pages on the shop (``SHOP_PUBLIC_URL``); "" when it names none.
+
+    A product is named by its full name or from its brand on ("Karofi 9 lõi"),
+    as ``apps/web/src/lib/mentions.ts`` reads it for the web chat; a short name
+    two products share goes to the main one, not its accessory.
+    """
+    if not reply or not seen:
+        return ""
+    from ..mcp.servers import btc
+
+    catalogue = {p["sku"]: p for p in btc.mock().PRODUCTS}
+    keys: dict[str, list[dict[str, Any]]] = {}
+    for product in seen:
+        name = str(product.get("name") or "")
+        if not name:
+            continue
+        keys.setdefault(name.lower(), []).append(product)
+        brand = str((catalogue.get(product["sku"]) or {}).get("brand") or "")
+        at = name.lower().find(brand.lower()) if brand else -1
+        if at > 0 and len(name) - at > len(brand) + 1:
+            keys.setdefault(name[at:].lower(), []).append(product)
+    text = reply.lower()
+    taken: list[tuple[int, int]] = []
+    hits: dict[str, tuple[int, dict[str, Any]]] = {}
+    for key in sorted(keys, key=len, reverse=True):
+        owners = keys[key]
+        if len(owners) > 1:
+            owners = [p for p in owners if not _SECONDARY.search(str((catalogue.get(p["sku"]) or {}).get("category") or ""))]
+            if len(owners) != 1:
+                continue
+        for match in re.finditer(rf"(?<!\w){re.escape(key)}(?!\w)", text):
+            span = (match.start(), match.end())
+            if any(span[0] < end and span[1] > start for start, end in taken):
+                continue
+            taken.append(span)
+            if owners[0]["sku"] not in hits:
+                hits[owners[0]["sku"]] = (match.start(), owners[0])
+    if not hits:
+        return ""
+    base = (_env("SHOP_PUBLIC_URL") or "http://localhost:3000").rstrip("/")
+    lines = []
+    for _, product in sorted(hits.values(), key=lambda hit: hit[0])[:LINKED_PRODUCTS]:
+        price = f" – {format_vnd(int(product['price_vnd']))}" if product.get("price_vnd") else ""
+        lines.append(f"• {product['name']}{price}\n  {base}/san-pham/{product['sku']}")
+    return "\n\nXem sản phẩm:\n" + "\n".join(lines)

@@ -155,7 +155,8 @@ async def stored_reply(call_id: int, turn_id: str) -> dict[str, Any] | None:
 
 async def take_turn(row: dict[str, Any], *, content: str, turn_id: str, arrived: float,
                     actor: Actor, memory: bool = True,
-                    emit: Callable[[str, str], Awaitable[None]] | None = None) -> harness.Outcome:
+                    emit: Callable[[str, str], Awaitable[None]] | None = None,
+                    account_id: str | None = None, account_name: str | None = None) -> harness.Outcome:
     """Run one customer turn under the call's lease. Raises :class:`CallError` if busy or ended.
 
     *emit* hears each checked sentence as it may be said (``harness.run_turn``).
@@ -166,7 +167,8 @@ async def take_turn(row: dict[str, Any], *, content: str, turn_id: str, arrived:
         raise CallError(409, "The assistant is still answering the previous message.")
     try:
         return await harness.run_turn(row, content=content, turn_id=turn_id, arrived=arrived,
-                                      user_id=actor.id, memory=memory, emit=emit)
+                                      user_id=actor.id, memory=memory, emit=emit, account_id=account_id,
+                                      account_name=account_name)
     finally:
         await release_lease(row["id"])
 

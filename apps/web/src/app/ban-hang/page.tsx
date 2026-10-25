@@ -8,7 +8,7 @@
 // admins everything.
 import Link from "next/link";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { LogoMark } from "@/components/brand/Logo";
+import { Logo } from "@/components/brand/Logo";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 import CallConsole from "@/features/call-console";
 import { api, AgentCall } from "@/services/api";
@@ -115,7 +115,7 @@ export default function SalesPage() {
     return (
       <div className="sl-gate">
         <div className="sl-gate-card">
-          <LogoMark />
+          <Logo height={40} className="text-brand" />
           <h1>Trang bán hàng</h1>
           <p>Đăng nhập bằng tài khoản nhân viên để xem hội thoại, đơn hàng và lịch gọi lại.</p>
           <Link className="sl-btn" href="/login?next=/ban-hang">
@@ -132,11 +132,10 @@ export default function SalesPage() {
   return (
     <div className="sl-app">
       <aside className="sl-side">
-        <Link href="/" className="sl-logo">
-          <LogoMark />
+        <Link href="/" className="sl-logo" aria-label="Quivo, về cửa hàng">
           <span>
-            <strong>Tiếp Nối</strong>
-            <small>Bán hàng & chăm sóc khách</small>
+            <Logo height={28} title="" className="text-on-chrome" />
+            <small className="mt-1 block">Bán hàng & chăm sóc khách</small>
           </span>
         </Link>
         <span className="sl-side-label">Bán hàng</span>

@@ -597,6 +597,26 @@
   width: 70%;
   height: 70%;
 }
+.s-art-photo {
+  background: #fff;
+}
+.s-art-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.s-photo-credit {
+  margin: 8px 2px 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--s-muted);
+}
+.s-photo-credit a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 .s-art-brand {
   position: absolute;
   left: 12px;
@@ -1460,38 +1480,14 @@
   padding-top: 40px;
   font-size: 14px;
 }
-.s-footer-grid {
-  display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr 1fr;
-  gap: 28px;
-}
 .s-footer h4 {
   color: var(--on-chrome);
   margin: 6px 0 12px;
-}
-.s-footer-grid a {
-  display: block;
-  padding: 4px 0;
-}
-.s-footer-grid a:hover {
-  color: var(--accent);
 }
 .s-footer .s-logo {
   color: var(--on-chrome);
 }
 .s-footer .s-logo-text small {
-  color: var(--on-chrome-muted);
-}
-.s-footer-base {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  margin-top: 28px;
-  padding-top: 16px;
-  padding-bottom: 24px;
-  font-size: 12px;
   color: var(--on-chrome-muted);
 }
 
@@ -1875,9 +1871,6 @@
   .s-assist-cards {
     grid-template-columns: 1fr;
   }
-  .s-footer-grid {
-    grid-template-columns: 1fr 1fr;
-  }
   .s-chat {
     right: 12px;
     bottom: 12px;
@@ -1896,9 +1889,6 @@
   }
   .s-price-lg strong {
     font-size: 24px;
-  }
-  .s-footer-grid {
-    grid-template-columns: 1fr;
   }
 }
 
@@ -1973,5 +1963,227 @@
   .s-transfer {
     grid-template-columns: 1fr;
     justify-items: center;
+  }
+}
+
+/* ---------- accounts: đăng nhập, đăng ký, tài khoản ---------- */
+.s-auth {
+  display: grid;
+  place-items: start center;
+}
+.s-auth-card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--surface);
+  border: 1px solid var(--s-line);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+}
+.s-auth-card .s-form {
+  max-width: none;
+}
+.s-auth-foot {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--s-line);
+  font-size: 14px;
+  color: var(--s-muted);
+  text-align: center;
+}
+.s-password {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.s-password input {
+  flex: 1;
+}
+.s-row-between {
+  justify-content: space-between;
+}
+.s-small {
+  font-size: 13px;
+}
+.s-subtitle {
+  font-size: 16px;
+  margin: 26px 0 8px;
+}
+.s-ok {
+  color: var(--brand-ink);
+  font-weight: 600;
+  font-size: 14px;
+}
+.s-alert-info {
+  background: var(--brand-soft);
+  color: var(--ink-2);
+  border-color: var(--brand-line);
+}
+.s-account-link span {
+  display: grid;
+  line-height: 1.15;
+  text-align: left;
+}
+.s-account-link small {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--s-muted);
+}
+.s-btn-inline {
+  flex: 0 0 auto;
+  width: auto;
+}
+.s-account-tile {
+  display: grid;
+  gap: 4px;
+  text-align: left;
+  padding: 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--s-line);
+  background: var(--surface);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.s-account-tile:hover {
+  border-color: var(--brand-line);
+  box-shadow: var(--shadow-sm);
+}
+.s-account-tile span {
+  font-size: 13px;
+  color: var(--s-muted);
+}
+.s-account-section {
+  margin-top: 26px;
+  padding: 22px;
+  border: 1px solid var(--s-line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.s-account-section h2 {
+  font-size: 18px;
+  margin: 0 0 12px;
+}
+@media (max-width: 720px) {
+  .s-account-link span {
+    display: none;
+  }
+}
+
+/* ---------- phones and small tablets ----------
+   The chat becomes a full screen sheet and its button a round icon that leaves the
+   page's last line visible; listings, the cart and the forms rearrange for one hand. */
+.s-chat-fab-icon {
+  display: none;
+  width: 24px;
+  height: 24px;
+}
+@media (max-width: 860px) {
+  .s-listing-bar {
+    flex-wrap: wrap;
+    gap: 8px 10px;
+  }
+  .s-listing-bar > span,
+  .s-filter-toggle {
+    white-space: nowrap;
+  }
+  .s-sort {
+    margin-left: auto !important;
+    white-space: nowrap;
+  }
+}
+@media (max-width: 600px) {
+  .s-main {
+    padding-bottom: 84px; /* the last line stays clear of the chat button */
+  }
+  .s-chat-fab {
+    right: 14px;
+    bottom: calc(14px + env(safe-area-inset-bottom));
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    justify-content: center;
+  }
+  .s-chat-fab-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .s-chat-fab-icon {
+    display: block;
+  }
+  .s-chat-fab-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 9px;
+    height: 9px;
+  }
+  .s-chat {
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+    padding-top: env(safe-area-inset-top);
+  }
+  .s-chat-foot {
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  }
+  html.s-chat-open,
+  html.s-chat-open body {
+    overflow: hidden;
+  }
+  /* 16px stops iOS Safari zooming into a field when it is tapped. */
+  .s-form input,
+  .s-form select,
+  .s-form textarea,
+  .s-search input,
+  .s-chat-input textarea,
+  .s-sort select {
+    font-size: 16px;
+  }
+  .s-sort {
+    font-size: 0; /* the select says what it sorts by; the label word goes */
+  }
+  .s-cart-line {
+    display: grid;
+    grid-template-columns: 64px 1fr auto;
+    grid-template-areas:
+      "art info info"
+      "art qty price";
+    gap: 8px 12px;
+    align-items: center;
+  }
+  .s-cart-line > .s-art {
+    grid-area: art;
+    align-self: start;
+  }
+  .s-cart-line-info {
+    grid-area: info;
+  }
+  .s-cart-line > .s-qty {
+    grid-area: qty;
+    justify-self: start;
+  }
+  .s-cart-line-price {
+    grid-area: price;
+    min-width: 0;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+  .s-auth-card,
+  .s-account-section {
+    padding: 18px;
+  }
+  .s-page-title {
+    font-size: 26px;
   }
 }

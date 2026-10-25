@@ -59,6 +59,19 @@ def main(argv=None):
     growth = commands.add_parser("gap-check", help="Check all approved growth cases against supplied agent responses")
     growth.add_argument("--growth-root", required=True, type=Path)
     growth.add_argument("--responses", required=True, type=Path)
+    asr_build = commands.add_parser("asr-build", help="Filter create_data's scenario audio into a new ASR set under datasets/; no model")
+    asr_build.add_argument("--set-id", default="asr-team-v2", help="New set directory name under datasets/ (never overwritten)")
+    asr_build.add_argument("--audio", type=Path, help="Clip folder (default: scripts/create_data/output/audio)")
+    asr_build.add_argument("--scenarios", type=Path, help="Current scenarios (default: scripts/create_data/output/scenarios_internal)")
+    asr_build.add_argument("--restore", action="store_true", help="Copy back the WAVs of an existing set (a fresh clone), hash-checked")
+    asr = commands.add_parser("asr", help="ASR set through the ASR service; BTC wer_cer on raw and lexicon-corrected text")
+    asr.add_argument("--set", default="asr-team-v2", help="ASR set under datasets/")
+    asr.add_argument("--out", type=Path, help="New output directory (default: runs/asr/<time>-<model>)")
+    asr.add_argument("--url", default="http://127.0.0.1:8500", help="ASR service (docker compose publishes it on 127.0.0.1:8500)")
+    asr.add_argument("--model", default="zipformer-30m", help="zipformer-30m, zipformer-2025, phowhisper-small, whisper-turbo")
+    asr.add_argument("--limit", type=int, help="The first N clips only (a smoke test)")
+    asr.add_argument("--no-hotwords", action="store_true", help="Do not send the agent's hotwords")
+    asr.add_argument("--hypotheses", type=Path, help="Score this hypotheses.json instead of calling the service")
     rag = commands.add_parser("rag-recall", help="Run product kb_search on all 60 BTC questions; retrieval only")
     rag.add_argument("--out", required=True, type=Path, help="New output directory")
     rag.add_argument("--on", default="2026-10-15", help="Call date for versioned policy (YYYY-MM-DD)")
@@ -135,6 +148,36 @@ def main(argv=None):
             return 2 if report.get("issues") or report.get("status") in {"INCOMPLETE", "pending_evidence"} or report.get("execution_gate", {}).get("allowed") is False else 0
         except (OSError, ValueError, KeyError, TypeError) as exc:
             print("Offline improvement check error:", exc)
+            return 3
+    if args.command == "asr-build":
+        from .asr_eval import AUDIO_ROOT, SCENARIOS_DIR, build_set, restore_audio
+        try:
+            if args.restore:
+                report = restore_audio(args.set_id, audio_root=args.audio or AUDIO_ROOT)
+                print(json.dumps({**report, "missing_or_changed": report["missing_or_changed"][:20]}, ensure_ascii=False, indent=2))
+                return 2 if report["missing_or_changed"] else 0
+            report = build_set(set_id=args.set_id, audio_root=args.audio or AUDIO_ROOT,
+                               scenarios_dir=args.scenarios or SCENARIOS_DIR)
+            print(json.dumps(report["counts"], ensure_ascii=False, indent=2))
+            print("Set written to", (Path(__file__).resolve().parents[1] / "datasets" / args.set_id))
+            return 0
+        except (OSError, ValueError, KeyError) as exc:
+            print("ASR set not built:", exc)
+            return 3
+    if args.command == "asr":
+        from datetime import datetime
+        from .asr_eval import evaluate
+        out = args.out or (Path(__file__).resolve().parents[1] / "runs" / "asr"
+                           / f"{datetime.now():%Y%m%d-%H%M%S}-{'file' if args.hypotheses else args.model}")
+        try:
+            report = evaluate(out, set_id=args.set, url=args.url, model=args.model, limit=args.limit,
+                              hypotheses=args.hypotheses, hotwords=not args.no_hotwords)
+            print(json.dumps({key: report[key] for key in ("set_id", "engine", "n_clips", "complete", "rtf_mean", "raw", "lexicon")},
+                             ensure_ascii=False, indent=2))
+            print("Report written to", (out / "report.json").resolve())
+            return 0 if report["complete"] else 2
+        except (OSError, ValueError, KeyError, RuntimeError) as exc:
+            print("ASR evaluation incomplete:", exc)
             return 3
     if args.command == "rag-recall":
         from datetime import date

@@ -94,6 +94,16 @@ async def verified_phone(app: Any, customer_id: str) -> str | None:
     return await asyncio.to_thread(_verified_phone, app, customer_id)
 
 
+def _account_name(app: Any, customer_id: str) -> str | None:
+    with app.state.database.sessions() as db:
+        return db.scalar(select(Customer.full_name).where(Customer.id == customer_id, Customer.deleted_at.is_(None)))
+
+
+async def account_name(app: Any, customer_id: str) -> str | None:
+    """The full name the customer gave their website account (or at the phone check)."""
+    return await asyncio.to_thread(_account_name, app, customer_id)
+
+
 def _customer_region(app: Any, conversation_id: str) -> str | None:
     with app.state.database.sessions() as db:
         conv = db.get(Conversation, conversation_id)

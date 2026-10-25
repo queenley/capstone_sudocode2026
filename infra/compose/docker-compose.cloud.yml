@@ -117,10 +117,12 @@ services:
       ASR_URL: ${ASR_URL:-http://asr-service:8500}
       ASR_API_KEY: ${ASR_API_KEY:-}
       HOTLINE_BRIDGE_KEY: ${HOTLINE_BRIDGE_KEY:?set HOTLINE_BRIDGE_KEY}
-      # Never the local simulators in the cloud.
+      SHOP_PUBLIC_URL: https://${DOMAIN:?set DOMAIN}
+      # Never an unsigned webhook. Replies go to Zalo, or to the demo mock when
+      # ZALO_MOCK_URL is set (http://zalo-mock:8090, with --profile zalo-mock).
       ZALO_WEBHOOK_INSECURE: "0"
-      ZALO_OPENAPI_URL: ""
-      ZALO_OAUTH_URL: ""
+      ZALO_OPENAPI_URL: ${ZALO_MOCK_URL:-}
+      ZALO_OAUTH_URL: ${ZALO_MOCK_URL:-}
     restart: unless-stopped
     logging: *logging
 
@@ -142,6 +144,37 @@ services:
     restart: unless-stopped
     logging: *logging
   kafka:
+    restart: unless-stopped
+    logging: *logging
+
+  # A demo of the Zalo channel without an Official Account (--profile zalo-mock):
+  # https://DOMAIN/zalo-mock/, behind ZALO_MOCK_PASSWORD. The shop sends its
+  # replies to it inside the network (ZALO_MOCK_URL=http://zalo-mock:8090).
+  zalo-mock:
+    profiles: ["zalo-mock"]
+    image: python:3.12-slim
+    working_dir: /app
+    command: ["python", "-u", "scripts/dev/zalo_mock.py", "--host", "0.0.0.0", "--port", "8090", "--no-browser",
+              "--require-password", "--webhook", "http://api-gateway:8000/api/channels/zalo/webhook"]
+    environment:
+      PYTHONUTF8: "1"
+      ZALO_MOCK_PASSWORD: ${ZALO_MOCK_PASSWORD:-}
+      ZALO_MOCK_URL: ${ZALO_MOCK_URL:-http://zalo-mock:8090}
+      ZALO_OA_NAME: ${ZALO_OA_NAME:-}
+      ZALO_APP_ID: ${ZALO_APP_ID:-mock-app}
+      ZALO_OA_ID: ${ZALO_OA_ID:-mock-oa}
+      ZALO_OA_SECRET_KEY: ${ZALO_OA_SECRET_KEY:-mock-oa-secret}
+      ZALO_ACCESS_TOKEN: ${ZALO_ACCESS_TOKEN:-mock-access-token}
+      ZALO_APP_SECRET: ${ZALO_APP_SECRET:-}
+      ZALO_REFRESH_TOKEN: ${ZALO_REFRESH_TOKEN:-}
+      ZALO_OPENAPI_URL: ${ZALO_MOCK_URL:-http://zalo-mock:8090}
+      ZALO_OAUTH_URL: ${ZALO_MOCK_URL:-http://zalo-mock:8090}
+    volumes:
+      - ./scripts/dev:/app/scripts/dev:ro
+      - ./apps/ai-agent-service/data/btc/catalog:/app/apps/ai-agent-service/data/btc/catalog:ro
+    depends_on:
+      api-gateway:
+        condition: service_healthy
     restart: unless-stopped
     logging: *logging
 

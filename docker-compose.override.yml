@@ -13,8 +13,41 @@ services:
     ports: ["127.0.0.1:8000:8000"]
   web:
     ports: ["127.0.0.1:3000:3000"]
+  # For the ASR evaluation (scripts/evaluation/run_eval.py asr) and scripts on this machine.
+  asr-service:
+    ports: ["127.0.0.1:8500:8500"]
   qdrant:
     ports: ["127.0.0.1:6333:6333"]
   livekit:
     ports:
       - "127.0.0.1:7880:7880"
+
+  # Zalo without an Official Account (scripts/dev/zalo_mock.py), local only:
+  #   docker compose --profile zalo-mock up -d        then http://127.0.0.1:8090
+  # .env: the mock values of .env.example's Zalo block (ZALO_OPENAPI_URL and
+  # ZALO_OAUTH_URL = http://host.docker.internal:8090); the agent reaches the
+  # mock through the port published here, the mock posts to the gateway.
+  zalo-mock:
+    profiles: ["zalo-mock"]
+    image: python:3.12-slim
+    working_dir: /app
+    command: ["python", "-u", "scripts/dev/zalo_mock.py", "--host", "0.0.0.0", "--port", "8090", "--no-browser",
+              "--webhook", "http://api-gateway:8000/api/channels/zalo/webhook"]
+    environment:
+      PYTHONUTF8: "1"
+      ZALO_APP_ID: ${ZALO_APP_ID:-mock-app}
+      ZALO_OA_ID: ${ZALO_OA_ID:-mock-oa}
+      ZALO_OA_SECRET_KEY: ${ZALO_OA_SECRET_KEY:-mock-oa-secret}
+      ZALO_ACCESS_TOKEN: ${ZALO_ACCESS_TOKEN:-mock-access-token}
+      ZALO_APP_SECRET: ${ZALO_APP_SECRET:-}
+      ZALO_REFRESH_TOKEN: ${ZALO_REFRESH_TOKEN:-}
+      ZALO_OPENAPI_URL: ${ZALO_OPENAPI_URL:-http://host.docker.internal:8090}
+      ZALO_OAUTH_URL: ${ZALO_OAUTH_URL:-http://host.docker.internal:8090}
+    volumes:
+      - ./scripts/dev:/app/scripts/dev:ro
+      # The CRM's customers with a zalo_id appear as users of the mock.
+      - ./apps/ai-agent-service/data/btc/catalog:/app/apps/ai-agent-service/data/btc/catalog:ro
+    ports: ["127.0.0.1:8090:8090"]
+    depends_on:
+      api-gateway:
+        condition: service_healthy

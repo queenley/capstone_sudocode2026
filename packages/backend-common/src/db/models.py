@@ -44,6 +44,9 @@ class Product(Base):
     brand = Column(String)
     category = Column(String, nullable=False)
     description = Column(Text)
+    # A photo the storefront serves (/products/<ref>.jpg) and its credit (title, author, licence, source).
+    image_url = Column(String)
+    image_credit = Column(JSON)
     active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime(timezone=True), default=now)
     updated_at = Column(DateTime(timezone=True), default=now, onupdate=now)
@@ -117,6 +120,11 @@ class Customer(Base):
     synthetic = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), default=now)
     deleted_at = Column(DateTime(timezone=True))
+    # A storefront account: a password beside the verified phone (src.identity.accounts).
+    password_hash = Column(String)
+    registered_at = Column(DateTime(timezone=True))
+    failed_logins = Column(Integer, default=0, nullable=False)
+    locked_until = Column(DateTime(timezone=True))
 
 
 class CustomerIdentity(Base):
@@ -345,9 +353,12 @@ class Challenge(Base):
     __tablename__ = "challenges"
     __table_args__ = {"schema": "identity"}
     id = pk()
+    # None for an account's code (register, password reset), which has no conversation.
     conversation_id = Column(
-        Uuid(as_uuid=False), ForeignKey("conversation.conversations.id"), nullable=False
+        Uuid(as_uuid=False), ForeignKey("conversation.conversations.id")
     )
+    purpose = Column(String, default="conversation", nullable=False)
+    encrypted_payload = Column(LargeBinary)
     identifier_digest = Column(String, nullable=False)
     kind = Column(String, nullable=False)
     encrypted_value = Column(LargeBinary, nullable=False)
@@ -367,6 +378,19 @@ class CustomerAccess(Base):
     token_digest = Column(String, nullable=False, unique=True)
     expires_at = Column(DateTime(timezone=True), nullable=False)
     revoked_at = Column(DateTime(timezone=True))
+
+
+class CartItem(Base):
+    """A customer's cart line, kept on the server so it follows them between devices."""
+
+    __tablename__ = "cart_items"
+    __table_args__ = {"schema": "commerce"}
+    customer_id = Column(
+        Uuid(as_uuid=False), ForeignKey("identity.customers.id"), primary_key=True
+    )
+    sku_code = Column(String, primary_key=True)
+    quantity = Column(Integer, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=now, onupdate=now)
 
 
 class ProcessedEvent(Base):

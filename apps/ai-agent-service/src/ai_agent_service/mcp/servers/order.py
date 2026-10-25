@@ -62,4 +62,6 @@ async def order_update(
 
 if __name__ == "__main__":
     apply_schema(btc.STATE_SCHEMA)
+    # The organisers' mock loaded now, not inside the first call's 2-second budget.
+    btc.mock()
     server.run()

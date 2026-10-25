@@ -4,10 +4,17 @@
 #
 #   /api/*  -> api-gateway: the API, the Zalo webhook (/api/channels/zalo/webhook)
 #              and the browser's voice call (WebSocket /api/conversations/{id}/voice)
+#   /zalo-mock/ -> the Zalo demo, when its profile runs
 #   else    -> web: the shop and the staff pages (which reach the API themselves
 #              through /backend on the server side)
 {$DOMAIN} {
 	encode zstd gzip
+
+	# The Zalo demo (--profile zalo-mock): its own password; a 502 when it is not running.
+	handle_path /zalo-mock/* {
+		reverse_proxy zalo-mock:8090
+	}
+	redir /zalo-mock /zalo-mock/
 
 	@api path /api/*
 	handle @api {

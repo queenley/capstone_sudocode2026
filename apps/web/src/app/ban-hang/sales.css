@@ -555,31 +555,56 @@
 }
 
 @media (max-width: 900px) {
+  /* One column: the sidebar becomes a bar on top (its row sized to it, not stretched to
+     the screen), the tabs and the system links scroll sideways on one line each. */
   .sl-app {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr); /* a sideways-scrolling tab row must not widen the page */
+    grid-template-rows: auto 1fr;
   }
   .sl-side {
-    position: static;
+    position: sticky;
+    top: 0;
+    z-index: 20;
     height: auto;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
+    padding: 10px 12px 8px;
+    gap: 6px;
   }
   .sl-logo {
     border: 0;
     margin: 0;
-    padding-bottom: 2px;
+    padding: 0 2px 2px;
   }
-  .sl-side nav {
+  .sl-logo small {
+    display: none;
+  }
+  .sl-side nav,
+  .sl-side-foot {
     display: flex;
-    flex-wrap: wrap;
-    width: 100%;
+    flex-wrap: nowrap;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
   }
-  .sl-side nav button {
+  .sl-side nav::-webkit-scrollbar,
+  .sl-side-foot::-webkit-scrollbar {
+    display: none;
+  }
+  .sl-side nav button,
+  .sl-side-foot a,
+  .sl-side-foot button {
     width: auto;
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  .sl-side-foot {
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    padding-top: 4px;
   }
   .sl-side-label,
-  .sl-side-foot {
+  .sl-side-status {
     display: none;
   }
   .sl-main {

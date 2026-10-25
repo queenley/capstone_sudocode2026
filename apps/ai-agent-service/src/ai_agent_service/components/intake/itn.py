@@ -8,7 +8,10 @@ what the customer said and what the guardrail reads are counted the same way.
 - "bốn triệu tám" is 4.800.000, not 4.000.008; "hai trăm bốn chín k" is
   249.000; "một củ hai" is 1.200.000; "hai triệu rưỡi" is 2.500.000;
 - a run of three or more bare digits is a digit string: "không chín tám bốn
-  ..." is a phone number, 0984...;
+  ..." is a phone number, 0984...; "bốn mốt" (41) never is;
+- "không" before or after a number asks or negates: "bốn triệu tám không
+  biết" is 4.800.000 then "không biết", not 4.000.080 (a recogniser writes
+  no question mark to end the number);
 - "ô đê" followed by a number is an order code: "ô đê ba trăm mười hai
   nghìn bốn trăm năm mươi sáu" is OD312456, not money (catalogue case D13);
 - a time with its part of the day before or after it, and a day if one is
@@ -171,17 +174,31 @@ def _runs(tokens: list[str]) -> list[tuple[int, int]]:
     return runs
 
 
+#: Forms of a digit that only a counted number uses ("bốn mốt" is 41): never one of a phone number's digits.
+COUNTED = {"mốt", "lăm", "nhăm"}
+
+
+def _digit_string(words: list[str]) -> bool:
+    return all(w in DIGITS for w in words) and not COUNTED & set(words)
+
+
 def _spoken_numbers(text: str) -> str:
     tokens = text.split(" ")
     out: list[str] = []
     cursor = 0
     for start, end in _runs(tokens):
         words = [_bare(t) for t in tokens[start:end]]
-        bare = all(w in DIGITS for w in words)
+        bare = _digit_string(words)
         # "không năm triệu" is a negation before a number, not a zero.
         while len(words) > 1 and words[0] == "không" and not bare:
             start += 1
             words = words[1:]
+        # Nor is one after it: "bốn triệu tám không biết", "năm triệu hai không em" ask or negate.
+        # A recogniser writes no question mark to end the run, so only a digit string keeps it.
+        while len(words) > 1 and words[-1] == "không" and not (bare and len(words) >= 3):
+            end -= 1
+            words = words[:-1]
+            bare = _digit_string(words)
         has_digit = any(w in DIGITS or w == "mười" for w in words)
         unit_follows = end < len(tokens) and _bare(tokens[end]) in UNITS
         if not has_digit or (all(w in WEAK for w in words) and len(words) < 3 and not unit_follows):

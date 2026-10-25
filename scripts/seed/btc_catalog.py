@@ -133,6 +133,23 @@ def _promotions(db, sku: SKU, quote: dict, promos: dict, reference: str) -> None
         row.synthetic = False
 
 
+def apply_images(db, manifest: Path) -> int:
+    """Photos picked by ``scripts/seed/product_images.py`` (file and credit), onto their products."""
+    if not manifest.is_file():
+        return 0
+    import json
+
+    photos = json.loads(manifest.read_text(encoding="utf-8"))
+    applied = 0
+    for row in db.scalars(select(Product)):
+        entry = photos.get(row.external_id)
+        # A photo dropped from the manifest (it did not show the product) goes back to the drawing.
+        row.image_url, row.image_credit = (entry["image_url"], entry["credit"]) if entry else (None, None)
+        applied += bool(entry)
+    db.flush()
+    return applied
+
+
 def seed_btc(db, btc: Path) -> dict:
     mock = load_mock(btc)
     reference = mock.REF

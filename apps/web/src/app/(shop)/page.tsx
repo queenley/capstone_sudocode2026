@@ -81,7 +81,7 @@ export default function HomePage() {
               Mua đúng thứ nhà bạn cần, <em>hỏi gì cũng có người trả lời.</em>
             </h1>
             <p>
-              Máy lọc không khí, máy lọc nước, giày chạy bộ, đồ cho bé… Trợ lý Tiếp Nối báo giá, tồn kho và khuyến mãi
+              Máy lọc không khí, máy lọc nước, giày chạy bộ, đồ cho bé… Trợ lý Quivo báo giá, tồn kho và khuyến mãi
               theo đúng dữ liệu cửa hàng, nhớ nhu cầu của bạn cho lần sau.
             </p>
             <div className="s-hero-stats">

@@ -3,7 +3,7 @@
 // The API returns one row per sellable SKU; products with sizes or colours
 // have one row per variant, all sharing the product's `product_ref`. The shop
 // shows products, so rows are grouped here.
-import { api, CommerceCatalogItem } from "@/services/api";
+import { api, CommerceCatalogItem, ImageCredit } from "@/services/api";
 
 export type CatalogRow = CommerceCatalogItem & { product_ref: string | null };
 
@@ -13,6 +13,8 @@ export type ShopProduct = {
   brand: string;
   category: string;
   description: string | null;
+  image: string | null;
+  imageCredit: ImageCredit | null;
   variants: CatalogRow[];
   /** The cheapest sale price among the variants, and its list price. */
   price: number;
@@ -91,6 +93,8 @@ export function groupProducts(rows: CatalogRow[]): ShopProduct[] {
         brand: row.brand,
         category: row.category,
         description: row.description,
+        image: row.image_url || null,
+        imageCredit: row.image_credit || null,
         variants: [],
         price: Infinity,
         listPrice: 0,

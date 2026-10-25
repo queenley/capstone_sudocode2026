@@ -185,6 +185,8 @@ async def run_turn(
     asr_confidence: float | None = None,
     memory: bool = True,
     emit: Callable[[str, str], Awaitable[None]] | None = None,
+    account_id: str | None = None,
+    account_name: str | None = None,
 ) -> Outcome:
     """Take one turn through the hot graph; the caller holds the call's lease.
 
@@ -206,6 +208,8 @@ async def run_turn(
         text=content,
         asr_confidence=asr_confidence,
         caller_phone=vault.get(row["caller_token"]) if row.get("caller_token") else None,
+        account_id=account_id,
+        account_name=account_name,
         zalo_id=row.get("channel_ref") if row["channel"] == "zalo" else None,
         fb_id=row.get("channel_ref") if row["channel"] == "facebook" else None,
         vault=vault,

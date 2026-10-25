@@ -67,8 +67,8 @@ class ScriptedAgent:
         content = self.replies.get((call_id, turn_id))
         return {"content": content} if content is not None else None
 
-    async def take_turn(self, row, *, content, turn_id, arrived, actor, memory, emit=None):
-        self.turns.append({"call_id": row["id"], "content": content, "memory": memory})
+    async def take_turn(self, row, *, content, turn_id, arrived, actor, memory, emit=None, account_id=None, account_name=None):
+        self.turns.append({"call_id": row["id"], "content": content, "memory": memory, "account_id": account_id, "account_name": account_name})
         if row.get("mode") == "copilot":
             return harness.Outcome(kind="waiting", turn_id=turn_id, state={"lane": "HANDOFF", "mode": "copilot"})
         if "nhân viên" in content.lower():
@@ -119,9 +119,9 @@ class StreamingAgent(ScriptedAgent):
 
     SENTENCES = ("Dạ, bên em có mẫu này ạ.", "Anh/chị muốn xem thêm không?")
 
-    async def take_turn(self, row, *, content, turn_id, arrived, actor, memory, emit=None):
+    async def take_turn(self, row, *, content, turn_id, arrived, actor, memory, emit=None, account_id=None, account_name=None):
         outcome = await super().take_turn(row, content=content, turn_id=turn_id, arrived=arrived, actor=actor,
-                                          memory=memory)
+                                          memory=memory, account_id=account_id, account_name=account_name)
         if emit is None or outcome.kind != "message":
             return outcome
         # The line said while tools run comes first; the chat shows typing instead of it.

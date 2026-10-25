@@ -25,7 +25,10 @@ spec = importlib.util.spec_from_file_location("ref", REPO / "scripts/evaluation/
 ref = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(ref)
 
-AUDIO = REPO / "scenarios_SCN-GEN-0001"
+# ASR_AUDIO, else create_data's output (gitignored), else the copy committed at the repository root.
+AUDIO = Path(os.environ.get("ASR_AUDIO") or next(
+    (p for p in (REPO / "scripts/create_data/output/audio/scenarios_SCN-GEN-0001", REPO / "scenarios_SCN-GEN-0001")
+     if p.is_dir()), REPO / "scenarios_SCN-GEN-0001"))
 
 
 def clip(call, turn):

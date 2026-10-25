@@ -2,9 +2,10 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
-import { LogoMark } from "@/components/brand/Logo";
+import { Logo } from "@/components/brand/Logo";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 import { categoryName, DEPARTMENTS } from "@/lib/catalog";
+import { firstName, useAccount } from "@/lib/account";
 import { useCart } from "@/lib/cart";
 import { HOTLINE, ZALO_URL } from "@/lib/contact";
 
@@ -12,6 +13,7 @@ const icon = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strok
 
 export default function Header() {
   const lines = useCart();
+  const { status, account } = useAccount();
   const count = lines.reduce((sum, line) => sum + line.qty, 0);
   const router = useRouter();
   const pathname = usePathname();
@@ -53,11 +55,11 @@ export default function Header() {
         <button className="s-menu-btn" aria-label="Danh mục" aria-expanded={menu} onClick={() => setMenu(!menu)}>
           ☰
         </button>
-        <Link href="/" className="s-logo" aria-label="Tiếp Nối, trang chủ">
-          <LogoMark className="s-logo-mark" />
+        <Link href="/" className="s-logo" aria-label="Quivo, trang chủ">
+          {/* The wordmark's "Q" is the mark: one image, no separate icon beside it. */}
           <span className="s-logo-text">
-            <strong>Tiếp Nối</strong>
-            <small>Trợ lý mua sắm AI</small>
+            <Logo height={30} title="" className="text-brand" />
+            <small className="hidden xs:block">Trợ lý mua sắm AI</small>
           </span>
         </Link>
         <form className="s-search" role="search" onSubmit={search}>
@@ -74,6 +76,29 @@ export default function Header() {
           <button type="submit">Tìm</button>
         </form>
         <div className="s-header-actions">
+          <Link
+            href={status === "signed-in" ? "/tai-khoan" : "/dang-nhap"}
+            className="s-header-link s-account-link"
+            aria-label={status === "signed-in" ? "Tài khoản của tôi" : "Đăng nhập hoặc đăng ký"}
+          >
+            <svg {...icon}>
+              <circle cx="12" cy="8" r="4" />
+              <path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" />
+            </svg>
+            <span>
+              {status === "signed-in" ? (
+                <>
+                  <small>Xin chào</small>
+                  {firstName(account)}
+                </>
+              ) : (
+                <>
+                  <small>Đăng nhập</small>
+                  Tài khoản
+                </>
+              )}
+            </span>
+          </Link>
           <Link href="/don-hang" className="s-header-link" aria-label="Đơn hàng của tôi">
             <svg {...icon}>
               <path d="M6 2h12l2 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6z" />

@@ -12,7 +12,7 @@ export default function ProductCard({ product }: { product: ShopProduct }) {
     <article className="s-card">
       <Link href={`/san-pham/${encodeURIComponent(product.ref)}`} className="s-card-link">
         <div className="s-card-media">
-          <ProductArt category={product.category} brand={product.brand} />
+          <ProductArt category={product.category} brand={product.brand} image={product.image} alt={product.name} />
           {off > 0 && <span className="s-badge s-badge-sale">-{off}%</span>}
           {soldOut && <span className="s-badge s-badge-out">Hết hàng</span>}
         </div>

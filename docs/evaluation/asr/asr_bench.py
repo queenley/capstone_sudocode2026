@@ -13,7 +13,10 @@ import soundfile as sf
 
 LAB = Path(os.environ.get("ASR_LAB", Path(__file__).parent))  # models/, agent_tts/ and the venv live here
 REPO = Path(__file__).resolve().parents[3]
-AUDIO = REPO / "scenarios_SCN-GEN-0001"
+# ASR_AUDIO, else create_data's output (gitignored), else the copy committed at the repository root.
+AUDIO = Path(os.environ.get("ASR_AUDIO") or next(
+    (p for p in (REPO / "scripts/create_data/output/audio/scenarios_SCN-GEN-0001", REPO / "scenarios_SCN-GEN-0001")
+     if p.is_dir()), REPO / "scenarios_SCN-GEN-0001"))
 spec = importlib.util.spec_from_file_location("ref", REPO / "scripts/evaluation/evaluation-contracts/sources/btc/eval/reference_eval.py")
 ref = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(ref)

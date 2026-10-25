@@ -2,8 +2,11 @@
 // Verify the shopper's phone number with a one-time code (Identity service),
 // on their current conversation. On success the customer token is kept on
 // this device, so later visits, chats and orders are recognised.
+import { usePathname } from "next/navigation";
 import { useState } from "react";
+import Link from "next/link";
 import { api } from "@/services/api";
+import { account } from "@/lib/account";
 import { customerToken, openSession, setCustomerToken, ShopSession } from "@/lib/session";
 
 type Challenge = { challenge_id: string; delivery: string; development_code?: string };
@@ -17,6 +20,7 @@ export default function VerifyPhone({ onVerified }: { onVerified: (session: Shop
   const [session, setSession] = useState<ShopSession | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const pathname = usePathname();
 
   async function run(task: () => Promise<void>) {
     setBusy(true);
@@ -28,7 +32,7 @@ export default function VerifyPhone({ onVerified }: { onVerified: (session: Shop
       // A number already verified (it may be a household's) cannot prove which person is back.
       setError(
         message.startsWith("Returning/shared identifier")
-          ? "Số điện thoại này đã được xác minh trước đây. Hãy dùng thiết bị bạn đã xác minh lần trước, hoặc nhắn trợ lý / gọi hotline để nhân viên xác nhận giúp."
+          ? "Số điện thoại này đã có tài khoản hoặc đã được xác minh trước đây. Hãy đăng nhập (hoặc lấy lại mật khẩu) để tiếp tục."
           : message === "Incorrect verification code"
             ? "Mã xác minh chưa đúng, vui lòng kiểm tra lại."
             : message === "Challenge expired or invalid"
@@ -65,6 +69,7 @@ export default function VerifyPhone({ onVerified }: { onVerified: (session: Shop
             { challenge_id: challenge.challenge_id, code: code.trim(), full_name: name.trim(), customer_token: customerToken() },
           );
           setCustomerToken(result.customer_token);
+          await account.verified();
           onVerified({ ...s, customer_id: result.customer_id });
         });
       }}
@@ -131,6 +136,10 @@ export default function VerifyPhone({ onVerified }: { onVerified: (session: Shop
           {error}
         </div>
       )}
+      <p className="s-muted s-small">
+        Đã có tài khoản? <Link href={`/dang-nhap?next=${encodeURIComponent(pathname)}`}>Đăng nhập</Link> ·{" "}
+        <Link href="/dang-ky">Đăng ký</Link>
+      </p>
     </form>
   );
 }

@@ -66,6 +66,8 @@ def catalog_row(row):
         "brand": product.brand,
         "category": product.category,
         "description": product.description,
+        "image_url": product.image_url,
+        "image_credit": product.image_credit,
         "sku_code": sku.sku_code,
         "variant": sku.variant,
         "list_price": str(sku.list_price),

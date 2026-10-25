@@ -27,7 +27,7 @@ from ...components.guardrails import fallback
 from ...components.guardrails.hard import MAX_SENTENCES, ORDER_SUMMARY, GuardInput, check
 from ...components.guardrails.stream import SentenceSplitter
 from ...components.identity import resolver
-from ...components.intake import itn, lexicon, pii, signals, text as intake_text
+from ...components.intake import honorific, itn, lexicon, pii, signals, text as intake_text
 from ...components.memory import brief as briefs
 from ...components.memory import recall
 from ...components.memory.brief import BriefLine
@@ -97,6 +97,12 @@ async def perceive(state: HotState, runtime: Runtime[HotContext]) -> dict[str, A
         if resolver.digest("phone", context.vault.get(token) or "", context.identity_secret) not in seen
     ]
     mode = state.get("input_mode") or ("chat_teencode" if teencode else "clean")
+    agent_said = _last_reply(state)
+    called = honorific.self_reference(written, agent_asked=agent_said)
+    if called:
+        update["honorific_said"] = called
+    if agent_said and honorific.ASKED.search(intake_text.plain(agent_said)):
+        update["honorific_asked"] = True
     low = context.asr_confidence is not None and context.asr_confidence < ASR_LOW_CONFIDENCE
     update.update(
         input_mode=mode,
@@ -194,7 +200,7 @@ async def _identify(state: HotState, context: HotContext) -> dict[str, Any]:
         return update
     if tier == "AMBIGUOUS":
         # The first words may already carry the name; otherwise the fixed question.
-        chosen = resolver.pick_by_name(answer or "", matches)
+        chosen = resolver.pick_by_name(answer or "", matches) or resolver.pick_by_account(context.account_name, matches)
         if chosen is None:
             update.update(candidates=[m._asdict() | {"phone": None} for m in matches], awaiting="name",
                           customer_id=None, brief=None, brief_lines=[])
@@ -441,6 +447,7 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
     return AgentContext(
         call_id=str(state["call_id"]),
         customer_id=state.get("customer_id") if tier == "VERIFIED" else None,
+        account_id=context.account_id,
         address_as=_address_as(state),
         tier=tier,
         lane=state.get("lane") or "NEW",
@@ -477,11 +484,49 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
         knowledge_note=_knowledge_note(state),
         confirm_reason="probable" if state.get("awaiting") == "confirm" else None,
         notes=tuple(state.get("route_notes") or ()),
-        trusted_skus=trusted,
+        trusted_skus=trusted | frozenset(p["sku"] for p in state.get("seen_products") or []),
+        seen_products=tuple(state.get("seen_products") or ()),
+        self_called=None if tier == "VERIFIED" else state.get("honorific_said"),
+        honorific_asked=bool(state.get("honorific_asked")),
         flags=dict(state.get("flags") or {}),
         customer_said=_last_customer_text(state),
         last_agent_said=_last_agent_text(state),
     )
+
+
+def _last_reply(state: HotState) -> str | None:
+    """The agent's latest reply, before this turn's words are added."""
+    for message in reversed(state.get("messages") or []):
+        if isinstance(message, AIMessage):
+            return str(message.content)
+    return None
+
+
+#: The products kept for later turns: enough for a conversation, small in the prompt.
+SEEN_PRODUCTS = 15
+
+
+def _products_in(results: Sequence[Mapping[str, Any]], seen: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """*seen* with the products in *results* added (a product seen again moves last), at most SEEN_PRODUCTS."""
+    found = {p["sku"]: dict(p) for p in seen if p.get("sku")}
+    for result in results:
+        envelope = result.get("result") or {}
+        if not envelope.get("ok"):
+            continue
+        data = envelope.get("data") or {}
+        items = data.get("items") if result.get("name") == "catalog.search" else ([data] if data.get("sku") else [])
+        for item in items or []:
+            sku = item.get("sku")
+            if not isinstance(sku, str):
+                continue
+            entry = found.pop(sku, {"sku": sku})
+            if item.get("name"):
+                entry["name"] = item["name"]
+            price = item.get("final_price_vnd") or item.get("price_vnd") or item.get("list_price_vnd")
+            if price:
+                entry["price_vnd"] = int(price)
+            found[sku] = entry
+    return list(found.values())[-SEEN_PRODUCTS:]
 
 
 def _address_as(state: HotState) -> str | None:
@@ -512,7 +557,8 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
             failures += 1
     return {"tool_results": list(state.get("tool_results") or []) + new_results, "quotes": quotes,
             "known_orders": orders, "tool_failures": failures,
-            "trusted_skus": sorted(set(state.get("trusted_skus") or []) | codes)}
+            "trusted_skus": sorted(set(state.get("trusted_skus") or []) | codes),
+            "seen_products": _products_in(new_results, state.get("seen_products") or [])}
 
 
 # ── 4b. the streamed answer, section 4.8 ──────────────────────────────────

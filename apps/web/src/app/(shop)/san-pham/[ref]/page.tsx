@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import ProductArt from "@/components/product/ProductArt";
+import ProductArt, { PhotoCredit } from "@/components/product/ProductArt";
 import ProductCard from "@/components/product/ProductCard";
 import { api } from "@/services/api";
 import {
@@ -110,8 +110,9 @@ export default function ProductPage() {
       </nav>
       <div className="s-detail">
         <div className="s-detail-media">
-          <ProductArt category={product.category} brand={product.brand} size="hero" />
+          <ProductArt category={product.category} brand={product.brand} size="hero" image={product.image} alt={product.name} />
           {off > 0 && <span className="s-badge s-badge-sale s-badge-lg">-{off}%</span>}
+          {product.image && product.imageCredit && <PhotoCredit credit={product.imageCredit} />}
         </div>
         <div className="s-detail-info">
           <span className="s-card-cat">{product.brand}</span>

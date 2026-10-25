@@ -12,6 +12,7 @@ import { money, variantLabel } from "@/lib/catalog";
 import { cart, useCart } from "@/lib/cart";
 import { newKey, useCartItems } from "@/lib/cart-items";
 import { openSession, ShopSession } from "@/lib/session";
+import { useAccount } from "@/lib/account";
 
 type Quote = { sku_code: string; sale_price: string; total: string; discount: string };
 type Payment = "cod" | "bank_transfer";
@@ -27,6 +28,7 @@ type Order = {
 export default function CheckoutPage() {
   const lines = useCart();
   const { items } = useCartItems(lines);
+  const { account: me } = useAccount();
   const [session, setSession] = useState<ShopSession | null>(null);
   const [checking, setChecking] = useState(true);
   const [methods, setMethods] = useState<Methods | null>(null);
@@ -143,7 +145,11 @@ export default function CheckoutPage() {
             {checking ? (
               <p className="s-muted">Đang kiểm tra…</p>
             ) : verified ? (
-              <p className="s-good">✓ Số điện thoại đã được xác minh trên thiết bị này.</p>
+              <p className="s-good">
+                {me?.registered
+                  ? `✓ Đặt hàng với tài khoản ${me.full_name || ""} (${me.phone || ""}).`
+                  : "✓ Số điện thoại đã được xác minh trên thiết bị này."}
+              </p>
             ) : (
               <>
                 <p className="s-muted">Để bảo vệ đơn hàng, cửa hàng cần xác minh số điện thoại của bạn một lần.</p>

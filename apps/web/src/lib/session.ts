@@ -30,6 +30,16 @@ export function setCustomerToken(token: string | null) {
   }
 }
 
+/** Drop this tab's conversation: the next message starts one as whoever is signed in now. */
+export function forgetConversation() {
+  try {
+    sessionStorage.removeItem(CONVERSATION);
+  } catch {
+    /* ignore */
+  }
+  window.dispatchEvent(new Event("shop-conversation-reset"));
+}
+
 export function savedSession(): ShopSession | null {
   try {
     const saved = sessionStorage.getItem(CONVERSATION);

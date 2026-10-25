@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { LogoMark } from "@/components/brand/Logo";
+import { Logo } from "@/components/brand/Logo";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 import { api } from "@/services/api";
 
@@ -23,10 +23,9 @@ export default function LoginPage() {
     <main className="auth">
       <section className="auth-brand">
         <Link className="auth-logo" href="/">
-          <LogoMark />
           <span>
-            <strong>Tiếp Nối</strong>
-            <small>Bán hàng & chăm sóc khách</small>
+            <Logo height={40} className="text-on-chrome" />
+            <small className="mt-1.5 block">Bán hàng & chăm sóc khách</small>
           </span>
         </Link>
         <div>
@@ -37,7 +36,7 @@ export default function LoginPage() {
             <li>Gợi ý câu trả lời của trợ lý, luôn theo đúng giá và chính sách</li>
           </ul>
         </div>
-        <small>Dành cho nhân viên Tiếp Nối · Tài khoản do quản trị viên cấp</small>
+        <small>Dành cho nhân viên Quivo · Tài khoản do quản trị viên cấp</small>
       </section>
       <section className="auth-side">
         <div className="auth-top">
