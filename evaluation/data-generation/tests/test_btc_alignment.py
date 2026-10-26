@@ -18,7 +18,8 @@ def test_adapter_reproduces_btc_example_report():
         assert ours[key]["value"] == theirs[key]["value"], key
 
 
-def test_oracle_trace_is_perfect_under_official_script(scenarios):
+def test_oracle_trace_is_perfect_under_official_script(all_scenarios):
+    scenarios = all_scenarios   # BTC's personas and the team's
     exported = {s.scenario_id: s.btc_export() for s in scenarios}
     report = evaluate(exported, [row for s in scenarios for row in oracle_rows(s)])
     assert report["repeat_question_rate"]["value"] == 0.0
@@ -43,4 +44,7 @@ def test_btc_export_shape(scenarios):
     call = payload["calls"]["call_1"]
     assert "tool_called" in call["success_if"]
     assert "oracle_tool_calls" not in call and "simulator_persona_key" not in call
+    assert not {"expected_call_brief", "expected_handoff_brief", "kind", "speaker_customer_id"} & set(call)
+    assert list(payload) == ["scenario_id", "level", "persona", "hard_case", "customer_phone", "customer_name",
+                             "honorific", "notes", "calls"]
     assert isinstance(call.get("memory_expectation", {}), dict)

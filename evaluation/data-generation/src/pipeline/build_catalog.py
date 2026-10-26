@@ -1,74 +1,110 @@
+"""Stage 1 — validate BTC's catalogue and keep every copy of it in sync.
+
+Checks, offline (``output/reports/catalog_check.json``; non-zero exit on an error):
+
+* each file parses: products, promotions, inventory timeline, CRM seed, synthetic CRM;
+* prices, variants, stock and promotions agree with each other: every SKU a
+  promotion, a gift, the inventory timeline or a CRM order names exists; a CRM
+  order's variant was in stock on its date and costs what ``mock_tools`` quotes
+  for that day (the promotions of that day applied); synthetic ids and phones
+  do not collide with BTC's;
+* the agent's copy (``apps/ai-agent-service/data/btc/catalog``) is the same,
+  file by file. ``--sync`` copies the files that differ there.
+
+    python -m src.pipeline.build_catalog            # check
+    python -m src.pipeline.build_catalog --sync     # check, then make the agent's copy equal
+"""
+from __future__ import annotations
+
 import argparse
 import json
-from pathlib import Path
+import shutil
+import sys
 
 from src.schemas.catalog import CustomerCatalog, InventoryTimeline, ProductCatalog, PromotionCatalog
+from src.utils.btc_tools import mock_tools
+from src.utils.io import load_model, write_json
+from src.utils.paths import AGENT_CATALOG_DIR, CATALOG_DIR, REPORTS_DIR
+
+#: The files the agent's mock and the evaluation harness read, kept equal to ours.
+SHARED_FILES = ("products.json", "promotions.json", "inventory_timeline.json", "crm_seed.json", "crm_seed_synthetic.json")
 
 
-def load_catalog(path: Path) -> ProductCatalog:
-    with path.open(encoding="utf-8-sig") as stream:
-        return ProductCatalog.model_validate_json(stream.read())
+def consistency_errors() -> tuple[list[str], dict[str, int]]:
+    catalog = load_model(CATALOG_DIR / "products.json", ProductCatalog)
+    promotions = load_model(CATALOG_DIR / "promotions.json", PromotionCatalog)
+    timeline = load_model(CATALOG_DIR / "inventory_timeline.json", InventoryTimeline)
+    official = load_model(CATALOG_DIR / "crm_seed.json", CustomerCatalog).customers
+    synthetic_path = CATALOG_DIR / "crm_seed_synthetic.json"
+    synthetic = load_model(synthetic_path, CustomerCatalog).customers if synthetic_path.exists() else []
+
+    skus = {p.sku for p in catalog.products} | {v.variant_sku for p in catalog.products for v in p.variants}
+    errors = []
+    for promo in promotions.promotions:
+        unknown = [t for t in promo.applies_to if t != "*" and not t.startswith("category:") and t not in skus]
+        if unknown:
+            errors.append(f"promotion {promo.promo_code} applies to unknown SKUs {unknown}")
+        if promo.gift_sku and promo.gift_sku not in skus:
+            errors.append(f"promotion {promo.promo_code} gives unknown SKU {promo.gift_sku}")
+    errors += [f"inventory event for unknown SKU {e.sku} on {e.date}" for e in timeline.events if e.sku not in skus]
+
+    mock = mock_tools()
+    for customer in official + synthetic:
+        for order in customer.orders:
+            if order.sku not in skus:
+                errors.append(f"{customer.customer_id} order {order.order_id}: unknown SKU {order.sku}")
+                continue
+            if not customer.synthetic:
+                continue   # BTC's own records are theirs; ours must match the catalogue of their day
+            on = order.date.isoformat()
+            if not mock.inventory_check(order.sku, on).get("in_stock"):
+                errors.append(f"{customer.customer_id} order {order.order_id}: {order.sku} out of stock on {on}")
+            quoted = mock.pricing_get_quote(order.sku, on)["final_price_vnd"]
+            if order.price_vnd != quoted:
+                errors.append(f"{customer.customer_id} order {order.order_id}: price {order.price_vnd} "
+                              f"but mock_tools quotes {quoted} on {on}")
+    ids, phones = {c.customer_id for c in official}, {c.phone for c in official}
+    errors += [f"synthetic {c.customer_id} collides with a BTC customer id or phone"
+               for c in synthetic if c.customer_id in ids or c.phone in phones]
+    counts = {"products": len(catalog.products), "variants": sum(len(p.variants) for p in catalog.products),
+              "promotions": len(promotions.promotions), "inventory_events": len(timeline.events),
+              "btc_customers": len(official), "synthetic_customers": len(synthetic),
+              "zalo_ids": sum(bool(c.zalo_id) for c in official + synthetic),
+              "fb_ids": sum(bool(c.fb_id) for c in official + synthetic)}
+    return errors, counts
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Validate the source product catalog")
-    parser.add_argument(
-        "--input",
-        type=Path,
-        default=Path(__file__).resolve().parents[2] / "data/catalog/products.json",
-    )
-    parser.add_argument(
-        "--output",
-        type=Path,
-        help="Optional path to write normalized, validated JSON",
-    )
+def agent_copy_differences() -> list[str]:
+    """Files of ours the agent's catalogue lacks or holds a different version of."""
+    if not AGENT_CATALOG_DIR.is_dir():
+        return []
+    return [name for name in SHARED_FILES if (CATALOG_DIR / name).exists()
+            and (not (AGENT_CATALOG_DIR / name).exists()
+                 or json.loads((CATALOG_DIR / name).read_text(encoding="utf-8-sig"))
+                 != json.loads((AGENT_CATALOG_DIR / name).read_text(encoding="utf-8-sig")))]
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--sync", action="store_true", help="copy the files that differ to the agent's catalogue")
     args = parser.parse_args()
-    catalog = load_catalog(args.input)
-    source_dir = args.input.parent
-    promotion_path = source_dir / "promotions.json"
-    inventory_path = source_dir / "inventory_timeline.json"
-    customer_path = source_dir / "crm_seed.json"
-    promotions = None
-    inventory = None
-    customers = None
-    if promotion_path.exists():
-        promotions = PromotionCatalog.model_validate_json(
-            promotion_path.read_text(encoding="utf-8-sig")
-        )
-    if inventory_path.exists():
-        inventory = InventoryTimeline.model_validate_json(
-            inventory_path.read_text(encoding="utf-8-sig")
-        )
-    if customer_path.exists():
-        customers = CustomerCatalog.model_validate_json(customer_path.read_text(encoding="utf-8-sig"))
-    synthetic_customers=source_dir / "crm_seed_synthetic.json"
-    if synthetic_customers.exists():
-        synthetic=CustomerCatalog.model_validate_json(synthetic_customers.read_text(encoding="utf-8-sig"))
-        source_customers=customers.customers if customers else []
-        source_ids={c.customer_id for c in source_customers}
-        source_phones={c.phone for c in source_customers}
-        duplicate_ids=[c.customer_id for c in synthetic.customers if c.customer_id in source_ids]
-        duplicate_phones=[c.phone for c in synthetic.customers if c.phone in source_phones]
-        if duplicate_ids or duplicate_phones:
-            raise ValueError(f"Synthetic CRM collides with source IDs/phones: ids={duplicate_ids}, phones={duplicate_phones}")
-    if args.output:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(
-            json.dumps(catalog.model_dump(mode="json"), ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
-        )
-    variant_count = sum(len(product.variants) for product in catalog.products)
-    summary = (
-        f"Validated {len(catalog.products)} products and {variant_count} variants "
-        f"(reference date {catalog.reference_date}, currency {catalog.currency})"
-    )
-    if promotions is not None:
-        summary += f", {len(promotions.promotions)} promotions"
-    if inventory is not None:
-        summary += f", {len(inventory.events)} inventory events"
-    if customers is not None:
-        summary += f", {len(customers.customers)} CRM seed customers"
-    print(summary + ".")
+
+    errors, counts = consistency_errors()
+    differing = agent_copy_differences()
+    if args.sync:
+        for name in differing:
+            shutil.copyfile(CATALOG_DIR / name, AGENT_CATALOG_DIR / name)
+            print(f"Synced {name} -> {AGENT_CATALOG_DIR}")
+        differing = agent_copy_differences()
+    write_json(REPORTS_DIR / "catalog_check.json", {"counts": counts, "errors": errors, "agent_copy_differs": differing})
+    print(", ".join(f"{v} {k.replace('_', ' ')}" for k, v in counts.items()))
+    for error in errors:
+        print(f"  ERROR {error}")
+    if differing:
+        print(f"  The agent's catalogue differs in {differing}; rerun with --sync.")
+    if errors or differing:
+        sys.exit(1)
+    print("Catalogue consistent, and equal to the agent's copy.")
 
 
 if __name__ == "__main__":

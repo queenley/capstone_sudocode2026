@@ -97,23 +97,23 @@ flowchart LR
 
 - **Mã đơn, số tiền hoàn, lịch dời, ETA, lỗi COD đều là kết quả của chính mock BTC**, vì planner thực sự chạy `order.create`, `order.update`, `schedule.callback`... Một lệnh bị từ chối (sai giá, hết hàng, quá COD) làm dừng việc lập kế hoạch.
 - **LLM không bao giờ thấy nhãn**, chỉ được nói fact trong bộ slot cố định.
-- **Oracle**: từ nhãn dựng trace của agent lý tưởng, chấm bằng `reference_eval.py`. Phải ra RQR 0, CCR 100, TSR 100, HR 0, 0 vi phạm. Kết quả: **hoàn hảo trên 120 kịch bản / 260 cuộc**, tức mọi nhãn đều khả thi và nhất quán với logic BTC.
+- **Oracle**: từ nhãn dựng trace của agent lý tưởng, chấm bằng `reference_eval.py`. Phải ra RQR 0, CCR 100, TSR 100, HR 0, 0 vi phạm. Kết quả: **hoàn hảo trên 218 kịch bản / 448 cuộc** (150 theo persona BTC + 68 theo persona nâng cao của nhóm), tức mọi nhãn đều khả thi và nhất quán với logic BTC.
 - **Số dùng chung**: bộ nhớ được theo dõi **theo người nói**, nên fact của người kia không bao giờ bị mang sang (`must_not_write_to`).
 
 ### 14 bước pipeline
 
 | # | Bước | Gọi API | Đầu ra chính |
 |---|---|---|---|
-| 1 | `build_catalog` | không | kiểm đầu vào |
-| 2 | `generate_synthetic_customers` | LLM (tên) | `crm_seed_synthetic.json` |
-| 3 | `generate_scenarios` | LLM, 1/kịch bản | `output/scenarios/`, `scenarios_internal/` |
+| 1 | `build_catalog` | không | kiểm catalog nhất quán (giá, biến thể, tồn kho, khuyến mãi) và khớp bản của agent |
+| 2 | `generate_synthetic_customers` | LLM (tên) | 10 khách giả lập thêm vào 50 khách BTC, `crm_seed_synthetic.json` |
+| 3 | `generate_scenarios` | LLM, 1/kịch bản | `output/scenarios/` (định dạng mẫu BTC), `metadata/`, `call_brief/`, `handoff_brief/`, `tools/` |
 | 4 | `generate_dialogue` | LLM, 1/cuộc | transcript tham chiếu |
 | 5 | `simulate_replays` | không (tùy chọn LLM) | replay theo simulator BTC × 3 seed |
 | 6 | `validate_rules` | không | chấm chính thức, phải hoàn hảo |
 | 7 | `llm_judge` | LLM, 1/transcript | rubric J01–J12 |
-| 8 | `build_ground_truth` | không | `test_set/`, trace oracle, brief mong đợi, audit tool |
+| 8 | `build_ground_truth` | không | `trace_log/` theo từng cuộc, báo cáo chính thức, audit tool |
 | 9 | `export_manual_review` | không | CSV cho người duyệt |
-| 10 | `synthesize_scenario_audio` | ElevenLabs | WAV từng lượt khách |
+| 10 | `synthesize_scenario_audio` | ElevenLabs | WAV từng lượt khách, tới khi đủ 3 giờ |
 | 11 | `build_asr_testset` | ElevenLabs | bộ ASR định dạng BTC |
 | 12 | `eval_rag` | không | Recall@k baseline |
 | 13 | `summarize_dataset` | không | dashboard HTML |

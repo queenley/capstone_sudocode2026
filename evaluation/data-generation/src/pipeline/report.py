@@ -21,13 +21,13 @@ from pathlib import Path
 from typing import Any
 
 from src.schemas.catalog import ProductCatalog
-from src.schemas.scenario import Scenario
 from src.utils.audio_stats import collect as collect_audio, summarize as summarize_audio, to_markdown as audio_markdown
 from src.utils.crm import load_customers
-from src.utils.io import iter_models, load_model
+from src.utils.dataset import Dataset
+from src.utils.io import load_model
 from src.utils.paths import (
-    CATALOG_DIR, CONVERSATIONS_DIR, OUTPUT_DIR, GOLDEN_DIR, JUDGMENTS_DIR, MODEL_CALLS_LOG, REPORTS_DIR, REVIEW_DIR,
-    SCENARIOS_INTERNAL_DIR, SIMULATIONS_DIR, VALIDATION_JSON,
+    ASR_TEST_DIR, CATALOG_DIR, GOLDEN_MANIFEST, MODEL_CALLS_LOG, PLAN_PREVIEW_DIR, RAG_DIR, REPORTS_DIR, REVIEW_DIR,
+    SIMULATION_REPLAYS, VALIDATION_JSON,
 )
 from src.utils.report_html import render as render_html
 
@@ -47,7 +47,7 @@ def _json(path: Path, default: Any) -> Any:
 # Data collection                                                              #
 # --------------------------------------------------------------------------- #
 def simulator_stats() -> dict[str, Any]:
-    path = SIMULATIONS_DIR / "replay.jsonl"
+    path = SIMULATION_REPLAYS
     records = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()] if path.exists() else []
     records = [r for r in records if "tsr_pass" in r]  # ignore pre-v2 replays
     by_seed: dict[int, list[bool]] = defaultdict(list)
@@ -77,10 +77,11 @@ def write_audio_outputs(summary: dict[str, Any]) -> None:
 def build_context() -> dict[str, Any]:
     """Every number shown in the Markdown and HTML reports."""
     catalog = load_model(CATALOG_DIR / "products.json", ProductCatalog)
-    scenarios = [s for _, s in iter_models(sorted(SCENARIOS_INTERNAL_DIR.glob("SCN-GEN-*.json")), Scenario)]
-    conversations = [_json(p, {}) for p in sorted(CONVERSATIONS_DIR.glob("*__call_*.json"))]
+    dataset = Dataset()
+    scenarios = list(dataset.iter_scenarios())
+    conversations = [_json(p, {}) for p in dataset.conversation_paths()]
     validations = [r for r in _json(VALIDATION_JSON, []) if "call" in r]  # ignore pre-v2 rows
-    verdicts = {p.stem: _json(p, {}) for p in JUDGMENTS_DIR.glob("*.json")}
+    verdicts = {v.get("conversation_id"): v for v in (_json(p, {}) for p in dataset.judgment_paths())}
     stats = _json(REPORTS_DIR / "dataset_statistics.json", {})
     audio = summarize_audio(collect_audio())
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -88,10 +89,13 @@ def build_context() -> dict[str, Any]:
     ov = audio["overview"]
     noisy_ratio = audio["noise_summary"]["noisy_ratio"] or 0.0
 
+    # Sessions and channels per customer, over every planned call (BTC M2: ≥ 60 and ≥ 30 customers).
     sessions, channels = defaultdict(int), defaultdict(set)
-    for conversation in conversations:
-        sessions[conversation.get("customer_id")] += 1
-        channels[conversation.get("customer_id")].add(conversation.get("channel"))
+    for scenario in scenarios:
+        for _, call in scenario.ordered_calls():
+            who = call.speaker_customer_id or scenario.customer_id
+            sessions[who] += 1
+            channels[who].add(call.channel)
     multi_session = sum(n >= 2 for n in sessions.values())
     multi_channel = sum(len(c) >= 2 for c in channels.values())
     domains = {p.category.split("/")[0] for p in catalog.products}
@@ -122,9 +126,9 @@ def build_context() -> dict[str, Any]:
 
     coverage_raw = stats.get("metric_coverage", {})
     # Real run first; fall back to the offline plan preview (run_all --plan-only) when nothing was generated yet.
-    gt_root = OUTPUT_DIR if (OUTPUT_DIR / "ground_truth" / "summary.json").exists() else OUTPUT_DIR / "plans"
-    preview = gt_root != OUTPUT_DIR
-    gt_summary = _json(gt_root / "ground_truth" / "summary.json", {})
+    summary_path = REPORTS_DIR / "ground_truth_summary.json"
+    preview = not summary_path.exists()
+    gt_summary = _json(PLAN_PREVIEW_DIR / "reports" / "ground_truth_summary.json" if preview else summary_path, {})
     official = {"oracle": gt_summary.get("oracle"), "reference": gt_summary.get("reference"),
                 "oracle_perfect": gt_summary.get("oracle_perfect"), "preview": preview}
     coverage = {}
@@ -134,9 +138,8 @@ def build_context() -> dict[str, Any]:
         ref = (official["reference"] or {}).get(key)
         coverage[name] = {"calls": item.get("calls", 0), "labels": item.get("labels", 0),
                           "reference": "n/a" if ref is None else ref}
-    manifest = _json(gt_root / "test_set" / "_manifest.json", {})
     hard_cases: dict[str, int] = defaultdict(int)
-    for case in manifest.get("hard_cases", {}).values():
+    for case in gt_summary.get("hard_case_ids", {}).values():
         hard_cases[case] += 1
 
     rule_pass = sum(r["validator_pass"] for r in validations)
@@ -144,7 +147,7 @@ def build_context() -> dict[str, Any]:
                      for r in validations)
     approved_csv = REVIEW_DIR / "approved.csv"
     human = sum(1 for _ in csv.DictReader(approved_csv.open(encoding="utf-8-sig"))) if approved_csv.exists() else 0
-    golden = len(_json(GOLDEN_DIR / "manifest.json", {}).get("conversation_ids", []))
+    golden = len(_json(GOLDEN_MANIFEST, {}).get("conversation_ids", []))
     calls_log = [json.loads(x) for x in MODEL_CALLS_LOG.read_text(encoding="utf-8").splitlines()] if MODEL_CALLS_LOG.exists() else []
 
     return {
@@ -155,12 +158,12 @@ def build_context() -> dict[str, Any]:
         "targets": targets,
         "coverage": coverage,
         "official": official,
-        "test_set": {"n_scenarios": manifest.get("n_scenarios", 0), "n_hard_cases": manifest.get("n_hard_cases", 0),
-                     "n_calls": manifest.get("n_calls", 0), "hard_cases": dict(sorted(hard_cases.items()))},
-        "rag": _json(OUTPUT_DIR / "rag" / "rag_report.json", None),
+        "test_set": {"n_scenarios": gt_summary.get("scenarios", 0), "n_hard_cases": gt_summary.get("hard_cases", 0),
+                     "n_calls": gt_summary.get("calls", 0), "hard_cases": dict(sorted(hard_cases.items()))},
+        "rag": _json(RAG_DIR / "rag_report.json", None),
         "asr": {name: _json(REPORTS_DIR / f"asr_report_{name}.json", None) for name in ("btc", "team")},
-        "asr_team_dialogues": len(_json(OUTPUT_DIR / "asr_test" / "ground_truth.json", {}).get("dialogues", [])),
-        "tools": _json(REPORTS_DIR / "tools_audit.json", None) or _json(gt_root / "ground_truth" / "tools_audit.json", None),
+        "asr_team_dialogues": len(_json(ASR_TEST_DIR / "ground_truth.json", {}).get("dialogues", [])),
+        "tools": _json(REPORTS_DIR / "tools_audit.json", None) or _json(PLAN_PREVIEW_DIR / "reports" / "tools_audit.json", None),
         "judge_agreement": _json(REPORTS_DIR / "judge_agreement.json", None),
         "simulator": simulator_stats(),
         "audio": audio,
@@ -198,7 +201,7 @@ def official_markdown(ctx: dict[str, Any]) -> list[str]:
             if off[name]:
                 lines.append(f"| {name} | " + " | ".join(str(off[name].get(k)) for k in keys) + " |")
         lines += ["", f"Oracle perfect (every label satisfiable with BTC mock_tools): **{off['oracle_perfect']}**. "
-                      "Score the agent with `data/eval/reference_eval.py --scenarios output/test_set --trace <agent trace>`."]
+                      "Score the agent with `data/eval/reference_eval.py --scenarios output/scenarios --trace <agent trace>`."]
     else:
         lines.append("Not built yet: `python -m src.pipeline.build_ground_truth`.")
     ts = ctx["test_set"]

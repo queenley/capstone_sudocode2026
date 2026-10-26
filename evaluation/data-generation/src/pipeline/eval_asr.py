@@ -27,9 +27,9 @@ import sys
 from pathlib import Path
 
 from src.utils.btc_tools import reference_eval
-from src.utils.paths import DATA_DIR, OUTPUT_DIR, ROOT
+from src.utils.paths import ASR_TEST_DIR, DATA_DIR, REPORTS_DIR, ROOT
 
-SETS = {"btc": DATA_DIR / "asr", "team": OUTPUT_DIR / "asr_test"}
+SETS = {"btc": DATA_DIR / "asr", "team": ASR_TEST_DIR}
 
 
 def load_engine(engine: str, models_dir: Path, whisper_model: str):
@@ -106,8 +106,8 @@ def main() -> None:
     asr_dir = SETS[args.set]
     if not (asr_dir / "ground_truth.json").exists():
         sys.exit(f"{asr_dir / 'ground_truth.json'} not found (team set: run build_asr_testset first)")
-    # Work in output/asr_eval/<set>/ so BTC input folders are never modified.
-    work = OUTPUT_DIR / "asr_eval" / args.set
+    # Work in output/reports/asr_eval/<set>/ so BTC input folders are never modified.
+    work = REPORTS_DIR / "asr_eval" / args.set
     (work / "audio").mkdir(parents=True, exist_ok=True)
     shutil.copyfile(asr_dir / "ground_truth.json", work / "ground_truth.json")
     for seg in (asr_dir / "audio").glob("*.segments.json"):
@@ -127,7 +127,7 @@ def main() -> None:
         sys.exit("No hypotheses.json: pass --hypotheses or --transcribe")
 
     report = reference_eval().wer_cer(str(work))
-    out = OUTPUT_DIR / "reports" / f"asr_report_{args.set}.json"
+    out = REPORTS_DIR / f"asr_report_{args.set}.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps({k: v for k, v in report.items() if k != "per_dialogue"}, ensure_ascii=False, indent=2))

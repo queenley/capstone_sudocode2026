@@ -20,6 +20,7 @@ class SimulatorState:
     confirmation_seen: set[str] = field(default_factory=set)
     irritation: int = 0
     silence_streak: int = 0
+    price_challenged: bool = False
     n_turns: int = 0
     cursor: int = 0
     outcome: str | None = None
@@ -71,9 +72,12 @@ class SimulatorState:
             self.outcome, self.ended_by = "tu_choi", "customer"
             self.n_turns += 1
             return {"ended": True, "text": "Thôi để chị xem lại.", "outcome": self.outcome}
-        # Rule 3: a price different from the one quoted earlier costs patience (agent must explain why).
+        # Rule 3: a price different from the one quoted earlier costs patience, once a call: the customer reacts,
+        # and an agent that explains why (an ended promotion) is not punished again for repeating the new price.
         expected_price = self.facts_established.get("price_quoted_vnd", self.facts_established.get("final_price_vnd"))
-        if expected_price is not None and agent_turn.get("price_vnd") is not None and agent_turn.get("price_vnd") != expected_price:
+        if (not self.price_challenged and expected_price is not None and agent_turn.get("price_vnd") is not None
+                and agent_turn.get("price_vnd") != expected_price):
+            self.price_challenged = True
             self.patience -= 1
             if self.patience <= 0:
                 self.patience_trace.append(self.patience)

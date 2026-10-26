@@ -24,7 +24,7 @@ from typing import Any, Literal
 from pydantic import Field, field_validator, model_validator
 
 from .catalog import StrictModel
-from .slots import CUSTOMER_SLOTS, Channel, InputMode, Outcome, normalize_outcome
+from .slots import CUSTOMER_SLOTS, Channel, InputMode, Outcome, btc_outcome, normalize_outcome
 
 Region = Literal["bac", "trung", "nam"]
 CallName = Literal["call_1", "call_2", "call_3"]
@@ -104,7 +104,10 @@ class CallSpec(StrictModel):
     expected_handoff_brief: dict[str, Any] | None = None
     # Tool calls of the ideal agent, executed on BTC mock_tools while planning: [{name, args, result}].
     oracle_tool_calls: list[dict[str, Any]] = Field(default_factory=list)
-    # Simulator configuration (pipeline-only; not exported to BTC files)
+    # Pipeline-only (not exported to BTC files): the call kind it was planned as, and the simulator's setup
+    kind: str | None = None
+    #: What the ideal agent tells the customer (products, alternatives, totals): the dialogue writer's brief.
+    agent_will_tell: dict[str, Any] = Field(default_factory=dict)
     simulator_persona_key: str | None = None
     patience_start: int | None = Field(default=None, ge=0)
 
@@ -129,6 +132,8 @@ class Scenario(StrictModel):
     scenario_id: str = Field(min_length=1)
     level: Literal["M1", "M2"] = "M2"
     persona: str = Field(min_length=1)
+    #: btc: a BTC persona (config/personas.yaml); advanced: the team's (config/personas_advanced.yaml).
+    persona_source: Literal["btc", "advanced"] = "btc"
     hard_case: str | None = None
     customer_id: str | None = None
     customer_phone: str = Field(min_length=1)
@@ -156,21 +161,57 @@ class Scenario(StrictModel):
         return list(self.calls.items())
 
     def btc_export(self) -> dict[str, Any]:
-        """Return the scenario in BTC ``scenario_format.md`` JSON shape."""
+        """The test case as BTC ships it (``data/sample/SAMPLE-0*.json``, ``schemas/scenario_format.md``).
+
+        Only what ``reference_eval.py`` and the agent under test read, in the samples' order. M2 fields
+        (channel, input mode, ASR lines, CRM history, memory expectation, fault) appear when they say
+        something; the expected briefs, the oracle's tool calls and the pipeline's own fields are written
+        elsewhere (``src/utils/dataset.py``).
+        """
         calls: dict[str, Any] = {}
         for name, call in self.calls.items():
-            payload = call.model_dump(
-                mode="json",
-                exclude={"simulator_persona_key", "patience_start", "success_if", "oracle_tool_calls"},
-                exclude_none=True,
-            )
-            payload = {key: value for key, value in payload.items() if value not in ([], {})}
+            payload: dict[str, Any] = {}
+            if call.channel != "hotline":
+                payload.update(channel=call.channel, channel_identity=call.channel_identity)
             if name == "call_1":
-                payload.pop("days_later", None)
+                payload["call_date"] = call.call_date.isoformat()
+            else:
+                payload["days_later"] = call.days_later
+            if call.input_mode != "text":
+                payload["input_mode"] = call.input_mode
+            payload.update(customer_goal=call.customer_goal, customer_turns=call.customer_turns)
+            optional = {"customer_turns_asr": call.customer_turns_asr, "seed_history": call.seed_history}
+            payload.update({key: value for key, value in optional.items() if value})
+            payload["facts_established"] = call.facts_established
+            payload.update({key: value for key, value in (("must_carry_over", call.must_carry_over),
+                                                          ("must_not_ask", call.must_not_ask)) if value})
             payload["success_if"] = call.success_if.export()
-            calls[name] = payload
-        header = self.model_dump(mode="json", exclude={"calls"}, exclude_none=True)
-        return {**header, "calls": calls}
+            payload["ground_truth_facts"] = call.ground_truth_facts
+            if call.memory_expectation:
+                payload["memory_expectation"] = call.memory_expectation
+            if call.fault_injection:
+                payload["fault_injection"] = call.fault_injection.model_dump(mode="json")
+            payload["expected_outcome"] = btc_outcome(call.expected_outcome)
+            calls[name] = {key: value for key, value in payload.items() if value is not None}
+        return {"scenario_id": self.scenario_id, "level": self.level, "persona": self.persona,
+                "hard_case": self.hard_case, "customer_phone": self.customer_phone,
+                "customer_name": self.customer_name, "honorific": self.honorific, "notes": self.notes,
+                "calls": calls}
+
+    def metadata(self) -> dict[str, Any]:
+        """The pipeline's own fields: everything :meth:`btc_export` leaves out, except briefs and tools.
+
+        ``outcome_detail`` keeps the pipeline's outcome where BTC's file says "khac" (cap_nhat_don, thong_tin, xoa_du_lieu).
+        """
+        return {"scenario_id": self.scenario_id, "persona_source": self.persona_source,
+                "customer_id": self.customer_id, "region": self.region, "category": self.category,
+                "difficulty": self.difficulty, "tags": self.tags, "metric_focus": self.metric_focus,
+                "calls": {name: {"kind": call.kind, "outcome_detail": call.expected_outcome,
+                                 "agent_will_tell": call.agent_will_tell,
+                                 "speaker_customer_id": call.speaker_customer_id,
+                                 "simulator_persona_key": call.simulator_persona_key,
+                                 "patience_start": call.patience_start}
+                          for name, call in self.calls.items()}}
 
 
 # --------------------------------------------------------------------------- #

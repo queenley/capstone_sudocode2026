@@ -36,7 +36,7 @@ _SLOTS = [
     Slot("size", "customer", True, True, "Size giày/áo khách mặc"),
     Slot("color", "customer", False, True, "Màu khách chọn"),
     Slot("quantity", "customer", False, False, "Số lượng muốn mua"),
-    Slot("payment", "customer", True, True, "Hình thức thanh toán: COD | chuyen_khoan"),
+    Slot("payment", "customer", True, True, "Hình thức thanh toán: COD | bank (chuyển khoản), như tools.schema.json"),
     Slot("delivery_area", "customer", True, True, "Quận/huyện + tỉnh giao hàng (không ghi số nhà)"),
     Slot("phone_provided", "customer", False, True, "Khách đã cung cấp SĐT (true) — không ghi số thật"),
     Slot("decision_maker", "customer", True, True, "Người quyết định mua (chồng, vợ, con gái…)"),
@@ -45,6 +45,8 @@ _SLOTS = [
     Slot("competitor_price_vnd", "customer", True, False, "Giá đối thủ khách nêu (VND)"),
     Slot("callback_time", "customer", False, False, "Thời điểm khách hẹn gọi lại"),
     Slot("preferred_channel", "customer", True, False, "Kênh liên hệ ưu tiên: hotline | zalo_oa | chat_fanpage"),
+    Slot("issue", "customer", True, True, "Lỗi/vấn đề khách gặp với sản phẩm đã mua (ngắn)"),
+    Slot("return_reason", "customer", False, False, "Lý do khách muốn trả hàng (ngắn)"),
     # --- Agent-established (injected from trusted catalog/pricing) --------
     Slot("product_advised", "agent", True, True, "SKU đã tư vấn"),
     Slot("variant_sku", "agent", True, True, "SKU biến thể (size/màu) đã chọn"),
@@ -72,12 +74,21 @@ STALE_AFTER_DAYS = 180
 OUTCOMES = ("hen_goi_lai", "chot_don", "chuyen_may", "tu_choi", "cap_nhat_don", "thong_tin", "xoa_du_lieu")
 Outcome = Literal["hen_goi_lai", "chot_don", "chuyen_may", "tu_choi", "cap_nhat_don", "thong_tin", "xoa_du_lieu"]
 ESCALATION_OUTCOME = "chuyen_may"
+#: The values BTC uses (scenario_format.md, call_brief.schema.json); the pipeline's finer outcomes are "khac" there.
+BTC_OUTCOMES = ("hen_goi_lai", "chot_don", "chuyen_may", "tu_choi", "khac")
+
+
+def btc_outcome(outcome: str) -> str:
+    """*outcome* as BTC names it: cap_nhat_don, thong_tin and xoa_du_lieu are "khac"."""
+    return outcome if outcome in BTC_OUTCOMES else "khac"
 
 # Legacy spellings produced by older prompts.
 OUTCOME_ALIASES = {"chot": "chot_don", "dat_hang": "chot_don", "hen_lai": "hen_goi_lai"}
 
 Channel = Literal["hotline", "zalo_oa", "chat_fanpage"]
-InputMode = Literal["text", "asr_transcript", "chat_teencode"]
+#: How the system receives the customer's words. Every mode but ``text`` comes with ``customer_turns_asr``:
+#: speech-recognition errors, chat teencode, chat without diacritics, or chat with typos.
+InputMode = Literal["text", "asr_transcript", "chat_teencode", "chat_khong_dau", "chat_sai_chinh_ta"]
 
 # Fields an agent may assert in ``claims`` and that the HR metric checks.
 CLAIM_FIELDS = (

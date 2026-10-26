@@ -20,10 +20,11 @@ from pathlib import Path
 from typing import Any
 
 from src.metrics.btc_metrics import has_positive_requirement
-from src.planning.personas import ESCALATION_TEMPTATION
+from src.planning.planner import ESCALATION_TEMPTATION
 from src.schemas.scenario import Scenario
-from src.utils.io import iter_models
-from src.utils.paths import AUDIO_DIR, CONVERSATIONS_DIR, GOLDEN_DIR, OUTPUT_DIR, REPORTS_DIR, SCENARIOS_INTERNAL_DIR
+from src.utils.dataset import Dataset
+from src.utils.paths import AUDIO_DIR, GOLDEN_MANIFEST, REPORTS_DIR
+from src.utils.settings import load_settings
 
 METRIC_HELP = {
     "CCR": "Context carry-over — slots the agent must reuse (must_carry_over)",
@@ -36,12 +37,13 @@ METRIC_HELP = {
 
 def coverage(scenarios: list[Scenario]) -> tuple[dict[str, Any], dict[str, Counter]]:
     c: dict[str, Counter] = {name: Counter() for name in (
-        "persona", "hard_case", "variant", "region", "category", "category_region", "expected_outcome", "channel", "input_mode",
+        "persona_source", "persona", "hard_case", "variant", "region", "category", "category_region", "expected_outcome", "channel", "input_mode",
         "metric_focus", "calls_per_scenario", "must_carry_over", "must_not_ask", "success_if_checks",
         "forbidden_claim_fields", "ground_truth_facts_keys", "facts_established_keys")}
     m = Counter()
     for s in scenarios:
         top = s.category.split("/")[0]
+        c["persona_source"][s.persona_source] += 1
         c["persona"][s.persona] += 1
         c["hard_case"][s.hard_case or "(none)"] += 1
         c["variant"][next((t.split(":", 1)[1] for t in s.tags if t.startswith("variant:")), "?")] += 1
@@ -85,7 +87,7 @@ def coverage(scenarios: list[Scenario]) -> tuple[dict[str, Any], dict[str, Count
 
 def reference_scores() -> dict[str, Any] | None:
     """Official reference_eval summaries written by ``build_ground_truth`` (oracle + reference transcripts)."""
-    path = OUTPUT_DIR / "ground_truth" / "summary.json"
+    path = REPORTS_DIR / "ground_truth_summary.json"
     if not path.exists():
         return None
     summary = json.loads(path.read_text(encoding="utf-8"))
@@ -158,12 +160,28 @@ Refresh with <code>python -m src.pipeline.summarize_dataset</code>.</p>
 </body></html>'''
 
 
+def m2_targets(scenarios: list[Scenario], audio_seconds: float) -> dict[str, Any]:
+    """BTC M2 volume targets this dataset is generated for (config/settings.yaml generation.*)."""
+    generation = load_settings()["generation"]
+    channels: dict[str, set[str]] = {}
+    for s in scenarios:
+        for _, call in s.ordered_calls():
+            channels.setdefault(call.speaker_customer_id or s.customer_id or s.customer_phone, set()).add(call.channel)
+    multi = sum(len(found) >= 2 for found in channels.values())
+    hours = round(audio_seconds / 3600, 2)
+    return {"multi_channel_customers": {"current": multi, "required": generation["multi_channel_customers_target"],
+                                        "ok": multi >= generation["multi_channel_customers_target"]},
+            "audio_hours": {"current": hours, "required": generation["audio_hours_target"],
+                            "ok": hours >= generation["audio_hours_target"]}}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--output", type=Path, default=REPORTS_DIR / "dataset_statistics.json")
     args = parser.parse_args()
 
-    scenarios = [s for _, s in iter_models(sorted(SCENARIOS_INTERNAL_DIR.glob("SCN-GEN-*.json")), Scenario)]
+    dataset = Dataset()
+    scenarios = list(dataset.iter_scenarios())
     summary, counters = coverage(scenarios)
     voices = Counter()
     audio_meta = sorted(AUDIO_DIR.glob("scenarios_*/call_*/turn_*.json"))
@@ -175,16 +193,22 @@ def main() -> None:
         if voice:
             voices[voice] += 1
     counters["voice_id"] = voices
-    golden_path = GOLDEN_DIR / "manifest.json"
-    golden = json.loads(golden_path.read_text(encoding="utf-8")) if golden_path.exists() else {}
+    golden = json.loads(GOLDEN_MANIFEST.read_text(encoding="utf-8")) if GOLDEN_MANIFEST.exists() else {}
+    audio_seconds = 0.0
+    for path in audio_meta:
+        try:
+            audio_seconds += float(json.loads(path.read_text(encoding="utf-8")).get("duration_seconds") or 0)
+        except (OSError, ValueError):
+            continue
 
     stats = {
         "totals": {
             "scenarios": len(scenarios), "calls": summary["calls"], "customer_turns": summary["customer_turns"],
-            "conversations": len(list(CONVERSATIONS_DIR.glob("*__call_*.json"))),
+            "conversations": len(dataset.conversation_paths()),
             "audio_turns": len(list(AUDIO_DIR.glob("scenarios_*/call_*/turn_*.wav"))),
             "golden_conversations": len(golden.get("conversation_ids", [])),
         },
+        "m2_targets": m2_targets(scenarios, audio_seconds),
         "metric_coverage": summary["metric_coverage"],
         "reference_scores": reference_scores(),
         **{key: dict(counter) for key, counter in counters.items()},

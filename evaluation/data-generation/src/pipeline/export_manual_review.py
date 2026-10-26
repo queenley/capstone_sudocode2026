@@ -8,7 +8,7 @@ Export (default)::
 Fill ``approve`` with Y/N in a spreadsheet, then ingest::
 
     python -m src.pipeline.export_manual_review --ingest
-    -> output/review/approved.csv, rejected.csv, output/golden/manifest.json
+    -> output/review/approved.csv, rejected.csv, output/review/golden_manifest.json
 
 Golden rule: ``validator_pass`` AND (judge pass without review flag OR human Y).
 A human can never override a rule failure; a human N always removes the record.
@@ -21,7 +21,10 @@ import json
 from pathlib import Path
 from typing import Any
 
-from src.utils.paths import CONVERSATIONS_DIR, GOLDEN_DIR, JUDGMENTS_DIR, REVIEW_DIR, SCENARIOS_INTERNAL_DIR, VALIDATION_JSON
+from src.utils.dataset import Dataset
+from src.utils.paths import GOLDEN_MANIFEST, REVIEW_DIR, VALIDATION_JSON
+
+DATASET = Dataset()
 
 FIELDS = ["conversation_id", "scenario_id", "call", "persona", "reason", "transcript_preview", "transcript_path",
           "approve", "notes"]
@@ -40,7 +43,7 @@ def export(records: list[dict[str, Any]], target: Path) -> int:
     rows = []
     for item in records:
         cid = item["conversation_id"]
-        verdict = _read_json(JUDGMENTS_DIR / f"{cid}.json")
+        verdict = _read_json(DATASET.judgment_file(cid))
         if item["validator_pass"] and not item.get("needs_manual_review") and _judge_ok(verdict):
             continue  # automatically golden
         reasons = list(item.get("errors", []))
@@ -48,10 +51,10 @@ def export(records: list[dict[str, Any]], target: Path) -> int:
             reasons.append(verdict.get("reasons") or "judge_requested_manual_review")
         if not verdict:
             reasons.append("judge_missing")
-        conversation_path = CONVERSATIONS_DIR / f"{cid}.json"
+        conversation_path = DATASET.conversation_file(cid)
         conversation = _read_json(conversation_path)
         preview = " | ".join(f"{t.get('speaker', '?')}: {t.get('text', '')}" for t in conversation.get("turns", []))
-        scenario = _read_json(SCENARIOS_INTERNAL_DIR / f"{item['scenario_id']}.json")
+        scenario = _read_json(DATASET.scenarios_dir / f"{item['scenario_id']}.json")
         rows.append({"conversation_id": cid, "scenario_id": item["scenario_id"], "call": item.get("call", ""),
                      "persona": scenario.get("persona", ""), "reason": "; ".join(reasons) or "risk_persona",
                      "transcript_preview": preview[:PREVIEW_CHARS], "transcript_path": str(conversation_path),
@@ -82,12 +85,11 @@ def ingest(records: list[dict[str, Any]], target: Path) -> int:
         cid = item["conversation_id"]
         if not item["validator_pass"] or decision.get(cid) == "N":
             continue
-        if _judge_ok(_read_json(JUDGMENTS_DIR / f"{cid}.json")) and not item.get("needs_manual_review") \
+        if _judge_ok(_read_json(DATASET.judgment_file(cid))) and not item.get("needs_manual_review") \
                 or decision.get(cid) == "Y":
             golden.append(cid)
-    GOLDEN_DIR.mkdir(parents=True, exist_ok=True)
     scenario_ids = sorted({cid.split("__")[0] for cid in golden})
-    (GOLDEN_DIR / "manifest.json").write_text(json.dumps(
+    GOLDEN_MANIFEST.write_text(json.dumps(
         {"conversation_ids": golden, "scenario_ids": scenario_ids}, ensure_ascii=False, indent=2), encoding="utf-8")
     return len(golden)
 
@@ -104,7 +106,7 @@ def main() -> None:
     if args.ingest:
         if not target.exists():
             parser.error(f"{target} not found; run without --ingest first")
-        print(f"Golden manifest: {ingest(records, target)} conversations -> {GOLDEN_DIR / 'manifest.json'}")
+        print(f"Golden manifest: {ingest(records, target)} conversations -> {GOLDEN_MANIFEST}")
     else:
         print(f"Exported {export(records, target)} cases for review -> {target}")
 

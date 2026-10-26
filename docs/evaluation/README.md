@@ -56,10 +56,10 @@ Quy trình:
 
 ```powershell
 cd evaluation/data-generation
-python -m src.pipeline.run_all --plan-only --limit 120     # kịch bản + nhãn + kiểm tra oracle, không tốn API
+python -m src.pipeline.run_all --plan-only               # kịch bản + nhãn + kiểm tra oracle, không tốn API
 # chạy agent trên các kịch bản (chế độ đầy đủ và memory_enabled=false), xuất trace JSONL
 python ../../apps/ai-agent-service/data/btc/eval/reference_eval.py `
-  --scenarios output/test_set --trace runs/full.jsonl --baseline runs/no_memory.jsonl --out report.json
+  --scenarios output/scenarios --trace runs/full.jsonl --baseline runs/no_memory.jsonl --out report.json
 ```
 
 Phần `comparison` trong `report.json` cho biết đã đạt ngưỡng của BTC chưa: RQR giảm ≥ 40% so với baseline, TSR ≥ 70%, HR về giá/khuyến mãi ≤ 5%.

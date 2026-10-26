@@ -207,9 +207,9 @@ Một clip chỉ được giữ khi đạt **tất cả** các điều kiện sa
 | Điều kiện | Lý do loại |
 |---|---|
 | Có file `.wav` cạnh file `.json` | `wav_missing` |
-| Kịch bản, cuộc gọi và lượt vẫn còn trong `evaluation/data-generation/output/scenarios_internal/` | `scenario_missing`, `call_missing`, `turn_out_of_range` (clip cũ của bản kịch bản trước) |
+| Kịch bản, cuộc gọi và lượt vẫn còn trong `evaluation/data-generation/output/scenarios/` | `scenario_missing`, `call_missing`, `turn_out_of_range` (clip cũ của bản kịch bản trước) |
 | Câu trong `.json` trùng đúng lượt nói hiện tại của kịch bản | `text_changed` (audio cũ, kịch bản đã sinh lại) |
-| Không phải `input_mode: chat_teencode` (chữ chat như "ko", "dc", người gọi không nói vậy) | `not_speech` |
+| Không phải chữ gõ chat (`chat_teencode`, `chat_khong_dau`, `chat_sai_chinh_ta`: người gọi không nói vậy) | `not_speech` |
 | WAV đọc được, PCM16 mono 16 kHz, không rỗng, dài đúng `duration_seconds` ± 0,05 s | `wav_unreadable`, `wav_format`, `wav_empty`, `wav_length_mismatch` |
 
 Lệnh không bao giờ ghi đè một bộ đã có. Muốn tạo lại thì dùng `--set-id` mới. Riêng bộ chưa được lần chạy nào dùng thì xóa thư mục rồi chạy lại. Bộ mới phải được thêm vào `asr_sets` trong `datasets/registry.json`.

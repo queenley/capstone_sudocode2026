@@ -1,0 +1,43 @@
+{
+  "scenario_id": "SCN-GEN-0002",
+  "persona_source": "btc",
+  "customer_id": "C032",
+  "region": "trung",
+  "category": "me-be",
+  "difficulty": "normal",
+  "tags": [
+    "address_change",
+    "customer_service",
+    "order",
+    "order_status",
+    "shipping_update",
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "order_status",
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_co_don_chua_co_lich_su",
+      "patience_start": 4,
+      "agent_will_tell": {
+        "order_status": "shipping",
+        "tracking": "GHN7781234"
+      }
+    },
+    "call_2": {
+      "kind": "address_change",
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_co_don_chua_co_lich_su",
+      "patience_start": 3,
+      "agent_will_tell": {
+        "order_status": "shipping",
+        "tracking": "GHN7781234"
+      }
+    }
+  }
+}

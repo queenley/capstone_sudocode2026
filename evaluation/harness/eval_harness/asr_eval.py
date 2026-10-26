@@ -32,12 +32,13 @@ REPOSITORY = EVALUATION.parents[1]
 CREATE_DATA = REPOSITORY / "evaluation/data-generation"
 SERVICE_SRC = REPOSITORY / "apps/ai-agent-service/src"
 AUDIO_ROOT = CREATE_DATA / "output/audio"
-SCENARIOS_DIR = CREATE_DATA / "output/scenarios_internal"
+#: The test cases (BTC format); their region is in the metadata/ folder beside them (data-generation dataset.py).
+SCENARIOS_DIR = CREATE_DATA / "output/scenarios"
 DATASETS = EVALUATION / "datasets"
 DEFAULT_SET = "asr-team-v2"
 RATE = 16_000
-#: Typed chat slang ("ko", "dc", "bn"): the clip reads it aloud, no caller says it.
-NOT_SPEECH = {"chat_teencode"}
+#: Typed chat (teencode, no diacritics, typos): the clip reads it aloud, no caller says it.
+NOT_SPEECH = {"chat_teencode", "chat_khong_dau", "chat_sai_chinh_ta"}
 BTC_GROUND_TRUTH = EVALUATION / "evaluation-contracts/sources/btc/asr/ground_truth.json"
 
 
@@ -109,6 +110,9 @@ def build_set(out=None, *, audio_root=AUDIO_ROOT, scenarios_dir=SCENARIOS_DIR, s
             scenarios[sid] = json.loads(source.read_text(encoding="utf-8")) if source.is_file() else None
             if scenarios[sid] is not None:
                 used[source.name] = _sha256(source)
+                metadata = scenarios_dir.parent / "metadata" / source.name
+                if metadata.is_file():
+                    scenarios[sid].setdefault("region", json.loads(metadata.read_text(encoding="utf-8")).get("region"))
         scenario = scenarios[sid]
         wav = meta_path.with_suffix(".wav")
         turns = (scenario or {}).get("calls", {}).get(call, {}).get("customer_turns", [])
@@ -170,7 +174,7 @@ def build_set(out=None, *, audio_root=AUDIO_ROOT, scenarios_dir=SCENARIOS_DIR, s
                    "spoken_py_sha256": _sha256(CREATE_DATA / "src/asr/spoken.py"),
                    "entities_py_sha256": _sha256(CREATE_DATA / "src/asr/entities.py")},
         "rules": ["WAV exists, PCM16 mono 16 kHz, nonempty, length = duration_seconds ± 0.05 s",
-                  "scenario, call and turn exist in the current scenarios_internal file",
+                  "scenario, call and turn exist in the current scenarios file",
                   "clip text == that customer turn (otherwise the audio is stale)",
                   "input_mode chat_teencode dropped (typed slang, not speech)"],
         "reference": "full_text = to_spoken(source_text); entities = entities.extract(full_text). Both are "

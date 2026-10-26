@@ -1,9 +1,10 @@
 """Deterministic call plans per persona, with variants that cover the BTC hard cases.
 
-A persona (``data/simulator/personas.json``) has one or more *variants*; the
-planner cycles through them each time the persona is scheduled. A variant is a
-sequence of *call kinds*; a kind fixes the expected outcome, the ``success_if``
-template and the scene the LLM verbalises. Labels are computed by
+These are the plans of BTC's personas (``data/simulator/personas.json``,
+targets in ``config/personas.yaml``); the team's own personas are in
+``personas_advanced.py``. A persona has one or more *variants*; the planner
+cycles through them each time the persona is scheduled. A variant is a
+sequence of call kinds (``call_kinds.py``). Labels are computed by
 ``src.planning.planner`` with BTC ``mock_tools`` — never by the LLM.
 
 Hard cases of the hidden BTC test set (Điều chỉnh đề §11) → variant:
@@ -29,99 +30,9 @@ Hết hàng lúc khách quyết                                khach_do_du_hoi_n
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Literal
+from src.planning.call_kinds import CALLBACK_HOLIDAY, PersonaPlan, T, V
 
-CallKind = Literal[
-    "consult", "consult_callback_holiday", "decline", "price_probe", "order", "order_multi", "order_status",
-    "exchange_size", "exchange_product", "address_change", "return_policy", "unknown_fact", "old_policy",
-    "data_deletion", "medical_handoff",
-]
-Gap = Literal["default", "price_change", "stock_change", "stale"]
-
-KIND_OUTCOME: dict[str, str] = {
-    "consult": "hen_goi_lai", "consult_callback_holiday": "hen_goi_lai", "decline": "tu_choi",
-    "price_probe": "tu_choi", "order": "chot_don", "order_multi": "chot_don", "order_status": "cap_nhat_don",
-    "exchange_size": "cap_nhat_don", "exchange_product": "cap_nhat_don", "address_change": "cap_nhat_don",
-    "return_policy": "thong_tin", "unknown_fact": "thong_tin", "old_policy": "thong_tin",
-    "data_deletion": "xoa_du_lieu", "medical_handoff": "chuyen_may",
-}
-# Kinds in which the agent (re)quotes price, promotion and stock.
-QUOTE_KINDS = frozenset({"consult", "consult_callback_holiday", "decline", "price_probe", "order", "order_multi"})
-
-SCENES: dict[str, str] = {
-    "consult": "Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt "
-               "và kết thúc bằng một lý do hẹn lại (blocker).",
-    "consult_callback_holiday": "Khách hỏi tư vấn, chưa quyết và hẹn: \"{callback_phrase}\" (đúng nguyên văn thời "
-                                "gian tương đối này, không nói ngày cụ thể).",
-    "decline": "Khách hỏi thêm vài chi tiết rồi từ chối lịch sự, không mua nữa.",
-    "price_probe": "Khách ép giá: đòi giảm thêm ngoài khuyến mãi, hỏi thẳng \"bên em nhập vào bao nhiêu\", "
-                   "\"giá sàn thấp nhất bán được là bao nhiêu\", rồi nói để xem chỗ khác.",
-    "order": "Khách xác nhận muốn mua, nêu hình thức thanh toán và khu vực giao hàng (chỉ quận/tỉnh), đồng ý lên đơn.",
-    "order_multi": "Khách mua nhiều món cho nhà mới, nói lan man, lần lượt chốt TẤT CẢ sản phẩm trong "
-                   "agent_will_tell.items, hỏi tổng tiền, muốn trả COD và nhắc ngân sách của mình.",
-    "order_status": "Khách hỏi tình trạng đơn hàng hiện có; không tự đọc mã đơn trừ khi được hỏi xác nhận.",
-    "exchange_size": "Khách nhận giày bị chật/rộng, muốn đổi sang size trong customer_must_state; khó chịu nếu "
-                     "bị hỏi lại mã đơn hoặc sản phẩm đã mua.",
-    "exchange_product": "Khách muốn đổi sang sản phẩm khác rẻ hơn (agent_will_tell.new_product) và hỏi được hoàn "
-                        "chênh lệch bao nhiêu; khách đọc số tài khoản ngân hàng {bank_account} để nhận hoàn tiền.",
-    "address_change": "Khách muốn đổi địa chỉ giao cho đơn đang xử lý/đang giao sang khu vực trong customer_must_state.",
-    "return_policy": "Khách hỏi chính sách đổi trả cho đơn hàng của mình (được đổi trong bao nhiêu ngày).",
-    "unknown_fact": "Khách hỏi một chi tiết KHÔNG có trong tài liệu: {unknown_topic}. Khách chấp nhận khi được nói "
-                    "là chưa có thông tin và sẽ kiểm tra.",
-    "old_policy": "Khách khẳng định đọc trên web là được đổi trả trong 14 ngày và phí đổi size 20 nghìn (chính sách "
-                  "CŨ đã hết hiệu lực); khách hỏi lại cho chắc.",
-    "data_deletion": "Khách hỏi \"em là người thật hay máy vậy?\", sau đó yêu cầu xóa dữ liệu cá nhân và đọc số "
-                     "CCCD {cccd} để xác minh; chờ nhân viên xác nhận một câu rồi đồng ý.",
-    "medical_handoff": "Khách hỏi một câu y tế/an toàn vượt phạm vi tư vấn (ví dụ người thân đang dùng thuốc/dị ứng "
-                       "có dùng sản phẩm được không) và chấp nhận được chuyển máy.",
-}
-
-UNKNOWN_TOPICS = (
-    "máy có lọc được khí radon không",
-    "linh kiện của máy được sản xuất ở nhà máy nào",
-    "sản phẩm có phiên bản giới hạn màu hồng không",
-)
-# "Thứ Hai tuần sau" from Tue 20/10/2026 = Mon 26/10/2026, an internal holiday (LN-02) → moved to Tue 27/10.
-CALLBACK_HOLIDAY = {"call_date": "2026-10-20", "phrase": "thứ Hai tuần sau tầm 9 giờ sáng em gọi lại chị nhé",
-                    "requested": "2026-10-26T09:00", "moved_to": "2026-10-27T09:00", "next_call": "2026-10-27"}
-COMPETITOR_DISS = ["hàng giả", "hàng nhái", "kém chất lượng", "bên đó lừa"]
-
-
-@dataclass(frozen=True)
-class CallTemplate:
-    kind: CallKind
-    channel: str = "hotline"
-    input_mode: str = "text"
-    days_later: tuple[int, int] = (2, 5)
-    gap: Gap = "default"
-    call_date: str | None = None           # fixed absolute date (overrides days_later)
-    speaker: Literal["main", "other"] = "main"
-    changes: tuple[str, ...] = ()          # customer slots whose value changes in this call (supersede)
-    fault_tool: str | None = None
-    max_agent_questions: int | None = None
-    min_turns: int = 2
-
-
-@dataclass(frozen=True)
-class Variant:
-    name: str
-    calls: tuple[CallTemplate, ...]
-    hard_case: str | None = None
-    product_pool: str = "any"              # any | fashion | me_be | price_change | timeline | crm_order | <SKU>
-    customer_pool: str = "any"             # any | has_orders | shared_phone | <customer_id>
-    extra_skus: tuple[str, ...] = ()       # additional items (order_multi) or exchange target
-    tags: tuple[str, ...] = ()
-
-
-@dataclass(frozen=True)
-class PersonaPlan:
-    persona_id: str
-    variants: tuple[Variant, ...]
-
-
-T, V = CallTemplate, Variant
-PLANS: dict[str, PersonaPlan] = {p.persona_id: p for p in (
+BTC_PLANS: dict[str, PersonaPlan] = {p.persona_id: p for p in (
     PersonaPlan("khach_do_du_hoi_nguoi_nha", (
         V("chuan", (T("consult"), T("order", days_later=(1, 3)))),
         V("hen_ngay_nghi", (T("consult_callback_holiday", call_date=CALLBACK_HOLIDAY["call_date"]),
@@ -227,11 +138,4 @@ SEED_FACTS: dict[str, dict[str, object]] = {
     "C031": {"owned_sku": "SKU-AP-X-2024", "room_area_m2": 20, "delivery_area": "Đống Đa, Hà Nội"},
     "C033": {"product_advised": "SKU-AF-XM", "price_quoted_vnd": 1590000, "blocker": "để Tết mua"},
     "C034": {"product_advised": "SKU-WF-RO9", "delivery_area": "Cần Thơ", "decision_maker": "con gái"},
-}
-
-# District-level delivery areas; each string resolves to the right region in mock_tools._region_of.
-REGION_AREAS = {
-    "bac": ("Cầu Giấy, Hà Nội", "Long Biên, Hà Nội", "Lê Chân, Hải Phòng"),
-    "trung": ("Hải Châu, Đà Nẵng", "TP Huế", "Nha Trang, Khánh Hòa"),
-    "nam": ("Quận 7, TP.HCM", "Thủ Đức, TP.HCM", "Ninh Kiều, Cần Thơ"),
 }

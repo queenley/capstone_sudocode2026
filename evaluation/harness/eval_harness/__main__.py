@@ -62,7 +62,7 @@ def main(argv=None):
     asr_build = commands.add_parser("asr-build", help="Filter create_data's scenario audio into a new ASR set under datasets/; no model")
     asr_build.add_argument("--set-id", default="asr-team-v2", help="New set directory name under datasets/ (never overwritten)")
     asr_build.add_argument("--audio", type=Path, help="Clip folder (default: evaluation/data-generation/output/audio)")
-    asr_build.add_argument("--scenarios", type=Path, help="Current scenarios (default: evaluation/data-generation/output/scenarios_internal)")
+    asr_build.add_argument("--scenarios", type=Path, help="Current scenarios (default: evaluation/data-generation/output/scenarios)")
     asr_build.add_argument("--restore", action="store_true", help="Copy back the WAVs of an existing set (a fresh clone), hash-checked")
     asr = commands.add_parser("asr", help="ASR set through the ASR service; BTC wer_cer on raw and lexicon-corrected text")
     asr.add_argument("--set", default="asr-team-v2", help="ASR set under datasets/")

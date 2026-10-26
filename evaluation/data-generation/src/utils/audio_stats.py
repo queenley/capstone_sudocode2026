@@ -20,7 +20,10 @@ from pathlib import Path
 from typing import Any
 
 from src.utils.crm import load_customers
-from src.utils.paths import AUDIO_DIR, CONVERSATIONS_DIR, SCENARIOS_INTERNAL_DIR
+from src.utils.dataset import Dataset
+from src.utils.paths import AUDIO_DIR
+
+DATASET = Dataset()
 
 UNKNOWN = "unknown"
 MALE_HONORIFICS = {"anh", "chú", "ông", "em trai", "bác trai"}
@@ -34,19 +37,19 @@ def _read(path: Path) -> dict[str, Any]:
 
 
 def _scenario_info(scenario_id: str, cache: dict[str, dict], customers: dict[str, Any]) -> dict[str, Any]:
-    """customer_id, persona and per-call channel/input_mode; tolerant of the pre-v2 schema."""
+    """customer_id, persona and per-call channel/input_mode/speaker of a scenario."""
     if scenario_id not in cache:
-        raw = _read(SCENARIOS_INTERNAL_DIR / f"{scenario_id}.json")
-        calls = raw.get("calls") or {name: raw[name] for name in ("call_1", "call_2", "call_3") if raw.get(name)}
-        customer = raw.get("customer_id") or (calls.get("call_1", {}).get("ground_truth_facts") or {}).get("customer_id")
-        # Pre-v2 scenarios had no per-call channel; the old dialogue stage stored one per scenario.
-        legacy_channel = _read(CONVERSATIONS_DIR / f"{scenario_id}.json").get("channel", UNKNOWN)
+        raw = _read(DATASET.scenarios_dir / f"{scenario_id}.json")
+        meta = _read(DATASET.metadata_dir / f"{scenario_id}.json")
+        calls = {name: {**call, **(meta.get("calls") or {}).get(name, {})} for name, call in (raw.get("calls") or {}).items()}
+        customer = meta.get("customer_id")
+        default_channel = "hotline"   # btc_export omits the channel of a hotline call
         cache[scenario_id] = {
             "customer_id": customer or UNKNOWN,
             "customer_name": raw.get("customer_name"),
-            "region": raw.get("region", UNKNOWN),
+            "region": meta.get("region", UNKNOWN),
             "persona": raw.get("persona", UNKNOWN),
-            "channels": {name: call.get("channel", legacy_channel) for name, call in calls.items()},
+            "channels": {name: call.get("channel", default_channel) for name, call in calls.items()},
             "input_modes": {name: call.get("input_mode", "text") for name, call in calls.items()},
             "genders": {name: ("male" if (customers.get(call.get("speaker_customer_id") or customer) and
                                               customers[call.get("speaker_customer_id") or customer].honorific.lower() in MALE_HONORIFICS)

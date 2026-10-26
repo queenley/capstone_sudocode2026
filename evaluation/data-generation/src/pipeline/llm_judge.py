@@ -6,7 +6,7 @@ the BTC ``judge_prompt_template`` is filled with the scenario JSON, the agent
 transcript and those criteria, and the model returns PASS/FAIL + one evidence
 quote per criterion. Rule failures from ``validate_rules`` always force manual review.
 
-Output: ``output/judgments/<conversation_id>.json``. Human agreement (Cohen's kappa,
+Output: ``output/judgments/scenarios_<scenario_id>/<call>.json``. Human agreement (Cohen's kappa,
 ≥ 20 samples) is measured with ``python -m src.pipeline.judge_agreement``.
 """
 from __future__ import annotations
@@ -15,12 +15,13 @@ import argparse
 import json
 
 from src.pipeline.validate_rules import needs_review
-from src.schemas.conversation import AgentTurn, Conversation, split_conversation_id
+from src.schemas.conversation import AgentTurn, Conversation
 from src.schemas.review import JudgeOutput, JudgeVerdict
 from src.schemas.scenario import Scenario
-from src.utils.io import iter_models, load_model, write_json
+from src.utils.dataset import Dataset
+from src.utils.io import write_json
 from src.utils.memory import known_facts_before
-from src.utils.paths import CONVERSATIONS_DIR, DATA_DIR, JUDGMENTS_DIR, SCENARIOS_INTERNAL_DIR, VALIDATION_JSON
+from src.utils.paths import DATA_DIR, VALIDATION_JSON
 from src.utils.settings import load_settings, model_client, sampling
 from src.utils.quota import DailyLimitReached, stop_on_daily_limit
 
@@ -75,17 +76,15 @@ def main() -> None:
 
     judged = 0
     skipped: list[str] = []
-    paths = sorted(CONVERSATIONS_DIR.glob("*__call_*.json"))[:args.limit]
-    for _, conversation in iter_models(paths, Conversation):
-        cid = conversation.conversation_id
-        dest = JUDGMENTS_DIR / f"{cid}.json"
+    dataset = Dataset()
+    for conversation in dataset.iter_conversations(args.limit):
+        cid, scenario_id, call_name = conversation.conversation_id, conversation.scenario_id, conversation.call
+        dest = dataset.judgment_path(scenario_id, call_name)
         if args.resume and dest.exists():
             continue
-        scenario_id, call_name = split_conversation_id(cid)
-        scenario_path = SCENARIOS_INTERNAL_DIR / f"{scenario_id}.json"
-        if not scenario_path.exists():
+        scenario = dataset.scenario(scenario_id)
+        if scenario is None:
             continue
-        scenario = load_model(scenario_path, Scenario)
         applied = applicable_criteria(scenario, call_name)
         scenario_json = {"customer_goal": scenario.calls[call_name].customer_goal,
                          "facts_from_previous_sessions": known_facts_before(scenario, call_name),
@@ -115,7 +114,7 @@ def main() -> None:
             reasons="; ".join([*(f"FAIL {c}" for c in failed), *(f"missing {c}" for c in missing),
                                *(["rule failures"] if rule_failed else [])])))
         judged += 1
-    print(f"Judged {judged} conversations -> {JUDGMENTS_DIR}")
+    print(f"Judged {judged} conversations -> {dataset.root / 'judgments'}")
     if skipped:
         print(f"{len(skipped)} conversation(s) not judged ({', '.join(skipped)}); rerun with --resume.", flush=True)
 

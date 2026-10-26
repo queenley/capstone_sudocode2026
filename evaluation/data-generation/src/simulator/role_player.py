@@ -1,6 +1,5 @@
 from __future__ import annotations
 import json
-from pathlib import Path
 from typing import Any
 from src.schemas.simulator import CustomerReply
 from src.utils.pii import redact_contacts
@@ -10,9 +9,9 @@ class CustomerRolePlayer:
 
     ``client`` is any structured-output client from ``src.providers`` (role ``simulator``).
     """
-    def __init__(self, persona_path: Path, client: Any):
-        raw=json.loads(persona_path.read_text(encoding="utf-8"))
-        self.personas={p["persona_id"]:p for p in raw["personas"]}
+    def __init__(self, personas: dict[str, dict[str, Any]], client: Any):
+        """*personas*: persona id -> profile (``src.planning.persona_config.load_profiles``)."""
+        self.personas=personas
         self.client=client
 
     def reply(self, persona_id: str, safe_context: dict[str, Any], agent_turn: dict[str, Any]) -> str:

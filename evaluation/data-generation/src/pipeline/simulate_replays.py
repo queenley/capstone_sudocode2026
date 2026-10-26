@@ -16,13 +16,12 @@ import json
 
 from src.ground_truth.traces import conversation_rows
 from src.metrics.btc_metrics import check_call, has_positive_requirement
-from src.schemas.conversation import Conversation, split_conversation_id
-from src.schemas.scenario import Scenario
+from src.planning.persona_config import load_profiles
 from src.simulator.engine import SimulatorState
 from src.simulator.role_player import CustomerRolePlayer
-from src.utils.io import iter_models, load_model
+from src.utils.dataset import Dataset
 from src.utils.memory import known_facts_before
-from src.utils.paths import CONVERSATIONS_DIR, PERSONAS_JSON, SCENARIOS_INTERNAL_DIR, SIMULATIONS_DIR
+from src.utils.paths import SIMULATION_REPLAYS
 from src.utils.settings import load_settings, model_client
 from src.utils.quota import stop_on_daily_limit
 
@@ -46,20 +45,19 @@ def main() -> None:
 
     settings = load_settings()
     seed_base = int(settings["generation"]["seed"])
-    personas = {p["persona_id"]: p for p in json.loads(PERSONAS_JSON.read_text(encoding="utf-8"))["personas"]}
-    role_player = CustomerRolePlayer(PERSONAS_JSON, model_client("simulator", settings)) if args.llm else None
+    personas = load_profiles()
+    role_player = CustomerRolePlayer(personas, model_client("simulator", settings)) if args.llm else None
 
-    output = SIMULATIONS_DIR / "replay.jsonl"
+    output = SIMULATION_REPLAYS
+    dataset = Dataset()
     output.parent.mkdir(parents=True, exist_ok=True)
     written = 0
-    scenarios: dict[str, Scenario] = {}
     with output.open("w", encoding="utf-8") as stream:
-        for _, conversation in iter_models(sorted(CONVERSATIONS_DIR.glob("*__call_*.json"))[:args.limit], Conversation):
-            scenario_id, call_name = split_conversation_id(conversation.conversation_id)
-            path = SCENARIOS_INTERNAL_DIR / f"{scenario_id}.json"
-            if not path.exists():
+        for conversation in dataset.iter_conversations(args.limit):
+            call_name = conversation.call
+            scenario = dataset.scenario(conversation.scenario_id)
+            if scenario is None:
                 continue
-            scenario = scenarios.setdefault(scenario_id, load_model(path, Scenario))
             call = scenario.calls.get(call_name)
             persona = personas.get(call.simulator_persona_key or scenario.persona) if call else None
             if call is None or persona is None:

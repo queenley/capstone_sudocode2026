@@ -66,12 +66,17 @@ def official_customers():
     return {c["customer_id"] for c in customers}
 
 
-def convert(source, customers, payment_vocabulary=False):
-    """``(scenario, changes, None)``, or ``(None, [], reason)`` when it cannot run."""
+def convert(source, customers, payment_vocabulary=False, customer_id=None):
+    """``(scenario, changes, None)``, or ``(None, [], reason)`` when it cannot run.
+
+    *customer_id* is the scenario's customer when the source keeps it apart (the generator's
+    ``metadata/``); a caller the CRM has never seen (``ANON-*``) is meant to be unknown.
+    """
     scenario = copy.deepcopy(source)
     sid = scenario.get("scenario_id")
-    if scenario.get("customer_id") and scenario["customer_id"] not in customers:
-        return None, [], {"code": "CUSTOMER_NOT_IN_PINNED_CRM", "customer_id": scenario["customer_id"]}
+    customer_id = customer_id or scenario.get("customer_id")
+    if customer_id and not customer_id.startswith("ANON-") and customer_id not in customers:
+        return None, [], {"code": "CUSTOMER_NOT_IN_PINNED_CRM", "customer_id": customer_id}
     changes = []
     for key, default in (("hard_case", None), ("notes", "")):
         if key not in scenario:
@@ -137,7 +142,10 @@ def main(argv=None):
     prepared, labels, files, excluded = {}, {}, [], []
     for path in sorted(source.glob("*.json")):
         raw = path.read_bytes()
-        scenario, changes, reason = convert(json.loads(raw), customers, payment_vocabulary=args.payment_vocabulary)
+        metadata = path.parent.parent / "metadata" / path.name
+        customer_id = json.loads(metadata.read_text(encoding="utf-8")).get("customer_id") if metadata.is_file() else None
+        scenario, changes, reason = convert(json.loads(raw), customers, payment_vocabulary=args.payment_vocabulary,
+                                            customer_id=customer_id)
         record = {"source": path.relative_to(ROOT.parent).as_posix() if path.is_relative_to(ROOT.parent) else str(path),
                   "source_sha256": hashlib.sha256(raw).hexdigest()}
         if reason:

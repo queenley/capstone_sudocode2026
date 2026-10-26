@@ -20,7 +20,8 @@ import json
 import random
 from collections import defaultdict
 
-from src.utils.paths import CONVERSATIONS_DIR, JUDGMENTS_DIR, REPORTS_DIR, REVIEW_DIR
+from src.utils.dataset import Dataset
+from src.utils.paths import REPORTS_DIR, REVIEW_DIR
 
 CSV_PATH = REVIEW_DIR / "judge_agreement.csv"
 KEY_PATH = REVIEW_DIR / "judge_agreement_key.json"   # LLM verdicts kept apart so reviewers are blind
@@ -39,7 +40,8 @@ def cohen_kappa(pairs: list[tuple[str, str]]) -> float | None:
 
 def export(n: int, seed: int) -> None:
     items = []
-    for path in sorted(JUDGMENTS_DIR.glob("*.json")):
+    dataset = Dataset()
+    for path in dataset.judgment_paths():
         judgment = json.loads(path.read_text(encoding="utf-8"))
         for v in judgment.get("verdicts", []):
             items.append((judgment["conversation_id"], v["criterion_id"], v["verdict"]))
@@ -52,7 +54,7 @@ def export(n: int, seed: int) -> None:
         writer.writeheader()
         for i, (cid, criterion, _) in enumerate(sample, start=1):
             writer.writerow({"sample_id": i, "conversation_id": cid, "criterion_id": criterion, "evidence_llm_hidden": "",
-                             "transcript_path": str(CONVERSATIONS_DIR / f"{cid}.json"), "human_verdict": "", "notes": ""})
+                             "transcript_path": str(dataset.conversation_file(cid)), "human_verdict": "", "notes": ""})
     KEY_PATH.write_text(json.dumps({str(i): v for i, (_, _, v) in enumerate(sample, start=1)}, indent=2), encoding="utf-8")
     print(f"Exported {len(sample)} samples -> {CSV_PATH} (fill human_verdict with PASS/FAIL)")
 

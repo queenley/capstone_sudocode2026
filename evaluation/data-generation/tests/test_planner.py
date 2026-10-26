@@ -1,12 +1,7 @@
 """Deterministic planning: coverage of BTC hard cases and correctness of key labels."""
-import json
-
-import yaml
-
-from src.planning.planner import assemble, check_draft, plan_scenarios
+from src.planning.planner import assemble, check_draft
 from src.schemas.scenario import ScenarioDraft
-from src.utils.crm import SourceData
-from src.utils.paths import CONFIG_DIR, PERSONAS_JSON
+from tests.conftest import plan
 
 BTC_HARD_CASES = {
     "ba_kenh_bao_gia_lech", "chung_sdt_memory_poisoning", "quay_lai_8_thang_ttl_trade_in", "km_loai_tru_size",
@@ -17,9 +12,7 @@ BTC_HARD_CASES = {
 
 
 def test_plans_are_deterministic(plans):
-    targets = yaml.safe_load((CONFIG_DIR / "personas.yaml").read_text(encoding="utf-8"))["personas"]
-    personas = {p["persona_id"]: p for p in json.loads(PERSONAS_JSON.read_text(encoding="utf-8"))["personas"]}
-    again = plan_scenarios(20, SourceData.load(), targets, personas, seed=20261007)
+    again = plan("btc", 20)
     assert [assemble(s, None).model_dump() for s in again] == [assemble(s, None).model_dump() for s in plans[:20]]
 
 
@@ -56,7 +49,7 @@ def test_callback_moved_off_holiday(by_hard_case):
 def test_multi_item_over_cod_limit(by_hard_case):
     call = by_hard_case["16_luot_4_san_pham_vuot_cod"].calls["call_2"]
     assert call.success_if.total_match_vnd > 10_000_000 and len(call.success_if.also_ordered) == 3
-    assert all(tc["args"]["payment"] == "chuyen_khoan" for tc in call.oracle_tool_calls)
+    assert all(tc["args"]["payment"] == "bank" for tc in call.oracle_tool_calls)
 
 
 def test_shared_phone_never_carries_the_other_persons_facts(by_hard_case):

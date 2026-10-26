@@ -111,12 +111,26 @@ evaluation/
 │   ├── evaluation-contracts/  Hợp đồng chấm điểm và bản sao nguồn BTC (khóa bằng hash)
 │   └── runs/             Bằng chứng từng lượt chạy (chỉ lưu local, không commit)
 └── data-generation/      Bộ sinh dữ liệu test theo định dạng BTC
-    ├── config/           settings.yaml (model, giới hạn), personas.yaml (persona và chỉ tiêu), voices.yaml
-    ├── data/             Đầu vào của BTC (chỉ đọc): catalog, chính sách, mock_tools, reference_eval
-    ├── src/planning/     Lập kế hoạch kịch bản và tính nhãn bằng mock_tools của BTC
-    ├── src/pipeline/     Các bước: sinh kịch bản, hội thoại mẫu, kiểm tra, judge, audio, báo cáo
-    ├── src/schemas/      Schema dữ liệu: kịch bản, hội thoại, catalog, phán quyết
-    └── output/           Dữ liệu sinh ra: kịch bản, ground truth, hội thoại, audio, báo cáo
+    ├── config/
+    │   ├── personas.yaml           Persona của BTC và chỉ tiêu số kịch bản
+    │   ├── personas_advanced.yaml  Persona nâng cao của nhóm (khách vô danh, bảo hành, trả hàng, giỏ hàng,
+    │   │                           chuyển AI ↔ nhân viên, hỏi thông tin khách khác, prompt injection…): chỉ tiêu, cách nói, độ kiên nhẫn, prompt simulator
+    │   ├── settings.yaml           Model, giới hạn gọi API, chỉ tiêu M2 (3 giờ audio, 30 khách đa kênh)
+    │   └── voices.yaml             Giọng ElevenLabs theo miền, giới tính, độ tuổi
+    ├── data/                       Đầu vào của BTC (chỉ đọc): catalog, CRM, chính sách, mock_tools, reference_eval, schema
+    ├── src/planning/               Lập kế hoạch kịch bản; nhãn tính bằng mock_tools của BTC (call_kinds, personas, planner)
+    ├── src/pipeline/               Các bước: kiểm catalog, sinh kịch bản, hội thoại mẫu, kiểm tra, judge, audio, báo cáo
+    ├── src/utils/dataset.py        Quy định vị trí mọi file output, đọc/ghi kịch bản
+    └── output/                     Dữ liệu sinh ra, mỗi thông tin chỉ lưu một nơi:
+        ├── scenarios/              Kịch bản test, đúng định dạng mẫu của BTC
+        ├── metadata/               Trường nội bộ của pipeline (khách, miền, tag, loại cuộc gọi)
+        ├── call_brief/scenarios_<id>/call_<n>.json     Call Brief mong đợi của từng cuộc
+        ├── handoff_brief/scenarios_<id>/call_<n>.json  Handoff Brief mong đợi (cuộc chuyển nhân viên)
+        ├── tools/scenarios_<id>/call_<n>.json          Tool call của agent lý tưởng, kèm kết quả mock
+        ├── trace_log/scenarios_<id>/call_<n>.jsonl     Trace của agent lý tưởng (chấm điểm tuyệt đối)
+        ├── conversations/, judgments/                  Hội thoại mẫu và phán quyết judge của từng cuộc
+        ├── audio/scenarios_<id>/call_<n>/turn_<k>.wav  Giọng khách từng lượt
+        └── asr_test/, rag/, review/, reports/          Bộ ASR, đánh giá RAG, duyệt tay, báo cáo
 ```
 
 Chi tiết các bước và từng loại output: [evaluation/data-generation/README.md](../evaluation/data-generation/README.md).

@@ -2,13 +2,13 @@
 
 Mỗi file `SC-xx.json`: `scenario_id, level (M1|M2), persona, hard_case, customer_phone, customer_name, honorific, notes, calls{call_1..call_3}`.
 
-Trường trong mỗi asr` + `input_mode` | bản lỗi ASR / teencode — **hệ th`call_n`:
+Trường trong mỗi `call_n`:
 | Trường | Ý nghĩa | Dùng cho |
 |---|---|---|
 | `channel`, `channel_identity` | hotline / chat_fanpage / zalo_oa + định danh kênh | identity resolution |
 | `call_date` hoặc `days_later` | ngày của cuộc gọi (mặc định reference_date 2026-10-15 + cộng dồn days_later) | KM hết hạn, tồn kho theo ngày, TTL |
 | `customer_turns` | lượt khách viết sẵn (deterministic) | chấm chéo |
-| `customer_turns_ống phải nhận bản này** nếu có | chuẩn hóa tiếng Việt |
+| `customer_turns_asr` + `input_mode` | bản lỗi ASR / teencode — **hệ thống phải nhận bản này** nếu có | chuẩn hóa tiếng Việt |
 | `seed_history` | phiên cũ (từ CRM) cần nạp trước khi gọi | TTL, khách cũ |
 | `facts_established` | fact khách cung cấp trong call này (ground truth để ghi nhớ) | CCR của call sau |
 | `must_carry_over` | slot bắt buộc dùng đúng ở call này | CCR |

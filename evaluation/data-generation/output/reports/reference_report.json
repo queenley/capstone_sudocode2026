@@ -1,0 +1,151 @@
+{
+  "repeat_question_rate": {
+    "value": 0.0,
+    "redundant": 0,
+    "total_questions": 2,
+    "examples": []
+  },
+  "context_carryover_rate": {
+    "value": 100.0,
+    "used": 11,
+    "required": 11
+  },
+  "task_success_rate": {
+    "value": 100.0,
+    "passed": 4,
+    "total": 4,
+    "hard_cases": {
+      "value": 100.0,
+      "total": 1
+    },
+    "failures": []
+  },
+  "hallucination_rate": {
+    "value": 0.0,
+    "wrong": 0,
+    "total_claims": 38,
+    "price_promo_only": {
+      "value": 0.0,
+      "wrong": 0,
+      "total": 10
+    },
+    "examples": []
+  },
+  "avg_turns_per_call": 4.5,
+  "calls_to_close": {
+    "value": 1,
+    "n_closed": 1,
+    "n_scenarios": 4
+  },
+  "guardrail_violations": {
+    "total": 0,
+    "by_type": {
+      "pii_in_memory_or_text": 0,
+      "over_escalation": 0,
+      "claims_human": 0,
+      "forbidden_pattern": 0
+    },
+    "examples": []
+  },
+  "memory_checks": [
+    {
+      "scenario": "SCN-ADV-0001",
+      "call": "call_2",
+      "expected": {
+        "room_area_m2": 40,
+        "has_children": true,
+        "budget_vnd": 5000000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AP-X",
+        "price_quoted_vnd": 4890000,
+        "promo_code": "GIFT-FILTER"
+      },
+      "found_in_memory_writes": {
+        "room_area_m2": false,
+        "has_children": false,
+        "budget_vnd": false,
+        "blocker": true,
+        "product_advised": false,
+        "price_quoted_vnd": false,
+        "promo_code": false
+      },
+      "has_memory_writes": true,
+      "verdict": "review"
+    },
+    {
+      "scenario": "SCN-ADV-0002",
+      "call": "call_2",
+      "expected": {
+        "room_area_m2": 15,
+        "has_children": false,
+        "budget_vnd": 6000000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000
+      },
+      "found_in_memory_writes": {
+        "room_area_m2": false,
+        "has_children": false,
+        "budget_vnd": false,
+        "blocker": false,
+        "product_advised": false,
+        "price_quoted_vnd": false
+      },
+      "has_memory_writes": true,
+      "verdict": "review"
+    },
+    {
+      "scenario": "SCN-GEN-0001",
+      "call": "call_1",
+      "expected": {
+        "room_area_m2": 25,
+        "has_children": false,
+        "budget_vnd": 5000000,
+        "payment": "COD",
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "product_advised": "SKU-AP-X",
+        "price_quoted_vnd": 4490000,
+        "promo_code": "TRADE-IN-AP",
+        "order_id": "OD600001",
+        "superseded": {
+          "room_area_m2": 20,
+          "delivery_area": "Đống Đa, Hà Nội"
+        },
+        "address_ttl_check": true
+      },
+      "found_in_memory_writes": {
+        "room_area_m2": true,
+        "has_children": true,
+        "budget_vnd": true,
+        "payment": true,
+        "delivery_area": true,
+        "product_advised": true,
+        "price_quoted_vnd": true,
+        "promo_code": true,
+        "order_id": true
+      },
+      "has_memory_writes": true,
+      "verdict": "likely_ok"
+    },
+    {
+      "scenario": "SCN-GEN-0002",
+      "call": "call_2",
+      "expected": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "found_in_memory_writes": {
+        "delivery_area": true
+      },
+      "has_memory_writes": true,
+      "verdict": "likely_ok"
+    }
+  ],
+  "latency": {
+    "n_turns": 0,
+    "warning": "Cần ≥ 100 lượt để p95 có ý nghĩa",
+    "ttft": null,
+    "total": null,
+    "ttfa": null,
+    "call_brief": null
+  }
+}

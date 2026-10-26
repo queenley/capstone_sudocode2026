@@ -10,20 +10,20 @@ BTC allows extra tools/params ("Được thêm tool/tham số riêng"); they mus
 
 ## Extra parameters passed to official tools
 
-- `inventory.check`: `variant_sku`
+- none
 
 ## All tools
 
 | Tool | Official | Level | Required params (mock) | Args we use | Used |
 |---|---|---|---|---|---|
-| `catalog.search` | yes | M1 | — | — | — |
-| `crm.get_customer` | yes | M1 | — | phone | oracle_trace: 325 |
-| `handoff.transfer` | yes | M1 | brief | brief | success_if.tool_called: 9, oracle_trace: 9, reference_transcripts: 12 |
-| `inventory.check` | yes | M1 | sku | on, sku, variant_sku | fault_injection: 9, oracle_trace: 262, reference_transcripts: 1 |
-| `order.create` | yes | M1 | customer_phone, sku | address, customer_phone, on, payment, price_vnd, qty, sku | success_if.tool_called: 88, success_if.must_not_call_tools: 194, oracle_trace: 109, reference_transcripts: 109 |
-| `order.status` | yes | M2 | — | order_id | success_if.tool_called: 21, oracle_trace: 21, reference_transcripts: 24 |
-| `order.update` | yes | M1 | order_id, action | action, new_variant_sku, on, order_id | success_if.tool_called: 18, oracle_trace: 18, reference_transcripts: 18 |
-| `pricing.get_quote` | yes | M2 | sku | customer_phone, on, sku | oracle_trace: 262 |
-| `schedule.callback` | yes | M1 | customer_phone, callback_at | callback_at, customer_phone, note | success_if.tool_called: 4, oracle_trace: 4, reference_transcripts: 4 |
+| `catalog.search` | yes | M1 | — | query | oracle_trace: 1, reference_transcripts: 1 |
+| `crm.get_customer` | yes | M1 | — | phone | oracle_trace: 8 |
+| `handoff.transfer` | yes | M1 | brief | — | success_if.must_not_call_tools: 1 |
+| `inventory.check` | yes | M1 | sku | on, sku | oracle_trace: 3 |
+| `order.create` | yes | M1 | customer_phone, sku | address, customer_phone, on, payment, price_vnd, qty, sku | success_if.must_not_call_tools: 4, success_if.tool_called: 1, oracle_trace: 1, reference_transcripts: 1 |
+| `order.status` | yes | M2 | — | order_id | success_if.tool_called: 2, oracle_trace: 2, reference_transcripts: 2 |
+| `order.update` | yes | M1 | order_id, action | action, on, order_id | success_if.tool_called: 1, oracle_trace: 1, reference_transcripts: 1 |
+| `pricing.get_quote` | yes | M2 | sku | customer_phone, on, sku | oracle_trace: 3 |
+| `schedule.callback` | yes | M1 | customer_phone, callback_at | — | — |
 
-Official tools not exercised by any scenario yet: `catalog.search`
+Official tools not exercised by any scenario yet: `schedule.callback`

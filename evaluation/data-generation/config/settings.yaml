@@ -4,7 +4,8 @@ models:
     model: gpt-4o-mini
   dialogue:
     provider: openai
-    model: gpt-4o-mini
+    # The hardest writer: a whole call that passes BTC's checks. gpt-4o-mini dropped the customer's lines.
+    model: gpt-4.1
   customer:
     provider: openai
     model: gpt-4o-mini
@@ -31,7 +32,8 @@ gemini:
   retries: 5
   retry_backoff_seconds: 2
 budget:
-  max_elevenlabs_chars_per_run: 100000
+  # 3 hours of customer speech is about 150.000 characters.
+  max_elevenlabs_chars_per_run: 250000
 scenario_audio:
   model_id: eleven_v4
   language_code: null
@@ -43,10 +45,13 @@ scenario_audio:
   noise_fraction: 0.5
   noise_snr_db: 6
 generation:
-  # ~2.1 calls per scenario: 120 scenarios ~= 250 reference transcripts (one per call).
-  scenario_target: 120
-  transcript_target: 250
-  audio_conversation_target: 100
+  # BTC personas (SCN-GEN) + the team's advanced ones (SCN-ADV, config/personas_advanced.yaml):
+  # 150 + 76 scenarios ~= 460 calls, one reference transcript each.
+  scenario_target: 150
+  advanced_scenario_target: 76
+  transcript_target: 460
+  # M2 targets checked by summarize_dataset: customer audio and customers seen on 2+ channels.
   audio_hours_target: 3
+  multi_channel_customers_target: 30
   noisy_audio_fraction: 0.20
   seed: 20261007

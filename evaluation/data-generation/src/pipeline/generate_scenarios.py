@@ -2,30 +2,35 @@
 
     plan (deterministic labels) ──► LLM writes customer language ──► check ──► assemble ──► write
 
+Two persona sets (``src/planning/persona_config.py``): BTC's (``SCN-GEN-*``) and
+the team's advanced ones (``SCN-ADV-*``). ``--limit`` and ``--advanced-limit``
+say how many scenarios of each.
+
 Usage::
 
-    python -m src.pipeline.generate_scenarios --limit 48            # generate
-    python -m src.pipeline.generate_scenarios --limit 48 --resume   # skip existing files
-    python -m src.pipeline.generate_scenarios --limit 48 --plan-only  # labels only, no API calls
+    python -m src.pipeline.generate_scenarios --limit 150                     # both sets
+    python -m src.pipeline.generate_scenarios --personas advanced             # the team's only
+    python -m src.pipeline.generate_scenarios --limit 150 --resume                     # keep what is on disk
+    python -m src.pipeline.generate_scenarios --limit 150 --fresh                      # delete old output first
+    python -m src.pipeline.generate_scenarios --limit 150 --plan-only                  # labels only, no API calls
 
-``--plan-only`` writes ``output/plans/*.json`` so the team can inspect every
-metric label before spending API budget.
+``--plan-only`` writes the same layout to ``output/plan_preview/`` with
+placeholder customer turns, so every label can be checked before spending API budget.
 """
 from __future__ import annotations
 
 import argparse
 import json
 
-import yaml
-
-from src.planning.planner import assemble, check_draft, plan_scenarios, writer_context
-from src.schemas.scenario import Scenario, ScenarioDraft
+from src.planning.persona_config import load_persona_set, load_persona_sets, load_profiles
+from src.planning.planner import ScenarioPlan, assemble, check_draft, plan_scenarios, writer_context
+from src.schemas.scenario import ScenarioDraft
 from src.utils.crm import SourceData
-from src.utils.io import load_model, write_json
-from src.utils.paths import CONFIG_DIR, PERSONAS_JSON, PLANS_DIR, PROMPTS_DIR, REPORTS_DIR, SCENARIOS_DIR, SCENARIOS_INTERNAL_DIR
-from src.utils.scenario_export import write_combined_export, write_scenario
-from src.utils.settings import load_settings, model_client, sampling
+from src.utils.dataset import Dataset
+from src.utils.io import write_json
+from src.utils.paths import PLAN_PREVIEW_DIR, PROMPTS_DIR, REPORTS_DIR
 from src.utils.quota import DailyLimitReached, stop_on_daily_limit
+from src.utils.settings import load_settings, model_client, sampling
 
 MAX_DRAFT_ATTEMPTS = 4
 #: Retries are about following the structure, not creativity.
@@ -82,63 +87,65 @@ def write_draft(client, template: str, context: dict, sp, params: dict) -> Scena
     raise DraftRejected(sp.scenario_id, errors)
 
 
+def planned(personas: str, limit: int, advanced_limit: int | None, seed: int) -> list[ScenarioPlan]:
+    """The plans of each persona set asked for, BTC's first."""
+    source, profiles = SourceData.load(), load_profiles()
+    counts = {"btc": limit, "advanced": advanced_limit}
+    if advanced_limit is None:
+        counts["advanced"] = sum(x["target"] for x in load_persona_set("advanced").targets)
+    return [sp for persona_set in load_persona_sets(personas)
+            for sp in plan_scenarios(counts[persona_set.source], source, persona_set, profiles, seed)]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--limit", type=int, default=48, help="number of scenarios (each has 2–3 calls)")
+    parser.add_argument("--personas", default="all", choices=("btc", "advanced", "all"))
+    parser.add_argument("--limit", type=int, default=150, help="BTC-persona scenarios (each has 1–3 calls)")
+    parser.add_argument("--advanced-limit", type=int,
+                        help="advanced-persona scenarios (default: the sum of the targets in personas_advanced.yaml)")
     parser.add_argument("--resume", action="store_true", help="keep scenarios already on disk")
+    parser.add_argument("--fresh", action="store_true", help="delete every generated scenario and transcript first")
     parser.add_argument("--plan-only", action="store_true", help="write label previews without calling a model")
     args = parser.parse_args()
 
     settings = load_settings()
-    persona_cfg = yaml.safe_load((CONFIG_DIR / "personas.yaml").read_text(encoding="utf-8"))
-    personas = {p["persona_id"]: p for p in json.loads(PERSONAS_JSON.read_text(encoding="utf-8"))["personas"]}
-    levels = {p["id"]: p.get("level", "M2") for p in persona_cfg["personas"]}
-    plans = plan_scenarios(args.limit, SourceData.load(), persona_cfg["personas"], personas,
-                           int(settings["generation"]["seed"]))
+    plans = planned(args.personas, args.limit, args.advanced_limit, int(settings["generation"]["seed"]))
 
     if args.plan_only:
-        # Full internal scenarios with placeholder customer turns; feed them to
-        # `build_ground_truth --scenarios output/plans --out output/plans` to verify every label offline.
-        for old in PLANS_DIR.glob("SCN-GEN-*.json"):
-            old.unlink()
+        preview = Dataset(PLAN_PREVIEW_DIR)
+        preview.clear()
         for sp in plans:
-            write_json(PLANS_DIR / f"{sp.scenario_id}.json", assemble(sp, None, levels[sp.persona_id]))
-        print(f"Wrote {len(plans)} label previews to {PLANS_DIR}")
+            preview.write_scenario(assemble(sp, None))
+        print(f"Wrote {len(plans)} label previews to {PLAN_PREVIEW_DIR}")
         return
 
+    dataset = Dataset()
+    if args.fresh:
+        dataset.clear()
     client = model_client("scenario", settings)
     params = sampling(settings)
     template = (PROMPTS_DIR / "scenario_writer.jinja").read_text(encoding="utf-8")
+    profiles = load_profiles()
     failures: list[dict] = []
     out_of_budget: DailyLimitReached | None = None
     for sp in plans:
-        path = SCENARIOS_INTERNAL_DIR / f"{sp.scenario_id}.json"
-        if args.resume and path.exists():
-            try:
-                load_model(path, Scenario)
-                continue
-            except ValueError:
-                print(f"  {path.name} uses an old schema; regenerating", flush=True)
-        context = writer_context(sp, personas.get(sp.persona_id, {}).get("style", ""))
+        if args.resume and dataset.has_scenario(sp.scenario_id):
+            continue
+        context = writer_context(sp, profiles.get(sp.persona_id, {}).get("style", ""))
         try:
             draft = write_draft(client, template, context, sp, params)
         except DailyLimitReached as error:
-            # Stop asking, but still write the combined export of what exists.
-            out_of_budget = error
+            out_of_budget = error   # stop asking; what exists is already written
             break
         except DraftRejected as rejected:
-            # One stubborn scenario must not cost the other 149: skip it, record why.
+            # One stubborn scenario must not cost the others: skip it, record why.
             print(f"  SKIPPED {sp.scenario_id} ({sp.persona_id}): {rejected.errors}", flush=True)
             failures.append({"scenario_id": sp.scenario_id, "persona": sp.persona_id, "errors": rejected.errors})
             continue
-        scenario = assemble(sp, draft, levels[sp.persona_id])
-        write_scenario(scenario)
+        scenario = assemble(sp, draft)
+        dataset.write_scenario(scenario)
         print(f"Wrote {sp.scenario_id} ({sp.persona_id}, {len(scenario.calls)} calls, "
               f"focus={','.join(scenario.metric_focus)})", flush=True)
-
-    exported = sorted(p for p in SCENARIOS_DIR.glob("SCN-GEN-*.json"))
-    count = write_combined_export(exported, SCENARIOS_DIR.parent / "scenarios_all.json")
-    print(f"Combined export: {count} scenarios -> output/scenarios_all.json")
 
     write_json(FAILURES_PATH, {"failed": failures})
     if failures:
@@ -148,7 +155,7 @@ def main() -> None:
         if len(failures) == len(plans):
             raise SystemExit("Every scenario failed; check the model and the prompt.")
     if out_of_budget is not None:
-        missing = sum(1 for sp in plans if not (SCENARIOS_INTERNAL_DIR / f"{sp.scenario_id}.json").exists())
+        missing = sum(1 for sp in plans if not dataset.has_scenario(sp.scenario_id))
         print(f"{missing} of {len(plans)} scenarios still to write.", flush=True)
         raise out_of_budget  # stop_on_daily_limit prints the advice and exits EXIT_DAILY_LIMIT
 

@@ -4,10 +4,12 @@ You write the CUSTOMER side of a Vietnamese e-commerce test scenario used to eva
 - `calls`: exactly one object per entry of INPUT.calls, same order — the count of INPUT.calls, never more, never fewer. `crm_history` describes sessions that already happened before call_1: it is background the customer may mention, NOT a call to write.
   - `call`: copy that entry's `call` value (`call_1`, `call_2`, `call_3`).
   - `customer_goal`: one short Vietnamese sentence (what the customer wants in this call).
-  - `customer_turns`: separate customer utterances in chronological order (at least the call's `min_customer_turns`, usually 2–6; long calls such as multi-item orders need 8–10), natural spoken Vietnamese, 1–2 sentences each, using the customer's honorific (`chị`, `anh`, `cô`…). The utterances are an outline the simulator will speak; they must make sense whatever the agent says in between.
+  - `customer_turns`: separate customer utterances in chronological order: at least the call's `min_customer_turns`, usually 5–8, and 8–12 for long calls (detailed questions, comparisons, multi-item orders). Each is 1–3 sentences of natural spoken Vietnamese with the customer's honorific (`chị`, `anh`, `cô`…), the way real people talk on the phone or in chat: fillers and particles (ừ, à, ờ, thế, nhỉ, nhé, ấy), a short hesitation or self-correction ("phòng 20… à không, 25 mét"), a reaction before the next question ("ừ được", "thế à"), now and then a small personal detail that fits the persona. Never two turns that say the same thing. The utterances are an outline the simulator will speak; they must make sense whatever the agent says in between.
   - `customer_turns_asr`: only when the call's `input_mode` is not `text`; one line per customer_turn with the SAME meaning:
       * `asr_transcript` → lowercase, no punctuation, speech-recognition errors (e.g. "xiao mi bốn pờ rô", numbers spelled out: "năm triệu rưỡi").
       * `chat_teencode` → chat style without diacritics + teencode (k, ko, bn, sp, đc, r, e, a).
+      * `chat_khong_dau` → the same sentence typed without any Vietnamese diacritics, normal words, light abbreviations ("chi muon hoi may loc khong khi cho phong 25m2").
+      * `chat_sai_chinh_ta` → typed in a hurry: 2–4 realistic typos per line (missing/wrong tone marks, swapped or doubled letters, telex leftovers: "mấy lộc khôg khí", "giá bao nhieuu", "phòg ngủ"), still understandable; numbers, codes and names stay correct.
     For `input_mode = text` return an empty list.
   - `facts_stated`: every customer fact the turns express, as `{slot, value}` using ONLY slots from INPUT.allowed_customer_slots. It MUST include every key of that call's `customer_must_state`, with exactly that value, and the turns must actually say it.
 - `tags`: up to 4 short snake_case tags describing the situation.
@@ -21,6 +23,9 @@ You write the CUSTOMER side of a Vietnamese e-commerce test scenario used to eva
 6. Strings in a call's `must_include_verbatim` (a relative time like "thứ Hai tuần sau…", an ID card or bank account number) must appear character-for-character in one customer turn. These are deliberate test inputs, not real data.
 7. Persona: match `persona.style` (e.g. impatient → short, curt; price-sensitive → mentions competitor price; teencode on chat channels).
 8. Do not mention being an AI, a test, a simulator, or any field name.
+9. When `customer.known_to_shop` is false the shop has never seen this customer: no name unless asked, no "lần trước" in call_1, and later calls refer only to this scenario's earlier calls.
+10. Handoffs between the AI and a person: a call whose `expected_outcome` is `chuyen_may` ends with the customer accepting to be transferred to a staff member. A later call after such a handoff is again with the AI assistant: the customer mentions briefly that a staff member already helped ("hôm trước bạn nhân viên tư vấn rồi") and does not repeat what was said.
+11. Products, prices, variants (size/colour), stock and promotions: only those in `agent_will_tell` or `customer_must_state`. The customer never invents a product code, a price or a promotion.
 
 # Example (one call shown, abbreviated)
 INPUT call: {"call":"call_1","kind":"consult","expected_outcome":"hen_goi_lai","input_mode":"text","scene":"Khách hỏi tư vấn…","agent_will_tell":{"product":"Máy lọc không khí AirPure Y","price_vnd":5200000,"promo":"GIFT-FILTER"},"customer_must_state":{"room_area_m2":25,"has_children":true,"budget_vnd":5500000,"decision_maker":"chồng","blocker":"cần hỏi chồng"}}

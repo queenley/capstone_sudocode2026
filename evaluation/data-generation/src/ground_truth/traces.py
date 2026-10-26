@@ -21,19 +21,26 @@ from typing import Any
 from src.metrics.btc_metrics import ABSTAIN_PHRASES
 from src.schemas.conversation import AgentTurn, Conversation, CustomerTurn
 from src.schemas.scenario import CallSpec, Scenario
+from src.utils.btc_schemas import INPUT_MODES
 from src.utils.btc_tools import call_tool, mock_tools
 
 # ground_truth_facts keys that are context, not claimable facts.
-NON_CLAIM_FACTS = {"call_date", "unknown_topic", "policy_version"}
+NON_CLAIM_FACTS = {"call_date", "unknown_topic", "off_topic_question", "policy_version"}
 # memory_expectation keys that are instructions to the checker, not values to write.
 MEMORY_CONTROL_KEYS = {"superseded", "must_not_write_to", "address_ttl_check", "profile_state"}
-NO_LATENCY = {"ttft_ms": None, "total_ms": None, "ttfa_ms": None}
+# trace_log.schema.json requires integer ttft_ms/total_ms. A trace built from labels was never timed: 0, not a
+# measurement (reference_eval's latency section of these traces means nothing).
+NO_LATENCY = {"ttft_ms": 0, "total_ms": 0, "ttfa_ms": None}
 
 
-def _row(scenario_id: str, call: str, turn: int, customer_text: str, run_id: str, config: str) -> dict[str, Any]:
-    return {"run_id": run_id, "config": config, "scenario_id": scenario_id, "call": call, "turn": turn,
-            "customer_text": customer_text, "agent_text": "", "questions": [], "facts_used": [], "claims": [],
-            "tool_calls": [], "memory_writes": [], "latency": dict(NO_LATENCY)}
+def _row(scenario_id: str, call: str, turn: int, customer_text: str, run_id: str, config: str,
+         input_mode: str | None = None) -> dict[str, Any]:
+    row = {"run_id": run_id, "config": config, "scenario_id": scenario_id, "call": call, "turn": turn,
+           "customer_text": customer_text, "agent_text": "", "questions": [], "facts_used": [], "claims": [],
+           "tool_calls": [], "memory_writes": [], "latency": dict(NO_LATENCY)}
+    if input_mode in INPUT_MODES:   # the mode the system received the customer's words in
+        row["customer_input_mode"] = INPUT_MODES[input_mode]
+    return row
 
 
 def _customer_lines(call: CallSpec) -> list[str]:
@@ -41,11 +48,12 @@ def _customer_lines(call: CallSpec) -> list[str]:
     return call.customer_turns_asr if call.input_mode != "text" and call.customer_turns_asr else call.customer_turns
 
 
-def oracle_rows(scenario: Scenario, run_id: str = "ground_truth", config: str = "oracle") -> list[dict[str, Any]]:
+def oracle_rows(scenario: Scenario, run_id: str = "oracle", config: str = "full") -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for call_name, call in scenario.ordered_calls():
         lines = _customer_lines(call)
-        call_rows = [_row(scenario.scenario_id, call_name, t, text, run_id, config) for t, text in enumerate(lines, 1)]
+        call_rows = [_row(scenario.scenario_id, call_name, t, text, run_id, config, call.input_mode)
+                     for t, text in enumerate(lines, 1)]
         first, middle, last = call_rows[0], call_rows[min(1, len(call_rows) - 1)], call_rows[-1]
         honor = scenario.honorific or "anh/chị"
 
@@ -77,8 +85,12 @@ def oracle_rows(scenario: Scenario, run_id: str = "ground_truth", config: str = 
         # Last turn — the executed tool calls (TSR) and memory writes (memory_checks).
         last["tool_calls"] += [{"name": tc["name"], "args": tc["args"], "result": tc["result"]}
                               for tc in call.oracle_tool_calls]
-        last["memory_writes"] = [{"key": k, "value": v} for k, v in call.memory_expectation.items()
-                                 if k not in MEMORY_CONTROL_KEYS]
+        # trace_log.schema.json: {key, value, op: set|supersede|delete, source: "call_n#turnk", customer_id}
+        superseded = call.memory_expectation.get("superseded") or {}
+        speaker = call.speaker_customer_id or scenario.customer_id
+        last["memory_writes"] = [{"key": k, "value": v, "op": "supersede" if k in superseded else "set",
+                                  "source": f"{call_name}#turn{last['turn']}", "customer_id": speaker}
+                                 for k, v in call.memory_expectation.items() if k not in MEMORY_CONTROL_KEYS]
         if not last["agent_text"]:
             last["agent_text"] = "Dạ em cảm ơn ạ."
         rows.extend(call_rows)
@@ -102,7 +114,7 @@ def _lookups(scenario: Scenario, call: CallSpec) -> list[dict[str, Any]]:
 
 
 def conversation_rows(conversation: Conversation, mock=None, run_id: str = "reference",
-                      config: str = "reference") -> list[dict[str, Any]]:
+                      config: str = "full") -> list[dict[str, Any]]:
     """Pair each customer turn with the agent turns that follow it; execute tool calls on ``mock`` if given."""
     rows: list[dict[str, Any]] = []
     pending_agent: list[AgentTurn] = []

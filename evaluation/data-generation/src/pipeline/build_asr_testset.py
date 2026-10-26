@@ -32,11 +32,11 @@ from src.asr.spoken import to_spoken
 from src.schemas.conversation import AgentTurn, Conversation, split_conversation_id
 from src.schemas.scenario import Scenario
 from src.utils.crm import load_customers
-from src.utils.io import iter_models, load_model
-from src.utils.paths import CONFIG_DIR, CONVERSATIONS_DIR, DATA_DIR, OUTPUT_DIR, SCENARIOS_INTERNAL_DIR
+from src.utils.dataset import Dataset
+from src.utils.paths import ASR_TEST_DIR, CONFIG_DIR, DATA_DIR
 from src.utils.settings import load_settings
 
-ASR_DIR = OUTPUT_DIR / "asr_test"
+ASR_DIR = ASR_TEST_DIR
 SAMPLE_RATE = 16000
 TURN_GAP_S = 0.35
 ENTITY_KEYS = ("price_vnd", "room_area_m2", "budget_vnd", "size", "order_id", "has_children", "payment",
@@ -114,22 +114,20 @@ def main() -> None:
     parser.add_argument("--text-only", action="store_true", help="write ground_truth.json without TTS")
     args = parser.parse_args()
 
-    conversations = [c for _, c in iter_models(sorted(CONVERSATIONS_DIR.glob("*__call_*.json")), Conversation)]
+    dataset = Dataset()
+    conversations = list(dataset.iter_conversations())
     if not conversations:
         sys.exit("No reference transcripts in output/conversations; run generate_dialogue first.")
     customers = {c.customer_id: c for c in load_customers()}
-    scenarios: dict[str, Scenario] = {}
     dialogues = []
     # Prefer variety: interleave hard cases and normal calls by taking every other conversation first.
     ordered = conversations[::2] + conversations[1::2]
     for conversation in ordered:
         if len(dialogues) >= args.limit:
             break
-        sid, _ = split_conversation_id(conversation.conversation_id)
-        path = SCENARIOS_INTERNAL_DIR / f"{sid}.json"
-        if not path.exists():
+        scenario = dataset.scenario(conversation.scenario_id)
+        if scenario is None:
             continue
-        scenario = scenarios.setdefault(sid, load_model(path, Scenario))
         index = len(dialogues) + 1
         noisy = (index % round(1 / args.noisy_fraction) == 0) if args.noisy_fraction > 0 else False
         dialogues.append(build_dialogue(index, scenario, conversation, customers.get(conversation.customer_id), noisy))

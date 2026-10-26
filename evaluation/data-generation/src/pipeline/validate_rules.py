@@ -4,7 +4,9 @@ Each transcript is converted to BTC trace rows (tool calls re-executed on BTC
 ``mock_tools``) and scored by ``data/eval/reference_eval.py``. A gold transcript
 must be perfect: RQR 0, CCR 100%, success_if pass, HR 0, no guardrail violation.
 Extra consistency checks: identity fields, script adherence, tool calls rejected
-by the mock, and spoken amounts that are not grounded in the call's facts.
+by the mock, spoken amounts that are not grounded in the call's facts, and BTC's
+schemas (``data/schemas``: every trace row against ``trace_log``, every tool call
+against ``tools``).
 
 Output: ``output/reports/validation.json`` (one row per conversation).
 """
@@ -19,15 +21,17 @@ from typing import Any
 
 from src.ground_truth.traces import conversation_rows
 from src.metrics.btc_metrics import money_mentions, score_call
-from src.schemas.conversation import Conversation, split_conversation_id
+from src.schemas.conversation import Conversation
 from src.schemas.scenario import CallSpec, Scenario
+from src.utils.btc_schemas import errors as schema_errors, tool_call_errors
 from src.utils.btc_tools import fresh_mock_tools
-from src.utils.io import iter_models, load_model
+from src.utils.dataset import Dataset
 from src.utils.memory import known_facts_before, speaker_of
-from src.utils.paths import CONVERSATIONS_DIR, SCENARIOS_INTERNAL_DIR, VALIDATION_JSON
+from src.utils.paths import OUTPUT_DIR, VALIDATION_JSON
 
 # Personas/tags that always need a human look, even when every rule passes.
-RISK_MARKERS = ("xoa_du_lieu", "chung_sdt", "shared_phone", "pii", "memory_poison", "bot_identity", "internal_doc")
+RISK_MARKERS = ("xoa_du_lieu", "chung_sdt", "shared_phone", "pii", "memory_poison", "bot_identity", "internal_doc",
+                "privacy", "prompt_injection", "other_customer", "handoff")
 SCRIPT_ADHERENCE_MIN = 0.6
 
 
@@ -86,6 +90,8 @@ def validate(scenario: Scenario, call_name: str, conversation: Conversation, moc
         for tc in row["tool_calls"]:
             if isinstance(tc["result"], dict) and tc["result"].get("error"):
                 errors.append(f"tool_rejected_by_mock:{tc['name']}:{tc['result']['error']}")
+            errors += [f"schema:tools:{e}" for e in tool_call_errors(tc["name"], tc["args"])]
+        errors += [f"schema:trace_log:turn {row['turn']}:{e}" for e in schema_errors("trace_log", row)]
 
     # -- the customer must speak the scenario outline ------------------------------
     script = call.customer_turns_asr if call.input_mode != "text" and call.customer_turns_asr else call.customer_turns
@@ -107,26 +113,20 @@ def validate(scenario: Scenario, call_name: str, conversation: Conversation, moc
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--scenarios", type=Path, default=SCENARIOS_INTERNAL_DIR)
-    parser.add_argument("--conversations", type=Path, default=CONVERSATIONS_DIR)
+    parser.add_argument("--root", type=Path, default=OUTPUT_DIR, help="dataset root (src/utils/dataset.py)")
     parser.add_argument("--output", type=Path, default=VALIDATION_JSON)
     args = parser.parse_args()
 
-    scenarios: dict[str, Scenario] = {}
+    dataset = Dataset(args.root)
     mocks: dict[str, Any] = {}
     rows = []
-    for _, conversation in iter_models(sorted(args.conversations.glob("*__call_*.json")), Conversation):
-        scenario_id, call_name = split_conversation_id(conversation.conversation_id)
-        if scenario_id not in scenarios:
-            path = args.scenarios / f"{scenario_id}.json"
-            try:
-                scenarios[scenario_id] = load_model(path, Scenario)
-            except (OSError, ValueError):
-                continue
-            mocks[scenario_id] = fresh_mock_tools()   # calls of one scenario share runtime state (order ids)
-        scenario = scenarios[scenario_id]
-        if call_name not in scenario.calls:
+    for conversation in dataset.iter_conversations():
+        scenario_id, call_name = conversation.scenario_id, conversation.call
+        scenario = dataset.scenario(scenario_id)
+        if scenario is None or call_name not in scenario.calls:
             continue
+        if scenario_id not in mocks:
+            mocks[scenario_id] = fresh_mock_tools()   # calls of one scenario share runtime state (order ids)
         errors, metrics = validate(scenario, call_name, conversation, mocks[scenario_id])
         rows.append({"scenario_id": scenario_id, "call": call_name, "conversation_id": conversation.conversation_id,
                      "hard_case": scenario.hard_case, "validator_pass": not errors, "errors": errors,
