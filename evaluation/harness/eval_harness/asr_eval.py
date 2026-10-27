@@ -136,7 +136,10 @@ def build_set(out=None, *, audio_root=AUDIO_ROOT, scenarios_dir=SCENARIOS_DIR, s
             continue
         noise = (meta.get("noise") or {}).get("type")
         clip_id = f"{sid}-{call}-t{turn}"
-        reference = spoken.to_spoken(text)
+        # What the voice read: the model-written spoken form the clip carries (create_data src/asr/reference.py),
+        # or, for clips spoken before it existed, the rule-made one.
+        reference = meta.get("spoken_text") or spoken.to_spoken(text)
+        source = (meta.get("reference_source") or "rule") if meta.get("spoken_text") else "rule_at_build"
         # From the spoken reference, the way a hypothesis gets them: a perfect transcript scores 100%.
         stated = entities.extract(reference)
         kept.append((wav, {
@@ -145,6 +148,7 @@ def build_set(out=None, *, audio_root=AUDIO_ROOT, scenarios_dir=SCENARIOS_DIR, s
             "n_turns": 1, "scenario_ref": f"{sid} {call} turn {turn}", "source_text": text,
             "customer_region": scenario.get("region"), "input_mode": meta.get("input_mode"),
             "noise": noise or "clean", "snr_db": (meta.get("noise") or {}).get("snr_db"),
+            "reference_source": source, "reference_entities": meta.get("entities"),
             "voice_id": meta.get("voice_id"), "tts_model": meta.get("model_id"),
             "duration_seconds": meta.get("duration_seconds"), "number_or_code": has_number_or_code(text),
             "source_clip": relative}))
@@ -159,8 +163,9 @@ def build_set(out=None, *, audio_root=AUDIO_ROOT, scenarios_dir=SCENARIOS_DIR, s
         files[f"audio/{row['id']}.wav"] = _sha256(wav)
     ground_truth = {
         "description": f"{set_id}: one customer turn per clip (ElevenLabs voices, synthetic noise) from the "
-                       "team scenarios; diagnostic, not reviewed. Reference = source text in spoken form "
-                       "(create_data src/asr/spoken.py), as we assume the voice read it.",
+                       "team scenarios; diagnostic, not reviewed. Reference = the spoken form the voice read "
+                       "(create_data src/asr/reference.py), or for older clips the source text in spoken form "
+                       "(src/asr/spoken.py), as we assume the voice read it.",
         "hypotheses_format": btc["hypotheses_format"], "normalization_rule": btc["normalization_rule"],
         "reference_date": btc.get("reference_date"), "dialogues": dialogues}
     (out / "ground_truth.json").write_text(json.dumps(ground_truth, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -177,13 +182,16 @@ def build_set(out=None, *, audio_root=AUDIO_ROOT, scenarios_dir=SCENARIOS_DIR, s
                   "scenario, call and turn exist in the current scenarios file",
                   "clip text == that customer turn (otherwise the audio is stale)",
                   "input_mode chat_teencode dropped (typed slang, not speech)"],
-        "reference": "full_text = to_spoken(source_text); entities = entities.extract(full_text). Both are "
-                     "rule-made: a clip with numbers or codes (number_or_code) is scored against how we assume "
-                     "the voice read them; listen before blaming the recogniser.",
+        "reference": "full_text = the clip's spoken_text, the exact words TTS read (reference_source llm|rule); "
+                     "a clip spoken before create_data wrote spoken_text gets to_spoken(source_text) "
+                     "(reference_source rule_at_build), scored against how we assume the voice read numbers and "
+                     "codes: listen before blaming the recogniser. entities = entities.extract(full_text), the "
+                     "same extraction the hypotheses get; the model's own entities are kept as reference_entities.",
         "counts": {"clips_json": len(clips), "kept": len(kept), "dropped": len(dropped),
                    "dropped_by_reason": dict(Counter(d["reason"] for d in dropped).most_common()),
                    "kept_by_noise": dict(Counter(r["noise"] for r in dialogues).most_common()),
                    "kept_by_input_mode": dict(Counter(r["input_mode"] for r in dialogues).most_common()),
+                   "kept_by_reference_source": dict(Counter(r["reference_source"] for r in dialogues).most_common()),
                    "kept_number_or_code": sum(r["number_or_code"] for r in dialogues),
                    "kept_with_entities": sum(bool(r["entities"]) for r in dialogues),
                    "scenarios": len({r["scenario_ref"].split()[0] for r in dialogues}),

@@ -103,6 +103,9 @@ class Dataset:
             extra = dict(meta["calls"].get(name, {}))
             # BTC's file says "khac" for the pipeline's finer outcomes; the metadata keeps which one.
             payload = {**payload, "expected_outcome": extra.pop("outcome_detail", None) or payload["expected_outcome"]}
+            detail = extra.pop("input_mode_detail", None)
+            if detail and detail != "text":
+                payload["input_mode"] = detail
             calls[name] = CallSpec(
                 **{k: v for k, v in payload.items() if k not in {"call_date"}}, call_date=on,
                 expected_call_brief=self._optional("call_brief", scenario_id, name),

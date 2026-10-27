@@ -15,6 +15,10 @@ models:
   simulator:
     provider: openai
     model: gpt-4o-mini
+  asr_reference:
+    # Customer turns in spoken form before TTS reads them (src/asr/reference.py): the ASR ground truth.
+    provider: openai
+    model: gpt-4.1-mini
 # Sampling parameters shared by every provider.
 sampling:
   temperature: 0.7          # scenario / dialogue / CRM writers

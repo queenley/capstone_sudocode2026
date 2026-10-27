@@ -36,13 +36,15 @@ $PY = "apps/ai-agent-service/.venv/Scripts/python"
 
 ## 2. Chạy đánh giá trong 3 bước
 
-**Bước 1. Chuyển dữ liệu từ `evaluation/data-generation` sang dạng bộ chấm đọc được** (chỉ chạy một lần):
+**Bước 1. Chuyển dữ liệu từ `evaluation/data-generation` sang dạng bộ chấm đọc được** (một lần cho mỗi lần sinh dữ liệu mới):
 
 ```powershell
-& $PY evaluation/harness/normalize_create_data.py
+Set-Location evaluation/harness
+& ../../$PY normalize_create_data.py --name create-data-diagnostic-v5   # tên mới: một bản đã dùng không bao giờ bị ghi đè
+Set-Location ../..
 ```
 
-Kết quả: 150/150 kịch bản dùng được, lưu ở `datasets/create-data-diagnostic-v3/`. Lý do loại (nếu có) ghi trong `conversion-report.json`.
+Kết quả lưu ở `datasets/create-data-diagnostic-v5/` và được đăng ký trong `datasets/registry.json`. Lý do loại (nếu có) ghi trong `conversion-report.json`. Bộ hiện có sẵn: `create-data-diagnostic-v4` (150 kịch bản). Các lệnh bên dưới dùng `v4`; đổi sang tên bạn vừa tạo khi dùng dữ liệu mới.
 
 - **Lịch sử cuộc gọi cũ** (`seed_history`): trước cuộc gọi, `agent/bridge.py` ghi các phiên cũ và đơn cũ vào trí nhớ của khách, giống lệnh chấm của BTC (`pipeline/eval/runner.py`, hàm `seed`), ở cả hai cấu hình; riêng `baseline_no_memory` không đọc lại chúng.
 - **Khách tổng hợp** (`SYN-C...`, 28 kịch bản): ngoài 50 khách của BTC, agent và mock của bộ chấm cùng nạp `apps/ai-agent-service/data/btc/catalog/crm_seed_synthetic.json`. Mỗi lần chạy chép và khóa hash file này (`crm-extension.json`); `BTC_SYNTHETIC_CRM=0` tắt cả hai. Sinh lại khách tổng hợp thì phải sinh lại kịch bản của họ và tạo bản dataset mới (`conversion-report.json` ghi hash file đã dùng).
@@ -51,7 +53,7 @@ Kết quả: 150/150 kịch bản dùng được, lưu ở `datasets/create-data
 **Bước 2. Kiểm tra trước, không tốn tiền gọi AI:**
 
 ```powershell
-& $PY evaluation/harness/run_eval.py prepare --dataset-id create-data-diagnostic-v3 --level M2 --limit 5
+& $PY evaluation/harness/run_eval.py prepare --dataset-id create-data-diagnostic-v4 --level M2 --limit 5
 ```
 
 Thấy `"allowed": true` là đầu vào hợp lệ.
@@ -59,11 +61,11 @@ Thấy `"allowed": true` là đầu vào hợp lệ.
 **Bước 3. Chạy thật và chấm điểm:**
 
 ```powershell
-& $PY evaluation/harness/run_eval.py evaluate --dataset-id create-data-diagnostic-v3 --level M2 --limit 5
+& $PY evaluation/harness/run_eval.py evaluate --dataset-id create-data-diagnostic-v4 --level M2 --limit 5
 ```
 
 - `--level M2` hoặc `M1`: chỉ chạy một cấp độ. **Bỏ `--level`** thì chạy cả hai, mỗi cấp độ thành một lần chạy riêng (thư mục `<tên>-M1` và `<tên>-M2`), vì một lần chạy chỉ chứa được một cấp độ.
-- `--limit 5`: chạy 5 kịch bản đầu (của mỗi cấp độ). **Nên bắt đầu nhỏ**, vì mỗi lượt chat gọi AI nhiều lần, nhân 2 cấu hình. Chạy toàn bộ 150 kịch bản là khoảng 2.500 lượt AI cộng 2.500 lượt chấm, mất nhiều giờ và tốn phí API đáng kể.
+- `--limit 5`: chạy 5 kịch bản đầu (của mỗi cấp độ). **Nên bắt đầu nhỏ**, vì mỗi lượt chat gọi AI nhiều lần, nhân 2 cấu hình. Chạy toàn bộ 150 kịch bản là khoảng 2.500 lượt AI cộng 2.500 lượt chấm (luồng chi tiết: mục 9), mất nhiều giờ và tốn phí API đáng kể.
 - `--only SCN-GEN-0003`: chạy đúng một kịch bản (lặp lại để chọn nhiều kịch bản).
 - Trong lúc chạy, màn hình in tiến độ: bước đang làm (1/4 → 4/4), từng lượt chat (khách nói gì, AI trả lời gì, mất bao lâu, tốn bao nhiêu tiền, tổng tiền đến lúc đó) và thời gian ước tính. Mỗi kịch bản mất khoảng 1 phút để khởi động AI. Đặt `$env:EVAL_QUIET="1"` để tắt các dòng này.
 - Bước chấm (extract) chạy **song song 6 lượt một lúc**, nhanh hơn khoảng 2 lần. Đổi bằng `$env:EVAL_EXTRACT_WORKERS="4"` (đặt `1` để chạy tuần tự). Không nên đặt quá cao vì OpenAI giới hạn số request mỗi phút.
@@ -170,8 +172,12 @@ create_data: synthesize_scenario_audio (ElevenLabs)
 }
 ```
 
-- `full_text`: câu gốc đổi sang **dạng đọc** bằng `evaluation/data-generation/src/asr/spoken.py` theo quy ước ground truth của BTC: số viết bằng chữ; số điện thoại, CCCD, số tài khoản đọc từng chữ số; `COD` thành "cê ô đê"; `4.5L` thành "bốn phẩy năm lít"; `TP.HCM` thành "thành phố hồ chí minh".
-- `entities`: lấy từ `full_text` bằng `evaluation/data-generation/src/asr/entities.py`, cũng là bước áp lên chữ mô hình nghe được (ITN của agent). Bản chép đúng từng chữ được 100%.
+- `full_text`: **đúng câu giọng TTS đã đọc**, tức `spoken_text` trong `.json` của clip.
+  - Câu này do LLM của data-generation viết ở dạng nói trước khi TTS đọc (`src/asr/reference.py`), theo quy ước ground truth của BTC: số viết bằng chữ; số điện thoại đọc từng chữ số; "AirPure X" thành "e pia x"; `COD` thành "cê ô đê".
+  - Câu LLM viết sai được thay bằng luật `src/asr/spoken.py`.
+  - Clip đọc trước khi có `spoken_text` thì `full_text` được tính lúc dựng bộ bằng `spoken.py`. Khi đó `reference_source` là `rule_at_build`: đáp án là cách *đoán* giọng đã đọc số và mã, nên nghe lại clip trước khi đổ lỗi cho mô hình.
+  - Số clip theo từng nguồn đáp án nằm ở `conversion-report.json → counts.kept_by_reference_source`.
+- `entities`: lấy từ `full_text` bằng `evaluation/data-generation/src/asr/entities.py`. Đây cũng là bước áp lên chữ mô hình nghe được (ITN của agent), nên bản chép đúng từng chữ được 100%. Entities do LLM gán (gồm cả `sku`, `blocker`, những khóa mà bước trích của hypothesis không tạo ra) được giữ ở `reference_entities` để tham khảo, không dùng để chấm.
 - `hypotheses.json` (do lệnh `asr` tạo): `{"<id>": {"text": "...", "entities": {...}}}`, đúng `hypotheses_format` của BTC.
 
 ### 5.2 Các bước chạy
@@ -310,7 +316,7 @@ Clip nào thiếu hoặc khác hash sẽ không được chép mà liệt kê tr
 | Lệnh | Làm gì | Gọi AI? |
 |---|---|---|
 | `run_eval.py history` | Liệt kê mọi lần chạy cũ và điểm của chúng | Không |
-| `run_eval.py data-check --set create-data-diagnostic-v3` | Kiểm tra bộ dữ liệu có hợp lệ không | Không |
+| `run_eval.py data-check --set create-data-diagnostic-v4` | Kiểm tra bộ dữ liệu có hợp lệ không | Không |
 | `run_eval.py asr-build` | Lọc audio của `create_data` thành bộ chấm ASR (mục 5) | Không |
 | `run_eval.py asr` | Chấm ASR qua `asr-service` bằng `wer_cer` của BTC (mục 5) | Không (chỉ model ASR local) |
 | `run_eval.py rag-recall --out evaluation/harness/runs/rag-1` | Đo khả năng tìm đúng đoạn chính sách (Recall@3/@5 trên 60 câu BTC) | Không |
@@ -366,15 +372,193 @@ runs/                     Kết quả các lần chạy (không lên Git)
 
 ---
 
-## 9. Cách hoạt động (cho người muốn hiểu sâu)
+## 9. Logic và luồng đánh giá agent
 
-1. `prepare` sao chép và "khóa" (hash) mọi đầu vào: kịch bản, nhãn, code AI. Code AI bị sửa giữa chừng thì lần chạy bị từ chối, để kết quả luôn ứng với đúng một phiên bản code.
-2. `evaluate` mở AI trong một tiến trình riêng cho từng kịch bản và từng cấu hình. Các tool nghiệp vụ (giá, tồn kho, đơn hàng) **không** chạy trong AI mà được trả lời bởi bản mock của BTC nằm trong bộ chấm, để biết chính xác AI đã gọi gì và làm thay đổi gì.
-3. Trí nhớ và chính sách vẫn chạy qua server MCP của AI, trên schema database riêng `agent_eval`, được xóa trước mỗi kịch bản. Dữ liệu thật trong schema `agent` không bị đụng tới.
-4. Sau khi chạy, một model "extractor" đọc từng câu trả lời để tách câu hỏi, khẳng định (giá, tồn kho, ...) và thông tin được dùng lại; code chấm của BTC tính điểm từ đó.
-5. Không thử lại khi lỗi: mọi lần gọi AI hay tool thất bại đều được ghi nhận như nó xảy ra.
+Phần này mô tả `run_eval.py evaluate` làm gì, theo đúng thứ tự trong code: [`product.py`](product.py) điều phối bốn giai đoạn, mỗi giai đoạn ghi vào một thư mục riêng của lần chạy và không bao giờ ghi đè.
 
-Biến môi trường có thể đổi: `EVAL_DB_SCHEMA` (mặc định `agent_eval`, phải kết thúc bằng `_eval`), `EVAL_DATABASE_URL`, `AGENT_PYTHON` (Python dùng để chạy AI).
+```mermaid
+flowchart LR
+    DS["datasets/&lt;id&gt;/<br/>kịch bản + tool-labels"] --> P1
+    subgraph run["runs/&lt;ngày-giờ&gt;/"]
+        P1["1 Prepare<br/>inputs/<br/>khóa hash mọi đầu vào"] --> P2["2 Run<br/>raw/<br/>agent thật × 2 cấu hình"]
+        P2 --> P3["3 Collect<br/>evidence/<br/>log thô → trace BTC"]
+        P3 --> P4["4 Score<br/>scored/<br/>reference_eval + kiểm riêng"]
+        P4 --> R["execution-report.json<br/>case-trace.json"]
+    end
+    R --> L["Langfuse<br/>chi phí + điểm"]
+```
+
+| Giai đoạn | Code | Gọi model? | Ghi vào | Đọc gì đầu tiên |
+|---|---|---|---|---|
+| 1 Prepare | `product.prepare`, `eval_harness/preflight.py` | không | `inputs/` | `preparation-report.json` |
+| 2 Run (P2) | `eval_harness/runner.py`, `product_adapter.py`, `agent/bridge.py` | advisor của agent | `raw/` | `runner-report.json`, `full/adapter-*.log` |
+| 3 Collect (P3) | `eval_harness/collector.py`, `agent/extract_command.py` | extractor, 1 lần/lượt | `evidence/` | `full.jsonl`, `baseline.jsonl`, `validation.json` |
+| 4 Score (P4) | `eval_harness/scoring.py`, `supplement.py` | không | `scored/` | `scorer.stdout.txt`, `official-report.json` |
+
+### 9.1 Đầu vào: kịch bản và nhãn
+
+- **Bộ dữ liệu** là một thư mục trong `datasets/`, khai báo trong `datasets/registry.json`: `scenarios/` (kịch bản đúng định dạng BTC) và `tool-labels.json` (nhãn tool của từng cuộc gọi). Bỏ `--dataset-id` thì dùng 5 kịch bản mẫu `output1-diagnostic-v2`.
+- **Từ data-generation sang bộ dữ liệu:** [`normalize_create_data.py`](normalize_create_data.py) đọc `evaluation/data-generation/output/scenarios/` và chỉ đổi những chỗ contract của harness khác (ví dụ `expected_outcome` ngoài 5 giá trị của BTC thành `khac`). Mọi thay đổi được ghi theo từng cuộc trong `conversion-report.json` kèm hash nguồn. Kịch bản không chạy được (khách không có trong CRM đã khóa, sai schema) bị loại kèm lý do, không bỏ âm thầm.
+- **Nhãn tool** lấy từ `success_if.tool_called` / `args_match` của chính kịch bản. Bộ sinh tự động có trạng thái `diagnostic`; chỉ khi người duyệt từng cuộc mới thành `approved` ([quy tắc](datasets/ground-truth-review/SKILL.md)).
+- `--only`, `--level`, `--limit` chọn kịch bản; một lần chạy chỉ chứa một cấp độ (M1 hoặc M2).
+
+### 9.2 Giai đoạn 1 — Prepare: khóa đầu vào, không gọi model
+
+1. Copy vào `inputs/` mọi thứ lần chạy cần, mỗi thứ kèm SHA-256 trong manifest:
+   - kịch bản đã chọn, một grading contract mỗi kịch bản, phạm vi;
+   - adapter (`product_adapter.py`) và bundle mô tả agent;
+   - policy chỉ số;
+   - extractor: prompt `config/prompts/evaluation/extractor.txt` (lưu thành `extractor-prompt.txt`), lệnh `agent/extract_command.py`, cấu hình model;
+   - CRM giả lập (`crm-extension.json`), để mock của harness biết cùng tập khách với agent.
+2. Bundle chứa **một hash duy nhất trên toàn bộ code agent**: `apps/ai-agent-service/src`, `config/`, catalog, `config/prompts/agent/` và `agent/` của harness. Sửa bất kỳ file nào trong đó sau bước này thì lần chạy bị từ chối ("The agent's code changed after preparation").
+3. **Preflight** kiểm schema của mọi đầu vào, dựng *kế hoạch phủ*: mỗi `(cấu hình, kịch bản, cuộc, lượt)` phải có đúng một dòng trace. Kết quả là `execution_gate.allowed`; nếu `false` kèm `blocking_codes` thì dừng ở đây.
+4. Model và tham số của agent đọc từ `apps/ai-agent-service/config/models.yaml`, giống agent thật (đổi bằng `--advisor`); extractor mặc định là OpenAI `gpt-4.1-mini` (đổi bằng `--extractor`).
+
+### 9.3 Giai đoạn 2 — Run: agent thật nói chuyện với khách theo kịch bản
+
+Mỗi kịch bản chạy **hai lần**, mỗi lần một tiến trình agent mới:
+
+| | `full` | `baseline_no_memory` |
+|---|---|---|
+| Đọc bộ nhớ từ cuộc trước | có (`memory_read_previous: true`) | không |
+| `seed_history` (phiên cũ, đơn cũ trong CRM) | ghi vào bộ nhớ trước cuộc gọi | vẫn ghi, nhưng agent không đọc lại |
+| `crm.get_customer` | trả về đủ | mock giấu `sessions` |
+| Call Brief | được kỳ vọng từ cuộc 2 (khách đã nhận diện) | không |
+
+```mermaid
+sequenceDiagram
+    participant R as runner.py (harness)
+    participant A as product_adapter (tiến trình riêng)
+    participant B as agent.bridge (venv của agent)
+    participant G as Agent thật (graph, Advisor, Policy, after_call)
+    participant M as Mock BTC (trong harness)
+    participant DB as Postgres schema agent_eval
+    R->>A: open_scenario(runtime: config, namespace, seed_history)
+    A->>B: lifecycle
+    loop mỗi cuộc gọi
+        R->>A: start_call(SĐT, kênh, ngày, input_mode)
+        A->>B: start_call
+        B->>DB: ghi seed_history, nhận diện khách
+        B-->>R: memory_snapshot + call_brief
+        loop mỗi câu của khách (customer_turns hoặc customer_turns_asr)
+            R->>A: run_turn(câu khách)
+            A->>B: turn
+            B->>G: lượt mới
+            G->>B: gọi tool nghiệp vụ (giá, tồn kho, đơn…)
+            B->>M: tool request
+            M-->>B: kết quả (ghi lại cả trạng thái mock đổi gì)
+            G->>DB: bộ nhớ, tri thức qua MCP server
+            B-->>R: agent_text, usage (token, USD), thời gian
+        end
+        R->>A: end_call
+        B->>G: after_call (ghi bộ nhớ, tóm tắt)
+        B-->>R: completed + barrier + memory_snapshot
+    end
+    R->>A: close_scenario
+```
+
+- **Tool nghiệp vụ không chạy trong agent.** Mọi tool `crm.*`, `catalog.*`, `inventory.*`, `pricing.*`, `order.*`, `schedule.*`, `handoff.*` được trả lời bởi một bản `mock_tools.py` của BTC, khởi tạo mới cho mỗi kịch bản và cấu hình (`eval_harness/environment.py`). Nhờ đó biết chính xác agent gọi gì với tham số nào, và mock đã đổi trạng thái gì (đơn mới, vé chuyển máy…), qua các *business snapshot* trước và sau mỗi cuộc.
+- **Bộ nhớ và tri thức** vẫn chạy qua MCP server thật của agent, trên schema `agent_eval`, xóa trước mỗi kịch bản. Dữ liệu thật trong schema `agent` không bị đụng tới.
+- **Agent là agent thật** (`agent/runner.py` lắp ráp giống API): đồ thị 7 nút, `AdvisorAgent`, `PolicyAgent`, `after_call`. Chỉ khác hai điểm, đều do harness yêu cầu: không thử lại khi lỗi, và khách được nhận diện ngay khi kết nối (như hotline), nên Call Brief có trước lượt đầu.
+- **Không thử lại.** Một lỗi (timeout, tool lỗi, barrier không xong) được ghi kèm giai đoạn xảy ra, và cuộc tiếp theo của kịch bản đó không chạy. Lỗi ở `start_call`/`run_turn`/`end_call` được đánh dấu cần đối chiếu.
+- **Ghi:** `raw/<config>/raw-execution.jsonl` (mọi hook, câu khách, snapshot), `raw/<config>/tools.jsonl` (mọi tool call), `adapter-*.log`, `execution-plan.json`, `runner-report.json` (lượt quan sát được so với kế hoạch).
+
+### 9.4 Giai đoạn 3 — Collect: từ log thô thành trace của BTC
+
+Giai đoạn này đọc lại `raw/` (kiểm hash từng file trước), không chạy agent.
+
+1. **Tài liệu của từng lượt:** câu khách, câu agent, văn bản kết quả tool, câu của nhân viên (nếu có chuyển máy), và `facts_used` do agent tự báo.
+2. **Trích xuất** ([`agent/extract_command.py`](agent/extract_command.py), một tiến trình mỗi lượt, song song `EVAL_EXTRACT_WORKERS`):
+   - model đọc lượt đó với prompt `extractor.txt`, trả về các mục `question` / `claim` / `fact_usage` theo schema;
+   - mỗi trích dẫn được tìm lại đúng vị trí trong câu gốc (vị trí sai thì bỏ);
+   - slot ngoài bộ từ vựng thành `other`;
+   - JSON hỏng được sửa bằng `json-repair`, sai schema thì hỏi lại 1 lần.
+
+   Extractor chỉ đọc lời agent, kết quả tool và lời nhân viên; **không bao giờ đọc nhãn hay bộ nhớ**.
+3. **Dựng dòng trace** theo `trace_log.schema.json` của BTC:
+
+   | Trường | Lấy từ |
+   |---|---|
+   | `questions` | các mục `question` của agent (open/confirm, theo slot) |
+   | `claims` | các mục `claim` |
+   | `facts_used` | `fact_usage` của extractor, cộng slot agent tự báo |
+   | `tool_calls` | tool call thật kèm kết quả mock |
+   | `latency` | thời gian đo được |
+   | `customer_input_mode` | mode của kịch bản |
+   | `call_brief_latency_ms` | lượt 1 của cuộc 2 trở đi |
+   | `memory_writes` | bộ nhớ ghi sau cuộc, đúng những ghi chép có nguồn là chính lượt đó |
+
+   Dòng nào sai schema thì bị loại và ghi `TRACE_SCHEMA`.
+4. **Kiểm bằng chứng:**
+   - Call Brief có khi phải có (cấu hình `full`, cuộc 2 trở đi, khách đã nhận diện) và đúng schema, đúng hồ sơ;
+   - Handoff Brief đủ trường và có thời gian;
+   - bộ nhớ đúng namespace, đúng hồ sơ khách, nguồn không ở tương lai;
+   - đủ lượt so với kế hoạch.
+
+   Mỗi vấn đề được phân loại `agent_violation` (agent làm sai) hoặc `missing_evidence` (thiếu bằng chứng để kết luận).
+5. **Ghi:** `evidence/full.jsonl`, `evidence/baseline.jsonl` (trace đúng định dạng BTC), bản ghi hội thoại, kết quả trích xuất, bộ nhớ, brief, `extractor-audit.json` (mẫu ngẫu nhiên để người kiểm extractor), `validation.json`.
+
+### 9.5 Giai đoạn 4 — Score: chấm điểm
+
+1. **Điểm chính thức:** chạy `reference_eval.py` của BTC *nguyên bản* (so hash với `evaluation-contracts/sources/btc`) trên `scorer-input/scenarios/`, `full.jsonl` và `baseline.jsonl`. Ra `official-report.json` và bảng `scorer.stdout.txt`: RQR, CCR, TSR (+ ca khó), HR (+ giá & khuyến mãi), guardrail, latency, so sánh full với baseline. Harness không bao giờ sửa điểm này.
+2. **Kiểm riêng của harness**, theo từng cuộc gọi:
+
+   | Kiểm | Nghĩa |
+   |---|---|
+   | `tool_execution_state` | đơn "đã tạo" phải thật sự có trong trạng thái mock, đúng SĐT, SKU, giá, số lượng, thanh toán |
+   | `memory_integrity` | không ghi nhầm hồ sơ, không để giá trị cũ còn hiệu lực, có lịch sử supersede |
+   | `fact_carryover` | thông tin phải nhớ được dùng đúng giá trị |
+   | `claim_gt_coverage` | mọi khẳng định đều có trong ground truth và đúng |
+   | `grading` + các assertion của `tool-labels.json` | tool bắt buộc được gọi đúng tham số, tool cấm không gọi |
+   | `planned_trace_coverage` | đủ dòng trace theo kế hoạch |
+
+3. **Bổ sung** (`supplemental-report.json`):
+   - latency bỏ 3 lượt khởi động, đúng quy tắc 2 của `huong-dan-do-latency.md` (script của BTC lấy mọi lượt);
+   - Calls-to-Close chỉ đếm đơn đã chứng minh trong mock.
+4. **Báo cáo phụ, không đổi điểm chính thức:**
+   - `claim-adjudication.json`: khẳng định khác đáp án nhưng có thể tương đương;
+   - `tool-business-error-review.json`: tool báo lỗi nghiệp vụ, agent có tự sửa không;
+   - `knowledge-gap-candidates.json`: các lượt phải nói "chưa có thông tin" hay chuyển máy, ứng viên FAQ.
+
+### 9.6 Kết luận một lần chạy
+
+- `execution-report.json` tóm tắt bốn giai đoạn; `case-trace.json` cho đọc lại từng hội thoại; chi phí và điểm được ghi lên Langfuse (mục 4).
+- **Mã thoát:**
+  - `3`: lỗi ở một giai đoạn;
+  - `1`: chạy xong nhưng có `agent_violation`, tức agent trượt một kiểm tra;
+  - `2`: thiếu bằng chứng để kết luận (`INCOMPLETE`);
+  - `0`: đạt hết.
+
+  Chạy nhiều cấp độ thì lấy kết quả xấu nhất theo thứ tự 3 → 1 → 2 → 0.
+- `quality_accepted` luôn là `false`: nhãn của bộ `diagnostic` chưa được người duyệt, nên đây không phải nghiệm thu của BTC.
+
+### 9.7 Những bảo đảm
+
+| Bảo đảm | Cách làm |
+|---|---|
+| Kết quả ứng với đúng một phiên bản code và dữ liệu | mọi đầu vào và cây code agent khóa hash ở Prepare; nguồn BTC khóa trong `sources.lock.json`; mỗi giai đoạn kiểm lại hash của giai đoạn trước |
+| Agent không thấy đáp án | agent chỉ nhận câu khách và kết quả tool; nhãn, ground truth, `success_if` chỉ nằm trong harness |
+| Bằng chứng không bị sửa | thư mục run không bao giờ ghi đè; mỗi giai đoạn khóa file của mình (`artifacts.lock.json`) |
+| Không làm đẹp số | không thử lại; lỗi được ghi như nó xảy ra; dòng trace sai schema bị loại chứ không sửa |
+| Không đụng dữ liệu thật | schema `agent_eval` riêng, xóa trước mỗi kịch bản; tool nghiệp vụ chạy trên mock |
+
+### 9.8 Biến thể: khách mô phỏng (`simulate`)
+
+`run_eval.py simulate` dùng cùng Prepare và Run, nhưng câu khách do simulator của BTC sinh ra thay vì `customer_turns` cố định ([`simulate.py`](simulate.py)):
+
+- một nhân luật áp 8 quy tắc phản ứng (kiên nhẫn theo persona và theo cuộc, tối đa 12 lượt);
+- một model *quan sát* phân loại từng câu agent (câu hỏi, giá nêu ra, lạc đề, đã trả lời trước dòng nào);
+- một model *giọng* nói câu khách theo persona.
+
+Chạy 3 seed × 2 cấu hình. "Đạt" tính bằng `check_call` của BTC trên các tool call thật trên mock. Báo cáo có TSR trung bình ± độ lệch giữa các seed.
+
+Biến môi trường có thể đổi:
+- `EVAL_DB_SCHEMA` (mặc định `agent_eval`, phải kết thúc bằng `_eval`);
+- `EVAL_DATABASE_URL`;
+- `AGENT_PYTHON` (Python chạy agent);
+- `EVAL_EXTRACT_WORKERS` (số tiến trình trích xuất song song);
+- `EVAL_QUIET` (tắt in tiến độ);
+- `BTC_SYNTHETIC_CRM=0` (tắt khách giả lập).
 
 ---
 
@@ -387,7 +571,8 @@ Biến môi trường có thể đổi: `EVAL_DB_SCHEMA` (mặc định `agent_e
   - không đổi điều kiện chấm sau khi đã xem điểm.
 - Các bộ dữ liệu hiện có:
   - `output1-diagnostic-v2`: 5 kịch bản mẫu, mặc định ([quyết định duyệt](datasets/output1-btc-diagnostic-v2/review-decisions.md));
-  - `create-data-diagnostic-v3`: 150 kịch bản từ `create_data`, gồm cả `seed_history` và khách tổng hợp, nhãn chờ duyệt;
+  - `create-data-diagnostic-v4`: 150 kịch bản từ data-generation, từ vựng thanh toán của BTC (`bank`), nhãn chờ duyệt;
+  - `create-data-diagnostic-v3`: 150 kịch bản, gồm cả `seed_history` và khách tổng hợp, nhãn chờ duyệt;
   - `create-data-diagnostic-v2`: bản cũ, 122 kịch bản, không có khách tổng hợp;
   - `create-data-diagnostic-v1`: bản cũ, 101 kịch bản, không có `seed_history`;
   - `asr-team-v2` (trong `asr_sets`): 674 lượt nói của khách có audio, cho đánh giá ASR (mục 5), nhãn chờ duyệt.

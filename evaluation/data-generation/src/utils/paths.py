@@ -25,6 +25,7 @@ AGENT_CATALOG_DIR = ROOT.parents[1] / "apps" / "ai-agent-service" / "data" / "bt
 OUTPUT_DIR = ROOT / "output"
 PLAN_PREVIEW_DIR = OUTPUT_DIR / "plan_preview"        # --plan-only: the same layout, placeholder customer turns
 AUDIO_DIR = OUTPUT_DIR / "audio"
+ASR_REFERENCE_DIR = OUTPUT_DIR / "asr_reference"   # spoken form of each customer turn + ground_truth.json of the audio
 ASR_TEST_DIR = OUTPUT_DIR / "asr_test"
 RAG_DIR = OUTPUT_DIR / "rag"
 REVIEW_DIR = OUTPUT_DIR / "review"

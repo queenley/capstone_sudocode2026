@@ -151,6 +151,8 @@ python -m src.pipeline.run_all --resume --asr-dialogues 24
 | Chỉ sinh hội thoại mẫu | `python -m src.pipeline.generate_dialogue --resume` |
 | Sinh lại các hội thoại bị loại | `python -m src.pipeline.run_all --only-failed --skip-audio` |
 | Chỉ audio, tới 3 giờ (hoặc `--hours 1`) | `python -m src.pipeline.synthesize_scenario_audio --resume` |
+| Chỉ dạng nói của lượt khách (LLM, không TTS), để xem trước khi tốn ElevenLabs | `python -m src.pipeline.synthesize_scenario_audio --reference-only --limit 5` |
+| Ghi lại `asr_reference/ground_truth.json` từ audio đang có | `python -m src.pipeline.synthesize_scenario_audio --ground-truth-only` |
 | Chỉ tính lại trace mong đợi, schema và báo cáo chính thức | `python -m src.pipeline.build_ground_truth` |
 | Kiểm catalog / copy sang agent | `python -m src.pipeline.build_catalog [--sync]` |
 | Tham số của một bước | `python -m src.pipeline.<bước> --help` |
@@ -213,7 +215,7 @@ data/ (BTC, chỉ đọc)  config/ (persona, settings)  ../../config/prompts/dat
 | 7 | `llm_judge` | vai `judge`, 1/cuộc | `judgments/` |
 | 8 | `build_ground_truth` | không | `trace_log/`, `reports/oracle_report*.json`, `reference_report.json`, `a6_oracle.txt`, `tools_audit.*`, `schema_check.json`, `ground_truth_summary.json` |
 | 9 | `export_manual_review` | không | `review/needs_manual_review.csv`; `--ingest`: `approved.csv`, `rejected.csv`, `golden_manifest.json` |
-| 10 | `synthesize_scenario_audio` | ElevenLabs | `audio/scenarios_<id>/call_<n>/turn_<k>.{wav,json}`, `reports/elevenlabs_usage.json` |
+| 10 | `synthesize_scenario_audio` | LLM `asr_reference` + ElevenLabs | `asr_reference/scenarios_<id>/call_<n>.json`, `audio/scenarios_<id>/call_<n>/turn_<k>.{wav,json}`, `asr_reference/ground_truth.json`, `reports/elevenlabs_usage.json` |
 | 11 | `build_asr_testset` (khi `--asr-dialogues N`) | ElevenLabs (`--text-only`: không) | `asr_test/` |
 | 12 | `eval_rag` | không | `rag/` |
 | 13 | `summarize_dataset` | không | `reports/dataset_statistics.json` (+ CSV), `dataset_dashboard.html` |
@@ -291,7 +293,26 @@ Cuộc nào qua kiểm tra luật, judge PASS và không thuộc nhóm rủi ro 
 
 ### Bước 10 — `synthesize_scenario_audio`
 
-Đọc từng lượt khách bằng ElevenLabs. Giọng chọn theo miền, giới tính, độ tuổi (khách lớn tuổi dùng giọng cao tuổi); một phần lượt có thêm nhiễu nền. Dừng khi tổng audio đạt `generation.audio_hours_target` (3 giờ). `--resume` bỏ qua lượt đã đọc *đúng câu đó*, đọc lại nếu câu đã đổi.
+Đọc từng lượt khách bằng ElevenLabs và tạo luôn **đáp án ASR** (`ground_truth.json` theo định dạng [`data/asr/ground_truth.json`](data/asr/ground_truth.json) của BTC), để pipeline đánh giá kiểm được ASR service. Với mỗi cuộc gọi:
+
+1. **LLM viết dạng nói** ([`src/asr/reference.py`](src/asr/reference.py), prompt [`asr_reference.md`](../../config/prompts/data-generation/asr_reference.md), schema [`src/schemas/asr.py`](src/schemas/asr.py), model `models.asr_reference`).
+   - Mỗi lượt khách được viết lại như người gọi nói ra, đúng kiểu D01–D04 của BTC: "Ngân sách tầm 5 triệu" → "ngân sách tầm năm triệu", "AirPure X" → "e pia x", "25m2" → "hai mươi lăm mét vuông".
+   - Kèm `entities` khách nói trong câu, theo khóa của BTC: `room_area_m2`, `has_children`, `budget_vnd`, `competitor_price_vnd`, `payment`, `sku`, `order_id`, `phone`, `size_old`/`size_new`, `color`, `blocker`.
+   - Mỗi cuộc gọi là một lần gọi model, lưu ở `asr_reference/scenarios_<id>/call_<n>.json`, dùng lại khi câu không đổi.
+2. **Kiểm từng câu** (`problems`):
+   - không còn chữ số hay mã (SKU-…);
+   - giữ ≥ 90% từ thường của câu gốc, đúng thứ tự, không thêm từ;
+   - mọi giá trị số trong `entities` phải có trong câu gốc và nghe được trong câu nói;
+   - `sku` nằm trong danh sách sản phẩm của cuộc;
+   - `blocker` thuộc danh sách nhãn cố định.
+
+   Câu sai được hỏi lại 1 lần kèm lỗi. Còn sai thì dùng luật [`src/asr/spoken.py`](src/asr/spoken.py) + [`entities.py`](src/asr/entities.py), ghi `reference_source: "rule"` và `issues`.
+3. **TTS đọc đúng câu dạng nói đó**, nên đáp án khớp audio ngay từ cách tạo. `turn_<k>.json` lưu `text` (câu gốc), `spoken_text`, `entities`, `reference_source`.
+4. **Cuối bước, ghi `asr_reference/ground_truth.json`** từ các clip đang có. Mỗi clip là một `dialogues[]` với `id = <scenario>-<call>-t<k>`, `full_text`, `entities` và `turns: [{speaker: "C", …}]`, cùng `hypotheses_format` và `normalization_rule` của BTC. File có thêm `audio` (đường dẫn WAV), `source_text` và `reference_source`.
+
+   Bỏ qua chat gõ (`chat_*`, không phải lời nói), clip cũ chưa có `spoken_text`, và clip mà câu trong kịch bản đã đổi.
+
+Giọng được chọn theo miền, giới tính và độ tuổi (khách lớn tuổi dùng giọng cao tuổi). Một phần lượt có thêm nhiễu nền. Bước dừng khi tổng audio đạt `generation.audio_hours_target` (3 giờ). `--resume` bỏ qua lượt đã đọc *đúng câu đó* và đọc lại nếu câu đã đổi.
 
 ### Bước 11–14
 
@@ -336,8 +357,11 @@ output/
 ├── trace_log/scenarios_<id>/call_<n>.jsonl      trace của agent lý tưởng (trace_log.schema.json), một dòng mỗi lượt khách
 ├── conversations/scenarios_<id>/call_<n>.json   hội thoại mẫu của cuộc; lượt agent mang đủ trường của trace
 ├── judgments/scenarios_<id>/call_<n>.json       phán quyết judge J01–J12 cho hội thoại đó
-├── audio/scenarios_<id>/call_<n>/turn_<k>.wav   một lượt khách, 16 kHz mono; turn_<k>.json: câu, dòng ASR mong đợi,
-│                                                giọng, nhiễu, thời lượng
+├── audio/scenarios_<id>/call_<n>/turn_<k>.wav   một lượt khách, 16 kHz mono; turn_<k>.json: câu gốc, spoken_text (câu TTS đọc),
+│                                                entities, giọng, nhiễu, thời lượng
+├── asr_reference/                               đáp án ASR của audio kịch bản
+│   ├── scenarios_<id>/call_<n>.json             dạng nói + entities của từng lượt khách (LLM; "rule" khi phải dùng luật)
+│   └── ground_truth.json                        mọi clip đã đọc, định dạng data/asr/ground_truth.json của BTC
 ├── asr_test/                                    bộ ASR của nhóm theo định dạng asr/ của BTC (ground_truth.json + audio/)
 ├── rag/                                         đánh giá RAG: report, kết quả theo định dạng BTC, CSV từng câu hỏi
 ├── review/                                      duyệt tay: needs_manual_review.csv, approved.csv, rejected.csv,
@@ -357,7 +381,8 @@ scenario_id, level, persona, hard_case, customer_phone, customer_name, honorific
 calls: { call_n: {
     [channel, channel_identity]   khi không phải hotline
     call_date | days_later        call_1 có call_date; các cuộc sau có days_later
-    [input_mode]                  khi không phải text: asr_transcript, chat_teencode, chat_khong_dau, chat_sai_chinh_ta
+    [input_mode]                  khi không phải text: asr_transcript hoặc chat_teencode (gồm cả gõ không dấu,
+                                  sai chính tả; mode chi tiết ở metadata/)
     customer_goal, customer_turns, [customer_turns_asr], [seed_history],
     facts_established, [must_carry_over], [must_not_ask], success_if, ground_truth_facts,
     [memory_expectation], [fault_injection], expected_outcome
@@ -378,7 +403,7 @@ calls: { call_n: {
  "latency": {"ttft_ms": 0, "total_ms": 0, "ttfa_ms": null}}
 ```
 
-Trace dựng từ nhãn thì không đo thời gian: latency để `0` vì schema bắt buộc kiểu số nguyên, nên phần latency trong báo cáo của trace này không có ý nghĩa. `customer_input_mode` chỉ ghi khi BTC có tên cho mode đó (`clean`, `asr_transcript`, `chat_teencode`).
+Trace dựng từ nhãn thì không đo thời gian: latency để `0` vì schema bắt buộc kiểu số nguyên, nên phần latency trong báo cáo của trace này không có ý nghĩa. `customer_input_mode` là `clean`, `asr_transcript` hoặc `chat_teencode` (gõ không dấu và sai chính tả cũng là `chat_teencode`).
 
 ### Quy ước khóa của `ground_truth_facts`
 
@@ -534,7 +559,11 @@ python -m src.pipeline.eval_asr --set team --transcribe             # faster-whi
 python -m src.pipeline.eval_asr --set btc --hypotheses path/hypotheses.json
 ```
 
-Bộ ASR dựng từ hội thoại mẫu. Câu được chuyển sang **dạng nói** như D01–D04 của BTC ([`src/asr/spoken.py`](src/asr/spoken.py)): 5.200.000đ → "năm triệu hai trăm nghìn", 22/10 → "hai mươi hai tháng mười", OD600001 → "ô đê sáu trăm nghìn không trăm linh một". Chính câu đó được gửi đi TTS, nên đáp án đúng ngay từ cách tạo. Một phần ba hội thoại có nhiễu băng thông điện thoại + mất gói (BTC: 4/12 có nhiễu). Mỗi hội thoại có `audio/<id>.segments.json` cho chấm phân vai (M2). Điểm tính bằng `wer_cer` của BTC; việc chấm chạy trong `reports/asr_eval/<set>/`, không đụng vào `data/`.
+Có hai bộ đáp án ASR:
+- **Audio kịch bản** (`asr_reference/ground_truth.json`, bước 10): mỗi lượt khách là một clip, dạng nói do LLM viết, TTS đọc đúng câu đó. Harness dựng bộ chấm từ đây bằng `run_eval.py asr-build` và dùng `spoken_text` của clip làm đáp án.
+- **Bộ hội thoại của nhóm** (`asr_test/`, bước 11): đủ cả lượt agent và khách, như D01–D04.
+
+Bộ hội thoại dựng từ hội thoại mẫu. Câu được chuyển sang **dạng nói** như D01–D04 của BTC ([`src/asr/spoken.py`](src/asr/spoken.py)): 5.200.000đ → "năm triệu hai trăm nghìn", 22/10 → "hai mươi hai tháng mười", OD600001 → "ô đê sáu trăm nghìn không trăm linh một". Chính câu đó được gửi đi TTS, nên đáp án đúng ngay từ cách tạo. Một phần ba hội thoại có nhiễu băng thông điện thoại + mất gói (BTC: 4/12 có nhiễu). Mỗi hội thoại có `audio/<id>.segments.json` cho chấm phân vai (M2). Điểm tính bằng `wer_cer` của BTC; việc chấm chạy trong `reports/asr_eval/<set>/`, không đụng vào `data/`.
 
 ---
 
@@ -584,7 +613,7 @@ Prompt nằm ở `../../config/prompts/data-generation/` (prompt của judge l�
 |---|---|
 | `data/eval/mock_tools.py` có thêm 3 dòng nạp `crm_seed_synthetic.json` | để mock biết khách giả lập, giống cách agent nạp họ (`apps/ai-agent-service/.../mcp/servers/btc.py`); mọi logic khác giữ nguyên |
 | Kết quả chi tiết `cap_nhat_don`, `thong_tin`, `xoa_du_lieu` | file kịch bản ghi `khac` như BTC; kết quả chi tiết nằm ở `metadata/` (`outcome_detail`) |
-| Input mode `chat_khong_dau`, `chat_sai_chinh_ta` | tình huống thật BTC chưa có tên; vẫn đi kèm `customer_turns_asr` như ASR/teencode, trace bỏ `customer_input_mode` cho hai mode này |
+| Input mode `chat_khong_dau`, `chat_sai_chinh_ta` | tình huống thật BTC chưa có tên. File kịch bản và trace ghi `chat_teencode` (chữ gõ chat), là giá trị mà BTC, agent và harness đều nhận; mode chi tiết nằm ở `metadata/` (`input_mode_detail`). Đi kèm `customer_turns_asr` như ASR/teencode |
 | Latency `0` trong trace lý tưởng, `latency_ms: 0` trong brief mong đợi | schema bắt buộc kiểu số nguyên; đây là nhãn, không phải số đo |
 | Trường thêm trong brief (`customer_id`, `freshness_checks`, `ambiguous_identity`, `last_session.handled_by`) và trong ground truth của persona nâng cao | schema của BTC cho phép thêm trường |
 | 21 persona nâng cao, 2 loại khách mới (giả lập, ẩn danh) | phủ tình huống thật ngoài bộ ca khó của BTC; nhãn vẫn tính bằng mock và chính sách của BTC |

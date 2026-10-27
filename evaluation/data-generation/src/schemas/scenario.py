@@ -24,7 +24,7 @@ from typing import Any, Literal
 from pydantic import Field, field_validator, model_validator
 
 from .catalog import StrictModel
-from .slots import CUSTOMER_SLOTS, Channel, InputMode, Outcome, btc_outcome, normalize_outcome
+from .slots import CUSTOMER_SLOTS, Channel, InputMode, Outcome, btc_input_mode, btc_outcome, normalize_outcome
 
 Region = Literal["bac", "trung", "nam"]
 CallName = Literal["call_1", "call_2", "call_3"]
@@ -178,7 +178,7 @@ class Scenario(StrictModel):
             else:
                 payload["days_later"] = call.days_later
             if call.input_mode != "text":
-                payload["input_mode"] = call.input_mode
+                payload["input_mode"] = btc_input_mode(call.input_mode)
             payload.update(customer_goal=call.customer_goal, customer_turns=call.customer_turns)
             optional = {"customer_turns_asr": call.customer_turns_asr, "seed_history": call.seed_history}
             payload.update({key: value for key, value in optional.items() if value})
@@ -201,12 +201,14 @@ class Scenario(StrictModel):
     def metadata(self) -> dict[str, Any]:
         """The pipeline's own fields: everything :meth:`btc_export` leaves out, except briefs and tools.
 
-        ``outcome_detail`` keeps the pipeline's outcome where BTC's file says "khac" (cap_nhat_don, thong_tin, xoa_du_lieu).
+        ``outcome_detail`` keeps the pipeline's outcome where BTC's file says "khac" (cap_nhat_don, thong_tin, xoa_du_lieu);
+        ``input_mode_detail`` the typed-chat mode where it says "chat_teencode" (chat_khong_dau, chat_sai_chinh_ta).
         """
         return {"scenario_id": self.scenario_id, "persona_source": self.persona_source,
                 "customer_id": self.customer_id, "region": self.region, "category": self.category,
                 "difficulty": self.difficulty, "tags": self.tags, "metric_focus": self.metric_focus,
                 "calls": {name: {"kind": call.kind, "outcome_detail": call.expected_outcome,
+                                 "input_mode_detail": call.input_mode,
                                  "agent_will_tell": call.agent_will_tell,
                                  "speaker_customer_id": call.speaker_customer_id,
                                  "simulator_persona_key": call.simulator_persona_key,

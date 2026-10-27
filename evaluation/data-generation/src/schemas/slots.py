@@ -78,6 +78,15 @@ ESCALATION_OUTCOME = "chuyen_may"
 BTC_OUTCOMES = ("hen_goi_lai", "chot_don", "chuyen_may", "tu_choi", "khac")
 
 
+#: Input modes BTC names (trace_log customer_input_mode; the agent's and the harness's loaders accept only these).
+BTC_INPUT_MODES = ("text", "asr_transcript", "chat_teencode")
+
+
+def btc_input_mode(mode: str) -> str:
+    """*mode* as BTC names it: chat without diacritics or with typos is typed chat, "chat_teencode"."""
+    return mode if mode in BTC_INPUT_MODES else "chat_teencode"
+
+
 def btc_outcome(outcome: str) -> str:
     """*outcome* as BTC names it: cap_nhat_don, thong_tin and xoa_du_lieu are "khac"."""
     return outcome if outcome in BTC_OUTCOMES else "khac"

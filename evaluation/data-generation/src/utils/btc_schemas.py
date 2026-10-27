@@ -23,8 +23,9 @@ SCHEMA_DIR = DATA_DIR / "schemas"
 JSON_SCHEMAS = ("trace_log", "call_brief", "handoff_brief")
 #: Trace configurations reference_eval tells apart (trace_log.schema.json → config).
 CONFIGS = ("full", "baseline_no_memory")
-#: Our input modes as trace_log's ``customer_input_mode`` names them; the chat modes BTC has no name for are left out.
-INPUT_MODES = {"text": "clean", "asr_transcript": "asr_transcript", "chat_teencode": "chat_teencode"}
+#: Our input modes as trace_log's ``customer_input_mode`` names them: every typed-chat mode is chat_teencode.
+INPUT_MODES = {"text": "clean", "asr_transcript": "asr_transcript", "chat_teencode": "chat_teencode",
+               "chat_khong_dau": "chat_teencode", "chat_sai_chinh_ta": "chat_teencode"}
 
 
 @lru_cache(maxsize=None)

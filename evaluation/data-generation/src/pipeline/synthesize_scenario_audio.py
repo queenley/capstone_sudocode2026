@@ -1,7 +1,13 @@
 """Stage 9 — speak every customer turn of the scenarios, until the audio reaches its target length.
 
 Output: ``output/audio/scenarios_<id>/call_<n>/turn_<k>.wav`` (16 kHz mono) and a
-``.json`` beside each with its text, the expected ASR line, voice, noise and duration.
+``.json`` beside each with its text, the spoken form the voice read, its entities, voice, noise and duration.
+
+The voice does not read the written turn ("5.200.000đ", "AirPure X"). It reads the spoken form
+("năm triệu hai trăm nghìn", "e pia x"). A model writes that form first (``src/asr/reference.py``,
+``output/asr_reference/scenarios_<id>/call_<n>.json``), so the ASR reference is exactly what was said.
+After the run, ``output/asr_reference/ground_truth.json`` lists every spoken clip in BTC's
+``data/asr/ground_truth.json`` format. Typed chat (teencode, no diacritics) is read as written and left out.
 
 Scenarios are taken in id order until the audio on disk reaches
 ``generation.audio_hours_target`` (BTC M2: ≥ 3 hours) or ``--hours``; ``--limit``
@@ -11,6 +17,8 @@ with the same words.
 
     python -m src.pipeline.synthesize_scenario_audio --resume            # up to the target hours
     python -m src.pipeline.synthesize_scenario_audio --hours 1 --clean   # one hour, no background noise
+    python -m src.pipeline.synthesize_scenario_audio --reference-only --limit 5   # spoken forms only, no TTS
+    python -m src.pipeline.synthesize_scenario_audio --ground-truth-only          # rewrite ground_truth.json
 """
 from __future__ import annotations
 
@@ -23,11 +31,13 @@ from pathlib import Path
 import numpy as np
 import yaml
 
-from src.elevenlabs_client import ElevenLabsClient
+from src.asr.reference import load_or_build, write_ground_truth
 from src.utils.audio_noise import NOISE_TYPES, add_noise
-from src.utils.crm import load_customers
+from src.utils.crm import SourceData, load_customers
 from src.utils.dataset import Dataset, call_folder
 from src.utils.paths import AUDIO_DIR, REPORTS_DIR, ROOT
+from src.utils.quota import stop_on_daily_limit
+from src.utils.settings import model_client
 
 SAMPLE_RATE = 16000
 SENIOR = ("cô", "chú", "bác", "ông", "bà")
@@ -43,12 +53,13 @@ def write_wav(path: Path, pcm: bytes, sample_rate: int = SAMPLE_RATE) -> None:
         stream.writeframes(pcm)
 
 
-def _spoken_text(wav: Path) -> str | None:
-    """The text a WAV on disk was synthesized from, per the .json beside it."""
+def _spoken_text(wav: Path) -> tuple[str | None, str | None]:
+    """``(turn text, what the voice read)`` of a WAV on disk, per the .json beside it."""
     try:
-        return json.loads(wav.with_suffix(".json").read_text(encoding="utf-8")).get("text")
+        meta = json.loads(wav.with_suffix(".json").read_text(encoding="utf-8"))
     except (OSError, ValueError):
-        return None
+        return None, None
+    return meta.get("text"), meta.get("spoken_text") or meta.get("text")
 
 
 def spoken_seconds(root: Path = AUDIO_DIR) -> float:
@@ -69,7 +80,12 @@ def main() -> None:
     parser.add_argument("--clean", action="store_true", help="Do not add background noise")
     parser.add_argument("--noise-type", choices=NOISE_TYPES, help="Use one noise type for every turn")
     parser.add_argument("--resume", action="store_true", help="Skip turns whose WAV and JSON already exist")
+    parser.add_argument("--reference-only", action="store_true", help="Write the spoken forms only (model, no TTS)")
+    parser.add_argument("--ground-truth-only", action="store_true", help="Rewrite ground_truth.json from the clips on disk")
     args = parser.parse_args()
+    if args.ground_truth_only:
+        print(f"ASR ground truth: {write_ground_truth()}")
+        return
     settings = yaml.safe_load((ROOT / "config/settings.yaml").read_text(encoding="utf-8"))
     target_seconds = 3600 * (args.hours if args.hours is not None else float(settings["generation"]["audio_hours_target"]))
     budget = settings["budget"]["max_elevenlabs_chars_per_run"]
@@ -79,6 +95,24 @@ def main() -> None:
     voice_settings = audio_config.get("voice_settings", {})
     noise_fraction = float(audio_config.get("noise_fraction", 0.5))
     noise_snr_db = int(audio_config.get("noise_snr_db", 6))
+    names = {product.sku: product.name for product in SourceData.load().catalog.products}
+    clients: list = []
+
+    def reference_client():   # built on first use: a rerun whose spoken forms are on disk makes no model call
+        if not clients:
+            clients.append(model_client("asr_reference", settings))
+        return clients[0]
+
+    if args.reference_only:
+        written = 0
+        for scenario in Dataset().iter_scenarios(args.limit):
+            for call_name, call in scenario.ordered_calls():
+                written += load_or_build(reference_client, scenario, call_name, call, names) is not None
+        print(f"Spoken forms on disk for {written} calls -> output/asr_reference/")
+        return
+
+    from src.elevenlabs_client import ElevenLabsClient
+
     tts = ElevenLabsClient(ROOT / "config/voices.yaml", AUDIO_DIR, budget)
     missing = tts.missing_voices()
     if missing:
@@ -97,11 +131,14 @@ def main() -> None:
         age_band = "senior" if honorific in SENIOR or scenario.persona == "khach_lon_tuoi" else "adult"
         for call_name, call in scenario.ordered_calls():
             voice = tts.pick_voice("customer", gender, scenario.region, age_band, scenario.customer_id or scenario.customer_phone)
+            reference = load_or_build(reference_client, scenario, call_name, call, names)
             for turn_index, text in enumerate(call.customer_turns, start=1):
+                spoken = reference["turns"][turn_index - 1] if reference else None
+                said = spoken["spoken_text"] if spoken else text
                 output = AUDIO_DIR / call_folder(scenario.scenario_id) / call_name / f"turn_{turn_index}.wav"
-                if args.resume and output.exists() and _spoken_text(output) == text:
+                if args.resume and output.exists() and _spoken_text(output) == (text, said):
                     continue   # a turn whose words changed (a regenerated scenario) is spoken again
-                pcm = tts.synthesize_turn(text, voice, model_id=model_id, language_code=language_code,
+                pcm = tts.synthesize_turn(said, voice, model_id=model_id, language_code=language_code,
                                           stability=voice_settings.get("stability", .35),
                                           similarity_boost=voice_settings.get("similarity_boost", .8),
                                           style=voice_settings.get("style", .35),
@@ -121,6 +158,11 @@ def main() -> None:
                 output.with_suffix(".json").write_text(json.dumps({
                     "scenario_id": scenario.scenario_id, "call": call_name, "turn": turn_index,
                     "speaker": "customer", "text": text, "input_mode": call.input_mode,
+                    # The ASR reference: what the voice read, and the values it states (None for typed chat).
+                    "spoken_text": spoken["spoken_text"] if spoken else None,
+                    "entities": spoken["entities"] if spoken else None,
+                    "reference_source": spoken["reference_source"] if spoken else None,
+                    "customer_gender": "m" if gender == "male" else "f",
                     "asr_text": call.customer_turns_asr[turn_index - 1] if turn_index <= len(call.customer_turns_asr) else None,
                     "voice_id": voice, "duration_seconds": duration,
                     "model_id": model_id, "language_code": language_code,
@@ -138,7 +180,8 @@ def main() -> None:
                                  indent=2), encoding="utf-8")
     print(f"Scenario turn audio generated: {generated}; characters sent: {tts.characters_sent}/{budget}; "
           f"audio on disk: {seconds / 3600:.2f} h (target {target_seconds / 3600:.1f} h)")
+    print(f"ASR ground truth: {write_ground_truth()}")
 
 
 if __name__ == "__main__":
-    main()
+    stop_on_daily_limit(main)()
