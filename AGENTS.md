@@ -1,14 +1,13 @@
-# Evaluation run history
+# Evaluation
 
-Before selecting model-backed test cases, read `docs/evaluation/RUN-LEDGER.md`.
-Prefer cases absent from completed runs and reserved holdouts. A paired R0/R1
-retest is intentional: label it explicitly, keep the same cohort and grading,
-and do not count it as new coverage.
+Before changing or running anything under `evaluation/`, read `evaluation/README.md`, especially its rules. The only
+evaluation command is `run_eval.py` at the repository root; how a number is produced is in
+`docs/evaluation/scoring-flow.md`.
 
-After starting or finishing each model-backed run, update its entry in that
-ledger with selected scenario IDs, configs, status and the evidence directory.
-Preserve historical entries; missing evidence or billing remains INCOMPLETE.
-Never commit raw conversations, keys or customer data into the ledger.
-
-The imported `20261017-111459` is read-only evidence. The user explicitly
-excluded its ten scenario IDs from this work's model runs; see the ledger.
+- Every model-backed run spends money. Set `EVAL_BUDGET_DB` to the budget ledger (`evaluation/runs/20261024-work/budget.sqlite`)
+  and never recreate the ledger to get past a cap. Try one scenario before a cohort.
+- Changing the extractor (`config/prompts/evaluation/extractor.txt`, `scorers.py`) changes the instrument: compare numbers
+  only between runs of the same `extractor_version`, and use `run_eval.py --relabel` to compare extractors on the same replies.
+- The organisers' pack (`apps/ai-agent-service/data/btc`) is read-only; `tests/agent/test_btc_pack.py` pins it.
+- Changing a scenario or a ground-truth label follows `evaluation/datasets/ground-truth-review/SKILL.md`.
+- Never commit raw conversations, keys or customer data. `evaluation/runs/` is not in git.

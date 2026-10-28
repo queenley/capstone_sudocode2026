@@ -5,7 +5,7 @@ aloud (BTC ``data/asr/ground_truth.json``: numbers, money, codes and brand names
 TTS, so it is both the audio and the WER reference; ``entities`` are what BTC's ``entity_accuracy`` compares against.
 
 :class:`SpokenEntities` is the one entity vocabulary of both sides: ``ground_truth.json`` carries its JSON schema
-(``entity_schema``), and ``evaluation/agent-evaluation`` extracts the entities of what a recogniser heard into the same
+(``entity_schema``), and whoever scores a recogniser extracts the entities of what it heard into the same
 schema, so a correct transcript can score 100%.
 """
 from typing import Any, Literal

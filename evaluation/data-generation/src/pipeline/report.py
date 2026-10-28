@@ -220,8 +220,7 @@ def official_markdown(ctx: dict[str, Any]) -> list[str]:
         lines.append("Not run yet: `python -m src.pipeline.eval_rag`.")
     lines += ["", "## ASR (WER / CER / entity accuracy)", "",
               f"Team ASR set: {ctx['asr_team_dialogues']} dialogues (BTC requires >= 20 plus the 12 BTC dialogues)."]
-    lines.append("Scored in evaluation/agent-evaluation: `run_eval.py asr-build --kind turns|dialogues`, then `run_eval.py asr` "
-                 "(the agent's ASR and understanding against this ground truth).")
+    lines.append("Scoring: BTC's `reference_eval.py` grades an ASR hypotheses file against this ground truth (`--asr`).")
     tools = ctx["tools"]
     lines += ["", "## Tools vs BTC tool set", ""]
     if tools:
