@@ -112,3 +112,29 @@ BTC không cung cấp extractor: `trace_log.schema.json` ghi việc trích `ques
 Bộ chấm phân tích trước đây để extractor tự đặt tên slot và tên trường claim, nên RQR, CCR và HR lệch khỏi đường chính thức. v3 (`scripts/evaluation/agent/slots.py`) dùng đúng từ vựng, ép kiểu và quy tắc gắn nhãn của đường chính thức: slot ngoài bộ là `other` kiểu `open`, `fact_usage` ngoài bộ bị bỏ, claim phải thuộc trường BTC với giá trị đúng kiểu. Đây là đổi công cụ đo sau khi đã xem điểm, nên chỉ so sánh trên **cùng transcript**; không so với run dùng v2.
 
 Một bản thử trung gian (chỉ 30 slot lấy từ mẫu công khai BTC, trước khi thống nhất với đường chính thức) chấm lại 104 lượt của `development-r2-v4-M2` cho RQR hệ thống 4,1% và baseline 25,3% (v2: 3,8% và 3,7%). Số này **chưa được đo lại** với bản v3 cuối; cần chạy lại `docs/evaluation/rescore_with_scoped_extractor.py`.
+
+## Ngày 28/10/2026: một đường chạy duy nhất (extractor v4 trong sản phẩm)
+
+Nhánh `feat/single-eval-path`. Đường chấm duy nhất là `run_eval.py` ở gốc repo (`apps/ai-agent-service/.../pipeline/eval`); extractor `product-extractor-v4` (`config/prompts/evaluation/extractor.txt`) thay `turn_labeller.md`. Số của lần chạy dưới đây không so được với các run trước (đổi đường chạy và dụng cụ đo).
+
+### 20261028-sample01-noextract (chạy kiểm đường ống)
+
+- Mục đích: chạy kiểm đường A sau khi nối extractor v4, **không gọi extractor** (`--no-extract`), nên RQR và HR không đo. Không tính là coverage.
+- Case: BTC `SAMPLE-01` (public sample), full + baseline_no_memory, warm-up 3.
+- Model agent: theo `config/models.yaml`. Sổ ngân sách: `evaluation/runs/20261024-work/budget.sqlite` (chuyển từ `evaluation/agent-evaluation/runs/` ngày 28/10) (trần 50 USD, đã dùng ~43,03 USD trước lần chạy).
+- Evidence: `apps/ai-agent-service/runs/20261028-sample01-noextract/`.
+- Trạng thái: **COMPLETE** (thoát mã 0; 0 lượt lỗi, 0 lỗi schema, 0 after_call lỗi). Chi phí theo sổ: **0,0612 USD** (dự phòng gồm cả request chưa đối soát; sổ còn ~6,91 USD).
+- Kết quả diagnostic (không có extractor nên RQR, HR = None): full TSR 100%, CCR 50%; baseline TSR 0% (call_2 không có `order.create` khớp `args_match`), CCR 0%. Latency 7 lượt: TTFT p50 2.233 ms, p95 4.239 ms (dưới 100 lượt, p95 không có ý nghĩa).
+- Recall@3/@5 của RAG trên 60 câu BTC: 89,8% / 93,2%.
+
+### 20261028-sample01-extractor-v4 (kiểm nhãn extractor v4)
+
+- Mục đích: lần đầu gọi extractor v4 thật trong đường chạy duy nhất, để đọc nhãn từng lượt. Cùng case với lần chạy trước; không tính là coverage.
+- Case: BTC `SAMPLE-01`, full + baseline_no_memory, warm-up 3. Extractor `product-extractor-v4`, gpt-4.1-mini theo `config/models.yaml`.
+- Sổ ngân sách: `evaluation/runs/20261024-work/budget.sqlite` (chuyển từ `evaluation/agent-evaluation/runs/` ngày 28/10) (~43,09 USD đã dùng trước lần chạy).
+- Evidence: `apps/ai-agent-service/runs/20261028-sample01-extractor-v4/`.
+- Trạng thái: **COMPLETE** (thoát mã 0; 0 lượt chưa gắn nhãn, 0 item bị bỏ do quote sai). Chi phí theo sổ: **0.1048 USD**; sổ còn ~6.81 USD.
+- Kết quả diagnostic baseline → hệ thống: RQR 50% → 0%, CCR 50% → 50%, TSR 0% → 100%, HR giá&KM 66,7% → 0%.
+- Đọc tay 14 lượt: phân loại câu hỏi và kiểu giá trị claim đúng; lỗi extractor thấy được: baseline được tính `fact_usage` cho giá trị KHÔNG có ở cuộc trước (giá 4.890.000 của AirPure X, `quantity`, `address_token` rỗng), full bỏ sót `price_quoted_vnd` khi agent nói "giá vẫn giữ nguyên"/đưa giá vào `order.create`, và "dự kiến giao ngày 22/10" bị gắn `restock_date`. Agent nói giao 4 ngày, GT `delivery_days` = 2.
+
+Thư mục `runs/` (bằng chứng 22/10 và 24/10, sổ ngân sách) được giữ nguyên làm kho lượt agent thật để kiểm extractor, chuyển sang `evaluation/runs/` (gitignore). Chấm lại một run cũ bằng extractor hiện tại: `run_eval.py --relabel evaluation/runs/<ngày>-work/<run> --out <thư mục>` (không chạy lại agent; run gốc không bị sửa).
