@@ -43,9 +43,20 @@ from typing import Any, Sequence
 
 from ...config.config_manager import ROOT, btc_data_dir
 
-#: The repository's root, where the organisers' command is run from.
-#: Under the service home, as the image prepares it (``/app/agent/runs``).
-RUNS = ROOT / "runs"
+
+def runs_dir() -> Path:
+    """Where every run, the extractor's cache and the budget ledger are kept: ``evaluation/runs`` of the repository
+    (not under git), or ``EVAL_RUNS_DIR``. An image has no ``evaluation/`` beside the service home, so there it is
+    ``runs`` under the service home (``/app/agent/runs``)."""
+    if os.environ.get("EVAL_RUNS_DIR"):
+        return Path(os.environ["EVAL_RUNS_DIR"]).resolve()
+    repository = ROOT.parents[1] if len(ROOT.parents) > 1 else None
+    if repository is not None and (repository / "evaluation").is_dir():
+        return repository / "evaluation" / "runs"
+    return ROOT / "runs"
+
+
+RUNS = runs_dir()
 EXTRACTOR_CACHE = RUNS / "cache" / "extractor.json"
 
 #: Extractor calls in flight at once; the provider's rate limiter paces them.
@@ -81,7 +92,7 @@ def parser() -> argparse.ArgumentParser:
     parser.add_argument("--config", choices=("full", "baseline_no_memory"),
                         help="One configuration. Without it, both, then the organisers' table.")
     parser.add_argument("--out", type=Path,
-                        help="With --config, the trace file; without, the run's directory (default: runs/<run id>).")
+                        help="With --config, the trace file; without, the run's directory (default: evaluation/runs/<run id>).")
     parser.add_argument("--only", action="append", default=[], metavar="SCENARIO_ID",
                         help="Run only this scenario; repeat for more.")
     parser.add_argument("--warmup", type=int, default=3, help="Untraced turns before the first measured one (default 3).")
