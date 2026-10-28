@@ -5,8 +5,9 @@ described in its report; BTC hand-checks 20 turns for an extractor that cheats).
 scenarios use. The organisers' command (``run_eval.py --scenarios``) runs ``components/evaluation/scorers.py``, whose
 vocabularies are "fixed, never read from a scenario" so the extractor cannot learn the answer key:
 
-- question slots: the memory ontology's slots (``SLOTS``), a superset of every ``must_not_ask`` /
-  ``must_carry_over`` name in BTC's public samples (``test_slot_vocabulary`` keeps it so);
+- question slots: the memory ontology's slots (``SLOTS``) plus :data:`EXTRA_SLOTS`, a superset of every
+  ``must_not_ask`` / ``must_carry_over`` / ``facts_established`` name in BTC's public samples
+  (``test_slot_vocabulary`` keeps it so);
 - claim fields: ``CLAIM_FIELDS``, the keys of BTC's ``ground_truth_facts``, with each value's type, plus
   ``promo_<CODE>_active``.
 
@@ -29,36 +30,22 @@ from ai_agent_service.components.evaluation import scorers  # noqa: E402
 
 OTHER = scorers.OTHER
 
+#: Slots BTC's scenarios use that the agent's memory ontology does not keep: ``channel`` is in BTC's
+#: ``facts_established`` (SAMPLE-04) and in the handoff brief. Only the extractor knows them, so the product's
+#: ontology and memory stay as they are.
+EXTRA_SLOTS: frozenset[str] = frozenset({"channel"})
+
 
 def vocabulary() -> frozenset[str]:
-    return frozenset(scorers.SLOTS)
-
-
-def prompt_block() -> str:
-    """The sentence block ``config/prompts/evaluation/extractor.txt`` carries; a test keeps the file equal to this."""
-    slots = "\n".join(f"- {name}: {label}" for name, label in scorers.SLOT_LABELS.items())
-    return (
-        "SLOT VOCABULARY. For kind=question and kind=fact_usage, slot_or_field must be exactly one of these names, "
-        "or \"other\" for a question about none of them:\n"
-        f"{slots}\n"
-        "A question is a question the agent asks the customer; its slot is the name it asks about. question_type "
-        "is \"confirm\" only when the agent states the value itself and asks the customer to confirm it "
-        "(\"vẫn là phòng 25 m² đúng không ạ?\"); otherwise \"open\". An offer, a request for permission or a "
-        "closing question (\"có muốn em ... không\", \"cần hỗ trợ gì thêm\") has slot \"other\" and question_type "
-        "\"open\". A fact_usage is the agent reusing one of these values in its reply or a tool argument; if the item "
-        "concerns anything else, do not emit it.\n"
-        "CLAIM FIELDS. For kind=claim, slot_or_field is one of: "
-        f"{', '.join(scorers.CLAIM_FIELDS)}, or promo_<CODE>_active for a named promotion code. Skip a claim no "
-        "field fits. value is an integer for money, days and months, true or false for yes/no facts, "
-        "\"YYYY-MM-DD\" for dates. A value named only to say it is outdated or wrong is not a claim of that value."
-    )
+    """Every name a question or fact use may be filed under; ``config/prompts/evaluation/extractor.txt`` lists the same."""
+    return frozenset(scorers.SLOTS) | EXTRA_SLOTS
 
 
 def restrict(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], int]:
     """*items* under the instrument's rules; how many were changed or set aside.
 
     Questions: a slot outside ``SLOTS`` is ``other``, and a question about nothing in ``SLOTS`` is never a confirm.
-    Fact uses outside ``SLOTS`` are dropped. Claims: the field must be in ``CLAIM_FIELDS`` (or a named promotion),
+    Fact uses outside ``SLOTS`` are dropped. An observation repeated at the same span is kept once. Claims: the field must be in ``CLAIM_FIELDS`` (or a named promotion),
     the value is coerced to the field's type (else set aside), and the instrument's grounding rules apply.
     """
     allowed, kept, changed = vocabulary(), [], 0
@@ -81,7 +68,18 @@ def restrict(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], int]:
             kept.extend(produced)
             continue
         kept.append(item)
-    return kept, changed
+    unique, seen = [], set()
+    for item in kept:
+        # The same observation twice (a named promotion the model also wrote as promo_active, which the pipeline adds
+        # itself) would count twice in the trace and the collector rejects duplicates, losing the whole turn.
+        identity = json.dumps({k: item.get(k) for k in ("kind", "slot_or_field", "value", "question_type", "source_field", "start", "end")},
+                              sort_keys=True, ensure_ascii=False)
+        if identity in seen:
+            changed += 1
+            continue
+        seen.add(identity)
+        unique.append(item)
+    return unique, changed
 
 
 def _claim(item: dict[str, Any]) -> list[dict[str, Any]] | None:

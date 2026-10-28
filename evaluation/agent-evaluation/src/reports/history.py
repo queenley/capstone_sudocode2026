@@ -3,16 +3,38 @@ import json
 from pathlib import Path
 
 
+#: What a run folder holds: its report once finished, its manifest once prepared, its raw records once started.
+RUN_MARKERS = ("execution-report.json", "manifest.json", "raw")
+
+
+def is_run(path: Path) -> bool:
+    return any((path / marker).exists() for marker in RUN_MARKERS)
+
+
+def run_directories(root: Path) -> list[Path]:
+    """The runs under *root*: its subfolders, and the runs inside a subfolder that only groups them.
+
+    A day's work is kept in one folder (``20261024-work/development-r0-M1``, ...) next to its budget ledger and
+    scripts. Such a folder is not a run itself, so it is replaced by the runs it holds; a subfolder with neither
+    markers nor runs inside is still listed, as a run whose report is missing.
+    """
+    found = []
+    for child in sorted(p for p in root.iterdir() if p.is_dir()):
+        nested = [] if is_run(child) else [p for p in sorted(child.iterdir()) if p.is_dir() and is_run(p)]
+        found.extend(nested or [child])
+    return found
+
+
 def render_history(runs: Path) -> str:
     lines = [
         "| Run | Calls | TSR baseline → system | CCR baseline → system | RQR baseline → system | Status | Reasons | Report |",
         "| --- | ---: | ---: | ---: | ---: | --- | --- | --- |",
     ]
-    directories = sorted([p for root in (runs, runs.parent / "archive/runs") if root.is_dir()
-                          for p in root.iterdir() if p.is_dir()])
-    for run in directories:
+    archive = runs.parent / "archive/runs"
+    directories = [(root, run) for root in (runs, archive) if root.is_dir() for run in run_directories(root)]
+    for root, run in directories:
         report_path = run / "execution-report.json"
-        label = ("archive/" if run.is_relative_to(runs.parent / "archive/runs") else "") + run.name
+        label = ("archive/" if root == archive else "") + run.relative_to(root).as_posix()
         if not report_path.is_file():
             lines.append(f"| {label} | — | — | — | — | INCOMPLETE | EXECUTION_REPORT_MISSING | {run.resolve()} |")
             continue

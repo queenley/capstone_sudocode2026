@@ -6,6 +6,11 @@ instructions, ``config/prompts/evaluation/extractor.txt``, then the turn's text 
 ``[INPUT DATA]``), and one JSON line goes to stdout: ``{"raw", "usage"}``,
 where ``raw`` holds ``{"items": [...]}``.
 
+The turn's text holds ``agent_text``, ``tool_texts`` and ``consultant_texts``; from the second call of a scenario it
+also holds ``previous_sessions``, the earlier calls' turns, so the model can tell a fact carried over from a previous
+session (BTC's ``facts_used``). That key is context only: :func:`spanned` accepts a quote only from the first three, so
+nothing in an earlier call can become an item's evidence.
+
 ``config`` is an ``llm_config`` block of ``apps/ai-agent-service/config/models.yaml``
 (by default OpenAI ``gpt-4.1-mini``; see ``product.py``), built by the agent's
 own ``LLMFactory``.

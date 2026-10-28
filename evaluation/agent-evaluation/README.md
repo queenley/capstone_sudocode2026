@@ -356,6 +356,8 @@ evaluation/agent-evaluation/
 
 Phần này mô tả `run_eval.py evaluate` làm gì, theo đúng thứ tự trong code: [`src/pipeline.py`](src/pipeline.py) điều phối bốn bước trong [`src/steps/`](src/steps/), mỗi bước ghi vào một thư mục riêng của lần chạy và không bao giờ ghi đè.
 
+Bảng "chỉ số nào đọc trường nào của trace", khác biệt với lệnh `run_eval.py` ở gốc repo (lệnh giám khảo chạy, dùng extractor khác) và các điểm dễ nhầm: [docs/evaluation/scoring-flow.md](../../docs/evaluation/scoring-flow.md).
+
 ```mermaid
 flowchart LR
     DS["datasets/&lt;id&gt;/<br/>kịch bản + tool-labels"] --> P1

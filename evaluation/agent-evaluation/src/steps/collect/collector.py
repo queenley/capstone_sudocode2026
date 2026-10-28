@@ -78,6 +78,19 @@ def milliseconds(start, end):
     return round((b - a).total_seconds() * 1000)
 
 
+def extraction_inputs(extractor, documents):
+    """What each turn's extraction is given, and the function that says which part of it the extractor reads.
+
+    The real extractor also sees the earlier calls of the same scenario and configuration (BTC's ``facts_used`` is
+    defined against the previous session). The pinned fixture replay reads only the turn, so it gets the documents
+    as they are. The second value keys the extraction cache and its ``input_sha256``.
+    """
+    if not extractor:
+        return documents, extractor_input
+    from src.services.extractor import attach_history
+    return attach_history(documents), getattr(extractor, "input_of", extractor_input)
+
+
 def _replay_all(extractor, documents):
     """Each document's extraction, or the exception it raised, run on a thread pool.
 
@@ -402,7 +415,8 @@ def collect(run_dir, out, *, extractor_path=None, audit_seed=0):
     warmup_index = Counter()
     # Every extraction call is independent: run them on a pool, then the loop
     # below checks each result in document order exactly as before.
-    replays = _replay_all(extractor, documents) if extractor else {}
+    inputs, input_of = extraction_inputs(extractor, documents)
+    replays = _replay_all(extractor, inputs) if extractor else {}
     for key, document in documents.items():
         context = document["context"]
         result, raw_ref = turn_results[key]
@@ -445,8 +459,8 @@ def collect(run_dir, out, *, extractor_path=None, audit_seed=0):
                 replay = replays[key]
                 if isinstance(replay, Exception):
                     raise replay
-                cache_key = digest({"input": extractor_input(document), "context": context, "descriptor": extractor.descriptor})
-                replay_ref = write(f"cache/{cache_key}.json", {"input_sha256": digest(extractor_input(document)), "items": replay})
+                cache_key = digest({"input": input_of(inputs[key]), "context": context, "descriptor": extractor.descriptor})
+                replay_ref = write(f"cache/{cache_key}.json", {"input_sha256": digest(input_of(inputs[key])), "items": replay})
                 items = []
                 for original in replay:
                     item = copy.deepcopy(original)
