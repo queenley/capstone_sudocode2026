@@ -1,8 +1,8 @@
 """Stage 2 — synthetic CRM customers, added to BTC's 50 (``crm_seed.json``).
 
-Writes ``data/catalog/crm_seed_synthetic.json`` (10 customers by default) and
-copies it to the agent's catalogue (``apps/ai-agent-service/data/btc/catalog``),
-so the agent, the evaluation harness and these scenarios know the same callers.
+Writes ``crm_seed_synthetic.json`` (10 customers by default) into the agent's catalogue
+(``apps/ai-agent-service/data/btc/catalog``, the only copy of BTC's pack), so the agent,
+the evaluation command and these scenarios know the same callers.
 ``crm_seed.json`` is never modified.
 
 The model writes names only. The rest is the pipeline's, consistent with BTC's
@@ -22,7 +22,6 @@ catalogue on the day of each order:
 from __future__ import annotations
 
 import argparse
-import shutil
 import unicodedata
 from datetime import date
 
@@ -30,7 +29,7 @@ from src.schemas.catalog import Customer, CustomerCatalog, CustomerOrder, Custom
 from src.utils.btc_tools import mock_tools
 from src.utils.crm import SYNTHETIC_CRM
 from src.utils.io import load_model, write_json
-from src.utils.paths import AGENT_CATALOG_DIR, CATALOG_DIR, PROMPTS_DIR
+from src.utils.paths import CATALOG_DIR, PROMPTS_DIR
 from src.utils.quota import stop_on_daily_limit
 from src.utils.settings import load_settings, model_client, sampling
 
@@ -137,13 +136,6 @@ def _grounded(customer: Customer, i: int, products: dict[str, list[Product]], ta
     })
 
 
-def sync_to_agent() -> None:
-    """Copy the synthetic CRM to the agent's catalogue, which its BTC mock and the harness read."""
-    if AGENT_CATALOG_DIR.is_dir():
-        shutil.copyfile(SYNTHETIC_CRM, AGENT_CATALOG_DIR / SYNTHETIC_CRM.name)
-        print(f"Copied {SYNTHETIC_CRM.name} to {AGENT_CATALOG_DIR}")
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--count", type=int, default=10, help="customers to add to BTC's 50")
@@ -172,7 +164,6 @@ def main() -> None:
         notes="Fictional CRM records: names by a model; IDs, phones, identities, orders (catalogue SKUs at the "
               "price of their day) and sessions by the pipeline."))
     print(f"Wrote {len(customers)} synthetic CRM records to {SYNTHETIC_CRM}")
-    sync_to_agent()
 
 
 if __name__ == "__main__":

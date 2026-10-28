@@ -25,7 +25,7 @@ from src.utils.paths import PLAN_PREVIEW_DIR, ROOT, VALIDATION_JSON
 from src.utils.quota import EXIT_DAILY_LIMIT
 
 STAGES = [
-    "build_catalog",                 # 1  catalogue consistent, and equal to the agent's copy (offline)
+    "build_catalog",                 # 1  catalogue consistent (offline)
     "generate_scenarios",            # 2  plan labels + LLM customer language
     "generate_dialogue",             # 3  one reference transcript per call
     "simulate_replays",              # 4  BTC simulator × 3 seeds

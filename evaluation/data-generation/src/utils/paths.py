@@ -6,20 +6,22 @@ folder only requires one edit. Where each generated file goes inside
 """
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
 # Inputs (read-only; never overwritten by the pipeline except the synthetic CRM)
 CONFIG_DIR = ROOT / "config"
-DATA_DIR = ROOT / "data"
+#: The organisers' pack: the one copy there is, the agent's (``apps/ai-agent-service/data/btc``). ``BTC_DATA_DIR``
+#: points elsewhere, as it does for the agent. The synthetic CRM this project generates is written into its catalogue.
+DATA_DIR = Path(os.environ.get("BTC_DATA_DIR") or ROOT.parents[1] / "apps" / "ai-agent-service" / "data" / "btc").resolve()
 CATALOG_DIR = DATA_DIR / "catalog"
 POLICY_DIR = DATA_DIR / "policy"
 SIMULATOR_DIR = DATA_DIR / "simulator"
 PERSONAS_JSON = SIMULATOR_DIR / "personas.json"
 PROMPTS_DIR = ROOT.parents[1] / "config" / "prompts" / "data-generation"  # the repository's prompt folder
-#: The agent's copy of BTC's catalogue, kept equal to CATALOG_DIR (build_catalog --sync).
-AGENT_CATALOG_DIR = ROOT.parents[1] / "apps" / "ai-agent-service" / "data" / "btc" / "catalog"
+SAMPLE_DIR = DATA_DIR / "test_set" / "public_sample"   # the seven scenarios BTC ships
 
 # Outputs (layout: src/utils/dataset.py)
 OUTPUT_DIR = ROOT / "output"

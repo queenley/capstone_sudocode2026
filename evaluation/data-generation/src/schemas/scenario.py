@@ -161,7 +161,7 @@ class Scenario(StrictModel):
         return list(self.calls.items())
 
     def btc_export(self) -> dict[str, Any]:
-        """The test case as BTC ships it (``data/sample/SAMPLE-0*.json``, ``schemas/scenario_format.md``).
+        """The test case as BTC ships it (``test_set/public_sample/SAMPLE-0*.json``, ``schemas/scenario_format.md``).
 
         Only what ``reference_eval.py`` and the agent under test read, in the samples' order. M2 fields
         (channel, input mode, ASR lines, CRM history, memory expectation, fault) appear when they say

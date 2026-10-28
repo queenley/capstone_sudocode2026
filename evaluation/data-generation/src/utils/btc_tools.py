@@ -12,10 +12,12 @@ from __future__ import annotations
 
 import importlib.util
 import inspect
+import json
+import os
 from functools import lru_cache
 from types import ModuleType
 
-from src.utils.paths import DATA_DIR
+from src.utils.paths import CATALOG_DIR, DATA_DIR
 
 EVAL_DIR = DATA_DIR / "eval"
 OFFICIAL_TOOLS = ("crm.get_customer", "catalog.search", "inventory.check", "order.create", "order.update",
@@ -30,9 +32,25 @@ def _load(name: str, filename: str) -> ModuleType:
     return module
 
 
+def _add_synthetic_customers(module: ModuleType) -> None:
+    """Add the synthetic CRM customers this project generates to the mock's CRM, in memory, so generated
+    scenarios find their callers. ``mock_tools.py`` stays the organisers' file, as in the agent
+    (``mcp/servers/btc.py``): ids and phones that collide with BTC's 50 are not added; ``BTC_SYNTHETIC_CRM=0``
+    turns it off."""
+    path = CATALOG_DIR / "crm_seed_synthetic.json"
+    if os.environ.get("BTC_SYNTHETIC_CRM", "1") == "0" or not path.exists():
+        return
+    known_ids = {c.get("customer_id") for c in module.CRM}
+    known_phones = {c.get("phone") for c in module.CRM}
+    module.CRM.extend(c for c in json.loads(path.read_text(encoding="utf-8")).get("customers", [])
+                      if c.get("customer_id") not in known_ids and c.get("phone") not in known_phones)
+
+
 def fresh_mock_tools() -> ModuleType:
-    """New, state-free instance of BTC ``mock_tools``."""
-    return _load("btc_mock_tools", "mock_tools.py")
+    """New, state-free instance of BTC ``mock_tools``, with the synthetic customers."""
+    module = _load("btc_mock_tools", "mock_tools.py")
+    _add_synthetic_customers(module)
+    return module
 
 
 @lru_cache(maxsize=1)

@@ -1,4 +1,4 @@
-"""Stage 1 — validate BTC's catalogue and keep every copy of it in sync.
+"""Stage 1 — validate BTC's catalogue (the agent's ``apps/ai-agent-service/data/btc/catalog``, the only copy).
 
 Checks, offline (``output/reports/catalog_check.json``; non-zero exit on an error):
 
@@ -8,26 +8,17 @@ Checks, offline (``output/reports/catalog_check.json``; non-zero exit on an erro
   order's variant was in stock on its date and costs what ``mock_tools`` quotes
   for that day (the promotions of that day applied); synthetic ids and phones
   do not collide with BTC's;
-* the agent's copy (``apps/ai-agent-service/data/btc/catalog``) is the same,
-  file by file. ``--sync`` copies the files that differ there.
 
-    python -m src.pipeline.build_catalog            # check
-    python -m src.pipeline.build_catalog --sync     # check, then make the agent's copy equal
+    python -m src.pipeline.build_catalog
 """
 from __future__ import annotations
 
-import argparse
-import json
-import shutil
 import sys
 
 from src.schemas.catalog import CustomerCatalog, InventoryTimeline, ProductCatalog, PromotionCatalog
 from src.utils.btc_tools import mock_tools
 from src.utils.io import load_model, write_json
-from src.utils.paths import AGENT_CATALOG_DIR, CATALOG_DIR, REPORTS_DIR
-
-#: The files the agent's mock and the evaluation harness read, kept equal to ours.
-SHARED_FILES = ("products.json", "promotions.json", "inventory_timeline.json", "crm_seed.json", "crm_seed_synthetic.json")
+from src.utils.paths import CATALOG_DIR, REPORTS_DIR
 
 
 def consistency_errors() -> tuple[list[str], dict[str, int]]:
@@ -74,37 +65,15 @@ def consistency_errors() -> tuple[list[str], dict[str, int]]:
     return errors, counts
 
 
-def agent_copy_differences() -> list[str]:
-    """Files of ours the agent's catalogue lacks or holds a different version of."""
-    if not AGENT_CATALOG_DIR.is_dir():
-        return []
-    return [name for name in SHARED_FILES if (CATALOG_DIR / name).exists()
-            and (not (AGENT_CATALOG_DIR / name).exists()
-                 or json.loads((CATALOG_DIR / name).read_text(encoding="utf-8-sig"))
-                 != json.loads((AGENT_CATALOG_DIR / name).read_text(encoding="utf-8-sig")))]
-
-
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--sync", action="store_true", help="copy the files that differ to the agent's catalogue")
-    args = parser.parse_args()
-
     errors, counts = consistency_errors()
-    differing = agent_copy_differences()
-    if args.sync:
-        for name in differing:
-            shutil.copyfile(CATALOG_DIR / name, AGENT_CATALOG_DIR / name)
-            print(f"Synced {name} -> {AGENT_CATALOG_DIR}")
-        differing = agent_copy_differences()
-    write_json(REPORTS_DIR / "catalog_check.json", {"counts": counts, "errors": errors, "agent_copy_differs": differing})
+    write_json(REPORTS_DIR / "catalog_check.json", {"counts": counts, "errors": errors})
     print(", ".join(f"{v} {k.replace('_', ' ')}" for k, v in counts.items()))
     for error in errors:
         print(f"  ERROR {error}")
-    if differing:
-        print(f"  The agent's catalogue differs in {differing}; rerun with --sync.")
-    if errors or differing:
+    if errors:
         sys.exit(1)
-    print("Catalogue consistent, and equal to the agent's copy.")
+    print("Catalogue consistent.")
 
 
 if __name__ == "__main__":
