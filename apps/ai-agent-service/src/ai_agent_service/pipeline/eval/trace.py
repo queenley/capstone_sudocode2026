@@ -7,7 +7,7 @@ to the run's diagnostics file instead. Every line is checked against the
 schema before it is written.
 
 How each field is filled, matching ``eval/reference_eval.py`` and the
-harness's collector (``evaluation/harness/eval_harness/collector.py``):
+harness's collector (``evaluation/agent-evaluation/src/steps/collect/collector.py``):
 
 - ``tool_calls``: the calls that ran, with the arguments they ran with (the
   day and the phone the harness filled in, the defaults it completed), and

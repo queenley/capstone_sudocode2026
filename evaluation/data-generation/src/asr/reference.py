@@ -3,7 +3,9 @@
 ``synthesize_scenario_audio`` uses this module in three steps:
 
 1. :func:`load_or_build` writes ``output/asr_reference/scenarios_<id>/call_<n>.json``.
-   It makes one model call per call and is cached while the turns keep the same words.
+   It makes one model call per call and is cached while the lines keep the same words. A line is
+   ``{idx, speaker: A|C, text}``: the per-turn clips use the customer's lines, ``build_asr_testset``'s whole
+   dialogues both speakers' (under ``output/asr_test/spoken/``).
 2. TTS reads ``turns[k].spoken_text``. The ``.json`` written beside each WAV keeps that text and its ``entities``.
 3. :func:`write_ground_truth` writes ``output/asr_reference/ground_truth.json`` in BTC's ``data/asr/`` format, one dialogue per clip.
 
@@ -30,7 +32,7 @@ from typing import Any
 
 from src.asr import entities as rule_entities
 from src.asr.spoken import to_spoken
-from src.schemas.asr import SpokenCall, SpokenTurn
+from src.schemas.asr import SpokenCall, SpokenTurn, entity_schema
 from src.schemas.scenario import CallSpec, Scenario
 from src.utils.dataset import Dataset, call_folder
 from src.utils.paths import ASR_REFERENCE_DIR, AUDIO_DIR, DATA_DIR, PROMPTS_DIR
@@ -41,8 +43,11 @@ NOT_SPEECH = {"chat_teencode", "chat_khong_dau", "chat_sai_chinh_ta"}
 MAX_ATTEMPTS = 2
 #: Share of a line's plain words the spoken form must keep, in order.
 MIN_KEPT = 0.9
-#: Entities read as numbers, checked against the numbers the line states.
-NUMERIC = ("room_area_m2", "budget_vnd", "competitor_price_vnd", "size_old", "size_new")
+#: Entities read as numbers, checked against the numbers the line states (0, "miễn phí", is not said as a number).
+NUMERIC = ("room_area_m2", "budget_vnd", "competitor_price_vnd", "size_old", "size_new", "price_vnd", "delivery_days",
+           "warranty_months", "return_days", "min_free_ship_vnd", "bulky_fee_vnd", "exchange_fee_vnd", "refund_vnd")
+#: BTC's speaker labels: the shop agent and the customer.
+AGENT, CUSTOMER = "A", "C"
 
 
 def _norm(text: str) -> str:
@@ -90,38 +95,47 @@ def problems(text: str, turn: SpokenTurn, products: dict[str, str]) -> list[str]
             found.append("entity_not_stated:order_id")
         elif key == "phone" and re.sub(r"\D", "", str(value)) not in re.sub(r"\D", "", text):
             found.append("entity_not_stated:phone")
-        elif key in NUMERIC and str(value).isdigit() and not {int(value)} <= stated_numbers & said_numbers:
+        elif key in NUMERIC and str(value).isdigit() and int(value) and not {int(value)} <= stated_numbers & said_numbers:
             found.append(f"entity_not_stated:{key}")
     return found
 
 
-def rule_turn(idx: int, text: str, issues: list[str]) -> dict[str, Any]:
+def rule_turn(line: dict[str, Any], issues: list[str]) -> dict[str, Any]:
     """The rule-made reference of one line, when the model's could not be used."""
-    spoken = to_spoken(text)
-    return {"idx": idx, "text": text, "spoken_text": spoken, "entities": rule_entities.extract(spoken),
-            "reference_source": "rule", "issues": issues}
+    spoken = to_spoken(line["text"])
+    return {**line, "spoken_text": spoken, "entities": rule_entities.extract(spoken), "reference_source": "rule",
+            "issues": issues}
 
 
-def products_of(call: CallSpec, names: dict[str, str]) -> dict[str, str]:
-    """SKU -> name of the products this call is about (its labels), or whose name a customer line says."""
+def customer_lines(call: CallSpec) -> list[dict[str, Any]]:
+    """The lines of the per-turn clips: the customer's turns of the call."""
+    return [{"idx": i, "speaker": CUSTOMER, "text": text} for i, text in enumerate(call.customer_turns, start=1)]
+
+
+def products_of(call: CallSpec, names: dict[str, str], lines: list[dict[str, Any]] | None = None) -> dict[str, str]:
+    """SKU -> name of the products this call is about (its labels), or whose name a line says."""
     labels = json.dumps(call.model_dump(mode="json"), ensure_ascii=False)
-    said = " ".join(call.customer_turns).lower()
+    said = " ".join(line["text"] for line in (lines or customer_lines(call))).lower()
     return {sku: name for sku, name in names.items() if sku in labels or name.lower() in said}
 
 
-def _sha(turns: list[str]) -> str:
-    return hashlib.sha256("\n".join(turns).encode("utf-8")).hexdigest()
+def _sha(lines: list[dict[str, Any]]) -> str:
+    return hashlib.sha256(json.dumps([[line["speaker"], line["text"]] for line in lines], ensure_ascii=False).encode("utf-8")).hexdigest()
 
 
 def reference_path(scenario_id: str, call: str, root: Path = ASR_REFERENCE_DIR) -> Path:
     return root / call_folder(scenario_id) / f"{call}.json"
 
 
-def build(client, scenario: Scenario, call_name: str, call: CallSpec, products: dict[str, str]) -> dict[str, Any]:
-    """Ask the model for the spoken form of every customer line of the call; check it; fall back per line."""
-    lines = {i: text for i, text in enumerate(call.customer_turns, start=1)}
+def build(client, scenario: Scenario, call_name: str, call: CallSpec, products: dict[str, str],
+          line_list: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    """Ask the model for the spoken form of every line (``{idx, speaker: A|C, text}``); check it; fall back per line."""
+    line_list = line_list or customer_lines(call)
+    by_idx = {line["idx"]: line for line in line_list}
+    lines = {line["idx"]: line["text"] for line in line_list}
     request = {"input_mode": call.input_mode, "region": scenario.region, "products": products,
-               "customer_lines": [{"idx": i, "text": t} for i, t in lines.items()]}
+               "lines": [{"idx": line["idx"], "speaker": "agent" if line["speaker"] == AGENT else "customer",
+                          "text": line["text"]} for line in line_list]}
     prompt = f"{PROMPT}\n\nCALL JSON (trusted):\n{json.dumps(request, ensure_ascii=False)}"
     accepted: dict[int, dict[str, Any]] = {}
     issues: dict[int, list[str]] = {i: ["no_answer"] for i in lines}
@@ -138,26 +152,31 @@ def build(client, scenario: Scenario, call_name: str, call: CallSpec, products: 
                 turn = turn.model_copy(update={"spoken_text": unicodedata.normalize("NFC", turn.spoken_text.lower()).strip()})
                 issues[turn.idx] = problems(lines[turn.idx], turn, products)
                 if not issues[turn.idx]:
-                    accepted[turn.idx] = {"idx": turn.idx, "text": lines[turn.idx], "spoken_text": turn.spoken_text,
+                    accepted[turn.idx] = {**by_idx[turn.idx], "spoken_text": turn.spoken_text,
                                           "entities": turn.entities.stated(), "reference_source": "llm", "issues": []}
         if len(accepted) == len(lines):
             break
-    turns = [accepted.get(i) or rule_turn(i, text, issues.get(i, ["no_answer"])) for i, text in lines.items()]
+    turns = [accepted.get(i) or rule_turn(by_idx[i], issues.get(i, ["no_answer"])) for i in lines]
     return {"scenario_id": scenario.scenario_id, "call": call_name, "input_mode": call.input_mode,
-            "source_sha256": _sha(call.customer_turns), "model": getattr(client, "model", None), "turns": turns}
+            "source_sha256": _sha(line_list), "model": getattr(client, "model", None), "turns": turns}
 
 
 def load_or_build(client_factory, scenario: Scenario, call_name: str, call: CallSpec, names: dict[str, str],
-                  root: Path = ASR_REFERENCE_DIR) -> dict[str, Any] | None:
-    """The call's reference from disk while its lines are unchanged, otherwise built and saved; None for typed chat."""
-    if call.input_mode in NOT_SPEECH or not call.customer_turns:
+                  root: Path = ASR_REFERENCE_DIR, lines: list[dict[str, Any]] | None = None) -> dict[str, Any] | None:
+    """The call's reference from disk while its lines are unchanged, otherwise built and saved; None for typed chat.
+
+    *lines* default to the customer's turns (the per-turn clips); a whole dialogue passes both speakers' lines
+    and its own *root* (``build_asr_testset``).
+    """
+    lines = lines or customer_lines(call)
+    if call.input_mode in NOT_SPEECH or not lines:
         return None
     path = reference_path(scenario.scenario_id, call_name, root)
     if path.exists():
         record = json.loads(path.read_text(encoding="utf-8"))
-        if record.get("source_sha256") == _sha(call.customer_turns):
+        if record.get("source_sha256") == _sha(lines):
             return record
-    record = build(client_factory(), scenario, call_name, call, products_of(call, names))
+    record = build(client_factory(), scenario, call_name, call, products_of(call, names, lines), lines)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return record
@@ -202,7 +221,7 @@ def write_ground_truth(audio_root: Path = AUDIO_DIR, out: Path = ASR_REFERENCE_D
             "turns": [{"idx": 1, "speaker": "C", "text": spoken, "entities": stated}],
             # Not in BTC's file: where the clip is and how its reference was made.
             "audio": meta_path.with_suffix(".wav").relative_to(audio_root.parent).as_posix(),
-            "source_text": meta["text"], "reference_source": meta.get("reference_source"),
+            "source_text": meta["text"], "reference_source": meta.get("reference_source"), "noise": noise or "clean",
             "input_mode": meta.get("input_mode"), "duration_seconds": meta.get("duration_seconds"),
         })
     seconds = sum(float(d["duration_seconds"] or 0) for d in dialogues)
@@ -212,7 +231,9 @@ def write_ground_truth(audio_root: Path = AUDIO_DIR, out: Path = ASR_REFERENCE_D
                        "each turn in spoken form and the TTS voice read exactly that text; 'rule' references "
                        "come from src/asr/spoken.py.",
         "hypotheses_format": btc["hypotheses_format"], "normalization_rule": btc["normalization_rule"],
-        "reference_date": btc["reference_date"], "dialogues": dialogues,
+        "reference_date": btc["reference_date"], "kind": "turns",
+        # Not in BTC's file: the entity keys and types, so the evaluator extracts the same ones from what was heard.
+        "entity_schema": entity_schema(), "dialogues": dialogues,
     }
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(ground_truth, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

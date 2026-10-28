@@ -161,7 +161,6 @@ def build_context() -> dict[str, Any]:
         "test_set": {"n_scenarios": gt_summary.get("scenarios", 0), "n_hard_cases": gt_summary.get("hard_cases", 0),
                      "n_calls": gt_summary.get("calls", 0), "hard_cases": dict(sorted(hard_cases.items()))},
         "rag": _json(RAG_DIR / "rag_report.json", None),
-        "asr": {name: _json(REPORTS_DIR / f"asr_report_{name}.json", None) for name in ("btc", "team")},
         "asr_team_dialogues": len(_json(ASR_TEST_DIR / "ground_truth.json", {}).get("dialogues", [])),
         "tools": _json(REPORTS_DIR / "tools_audit.json", None) or _json(PLAN_PREVIEW_DIR / "reports" / "tools_audit.json", None),
         "judge_agreement": _json(REPORTS_DIR / "judge_agreement.json", None),
@@ -221,12 +220,8 @@ def official_markdown(ctx: dict[str, Any]) -> list[str]:
         lines.append("Not run yet: `python -m src.pipeline.eval_rag`.")
     lines += ["", "## ASR (WER / CER / entity accuracy)", "",
               f"Team ASR set: {ctx['asr_team_dialogues']} dialogues (BTC requires >= 20 plus the 12 BTC dialogues)."]
-    for name, rep in ctx["asr"].items():
-        if rep:
-            lines.append(f"- {name}: WER {rep['WER']} · CER {rep['CER']} · entity {rep['entity_accuracy']} · "
-                         f"clean {rep['wer_clean']} / noisy {rep['wer_noisy']} · diarization {rep['diarization_turn_accuracy']}")
-        else:
-            lines.append(f"- {name}: no hypotheses scored yet (`python -m src.pipeline.eval_asr --set {name} ...`)")
+    lines.append("Scored in evaluation/agent-evaluation: `run_eval.py asr-build --kind turns|dialogues`, then `run_eval.py asr` "
+                 "(the agent's ASR and understanding against this ground truth).")
     tools = ctx["tools"]
     lines += ["", "## Tools vs BTC tool set", ""]
     if tools:

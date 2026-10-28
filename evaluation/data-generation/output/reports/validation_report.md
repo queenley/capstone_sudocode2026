@@ -1,6 +1,6 @@
 # Data generation report
 
-_Generated 2026-10-26 03:38. Visual version: [validation_report.html](validation_report.html)._
+_Generated 2026-10-28 01:58. Visual version: [validation_report.html](validation_report.html)._
 
 Generated records are not golden until they pass rules and the judge (or a human approves them).
 
@@ -84,9 +84,8 @@ xychart-beta horizontal
 
 ## ASR (WER / CER / entity accuracy)
 
-Team ASR set: 0 dialogues (BTC requires >= 20 plus the 12 BTC dialogues).
-- btc: no hypotheses scored yet (`python -m src.pipeline.eval_asr --set btc ...`)
-- team: no hypotheses scored yet (`python -m src.pipeline.eval_asr --set team ...`)
+Team ASR set: 2 dialogues (BTC requires >= 20 plus the 12 BTC dialogues).
+Scored in evaluation/agent-evaluation: `run_eval.py asr-build --kind turns|dialogues`, then `run_eval.py asr` (the agent's ASR and understanding against this ground truth).
 
 ## Tools vs BTC tool set
 
@@ -119,5 +118,5 @@ xychart-beta horizontal
 Generated **8** → Rule pass **8** → Judge pass **8** → Human approved **0** → Golden **0**
 
 - CRM profiles: 70 (incl. synthetic when generated)
-- Model API requests: 41 · cache hits: 0 · prompt tokens: 351095 · output tokens: 22530
+- Model API requests: 51 · cache hits: 0 · prompt tokens: 377354 · output tokens: 28016
 - ElevenLabs characters: 0

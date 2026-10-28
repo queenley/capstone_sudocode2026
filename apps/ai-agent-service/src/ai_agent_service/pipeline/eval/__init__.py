@@ -4,7 +4,7 @@ The organisers' command, ``python -m ai_agent_service.pipeline.eval.cli``
 (:mod:`.cli`), runs scenarios in their format through the agent, writes their
 trace and prints their table, with retrieval measured on their labelled
 questions (:mod:`.rag`). The team's analysis harness in
-``evaluation/harness`` drives the same agent through its own bridge.
+``evaluation/agent-evaluation`` drives the same agent through its own bridge.
 
 The modules:
 

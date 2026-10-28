@@ -23,7 +23,7 @@ Không suy rằng unit test API với ScriptedAgent đã kiểm chất lượng 
 | Runner | Business tools | Đầu ra |
 |---|---|---|
 | Root `run_eval.py` | MCP của sản phẩm | full/baseline JSONL, diagnostics, usage, manifest, report và RAG |
-| `evaluation/harness/run_eval.py` | Mock/audit do harness quản lý; memory/knowledge vẫn MCP | prepare → raw → evidence → scored; kiểm provenance, coverage và nhãn bổ sung |
+| `evaluation/agent-evaluation/run_eval.py` | Mock/audit do harness quản lý; memory/knowledge vẫn MCP | prepare → raw → evidence → scored; kiểm provenance, coverage và nhãn bổ sung |
 
 Không gộp delta giữa hai runner. Root runner dùng database có tên kết thúc `_eval`; harness dùng schema kết thúc `_eval`. Chỉ chạy từng runner một trên cùng môi trường evaluation vì reset làm sạch trạng thái.
 
@@ -33,9 +33,9 @@ Từ gốc repo, Python 3.12 trong `apps/ai-agent-service/.venv`:
 
 ```sh
 apps/ai-agent-service/.venv/bin/python -m pytest -q
-(cd evaluation/harness && ../../apps/ai-agent-service/.venv/bin/python -X utf8 -m unittest discover -s tests -p 'test_*.py')
-PYTHONPATH=apps/ai-agent-service/src:packages/backend-common apps/ai-agent-service/.venv/bin/python evaluation/harness/evaluate.py
-apps/ai-agent-service/.venv/bin/python evaluation/harness/run_eval.py data-check --set create-data-diagnostic-v1
+(cd evaluation/agent-evaluation && ../../apps/ai-agent-service/.venv/bin/python -X utf8 -m unittest discover -s tests -p 'test_*.py')
+PYTHONPATH=apps/ai-agent-service/src:packages/backend-common apps/ai-agent-service/.venv/bin/python evaluation/agent-evaluation/run_eval.py rag-offline
+apps/ai-agent-service/.venv/bin/python evaluation/agent-evaluation/run_eval.py data-check --set create-data-diagnostic-v1
 ```
 
 `data-check` có thể không có schema issue nhưng vẫn exit 2 vì dataset diagnostic chưa được người duyệt. `prepare` cho diagnostic là gate đầu vào, không chứng nhận GT chính thức hay chất lượng agent.

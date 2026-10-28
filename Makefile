@@ -14,4 +14,4 @@ test:
 	cd apps/web && npm run typecheck
 
 eval:
-	python evaluation/harness/evaluate.py
+	python evaluation/agent-evaluation/run_eval.py rag-offline

@@ -4,7 +4,7 @@
 
 Mọi con số báo cáo được tính bằng **code chấm của BTC** ([reference_eval.py](../../apps/ai-agent-service/data/btc/eval/reference_eval.py)). Nhóm không tự viết lại công thức, chỉ chuẩn bị đầu vào (trace) và đọc đầu ra.
 
-Tài liệu vận hành chi tiết: [docs/evaluation/](../evaluation/README.md), [evaluation/harness/README.md](../../evaluation/harness/README.md). Lịch sử từng lần chạy: [RUN-LEDGER.md](../evaluation/RUN-LEDGER.md).
+Tài liệu vận hành chi tiết: [docs/evaluation/](../evaluation/README.md), [evaluation/agent-evaluation/README.md](../../evaluation/agent-evaluation/README.md). Lịch sử từng lần chạy: [RUN-LEDGER.md](../evaluation/RUN-LEDGER.md).
 
 ---
 
@@ -15,8 +15,8 @@ Xếp từ rẻ đến đầy đủ:
 | Tầng | Lệnh | Cần gì | Đo gì | Tần suất |
 |---|---|---|---|---|
 | **1. Unit test** | `python -m pytest -q` | không gì | lane, hard guard, PII, ITN, contract BTC, route API với agent giả | mỗi push (CI) |
-| **2. Truy hồi** | `python evaluation/harness/evaluate.py` | không gì | Recall@3/@5, multi-hop, tỉ lệ từ chối | mỗi push (CI) |
-| **3. End-to-end** | `evaluation/harness/run_eval.py evaluate` | PostgreSQL + key model | TSR, CCR, RQR, HR, guardrail, latency | thủ công, tốn phí |
+| **2. Truy hồi** | `python evaluation/agent-evaluation/run_eval.py rag-offline` | không gì | Recall@3/@5, multi-hop, tỉ lệ từ chối | mỗi push (CI) |
+| **3. End-to-end** | `evaluation/agent-evaluation/run_eval.py evaluate` | PostgreSQL + key model | TSR, CCR, RQR, HR, guardrail, latency | thủ công, tốn phí |
 | (phụ) **ASR** | `run_eval.py asr` | `asr-service` | WER, CER, entity accuracy | thủ công, không tốn API |
 | (phụ) **Simulator** | `run_eval.py simulate` | như tầng 3 | TSR khi khách phản ứng theo agent | thủ công, tốn phí |
 
@@ -81,7 +81,7 @@ Hai lần chạy phải dùng cùng dataset, model, temperature, tool và prompt
 | Runner | Tool nghiệp vụ | Đầu ra | Dùng khi |
 |---|---|---|---|
 | `run_eval.py` ở gốc repo | MCP của sản phẩm | `full.jsonl`, `baseline.jsonl`, `report.json`, `table.txt`, `rag/` | lệnh dạng BTC yêu cầu |
-| [`evaluation/harness/run_eval.py`](../../evaluation/harness/run_eval.py) | mock/audit do harness quản lý; memory, knowledge vẫn qua MCP | prepare → raw → evidence → scored | phân tích, kiểm nguồn gốc bằng chứng |
+| [`evaluation/agent-evaluation/run_eval.py`](../../evaluation/agent-evaluation/run_eval.py) | mock/audit do harness quản lý; memory, knowledge vẫn qua MCP | prepare → raw → evidence → scored | phân tích, kiểm nguồn gốc bằng chứng |
 
 **Không gộp số giữa hai runner.** Cả hai dùng database/schema đuôi `_eval` và reset trạng thái, nên chỉ chạy một runner một lúc.
 
@@ -98,7 +98,7 @@ flowchart LR
     RUN -. "sửa code trong lúc chạy" .-> STOP(("từ chối<br/>chạy tiếp"))
 ```
 
-- **Khóa mã nguồn:** sau `prepare`, hash của `apps/ai-agent-service/src`, `config`, `evaluation/harness/agent` bị khóa. Sửa mã giữa chừng thì bộ chấm từ chối chạy tiếp.
+- **Khóa mã nguồn:** sau `prepare`, hash của `apps/ai-agent-service/src`, `config`, `evaluation/agent-evaluation/src/services/agent` bị khóa. Sửa mã giữa chừng thì bộ chấm từ chối chạy tiếp.
 - **`facts_used`** lấy từ dấu `[Bn]` agent tự đánh, cộng giá trị brief được nhắc lại.
 - **`questions` và `claims`** do **extractor** trích. BTC không cung cấp extractor (đây là trách nhiệm của đội); BTC chấm tay ngẫu nhiên 20 lượt để kiểm extractor có bỏ sót không. Extractor hiện tại `product-extractor-v3` dùng **từ vựng cố định**: 34 slot của ontology và các trường claim BTC kèm kiểu giá trị; slot ngoài bộ thành `other`, claim sai kiểu bị bỏ.
 - **Thiếu bằng chứng không được điền 0 hay PASS.** Run thiếu nhãn cho một số lượt thì ghi `INCOMPLETE`, không xuất điểm tổng.
@@ -107,7 +107,7 @@ flowchart LR
 
 ### Customer simulator
 
-Kịch bản cố định không phản ứng theo agent: agent hỏi thừa thì khách vẫn nói câu kế tiếp. Simulator ([eval_harness/simulation.py](../../evaluation/harness/eval_harness/simulation.py), [simulate.py](../../evaluation/harness/simulate.py)) cài **8 quy tắc của BTC**, áp theo thứ tự:
+Kịch bản cố định không phản ứng theo agent: agent hỏi thừa thì khách vẫn nói câu kế tiếp. Simulator ([src/simulation/customer.py](../../evaluation/agent-evaluation/src/simulation/customer.py), [simulate.py](../../evaluation/agent-evaluation/src/simulation/simulate.py)) cài **8 quy tắc của BTC**, áp theo thứ tự:
 
 | # | Agent làm | Khách phản ứng |
 |---|---|---|
@@ -242,21 +242,21 @@ docker compose up -d postgres
 
 # Tầng 1 và 2: miễn phí
 & $PY -m pytest -q
-& $PY evaluation/harness/evaluate.py
+& $PY evaluation/agent-evaluation/run_eval.py rag-offline
 
 # Tầng 3: kiểm đầu vào (miễn phí) rồi chạy thật (tốn phí, bắt đầu nhỏ)
-& $PY evaluation/harness/run_eval.py prepare  --dataset-id create-data-diagnostic-v4 --level M2 --limit 5
-& $PY evaluation/harness/run_eval.py evaluate --dataset-id create-data-diagnostic-v4 --level M2 --only SCN-GEN-xxxx
+& $PY evaluation/agent-evaluation/run_eval.py prepare  --dataset-id create-data-diagnostic-v4 --level M2 --limit 5
+& $PY evaluation/agent-evaluation/run_eval.py evaluate --dataset-id create-data-diagnostic-v4 --level M2 --only SCN-GEN-xxxx
 
 # Simulator, 3 seed
-& $PY evaluation/harness/run_eval.py simulate --dataset-id create-data-diagnostic-v4 --level M2 --only SCN-GEN-xxxx --seeds 0 1 2
+& $PY evaluation/agent-evaluation/run_eval.py simulate --dataset-id create-data-diagnostic-v4 --level M2 --only SCN-GEN-xxxx --seeds 0 1 2
 
 # ASR: không gọi LLM
 docker compose up -d asr-service
-& $PY evaluation/harness/run_eval.py asr --limit 10
+& $PY evaluation/agent-evaluation/run_eval.py asr --limit 10
 ```
 
-Kết quả nằm ở `evaluation/harness/runs/<ngày-giờ>/` (không lên Git): `scored/scorer.stdout.txt` là bảng điểm, `case-trace.json` để đọc lại từng hội thoại. Chạy toàn bộ 150 kịch bản là khoảng 2.500 lượt agent + 2.500 lượt chấm, mất nhiều giờ và tốn phí đáng kể.
+Kết quả nằm ở `evaluation/agent-evaluation/runs/<ngày-giờ>/` (không lên Git): `scored/scorer.stdout.txt` là bảng điểm, `case-trace.json` để đọc lại từng hội thoại. Chạy toàn bộ 150 kịch bản là khoảng 2.500 lượt agent + 2.500 lượt chấm, mất nhiều giờ và tốn phí đáng kể.
 
 ---
 

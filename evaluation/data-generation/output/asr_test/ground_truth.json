@@ -1,0 +1,506 @@
+{
+  "description": "Bộ ASR hội thoại của team: 2 cuộc gọi hai người nói (agent + khách) sinh từ reference transcript; LLM viết từng câu ở dạng nói rồi TTS đọc đúng câu đó (19 câu LLM, 0 câu theo luật); 0 hội thoại băng thông điện thoại có nhiễu.",
+  "hypotheses_format": "asr/hypotheses.json = {\"D01\": {\"text\": \"<transcript toàn hội thoại>\", \"entities\": {\"price_vnd\": 4890000, ...}, \"turns\": [{\"speaker\": \"A|C\", \"start\": 0.0, \"end\": 3.2, \"text\": \"...\"}]}}. turns là tùy chọn (M2 diarization).",
+  "normalization_rule": "Trước khi tính WER/CER: lowercase, NFC, bỏ dấu câu, gộp khoảng trắng. Ground truth viết số bằng chữ như lời nói; nếu ASR trả về chữ số thì nhóm phải chuẩn hóa về cùng một dạng (nêu rõ chọn dạng nào) trước khi tính WER. Entity so exact-match sau ITN.",
+  "reference_date": "2026-10-15",
+  "kind": "dialogues",
+  "entity_schema": {
+    "additionalProperties": false,
+    "description": "Values a line states, in BTC's ``asr/ground_truth.json`` keys (D01–D04); null when the line does not say it.",
+    "properties": {
+      "room_area_m2": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Diện tích phòng, m² (\"hai mươi lăm mét vuông\" → 25)",
+        "title": "Room Area M2"
+      },
+      "has_children": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Nhà có (true) / không có (false) trẻ nhỏ",
+        "title": "Has Children"
+      },
+      "budget_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Ngân sách khách nói, đồng (\"năm triệu\" → 5000000)",
+        "title": "Budget Vnd"
+      },
+      "competitor_price_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Giá chỗ khác khách đưa ra để so sánh, đồng",
+        "title": "Competitor Price Vnd"
+      },
+      "payment": {
+        "anyOf": [
+          {
+            "enum": [
+              "COD",
+              "bank"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Cách trả tiền: COD (thu hộ) hoặc bank (chuyển khoản)",
+        "title": "Payment"
+      },
+      "blocker": {
+        "anyOf": [
+          {
+            "enum": [
+              "can hoi chong",
+              "can hoi vo",
+              "can hoi nguoi nha",
+              "so sanh gia",
+              "vuot ngan sach",
+              "cho luong",
+              "can suy nghi them"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Lý do chưa chốt mà câu nói rõ; null khi câu không nêu lý do",
+        "title": "Blocker"
+      },
+      "size_old": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Size đang có khi khách muốn đổi",
+        "title": "Size Old"
+      },
+      "size_new": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Size khách muốn đổi sang",
+        "title": "Size New"
+      },
+      "color": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Màu được chọn, không dấu, chữ thường (\"den\")",
+        "title": "Color"
+      },
+      "phone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Số điện thoại được đọc, 10 chữ số",
+        "title": "Phone"
+      },
+      "sku": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Mã sản phẩm được nhắc tới, CHỈ lấy từ danh sách products được gửi",
+        "title": "Sku"
+      },
+      "order_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Mã đơn được đọc, viết hoa như OD312456",
+        "title": "Order Id"
+      },
+      "price_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Giá bán agent báo, đồng",
+        "title": "Price Vnd"
+      },
+      "promo_expiry": {
+        "anyOf": [
+          {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Hạn khuyến mãi agent báo, YYYY-MM-DD",
+        "title": "Promo Expiry"
+      },
+      "delivery_days": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Số ngày giao hàng agent báo",
+        "title": "Delivery Days"
+      },
+      "warranty_months": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Số tháng bảo hành agent báo",
+        "title": "Warranty Months"
+      },
+      "return_days": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Số ngày được đổi trả agent báo",
+        "title": "Return Days"
+      },
+      "min_free_ship_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Giá trị đơn tối thiểu để miễn phí giao, đồng",
+        "title": "Min Free Ship Vnd"
+      },
+      "bulky_fee_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Phụ phí hàng cồng kềnh, đồng",
+        "title": "Bulky Fee Vnd"
+      },
+      "exchange_fee_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Phí đổi hàng, đồng (0 khi miễn phí)",
+        "title": "Exchange Fee Vnd"
+      },
+      "refund_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Số tiền hoàn lại, đồng",
+        "title": "Refund Vnd"
+      },
+      "in_stock": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Agent báo còn hàng (true) / hết hàng (false)",
+        "title": "In Stock"
+      },
+      "restock_date": {
+        "anyOf": [
+          {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Ngày có hàng lại agent báo, YYYY-MM-DD",
+        "title": "Restock Date"
+      }
+    },
+    "title": "SpokenEntities",
+    "type": "object"
+  },
+  "dialogues": [
+    {
+      "id": "T01",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": "f",
+      "agent_region": "bac",
+      "scenario_ref": "SCN-ADV-0001 call_1",
+      "noisy": false,
+      "note": "khach_hoi_san_pham_khong_ban; normal",
+      "entities": {
+        "sku": "SKU-AP-X"
+      },
+      "full_text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê em có thể hỗ trợ chị hoa ạ alo em ơi chị muốn mua tủ lạnh inverter khoảng ba trăm lít dạ hiện tại shop chưa kinh doanh tủ lạnh inverter khoảng ba trăm lít ạ chị đã xem trên mạng mà không thấy shop mình bán cái này dạ đúng rồi chị sản phẩm tủ lạnh inverter khoảng ba trăm lít hiện shop chưa có mặt hàng này ạ có mặt hàng nào tương tự không em hiện tại bên em không có dòng tủ lạnh nhưng chị có thể tham khảo máy lọc không khí e pia x sản phẩm này rất phù hợp cho gia đình hiện đại ạ thế có máy lọc không khí nào không nhỉ dạ bên em có máy lọc không khí e pia x chị nhé nếu cần tư vấn thêm về chức năng hay giá cả em sẵn sàng hỗ trợ chị ạ chị sẽ liên hệ lại sau nhé dạ vâng em cảm ơn chị đã quan tâm khi nào cần hỗ trợ chị cứ nhắn cho em nhé chúc chị một ngày vui vẻ ạ",
+      "n_turns": 11,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê em có thể hỗ trợ chị hoa ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "alo em ơi chị muốn mua tủ lạnh inverter khoảng ba trăm lít",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ hiện tại shop chưa kinh doanh tủ lạnh inverter khoảng ba trăm lít ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "chị đã xem trên mạng mà không thấy shop mình bán cái này",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ đúng rồi chị sản phẩm tủ lạnh inverter khoảng ba trăm lít hiện shop chưa có mặt hàng này ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "có mặt hàng nào tương tự không em",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "hiện tại bên em không có dòng tủ lạnh nhưng chị có thể tham khảo máy lọc không khí e pia x sản phẩm này rất phù hợp cho gia đình hiện đại ạ",
+          "entities": {
+            "sku": "SKU-AP-X"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "thế có máy lọc không khí nào không nhỉ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ bên em có máy lọc không khí e pia x chị nhé nếu cần tư vấn thêm về chức năng hay giá cả em sẵn sàng hỗ trợ chị ạ",
+          "entities": {
+            "sku": "SKU-AP-X"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 10,
+          "speaker": "C",
+          "text": "chị sẽ liên hệ lại sau nhé",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 11,
+          "speaker": "A",
+          "text": "dạ vâng em cảm ơn chị đã quan tâm khi nào cần hỗ trợ chị cứ nhắn cho em nhé chúc chị một ngày vui vẻ ạ",
+          "entities": {},
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T02",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": "f",
+      "agent_region": "bac",
+      "scenario_ref": "SCN-ADV-0002 call_1",
+      "noisy": false,
+      "note": "khach_hoi_ngoai_chu_de; normal",
+      "entities": {},
+      "full_text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê em có thể hỗ trợ chị về thông tin sản phẩm hoặc chính sách mua hàng của shop mình ạ alo chị đang tìm hiểu cách nấu phở bò ngon có ai biết không em dạ hiện em chưa có thông tin về công thức nấu phở bò ngon chị ạ nếu chị cần tư vấn về sản phẩm của shop hoặc các chính sách em rất sẵn lòng hỗ trợ thêm cho mình chị nghe nói cần có nước dùng thật ngon thì mới ngon ấy có đúng không nhỉ dạ em xin phép trả lời là hiện em chưa có thông tin về bí quyết nấu nước dùng cho phở bò ngon chị nhé mình cần hỗ trợ về sản phẩm bên shop thì em sẽ kiểm tra thông tin cho mình ạ à mà chị cũng đang muốn hỏi thêm là có ai có mẹo gì không dạ em chưa nắm được mẹo nấu phở bò ngon nào để chia sẻ với chị ạ nếu chị quan tâm đến sản phẩm hay chương trình của shop thì em rất sẵn lòng tư vấn thêm cho mình thôi thôi em chưa có thông tin gì cho chị đúng không chị hiểu rồi chị quay lại hỏi về sản phẩm nhé",
+      "n_turns": 8,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê em có thể hỗ trợ chị về thông tin sản phẩm hoặc chính sách mua hàng của shop mình ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "alo chị đang tìm hiểu cách nấu phở bò ngon có ai biết không em",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ hiện em chưa có thông tin về công thức nấu phở bò ngon chị ạ nếu chị cần tư vấn về sản phẩm của shop hoặc các chính sách em rất sẵn lòng hỗ trợ thêm cho mình",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "chị nghe nói cần có nước dùng thật ngon thì mới ngon ấy có đúng không nhỉ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ em xin phép trả lời là hiện em chưa có thông tin về bí quyết nấu nước dùng cho phở bò ngon chị nhé mình cần hỗ trợ về sản phẩm bên shop thì em sẽ kiểm tra thông tin cho mình ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "à mà chị cũng đang muốn hỏi thêm là có ai có mẹo gì không",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ em chưa nắm được mẹo nấu phở bò ngon nào để chia sẻ với chị ạ nếu chị quan tâm đến sản phẩm hay chương trình của shop thì em rất sẵn lòng tư vấn thêm cho mình",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "thôi thôi em chưa có thông tin gì cho chị đúng không chị hiểu rồi chị quay lại hỏi về sản phẩm nhé",
+          "entities": {},
+          "reference_source": "llm"
+        }
+      ]
+    }
+  ]
+}

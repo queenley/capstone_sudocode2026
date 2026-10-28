@@ -17,7 +17,7 @@ REPO = Path(__file__).resolve().parents[3]
 AUDIO = Path(os.environ.get("ASR_AUDIO") or next(
     (p for p in (REPO / "evaluation/data-generation/output/audio/scenarios_SCN-GEN-0001", REPO / "scenarios_SCN-GEN-0001")
      if p.is_dir()), REPO / "scenarios_SCN-GEN-0001"))
-spec = importlib.util.spec_from_file_location("ref", REPO / "evaluation/harness/evaluation-contracts/sources/btc/eval/reference_eval.py")
+spec = importlib.util.spec_from_file_location("ref", REPO / "evaluation/agent-evaluation/contracts/sources/btc/eval/reference_eval.py")
 ref = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(ref)
 

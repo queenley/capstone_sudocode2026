@@ -10,7 +10,7 @@ scenarios through here.
   each later call on its ``call_date``, else the previous call's day plus
   ``days_later``. Calls are numbered from ``call_1`` without gaps and never go
   back in time, which the harness enforces too
-  (``evaluation/harness/eval_harness/preflight.py``).
+  (``evaluation/agent-evaluation/src/steps/prepare/preflight.py``).
 - **Turns.** The ASR or teencode version, ``customer_turns_asr``, when a call
   has one: the system must take that one (``scenario_format.md``). Its
   ``input_mode`` then labels the turn; a call without it is ``clean``.

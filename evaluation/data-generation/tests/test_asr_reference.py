@@ -77,7 +77,8 @@ def test_ground_truth_lists_spoken_clips_in_btc_format(tmp_path, all_scenarios):
     summary = write_ground_truth(tmp_path / "output" / "audio", tmp_path / "gt.json", dataset)
     truth = json.loads((tmp_path / "gt.json").read_text(encoding="utf-8"))
     assert summary["dialogues"] == 1 and set(truth) == {"description", "hypotheses_format", "normalization_rule",
-                                                         "reference_date", "dialogues"}
+                                                         "reference_date", "kind", "entity_schema", "dialogues"}
+    assert truth["kind"] == "turns" and {"budget_vnd", "price_vnd", "blocker"} <= set(truth["entity_schema"]["properties"])
     dialogue = truth["dialogues"][0]
     assert dialogue["full_text"] == "câu 1" and dialogue["turns"][0]["speaker"] == "C"
     assert dialogue["id"] == f"{scenario.scenario_id}-call_1-t1"

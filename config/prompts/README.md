@@ -10,9 +10,9 @@ Mọi prompt đưa cho model đều nằm ở đây, mỗi thư mục con ứng 
 | `agent/context_compactor.md` | `components/context/compact.py` | Tóm tắt lượt cũ. `{previous}`, `{turns}` |
 | `agent/turn_labeller.md` | `components/evaluation/scorers.py` | Gán nhãn câu hỏi/claim cho grader. `{slots}`, `{fields}` |
 | `agent/tts_openai.md` | `components/voice/tts.py` | Chỉ dẫn giọng đọc cho model gpt-4o TTS |
-| `evaluation/extractor.txt` | `evaluation/harness` (`product.py`, `agent/extract_command.py`) | Copy vào mỗi run dưới tên `extractor-prompt.txt` |
-| `evaluation/observer.md` | `evaluation/harness/simulate.py` | Bộ quan sát của customer simulator |
-| `evaluation/customer_voice.md` | `evaluation/harness/simulate.py` | Nối sau persona khi viết lại lời khách |
+| `evaluation/extractor.txt` | `evaluation/agent-evaluation` (`product.py`, `agent/extract_command.py`) | Copy vào mỗi run dưới tên `extractor-prompt.txt` |
+| `evaluation/observer.md` | `evaluation/agent-evaluation/src/simulation/simulate.py` | Bộ quan sát của customer simulator |
+| `evaluation/customer_voice.md` | `evaluation/agent-evaluation/src/simulation/simulate.py` | Nối sau persona khi viết lại lời khách |
 | `data-generation/*.jinja` | `evaluation/data-generation/src/pipeline/generate_{scenarios,dialogue}.py` | `voice_direction.jinja` hiện chưa có code dùng |
 | `data-generation/synthetic_customers.md` | `generate_synthetic_customers.py` | Sinh hồ sơ CRM giả lập |
 

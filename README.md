@@ -163,10 +163,10 @@ Set-Location apps/web; npm run typecheck; npm run build
 
 ### Đánh giá chất lượng AI
 
-Bộ chấm điểm (so sánh AI có nhớ khách và không nhớ khách, dùng scorer của BTC) nằm ở `evaluation/harness`. Xem [evaluation/harness/README.md](evaluation/harness/README.md).
+Bộ chấm điểm (so sánh AI có nhớ khách và không nhớ khách, dùng scorer của BTC) nằm ở `evaluation/agent-evaluation`. Xem [evaluation/agent-evaluation/README.md](evaluation/agent-evaluation/README.md).
 
 ```powershell
-apps/ai-agent-service/.venv/Scripts/python evaluation/harness/run_eval.py evaluate --advisor openai:gpt-4.1-mini
+apps/ai-agent-service/.venv/Scripts/python evaluation/agent-evaluation/run_eval.py evaluate --advisor openai:gpt-4.1-mini
 ```
 
 Lệnh dạng BTC (`--scenarios`, `--config`, `--out`) chạy agent trên kịch bản của BTC và chấm luôn bằng `reference_eval.py`, kèm bảng truy hồi: xem [README của AI agent](apps/ai-agent-service/README.md#test-và-đánh-giá).

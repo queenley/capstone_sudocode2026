@@ -1,15 +1,19 @@
 """The evaluation routes business tools to the organisers' mock, which has no idempotency_key."""
 import asyncio
+import importlib.util
 import json
-import sys
 from pathlib import Path
+import sys
 
 from langchain_core.tools import StructuredTool
 from pydantic import BaseModel
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "evaluation" / "harness"))
-
-from agent import runner  # noqa: E402
+# Loaded by path: the evaluator's package is named ``src``, as is ``packages/backend-common/src`` on this suite's path.
+_RUNNER = Path(__file__).resolve().parents[2] / "evaluation/agent-evaluation/src/services/agent/runner.py"
+_spec = importlib.util.spec_from_file_location("agent_evaluation_runner", _RUNNER)
+runner = importlib.util.module_from_spec(_spec)
+sys.modules[_spec.name] = runner   # its dataclasses look themselves up there
+_spec.loader.exec_module(runner)
 
 
 class _Args(BaseModel):

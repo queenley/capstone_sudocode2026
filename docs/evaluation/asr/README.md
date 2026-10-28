@@ -1,6 +1,6 @@
 # So sánh 3 mô hình ASR và diarization (24/10/2026)
 
-> Đánh giá trên cả bộ (674 lượt nói của khách, 85 kịch bản) chạy bằng `evaluation/harness/run_eval.py asr`; cách làm và kết quả ở [evaluation/harness/README.md](../../../evaluation/harness/README.md) mục 5. Trang này là thí nghiệm so sánh ban đầu trên 7 clip.
+> Đánh giá trên cả bộ (674 lượt nói của khách, 85 kịch bản) chạy bằng `evaluation/agent-evaluation/run_eval.py asr`; cách làm và kết quả ở [evaluation/agent-evaluation/README.md](../../../evaluation/agent-evaluation/README.md) mục 5. Trang này là thí nghiệm so sánh ban đầu trên 7 clip.
 
 Dữ liệu: audio `scenarios_SCN-GEN-0001/` (7 clip khách hàng, một giọng ElevenLabs; 4 clip có nhiễu quán cà phê/đường phố/sóng yếu, 3 clip sạch). Reference là văn bản gốc đổi sang dạng đọc bằng `evaluation/data-generation/src/asr/spoken.py` (số thành chữ, giống ground truth ASR của BTC). Chấm bằng `wer_cer` của BTC (`reference_eval.py`). CPU Apple, 4 luồng, lúc đó simulator đang chạy nền nên RTF chỉ để so sánh tương đối.
 
@@ -28,13 +28,13 @@ Giữ **Zipformer 30M** (`voice.asr: zipformer-30m`).
 
 ## Diarization
 
-`evaluation/data-generation/src/asr/diarize.py` (mới), nối vào `eval_asr.py --diarize`:
+`evaluation/agent-evaluation/src/services/asr/sherpa.py` (trước ở `data-generation/src/asr/diarize.py`), dùng qua `run_eval.py asr --diarizer sherpa`:
 1. sherpa-onnx cắt đoạn theo người nói (pyannote segmentation 3.0 + embedding 3D-Speaker ERes2Net, CPU), đặt trước 2 người nói.
 2. Gán vai BTC: người nói trước là **A** (shop nghe máy trước, như các hội thoại BTC), người còn lại là **C**; một cụm duy nhất thì nhận nhãn `single` (clip khách đơn lẻ = C).
 3. Nối các đoạn cùng vai cách nhau ≤ 0,6 s, bỏ đoạn < 0,3 s.
 4. Nhận dạng từng đoạn bằng Zipformer rồi xuất `turns` {speaker, start, end, text}. Khi đó `wer_cer` của BTC tính `diarization_turn_accuracy`.
 
-Cách chạy: `python -m src.pipeline.eval_asr --set team --transcribe --engine zipformer --diarize --segmentation <model.onnx> --embedding <.onnx>`.
+Cách chạy: `run_eval.py asr --set <bộ hội thoại> --diarizer sherpa --segmentation <model.onnx> --embedding <.onnx>` (xem mục 5 của [agent-evaluation/README.md](../../../evaluation/agent-evaluation/README.md)). Hoặc dùng `--engine openai:gpt-4o-transcribe-diarize`, engine tự phân vai.
 
 **Kiểm tra** (`diarization_check.py`; không có audio agent thật của SCN-GEN-0001 nên dựng hội thoại 8 lượt từ clip khách của bộ dữ liệu và 2 câu của giọng nam Edge-TTS làm "agent"):
 

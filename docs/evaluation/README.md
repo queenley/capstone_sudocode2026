@@ -8,14 +8,14 @@ Kết quả ngày 22/10/2026: [báo cáo và giới hạn](2026-10-22-results.md
 
 Lịch sử chọn case và run mới: [RUN-LEDGER.md](RUN-LEDGER.md). Trước khi chạy thêm, kiểm danh sách đã chạy và holdout để tránh trùng.
 
-Main hiện có runner BTC ở gốc repo (`run_eval.py`) và harness phân tích tại `evaluation/harness/run_eval.py`. Xem [bản đồ hiện tại](system-map.md) và [đợt kiểm ngày 22/10/2026](2026-10-22-worklog.md). Các bảng số liệu và ghi chú runner stub bên dưới là tài liệu lịch sử, không phải readiness mới nhất.
+Main hiện có runner BTC ở gốc repo (`run_eval.py`) và harness phân tích tại `evaluation/agent-evaluation/run_eval.py`. Xem [bản đồ hiện tại](system-map.md) và [đợt kiểm ngày 22/10/2026](2026-10-22-worklog.md). Các bảng số liệu và ghi chú runner stub bên dưới là tài liệu lịch sử, không phải readiness mới nhất.
 
 Mọi con số dùng trong báo cáo đều được tính bằng code chấm của BTC: `apps/ai-agent-service/data/btc/eval/reference_eval.py`. Repo có ba tầng đánh giá, xếp từ rẻ đến đầy đủ:
 
 | Tầng | Lệnh | Cần gì | Đo gì |
 |---|---|---|---|
 | 1. Test | `python -m pytest -q` | không gì | lane, hard guard, PII, ITN; contract của route agent; workflow nền tảng |
-| 2. Retrieval của agent | `python evaluation/harness/evaluate.py` | không gì | Recall@3/@5, multi-hop, tỉ lệ từ chối (abstain), `rag_eval` của BTC |
+| 2. Retrieval của agent | `python evaluation/agent-evaluation/run_eval.py rag-offline` | không gì | Recall@3/@5, multi-hop, tỉ lệ từ chối (abstain), `rag_eval` của BTC |
 | 3. End-to-end Chương A | `evaluation/data-generation` + `reference_eval.py` | stack đang chạy + key model | CCR, RQR, TSR (+ hard case), HR (+ giá/khuyến mãi), guardrails, latency, ASR |
 
 CI chạy tầng 1 và 2 ở mỗi push. Tầng 2 ghi `reports/generated/evaluation.json`, CI upload file này thành artifact.
@@ -28,7 +28,7 @@ CI chạy tầng 1 và 2 ở mỗi push. Tầng 2 ghi `reports/generated/evaluat
 
 ## Tầng 2: retrieval của agent
 
-`evaluation/harness/evaluate.py` cho chính retriever của agent (`kb_search`: BM25 trên `data/btc/policy`, mỗi mục `## [XX-nn]` là một chunk) trả lời 60 câu trong `data/btc/rag/qa_labeled.json`. Agent được tính là "từ chối" khi không có kết quả nào, hoặc kết quả đầu là tài liệu nội bộ.
+`evaluation/agent-evaluation/run_eval.py rag-offline` cho chính retriever của agent (`kb_search`: BM25 trên `data/btc/policy`, mỗi mục `## [XX-nn]` là một chunk) trả lời 60 câu trong `data/btc/rag/qa_labeled.json`. Agent được tính là "từ chối" khi không có kết quả nào, hoặc kết quả đầu là tài liệu nội bộ.
 
 | Chỉ số | Retriever của agent | Baseline `create_data` |
 |---|---:|---:|

@@ -171,7 +171,7 @@ Docker: `docker compose up --build ai-agent-service`. Thêm voice bằng `--buil
 - `python -m pytest -q` (từ root):
   - `tests/agent/` kiểm tra lane, hard guard, PII, ITN;
   - `tests/test_agent_turns.py` kiểm tra route với agent giả lập.
-- `python evaluation/harness/evaluate.py`: Recall@k của kho tri thức trên `data/btc/rag/qa_labeled.json`.
+- `python evaluation/agent-evaluation/run_eval.py rag-offline`: Recall@k của kho tri thức trên `data/btc/rag/qa_labeled.json`.
 - Lệnh đánh giá dạng BTC, `run_eval.py` ở thư mục gốc repo: chạy agent thật trên kịch bản định dạng BTC, ghi trace, chấm bằng `reference_eval.py`, kèm bảng RAG. Cần PostgreSQL và key model; tự dùng database `<tên>_eval`. Từ thư mục gốc:
 
   ```powershell

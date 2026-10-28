@@ -15,13 +15,22 @@ import soundfile as sf
 
 LAB = Path(os.environ.get("ASR_LAB", Path(__file__).parent))  # models/, agent_tts/ and the venv live here
 REPO = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(REPO / "evaluation/data-generation"))
 sys.path.insert(0, str(Path(__file__).parent))
-from src.asr import diarize as D  # noqa: E402
-from src.asr.spoken import to_spoken  # noqa: E402
 from asr_bench import Zipformer  # noqa: E402
 
-spec = importlib.util.spec_from_file_location("ref", REPO / "evaluation/harness/evaluation-contracts/sources/btc/eval/reference_eval.py")
+
+def _load(name, path):
+    # Both projects name their package ``src``: load the two modules by path.
+    found = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(found)
+    found.loader.exec_module(module)
+    return module
+
+
+D = _load("sherpa_diarize", REPO / "evaluation/agent-evaluation/src/services/asr/sherpa.py")
+to_spoken = _load("spoken", REPO / "evaluation/data-generation/src/asr/spoken.py").to_spoken
+
+spec = importlib.util.spec_from_file_location("ref", REPO / "evaluation/agent-evaluation/contracts/sources/btc/eval/reference_eval.py")
 ref = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(ref)
 

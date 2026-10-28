@@ -9,7 +9,7 @@ The agent lives in ``apps/ai-agent-service``; this file only puts it on the
 path and hands over to ``ai_agent_service/pipeline/eval/cli.py``, which
 documents the options. Run it with the agent's interpreter
 (``apps/ai-agent-service/.venv``), from any directory. The team's analysis
-harness is a different command, ``evaluation/harness/run_eval.py``.
+harness is a different command, ``evaluation/agent-evaluation/run_eval.py``.
 """
 
 import sys

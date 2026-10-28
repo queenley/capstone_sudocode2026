@@ -101,14 +101,19 @@ config/prompts/
 
 ```text
 evaluation/
-├── harness/              Bộ chấm điểm agent end-to-end
-│   ├── run_eval.py       Lệnh chính: preflight, chạy agent trên kịch bản, chấm, xuất báo cáo
-│   ├── evaluate.py       Đo nhanh Recall@k của kho tri thức, không cần model
-│   ├── eval_harness/     Lõi harness: chạy, thu trace, chấm điểm, báo cáo, ASR, RAG
-│   ├── agent/            Cầu nối từ harness tới agent thật trong apps/ai-agent-service
-│   ├── simulate.py       Khách giả lập phản ứng theo câu trả lời của agent
+├── agent-evaluation/     Chấm agent của nhóm và baseline không nhớ theo tiêu chí của BTC
+│   ├── run_eval.py       Script chạy toàn bộ (evaluate) và các lệnh phụ
+│   ├── src/
+│   │   ├── pipeline.py   Điều phối 4 bước
+│   │   ├── steps/        prepare → run → collect → score
+│   │   ├── criteria/     Mỗi tiêu chí một file (tool, bộ nhớ, carry-over, claim, brief, guardrail, latency…)
+│   │   ├── baseline/     Khác biệt giữa full và baseline_no_memory
+│   │   ├── services/     Gọi agent (bridge, adapter), LLM trích xuất, ASR, RAG, Langfuse
+│   │   ├── simulation/   Khách giả lập phản ứng theo câu trả lời của agent
+│   │   ├── datasets/     Nhập dữ liệu từ data-generation, registry, kiểm nhãn
+│   │   └── reports/      case-trace, lịch sử run
+│   ├── contracts/        Schema của bộ chấm và bản gốc nguồn BTC (khóa bằng hash)
 │   ├── datasets/         Các bộ dữ liệu test đã chuẩn hóa, có registry
-│   ├── evaluation-contracts/  Hợp đồng chấm điểm và bản sao nguồn BTC (khóa bằng hash)
 │   └── runs/             Bằng chứng từng lượt chạy (chỉ lưu local, không commit)
 └── data-generation/      Bộ sinh dữ liệu test theo định dạng BTC
     ├── config/

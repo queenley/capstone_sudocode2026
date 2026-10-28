@@ -141,7 +141,7 @@ Danh sách đủ 15 loại: [evaluation/data-generation/README.md §3](../../eva
 
 ### Các phiên bản dataset
 
-Bộ chấm đọc dataset đã chuẩn hóa ở [`evaluation/harness/datasets/`](../../evaluation/harness/datasets/) (chuyển bằng `normalize_create_data.py`):
+Bộ chấm đọc dataset đã chuẩn hóa ở [`evaluation/agent-evaluation/datasets/`](../../evaluation/agent-evaluation/datasets/) (chuyển bằng `run_eval.py data-import`):
 
 | Dataset | Kịch bản | Khác bản trước |
 |---|---:|---|

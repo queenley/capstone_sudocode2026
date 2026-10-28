@@ -177,11 +177,11 @@ Cho agent chạy trên `output/scenarios/`, ghi trace theo `data/schemas/trace_l
 python data/eval/reference_eval.py --scenarios output/scenarios --trace runs/full.jsonl --baseline runs/baseline.jsonl --out report.json
 ```
 
-Hoặc dùng harness của nhóm: chuẩn hóa bộ mới thành một dataset rồi chạy theo [evaluation/harness/README.md](../harness/README.md):
+Hoặc dùng bộ chấm của nhóm: chuẩn hóa bộ mới thành một dataset rồi chạy theo [evaluation/agent-evaluation/README.md](../agent-evaluation/README.md):
 
 ```powershell
-cd ../harness
-../../apps/ai-agent-service/.venv/Scripts/python normalize_create_data.py --name create-data-diagnostic-v5
+cd ../..
+apps/ai-agent-service/.venv/Scripts/python evaluation/agent-evaluation/run_eval.py data-import --name create-data-diagnostic-v5
 ```
 
 ---
@@ -216,7 +216,7 @@ data/ (BTC, chỉ đọc)  config/ (persona, settings)  ../../config/prompts/dat
 | 8 | `build_ground_truth` | không | `trace_log/`, `reports/oracle_report*.json`, `reference_report.json`, `a6_oracle.txt`, `tools_audit.*`, `schema_check.json`, `ground_truth_summary.json` |
 | 9 | `export_manual_review` | không | `review/needs_manual_review.csv`; `--ingest`: `approved.csv`, `rejected.csv`, `golden_manifest.json` |
 | 10 | `synthesize_scenario_audio` | LLM `asr_reference` + ElevenLabs | `asr_reference/scenarios_<id>/call_<n>.json`, `audio/scenarios_<id>/call_<n>/turn_<k>.{wav,json}`, `asr_reference/ground_truth.json`, `reports/elevenlabs_usage.json` |
-| 11 | `build_asr_testset` (khi `--asr-dialogues N`) | ElevenLabs (`--text-only`: không) | `asr_test/` |
+| 11 | `build_asr_testset` (khi `--asr-dialogues N`) | LLM `asr_reference` + ElevenLabs (`--text-only`: chỉ LLM) | `asr_test/` |
 | 12 | `eval_rag` | không | `rag/` |
 | 13 | `summarize_dataset` | không | `reports/dataset_statistics.json` (+ CSV), `dataset_dashboard.html` |
 | 14 | `report` | không | `reports/validation_report.{md,html}`, `audio_statistics.json`, `audio_by_customer.csv` |
@@ -362,7 +362,8 @@ output/
 ├── asr_reference/                               đáp án ASR của audio kịch bản
 │   ├── scenarios_<id>/call_<n>.json             dạng nói + entities của từng lượt khách (LLM; "rule" khi phải dùng luật)
 │   └── ground_truth.json                        mọi clip đã đọc, định dạng data/asr/ground_truth.json của BTC
-├── asr_test/                                    bộ ASR của nhóm theo định dạng asr/ của BTC (ground_truth.json + audio/)
+├── asr_test/                                    bộ ASR hội thoại hai người (định dạng asr/ của BTC):
+│                                                ground_truth.json, spoken/ (dạng nói của từng câu), audio/<id>.wav + .segments.json
 ├── rag/                                         đánh giá RAG: report, kết quả theo định dạng BTC, CSV từng câu hỏi
 ├── review/                                      duyệt tay: needs_manual_review.csv, approved.csv, rejected.csv,
 │                                                golden_manifest.json, judge_agreement.csv
@@ -551,19 +552,26 @@ Chunk theo `chunk_id_rule` của BTC (mỗi `## [XX-nn]` một chunk), chấm b�
 
 `version_accuracy` và chất lượng câu trả lời cần judge hoặc người chấm.
 
-### ASR: WER / CER / độ đúng thực thể / phân vai
+### ASR: đáp án cho bộ chấm
+
+Project này chỉ sinh **đáp án ASR**. Việc nghe audio, hiểu câu và chấm điểm nằm ở [`evaluation/agent-evaluation`](../agent-evaluation/README.md) (mục 5), dùng pipeline thật của ai-agent-service.
 
 ```powershell
-python -m src.pipeline.build_asr_testset --limit 24 [--text-only]   # bộ của nhóm, định dạng asr/ của BTC
-python -m src.pipeline.eval_asr --set team --transcribe             # faster-whisper chạy local (M1 yêu cầu ASR local)
-python -m src.pipeline.eval_asr --set btc --hypotheses path/hypotheses.json
+python -m src.pipeline.synthesize_scenario_audio --resume                # bộ theo lượt: asr_reference/ + audio/
+python -m src.pipeline.build_asr_testset --limit 24 [--text-only]       # bộ hội thoại hai người: asr_test/
 ```
 
-Có hai bộ đáp án ASR:
-- **Audio kịch bản** (`asr_reference/ground_truth.json`, bước 10): mỗi lượt khách là một clip, dạng nói do LLM viết, TTS đọc đúng câu đó. Harness dựng bộ chấm từ đây bằng `run_eval.py asr-build` và dùng `spoken_text` của clip làm đáp án.
-- **Bộ hội thoại của nhóm** (`asr_test/`, bước 11): đủ cả lượt agent và khách, như D01–D04.
+| Bộ | Mỗi mục | Đáp án |
+|---|---|---|
+| **Theo lượt** (`asr_reference/ground_truth.json`, bước 10) | một lượt khách, một giọng | `full_text` = câu TTS đọc |
+| **Hội thoại** (`asr_test/ground_truth.json`, bước 11) | cả cuộc gọi: shop (`A`) và khách (`C`), hai giọng, `audio/<id>.segments.json` cho phân vai; một phần ba có nhiễu băng thông điện thoại (BTC: 4/12) | `turns[].text` = câu TTS đọc |
 
-Bộ hội thoại dựng từ hội thoại mẫu. Câu được chuyển sang **dạng nói** như D01–D04 của BTC ([`src/asr/spoken.py`](src/asr/spoken.py)): 5.200.000đ → "năm triệu hai trăm nghìn", 22/10 → "hai mươi hai tháng mười", OD600001 → "ô đê sáu trăm nghìn không trăm linh một". Chính câu đó được gửi đi TTS, nên đáp án đúng ngay từ cách tạo. Một phần ba hội thoại có nhiễu băng thông điện thoại + mất gói (BTC: 4/12 có nhiễu). Mỗi hội thoại có `audio/<id>.segments.json` cho chấm phân vai (M2). Điểm tính bằng `wer_cer` của BTC; việc chấm chạy trong `reports/asr_eval/<set>/`, không đụng vào `data/`.
+Cả hai bộ dùng chung [`src/asr/reference.py`](src/asr/reference.py):
+- **Câu chuẩn → dạng nói:** LLM viết lại từng câu như người nói ra (5.200.000đ → "năm triệu hai trăm nghìn", "AirPure X" → "e pia x"); TTS đọc đúng câu đó, nên đáp án khớp audio ngay từ cách tạo.
+- **Entity:** trích từ chính câu chuẩn theo khóa của BTC. Câu khách cho `budget_vnd`, `room_area_m2`, `payment`, `blocker`…; câu shop cho `price_vnd`, `promo_expiry`, `warranty_months`…
+- **Kiểm từng câu:** không còn chữ số hay mã, giữ nguyên các từ khác, entity phải có trong câu. Câu sai được hỏi lại một lần; vẫn sai thì dùng luật `spoken.py` / `entities.py` (`reference_source: "rule"`).
+
+Mỗi file ghi `kind` (`turns` hoặc `dialogues`) và `entity_schema` (khóa và kiểu entity). Nhãn `blocker` trùng cụm từ agent dùng, chỉ bỏ dấu (`can hoi chong`, `can hoi nguoi nha`…), nên agent hiểu đúng thì khớp đúng.
 
 ---
 

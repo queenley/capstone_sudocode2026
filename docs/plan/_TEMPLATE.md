@@ -14,7 +14,7 @@ Agent đang làm sai gì? Viết bằng ví dụ cụ thể.
 
 ## 2. Bằng chứng
 
-- Run / kịch bản / lượt: `evaluation/harness/runs/...`, `SCN-GEN-xxxx call_N turn_K`
+- Run / kịch bản / lượt: `evaluation/agent-evaluation/runs/...`, `SCN-GEN-xxxx call_N turn_K`
 - Khách nói: "..."
 - Agent nói: "..."
 - Đáng lẽ: "..."
