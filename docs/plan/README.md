@@ -14,7 +14,7 @@ flowchart LR
     B --> P["Viết file đề xuất<br/>NNN-ten-ngan.md"]
     P --> R["Nhóm duyệt"]
     R --> C["Code + test"]
-    C --> E["Đo: R0 trước / R1 sau<br/>(ghi RUN-LEDGER)"]
+    C --> E["Đo: R0 trước / R1 sau<br/>(cùng cohort)"]
     E -- "tốt hơn" --> D["Trạng thái: xong"]
     E -- "không tốt hơn / gây hại" --> X["Quay lui, ghi lý do"]
 ```
@@ -35,7 +35,7 @@ Trạng thái dùng chung: `ý tưởng` · `đề xuất` · `đã duyệt` · 
 
 | Muốn agent... | Loại | Sửa ở đâu | Cần thêm |
 |---|---|---|---|
-| Biết thêm một câu trả lời (FAQ, cách xử lý một tình huống) | **Tri thức** | thêm mục vào `apps/ai-agent-service/data/kb/v<N+1>.jsonl`, tăng `version` trong `config/knowledge.yaml` | đo lại Recall (`python evaluation/agent-evaluation/run_eval.py rag-offline`) |
+| Biết thêm một câu trả lời (FAQ, cách xử lý một tình huống) | **Tri thức** | thêm mục vào `apps/ai-agent-service/data/kb/v<N+1>.jsonl`, tăng `version` trong `config/knowledge.yaml` | đo lại Recall (`python evaluation/rag_offline.py`) |
 | Xử lý một **tình huống bán hàng** theo cách đã thắng (chê đắt, hỏi người nhà...) | **Playbook** | mục playbook trong `data/kb/` gắn `situation` từ `config/situations.yaml` | thêm situation mới nếu chưa có; vòng tự cải tiến tự động (`components/improvement/playbook.py`) **chưa xây** |
 | Tuân theo một **quy tắc hành xử** mới | **Prompt** | `HARD_RULES` hoặc `LANE_NOTES` trong `src/ai_agent_service/agents/advisor.py` | quy tắc nào kiểm được bằng code thì thêm luôn guard (dòng dưới) |
 | **Không bao giờ** nói một loại câu | **Hard guard** | `components/guardrails/hard.py`: thêm regex + nhánh trong `check()` | test trong `tests/agent/`; lý do viết tiếng Việt (được đưa thẳng cho model) |

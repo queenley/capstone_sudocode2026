@@ -31,7 +31,7 @@ def test_digit_strings_and_order_codes(said, written):
 
 
 @pytest.mark.parametrize("said, written", [
-    # Found by the ASR evaluation (evaluation/agent-evaluation, asr-team-v2): "không" after a number was read as a zero.
+    # Found by the ASR evaluation (the ASR evaluation): "không" after a number was read as a zero.
     ("chỗ khác là bốn triệu tám không biết có giảm được không", "chỗ khác là 4.800.000đ không biết có giảm được không"),
     ("giá năm triệu hai không em", "giá 5.200.000đ không em"),
     ("còn năm triệu không", "còn 5.000.000đ không"),

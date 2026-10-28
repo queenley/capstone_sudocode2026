@@ -1,6 +1,6 @@
 """Canonical slot vocabulary shared by scenarios, transcripts and metrics.
 
-Slot names follow the BTC samples (``data/sample/SAMPLE-0*.json``). A stable
+Slot names follow the BTC samples (``test_set/public_sample/SAMPLE-0*.json``). A stable
 vocabulary is what makes the metrics computable:
 
 * ``carry``   -> the slot is listed in ``must_carry_over`` of later calls (CCR).

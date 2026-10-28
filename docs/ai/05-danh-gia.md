@@ -4,21 +4,20 @@
 
 Mọi con số báo cáo được tính bằng **code chấm của BTC** ([reference_eval.py](../../apps/ai-agent-service/data/btc/eval/reference_eval.py)). Nhóm không tự viết lại công thức, chỉ chuẩn bị đầu vào (trace) và đọc đầu ra.
 
-Tài liệu vận hành chi tiết: [docs/evaluation/](../evaluation/README.md), [evaluation/agent-evaluation/README.md](../../evaluation/agent-evaluation/README.md). Lịch sử từng lần chạy: [RUN-LEDGER.md](../evaluation/RUN-LEDGER.md).
+Cửa vào vận hành: [evaluation/README.md](../../evaluation/README.md). Luồng từng bước và bảng "chỉ số nào đọc trường nào": [docs/evaluation/scoring-flow.md](../evaluation/scoring-flow.md).
 
 ---
 
-## 1. Ba tầng đánh giá
+## 1. Các tầng đánh giá
 
 Xếp từ rẻ đến đầy đủ:
 
 | Tầng | Lệnh | Cần gì | Đo gì | Tần suất |
 |---|---|---|---|---|
-| **1. Unit test** | `python -m pytest -q` | không gì | lane, hard guard, PII, ITN, contract BTC, route API với agent giả | mỗi push (CI) |
-| **2. Truy hồi** | `python evaluation/agent-evaluation/run_eval.py rag-offline` | không gì | Recall@3/@5, multi-hop, tỉ lệ từ chối | mỗi push (CI) |
-| **3. End-to-end** | `evaluation/agent-evaluation/run_eval.py evaluate` | PostgreSQL + key model | TSR, CCR, RQR, HR, guardrail, latency | thủ công, tốn phí |
-| (phụ) **ASR** | `run_eval.py asr` | `asr-service` | WER, CER, entity accuracy | thủ công, không tốn API |
-| (phụ) **Simulator** | `run_eval.py simulate` | như tầng 3 | TSR khi khách phản ứng theo agent | thủ công, tốn phí |
+| **1. Unit test** | `python -m pytest -q` | không gì | lane, hard guard, PII, ITN, contract BTC, extractor, gói BTC, route API với agent giả | mỗi push (CI) |
+| **2. Truy hồi** | `python evaluation/rag_offline.py` | không gì | Recall@3/@5, multi-hop, tỉ lệ từ chối | mỗi push (CI) |
+| **3. End-to-end** | `python run_eval.py --scenarios <thư mục> ...` | PostgreSQL + key model | TSR, CCR, RQR, HR, guardrail, latency | thủ công, tốn phí |
+| (phụ) **Gắn nhãn lại** | `python run_eval.py --relabel <run> --out <thư mục>` | key model (chỉ extractor) | RQR, CCR, HR trên lời agent đã có, để so extractor | thủ công, rẻ |
 
 > Unit test với agent giả **không chứng minh** chất lượng của model thật. Đánh giá text **không chứng minh** voice chạy được.
 
@@ -61,6 +60,8 @@ Agent: "Dạ hôm trước bên em báo chị AirPure X [B1] giá 4.890.000đ [B
 
 ---
 
+---
+
 ## 3. So sánh full và baseline
 
 Mỗi kịch bản chạy **hai lần**:
@@ -74,59 +75,32 @@ Hai lần chạy phải dùng cùng dataset, model, temperature, tool và prompt
 
 ---
 
-## 4. Cách bộ chấm hoạt động
+---
 
-### Hai runner
+## 4. Cách chấm hoạt động
 
-| Runner | Tool nghiệp vụ | Đầu ra | Dùng khi |
-|---|---|---|---|
-| `run_eval.py` ở gốc repo | MCP của sản phẩm | `full.jsonl`, `baseline.jsonl`, `report.json`, `table.txt`, `rag/` | lệnh dạng BTC yêu cầu |
-| [`evaluation/agent-evaluation/run_eval.py`](../../evaluation/agent-evaluation/run_eval.py) | mock/audit do harness quản lý; memory, knowledge vẫn qua MCP | prepare → raw → evidence → scored | phân tích, kiểm nguồn gốc bằng chứng |
-
-**Không gộp số giữa hai runner.** Cả hai dùng database/schema đuôi `_eval` và reset trạng thái, nên chỉ chạy một runner một lúc.
-
-### Luồng của harness
+Một lệnh duy nhất, `run_eval.py` ở gốc repo, cũng là lệnh giám khảo sẽ gọi. Nó chạy kịch bản qua agent thật ở hai cấu hình, gắn nhãn câu hỏi/claim bằng extractor, rồi để `reference_eval.py` của BTC chấm. Chi tiết và lý do từng bước: [scoring-flow.md](../evaluation/scoring-flow.md).
 
 ```mermaid
 flowchart LR
-    DS[("Dataset<br/>v4")] --> PR["prepare<br/>kiểm nhãn, khóa hash<br/>source + config"]
-    PR -- "allowed: true" --> RUN["raw<br/>chạy agent thật<br/>full + baseline"]
-    RUN --> EX["extract<br/>model đọc từng lượt:<br/>questions, claims"]
-    EX --> EV["evidence<br/>kiểm đủ bằng chứng<br/>mỗi lượt"]
-    EV --> SC["scored<br/>reference_eval.py"]
-    SC --> OUT["bảng chỉ số<br/>+ Langfuse (token, USD)"]
-    RUN -. "sửa code trong lúc chạy" .-> STOP(("từ chối<br/>chạy tiếp"))
+    DS[("Kịch bản<br/>v4 hoặc public_sample")] --> RUN["chạy agent thật<br/>full + baseline"]
+    RUN --> TR["trace BTC<br/>(tool, latency, memory)"]
+    TR --> EX["extractor v4<br/>questions, claims, facts_used"]
+    EX --> CK["kiểm: lượt lỗi hoặc<br/>chưa gắn nhãn thì chặn"]
+    CK --> SC["reference_eval.py<br/>(BTC)"]
+    SC --> OUT["bảng chỉ số + Recall@k"]
 ```
 
-- **Khóa mã nguồn:** sau `prepare`, hash của `apps/ai-agent-service/src`, `config`, `evaluation/agent-evaluation/src/services/agent` bị khóa. Sửa mã giữa chừng thì bộ chấm từ chối chạy tiếp.
-- **`facts_used`** lấy từ dấu `[Bn]` agent tự đánh, cộng giá trị brief được nhắc lại.
-- **`questions` và `claims`** do **extractor** trích. BTC không cung cấp extractor (đây là trách nhiệm của đội); BTC chấm tay ngẫu nhiên 20 lượt để kiểm extractor có bỏ sót không. Extractor hiện tại `product-extractor-v3` dùng **từ vựng cố định**: 34 slot của ontology và các trường claim BTC kèm kiểu giá trị; slot ngoài bộ thành `other`, claim sai kiểu bị bỏ.
-- **Thiếu bằng chứng không được điền 0 hay PASS.** Run thiếu nhãn cho một số lượt thì ghi `INCOMPLETE`, không xuất điểm tổng.
-- **Mã thoát `evaluate`:** `0` đạt hết · `1` chạy xong nhưng trượt một số kiểm (bình thường) · `2` thiếu bằng chứng · `3` lỗi chạy.
-- **Ngân sách API:** sổ SQLite (`EVAL_BUDGET_DB`) giữ dự phòng trước mỗi request có phí, chỉ hoàn khi có usage. Hết ngân sách thì dừng, không reset sổ để lách.
-
-### Customer simulator
-
-Kịch bản cố định không phản ứng theo agent: agent hỏi thừa thì khách vẫn nói câu kế tiếp. Simulator ([src/simulation/customer.py](../../evaluation/agent-evaluation/src/simulation/customer.py), [simulate.py](../../evaluation/agent-evaluation/src/simulation/simulate.py)) cài **8 quy tắc của BTC**, áp theo thứ tự:
-
-| # | Agent làm | Khách phản ứng |
-|---|---|---|
-| 1 | hỏi lại slot đã có | `patience −1`, vẫn trả lời nhưng phàn nàn ("hôm trước chị nói rồi mà"). Xác nhận lần đầu không trừ |
-| 2 | (patience = 0) | khách kết thúc, `outcome = tu_choi` |
-| 3 | bịa / khác giá đã biết | phản ứng, `patience −1`, không nhận giá cao hơn nếu không giải thích |
-| 4 | hỏi thông tin mới cần thiết | trả lời bình thường |
-| 5 | đề xuất đúng nhu cầu + giá đúng | đồng ý theo `expected_outcome` |
-| 6 | im / lạc đề 2 lượt liền | "em còn đó không?", lần 3 cúp máy |
-| 7 | hỏi điều kịch bản không có | "chị không rõ" (không bịa fact) |
-| 8 | quá 12 lượt khách | `outcome = timeout` |
-
-Mỗi lượt agent, một **bộ quan sát** (một lần gọi model) phân loại câu hỏi; một LLM diễn đạt lại lời khách theo persona (temperature 0,3, có seed). `passed` = `check_call` của BTC trên **tool call thật**. Chạy 3 seed để đo độ ổn định.
+- **`facts_used`** = slot extractor thấy được dùng lại từ cuộc trước, rồi slot của các dòng brief agent đã trích dẫn `[Bn]`.
+- **`questions` và `claims`** do **extractor** trích. BTC không cung cấp extractor (đây là trách nhiệm của đội); BTC chấm tay ngẫu nhiên 20 lượt để kiểm extractor có bỏ sót không. Extractor dùng **từ vựng cố định**: 35 slot (34 của ontology và `channel`) và 18 trường claim cộng `promo_<CODE>_active`, kèm kiểu giá trị; slot ngoài bộ thành `other`, claim sai kiểu bị bỏ. Mỗi item kèm câu trích dẫn đúng nguyên văn để người chấm kiểm tay (`diagnostics.jsonl`).
+- **Thiếu bằng chứng không được điền 0 hay PASS.** Một lượt lỗi hoặc chưa gắn nhãn thì không in bảng.
+- **Ngân sách API:** sổ SQLite (`EVAL_BUDGET_DB`) giữ dự phòng trước mỗi request có phí, chỉ hoàn khi có usage. Hết ngân sách thì dừng, không tạo lại sổ để lách.
 
 ---
 
 ## 5. Đánh giá ASR
 
-So 3 mô hình trên 7 clip (24/10), rồi chạy cả bộ với mô hình được chọn (25/10). Chấm bằng `wer_cer` của BTC.
+Kết quả đo ngày 24 và 25/10 bằng `wer_cer` của BTC. **Công cụ đo ASR (lệnh `asr`, bộ `asr-team-v2`, diarization) đã gỡ khỏi cây thư mục cùng bộ chấm cũ**; mã còn trong lịch sử git trước commit `358a070`. Số dưới đây là kết quả đã đo, không tái lập được từ repo hiện tại. Bộ audio của BTC (12 hội thoại) vẫn chấm được bằng `wer_cer` trong `reference_eval.py`.
 
 ### So sánh mô hình (7 clip, ~60 từ: mẫu nhỏ, chỉ để chọn hướng)
 
@@ -136,7 +110,7 @@ So 3 mô hình trên 7 clip (24/10), rồi chạy cả bộ với mô hình đư
 | **Zipformer 30M int8** | 5,0% | **1,8%** | **0,03** | 33 MB, không cần torch, **được chọn** |
 | PhoWhisper-small int8 | 6,0% | 4,5% | 0,52 | chậm hơn và kém hơn Zipformer |
 
-### Cả bộ `asr-team-v2` (674 lượt nói, 85 kịch bản, 0,62 giờ audio, Zipformer 30M, CPU)
+### Cả bộ ASR của đội (674 lượt nói, 85 kịch bản, 0,62 giờ audio, Zipformer 30M, CPU)
 
 | Chỉ số | Giá trị |
 |---|---|
@@ -148,13 +122,15 @@ So 3 mô hình trên 7 clip (24/10), rồi chạy cả bộ với mô hình đư
 
 Lỗi hay gặp: "size" → "sai/side" (27 lần), "chị" → "chỉ" (21), "AirPure" → "epio" (~17), "COD" → "ceo d" (~20, entity `payment` vẫn đúng nhờ ITN). Lần chạy này **phát hiện lỗi ITN** "bốn triệu tám không biết" → 4.000.080đ, đã sửa.
 
-**Diarization** (tách người nói, M2): 100% trên hội thoại 8 đoạn dựng từ 2 giọng thật khác nhau; chưa có audio hội thoại thật của BTC để đo chính thức. Chi tiết: [docs/evaluation/asr/](../evaluation/asr/README.md).
+**Diarization** (tách người nói, M2): 100% trên hội thoại 8 đoạn dựng từ 2 giọng thật khác nhau; chưa có audio hội thoại thật của BTC để đo chính thức.
+
+---
 
 ---
 
 ## 6. Kết quả đến hiện tại
 
-> **Đọc kỹ trước khi trích dẫn.** Mọi nhãn còn là **diagnostic, chưa có người duyệt**. Các cohort nhỏ (5–16 kịch bản) và đã dùng để gỡ lỗi, nên **không phải kết quả đo độc lập**. Không so số giữa các ngày khác cấu hình (22/10 hard guard, 24/10 có Jev) hoặc khác extractor.
+> **Đọc kỹ trước khi trích dẫn.** Các số dưới đây đo bằng bộ chấm cũ (đã gỡ) với extractor v3; extractor hiện tại là v4 và chưa đo lại trên cùng kịch bản, nên chưa so được. Bằng chứng gốc còn trong `evaluation/runs/` (chưa xóa). Mọi nhãn còn là **diagnostic, chưa có người duyệt**. Các cohort nhỏ (5–16 kịch bản) và đã dùng để gỡ lỗi, nên **không phải kết quả đo độc lập**. Không so số giữa các ngày khác cấu hình (22/10 hard guard, 24/10 có Jev) hoặc khác extractor.
 
 ### Truy hồi tri thức (60 câu BTC, hybrid BM25 + e5-small)
 
@@ -219,16 +195,17 @@ Hệ thống ổn định giữa các seed, hơn baseline trung bình **+26,7 đ
 
 ---
 
+---
+
 ## 7. Quy tắc khi chạy thêm
 
-Từ [AGENTS.md](../../AGENTS.md) và [RUN-LEDGER.md](../evaluation/RUN-LEDGER.md):
+Theo [evaluation/README.md](../../evaluation/README.md) và [AGENTS.md](../../AGENTS.md):
 
-1. **Đọc ledger trước khi chọn kịch bản.** Ưu tiên ID chưa chạy và không thuộc holdout. Đã có 30+ ID được dùng.
-2. **Retest cùng cohort** (R0 → R1) là có chủ đích: ghi rõ, giữ nguyên cohort và cách chấm, **không tính là độ phủ mới**.
+1. **Chọn kịch bản chưa dùng và không thuộc holdout.** Danh sách ID đã dùng và holdout ở [evaluation/datasets/README.md](../../evaluation/datasets/README.md).
+2. **Retest cùng cohort** là có chủ đích: giữ nguyên cohort và cách chấm, **không tính là độ phủ mới**; báo thay đổi nhãn tách khỏi thay đổi của agent.
 3. **Holdout** chỉ chạy sau khi chốt sửa, chạy đúng một lần, không dùng để sửa sản phẩm. Holdout 22/10 đã bị dùng để gỡ lỗi nên không còn độc lập; holdout 24/10 (10 ID) chưa chạy.
-4. Run `20261017-111459` là bằng chứng chỉ đọc; 10 ID của nó bị loại khỏi các run mới.
-5. **Cập nhật ledger khi bắt đầu và khi kết thúc** mỗi run: ID, cấu hình, trạng thái, thư mục evidence. Thiếu evidence hay billing thì ghi `INCOMPLETE`.
-6. Không commit hội thoại thô, key hay dữ liệu khách.
+4. **Đổi extractor là đổi dụng cụ đo**: chỉ so số của cùng `extractor_version`.
+5. Không commit hội thoại thô, key hay dữ liệu khách; `evaluation/runs/` không nằm trong Git.
 
 ---
 
@@ -242,32 +219,26 @@ docker compose up -d postgres
 
 # Tầng 1 và 2: miễn phí
 & $PY -m pytest -q
-& $PY evaluation/agent-evaluation/run_eval.py rag-offline
+& $PY evaluation/rag_offline.py
 
-# Tầng 3: kiểm đầu vào (miễn phí) rồi chạy thật (tốn phí, bắt đầu nhỏ)
-& $PY evaluation/agent-evaluation/run_eval.py prepare  --dataset-id create-data-diagnostic-v4 --level M2 --limit 5
-& $PY evaluation/agent-evaluation/run_eval.py evaluate --dataset-id create-data-diagnostic-v4 --level M2 --only SCN-GEN-xxxx
+# Tầng 3: bắt đầu nhỏ (tốn phí). Không --config: cả hai cấu hình, rồi in bảng BTC
+$env:EVAL_BUDGET_DB = "evaluation/runs/20261024-work/budget.sqlite"
+& $PY run_eval.py --scenarios evaluation/datasets/create-data-diagnostic-v4/scenarios --only SCN-GEN-0051 --out evaluation/runs/thu-1
 
-# Simulator, 3 seed
-& $PY evaluation/agent-evaluation/run_eval.py simulate --dataset-id create-data-diagnostic-v4 --level M2 --only SCN-GEN-xxxx --seeds 0 1 2
-
-# ASR: không gọi LLM
-docker compose up -d asr-service
-& $PY evaluation/agent-evaluation/run_eval.py asr --limit 10
+# Chỉ đổi extractor: gắn nhãn lại một run cũ, không chạy lại agent
+& $PY run_eval.py --relabel evaluation/runs/20261024-work/development-r2-v4-M2 --out evaluation/runs/relabel-r2
 ```
 
-Kết quả nằm ở `evaluation/agent-evaluation/runs/<ngày-giờ>/` (không lên Git): `scored/scorer.stdout.txt` là bảng điểm, `case-trace.json` để đọc lại từng hội thoại. Chạy toàn bộ 150 kịch bản là khoảng 2.500 lượt agent + 2.500 lượt chấm, mất nhiều giờ và tốn phí đáng kể.
+Kết quả nằm ở thư mục `--out` (không lên Git): `table.txt` là bảng điểm, `diagnostics.jsonl` để đọc lại từng lượt và từng nhãn của extractor.
 
 ---
 
 ## 9. Còn thiếu
 
-Theo thứ tự ưu tiên ([bàn giao 24/10](../BAN-GIAO-2026-10-24.md)):
-
 1. **Vòng tự cải tiến**: feedback (👍/👎, kết quả cuộc gọi, điểm chấm) → đề xuất → người duyệt → áp dụng → đo → quay lui. Module `components/improvement/{lessons,playbook,versions,review,gaps}.py` còn là stub.
-2. **Kết quả chính thức**: chạy holdout; người duyệt nhãn; đo lại RQR với extractor v3.
-3. **Lỗi agent đã thấy**: hỏi lại mã sản phẩm/mã đơn dù đã có; có lượt báo "không lấy được giá".
-4. **QaAgent**: chấm rubric J01–J12 sau mỗi cuộc chưa nối model.
-5. **Simulator**: mới 5 kịch bản × 3 seed; bộ quan sát là model chưa được kiểm độc lập; `forbidden_claims` ngoài giá chưa được kiểm.
-6. **ASR**: chưa có audio hội thoại 2 giọng thật; entity chưa có `sku`, `order_id`, số điện thoại.
+2. **Kết quả chính thức**: chạy holdout; người duyệt nhãn; đo lại trên extractor v4 (đã có `--relabel`).
+3. **Lỗi nhãn extractor đã thấy ở `SAMPLE-01`** (chưa sửa): baseline được tính `fact_usage` cho giá trị không có ở cuộc trước; bản full bỏ sót `price_quoted_vnd` khi agent nói "giá vẫn giữ nguyên"; ngày giao dự kiến bị gắn nhầm `restock_date`.
+4. **Lỗi agent đã thấy**: hỏi lại mã sản phẩm/mã đơn dù đã có; có lượt báo "không lấy được giá"; nói giao trong 4 ngày khi ground truth là 2.
+5. **QaAgent**: chấm rubric J01–J12 sau mỗi cuộc chưa nối model.
+6. **Công cụ đã gỡ**: bộ mô phỏng khách (BTC chấm thiết kế và độ lặp lại qua 3 seed) và công cụ đo ASR không còn trong cây thư mục; mã trong lịch sử git trước commit `358a070`. Cần làm lại nếu giám khảo yêu cầu.
 7. **Latency**: TTFT p95 cần giảm dưới 3 s và đo trên ≥ 100 lượt.

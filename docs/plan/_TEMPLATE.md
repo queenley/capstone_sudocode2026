@@ -14,7 +14,7 @@ Agent đang làm sai gì? Viết bằng ví dụ cụ thể.
 
 ## 2. Bằng chứng
 
-- Run / kịch bản / lượt: `evaluation/agent-evaluation/runs/...`, `SCN-GEN-xxxx call_N turn_K`
+- Run / kịch bản / lượt: `evaluation/runs/...`, `SCN-GEN-xxxx call_N turn_K`
 - Khách nói: "..."
 - Agent nói: "..."
 - Đáng lẽ: "..."
@@ -33,7 +33,7 @@ Thay đổi này có thể làm hỏng tình huống nào khác? (Ví dụ: quy 
 ## 5. Cách đo
 
 - Test offline thêm:
-- Cohort đo trước/sau (ID, lấy từ [RUN-LEDGER](../evaluation/RUN-LEDGER.md)):
+- Cohort đo trước/sau (ID kịch bản, chọn từ ID chưa dùng trong [evaluation/datasets/README.md](../../evaluation/datasets/README.md)):
 - Kỳ vọng: chỉ số X từ ... lên ...
 - Điều kiện quay lui:
 

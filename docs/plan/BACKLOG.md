@@ -2,7 +2,7 @@
 
 Một dòng mỗi cải tiến. Khi bắt đầu làm, tạo file `NNN-ten-ngan.md` từ [mẫu](_TEMPLATE.md) và điền cột "File".
 
-Các mục dưới đây lấy từ lỗi và giới hạn **đã ghi nhận** trong [bàn giao 24/10](../BAN-GIAO-2026-10-24.md), [bảng 5 case](../evaluation/2026-10-24-final-5-case-table.md) và [docs/ai/05-danh-gia.md](../ai/05-danh-gia.md#9-còn-thiếu). Ưu tiên chỉ là gợi ý ban đầu, nhóm tự sắp lại.
+Các mục dưới đây lấy từ lỗi và giới hạn **đã ghi nhận** trong [docs/ai/05-danh-gia.md](../ai/05-danh-gia.md#9-còn-thiếu). Ưu tiên chỉ là gợi ý ban đầu, nhóm tự sắp lại.
 
 | # | Cải tiến | Vấn đề / bằng chứng | Loại | Chỉ số | Ưu tiên | Trạng thái | File |
 |---|---|---|---|---|---|---|---|

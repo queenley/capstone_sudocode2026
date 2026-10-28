@@ -139,32 +139,19 @@ Mỗi trong **16 persona** có các **biến thể** ([personas.py](../../evalua
 
 Danh sách đủ 15 loại: [evaluation/data-generation/README.md §3](../../evaluation/data-generation/README.md#3-hard-cases-điều-chỉnh-đề-11-and-other-situations). Với `--limit 120`: 120 kịch bản, 260 cuộc, 83 kịch bản ca khó, phủ đủ 9 cặp ngành hàng × vùng miền và 16 persona.
 
-### Các phiên bản dataset
+### Dataset để chấm
 
-Bộ chấm đọc dataset đã chuẩn hóa ở [`evaluation/agent-evaluation/datasets/`](../../evaluation/agent-evaluation/datasets/) (chuyển bằng `run_eval.py data-import`):
+Lệnh đánh giá (`run_eval.py`) đọc kịch bản ở [`evaluation/datasets/`](../../evaluation/datasets/README.md): hiện chỉ giữ `create-data-diagnostic-v4` (150 kịch bản đã gán nhãn; bản v4 sửa 40 nhãn `chuyen_khoan` thành `bank` cho khớp schema BTC). Các bản v1 đến v3 đã xóa, còn trong lịch sử git.
 
-| Dataset | Kịch bản | Khác bản trước |
-|---|---:|---|
-| `create-data-diagnostic-v1` | 101 | bản đầu, không có `seed_history` |
-| `create-data-diagnostic-v2` | 122 | thêm lịch sử cuộc cũ |
-| `create-data-diagnostic-v3` | 150 | thêm khách tổng hợp `SYN-C...` |
-| `create-data-diagnostic-v4` | 150 | sửa 40 nhãn dùng `chuyen_khoan` → `bank` cho khớp schema BTC |
-| `asr-team-v2` | 674 lượt nói / 85 kịch bản | bộ ASR (xem dưới) |
+> Dataset có trạng thái **diagnostic**: nhãn do bộ sinh gán, **chưa có người duyệt** (`official_gt_approved: false`). Tranh chấp nhãn đã biết: [DISPUTES.md](../../evaluation/datasets/create-data-diagnostic-v4/DISPUTES.md). Quy tắc duyệt và sửa nhãn: [ground-truth-review](../../evaluation/datasets/ground-truth-review/SKILL.md).
 
-> Mọi dataset đều có trạng thái **diagnostic**: nhãn sinh bằng luật, **chưa có người duyệt**. `data-check` trả `allowed: false` là đúng thiết kế. Tranh chấp nhãn đã biết: [label-disputes-v4.md](../evaluation/label-disputes-v4.md).
-
-**Lịch sử cuộc cũ** (`seed_history`): trước khi chạy, bộ chấm ghi các phiên cũ và đơn cũ vào bộ nhớ của khách ở cả hai cấu hình; cấu hình baseline chỉ là **không đọc lại** chúng.
+**Lịch sử cuộc cũ** (`seed_history`): trước khi chạy, lệnh đánh giá ghi các phiên cũ và đơn cũ vào bộ nhớ của khách ở cả hai cấu hình; cấu hình baseline chỉ là **không đọc lại** chúng.
 
 ### Bộ ASR
 
-```text
-synthesize_scenario_audio (ElevenLabs)
-  → evaluation/data-generation/output/audio/scenarios_<id>/call_N/turn_K.wav + .json
-  → run_eval.py asr-build    lọc, đổi định dạng BTC, ghi SHA-256 từng file
-  → datasets/asr-team-v2/    ground_truth.json + audio/ (không lên Git, ~71 MB)
-```
+Pipeline sinh còn tạo **đáp án ASR** (`evaluation/data-generation`: `synthesize_scenario_audio`, `build_asr_testset`). Phần nghe audio và chấm WER/CER không còn trong cây thư mục (công cụ đã gỡ, xem [05-danh-gia.md](05-danh-gia.md#5-đánh-giá-asr)).
 
-- **Đáp án dạng đọc** ([spoken.py](../../evaluation/data-generation/src/asr/spoken.py)): 5.200.000đ → "năm triệu hai trăm nghìn", OD600001 → "ô đê sáu trăm nghìn không trăm linh một", COD → "cê ô đê". Đúng văn bản này được gửi cho TTS, nên đáp án đúng theo cách dựng.
+- **Đáp án dạng đọc** ([spoken.py](../../evaluation/data-generation/src/asr/spoken.py)): 5.200.000đ → "năm triệu hai trăm nghìn", OD600001 → "ô đê sáu trăm nghìn không trăm linh một", COD → "cê ô đê". Đúng văn bản này đưa vào TTS.
 - **Nhiễu:** một phần ba có nhiễu dải điện thoại + mất gói (BTC: 4/12 có nhiễu); loại `clean`, `cafe`, `street`, `weak_signal`, `wind`, SNR 6 dB.
 - **Entity** (ngân sách, diện tích, thanh toán...) lấy bằng chính ITN của agent.
 - Clip bị loại nếu thiếu WAV, kịch bản đã đổi, là chat teencode (người gọi không nói "ko", "dc"), sai định dạng hay sai độ dài.

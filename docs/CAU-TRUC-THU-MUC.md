@@ -100,21 +100,11 @@ config/prompts/
 ## `evaluation/`: đánh giá chất lượng AI
 
 ```text
-evaluation/
-├── agent-evaluation/     Chấm agent của nhóm và baseline không nhớ theo tiêu chí của BTC
-│   ├── run_eval.py       Script chạy toàn bộ (evaluate) và các lệnh phụ
-│   ├── src/
-│   │   ├── pipeline.py   Điều phối 4 bước
-│   │   ├── steps/        prepare → run → collect → score
-│   │   ├── criteria/     Mỗi tiêu chí một file (tool, bộ nhớ, carry-over, claim, brief, guardrail, latency…)
-│   │   ├── baseline/     Khác biệt giữa full và baseline_no_memory
-│   │   ├── services/     Gọi agent (bridge, adapter), LLM trích xuất, ASR, RAG, Langfuse
-│   │   ├── simulation/   Khách giả lập phản ứng theo câu trả lời của agent
-│   │   ├── datasets/     Nhập dữ liệu từ data-generation, registry, kiểm nhãn
-│   │   └── reports/      case-trace, lịch sử run
-│   ├── contracts/        Schema của bộ chấm và bản gốc nguồn BTC (khóa bằng hash)
-│   ├── datasets/         Các bộ dữ liệu test đã chuẩn hóa, có registry
-│   └── runs/             Bằng chứng từng lượt chạy (chỉ lưu local, không commit)
+evaluation/               (lệnh chạy là run_eval.py ở GỐC repo; mã chấm nằm trong apps/ai-agent-service)
+├── README.md             Cửa vào duy nhất: bản đồ, lệnh chạy, quy tắc
+├── rag_offline.py        Recall@k của kho tri thức, không model, không database (make eval)
+├── datasets/             Kịch bản đã gán nhãn (create-data-diagnostic-v4) và quy tắc duyệt nhãn (ground-truth-review)
+├── runs/                 Bằng chứng từng lượt chạy, cache extractor, sổ ngân sách (chỉ lưu local, không commit)
 └── data-generation/      Bộ sinh dữ liệu test theo định dạng BTC
     ├── config/
     │   ├── personas.yaml           Persona của BTC và chỉ tiêu số kịch bản
@@ -122,20 +112,10 @@ evaluation/
     │   │                           chuyển AI ↔ nhân viên, hỏi thông tin khách khác, prompt injection…): chỉ tiêu, cách nói, độ kiên nhẫn, prompt simulator
     │   ├── settings.yaml           Model, giới hạn gọi API, chỉ tiêu M2 (3 giờ audio, 30 khách đa kênh)
     │   └── voices.yaml             Giọng ElevenLabs theo miền, giới tính, độ tuổi
-    ├── data/                       Đầu vào của BTC (chỉ đọc): catalog, CRM, chính sách, mock_tools, reference_eval, schema
     ├── src/planning/               Lập kế hoạch kịch bản; nhãn tính bằng mock_tools của BTC (call_kinds, personas, planner)
     ├── src/pipeline/               Các bước: kiểm catalog, sinh kịch bản, hội thoại mẫu, kiểm tra, judge, audio, báo cáo
     ├── src/utils/dataset.py        Quy định vị trí mọi file output, đọc/ghi kịch bản
-    └── output/                     Dữ liệu sinh ra, mỗi thông tin chỉ lưu một nơi:
-        ├── scenarios/              Kịch bản test, đúng định dạng mẫu của BTC
-        ├── metadata/               Trường nội bộ của pipeline (khách, miền, tag, loại cuộc gọi)
-        ├── call_brief/scenarios_<id>/call_<n>.json     Call Brief mong đợi của từng cuộc
-        ├── handoff_brief/scenarios_<id>/call_<n>.json  Handoff Brief mong đợi (cuộc chuyển nhân viên)
-        ├── tools/scenarios_<id>/call_<n>.json          Tool call của agent lý tưởng, kèm kết quả mock
-        ├── trace_log/scenarios_<id>/call_<n>.jsonl     Trace của agent lý tưởng (chấm điểm tuyệt đối)
-        ├── conversations/, judgments/                  Hội thoại mẫu và phán quyết judge của từng cuộc
-        ├── audio/scenarios_<id>/call_<n>/turn_<k>.wav  Giọng khách từng lượt
-        └── asr_test/, rag/, review/, reports/          Bộ ASR, đánh giá RAG, duyệt tay, báo cáo
+    └── output/                     Dữ liệu sinh ra (không lưu trong git; sinh lại bằng pipeline)
 ```
 
 Chi tiết các bước và từng loại output: [evaluation/data-generation/README.md](../evaluation/data-generation/README.md).
@@ -172,9 +152,8 @@ tests/
 docs/
 ├── ai/                   Tài liệu AI: pipeline, xử lý tình huống, thuật toán, dữ liệu, đánh giá
 ├── architecture/         Kiến trúc microservice, quyền sở hữu dữ liệu
-├── evaluation/           Kết quả, nhật ký và ledger các lượt chạy đánh giá
+├── evaluation/           Luồng vào bộ chấm, bản đồ hệ thống
 ├── deployment/           Hướng dẫn triển khai
 ├── plan/                 Backlog và mẫu kế hoạch
-├── api.md, channels.md, kafka.md   API HTTP, kênh Zalo/hotline, sự kiện Kafka
-└── BAN-GIAO-2026-10-24.md          Tài liệu bàn giao
+└── api.md, channels.md, kafka.md   API HTTP, kênh Zalo/hotline, sự kiện Kafka
 ```

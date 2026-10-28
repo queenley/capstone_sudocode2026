@@ -2,7 +2,7 @@
 
 Thư mục này tạo dữ liệu để kiểm thử trợ lý bán hàng của nhóm, **theo đúng định dạng của BTC và chấm bằng chính code của BTC**:
 
-- **Kịch bản test** đúng mẫu `data/sample/SAMPLE-0*.json`, cho hai bộ persona: 16 persona của BTC (phủ đủ ca khó của bộ test ẩn) và 21 persona nâng cao của nhóm.
+- **Kịch bản test** đúng mẫu `test_set/public_sample/SAMPLE-0*.json`, cho hai bộ persona: 16 persona của BTC (phủ đủ ca khó của bộ test ẩn) và 21 persona nâng cao của nhóm.
 - **Ground truth cho từng cuộc gọi**, mỗi thứ một file: trace của agent lý tưởng (`trace_log`), tool call của nó, Call Brief / Handoff Brief mong đợi, và một hội thoại mẫu.
 - **Replay trên simulator khách** theo đặc tả của BTC (3 seed).
 - **Audio giọng khách** (≥ 3 giờ cho M2) và **bộ ASR của nhóm** (≥ 20 hội thoại) theo định dạng `asr/` của BTC.
@@ -72,7 +72,7 @@ flowchart LR
 | `data/eval/mock_tools.py` | **Ground truth** của BTC: giá sau khuyến mãi, tồn kho theo ngày, điều kiện khuyến mãi, giới hạn COD, ngày nghỉ. Mọi nhãn tính bằng cách chạy file này. |
 | `data/eval/reference_eval.py` | **Cài đặt chỉ số duy nhất**: RQR, CCR, TSR (+ ca khó), HR (+ giá & khuyến mãi), guardrail, memory checks, ASR, RAG. |
 | `data/eval/llm_judge_rubric.json` | Rubric judge J01–J12 và quy trình đo độ đồng thuận với người. |
-| `data/sample/SAMPLE-0*.json` | Mẫu kịch bản mà `output/scenarios/` theo. |
+| `test_set/public_sample/SAMPLE-0*.json` | Mẫu kịch bản mà `output/scenarios/` theo. |
 | `data/schemas/` | `scenario_format.md`, `trace_log`, `call_brief`, `handoff_brief`, `tools`: định dạng mọi file output phải theo (§8). |
 | `data/catalog/` | Sản phẩm, khuyến mãi, timeline tồn kho, CRM 50 khách của BTC, và `crm_seed_synthetic.json` (khách giả lập của nhóm). |
 | `data/policy/`, `data/rag/`, `data/asr/`, `data/simulator/` | Chính sách (corpus RAG), nhãn RAG, mẫu ASR, persona và đặc tả simulator của BTC. |
@@ -82,7 +82,7 @@ flowchart LR
 | `config/voices.yaml` | Giọng ElevenLabs theo miền, giới tính, độ tuổi. |
 | `../../config/prompts/data-generation/` | Prompt: `scenario_writer.jinja`, `dialogue_full_call.jinja`, `synthetic_customers.md`. |
 
-`data/` là bản copy dữ liệu của BTC; pipeline chỉ ghi vào `data/catalog/crm_seed_synthetic.json`. Catalog được giữ giống hệt bản của agent (`apps/ai-agent-service/data/btc/catalog`), `build_catalog` kiểm điều này.
+`data/...` trong tài liệu này là gói dữ liệu của BTC ở `apps/ai-agent-service/data/btc/`: bản **duy nhất** trong repo, đọc qua `DATA_DIR` trong `src/utils/paths.py` (`BTC_DATA_DIR` đổi chỗ). Project không còn thư mục `data/` riêng. Pipeline chỉ ghi vào `catalog/crm_seed_synthetic.json` ở đó. `tests/agent/test_btc_pack.py` ở gốc repo ghim hash từng file.
 
 ---
 
@@ -104,7 +104,7 @@ Copy-Item config/.env.example .env          # OPENAI_API_KEY (bắt buộc), ELE
 
 ```powershell
 python -m pytest                            # test offline, gồm "agent lý tưởng đạt điểm tuyệt đối" và "mọi file đúng schema"
-python -m src.pipeline.build_catalog        # catalog nhất quán và khớp bản của agent
+python -m src.pipeline.build_catalog        # catalog nhất quán (giá, biến thể, tồn kho, khuyến mãi)
 python -m src.pipeline.run_all --plan-only  # lập kế hoạch toàn bộ + chấm agent lý tưởng → output/plan_preview/
 ```
 
@@ -117,7 +117,7 @@ python -m src.pipeline.generate_synthetic_customers --count 10           # model
 python -m src.pipeline.generate_synthetic_customers --count 10 --resume  # giữ tên cũ, chỉ tính lại đơn/ID (không tốn API)
 ```
 
-File được copy sang catalog của agent, nên agent, harness và các kịch bản cùng thấy một tập khách.
+File nằm thẳng trong catalog của agent, nên agent và các kịch bản cùng thấy một tập khách.
 
 ### Bước 4. Chạy thử nhỏ
 
@@ -154,7 +154,7 @@ python -m src.pipeline.run_all --resume --asr-dialogues 24
 | Chỉ dạng nói của lượt khách (LLM, không TTS), để xem trước khi tốn ElevenLabs | `python -m src.pipeline.synthesize_scenario_audio --reference-only --limit 5` |
 | Ghi lại `asr_reference/ground_truth.json` từ audio đang có | `python -m src.pipeline.synthesize_scenario_audio --ground-truth-only` |
 | Chỉ tính lại trace mong đợi, schema và báo cáo chính thức | `python -m src.pipeline.build_ground_truth` |
-| Kiểm catalog / copy sang agent | `python -m src.pipeline.build_catalog [--sync]` |
+| Kiểm catalog | `python -m src.pipeline.build_catalog` |
 | Tham số của một bước | `python -m src.pipeline.<bước> --help` |
 
 ### Bước 6. Kiểm tra kết quả
@@ -171,18 +171,14 @@ python -m src.pipeline.run_all --resume --asr-dialogues 24
 
 ### Bước 7. Chấm agent trên bộ dữ liệu
 
-Cho agent chạy trên `output/scenarios/`, ghi trace theo `data/schemas/trace_log.schema.json` cho cả hai cấu hình, rồi:
-
-```powershell
-python data/eval/reference_eval.py --scenarios output/scenarios --trace runs/full.jsonl --baseline runs/baseline.jsonl --out report.json
-```
-
-Hoặc dùng bộ chấm của nhóm: chuẩn hóa bộ mới thành một dataset rồi chạy theo [evaluation/agent-evaluation/README.md](../agent-evaluation/README.md):
+Cho agent chạy trên `output/scenarios/` bằng lệnh đánh giá của repo (`run_eval.py` ở gốc: chạy hai cấu hình, ghi trace theo `data/schemas/trace_log.schema.json`, rồi chấm bằng `data/eval/reference_eval.py`):
 
 ```powershell
 cd ../..
-apps/ai-agent-service/.venv/Scripts/python evaluation/agent-evaluation/run_eval.py data-import --name create-data-diagnostic-v5
+apps/ai-agent-service/.venv/Scripts/python run_eval.py --scenarios evaluation/data-generation/output/scenarios --only SCN-GEN-0001 --out evaluation/runs/<tên>
 ```
+
+Muốn giữ một bộ để chấm lại về sau, chép nó vào `evaluation/datasets/<revision>/` theo [quy tắc duyệt nhãn](../datasets/ground-truth-review/SKILL.md). Công cụ chuyển đổi `data-import` của bộ chấm cũ đã gỡ.
 
 ---
 
@@ -207,7 +203,7 @@ data/ (BTC, chỉ đọc)  config/ (persona, settings)  ../../config/prompts/dat
 | # | Bước | Gọi model | Ghi |
 |---|---|---|---|
 | 1 | `build_catalog` | không | `reports/catalog_check.json` |
-| 2 | `generate_synthetic_customers` (chạy riêng) | vai `customer`, chỉ đặt tên | `data/catalog/crm_seed_synthetic.json` (+ bản của agent) |
+| 2 | `generate_synthetic_customers` (chạy riêng) | vai `customer`, chỉ đặt tên | `data/catalog/crm_seed_synthetic.json` |
 | 3 | `generate_scenarios` | vai `scenario`, 1/kịch bản | `scenarios/`, `metadata/`, `call_brief/`, `handoff_brief/`, `tools/` |
 | 4 | `generate_dialogue` | vai `dialogue`, 1–3/cuộc | `conversations/` |
 | 5 | `simulate_replays` | không (`--llm`: vai `simulator`) | `reports/simulation_replays.jsonl` |
@@ -223,8 +219,8 @@ data/ (BTC, chỉ đọc)  config/ (persona, settings)  ../../config/prompts/dat
 
 ### Bước 1 — `build_catalog`: kiểm tra catalog
 
-- **Đọc:** `data/catalog/*.json` và bản copy của agent.
-- **Làm gì:** mỗi SKU mà khuyến mãi, quà tặng, timeline tồn kho hay đơn CRM nhắc tới phải có thật. Đơn của khách giả lập phải còn hàng vào ngày đặt và có giá đúng bằng giá `mock_tools.pricing_get_quote` báo cho ngày đó. ID/SĐT giả lập không trùng của BTC. Bản của agent phải giống hệt (`--sync` để copy sang).
+- **Đọc:** `data/catalog/*.json`.
+- **Làm gì:** mỗi SKU mà khuyến mãi, quà tặng, timeline tồn kho hay đơn CRM nhắc tới phải có thật. Đơn của khách giả lập phải còn hàng vào ngày đặt và có giá đúng bằng giá `mock_tools.pricing_get_quote` báo cho ngày đó. ID/SĐT giả lập không trùng của BTC.
 - **Ghi:** `reports/catalog_check.json`. Có lỗi thì dừng pipeline.
 
 ### Bước 2 — `generate_synthetic_customers`: thêm khách giả lập
@@ -235,7 +231,7 @@ data/ (BTC, chỉ đọc)  config/ (persona, settings)  ../../config/prompts/dat
   - một đơn đã giao, một đơn đang mở (hai sản phẩm khác nhau), và với một nửa số khách thêm một đồ gia dụng mua từ 2025 đã hết bảo hành 12 tháng;
   - mỗi đơn là một SKU còn hàng vào ngày đặt, với giá sau khuyến mãi của ngày đó;
   - mỗi đơn kèm một phiên tư vấn trong CRM.
-- **Ghi:** `data/catalog/crm_seed_synthetic.json`, copy sang `apps/ai-agent-service/data/btc/catalog/`.
+- **Ghi:** `data/catalog/crm_seed_synthetic.json`.
 
 ### Bước 3 — `generate_scenarios`: kịch bản test
 
@@ -293,7 +289,7 @@ Cuộc nào qua kiểm tra luật, judge PASS và không thuộc nhóm rủi ro 
 
 ### Bước 10 — `synthesize_scenario_audio`
 
-Đọc từng lượt khách bằng ElevenLabs và tạo luôn **đáp án ASR** (`ground_truth.json` theo định dạng [`data/asr/ground_truth.json`](data/asr/ground_truth.json) của BTC), để pipeline đánh giá kiểm được ASR service. Với mỗi cuộc gọi:
+Đọc từng lượt khách bằng ElevenLabs và tạo luôn **đáp án ASR** (`ground_truth.json` theo định dạng [`data/asr/ground_truth.json`](../../apps/ai-agent-service/data/btc/asr/ground_truth.json) của BTC), để pipeline đánh giá kiểm được ASR service. Với mỗi cuộc gọi:
 
 1. **LLM viết dạng nói** ([`src/asr/reference.py`](src/asr/reference.py), prompt [`asr_reference.md`](../../config/prompts/data-generation/asr_reference.md), schema [`src/schemas/asr.py`](src/schemas/asr.py), model `models.asr_reference`).
    - Mỗi lượt khách được viết lại như người gọi nói ra, đúng kiểu D01–D04 của BTC: "Ngân sách tầm 5 triệu" → "ngân sách tầm năm triệu", "AirPure X" → "e pia x", "25m2" → "hai mươi lăm mét vuông".
@@ -554,7 +550,7 @@ Chunk theo `chunk_id_rule` của BTC (mỗi `## [XX-nn]` một chunk), chấm b�
 
 ### ASR: đáp án cho bộ chấm
 
-Project này chỉ sinh **đáp án ASR**. Việc nghe audio, hiểu câu và chấm điểm nằm ở [`evaluation/agent-evaluation`](../agent-evaluation/README.md) (mục 5), dùng pipeline thật của ai-agent-service.
+Project này chỉ sinh **đáp án ASR**. Phần nghe audio và chấm WER/CER trước đây nằm ở bộ chấm cũ (đã gỡ, còn trong lịch sử git trước commit `358a070`); `reference_eval.py` của BTC vẫn chấm được `hypotheses.json` theo `ground_truth.json` này.
 
 ```powershell
 python -m src.pipeline.synthesize_scenario_audio --resume                # bộ theo lượt: asr_reference/ + audio/
@@ -593,7 +589,7 @@ Mỗi file ghi `kind` (`turns` hoặc `dialogues`) và `entity_schema` (khóa v�
 
 ```text
 config/                    settings.yaml, personas.yaml, personas_advanced.yaml, voices.yaml, .env.example
-data/                      dữ liệu BTC (chỉ đọc): catalog, policy, rag, asr, eval, sample, schemas, simulator
+(không có data/)           dữ liệu BTC là apps/ai-agent-service/data/btc/ (DATA_DIR), chỉ đọc trừ crm_seed_synthetic.json
 src/planning/              call_kinds.py (loại cuộc, cảnh, template), personas.py (plan của BTC),
                            personas_advanced.py (plan của nhóm), persona_config.py (persona nào được lập kế hoạch),
                            planner.py (nhãn qua mock_tools, ghép kịch bản)
@@ -619,7 +615,7 @@ Prompt nằm ở `../../config/prompts/data-generation/` (prompt của judge l�
 
 | Chỗ khác | Lý do |
 |---|---|
-| `data/eval/mock_tools.py` có thêm 3 dòng nạp `crm_seed_synthetic.json` | để mock biết khách giả lập, giống cách agent nạp họ (`apps/ai-agent-service/.../mcp/servers/btc.py`); mọi logic khác giữ nguyên |
+| `mock_tools.py` giữ nguyên của BTC; khách giả lập được thêm vào CRM của mock trong bộ nhớ (`src/utils/btc_tools.py`) | giống cách agent nạp họ (`apps/ai-agent-service/.../mcp/servers/btc.py`); id hoặc số điện thoại trùng khách BTC thì bỏ |
 | Kết quả chi tiết `cap_nhat_don`, `thong_tin`, `xoa_du_lieu` | file kịch bản ghi `khac` như BTC; kết quả chi tiết nằm ở `metadata/` (`outcome_detail`) |
 | Input mode `chat_khong_dau`, `chat_sai_chinh_ta` | tình huống thật BTC chưa có tên. File kịch bản và trace ghi `chat_teencode` (chữ gõ chat), là giá trị mà BTC, agent và harness đều nhận; mode chi tiết nằm ở `metadata/` (`input_mode_detail`). Đi kèm `customer_turns_asr` như ASR/teencode |
 | Latency `0` trong trace lý tưởng, `latency_ms: 0` trong brief mong đợi | schema bắt buộc kiểu số nguyên; đây là nhãn, không phải số đo |

@@ -163,13 +163,13 @@ Set-Location apps/web; npm run typecheck; npm run build
 
 ### Đánh giá chất lượng AI
 
-Bộ chấm điểm (so sánh AI có nhớ khách và không nhớ khách, dùng scorer của BTC) nằm ở `evaluation/agent-evaluation`. Xem [evaluation/agent-evaluation/README.md](evaluation/agent-evaluation/README.md).
+Có một lệnh đánh giá duy nhất, `run_eval.py` ở gốc repo, cũng là lệnh giám khảo BTC sẽ gọi: chạy agent trên kịch bản, hai cấu hình (có nhớ khách và không nhớ khách), gắn nhãn bằng extractor rồi chấm bằng `reference_eval.py` của BTC. Cửa vào: [evaluation/README.md](evaluation/README.md).
 
 ```powershell
-apps/ai-agent-service/.venv/Scripts/python evaluation/agent-evaluation/run_eval.py evaluate --advisor openai:gpt-4.1-mini
+apps/ai-agent-service/.venv/Scripts/python run_eval.py --scenarios evaluation/datasets/create-data-diagnostic-v4/scenarios --only SCN-GEN-0051 --out evaluation/runs/thu-1
 ```
 
-Lệnh dạng BTC (`--scenarios`, `--config`, `--out`) chạy agent trên kịch bản của BTC và chấm luôn bằng `reference_eval.py`, kèm bảng truy hồi: xem [README của AI agent](apps/ai-agent-service/README.md#test-và-đánh-giá).
+Cách một con số được tạo ra: [docs/evaluation/scoring-flow.md](docs/evaluation/scoring-flow.md). Chi tiết lệnh của agent: [README của AI agent](apps/ai-agent-service/README.md#test-và-đánh-giá).
 
 ### Chạy service Python không qua Docker
 

@@ -4,13 +4,13 @@ import json
 from src.ground_truth.traces import oracle_rows
 from src.metrics.btc_metrics import evaluate, group_rows
 from src.utils.btc_tools import reference_eval
-from src.utils.paths import DATA_DIR
+from src.utils.paths import DATA_DIR, SAMPLE_DIR
 
 
 def test_adapter_reproduces_btc_example_report():
     """reference_eval on BTC's public sample + example trace must give BTC's own example numbers."""
     ref = reference_eval()
-    scenarios = ref.load_scenarios(str(DATA_DIR / "sample"))
+    scenarios = ref.load_scenarios(str(SAMPLE_DIR))
     rows = [json.loads(line) for line in (DATA_DIR / "eval" / "runs" / "full.jsonl").read_text(encoding="utf-8").splitlines()]
     ours = evaluate(scenarios, rows)
     theirs = json.loads((DATA_DIR / "eval" / "runs" / "report_example.json").read_text(encoding="utf-8"))["system"]

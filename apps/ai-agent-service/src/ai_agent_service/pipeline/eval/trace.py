@@ -6,16 +6,17 @@ read a run but is not graded (the lane, the guard's verdicts, an error) goes
 to the run's diagnostics file instead. Every line is checked against the
 schema before it is written.
 
-How each field is filled, matching ``eval/reference_eval.py`` and the
-harness's collector (``evaluation/agent-evaluation/src/steps/collect/collector.py``):
+How each field is filled, matching ``eval/reference_eval.py``:
 
 - ``tool_calls``: the calls that ran, with the arguments they ran with (the
   day and the phone the harness filled in, the defaults it completed), and
   their result envelope. A call the guardrail before act refused never ran,
   so it is not here. The idempotency key is transport, not business: dropped.
-- ``facts_used``: section 5.5's chain, the ``[Bn]`` the reply cited, the
-  ``fact_ids`` of those brief lines, the slots of those facts. Only facts in
-  force are resolved; a line with no ledger fact behind it names no slot.
+- ``facts_used``: first section 5.5's chain, the ``[Bn]`` the reply cited, the
+  ``fact_ids`` of those brief lines, the slots of those facts (only facts in
+  force are resolved; a line with no ledger fact behind it names no slot).
+  When the extractor runs, the slots it saw reused from an earlier call come
+  first and these follow, each slot once (:func:`merged_facts_used`).
 - ``memory_writes``: on the last line of each call, what ``after_call``
   wrote, as ``{key, value, op, source, customer_id}``. Never ``fact_id``: a
   twelve-character hex id can be all digits, and any run of 10 to 14 digits in
@@ -28,7 +29,8 @@ harness's collector (``evaluation/agent-evaluation/src/steps/collect/collector.p
   (``eval/huong-dan-do-latency.md``, rule 7).
 
 ``questions`` and ``claims`` are left empty here and filled by the extractor
-after every turn of a configuration has run (:mod:`.runner`).
+(``components/evaluation/scorers.py``) after every turn of a configuration has run
+(``cli._label``).
 """
 
 from __future__ import annotations
@@ -65,6 +67,15 @@ def facts_used(state: Mapping[str, Any]) -> list[str]:
     brief = state.get("brief") or {}
     cited = (state.get("reply") or {}).get("used_lines") or []
     return used_slots(cited, state.get("brief_lines") or [], brief.get("profile_facts") or {})
+
+
+def merged_facts_used(extracted: Iterable[str], cited: Iterable[str]) -> list[str]:
+    """The extractor's reused slots, then the cited ones, each once."""
+    merged: list[str] = []
+    for slot in [*extracted, *cited]:
+        if slot not in merged:
+            merged.append(slot)
+    return merged
 
 
 def memory_writes(writes: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
