@@ -6,18 +6,19 @@ over the organisers' policy corpus, one chunk per ``## [XX-nn]``) answers every 
 abstain rates). The agent abstains as its search decides: the best passage is restricted, says there is no
 information, or scores under θ (``config/knowledge.yaml``).
 
-This is the quick gate of ``make eval`` and ``scripts/dev/check.ps1``. ``rag-recall`` measures the same through the
-agent's ``kb_search`` MCP tool, with the database.
+This is the quick gate of ``make eval`` and ``scripts/dev/check.ps1``. The full run (``run_eval.py`` at the repository's
+root) measures the same through the agent's ``kb_search`` MCP tool, with the database.
 
-    python evaluation/agent-evaluation/run_eval.py rag-offline [--k 5] [--output reports/generated/evaluation.json]
+    python evaluation/rag_offline.py [--k 5] [--output reports/generated/evaluation.json]
 """
+import argparse
 import importlib.util
 import json
 from pathlib import Path
 import sys
 import tempfile
 
-REPOSITORY = Path(__file__).resolve().parents[4]
+REPOSITORY = Path(__file__).resolve().parents[1]
 AGENT = REPOSITORY / "apps" / "ai-agent-service"
 BTC = AGENT / "data" / "btc"
 QA_PATH = BTC / "rag" / "qa_labeled.json"
@@ -63,3 +64,19 @@ def run(k: int = 5, output: Path = DEFAULT_OUTPUT) -> dict:
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     return report
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="The agent's knowledge base on BTC's 60 questions; no model, no database.")
+    parser.add_argument("--k", type=int, default=5)
+    parser.add_argument("--output", type=Path, help="Report file (default: reports/generated/evaluation.json)")
+    args = parser.parse_args(argv)
+    output = args.output or DEFAULT_OUTPUT
+    report = run(args.k, output)
+    print(json.dumps(report["retrieval"], ensure_ascii=False, indent=2))
+    print("Wrote", output)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
