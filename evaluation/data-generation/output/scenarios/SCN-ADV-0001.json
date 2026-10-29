@@ -1,0 +1,99 @@
+{
+  "scenario_id": "SCN-ADV-0001",
+  "level": "M2",
+  "persona": "khach_hoi_san_pham_khong_ban",
+  "hard_case": null,
+  "customer_phone": "0984726714",
+  "customer_name": "Hoa",
+  "honorific": "chị",
+  "notes": "Persona khach_hoi_san_pham_khong_ban, biến thể khong_ban_roi_tu_van. call_1 (zalo_oa): hỏi sản phẩm shop không bán → thong_tin; call_2 (hotline): tư vấn, chưa chốt → hen_goi_lai. Chấm chủ yếu: TSR, HR.",
+  "calls": {
+    "call_1": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_hoa73",
+      "call_date": "2026-10-15",
+      "customer_goal": "Hỏi về tủ lạnh Inverter khoảng 300 lít không có ở shop.",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về tủ lạnh Inverter khoảng 300 lít, em có không?",
+        "Thấy tủ lạnh này bên em không có, mà chị đang cần gấp.",
+        "Có cái nào gần giống không em?",
+        "Ờ, chị nghe nói có máy lọc không khí AirPure X, có đúng không?",
+        "Chị sẽ liên hệ lại nhé."
+      ],
+      "facts_established": {},
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "chưa kinh doanh",
+          "không kinh doanh",
+          "chưa có mặt hàng",
+          "chưa bán"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "product_available",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "product_available": false,
+        "call_date": "2026-10-15"
+      },
+      "expected_outcome": "khac"
+    },
+    "call_2": {
+      "days_later": 1,
+      "customer_goal": "Hỏi tư vấn về máy lọc không khí và giá cả.",
+      "customer_turns": [
+        "Chào em, hôm qua chị đã hỏi về máy lọc không khí AirPure X rồi.",
+        "Chị có diện tích phòng khoảng 40 mét vuông và có con nhỏ.",
+        "Ngân sách của chị tầm 5 triệu thôi.",
+        "Chị muốn biết thêm về giá và khuyến mãi, có gì không?",
+        "Chị sẽ bàn với gia đình trước khi quyết định nhé."
+      ],
+      "facts_established": {
+        "room_area_m2": 40,
+        "has_children": true,
+        "budget_vnd": 5000000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AP-X",
+        "price_quoted_vnd": 4890000,
+        "promo_code": "GIFT-FILTER",
+        "promo_expiry": "2026-10-22"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 4890000,
+        "list_price_vnd": 4890000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_GIFT-FILTER_active": true,
+        "gift_sku": "SKU-AP-FLT-X",
+        "promo_AP-SEP_active": false,
+        "promo_AIR-2ND-50_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "room_area_m2": 40,
+        "has_children": true,
+        "budget_vnd": 5000000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AP-X",
+        "price_quoted_vnd": 4890000,
+        "promo_code": "GIFT-FILTER"
+      },
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

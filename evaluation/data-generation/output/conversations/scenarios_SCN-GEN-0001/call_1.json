@@ -1,0 +1,329 @@
+{
+  "conversation_id": "SCN-GEN-0001__call_1",
+  "scenario_id": "SCN-GEN-0001",
+  "call": "call_1",
+  "customer_id": "C031",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-15",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Oanh ạ, em là trợ lý ảo của shop BTC. Em gọi lại về Máy lọc không khí AirPure X bản 2024 mà chị đã mua trước đây, mình cần hỗ trợ gì thêm ạ?",
+      "questions": [],
+      "facts_used": [
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Oanh đây, chị muốn mua lại máy lọc không khí AirPure X bản cũ mà chị đã mua cách đây 8 tháng á.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận chị đã từng mua AirPure X bản 2024 ạ. Hiện tại mẫu đó đã ngừng bán từ tháng 6, nhưng shop có mẫu thay thế là AirPure X phiên bản mới, phù hợp phòng 25m² trở xuống. Chị muốn em tư vấn mẫu mới này không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Phòng mình vẫn khoảng 25 mét vuông đúng không chị?"
+        }
+      ],
+      "facts_used": [
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "successor_sku",
+          "value": "SKU-AP-X"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em ơi, cái máy đó giờ còn không? Chị nghe nói mẫu cũ ngừng bán rồi đúng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi chị, AirPure X bản cũ đã ngừng bán, hiện shop chỉ còn AirPure X phiên bản mới thôi ạ. Máy này đang còn hàng và có chương trình thu cũ đổi mới dành riêng cho khách đã mua bản 2024 như chị.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "promo_TRADE-IN-AP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu không có thì chị có thể chọn mẫu nào khác hả em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với phòng 25m², AirPure X bản mới là lựa chọn phù hợp nhất hiện tại, giá sau khuyến mãi thu cũ đổi mới là 4.490.000đ. Ngoài ra, chị có thể cân nhắc AirPure Y nếu muốn thêm tính năng lọc mùi và khóa trẻ em, nhưng giá sẽ cao hơn ạ.",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của mình khoảng 5 triệu như lần trước đúng không chị?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn đổi cái cũ lấy mới luôn, có được không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chương trình thu cũ đổi mới áp dụng cho khách đã mua AirPure X bản 2024 như chị, máy cũ sẽ được đơn vị vận chuyển thu lại khi giao máy mới, không yêu cầu máy còn hoạt động. Em sẽ tiến hành đặt đơn mới cho chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_TRADE-IN-AP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, địa chỉ giao hàng vẫn như cũ, 12 ngõ 38 Hoàng Cầu, Đống Đa, Hà Nội nhé.",
+      "facts_stated": {
+        "delivery_area": "Đống Đa, Hà Nội"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "12 ngõ 38 Hoàng Cầu, Đống Đa, Hà Nội",
+          "spoken": "12 ngõ 38 Hoàng Cầu, Đống Đa, Hà Nội"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận lại chị muốn giao máy mới về 12 ngõ 38 Hoàng Cầu, Đống Đa, Hà Nội. Tuy nhiên, em thấy mình đã cập nhật địa chỉ mới là Cầu Giấy, Hà Nội, chị muốn giao về địa chỉ nào ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Chị xác nhận giúp em địa chỉ giao hàng cuối cùng là ở đâu nhé?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cầu Giấy, Hà Nội em nhé.",
+      "facts_stated": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Cầu Giấy, Hà Nội",
+          "spoken": "Cầu Giấy, Hà Nội"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã xác nhận. Em chốt đơn Máy lọc không khí AirPure X bản mới, giá 4.490.000đ, giao về Cầu Giấy, Hà Nội, thanh toán khi nhận hàng. Dự kiến giao trong ngày 17/10. Đơn này sẽ có nhân viên gọi xác nhận lại với chị trước khi giao ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-17"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0985003703",
+            "sku": "SKU-AP-X",
+            "qty": 1,
+            "price_vnd": 4490000,
+            "payment": "COD",
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-15"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "room_area_m2",
+          "value": 25,
+          "op": "supersede",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Cầu Giấy, Hà Nội",
+          "op": "supersede",
+          "source": "call_1#turn12"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 5000000,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_1#turn15"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-X",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 4490000,
+          "op": "set",
+          "source": "call_1#turn15"
+        },
+        {
+          "key": "promo_code",
+          "value": "TRADE-IN-AP",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_1#turn15"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "mua_may_loc_khong_khi",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "room_area_m2",
+        "old": "20",
+        "new": 25
+      },
+      {
+        "slot": "delivery_area",
+        "old": "Đống Đa, Hà Nội",
+        "new": "Cầu Giấy, Hà Nội"
+      }
+    ],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001",
+      "sku": "SKU-AP-X",
+      "qty": 1,
+      "price_vnd": 4490000,
+      "payment": "COD",
+      "address": "Cầu Giấy, Hà Nội",
+      "estimated_delivery": "2026-10-17"
+    }
+  }
+}

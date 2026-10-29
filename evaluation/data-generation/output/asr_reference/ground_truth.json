@@ -1,0 +1,909 @@
+{
+  "description": "ASR ground truth of the scenario audio: 20 customer turns (11 with noise, 0.02 h). The model wrote each turn in spoken form and the TTS voice read exactly that text; 'rule' references come from src/asr/spoken.py.",
+  "hypotheses_format": "asr/hypotheses.json = {\"D01\": {\"text\": \"<transcript toàn hội thoại>\", \"entities\": {\"price_vnd\": 4890000, ...}, \"turns\": [{\"speaker\": \"A|C\", \"start\": 0.0, \"end\": 3.2, \"text\": \"...\"}]}}. turns là tùy chọn (M2 diarization).",
+  "normalization_rule": "Trước khi tính WER/CER: lowercase, NFC, bỏ dấu câu, gộp khoảng trắng. Ground truth viết số bằng chữ như lời nói; nếu ASR trả về chữ số thì nhóm phải chuẩn hóa về cùng một dạng (nêu rõ chọn dạng nào) trước khi tính WER. Entity so exact-match sau ITN.",
+  "reference_date": "2026-10-15",
+  "kind": "turns",
+  "entity_schema": {
+    "additionalProperties": false,
+    "description": "Values a line states, in BTC's ``asr/ground_truth.json`` keys (D01–D04); null when the line does not say it.",
+    "properties": {
+      "room_area_m2": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Diện tích phòng, m² (\"hai mươi lăm mét vuông\" → 25)",
+        "title": "Room Area M2"
+      },
+      "has_children": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Nhà có (true) / không có (false) trẻ nhỏ",
+        "title": "Has Children"
+      },
+      "budget_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Ngân sách khách nói, đồng (\"năm triệu\" → 5000000)",
+        "title": "Budget Vnd"
+      },
+      "competitor_price_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Giá chỗ khác khách đưa ra để so sánh, đồng",
+        "title": "Competitor Price Vnd"
+      },
+      "payment": {
+        "anyOf": [
+          {
+            "enum": [
+              "COD",
+              "bank"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Cách trả tiền: COD (thu hộ) hoặc bank (chuyển khoản)",
+        "title": "Payment"
+      },
+      "blocker": {
+        "anyOf": [
+          {
+            "enum": [
+              "can hoi chong",
+              "can hoi vo",
+              "can hoi nguoi nha",
+              "so sanh gia",
+              "vuot ngan sach",
+              "cho luong",
+              "can suy nghi them"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Lý do chưa chốt mà câu nói rõ; null khi câu không nêu lý do",
+        "title": "Blocker"
+      },
+      "size_old": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Size đang có khi khách muốn đổi",
+        "title": "Size Old"
+      },
+      "size_new": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Size khách muốn đổi sang",
+        "title": "Size New"
+      },
+      "color": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Màu được chọn, không dấu, chữ thường (\"den\")",
+        "title": "Color"
+      },
+      "phone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Số điện thoại được đọc, 10 chữ số",
+        "title": "Phone"
+      },
+      "sku": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Mã sản phẩm được nhắc tới, CHỈ lấy từ danh sách products được gửi",
+        "title": "Sku"
+      },
+      "order_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Mã đơn được đọc, viết hoa như OD312456",
+        "title": "Order Id"
+      },
+      "price_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Giá bán agent báo, đồng",
+        "title": "Price Vnd"
+      },
+      "promo_expiry": {
+        "anyOf": [
+          {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Hạn khuyến mãi agent báo, YYYY-MM-DD",
+        "title": "Promo Expiry"
+      },
+      "delivery_days": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Số ngày giao hàng agent báo",
+        "title": "Delivery Days"
+      },
+      "warranty_months": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Số tháng bảo hành agent báo",
+        "title": "Warranty Months"
+      },
+      "return_days": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Số ngày được đổi trả agent báo",
+        "title": "Return Days"
+      },
+      "min_free_ship_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Giá trị đơn tối thiểu để miễn phí giao, đồng",
+        "title": "Min Free Ship Vnd"
+      },
+      "bulky_fee_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Phụ phí hàng cồng kềnh, đồng",
+        "title": "Bulky Fee Vnd"
+      },
+      "exchange_fee_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Phí đổi hàng, đồng (0 khi miễn phí)",
+        "title": "Exchange Fee Vnd"
+      },
+      "refund_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Số tiền hoàn lại, đồng",
+        "title": "Refund Vnd"
+      },
+      "in_stock": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Agent báo còn hàng (true) / hết hàng (false)",
+        "title": "In Stock"
+      },
+      "restock_date": {
+        "anyOf": [
+          {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Ngày có hàng lại agent báo, YYYY-MM-DD",
+        "title": "Restock Date"
+      }
+    },
+    "title": "SpokenEntities",
+    "type": "object"
+  },
+  "dialogues": [
+    {
+      "id": "SCN-ADV-0001-call_1-t1",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-ADV-0001 call_1 turn 1",
+      "noisy": false,
+      "note": "khach_hoi_san_pham_khong_ban; clean",
+      "entities": {},
+      "full_text": "alo chị muốn hỏi về tủ lạnh inverter khoảng ba trăm lít em có không",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "alo chị muốn hỏi về tủ lạnh inverter khoảng ba trăm lít em có không",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-ADV-0001/call_1/turn_1.wav",
+      "source_text": "Alo, chị muốn hỏi về tủ lạnh Inverter khoảng 300 lít, em có không?",
+      "reference_source": "llm",
+      "noise": "clean",
+      "input_mode": "text",
+      "duration_seconds": 4.72
+    },
+    {
+      "id": "SCN-ADV-0001-call_1-t2",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-ADV-0001 call_1 turn 2",
+      "noisy": true,
+      "note": "khach_hoi_san_pham_khong_ban; street",
+      "entities": {},
+      "full_text": "thấy tủ lạnh này bên em không có mà chị đang cần gấp",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "thấy tủ lạnh này bên em không có mà chị đang cần gấp",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-ADV-0001/call_1/turn_2.wav",
+      "source_text": "Thấy tủ lạnh này bên em không có, mà chị đang cần gấp.",
+      "reference_source": "llm",
+      "noise": "street",
+      "input_mode": "text",
+      "duration_seconds": 3.44
+    },
+    {
+      "id": "SCN-ADV-0001-call_1-t3",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-ADV-0001 call_1 turn 3",
+      "noisy": true,
+      "note": "khach_hoi_san_pham_khong_ban; street",
+      "entities": {},
+      "full_text": "có cái nào gần giống không em",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "có cái nào gần giống không em",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-ADV-0001/call_1/turn_3.wav",
+      "source_text": "Có cái nào gần giống không em?",
+      "reference_source": "llm",
+      "noise": "street",
+      "input_mode": "text",
+      "duration_seconds": 1.84
+    },
+    {
+      "id": "SCN-ADV-0001-call_1-t4",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-ADV-0001 call_1 turn 4",
+      "noisy": true,
+      "note": "khach_hoi_san_pham_khong_ban; wind",
+      "entities": {
+        "sku": "SKU-AP-X"
+      },
+      "full_text": "ờ chị nghe nói có máy lọc không khí e pia x có đúng không",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "ờ chị nghe nói có máy lọc không khí e pia x có đúng không",
+          "entities": {
+            "sku": "SKU-AP-X"
+          }
+        }
+      ],
+      "audio": "audio/scenarios_SCN-ADV-0001/call_1/turn_4.wav",
+      "source_text": "Ờ, chị nghe nói có máy lọc không khí AirPure X, có đúng không?",
+      "reference_source": "llm",
+      "noise": "wind",
+      "input_mode": "text",
+      "duration_seconds": 4.16
+    },
+    {
+      "id": "SCN-ADV-0001-call_1-t5",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-ADV-0001 call_1 turn 5",
+      "noisy": true,
+      "note": "khach_hoi_san_pham_khong_ban; wind",
+      "entities": {},
+      "full_text": "chị sẽ liên hệ lại nhé",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "chị sẽ liên hệ lại nhé",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-ADV-0001/call_1/turn_5.wav",
+      "source_text": "Chị sẽ liên hệ lại nhé.",
+      "reference_source": "llm",
+      "noise": "wind",
+      "input_mode": "text",
+      "duration_seconds": 1.52
+    },
+    {
+      "id": "SCN-ADV-0001-call_2-t1",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-ADV-0001 call_2 turn 1",
+      "noisy": false,
+      "note": "khach_hoi_san_pham_khong_ban; clean",
+      "entities": {
+        "sku": "SKU-AP-X"
+      },
+      "full_text": "chào em hôm qua chị đã hỏi về máy lọc không khí e pia x rồi",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "chào em hôm qua chị đã hỏi về máy lọc không khí e pia x rồi",
+          "entities": {
+            "sku": "SKU-AP-X"
+          }
+        }
+      ],
+      "audio": "audio/scenarios_SCN-ADV-0001/call_2/turn_1.wav",
+      "source_text": "Chào em, hôm qua chị đã hỏi về máy lọc không khí AirPure X rồi.",
+      "reference_source": "llm",
+      "noise": "clean",
+      "input_mode": "text",
+      "duration_seconds": 4.16
+    },
+    {
+      "id": "SCN-ADV-0001-call_2-t2",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-ADV-0001 call_2 turn 2",
+      "noisy": false,
+      "note": "khach_hoi_san_pham_khong_ban; clean",
+      "entities": {
+        "room_area_m2": 40,
+        "has_children": true
+      },
+      "full_text": "chị có diện tích phòng khoảng bốn mươi mét vuông và có con nhỏ",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "chị có diện tích phòng khoảng bốn mươi mét vuông và có con nhỏ",
+          "entities": {
+            "room_area_m2": 40,
+            "has_children": true
+          }
+        }
+      ],
+      "audio": "audio/scenarios_SCN-ADV-0001/call_2/turn_2.wav",
+      "source_text": "Chị có diện tích phòng khoảng 40 mét vuông và có con nhỏ.",
+      "reference_source": "llm",
+      "noise": "clean",
+      "input_mode": "text",
+      "duration_seconds": 3.84
+    },
+    {
+      "id": "SCN-ADV-0001-call_2-t3",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-ADV-0001 call_2 turn 3",
+      "noisy": true,
+      "note": "khach_hoi_san_pham_khong_ban; wind",
+      "entities": {
+        "budget_vnd": 5000000
+      },
+      "full_text": "ngân sách của chị tầm năm triệu thôi",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "ngân sách của chị tầm năm triệu thôi",
+          "entities": {
+            "budget_vnd": 5000000
+          }
+        }
+      ],
+      "audio": "audio/scenarios_SCN-ADV-0001/call_2/turn_3.wav",
+      "source_text": "Ngân sách của chị tầm 5 triệu thôi.",
+      "reference_source": "llm",
+      "noise": "wind",
+      "input_mode": "text",
+      "duration_seconds": 2.4
+    },
+    {
+      "id": "SCN-ADV-0001-call_2-t4",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-ADV-0001 call_2 turn 4",
+      "noisy": false,
+      "note": "khach_hoi_san_pham_khong_ban; clean",
+      "entities": {},
+      "full_text": "chị muốn biết thêm về giá và khuyến mãi có gì không",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "chị muốn biết thêm về giá và khuyến mãi có gì không",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-ADV-0001/call_2/turn_4.wav",
+      "source_text": "Chị muốn biết thêm về giá và khuyến mãi, có gì không?",
+      "reference_source": "llm",
+      "noise": "clean",
+      "input_mode": "text",
+      "duration_seconds": 3.04
+    },
+    {
+      "id": "SCN-ADV-0001-call_2-t5",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-ADV-0001 call_2 turn 5",
+      "noisy": false,
+      "note": "khach_hoi_san_pham_khong_ban; clean",
+      "entities": {
+        "blocker": "can hoi nguoi nha"
+      },
+      "full_text": "chị sẽ bàn với gia đình trước khi quyết định nhé",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "chị sẽ bàn với gia đình trước khi quyết định nhé",
+          "entities": {
+            "blocker": "can hoi nguoi nha"
+          }
+        }
+      ],
+      "audio": "audio/scenarios_SCN-ADV-0001/call_2/turn_5.wav",
+      "source_text": "Chị sẽ bàn với gia đình trước khi quyết định nhé.",
+      "reference_source": "llm",
+      "noise": "clean",
+      "input_mode": "text",
+      "duration_seconds": 2.24
+    },
+    {
+      "id": "SCN-GEN-0001-call_1-t1",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-GEN-0001 call_1 turn 1",
+      "noisy": true,
+      "note": "khach_quay_lai_sau_8_thang; cafe",
+      "entities": {
+        "size_old": 8,
+        "sku": "SKU-AP-X"
+      },
+      "full_text": "alo chị oanh đây chị muốn mua lại máy lọc không khí e pia x bản cũ mà chị đã mua cách đây tám tháng á",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "alo chị oanh đây chị muốn mua lại máy lọc không khí e pia x bản cũ mà chị đã mua cách đây tám tháng á",
+          "entities": {
+            "size_old": 8,
+            "sku": "SKU-AP-X"
+          }
+        }
+      ],
+      "audio": "audio/scenarios_SCN-GEN-0001/call_1/turn_1.wav",
+      "source_text": "Alo, chị Oanh đây, chị muốn mua lại máy lọc không khí AirPure X bản cũ mà chị đã mua cách đây 8 tháng á.",
+      "reference_source": "llm",
+      "noise": "cafe",
+      "input_mode": "text",
+      "duration_seconds": 6.72
+    },
+    {
+      "id": "SCN-GEN-0001-call_1-t2",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-GEN-0001 call_1 turn 2",
+      "noisy": true,
+      "note": "khach_quay_lai_sau_8_thang; street",
+      "entities": {},
+      "full_text": "em ơi cái máy đó giờ còn không chị nghe nói mẫu cũ ngừng bán rồi đúng không",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "em ơi cái máy đó giờ còn không chị nghe nói mẫu cũ ngừng bán rồi đúng không",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-GEN-0001/call_1/turn_2.wav",
+      "source_text": "Em ơi, cái máy đó giờ còn không? Chị nghe nói mẫu cũ ngừng bán rồi đúng không?",
+      "reference_source": "llm",
+      "noise": "street",
+      "input_mode": "text",
+      "duration_seconds": 5.2
+    },
+    {
+      "id": "SCN-GEN-0001-call_1-t3",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-GEN-0001 call_1 turn 3",
+      "noisy": true,
+      "note": "khach_quay_lai_sau_8_thang; street",
+      "entities": {},
+      "full_text": "nếu không có thì chị có thể chọn mẫu nào khác hả em",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "nếu không có thì chị có thể chọn mẫu nào khác hả em",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-GEN-0001/call_1/turn_3.wav",
+      "source_text": "Nếu không có thì chị có thể chọn mẫu nào khác hả em?",
+      "reference_source": "llm",
+      "noise": "street",
+      "input_mode": "text",
+      "duration_seconds": 3.2
+    },
+    {
+      "id": "SCN-GEN-0001-call_1-t4",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-GEN-0001 call_1 turn 4",
+      "noisy": true,
+      "note": "khach_quay_lai_sau_8_thang; cafe",
+      "entities": {},
+      "full_text": "chị muốn đổi cái cũ lấy mới luôn có được không",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "chị muốn đổi cái cũ lấy mới luôn có được không",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-GEN-0001/call_1/turn_4.wav",
+      "source_text": "Chị muốn đổi cái cũ lấy mới luôn, có được không?",
+      "reference_source": "llm",
+      "noise": "cafe",
+      "input_mode": "text",
+      "duration_seconds": 2.96
+    },
+    {
+      "id": "SCN-GEN-0001-call_1-t5",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-GEN-0001 call_1 turn 5",
+      "noisy": false,
+      "note": "khach_quay_lai_sau_8_thang; clean",
+      "entities": {},
+      "full_text": "à địa chỉ giao hàng vẫn như cũ một hai ngõ ba tám hoàng cầu đống đa hà nội nhé",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "à địa chỉ giao hàng vẫn như cũ một hai ngõ ba tám hoàng cầu đống đa hà nội nhé",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-GEN-0001/call_1/turn_5.wav",
+      "source_text": "À, địa chỉ giao hàng vẫn như cũ, 12 ngõ 38 Hoàng Cầu, Đống Đa, Hà Nội nhé.",
+      "reference_source": "llm",
+      "noise": "clean",
+      "input_mode": "text",
+      "duration_seconds": 5.44
+    },
+    {
+      "id": "SCN-GEN-0001-call_2-t1",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-GEN-0001 call_2 turn 1",
+      "noisy": false,
+      "note": "khach_quay_lai_sau_8_thang; clean",
+      "entities": {},
+      "full_text": "chị muốn hỏi đơn hàng của chị bây giờ thế nào rồi?",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "chị muốn hỏi đơn hàng của chị bây giờ thế nào rồi?",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-GEN-0001/call_2/turn_1.wav",
+      "source_text": "Chị muốn hỏi đơn hàng của chị bây giờ thế nào rồi?",
+      "reference_source": "llm",
+      "noise": "clean",
+      "input_mode": "text",
+      "duration_seconds": 2.96
+    },
+    {
+      "id": "SCN-GEN-0001-call_2-t2",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-GEN-0001 call_2 turn 2",
+      "noisy": false,
+      "note": "khach_quay_lai_sau_8_thang; clean",
+      "entities": {},
+      "full_text": "chị không nhớ mã đơn, nhưng em có thể kiểm tra giúp chị được không?",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "chị không nhớ mã đơn, nhưng em có thể kiểm tra giúp chị được không?",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-GEN-0001/call_2/turn_2.wav",
+      "source_text": "Chị không nhớ mã đơn, nhưng em có thể kiểm tra giúp chị được không?",
+      "reference_source": "llm",
+      "noise": "clean",
+      "input_mode": "text",
+      "duration_seconds": 3.92
+    },
+    {
+      "id": "SCN-GEN-0001-call_2-t3",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-GEN-0001 call_2 turn 3",
+      "noisy": true,
+      "note": "khach_quay_lai_sau_8_thang; weak_signal",
+      "entities": {},
+      "full_text": "hôm kia chị đã đặt hàng mà.",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "hôm kia chị đã đặt hàng mà.",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-GEN-0001/call_2/turn_3.wav",
+      "source_text": "Hôm kia chị đã đặt hàng mà.",
+      "reference_source": "llm",
+      "noise": "weak_signal",
+      "input_mode": "text",
+      "duration_seconds": 2.08
+    },
+    {
+      "id": "SCN-GEN-0001-call_2-t4",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-GEN-0001 call_2 turn 4",
+      "noisy": true,
+      "note": "khach_quay_lai_sau_8_thang; cafe",
+      "entities": {
+        "sku": "SKU-AP-X"
+      },
+      "full_text": "chị chỉ nhớ là chị đã đặt máy lọc không khí e pia x thôi.",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "chị chỉ nhớ là chị đã đặt máy lọc không khí e pia x thôi.",
+          "entities": {
+            "sku": "SKU-AP-X"
+          }
+        }
+      ],
+      "audio": "audio/scenarios_SCN-GEN-0001/call_2/turn_4.wav",
+      "source_text": "Chị chỉ nhớ là chị đã đặt máy lọc không khí AirPure X thôi.",
+      "reference_source": "llm",
+      "noise": "cafe",
+      "input_mode": "text",
+      "duration_seconds": 3.6
+    },
+    {
+      "id": "SCN-GEN-0001-call_2-t5",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-GEN-0001 call_2 turn 5",
+      "noisy": false,
+      "note": "khach_quay_lai_sau_8_thang; clean",
+      "entities": {},
+      "full_text": "có gì mới không em? chị cần biết để chuẩn bị sẵn.",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "có gì mới không em? chị cần biết để chuẩn bị sẵn.",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-GEN-0001/call_2/turn_5.wav",
+      "source_text": "Có gì mới không em? Chị cần biết để chuẩn bị sẵn.",
+      "reference_source": "llm",
+      "noise": "clean",
+      "input_mode": "text",
+      "duration_seconds": 3.04
+    }
+  ]
+}
