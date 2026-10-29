@@ -183,6 +183,9 @@ def render(
             (),
         ))
 
+    if not episodes and (held or orders):
+        lines.insert(0, (f"Khách quen: {who}; đã có thông tin được lưu, chưa có cuộc trước kết thúc.", False, ()))
+
     for fact in facts:
         if fact.get("status") == "disputed":
             label = _label(fact["slot"])
@@ -231,7 +234,7 @@ def render(
         "open_questions": [],
         "must_not_ask": sorted(n for n in held if n in ASKED_ONCE),
         "stale_warnings": list(warnings),
-        "suggested_opening": opening(who, products, blockers, bool(episodes)),
+        "suggested_opening": opening(who, products, blockers, bool(episodes or held or orders)),
         "suggested_next_action": next_action(products, blockers, warnings),
         "generated_at": now.isoformat(),
         "latency_ms": int(latency_ms),

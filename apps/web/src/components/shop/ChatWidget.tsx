@@ -14,6 +14,7 @@ import { HOTLINE, ZALO_URL } from "@/lib/contact";
 import { cart } from "@/lib/cart";
 import { variantLabel } from "@/lib/catalog";
 import { catalogOnce } from "@/lib/mentions";
+import { useAccount } from "@/lib/account";
 
 /** The cart in this browser with the names the shop shows, for the assistant ("giỏ hàng tôi có gì").
  *  Signed in, the assistant reads the account's cart itself (its account_cart tool): nothing is sent. */
@@ -42,6 +43,11 @@ const SUGGESTIONS = [
 const SPEAKER: Record<string, string> = { customer: "Bạn", assistant: "Trợ lý AI", agent: "Nhân viên", system: "Hệ thống" };
 
 export default function ChatWidget() {
+  const { account } = useAccount();
+  return <ConversationWidget key={account?.customer_id || "guest"} />;
+}
+
+function ConversationWidget() {
   const { chatOpen, sku, productName } = useShopContext();
   const [session, setSession] = useState<ShopSession | null>(null);
   const [lines, setLines] = useState<Line[]>([]);

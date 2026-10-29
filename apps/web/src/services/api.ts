@@ -26,13 +26,13 @@ export async function api<T = unknown>(
     );
   }
   if (!response.ok)
-    throw new Error(
+    throw Object.assign(new Error(
       typeof result.detail === "string"
         ? result.detail
         : Array.isArray(result.detail) && typeof result.detail[0]?.msg === "string"
           ? result.detail[0].msg
           : JSON.stringify(result.detail || result),
-    );
+    ), { status: response.status });
   return result as T;
 }
 

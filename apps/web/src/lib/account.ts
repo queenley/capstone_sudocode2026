@@ -53,12 +53,16 @@ export const account = {
     }
     loading = api<Account>("/api/customer/me", token)
       .then(async (me) => {
+        if (customerToken() !== token) return;
         set({ status: "signed-in", account: me });
         await cart.attach(token);
       })
-      .catch(() => {
+      .catch((error) => {
+        if (customerToken() !== token || ![401, 403].includes(error?.status)) return;
         // Expired or revoked: the shopper is a guest again.
         setCustomerToken(null);
+        forgetConversation();
+        cart.detach();
         set({ status: "guest", account: null });
       });
     return loading;
@@ -88,11 +92,11 @@ export const account = {
   },
   async logout() {
     const token = customerToken();
-    if (token) await api("/api/customer/logout", token, {}).catch(() => undefined);
     setCustomerToken(null);
     forgetConversation();
     cart.detach();
     set({ status: "guest", account: null });
+    if (token) await api("/api/customer/logout", token, {}).catch(() => undefined);
   },
   /** After the phone check at checkout or on the order page: the token is new, read who it is.
    *  The conversation stays: the code was checked on it, so it already belongs to this customer. */
@@ -105,12 +109,23 @@ export function useAccount(): State {
   return useSyncExternalStore(
     (listener) => {
       listeners.add(listener);
+      if (listeners.size === 1) window.addEventListener("storage", changedAccount);
       if (state.status === "unknown") account.load();
-      return () => listeners.delete(listener);
+      return () => {
+        listeners.delete(listener);
+        if (!listeners.size) window.removeEventListener("storage", changedAccount);
+      };
     },
     () => state,
     () => state,
   );
+}
+
+function changedAccount(event: StorageEvent) {
+  if (event.key !== "customer-token" && event.key !== null) return;
+  forgetConversation();
+  cart.detach();
+  void account.load(true);
 }
 
 /** "Nguyễn Thị Oanh" -> "Oanh", as the header greets: Vietnamese names end with the given name. */

@@ -1,7 +1,7 @@
 """MemoryAgent: what to remember about this customer. ``docs/design.md`` section 5.4.
 
-Runs in ``after_call`` under the ``memory_writer`` role, the only path into
-the ledger. Of the five steps, two are judgements and live here; the gate and
+Runs after verified web turns and in ``after_call`` under the ``memory_writer``
+role, the only path into the ledger. Of the five steps, two are judgements and live here; the gate and
 the commit decision are code (``src/components/memory``, ``after_call``):
 
 - ``extract``: candidates in the organisers' flat slot names.

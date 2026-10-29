@@ -12,6 +12,8 @@ export type ShopSession = Session & { customer_id?: string | null };
 
 const CONVERSATION = "conversation";
 const CUSTOMER = "customer-token";
+const OWNER = "conversation-customer";
+let opening: Promise<ShopSession> | null = null;
 
 export function customerToken(): string {
   try {
@@ -32,8 +34,10 @@ export function setCustomerToken(token: string | null) {
 
 /** Drop this tab's conversation: the next message starts one as whoever is signed in now. */
 export function forgetConversation() {
+  opening = null;
   try {
     sessionStorage.removeItem(CONVERSATION);
+    sessionStorage.removeItem(OWNER);
   } catch {
     /* ignore */
   }
@@ -43,6 +47,8 @@ export function forgetConversation() {
 export function savedSession(): ShopSession | null {
   try {
     const saved = sessionStorage.getItem(CONVERSATION);
+    const owner = sessionStorage.getItem(OWNER);
+    if (owner !== null && owner !== customerToken()) return null;
     return saved ? (JSON.parse(saved) as ShopSession) : null;
   } catch {
     return null;
@@ -50,9 +56,12 @@ export function savedSession(): ShopSession | null {
 }
 
 export async function newSession(): Promise<ShopSession> {
-  const session = await api<ShopSession>("/api/conversations", customerToken(), {});
+  const token = customerToken();
+  const session = await api<ShopSession>("/api/conversations", token, {});
+  if (customerToken() !== token) throw new Error("Tài khoản đã thay đổi. Vui lòng mở lại cuộc trò chuyện.");
   try {
     sessionStorage.setItem(CONVERSATION, JSON.stringify(session));
+    sessionStorage.setItem(OWNER, token);
   } catch {
     /* ignore */
   }
@@ -70,7 +79,16 @@ export function loadConversation(session: Session) {
 }
 
 /** The saved conversation if it is still open, otherwise a new one. */
-export async function openSession(): Promise<ShopSession> {
+export function openSession(): Promise<ShopSession> {
+  if (opening) return opening;
+  const pending = resumeSession().finally(() => {
+    if (opening === pending) opening = null;
+  });
+  opening = pending;
+  return pending;
+}
+
+async function resumeSession(): Promise<ShopSession> {
   const saved = savedSession();
   if (saved) {
     try {

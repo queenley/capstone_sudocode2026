@@ -320,8 +320,9 @@ async def _apply(conn: Any, customer_id: str, decision: dict[str, Any], day: dat
     if decision["operation"] == "invalidate":
         cursor = await conn.execute(
             "UPDATE facts SET status = 'invalidated', valid_to = %s WHERE fact_id = %s AND customer_id = %s "
-            "AND status = 'active' RETURNING fact_id",
-            (day, decision.get("replaces"), customer_id),
+            "AND status = 'active' AND (%s::text IS NULL OR source->>'observed_at' IS NULL "
+            "OR source->>'observed_at' <= %s) RETURNING fact_id",
+            (day, decision.get("replaces"), customer_id, source.get("observed_at"), source.get("observed_at")),
         )
         return _write(slot, value, "delete", source, customer_id, None) if await cursor.fetchone() else None
     if await _already(conn, customer_id, slot, source):
@@ -330,12 +331,17 @@ async def _apply(conn: Any, customer_id: str, decision: dict[str, Any], day: dat
     current = None
     if not decision.get("disputed"):
         cursor = await conn.execute(
-            "SELECT fact_id, value FROM facts WHERE customer_id = %s AND slot = %s AND status = 'active' "
+            "SELECT fact_id, value, source FROM facts WHERE customer_id = %s AND slot = %s AND status = 'active' "
             + ("AND value = %s::jsonb " if kind == "open_note" else "AND kind <> 'open_note' ")
             + "ORDER BY created_at DESC LIMIT 1",
             (customer_id, slot, json.dumps(value, ensure_ascii=False)) if kind == "open_note" else (customer_id, slot),
         )
         current = await cursor.fetchone()
+        if current is not None and slot != "order_ids":
+            held_at = (current.get("source") or {}).get("observed_at")
+            observed_at = source.get("observed_at")
+            if held_at and observed_at and observed_at < held_at:
+                return None  # An older tab or delayed finalizer cannot replace newer facts.
         if current is not None and slot == "order_ids":
             value = list(dict.fromkeys([*current["value"], *value]))
         if current is not None and current["value"] == value:
