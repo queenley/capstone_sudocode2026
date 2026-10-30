@@ -1,0 +1,81 @@
+[10/17/26 07:44:08] INFO     Starting MCP server 'knowledge'   transport.py:242
+                             with transport 'stdio'                            
+[10/17/26 07:44:08] INFO     Starting MCP server 'memory' with transport.py:242
+                             transport 'stdio'                                 
+[10/17/26 07:44:08] INFO     Starting MCP server 'order' with  transport.py:242
+                             transport 'stdio'                                 
+[10/17/26 07:44:08] [10/17/26 07:44:08]INFO     Starting MCP server 'catalog'     transport.py:242
+                             with transport 'stdio'                            
+ INFO     Starting MCP server 'crm' with    transport.py:242
+                             transport 'stdio'                                 
+[10/17/26 07:46:40] INFO     Starting MCP server 'order' with  transport.py:242
+                             transport 'stdio'                                 
+[10/17/26 07:46:40] INFO     Starting MCP server 'knowledge'   transport.py:242
+                             with transport 'stdio'                            
+[10/17/26 07:46:40] INFO     Starting MCP server 'catalog'     transport.py:242
+                             with transport 'stdio'                            
+[10/17/26 07:46:40] INFO     Starting MCP server 'crm' with    transport.py:242
+                             transport 'stdio'                                 
+[10/17/26 07:46:40] INFO     Starting MCP server 'memory' with transport.py:242
+                             transport 'stdio'                                 
+[10/17/26 07:49:09] INFO     Starting MCP server 'crm' with    transport.py:242
+                             transport 'stdio'                                 
+[10/17/26 07:49:10] INFO     Starting MCP server 'memory' with transport.py:242
+                             transport 'stdio'                                 
+[10/17/26 07:49:10] INFO     Starting MCP server 'catalog'     transport.py:242
+                             with transport 'stdio'                            
+[10/17/26 07:49:11] INFO     Starting MCP server 'order' with  transport.py:242
+                             transport 'stdio'                                 
+[10/17/26 07:49:11] INFO     Starting MCP server 'knowledge'   transport.py:242
+                             with transport 'stdio'                            
+ERROR:__main__:Bridge failed
+Traceback (most recent call last):
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\scripts\evaluation\agent\bridge.py", line 315, in main
+    asyncio.run(serve(protocol))
+  File "C:\Users\mt200\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\scripts\evaluation\agent\bridge.py", line 286, in serve
+    await bridge.lifecycle(first)
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\scripts\evaluation\agent\bridge.py", line 157, in lifecycle
+    self.send({"type": "ready", "model": self.rig.advisor.model_name, "provider": self.rig.provider,
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\scripts\evaluation\agent\bridge.py", line 107, in send
+    self.protocol.flush()
+OSError: [Errno 22] Invalid argument
+Traceback (most recent call last):
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\scripts\evaluation\agent\bridge.py", line 315, in main
+    asyncio.run(serve(protocol))
+  File "C:\Users\mt200\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\scripts\evaluation\agent\bridge.py", line 286, in serve
+    await bridge.lifecycle(first)
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\scripts\evaluation\agent\bridge.py", line 157, in lifecycle
+    self.send({"type": "ready", "model": self.rig.advisor.model_name, "provider": self.rig.provider,
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\scripts\evaluation\agent\bridge.py", line 107, in send
+    self.protocol.flush()
+OSError: [Errno 22] Invalid argument
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\scripts\evaluation\agent\bridge.py", line 326, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\scripts\evaluation\agent\bridge.py", line 320, in main
+    protocol.flush()
+OSError: [Errno 22] Invalid argument

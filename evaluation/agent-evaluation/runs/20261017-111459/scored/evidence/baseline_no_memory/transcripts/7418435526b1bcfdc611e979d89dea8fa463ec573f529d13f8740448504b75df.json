@@ -1,0 +1,119 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0018",
+    "call": "call_2",
+    "turn": 3
+  },
+  "customer_text": "khi nao co hang lai vay em",
+  "agent_text": "Dạ hiện tại xe đẩy gấp gọn Joie Pact bên em vẫn chưa có hàng lại ạ. Anh có muốn em ghi nhận thông tin để báo ngay khi có hàng không ạ?",
+  "customer_id": "C010",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0018/call_2/3/9",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0018",
+        "call": "call_2",
+        "turn": 3
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/585"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0018/call_2/3/9",
+      "request": {
+        "name": "catalog.search",
+        "args": {
+          "query": "Joie Pact"
+        }
+      },
+      "on": "2026-10-25",
+      "started_at": "2026-10-17T04:44:51.096805+00:00",
+      "finished_at": "2026-10-17T04:44:51.097823+00:00",
+      "outcome": "success",
+      "result": {
+        "items": [
+          {
+            "sku": "SKU-MB-STR1",
+            "name": "Xe đẩy gấp gọn Joie Pact",
+            "category": "me-be",
+            "list_price_vnd": 3490000,
+            "attributes": {
+              "max_weight_kg": 22,
+              "warranty_months": 12
+            },
+            "variants": []
+          }
+        ],
+        "total": 1
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0018/call_2/3/10",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0018",
+        "call": "call_2",
+        "turn": 3
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/588"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0018/call_2/3/10",
+      "request": {
+        "name": "inventory.check",
+        "args": {
+          "sku": "SKU-MB-STR1",
+          "on": "2026-10-25"
+        }
+      },
+      "on": "2026-10-25",
+      "started_at": "2026-10-17T04:44:51.887998+00:00",
+      "finished_at": "2026-10-17T04:44:51.887998+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-MB-STR1",
+        "in_stock": false,
+        "qty": 0
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"query\": \"Joie Pact\"}, \"name\": \"catalog.search\"}",
+    "{\"args\": {\"on\": \"2026-10-25\", \"sku\": \"SKU-MB-STR1\"}, \"name\": \"inventory.check\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/581"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/589"
+    }
+  ]
+}

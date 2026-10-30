@@ -1,0 +1,161 @@
+{
+  "n_scenarios": 1,
+  "system": {
+    "repeat_question_rate": {
+      "value": null,
+      "redundant": 0,
+      "total_questions": 0,
+      "examples": []
+    },
+    "context_carryover_rate": {
+      "value": 0.0,
+      "used": 0,
+      "required": 1
+    },
+    "task_success_rate": {
+      "value": 0.0,
+      "passed": 0,
+      "total": 1,
+      "hard_cases": {
+        "value": 0.0,
+        "total": 1
+      },
+      "failures": [
+        {
+          "scenario": "SCN-GEN-0002",
+          "call": "call_1",
+          "hard_case": "shipping order GHN7781234; changes after dispatch are not allowed",
+          "reasons": [
+            "không có tool call pricing.get_quote khớp args_match"
+          ]
+        },
+        {
+          "scenario": "SCN-GEN-0002",
+          "call": "call_2",
+          "hard_case": "shipping order GHN7781234; changes after dispatch are not allowed",
+          "reasons": [
+            "không có tool call order.status khớp args_match"
+          ]
+        }
+      ]
+    },
+    "hallucination_rate": {
+      "value": null,
+      "wrong": 0,
+      "total_claims": 0,
+      "price_promo_only": {
+        "value": null,
+        "wrong": 0,
+        "total": 0
+      },
+      "examples": []
+    },
+    "avg_turns_per_call": null,
+    "calls_to_close": {
+      "value": null,
+      "n_closed": 0,
+      "n_scenarios": 1
+    },
+    "guardrail_violations": {
+      "total": 0,
+      "by_type": {
+        "pii_in_memory_or_text": 0,
+        "over_escalation": 0,
+        "claims_human": 0,
+        "forbidden_pattern": 0
+      },
+      "examples": []
+    },
+    "memory_checks": [],
+    "latency": {
+      "n_turns": 0,
+      "warning": "Cần ≥ 100 lượt để p95 có ý nghĩa",
+      "ttft": null,
+      "total": null,
+      "ttfa": null,
+      "call_brief": null
+    }
+  },
+  "baseline": {
+    "repeat_question_rate": {
+      "value": null,
+      "redundant": 0,
+      "total_questions": 0,
+      "examples": []
+    },
+    "context_carryover_rate": {
+      "value": 0.0,
+      "used": 0,
+      "required": 1
+    },
+    "task_success_rate": {
+      "value": 0.0,
+      "passed": 0,
+      "total": 1,
+      "hard_cases": {
+        "value": 0.0,
+        "total": 1
+      },
+      "failures": [
+        {
+          "scenario": "SCN-GEN-0002",
+          "call": "call_1",
+          "hard_case": "shipping order GHN7781234; changes after dispatch are not allowed",
+          "reasons": [
+            "không có tool call pricing.get_quote khớp args_match"
+          ]
+        },
+        {
+          "scenario": "SCN-GEN-0002",
+          "call": "call_2",
+          "hard_case": "shipping order GHN7781234; changes after dispatch are not allowed",
+          "reasons": [
+            "không có tool call order.status khớp args_match"
+          ]
+        }
+      ]
+    },
+    "hallucination_rate": {
+      "value": null,
+      "wrong": 0,
+      "total_claims": 0,
+      "price_promo_only": {
+        "value": null,
+        "wrong": 0,
+        "total": 0
+      },
+      "examples": []
+    },
+    "avg_turns_per_call": null,
+    "calls_to_close": {
+      "value": null,
+      "n_closed": 0,
+      "n_scenarios": 1
+    },
+    "guardrail_violations": {
+      "total": 0,
+      "by_type": {
+        "pii_in_memory_or_text": 0,
+        "over_escalation": 0,
+        "claims_human": 0,
+        "forbidden_pattern": 0
+      },
+      "examples": []
+    },
+    "memory_checks": [],
+    "latency": {
+      "n_turns": 0,
+      "warning": "Cần ≥ 100 lượt để p95 có ý nghĩa",
+      "ttft": null,
+      "total": null,
+      "ttfa": null,
+      "call_brief": null
+    }
+  },
+  "comparison": {
+    "rqr_relative_reduction_pct": null,
+    "meets_rqr_threshold_40pct": false,
+    "meets_tsr_70pct": false,
+    "meets_hr_price_5pct": false
+  }
+}

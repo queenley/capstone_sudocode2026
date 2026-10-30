@@ -1,0 +1,77 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0017",
+    "call": "call_2",
+    "turn": 1
+  },
+  "customer_text": "Alo, hôm qua anh đã suy nghĩ về máy lọc không khí, giờ anh muốn mua nhiều món cho nhà mới.",
+  "agent_text": "Dạ anh Huy ạ, anh muốn em tư vấn máy lọc không khí trước hay các món khác cho nhà mới trước ạ? Anh thích loại nào hoặc có thương hiệu nào anh quan tâm không ạ?",
+  "customer_id": "C014",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0017/call_2/1/6",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0017",
+        "call": "call_2",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/449"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0017/call_2/1/6",
+      "request": {
+        "name": "crm.get_customer",
+        "args": {
+          "phone": "0925877188"
+        }
+      },
+      "on": "2026-10-17",
+      "started_at": "2026-10-17T04:42:58.415635+00:00",
+      "finished_at": "2026-10-17T04:42:58.415635+00:00",
+      "outcome": "success",
+      "result": {
+        "found": true,
+        "ambiguous": false,
+        "customer_id": "C014",
+        "name": "Huy",
+        "honorific": "anh",
+        "phone": "0925877188",
+        "identities": {
+          "zalo_id": null,
+          "fb_id": null
+        },
+        "orders": [],
+        "sessions": []
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"phone\": \"0925877188\"}, \"name\": \"crm.get_customer\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/452"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/454"
+    }
+  ]
+}

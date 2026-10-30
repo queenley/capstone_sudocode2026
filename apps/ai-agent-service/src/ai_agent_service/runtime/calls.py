@@ -273,7 +273,16 @@ async def request_handoff(call_id: int, *, reason: str) -> dict[str, Any]:
             "handoff_requested_at = now() WHERE id = %s AND handoff_status IS NULL RETURNING *",
             (reason, call_id),
         )
-        row = await cursor.fetchone() or row
+        updated = await cursor.fetchone()
+        row = updated or row
+        if updated is not None:
+            # The consultant's screen highlights the message the call was handed over after.
+            await conn.execute(
+                "UPDATE turns SET meta = meta || %s::jsonb WHERE id = (SELECT id FROM turns WHERE call_id = %s "
+                "AND speaker = 'customer' ORDER BY created_at DESC, id DESC LIMIT 1)",
+                (json.dumps({"handoff": {"role": "trigger", "reason": "nhan_vien", "label": reason}}, ensure_ascii=False),
+                 call_id),
+            )
         await conn.execute(
             "INSERT INTO turns (call_id, turn_id, speaker, content, meta) VALUES (%s, %s, 'agent', %s, %s) "
             "ON CONFLICT (call_id, turn_id, speaker) DO NOTHING",

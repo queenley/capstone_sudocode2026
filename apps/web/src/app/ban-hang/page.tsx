@@ -11,6 +11,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Logo } from "@/components/brand/Logo";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 import CallConsole from "@/features/call-console";
+import { handoffReason, HandoffToasts, useHandoffAlerts } from "@/features/handoff-alerts";
 import { api, AgentCall } from "@/services/api";
 import { colorName, money } from "@/lib/catalog";
 import "./sales.css";
@@ -75,6 +76,9 @@ export default function SalesPage() {
   const [access, setAccess] = useState({ calls: false, orders: false });
   const [checked, setChecked] = useState(false);
   const [error, setError] = useState("");
+  const [focus, setFocus] = useState<number | null>(null);
+  // Every tab: a waiting customer is announced wherever the person is in the workspace.
+  const alerts = useHandoffAlerts(calls);
 
   useEffect(() => {
     setToken(sessionStorage.getItem("staff-token") || "");
@@ -127,7 +131,11 @@ export default function SalesPage() {
 
   const visible = TABS.filter((t) => !t.needs || access[t.needs]);
   const current = TABS.find((t) => t.id === tab) || TABS[0];
-  const waiting = (calls || []).filter((c) => c.handoff_status === "pending" && !c.ended_at);
+  const waiting = alerts.waiting;
+  const openCall = (id: number) => {
+    setFocus(id);
+    go("conversations");
+  };
 
   return (
     <div className="sl-app">
@@ -193,10 +201,10 @@ export default function SalesPage() {
         {!checked ? (
           <p className="sl-muted">Đang tải…</p>
         ) : tab === "overview" ? (
-          <Overview calls={calls} orders={orders} callbacks={callbacks} waiting={waiting} go={go} />
+          <Overview calls={calls} orders={orders} callbacks={callbacks} waiting={waiting} go={go} openCall={openCall} />
         ) : tab === "conversations" ? (
           <div className="sl-console">
-            <CallConsole embedded />
+            <CallConsole embedded focus={focus} />
           </div>
         ) : tab === "orders" ? (
           <Orders orders={orders || []} token={token} onChange={refresh} />
@@ -204,6 +212,7 @@ export default function SalesPage() {
           <Callbacks callbacks={callbacks || []} />
         )}
       </main>
+      <HandoffToasts alerts={alerts} onOpen={openCall} />
     </div>
   );
 }
@@ -214,12 +223,14 @@ function Overview({
   callbacks,
   waiting,
   go,
+  openCall,
 }: {
   calls: AgentCall[] | null;
   orders: Order[] | null;
   callbacks: Callback[] | null;
   waiting: AgentCall[];
   go: (tab: Tab) => void;
+  openCall: (id: number) => void;
 }) {
   const open = (calls || []).filter((c) => !c.ended_at);
   const todayOrders = (orders || []).filter((o) => isToday(o.created_at) && o.status !== "cancelled");
@@ -299,15 +310,15 @@ function Overview({
               <p className="sl-muted">Không có khách nào đang chờ. AI đang xử lý các cuộc trò chuyện.</p>
             ) : (
               waiting.slice(0, 6).map((c) => (
-                <div key={c.id} className="sl-row">
+                <button key={c.id} className="sl-row sl-row-hot" onClick={() => openCall(c.id)}>
                   <div>
                     <b>{c.customer_label || (c.phone_last4 ? `Khách ···${c.phone_last4}` : "Khách chưa xác định")}</b>
                     <small>
-                      {CHANNEL[c.channel] || c.channel} · {c.handoff_reason || "Cần hỗ trợ"}
+                      {CHANNEL[c.channel] || c.channel} · {handoffReason(c)}
                     </small>
                   </div>
                   <span className="sl-badge sl-badge-hot">Chờ nhận</span>
-                </div>
+                </button>
               ))
             )}
           </section>

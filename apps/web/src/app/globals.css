@@ -985,6 +985,27 @@ button.small { padding: 6px 12px; font-size: 11px; margin: 0 0 8px 26px; }
 .tag.accent { background: var(--lime); border-color: var(--lime); color: var(--brand-ink); }
 .call-turns { height: auto; min-height: 280px; max-height: 52vh; padding: 4px 0; }
 .message.human { background: var(--info); }
+/* Handoff (features/handoff-alerts.tsx, TurnBubble): the customer messages a person must read. */
+.message.incoming.handoff-trigger { background: var(--danger-soft); border: 1px solid var(--danger); box-shadow: 0 0 0 3px var(--danger-line); }
+.message.incoming.handoff-waiting { background: var(--danger-soft); border: 1px dashed var(--danger); }
+.panel .message.handoff-trigger p, .panel .message.handoff-waiting p { color: var(--danger-ink); font-weight: 500; }
+.handoff-flag { display: block; font-size: 11px; font-weight: 700; color: var(--danger-ink); margin-bottom: 4px; }
+.handoff-legend { font-size: 12px; color: var(--danger-ink); margin: 8px 0 0; }
+.call-action-bar.handoff-pending { color: var(--danger-ink); font-weight: 600; }
+.queue-item.waiting { background: var(--danger-soft); box-shadow: inset 3px 0 0 var(--danger); border-radius: 8px; }
+.queue-item.waiting .queue-text small:first-of-type { color: var(--danger-ink); font-weight: 600; }
+.queue-item.waiting .live-dot { background: var(--danger); animation: handoff-pulse 1.2s ease-in-out infinite; }
+@keyframes handoff-pulse { 50% { box-shadow: 0 0 0 5px var(--danger-line); } }
+@media (prefers-reduced-motion: reduce) { .queue-item.waiting .live-dot { animation: none; } }
+.handoff-toasts { position: fixed; right: 16px; bottom: 16px; z-index: 60; display: grid; gap: 10px; width: min(360px, calc(100vw - 32px)); }
+.handoff-toast { display: grid; gap: 4px; padding: 14px 16px; border-radius: 12px; background: var(--surface-2); color: var(--ink); border: 1px solid var(--danger); box-shadow: inset 4px 0 0 var(--danger), 0 10px 30px rgba(0, 0, 0, 0.18); }
+.handoff-toast strong { color: var(--danger-ink); font-size: 14px; }
+.handoff-toast span { font-size: 13px; }
+.handoff-toast small { font-size: 12px; color: var(--muted); }
+.handoff-toast-actions { display: flex; gap: 8px; margin-top: 6px; }
+.handoff-toast-actions button { font-size: 12px; padding: 7px 12px; background: var(--danger); color: #fff; }
+.handoff-toast-actions button.secondary { background: var(--surface-3); color: var(--ink); }
+.handoff-enable { font-size: 12px; padding: 8px 12px; background: var(--surface-3); color: var(--ink); border: 1px solid var(--line); justify-self: end; }
 .call-action-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 0; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
 .copilot { border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 12px; }
 .alert.column { flex-direction: column; }

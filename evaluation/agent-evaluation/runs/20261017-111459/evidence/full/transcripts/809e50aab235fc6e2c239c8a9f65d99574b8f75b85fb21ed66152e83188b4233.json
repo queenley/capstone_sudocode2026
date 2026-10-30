@@ -1,0 +1,71 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0012",
+    "call": "call_1",
+    "turn": 3
+  },
+  "customer_text": "Máy này đang có khuyến mãi gì không em?",
+  "agent_text": "Dạ em xin lỗi anh, hiện tại em chưa có thông tin giá và khuyến mãi chính xác cho máy hút sữa điện đôi Spectra S1. Anh có muốn em kiểm tra lại hoặc chuyển anh gặp nhân viên phụ trách để hỗ trợ kỹ hơn không ạ?",
+  "customer_id": "C008",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0012/call_1/3/4",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0012",
+        "call": "call_1",
+        "turn": 3
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/218"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0012/call_1/3/4",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-MHS-SPECTRA-S1",
+          "on": "2026-10-17",
+          "customer_phone": "0975475177"
+        }
+      },
+      "on": "2026-10-17",
+      "started_at": "2026-10-17T04:21:28.386670+00:00",
+      "finished_at": "2026-10-17T04:21:28.386670+00:00",
+      "outcome": "business_error",
+      "result": {
+        "error": "unknown_sku"
+      },
+      "error": {
+        "code": "unknown_sku",
+        "message": "BTC mock business error"
+      },
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"customer_phone\": \"0975475177\", \"on\": \"2026-10-17\", \"sku\": \"SKU-MHS-SPECTRA-S1\"}, \"name\": \"pricing.get_quote\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/214"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/219"
+    }
+  ]
+}

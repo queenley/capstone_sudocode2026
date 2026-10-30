@@ -338,7 +338,12 @@ class CallStore:
         if reply:
             rows.append(("agent", reply["text"], self._meta(state)))
         async with connection() as conn:
+            cursor = await conn.execute("SELECT handoff_status FROM calls WHERE id = %s", (self.call_id,))
+            before = ((await cursor.fetchone()) or {}).get("handoff_status")
             for speaker, text, meta in rows:
+                mark = handoff_mark(state, before) if speaker == "customer" else None
+                if mark:
+                    meta = {**meta, "handoff": mark}
                 await conn.execute(
                     "INSERT INTO turns (call_id, turn_id, speaker, content, meta) VALUES (%s, %s, %s, %s, %s) "
                     "ON CONFLICT (call_id, turn_id, speaker) DO NOTHING",
@@ -415,6 +420,24 @@ class CallStore:
                 if handoff else None,
             },
         )
+
+
+def handoff_mark(state: dict[str, Any], before: str | None) -> dict[str, Any] | None:
+    """What the staff screen highlights on a customer message (``turns.meta.handoff``).
+
+    ``trigger``: the message after which the assistant handed over (a successful
+    ``handoff.transfer`` this turn, on a call not handed over yet). ``waiting``:
+    a message written while the handoff waits for a person, which the assistant
+    only drafts for. Once a consultant holds the call, nothing is marked.
+    """
+    if before == "pending":
+        return {"role": "waiting", "label": "Khách nhắn khi đang chờ nhân viên"}
+    handed = next((r for r in state.get("tool_results") or []
+                   if r.get("name") == "handoff.transfer" and (r.get("result") or {}).get("ok")), None)
+    if before is None and handed is not None:
+        code = ((handed.get("args") or {}).get("brief") or {}).get("escalation_reason") or "khac"
+        return {"role": "trigger", "reason": code, "label": REASONS.get(code, code)}
+    return None
 
 
 def _reason_label(code: str | None) -> str | None:

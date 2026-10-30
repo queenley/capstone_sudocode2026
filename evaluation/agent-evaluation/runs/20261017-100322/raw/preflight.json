@@ -1,0 +1,158 @@
+{
+  "notice": "Planned-input validation only; no Agent/runner/A11 end-to-end PASS",
+  "asset_root": "C:\\Users\\mt200\\OneDrive\\Desktop\\AI_egineering\\sudocode\\capstone_sudocode2026\\scripts\\evaluation\\runs\\20261017-100322\\inputs",
+  "validation": {
+    "schema_version": "1.0.0",
+    "artifact_id": "PRODUCT-8450047b31a0be3a/preflight",
+    "run_id": "PRODUCT-8450047b31a0be3a",
+    "status": {
+      "verdict": "PASS",
+      "completeness": "COMPLETE",
+      "reason_codes": []
+    },
+    "issues": [],
+    "coverage_refs": []
+  },
+  "manifest": {
+    "path": "manifest.json",
+    "sha256": "7164c66ebd0bd72a16578ac4d9c209765b606f722e8d9699d9b96acd678b51b6",
+    "pointer": ""
+  },
+  "scope": {
+    "path": "fixtures/p1-scope.json",
+    "sha256": "9420d563a85f8a772b707baa299919410e7356ee10333ac74acd66f2d8c225e9",
+    "pointer": ""
+  },
+  "configuration": {
+    "model": "gpt-4.1-mini",
+    "parameters": {
+      "provider": "openai",
+      "temperature": 0.0,
+      "max_tokens": 2048,
+      "timeout": 60.0,
+      "max_retries": 0,
+      "retries": 0
+    },
+    "prompt": {
+      "path": "sources/btc/policy/playbook-telesale.md",
+      "sha256": "ca74b496676a1bf88c7d0caf36cfaada69c9f9003045c98055426f259a0fae0d",
+      "pointer": ""
+    },
+    "tools": {
+      "path": "sources/btc/schemas/tools.schema.json",
+      "sha256": "4cc8935e3e7f1a37b43eab0d68d85e8383037e52423e9f7cc022da916c97d4e0",
+      "pointer": ""
+    },
+    "kb": {
+      "path": "sources/btc/policy/faq.md",
+      "sha256": "1c9874be840123bf19c30f87d29ab0ededdfd1b1a50c6d7417d1acadea4f1f60",
+      "pointer": ""
+    },
+    "hardware": "local apps/ai-agent-service, agent_eval schema",
+    "extractor_version": "product-extractor-v2",
+    "judge_version": null
+  },
+  "warnings": [
+    "Below official dataset scale; development/fixture only, not official acceptance"
+  ],
+  "adapter": {
+    "kind": "runtime",
+    "entrypoint": "product_adapter:factory",
+    "code": {
+      "path": "product_adapter.py",
+      "sha256": "1007f0df6f6935d1a81d708a5b88af412b57543b491e7ecff278e92fa4134be9",
+      "pointer": ""
+    },
+    "capabilities": [
+      "business_tools",
+      "memory_isolation",
+      "memory_read_gate",
+      "after_call_barrier",
+      "snapshots",
+      "briefs",
+      "timestamps",
+      "usage"
+    ]
+  },
+  "execution_gate": {
+    "allowed": true,
+    "blocking_codes": [],
+    "nonblocking_dispute_codes": [],
+    "binding_verified": false,
+    "runtime_checks": "NOT_RUN_PREFLIGHT_ONLY",
+    "notice": "Input gate only; does not certify Agent/criteria or permit test fallback"
+  },
+  "coverage_plan": {
+    "calls": [
+      {
+        "scenario_id": "SCN-GEN-0010",
+        "call": "call_1",
+        "on": "2026-10-15",
+        "expected_turns": 5,
+        "input_field": "customer_turns"
+      },
+      {
+        "scenario_id": "SCN-GEN-0010",
+        "call": "call_2",
+        "on": "2026-10-18",
+        "expected_turns": 4,
+        "input_field": "customer_turns"
+      },
+      {
+        "scenario_id": "SCN-GEN-0010",
+        "call": "call_3",
+        "on": "2026-10-20",
+        "expected_turns": 4,
+        "input_field": "customer_turns"
+      }
+    ],
+    "expected_trace_ids": [
+      "PRODUCT-8450047b31a0be3a/full/SCN-GEN-0010/call_1/1",
+      "PRODUCT-8450047b31a0be3a/full/SCN-GEN-0010/call_1/2",
+      "PRODUCT-8450047b31a0be3a/full/SCN-GEN-0010/call_1/3",
+      "PRODUCT-8450047b31a0be3a/full/SCN-GEN-0010/call_1/4",
+      "PRODUCT-8450047b31a0be3a/full/SCN-GEN-0010/call_1/5",
+      "PRODUCT-8450047b31a0be3a/full/SCN-GEN-0010/call_2/1",
+      "PRODUCT-8450047b31a0be3a/full/SCN-GEN-0010/call_2/2",
+      "PRODUCT-8450047b31a0be3a/full/SCN-GEN-0010/call_2/3",
+      "PRODUCT-8450047b31a0be3a/full/SCN-GEN-0010/call_2/4",
+      "PRODUCT-8450047b31a0be3a/full/SCN-GEN-0010/call_3/1",
+      "PRODUCT-8450047b31a0be3a/full/SCN-GEN-0010/call_3/2",
+      "PRODUCT-8450047b31a0be3a/full/SCN-GEN-0010/call_3/3",
+      "PRODUCT-8450047b31a0be3a/full/SCN-GEN-0010/call_3/4",
+      "PRODUCT-8450047b31a0be3a/baseline_no_memory/SCN-GEN-0010/call_1/1",
+      "PRODUCT-8450047b31a0be3a/baseline_no_memory/SCN-GEN-0010/call_1/2",
+      "PRODUCT-8450047b31a0be3a/baseline_no_memory/SCN-GEN-0010/call_1/3",
+      "PRODUCT-8450047b31a0be3a/baseline_no_memory/SCN-GEN-0010/call_1/4",
+      "PRODUCT-8450047b31a0be3a/baseline_no_memory/SCN-GEN-0010/call_1/5",
+      "PRODUCT-8450047b31a0be3a/baseline_no_memory/SCN-GEN-0010/call_2/1",
+      "PRODUCT-8450047b31a0be3a/baseline_no_memory/SCN-GEN-0010/call_2/2",
+      "PRODUCT-8450047b31a0be3a/baseline_no_memory/SCN-GEN-0010/call_2/3",
+      "PRODUCT-8450047b31a0be3a/baseline_no_memory/SCN-GEN-0010/call_2/4",
+      "PRODUCT-8450047b31a0be3a/baseline_no_memory/SCN-GEN-0010/call_3/1",
+      "PRODUCT-8450047b31a0be3a/baseline_no_memory/SCN-GEN-0010/call_3/2",
+      "PRODUCT-8450047b31a0be3a/baseline_no_memory/SCN-GEN-0010/call_3/3",
+      "PRODUCT-8450047b31a0be3a/baseline_no_memory/SCN-GEN-0010/call_3/4"
+    ],
+    "asr_ids": [],
+    "rag_ids": []
+  },
+  "disputes": [],
+  "capabilities": {
+    "btc_worker": "IMPLEMENTED_COMPONENT_TESTS",
+    "runtime_memory_access_gate": "NOT_RUN",
+    "after_call_barrier": "NOT_BOUND_PREFLIGHT_ONLY",
+    "runtime_adapter": "NOT_BOUND_PREFLIGHT_ONLY"
+  },
+  "deferred": [
+    {
+      "id": "btc.validator",
+      "reason": "DEFERRED_BY_USER_2026_10_04"
+    },
+    {
+      "id": "btc.audio_segments",
+      "reason": "DEFERRED_BY_USER_2026_10_04"
+    }
+  ],
+  "btc_full_readiness": "INCOMPLETE"
+}

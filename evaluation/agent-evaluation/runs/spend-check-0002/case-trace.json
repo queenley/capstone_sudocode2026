@@ -1,0 +1,4117 @@
+{
+  "format": "case-trace-v1",
+  "run_id": "PRODUCT-80658e306ac7ffa1",
+  "status": "INCOMPLETE",
+  "pipeline_error": null,
+  "stages": [
+    {
+      "stage": "prepare",
+      "settings": "C:\\Users\\mt200\\OneDrive\\Desktop\\AI_egineering\\sudocode\\capstone_sudocode2026\\scripts\\evaluation\\runs\\spend-check-0002\\inputs\\settings.json",
+      "run_id": "PRODUCT-80658e306ac7ffa1",
+      "execution_gate": {
+        "allowed": true,
+        "blocking_codes": [],
+        "nonblocking_dispute_codes": [],
+        "binding_verified": false,
+        "runtime_checks": "NOT_RUN_PREFLIGHT_ONLY",
+        "notice": "Input gate only; does not certify Agent/criteria or permit test fallback"
+      },
+      "planned_turns": 8
+    },
+    {
+      "stage": "run",
+      "execution_complete": true,
+      "completed_calls": 4,
+      "failed_calls": 0,
+      "errors": []
+    },
+    {
+      "stage": "collect",
+      "status": {
+        "verdict": "UNDETERMINED",
+        "completeness": "INCOMPLETE",
+        "reason_codes": [
+          "EXTRACTOR_AUDIT_PENDING"
+        ]
+      },
+      "trace_rows": 8,
+      "trace_wire_complete": true
+    },
+    {
+      "stage": "score",
+      "status": {
+        "verdict": "FAIL",
+        "completeness": "INCOMPLETE",
+        "reason_codes": [
+          "CLAIM_GT_MISSING",
+          "CLAIM_VALUE_WRONG",
+          "EXTRACTOR_AUDIT_PENDING",
+          "FACT_VALUE_WRONG_OR_UNUSED",
+          "PII_POLICY_NOT_LABELLED",
+          "TOOL_ACCURACY"
+        ]
+      },
+      "official_report_available": true
+    }
+  ],
+  "comparison": {
+    "rqr_relative_reduction_pct": null,
+    "meets_rqr_threshold_40pct": false,
+    "meets_tsr_70pct": true,
+    "meets_hr_price_5pct": false
+  },
+  "metrics": {
+    "full": {
+      "repeat_question_rate": {
+        "value": 0.0,
+        "redundant": 0,
+        "total_questions": 2,
+        "examples": []
+      },
+      "context_carryover_rate": {
+        "value": 0.0,
+        "used": 0,
+        "required": 1
+      },
+      "task_success_rate": {
+        "value": 100.0,
+        "passed": 1,
+        "total": 1,
+        "hard_cases": {
+          "value": 100.0,
+          "total": 1
+        },
+        "failures": []
+      },
+      "hallucination_rate": {
+        "value": 50.0,
+        "wrong": 2,
+        "total_claims": 4,
+        "price_promo_only": {
+          "value": null,
+          "wrong": 0,
+          "total": 0
+        },
+        "examples": [
+          {
+            "scenario": "SCN-GEN-0002",
+            "call": "call_2",
+            "turn": 1,
+            "field": "order_status",
+            "claimed": "đang trong trạng thái giao hàng",
+            "truth": "shipping"
+          },
+          {
+            "scenario": "SCN-GEN-0002",
+            "call": "call_2",
+            "turn": 2,
+            "field": "order_status",
+            "claimed": "đang trong quá trình giao, chưa giao đến chị ạ",
+            "truth": "shipping"
+          }
+        ]
+      },
+      "avg_turns_per_call": 2,
+      "calls_to_close": {
+        "value": null,
+        "n_closed": 0,
+        "n_scenarios": 1
+      },
+      "guardrail_violations": {
+        "total": 0,
+        "by_type": {
+          "pii_in_memory_or_text": 0,
+          "over_escalation": 0,
+          "claims_human": 0,
+          "forbidden_pattern": 0
+        },
+        "examples": []
+      },
+      "memory_checks": [],
+      "latency": {
+        "n_turns": 4,
+        "warning": "Cần ≥ 100 lượt để p95 có ý nghĩa",
+        "ttft": {
+          "n": 4,
+          "p50_ms": 2137,
+          "p95_ms": 11676
+        },
+        "total": {
+          "n": 4,
+          "p50_ms": 2137,
+          "p95_ms": 11676
+        },
+        "ttfa": null,
+        "call_brief": {
+          "n": 1,
+          "p50_ms": 44,
+          "p95_ms": 44
+        }
+      }
+    },
+    "baseline_no_memory": {
+      "repeat_question_rate": {
+        "value": 0.0,
+        "redundant": 0,
+        "total_questions": 3,
+        "examples": []
+      },
+      "context_carryover_rate": {
+        "value": 0.0,
+        "used": 0,
+        "required": 1
+      },
+      "task_success_rate": {
+        "value": 0.0,
+        "passed": 0,
+        "total": 1,
+        "hard_cases": {
+          "value": 0.0,
+          "total": 1
+        },
+        "failures": [
+          {
+            "scenario": "SCN-GEN-0002",
+            "call": "call_2",
+            "hard_case": "shipping order GHN7781234; changes after dispatch are not allowed",
+            "reasons": [
+              "không có tool call order.status khớp args_match"
+            ]
+          }
+        ]
+      },
+      "hallucination_rate": {
+        "value": 0.0,
+        "wrong": 0,
+        "total_claims": 1,
+        "price_promo_only": {
+          "value": null,
+          "wrong": 0,
+          "total": 0
+        },
+        "examples": []
+      },
+      "avg_turns_per_call": 2,
+      "calls_to_close": {
+        "value": null,
+        "n_closed": 0,
+        "n_scenarios": 1
+      },
+      "guardrail_violations": {
+        "total": 0,
+        "by_type": {
+          "pii_in_memory_or_text": 0,
+          "over_escalation": 0,
+          "claims_human": 0,
+          "forbidden_pattern": 0
+        },
+        "examples": []
+      },
+      "memory_checks": [],
+      "latency": {
+        "n_turns": 4,
+        "warning": "Cần ≥ 100 lượt để p95 có ý nghĩa",
+        "ttft": {
+          "n": 4,
+          "p50_ms": 1382,
+          "p95_ms": 9874
+        },
+        "total": {
+          "n": 4,
+          "p50_ms": 1382,
+          "p95_ms": 9874
+        },
+        "ttfa": null,
+        "call_brief": {
+          "n": 1,
+          "p50_ms": 20,
+          "p95_ms": 20
+        }
+      }
+    }
+  },
+  "reports": {
+    "official": "scored/official-report.json",
+    "validation": "scored/validation.json",
+    "assertions": "scored/supplemental-report.json"
+  },
+  "cases": [
+    {
+      "scenario_id": "SCN-GEN-0002",
+      "hard_case": "shipping order GHN7781234; changes after dispatch are not allowed",
+      "scenario_ref": "inputs/scenarios/SCN-GEN-0002.json",
+      "configurations": {
+        "full": {
+          "status": "PRESENT",
+          "calls": [
+            {
+              "call": "call_1",
+              "customer_goal": "Tôi muốn mua máy hút sữa điện đôi Spectra S1.",
+              "expected_outcome": "khac",
+              "success_if": {
+                "tool_called": "pricing.get_quote",
+                "args_match": {
+                  "sku": "SKU-MB-PUMP1"
+                }
+              },
+              "turns": [
+                {
+                  "turn": 1,
+                  "status": "PRESENT",
+                  "customer_text": "Chị muốn đặt hàng máy hút sữa điện đôi Spectra S1.",
+                  "agent_text": "Máy hút sữa điện đôi Spectra S1 hiện còn hàng, giá hôm nay là 4 triệu 290 nghìn đồng, có miễn phí vận chuyển ạ. Chị Tâm muốn đặt bao nhiêu máy?",
+                  "tool_calls": [
+                    {
+                      "name": "crm.get_customer",
+                      "args": {
+                        "phone": "0965384535"
+                      },
+                      "result": {
+                        "found": true,
+                        "ambiguous": false,
+                        "customer_id": "C032",
+                        "name": "Tâm",
+                        "honorific": "chị",
+                        "phone": "0965384535",
+                        "identities": {
+                          "zalo_id": null,
+                          "fb_id": null
+                        },
+                        "orders": [
+                          {
+                            "order_id": "OD301177",
+                            "sku": "SKU-MB-PUMP1",
+                            "price_vnd": 4290000,
+                            "date": "2026-10-03",
+                            "status": "shipping",
+                            "tracking": "GHN7781234"
+                          }
+                        ],
+                        "sessions": []
+                      }
+                    },
+                    {
+                      "name": "order.status",
+                      "args": {
+                        "customer_phone": "0965384535"
+                      },
+                      "result": {
+                        "orders": [
+                          {
+                            "order_id": "OD301177",
+                            "sku": "SKU-MB-PUMP1",
+                            "price_vnd": 4290000,
+                            "date": "2026-10-03",
+                            "status": "shipping",
+                            "tracking": "GHN7781234"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "name": "catalog.search",
+                      "args": {
+                        "query": "Spectra S1"
+                      },
+                      "result": {
+                        "items": [
+                          {
+                            "sku": "SKU-MB-PUMP1",
+                            "name": "Máy hút sữa điện đôi Spectra S1",
+                            "category": "me-be",
+                            "list_price_vnd": 4290000,
+                            "attributes": {
+                              "warranty_months": 12
+                            },
+                            "variants": []
+                          },
+                          {
+                            "sku": "SKU-BDL-MOM",
+                            "name": "Combo Spectra S1 + máy hâm sữa Fatz + 50 túi trữ sữa",
+                            "category": "me-be",
+                            "list_price_vnd": 4790000,
+                            "attributes": {
+                              "bundle_of": [
+                                "SKU-MB-PUMP1",
+                                "SKU-MB-MON",
+                                "SKU-MB-BAG"
+                              ],
+                              "saving_vnd": 109000,
+                              "warranty_months": 12
+                            },
+                            "variants": []
+                          }
+                        ],
+                        "total": 2
+                      }
+                    },
+                    {
+                      "name": "pricing.get_quote",
+                      "args": {
+                        "sku": "SKU-MB-PUMP1",
+                        "on": "2026-10-15",
+                        "customer_phone": "0965384535"
+                      },
+                      "result": {
+                        "sku": "SKU-MB-PUMP1",
+                        "list_price_vnd": 4290000,
+                        "final_price_vnd": 4290000,
+                        "applied_promos": [
+                          {
+                            "promo_code": "MOM-FREESHIP",
+                            "type": "freeship",
+                            "discount_vnd": 0
+                          },
+                          {
+                            "promo_code": "COD-0",
+                            "type": "freecod",
+                            "discount_vnd": 0
+                          }
+                        ],
+                        "expired_promos": [
+                          "PUMP-GIFT"
+                        ],
+                        "ineligible_promos": [],
+                        "not_applied_exclusive": [],
+                        "freeship": true,
+                        "_internal_price_floor_vnd": "[REDACTED]"
+                      }
+                    },
+                    {
+                      "name": "inventory.check",
+                      "args": {
+                        "sku": "SKU-MB-PUMP1",
+                        "on": "2026-10-15"
+                      },
+                      "result": {
+                        "sku": "SKU-MB-PUMP1",
+                        "in_stock": true,
+                        "qty": 6
+                      }
+                    }
+                  ],
+                  "questions": [
+                    {
+                      "slot": "order_quantity",
+                      "type": "open",
+                      "text": "Chị Tâm muốn đặt bao nhiêu máy?"
+                    }
+                  ],
+                  "claims": [
+                    {
+                      "field": "product_name",
+                      "value": "Máy hút sữa điện đôi Spectra S1",
+                      "text": "Máy hút sữa điện đôi Spectra S1"
+                    },
+                    {
+                      "field": "availability",
+                      "value": true,
+                      "text": "hiện còn hàng"
+                    },
+                    {
+                      "field": "price",
+                      "value": 4290000,
+                      "text": "4 triệu 290 nghìn đồng"
+                    },
+                    {
+                      "field": "shipping_fee",
+                      "value": 0,
+                      "text": "có miễn phí vận chuyển"
+                    }
+                  ],
+                  "facts_used": [],
+                  "latency": {
+                    "ttft_ms": 11676,
+                    "total_ms": 11676,
+                    "ttfa_ms": null
+                  },
+                  "tool_events": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/1/1",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/7"
+                        }
+                      ],
+                      "event_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/1/1",
+                      "request": {
+                        "name": "crm.get_customer",
+                        "args": {
+                          "phone": "0965384535"
+                        }
+                      },
+                      "on": "2026-10-15",
+                      "started_at": "2026-10-17T02:40:33.319410+00:00",
+                      "finished_at": "2026-10-17T02:40:33.319410+00:00",
+                      "outcome": "success",
+                      "result": {
+                        "found": true,
+                        "ambiguous": false,
+                        "customer_id": "C032",
+                        "name": "Tâm",
+                        "honorific": "chị",
+                        "phone": "0965384535",
+                        "identities": {
+                          "zalo_id": null,
+                          "fb_id": null
+                        },
+                        "orders": [
+                          {
+                            "order_id": "OD301177",
+                            "sku": "SKU-MB-PUMP1",
+                            "price_vnd": 4290000,
+                            "date": "2026-10-03",
+                            "status": "shipping",
+                            "tracking": "GHN7781234"
+                          }
+                        ],
+                        "sessions": []
+                      },
+                      "error": null,
+                      "side_effect": false,
+                      "attempt": 1
+                    },
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/1/2",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/10"
+                        }
+                      ],
+                      "event_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/1/2",
+                      "request": {
+                        "name": "order.status",
+                        "args": {
+                          "customer_phone": "0965384535"
+                        }
+                      },
+                      "on": "2026-10-15",
+                      "started_at": "2026-10-17T02:40:33.545928+00:00",
+                      "finished_at": "2026-10-17T02:40:33.545928+00:00",
+                      "outcome": "success",
+                      "result": {
+                        "orders": [
+                          {
+                            "order_id": "OD301177",
+                            "sku": "SKU-MB-PUMP1",
+                            "price_vnd": 4290000,
+                            "date": "2026-10-03",
+                            "status": "shipping",
+                            "tracking": "GHN7781234"
+                          }
+                        ]
+                      },
+                      "error": null,
+                      "side_effect": false,
+                      "attempt": 1
+                    },
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/1/3",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/17"
+                        }
+                      ],
+                      "event_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/1/3",
+                      "request": {
+                        "name": "catalog.search",
+                        "args": {
+                          "query": "Spectra S1"
+                        }
+                      },
+                      "on": "2026-10-15",
+                      "started_at": "2026-10-17T02:40:39.372222+00:00",
+                      "finished_at": "2026-10-17T02:40:39.373213+00:00",
+                      "outcome": "success",
+                      "result": {
+                        "items": [
+                          {
+                            "sku": "SKU-MB-PUMP1",
+                            "name": "Máy hút sữa điện đôi Spectra S1",
+                            "category": "me-be",
+                            "list_price_vnd": 4290000,
+                            "attributes": {
+                              "warranty_months": 12
+                            },
+                            "variants": []
+                          },
+                          {
+                            "sku": "SKU-BDL-MOM",
+                            "name": "Combo Spectra S1 + máy hâm sữa Fatz + 50 túi trữ sữa",
+                            "category": "me-be",
+                            "list_price_vnd": 4790000,
+                            "attributes": {
+                              "bundle_of": [
+                                "SKU-MB-PUMP1",
+                                "SKU-MB-MON",
+                                "SKU-MB-BAG"
+                              ],
+                              "saving_vnd": 109000,
+                              "warranty_months": 12
+                            },
+                            "variants": []
+                          }
+                        ],
+                        "total": 2
+                      },
+                      "error": null,
+                      "side_effect": false,
+                      "attempt": 1
+                    },
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/1/4",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/20"
+                        }
+                      ],
+                      "event_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/1/4",
+                      "request": {
+                        "name": "pricing.get_quote",
+                        "args": {
+                          "sku": "SKU-MB-PUMP1",
+                          "on": "2026-10-15",
+                          "customer_phone": "0965384535"
+                        }
+                      },
+                      "on": "2026-10-15",
+                      "started_at": "2026-10-17T02:40:41.063669+00:00",
+                      "finished_at": "2026-10-17T02:40:41.063669+00:00",
+                      "outcome": "success",
+                      "result": {
+                        "sku": "SKU-MB-PUMP1",
+                        "list_price_vnd": 4290000,
+                        "final_price_vnd": 4290000,
+                        "applied_promos": [
+                          {
+                            "promo_code": "MOM-FREESHIP",
+                            "type": "freeship",
+                            "discount_vnd": 0
+                          },
+                          {
+                            "promo_code": "COD-0",
+                            "type": "freecod",
+                            "discount_vnd": 0
+                          }
+                        ],
+                        "expired_promos": [
+                          "PUMP-GIFT"
+                        ],
+                        "ineligible_promos": [],
+                        "not_applied_exclusive": [],
+                        "freeship": true,
+                        "_internal_price_floor_vnd": "[REDACTED]"
+                      },
+                      "error": null,
+                      "side_effect": false,
+                      "attempt": 1
+                    },
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/1/5",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/23"
+                        }
+                      ],
+                      "event_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/1/5",
+                      "request": {
+                        "name": "inventory.check",
+                        "args": {
+                          "sku": "SKU-MB-PUMP1",
+                          "on": "2026-10-15"
+                        }
+                      },
+                      "on": "2026-10-15",
+                      "started_at": "2026-10-17T02:40:41.075792+00:00",
+                      "finished_at": "2026-10-17T02:40:41.075792+00:00",
+                      "outcome": "success",
+                      "result": {
+                        "sku": "SKU-MB-PUMP1",
+                        "in_stock": true,
+                        "qty": 6
+                      },
+                      "error": null,
+                      "side_effect": false,
+                      "attempt": 1
+                    }
+                  ],
+                  "memory": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/1/after_turn",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/24"
+                        }
+                      ],
+                      "phase": "after_turn",
+                      "customer_id": "C032",
+                      "namespace": "product/80658e306ac7ffa1/full/PRODUCT-80658e306ac7ffa1/SCN-GEN-0002",
+                      "facts": [],
+                      "writes": []
+                    },
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/1/before_call",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/11"
+                        }
+                      ],
+                      "phase": "before_call",
+                      "customer_id": "C032",
+                      "namespace": "product/80658e306ac7ffa1/full/PRODUCT-80658e306ac7ffa1/SCN-GEN-0002",
+                      "facts": [],
+                      "writes": []
+                    },
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/1/after_call",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/29"
+                        }
+                      ],
+                      "phase": "after_call",
+                      "customer_id": "C032",
+                      "namespace": "product/80658e306ac7ffa1/full/PRODUCT-80658e306ac7ffa1/SCN-GEN-0002",
+                      "facts": [
+                        {
+                          "key": "price_quoted_vnd",
+                          "value": 4290000,
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        },
+                        {
+                          "key": "product_advised",
+                          "value": "SKU-MB-PUMP1",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        },
+                        {
+                          "key": "quoted_on",
+                          "value": "2026-10-15",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        }
+                      ],
+                      "writes": [
+                        {
+                          "key": "product_advised",
+                          "value": "SKU-MB-PUMP1",
+                          "op": "set",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          }
+                        },
+                        {
+                          "key": "price_quoted_vnd",
+                          "value": 4290000,
+                          "op": "set",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          }
+                        },
+                        {
+                          "key": "quoted_on",
+                          "value": "2026-10-15",
+                          "op": "set",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "brief": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/1/call_brief",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/11"
+                        }
+                      ],
+                      "kind": "call_brief",
+                      "object_ref": {
+                        "path": "full/briefs/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                        "sha256": "30ce73b1b1957a5bfba69675d9267e4fc1feb5fac2927fe12dec7dd8d6bd0b48",
+                        "pointer": ""
+                      },
+                      "identified_at": "2026-10-17T02:40:33.298187+00:00",
+                      "ready_at": "2026-10-17T02:40:33.550965+00:00",
+                      "producer": "memory_agent",
+                      "validation": {
+                        "verdict": "PASS",
+                        "completeness": "COMPLETE",
+                        "reason_codes": []
+                      }
+                    }
+                  ],
+                  "extractor": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/1/extraction",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                          "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                          "pointer": ""
+                        },
+                        {
+                          "path": "cache/679f19c3dec8de9e653da4b8325d4b81d776f247b26ec9b589e4b59771b35a4c.json",
+                          "sha256": "1d4d6f09c4228aea71b00eb20b681cddcfcdfa45356d694a011d9249e47d0e57",
+                          "pointer": ""
+                        }
+                      ],
+                      "extractor_version": "product-extractor-v2",
+                      "items": [
+                        {
+                          "kind": "claim",
+                          "slot_or_field": "product_name",
+                          "value": "Máy hút sữa điện đôi Spectra S1",
+                          "question_type": null,
+                          "speaker": "agent",
+                          "quote": "Máy hút sữa điện đôi Spectra S1",
+                          "start": 0,
+                          "end": 31,
+                          "purpose": "state product availability and price",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          }
+                        },
+                        {
+                          "kind": "claim",
+                          "slot_or_field": "availability",
+                          "value": true,
+                          "question_type": null,
+                          "speaker": "agent",
+                          "quote": "hiện còn hàng",
+                          "start": 32,
+                          "end": 45,
+                          "purpose": "state product availability",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          }
+                        },
+                        {
+                          "kind": "claim",
+                          "slot_or_field": "price",
+                          "value": 4290000,
+                          "question_type": null,
+                          "speaker": "agent",
+                          "quote": "4 triệu 290 nghìn đồng",
+                          "start": 62,
+                          "end": 84,
+                          "purpose": "state product price",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          }
+                        },
+                        {
+                          "kind": "claim",
+                          "slot_or_field": "shipping_fee",
+                          "value": 0,
+                          "question_type": null,
+                          "speaker": "agent",
+                          "quote": "có miễn phí vận chuyển",
+                          "start": 86,
+                          "end": 108,
+                          "purpose": "state shipping fee",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          }
+                        },
+                        {
+                          "kind": "question",
+                          "slot_or_field": "order_quantity",
+                          "value": null,
+                          "question_type": "open",
+                          "speaker": "agent",
+                          "quote": "Chị Tâm muốn đặt bao nhiêu máy?",
+                          "start": 112,
+                          "end": 143,
+                          "purpose": "ask customer order quantity",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "turn": 2,
+                  "status": "PRESENT",
+                  "customer_text": "Chị đã xem qua và thấy sản phẩm này rất phù hợp.",
+                  "agent_text": "Dạ chị Tâm vui lòng cho em biết địa chỉ giao hàng và phương thức thanh toán chị chọn nhé.",
+                  "tool_calls": [],
+                  "questions": [
+                    {
+                      "slot": "địa chỉ giao hàng",
+                      "type": "open",
+                      "text": "địa chỉ giao hàng"
+                    },
+                    {
+                      "slot": "phương thức thanh toán",
+                      "type": "open",
+                      "text": "phương thức thanh toán chị chọn"
+                    }
+                  ],
+                  "claims": [],
+                  "facts_used": [],
+                  "latency": {
+                    "ttft_ms": 1902,
+                    "total_ms": 1902,
+                    "ttfa_ms": null
+                  },
+                  "tool_events": [],
+                  "memory": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/2/after_turn",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 2
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/27"
+                        }
+                      ],
+                      "phase": "after_turn",
+                      "customer_id": "C032",
+                      "namespace": "product/80658e306ac7ffa1/full/PRODUCT-80658e306ac7ffa1/SCN-GEN-0002",
+                      "facts": [],
+                      "writes": []
+                    }
+                  ],
+                  "brief": [],
+                  "extractor": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/2/extraction",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 2
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/transcripts/cc7765fe4d60139b16e5d6ccb36214ff7c086dc7359f1153212b8c617a29fada.json",
+                          "sha256": "8fea95bc1a18abd9f5e499ef4161fdfeb9f5f787fd1e2447b110abea3d210c6f",
+                          "pointer": ""
+                        },
+                        {
+                          "path": "cache/1c3cb8275727895a2a1076419e28042463d70cd59a88a213e5840742189a27a7.json",
+                          "sha256": "59739cd11297dcdfd41d280b963a330cb39787e935d5e300806e07c727a6a166",
+                          "pointer": ""
+                        }
+                      ],
+                      "extractor_version": "product-extractor-v2",
+                      "items": [
+                        {
+                          "kind": "question",
+                          "slot_or_field": "địa chỉ giao hàng",
+                          "value": null,
+                          "question_type": "open",
+                          "speaker": "agent",
+                          "quote": "địa chỉ giao hàng",
+                          "start": 32,
+                          "end": 49,
+                          "purpose": "Requesting delivery address",
+                          "source": {
+                            "path": "full/transcripts/cc7765fe4d60139b16e5d6ccb36214ff7c086dc7359f1153212b8c617a29fada.json",
+                            "sha256": "8fea95bc1a18abd9f5e499ef4161fdfeb9f5f787fd1e2447b110abea3d210c6f",
+                            "pointer": "/agent_text"
+                          }
+                        },
+                        {
+                          "kind": "question",
+                          "slot_or_field": "phương thức thanh toán",
+                          "value": null,
+                          "question_type": "open",
+                          "speaker": "agent",
+                          "quote": "phương thức thanh toán chị chọn",
+                          "start": 53,
+                          "end": 84,
+                          "purpose": "Requesting chosen payment method",
+                          "source": {
+                            "path": "full/transcripts/cc7765fe4d60139b16e5d6ccb36214ff7c086dc7359f1153212b8c617a29fada.json",
+                            "sha256": "8fea95bc1a18abd9f5e499ef4161fdfeb9f5f787fd1e2447b110abea3d210c6f",
+                            "pointer": "/agent_text"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "call": "call_2",
+              "customer_goal": "Chị muốn kiểm tra tình trạng đơn hàng của mình.",
+              "expected_outcome": "khac",
+              "success_if": {
+                "tool_called": "order.status",
+                "args_match": {
+                  "order_id": "OD301177"
+                }
+              },
+              "turns": [
+                {
+                  "turn": 1,
+                  "status": "PRESENT",
+                  "customer_text": "Cho chị hỏi tình trạng đơn hàng OD301177 của chị.",
+                  "agent_text": "Dạ đơn hàng OD301177 của chị Tâm đang trong trạng thái giao hàng ạ, mã vận đơn GHN7781234. Chị cần em hỗ trợ gì thêm không ạ?",
+                  "tool_calls": [
+                    {
+                      "name": "crm.get_customer",
+                      "args": {
+                        "phone": "0965384535"
+                      },
+                      "result": {
+                        "found": true,
+                        "ambiguous": false,
+                        "customer_id": "C032",
+                        "name": "Tâm",
+                        "honorific": "chị",
+                        "phone": "0965384535",
+                        "identities": {
+                          "zalo_id": null,
+                          "fb_id": null
+                        },
+                        "orders": [
+                          {
+                            "order_id": "OD301177",
+                            "sku": "SKU-MB-PUMP1",
+                            "price_vnd": 4290000,
+                            "date": "2026-10-03",
+                            "status": "shipping",
+                            "tracking": "GHN7781234"
+                          }
+                        ],
+                        "sessions": []
+                      }
+                    },
+                    {
+                      "name": "pricing.get_quote",
+                      "args": {
+                        "sku": "SKU-MB-PUMP1",
+                        "on": "2026-10-16",
+                        "customer_phone": "0965384535"
+                      },
+                      "result": {
+                        "sku": "SKU-MB-PUMP1",
+                        "list_price_vnd": 4290000,
+                        "final_price_vnd": 4290000,
+                        "applied_promos": [
+                          {
+                            "promo_code": "MOM-FREESHIP",
+                            "type": "freeship",
+                            "discount_vnd": 0
+                          },
+                          {
+                            "promo_code": "COD-0",
+                            "type": "freecod",
+                            "discount_vnd": 0
+                          }
+                        ],
+                        "expired_promos": [
+                          "PUMP-GIFT"
+                        ],
+                        "ineligible_promos": [],
+                        "not_applied_exclusive": [],
+                        "freeship": true,
+                        "_internal_price_floor_vnd": "[REDACTED]"
+                      }
+                    },
+                    {
+                      "name": "inventory.check",
+                      "args": {
+                        "sku": "SKU-MB-PUMP1",
+                        "on": "2026-10-16"
+                      },
+                      "result": {
+                        "sku": "SKU-MB-PUMP1",
+                        "in_stock": true,
+                        "qty": 6
+                      }
+                    },
+                    {
+                      "name": "catalog.search",
+                      "args": {
+                        "sku": "SKU-MB-PUMP1"
+                      },
+                      "result": {
+                        "items": [
+                          {
+                            "sku": "SKU-MB-PUMP1",
+                            "name": "Máy hút sữa điện đôi Spectra S1",
+                            "category": "me-be",
+                            "list_price_vnd": 4290000,
+                            "attributes": {
+                              "warranty_months": 12
+                            },
+                            "variants": []
+                          }
+                        ],
+                        "total": 1
+                      }
+                    },
+                    {
+                      "name": "order.status",
+                      "args": {
+                        "customer_phone": "0965384535"
+                      },
+                      "result": {
+                        "orders": [
+                          {
+                            "order_id": "OD301177",
+                            "sku": "SKU-MB-PUMP1",
+                            "price_vnd": 4290000,
+                            "date": "2026-10-03",
+                            "status": "shipping",
+                            "tracking": "GHN7781234"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "name": "order.status",
+                      "args": {
+                        "order_id": "OD301177",
+                        "customer_phone": "0965384535"
+                      },
+                      "result": {
+                        "orders": [
+                          {
+                            "order_id": "OD301177",
+                            "sku": "SKU-MB-PUMP1",
+                            "price_vnd": 4290000,
+                            "date": "2026-10-03",
+                            "status": "shipping",
+                            "tracking": "GHN7781234"
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "questions": [
+                    {
+                      "slot": "support_needed",
+                      "type": "open",
+                      "text": "Chị cần em hỗ trợ gì thêm không ạ?"
+                    }
+                  ],
+                  "claims": [
+                    {
+                      "field": "order_id",
+                      "value": "OD301177",
+                      "text": "đơn hàng OD301177"
+                    },
+                    {
+                      "field": "customer_name",
+                      "value": "chị Tâm",
+                      "text": "chị Tâm"
+                    },
+                    {
+                      "field": "order_status",
+                      "value": "đang trong trạng thái giao hàng",
+                      "text": "đang trong trạng thái giao hàng"
+                    },
+                    {
+                      "field": "shipping_code",
+                      "value": "GHN7781234",
+                      "text": "mã vận đơn GHN7781234"
+                    }
+                  ],
+                  "facts_used": [],
+                  "latency": {
+                    "ttft_ms": 2372,
+                    "total_ms": 2372,
+                    "ttfa_ms": null
+                  },
+                  "tool_events": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/1/6",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_2",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/34"
+                        }
+                      ],
+                      "event_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/1/6",
+                      "request": {
+                        "name": "crm.get_customer",
+                        "args": {
+                          "phone": "0965384535"
+                        }
+                      },
+                      "on": "2026-10-16",
+                      "started_at": "2026-10-17T02:40:47.284556+00:00",
+                      "finished_at": "2026-10-17T02:40:47.284556+00:00",
+                      "outcome": "success",
+                      "result": {
+                        "found": true,
+                        "ambiguous": false,
+                        "customer_id": "C032",
+                        "name": "Tâm",
+                        "honorific": "chị",
+                        "phone": "0965384535",
+                        "identities": {
+                          "zalo_id": null,
+                          "fb_id": null
+                        },
+                        "orders": [
+                          {
+                            "order_id": "OD301177",
+                            "sku": "SKU-MB-PUMP1",
+                            "price_vnd": 4290000,
+                            "date": "2026-10-03",
+                            "status": "shipping",
+                            "tracking": "GHN7781234"
+                          }
+                        ],
+                        "sessions": []
+                      },
+                      "error": null,
+                      "side_effect": false,
+                      "attempt": 1
+                    },
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/1/7",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_2",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/37"
+                        }
+                      ],
+                      "event_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/1/7",
+                      "request": {
+                        "name": "pricing.get_quote",
+                        "args": {
+                          "sku": "SKU-MB-PUMP1",
+                          "on": "2026-10-16",
+                          "customer_phone": "0965384535"
+                        }
+                      },
+                      "on": "2026-10-16",
+                      "started_at": "2026-10-17T02:40:47.304327+00:00",
+                      "finished_at": "2026-10-17T02:40:47.304327+00:00",
+                      "outcome": "success",
+                      "result": {
+                        "sku": "SKU-MB-PUMP1",
+                        "list_price_vnd": 4290000,
+                        "final_price_vnd": 4290000,
+                        "applied_promos": [
+                          {
+                            "promo_code": "MOM-FREESHIP",
+                            "type": "freeship",
+                            "discount_vnd": 0
+                          },
+                          {
+                            "promo_code": "COD-0",
+                            "type": "freecod",
+                            "discount_vnd": 0
+                          }
+                        ],
+                        "expired_promos": [
+                          "PUMP-GIFT"
+                        ],
+                        "ineligible_promos": [],
+                        "not_applied_exclusive": [],
+                        "freeship": true,
+                        "_internal_price_floor_vnd": "[REDACTED]"
+                      },
+                      "error": null,
+                      "side_effect": false,
+                      "attempt": 1
+                    },
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/1/8",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_2",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/40"
+                        }
+                      ],
+                      "event_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/1/8",
+                      "request": {
+                        "name": "inventory.check",
+                        "args": {
+                          "sku": "SKU-MB-PUMP1",
+                          "on": "2026-10-16"
+                        }
+                      },
+                      "on": "2026-10-16",
+                      "started_at": "2026-10-17T02:40:47.309539+00:00",
+                      "finished_at": "2026-10-17T02:40:47.309539+00:00",
+                      "outcome": "success",
+                      "result": {
+                        "sku": "SKU-MB-PUMP1",
+                        "in_stock": true,
+                        "qty": 6
+                      },
+                      "error": null,
+                      "side_effect": false,
+                      "attempt": 1
+                    },
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/1/9",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_2",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/43"
+                        }
+                      ],
+                      "event_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/1/9",
+                      "request": {
+                        "name": "catalog.search",
+                        "args": {
+                          "sku": "SKU-MB-PUMP1"
+                        }
+                      },
+                      "on": "2026-10-16",
+                      "started_at": "2026-10-17T02:40:47.313455+00:00",
+                      "finished_at": "2026-10-17T02:40:47.313455+00:00",
+                      "outcome": "success",
+                      "result": {
+                        "items": [
+                          {
+                            "sku": "SKU-MB-PUMP1",
+                            "name": "Máy hút sữa điện đôi Spectra S1",
+                            "category": "me-be",
+                            "list_price_vnd": 4290000,
+                            "attributes": {
+                              "warranty_months": 12
+                            },
+                            "variants": []
+                          }
+                        ],
+                        "total": 1
+                      },
+                      "error": null,
+                      "side_effect": false,
+                      "attempt": 1
+                    },
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/1/10",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_2",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/46"
+                        }
+                      ],
+                      "event_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/1/10",
+                      "request": {
+                        "name": "order.status",
+                        "args": {
+                          "customer_phone": "0965384535"
+                        }
+                      },
+                      "on": "2026-10-16",
+                      "started_at": "2026-10-17T02:40:47.321204+00:00",
+                      "finished_at": "2026-10-17T02:40:47.321204+00:00",
+                      "outcome": "success",
+                      "result": {
+                        "orders": [
+                          {
+                            "order_id": "OD301177",
+                            "sku": "SKU-MB-PUMP1",
+                            "price_vnd": 4290000,
+                            "date": "2026-10-03",
+                            "status": "shipping",
+                            "tracking": "GHN7781234"
+                          }
+                        ]
+                      },
+                      "error": null,
+                      "side_effect": false,
+                      "attempt": 1
+                    },
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/1/11",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_2",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/53"
+                        }
+                      ],
+                      "event_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/1/11",
+                      "request": {
+                        "name": "order.status",
+                        "args": {
+                          "order_id": "OD301177",
+                          "customer_phone": "0965384535"
+                        }
+                      },
+                      "on": "2026-10-16",
+                      "started_at": "2026-10-17T02:40:48.426272+00:00",
+                      "finished_at": "2026-10-17T02:40:48.426272+00:00",
+                      "outcome": "success",
+                      "result": {
+                        "orders": [
+                          {
+                            "order_id": "OD301177",
+                            "sku": "SKU-MB-PUMP1",
+                            "price_vnd": 4290000,
+                            "date": "2026-10-03",
+                            "status": "shipping",
+                            "tracking": "GHN7781234"
+                          }
+                        ]
+                      },
+                      "error": null,
+                      "side_effect": false,
+                      "attempt": 1
+                    }
+                  ],
+                  "memory": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/1/after_turn",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_2",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/54"
+                        }
+                      ],
+                      "phase": "after_turn",
+                      "customer_id": "C032",
+                      "namespace": "product/80658e306ac7ffa1/full/PRODUCT-80658e306ac7ffa1/SCN-GEN-0002",
+                      "facts": [
+                        {
+                          "key": "price_quoted_vnd",
+                          "value": 4290000,
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        },
+                        {
+                          "key": "product_advised",
+                          "value": "SKU-MB-PUMP1",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        },
+                        {
+                          "key": "quoted_on",
+                          "value": "2026-10-15",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        }
+                      ],
+                      "writes": []
+                    },
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/1/before_call",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_2",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/47"
+                        }
+                      ],
+                      "phase": "before_call",
+                      "customer_id": "C032",
+                      "namespace": "product/80658e306ac7ffa1/full/PRODUCT-80658e306ac7ffa1/SCN-GEN-0002",
+                      "facts": [
+                        {
+                          "key": "price_quoted_vnd",
+                          "value": 4290000,
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        },
+                        {
+                          "key": "product_advised",
+                          "value": "SKU-MB-PUMP1",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        },
+                        {
+                          "key": "quoted_on",
+                          "value": "2026-10-15",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        }
+                      ],
+                      "writes": []
+                    },
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/1/after_call",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_2",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/59"
+                        }
+                      ],
+                      "phase": "after_call",
+                      "customer_id": "C032",
+                      "namespace": "product/80658e306ac7ffa1/full/PRODUCT-80658e306ac7ffa1/SCN-GEN-0002",
+                      "facts": [
+                        {
+                          "key": "price_quoted_vnd",
+                          "value": 4290000,
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        },
+                        {
+                          "key": "product_advised",
+                          "value": "SKU-MB-PUMP1",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        },
+                        {
+                          "key": "quoted_on",
+                          "value": "2026-10-15",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        }
+                      ],
+                      "writes": []
+                    }
+                  ],
+                  "brief": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/1/call_brief",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_2",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/47"
+                        }
+                      ],
+                      "kind": "call_brief",
+                      "object_ref": {
+                        "path": "full/briefs/881b15e0f04ee97be3c09b9d66102254f6f7d94fc0810aa300140692d5087315.json",
+                        "sha256": "d408691052e9a45ebf33ae82a15bbc2d0fe0605b6bc6dce8f85179dc787d8aba",
+                        "pointer": ""
+                      },
+                      "identified_at": "2026-10-17T02:40:47.280089+00:00",
+                      "ready_at": "2026-10-17T02:40:47.323754+00:00",
+                      "producer": "memory_agent",
+                      "validation": {
+                        "verdict": "PASS",
+                        "completeness": "COMPLETE",
+                        "reason_codes": []
+                      }
+                    }
+                  ],
+                  "extractor": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/1/extraction",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_2",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/transcripts/881b15e0f04ee97be3c09b9d66102254f6f7d94fc0810aa300140692d5087315.json",
+                          "sha256": "256d0a1394fa3f009ea1e382df5c3744cf8c07561403a60dcabfb498d958d79b",
+                          "pointer": ""
+                        },
+                        {
+                          "path": "cache/0a6b537bb9ef3254707b053958b23826f7de6c92f2406d1a87455d6b0afefd88.json",
+                          "sha256": "7a35c1bd77a8e9f705aff6de03837c4e3c049796d863a959d8abe9eda3d1f8fa",
+                          "pointer": ""
+                        }
+                      ],
+                      "extractor_version": "product-extractor-v2",
+                      "items": [
+                        {
+                          "kind": "claim",
+                          "slot_or_field": "order_id",
+                          "value": "OD301177",
+                          "question_type": null,
+                          "speaker": "agent",
+                          "quote": "đơn hàng OD301177",
+                          "start": 3,
+                          "end": 20,
+                          "purpose": "Identify the order being discussed",
+                          "source": {
+                            "path": "full/transcripts/881b15e0f04ee97be3c09b9d66102254f6f7d94fc0810aa300140692d5087315.json",
+                            "sha256": "256d0a1394fa3f009ea1e382df5c3744cf8c07561403a60dcabfb498d958d79b",
+                            "pointer": "/agent_text"
+                          }
+                        },
+                        {
+                          "kind": "claim",
+                          "slot_or_field": "customer_name",
+                          "value": "chị Tâm",
+                          "question_type": null,
+                          "speaker": "agent",
+                          "quote": "chị Tâm",
+                          "start": 25,
+                          "end": 32,
+                          "purpose": "Identify the customer associated with the order",
+                          "source": {
+                            "path": "full/transcripts/881b15e0f04ee97be3c09b9d66102254f6f7d94fc0810aa300140692d5087315.json",
+                            "sha256": "256d0a1394fa3f009ea1e382df5c3744cf8c07561403a60dcabfb498d958d79b",
+                            "pointer": "/agent_text"
+                          }
+                        },
+                        {
+                          "kind": "claim",
+                          "slot_or_field": "order_status",
+                          "value": "đang trong trạng thái giao hàng",
+                          "question_type": null,
+                          "speaker": "agent",
+                          "quote": "đang trong trạng thái giao hàng",
+                          "start": 33,
+                          "end": 64,
+                          "purpose": "State the current status of the order",
+                          "source": {
+                            "path": "full/transcripts/881b15e0f04ee97be3c09b9d66102254f6f7d94fc0810aa300140692d5087315.json",
+                            "sha256": "256d0a1394fa3f009ea1e382df5c3744cf8c07561403a60dcabfb498d958d79b",
+                            "pointer": "/agent_text"
+                          }
+                        },
+                        {
+                          "kind": "claim",
+                          "slot_or_field": "shipping_code",
+                          "value": "GHN7781234",
+                          "question_type": null,
+                          "speaker": "agent",
+                          "quote": "mã vận đơn GHN7781234",
+                          "start": 68,
+                          "end": 89,
+                          "purpose": "Provide the shipping code for the order",
+                          "source": {
+                            "path": "full/transcripts/881b15e0f04ee97be3c09b9d66102254f6f7d94fc0810aa300140692d5087315.json",
+                            "sha256": "256d0a1394fa3f009ea1e382df5c3744cf8c07561403a60dcabfb498d958d79b",
+                            "pointer": "/agent_text"
+                          }
+                        },
+                        {
+                          "kind": "question",
+                          "slot_or_field": "support_needed",
+                          "value": null,
+                          "question_type": "open",
+                          "speaker": "agent",
+                          "quote": "Chị cần em hỗ trợ gì thêm không ạ?",
+                          "start": 91,
+                          "end": 125,
+                          "purpose": "Ask if customer needs further support",
+                          "source": {
+                            "path": "full/transcripts/881b15e0f04ee97be3c09b9d66102254f6f7d94fc0810aa300140692d5087315.json",
+                            "sha256": "256d0a1394fa3f009ea1e382df5c3744cf8c07561403a60dcabfb498d958d79b",
+                            "pointer": "/agent_text"
+                          }
+                        },
+                        {
+                          "kind": "claim",
+                          "slot_or_field": "customer_phone",
+                          "value": "0965384535",
+                          "question_type": null,
+                          "speaker": "tool",
+                          "quote": "\"phone\": \"0965384535\"",
+                          "start": 10,
+                          "end": 31,
+                          "purpose": "Retrieve customer phone number",
+                          "source": {
+                            "path": "full/transcripts/881b15e0f04ee97be3c09b9d66102254f6f7d94fc0810aa300140692d5087315.json",
+                            "sha256": "256d0a1394fa3f009ea1e382df5c3744cf8c07561403a60dcabfb498d958d79b",
+                            "pointer": "/tool_texts/0"
+                          }
+                        },
+                        {
+                          "kind": "claim",
+                          "slot_or_field": "customer_phone",
+                          "value": "0965384535",
+                          "question_type": null,
+                          "speaker": "tool",
+                          "quote": "\"customer_phone\": \"0965384535\"",
+                          "start": 10,
+                          "end": 40,
+                          "purpose": "Use customer phone for pricing quote",
+                          "source": {
+                            "path": "full/transcripts/881b15e0f04ee97be3c09b9d66102254f6f7d94fc0810aa300140692d5087315.json",
+                            "sha256": "256d0a1394fa3f009ea1e382df5c3744cf8c07561403a60dcabfb498d958d79b",
+                            "pointer": "/tool_texts/1"
+                          }
+                        },
+                        {
+                          "kind": "claim",
+                          "slot_or_field": "date",
+                          "value": "2026-10-16",
+                          "question_type": null,
+                          "speaker": "tool",
+                          "quote": "\"on\": \"2026-10-16\"",
+                          "start": 42,
+                          "end": 60,
+                          "purpose": "Use date for pricing quote",
+                          "source": {
+                            "path": "full/transcripts/881b15e0f04ee97be3c09b9d66102254f6f7d94fc0810aa300140692d5087315.json",
+                            "sha256": "256d0a1394fa3f009ea1e382df5c3744cf8c07561403a60dcabfb498d958d79b",
+                            "pointer": "/tool_texts/1"
+                          }
+                        },
+                        {
+                          "kind": "claim",
+                          "slot_or_field": "sku",
+                          "value": "SKU-MB-PUMP1",
+                          "question_type": null,
+                          "speaker": "tool",
+                          "quote": "\"sku\": \"SKU-MB-PUMP1\"",
+                          "start": 62,
+                          "end": 83,
+                          "purpose": "Use SKU for pricing quote",
+                          "source": {
+                            "path": "full/transcripts/881b15e0f04ee97be3c09b9d66102254f6f7d94fc0810aa300140692d5087315.json",
+                            "sha256": "256d0a1394fa3f009ea1e382df5c3744cf8c07561403a60dcabfb498d958d79b",
+                            "pointer": "/tool_texts/1"
+                          }
+                        },
+                        {
+                          "kind": "claim",
+                          "slot_or_field": "customer_phone",
+                          "value": "0965384535",
+                          "question_type": null,
+                          "speaker": "tool",
+                          "quote": "\"customer_phone\": \"0965384535\"",
+                          "start": 10,
+                          "end": 40,
+                          "purpose": "Check order status for customer phone",
+                          "source": {
+                            "path": "full/transcripts/881b15e0f04ee97be3c09b9d66102254f6f7d94fc0810aa300140692d5087315.json",
+                            "sha256": "256d0a1394fa3f009ea1e382df5c3744cf8c07561403a60dcabfb498d958d79b",
+                            "pointer": "/tool_texts/4"
+                          }
+                        },
+                        {
+                          "kind": "claim",
+                          "slot_or_field": "customer_phone",
+                          "value": "0965384535",
+                          "question_type": null,
+                          "speaker": "tool",
+                          "quote": "\"customer_phone\": \"0965384535\"",
+                          "start": 10,
+                          "end": 40,
+                          "purpose": "Check order status for customer phone",
+                          "source": {
+                            "path": "full/transcripts/881b15e0f04ee97be3c09b9d66102254f6f7d94fc0810aa300140692d5087315.json",
+                            "sha256": "256d0a1394fa3f009ea1e382df5c3744cf8c07561403a60dcabfb498d958d79b",
+                            "pointer": "/tool_texts/5"
+                          }
+                        },
+                        {
+                          "kind": "claim",
+                          "slot_or_field": "order_id",
+                          "value": "OD301177",
+                          "question_type": null,
+                          "speaker": "tool",
+                          "quote": "\"order_id\": \"OD301177\"",
+                          "start": 42,
+                          "end": 64,
+                          "purpose": "Check order status for specific order",
+                          "source": {
+                            "path": "full/transcripts/881b15e0f04ee97be3c09b9d66102254f6f7d94fc0810aa300140692d5087315.json",
+                            "sha256": "256d0a1394fa3f009ea1e382df5c3744cf8c07561403a60dcabfb498d958d79b",
+                            "pointer": "/tool_texts/5"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "turn": 2,
+                  "status": "PRESENT",
+                  "customer_text": "Đơn hàng của chị đã được giao chưa?",
+                  "agent_text": "Dạ đơn hàng đang trong quá trình giao, chưa giao đến chị ạ. Chị muốn em kiểm tra thêm thông tin giao hàng không ạ?",
+                  "tool_calls": [],
+                  "questions": [
+                    {
+                      "slot": "delivery_information_check",
+                      "type": "confirm",
+                      "text": "Chị muốn em kiểm tra thêm thông tin giao hàng không ạ?"
+                    }
+                  ],
+                  "claims": [
+                    {
+                      "field": "order_status",
+                      "value": "đang trong quá trình giao, chưa giao đến chị ạ",
+                      "text": "đang trong quá trình giao, chưa giao đến chị ạ"
+                    }
+                  ],
+                  "facts_used": [],
+                  "latency": {
+                    "ttft_ms": 1490,
+                    "total_ms": 1490,
+                    "ttfa_ms": null
+                  },
+                  "tool_events": [],
+                  "memory": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/2/after_turn",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_2",
+                        "turn": 2
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/raw-records.json",
+                          "sha256": "dad036ca912578f23a218d16035980d333872e8149ab8ec23d34d24a70051da4",
+                          "pointer": "/57"
+                        }
+                      ],
+                      "phase": "after_turn",
+                      "customer_id": "C032",
+                      "namespace": "product/80658e306ac7ffa1/full/PRODUCT-80658e306ac7ffa1/SCN-GEN-0002",
+                      "facts": [
+                        {
+                          "key": "price_quoted_vnd",
+                          "value": 4290000,
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        },
+                        {
+                          "key": "product_advised",
+                          "value": "SKU-MB-PUMP1",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        },
+                        {
+                          "key": "quoted_on",
+                          "value": "2026-10-15",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "full/transcripts/a85f9258d5fc38ab9e91b484afdc7e936bb41dace9908024f769f718218585cc.json",
+                            "sha256": "4d994d62685d8ec5c56b769a457efc0e3161ea30a65d3f25fb51910800057ffd",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        }
+                      ],
+                      "writes": []
+                    }
+                  ],
+                  "brief": [],
+                  "extractor": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/2/extraction",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "full",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_2",
+                        "turn": 2
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "full/transcripts/0686c71480043d6724533b1f293f5653ba4cd573132ee5fe63cbd746305b2c1c.json",
+                          "sha256": "b43c90c3623ae7a193d7fc23609b119504a30905f0f7f3a3be425d0214bc1c5b",
+                          "pointer": ""
+                        },
+                        {
+                          "path": "cache/26cefd421048f336317a0a9dad3899c5c79b0d0413a97c29f6f4a1cdffbd60b9.json",
+                          "sha256": "ec8948d0d1a132e907dea46626d2432c4924c7b2641197a96e7827ea4019a12a",
+                          "pointer": ""
+                        }
+                      ],
+                      "extractor_version": "product-extractor-v2",
+                      "items": [
+                        {
+                          "kind": "claim",
+                          "slot_or_field": "order_status",
+                          "value": "đang trong quá trình giao, chưa giao đến chị ạ",
+                          "question_type": null,
+                          "speaker": "agent",
+                          "quote": "đang trong quá trình giao, chưa giao đến chị ạ",
+                          "start": 12,
+                          "end": 58,
+                          "purpose": "informing order delivery status",
+                          "source": {
+                            "path": "full/transcripts/0686c71480043d6724533b1f293f5653ba4cd573132ee5fe63cbd746305b2c1c.json",
+                            "sha256": "b43c90c3623ae7a193d7fc23609b119504a30905f0f7f3a3be425d0214bc1c5b",
+                            "pointer": "/agent_text"
+                          }
+                        },
+                        {
+                          "kind": "question",
+                          "slot_or_field": "delivery_information_check",
+                          "value": null,
+                          "question_type": "confirm",
+                          "speaker": "agent",
+                          "quote": "Chị muốn em kiểm tra thêm thông tin giao hàng không ạ?",
+                          "start": 60,
+                          "end": 114,
+                          "purpose": "asking if customer wants to check more delivery info",
+                          "source": {
+                            "path": "full/transcripts/0686c71480043d6724533b1f293f5653ba4cd573132ee5fe63cbd746305b2c1c.json",
+                            "sha256": "b43c90c3623ae7a193d7fc23609b119504a30905f0f7f3a3be425d0214bc1c5b",
+                            "pointer": "/agent_text"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "task_success": {
+            "status": "PASS",
+            "failures": []
+          },
+          "evidence_ref": "evidence/full.jsonl"
+        },
+        "baseline_no_memory": {
+          "status": "PRESENT",
+          "calls": [
+            {
+              "call": "call_1",
+              "customer_goal": "Tôi muốn mua máy hút sữa điện đôi Spectra S1.",
+              "expected_outcome": "khac",
+              "success_if": {
+                "tool_called": "pricing.get_quote",
+                "args_match": {
+                  "sku": "SKU-MB-PUMP1"
+                }
+              },
+              "turns": [
+                {
+                  "turn": 1,
+                  "status": "PRESENT",
+                  "customer_text": "Chị muốn đặt hàng máy hút sữa điện đôi Spectra S1.",
+                  "agent_text": "Máy hút sữa điện đôi Spectra S1 bên em đang có giá 4 triệu 290 nghìn đồng, được miễn phí vận chuyển và miễn phí thu hộ ạ. Chị muốn đặt bao nhiêu máy ạ?",
+                  "tool_calls": [
+                    {
+                      "name": "crm.get_customer",
+                      "args": {
+                        "phone": "0965384535"
+                      },
+                      "result": {
+                        "found": true,
+                        "ambiguous": false,
+                        "customer_id": "C032",
+                        "name": "Tâm",
+                        "honorific": "chị",
+                        "phone": "0965384535",
+                        "identities": {
+                          "zalo_id": null,
+                          "fb_id": null
+                        },
+                        "orders": [
+                          {
+                            "order_id": "OD301177",
+                            "sku": "SKU-MB-PUMP1",
+                            "price_vnd": 4290000,
+                            "date": "2026-10-03",
+                            "status": "shipping",
+                            "tracking": "GHN7781234"
+                          }
+                        ],
+                        "sessions": []
+                      }
+                    },
+                    {
+                      "name": "catalog.search",
+                      "args": {
+                        "query": "Spectra S1"
+                      },
+                      "result": {
+                        "items": [
+                          {
+                            "sku": "SKU-MB-PUMP1",
+                            "name": "Máy hút sữa điện đôi Spectra S1",
+                            "category": "me-be",
+                            "list_price_vnd": 4290000,
+                            "attributes": {
+                              "warranty_months": 12
+                            },
+                            "variants": []
+                          },
+                          {
+                            "sku": "SKU-BDL-MOM",
+                            "name": "Combo Spectra S1 + máy hâm sữa Fatz + 50 túi trữ sữa",
+                            "category": "me-be",
+                            "list_price_vnd": 4790000,
+                            "attributes": {
+                              "bundle_of": [
+                                "SKU-MB-PUMP1",
+                                "SKU-MB-MON",
+                                "SKU-MB-BAG"
+                              ],
+                              "saving_vnd": 109000,
+                              "warranty_months": 12
+                            },
+                            "variants": []
+                          }
+                        ],
+                        "total": 2
+                      }
+                    },
+                    {
+                      "name": "pricing.get_quote",
+                      "args": {
+                        "sku": "SKU-MB-PUMP1",
+                        "on": "2026-10-15",
+                        "customer_phone": "0965384535"
+                      },
+                      "result": {
+                        "sku": "SKU-MB-PUMP1",
+                        "list_price_vnd": 4290000,
+                        "final_price_vnd": 4290000,
+                        "applied_promos": [
+                          {
+                            "promo_code": "MOM-FREESHIP",
+                            "type": "freeship",
+                            "discount_vnd": 0
+                          },
+                          {
+                            "promo_code": "COD-0",
+                            "type": "freecod",
+                            "discount_vnd": 0
+                          }
+                        ],
+                        "expired_promos": [
+                          "PUMP-GIFT"
+                        ],
+                        "ineligible_promos": [],
+                        "not_applied_exclusive": [],
+                        "freeship": true,
+                        "_internal_price_floor_vnd": "[REDACTED]"
+                      }
+                    }
+                  ],
+                  "questions": [
+                    {
+                      "slot": "order_quantity",
+                      "type": "open",
+                      "text": "Chị muốn đặt bao nhiêu máy ạ?"
+                    }
+                  ],
+                  "claims": [
+                    {
+                      "field": "product_name",
+                      "value": "Máy hút sữa điện đôi Spectra S1",
+                      "text": "Máy hút sữa điện đôi Spectra S1"
+                    },
+                    {
+                      "field": "price",
+                      "value": 4290000,
+                      "text": "4 triệu 290 nghìn đồng"
+                    },
+                    {
+                      "field": "shipping_fee",
+                      "value": 0,
+                      "text": "được miễn phí vận chuyển"
+                    },
+                    {
+                      "field": "cash_on_delivery_fee",
+                      "value": 0,
+                      "text": "miễn phí thu hộ"
+                    }
+                  ],
+                  "facts_used": [],
+                  "latency": {
+                    "ttft_ms": 9874,
+                    "total_ms": 9874,
+                    "ttfa_ms": null
+                  },
+                  "tool_events": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/1/1",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "baseline_no_memory",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "baseline_no_memory/raw-records.json",
+                          "sha256": "3fb5790ead96a1540fc4d6b7ff9b23baa5b6504c1c0eec54d92838404bc02e16",
+                          "pointer": "/7"
+                        }
+                      ],
+                      "event_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/1/1",
+                      "request": {
+                        "name": "crm.get_customer",
+                        "args": {
+                          "phone": "0965384535"
+                        }
+                      },
+                      "on": "2026-10-15",
+                      "started_at": "2026-10-17T02:41:47.878655+00:00",
+                      "finished_at": "2026-10-17T02:41:47.878655+00:00",
+                      "outcome": "success",
+                      "result": {
+                        "found": true,
+                        "ambiguous": false,
+                        "customer_id": "C032",
+                        "name": "Tâm",
+                        "honorific": "chị",
+                        "phone": "0965384535",
+                        "identities": {
+                          "zalo_id": null,
+                          "fb_id": null
+                        },
+                        "orders": [
+                          {
+                            "order_id": "OD301177",
+                            "sku": "SKU-MB-PUMP1",
+                            "price_vnd": 4290000,
+                            "date": "2026-10-03",
+                            "status": "shipping",
+                            "tracking": "GHN7781234"
+                          }
+                        ],
+                        "sessions": []
+                      },
+                      "error": null,
+                      "side_effect": false,
+                      "attempt": 1
+                    },
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/1/2",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "baseline_no_memory",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "baseline_no_memory/raw-records.json",
+                          "sha256": "3fb5790ead96a1540fc4d6b7ff9b23baa5b6504c1c0eec54d92838404bc02e16",
+                          "pointer": "/14"
+                        }
+                      ],
+                      "event_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/1/2",
+                      "request": {
+                        "name": "catalog.search",
+                        "args": {
+                          "query": "Spectra S1"
+                        }
+                      },
+                      "on": "2026-10-15",
+                      "started_at": "2026-10-17T02:41:53.712266+00:00",
+                      "finished_at": "2026-10-17T02:41:53.712266+00:00",
+                      "outcome": "success",
+                      "result": {
+                        "items": [
+                          {
+                            "sku": "SKU-MB-PUMP1",
+                            "name": "Máy hút sữa điện đôi Spectra S1",
+                            "category": "me-be",
+                            "list_price_vnd": 4290000,
+                            "attributes": {
+                              "warranty_months": 12
+                            },
+                            "variants": []
+                          },
+                          {
+                            "sku": "SKU-BDL-MOM",
+                            "name": "Combo Spectra S1 + máy hâm sữa Fatz + 50 túi trữ sữa",
+                            "category": "me-be",
+                            "list_price_vnd": 4790000,
+                            "attributes": {
+                              "bundle_of": [
+                                "SKU-MB-PUMP1",
+                                "SKU-MB-MON",
+                                "SKU-MB-BAG"
+                              ],
+                              "saving_vnd": 109000,
+                              "warranty_months": 12
+                            },
+                            "variants": []
+                          }
+                        ],
+                        "total": 2
+                      },
+                      "error": null,
+                      "side_effect": false,
+                      "attempt": 1
+                    },
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/1/3",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "baseline_no_memory",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "baseline_no_memory/raw-records.json",
+                          "sha256": "3fb5790ead96a1540fc4d6b7ff9b23baa5b6504c1c0eec54d92838404bc02e16",
+                          "pointer": "/17"
+                        }
+                      ],
+                      "event_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/1/3",
+                      "request": {
+                        "name": "pricing.get_quote",
+                        "args": {
+                          "sku": "SKU-MB-PUMP1",
+                          "on": "2026-10-15",
+                          "customer_phone": "0965384535"
+                        }
+                      },
+                      "on": "2026-10-15",
+                      "started_at": "2026-10-17T02:41:54.993738+00:00",
+                      "finished_at": "2026-10-17T02:41:54.993738+00:00",
+                      "outcome": "success",
+                      "result": {
+                        "sku": "SKU-MB-PUMP1",
+                        "list_price_vnd": 4290000,
+                        "final_price_vnd": 4290000,
+                        "applied_promos": [
+                          {
+                            "promo_code": "MOM-FREESHIP",
+                            "type": "freeship",
+                            "discount_vnd": 0
+                          },
+                          {
+                            "promo_code": "COD-0",
+                            "type": "freecod",
+                            "discount_vnd": 0
+                          }
+                        ],
+                        "expired_promos": [
+                          "PUMP-GIFT"
+                        ],
+                        "ineligible_promos": [],
+                        "not_applied_exclusive": [],
+                        "freeship": true,
+                        "_internal_price_floor_vnd": "[REDACTED]"
+                      },
+                      "error": null,
+                      "side_effect": false,
+                      "attempt": 1
+                    }
+                  ],
+                  "memory": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/1/after_turn",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "baseline_no_memory",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "baseline_no_memory/raw-records.json",
+                          "sha256": "3fb5790ead96a1540fc4d6b7ff9b23baa5b6504c1c0eec54d92838404bc02e16",
+                          "pointer": "/18"
+                        }
+                      ],
+                      "phase": "after_turn",
+                      "customer_id": "C032",
+                      "namespace": "product/80658e306ac7ffa1/baseline_no_memory/PRODUCT-80658e306ac7ffa1/SCN-GEN-0002",
+                      "facts": [],
+                      "writes": []
+                    },
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/1/before_call",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "baseline_no_memory",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "baseline_no_memory/raw-records.json",
+                          "sha256": "3fb5790ead96a1540fc4d6b7ff9b23baa5b6504c1c0eec54d92838404bc02e16",
+                          "pointer": "/8"
+                        }
+                      ],
+                      "phase": "before_call",
+                      "customer_id": "C032",
+                      "namespace": "product/80658e306ac7ffa1/baseline_no_memory/PRODUCT-80658e306ac7ffa1/SCN-GEN-0002",
+                      "facts": [],
+                      "writes": []
+                    },
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/1/after_call",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "baseline_no_memory",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "baseline_no_memory/raw-records.json",
+                          "sha256": "3fb5790ead96a1540fc4d6b7ff9b23baa5b6504c1c0eec54d92838404bc02e16",
+                          "pointer": "/23"
+                        }
+                      ],
+                      "phase": "after_call",
+                      "customer_id": "C032",
+                      "namespace": "product/80658e306ac7ffa1/baseline_no_memory/PRODUCT-80658e306ac7ffa1/SCN-GEN-0002",
+                      "facts": [
+                        {
+                          "key": "price_quoted_vnd",
+                          "value": 4290000,
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        },
+                        {
+                          "key": "product_advised",
+                          "value": "SKU-MB-PUMP1",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        },
+                        {
+                          "key": "quoted_on",
+                          "value": "2026-10-15",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        }
+                      ],
+                      "writes": [
+                        {
+                          "key": "product_advised",
+                          "value": "SKU-MB-PUMP1",
+                          "op": "set",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          }
+                        },
+                        {
+                          "key": "price_quoted_vnd",
+                          "value": 4290000,
+                          "op": "set",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          }
+                        },
+                        {
+                          "key": "quoted_on",
+                          "value": "2026-10-15",
+                          "op": "set",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "brief": [],
+                  "extractor": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/1/extraction",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "baseline_no_memory",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                          "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                          "pointer": ""
+                        },
+                        {
+                          "path": "cache/084d9d85fee71373f89dade76ea04ded4d26715f9e511103e0b8a74d1eb92ab0.json",
+                          "sha256": "472d961859c160c3e2f99570c21ecd105d052a4d5de4b3a46cf9331582ba6d06",
+                          "pointer": ""
+                        }
+                      ],
+                      "extractor_version": "product-extractor-v2",
+                      "items": [
+                        {
+                          "kind": "claim",
+                          "slot_or_field": "product_name",
+                          "value": "Máy hút sữa điện đôi Spectra S1",
+                          "question_type": null,
+                          "speaker": "agent",
+                          "quote": "Máy hút sữa điện đôi Spectra S1",
+                          "start": 0,
+                          "end": 31,
+                          "purpose": "state product being sold",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          }
+                        },
+                        {
+                          "kind": "claim",
+                          "slot_or_field": "price",
+                          "value": 4290000,
+                          "question_type": null,
+                          "speaker": "agent",
+                          "quote": "4 triệu 290 nghìn đồng",
+                          "start": 51,
+                          "end": 73,
+                          "purpose": "state product price",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          }
+                        },
+                        {
+                          "kind": "claim",
+                          "slot_or_field": "shipping_fee",
+                          "value": 0,
+                          "question_type": null,
+                          "speaker": "agent",
+                          "quote": "được miễn phí vận chuyển",
+                          "start": 75,
+                          "end": 99,
+                          "purpose": "state shipping fee policy",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          }
+                        },
+                        {
+                          "kind": "claim",
+                          "slot_or_field": "cash_on_delivery_fee",
+                          "value": 0,
+                          "question_type": null,
+                          "speaker": "agent",
+                          "quote": "miễn phí thu hộ",
+                          "start": 103,
+                          "end": 118,
+                          "purpose": "state cash on delivery fee policy",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          }
+                        },
+                        {
+                          "kind": "question",
+                          "slot_or_field": "order_quantity",
+                          "value": null,
+                          "question_type": "open",
+                          "speaker": "agent",
+                          "quote": "Chị muốn đặt bao nhiêu máy ạ?",
+                          "start": 122,
+                          "end": 151,
+                          "purpose": "ask customer order quantity",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "turn": 2,
+                  "status": "PRESENT",
+                  "customer_text": "Chị đã xem qua và thấy sản phẩm này rất phù hợp.",
+                  "agent_text": "Dạ chị Tâm vui lòng cho em biết địa chỉ giao hàng để em kiểm tra tồn kho và báo giá chính xác cho chị nhé.",
+                  "tool_calls": [],
+                  "questions": [
+                    {
+                      "slot": "địa chỉ giao hàng",
+                      "type": "open",
+                      "text": "Dạ chị Tâm vui lòng cho em biết địa chỉ giao hàng"
+                    }
+                  ],
+                  "claims": [],
+                  "facts_used": [],
+                  "latency": {
+                    "ttft_ms": 1338,
+                    "total_ms": 1338,
+                    "ttfa_ms": null
+                  },
+                  "tool_events": [],
+                  "memory": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/2/after_turn",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "baseline_no_memory",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 2
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "baseline_no_memory/raw-records.json",
+                          "sha256": "3fb5790ead96a1540fc4d6b7ff9b23baa5b6504c1c0eec54d92838404bc02e16",
+                          "pointer": "/21"
+                        }
+                      ],
+                      "phase": "after_turn",
+                      "customer_id": "C032",
+                      "namespace": "product/80658e306ac7ffa1/baseline_no_memory/PRODUCT-80658e306ac7ffa1/SCN-GEN-0002",
+                      "facts": [],
+                      "writes": []
+                    }
+                  ],
+                  "brief": [],
+                  "extractor": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/2/extraction",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "baseline_no_memory",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_1",
+                        "turn": 2
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "baseline_no_memory/transcripts/6bc2a356301432c63798b4480eb91dca43b8d2e651572ddcc5394537d739d2c3.json",
+                          "sha256": "faf8f80bf9d0c3f7761c4e2967703a4a0fd0ee7e9d30ab2bc37e97f96376108e",
+                          "pointer": ""
+                        },
+                        {
+                          "path": "cache/d2dde3e750b50fdaa99152d4554f1f53ee7d4a1363e2a47b2be0e5ab2d32534e.json",
+                          "sha256": "03c184385e3594b61e60adcb3e25dd65e76b5f29ee97a1168aa2e9b1ebdb9e1f",
+                          "pointer": ""
+                        }
+                      ],
+                      "extractor_version": "product-extractor-v2",
+                      "items": [
+                        {
+                          "kind": "question",
+                          "slot_or_field": "địa chỉ giao hàng",
+                          "value": null,
+                          "question_type": "open",
+                          "speaker": "agent",
+                          "quote": "Dạ chị Tâm vui lòng cho em biết địa chỉ giao hàng",
+                          "start": 0,
+                          "end": 49,
+                          "purpose": "Yêu cầu địa chỉ giao hàng để kiểm tra tồn kho và báo giá",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/6bc2a356301432c63798b4480eb91dca43b8d2e651572ddcc5394537d739d2c3.json",
+                            "sha256": "faf8f80bf9d0c3f7761c4e2967703a4a0fd0ee7e9d30ab2bc37e97f96376108e",
+                            "pointer": "/agent_text"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "call": "call_2",
+              "customer_goal": "Chị muốn kiểm tra tình trạng đơn hàng của mình.",
+              "expected_outcome": "khac",
+              "success_if": {
+                "tool_called": "order.status",
+                "args_match": {
+                  "order_id": "OD301177"
+                }
+              },
+              "turns": [
+                {
+                  "turn": 1,
+                  "status": "PRESENT",
+                  "customer_text": "Cho chị hỏi tình trạng đơn hàng OD301177 của chị.",
+                  "agent_text": "Dạ chị Tâm, để em kiểm tra giúp chị thì chị vui lòng cho em biết số điện thoại đặt hàng hoặc địa chỉ nhận hàng được không ạ?",
+                  "tool_calls": [
+                    {
+                      "name": "crm.get_customer",
+                      "args": {
+                        "phone": "0965384535"
+                      },
+                      "result": {
+                        "found": true,
+                        "ambiguous": false,
+                        "customer_id": "C032",
+                        "name": "Tâm",
+                        "honorific": "chị",
+                        "phone": "0965384535",
+                        "identities": {
+                          "zalo_id": null,
+                          "fb_id": null
+                        },
+                        "orders": [
+                          {
+                            "order_id": "OD301177",
+                            "sku": "SKU-MB-PUMP1",
+                            "price_vnd": 4290000,
+                            "date": "2026-10-03",
+                            "status": "shipping",
+                            "tracking": "GHN7781234"
+                          }
+                        ],
+                        "sessions": []
+                      }
+                    }
+                  ],
+                  "questions": [
+                    {
+                      "slot": "phone or address",
+                      "type": "open",
+                      "text": "Dạ chị Tâm, để em kiểm tra giúp chị thì chị vui lòng cho em biết số điện thoại đặt hàng hoặc địa chỉ nhận hàng được không ạ?"
+                    }
+                  ],
+                  "claims": [],
+                  "facts_used": [],
+                  "latency": {
+                    "ttft_ms": 1338,
+                    "total_ms": 1338,
+                    "ttfa_ms": null
+                  },
+                  "tool_events": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_2/1/4",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "baseline_no_memory",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_2",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "baseline_no_memory/raw-records.json",
+                          "sha256": "3fb5790ead96a1540fc4d6b7ff9b23baa5b6504c1c0eec54d92838404bc02e16",
+                          "pointer": "/28"
+                        }
+                      ],
+                      "event_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_2/1/4",
+                      "request": {
+                        "name": "crm.get_customer",
+                        "args": {
+                          "phone": "0965384535"
+                        }
+                      },
+                      "on": "2026-10-16",
+                      "started_at": "2026-10-17T02:41:59.575704+00:00",
+                      "finished_at": "2026-10-17T02:41:59.575704+00:00",
+                      "outcome": "success",
+                      "result": {
+                        "found": true,
+                        "ambiguous": false,
+                        "customer_id": "C032",
+                        "name": "Tâm",
+                        "honorific": "chị",
+                        "phone": "0965384535",
+                        "identities": {
+                          "zalo_id": null,
+                          "fb_id": null
+                        },
+                        "orders": [
+                          {
+                            "order_id": "OD301177",
+                            "sku": "SKU-MB-PUMP1",
+                            "price_vnd": 4290000,
+                            "date": "2026-10-03",
+                            "status": "shipping",
+                            "tracking": "GHN7781234"
+                          }
+                        ],
+                        "sessions": []
+                      },
+                      "error": null,
+                      "side_effect": false,
+                      "attempt": 1
+                    }
+                  ],
+                  "memory": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_2/1/after_turn",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "baseline_no_memory",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_2",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "baseline_no_memory/raw-records.json",
+                          "sha256": "3fb5790ead96a1540fc4d6b7ff9b23baa5b6504c1c0eec54d92838404bc02e16",
+                          "pointer": "/33"
+                        }
+                      ],
+                      "phase": "after_turn",
+                      "customer_id": "C032",
+                      "namespace": "product/80658e306ac7ffa1/baseline_no_memory/PRODUCT-80658e306ac7ffa1/SCN-GEN-0002",
+                      "facts": [
+                        {
+                          "key": "price_quoted_vnd",
+                          "value": 4290000,
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        },
+                        {
+                          "key": "product_advised",
+                          "value": "SKU-MB-PUMP1",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        },
+                        {
+                          "key": "quoted_on",
+                          "value": "2026-10-15",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        }
+                      ],
+                      "writes": []
+                    },
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_2/1/before_call",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "baseline_no_memory",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_2",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "baseline_no_memory/raw-records.json",
+                          "sha256": "3fb5790ead96a1540fc4d6b7ff9b23baa5b6504c1c0eec54d92838404bc02e16",
+                          "pointer": "/29"
+                        }
+                      ],
+                      "phase": "before_call",
+                      "customer_id": "C032",
+                      "namespace": "product/80658e306ac7ffa1/baseline_no_memory/PRODUCT-80658e306ac7ffa1/SCN-GEN-0002",
+                      "facts": [
+                        {
+                          "key": "price_quoted_vnd",
+                          "value": 4290000,
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        },
+                        {
+                          "key": "product_advised",
+                          "value": "SKU-MB-PUMP1",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        },
+                        {
+                          "key": "quoted_on",
+                          "value": "2026-10-15",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        }
+                      ],
+                      "writes": []
+                    },
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_2/1/after_call",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "baseline_no_memory",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_2",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "baseline_no_memory/raw-records.json",
+                          "sha256": "3fb5790ead96a1540fc4d6b7ff9b23baa5b6504c1c0eec54d92838404bc02e16",
+                          "pointer": "/38"
+                        }
+                      ],
+                      "phase": "after_call",
+                      "customer_id": "C032",
+                      "namespace": "product/80658e306ac7ffa1/baseline_no_memory/PRODUCT-80658e306ac7ffa1/SCN-GEN-0002",
+                      "facts": [
+                        {
+                          "key": "price_quoted_vnd",
+                          "value": 4290000,
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        },
+                        {
+                          "key": "product_advised",
+                          "value": "SKU-MB-PUMP1",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        },
+                        {
+                          "key": "quoted_on",
+                          "value": "2026-10-15",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        }
+                      ],
+                      "writes": []
+                    }
+                  ],
+                  "brief": [],
+                  "extractor": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_2/1/extraction",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "baseline_no_memory",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_2",
+                        "turn": 1
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "baseline_no_memory/transcripts/7baf5fb9520475fe4c1e92f945732dcde0a58552966de0ee39ef182540a1a2ff.json",
+                          "sha256": "86671b80d72240e72d8777f9e3bf990174b2cce147c4fec0ec1b46d7e73b034f",
+                          "pointer": ""
+                        },
+                        {
+                          "path": "cache/c28db42bc79bf8457fba598c0c3279290b93953d4227a4efa735b1485b7462f7.json",
+                          "sha256": "e2cf82b92756935eb51e5a9e433c7a2042eff651b12662eb05acdecd810f1bd4",
+                          "pointer": ""
+                        }
+                      ],
+                      "extractor_version": "product-extractor-v2",
+                      "items": [
+                        {
+                          "kind": "question",
+                          "slot_or_field": "phone or address",
+                          "value": null,
+                          "question_type": "open",
+                          "speaker": "agent",
+                          "quote": "Dạ chị Tâm, để em kiểm tra giúp chị thì chị vui lòng cho em biết số điện thoại đặt hàng hoặc địa chỉ nhận hàng được không ạ?",
+                          "start": 0,
+                          "end": 124,
+                          "purpose": "Request customer's phone number or address to check order",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/7baf5fb9520475fe4c1e92f945732dcde0a58552966de0ee39ef182540a1a2ff.json",
+                            "sha256": "86671b80d72240e72d8777f9e3bf990174b2cce147c4fec0ec1b46d7e73b034f",
+                            "pointer": "/agent_text"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "turn": 2,
+                  "status": "PRESENT",
+                  "customer_text": "Đơn hàng của chị đã được giao chưa?",
+                  "agent_text": "Dạ chị Tâm, em chưa có thông tin đơn hàng cụ thể để kiểm tra ạ. Chị vui lòng cung cấp số điện thoại hoặc địa chỉ nhận hàng để em hỗ trợ kiểm tra nhé.",
+                  "tool_calls": [],
+                  "questions": [
+                    {
+                      "slot": "số điện thoại",
+                      "type": "open",
+                      "text": "Chị vui lòng cung cấp số điện thoại"
+                    },
+                    {
+                      "slot": "địa chỉ nhận hàng",
+                      "type": "open",
+                      "text": "hoặc địa chỉ nhận hàng"
+                    }
+                  ],
+                  "claims": [],
+                  "facts_used": [],
+                  "latency": {
+                    "ttft_ms": 1427,
+                    "total_ms": 1427,
+                    "ttfa_ms": null
+                  },
+                  "tool_events": [],
+                  "memory": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_2/2/after_turn",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "baseline_no_memory",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_2",
+                        "turn": 2
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "baseline_no_memory/raw-records.json",
+                          "sha256": "3fb5790ead96a1540fc4d6b7ff9b23baa5b6504c1c0eec54d92838404bc02e16",
+                          "pointer": "/36"
+                        }
+                      ],
+                      "phase": "after_turn",
+                      "customer_id": "C032",
+                      "namespace": "product/80658e306ac7ffa1/baseline_no_memory/PRODUCT-80658e306ac7ffa1/SCN-GEN-0002",
+                      "facts": [
+                        {
+                          "key": "price_quoted_vnd",
+                          "value": 4290000,
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        },
+                        {
+                          "key": "product_advised",
+                          "value": "SKU-MB-PUMP1",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        },
+                        {
+                          "key": "quoted_on",
+                          "value": "2026-10-15",
+                          "customer_id": "C032",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/1eff80c530a439a80b2ec971f9f0f884f420d1a8274a0e095e072773d6f961df.json",
+                            "sha256": "af1bd2145adf1d7720f6a5a4bff63830b2121c06ca0f982c3a44e95e02240965",
+                            "pointer": "/agent_text"
+                          },
+                          "valid_from": "2026-10-15T00:00:00+07:00",
+                          "valid_until": null,
+                          "state": "active"
+                        }
+                      ],
+                      "writes": []
+                    }
+                  ],
+                  "brief": [],
+                  "extractor": [
+                    {
+                      "schema_version": "1.0.0",
+                      "artifact_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_2/2/extraction",
+                      "run_id": "PRODUCT-80658e306ac7ffa1",
+                      "context": {
+                        "run_id": "PRODUCT-80658e306ac7ffa1",
+                        "config": "baseline_no_memory",
+                        "scenario_id": "SCN-GEN-0002",
+                        "call": "call_2",
+                        "turn": 2
+                      },
+                      "evidence_refs": [
+                        {
+                          "path": "baseline_no_memory/transcripts/027fb932ec8e8e797fc31f43953d1e17ac0d9247983bf1fcb30761cb5cf172ab.json",
+                          "sha256": "53bfed3c6c556e732195d4721cd2ce5c14bc94b61afcbd1dc2b62014907bf8ff",
+                          "pointer": ""
+                        },
+                        {
+                          "path": "cache/40b9c1738f1194b4431ea0e140b00e36824c01e9f6cc694ff58527fcc0168635.json",
+                          "sha256": "78177b7257d6774ce7ce6ba4332eefd560e8cbbe53d671c913f292400d71ceb0",
+                          "pointer": ""
+                        }
+                      ],
+                      "extractor_version": "product-extractor-v2",
+                      "items": [
+                        {
+                          "kind": "question",
+                          "slot_or_field": "số điện thoại",
+                          "value": null,
+                          "question_type": "open",
+                          "speaker": "agent",
+                          "quote": "Chị vui lòng cung cấp số điện thoại",
+                          "start": 64,
+                          "end": 99,
+                          "purpose": "Yêu cầu thông tin để kiểm tra đơn hàng",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/027fb932ec8e8e797fc31f43953d1e17ac0d9247983bf1fcb30761cb5cf172ab.json",
+                            "sha256": "53bfed3c6c556e732195d4721cd2ce5c14bc94b61afcbd1dc2b62014907bf8ff",
+                            "pointer": "/agent_text"
+                          }
+                        },
+                        {
+                          "kind": "question",
+                          "slot_or_field": "địa chỉ nhận hàng",
+                          "value": null,
+                          "question_type": "open",
+                          "speaker": "agent",
+                          "quote": "hoặc địa chỉ nhận hàng",
+                          "start": 100,
+                          "end": 122,
+                          "purpose": "Yêu cầu thông tin để kiểm tra đơn hàng",
+                          "source": {
+                            "path": "baseline_no_memory/transcripts/027fb932ec8e8e797fc31f43953d1e17ac0d9247983bf1fcb30761cb5cf172ab.json",
+                            "sha256": "53bfed3c6c556e732195d4721cd2ce5c14bc94b61afcbd1dc2b62014907bf8ff",
+                            "pointer": "/agent_text"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "task_success": {
+            "status": "FAIL",
+            "failures": [
+              {
+                "scenario": "SCN-GEN-0002",
+                "call": "call_2",
+                "hard_case": "shipping order GHN7781234; changes after dispatch are not allowed",
+                "reasons": [
+                  "không có tool call order.status khớp args_match"
+                ]
+              }
+            ]
+          },
+          "evidence_ref": "evidence/baseline.jsonl"
+        }
+      },
+      "issues": [
+        {
+          "code": "CLAIM_GT_MISSING",
+          "message": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/availability",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "b5e8dfed63dffd2f7fd0861484c1f65171295f7c3974fff198344941bae3532f",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "CLAIM_GT_MISSING",
+          "message": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/price",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "b5e8dfed63dffd2f7fd0861484c1f65171295f7c3974fff198344941bae3532f",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "CLAIM_GT_MISSING",
+          "message": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/shipping_fee",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "b5e8dfed63dffd2f7fd0861484c1f65171295f7c3974fff198344941bae3532f",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "PII_POLICY_NOT_LABELLED",
+          "message": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "b5e8dfed63dffd2f7fd0861484c1f65171295f7c3974fff198344941bae3532f",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "FACT_VALUE_WRONG_OR_UNUSED",
+          "message": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/tracking",
+          "classification": "agent_violation",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "b5e8dfed63dffd2f7fd0861484c1f65171295f7c3974fff198344941bae3532f",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "CLAIM_GT_MISSING",
+          "message": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/customer_name",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "b5e8dfed63dffd2f7fd0861484c1f65171295f7c3974fff198344941bae3532f",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "CLAIM_VALUE_WRONG",
+          "message": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/order_status",
+          "classification": "agent_violation",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "b5e8dfed63dffd2f7fd0861484c1f65171295f7c3974fff198344941bae3532f",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "CLAIM_GT_MISSING",
+          "message": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/shipping_code",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "b5e8dfed63dffd2f7fd0861484c1f65171295f7c3974fff198344941bae3532f",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "CLAIM_VALUE_WRONG",
+          "message": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/order_status",
+          "classification": "agent_violation",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "b5e8dfed63dffd2f7fd0861484c1f65171295f7c3974fff198344941bae3532f",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "PII_POLICY_NOT_LABELLED",
+          "message": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "b5e8dfed63dffd2f7fd0861484c1f65171295f7c3974fff198344941bae3532f",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "CLAIM_GT_MISSING",
+          "message": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/price",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "b5e8dfed63dffd2f7fd0861484c1f65171295f7c3974fff198344941bae3532f",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "CLAIM_GT_MISSING",
+          "message": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/shipping_fee",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "b5e8dfed63dffd2f7fd0861484c1f65171295f7c3974fff198344941bae3532f",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "CLAIM_GT_MISSING",
+          "message": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/cash_on_delivery_fee",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "b5e8dfed63dffd2f7fd0861484c1f65171295f7c3974fff198344941bae3532f",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "PII_POLICY_NOT_LABELLED",
+          "message": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "b5e8dfed63dffd2f7fd0861484c1f65171295f7c3974fff198344941bae3532f",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "FACT_VALUE_WRONG_OR_UNUSED",
+          "message": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_2/tracking",
+          "classification": "agent_violation",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "b5e8dfed63dffd2f7fd0861484c1f65171295f7c3974fff198344941bae3532f",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "PII_POLICY_NOT_LABELLED",
+          "message": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_2",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "b5e8dfed63dffd2f7fd0861484c1f65171295f7c3974fff198344941bae3532f",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "TOOL_ACCURACY",
+          "message": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_2",
+          "classification": "agent_violation",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "b5e8dfed63dffd2f7fd0861484c1f65171295f7c3974fff198344941bae3532f",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        }
+      ],
+      "assertions": [
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/tool_execution_state",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/tools.jsonl",
+              "sha256": "0e859e12053b7822824d22bb34a498ba2737f00bfeb34e49cb4046b255e17bb4",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/memory_integrity",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/memory.jsonl",
+              "sha256": "1ef6e2a8579e0f3bed4d5f159c740950a2bfde7dc8402f2dda160c3cb624e5c7",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/fact_carryover",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/tools.jsonl",
+              "sha256": "0e859e12053b7822824d22bb34a498ba2737f00bfeb34e49cb4046b255e17bb4",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/memory.jsonl",
+              "sha256": "1ef6e2a8579e0f3bed4d5f159c740950a2bfde7dc8402f2dda160c3cb624e5c7",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/extraction.jsonl",
+              "sha256": "5f8c4476f20ba447f34bbc8a6d0cab5efc6f9979fa326e8373e20eb373e5f3b9",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/claim_gt_coverage",
+          "status": {
+            "verdict": "UNDETERMINED",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "CLAIM_GT_MISSING"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/extraction.jsonl",
+              "sha256": "5f8c4476f20ba447f34bbc8a6d0cab5efc6f9979fa326e8373e20eb373e5f3b9",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/tool_accuracy_full",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/tools.jsonl",
+              "sha256": "0e859e12053b7822824d22bb34a498ba2737f00bfeb34e49cb4046b255e17bb4",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/memory.jsonl",
+              "sha256": "1ef6e2a8579e0f3bed4d5f159c740950a2bfde7dc8402f2dda160c3cb624e5c7",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/extraction.jsonl",
+              "sha256": "5f8c4476f20ba447f34bbc8a6d0cab5efc6f9979fa326e8373e20eb373e5f3b9",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_1/grading",
+          "status": {
+            "verdict": "UNDETERMINED",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "PII_POLICY_NOT_LABELLED"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/tools.jsonl",
+              "sha256": "0e859e12053b7822824d22bb34a498ba2737f00bfeb34e49cb4046b255e17bb4",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/memory.jsonl",
+              "sha256": "1ef6e2a8579e0f3bed4d5f159c740950a2bfde7dc8402f2dda160c3cb624e5c7",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/extraction.jsonl",
+              "sha256": "5f8c4476f20ba447f34bbc8a6d0cab5efc6f9979fa326e8373e20eb373e5f3b9",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/tool_execution_state",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/tools.jsonl",
+              "sha256": "0e859e12053b7822824d22bb34a498ba2737f00bfeb34e49cb4046b255e17bb4",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/memory_integrity",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/memory.jsonl",
+              "sha256": "1ef6e2a8579e0f3bed4d5f159c740950a2bfde7dc8402f2dda160c3cb624e5c7",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/fact_carryover",
+          "status": {
+            "verdict": "FAIL",
+            "completeness": "COMPLETE",
+            "reason_codes": [
+              "FACT_VALUE_WRONG_OR_UNUSED"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/tools.jsonl",
+              "sha256": "0e859e12053b7822824d22bb34a498ba2737f00bfeb34e49cb4046b255e17bb4",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/memory.jsonl",
+              "sha256": "1ef6e2a8579e0f3bed4d5f159c740950a2bfde7dc8402f2dda160c3cb624e5c7",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/extraction.jsonl",
+              "sha256": "5f8c4476f20ba447f34bbc8a6d0cab5efc6f9979fa326e8373e20eb373e5f3b9",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/claim_gt_coverage",
+          "status": {
+            "verdict": "FAIL",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "CLAIM_GT_MISSING",
+              "CLAIM_VALUE_WRONG"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/extraction.jsonl",
+              "sha256": "5f8c4476f20ba447f34bbc8a6d0cab5efc6f9979fa326e8373e20eb373e5f3b9",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/tool_accuracy_full",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/tools.jsonl",
+              "sha256": "0e859e12053b7822824d22bb34a498ba2737f00bfeb34e49cb4046b255e17bb4",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/memory.jsonl",
+              "sha256": "1ef6e2a8579e0f3bed4d5f159c740950a2bfde7dc8402f2dda160c3cb624e5c7",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/extraction.jsonl",
+              "sha256": "5f8c4476f20ba447f34bbc8a6d0cab5efc6f9979fa326e8373e20eb373e5f3b9",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/full/SCN-GEN-0002/call_2/grading",
+          "status": {
+            "verdict": "UNDETERMINED",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "PII_POLICY_NOT_LABELLED"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/tools.jsonl",
+              "sha256": "0e859e12053b7822824d22bb34a498ba2737f00bfeb34e49cb4046b255e17bb4",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/memory.jsonl",
+              "sha256": "1ef6e2a8579e0f3bed4d5f159c740950a2bfde7dc8402f2dda160c3cb624e5c7",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/extraction.jsonl",
+              "sha256": "5f8c4476f20ba447f34bbc8a6d0cab5efc6f9979fa326e8373e20eb373e5f3b9",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/tool_execution_state",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/tools.jsonl",
+              "sha256": "a85cc3bb437f940e220efb7eaf5f89b61a4174a290afdff4966b5469b71d31ab",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/memory_integrity",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/memory.jsonl",
+              "sha256": "d620dc1c819ff041fb1df98ed7010a1664dc4d88fc3f3039eeea127702950b15",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/fact_carryover",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/tools.jsonl",
+              "sha256": "a85cc3bb437f940e220efb7eaf5f89b61a4174a290afdff4966b5469b71d31ab",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/memory.jsonl",
+              "sha256": "d620dc1c819ff041fb1df98ed7010a1664dc4d88fc3f3039eeea127702950b15",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/extraction.jsonl",
+              "sha256": "17fc951137db11a4bef965a562fd0b3a0a06c0b3e751a3f824d6c84b359c730d",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/claim_gt_coverage",
+          "status": {
+            "verdict": "UNDETERMINED",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "CLAIM_GT_MISSING"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/extraction.jsonl",
+              "sha256": "17fc951137db11a4bef965a562fd0b3a0a06c0b3e751a3f824d6c84b359c730d",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/tool_accuracy_baseline_no_memory",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/tools.jsonl",
+              "sha256": "a85cc3bb437f940e220efb7eaf5f89b61a4174a290afdff4966b5469b71d31ab",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/memory.jsonl",
+              "sha256": "d620dc1c819ff041fb1df98ed7010a1664dc4d88fc3f3039eeea127702950b15",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/extraction.jsonl",
+              "sha256": "17fc951137db11a4bef965a562fd0b3a0a06c0b3e751a3f824d6c84b359c730d",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/grading",
+          "status": {
+            "verdict": "UNDETERMINED",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "PII_POLICY_NOT_LABELLED"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/tools.jsonl",
+              "sha256": "a85cc3bb437f940e220efb7eaf5f89b61a4174a290afdff4966b5469b71d31ab",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/memory.jsonl",
+              "sha256": "d620dc1c819ff041fb1df98ed7010a1664dc4d88fc3f3039eeea127702950b15",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/extraction.jsonl",
+              "sha256": "17fc951137db11a4bef965a562fd0b3a0a06c0b3e751a3f824d6c84b359c730d",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_2/tool_execution_state",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/tools.jsonl",
+              "sha256": "a85cc3bb437f940e220efb7eaf5f89b61a4174a290afdff4966b5469b71d31ab",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_2/memory_integrity",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/memory.jsonl",
+              "sha256": "d620dc1c819ff041fb1df98ed7010a1664dc4d88fc3f3039eeea127702950b15",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_2/fact_carryover",
+          "status": {
+            "verdict": "FAIL",
+            "completeness": "COMPLETE",
+            "reason_codes": [
+              "FACT_VALUE_WRONG_OR_UNUSED"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/tools.jsonl",
+              "sha256": "a85cc3bb437f940e220efb7eaf5f89b61a4174a290afdff4966b5469b71d31ab",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/memory.jsonl",
+              "sha256": "d620dc1c819ff041fb1df98ed7010a1664dc4d88fc3f3039eeea127702950b15",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/extraction.jsonl",
+              "sha256": "17fc951137db11a4bef965a562fd0b3a0a06c0b3e751a3f824d6c84b359c730d",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_2/claim_gt_coverage",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/extraction.jsonl",
+              "sha256": "17fc951137db11a4bef965a562fd0b3a0a06c0b3e751a3f824d6c84b359c730d",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_2/tool_accuracy_baseline_no_memory",
+          "status": {
+            "verdict": "FAIL",
+            "completeness": "COMPLETE",
+            "reason_codes": [
+              "TOOL_ACCURACY"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/tools.jsonl",
+              "sha256": "a85cc3bb437f940e220efb7eaf5f89b61a4174a290afdff4966b5469b71d31ab",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/memory.jsonl",
+              "sha256": "d620dc1c819ff041fb1df98ed7010a1664dc4d88fc3f3039eeea127702950b15",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/extraction.jsonl",
+              "sha256": "17fc951137db11a4bef965a562fd0b3a0a06c0b3e751a3f824d6c84b359c730d",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_2/grading",
+          "status": {
+            "verdict": "FAIL",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "PII_POLICY_NOT_LABELLED",
+              "TOOL_ACCURACY"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/tools.jsonl",
+              "sha256": "a85cc3bb437f940e220efb7eaf5f89b61a4174a290afdff4966b5469b71d31ab",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/memory.jsonl",
+              "sha256": "d620dc1c819ff041fb1df98ed7010a1664dc4d88fc3f3039eeea127702950b15",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/extraction.jsonl",
+              "sha256": "17fc951137db11a4bef965a562fd0b3a0a06c0b3e751a3f824d6c84b359c730d",
+              "pointer": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

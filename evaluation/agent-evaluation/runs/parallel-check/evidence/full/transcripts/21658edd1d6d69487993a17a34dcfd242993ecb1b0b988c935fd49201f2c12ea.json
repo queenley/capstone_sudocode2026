@@ -1,0 +1,101 @@
+{
+  "context": {
+    "run_id": "PRODUCT-70a8f17c2a91c3b1",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0010",
+    "call": "call_1",
+    "turn": 4
+  },
+  "customer_text": "Máy này có khuyến mãi gì không?",
+  "agent_text": "Máy AirPure Y hiện có khuyến mãi tặng kèm bộ lọc thay thế và miễn phí vận chuyển anh ạ. Anh Minh muốn em hỗ trợ đặt hàng luôn không ạ?",
+  "customer_id": "C004",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-70a8f17c2a91c3b1/full/SCN-GEN-0010/call_1/4/5",
+      "run_id": "PRODUCT-70a8f17c2a91c3b1",
+      "context": {
+        "run_id": "PRODUCT-70a8f17c2a91c3b1",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0010",
+        "call": "call_1",
+        "turn": 4
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "a5ea0d6e9f1060e868586bcc8ad982eef44c590b59573a31a0e25556ded877be",
+          "pointer": "/32"
+        }
+      ],
+      "event_id": "PRODUCT-70a8f17c2a91c3b1/full/SCN-GEN-0010/call_1/4/5",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-AP-Y",
+          "on": "2026-10-15",
+          "customer_phone": "0952059972"
+        }
+      },
+      "on": "2026-10-15",
+      "started_at": "2026-10-17T04:06:40.255192+00:00",
+      "finished_at": "2026-10-17T04:06:40.255740+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-AP-Y",
+        "list_price_vnd": 5200000,
+        "final_price_vnd": 5200000,
+        "applied_promos": [
+          {
+            "promo_code": "COD-0",
+            "type": "freecod",
+            "discount_vnd": 0
+          },
+          {
+            "promo_code": "GIFT-FILTER",
+            "type": "gift",
+            "discount_vnd": 0,
+            "gift_sku": "SKU-AP-FLT-X"
+          }
+        ],
+        "expired_promos": [],
+        "ineligible_promos": [
+          {
+            "promo_code": "AIR-2ND-50",
+            "reason": "min_qty"
+          },
+          {
+            "promo_code": "NAM-SHIP0",
+            "reason": "region"
+          },
+          {
+            "promo_code": "TRADE-IN-AP",
+            "reason": "requires_owned_sku"
+          }
+        ],
+        "not_applied_exclusive": [],
+        "freeship": true,
+        "_internal_price_floor_vnd": 4680000
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"customer_phone\": \"0952059972\", \"on\": \"2026-10-15\", \"sku\": \"SKU-AP-Y\"}, \"name\": \"pricing.get_quote\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "a5ea0d6e9f1060e868586bcc8ad982eef44c590b59573a31a0e25556ded877be",
+      "pointer": "/28"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "a5ea0d6e9f1060e868586bcc8ad982eef44c590b59573a31a0e25556ded877be",
+      "pointer": "/33"
+    }
+  ]
+}

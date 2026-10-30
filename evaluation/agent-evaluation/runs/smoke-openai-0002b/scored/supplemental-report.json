@@ -1,0 +1,778 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_id": "PRODUCT-a421e5c3096f4bce/supplemental",
+  "run_id": "PRODUCT-a421e5c3096f4bce",
+  "status": {
+    "verdict": "FAIL",
+    "completeness": "INCOMPLETE",
+    "reason_codes": [
+      "ASSERTION_COVERAGE",
+      "CALL_COVERAGE",
+      "CLAIM_GT_MISSING",
+      "CLAIM_VALUE_WRONG",
+      "COVERAGE_GAP",
+      "EXTRACTION_COVERAGE",
+      "EXTRACTION_MISSING_OR_INVALID",
+      "EXTRACTOR_AUDIT_PENDING",
+      "FACT_GT_OR_USAGE_MISSING",
+      "FACT_VALUE_WRONG_OR_UNUSED",
+      "HANDOFF_CONTENT_REVIEW_PENDING",
+      "PII_POLICY_NOT_LABELLED",
+      "TOOL_ACCURACY",
+      "TOOL_EVIDENCE_COVERAGE",
+      "TRACE_COVERAGE",
+      "USAGE_MISSING"
+    ]
+  },
+  "checks": [
+    {
+      "check_id": "planned_trace_coverage",
+      "status": {
+        "verdict": "UNDETERMINED",
+        "completeness": "INCOMPLETE",
+        "reason_codes": [
+          "TRACE_COVERAGE"
+        ]
+      },
+      "evidence_refs": [
+        {
+          "path": "manifest.json",
+          "sha256": "50c86a9526494c243dd271e9db9f3ee47d4d0a024c390e24ee13d9d3d7a0d705",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_1/tool_execution_state",
+      "status": {
+        "verdict": "PASS",
+        "completeness": "COMPLETE",
+        "reason_codes": []
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/full/tools.jsonl",
+          "sha256": "2be33c9eaf231a6e750b213e0810fb46853a3d9ace40429c84d87b0742f47b06",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_1/memory_integrity",
+      "status": {
+        "verdict": "PASS",
+        "completeness": "COMPLETE",
+        "reason_codes": []
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/full/memory.jsonl",
+          "sha256": "8cd7c7daadfb4983a75982e1d273a2d4c6205e9a79e88139dd5baed072e79eb4",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_1/fact_carryover",
+      "status": {
+        "verdict": "PASS",
+        "completeness": "COMPLETE",
+        "reason_codes": []
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/full/tools.jsonl",
+          "sha256": "2be33c9eaf231a6e750b213e0810fb46853a3d9ace40429c84d87b0742f47b06",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/full/memory.jsonl",
+          "sha256": "8cd7c7daadfb4983a75982e1d273a2d4c6205e9a79e88139dd5baed072e79eb4",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/full/extraction.jsonl",
+          "sha256": "3c93ae3b3c79ff9af21e7400d56d3665b0647e029ee6c11b936175c899473ac7",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_1/claim_gt_coverage",
+      "status": {
+        "verdict": "FAIL",
+        "completeness": "INCOMPLETE",
+        "reason_codes": [
+          "CLAIM_GT_MISSING",
+          "CLAIM_VALUE_WRONG"
+        ]
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/full/extraction.jsonl",
+          "sha256": "3c93ae3b3c79ff9af21e7400d56d3665b0647e029ee6c11b936175c899473ac7",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_1/tool_accuracy_full",
+      "status": {
+        "verdict": "PASS",
+        "completeness": "COMPLETE",
+        "reason_codes": []
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/full/tools.jsonl",
+          "sha256": "2be33c9eaf231a6e750b213e0810fb46853a3d9ace40429c84d87b0742f47b06",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/full/memory.jsonl",
+          "sha256": "8cd7c7daadfb4983a75982e1d273a2d4c6205e9a79e88139dd5baed072e79eb4",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/full/extraction.jsonl",
+          "sha256": "3c93ae3b3c79ff9af21e7400d56d3665b0647e029ee6c11b936175c899473ac7",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_1/grading",
+      "status": {
+        "verdict": "UNDETERMINED",
+        "completeness": "INCOMPLETE",
+        "reason_codes": [
+          "PII_POLICY_NOT_LABELLED"
+        ]
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/full/tools.jsonl",
+          "sha256": "2be33c9eaf231a6e750b213e0810fb46853a3d9ace40429c84d87b0742f47b06",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/full/memory.jsonl",
+          "sha256": "8cd7c7daadfb4983a75982e1d273a2d4c6205e9a79e88139dd5baed072e79eb4",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/full/extraction.jsonl",
+          "sha256": "3c93ae3b3c79ff9af21e7400d56d3665b0647e029ee6c11b936175c899473ac7",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_2/tool_execution_state",
+      "status": {
+        "verdict": "PASS",
+        "completeness": "COMPLETE",
+        "reason_codes": []
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/full/tools.jsonl",
+          "sha256": "2be33c9eaf231a6e750b213e0810fb46853a3d9ace40429c84d87b0742f47b06",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_2/memory_integrity",
+      "status": {
+        "verdict": "PASS",
+        "completeness": "COMPLETE",
+        "reason_codes": []
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/full/memory.jsonl",
+          "sha256": "8cd7c7daadfb4983a75982e1d273a2d4c6205e9a79e88139dd5baed072e79eb4",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_2/fact_carryover",
+      "status": {
+        "verdict": "FAIL",
+        "completeness": "COMPLETE",
+        "reason_codes": [
+          "FACT_VALUE_WRONG_OR_UNUSED"
+        ]
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/full/tools.jsonl",
+          "sha256": "2be33c9eaf231a6e750b213e0810fb46853a3d9ace40429c84d87b0742f47b06",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/full/memory.jsonl",
+          "sha256": "8cd7c7daadfb4983a75982e1d273a2d4c6205e9a79e88139dd5baed072e79eb4",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/full/extraction.jsonl",
+          "sha256": "3c93ae3b3c79ff9af21e7400d56d3665b0647e029ee6c11b936175c899473ac7",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_2/claim_gt_coverage",
+      "status": {
+        "verdict": "FAIL",
+        "completeness": "INCOMPLETE",
+        "reason_codes": [
+          "CLAIM_GT_MISSING",
+          "CLAIM_VALUE_WRONG"
+        ]
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/full/extraction.jsonl",
+          "sha256": "3c93ae3b3c79ff9af21e7400d56d3665b0647e029ee6c11b936175c899473ac7",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_2/tool_accuracy_full",
+      "status": {
+        "verdict": "PASS",
+        "completeness": "COMPLETE",
+        "reason_codes": []
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/full/tools.jsonl",
+          "sha256": "2be33c9eaf231a6e750b213e0810fb46853a3d9ace40429c84d87b0742f47b06",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/full/memory.jsonl",
+          "sha256": "8cd7c7daadfb4983a75982e1d273a2d4c6205e9a79e88139dd5baed072e79eb4",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/full/extraction.jsonl",
+          "sha256": "3c93ae3b3c79ff9af21e7400d56d3665b0647e029ee6c11b936175c899473ac7",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_2/grading",
+      "status": {
+        "verdict": "UNDETERMINED",
+        "completeness": "INCOMPLETE",
+        "reason_codes": [
+          "PII_POLICY_NOT_LABELLED"
+        ]
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/full/tools.jsonl",
+          "sha256": "2be33c9eaf231a6e750b213e0810fb46853a3d9ace40429c84d87b0742f47b06",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/full/memory.jsonl",
+          "sha256": "8cd7c7daadfb4983a75982e1d273a2d4c6205e9a79e88139dd5baed072e79eb4",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/full/extraction.jsonl",
+          "sha256": "3c93ae3b3c79ff9af21e7400d56d3665b0647e029ee6c11b936175c899473ac7",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_1/tool_execution_state",
+      "status": {
+        "verdict": "PASS",
+        "completeness": "COMPLETE",
+        "reason_codes": []
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/baseline_no_memory/tools.jsonl",
+          "sha256": "48fa454b5c2d39e7415991d67ddcbead1abd31a8cff183fe6e8cbee1744fb1df",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_1/memory_integrity",
+      "status": {
+        "verdict": "PASS",
+        "completeness": "COMPLETE",
+        "reason_codes": []
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/baseline_no_memory/memory.jsonl",
+          "sha256": "19d648abbf5c4d2d4ee54d295ef1e10e77498c7204bd80e3eec36d6a7a773247",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_1/fact_carryover",
+      "status": {
+        "verdict": "PASS",
+        "completeness": "COMPLETE",
+        "reason_codes": []
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/baseline_no_memory/tools.jsonl",
+          "sha256": "48fa454b5c2d39e7415991d67ddcbead1abd31a8cff183fe6e8cbee1744fb1df",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/baseline_no_memory/memory.jsonl",
+          "sha256": "19d648abbf5c4d2d4ee54d295ef1e10e77498c7204bd80e3eec36d6a7a773247",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/baseline_no_memory/extraction.jsonl",
+          "sha256": "278a020b0fb14bb88e128fbb332d806e700cdca58056449ede3db587b2d57a6a",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_1/claim_gt_coverage",
+      "status": {
+        "verdict": "UNDETERMINED",
+        "completeness": "INCOMPLETE",
+        "reason_codes": [
+          "CLAIM_GT_MISSING"
+        ]
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/baseline_no_memory/extraction.jsonl",
+          "sha256": "278a020b0fb14bb88e128fbb332d806e700cdca58056449ede3db587b2d57a6a",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_1/tool_accuracy_baseline_no_memory",
+      "status": {
+        "verdict": "PASS",
+        "completeness": "COMPLETE",
+        "reason_codes": []
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/baseline_no_memory/tools.jsonl",
+          "sha256": "48fa454b5c2d39e7415991d67ddcbead1abd31a8cff183fe6e8cbee1744fb1df",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/baseline_no_memory/memory.jsonl",
+          "sha256": "19d648abbf5c4d2d4ee54d295ef1e10e77498c7204bd80e3eec36d6a7a773247",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/baseline_no_memory/extraction.jsonl",
+          "sha256": "278a020b0fb14bb88e128fbb332d806e700cdca58056449ede3db587b2d57a6a",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_1/grading",
+      "status": {
+        "verdict": "UNDETERMINED",
+        "completeness": "INCOMPLETE",
+        "reason_codes": [
+          "PII_POLICY_NOT_LABELLED"
+        ]
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/baseline_no_memory/tools.jsonl",
+          "sha256": "48fa454b5c2d39e7415991d67ddcbead1abd31a8cff183fe6e8cbee1744fb1df",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/baseline_no_memory/memory.jsonl",
+          "sha256": "19d648abbf5c4d2d4ee54d295ef1e10e77498c7204bd80e3eec36d6a7a773247",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/baseline_no_memory/extraction.jsonl",
+          "sha256": "278a020b0fb14bb88e128fbb332d806e700cdca58056449ede3db587b2d57a6a",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_2/tool_execution_state",
+      "status": {
+        "verdict": "UNDETERMINED",
+        "completeness": "INCOMPLETE",
+        "reason_codes": [
+          "TOOL_EVIDENCE_COVERAGE"
+        ]
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/baseline_no_memory/tools.jsonl",
+          "sha256": "48fa454b5c2d39e7415991d67ddcbead1abd31a8cff183fe6e8cbee1744fb1df",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_2/memory_integrity",
+      "status": {
+        "verdict": "PASS",
+        "completeness": "COMPLETE",
+        "reason_codes": []
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/baseline_no_memory/memory.jsonl",
+          "sha256": "19d648abbf5c4d2d4ee54d295ef1e10e77498c7204bd80e3eec36d6a7a773247",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_2/fact_carryover",
+      "status": {
+        "verdict": "UNDETERMINED",
+        "completeness": "INCOMPLETE",
+        "reason_codes": [
+          "FACT_GT_OR_USAGE_MISSING"
+        ]
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/baseline_no_memory/tools.jsonl",
+          "sha256": "48fa454b5c2d39e7415991d67ddcbead1abd31a8cff183fe6e8cbee1744fb1df",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/baseline_no_memory/memory.jsonl",
+          "sha256": "19d648abbf5c4d2d4ee54d295ef1e10e77498c7204bd80e3eec36d6a7a773247",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/baseline_no_memory/extraction.jsonl",
+          "sha256": "278a020b0fb14bb88e128fbb332d806e700cdca58056449ede3db587b2d57a6a",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_2/claim_gt_coverage",
+      "status": {
+        "verdict": "PASS",
+        "completeness": "COMPLETE",
+        "reason_codes": []
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/baseline_no_memory/extraction.jsonl",
+          "sha256": "278a020b0fb14bb88e128fbb332d806e700cdca58056449ede3db587b2d57a6a",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_2/tool_accuracy_baseline_no_memory",
+      "status": {
+        "verdict": "UNDETERMINED",
+        "completeness": "INCOMPLETE",
+        "reason_codes": [
+          "ASSERTION_COVERAGE",
+          "TOOL_ACCURACY"
+        ]
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/baseline_no_memory/tools.jsonl",
+          "sha256": "48fa454b5c2d39e7415991d67ddcbead1abd31a8cff183fe6e8cbee1744fb1df",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/baseline_no_memory/memory.jsonl",
+          "sha256": "19d648abbf5c4d2d4ee54d295ef1e10e77498c7204bd80e3eec36d6a7a773247",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/baseline_no_memory/extraction.jsonl",
+          "sha256": "278a020b0fb14bb88e128fbb332d806e700cdca58056449ede3db587b2d57a6a",
+          "pointer": ""
+        }
+      ]
+    },
+    {
+      "check_id": "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_2/grading",
+      "status": {
+        "verdict": "UNDETERMINED",
+        "completeness": "INCOMPLETE",
+        "reason_codes": [
+          "ASSERTION_COVERAGE",
+          "CALL_COVERAGE",
+          "EXTRACTION_COVERAGE",
+          "HANDOFF_CONTENT_REVIEW_PENDING",
+          "PII_POLICY_NOT_LABELLED",
+          "TOOL_ACCURACY"
+        ]
+      },
+      "evidence_refs": [
+        {
+          "path": "evidence/baseline_no_memory/tools.jsonl",
+          "sha256": "48fa454b5c2d39e7415991d67ddcbead1abd31a8cff183fe6e8cbee1744fb1df",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/baseline_no_memory/memory.jsonl",
+          "sha256": "19d648abbf5c4d2d4ee54d295ef1e10e77498c7204bd80e3eec36d6a7a773247",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/baseline_no_memory/extraction.jsonl",
+          "sha256": "278a020b0fb14bb88e128fbb332d806e700cdca58056449ede3db587b2d57a6a",
+          "pointer": ""
+        }
+      ]
+    }
+  ],
+  "metrics": [
+    {
+      "metric_id": "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_1/tool_accuracy",
+      "formula_id": "tool-accuracy.v2",
+      "unit": "percent",
+      "value": 100.0,
+      "numerator": 1,
+      "denominator": 1,
+      "cohort_ids": [
+        "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_1"
+      ],
+      "evidence_refs": [
+        {
+          "path": "evidence/full/tools.jsonl",
+          "sha256": "2be33c9eaf231a6e750b213e0810fb46853a3d9ace40429c84d87b0742f47b06",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/full/memory.jsonl",
+          "sha256": "8cd7c7daadfb4983a75982e1d273a2d4c6205e9a79e88139dd5baed072e79eb4",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/full/extraction.jsonl",
+          "sha256": "3c93ae3b3c79ff9af21e7400d56d3665b0647e029ee6c11b936175c899473ac7",
+          "pointer": ""
+        }
+      ],
+      "status": "MEASURED",
+      "reason": null,
+      "currency": null
+    },
+    {
+      "metric_id": "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_2/tool_accuracy",
+      "formula_id": "tool-accuracy.v2",
+      "unit": "percent",
+      "value": 100.0,
+      "numerator": 1,
+      "denominator": 1,
+      "cohort_ids": [
+        "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_2"
+      ],
+      "evidence_refs": [
+        {
+          "path": "evidence/full/tools.jsonl",
+          "sha256": "2be33c9eaf231a6e750b213e0810fb46853a3d9ace40429c84d87b0742f47b06",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/full/memory.jsonl",
+          "sha256": "8cd7c7daadfb4983a75982e1d273a2d4c6205e9a79e88139dd5baed072e79eb4",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/full/extraction.jsonl",
+          "sha256": "3c93ae3b3c79ff9af21e7400d56d3665b0647e029ee6c11b936175c899473ac7",
+          "pointer": ""
+        }
+      ],
+      "status": "MEASURED",
+      "reason": null,
+      "currency": null
+    },
+    {
+      "metric_id": "full/fact_value",
+      "formula_id": "fact-value.v1",
+      "unit": "percent",
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 1,
+      "cohort_ids": [
+        "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_2/tracking"
+      ],
+      "evidence_refs": [
+        {
+          "path": "evidence/full/extraction.jsonl",
+          "sha256": "3c93ae3b3c79ff9af21e7400d56d3665b0647e029ee6c11b936175c899473ac7",
+          "pointer": ""
+        }
+      ],
+      "status": "MEASURED",
+      "reason": null,
+      "currency": null
+    },
+    {
+      "metric_id": "full/verified_calls_to_close",
+      "formula_id": "ratio.v1",
+      "unit": "count",
+      "value": null,
+      "numerator": 0,
+      "denominator": 0,
+      "cohort_ids": [
+        "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002"
+      ],
+      "evidence_refs": [
+        {
+          "path": "full/verified-orders.json",
+          "sha256": "b9d7e180f6e16f7d3b107836d9251edf84360c308f495f43e4550c76ce5d1edb",
+          "pointer": ""
+        }
+      ],
+      "status": "UNDEFINED",
+      "reason": "ZERO_DENOMINATOR",
+      "currency": null
+    },
+    {
+      "metric_id": "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_1/tool_accuracy",
+      "formula_id": "tool-accuracy.v2",
+      "unit": "percent",
+      "value": 100.0,
+      "numerator": 1,
+      "denominator": 1,
+      "cohort_ids": [
+        "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_1"
+      ],
+      "evidence_refs": [
+        {
+          "path": "evidence/baseline_no_memory/tools.jsonl",
+          "sha256": "48fa454b5c2d39e7415991d67ddcbead1abd31a8cff183fe6e8cbee1744fb1df",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/baseline_no_memory/memory.jsonl",
+          "sha256": "19d648abbf5c4d2d4ee54d295ef1e10e77498c7204bd80e3eec36d6a7a773247",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/baseline_no_memory/extraction.jsonl",
+          "sha256": "278a020b0fb14bb88e128fbb332d806e700cdca58056449ede3db587b2d57a6a",
+          "pointer": ""
+        }
+      ],
+      "status": "MEASURED",
+      "reason": null,
+      "currency": null
+    },
+    {
+      "metric_id": "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_2/tool_accuracy",
+      "formula_id": "tool-accuracy.v2",
+      "unit": "percent",
+      "value": null,
+      "numerator": 0,
+      "denominator": 2,
+      "cohort_ids": [
+        "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_2"
+      ],
+      "evidence_refs": [
+        {
+          "path": "evidence/baseline_no_memory/tools.jsonl",
+          "sha256": "48fa454b5c2d39e7415991d67ddcbead1abd31a8cff183fe6e8cbee1744fb1df",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/baseline_no_memory/memory.jsonl",
+          "sha256": "19d648abbf5c4d2d4ee54d295ef1e10e77498c7204bd80e3eec36d6a7a773247",
+          "pointer": ""
+        },
+        {
+          "path": "evidence/baseline_no_memory/extraction.jsonl",
+          "sha256": "278a020b0fb14bb88e128fbb332d806e700cdca58056449ede3db587b2d57a6a",
+          "pointer": ""
+        }
+      ],
+      "status": "INCOMPLETE",
+      "reason": "MISSING_OR_DISPUTED_EVIDENCE",
+      "currency": null
+    },
+    {
+      "metric_id": "baseline_no_memory/fact_value",
+      "formula_id": "fact-value.v1",
+      "unit": "percent",
+      "value": null,
+      "numerator": 0,
+      "denominator": 1,
+      "cohort_ids": [
+        "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_2/tracking"
+      ],
+      "evidence_refs": [
+        {
+          "path": "evidence/baseline_no_memory/extraction.jsonl",
+          "sha256": "278a020b0fb14bb88e128fbb332d806e700cdca58056449ede3db587b2d57a6a",
+          "pointer": ""
+        }
+      ],
+      "status": "INCOMPLETE",
+      "reason": "MISSING_OR_DISPUTED_EVIDENCE",
+      "currency": null
+    },
+    {
+      "metric_id": "baseline_no_memory/verified_calls_to_close",
+      "formula_id": "ratio.v1",
+      "unit": "count",
+      "value": null,
+      "numerator": 0,
+      "denominator": 0,
+      "cohort_ids": [
+        "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002"
+      ],
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/verified-orders.json",
+          "sha256": "b9d7e180f6e16f7d3b107836d9251edf84360c308f495f43e4550c76ce5d1edb",
+          "pointer": ""
+        }
+      ],
+      "status": "INCOMPLETE",
+      "reason": "MISSING_OR_DISPUTED_EVIDENCE",
+      "currency": null
+    }
+  ],
+  "coverage_refs": [
+    {
+      "path": "coverage.json",
+      "sha256": "e372f1d21993844b1cba96a62647dbb7ed47d5542a2de822e4a05c2e61e4f54f",
+      "pointer": ""
+    }
+  ],
+  "official_report": {
+    "path": "official-report.json",
+    "sha256": "a84161f15581c9b51e84957fb965ce86e122438e0d165477284caebf41cfb107",
+    "pointer": ""
+  }
+}

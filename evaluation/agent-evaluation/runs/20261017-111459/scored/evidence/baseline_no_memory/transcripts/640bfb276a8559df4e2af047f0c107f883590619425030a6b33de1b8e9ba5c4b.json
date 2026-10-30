@@ -1,0 +1,71 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0012",
+    "call": "call_1",
+    "turn": 3
+  },
+  "customer_text": "Máy này đang có khuyến mãi gì không em?",
+  "agent_text": "Dạ em xin lỗi anh Long, hiện em chưa có thông tin giá và khuyến mãi chính xác cho máy hút sữa điện đôi Spectra S1. Anh Long vui lòng chờ em kiểm tra lại hoặc để em kết nối người phụ trách hỗ trợ anh nhé?",
+  "customer_id": "C008",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0012/call_1/3/4",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0012",
+        "call": "call_1",
+        "turn": 3
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/206"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0012/call_1/3/4",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-MHS-SPECTRA-S1",
+          "on": "2026-10-17",
+          "customer_phone": "0975475177"
+        }
+      },
+      "on": "2026-10-17",
+      "started_at": "2026-10-17T04:38:11.099354+00:00",
+      "finished_at": "2026-10-17T04:38:11.099354+00:00",
+      "outcome": "business_error",
+      "result": {
+        "error": "unknown_sku"
+      },
+      "error": {
+        "code": "unknown_sku",
+        "message": "BTC mock business error"
+      },
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"customer_phone\": \"0975475177\", \"on\": \"2026-10-17\", \"sku\": \"SKU-MHS-SPECTRA-S1\"}, \"name\": \"pricing.get_quote\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/202"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/207"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "report_kind": "claim-adjudication-v1",
+  "official_score_changed": false,
+  "counts": {
+    "EQUIVALENT": 1,
+    "NEEDS_REVIEW": 1
+  },
+  "rows": [
+    {
+      "config": "full",
+      "trace_source": "evidence/full.jsonl",
+      "scenario_id": "SCN-GEN-0002",
+      "call": "call_2",
+      "turn": 1,
+      "field": "order_status",
+      "claimed": "đang trong trạng thái giao hàng",
+      "ground_truth": "shipping",
+      "decision": "EQUIVALENT",
+      "rule": "shipping_phrase_and_order_tool",
+      "evidence": [
+        {
+          "tool": "order.status",
+          "status": "shipping"
+        }
+      ]
+    },
+    {
+      "config": "full",
+      "trace_source": "evidence/full.jsonl",
+      "scenario_id": "SCN-GEN-0002",
+      "call": "call_2",
+      "turn": 2,
+      "field": "order_status",
+      "claimed": "đang trong quá trình giao, chưa giao đến chị ạ",
+      "ground_truth": "shipping",
+      "decision": "NEEDS_REVIEW",
+      "rule": "no_verified_equivalence",
+      "evidence": []
+    }
+  ]
+}

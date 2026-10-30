@@ -1,0 +1,144 @@
+[10/17/26 10:03:58] INFO     Starting MCP server 'catalog'     transport.py:242
+                             with transport 'stdio'                            
+[10/17/26 10:03:59] INFO     Starting MCP server 'order' with  transport.py:242
+                             transport 'stdio'                                 
+[10/17/26 10:03:59] INFO     Starting MCP server 'crm' with    transport.py:242
+                             transport 'stdio'                                 
+[10/17/26 10:03:59] INFO     Starting MCP server 'memory' with transport.py:242
+                             transport 'stdio'                                 
+[10/17/26 10:03:59] INFO     Starting MCP server 'knowledge'   transport.py:242
+                             with transport 'stdio'                            
+[10/17/26 10:04:06] INFO     Starting MCP server 'memory' with transport.py:242
+                             transport 'stdio'                                 
+[10/17/26 10:04:06] INFO     Starting MCP server 'order' with  transport.py:242
+                             transport 'stdio'                                 
+[10/17/26 10:04:07] INFO     Starting MCP server 'catalog'     transport.py:242
+                             with transport 'stdio'                            
+[10/17/26 10:04:07] INFO     Starting MCP server 'knowledge'   transport.py:242
+                             with transport 'stdio'                            
+[10/17/26 10:04:07] INFO     Starting MCP server 'crm' with    transport.py:242
+                             transport 'stdio'                                 
+[10/17/26 10:04:14] INFO     Starting MCP server 'crm' with    transport.py:242
+                             transport 'stdio'                                 
+[10/17/26 10:04:14] INFO     Starting MCP server 'catalog'     transport.py:242
+                             with transport 'stdio'                            
+[10/17/26 10:04:14] INFO     Starting MCP server 'memory' with transport.py:242
+                             transport 'stdio'                                 
+[10/17/26 10:04:14] INFO     Starting MCP server 'order' with  transport.py:242
+                             transport 'stdio'                                 
+[10/17/26 10:04:14] INFO     Starting MCP server 'knowledge'   transport.py:242
+                             with transport 'stdio'                            
+Traceback (most recent call last):
+  File "C:\Users\mt200\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\scripts\evaluation\agent\bridge.py", line 297, in serve
+    result = await bridge.turn(message["text"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\scripts\evaluation\agent\bridge.py", line 194, in turn
+    state, error = await runner.take_turn(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\scripts\evaluation\agent\runner.py", line 222, in take_turn
+    return await rig.graph.ainvoke(turn, config={"configurable": {"thread_id": thread}}, context=context), None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\langgraph\pregel\main.py", line 4155, in ainvoke
+    async for chunk in self.astream(
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3505, in astream
+    async for _ in runner.atick(
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 397, in atick
+    await arun_with_retry(
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 744, in arun_with_retry
+    return await task.proc.ainvoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 756, in ainvoke
+    input = await asyncio.create_task(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 522, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\src\ai_agent_service\pipeline\hot\nodes.py", line 395, in guard
+    soft = await context.policy.review(PolicyInput(text=text, tool_results=results, tier=tier, policy_snippets=policy))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\src\ai_agent_service\agents\policy.py", line 106, in review
+    decision = await self.evaluate(json.loads(json.dumps(state, ensure_ascii=False, default=str)), QUESTIONS)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\src\ai_agent_service\agents\base.py", line 84, in evaluate
+    return await jev.evaluate(self.name, state, questions)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\src\ai_agent_service\llm\jev.py", line 196, in evaluate
+    response = await _http().post(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\httpx\_client.py", line 1859, in post
+    return await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\httpx\_client.py", line 1540, in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\httpx\_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\httpx\_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\httpx\_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\httpx\_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\httpx\_transports\default.py", line 394, in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\httpcore\_async\connection_pool.py", line 256, in handle_async_request
+    raise exc from None
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\httpcore\_async\connection_pool.py", line 236, in handle_async_request
+    response = await connection.handle_async_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\httpcore\_async\connection.py", line 103, in handle_async_request
+    return await self._connection.handle_async_request(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\httpcore\_async\http11.py", line 136, in handle_async_request
+    raise exc
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\httpcore\_async\http11.py", line 106, in handle_async_request
+    ) = await self._receive_response_headers(**kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\httpcore\_async\http11.py", line 177, in _receive_response_headers
+    event = await self._receive_event(timeout=timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\httpcore\_async\http11.py", line 217, in _receive_event
+    data = await self._network_stream.read(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\httpcore\_backends\anyio.py", line 35, in read
+    return await self._stream.receive(max_bytes=max_bytes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\anyio\streams\tls.py", line 254, in receive
+    data = await self._call_sslobject_method(self._ssl_object.read, max_bytes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\anyio\streams\tls.py", line 194, in _call_sslobject_method
+    data = await self.transport_stream.receive()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\apps\ai-agent-service\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 1407, in receive
+    await self._protocol.read_event.wait()
+  File "C:\Users\mt200\AppData\Local\Programs\Python\Python312\Lib\asyncio\locks.py", line 212, in wait
+    await fut
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\scripts\evaluation\agent\bridge.py", line 328, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "C:\Users\mt200\OneDrive\Desktop\AI_egineering\sudocode\capstone_sudocode2026\scripts\evaluation\agent\bridge.py", line 317, in main
+    asyncio.run(serve(protocol))
+  File "C:\Users\mt200\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\mt200\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py", line 123, in run
+    raise KeyboardInterrupt()
+KeyboardInterrupt

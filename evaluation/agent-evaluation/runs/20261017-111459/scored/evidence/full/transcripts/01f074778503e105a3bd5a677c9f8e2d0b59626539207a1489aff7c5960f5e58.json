@@ -1,0 +1,77 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0020",
+    "call": "call_1",
+    "turn": 1
+  },
+  "customer_text": "Alo em, chị muốn hỏi về máy lọc không khí cho phòng diện tích 35 mét vuông.",
+  "agent_text": "Dạ chị Linh, chị muốn máy lọc không khí của hãng nào hay có yêu cầu đặc biệt gì không ạ?",
+  "customer_id": "C019",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0020/call_1/1/1",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0020",
+        "call": "call_1",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/653"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0020/call_1/1/1",
+      "request": {
+        "name": "crm.get_customer",
+        "args": {
+          "phone": "0905218549"
+        }
+      },
+      "on": "2026-10-16",
+      "started_at": "2026-10-17T04:29:17.724391+00:00",
+      "finished_at": "2026-10-17T04:29:17.724391+00:00",
+      "outcome": "success",
+      "result": {
+        "found": true,
+        "ambiguous": false,
+        "customer_id": "C019",
+        "name": "Linh",
+        "honorific": "chị",
+        "phone": "0905218549",
+        "identities": {
+          "zalo_id": "zalo_linh18",
+          "fb_id": "fb.linh.398"
+        },
+        "orders": [],
+        "sessions": []
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"phone\": \"0905218549\"}, \"name\": \"crm.get_customer\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/656"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/658"
+    }
+  ]
+}

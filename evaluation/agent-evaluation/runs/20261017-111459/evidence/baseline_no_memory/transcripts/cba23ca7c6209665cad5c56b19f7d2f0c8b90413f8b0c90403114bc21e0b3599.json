@@ -1,0 +1,130 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0012",
+    "call": "call_2",
+    "turn": 1
+  },
+  "customer_text": "Alo, anh có câu hỏi về tính an toàn của máy hút sữa dành cho người thân đang dùng thuốc.",
+  "agent_text": "Dạ, em đã chuyển câu hỏi của anh cho nhân viên phụ trách rồi ạ. Anh vui lòng đợi trong giây lát để được hỗ trợ kỹ hơn nhé. Anh còn cần em giúp gì thêm không ạ? Dạ em kết nối anh/chị với đồng nghiệp phụ trách ngay ạ, anh/chị chờ em một chút.",
+  "customer_id": "C008",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0012/call_2/1/5",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0012",
+        "call": "call_2",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/217"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0012/call_2/1/5",
+      "request": {
+        "name": "crm.get_customer",
+        "args": {
+          "phone": "0975475177"
+        }
+      },
+      "on": "2026-10-20",
+      "started_at": "2026-10-17T04:38:14.763724+00:00",
+      "finished_at": "2026-10-17T04:38:14.763724+00:00",
+      "outcome": "success",
+      "result": {
+        "found": true,
+        "ambiguous": false,
+        "customer_id": "C008",
+        "name": "Long",
+        "honorific": "anh",
+        "phone": "0975475177",
+        "identities": {
+          "zalo_id": null,
+          "fb_id": null
+        },
+        "orders": [],
+        "sessions": []
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0012/call_2/1/6",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0012",
+        "call": "call_2",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/225"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0012/call_2/1/6",
+      "request": {
+        "name": "handoff.transfer",
+        "args": {
+          "brief": {
+            "customer_phone": "0975475177",
+            "customer_name": "Long",
+            "customer_id": "C008",
+            "channel": "hotline",
+            "product_advised": null,
+            "price_quoted_vnd": null,
+            "generated_at": "2026-10-20T10:00:00+07:00",
+            "escalation_reason": "cau_hoi_y_te",
+            "conversation_summary": "Khách hỏi về tính an toàn của máy hút sữa dành cho người thân đang dùng thuốc.",
+            "open_questions": [
+              "Tính an toàn của máy hút sữa khi dùng thuốc"
+            ],
+            "next_action": "Hỗ trợ tư vấn y tế về an toàn sử dụng máy hút sữa khi dùng thuốc"
+          }
+        }
+      },
+      "on": "2026-10-20",
+      "started_at": "2026-10-17T04:38:17.414535+00:00",
+      "finished_at": "2026-10-17T04:38:17.414535+00:00",
+      "outcome": "success",
+      "result": {
+        "ticket_id": "HT0001",
+        "status": "queued",
+        "brief_ok": true
+      },
+      "error": null,
+      "side_effect": true,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"phone\": \"0975475177\"}, \"name\": \"crm.get_customer\"}",
+    "{\"args\": {\"brief\": {\"channel\": \"hotline\", \"conversation_summary\": \"Khách hỏi về tính an toàn của máy hút sữa dành cho người thân đang dùng thuốc.\", \"customer_id\": \"C008\", \"customer_name\": \"Long\", \"customer_phone\": \"0975475177\", \"escalation_reason\": \"cau_hoi_y_te\", \"generated_at\": \"2026-10-20T10:00:00+07:00\", \"next_action\": \"Hỗ trợ tư vấn y tế về an toàn sử dụng máy hút sữa khi dùng thuốc\", \"open_questions\": [\"Tính an toàn của máy hút sữa khi dùng thuốc\"], \"price_quoted_vnd\": null, \"product_advised\": null}}, \"name\": \"handoff.transfer\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/220"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/226"
+    }
+  ]
+}

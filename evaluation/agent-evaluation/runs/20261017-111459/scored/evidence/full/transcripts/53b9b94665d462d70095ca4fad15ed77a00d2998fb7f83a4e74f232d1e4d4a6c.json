@@ -1,0 +1,154 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0010",
+    "call": "call_1",
+    "turn": 3
+  },
+  "customer_text": "Ngân sách của anh tầm 8 triệu rưỡi thôi.",
+  "agent_text": "Máy lọc không khí AirPure Pro hiện bên em có giá 7 triệu 690 nghìn đồng, đang có khuyến mãi giảm 300 nghìn và miễn phí vận chuyển ạ. Anh Minh có muốn đặt hàng hay cần thêm thông tin gì không ạ?",
+  "customer_id": "C004",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0010/call_1/3/3",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0010",
+        "call": "call_1",
+        "turn": 3
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/23"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0010/call_1/3/3",
+      "request": {
+        "name": "catalog.search",
+        "args": {
+          "query": "AirPure Pro",
+          "category": "gia-dung/may-loc-khong-khi",
+          "max_price_vnd": 8500000
+        }
+      },
+      "on": "2026-10-15",
+      "started_at": "2026-10-17T04:18:00.904633+00:00",
+      "finished_at": "2026-10-17T04:18:00.904633+00:00",
+      "outcome": "success",
+      "result": {
+        "items": [
+          {
+            "sku": "SKU-AP-PRO",
+            "name": "Máy lọc không khí AirPure Pro",
+            "category": "gia-dung/may-loc-khong-khi",
+            "list_price_vnd": 7990000,
+            "attributes": {
+              "room_area_m2": 45,
+              "features": "HEPA H13, UV, diệt khuẩn",
+              "warranty_months": 24,
+              "child_safe_lock": true
+            },
+            "variants": []
+          }
+        ],
+        "total": 1
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0010/call_1/3/4",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0010",
+        "call": "call_1",
+        "turn": 3
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/26"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0010/call_1/3/4",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-AP-PRO",
+          "on": "2026-10-15",
+          "customer_phone": "0952059972"
+        }
+      },
+      "on": "2026-10-15",
+      "started_at": "2026-10-17T04:18:02.436042+00:00",
+      "finished_at": "2026-10-17T04:18:02.436636+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-AP-PRO",
+        "list_price_vnd": 7990000,
+        "final_price_vnd": 7690000,
+        "applied_promos": [
+          {
+            "promo_code": "COD-0",
+            "type": "freecod",
+            "discount_vnd": 0
+          },
+          {
+            "promo_code": "AIR-OCT",
+            "type": "fixed",
+            "discount_vnd": 300000
+          }
+        ],
+        "expired_promos": [],
+        "ineligible_promos": [
+          {
+            "promo_code": "AIR-2ND-50",
+            "reason": "min_qty"
+          },
+          {
+            "promo_code": "NAM-SHIP0",
+            "reason": "region"
+          },
+          {
+            "promo_code": "TRADE-IN-AP",
+            "reason": "requires_owned_sku"
+          }
+        ],
+        "not_applied_exclusive": [],
+        "freeship": true,
+        "_internal_price_floor_vnd": 7191000
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"category\": \"gia-dung/may-loc-khong-khi\", \"max_price_vnd\": 8500000, \"query\": \"AirPure Pro\"}, \"name\": \"catalog.search\"}",
+    "{\"args\": {\"customer_phone\": \"0952059972\", \"on\": \"2026-10-15\", \"sku\": \"SKU-AP-PRO\"}, \"name\": \"pricing.get_quote\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/19"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/27"
+    }
+  ]
+}

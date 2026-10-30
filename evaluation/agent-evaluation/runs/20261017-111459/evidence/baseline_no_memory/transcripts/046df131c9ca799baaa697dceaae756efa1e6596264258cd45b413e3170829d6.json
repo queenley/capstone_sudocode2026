@@ -1,0 +1,205 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0017",
+    "call": "call_2",
+    "turn": 6
+  },
+  "customer_text": "Ngân sách của anh là 8 triệu rưỡi.",
+  "agent_text": "Dạ anh Huy, với ngân sách 8 triệu rưỡi, em sẽ tư vấn lại để chọn sản phẩm phù hợp hoặc ưu tiên những món anh cần nhất ạ. Anh muốn em tư vấn lại theo ngân sách này không ạ?",
+  "customer_id": "C014",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0017/call_2/6/16",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0017",
+        "call": "call_2",
+        "turn": 6
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/498"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0017/call_2/6/16",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-AP-PRO",
+          "on": "2026-10-17",
+          "customer_phone": "0925877188"
+        }
+      },
+      "on": "2026-10-17",
+      "started_at": "2026-10-17T04:43:15.483492+00:00",
+      "finished_at": "2026-10-17T04:43:15.483492+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-AP-PRO",
+        "list_price_vnd": 7990000,
+        "final_price_vnd": 7690000,
+        "applied_promos": [
+          {
+            "promo_code": "COD-0",
+            "type": "freecod",
+            "discount_vnd": 0
+          },
+          {
+            "promo_code": "AIR-OCT",
+            "type": "fixed",
+            "discount_vnd": 300000
+          }
+        ],
+        "expired_promos": [],
+        "ineligible_promos": [
+          {
+            "promo_code": "AIR-2ND-50",
+            "reason": "min_qty"
+          },
+          {
+            "promo_code": "NAM-SHIP0",
+            "reason": "region"
+          },
+          {
+            "promo_code": "TRADE-IN-AP",
+            "reason": "requires_owned_sku"
+          }
+        ],
+        "not_applied_exclusive": [],
+        "freeship": true,
+        "_internal_price_floor_vnd": 7191000
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0017/call_2/6/17",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0017",
+        "call": "call_2",
+        "turn": 6
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/501"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0017/call_2/6/17",
+      "request": {
+        "name": "catalog.search",
+        "args": {
+          "query": "màng lọc thay thế AirPure Pro"
+        }
+      },
+      "on": "2026-10-17",
+      "started_at": "2026-10-17T04:43:15.493394+00:00",
+      "finished_at": "2026-10-17T04:43:15.494368+00:00",
+      "outcome": "success",
+      "result": {
+        "items": [
+          {
+            "sku": "SKU-AP-FLT-P",
+            "name": "Màng lọc thay thế AirPure Pro",
+            "category": "gia-dung/phu-kien",
+            "list_price_vnd": 990000,
+            "attributes": {},
+            "variants": []
+          }
+        ],
+        "total": 1
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0017/call_2/6/18",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0017",
+        "call": "call_2",
+        "turn": 6
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/504"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0017/call_2/6/18",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-AP-FLT-P",
+          "on": "2026-10-17",
+          "customer_phone": "0925877188"
+        }
+      },
+      "on": "2026-10-17",
+      "started_at": "2026-10-17T04:43:16.344920+00:00",
+      "finished_at": "2026-10-17T04:43:16.344920+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-AP-FLT-P",
+        "list_price_vnd": 990000,
+        "final_price_vnd": 990000,
+        "applied_promos": [
+          {
+            "promo_code": "COD-0",
+            "type": "freecod",
+            "discount_vnd": 0
+          }
+        ],
+        "expired_promos": [],
+        "ineligible_promos": [
+          {
+            "promo_code": "NAM-SHIP0",
+            "reason": "region"
+          }
+        ],
+        "not_applied_exclusive": [],
+        "freeship": false,
+        "_internal_price_floor_vnd": 891000
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"customer_phone\": \"0925877188\", \"on\": \"2026-10-17\", \"sku\": \"SKU-AP-PRO\"}, \"name\": \"pricing.get_quote\"}",
+    "{\"args\": {\"query\": \"màng lọc thay thế AirPure Pro\"}, \"name\": \"catalog.search\"}",
+    "{\"args\": {\"customer_phone\": \"0925877188\", \"on\": \"2026-10-17\", \"sku\": \"SKU-AP-FLT-P\"}, \"name\": \"pricing.get_quote\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/494"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/505"
+    }
+  ]
+}

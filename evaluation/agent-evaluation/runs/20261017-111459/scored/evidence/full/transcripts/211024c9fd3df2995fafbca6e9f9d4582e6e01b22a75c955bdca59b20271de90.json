@@ -1,0 +1,70 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0010",
+    "call": "call_2",
+    "turn": 3
+  },
+  "customer_text": "Anh có thể chờ đến khi nào để mua máy?",
+  "agent_text": "Dạ máy AirPure Pro hiện bên em đang hết hàng, dự kiến có lại vào ngày 21 tháng 10 năm 2026 ạ. Anh Minh muốn em giữ máy cho anh khi có hàng không ạ?",
+  "customer_id": "C004",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0010/call_2/3/11",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0010",
+        "call": "call_2",
+        "turn": 3
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/68"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0010/call_2/3/11",
+      "request": {
+        "name": "inventory.check",
+        "args": {
+          "sku": "SKU-AP-PRO",
+          "on": "2026-10-18"
+        }
+      },
+      "on": "2026-10-18",
+      "started_at": "2026-10-17T04:18:13.278029+00:00",
+      "finished_at": "2026-10-17T04:18:13.278029+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-AP-PRO",
+        "in_stock": false,
+        "qty": 0,
+        "restock_expected": "2026-10-21"
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"on\": \"2026-10-18\", \"sku\": \"SKU-AP-PRO\"}, \"name\": \"inventory.check\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/64"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/69"
+    }
+  ]
+}

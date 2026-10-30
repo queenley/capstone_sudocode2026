@@ -1,0 +1,77 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0020",
+    "call": "call_3",
+    "turn": 1
+  },
+  "customer_text": "Alo em, chị gọi để hỏi tình trạng đơn hàng của mình.",
+  "agent_text": "Dạ chị Linh, để em kiểm tra giúp chị ạ. Chị vui lòng cho em biết số điện thoại hoặc mã đơn hàng chị đã đặt nhé.",
+  "customer_id": "C019",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0020/call_3/1/7",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0020",
+        "call": "call_3",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/659"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0020/call_3/1/7",
+      "request": {
+        "name": "crm.get_customer",
+        "args": {
+          "phone": "0905218549"
+        }
+      },
+      "on": "2026-10-23",
+      "started_at": "2026-10-17T04:46:17.419076+00:00",
+      "finished_at": "2026-10-17T04:46:17.419076+00:00",
+      "outcome": "success",
+      "result": {
+        "found": true,
+        "ambiguous": false,
+        "customer_id": "C019",
+        "name": "Linh",
+        "honorific": "chị",
+        "phone": "0905218549",
+        "identities": {
+          "zalo_id": "zalo_linh18",
+          "fb_id": "fb.linh.398"
+        },
+        "orders": [],
+        "sessions": []
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"phone\": \"0905218549\"}, \"name\": \"crm.get_customer\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/662"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/664"
+    }
+  ]
+}

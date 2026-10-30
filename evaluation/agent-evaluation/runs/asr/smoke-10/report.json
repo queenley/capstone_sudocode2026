@@ -1,0 +1,226 @@
+{
+  "schema_version": "team-asr-eval-v1",
+  "set_id": "asr-team-v1",
+  "set_sha256": "5a6935cfae613f5d4ded4bdebe362e89f23e916b5dbf7998da42c1df48295d40",
+  "engine": {
+    "url": "http://127.0.0.1:8500",
+    "model": "zipformer-30m",
+    "hotwords": true
+  },
+  "created_at": "2026-10-24T17:04:33+00:00",
+  "n_clips": 10,
+  "missing_hypotheses": [],
+  "complete": true,
+  "rtf_mean": 0.779,
+  "raw": {
+    "official": {
+      "normalization": "lowercase, NFC, bỏ dấu câu, gộp khoảng trắng; số/SĐT so exact-match sau ITN",
+      "WER": 5.1,
+      "CER": 3.2,
+      "entity_accuracy": 100.0,
+      "n_entities": 3,
+      "diarization_turn_accuracy": null,
+      "n_dialogues": 10,
+      "wer_noisy": 8.1,
+      "wer_clean": 0.0
+    },
+    "breakdown": {
+      "input_mode:text": {
+        "n": 10,
+        "mean_wer": 4.9
+      },
+      "noise:cafe": {
+        "n": 2,
+        "mean_wer": 16.6
+      },
+      "noise:clean": {
+        "n": 4,
+        "mean_wer": 0.0
+      },
+      "noise:street": {
+        "n": 3,
+        "mean_wer": 0.0
+      },
+      "noise:weak_signal": {
+        "n": 1,
+        "mean_wer": 15.4
+      },
+      "number_or_code:no": {
+        "n": 6,
+        "mean_wer": 4.0
+      },
+      "number_or_code:yes": {
+        "n": 4,
+        "mean_wer": 6.2
+      }
+    }
+  },
+  "lexicon": {
+    "official": {
+      "normalization": "lowercase, NFC, bỏ dấu câu, gộp khoảng trắng; số/SĐT so exact-match sau ITN",
+      "WER": 5.1,
+      "CER": 3.2,
+      "entity_accuracy": 100.0,
+      "n_entities": 3,
+      "diarization_turn_accuracy": null,
+      "n_dialogues": 10,
+      "wer_noisy": 8.1,
+      "wer_clean": 0.0
+    },
+    "breakdown": {
+      "input_mode:text": {
+        "n": 10,
+        "mean_wer": 4.9
+      },
+      "noise:cafe": {
+        "n": 2,
+        "mean_wer": 16.6
+      },
+      "noise:clean": {
+        "n": 4,
+        "mean_wer": 0.0
+      },
+      "noise:street": {
+        "n": 3,
+        "mean_wer": 0.0
+      },
+      "noise:weak_signal": {
+        "n": 1,
+        "mean_wer": 15.4
+      },
+      "number_or_code:no": {
+        "n": 6,
+        "mean_wer": 4.0
+      },
+      "number_or_code:yes": {
+        "n": 4,
+        "mean_wer": 6.2
+      }
+    }
+  },
+  "worst_clips_lexicon": [
+    {
+      "id": "SCN-GEN-0001-call_1-t4",
+      "wer": 25.0,
+      "noise": "cafe",
+      "reference": "chị muốn thanh toán cê ô đê và giao hàng ở cầu giấy, hà nội nhé.",
+      "hypothesis": "chị muốn thanh toán c od và giao hàng ở cầu giấy hà nội nhá"
+    },
+    {
+      "id": "SCN-GEN-0002-call_2-t2",
+      "wer": 15.4,
+      "noise": "weak_signal",
+      "reference": "chị muốn chuyển sang hải châu, đà nẵng, em làm giúp chị nhé.",
+      "hypothesis": "chị muốn chuyển sang hải châu đà nẵng em làm giúp việc khác"
+    },
+    {
+      "id": "SCN-GEN-0001-call_1-t1",
+      "wer": 8.3,
+      "noise": "cafe",
+      "reference": "alo, chị oanh đây, em ơi! chị muốn mua lại máy lọc không khí airpure x bản cũ mà chị đã mua trước đây.",
+      "hypothesis": "alo chị oanh đây em ơi chị muốn mua lại máy lọc không khí eprox bản cũ mà chị đã mua trước đây"
+    },
+    {
+      "id": "SCN-GEN-0001-call_1-t2",
+      "wer": 0.0,
+      "noise": "street",
+      "reference": "chị nhớ là phòng mình khoảng hai mươi lăm mét vuông, không có trẻ nhỏ đâu.",
+      "hypothesis": "chị nhớ là phòng mình khoảng hai mươi lăm mét vuông không có trẻ nhỏ đâu"
+    },
+    {
+      "id": "SCN-GEN-0001-call_1-t3",
+      "wer": 0.0,
+      "noise": "street",
+      "reference": "ngân sách chị chỉ có năm triệu thôi.",
+      "hypothesis": "ngân sách chị chỉ có năm triệu thôi"
+    },
+    {
+      "id": "SCN-GEN-0001-call_2-t1",
+      "wer": 0.0,
+      "noise": "clean",
+      "reference": "chị oanh đây, em ơi! chị muốn hỏi tình trạng đơn hàng của chị.",
+      "hypothesis": "chị oanh đây em ơi chị muốn hỏi tình trạng đơn hàng của chị"
+    },
+    {
+      "id": "SCN-GEN-0001-call_2-t2",
+      "wer": 0.0,
+      "noise": "clean",
+      "reference": "chị không nhớ mã đơn hàng, nhưng không biết đơn của chị hiện giờ thế nào?",
+      "hypothesis": "chị không nhớ mã đơn hàng nhưng không biết đơn của chị hiện giờ thế nào"
+    },
+    {
+      "id": "SCN-GEN-0002-call_1-t1",
+      "wer": 0.0,
+      "noise": "clean",
+      "reference": "alo, chị tâm đây, chị muốn hỏi tình trạng đơn hàng của mình hiện giờ như thế nào?",
+      "hypothesis": "alo chị tâm đây chị muốn hỏi tình trạng đơn hàng của mình hiện giờ như thế nào"
+    },
+    {
+      "id": "SCN-GEN-0002-call_1-t2",
+      "wer": 0.0,
+      "noise": "street",
+      "reference": "chị đặt hàng hôm ba tháng mười mà chưa thấy giao, em kiểm tra giúp chị với.",
+      "hypothesis": "chị đặt hàng hôm ba tháng mười mà chưa thấy giao em kiểm tra giúp chị với"
+    },
+    {
+      "id": "SCN-GEN-0002-call_2-t1",
+      "wer": 0.0,
+      "noise": "clean",
+      "reference": "alo, chị tâm đây, chị muốn đổi địa chỉ giao hàng cho đơn hàng của chị.",
+      "hypothesis": "alo chị tâm đây chị muốn đổi địa chỉ giao hàng cho đơn hàng của chị"
+    }
+  ],
+  "notice": "Diagnostic team set (one customer turn per clip, synthetic voices and noise, unreviewed reference); BTC's set is whole dialogues. No diarization: a clip has one speaker.",
+  "timing": {
+    "SCN-GEN-0001-call_1-t1": {
+      "audio_seconds": 6.4,
+      "asr_seconds": 7.951,
+      "round_trip_seconds": 8.589
+    },
+    "SCN-GEN-0001-call_1-t2": {
+      "audio_seconds": 4.0,
+      "asr_seconds": 4.212,
+      "round_trip_seconds": 4.65
+    },
+    "SCN-GEN-0001-call_1-t3": {
+      "audio_seconds": 2.4,
+      "asr_seconds": 3.138,
+      "round_trip_seconds": 3.748
+    },
+    "SCN-GEN-0001-call_1-t4": {
+      "audio_seconds": 3.84,
+      "asr_seconds": 2.268,
+      "round_trip_seconds": 2.4
+    },
+    "SCN-GEN-0001-call_2-t1": {
+      "audio_seconds": 4.0,
+      "asr_seconds": 1.657,
+      "round_trip_seconds": 1.757
+    },
+    "SCN-GEN-0001-call_2-t2": {
+      "audio_seconds": 4.56,
+      "asr_seconds": 3.848,
+      "round_trip_seconds": 4.134
+    },
+    "SCN-GEN-0002-call_1-t1": {
+      "audio_seconds": 5.12,
+      "asr_seconds": 2.196,
+      "round_trip_seconds": 2.339
+    },
+    "SCN-GEN-0002-call_1-t2": {
+      "audio_seconds": 4.56,
+      "asr_seconds": 1.857,
+      "round_trip_seconds": 1.987
+    },
+    "SCN-GEN-0002-call_2-t1": {
+      "audio_seconds": 4.48,
+      "asr_seconds": 4.291,
+      "round_trip_seconds": 4.929
+    },
+    "SCN-GEN-0002-call_2-t2": {
+      "audio_seconds": 3.92,
+      "asr_seconds": 2.138,
+      "round_trip_seconds": 2.547
+    }
+  }
+}

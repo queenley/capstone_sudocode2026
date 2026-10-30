@@ -1,0 +1,71 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0017",
+    "call": "call_1",
+    "turn": 3
+  },
+  "customer_text": "Máy này đang có khuyến mãi gì không em?",
+  "agent_text": "Dạ, em kiểm tra chưa có thông tin khuyến mãi cụ thể cho máy AirPure Pro hôm nay ạ. Anh có muốn em giới thiệu thêm sản phẩm khác trong tầm giá không ạ?",
+  "customer_id": "C014",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0017/call_1/3/4",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0017",
+        "call": "call_1",
+        "turn": 3
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/468"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0017/call_1/3/4",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "AirPure-Pro",
+          "on": "2026-10-16",
+          "customer_phone": "0925877188"
+        }
+      },
+      "on": "2026-10-16",
+      "started_at": "2026-10-17T04:26:31.263567+00:00",
+      "finished_at": "2026-10-17T04:26:31.263567+00:00",
+      "outcome": "business_error",
+      "result": {
+        "error": "unknown_sku"
+      },
+      "error": {
+        "code": "unknown_sku",
+        "message": "BTC mock business error"
+      },
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"customer_phone\": \"0925877188\", \"on\": \"2026-10-16\", \"sku\": \"AirPure-Pro\"}, \"name\": \"pricing.get_quote\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/464"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/469"
+    }
+  ]
+}

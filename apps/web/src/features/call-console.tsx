@@ -13,6 +13,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { api, AgentCall, AgentCallDetail, AgentTurn } from "@/services/api";
+import { handoffReason, HandoffToasts, useHandoffAlerts } from "@/features/handoff-alerts";
 
 const QUEUE_EVERY_MS = 5000;
 const CALL_EVERY_MS = 3000;
@@ -22,8 +23,9 @@ type Warning = { content: string; action: string; reasons: string[] };
 type Faq = { question: string; answer: string; saved: string | null };
 
 /** ``embedded``: inside the sales workspace (/ban-hang), which has already signed the person in:
- * connect at once with that token and leave out this page's own header and token form. */
-export default function CallConsole({ embedded = false }: { embedded?: boolean }) {
+ * connect at once with that token and leave out this page's own header and token form; the
+ * workspace raises the handoff alerts. ``focus``: a call to open (a clicked alert). */
+export default function CallConsole({ embedded = false, focus = null }: { embedded?: boolean; focus?: number | null }) {
   const [token, setToken] = useState("");
   const [connected, setConnected] = useState(false);
   const [openOnly, setOpenOnly] = useState(false);
@@ -43,6 +45,12 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
   useEffect(() => {
     setToken(sessionStorage.getItem("staff-token") || "");
   }, []);
+
+  useEffect(() => {
+    if (focus != null) setSelectedId(focus);
+  }, [focus]);
+
+  const alerts = useHandoffAlerts(connected && !embedded ? calls : null);
 
   const refreshQueue = useCallback(async () => {
     try {
@@ -160,6 +168,7 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
             : "Một nhân viên khác đang phụ trách"
           : "Trợ lý AI đang xử lý; bạn đang quan sát";
   const waiting = calls.filter((c) => c.handoff_status === "pending" && !c.ended_at).length;
+  const flagged = turns.filter((t) => t.speaker === "customer" && t.meta?.handoff).length;
 
   return (
     <main className={"shell workspace call-console" + (embedded ? " embedded" : "")}>
@@ -226,14 +235,21 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
           <h2>Hàng chờ</h2>
           {calls.length === 0 && <p className="empty">{connected ? "Chưa có cuộc gọi." : "Kết nối bằng token để tải."}</p>}
           {calls.map((c) => (
-            <div key={c.id} className={"queue-item" + (c.id === selectedId ? " selected" : "")}>
+            <div
+              key={c.id}
+              className={
+                "queue-item" +
+                (c.id === selectedId ? " selected" : "") +
+                (c.handoff_status === "pending" && !c.ended_at ? " waiting" : "")
+              }
+            >
               <button className="queue-row" onClick={() => setSelectedId(c.id)}>
                 <span className={"live-dot" + (c.ended_at ? " ended" : "")} />
                 <span className="queue-text">
                   <strong>{caller(c)}</strong>
                   <small>
                     {c.handoff_status === "pending"
-                      ? "Khách cần gặp nhân viên"
+                      ? `Cần nhân viên · ${handoffReason(c)}`
                       : c.handoff_status === "accepted"
                         ? "Nhân viên đang phụ trách"
                         : `${c.lane} · ${c.tier.toLowerCase()} · ${c.turn_count} lượt`}
@@ -274,9 +290,16 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
                 <div ref={bottom} />
               </div>
 
+              {flagged > 0 && (
+                <p className="handoff-legend">
+                  {flagged} tin nhắn của khách được tô đỏ: tin khiến cuộc trò chuyện chuyển sang nhân viên, và tin khách
+                  gửi trong lúc chờ.
+                </p>
+              )}
+
               {live && detail.handoff_status === "pending" && (
-                <div className="call-action-bar">
-                  <span>{detail.handoff_reason || "Trợ lý đã chuyển máy"}</span>
+                <div className="call-action-bar handoff-pending">
+                  <span>{handoffReason(detail)}</span>
                   <button onClick={() => accept(detail.id)}>Nhận cuộc gọi này</button>
                 </div>
               )}
@@ -445,6 +468,7 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
           {detail ? <Evidence detail={detail} /> : <p className="empty">Chọn cuộc gọi để xem brief và các lượt của trợ lý.</p>}
         </aside>
       </div>
+      {!embedded && <HandoffToasts alerts={alerts} onOpen={setSelectedId} />}
     </main>
   );
 }
@@ -455,8 +479,22 @@ function TurnBubble({ turn }: { turn: AgentTurn }) {
   const label =
     turn.speaker === "customer" ? "KHÁCH" : turn.speaker === "human_agent" ? "NHÂN VIÊN" : "TRỢ LÝ AI";
   const lane = turn.speaker === "agent" ? (turn.meta?.lane as string | undefined) : undefined;
+  // Set by the agent (runtime/harness.py handoff_mark): the message the call was handed over after
+  // ("trigger"), or one written while the handoff waited ("waiting").
+  const mark = turn.speaker === "customer" ? (turn.meta?.handoff as { role?: string; label?: string } | undefined) : undefined;
   return (
-    <div className={"message " + (turn.speaker === "customer" ? "incoming" : turn.speaker === "human_agent" ? "outgoing human" : "outgoing")}>
+    <div
+      className={
+        "message " +
+        (turn.speaker === "customer" ? "incoming" : turn.speaker === "human_agent" ? "outgoing human" : "outgoing") +
+        (mark?.role ? ` handoff-${mark.role}` : "")
+      }
+    >
+      {mark?.role && (
+        <span className="handoff-flag">
+          {mark.role === "trigger" ? `⚠ Cần nhân viên · ${mark.label || "chuyển máy"}` : mark.label || "Khách nhắn khi đang chờ"}
+        </span>
+      )}
       <small>
         {label}
         {lane ? ` · ${lane}` : ""} · {new Date(turn.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}

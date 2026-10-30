@@ -1,0 +1,635 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0013",
+    "call": "call_1",
+    "turn": 1
+  },
+  "customer_text": "Alo, chị muốn hỏi giày chạy bộ size 40 màu trắng.",
+  "agent_text": "Chị Hương ơi, bên em có mấy mẫu giày chạy bộ size 40 màu trắng như RunLite 1, RunLite 2 Pro, Urban Classic và HikePro. Chị muốn em tư vấn mẫu nào trước ạ?",
+  "customer_id": "C005",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0013/call_1/1/1",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0013",
+        "call": "call_1",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/245"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0013/call_1/1/1",
+      "request": {
+        "name": "crm.get_customer",
+        "args": {
+          "phone": "0979298416"
+        }
+      },
+      "on": "2026-10-15",
+      "started_at": "2026-10-17T04:39:28.448635+00:00",
+      "finished_at": "2026-10-17T04:39:28.448635+00:00",
+      "outcome": "success",
+      "result": {
+        "found": true,
+        "ambiguous": false,
+        "customer_id": "C005",
+        "name": "Hương",
+        "honorific": "chị",
+        "phone": "0979298416",
+        "identities": {
+          "zalo_id": "zalo_hương95",
+          "fb_id": null
+        },
+        "orders": [],
+        "sessions": []
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0013/call_1/1/2",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0013",
+        "call": "call_1",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/252"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0013/call_1/1/2",
+      "request": {
+        "name": "catalog.search",
+        "args": {
+          "query": "giày chạy bộ trắng size 40",
+          "category": "thoi-trang/giay"
+        }
+      },
+      "on": "2026-10-15",
+      "started_at": "2026-10-17T04:39:31.796140+00:00",
+      "finished_at": "2026-10-17T04:39:31.796140+00:00",
+      "outcome": "success",
+      "result": {
+        "items": [],
+        "total": 0
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0013/call_1/1/3",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0013",
+        "call": "call_1",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/255"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0013/call_1/1/3",
+      "request": {
+        "name": "catalog.search",
+        "args": {
+          "category": "thoi-trang/giay"
+        }
+      },
+      "on": "2026-10-15",
+      "started_at": "2026-10-17T04:39:31.806370+00:00",
+      "finished_at": "2026-10-17T04:39:31.806370+00:00",
+      "outcome": "success",
+      "result": {
+        "items": [
+          {
+            "sku": "SKU-SN-RUN1",
+            "name": "Giày chạy bộ RunLite 1",
+            "category": "thoi-trang/giay",
+            "list_price_vnd": 1290000,
+            "attributes": {
+              "material": "vải lưới + đế EVA",
+              "return_days": 7
+            },
+            "variants": [
+              {
+                "variant_sku": "SKU-SN-RUN1-38-DEN",
+                "size": 38,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-38-TRANG",
+                "size": 38,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-38-XAM",
+                "size": 38,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-39-DEN",
+                "size": 39,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-39-TRANG",
+                "size": 39,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-39-XAM",
+                "size": 39,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-40-DEN",
+                "size": 40,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-40-TRANG",
+                "size": 40,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-40-XAM",
+                "size": 40,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-41-DEN",
+                "size": 41,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-41-TRANG",
+                "size": 41,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-41-XAM",
+                "size": 41,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-42-DEN",
+                "size": 42,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-42-TRANG",
+                "size": 42,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-42-XAM",
+                "size": 42,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-43-DEN",
+                "size": 43,
+                "color": "den",
+                "price_delta_vnd": 50000
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-43-TRANG",
+                "size": 43,
+                "color": "trang",
+                "price_delta_vnd": 50000
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-43-XAM",
+                "size": 43,
+                "color": "xam",
+                "price_delta_vnd": 50000
+              }
+            ]
+          },
+          {
+            "sku": "SKU-SN-RUN2",
+            "name": "Giày chạy bộ RunLite 2 Pro",
+            "category": "thoi-trang/giay",
+            "list_price_vnd": 1690000,
+            "attributes": {
+              "material": "vải lưới + đế EVA",
+              "return_days": 7
+            },
+            "variants": [
+              {
+                "variant_sku": "SKU-SN-RUN2-38-DEN",
+                "size": 38,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-38-TRANG",
+                "size": 38,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-38-XAM",
+                "size": 38,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-39-DEN",
+                "size": 39,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-39-TRANG",
+                "size": 39,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-39-XAM",
+                "size": 39,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-40-DEN",
+                "size": 40,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-40-TRANG",
+                "size": 40,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-40-XAM",
+                "size": 40,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-41-DEN",
+                "size": 41,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-41-TRANG",
+                "size": 41,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-41-XAM",
+                "size": 41,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-42-DEN",
+                "size": 42,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-42-TRANG",
+                "size": 42,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-42-XAM",
+                "size": 42,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-43-DEN",
+                "size": 43,
+                "color": "den",
+                "price_delta_vnd": 50000
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-43-TRANG",
+                "size": 43,
+                "color": "trang",
+                "price_delta_vnd": 50000
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-43-XAM",
+                "size": 43,
+                "color": "xam",
+                "price_delta_vnd": 50000
+              }
+            ]
+          },
+          {
+            "sku": "SKU-SN-CAS",
+            "name": "Giày sneaker Urban Classic",
+            "category": "thoi-trang/giay",
+            "list_price_vnd": 890000,
+            "attributes": {
+              "material": "vải lưới + đế EVA",
+              "return_days": 7
+            },
+            "variants": [
+              {
+                "variant_sku": "SKU-SN-CAS-38-DEN",
+                "size": 38,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-CAS-38-TRANG",
+                "size": 38,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-CAS-38-XAM",
+                "size": 38,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-CAS-39-DEN",
+                "size": 39,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-CAS-39-TRANG",
+                "size": 39,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-CAS-39-XAM",
+                "size": 39,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-CAS-40-DEN",
+                "size": 40,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-CAS-40-TRANG",
+                "size": 40,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-CAS-40-XAM",
+                "size": 40,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-CAS-41-DEN",
+                "size": 41,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-CAS-41-TRANG",
+                "size": 41,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-CAS-41-XAM",
+                "size": 41,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-CAS-42-DEN",
+                "size": 42,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-CAS-42-TRANG",
+                "size": 42,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-CAS-42-XAM",
+                "size": 42,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-CAS-43-DEN",
+                "size": 43,
+                "color": "den",
+                "price_delta_vnd": 50000
+              },
+              {
+                "variant_sku": "SKU-SN-CAS-43-TRANG",
+                "size": 43,
+                "color": "trang",
+                "price_delta_vnd": 50000
+              },
+              {
+                "variant_sku": "SKU-SN-CAS-43-XAM",
+                "size": 43,
+                "color": "xam",
+                "price_delta_vnd": 50000
+              }
+            ]
+          },
+          {
+            "sku": "SKU-SN-TRK",
+            "name": "Giày trekking HikePro",
+            "category": "thoi-trang/giay",
+            "list_price_vnd": 1990000,
+            "attributes": {
+              "material": "vải lưới + đế EVA",
+              "return_days": 7
+            },
+            "variants": [
+              {
+                "variant_sku": "SKU-SN-TRK-38-DEN",
+                "size": 38,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-TRK-38-TRANG",
+                "size": 38,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-TRK-38-XAM",
+                "size": 38,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-TRK-39-DEN",
+                "size": 39,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-TRK-39-TRANG",
+                "size": 39,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-TRK-39-XAM",
+                "size": 39,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-TRK-40-DEN",
+                "size": 40,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-TRK-40-TRANG",
+                "size": 40,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-TRK-40-XAM",
+                "size": 40,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-TRK-41-DEN",
+                "size": 41,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-TRK-41-TRANG",
+                "size": 41,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-TRK-41-XAM",
+                "size": 41,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-TRK-42-DEN",
+                "size": 42,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-TRK-42-TRANG",
+                "size": 42,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-TRK-42-XAM",
+                "size": 42,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-TRK-43-DEN",
+                "size": 43,
+                "color": "den",
+                "price_delta_vnd": 50000
+              },
+              {
+                "variant_sku": "SKU-SN-TRK-43-TRANG",
+                "size": 43,
+                "color": "trang",
+                "price_delta_vnd": 50000
+              },
+              {
+                "variant_sku": "SKU-SN-TRK-43-XAM",
+                "size": 43,
+                "color": "xam",
+                "price_delta_vnd": 50000
+              }
+            ]
+          }
+        ],
+        "total": 4
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"phone\": \"0979298416\"}, \"name\": \"crm.get_customer\"}",
+    "{\"args\": {\"category\": \"thoi-trang/giay\", \"query\": \"giày chạy bộ trắng size 40\"}, \"name\": \"catalog.search\"}",
+    "{\"args\": {\"category\": \"thoi-trang/giay\"}, \"name\": \"catalog.search\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/248"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/256"
+    }
+  ]
+}

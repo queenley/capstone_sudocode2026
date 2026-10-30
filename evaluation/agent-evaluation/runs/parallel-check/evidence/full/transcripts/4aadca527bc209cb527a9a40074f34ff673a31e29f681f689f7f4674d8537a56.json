@@ -1,0 +1,282 @@
+{
+  "context": {
+    "run_id": "PRODUCT-70a8f17c2a91c3b1",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0010",
+    "call": "call_3",
+    "turn": 1
+  },
+  "customer_text": "Alo, cho anh hỏi máy lọc không khí AirPure Pro đã về hàng chưa?",
+  "agent_text": "Dạ máy lọc không khí AirPure Pro hiện bên em chưa có hàng ạ, dự kiến về lại ngày 21 tháng 10 năm 2026 anh nhé. Anh cần em hỗ trợ thêm gì không ạ?",
+  "customer_id": "C004",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-70a8f17c2a91c3b1/full/SCN-GEN-0010/call_3/1/14",
+      "run_id": "PRODUCT-70a8f17c2a91c3b1",
+      "context": {
+        "run_id": "PRODUCT-70a8f17c2a91c3b1",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0010",
+        "call": "call_3",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "a5ea0d6e9f1060e868586bcc8ad982eef44c590b59573a31a0e25556ded877be",
+          "pointer": "/85"
+        }
+      ],
+      "event_id": "PRODUCT-70a8f17c2a91c3b1/full/SCN-GEN-0010/call_3/1/14",
+      "request": {
+        "name": "crm.get_customer",
+        "args": {
+          "phone": "0952059972"
+        }
+      },
+      "on": "2026-10-20",
+      "started_at": "2026-10-17T04:06:52.987287+00:00",
+      "finished_at": "2026-10-17T04:06:52.988162+00:00",
+      "outcome": "success",
+      "result": {
+        "found": true,
+        "ambiguous": false,
+        "customer_id": "C004",
+        "name": "Minh",
+        "honorific": "anh",
+        "phone": "0952059972",
+        "identities": {
+          "zalo_id": null,
+          "fb_id": "fb.minh.658"
+        },
+        "orders": [],
+        "sessions": []
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-70a8f17c2a91c3b1/full/SCN-GEN-0010/call_3/1/15",
+      "run_id": "PRODUCT-70a8f17c2a91c3b1",
+      "context": {
+        "run_id": "PRODUCT-70a8f17c2a91c3b1",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0010",
+        "call": "call_3",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "a5ea0d6e9f1060e868586bcc8ad982eef44c590b59573a31a0e25556ded877be",
+          "pointer": "/88"
+        }
+      ],
+      "event_id": "PRODUCT-70a8f17c2a91c3b1/full/SCN-GEN-0010/call_3/1/15",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-AP-PRO",
+          "on": "2026-10-20",
+          "customer_phone": "0952059972"
+        }
+      },
+      "on": "2026-10-20",
+      "started_at": "2026-10-17T04:06:53.025435+00:00",
+      "finished_at": "2026-10-17T04:06:53.026439+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-AP-PRO",
+        "list_price_vnd": 7990000,
+        "final_price_vnd": 7690000,
+        "applied_promos": [
+          {
+            "promo_code": "COD-0",
+            "type": "freecod",
+            "discount_vnd": 0
+          },
+          {
+            "promo_code": "AIR-OCT",
+            "type": "fixed",
+            "discount_vnd": 300000
+          }
+        ],
+        "expired_promos": [],
+        "ineligible_promos": [
+          {
+            "promo_code": "AIR-2ND-50",
+            "reason": "min_qty"
+          },
+          {
+            "promo_code": "NAM-SHIP0",
+            "reason": "region"
+          },
+          {
+            "promo_code": "TRADE-IN-AP",
+            "reason": "requires_owned_sku"
+          }
+        ],
+        "not_applied_exclusive": [],
+        "freeship": true,
+        "_internal_price_floor_vnd": 7191000
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-70a8f17c2a91c3b1/full/SCN-GEN-0010/call_3/1/16",
+      "run_id": "PRODUCT-70a8f17c2a91c3b1",
+      "context": {
+        "run_id": "PRODUCT-70a8f17c2a91c3b1",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0010",
+        "call": "call_3",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "a5ea0d6e9f1060e868586bcc8ad982eef44c590b59573a31a0e25556ded877be",
+          "pointer": "/91"
+        }
+      ],
+      "event_id": "PRODUCT-70a8f17c2a91c3b1/full/SCN-GEN-0010/call_3/1/16",
+      "request": {
+        "name": "inventory.check",
+        "args": {
+          "sku": "SKU-AP-PRO",
+          "on": "2026-10-20"
+        }
+      },
+      "on": "2026-10-20",
+      "started_at": "2026-10-17T04:06:53.036121+00:00",
+      "finished_at": "2026-10-17T04:06:53.036121+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-AP-PRO",
+        "in_stock": false,
+        "qty": 0,
+        "restock_expected": "2026-10-21"
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-70a8f17c2a91c3b1/full/SCN-GEN-0010/call_3/1/17",
+      "run_id": "PRODUCT-70a8f17c2a91c3b1",
+      "context": {
+        "run_id": "PRODUCT-70a8f17c2a91c3b1",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0010",
+        "call": "call_3",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "a5ea0d6e9f1060e868586bcc8ad982eef44c590b59573a31a0e25556ded877be",
+          "pointer": "/94"
+        }
+      ],
+      "event_id": "PRODUCT-70a8f17c2a91c3b1/full/SCN-GEN-0010/call_3/1/17",
+      "request": {
+        "name": "catalog.search",
+        "args": {
+          "sku": "SKU-AP-PRO"
+        }
+      },
+      "on": "2026-10-20",
+      "started_at": "2026-10-17T04:06:53.044323+00:00",
+      "finished_at": "2026-10-17T04:06:53.044323+00:00",
+      "outcome": "success",
+      "result": {
+        "items": [
+          {
+            "sku": "SKU-AP-PRO",
+            "name": "Máy lọc không khí AirPure Pro",
+            "category": "gia-dung/may-loc-khong-khi",
+            "list_price_vnd": 7990000,
+            "attributes": {
+              "room_area_m2": 45,
+              "features": "HEPA H13, UV, diệt khuẩn",
+              "warranty_months": 24,
+              "child_safe_lock": true
+            },
+            "variants": []
+          }
+        ],
+        "total": 1
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-70a8f17c2a91c3b1/full/SCN-GEN-0010/call_3/1/18",
+      "run_id": "PRODUCT-70a8f17c2a91c3b1",
+      "context": {
+        "run_id": "PRODUCT-70a8f17c2a91c3b1",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0010",
+        "call": "call_3",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "a5ea0d6e9f1060e868586bcc8ad982eef44c590b59573a31a0e25556ded877be",
+          "pointer": "/101"
+        }
+      ],
+      "event_id": "PRODUCT-70a8f17c2a91c3b1/full/SCN-GEN-0010/call_3/1/18",
+      "request": {
+        "name": "inventory.check",
+        "args": {
+          "sku": "SKU-AP-PRO",
+          "on": "2026-10-20"
+        }
+      },
+      "on": "2026-10-20",
+      "started_at": "2026-10-17T04:06:53.772485+00:00",
+      "finished_at": "2026-10-17T04:06:53.772485+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-AP-PRO",
+        "in_stock": false,
+        "qty": 0,
+        "restock_expected": "2026-10-21"
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"phone\": \"0952059972\"}, \"name\": \"crm.get_customer\"}",
+    "{\"args\": {\"customer_phone\": \"0952059972\", \"on\": \"2026-10-20\", \"sku\": \"SKU-AP-PRO\"}, \"name\": \"pricing.get_quote\"}",
+    "{\"args\": {\"on\": \"2026-10-20\", \"sku\": \"SKU-AP-PRO\"}, \"name\": \"inventory.check\"}",
+    "{\"args\": {\"sku\": \"SKU-AP-PRO\"}, \"name\": \"catalog.search\"}",
+    "{\"args\": {\"on\": \"2026-10-20\", \"sku\": \"SKU-AP-PRO\"}, \"name\": \"inventory.check\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "a5ea0d6e9f1060e868586bcc8ad982eef44c590b59573a31a0e25556ded877be",
+      "pointer": "/97"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "a5ea0d6e9f1060e868586bcc8ad982eef44c590b59573a31a0e25556ded877be",
+      "pointer": "/102"
+    }
+  ]
+}

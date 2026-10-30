@@ -1,0 +1,16 @@
+{
+  "report_kind": "product-rag-recall-v1",
+  "retriever": "apps/ai-agent-service/src/ai_agent_service/mcp/servers/knowledge.py:kb_search",
+  "corpus": "BTC policy bytes match pinned evaluation corpus",
+  "on": "2026-10-15",
+  "status": "DIAGNOSTIC",
+  "scorer": "BTC reference_eval.py:rag_eval",
+  "metrics": {
+    "recall@3": 81.4,
+    "recall@5": 88.1,
+    "multi_hop_full_recall@3": 33.3,
+    "multi_hop_full_recall@5": 58.3
+  },
+  "non_btc_chunk_ids": [],
+  "notice": "Retrieval only; answer, abstention, DB KB version and response quality not certified."
+}

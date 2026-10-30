@@ -1,0 +1,187 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0017",
+    "call": "call_2",
+    "turn": 7
+  },
+  "customer_text": "Giao hàng ở Nha Trang, Khánh Hòa nhé!",
+  "agent_text": "Dạ, giá máy lọc không khí AirPure Pro hôm nay là 7 triệu 690 nghìn đồng, được miễn phí vận chuyển về Nha Trang, Khánh Hòa ạ. Riêng nồi chiên và quạt đứng bên em chưa có mã sản phẩm chính xác để báo giá ngay được ạ. Anh Huy muốn em hỗ trợ kiểm tra lại hoặc tư vấn thêm không ạ?",
+  "customer_id": "C014",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0017/call_2/7/21",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0017",
+        "call": "call_2",
+        "turn": 7
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/549"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0017/call_2/7/21",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-AP-PRO",
+          "address": "Nha Trang, Khánh Hòa",
+          "on": "2026-10-17",
+          "customer_phone": "0925877188"
+        }
+      },
+      "on": "2026-10-17",
+      "started_at": "2026-10-17T04:26:50.547197+00:00",
+      "finished_at": "2026-10-17T04:26:50.547197+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-AP-PRO",
+        "list_price_vnd": 7990000,
+        "final_price_vnd": 7690000,
+        "applied_promos": [
+          {
+            "promo_code": "COD-0",
+            "type": "freecod",
+            "discount_vnd": 0
+          },
+          {
+            "promo_code": "AIR-OCT",
+            "type": "fixed",
+            "discount_vnd": 300000
+          }
+        ],
+        "expired_promos": [],
+        "ineligible_promos": [
+          {
+            "promo_code": "AIR-2ND-50",
+            "reason": "min_qty"
+          },
+          {
+            "promo_code": "NAM-SHIP0",
+            "reason": "region"
+          },
+          {
+            "promo_code": "TRADE-IN-AP",
+            "reason": "requires_owned_sku"
+          }
+        ],
+        "not_applied_exclusive": [],
+        "freeship": true,
+        "_internal_price_floor_vnd": 7191000
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0017/call_2/7/22",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0017",
+        "call": "call_2",
+        "turn": 7
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/552"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0017/call_2/7/22",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-NC-XIAOMI-4.5L",
+          "address": "Nha Trang, Khánh Hòa",
+          "on": "2026-10-17",
+          "customer_phone": "0925877188"
+        }
+      },
+      "on": "2026-10-17",
+      "started_at": "2026-10-17T04:26:50.557724+00:00",
+      "finished_at": "2026-10-17T04:26:50.557724+00:00",
+      "outcome": "business_error",
+      "result": {
+        "error": "unknown_sku"
+      },
+      "error": {
+        "code": "unknown_sku",
+        "message": "BTC mock business error"
+      },
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0017/call_2/7/23",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0017",
+        "call": "call_2",
+        "turn": 7
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/555"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0017/call_2/7/23",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-QT-SENKO-TS16",
+          "address": "Nha Trang, Khánh Hòa",
+          "on": "2026-10-17",
+          "customer_phone": "0925877188"
+        }
+      },
+      "on": "2026-10-17",
+      "started_at": "2026-10-17T04:26:50.566721+00:00",
+      "finished_at": "2026-10-17T04:26:50.566721+00:00",
+      "outcome": "business_error",
+      "result": {
+        "error": "unknown_sku"
+      },
+      "error": {
+        "code": "unknown_sku",
+        "message": "BTC mock business error"
+      },
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"address\": \"Nha Trang, Khánh Hòa\", \"customer_phone\": \"0925877188\", \"on\": \"2026-10-17\", \"sku\": \"SKU-AP-PRO\"}, \"name\": \"pricing.get_quote\"}",
+    "{\"args\": {\"address\": \"Nha Trang, Khánh Hòa\", \"customer_phone\": \"0925877188\", \"on\": \"2026-10-17\", \"sku\": \"SKU-NC-XIAOMI-4.5L\"}, \"name\": \"pricing.get_quote\"}",
+    "{\"args\": {\"address\": \"Nha Trang, Khánh Hòa\", \"customer_phone\": \"0925877188\", \"on\": \"2026-10-17\", \"sku\": \"SKU-QT-SENKO-TS16\"}, \"name\": \"pricing.get_quote\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/545"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/556"
+    }
+  ]
+}

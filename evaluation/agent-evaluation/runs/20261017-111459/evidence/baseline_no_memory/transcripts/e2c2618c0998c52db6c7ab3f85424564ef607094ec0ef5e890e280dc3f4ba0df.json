@@ -1,0 +1,198 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0017",
+    "call": "call_2",
+    "turn": 4
+  },
+  "customer_text": "Tổng tiền cho tất cả là bao nhiêu em?",
+  "agent_text": "Dạ tổng tiền hôm nay là máy lọc không khí AirPure Pro giá 7.690.000 đồng, nồi chiên không dầu Xiaomi 4.5L giá 1.590.000 đồng, quạt đứng Senko TS16 giá 590.000 đồng ạ. Riêng màng lọc thay thế AirPure Pro em chưa có giá chính xác để báo anh ngay được ạ. Anh có muốn em giữ đơn và gọi lại sau báo giá màng lọc không ạ?",
+  "customer_id": "C014",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0017/call_2/4/13",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0017",
+        "call": "call_2",
+        "turn": 4
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/483"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0017/call_2/4/13",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-AP-PRO",
+          "on": "2026-10-17",
+          "customer_phone": "0925877188"
+        }
+      },
+      "on": "2026-10-17",
+      "started_at": "2026-10-17T04:43:09.736480+00:00",
+      "finished_at": "2026-10-17T04:43:09.737489+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-AP-PRO",
+        "list_price_vnd": 7990000,
+        "final_price_vnd": 7690000,
+        "applied_promos": [
+          {
+            "promo_code": "COD-0",
+            "type": "freecod",
+            "discount_vnd": 0
+          },
+          {
+            "promo_code": "AIR-OCT",
+            "type": "fixed",
+            "discount_vnd": 300000
+          }
+        ],
+        "expired_promos": [],
+        "ineligible_promos": [
+          {
+            "promo_code": "AIR-2ND-50",
+            "reason": "min_qty"
+          },
+          {
+            "promo_code": "NAM-SHIP0",
+            "reason": "region"
+          },
+          {
+            "promo_code": "TRADE-IN-AP",
+            "reason": "requires_owned_sku"
+          }
+        ],
+        "not_applied_exclusive": [],
+        "freeship": true,
+        "_internal_price_floor_vnd": 7191000
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0017/call_2/4/14",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0017",
+        "call": "call_2",
+        "turn": 4
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/486"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0017/call_2/4/14",
+      "request": {
+        "name": "catalog.search",
+        "args": {
+          "query": "nồi chiên không dầu Xiaomi 4.5L"
+        }
+      },
+      "on": "2026-10-17",
+      "started_at": "2026-10-17T04:43:09.755374+00:00",
+      "finished_at": "2026-10-17T04:43:09.755942+00:00",
+      "outcome": "success",
+      "result": {
+        "items": [
+          {
+            "sku": "SKU-AF-XM",
+            "name": "Nồi chiên không dầu Xiaomi 4.5L",
+            "category": "gia-dung/noi-chien",
+            "list_price_vnd": 1590000,
+            "attributes": {
+              "warranty_months": 12
+            },
+            "variants": []
+          }
+        ],
+        "total": 1
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0017/call_2/4/15",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0017",
+        "call": "call_2",
+        "turn": 4
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/489"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0017/call_2/4/15",
+      "request": {
+        "name": "catalog.search",
+        "args": {
+          "query": "quạt đứng Senko TS16"
+        }
+      },
+      "on": "2026-10-17",
+      "started_at": "2026-10-17T04:43:09.772244+00:00",
+      "finished_at": "2026-10-17T04:43:09.772819+00:00",
+      "outcome": "success",
+      "result": {
+        "items": [
+          {
+            "sku": "SKU-FAN-SEN",
+            "name": "Quạt đứng Senko TS16",
+            "category": "gia-dung/quat",
+            "list_price_vnd": 590000,
+            "attributes": {
+              "warranty_months": 12
+            },
+            "variants": []
+          }
+        ],
+        "total": 1
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"customer_phone\": \"0925877188\", \"on\": \"2026-10-17\", \"sku\": \"SKU-AP-PRO\"}, \"name\": \"pricing.get_quote\"}",
+    "{\"args\": {\"query\": \"nồi chiên không dầu Xiaomi 4.5L\"}, \"name\": \"catalog.search\"}",
+    "{\"args\": {\"query\": \"quạt đứng Senko TS16\"}, \"name\": \"catalog.search\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/479"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/490"
+    }
+  ]
+}

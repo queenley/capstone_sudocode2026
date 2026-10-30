@@ -1,0 +1,161 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0021",
+    "call": "call_1",
+    "turn": 2
+  },
+  "customer_text": "Phòng chị rộng khoảng 40 mét vuông, nhà có bé nhỏ nữa.",
+  "agent_text": "Dạ với phòng rộng 40 mét vuông và có bé nhỏ, em thấy máy lọc không khí AirPure Pro phù hợp hơn vì có tính năng diệt khuẩn và khóa an toàn cho trẻ ạ. Chị muốn em báo giá cho máy này luôn không ạ?",
+  "customer_id": "C011",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0021/call_1/2/2",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0021",
+        "call": "call_1",
+        "turn": 2
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/783"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0021/call_1/2/2",
+      "request": {
+        "name": "catalog.search",
+        "args": {
+          "query": "AirPure Mini",
+          "category": "gia-dung/may-loc-khong-khi",
+          "min_room_area_m2": 40
+        }
+      },
+      "on": "2026-10-17",
+      "started_at": "2026-10-17T04:31:07.024988+00:00",
+      "finished_at": "2026-10-17T04:31:07.024988+00:00",
+      "outcome": "success",
+      "result": {
+        "items": [],
+        "total": 0
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0021/call_1/2/3",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0021",
+        "call": "call_1",
+        "turn": 2
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/786"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0021/call_1/2/3",
+      "request": {
+        "name": "catalog.search",
+        "args": {
+          "category": "gia-dung/may-loc-khong-khi",
+          "min_room_area_m2": 40
+        }
+      },
+      "on": "2026-10-17",
+      "started_at": "2026-10-17T04:31:07.037170+00:00",
+      "finished_at": "2026-10-17T04:31:07.037170+00:00",
+      "outcome": "success",
+      "result": {
+        "items": [
+          {
+            "sku": "SKU-AP-PRO",
+            "name": "Máy lọc không khí AirPure Pro",
+            "category": "gia-dung/may-loc-khong-khi",
+            "list_price_vnd": 7990000,
+            "attributes": {
+              "room_area_m2": 45,
+              "features": "HEPA H13, UV, diệt khuẩn",
+              "warranty_months": 24,
+              "child_safe_lock": true
+            },
+            "variants": []
+          },
+          {
+            "sku": "SKU-XM-4L",
+            "name": "Máy lọc không khí Xiaomi Smart 4 Lite",
+            "category": "gia-dung/may-loc-khong-khi",
+            "list_price_vnd": 2990000,
+            "attributes": {
+              "room_area_m2": 43,
+              "features": "HEPA, app Mi Home",
+              "warranty_months": 24,
+              "child_safe_lock": false
+            },
+            "variants": []
+          },
+          {
+            "sku": "SKU-XM-4P",
+            "name": "Máy lọc không khí Xiaomi Smart 4 Pro",
+            "category": "gia-dung/may-loc-khong-khi",
+            "list_price_vnd": 5490000,
+            "attributes": {
+              "room_area_m2": 60,
+              "features": "HEPA, màn OLED, app Mi Home",
+              "warranty_months": 24,
+              "child_safe_lock": false
+            },
+            "variants": []
+          },
+          {
+            "sku": "SKU-SS-AX40",
+            "name": "Máy lọc không khí Samsung AX40",
+            "category": "gia-dung/may-loc-khong-khi",
+            "list_price_vnd": 6490000,
+            "attributes": {
+              "room_area_m2": 40,
+              "features": "HEPA, lọc khử mùi, cảm biến bụi",
+              "warranty_months": 24,
+              "child_safe_lock": true
+            },
+            "variants": []
+          }
+        ],
+        "total": 4
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"category\": \"gia-dung/may-loc-khong-khi\", \"min_room_area_m2\": 40, \"query\": \"AirPure Mini\"}, \"name\": \"catalog.search\"}",
+    "{\"args\": {\"category\": \"gia-dung/may-loc-khong-khi\", \"min_room_area_m2\": 40}, \"name\": \"catalog.search\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/779"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/787"
+    }
+  ]
+}

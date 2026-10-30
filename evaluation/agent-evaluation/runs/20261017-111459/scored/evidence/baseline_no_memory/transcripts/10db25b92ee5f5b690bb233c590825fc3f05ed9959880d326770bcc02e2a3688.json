@@ -1,0 +1,192 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0011",
+    "call": "call_1",
+    "turn": 1
+  },
+  "customer_text": "alo e, chi muon hoi ve may loc khong khi airpure x cho phong chi khoang bon muoi met vuong",
+  "agent_text": "Dạ máy lọc không khí AirPure X phù hợp cho phòng khoảng 25 mét vuông ạ. Giá hiện tại là 4.890.000 đồng, có quà tặng là bộ lọc thay thế và miễn phí vận chuyển ạ. Anh/chị cần em tư vấn thêm về tính năng hay đặt hàng luôn ạ?",
+  "customer_id": "unidentified",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0011/call_1/1/1",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0011",
+        "call": "call_1",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/112"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0011/call_1/1/1",
+      "request": {
+        "name": "crm.get_customer",
+        "args": {
+          "fb_id": "fb.c009"
+        }
+      },
+      "on": "2026-10-16",
+      "started_at": "2026-10-17T04:36:21.508640+00:00",
+      "finished_at": "2026-10-17T04:36:21.508640+00:00",
+      "outcome": "success",
+      "result": {
+        "found": false
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0011/call_1/1/2",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0011",
+        "call": "call_1",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/119"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0011/call_1/1/2",
+      "request": {
+        "name": "catalog.search",
+        "args": {
+          "query": "AirPure X",
+          "category": "gia-dung/may-loc-khong-khi"
+        }
+      },
+      "on": "2026-10-16",
+      "started_at": "2026-10-17T04:36:25.156973+00:00",
+      "finished_at": "2026-10-17T04:36:25.156973+00:00",
+      "outcome": "success",
+      "result": {
+        "items": [
+          {
+            "sku": "SKU-AP-X",
+            "name": "Máy lọc không khí AirPure X",
+            "category": "gia-dung/may-loc-khong-khi",
+            "list_price_vnd": 4890000,
+            "attributes": {
+              "room_area_m2": 25,
+              "features": "HEPA H13, cảm biến PM2.5, chế độ ngủ",
+              "warranty_months": 24,
+              "child_safe_lock": false
+            },
+            "variants": []
+          }
+        ],
+        "total": 1
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0011/call_1/1/3",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0011",
+        "call": "call_1",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/122"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0011/call_1/1/3",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-AP-X",
+          "on": "2026-10-16"
+        }
+      },
+      "on": "2026-10-16",
+      "started_at": "2026-10-17T04:36:25.891804+00:00",
+      "finished_at": "2026-10-17T04:36:25.891804+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-AP-X",
+        "list_price_vnd": 4890000,
+        "final_price_vnd": 4890000,
+        "applied_promos": [
+          {
+            "promo_code": "COD-0",
+            "type": "freecod",
+            "discount_vnd": 0
+          },
+          {
+            "promo_code": "GIFT-FILTER",
+            "type": "gift",
+            "discount_vnd": 0,
+            "gift_sku": "SKU-AP-FLT-X"
+          }
+        ],
+        "expired_promos": [
+          "AP-SEP"
+        ],
+        "ineligible_promos": [
+          {
+            "promo_code": "AIR-2ND-50",
+            "reason": "min_qty"
+          },
+          {
+            "promo_code": "NAM-SHIP0",
+            "reason": "region"
+          },
+          {
+            "promo_code": "TRADE-IN-AP",
+            "reason": "requires_owned_sku"
+          }
+        ],
+        "not_applied_exclusive": [],
+        "freeship": true,
+        "_internal_price_floor_vnd": 4401000
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"fb_id\": \"fb.c009\"}, \"name\": \"crm.get_customer\"}",
+    "{\"args\": {\"category\": \"gia-dung/may-loc-khong-khi\", \"query\": \"AirPure X\"}, \"name\": \"catalog.search\"}",
+    "{\"args\": {\"on\": \"2026-10-16\", \"sku\": \"SKU-AP-X\"}, \"name\": \"pricing.get_quote\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/115"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/123"
+    }
+  ]
+}

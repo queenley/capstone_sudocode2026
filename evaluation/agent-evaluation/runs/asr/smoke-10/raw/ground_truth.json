@@ -1,0 +1,278 @@
+{
+  "description": "asr-team-v1: one customer turn per clip (ElevenLabs voices, synthetic noise) from the team scenarios; diagnostic, not reviewed. Reference = source text in spoken form (create_data src/asr/spoken.py), as we assume the voice read it.",
+  "hypotheses_format": "asr/hypotheses.json = {\"D01\": {\"text\": \"<transcript toàn hội thoại>\", \"entities\": {\"price_vnd\": 4890000, ...}, \"turns\": [{\"speaker\": \"A|C\", \"start\": 0.0, \"end\": 3.2, \"text\": \"...\"}]}}. turns là tùy chọn (M2 diarization).",
+  "normalization_rule": "Trước khi tính WER/CER: lowercase, NFC, bỏ dấu câu, gộp khoảng trắng. Ground truth viết số bằng chữ như lời nói; nếu ASR trả về chữ số thì nhóm phải chuẩn hóa về cùng một dạng (nêu rõ chọn dạng nào) trước khi tính WER. Entity so exact-match sau ITN.",
+  "reference_date": "2026-10-15",
+  "dialogues": [
+    {
+      "id": "SCN-GEN-0001-call_1-t1",
+      "full_text": "alo, chị oanh đây, em ơi! chị muốn mua lại máy lọc không khí airpure x bản cũ mà chị đã mua trước đây.",
+      "noisy": true,
+      "entities": {},
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "alo, chị oanh đây, em ơi! chị muốn mua lại máy lọc không khí airpure x bản cũ mà chị đã mua trước đây.",
+          "entities": {}
+        }
+      ],
+      "n_turns": 1,
+      "scenario_ref": "SCN-GEN-0001 call_1 turn 1",
+      "source_text": "Alo, chị Oanh đây, em ơi! Chị muốn mua lại máy lọc không khí AirPure X bản cũ mà chị đã mua trước đây.",
+      "customer_region": "bac",
+      "input_mode": "text",
+      "noise": "cafe",
+      "snr_db": 6,
+      "voice_id": "szlbmCOTZzG1seZ82nZs",
+      "tts_model": "eleven_v4",
+      "duration_seconds": 6.4,
+      "number_or_code": false,
+      "source_clip": "scenarios_SCN-GEN-0001/call_1/turn_1.json"
+    },
+    {
+      "id": "SCN-GEN-0001-call_1-t2",
+      "full_text": "chị nhớ là phòng mình khoảng hai mươi lăm mét vuông, không có trẻ nhỏ đâu.",
+      "noisy": true,
+      "entities": {
+        "room_area_m2": 25,
+        "has_children": false
+      },
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "chị nhớ là phòng mình khoảng hai mươi lăm mét vuông, không có trẻ nhỏ đâu.",
+          "entities": {
+            "room_area_m2": 25,
+            "has_children": false
+          }
+        }
+      ],
+      "n_turns": 1,
+      "scenario_ref": "SCN-GEN-0001 call_1 turn 2",
+      "source_text": "Chị nhớ là phòng mình khoảng 25 mét vuông, không có trẻ nhỏ đâu.",
+      "customer_region": "bac",
+      "input_mode": "text",
+      "noise": "street",
+      "snr_db": 6,
+      "voice_id": "szlbmCOTZzG1seZ82nZs",
+      "tts_model": "eleven_v4",
+      "duration_seconds": 4.0,
+      "number_or_code": true,
+      "source_clip": "scenarios_SCN-GEN-0001/call_1/turn_2.json"
+    },
+    {
+      "id": "SCN-GEN-0001-call_1-t3",
+      "full_text": "ngân sách chị chỉ có năm triệu thôi.",
+      "noisy": true,
+      "entities": {
+        "budget_vnd": 5000000
+      },
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "ngân sách chị chỉ có năm triệu thôi.",
+          "entities": {
+            "budget_vnd": 5000000
+          }
+        }
+      ],
+      "n_turns": 1,
+      "scenario_ref": "SCN-GEN-0001 call_1 turn 3",
+      "source_text": "Ngân sách chị chỉ có 5 triệu thôi.",
+      "customer_region": "bac",
+      "input_mode": "text",
+      "noise": "street",
+      "snr_db": 6,
+      "voice_id": "szlbmCOTZzG1seZ82nZs",
+      "tts_model": "eleven_v4",
+      "duration_seconds": 2.4,
+      "number_or_code": true,
+      "source_clip": "scenarios_SCN-GEN-0001/call_1/turn_3.json"
+    },
+    {
+      "id": "SCN-GEN-0001-call_1-t4",
+      "full_text": "chị muốn thanh toán cê ô đê và giao hàng ở cầu giấy, hà nội nhé.",
+      "noisy": true,
+      "entities": {},
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "chị muốn thanh toán cê ô đê và giao hàng ở cầu giấy, hà nội nhé.",
+          "entities": {}
+        }
+      ],
+      "n_turns": 1,
+      "scenario_ref": "SCN-GEN-0001 call_1 turn 4",
+      "source_text": "Chị muốn thanh toán COD và giao hàng ở Cầu Giấy, Hà Nội nhé.",
+      "customer_region": "bac",
+      "input_mode": "text",
+      "noise": "cafe",
+      "snr_db": 6,
+      "voice_id": "szlbmCOTZzG1seZ82nZs",
+      "tts_model": "eleven_v4",
+      "duration_seconds": 3.84,
+      "number_or_code": true,
+      "source_clip": "scenarios_SCN-GEN-0001/call_1/turn_4.json"
+    },
+    {
+      "id": "SCN-GEN-0001-call_2-t1",
+      "full_text": "chị oanh đây, em ơi! chị muốn hỏi tình trạng đơn hàng của chị.",
+      "noisy": false,
+      "entities": {},
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "chị oanh đây, em ơi! chị muốn hỏi tình trạng đơn hàng của chị.",
+          "entities": {}
+        }
+      ],
+      "n_turns": 1,
+      "scenario_ref": "SCN-GEN-0001 call_2 turn 1",
+      "source_text": "Chị Oanh đây, em ơi! Chị muốn hỏi tình trạng đơn hàng của chị.",
+      "customer_region": "bac",
+      "input_mode": "text",
+      "noise": "clean",
+      "snr_db": null,
+      "voice_id": "szlbmCOTZzG1seZ82nZs",
+      "tts_model": "eleven_v4",
+      "duration_seconds": 4.0,
+      "number_or_code": false,
+      "source_clip": "scenarios_SCN-GEN-0001/call_2/turn_1.json"
+    },
+    {
+      "id": "SCN-GEN-0001-call_2-t2",
+      "full_text": "chị không nhớ mã đơn hàng, nhưng không biết đơn của chị hiện giờ thế nào?",
+      "noisy": false,
+      "entities": {},
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "chị không nhớ mã đơn hàng, nhưng không biết đơn của chị hiện giờ thế nào?",
+          "entities": {}
+        }
+      ],
+      "n_turns": 1,
+      "scenario_ref": "SCN-GEN-0001 call_2 turn 2",
+      "source_text": "Chị không nhớ mã đơn hàng, nhưng không biết đơn của chị hiện giờ thế nào?",
+      "customer_region": "bac",
+      "input_mode": "text",
+      "noise": "clean",
+      "snr_db": null,
+      "voice_id": "szlbmCOTZzG1seZ82nZs",
+      "tts_model": "eleven_v4",
+      "duration_seconds": 4.56,
+      "number_or_code": false,
+      "source_clip": "scenarios_SCN-GEN-0001/call_2/turn_2.json"
+    },
+    {
+      "id": "SCN-GEN-0002-call_1-t1",
+      "full_text": "alo, chị tâm đây, chị muốn hỏi tình trạng đơn hàng của mình hiện giờ như thế nào?",
+      "noisy": false,
+      "entities": {},
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "alo, chị tâm đây, chị muốn hỏi tình trạng đơn hàng của mình hiện giờ như thế nào?",
+          "entities": {}
+        }
+      ],
+      "n_turns": 1,
+      "scenario_ref": "SCN-GEN-0002 call_1 turn 1",
+      "source_text": "Alo, chị Tâm đây, chị muốn hỏi tình trạng đơn hàng của mình hiện giờ như thế nào?",
+      "customer_region": "trung",
+      "input_mode": "text",
+      "noise": "clean",
+      "snr_db": null,
+      "voice_id": "Na15FlRRkMEDtEW4nVVP",
+      "tts_model": "eleven_v4",
+      "duration_seconds": 5.12,
+      "number_or_code": false,
+      "source_clip": "scenarios_SCN-GEN-0002/call_1/turn_1.json"
+    },
+    {
+      "id": "SCN-GEN-0002-call_1-t2",
+      "full_text": "chị đặt hàng hôm ba tháng mười mà chưa thấy giao, em kiểm tra giúp chị với.",
+      "noisy": true,
+      "entities": {},
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "chị đặt hàng hôm ba tháng mười mà chưa thấy giao, em kiểm tra giúp chị với.",
+          "entities": {}
+        }
+      ],
+      "n_turns": 1,
+      "scenario_ref": "SCN-GEN-0002 call_1 turn 2",
+      "source_text": "Chị đặt hàng hôm 3 tháng 10 mà chưa thấy giao, em kiểm tra giúp chị với.",
+      "customer_region": "trung",
+      "input_mode": "text",
+      "noise": "street",
+      "snr_db": 6,
+      "voice_id": "Na15FlRRkMEDtEW4nVVP",
+      "tts_model": "eleven_v4",
+      "duration_seconds": 4.56,
+      "number_or_code": true,
+      "source_clip": "scenarios_SCN-GEN-0002/call_1/turn_2.json"
+    },
+    {
+      "id": "SCN-GEN-0002-call_2-t1",
+      "full_text": "alo, chị tâm đây, chị muốn đổi địa chỉ giao hàng cho đơn hàng của chị.",
+      "noisy": false,
+      "entities": {},
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "alo, chị tâm đây, chị muốn đổi địa chỉ giao hàng cho đơn hàng của chị.",
+          "entities": {}
+        }
+      ],
+      "n_turns": 1,
+      "scenario_ref": "SCN-GEN-0002 call_2 turn 1",
+      "source_text": "Alo, chị Tâm đây, chị muốn đổi địa chỉ giao hàng cho đơn hàng của chị.",
+      "customer_region": "trung",
+      "input_mode": "text",
+      "noise": "clean",
+      "snr_db": null,
+      "voice_id": "Na15FlRRkMEDtEW4nVVP",
+      "tts_model": "eleven_v4",
+      "duration_seconds": 4.48,
+      "number_or_code": false,
+      "source_clip": "scenarios_SCN-GEN-0002/call_2/turn_1.json"
+    },
+    {
+      "id": "SCN-GEN-0002-call_2-t2",
+      "full_text": "chị muốn chuyển sang hải châu, đà nẵng, em làm giúp chị nhé.",
+      "noisy": true,
+      "entities": {},
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "chị muốn chuyển sang hải châu, đà nẵng, em làm giúp chị nhé.",
+          "entities": {}
+        }
+      ],
+      "n_turns": 1,
+      "scenario_ref": "SCN-GEN-0002 call_2 turn 2",
+      "source_text": "Chị muốn chuyển sang Hải Châu, Đà Nẵng, em làm giúp chị nhé.",
+      "customer_region": "trung",
+      "input_mode": "text",
+      "noise": "weak_signal",
+      "snr_db": 6,
+      "voice_id": "Na15FlRRkMEDtEW4nVVP",
+      "tts_model": "eleven_v4",
+      "duration_seconds": 3.92,
+      "number_or_code": false,
+      "source_clip": "scenarios_SCN-GEN-0002/call_2/turn_2.json"
+    }
+  ]
+}

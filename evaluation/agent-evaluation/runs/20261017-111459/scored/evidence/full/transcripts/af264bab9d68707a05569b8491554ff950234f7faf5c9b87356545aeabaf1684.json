@@ -1,0 +1,82 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0020",
+    "call": "call_3",
+    "turn": 2
+  },
+  "customer_text": "Chị không nhớ mã đơn hàng, em có thể kiểm tra giúp chị không?",
+  "agent_text": "Đơn hàng của chị Linh là mã OD600001, sản phẩm Máy lọc không khí Xiaomi Smart 4 Lite, giá 2.990.000 đồng, trạng thái hiện tại là đã tạo ạ. Chị cần em hỗ trợ gì tiếp theo không ạ?",
+  "customer_id": "C019",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0020/call_3/2/21",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0020",
+        "call": "call_3",
+        "turn": 2
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/756"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0020/call_3/2/21",
+      "request": {
+        "name": "order.status",
+        "args": {
+          "customer_phone": "0905218549"
+        }
+      },
+      "on": "2026-10-23",
+      "started_at": "2026-10-17T04:29:47.849152+00:00",
+      "finished_at": "2026-10-17T04:29:47.850163+00:00",
+      "outcome": "success",
+      "result": {
+        "orders": [
+          {
+            "order_id": "OD600001",
+            "customer_phone": "0905218549",
+            "sku": "SKU-XM-4L",
+            "qty": 1,
+            "price_vnd": 2990000,
+            "total_vnd": 2990000,
+            "promos": [
+              "COD-0"
+            ],
+            "payment": "COD",
+            "address": "Hải Châu, Đà Nẵng",
+            "created_on": "2026-10-20",
+            "status": "created"
+          }
+        ]
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"customer_phone\": \"0905218549\"}, \"name\": \"order.status\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/752"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/757"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "context": {
+    "run_id": "PRODUCT-a421e5c3096f4bce",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0002",
+    "call": "call_2",
+    "turn": 2
+  },
+  "customer_text": "Đơn hàng của chị đã được giao chưa?",
+  "agent_text": "Em đã chuyển chị sang nhân viên phụ trách để kiểm tra đơn hàng rồi ạ, chị vui lòng chờ trong giây lát nhé. Dạ em kết nối anh/chị với đồng nghiệp phụ trách ngay ạ, anh/chị chờ em một chút.",
+  "customer_id": "C032",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_2/2/5",
+      "run_id": "PRODUCT-a421e5c3096f4bce",
+      "context": {
+        "run_id": "PRODUCT-a421e5c3096f4bce",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0002",
+        "call": "call_2",
+        "turn": 2
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "ef5c654946a196520d69a88afa2d5e2366c173da347d567e33e631280f5ef486",
+          "pointer": "/39"
+        }
+      ],
+      "event_id": "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_2/2/5",
+      "request": {
+        "name": "handoff.transfer",
+        "args": {
+          "brief": {
+            "customer_phone": "0965384535",
+            "customer_name": "Tâm",
+            "customer_id": "C032",
+            "channel": "hotline",
+            "product_advised": null,
+            "price_quoted_vnd": null,
+            "generated_at": "2026-10-16T10:00:00+07:00",
+            "escalation_reason": "khach_yeu_cau_gap_nguoi",
+            "conversation_summary": "Khách hỏi về trạng thái đơn hàng OD301177, đã hỏi đơn hàng đã được giao chưa nhưng trợ lý không có thông tin cụ thể.",
+            "open_questions": [
+              "Đơn hàng OD301177 đã được giao chưa?"
+            ],
+            "next_action": "Kiểm tra trạng thái đơn hàng và thông báo cho khách"
+          }
+        }
+      },
+      "on": "2026-10-16",
+      "started_at": "2026-10-17T01:07:28.305638+00:00",
+      "finished_at": "2026-10-17T01:07:28.305638+00:00",
+      "outcome": "success",
+      "result": {
+        "ticket_id": "HT0001",
+        "status": "queued",
+        "brief_ok": true
+      },
+      "error": null,
+      "side_effect": true,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"brief\": {\"channel\": \"hotline\", \"conversation_summary\": \"Khách hỏi về trạng thái đơn hàng OD301177, đã hỏi đơn hàng đã được giao chưa nhưng trợ lý không có thông tin cụ thể.\", \"customer_id\": \"C032\", \"customer_name\": \"Tâm\", \"customer_phone\": \"0965384535\", \"escalation_reason\": \"khach_yeu_cau_gap_nguoi\", \"generated_at\": \"2026-10-16T10:00:00+07:00\", \"next_action\": \"Kiểm tra trạng thái đơn hàng và thông báo cho khách\", \"open_questions\": [\"Đơn hàng OD301177 đã được giao chưa?\"], \"price_quoted_vnd\": null, \"product_advised\": null}}, \"name\": \"handoff.transfer\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "ef5c654946a196520d69a88afa2d5e2366c173da347d567e33e631280f5ef486",
+      "pointer": "/34"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "ef5c654946a196520d69a88afa2d5e2366c173da347d567e33e631280f5ef486",
+      "pointer": "/40"
+    }
+  ]
+}

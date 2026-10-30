@@ -1,0 +1,80 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0021",
+    "call": "call_2",
+    "turn": 2
+  },
+  "customer_text": "Chị cần xóa dữ liệu cá nhân của mình.",
+  "agent_text": "Dạ em đã chuyển yêu cầu của chị đến bộ phận phụ trách rồi ạ, họ sẽ liên hệ hỗ trợ chị sớm nhất. Chị Mai cần em giúp gì thêm không ạ? Dạ em kết nối anh/chị với đồng nghiệp phụ trách ngay ạ, anh/chị chờ em một chút.",
+  "customer_id": "C011",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0021/call_2/2/10",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0021",
+        "call": "call_2",
+        "turn": 2
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/826"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0021/call_2/2/10",
+      "request": {
+        "name": "handoff.transfer",
+        "args": {
+          "brief": {
+            "customer_phone": "0980737028",
+            "customer_name": "Mai",
+            "customer_id": "C011",
+            "channel": "hotline",
+            "product_advised": "SKU-AP-MINI",
+            "price_quoted_vnd": 2190000,
+            "generated_at": "2026-10-20T10:00:00+07:00",
+            "escalation_reason": "khach_yeu_cau_gap_nguoi",
+            "conversation_summary": "Khách là chị Mai, đã liên hệ trước, nay yêu cầu xóa dữ liệu cá nhân.",
+            "open_questions": [],
+            "next_action": "Hỗ trợ khách xóa dữ liệu cá nhân theo yêu cầu."
+          }
+        }
+      },
+      "on": "2026-10-20",
+      "started_at": "2026-10-17T04:31:17.145620+00:00",
+      "finished_at": "2026-10-17T04:31:17.145620+00:00",
+      "outcome": "success",
+      "result": {
+        "ticket_id": "HT0001",
+        "status": "queued",
+        "brief_ok": true
+      },
+      "error": null,
+      "side_effect": true,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"brief\": {\"channel\": \"hotline\", \"conversation_summary\": \"Khách là chị Mai, đã liên hệ trước, nay yêu cầu xóa dữ liệu cá nhân.\", \"customer_id\": \"C011\", \"customer_name\": \"Mai\", \"customer_phone\": \"0980737028\", \"escalation_reason\": \"khach_yeu_cau_gap_nguoi\", \"generated_at\": \"2026-10-20T10:00:00+07:00\", \"next_action\": \"Hỗ trợ khách xóa dữ liệu cá nhân theo yêu cầu.\", \"open_questions\": [], \"price_quoted_vnd\": 2190000, \"product_advised\": \"SKU-AP-MINI\"}}, \"name\": \"handoff.transfer\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/821"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/827"
+    }
+  ]
+}

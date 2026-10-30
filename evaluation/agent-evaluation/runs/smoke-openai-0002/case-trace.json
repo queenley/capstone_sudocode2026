@@ -1,0 +1,1400 @@
+{
+  "format": "case-trace-v1",
+  "run_id": "PRODUCT-19b14436a3986b92",
+  "status": "INCOMPLETE",
+  "pipeline_error": null,
+  "stages": [
+    {
+      "stage": "prepare",
+      "settings": "C:\\Users\\mt200\\OneDrive\\Desktop\\AI_egineering\\sudocode\\capstone_sudocode2026\\scripts\\evaluation\\runs\\smoke-openai-0002\\inputs\\settings.json",
+      "run_id": "PRODUCT-19b14436a3986b92",
+      "execution_gate": {
+        "allowed": true,
+        "blocking_codes": [],
+        "nonblocking_dispute_codes": [],
+        "binding_verified": false,
+        "runtime_checks": "NOT_RUN_PREFLIGHT_ONLY",
+        "notice": "Input gate only; does not certify Agent/criteria or permit test fallback"
+      },
+      "planned_turns": 8
+    },
+    {
+      "stage": "run",
+      "execution_complete": false,
+      "completed_calls": 0,
+      "failed_calls": 0,
+      "errors": [
+        {
+          "code": "EXECUTION_ERROR",
+          "config": "full",
+          "scenario_id": "SCN-GEN-0002",
+          "context": null,
+          "phase": "open_scenario",
+          "error": "TimeoutError: Adapter timeout at open_scenario; no retry",
+          "reconciliation_required": true,
+          "retry": 0
+        },
+        {
+          "code": "EXECUTION_ERROR",
+          "config": "baseline_no_memory",
+          "scenario_id": "SCN-GEN-0002",
+          "context": null,
+          "phase": "open_scenario",
+          "error": "TimeoutError: Adapter timeout at open_scenario; no retry",
+          "reconciliation_required": true,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "stage": "collect",
+      "status": {
+        "verdict": "UNDETERMINED",
+        "completeness": "INCOMPLETE",
+        "reason_codes": [
+          "COVERAGE_GAP",
+          "EXECUTION_INCOMPLETE",
+          "EXTRACTOR_AUDIT_PENDING"
+        ]
+      },
+      "trace_rows": 0,
+      "trace_wire_complete": false
+    },
+    {
+      "stage": "score",
+      "status": {
+        "verdict": "UNDETERMINED",
+        "completeness": "INCOMPLETE",
+        "reason_codes": [
+          "ASSERTION_COVERAGE",
+          "CALL_COVERAGE",
+          "COVERAGE_GAP",
+          "EXECUTION_INCOMPLETE",
+          "EXTRACTION_COVERAGE",
+          "EXTRACTOR_AUDIT_PENDING",
+          "FACT_GT_OR_USAGE_MISSING",
+          "MEMORY_PHASE_COVERAGE",
+          "PII_POLICY_NOT_LABELLED",
+          "REQUIRED_EVIDENCE_MISSING",
+          "TOOL_ACCURACY",
+          "TRACE_COVERAGE"
+        ]
+      },
+      "official_report_available": true
+    }
+  ],
+  "comparison": {
+    "rqr_relative_reduction_pct": null,
+    "meets_rqr_threshold_40pct": false,
+    "meets_tsr_70pct": false,
+    "meets_hr_price_5pct": false
+  },
+  "metrics": {
+    "full": {
+      "repeat_question_rate": {
+        "value": null,
+        "redundant": 0,
+        "total_questions": 0,
+        "examples": []
+      },
+      "context_carryover_rate": {
+        "value": 0.0,
+        "used": 0,
+        "required": 1
+      },
+      "task_success_rate": {
+        "value": 0.0,
+        "passed": 0,
+        "total": 1,
+        "hard_cases": {
+          "value": 0.0,
+          "total": 1
+        },
+        "failures": [
+          {
+            "scenario": "SCN-GEN-0002",
+            "call": "call_1",
+            "hard_case": "shipping order GHN7781234; changes after dispatch are not allowed",
+            "reasons": [
+              "không có tool call pricing.get_quote khớp args_match"
+            ]
+          },
+          {
+            "scenario": "SCN-GEN-0002",
+            "call": "call_2",
+            "hard_case": "shipping order GHN7781234; changes after dispatch are not allowed",
+            "reasons": [
+              "không có tool call order.status khớp args_match"
+            ]
+          }
+        ]
+      },
+      "hallucination_rate": {
+        "value": null,
+        "wrong": 0,
+        "total_claims": 0,
+        "price_promo_only": {
+          "value": null,
+          "wrong": 0,
+          "total": 0
+        },
+        "examples": []
+      },
+      "avg_turns_per_call": null,
+      "calls_to_close": {
+        "value": null,
+        "n_closed": 0,
+        "n_scenarios": 1
+      },
+      "guardrail_violations": {
+        "total": 0,
+        "by_type": {
+          "pii_in_memory_or_text": 0,
+          "over_escalation": 0,
+          "claims_human": 0,
+          "forbidden_pattern": 0
+        },
+        "examples": []
+      },
+      "memory_checks": [],
+      "latency": {
+        "n_turns": 0,
+        "warning": "Cần ≥ 100 lượt để p95 có ý nghĩa",
+        "ttft": null,
+        "total": null,
+        "ttfa": null,
+        "call_brief": null
+      }
+    },
+    "baseline_no_memory": {
+      "repeat_question_rate": {
+        "value": null,
+        "redundant": 0,
+        "total_questions": 0,
+        "examples": []
+      },
+      "context_carryover_rate": {
+        "value": 0.0,
+        "used": 0,
+        "required": 1
+      },
+      "task_success_rate": {
+        "value": 0.0,
+        "passed": 0,
+        "total": 1,
+        "hard_cases": {
+          "value": 0.0,
+          "total": 1
+        },
+        "failures": [
+          {
+            "scenario": "SCN-GEN-0002",
+            "call": "call_1",
+            "hard_case": "shipping order GHN7781234; changes after dispatch are not allowed",
+            "reasons": [
+              "không có tool call pricing.get_quote khớp args_match"
+            ]
+          },
+          {
+            "scenario": "SCN-GEN-0002",
+            "call": "call_2",
+            "hard_case": "shipping order GHN7781234; changes after dispatch are not allowed",
+            "reasons": [
+              "không có tool call order.status khớp args_match"
+            ]
+          }
+        ]
+      },
+      "hallucination_rate": {
+        "value": null,
+        "wrong": 0,
+        "total_claims": 0,
+        "price_promo_only": {
+          "value": null,
+          "wrong": 0,
+          "total": 0
+        },
+        "examples": []
+      },
+      "avg_turns_per_call": null,
+      "calls_to_close": {
+        "value": null,
+        "n_closed": 0,
+        "n_scenarios": 1
+      },
+      "guardrail_violations": {
+        "total": 0,
+        "by_type": {
+          "pii_in_memory_or_text": 0,
+          "over_escalation": 0,
+          "claims_human": 0,
+          "forbidden_pattern": 0
+        },
+        "examples": []
+      },
+      "memory_checks": [],
+      "latency": {
+        "n_turns": 0,
+        "warning": "Cần ≥ 100 lượt để p95 có ý nghĩa",
+        "ttft": null,
+        "total": null,
+        "ttfa": null,
+        "call_brief": null
+      }
+    }
+  },
+  "reports": {
+    "official": "scored/official-report.json",
+    "validation": "scored/validation.json",
+    "assertions": "scored/supplemental-report.json"
+  },
+  "cases": [
+    {
+      "scenario_id": "SCN-GEN-0002",
+      "hard_case": "shipping order GHN7781234; changes after dispatch are not allowed",
+      "scenario_ref": "inputs/scenarios/SCN-GEN-0002.json",
+      "configurations": {
+        "full": {
+          "status": "MISSING",
+          "calls": [
+            {
+              "call": "call_1",
+              "customer_goal": "Tôi muốn mua máy hút sữa điện đôi Spectra S1.",
+              "expected_outcome": "khac",
+              "success_if": {
+                "tool_called": "pricing.get_quote",
+                "args_match": {
+                  "sku": "SKU-MB-PUMP1"
+                }
+              },
+              "turns": [
+                {
+                  "turn": 1,
+                  "status": "MISSING",
+                  "customer_text": "Chị muốn đặt hàng máy hút sữa điện đôi Spectra S1.",
+                  "agent_text": "MISSING",
+                  "tool_calls": "MISSING",
+                  "questions": "MISSING",
+                  "claims": "MISSING",
+                  "facts_used": "MISSING",
+                  "latency": "MISSING",
+                  "tool_events": [],
+                  "memory": [],
+                  "brief": [],
+                  "extractor": []
+                },
+                {
+                  "turn": 2,
+                  "status": "MISSING",
+                  "customer_text": "Chị đã xem qua và thấy sản phẩm này rất phù hợp.",
+                  "agent_text": "MISSING",
+                  "tool_calls": "MISSING",
+                  "questions": "MISSING",
+                  "claims": "MISSING",
+                  "facts_used": "MISSING",
+                  "latency": "MISSING",
+                  "tool_events": [],
+                  "memory": [],
+                  "brief": [],
+                  "extractor": []
+                }
+              ]
+            },
+            {
+              "call": "call_2",
+              "customer_goal": "Chị muốn kiểm tra tình trạng đơn hàng của mình.",
+              "expected_outcome": "khac",
+              "success_if": {
+                "tool_called": "order.status",
+                "args_match": {
+                  "order_id": "OD301177"
+                }
+              },
+              "turns": [
+                {
+                  "turn": 1,
+                  "status": "MISSING",
+                  "customer_text": "Cho chị hỏi tình trạng đơn hàng OD301177 của chị.",
+                  "agent_text": "MISSING",
+                  "tool_calls": "MISSING",
+                  "questions": "MISSING",
+                  "claims": "MISSING",
+                  "facts_used": "MISSING",
+                  "latency": "MISSING",
+                  "tool_events": [],
+                  "memory": [],
+                  "brief": [],
+                  "extractor": []
+                },
+                {
+                  "turn": 2,
+                  "status": "MISSING",
+                  "customer_text": "Đơn hàng của chị đã được giao chưa?",
+                  "agent_text": "MISSING",
+                  "tool_calls": "MISSING",
+                  "questions": "MISSING",
+                  "claims": "MISSING",
+                  "facts_used": "MISSING",
+                  "latency": "MISSING",
+                  "tool_events": [],
+                  "memory": [],
+                  "brief": [],
+                  "extractor": []
+                }
+              ]
+            }
+          ],
+          "task_success": "MISSING",
+          "evidence_ref": "evidence/full.jsonl"
+        },
+        "baseline_no_memory": {
+          "status": "MISSING",
+          "calls": [
+            {
+              "call": "call_1",
+              "customer_goal": "Tôi muốn mua máy hút sữa điện đôi Spectra S1.",
+              "expected_outcome": "khac",
+              "success_if": {
+                "tool_called": "pricing.get_quote",
+                "args_match": {
+                  "sku": "SKU-MB-PUMP1"
+                }
+              },
+              "turns": [
+                {
+                  "turn": 1,
+                  "status": "MISSING",
+                  "customer_text": "Chị muốn đặt hàng máy hút sữa điện đôi Spectra S1.",
+                  "agent_text": "MISSING",
+                  "tool_calls": "MISSING",
+                  "questions": "MISSING",
+                  "claims": "MISSING",
+                  "facts_used": "MISSING",
+                  "latency": "MISSING",
+                  "tool_events": [],
+                  "memory": [],
+                  "brief": [],
+                  "extractor": []
+                },
+                {
+                  "turn": 2,
+                  "status": "MISSING",
+                  "customer_text": "Chị đã xem qua và thấy sản phẩm này rất phù hợp.",
+                  "agent_text": "MISSING",
+                  "tool_calls": "MISSING",
+                  "questions": "MISSING",
+                  "claims": "MISSING",
+                  "facts_used": "MISSING",
+                  "latency": "MISSING",
+                  "tool_events": [],
+                  "memory": [],
+                  "brief": [],
+                  "extractor": []
+                }
+              ]
+            },
+            {
+              "call": "call_2",
+              "customer_goal": "Chị muốn kiểm tra tình trạng đơn hàng của mình.",
+              "expected_outcome": "khac",
+              "success_if": {
+                "tool_called": "order.status",
+                "args_match": {
+                  "order_id": "OD301177"
+                }
+              },
+              "turns": [
+                {
+                  "turn": 1,
+                  "status": "MISSING",
+                  "customer_text": "Cho chị hỏi tình trạng đơn hàng OD301177 của chị.",
+                  "agent_text": "MISSING",
+                  "tool_calls": "MISSING",
+                  "questions": "MISSING",
+                  "claims": "MISSING",
+                  "facts_used": "MISSING",
+                  "latency": "MISSING",
+                  "tool_events": [],
+                  "memory": [],
+                  "brief": [],
+                  "extractor": []
+                },
+                {
+                  "turn": 2,
+                  "status": "MISSING",
+                  "customer_text": "Đơn hàng của chị đã được giao chưa?",
+                  "agent_text": "MISSING",
+                  "tool_calls": "MISSING",
+                  "questions": "MISSING",
+                  "claims": "MISSING",
+                  "facts_used": "MISSING",
+                  "latency": "MISSING",
+                  "tool_events": [],
+                  "memory": [],
+                  "brief": [],
+                  "extractor": []
+                }
+              ]
+            }
+          ],
+          "task_success": "MISSING",
+          "evidence_ref": "evidence/baseline.jsonl"
+        }
+      },
+      "issues": [
+        {
+          "code": "CALL_COVERAGE",
+          "message": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_1",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "REQUIRED_EVIDENCE_MISSING",
+          "message": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_1/trace",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "REQUIRED_EVIDENCE_MISSING",
+          "message": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_1/memory",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "EXTRACTION_COVERAGE",
+          "message": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_1",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "MEMORY_PHASE_COVERAGE",
+          "message": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_1",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "PII_POLICY_NOT_LABELLED",
+          "message": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_1",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "ASSERTION_COVERAGE",
+          "message": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_1",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "TOOL_ACCURACY",
+          "message": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_1",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "ASSERTION_COVERAGE",
+          "message": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_1",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "CALL_COVERAGE",
+          "message": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_2",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "REQUIRED_EVIDENCE_MISSING",
+          "message": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_2/trace",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "REQUIRED_EVIDENCE_MISSING",
+          "message": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_2/memory",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "EXTRACTION_COVERAGE",
+          "message": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_2",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "MEMORY_PHASE_COVERAGE",
+          "message": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_2",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "FACT_GT_OR_USAGE_MISSING",
+          "message": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_2/tracking",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "PII_POLICY_NOT_LABELLED",
+          "message": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_2",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "ASSERTION_COVERAGE",
+          "message": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_2",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "TOOL_ACCURACY",
+          "message": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_2",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "ASSERTION_COVERAGE",
+          "message": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_2",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "CALL_COVERAGE",
+          "message": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_1",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "REQUIRED_EVIDENCE_MISSING",
+          "message": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_1/trace",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "REQUIRED_EVIDENCE_MISSING",
+          "message": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_1/memory",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "EXTRACTION_COVERAGE",
+          "message": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_1",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "MEMORY_PHASE_COVERAGE",
+          "message": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_1",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "PII_POLICY_NOT_LABELLED",
+          "message": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_1",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "ASSERTION_COVERAGE",
+          "message": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_1",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "ASSERTION_COVERAGE",
+          "message": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_1",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "TOOL_ACCURACY",
+          "message": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_1",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "CALL_COVERAGE",
+          "message": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_2",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "REQUIRED_EVIDENCE_MISSING",
+          "message": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_2/trace",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "REQUIRED_EVIDENCE_MISSING",
+          "message": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_2/memory",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "EXTRACTION_COVERAGE",
+          "message": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_2",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "MEMORY_PHASE_COVERAGE",
+          "message": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_2",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "FACT_GT_OR_USAGE_MISSING",
+          "message": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_2/tracking",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "PII_POLICY_NOT_LABELLED",
+          "message": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_2",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "ASSERTION_COVERAGE",
+          "message": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_2",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "ASSERTION_COVERAGE",
+          "message": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_2",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        },
+        {
+          "code": "TOOL_ACCURACY",
+          "message": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_2",
+          "classification": "missing_evidence",
+          "artifact": {
+            "path": "manifest.json",
+            "sha256": "af78dd0305fe887712d90a80225a00405b89a9896759a57916fb0f310a28a9fd",
+            "pointer": ""
+          },
+          "json_pointer": ""
+        }
+      ],
+      "assertions": [
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_1/tool_execution_state",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/tools.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_1/memory_integrity",
+          "status": {
+            "verdict": "UNDETERMINED",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "MEMORY_PHASE_COVERAGE"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/memory.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_1/fact_carryover",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/tools.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/memory.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/extraction.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_1/claim_gt_coverage",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/extraction.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_1/tool_accuracy_full",
+          "status": {
+            "verdict": "UNDETERMINED",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "ASSERTION_COVERAGE",
+              "TOOL_ACCURACY"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/tools.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/memory.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/extraction.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_1/grading",
+          "status": {
+            "verdict": "UNDETERMINED",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "ASSERTION_COVERAGE",
+              "CALL_COVERAGE",
+              "EXTRACTION_COVERAGE",
+              "PII_POLICY_NOT_LABELLED",
+              "REQUIRED_EVIDENCE_MISSING",
+              "TOOL_ACCURACY"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/tools.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/memory.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/extraction.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_2/tool_execution_state",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/tools.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_2/memory_integrity",
+          "status": {
+            "verdict": "UNDETERMINED",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "MEMORY_PHASE_COVERAGE"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/memory.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_2/fact_carryover",
+          "status": {
+            "verdict": "UNDETERMINED",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "FACT_GT_OR_USAGE_MISSING"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/tools.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/memory.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/extraction.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_2/claim_gt_coverage",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/extraction.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_2/tool_accuracy_full",
+          "status": {
+            "verdict": "UNDETERMINED",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "ASSERTION_COVERAGE",
+              "TOOL_ACCURACY"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/tools.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/memory.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/extraction.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_2/grading",
+          "status": {
+            "verdict": "UNDETERMINED",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "ASSERTION_COVERAGE",
+              "CALL_COVERAGE",
+              "EXTRACTION_COVERAGE",
+              "PII_POLICY_NOT_LABELLED",
+              "REQUIRED_EVIDENCE_MISSING",
+              "TOOL_ACCURACY"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/full/tools.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/memory.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/full/extraction.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_1/tool_execution_state",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/tools.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_1/memory_integrity",
+          "status": {
+            "verdict": "UNDETERMINED",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "MEMORY_PHASE_COVERAGE"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/memory.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_1/fact_carryover",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/tools.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/memory.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/extraction.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_1/claim_gt_coverage",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/extraction.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_1/tool_accuracy_baseline_no_memory",
+          "status": {
+            "verdict": "UNDETERMINED",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "ASSERTION_COVERAGE",
+              "TOOL_ACCURACY"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/tools.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/memory.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/extraction.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_1/grading",
+          "status": {
+            "verdict": "UNDETERMINED",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "ASSERTION_COVERAGE",
+              "CALL_COVERAGE",
+              "EXTRACTION_COVERAGE",
+              "PII_POLICY_NOT_LABELLED",
+              "REQUIRED_EVIDENCE_MISSING",
+              "TOOL_ACCURACY"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/tools.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/memory.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/extraction.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_2/tool_execution_state",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/tools.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_2/memory_integrity",
+          "status": {
+            "verdict": "UNDETERMINED",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "MEMORY_PHASE_COVERAGE"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/memory.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_2/fact_carryover",
+          "status": {
+            "verdict": "UNDETERMINED",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "FACT_GT_OR_USAGE_MISSING"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/tools.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/memory.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/extraction.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_2/claim_gt_coverage",
+          "status": {
+            "verdict": "PASS",
+            "completeness": "COMPLETE",
+            "reason_codes": []
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/extraction.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_2/tool_accuracy_baseline_no_memory",
+          "status": {
+            "verdict": "UNDETERMINED",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "ASSERTION_COVERAGE",
+              "TOOL_ACCURACY"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/tools.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/memory.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/extraction.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        },
+        {
+          "check_id": "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_2/grading",
+          "status": {
+            "verdict": "UNDETERMINED",
+            "completeness": "INCOMPLETE",
+            "reason_codes": [
+              "ASSERTION_COVERAGE",
+              "CALL_COVERAGE",
+              "EXTRACTION_COVERAGE",
+              "PII_POLICY_NOT_LABELLED",
+              "REQUIRED_EVIDENCE_MISSING",
+              "TOOL_ACCURACY"
+            ]
+          },
+          "evidence_refs": [
+            {
+              "path": "evidence/baseline_no_memory/tools.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/memory.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            },
+            {
+              "path": "evidence/baseline_no_memory/extraction.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "pointer": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
