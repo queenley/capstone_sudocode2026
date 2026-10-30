@@ -2,12 +2,12 @@
 
 ``synthesize_scenario_audio`` uses this module in three steps:
 
-1. :func:`load_or_build` writes ``output/asr_reference/scenarios_<id>/call_<n>.json``.
+1. :func:`load_or_build` writes ``<seed>/asr_reference/scenarios_<id>/call_<n>.json``.
    It makes one model call per call and is cached while the lines keep the same words. A line is
    ``{idx, speaker: A|C, text}``: the per-turn clips use the customer's lines, ``build_asr_testset``'s whole
-   dialogues both speakers' (under ``output/asr_test/spoken/``).
+   dialogues both speakers' (under ``<seed>/asr_test/spoken/``).
 2. TTS reads ``turns[k].spoken_text``. The ``.json`` written beside each WAV keeps that text and its ``entities``.
-3. :func:`write_ground_truth` writes ``output/asr_reference/ground_truth.json`` in BTC's ``data/asr/`` format, one dialogue per clip.
+3. :func:`write_ground_truth` writes ``<seed>/asr_reference/ground_truth.json`` in BTC's ``data/asr/`` format, one dialogue per clip.
 
 Because the voice reads exactly the reference, the reference is right by construction.
 :func:`problems` checks the model's answer line by line:

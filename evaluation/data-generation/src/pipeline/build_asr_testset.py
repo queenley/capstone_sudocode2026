@@ -3,7 +3,7 @@
 Like BTC's D01–D04, each item is one call: the shop agent and the customer, each in their own voice, one after the
 other, so the set measures what the per-turn clips cannot: a two-person recording and diarization (who spoke when).
 
-Output ``output/asr_test/``::
+Output ``<seed>/asr_test/``::
 
     ground_truth.json            {description, hypotheses_format, normalization_rule, reference_date, kind: "dialogues",
                                   entity_schema, dialogues: [{id, customer_region, customer_gender, agent_gender,
@@ -115,7 +115,7 @@ def main() -> None:
     dataset = Dataset()
     conversations = list(dataset.iter_conversations())
     if not conversations:
-        sys.exit("No reference transcripts in output/conversations; run generate_dialogue first.")
+        sys.exit("No reference transcripts in <seed>/conversations; run generate_dialogue first.")
     settings = load_settings()
     customers = {c.customer_id: c for c in load_customers()}
     names = {product.sku: product.name for product in SourceData.load().catalog.products}

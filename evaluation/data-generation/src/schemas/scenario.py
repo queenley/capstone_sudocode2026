@@ -24,7 +24,7 @@ from typing import Any, Literal
 from pydantic import Field, field_validator, model_validator
 
 from .catalog import StrictModel
-from .slots import CUSTOMER_SLOTS, Channel, InputMode, Outcome, btc_input_mode, btc_outcome, normalize_outcome
+from .slots import CUSTOMER_SLOTS, Channel, InputMode, Outcome, btc_input_mode, normalize_outcome
 
 Region = Literal["bac", "trung", "nam"]
 CallName = Literal["call_1", "call_2", "call_3"]
@@ -99,6 +99,8 @@ class CallSpec(StrictModel):
     ground_truth_facts: dict[str, Any] = Field(default_factory=dict)
     # Flat BTC shape: {slot: value, ..., "superseded": {...}, "must_not_write_to": id, "address_ttl_check": bool}
     memory_expectation: dict[str, Any] = Field(default_factory=dict)
+    #: The policy sections ([XX-nn] of policy/) an ideal agent consults: retrieval ground truth (planning/policies.py).
+    relevant_policy_ids: list[str] = Field(default_factory=list)
     # Expected structured outputs of the agent (CallBrief at call start, HandoffBrief for chuyen_may).
     expected_call_brief: dict[str, Any] | None = None
     expected_handoff_brief: dict[str, Any] | None = None
@@ -182,16 +184,22 @@ class Scenario(StrictModel):
             payload.update(customer_goal=call.customer_goal, customer_turns=call.customer_turns)
             optional = {"customer_turns_asr": call.customer_turns_asr, "seed_history": call.seed_history}
             payload.update({key: value for key, value in optional.items() if value})
-            payload["facts_established"] = call.facts_established
-            payload.update({key: value for key, value in (("must_carry_over", call.must_carry_over),
+            # An empty section is left out, as in BTC's samples (contracts/scenario/scenario-keys.yaml rules.values).
+            payload.update({key: value for key, value in (("facts_established", call.facts_established),
+                                                          ("must_carry_over", call.must_carry_over),
                                                           ("must_not_ask", call.must_not_ask)) if value})
             payload["success_if"] = call.success_if.export()
-            payload["ground_truth_facts"] = call.ground_truth_facts
+            if call.ground_truth_facts:
+                payload["ground_truth_facts"] = call.ground_truth_facts
             if call.memory_expectation:
                 payload["memory_expectation"] = call.memory_expectation
+            if call.relevant_policy_ids:
+                payload["relevant_policy_ids"] = call.relevant_policy_ids
             if call.fault_injection:
                 payload["fault_injection"] = call.fault_injection.model_dump(mode="json")
-            payload["expected_outcome"] = btc_outcome(call.expected_outcome)
+            # The outcome itself, BTC's four or the team's (cap_nhat_don, thong_tin, xoa_du_lieu), never "khac":
+            # reference_eval reads only chuyen_may, and contracts/scenario/scenario-keys.yaml registers each.
+            payload["expected_outcome"] = call.expected_outcome
             calls[name] = {key: value for key, value in payload.items() if value is not None}
         return {"scenario_id": self.scenario_id, "level": self.level, "persona": self.persona,
                 "hard_case": self.hard_case, "customer_phone": self.customer_phone,
@@ -201,7 +209,7 @@ class Scenario(StrictModel):
     def metadata(self) -> dict[str, Any]:
         """The pipeline's own fields: everything :meth:`btc_export` leaves out, except briefs and tools.
 
-        ``outcome_detail`` keeps the pipeline's outcome where BTC's file says "khac" (cap_nhat_don, thong_tin, xoa_du_lieu);
+        ``outcome_detail`` repeats the outcome (files written before it was exported whole said "khac");
         ``input_mode_detail`` the typed-chat mode where it says "chat_teencode" (chat_khong_dau, chat_sai_chinh_ta).
         """
         return {"scenario_id": self.scenario_id, "persona_source": self.persona_source,

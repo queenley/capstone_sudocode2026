@@ -14,7 +14,7 @@ Usage::
     python -m src.pipeline.generate_scenarios --limit 150 --fresh                      # delete old output first
     python -m src.pipeline.generate_scenarios --limit 150 --plan-only                  # labels only, no API calls
 
-``--plan-only`` writes the same layout to ``output/plan_preview/`` with
+``--plan-only`` writes the same layout to ``<seed>/plan_preview/`` with
 placeholder customer turns, so every label can be checked before spending API budget.
 """
 from __future__ import annotations

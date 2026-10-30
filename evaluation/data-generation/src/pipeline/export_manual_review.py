@@ -3,12 +3,12 @@
 Export (default)::
 
     python -m src.pipeline.export_manual_review
-    -> output/review/needs_manual_review.csv   (rule failures, judge doubts, risky personas)
+    -> <seed>/review/needs_manual_review.csv   (rule failures, judge doubts, risky personas)
 
 Fill ``approve`` with Y/N in a spreadsheet, then ingest::
 
     python -m src.pipeline.export_manual_review --ingest
-    -> output/review/approved.csv, rejected.csv, output/review/golden_manifest.json
+    -> <seed>/review/approved.csv, rejected.csv, <seed>/review/golden_manifest.json
 
 Golden rule: ``validator_pass`` AND (judge pass without review flag OR human Y).
 A human can never override a rule failure; a human N always removes the record.

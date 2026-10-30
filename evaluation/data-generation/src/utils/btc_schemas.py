@@ -48,7 +48,16 @@ def tools() -> dict[str, dict[str, str]]:
 
 
 def tool_call_errors(name: str, args: dict[str, Any]) -> list[str]:
-    """How a tool call breaks tools.schema.json: an unknown tool, a missing required parameter, a value not allowed."""
+    """How a tool call breaks tools.schema.json: an unknown tool, a missing required parameter, a value not allowed.
+
+    A team tool registered in contracts/scenario/scenario-keys.yaml (``team_tools``) is checked by its arguments there.
+    """
+    from src.schemas import keys   # the registry imports this package's paths; import late
+
+    team = keys.registry().get("team_tools") or {}
+    if name in team:
+        unknown = sorted(set(args) - set(team[name]))
+        return [f"{name}: argument '{a}' not in team_tools" for a in unknown]
     if name not in tools():
         return [f"{name}: not a BTC tool"]
     found = []

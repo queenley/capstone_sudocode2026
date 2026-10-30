@@ -35,6 +35,9 @@ Freeship theo vùng (KM-08)              khach_hoi_freeship_theo_vung: theo đ�
 Trả bằng ví điện tử (VC-04)             khach_thanh_toan_vi_dien_tu: order.create payment momo|zalopay
 Mua nhiều cái cùng loại                 khach_mua_so_luong: order.create qty 3, tổng = 3 × đơn giá
 Số lạ xưng khách cũ (PB-08)             khach_goi_so_moi_xung_khach_cu: không đọc đơn, SĐT của khách kia
+Tách đơn COD trên 10 triệu (QT-01)      khach_tach_don_cod: hai order.create, order_group "1"/"2", mỗi đơn ≤ 10 triệu
+Chốt đơn, đọc lại một lần (PB-09)       khach_chot_don_doc_lai: không hỏi lại sản phẩm/thanh toán/nơi giao;
+                                        đọc lại đơn một lần (xác nhận lần đầu không tính RQR), ≤ 5 câu hỏi
 ======================================  ==========================================================
 
 Most variants start on Zalo or Facebook and continue on the hotline, so the
@@ -203,6 +206,17 @@ ADVANCED_PLANS: dict[str, PersonaPlan] = {p.persona_id: p for p in (
     PersonaPlan("khach_goi_so_moi_xung_khach_cu", (
         V("so_moi_hoi_don_cu", (T("unverified_identity"),), customer_pool="anonymous",
           tags=("privacy", "identity", "anonymous")),
+    )),
+    # COD above 10.000.000đ split in two orders (VC-03, QT-01, order_group); an order read back once (PB-09, RQR).
+    PersonaPlan("khach_tach_don_cod", (
+        V("hai_may_loc_vuot_cod", (T("consult"), T("order_split", days_later=(1, 3), min_turns=6)),
+          product_pool="SKU-AP-PRO", extra_skus=("SKU-SS-AX40",), tags=("multi_item", "cod_limit", "split_order")),
+    )),
+    PersonaPlan("khach_chot_don_doc_lai", (
+        # A read-back states product, price, payment and area: one confirm each, so 5 leaves one more question.
+        V("chot_nhu_hom_truoc", (T("consult_ready", channel="zalo_oa"),
+                                 T("order_readback", days_later=(1, 3), max_agent_questions=5)),
+          customer_pool="zalo", tags=("readback", "rqr_confirm", "cross_channel")),
     )),
     PersonaPlan("khach_lon_tuoi", (
         V("noi_cham_hoi_lai", (T("consult", scene="consult_elderly", input_mode="asr_transcript", min_turns=6),

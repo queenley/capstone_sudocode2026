@@ -6,7 +6,7 @@ the BTC ``judge_prompt_template`` is filled with the scenario JSON, the agent
 transcript and those criteria, and the model returns PASS/FAIL + one evidence
 quote per criterion. Rule failures from ``validate_rules`` always force manual review.
 
-Output: ``output/judgments/scenarios_<scenario_id>/<call>.json``. Human agreement (Cohen's kappa,
+Output: ``<seed>/judgments/scenarios_<scenario_id>/<call>.json``. Human agreement (Cohen's kappa,
 ≥ 20 samples) is measured with ``python -m src.pipeline.judge_agreement``.
 """
 from __future__ import annotations

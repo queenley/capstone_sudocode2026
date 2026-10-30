@@ -1,9 +1,9 @@
 """Stage 10 — dataset coverage statistics and HTML dashboard.
 
 Writes
-* ``output/reports/dataset_statistics.json``   – all counters (+ metric coverage)
-* ``output/reports/dataset_statistics/*.csv``  – one CSV per counter
-* ``output/reports/dataset_dashboard.html``    – static dashboard
+* ``<seed>/reports/dataset_statistics.json``   – all counters (+ metric coverage)
+* ``<seed>/reports/dataset_statistics/*.csv``  – one CSV per counter
+* ``<seed>/reports/dataset_dashboard.html``    – static dashboard
 
 "Metric coverage" answers: how many labelled opportunities does the dataset
 give each Chapter A metric (denominators), and how does the reference agent

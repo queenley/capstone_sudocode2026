@@ -1,12 +1,12 @@
 """Stage 9 — speak every customer turn of the scenarios, until the audio reaches its target length.
 
-Output: ``output/audio/scenarios_<id>/call_<n>/turn_<k>.wav`` (16 kHz mono) and a
+Output: ``<seed>/audio/scenarios_<id>/call_<n>/turn_<k>.wav`` (16 kHz mono) and a
 ``.json`` beside each with its text, the spoken form the voice read, its entities, voice, noise and duration.
 
 The voice does not read the written turn ("5.200.000đ", "AirPure X"). It reads the spoken form
 ("năm triệu hai trăm nghìn", "e pia x"). A model writes that form first (``src/asr/reference.py``,
-``output/asr_reference/scenarios_<id>/call_<n>.json``), so the ASR reference is exactly what was said.
-After the run, ``output/asr_reference/ground_truth.json`` lists every spoken clip in BTC's
+``<seed>/asr_reference/scenarios_<id>/call_<n>.json``), so the ASR reference is exactly what was said.
+After the run, ``<seed>/asr_reference/ground_truth.json`` lists every spoken clip in BTC's
 ``data/asr/ground_truth.json`` format. Typed chat (teencode, no diacritics) is read as written and left out.
 
 Scenarios are taken in id order until the audio on disk reaches
@@ -108,7 +108,7 @@ def main() -> None:
         for scenario in Dataset().iter_scenarios(args.limit):
             for call_name, call in scenario.ordered_calls():
                 written += load_or_build(reference_client, scenario, call_name, call, names) is not None
-        print(f"Spoken forms on disk for {written} calls -> output/asr_reference/")
+        print(f"Spoken forms on disk for {written} calls -> <seed>/asr_reference/")
         return
 
     from src.elevenlabs_client import ElevenLabsClient

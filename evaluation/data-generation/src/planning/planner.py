@@ -41,6 +41,7 @@ from src.planning.personas import (
 from src.planning.personas_advanced import ADVANCED_ESCALATION_TEMPTATION, ADVANCED_PLANS
 from src.schemas.catalog import Customer, CustomerOrder
 from src.schemas.scenario import CallSpec, FaultInjection, ForbiddenClaim, Scenario, ScenarioDraft, SuccessIf
+from src.planning import policies
 from src.schemas.slots import CARRY_SLOTS, PROTECTED_SLOTS, SLOTS, STALE_AFTER_DAYS, btc_outcome
 from src.utils.btc_tools import call_tool, fresh_mock_tools, mock_tools
 from src.utils.crm import SourceData
@@ -129,6 +130,8 @@ class PlannedCall:
     patience_start: int | None = None
     fault: FaultInjection | None = None
     quote: dict[str, Any] | None = None
+    #: The policy sections the call needs (policies.for_call): retrieval ground truth.
+    policy_ids: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -501,6 +504,10 @@ class _Planner:
         x.si["forbidden_claims"] = [ForbiddenClaim(**f) if isinstance(f, dict) else f for f in _dedupe(x.forbidden)]
         pc.success_if = SuccessIf(**{k: v for k, v in x.si.items() if v not in (None, [], {})})
         pc.ground_truth = x.gt
+        pc.policy_ids = policies.for_call(
+            pc.kind, category=self._category(x.sku) if x.sku in self.products or x.sku in self.variant_of else "",
+            sku=x.sku, persona=x.sp.persona_id, gt=x.gt, si=x.si, stated=pc.customer_must_state,
+            returning=bool(x.sp.calls or pc.seed_history))
         if pc.scene_values:
             pc.scene = pc.scene.format_map(_KeepMissing(pc.scene_values))
 
@@ -508,7 +515,7 @@ class _Planner:
         """Price, promotions and stock on the call date, as every selling call quotes them."""
         sp, pc, st, sku, mock = x.sp, x.pc, x.state, x.sku, x.mock
         address_for_quote = x.address if (st["address_stated"] or pc.kind in ORDERING_KINDS | {"regional_promo"}) else None
-        basket = list(sp.variant.extra_skus) if pc.kind in {"order_multi", "cart_quote"} else None
+        basket = list(sp.variant.extra_skus) if pc.kind in {"order_multi", "cart_quote", "order_split"} else None
         truth, quote = self._quote_truth(mock, sku, pc.call_date, pc.speaker.phone, address_for_quote, basket)
         x.gt.update(truth)
         pc.quote = quote
@@ -640,6 +647,12 @@ class _Planner:
         x.si.update(tool_called="schedule.callback", args_match={"callback_at": CALLBACK_HOLIDAY["requested"]},
                     must_say_any=["27/10", "thứ Ba", "Thứ Ba"], must_not_call_tools=["order.create"])
 
+    def _delivery(self, x: _Labels) -> None:
+        """delivery_estimate, the team's tool (the agent's own rule, mcp/servers/delivery.py): BTC's delivery_days."""
+        result = self._exec(x.pc, x.mock, "delivery_estimate", {"address": x.address, "on": x.pc.call_date.isoformat()})
+        if result.get("delivery_days") is not None:
+            x.gt["delivery_days"] = result["delivery_days"]
+
     def _label_order(self, x: _Labels, *, payments: tuple[str, ...] = ("COD", "bank"), qty: int = 1) -> None:
         pc, st, sp, on = x.pc, x.state, x.sp, x.pc.call_date
         payment = x.rng.choice(payments)   # tools.schema.json: COD|bank|momo|zalopay
@@ -653,6 +666,7 @@ class _Planner:
         elif not st["address_stated"]:
             pc.customer_must_state.setdefault("delivery_area", x.address)
         st["address_stated"] = True
+        self._delivery(x)
         result = self._exec(pc, x.mock, "order.create", {"customer_phone": pc.speaker.phone, "sku": x.sku, "qty": qty,
                                                          "price_vnd": x.gt["price_vnd"], "payment": payment,
                                                          "address": x.address, "on": on.isoformat()})
@@ -690,6 +704,7 @@ class _Planner:
                                        "quantity": len(items)})
         pc.customer_must_state.setdefault("delivery_area", x.address)
         st["address_stated"] = True
+        self._delivery(x)
         for item in items:
             # The basket goes with each item: its price depends on the others (AIR-2ND-50, the second purifier).
             result = self._exec(pc, x.mock, "order.create", {"customer_phone": pc.speaker.phone, "sku": item, "qty": 1,
@@ -699,12 +714,66 @@ class _Planner:
             st["orders"].append(result["order_id"])
         st.update(order_id=st["orders"][0], order_price=prices[x.sku])
         pc.agent_facts["order_id"] = st["order_id"]
-        x.gt.update(total_vnd=total, cod_allowed=total <= COD_LIMIT_VND)
+        x.gt.update(total_vnd=total, cod_allowed=total <= COD_LIMIT_VND, estimated_delivery=result["estimated_delivery"])
         pc.agent_will_tell.update(items=[f"{self._name(i)}: {vnd(prices[i])}đ" for i in items], total_vnd=total)
         x.si.update(tool_called="order.create", args_match={"sku": x.sku, "price_vnd": prices[x.sku]},
                     also_ordered=list(sp.variant.extra_skus), total_match_vnd=total)
         if total > COD_LIMIT_VND:
             x.si["must_say_any"] = ["10 triệu", "10.000.000", "chuyển khoản"]
+
+    def _label_order_split(self, x: _Labels) -> None:
+        """VC-03, QT-01: two items whose COD total is above 10.000.000đ, split in two orders the customer agreed to,
+        each at most the limit. Every line keeps the whole basket (QT-01: a split made the same day on the same
+        phone keeps its promotions) and names its order in order_group, the team's argument of order.create."""
+        pc, st, sp, on = x.pc, x.state, x.sp, x.pc.call_date
+        items = [x.sku, *sp.variant.extra_skus]
+        prices = {item: self._quote_truth(x.mock, item, on, pc.speaker.phone, x.address,
+                                          [i for i in items if i != item])[0]["price_vnd"] for item in items}
+        groups: list[list[str]] = [[], []]
+        for item in sorted(items, key=prices.get, reverse=True):
+            min(groups, key=lambda g: sum(prices[i] for i in g)).append(item)
+        total = sum(prices.values())
+        if total <= COD_LIMIT_VND or any(sum(prices[i] for i in g) > COD_LIMIT_VND for g in groups):
+            raise ValueError(f"{sp.scenario_id} {pc.name}: order_split needs a COD total above "
+                             f"{COD_LIMIT_VND} that two orders under it can hold, got {prices}")
+        group_of = {item: str(n + 1) for n, g in enumerate(groups) for item in g}
+        pc.customer_must_state.update(payment="COD", quantity=len(items))
+        pc.customer_must_state.setdefault("delivery_area", x.address)
+        st["address_stated"] = True
+        self._delivery(x)
+        for item in items:
+            result = self._exec(pc, x.mock, "order.create", {
+                "customer_phone": pc.speaker.phone, "sku": item, "qty": 1, "price_vnd": prices[item], "payment": "COD",
+                "address": x.address, "on": on.isoformat(), "basket_skus": [i for i in items if i != item],
+                "order_group": group_of[item]})
+            st["orders"].append(result["order_id"])
+        st.update(order_id=st["orders"][0], order_price=prices[x.sku])
+        pc.agent_facts["order_id"] = st["order_id"]
+        x.gt.update({f"price_vnd:{item}": prices[item] for item in items})
+        x.gt.update(total_vnd=total, cod_allowed=False, order_count=2, estimated_delivery=result["estimated_delivery"])
+        x.forbidden.append({"field": "cod_allowed", "value": True})
+        pc.agent_will_tell.update(items=[f"{self._name(i)}: {vnd(prices[i])}đ" for i in items], total_vnd=total,
+                                  split=[[self._name(i) for i in g] for g in groups])
+        x.si.update(tool_called="order.create", args_match={"sku": x.sku, "price_vnd": prices[x.sku], "payment": "COD",
+                                                            "order_group": group_of[x.sku]},
+                    also_ordered=list(sp.variant.extra_skus), total_match_vnd=total,
+                    must_say_any=["tách", "hai đơn", "2 đơn"])
+
+    def _label_consult_ready(self, x: _Labels) -> None:
+        """A consultation in which the customer already says how they will pay and where to: the next call's order
+        must not ask either again (must_not_ask payment, delivery_area)."""
+        self._no_order(x)
+        payment = x.rng.choice(("COD", "bank"))
+        x.pc.customer_must_state.update(payment=payment, delivery_area=x.address)
+        x.state.update(address_stated=True, payment=payment)
+        x.pc.scene_values["payment_phrase"] = {"COD": "tiền mặt khi nhận hàng (COD)", "bank": "chuyển khoản"}[payment]
+
+    def _label_order_readback(self, x: _Labels) -> None:
+        """PB-09 and BTC's RQR rule: the order agreed earlier, read back once (one confirm per slot is free, a second
+        is redundant) and placed; the customer repeats nothing. max_agent_questions comes from the template."""
+        payment = x.state.get("payment") or "COD"
+        self._label_order(x, payments=(payment,))
+        x.pc.customer_must_state.pop("payment", None)   # said in the earlier call: the agent reads it back
 
     def _label_order_ewallet(self, x: _Labels) -> None:
         """VC-04: the shop takes MoMo and ZaloPay; the order carries that payment."""
@@ -1322,6 +1391,7 @@ def assemble(sp: ScenarioPlan, draft: ScenarioDraft | None) -> Scenario:
             facts_established=facts, expected_outcome=pc.outcome,
             must_carry_over=must_carry_over, must_not_ask=must_not_ask,
             success_if=pc.success_if, ground_truth_facts=pc.ground_truth, memory_expectation=expectation,
+            relevant_policy_ids=pc.policy_ids,
             expected_call_brief=brief, expected_handoff_brief=pc.handoff_brief, oracle_tool_calls=pc.oracle_tool_calls,
             kind=pc.kind, agent_will_tell={k: v for k, v in pc.agent_will_tell.items() if v is not None},
             simulator_persona_key=sp.persona_id, patience_start=pc.patience_start,

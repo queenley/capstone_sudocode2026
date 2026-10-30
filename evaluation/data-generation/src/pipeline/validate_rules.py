@@ -8,7 +8,7 @@ by the mock, spoken amounts that are not grounded in the call's facts, and BTC's
 schemas (``data/schemas``: every trace row against ``trace_log``, every tool call
 against ``tools``).
 
-Output: ``output/reports/validation.json`` (one row per conversation).
+Output: ``<seed>/reports/validation.json`` (one row per conversation).
 """
 from __future__ import annotations
 

@@ -1,6 +1,6 @@
 """Stage 4 — generate one reference transcript per scenario call.
 
-Output: ``output/conversations/scenarios_<scenario_id>/<call>.json``. The transcript is
+Output: ``<seed>/conversations/scenarios_<scenario_id>/<call>.json``. The transcript is
 the gold behaviour for that call; ``validate_rules`` scores it with the same
 metric code as the agent under test and rejects anything below a perfect score.
 

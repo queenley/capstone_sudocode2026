@@ -49,7 +49,7 @@ def test_callback_moved_off_holiday(by_hard_case):
 def test_multi_item_over_cod_limit(by_hard_case):
     call = by_hard_case["16_luot_4_san_pham_vuot_cod"].calls["call_2"]
     assert call.success_if.total_match_vnd > 10_000_000 and len(call.success_if.also_ordered) == 3
-    assert all(tc["args"]["payment"] == "bank" for tc in call.oracle_tool_calls)
+    assert all(tc["args"]["payment"] == "bank" for tc in call.oracle_tool_calls if tc["name"] == "order.create")
 
 
 def test_shared_phone_never_carries_the_other_persons_facts(by_hard_case):

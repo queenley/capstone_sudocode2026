@@ -1,6 +1,6 @@
 """Stage 11 — data-generation report with visualizations.
 
-Outputs (``output/reports/``)
+Outputs (``<seed>/reports/``)
 * ``validation_report.md``   – tables + Mermaid charts (renders on GitHub / Mermaid-enabled previews)
 * ``validation_report.html`` – self-contained visual report (meters, bars, tooltips, dark mode)
 * ``audio_statistics.json``, ``audio_by_customer.csv`` – audio analysis data
@@ -200,7 +200,7 @@ def official_markdown(ctx: dict[str, Any]) -> list[str]:
             if off[name]:
                 lines.append(f"| {name} | " + " | ".join(str(off[name].get(k)) for k in keys) + " |")
         lines += ["", f"Oracle perfect (every label satisfiable with BTC mock_tools): **{off['oracle_perfect']}**. "
-                      "Score the agent with `data/eval/reference_eval.py --scenarios output/scenarios --trace <agent trace>`."]
+                      "Score the agent with `data/eval/reference_eval.py --scenarios <seed>/scenarios --trace <agent trace>`."]
     else:
         lines.append("Not built yet: `python -m src.pipeline.build_ground_truth`.")
     ts = ctx["test_set"]
@@ -226,7 +226,7 @@ def official_markdown(ctx: dict[str, Any]) -> list[str]:
     if tools:
         lines.append("Tools not in BTC set: " + (", ".join(f"`{t}`" for t in tools["not_in_btc"]) or "none")
                      + " · extra params: " + (", ".join(f"`{t}`: {p}" for t, p in tools["extra_params"].items()) or "none")
-                     + " · details: `output/reports/tools_audit.md`.")
+                     + " · details: `<seed>/reports/tools_audit.md`.")
     else:
         lines.append("Not audited yet: `python -m src.pipeline.build_ground_truth`.")
     agreement = ctx["judge_agreement"]
