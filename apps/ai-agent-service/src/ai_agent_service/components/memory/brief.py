@@ -198,6 +198,19 @@ def render(
     for fact in facts:
         if fact.get("status") == "active" and fact["slot"] == NOTE_SLOT:
             lines.append((f"Ghi chú về khách: {fact['value']}.", False, (fact["fact_id"],)))
+    unconfirmed = [f for f in facts if f.get("status") == "unconfirmed" and f["slot"] not in held]
+    if unconfirmed:
+        # Said by someone who gave this customer's number and left before confirming (after_call, PROBABLE).
+        source = unconfirmed[0].get("source") or {}
+        when = f" {day_label(unconfirmed[0]['valid_from'])}" if unconfirmed[0].get("valid_from") else ""
+        said = " ".join(_line(f["slot"], f).replace(" (đã biết, không hỏi lại)", "") for f in unconfirmed)
+        lines.append((
+            f"Chưa xác nhận: có người liên hệ qua {_channel(source.get('channel'))}{when} bằng số của khách nhưng chưa "
+            f"xác nhận là khách. {said} Chỉ nhắc dưới dạng một câu hỏi xác nhận; khách tự nhắc lại chuyện đó là đã "
+            "xác nhận, dùng bình thường.",
+            True,
+            tuple(f["fact_id"] for f in unconfirmed),
+        ))
 
     numbered = tuple(BriefLine(f"B{i}", text, sensitive, ids) for i, (text, sensitive, ids) in enumerate(lines, 1))
     blockers = [f for n, f in held.items() if n == "blocker"]
@@ -216,10 +229,11 @@ def render(
         "customer_name": name,
         "honorific": customer.get("honorific"),
         "customer_id": customer.get("customer_id"),
-        "is_returning": bool(episodes or held or orders),
+        "is_returning": bool(episodes or held or orders or unconfirmed),
         "n_previous_sessions": len(episodes),
         "last_session": last_session,
-        "profile_facts": {n: {"value": f["value"], "fact_id": f["fact_id"]} for n, f in held.items()},
+        "profile_facts": {**{f["slot"]: {"value": f["value"], "fact_id": f["fact_id"]} for f in unconfirmed},
+                          **{n: {"value": f["value"], "fact_id": f["fact_id"]} for n, f in held.items()}},
         "products_advised": [
             {k: p.get(k) for k in ("sku", "price_quoted_vnd", "promo_code", "promo_still_active", "quoted_on")}
             for p in products

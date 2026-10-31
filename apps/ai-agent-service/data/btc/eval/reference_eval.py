@@ -48,14 +48,28 @@ def p95(xs):
     xs = sorted(xs)
     return xs[min(len(xs) - 1, int(round(0.95 * len(xs) + 0.5)) - 1)]
 
-def args_match(expected, actual):
-    """expected ⊆ actual (so sánh đúng bằng từng key)."""
+def args_match(expected, actual, order_aliases=()):
+    """expected ⊆ actual (so sánh đúng bằng từng key).
+    order_id: chấp nhận mã ghi trong kịch bản HOẶC mã do chính order.create trả về ở cuộc gọi trước của cùng kịch bản
+    (mã đơn do hệ thống sinh, agent không thể biết trước — xem giải đáp câu 10)."""
     for k, v in (expected or {}).items():
         if v is None:
+            continue
+        if k == "order_id" and actual.get(k) in order_aliases:
             continue
         if actual.get(k) != v:
             return False
     return True
+
+def created_order_ids(rows):
+    """Mã đơn mà order.create trả về (tool_calls[].result.order_id) trong các lượt cho trước."""
+    out = set()
+    for r in rows:
+        for tc in r.get("tool_calls", []):
+            res = tc.get("result")
+            if tc.get("name") == "order.create" and isinstance(res, dict) and res.get("order_id"):
+                out.add(res["order_id"])
+    return out
 
 # --------------------------------------------------------------------------- metrics
 def repeat_question_rate(scenarios, trace):
@@ -120,7 +134,7 @@ def _blob(rows, include_tool_args=True):
             parts.append(json.dumps([tc.get("args", {}) for tc in r.get("tool_calls", [])], ensure_ascii=False))
     return "\n".join(parts)
 
-def check_call(spec, rows):
+def check_call(spec, rows, order_aliases=()):
     """Chấm 1 call theo success_if. Trả (passed, reasons[])."""
     si = spec.get("success_if")
     if not si:
@@ -140,7 +154,7 @@ def check_call(spec, rows):
         else:
             reasons.append("không gọi handoff.transfer")
     elif tool:
-        ok = any(tc["name"] == tool and args_match(si.get("args_match"), tc.get("args", {})) for tc in calls)
+        ok = any(tc["name"] == tool and args_match(si.get("args_match"), tc.get("args", {}), order_aliases) for tc in calls)
         if not ok: reasons.append(f"không có tool call {tool} khớp args_match")
         if ok and si.get("also_ordered"):
             ordered = {tc["args"].get("sku") for tc in calls if tc["name"] == "order.create"}
@@ -173,7 +187,8 @@ def task_success_rate(scenarios, trace):
     for sid, s in scenarios.items():
         passed_all = True; has_any = False
         for call, spec in s["calls"].items():
-            res, reasons = check_call(spec, trace.get((sid, call), []))
+            earlier = [r for c in sorted(s["calls"]) if c < call for r in trace.get((sid, c), [])]
+            res, reasons = check_call(spec, trace.get((sid, call), []), created_order_ids(earlier))
             if res is None: continue
             has_any = True
             if not res:
@@ -301,7 +316,7 @@ def wer_cer(asr_dir):
                 dp[j] = min(dp[j] + 1, dp[j - 1] + 1, prev + (a[i - 1] != b[j - 1]))
                 prev = cur
         return dp[-1]
-    S = N = Sc = Nc = 0; ent_ok = ent_n = 0; dia_ok = dia_n = 0; per = {}
+    S = N = Sc = Nc = 0; ent_ok = ent_n = 0; entt_ok = entt_n = 0; dia_ok = dia_n = 0; per = {}
     for i, g in gt.items():
         h = hy.get(i)
         if h is None:
@@ -311,7 +326,19 @@ def wer_cer(asr_dir):
         e_c = ed(gtx.replace(" ", ""), htx.replace(" ", "")); Sc += e_c; Nc += len(gtx.replace(" ", ""))
         per[i] = {"wer": pct(e_w, len(gtx.split())), "cer": pct(e_c, len(gtx.replace(" ", ""))), "noisy": g.get("noisy", False)}
         for k, v in g.get("entities", {}).items():
-            ent_n += 1; ent_ok += int(str(h.get("entities", {}).get(k)) == str(v))
+            ent_n += 1
+            hv = h.get("entities", {}).get(k)
+            # v là list khi thực thể được nhắc nhiều lần với giá trị khác nhau -> khớp bất kỳ giá trị nào là đúng
+            vals = v if isinstance(v, list) else [v]
+            ent_ok += int(any(str(hv) == str(x) for x in vals))
+        # bản chặt: chấm entity theo TỪNG LƯỢT, chỉ khi hypotheses có turns[] khớp idx
+        if h.get("turns"):
+            by_idx = {t.get("idx"): t for t in h["turns"] if t.get("idx") is not None}
+            for t in g["turns"]:
+                ht = by_idx.get(t["idx"])
+                for k, v in t.get("entities", {}).items():
+                    entt_n += 1
+                    entt_ok += int(bool(ht) and str((ht.get("entities") or {}).get(k)) == str(v))
         # diarization: đọc segments ground truth từ audio/<id>.segments.json nếu có
         seg_p = os.path.join(asr_dir, "audio", f"{i}.segments.json")
         if h.get("turns") and os.path.exists(seg_p):
@@ -321,6 +348,7 @@ def wer_cer(asr_dir):
                 dia_ok += int(bool(hit) and hit.get("speaker") == sg["speaker"])
     return {"normalization": "lowercase, NFC, bỏ dấu câu, gộp khoảng trắng; số/SĐT so exact-match sau ITN",
             "WER": pct(S, N), "CER": pct(Sc, Nc), "entity_accuracy": pct(ent_ok, ent_n), "n_entities": ent_n,
+            "entity_accuracy_per_turn": pct(entt_ok, entt_n) if entt_n else None, "n_entities_per_turn": entt_n,
             "diarization_turn_accuracy": pct(dia_ok, dia_n) if dia_n else None, "n_dialogues": len(per),
             "wer_noisy": round(statistics.mean([v["wer"] for v in per.values() if v["noisy"]]), 1) if any(v["noisy"] for v in per.values()) else None,
             "wer_clean": round(statistics.mean([v["wer"] for v in per.values() if not v["noisy"]]), 1) if any(not v["noisy"] for v in per.values()) else None,

@@ -38,7 +38,7 @@ def test_sensitive_tool_values_are_restored_only_at_explicit_trace_export():
             'result':{'ok':True,'data':{'customer_phone':'<PHONE_1>'}}}]},vault=vault,
         total_ms=1,first_token_ms=1,call_brief_latency_ms=None,input_mode='clean')
     assert row['tool_calls'][0]['args']['customer_phone']=='0900000001'
-    assert row['tool_calls'][0]['result']['data']['customer_phone']=='0900000001'
+    assert row['tool_calls'][0]['result']['customer_phone']=='0900000001'
 
 
 def test_business_evidence_and_repair_reason_survive_context_budget():

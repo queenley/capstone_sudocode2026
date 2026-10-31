@@ -5,7 +5,7 @@
 | 1 | tools failing in a row, or ``guard`` fell back to the safe line twice in the call | HANDOFF |
 | 2 | ``asr_low_conf`` | CLARIFY |
 | 3 | tier PROBABLE or AMBIGUOUS, while the one confirming question is out | CONFIRM_IDENTITY |
-| 4 | the customer has an order and the turn is about it | ORDER_SERVICE |
+| 4 | the customer has an order and the turn is about it, or answers what the agent just asked about it | ORDER_SERVICE |
 | 5 | a topic that must go to a person (PB-06) | OUT_OF_SCOPE |
 | 6 | VERIFIED with a brief | CONTINUITY |
 | 7 | anything else | NEW |
@@ -77,6 +77,11 @@ class RouteInput:
     #: been asked and not answered, the call goes on as a stranger's
     #: (section 4.2: the question is asked once).
     awaiting_identity: bool = True
+    #: The lane of the previous turn, and whether the agent's reply then asked
+    #: the customer something: an answer belongs to the task its question did
+    #: ("Địa chỉ mới là Hải Châu" says no "đơn", and is still about the order).
+    previous_lane: str | None = None
+    answering: bool = False
 
 
 @dataclass(frozen=True)
@@ -112,6 +117,8 @@ def _table(view: RouteInput) -> tuple[Lane, int, str]:
         return "CONFIRM_IDENTITY", 3, f"identity {view.tier.lower()}"
     if (view.has_order and ORDER_TALK.search(said)) or (view.tier == "VERIFIED" and ORDER_LOOKUP.search(said)):
         return "ORDER_SERVICE", 4, "about an existing order"
+    if view.has_order and view.previous_lane == "ORDER_SERVICE" and view.answering and not view.must_transfer:
+        return "ORDER_SERVICE", 4, "answering the agent's question about an order"
     if view.must_transfer:
         return "OUT_OF_SCOPE", 5, "a topic that must go to a person (PB-06)"
     if view.tier == "VERIFIED" and view.has_brief:

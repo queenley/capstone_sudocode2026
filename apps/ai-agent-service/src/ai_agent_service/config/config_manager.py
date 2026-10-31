@@ -25,7 +25,7 @@ from typing import Any, Literal
 
 import yaml
 from dotenv import load_dotenv
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 logger = logging.getLogger(__name__)
@@ -201,6 +201,42 @@ class AgentModel(BaseModel):
     generation: Generation = Field(default_factory=Generation)
 
 
+class ModelChoice(BaseModel):
+    """A provider and one of its models, nothing else."""
+
+    model_config = {"extra": "forbid"}
+
+    provider: str
+    model: str
+
+
+class Profile(BaseModel):
+    """One model for a set of agents, chosen by ``AGENT_PROFILE`` (a laptop on a free key).
+
+    ``overrides`` gives an agent a model of its own instead: a free tier
+    counts requests per model and per day, so an agent that makes many calls
+    can spend another model's quota.
+    """
+
+    model_config = {"extra": "forbid"}
+
+    provider: str
+    model: str
+    agents: list[str] = Field(min_length=1)
+    overrides: dict[str, ModelChoice] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def _one_model_per_agent(self) -> "Profile":
+        both = sorted(set(self.agents) & set(self.overrides))
+        if both:
+            raise ValueError(f"{', '.join(both)} listed both in agents and in overrides; keep one")
+        return self
+
+
+#: Names the profile of ``config/models.yaml`` this process runs under; unset runs the file as written.
+PROFILE_ENV = "AGENT_PROFILE"
+
+
 class EvaluationProvider(BaseModel):
     """A service that hosts evaluation models: typed answers, no text."""
 
@@ -294,6 +330,17 @@ class ModelsConfig(BaseModel):
     evaluation_providers: dict[str, EvaluationProvider] = Field(default_factory=dict)
     evaluators: dict[str, Evaluator] = Field(default_factory=dict)
     voice: VoiceConfig = Field(default_factory=VoiceConfig)
+    profiles: dict[str, Profile] = Field(default_factory=dict)
+
+    def profile(self) -> Profile | None:
+        """The profile ``AGENT_PROFILE`` names, or None; a name the file does not have is an error."""
+        name = os.environ.get(PROFILE_ENV, "").strip()
+        if not name:
+            return None
+        if name not in self.profiles:
+            known = ", ".join(sorted(self.profiles)) or "none"
+            raise KeyError(f"{PROFILE_ENV}={name!r} is not a profile in {MODELS_YAML}. Known: {known}")
+        return self.profiles[name]
 
     def evaluator_config(self, name: str) -> dict[str, Any]:
         """The resolved block for evaluator *name*, ready for ``src.llm.jev``.
@@ -339,14 +386,24 @@ class ModelsConfig(BaseModel):
         }
 
     def agent(self, name: str) -> AgentModel:
+        """The routing of agent *name*, with the active profile's model when the profile lists or overrides it."""
         try:
-            return self.agents[name]
+            routing = self.agents[name]
         except KeyError:
             known = ", ".join(sorted(self.agents)) or "none"
             raise KeyError(
                 f"No model configured for agent {name!r} in {MODELS_YAML}. "
                 f"Configured agents: {known}"
             ) from None
+        profile = self.profile()
+        if profile is None:
+            return routing
+        if name in profile.overrides:
+            own = profile.overrides[name]
+            return routing.model_copy(update={"provider": own.provider, "model": own.model})
+        if name in profile.agents:
+            return routing.model_copy(update={"provider": profile.provider, "model": profile.model})
+        return routing
 
     def agent_llm_config(self, name: str) -> dict[str, Any]:
         """The config block for *name*, ready for ``LLMFactory.create_llm``."""

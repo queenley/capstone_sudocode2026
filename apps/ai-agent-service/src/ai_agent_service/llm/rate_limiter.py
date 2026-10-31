@@ -74,6 +74,8 @@ class AdvancedTokenRateLimiter(BaseRateLimiter):
         self.total_input_tokens: int = 0
         self.total_output_tokens: int = 0
         self.total_cost: float = 0.0
+        #: Seconds callers spent queueing here: our own throttling, not the provider's latency.
+        self.total_waited: float = 0.0
 
         self._lock = threading.Lock()
 
@@ -289,15 +291,29 @@ class AdvancedTokenRateLimiter(BaseRateLimiter):
                 now = time.time()
                 wait = max(0.0, self._cooldown_until - now)
 
-                # How long until the oldest entry in each window ages out.
-                for queue, is_pair in (
-                    (self.request_timestamps, False),
-                    (self.input_token_usage, True),
-                    (self.output_token_usage, True),
+                # How long until the oldest entry of each budget that is full
+                # ages out. Only a full one: the token windows are written when
+                # a call returns, so their oldest entry is younger than the
+                # oldest request by a whole call's latency, and waiting on it
+                # as well held every call back that much longer than any
+                # budget asked.
+                if (
+                    self.request_timestamps
+                    and len(self.request_timestamps) + 1 > self.requests_per_minute
                 ):
-                    if queue:
-                        oldest = queue[0][0] if is_pair else queue[0]
-                        wait = max(wait, self.window_seconds - (now - oldest))
+                    wait = max(
+                        wait, self.window_seconds - (now - self.request_timestamps[0])
+                    )
+                for queue, budget, wanted in (
+                    (self.input_token_usage, self.input_tokens_per_minute, input_tokens),
+                    (
+                        self.output_token_usage,
+                        self.output_tokens_per_minute,
+                        estimated_output_tokens,
+                    ),
+                ):
+                    if queue and self._window_sum(queue) + wanted >= budget:
+                        wait = max(wait, self.window_seconds - (now - queue[0][0]))
 
                 if wait <= 0:
                     # A single request larger than the whole per-minute budget
@@ -311,7 +327,10 @@ class AdvancedTokenRateLimiter(BaseRateLimiter):
                     return
 
             logger.info("[%s] rate limit reached, waiting %.2fs", self.provider, wait)
-            yield min(wait, self.window_seconds)
+            step = min(wait, self.window_seconds)
+            with self._lock:
+                self.total_waited += step
+            yield step
 
     # ------------------------------------------------------------------ #
     #  Reporting                                                           #
@@ -327,4 +346,5 @@ class AdvancedTokenRateLimiter(BaseRateLimiter):
                 "input_tokens": self.total_input_tokens,
                 "output_tokens": self.total_output_tokens,
                 "cost_usd": round(self.total_cost, 6),
+                "waited_s": round(self.total_waited, 1),
             }

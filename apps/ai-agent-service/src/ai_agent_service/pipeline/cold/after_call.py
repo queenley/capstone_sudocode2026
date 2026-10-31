@@ -5,8 +5,14 @@ call confirmed. VERIFIED writes to that customer and confirms the keys seen.
 UNKNOWN with a key (a new caller, a Zalo identity, a number they typed that
 matched nobody) creates a customer on those keys. A caller who gave a number
 that belongs to a customer and never clearly answered the confirming question
-stays unconfirmed. As for AMBIGUOUS at hang-up, nothing is written to anyone:
-a model opinion cannot grant permission to update another person's memory.
+stays unconfirmed: what they said is kept for that customer as
+*unconfirmed*, beside their facts and never over them, and the next call the
+customer makes themselves settles it (their own facts win; it becomes theirs
+unless they say the contact was not them). So a chat that leaves a number and
+goes is remembered when that number calls (Case 2, one customer across channels), and
+a stranger typing someone's number writes nothing of theirs. As for AMBIGUOUS
+at hang-up, nothing is written to anyone: a model opinion cannot grant
+permission to update another person's memory.
 
 A call in which the customer asked to be forgotten (QT-06) writes nothing
 either: the request recorded during the call is carried out here, under the
@@ -22,6 +28,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 from typing import Any, Awaitable, Callable, Sequence
 
 from ...agents.memory import MemoryAgent
@@ -34,6 +41,11 @@ logger = logging.getLogger(__name__)
 #: Opens the ``admin`` role's tools when a call needs them: only to carry out
 #: a deletion, so a run without one never starts those servers.
 AdminTools = Callable[[], Awaitable[Any]]
+
+#: The customer saying an earlier contact under their number was not theirs.
+NOT_ME = re.compile(r"(không phải (?:tôi|em|anh|chị|mình|tui)\b|(?:tôi|em|anh|chị|mình|tui) (?:có )?(?:không|chưa) "
+                    r"(?:hề )?(?:nhắn|hỏi|gọi|liên hệ)\b|nhầm (?:số|người)\b|ai (?:đó )?(?:nhắn|gọi) (?:bằng|lấy) số)",
+                    re.IGNORECASE)
 
 
 async def after_call(
@@ -61,10 +73,18 @@ async def after_call(
     else:
         candidates = await memory.extract(transcript, tool_log, on=call["on"])
         settled = _settle_identity(call)
-        remembered = await _remember(settled, candidates, writer=writer, memory=memory)
+        claimed = (call.get("provisional") or {}).get("customer_id")
+        if settled.get("tier") == "PROBABLE" and claimed:
+            remembered = await _hold(claimed, settled, candidates, writer=writer)
+        else:
+            remembered = await _remember(settled, candidates, writer=writer, memory=memory)
+            if remembered.get("status") == "done" and settled.get("tier") == "VERIFIED":
+                denied = any(NOT_ME.search(str(line.get("text") or "")) for line in transcript
+                             if line.get("speaker") == "customer")
+                await writer.data("memory_settle_unconfirmed", customer_id=remembered["customer_id"],
+                                  confirm=not denied, on=call["on"])
     tags = await qa.tag(candidates, returning=bool(call.get("returning")))
-    score = await qa.score(transcript, tool_log)
-    return {**remembered, "tags": tags, "qa": score}
+    return {**remembered, "tags": tags}
 
 
 def requested_deletion(tool_log: Sequence[dict[str, Any]]) -> bool:
@@ -85,6 +105,22 @@ async def _forget(call: dict[str, Any], admin: AdminTools | None) -> dict[str, A
         return {"status": "failed", "reason": "the deletion could not be carried out", "memory_writes": []}
     logger.info("after_call %s: customer %s forgotten on request", call["call_id"], customer_id)
     return {"status": "deleted", "customer_id": customer_id, "memory_writes": [], "deleted": deleted.get("deleted")}
+
+
+async def _hold(customer_id: str, call: dict[str, Any], candidates: list[gate.Candidate], *, writer: Any) -> dict[str, Any]:
+    """What a caller who stated *customer_id*'s number said, kept for them as unconfirmed; nothing is theirs yet."""
+    profile = await writer.data("memory_get_profile", customer_id=customer_id, on=call["on"])
+    current = [f for f in (profile or {}).get("facts") or [] if f.get("status") == "active"]
+    source = {"call_id": str(call["call_id"]), "call": "unconfirmed", "channel": call.get("channel")}
+    decisions = [{**d.as_dict(), "operation": "add", "unconfirmed": True}
+                 for d in plan_writes(candidates, current, source=source, on=call["on"]) if d.operation in ("add", "update")]
+    if not decisions:
+        return {"status": "skipped", "reason": "identity still probable at hang-up; nothing to keep", "memory_writes": []}
+    held = await writer.data("memory_commit_facts", customer_id=customer_id, decisions=decisions, on=call["on"])
+    if held is None:
+        return {"status": "failed", "reason": "the ledger refused the unconfirmed facts", "memory_writes": []}
+    logger.info("after_call %s: %d facts kept unconfirmed for %s", call["call_id"], len(decisions), customer_id)
+    return {"status": "unconfirmed", "customer_id": customer_id, "held": len(decisions), "memory_writes": []}
 
 
 def _settle_identity(call: dict[str, Any]) -> dict[str, Any]:

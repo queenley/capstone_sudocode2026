@@ -47,6 +47,7 @@ RISK = re.compile(
     r"|con hang|het hang|chi con|sap het|co han|duy nhat|cuoi cung"
     r"|ben kia|shop khac|cho khac|cua hang khac|doi thu|re hon|dat hon"
     r"|chac chan|cam ket|dam bao|\bhua\b|bao hanh|doi tra|hoan tien"
+    r"|kinh doanh|ngung ban|ngung san xuat|khong ban|chua ban|thong tin ve"
 )
 
 
@@ -67,6 +68,13 @@ QUESTIONS = {
     "competitor": Boolean(
         instructions="Does the reply comment on, disparage or match another shop's price or product?",
     ),
+    "unsupported_absence": Boolean(
+        instructions=(
+            "Does the reply say the shop does not sell a product, no longer sells it, does not have it, or has "
+            "no information about it, when the tool results do not show that (no catalogue search, or a search "
+            "that found it)?"
+        ),
+    ),
     "false_pressure": Boolean(
         instructions=(
             "Does the reply pressure the customer with scarcity or urgency (only a few left, price rising "
@@ -75,13 +83,18 @@ QUESTIONS = {
     ),
 }
 
-#: Per question, from the lab's leave-one-out choice.
-THRESHOLDS = {"over_promise": 0.9, "stale_policy": 0.9, "competitor": 0.9, "false_pressure": 0.9}
+#: Per question, from the lab's leave-one-out choice. ``unsupported_absence`` came later and is set
+#: on four hand-written cases only (2026-10-31: 0.87 for a claim with no search, 0.93 against a search
+#: that found the product, 0.50 after one that found nothing): set it again on the team's labelled set.
+THRESHOLDS = {"over_promise": 0.9, "stale_policy": 0.9, "competitor": 0.9, "unsupported_absence": 0.8,
+              "false_pressure": 0.9}
 
 REASONS = {
     "over_promise": "Hứa điều chính sách và kết quả tool không xác nhận.",
     "stale_policy": "Nói theo giá, khuyến mãi hoặc chính sách đã hết hiệu lực.",
     "competitor": "Bình luận giá hoặc sản phẩm của cửa hàng khác.",
+    "unsupported_absence": "Nói shop không có, không còn bán hoặc không có thông tin về sản phẩm mà tool chưa cho thấy vậy; "
+                           "tra catalog_search trước.",
     "false_pressure": "Tạo áp lực khan hiếm hoặc gấp mà tool không xác nhận.",
 }
 

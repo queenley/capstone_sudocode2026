@@ -280,3 +280,96 @@ async def test_commitment_provenance_accepts_assistant_or_staff_actual_turn(spea
     result=await memory._from_words([{'speaker':'customer','turn':1,'text':'Gọi lại giúp chị'},
                                     {'speaker':speaker,'turn':2,'text':'Em sẽ gọi lại lúc 10 giờ ạ.'}])
     assert next(c.value for c in result if c.slot=='commitments')=='Gọi lại lúc 10 giờ'
+
+
+@pytest.mark.asyncio
+async def test_a_probable_caller_s_words_are_kept_unconfirmed_for_the_number_s_owner():
+    from ai_agent_service.pipeline.cold.after_call import after_call
+    writer=SimpleNamespace(data=AsyncMock(side_effect=lambda name, **kw: {'facts':[]} if name=='memory_get_profile' else {'memory_writes':[]}))
+    memory=SimpleNamespace(extract=AsyncMock(return_value=from_tools([quote('SKU-T-1',990000,1,'PROMO-T')],on='2026-10-15')))
+    qa=SimpleNamespace(tag=AsyncMock(return_value={}))
+    call={'tier':'PROBABLE','customer_id':'C-T','on':'2026-10-15','call_id':'chat-1','channel':'zalo',
+          'provisional':{'customer_id':'C-T','name':'Mai'},'keys_seen':[]}
+    result=await after_call(call,[],[],writer=writer,memory=memory,qa=qa)
+    assert result['status']=='unconfirmed' and result['customer_id']=='C-T' and result['memory_writes']==[]
+    commit=[c for c in writer.data.await_args_list if c.args[0]=='memory_commit_facts'][0]
+    assert commit.kwargs['customer_id']=='C-T'
+    assert all(d['unconfirmed'] and d['operation']=='add' for d in commit.kwargs['decisions'])
+    assert {d['slot'] for d in commit.kwargs['decisions']} >= {'product_advised','price_quoted_vnd'}
+    assert not any(c.args[0] in ('memory_commit_episode','memory_confirm_identity') for c in writer.data.await_args_list)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize('said, confirm', [
+    ('Alo em, hôm qua chị có nhắn hỏi về cái quạt đó.', True),
+    ('Không phải chị đâu em, chị không nhắn gì cả.', False),
+    ('Chắc nhầm số rồi em ơi.', False),
+])
+async def test_the_owner_s_own_call_settles_what_was_kept_unconfirmed(said, confirm):
+    from ai_agent_service.pipeline.cold import after_call as module
+    writer=SimpleNamespace(data=AsyncMock(return_value={'facts':[],'episodes':[],'customer_id':'C-T','memory_writes':[]}))
+    memory=SimpleNamespace(extract=AsyncMock(return_value=[]),
+                           summarize=AsyncMock(return_value={'summary':'s','outcome':'khac'}))
+    qa=SimpleNamespace(tag=AsyncMock(return_value={}))
+    call={'tier':'VERIFIED','customer_id':'C-T','on':'2026-10-16','call_id':'hot-1','channel':'hotline','keys_seen':[]}
+    await module.after_call(call,[{'speaker':'customer','text':said,'turn':1}],[],writer=writer,memory=memory,qa=qa)
+    settle=[c for c in writer.data.await_args_list if c.args[0]=='memory_settle_unconfirmed']
+    assert len(settle)==1 and settle[0].kwargs['confirm'] is confirm
+
+
+def test_the_brief_shows_unconfirmed_facts_as_a_question_and_counts_them_when_cited():
+    unconfirmed={'slot':'product_advised','value':'SKU-T-1','status':'unconfirmed','fact_id':'F-u1','kind':'past_event',
+                 'valid_from':'2026-10-15','source':{'channel':'zalo'}}
+    data,lines=brief.render(customer={'customer_id':'C-T','name':'Mai','honorific':'chị'},facts=[unconfirmed],
+                            episodes=[],orders=[],products=[],warnings=[],now=datetime(2026,10,16,10,tzinfo=timezone.utc),latency_ms=1)
+    line=next(l for l in lines if l.text.startswith('Chưa xác nhận'))
+    assert 'SKU-T-1' in line.text and line.fact_ids==('F-u1',) and data['is_returning']
+    assert brief.used_slots([line.id],[l.as_dict() for l in lines],data['profile_facts'])==['product_advised']
+
+
+@pytest.mark.parametrize('slot_name, value, lapses', [
+    ('address_token', '<ADDR_1>', '2027-04-13'),     # 180 days: an address may have changed
+    ('blocker', 'cần hỏi chồng', '2026-11-14'),        # 30 days: a pending matter goes stale
+    ('room_area_m2', 25, None),                        # a need never lapses
+])
+def test_each_slot_lapses_after_its_ttl(slot_name, value, lapses):
+    candidate=gate.Candidate(slot_name,value,'customer',1)
+    decisions=plan_writes([candidate],[],source={'call_id':'c1','call':'call_1'},on='2026-10-15')
+    assert [d.valid_to for d in decisions]==[lapses]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize('last_contact, warned', [('2026-03-01', True), ('2026-08-01', False)])
+async def test_a_contact_older_than_six_months_warns_the_agent_to_ask_again(last_contact, warned):
+    tools=SimpleNamespace(data=AsyncMock(return_value={}))
+    _, _, warnings=await recall.refresh([],[],[{'date':last_contact,'channel':'hotline'}],'2026-10-15',tools,customer_phone=None)
+    assert any('hơn 6 tháng' in w for w in warnings) is warned
+
+
+@pytest.mark.asyncio
+async def test_forgetting_a_customer_also_clears_their_conversation_log(monkeypatch):
+    from contextlib import asynccontextmanager
+    from ai_agent_service.mcp.servers import memory as store
+    executed=[]
+
+    class Cursor:
+        rowcount=1
+        async def fetchone(self):return {'t':'present'}
+        async def fetchall(self):return [{'request_id':'D-1'}]
+
+    class Conn:
+        async def execute(self,sql,params=()):
+            executed.append(' '.join(sql.split()));return Cursor()
+        @asynccontextmanager
+        async def transaction(self):yield
+
+    class Pool:
+        @asynccontextmanager
+        async def connection(self):yield Conn()
+
+    monkeypatch.setattr(store,'database',AsyncMock(return_value=Pool()))
+    fn=getattr(store.memory_delete_customer,'fn',store.memory_delete_customer)
+    result=await fn(customer_id='C-T')
+    assert {'facts','episodes','identities','pii_vault','turns','calls_unlinked'}<=set(result['deleted'])
+    assert any(s.startswith('DELETE FROM turns WHERE call_id IN') for s in executed)
+    assert any(s.startswith('UPDATE calls SET customer_id = NULL') for s in executed)

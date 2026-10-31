@@ -16,8 +16,8 @@ evaluator's transcripts, none of which has to be a graph.
 | ``guardrails`` | 4.4, 4.5, 4.9 | Checks before a write tool and on a reply, and the safe lines |
 | ``handoff`` | 4.6, 4.10 | Handing a call to a person, and the copilot that follows |
 | ``voice`` | 4.11 | VAD, turn detection, ASR and TTS for a live call |
-| ``evaluation`` | 9 | The rubric and the scorers |
-| ``improvement`` | 10 | Gap Loop and Reflection |
+| ``evaluation`` | 9 | The scorers |
+| ``improvement`` | 10 | Reflection |
 
 :mod:`.clock` is the virtual clock every one of them reads the day from.
 

@@ -45,6 +45,7 @@ import importlib.util
 import json
 import logging
 import os
+import re
 import unicodedata
 from datetime import date, timedelta
 from types import ModuleType
@@ -231,12 +232,17 @@ def enrich(name: str, result: Any) -> Any:
     """A mock result with our additions; anything the mock said stays as it said it.
 
     ``pricing.get_quote``: each applied promotion gets ``end``, its last day
-    in ``promotions.json``, the only source of a promotion's expiry.
+    in ``promotions.json``, the only source of a promotion's expiry, and
+    ``name``, what the promotion gives in the shop's words: a gift reported
+    as a ``gift_sku`` alone leaves the model to describe it, and it described
+    a value the tools never gave.
     """
     if name != "pricing.get_quote" or not isinstance(result, dict) or not result.get("applied_promos"):
         return result
-    ends = {promo["promo_code"]: promo.get("end") for promo in mock().PROMOS}
-    return {**result, "applied_promos": [{**p, "end": ends.get(p.get("promo_code"))} for p in result["applied_promos"]]}
+    known = {promo["promo_code"]: promo for promo in mock().PROMOS}
+    return {**result, "applied_promos": [
+        {**p, "name": (known.get(p.get("promo_code")) or {}).get("name"), "end": (known.get(p.get("promo_code")) or {}).get("end")}
+        for p in result["applied_promos"]]}
 
 
 def product_of(sku: str) -> tuple[str | None, dict[str, Any] | None]:
@@ -251,34 +257,57 @@ def plain(text: str) -> str:
     return "".join(c for c in decomposed if not unicodedata.combining(c)).replace("-", " ").replace("/", " ")
 
 
+def words(text: str) -> list[str]:
+    """The words of *text* as :func:`plain` writes them, punctuation dropped."""
+    return re.findall(r"[a-z0-9]+", plain(text))
+
+
 def rank(query: str, items: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """*items* that share a word with *query*, most shared words first, then cheapest."""
-    words = [w for w in plain(query).split() if len(w) > 1]
-    scored = []
+    """*items* named with two consecutive words of *query* (its one word, if it has one), most words first, then cheapest.
+
+    A pair, not a word: "máy rửa bát" shares "máy" with every "máy lọc", and
+    "nồi cơm điện" shares "nồi" with "nồi chiên", but neither is something
+    the shop sells. Whole words, not substrings, so "tủ" is not in "tủa".
+    """
+    asked = words(query)
+    pairs = set(zip(asked, asked[1:]))
+    scored, seen = [], set()
     for item in items:
-        haystack = plain(" ".join([item["name"], item["category"], item["sku"], str(item.get("attributes", ""))]))
-        score = sum(1 for w in words if w in haystack)
-        if score:
-            scored.append((score, item))
+        if item["sku"] in seen:
+            continue
+        seen.add(item["sku"])
+        named = words(" ".join([item["name"], item["category"], item["sku"]]))
+        hit = bool(pairs & set(zip(named, named[1:]))) if pairs else bool(asked) and asked[0] in named
+        if hit:
+            scored.append((len(set(asked) & set(named)), item))
     scored.sort(key=lambda pair: (-pair[0], pair[1]["list_price_vnd"]))
     return [item for _, item in scored]
+
+
+def categories(prefix: str | None) -> list[str]:
+    """The catalogue's category slugs under *prefix*, or all of them."""
+    return sorted({p["category"] for p in mock().PRODUCTS if not prefix or p["category"].startswith(prefix)})
 
 
 async def search_catalog(args: dict[str, Any], search: Callable[[dict[str, Any]], Awaitable[dict[str, Any]]]) -> dict[str, Any]:
     """``catalog.search``, retried loosely when the name matches nothing.
 
-    The mock wants every word of the query in a product's name, so "máy lọc
-    không khí" finds nothing (the category is spelled
-    ``may-loc-khong-khi``), and a search that answers "nothing" to the name
-    of a category the shop sells makes the model say the shop does not sell
-    it. *search* runs one mock search, through whichever path serves the
-    tools, and returns its data.
+    The mock wants every word of the query in a product's name, so "may loc
+    khong khi" typed without diacritics, or "máy lọc không khí cho phòng
+    ngủ", finds nothing, and a search that answers "nothing" to the name of a
+    category the shop sells makes the model say the shop does not sell it.
+    The loose pass asks one category at a time because the mock answers at
+    most 20 products, and the catalogue has more. *search* runs one mock
+    search, through whichever path serves the tools, and returns its data.
     """
     found = await search(args)
     if found.get("items") or not args.get("query"):
         return {**found, "match": "exact"}
-    loose = await search({k: v for k, v in args.items() if k != "query"})
-    ranked = rank(args["query"], loose.get("items") or [])
+    rest = {k: v for k, v in args.items() if k != "query"}
+    loose: list[dict[str, Any]] = []
+    for category in categories(args.get("category")):
+        loose += (await search({**rest, "category": category})).get("items") or []
+    ranked = rank(args["query"], loose)
     return {"items": ranked[:10], "total": len(ranked), "match": "loose" if ranked else "none"}
 
 

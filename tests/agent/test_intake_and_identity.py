@@ -59,3 +59,20 @@ def test_spoken_amounts_are_normalised(said, amount):
 def test_confirmation_answers():
     assert resolver.confirms("dạ đúng rồi") is True
     assert resolver.confirms("không phải") is False
+
+
+@pytest.mark.parametrize("typed, plain_text", [
+    ("e mún mua máy lọc, nhà có bé", "e muốn mua máy lọc, nhà có bé"),
+    ("thui để a hỏi vk đã, hnay bận wá", "thôi để a hỏi vợ đã, hôm nay bận quá"),
+    ("ko bít còn hàng ko", "không biết còn hàng không"),
+])
+def test_common_chat_spellings_become_plain_vietnamese(typed, plain_text):
+    from ai_agent_service.components.intake.text import clean
+    cleaned, changed = clean(typed)
+    assert cleaned == plain_text and changed
+
+
+def test_ambiguous_shorthand_is_left_for_the_reader():
+    from ai_agent_service.components.intake.text import clean
+    # "ck" is chồng or chuyển khoản, "a" anh or ạ: rewriting either would put words in the customer's mouth.
+    assert clean("thanh toán ck nhé a")[0] == "thanh toán ck nhé a"

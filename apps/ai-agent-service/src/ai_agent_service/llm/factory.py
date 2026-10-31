@@ -49,27 +49,29 @@ SUPPORTED_PROVIDERS = {
 # into the request body, so `max_retries: null` is the only way to call it.
 GENERATION_PARAMS = ("temperature", "max_tokens", "timeout", "max_retries")
 
-# One limiter per provider, shared by every model built for it.
+# One limiter per model of a provider, shared by every agent that calls it.
 #
 # A limiter created per call is no limiter at all: its sliding window and its
 # cooldown are thrown away with the object, so a 429 teaches the next call
-# nothing. Quotas are billed per account, so the account is the right scope.
+# nothing. The scope is the model because that is how the providers count:
+# Google's free tier refused us with GenerateRequestsPerDayPerProjectPerModel
+# (2026-10-25), and OpenAI and Groq publish their limits per model too. One
+# limiter for the whole provider made two models queue behind one budget.
 _LIMITERS: dict[str, AdvancedTokenRateLimiter] = {}
 _LIMITERS_LOCK = Lock()
 
 
-def limiter_for(provider: str, config: dict[str, Any]) -> AdvancedTokenRateLimiter:
-    """The shared limiter for *provider*, created on first use."""
+def limiter_for(provider: str, config: dict[str, Any], model: str | None = None) -> AdvancedTokenRateLimiter:
+    """The shared limiter for *model* of *provider* (``provider/model``), created on first use."""
+    key = f"{provider}/{model}" if model else provider
     with _LIMITERS_LOCK:
-        if provider not in _LIMITERS:
-            _LIMITERS[provider] = AdvancedTokenRateLimiter.from_config(
-                provider=provider, config=config
-            )
-        return _LIMITERS[provider]
+        if key not in _LIMITERS:
+            _LIMITERS[key] = AdvancedTokenRateLimiter.from_config(provider=key, config=config)
+        return _LIMITERS[key]
 
 
 def limiter_stats() -> dict[str, dict[str, Any]]:
-    """What each provider's limiter has seen this run."""
+    """What each model's limiter has seen this run."""
     with _LIMITERS_LOCK:
         return {name: rl.stats() for name, rl in _LIMITERS.items()}
 
@@ -123,7 +125,7 @@ class LLMFactory:
             callbacks.append(BudgetCallback(config, agent_name))
 
         if rate_limited:
-            limiter = limiter_for(provider, config.get("rate_limits") or {})
+            limiter = limiter_for(provider, config.get("rate_limits") or {}, model)
             kwargs["rate_limiter"] = limiter
             callbacks.append(TokenTrackingCallback(limiter, agent_name=agent_name))
 

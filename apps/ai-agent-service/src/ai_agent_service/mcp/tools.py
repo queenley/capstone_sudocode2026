@@ -46,6 +46,7 @@ from typing import Any, Iterable, Mapping
 from langchain.agents.middleware import AgentMiddleware
 from langchain_core.messages import ToolMessage
 from ..components.intake import pii
+from ..components.intake.text import plain
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +65,11 @@ WRITE_TOOLS = frozenset({
 
 #: The argument a write tool's server keeps its first result under.
 IDEMPOTENCY_ARG = "idempotency_key"
+
+#: An address argument that says there is none ("chưa có địa chỉ", "không rõ", "N/A"), on the plain
+#: text: a tool would take it for an address (``delivery.estimate`` dated a delivery to it). A real
+#: address never begins so.
+NO_ADDRESS = re.compile(r"^\s*(?:chua|khong|unknown|none|null|n/?a|tbd)\b|^\s*[-?.]*\s*$")
 
 
 def _tool_name(tool: Any) -> str | None:
@@ -263,6 +269,8 @@ class ToolGuardMiddleware(AgentMiddleware):
             args = {"phone": phone}
         if phone and "customer_phone" in accepted and name != "crm_get_customer":
             args["customer_phone"] = phone
+        if isinstance(args.get("address"), str) and NO_ADDRESS.search(plain(args["address"])):
+            args.pop("address")
         addresses = getattr(context, "addresses", None) or {}
         vault = getattr(context, "vault", None)
         if vault is not None and args.get("address"):

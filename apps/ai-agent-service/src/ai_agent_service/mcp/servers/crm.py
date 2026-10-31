@@ -70,8 +70,10 @@ async def order_create(
         price_vnd: The unit price from pricing_get_quote, in VND.
         qty: How many units.
         promo_code: The promotion applied, as pricing_get_quote named it.
-        payment: COD, bank, momo or zalopay.
-        address: The delivery address the customer gave.
+        payment: COD, bank, momo or zalopay: what the customer chose, or what the
+            Call Brief records; COD when neither says, read back so the customer
+            can change it. Never a reason to wait with the order.
+        address: The delivery address the customer gave; leave it out when none was given.
         customer_phone: Set by the system; leave it out.
         on: The day of the call. Set by the system; leave it out.
         idempotency_key: Set by the system; leave it out.
