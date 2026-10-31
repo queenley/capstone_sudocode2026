@@ -10,8 +10,12 @@ How each field is filled, matching ``eval/reference_eval.py``:
 
 - ``tool_calls``: the calls that ran, with the arguments they ran with (the
   day and the phone the harness filled in, the defaults it completed), and
-  their result envelope. A call the guardrail before act refused never ran,
-  so it is not here. The idempotency key is transport, not business: dropped.
+  their result as the tool gave it: the envelope's ``data``, or ``{"error":
+  code}`` for a refusal, the shape ``runtime/trace_export`` writes too. The
+  grader reads ``result.order_id`` of an ``order.create`` to accept the order
+  a later call acts on (organisers' answer 10). A call the guardrail before
+  act refused never ran, so it is not here. The idempotency key is
+  transport, not business: dropped.
 - ``facts_used``: first section 5.5's chain, the ``[Bn]`` the reply cited, the
   ``fact_ids`` of those brief lines, the slots of those facts (only facts in
   force are resolved; a line with no ledger fact behind it names no slot).
@@ -57,9 +61,18 @@ def tool_calls(results: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
     """The calls that ran, as the trace names them."""
     return [
         {"name": r["name"], "args": {k: v for k, v in (r.get("args") or {}).items() if k not in TRANSPORT_ARGS},
-         "result": r.get("result")}
+         "result": tool_result(r["result"])}
         for r in results if not r.get("blocked_by") and r.get("result") is not None
     ]
+
+
+def tool_result(envelope: Any) -> Any:
+    """What the tool gave, out of our envelope: its data, or ``{"error": code}`` when it refused."""
+    if not isinstance(envelope, Mapping) or "ok" not in envelope:
+        return envelope
+    if envelope.get("ok"):
+        return envelope.get("data")
+    return {"error": (envelope.get("error") or {}).get("code") or "failed"}
 
 
 def facts_used(state: Mapping[str, Any]) -> list[str]:

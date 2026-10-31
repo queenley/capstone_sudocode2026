@@ -104,6 +104,9 @@ class AgentContext:
     working_summary: str | None = None
     #: Why the previous draft of this turn was blocked, for a regeneration.
     block_reasons: tuple[str, ...] = ()
+    #: The sentences of this answer the customer already heard when a later one was blocked:
+    #: the regeneration goes on from them instead of starting over.
+    already_said: tuple[str, ...] = ()
     #: Tool results already gathered this turn, so a regeneration need not ask again.
     tool_results: tuple[dict[str, Any], ...] = ()
     #: Today's price per sku from every quote in this call, for the order check.
@@ -137,6 +140,8 @@ class AgentContext:
     flags: Mapping[str, Any] = field(default_factory=dict)
     #: The products tools showed earlier in this call: ``{sku, name, price_vnd}``.
     seen_products: tuple[Mapping[str, Any], ...] = ()
+    #: The orders earlier turns of this call created: ``{order_id, sku}``.
+    created_orders: tuple[Mapping[str, Any], ...] = ()
     #: How an unknown customer calls themselves, and whether the agent asked.
     self_called: str | None = None
     honorific_asked: bool = False
@@ -245,16 +250,14 @@ def system_prompt(context: AgentContext, *, max_tokens: int = 3000) -> tuple[str
             + f"\n{lane_instruction(context)}"
         ).strip()),
         Section("products", _products_block(context.seen_products)),
+        Section("orders", _orders_block(context.created_orders)),
         Section("brief", f"Call Brief:\n{brief}" if brief else ""),
         Section("summary", f"Tóm tắt các lượt trước:\n{context.working_summary}" if context.working_summary else ""),
         Section("knowledge", _knowledge_block("Tài liệu liên quan", policy) or context.knowledge_note or ""),
         Section("playbook", _knowledge_block("Kinh nghiệm xử lý đã được duyệt", playbook)),
         Section("tool_results", _tool_block(context.tool_results)),
         Section("opening", OPENING[bool(context.brief_lines)] if context.phase == "opening" else ""),
-        Section("blocked", (
-            "Câu trả lời trước của em đã bị chặn vì: " + "; ".join(context.block_reasons)
-            + " Hãy soạn lại, tránh đúng những điểm đó."
-        ) if context.block_reasons else ""),
+        Section("blocked", _blocked_block(context)),
     ]
     pack = assemble(sections, max_tokens=max_tokens)
     return pack.text, pack.cut
@@ -295,6 +298,26 @@ def _address_note(context: AgentContext) -> str:
         return " Chưa biết danh xưng và em đã hỏi rồi: gọi anh/chị, không hỏi lại."
     return (" Chưa biết danh xưng: tạm gọi anh/chị. Ở lượt thứ hai, hoặc khi xin thông tin đặt hàng, hỏi đúng một lần, "
             "gộp vào câu hỏi đang cần hỏi: \"Dạ cho em hỏi mình xưng hô là anh hay chị ạ?\"")
+
+
+def _blocked_block(context: AgentContext) -> str:
+    """Why the last draft was blocked, and when part of the answer was already said, what to go on from."""
+    if not context.block_reasons:
+        return ""
+    reasons = "; ".join(context.block_reasons)
+    if context.already_said:
+        return (f"Khách đã nghe em nói: «{' '.join(context.already_said)}». Câu tiếp theo của em bị chặn vì: {reasons} "
+                "Nói tiếp phần còn lại của câu trả lời, không lặp lại phần khách đã nghe; cần tool thì gọi trước khi nói.")
+    return f"Câu trả lời trước của em đã bị chặn vì: {reasons} Hãy soạn lại, tránh đúng những điểm đó."
+
+
+def _orders_block(orders: Sequence[Mapping[str, Any]]) -> str:
+    """The orders this call created: a later address or payment corrects them, it is not a new order."""
+    if not orders:
+        return ""
+    lines = [f"- {o['order_id']}" + (f": {o['sku']}" if o.get("sku") else "") for o in orders]
+    return ("Đơn đã tạo trong cuộc này (khách bổ sung địa chỉ, đổi thanh toán thì gọi order_update trên đơn đó, "
+            "không tạo đơn mới):\n" + "\n".join(lines))
 
 
 def _products_block(products: Sequence[Mapping[str, Any]]) -> str:
@@ -370,7 +393,8 @@ class ActionGuardMiddleware(AgentMiddleware):
             quotes=quotes, orders=context.known_orders | orders, trusted=context.trusted_skus | codes | set(quotes),
             lane=context.lane, flags=context.flags, now=context.now,
             last_agent_said=context.last_agent_said, customer_said=context.customer_said,
-            shared_phone=context.shared_phone,
+            shared_phone=context.shared_phone, created=(*context.created_orders, *_created_in(state)),
+            updated=_updated_in(state, context.tool_results),
         )
         if not verdict.passed:
             envelope = {"ok": False, "error": {"code": "PRECONDITION", "retryable": False, "message": " ".join(verdict.reasons)}}
@@ -405,6 +429,34 @@ def _seen_in(state: Mapping[str, Any], earlier: Sequence[Mapping[str, Any]]) -> 
         if isinstance(envelope, dict) and envelope.get("ok"):
             walk(envelope.get("data"))
     return frozenset(codes), frozenset(orders)
+
+
+def _created_in(state: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """The orders ``order_create`` made earlier in this run, ``{order_id, sku}``, the sku from the call's arguments."""
+    asked = {call["id"]: call.get("args") or {} for m in state.get("messages") or [] if isinstance(m, AIMessage)
+             for call in m.tool_calls if call.get("name") == "order_create"}
+    created = []
+    for message in state.get("messages") or []:
+        if isinstance(message, ToolMessage) and message.name == "order_create":
+            envelope = envelope_of(message)
+            data = envelope.get("data") if isinstance(envelope, dict) and envelope.get("ok") else None
+            if isinstance(data, dict) and data.get("order_id"):
+                created.append({"order_id": data["order_id"], "sku": asked.get(message.tool_call_id, {}).get("sku")})
+    return created
+
+
+def _updated_in(state: Mapping[str, Any], earlier: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """The arguments of every ``order_update`` that succeeded in this call: earlier turns' and this run's."""
+    done = [dict(r.get("args") or {}) for r in earlier
+            if str(r.get("name", "")).replace("_", ".", 1) == "order.update" and (r.get("result") or {}).get("ok")]
+    asked = {call["id"]: call.get("args") or {} for m in state.get("messages") or [] if isinstance(m, AIMessage)
+             for call in m.tool_calls if call.get("name") == "order_update"}
+    for message in state.get("messages") or []:
+        if isinstance(message, ToolMessage) and message.name == "order_update":
+            envelope = envelope_of(message)
+            if isinstance(envelope, dict) and envelope.get("ok"):
+                done.append(dict(asked.get(message.tool_call_id) or {}))
+    return done
 
 
 def _quotes_in(state: Mapping[str, Any]) -> dict[str, int]:

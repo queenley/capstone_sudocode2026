@@ -75,3 +75,52 @@ def test_order_code_is_read_only_to_a_verified_customer():
 def test_tokens_from_another_call_are_a_leak():
     assert guard("Dạ em gọi lại số <PHONE_1> ạ.", tier="VERIFIED", tokens=frozenset({"<PHONE_1>"})).passed
     assert not guard("Dạ em gọi lại số <PHONE_2> ạ.", tier="VERIFIED", tokens=frozenset({"<PHONE_1>"})).passed
+
+
+BY_AREA = {"name": "delivery_estimate", "args": {}, "result": {"ok": True, "data": {
+    "address_known": False, "delivery_days": None, "estimated_delivery": None,
+    "by_area": [{"area": "Hà Nội, TP.HCM, Đà Nẵng", "delivery_days": 2, "estimated_delivery": "2026-10-20"},
+                {"area": "tỉnh thành khác", "delivery_days": 4, "estimated_delivery": "2026-10-22"}]}}}
+
+
+@pytest.mark.parametrize("text, passes", [
+    ("Dạ đơn thanh toán khi nhận hàng, giao trong 4 ngày tới ạ.", False),
+    ("Dạ em nói là giao trong 2 ngày ạ.", False),
+    ("Dạ nếu chị ở Hà Nội thì giao trong 2 ngày ạ.", True),
+    ("Dạ nội thành TP.HCM giao 2 ngày, các tỉnh khác 4 ngày ạ.", True),
+    ("Dạ Hà Nội, TP.HCM, Đà Nẵng 2 ngày, tỉnh thành khác 4 ngày ạ.", True),
+    ("Dạ chị cho em xin địa chỉ để em báo thời gian giao chính xác ạ.", True),
+])
+def test_a_delivery_time_without_an_address_names_its_area(text, passes):
+    assert guard(text, [BY_AREA]).passed is passes
+
+
+def test_a_delivery_time_with_an_address_is_not_an_area_s():
+    known = {"name": "delivery_estimate", "args": {"address": "Lê Chân, Hải Phòng"}, "result": {"ok": True, "data": {
+        "address_known": True, "delivery_days": 4, "estimated_delivery": "2026-10-22"}}}
+    assert guard("Dạ giao trong 4 ngày tới ạ.", [BY_AREA, known]).passed
+
+
+@pytest.mark.parametrize("results, passes", [
+    ([], False),
+    ([{"name": "inventory_check", "result": {"ok": True, "data": {"sku": "SKU-T-1", "in_stock": True, "qty": 5}}}], False),
+    ([{"name": "inventory_check", "result": {"ok": True, "data": {"sku": "SKU-T-1", "in_stock": False,
+                                                                  "discontinued": True, "successor_sku": "SKU-T-2"}}}], True),
+])
+def test_a_product_said_no_longer_sold_needs_a_tool_saying_so(results, passes):
+    assert guard("Dạ mẫu quạt này đã ngừng bán rồi ạ.", results, tier="VERIFIED").passed is passes
+
+
+def test_a_product_the_shop_never_sold_is_not_a_discontinued_one():
+    assert guard("Dạ hiện bên em chưa kinh doanh máy rửa bát ạ.", []).passed
+
+
+@pytest.mark.parametrize("text", [
+    "Dạ hiện bên em chưa kinh doanh dòng máy này ạ.",
+    "Dạ mẫu đó bên em ngừng bán rồi ạ.",
+    "Dạ em chưa có thông tin về sản phẩm này ạ.",
+])
+def test_a_claim_the_shop_lacks_a_product_goes_to_the_policy_check(text):
+    """Whether such a claim is backed is a judgement on the whole reply: Jev's question, not a pattern of words."""
+    from ai_agent_service.agents import policy
+    assert policy.needs_review(text) and "unsupported_absence" in policy.QUESTIONS

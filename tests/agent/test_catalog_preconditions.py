@@ -108,7 +108,14 @@ def test_successful_order_remains_exported():
         "id": "order", "name": "order_create", "args": {"sku": "SKU-TEST"}}]),
         ToolMessage(content=json.dumps({"ok": True, "data": {"order_id": "ORDER-TEST"}}),
                     tool_call_id="order", name="order_create")]
-    assert tool_calls(tool_results_of(messages))[0]["result"]["data"]["order_id"] == "ORDER-TEST"
+    # The grader reads result.order_id to accept the order a later call acts on (organisers' answer 10).
+    assert tool_calls(tool_results_of(messages))[0]["result"]["order_id"] == "ORDER-TEST"
+
+
+def test_a_refused_call_is_traced_as_the_tool_s_error():
+    from ai_agent_service.pipeline.eval.trace import tool_calls
+    refused = [{"name": "order.create", "args": {}, "result": {"ok": False, "error": {"code": "price_mismatch"}}}]
+    assert tool_calls(refused)[0]["result"] == {"error": "price_mismatch"}
 
 
 @pytest.mark.asyncio
@@ -136,3 +143,43 @@ async def test_react_can_execute_more_than_six_catalogue_reads():
     result = await agent.draft([HumanMessage(content="Tìm sản phẩm")], AgentContext(call_id="test", lane="NEW"))
     assert len(queried) == 7
     assert all(r["result"]["ok"] for r in result.tool_results)
+
+
+# ── catalog_search: what the shop does not sell is not answered with something else ──
+
+
+async def _search(query, **filters):
+    async def mock_search(args):
+        return btc.mock().catalog_search(**{k: v for k, v in args.items() if v is not None})
+    return await btc.search_catalog({"query": query, "category": None, "sku": None, "max_price_vnd": None,
+                                     "min_room_area_m2": None, **filters}, mock_search)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("query", ["máy rửa bát Bosch", "tủ lạnh", "nồi cơm điện", "điều hòa Daikin", "máy giặt",
+                                   "áo mưa"])
+async def test_a_product_the_shop_does_not_sell_finds_nothing(query):
+    found = await _search(query)
+    assert found["match"] == "none" and found["items"] == []
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("query, sku", [
+    ("may loc khong khi", "SKU-AP-MINI"),
+    ("máy lọc không khí cho phòng ngủ có em bé", "SKU-AP-MINI"),
+    ("xe day gap gon", "SKU-MB-STR1"),
+    ("may hut sua", "SKU-MB-PUMP1"),
+    ("mang loc thay the", "SKU-AP-FLT-X"),
+])
+async def test_the_loose_search_still_finds_what_the_shop_sells(query, sku):
+    found = await _search(query)
+    assert found["match"] != "none"
+    assert sku in {item["sku"] for item in found["items"]}
+
+
+@pytest.mark.asyncio
+async def test_the_loose_search_keeps_the_kind_asked_for():
+    found = await _search("nồi chiên Sunhouse")
+    assert found["match"] == "loose"
+    assert {item["category"] for item in found["items"]} == {"gia-dung/noi-chien"}
+    assert all(item["category"] == "me-be" for item in (await _search("xe day", category="me-be"))["items"])

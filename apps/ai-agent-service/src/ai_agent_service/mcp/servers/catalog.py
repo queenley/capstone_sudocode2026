@@ -47,6 +47,14 @@ async def catalog_search(
     here are list prices; the price to tell a customer comes from
     pricing_get_quote. Discontinued products are hidden unless asked for by sku.
 
+    match says how the query was read. exact: every word is in the product.
+    loose: no product has every word; these share a phrase with the query,
+    so check each is the kind, brand and model the customer asked for before
+    offering it, and say plainly what the shop does not have. none: no
+    product is named so. If what was asked could belong to a category above,
+    search that category first; otherwise the shop does not sell it: say so,
+    and do not offer a product of another kind in its place.
+
     Args:
         query: Words from the product's name or brand, e.g. "AirPure" or "Xiaomi".
         category: A category slug or prefix from the list above.

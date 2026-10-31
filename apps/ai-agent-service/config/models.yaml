@@ -22,7 +22,8 @@
 # models endpoint lists it, but generating returns 404 "no longer available to
 # new users". A listed model is not a usable one.
 #
-# The rate_limits blocks feed the rate limiter. These are cautious guesses, not
+# The rate_limits blocks feed the rate limiter, one limiter per model, since
+# the providers count per model. These are cautious guesses, not
 # published figures: Google's rate-limit page now tells you to read your own
 # quota in AI Studio rather than listing numbers, and NVIDIA states limits vary
 # per model and are unpublished. Replace them with what you measure.
@@ -114,6 +115,48 @@ agents:
     generation:
       max_tokens: 1024
 
+  # Section 10.3: the QaAgent's reflection, which proposes the playbook hints
+  # the exploration tries. Not the evaluation's judge: that one is pinned on
+  # the evaluation side and no improvement round ever changes it.
+  qa:
+    provider: openai
+    model: gpt-4.1-mini
+    generation:
+      max_tokens: 2048
+
+  # The exploration's customer (agents/simulator.py): its persona voice and
+  # its observer of the agent's questions and prices. Offline, on the
+  # learning set only, and never the evaluation's simulator.
+  simulator:
+    provider: openai
+    model: gpt-4.1-mini
+    generation:
+      temperature: 0.3
+      max_tokens: 2048
+
+# AGENT_PROFILE=<name> in .env sends every agent listed under the profile to
+# its model, each keeping its own generation block; an agent under
+# `overrides` goes to the model named there instead. `local` is the free key a
+# laptop runs on. The evaluation's extractor is not listed: a measuring
+# instrument does not change with the machine it runs on (add it locally to
+# run without a paid key, and the labels are then not comparable).
+profiles:
+  local:
+    provider: google_genai
+    model: gemini-3.5-flash-lite
+    agents: [advisor, memory, compactor, qa]
+    overrides:
+      # The free tier stops a model at 500 requests a day (2026-10-25), and
+      # the exploration's customer makes two or three calls per agent turn,
+      # so it spends another model's quota. Chosen 2026-10-26 on one persona
+      # and one observer call each: gemini-3.1-flash-lite answered both
+      # schemas in about 8 s; NVIDIA deepseek-v4.1-flash and gpt-oss-20b timed
+      # out at 180 s, nemotron-3-super-120b-a12b is not served to this key.
+      # Keep the same split between R0 and R1, or the rounds do not compare.
+      simulator:
+        provider: google_genai
+        model: gemini-3.1-flash-lite
+
 providers:
   google_genai:
     label: Google AI Studio
@@ -123,7 +166,12 @@ providers:
       - gemini-3.6-flash
       - gemini-3.1-flash-lite
     rate_limits:
-      requests_per_minute: 10
+      # Measured 2026-10-31 on the free tier, per model: the 17th request of a
+      # minute to gemini-3.5-flash-lite came back 429 with
+      # GenerateRequestsPerMinutePerProjectPerModel-FreeTier = 15. The guess
+      # of 10 before it made local runs spend most of their time queueing
+      # behind themselves (the limiter's waited_s).
+      requests_per_minute: 15
       input_tokens_per_minute: 250000
       output_tokens_per_minute: 50000
 

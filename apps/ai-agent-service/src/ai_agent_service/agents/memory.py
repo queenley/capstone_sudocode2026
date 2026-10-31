@@ -117,6 +117,12 @@ TRANSFER = re.compile(r"(chuyển khoản|ck qua|banking)", re.IGNORECASE)
 COD = re.compile(r"(\bcod\b|nhận hàng (rồi )?trả tiền|thanh toán khi nhận)", re.IGNORECASE)
 UNHAPPY = re.compile(r"(bực|chán|mất thời gian|lâu quá|hỏi rồi mà|nói rồi mà)", re.IGNORECASE)
 CALL_BACK = re.compile(r"(gọi lại|liên hệ lại|báo lại)", re.IGNORECASE)
+#: The customer ends without buying; "thôi để chị xem lại" is the organisers' own (simulator spec, rule 2).
+DECLINE = re.compile(
+    r"(thôi khỏi|khỏi đi|thôi,? (không (mua|lấy|đặt|cần)|bỏ đi)|thôi,? để (chị|anh|em|mình|tôi) xem lại"
+    r"|không (mua|lấy|đặt|cần) (nữa|đâu)|để (dịp|khi) khác|không quan tâm)",
+    re.IGNORECASE,
+)
 #: Where to deliver, district and province only (never the house number).
 AREA = re.compile(
     r"\b((?:quận|huyện|thị xã|thành phố|tp\.?)\s+[\wÀ-ỹ]+(?:\s+[\wÀ-ỹ]+)?"
@@ -368,12 +374,24 @@ def _variant(turn: int, code: str, variant: dict[str, Any] | None) -> list[Candi
 
 
 def _outcome_from_words(transcript: Sequence[dict[str, Any]]) -> Candidate | None:
-    """The outcome when no tool settled it: a callback the customer promised."""
-    said = [line for line in transcript if line.get("speaker") == "customer"]
-    if any(CALL_BACK.search(str(line.get("text") or "")) for line in said):
-        last = max((int(line.get("turn") or 0) for line in transcript), default=0)
-        return Candidate("outcome", "hen_goi_lai", "system", last, extractor=RULES_VERSION)
-    return None
+    """The outcome when no tool settled it: a callback the customer promised, or a no.
+
+    The customer's latest line that says either decides; a line that says
+    both ("thôi chị gọi lại sau") is a callback.
+    """
+    outcome = None
+    for line in transcript:
+        if line.get("speaker") != "customer":
+            continue
+        text = str(line.get("text") or "")
+        if CALL_BACK.search(text):
+            outcome = "hen_goi_lai"
+        elif DECLINE.search(text):
+            outcome = "tu_choi"
+    if outcome is None:
+        return None
+    last = max((int(line.get("turn") or 0) for line in transcript), default=0)
+    return Candidate("outcome", outcome, "system", last, extractor=RULES_VERSION)
 
 
 def _customer_record(candidate: Candidate) -> bool:

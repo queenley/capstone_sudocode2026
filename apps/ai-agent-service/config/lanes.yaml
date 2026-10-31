@@ -39,6 +39,10 @@ lanes:
     - pricing_get_quote
     - delivery_estimate
     - order_create
+    # The order this call just created is corrected in the same lane: the
+    # address or payment the customer adds after it (an order a second time
+    # is refused before it runs, components/guardrails/actions.py).
+    - order_update
     - schedule_callback
     - handoff_transfer
     - memory_request_deletion

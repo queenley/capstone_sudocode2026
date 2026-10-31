@@ -7,7 +7,11 @@ guarantee, and it can be shown live.
 |---|---|
 | money | every amount, in digits or in words (read by the ITN the customer's words go through), must come from a valid source: this turn's tool results, today's quotes earlier in the call, the passages read this turn, the customer's own words, a quantity times a unit price, or the difference of two amounts. A price from the brief only as history ("hôm trước bên em báo"), and only when VERIFIED |
 | days, months | "giao trong 2 ngày", "đổi trả 7 ngày", "bảo hành 24 tháng" must match a tool result, a passage of the turn, the customer's words or a rule the prompt states |
+| discontinued | "ngừng bán" needs a tool of the turn reporting the product discontinued: a passage names its own model only |
+| delivery by area | without an address ``delivery.estimate`` answers per area; a sentence stating one area's days names that area or gives them all |
 | stock | "còn hàng", "hết hàng", "chỉ còn N" need a tool of the turn saying the same (``inventory.check``, or the stock a search returned), or a warning of the brief saying it |
+| order state | an order said to be in transit, delivered, processing or cancelled ("đơn … đang giao", "đã giao") needs an order tool of the turn (``order.status``, ``order.update``, ``order.create``, ``account.orders``): the brief's state is history, and today's may differ |
+| order done | saying an order was placed ("em đã lên đơn", "đơn … đã được tạo") needs ``order.create`` to have succeeded in this turn, an order read reporting it, or an order this call created earlier; saying it was changed ("đã đổi size") needs ``order.update``: a refused or missing call is not an order |
 | promotion | a code named must be applied in this turn's quote, said as history, or said to have ended; a promotion not yet started is never named (KM-02) |
 | internal | no purchase price, margin, supplier, price floor |
 | personal data | no raw phone, ID or account number; no run of 10 to 14 digits; no token that is not this call's |
@@ -61,6 +65,20 @@ MARKUP = re.compile(r"(\*\*|__|^\s*[-*•]\s|^\s*#{1,6}\s|```)", re.MULTILINE)
 DURATION = re.compile(r"(\d+)\s*(?:-|–|đến)?\s*(\d+)?\s*(ngày|tháng|tuần|giờ)\b", re.IGNORECASE)
 STOCK = re.compile(r"\b(còn hàng|hết hàng|có sẵn hàng|sẵn hàng|tạm hết|sắp hết hàng|chỉ còn \d+)\b", re.IGNORECASE)
 OUT_OF_STOCK = re.compile(r"\b(hết hàng|tạm hết)\b", re.IGNORECASE)
+#: A product said to be no longer sold: it existed, so a tool must say so ("chưa kinh doanh" is a product the shop never had).
+DISCONTINUED = re.compile(r"\b(ngừng bán|ngưng bán|ngừng kinh doanh|ngưng kinh doanh|ngừng sản xuất)\b", re.IGNORECASE)
+#: An order's state said as a fact, in a sentence about an order.
+ORDER_STATE = re.compile(
+    r"\b(đang (?:được )?(?:giao|vận chuyển|xử lý|chuẩn bị)|đang trên đường|đã (?:được )?(?:giao|bàn giao|hủy|huỷ|gửi đi)"
+    r"|chưa (?:được )?giao)\b", re.IGNORECASE)
+ORDER_WORD = re.compile(r"\b(đơn|kiện hàng|gói hàng)\b", re.IGNORECASE)
+ORDER_TOOLS = frozenset({"order.status", "order.update", "order.create", "account.orders"})
+#: The agent saying the order is placed, not offering to place it ("em lên đơn cho anh nhé?").
+ORDER_PLACED = re.compile(
+    r"\b(?:đã|vừa)\s+(?:được\s+)?(?:lên|tạo|chốt)\s+(?:xong\s+)?đơn\b"
+    r"|\b(?:lên|tạo|chốt|đặt)\s+đơn(?:\s+hàng)?\s+(?:thành công|xong|rồi)\b"
+    r"|\bđặt hàng thành công\b"
+    r"|\bđơn(?:\s+hàng)?\b[^.?!]{0,40}?\bđã\s+(?:được\s+)?(?:tạo|lên|ghi nhận)\b", re.IGNORECASE)
 ENDED = re.compile(r"(đã hết|hết hạn|kết thúc|không còn|ngừng)", re.IGNORECASE)
 #: The agent saying it does not know: about itself ("em chưa rõ", "bên em không có thông tin"), not
 #: about the customer ("nếu chị chưa biết chọn mẫu nào").
@@ -91,6 +109,8 @@ class GuardInput:
     #: Every promotion the shop runs, code to ``(start, end)``, and the day of the call (KM-02).
     promotions: Mapping[str, tuple[str, str]] = field(default_factory=dict)
     on: str | None = None
+    #: Orders this call created in earlier turns: a later turn may speak of them as placed.
+    created_orders: tuple[str, ...] = ()
     #: False for a consultant's text: they are the person, so there is no tool to wait for.
     check_handoff: bool = True
 
@@ -153,7 +173,10 @@ def check(view: GuardInput) -> Verdict:
     reasons: list[str] = []
     reasons += _money(text, view)
     reasons += _durations(text, view)
+    reasons += _area_days(text, view)
     reasons += _stock(text, view)
+    reasons += _discontinued(text, view)
+    reasons += _order_state(text, view)
     reasons += _promotions(text, view)
     reasons += _transfer(text, view)
     reasons += _completed_order(text, view)
@@ -211,6 +234,69 @@ def _durations(text: str, view: GuardInput) -> list[str]:
     return reasons
 
 
+def _area_days(text: str, view: GuardInput) -> list[str]:
+    """A delivery time read off ``delivery.estimate`` without an address is one area's, not the customer's.
+
+    With no address the tool answers each area (``by_area``); a sentence that states one of those
+    figures must say which area it is, or give them all, or the customer hears a promise for an area
+    nobody named. A turn whose estimate or order had the address is not checked.
+    """
+    areas: list[Mapping[str, Any]] = []
+    for result in view.tool_results:
+        data = ((result.get("result") or {}).get("data") or {}) if (result.get("result") or {}).get("ok") else {}
+        name = str(result.get("name", "")).replace("_", ".", 1)
+        if name == "delivery.estimate" and data.get("address_known"):
+            return []
+        if name == "order.create" and data.get("estimated_delivery") and (result.get("args") or {}).get("address"):
+            return []
+        if name == "delivery.estimate" and data.get("by_area"):
+            areas += [a for a in data["by_area"] if isinstance(a, Mapping)]
+    figures = {a.get("delivery_days") for a in areas if isinstance(a.get("delivery_days"), int)}
+    if len(figures) < 2:
+        return []
+    named = re.compile(r"\b(" + "|".join(re.escape(p) for p in _area_phrases(areas)) + r")\b")
+    for sentence in SENTENCE.split(text):
+        said = {int(m.group(1)) for m in DURATION.finditer(sentence) if m.group(3).lower() == "ngày"}
+        if not said & figures or figures <= said:
+            continue
+        if not named.search(plain(sentence)):
+            each = "; ".join(f"{a.get('delivery_days')} ngày ở {a.get('area')}" for a in areas
+                             if isinstance(a.get("delivery_days"), int))
+            return [f"Chưa có địa chỉ nên thời gian giao tùy khu vực: nói đủ \"giao {each}\", hoặc bỏ thời gian giao "
+                    "và xin địa chỉ; không nói một con số riêng."]
+    return []
+
+
+def _discontinued(text: str, view: GuardInput) -> list[str]:
+    """Saying a product is no longer sold needs a tool of the turn reporting one discontinued.
+
+    Like stock, a product's status is the tools': a passage that names a discontinued model is about
+    that model, and read alone it can be taken for a current one with a similar name.
+    """
+    if not DISCONTINUED.search(text):
+        return []
+    for result in view.tool_results:
+        envelope = result.get("result") or {}
+        data = envelope.get("data") or {} if envelope.get("ok") else {}
+        items = [data, *(data.get("items") or [])]
+        if any(item.get("discontinued") or (item.get("attributes") or {}).get("discontinued") for item in items):
+            return []
+    return ["Nói sản phẩm ngừng bán mà chưa có tool của lượt này báo vậy; gọi catalog_search hoặc inventory_check "
+            "với đúng mã, tài liệu chỉ nói về mẫu nó nêu."]
+
+
+def _area_phrases(areas: Iterable[Mapping[str, Any]]) -> set[str]:
+    """How a sentence names an area of ``by_area``: "Hà Nội, TP.HCM, Đà Nẵng" is three names, "tỉnh thành khác"
+    is said "tỉnh"; whole names, since a single word ("nội", "thành") is also in "nói", "thanh toán"."""
+    phrases = set()
+    for area in areas:
+        for part in str(area.get("area") or "").split(","):
+            words = re.sub(r"^tp\.?\s*", "", plain(part).strip()).split()
+            if words:
+                phrases.add(words[0] if len(words) >= 3 else " ".join(words))
+    return phrases or {"khu vuc"}
+
+
 def _stock(text: str, view: GuardInput) -> list[str]:
     """A stock claim needs a tool of the turn that says the same: ``inventory.check``, or the stock a search returned."""
     if not STOCK.search(text):
@@ -223,23 +309,61 @@ def _stock(text: str, view: GuardInput) -> list[str]:
     return ["Nói về tồn kho mà kết quả tool của lượt này không nói vậy; gọi inventory_check trước."]
 
 
+def _order_state(text: str, view: GuardInput) -> list[str]:
+    """An order's state comes from an order tool of the turn, like a stock claim from ``inventory.check``.
+
+    Not for a consultant's text (``check_handoff`` off): they read the order on their own screen.
+    """
+    if not view.check_handoff or not any(ORDER_STATE.search(s) and ORDER_WORD.search(s) for s in SENTENCE.split(text)):
+        return []
+    for result in view.tool_results:
+        if str(result.get("name", "")).replace("_", ".") in ORDER_TOOLS and (result.get("result") or {}).get("ok"):
+            return []
+    return ["Nói về trạng thái đơn mà chưa tra trong lượt này; gọi order_status trước, rồi nói đúng trạng thái tool trả về."]
+
+
 def _completed_order(text: str, view: GuardInput) -> list[str]:
+    """Saying an order was placed or changed is a claim about what the system did, like a transfer: the write must have run.
+
+    A placed order is also backed by an order this call created in an earlier turn, or by an order
+    read of the turn ("đơn … đang ở trạng thái đã tạo" reports what ``order.status`` returned). A
+    sentence about an earlier contact ("hôm trước em đã lên đơn") is history, not this claim. Not for
+    a consultant's text: they act on their own screen.
+    """
     if not view.check_handoff:
         return []
     for sentence in SENTENCE.split(text):
-        words = plain(sentence)
-        if "?" in sentence or re.search(r"\b(chua|khong|neu)\b", words):
+        if HISTORY.search(sentence):
             continue
-        creating = re.search(r"\b(da|vua) (len|tao|dat|xac nhan) (don|hang)\b", words)
-        updating = re.search(r"\b(da|vua) (doi|cap nhat|sua) (don|size|kich co|dia chi)\b", words)
+        words = plain(sentence)
+        creating = (_asserted(words, re.search(r"\b(da|vua) (len|tao|dat|xac nhan) (don|hang)\b", words))
+                    or _asserted(sentence, ORDER_PLACED.search(sentence)))
+        updating = _asserted(words, re.search(r"\b(da|vua) (doi|cap nhat|sua) (don|size|kich co|dia chi)\b", words))
         if not creating and not updating:
             continue
+        if creating and view.created_orders:
+            continue
         tool = "order.create" if creating else "order.update"
-        if not any(str(r.get("name", "")).replace("_", ".", 1) == tool
+        backing = {tool, "order.status", "account.orders"} if creating else {tool}
+        if not any(str(r.get("name", "")).replace("_", ".", 1) in backing
                    and (r.get("result") or {}).get("ok")
                    and (r.get("result") or {}).get("data") for r in view.tool_results):
-            return [f"Nói đã thực hiện đơn hàng mà chưa có {tool} thành công; chỉ báo thành công sau kết quả tool."]
+            wire = tool.replace(".", "_")
+            return [f"Nói đã thực hiện đơn hàng mà chưa có {wire} thành công; chỉ báo thành công sau kết quả tool. "
+                    "Tool từ chối thì làm theo đúng lý do nó trả về (ví dụ xin số điện thoại)."]
     return []
+
+
+def _asserted(text: str, match: re.Match[str] | None) -> bool:
+    """Whether *match* is said as done: no negation or condition before it in its clause, no question after it.
+
+    Only its own clause counts: "máy lọc không khí" later in the sentence is a product's name, not a negation.
+    """
+    if match is None:
+        return False
+    before = re.split(r"[,;:]", plain(text[:match.start()]))[-1]
+    after = re.split(r"[,;:]", text[match.end():])[0]
+    return not re.search(r"\b(chua|khong|neu)\b", before) and "?" not in after
 
 
 def _transfer(text: str, view: GuardInput) -> list[str]:
