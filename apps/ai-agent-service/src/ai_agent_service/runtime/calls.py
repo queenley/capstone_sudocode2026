@@ -166,9 +166,32 @@ async def take_turn(row: dict[str, Any], *, content: str, turn_id: str, arrived:
     if not await claim_lease(row["id"]):
         raise CallError(409, "The assistant is still answering the previous message.")
     try:
+        stored = await stored_reply(row["id"], turn_id)
+        if stored is not None:
+            await _complete_memory(row["id"], turn_id, stored)
+            return harness.Outcome("message", turn_id, content=stored["content"], meta={"replayed": True})
         return await harness.run_turn(row, content=content, turn_id=turn_id, arrived=arrived,
                                       user_id=actor.id, memory=memory, emit=emit, account_id=account_id,
                                       account_name=account_name)
+    finally:
+        await release_lease(row["id"])
+
+
+async def _complete_memory(call_id: int, turn_id: str, stored: dict[str, Any]) -> None:
+    if (stored.get("meta") or {}).get("memory_status") not in ("pending", "failed"):
+        return
+    result = await harness.remember(call_id, finalize=False)
+    await harness._patch_meta(call_id, turn_id, "agent", {"memory_status": result["status"]})
+
+
+async def complete_memory(row: dict[str, Any], turn_id: str, stored: dict[str, Any]) -> None:
+    """Replay retries only memory, under the same turn lease; never the advisor or its writes."""
+    if (stored.get("meta") or {}).get("memory_status") not in ("pending", "failed"):
+        return
+    if not await claim_lease(row["id"]):
+        raise CallError(409, "The assistant is still saving this turn.")
+    try:
+        await _complete_memory(row["id"], turn_id, stored)
     finally:
         await release_lease(row["id"])
 

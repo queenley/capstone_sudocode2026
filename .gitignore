@@ -21,26 +21,22 @@ infra/terraform/**/.terraform/
 *.tfstate.*
 *.tfvars
 
-# Local create_data environment and generated artifacts
-scripts/create_data/.venv/
-scripts/create_data/.cache/
-# scripts/create_data/output/
-scripts/create_data/.env
-scripts/create_data/**/__pycache__/
-scripts/create_data/**/*.py[cod]
+# Local data-generation environment and generated artifacts
+evaluation/data-generation/.venv/
+evaluation/data-generation/.cache/
+# evaluation/data-generation/output/
+evaluation/data-generation/.env
+evaluation/data-generation/**/__pycache__/
+evaluation/data-generation/**/*.py[cod]
 
 # Optional
 .github/
 
-# Evaluation runs (scripts/evaluation): local evidence, may hold customer data
-scripts/evaluation/runs/
-scripts/evaluation/archive/runs/
-# ASR set audio (71 MB): rebuilt by `run_eval.py asr-build`; data-check verifies the hashes in conversion-report.json
-scripts/evaluation/datasets/asr-*/audio/
+# Evaluation runs: local evidence and the store of real agent turns to re-label, may hold customer data
+evaluation/runs/
 # Imported historical evaluation evidence; may contain customer data.
 /20261017-111459/
-# The agent's own evaluation command and its downloaded embedding model
-apps/ai-agent-service/runs/
+# The agent's downloaded embedding model
 apps/ai-agent-service/models/
 
 # Local test artefacts

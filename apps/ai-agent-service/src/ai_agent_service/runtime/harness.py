@@ -44,7 +44,7 @@ from ..components.intake import text as intake_text
 from ..components.memory.brief import used_slots
 from ..mcp import client as mcp_client
 from ..mcp.tools import ToolBox
-from ..pipeline.cold.after_call import after_call
+from ..pipeline.cold.after_call import after_call, _remember, requested_deletion
 from ..pipeline.hot.graph import build_graph
 from ..pipeline.hot.state import HotContext
 from . import options, vault as vaults
@@ -248,6 +248,10 @@ async def run_turn(
         return Outcome("error", turn_id, error=f"{type(error).__name__}: {error}"[:300])
     await vaults.save(call_id, vault, customer_id=state.get("customer_id"))
 
+    if content is not None and row["channel"] == "web" and memory and state.get("tier") == "VERIFIED":
+        result = await remember(call_id, finalize=False)
+        await _patch_meta(call_id, turn_id, "agent", {"memory_status": result["status"]})
+
     total_ms = int((time.perf_counter() - arrived) * 1000)
     _turns_timed += 1
     timing = state.get("latency") or {}
@@ -347,6 +351,8 @@ class CallStore:
         return {
             "lane": state.get("lane"), "route_rule": state.get("route_rule"), "route_reason": state.get("route_reason"),
             "tier": state.get("tier"), "model": draft.get("model"), "model_calls": draft.get("model_calls"),
+            "memory_status": "pending" if state.get("channel") == "web" and state.get("tier") == "VERIFIED"
+            and (state.get("switches") or {}).get("memory", True) else None,
             "advisor_seconds": draft.get("seconds"), "fallback": bool(draft.get("fallback")), "error": draft.get("error"),
             "used_brief_lines": (state.get("reply") or {}).get("used_lines") or [],
             "facts_used": used_slots((state.get("reply") or {}).get("used_lines") or [],
@@ -418,24 +424,25 @@ def _reason_label(code: str | None) -> str | None:
 # ── after the call ────────────────────────────────────────────────────────
 
 
-async def remember(call_id: int) -> None:
-    """``after_call`` for one ended call; its outcome goes on the call's row."""
+async def remember(call_id: int, *, finalize: bool = True) -> dict[str, Any]:
+    """Save live web facts, or finalize an ended call with its episode and QA."""
     try:
         built = await ready()
         snapshot = await built.graph.aget_state(thread(call_id))
         state = snapshot.values or {}
         async with connection() as conn:
             cursor = await conn.execute(
-                "SELECT speaker, content, meta FROM turns WHERE call_id = %s AND speaker <> 'system' ORDER BY created_at, id",
+                "SELECT speaker, content, meta, created_at FROM turns WHERE call_id = %s AND speaker <> 'system' ORDER BY created_at, id",
                 (call_id,),
             )
             turns = await cursor.fetchall()
             cursor = await conn.execute("SELECT channel, business_day FROM calls WHERE id = %s", (call_id,))
             row = await cursor.fetchone()
-        transcript, tool_log, number = [], [], 0
+        transcript, tool_log, number, turn_times = [], [], 0, {}
         for turn in turns:
             if turn["speaker"] == "customer":
                 number += 1
+            turn_times[number] = turn["created_at"].isoformat()
             transcript.append({"speaker": turn["speaker"], "text": turn["content"], "turn": number})
             for call in (turn["meta"] or {}).get("tool_calls") or []:
                 tool_log.append({**call, "turn": call.get("turn") or number})
@@ -448,12 +455,19 @@ async def remember(call_id: int) -> None:
                 "on": state.get("on") or clock.on(clock.at(row["business_day"] or options.business_day())),
                 "tier": state.get("tier"),
                 "customer_id": state.get("customer_id"),
+                "turn_times": turn_times,
                 "keys_seen": state.get("keys_seen") or [],
                 "provisional": state.get("provisional"),
                 "returning": bool((state.get("brief") or {}).get("is_returning")),
             }
-            result = await after_call(call, transcript, tool_log, writer=await writer(), memory=built.memory, qa=built.qa,
-                                      admin=_admin)
+            if finalize or requested_deletion(tool_log):
+                result = await after_call(call, transcript, tool_log, writer=await writer(), memory=built.memory, qa=built.qa,
+                                          admin=_admin)
+            elif call["tier"] == "VERIFIED":
+                candidates = await built.memory.extract(transcript, tool_log, on=call["on"])
+                result = await _remember(call, candidates, writer=await writer(), memory=built.memory, episode=False)
+            else:
+                result = {"status": "skipped", "reason": "unconfirmed identity", "memory_writes": []}
         status = result.get("status", "done")
     except Exception as error:  # noqa: BLE001 - marked, and run again at the next start
         logger.exception("after_call failed on call %s", call_id)
@@ -463,6 +477,7 @@ async def remember(call_id: int) -> None:
             "UPDATE calls SET memory_status = %s, after_call = %s WHERE id = %s",
             (status, json.dumps(result, ensure_ascii=False, default=str), call_id),
         )
+    return result
 
 
 async def remember_unfinished(limit: int = 20) -> None:

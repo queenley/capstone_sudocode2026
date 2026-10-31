@@ -197,6 +197,13 @@ async def _identify(state: HotState, context: HotContext) -> dict[str, Any]:
         update["phone_token"] = context.vault.put("PHONE", phone)
 
     if tier == "UNKNOWN":
+        if context.account_id and state.get("channel") == "web" and context.caller_phone:
+            customer_id = f"web:{context.account_id}"
+            update.update(tier="VERIFIED", customer_id=customer_id, customer_name=context.account_name,
+                          awaiting=None, provisional=None)
+            update["keys_seen"] = [{**key, "customer_ids": [customer_id]} for key in keys_seen
+                                   if key["from_connection"]]
+            update.update(await _brief({**state, **update, "crm": {}}, context, started))
         return update
     if tier == "AMBIGUOUS":
         # The first words may already carry the name; otherwise the fixed question.
@@ -212,7 +219,7 @@ async def _identify(state: HotState, context: HotContext) -> dict[str, Any]:
     if match.phone and not phone:
         update["phone_token"] = context.vault.put("PHONE", match.phone)
         update["phone_last4"] = match.phone[-4:]
-    update.update(customer_id=match.customer_id, customer_name=match.name, honorific=match.honorific,
+    update.update(customer_id=match.customer_id, customer_name=match.name or (context.account_name if context.account_id else None), honorific=match.honorific,
                   awaiting="confirm" if tier == "PROBABLE" else None)
     if tier == "PROBABLE":
         # Kept whatever the answer: if the call ends unsure, after_call asks the

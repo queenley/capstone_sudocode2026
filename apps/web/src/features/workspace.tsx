@@ -399,7 +399,7 @@ export default function Workspace({ role }: { role: string }) {
                 tool execution. Run the evaluation command to compare baseline
                 against cross-session memory.
               </p>
-              <pre>python scripts/evaluation/evaluate.py</pre>
+              <pre>python evaluation/rag_offline.py</pre>
             </>
           )}
         </aside>

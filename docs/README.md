@@ -3,6 +3,8 @@
 | Tài liệu | Nội dung | Dành cho |
 |---|---|---|
 | [HTTP API](api.md) | Định tuyến gateway, xác thực, toàn bộ endpoint (kể cả agent, voice WebSocket) | frontend, QA, tích hợp |
+| [Tài liệu AI](ai/README.md) | Pipeline, xử lý tình huống, thuật toán, dữ liệu, đánh giá (bản dễ đọc) | mọi người, người mới |
+| [Kế hoạch cải tiến](plan/README.md) | Thêm skill cho agent ở đâu, mẫu đề xuất, backlog | người cải tiến agent |
 | [AI Agent](../apps/ai-agent-service/README.md) | Đồ thị 7 bước, lane, guard, MCP tools, lưu trữ, cấu hình | người phát triển agent |
 | [Kiến trúc microservice](architecture/microservices-target-structure.md) | Ranh giới service, luồng request/event, cấu trúc đích | mọi người |
 | [Sở hữu dữ liệu](architecture/data-ownership-migration.md) | Bảng thuộc service nào, phụ thuộc chéo, trình tự tách DB | backend |

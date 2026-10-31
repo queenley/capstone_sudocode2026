@@ -26,17 +26,17 @@ export async function api<T = unknown>(
     );
   }
   if (!response.ok)
-    throw new Error(
+    throw Object.assign(new Error(
       typeof result.detail === "string"
         ? result.detail
         : Array.isArray(result.detail) && typeof result.detail[0]?.msg === "string"
           ? result.detail[0].msg
           : JSON.stringify(result.detail || result),
-    );
+    ), { status: response.status });
   return result as T;
 }
 
-/** Source catalog shape from scripts/create_data/data/catalog/products.json. */
+/** Source catalog shape from evaluation/data-generation/data/catalog/products.json. */
 export type CatalogProductVariant = {
   variant_sku: string;
   size: string | number;

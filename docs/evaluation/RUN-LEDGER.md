@@ -3,6 +3,8 @@
 Đọc file này trước khi chọn case. Đây là mục theo dõi chung; raw log/trace giữ local, không commit.
 Một scenario chạy cả full/baseline vẫn là một scenario mới về độ phủ. Chạy R1 cùng cohort là retest có chủ đích, không cộng vào số case mới.
 
+Từ 25/10/2026, `scripts/evaluation/` đổi thành `evaluation/harness/` và `scripts/create_data/` thành `evaluation/data-generation/`. Các mục bên dưới giữ đường dẫn lúc ghi; thư mục bằng chứng `scripts/evaluation/runs/<run>` giờ nằm ở `evaluation/harness/runs/<run>`, nội dung không đổi. Từ 28/10/2026, `evaluation/harness/` đổi tiếp thành `evaluation/agent-evaluation/` (code chuyển vào `src/`, `evaluation-contracts/` thành `contracts/`); bằng chứng nằm ở `evaluation/agent-evaluation/runs/<run>`, nội dung không đổi.
+
 ## Các lượt chạy
 
 | Run | Ngày | Mục đích | Scenario | Cấu hình | Trạng thái |
@@ -110,3 +112,38 @@ BTC không cung cấp extractor: `trace_log.schema.json` ghi việc trích `ques
 Bộ chấm phân tích trước đây để extractor tự đặt tên slot và tên trường claim, nên RQR, CCR và HR lệch khỏi đường chính thức. v3 (`scripts/evaluation/agent/slots.py`) dùng đúng từ vựng, ép kiểu và quy tắc gắn nhãn của đường chính thức: slot ngoài bộ là `other` kiểu `open`, `fact_usage` ngoài bộ bị bỏ, claim phải thuộc trường BTC với giá trị đúng kiểu. Đây là đổi công cụ đo sau khi đã xem điểm, nên chỉ so sánh trên **cùng transcript**; không so với run dùng v2.
 
 Một bản thử trung gian (chỉ 30 slot lấy từ mẫu công khai BTC, trước khi thống nhất với đường chính thức) chấm lại 104 lượt của `development-r2-v4-M2` cho RQR hệ thống 4,1% và baseline 25,3% (v2: 3,8% và 3,7%). Số này **chưa được đo lại** với bản v3 cuối; cần chạy lại `docs/evaluation/rescore_with_scoped_extractor.py`.
+
+
+## 29/10/2026 — web-memory (sổ riêng, trần 10 USD)
+
+- Cohort mới: **WEB-MEM-01, WEB-MEM-02, WEB-MEM-03, WEB-MEM-04, WEB-MEM-05, WEB-MEM-06, WEB-MEM-07**; dữ liệu giả riêng, không dùng case lịch sử hoặc holdout.
+- Config: web local, memory enabled, model cấu hình hiện tại `openai:gpt-4.1-mini`; soft guard theo cấu hình hiện tại. Tiêu chí `web-memory-v1` khóa trong cohort.json.
+- Evidence local (gitignored): `evaluation/agent-evaluation/runs/20261029-web-memory/`; sổ `budget.sqlite`, không reset sổ lịch sử.
+- R0: PREPARING / INCOMPLETE; 0 turn model. Frontend dev trả HTTP 200; backend chưa khả dụng: Docker BuildKit lỗi metadata_v2.db input/output sau khi host hết dung lượng (110 MiB ở thời điểm lỗi). Đã xóa cache/browser tải riêng cho task để lấy lại khoảng 686 MiB; không reset volume. R1: PLANNED, paired retest cùng cohort/grading, không tính coverage mới.
+- Trạng thái tổng: INCOMPLETE cho đến khi đủ UI/server evidence và usage/billing.
+
+- Tiếp tục sau phục hồi: Docker daemon 29.7.2 hoạt động, host còn khoảng 13 GiB. Build lại backend từ source hiện tại theo README; frontend chạy npm dev. Chưa gửi turn model.
+- R0 STARTING: WEB-MEM-01…07, web-memory-v1, source repo hiện tại qua bind mount; image local bổ sung json-repair (đã có trong requirements). Bắt đầu UI khi AI ready; mọi request dùng budget.sqlite trần 10 USD.
+
+- R0 kết thúc: WEB-MEM-01…04 FAIL ở khôi phục phiên/nhận diện, WEB-MEM-05 PASS một nhánh đổi khách; 06–07 NOT RUN do lỗi điều phối login của script. Giữ R0 INCOMPLETE, không coi 05 là chứng minh đầy đủ cách ly. Evidence: R0/results.json, turns.json, call-3.json, ảnh hai phía; 2 lỗi setup trước đó lưu riêng.
+- R1 STARTING: paired retest WEB-MEM-01…07, cùng input/tiêu chí, dùng danh tính fixture mới tương đương để không đọc memory từ R0; không cộng coverage mới. Source bản sửa nhận diện, lưu từng lượt và phiên; sổ budget chung không reset.
+
+- R1 kết thúc INCOMPLETE: 01/05 PASS; 02–04 nhận VERIFIED và nhớ đúng sản phẩm/blocker nhưng script đòi đọc ra cả room/budget trong lời chào nên đánh FAIL; server brief chứa đủ 25 m², 6 triệu, SKU-AP-Y, 5.200.000đ. 06–07 chưa xong do script chờ vô hạn, đã dừng riêng script. Không tuyên bố 7/7.
+- R2 STARTING, paired retest cùng WEB-MEM-01…07/input; bổ sung sửa brief thiếu tên khi chỉ có facts chưa có episode. Tiêu chí web-memory-v2 kiểm room/budget/giá trong brief và lời tiếp nối + tên trong reply, thay vì buộc bot đọc lại toàn bộ profile. R0 theo v2 vẫn FAIL các nhánh nhận diện; giữ nguyên artifacts v1. Sổ budget dùng chung không reset.
+
+- R2 kết thúc: 02/04/05/06 PASS; 01 bị assertion so cả card sản phẩm tải bất đồng bộ, phần text hội thoại không đổi; 03 phát hiện race mở hai conversation đồng thời (đã sửa chia sẻ request mở phiên); 07 bị gateway 429 trước dispatch. R2 INCOMPLETE. Evidence R2/results.json + turns.json + call-*.json + ảnh.
+- R3 STARTING, paired retest WEB-MEM-01…07 cùng tiêu chí web-memory-v2, snapshot ảnh/brief/facts; assertion 01 so phần text tin nhắn, không so thời điểm card tải. Giãn 6 giây giữa case để giữ rate limit, không tắt guard/rate limit. Fixtures mới tương đương, sổ budget chung.
+
+- R3: 01–05 PASS; 06–07 chưa kết luận do gateway 429/queue polling. R3-followup STARTING: chỉ WEB-MEM-06/07, cùng khách R3 và tiêu chí, chờ cửa sổ rate-limit mới; 06 đặt bank rồi COD để chứng minh cập nhật thật thay vì hưởng facts có sẵn. Không cộng coverage, không reset budget.
+
+### Kết quả cuối web-memory, 29/10/2026
+
+- **Chức năng: PASS 7/7 nhóm case**, gồm 01–05 ở R3 và retest riêng 06–07 ở R3-followup; không phải một run độc lập 7/7. Các lượt trước giữ nguyên FAIL/INCOMPLETE và evidence.
+- 01: reload/đóng khung chat khôi phục đúng conversation và text, không thêm tin. 02–03: mất tab/session vẫn nhận đúng khách, memory có ngay. 04: trình duyệt sạch không biết khách trước login, đọc đúng sau login. 05: đổi A/B không mang transcript/memory A sang B. 06: hai tab giữ độc lập, đổi bank→COD được nhớ ở cuộc mới, đóng tab đang stream không kết thúc tab kia. 07: console thấy brief trước handoff; nhân viên nhận và gửi reply tới khách.
+- Brief đã đối chiếu với server: phòng 25 m², ngân sách 6 triệu, SKU-AP-Y, giá lịch sử 5.200.000đ, payment COD và nguồn fact ID. Tên khách có trong context cả khi chưa có episode. Không giả lập số cuộc đã kết thúc.
+- Sửa: chống stale profile response xóa token mới; gắn phiên chat với token, đồng bộ đổi khách giữa tab; dùng chung request mở phiên để không tạo hai cuộc. Tài khoản web mới có identity ổn định; giữ match ledger/CRM cũ, không chuyển/xóa memory lịch sử. Lưu facts trước khi trả done, episode/QA vẫn ở cuối cuộc; retry memory không chạy lại advisor. Chặn tab/finalizer cũ ghi đè hoặc invalidate fact mới; union order IDs dưới khóa. Thêm guard cho lời đã tạo/đổi đơn thiếu tool thành công.
+- Validation: **230 backend tests PASS**, **3 frontend Playwright regressions PASS**, Next production build/typecheck PASS, PostgreSQL schema tạm PASS (replay, mới thắng cũ, stale invalidation, concurrent order union, cách ly khách); schema đã drop. Diff kiểm bằng `git -c core.whitespace=cr-at-eol diff --check`.
+- Model/config: gpt-4.1-mini + policy Jev theo config hiện có; ngày nghiệp vụ local vẫn **2026-10-15**, không phải xác minh giá/KM thực ngày 29/10. Dữ liệu chỉ là fixture giả. Không chạy case lịch sử bị loại hoặc holdout.
+- Chi phí token đã biết: **0.123677131 USD**; **0.4223072 USD dự phòng thiếu usage**; tổng giữ **0.545984331/10 USD**. Không settle phỏng đoán, không reset sổ. **Đối soát billing/measurement tổng vẫn INCOMPLETE** dù kiểm chức năng PASS.
+- Evidence local gitignored: `evaluation/agent-evaluation/runs/20261029-web-memory/summary.json`, `R3/`, `R3-followup/`, `postgres-check.json`, `budget.sqlite`. Ảnh `R3-followup/07-call-brief.png`, `07-staff.png`, `07-customer.png`; call 36 VERIFIED, handoff accepted, memory done. Tài khoản/dữ liệu test giữ local để review; không ghi credentials/transcript vào ledger.
+- Hai dự án khác đã dừng, chỉ telesales-ai chạy. Backend source bind mount theo `compose.local.yml` trong evidence; frontend npm dev. Image base build chuẩn từng gặp Bus error sau hết ổ; dùng image local bổ sung dependency đã có trong requirements để test, chưa deploy production/commit. Ngoài phạm vi: audio, kênh ngoài web, chấm toàn bộ BTC, latency p95 và hoá đơn nhà cung cấp.

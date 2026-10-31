@@ -8,8 +8,8 @@
 The agent lives in ``apps/ai-agent-service``; this file only puts it on the
 path and hands over to ``ai_agent_service/pipeline/eval/cli.py``, which
 documents the options. Run it with the agent's interpreter
-(``apps/ai-agent-service/.venv``), from any directory. The team's analysis
-harness is a different command, ``scripts/evaluation/run_eval.py``.
+(``apps/ai-agent-service/.venv``), from any directory. It is the only evaluation
+command: ``--relabel <run>`` labels a finished run again without running the agent.
 """
 
 import sys

@@ -104,6 +104,10 @@ async def answer_turn(app: Any, conversation: platform.ConversationView, data: T
 
     stored = await calls.stored_reply(row["id"], turn_id)
     if stored is not None:
+        try:
+            await calls.complete_memory(row, turn_id, stored)
+        except CallError as error:
+            raise HTTPException(error.status, str(error)) from error
         return {**_result(row, turn_id, None, stored["content"]), "replayed": True}
 
     message = data.message

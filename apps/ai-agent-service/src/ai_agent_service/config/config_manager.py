@@ -38,6 +38,9 @@ CONFIG_DIR = ROOT / "config"
 MODELS_YAML = CONFIG_DIR / "models.yaml"
 LANES_YAML = CONFIG_DIR / "lanes.yaml"
 KNOWLEDGE_YAML = CONFIG_DIR / "knowledge.yaml"
+# Every prompt a model is given, in the repository's config/prompts/agent;
+# a container copies that folder and sets PROMPTS_DIR to it.
+PROMPTS_DIR = Path(os.environ.get("PROMPTS_DIR") or ROOT.parents[1] / "config" / "prompts" / "agent").resolve()
 
 # Loaded once, here. override=False leaves a variable that is already set
 # alone, so an IDE run configuration, the shell and CI can each override .env
@@ -482,6 +485,20 @@ def _load_yaml(path: Path) -> Any:
     if not path.exists():
         raise FileNotFoundError(f"Missing {path}")
     return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+
+
+def load_prompt(name: str) -> str:
+    """A prompt file under :data:`PROMPTS_DIR`, as written: CRLF read as LF, and
+    the file's final newline is not part of the prompt."""
+    path = PROMPTS_DIR / name
+    if not path.exists():
+        raise FileNotFoundError(f"Missing prompt {path}")
+    return path.read_text(encoding="utf-8").replace("\r\n", "\n").removesuffix("\n")
+
+
+def load_prompt_yaml(name: str) -> Any:
+    """A YAML file of prompt fragments under :data:`PROMPTS_DIR`."""
+    return yaml.safe_load(load_prompt(name)) or {}
 
 
 @lru_cache(maxsize=1)

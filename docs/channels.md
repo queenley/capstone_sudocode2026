@@ -139,7 +139,7 @@ Nhận dạng giọng nói luôn chạy cục bộ. Giọng đọc câu trả l�
 | `vieneu:` | CPU trong container | 10–15 giây mỗi câu, chiếm CPU của nhận dạng | miễn phí | ~1,4 GB lần đầu dùng |
 | (để trống) | theo `voice.tts` trong `apps/ai-agent-service/config/models.yaml` (`vieneu:`) | | | |
 
-Với `elevenlabs:`, giọng được chọn theo **miền của khách** trong CRM (`bac`, `trung`, `nam`), lấy từ nhóm `agent` của [scripts/create_data/config/voices.yaml](../scripts/create_data/config/voices.yaml): cùng một khách luôn nghe cùng một giọng; khách chưa nhận ra (hoặc CRM không có miền) nghe giọng **nữ miền Bắc** (`VOICE_DEFAULT_REGION=bac`, `VOICE_GENDER=female`). Hotline nhận ra khách ngay khi nối máy nên lời chào đã đúng giọng miền; trên web, giọng đổi theo miền khi khách được nhận ra, rồi giữ nguyên đến hết cuộc gọi. `elevenlabs:<voice id>` dùng một giọng cố định.
+Với `elevenlabs:`, giọng được chọn theo **miền của khách** trong CRM (`bac`, `trung`, `nam`), lấy từ nhóm `agent` của [evaluation/data-generation/config/voices.yaml](../evaluation/data-generation/config/voices.yaml): cùng một khách luôn nghe cùng một giọng; khách chưa nhận ra (hoặc CRM không có miền) nghe giọng **nữ miền Bắc** (`VOICE_DEFAULT_REGION=bac`, `VOICE_GENDER=female`). Hotline nhận ra khách ngay khi nối máy nên lời chào đã đúng giọng miền; trên web, giọng đổi theo miền khi khách được nhận ra, rồi giữ nguyên đến hết cuộc gọi. `elevenlabs:<voice id>` dùng một giọng cố định.
 
 Chỉ giọng được chọn mới được nạp: chọn `openai:` thì model VieNeu không được tải, không được nạp, và gói `vieneu` cũng không được cài vào image. Đổi qua lại thì build lại:
 

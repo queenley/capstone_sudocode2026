@@ -164,6 +164,7 @@ def check(view: GuardInput) -> Verdict:
     reasons += _order_state(text, view)
     reasons += _promotions(text, view)
     reasons += _transfer(text, view)
+    reasons += _completed_order(text, view)
     if INTERNAL.search(text):
         reasons.append("Nhắc tới thông tin nội bộ (giá nhập, biên lợi nhuận, nhà cung cấp, giá sàn).")
     for kind, pattern in PATTERNS:
@@ -241,6 +242,25 @@ def _order_state(text: str, view: GuardInput) -> list[str]:
         if str(result.get("name", "")).replace("_", ".") in ORDER_TOOLS and (result.get("result") or {}).get("ok"):
             return []
     return ["Nói về trạng thái đơn mà chưa tra trong lượt này; gọi order_status trước, rồi nói đúng trạng thái tool trả về."]
+
+
+def _completed_order(text: str, view: GuardInput) -> list[str]:
+    if not view.check_handoff:
+        return []
+    for sentence in SENTENCE.split(text):
+        words = plain(sentence)
+        if "?" in sentence or re.search(r"\b(chua|khong|neu)\b", words):
+            continue
+        creating = re.search(r"\b(da|vua) (len|tao|dat|xac nhan) (don|hang)\b", words)
+        updating = re.search(r"\b(da|vua) (doi|cap nhat|sua) (don|size|kich co|dia chi)\b", words)
+        if not creating and not updating:
+            continue
+        tool = "order.create" if creating else "order.update"
+        if not any(str(r.get("name", "")).replace("_", ".", 1) == tool
+                   and (r.get("result") or {}).get("ok")
+                   and (r.get("result") or {}).get("data") for r in view.tool_results):
+            return [f"Nói đã thực hiện đơn hàng mà chưa có {tool} thành công; chỉ báo thành công sau kết quả tool."]
+    return []
 
 
 def _transfer(text: str, view: GuardInput) -> list[str]:

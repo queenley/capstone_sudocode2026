@@ -132,7 +132,7 @@ Agent đọc conversation để xác thực lượt và để biết conversatio
 
 Test `tests/agent/test_btc_contract.py` giữ các điểm trên. Mọi tên slot mà kịch bản mẫu chấm phải có trong ledger.
 
-`data/btc/catalog/crm_seed_synthetic.json` (khách tổng hợp do `scripts/create_data` sinh) được nạp thêm vào CRM của mock khi khởi động, nên kịch bản sinh ra tìm được khách. File `mock_tools.py` của BTC giữ nguyên. Tắt bằng `BTC_SYNTHETIC_CRM=0`.
+`data/btc/catalog/crm_seed_synthetic.json` (khách tổng hợp do `evaluation/data-generation` sinh) được nạp thêm vào CRM của mock khi khởi động, nên kịch bản sinh ra tìm được khách. File `mock_tools.py` của BTC giữ nguyên. Tắt bằng `BTC_SYNTHETIC_CRM=0`.
 
 ## Cấu hình
 
@@ -151,6 +151,7 @@ Test `tests/agent/test_btc_contract.py` giữ các điểm trên. Mọi tên slo
 | `AGENT_PROFILE` | `local`: các agent liệt kê trong `profiles.local` của `models.yaml` dùng `gemini-3.5-flash-lite` (key miễn phí); extractor của phần đánh giá giữ nguyên model |
 | `IMPROVEMENT_DIR` | tín hiệu, round, thẻ bài học, file duyệt, sổ cải tiến (mặc định `data/improvement`, không đưa lên git) |
 | `EXPLORE_DATABASE_URL` | database của bước khám phá, tên phải kết thúc bằng `_explore` (mặc định: tên app + `_explore`) |
+| `PROMPTS_DIR` | prompt của agent, mặc định `config/prompts/agent` ở root repo (image: `/app/agent/prompts`) |
 
 Đổi model hoặc provider của advisor: sửa `config/models.yaml`, hoặc chọn tạm trong Agent Console (`/developer`); lựa chọn tạm mất khi restart.
 
@@ -174,7 +175,7 @@ Docker: `docker compose up --build ai-agent-service`. Thêm voice bằng `--buil
 - `python -m pytest -q` (từ root):
   - `tests/agent/` kiểm tra lane, hard guard, PII, ITN;
   - `tests/test_agent_turns.py` kiểm tra route với agent giả lập.
-- `python -m scripts.evaluation.evaluate`: Recall@k của kho tri thức trên `data/btc/rag/qa_labeled.json`.
+- `python evaluation/rag_offline.py`: Recall@k của kho tri thức trên `data/btc/rag/qa_labeled.json`.
 - Lệnh đánh giá dạng BTC, `run_eval.py` ở thư mục gốc repo: chạy agent thật trên kịch bản định dạng BTC, ghi trace, chấm bằng `reference_eval.py`, kèm bảng RAG. Cần PostgreSQL và key model; tự dùng database `<tên>_eval`. Từ thư mục gốc:
 
   ```powershell
@@ -183,7 +184,7 @@ Docker: `docker compose up --build ai-agent-service`. Thêm voice bằng `--buil
 
   `--config full --out full.jsonl` chỉ ghi một trace, đúng dạng lệnh BTC yêu cầu. Kết quả ở `apps/ai-agent-service/runs/<thời-điểm>/`: `full.jsonl`, `baseline.jsonl`, `report.json`, `table.txt`, `diagnostics.jsonl`, `errors.jsonl`, `manifest.json`, `rag/`.
 - `python -m ai_agent_service.pipeline.eval.rag --calibrate`: chỉ đo truy hồi và đề xuất θ từ nửa câu hỏi dùng để dò.
-- Chỉ số Chương A: `scripts/create_data` + `data/btc/eval/reference_eval.py`. Xem [docs/evaluation](../../docs/evaluation/README.md).
+- Chỉ số Chương A: `evaluation/data-generation` + `data/btc/eval/reference_eval.py`. Xem [docs/evaluation](../../docs/evaluation/README.md).
 
 ## Vòng cải tiến (Reflection)
 

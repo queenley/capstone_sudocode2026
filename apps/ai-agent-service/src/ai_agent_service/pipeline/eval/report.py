@@ -53,7 +53,9 @@ def problems(rows: Iterable[Mapping[str, Any]], diagnostics: Iterable[Mapping[st
         "schema_errors": schema_errors,
         "scenarios_rejected": rejected,
         "scenarios_stopped": scenario_errors,
-        "claims_set_aside": sum(len(d.get("claims_set_aside") or []) for d in diagnostics),
+        # Items whose quote was not where they said, and items the vocabularies changed or set aside.
+        "extraction_dropped_items": sum(d.get("extraction_dropped_items") or 0 for d in diagnostics),
+        "extraction_changed_items": sum(d.get("extraction_changed_items") or 0 for d in diagnostics),
         "policy_skipped": sum(1 for d in diagnostics if str(d.get("policy") or "").startswith("skipped")),
         "safe_lines": sum(1 for d in diagnostics if d.get("fallback")),
         "turns": sum(1 for _ in rows),
@@ -97,7 +99,7 @@ def manifest(
             "lanes_yaml": hashlib.sha256(LANES_YAML.read_bytes()).hexdigest(),
             "policy": _sha([{name: question.model_dump() for name, question in policy_rules.QUESTIONS.items()},
                             policy_rules.THRESHOLDS]),
-            "extractor": scorers.PROMPT_SHA,
+            "extractor": scorers.prompt_sha() if extractor else None,
         },
         "knowledge_sha256": _sha({path.name: hashlib.sha256(path.read_bytes()).hexdigest()
                                   for path in sorted((btc_data_dir() / "policy").glob("*.md"))}),

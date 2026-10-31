@@ -94,7 +94,7 @@ def _settle_identity(call: dict[str, Any]) -> dict[str, Any]:
     return call
 
 
-async def _remember(call: dict[str, Any], candidates: list[gate.Candidate], *, writer: Any, memory: MemoryAgent) -> dict[str, Any]:
+async def _remember(call: dict[str, Any], candidates: list[gate.Candidate], *, writer: Any, memory: MemoryAgent, episode: bool = True) -> dict[str, Any]:
     tier = call.get("tier") or "UNKNOWN"
     if tier in ("PROBABLE", "AMBIGUOUS"):
         return {"status": "skipped", "reason": f"identity still {tier.lower()} at hang-up", "memory_writes": []}
@@ -124,10 +124,14 @@ async def _remember(call: dict[str, Any], candidates: list[gate.Candidate], *, w
     number = len((history or {}).get("episodes") or []) + 1
     source = {"call_id": str(call["call_id"]), "call": f"call_{number}", "channel": call.get("channel")}
     decisions = plan_writes(candidates, current, source=source, on=call["on"])
+    decisions = [d._replace(source={**d.source, "observed_at": call["turn_times"][d.source["turn"]]})
+                 if d.source.get("turn") in call.get("turn_times", {}) else d for d in decisions]
     committed = await writer.data("memory_commit_facts", customer_id=customer_id,
                                   decisions=[d.as_dict() for d in decisions], on=call["on"])
     if committed is None:
         return {"status": "failed", "reason": "the ledger refused the call's facts", "memory_writes": []}
+    if not episode:
+        return {"status": "done", "customer_id": customer_id, "memory_writes": committed.get("memory_writes") or []}
     episode = await memory.summarize(candidates, call_number=number, day=call["on"], channel=call.get("channel") or "web")
     await writer.data("memory_commit_episode", customer_id=customer_id, episode={
         "call_id": str(call["call_id"]), "channel": call.get("channel"), "date": call["on"], **episode,

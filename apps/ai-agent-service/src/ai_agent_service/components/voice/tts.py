@@ -19,7 +19,7 @@ Engines:
 - ``elevenlabs``: ElevenLabs (``ELEVENLABS_API_KEY``, model
   ``ELEVENLABS_TTS_MODEL``, ``eleven_flash_v2_5`` unless set). ``elevenlabs:``
   picks the agent's voice by the caller's region from ``voices.yaml`` (the
-  file ``scripts/create_data`` voices its test calls with: ``agent.<bac|trung|
+  file ``evaluation/data-generation`` voices its test calls with: ``agent.<bac|trung|
   nam|default>.<female|male>``, gender from ``VOICE_GENDER``, female unless
   set); one customer always hears the same voice, an unknown caller (or one
   with no region) a northern one (``VOICE_DEFAULT_REGION``, ``bac`` unless set).
@@ -95,15 +95,18 @@ class EdgeVoice:
         yield Speech(b"".join(chunks), "audio/mpeg", time.perf_counter() - started, first)
 
 
+def _openai_instructions() -> str:
+    from ...config.config_manager import load_prompt
+
+    return load_prompt("tts_openai.md")
+
+
 class OpenAIVoice:
     """OpenAI's speech API: one request per sentence, all sentences at once."""
 
     parallel = True  # network-bound
     _client = None
     VOICES = ("coral", "nova", "sage", "shimmer", "alloy", "ash", "ballad", "echo", "fable", "onyx", "verse")
-    #: Only the gpt-4o voices follow instructions; tts-1 ignores them.
-    INSTRUCTIONS = ("Đọc bằng tiếng Việt tự nhiên, giọng nhân viên chăm sóc khách hàng thân thiện, "
-                    "rõ ràng, tốc độ vừa phải. Đọc số tiền và mã sản phẩm chậm, rõ từng phần.")
 
     def __init__(self, voice: str | None) -> None:
         self.voice = voice or "coral"
@@ -127,7 +130,8 @@ class OpenAIVoice:
         started = time.perf_counter()
         first: float | None = None
         chunks: list[bytes] = []
-        extra = {"instructions": self.INSTRUCTIONS} if self.model.startswith("gpt-4o") else {}
+        # Only the gpt-4o voices follow instructions; tts-1 ignores them.
+        extra = {"instructions": _openai_instructions()} if self.model.startswith("gpt-4o") else {}
         async with self._api().audio.speech.with_streaming_response.create(
             model=self.model, voice=self.voice, input=text, response_format="mp3", **extra,
         ) as response:
@@ -143,13 +147,13 @@ REGIONS = ("bac", "trung", "nam")
 
 def voices_file() -> "Path | None":
     """voices.yaml: ``ELEVENLABS_VOICES`` when set, the agent's config (the image
-    copies it there), else the create_data copy in this repository."""
+    copies it there), else the data-generation copy in this repository."""
     from pathlib import Path
 
     from ...config.config_manager import ROOT
 
     candidates = [os.environ.get("ELEVENLABS_VOICES", "").strip(), str(ROOT / "config" / "voices.yaml")]
-    candidates += [str(parent / "scripts" / "create_data" / "config" / "voices.yaml") for parent in Path(__file__).resolve().parents]
+    candidates += [str(parent / "evaluation" / "data-generation" / "config" / "voices.yaml") for parent in Path(__file__).resolve().parents]
     return next((Path(c) for c in candidates if c and Path(c).is_file()), None)
 
 

@@ -14,4 +14,4 @@ test:
 	cd apps/web && npm run typecheck
 
 eval:
-	python -m scripts.evaluation.evaluate
+	python evaluation/rag_offline.py
