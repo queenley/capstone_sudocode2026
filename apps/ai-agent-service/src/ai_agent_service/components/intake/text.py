@@ -24,6 +24,9 @@ TEENCODE = {
     "j": "gì", "vs": "với", "mk": "mình", "mik": "mình", "bn": "bao nhiêu", "bnh": "bao nhiêu",
     "trc": "trước", "ntn": "như thế nào", "r": "rồi", "ms": "mới", "cx": "cũng", "nc": "nói chuyện",
     "ib": "nhắn tin", "tks": "cảm ơn", "thks": "cảm ơn", "okie": "ok", "oke": "ok",
+    # Spellings by sound; "ck" (chồng or chuyển khoản) and "a", "e" stay, being two words each.
+    "mún": "muốn", "bít": "biết", "wá": "quá", "thui": "thôi", "nhìu": "nhiều", "lun": "luôn",
+    "hnay": "hôm nay", "bjo": "bây giờ", "zậy": "vậy", "dzậy": "vậy", "vk": "vợ", "đt": "điện thoại",
 }
 
 _WORD = re.compile(r"(?<![\w.,])([A-Za-zÀ-ỹđĐ]+)(?![\w])")

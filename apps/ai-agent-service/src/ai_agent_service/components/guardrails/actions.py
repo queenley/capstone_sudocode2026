@@ -7,7 +7,7 @@ a tool error with the reason, and nothing happens in the business.
 | Tool | Checked |
 |---|---|
 | ``order.create`` | a phone to order for; the tier allows it; the product code is trusted (it came from a tool this call or from the brief, never made up from a name); the unit price equals today's ``pricing.get_quote`` for that code; COD total at most 10.000.000đ; not the same product as an order this call already created, unless the customer asks for more (an address or payment added afterwards is an ``order.update``) |
-| ``order.update`` | the order is one this customer has, or one a tool showed this call; the new variant is trusted. An order this call created may be corrected by its caller whatever the tier |
+| ``order.update`` | the order is one this customer has, or one a tool showed this call; the new variant is trusted; not the same change as one this call already made (a second exchange is charged, DT-03). An order this call created may be corrected by its caller whatever the tier |
 | ``schedule.callback`` | an ISO 8601 time with +07:00, inside working hours (LN-01, LN-02) and not in the past; otherwise the nearest working slot, for the model to propose |
 | ``handoff.transfer`` | only in lane HANDOFF, on a PB-06 topic, when the customer asked for a person, or on a serious complaint (a transfer anywhere else is graded ``over_escalation``); the brief validates against ``schemas/handoff_brief.schema.json`` itself (required fields, enums, phone pattern, summary length), after the harness filled in what it knows |
 | ``memory.request_deletion`` | the agent's previous turn asked to confirm the deletion and the customer just agreed (QT-06) |
@@ -66,6 +66,7 @@ def check(
     customer_said: str | None = None,
     shared_phone: bool = False,
     created: Sequence[Mapping[str, Any]] = (),
+    updated: Sequence[Mapping[str, Any]] = (),
 ) -> Verdict:
     """Whether a write tool may run with *args*; the reasons if not.
 
@@ -74,7 +75,9 @@ def check(
     *flags* are the turn's signals (``components.intake.signals``).
     *created* is the orders this call created, ``{order_id, sku}``: the
     caller may correct those whatever the tier, and is not booked the same
-    product twice unless they ask for more.
+    product twice unless they ask for more. *updated* is the arguments of the
+    ``order_update`` calls that succeeded in this call: the same change is not
+    made twice.
     """
     created_ids = frozenset(str(o["order_id"]) for o in created if o.get("order_id"))
     if name in CUSTOMER_READ_TOOLS:
@@ -105,7 +108,8 @@ def check(
                                               created=created, customer_said=customer_said),
         "order_update": lambda: (["Xác nhận danh tính trước khi sửa đơn."]
                                  if tier != "VERIFIED" and args.get("order_id") not in created_ids
-                                 else _order_update(args, orders=orders | created_ids, trusted=trusted)),
+                                 else _order_update(args, orders=orders | created_ids, trusted=trusted,
+                                                    updated=updated)),
         "schedule_callback": lambda: _schedule_callback(args, now=now),
         "handoff_transfer": lambda: _handoff(args, lane=lane, flags=flags or {}),
         "memory_request_deletion": lambda: _deletion(tier=tier, last_agent_said=last_agent_said, customer_said=customer_said),
@@ -142,10 +146,16 @@ def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes
     return reasons
 
 
-def _order_update(args: Mapping[str, Any], *, orders: frozenset[str], trusted: frozenset[str] | None) -> list[str]:
+def _order_update(args: Mapping[str, Any], *, orders: frozenset[str], trusted: frozenset[str] | None,
+                  updated: Sequence[Mapping[str, Any]] = ()) -> list[str]:
     order_id, action = args.get("order_id"), args.get("action")
     if not order_id:
         return ["Thiếu order_id."]
+    if any(done.get("order_id") == order_id and done.get("action") == action
+           and done.get("new_variant_sku") == args.get("new_variant_sku") for done in updated):
+        # A second exchange of the same order is a new one, and charged (DT-03): the customer asked once.
+        return [f"Đơn {order_id} đã được {action} đúng như vậy trong cuộc gọi này; không gọi lại. "
+                "Báo khách kết quả và phí của lần trước."]
     reasons = []
     if order_id not in orders:
         reasons.append(f"Đơn {order_id} chưa thấy trong đơn của khách; tra order_status trước.")

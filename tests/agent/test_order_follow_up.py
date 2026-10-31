@@ -88,6 +88,48 @@ def test_an_orders_state_needs_an_order_tool_of_the_turn():
         assert not any("trạng thái đơn" in r for r in guard(plain_talk).reasons)
 
 
+def placed(text, results=(), **extra):
+    return any("order_create" in r for r in guard(text, results, **extra).reasons)
+
+
+def test_saying_the_order_is_placed_needs_an_order_create_that_succeeded():
+    claims = ("Dạ em đã lên đơn cho anh sản phẩm này, thanh toán COD ạ.",
+              "Dạ đơn hàng của chị đã được tạo ạ.",
+              "Dạ em chốt đơn xong rồi ạ.",
+              "Dạ đặt hàng thành công rồi anh nhé.",
+              "Dạ em đã lên đơn cho anh Máy lọc không khí Xiaomi, thanh toán COD ạ.",
+              "Dạ em đã lên đơn cho anh rồi, anh muốn nhận hàng giờ nào ạ?")
+    created = {"name": "order.create", "result": {"ok": True, "data": {"order_id": "OD600001", "status": "created"}}}
+    refused = {"name": "order.create", "blocked_by": "guardrail",
+               "result": {"ok": False, "error": {"code": "PRECONDITION", "message": "Chưa có số điện thoại"}}}
+    for claim in claims:
+        assert placed(claim), claim
+        assert placed(claim, [refused]), claim
+        assert not placed(claim, [created]), claim
+        assert not placed(claim, created_orders=("OD600001",)), claim
+        assert not placed(claim, check_handoff=False), claim
+    status = {"name": "order.status", "result": {"ok": True, "data": {"orders": [{"status": "created"}]}}}
+    assert not placed("Dạ đơn hàng của anh đang ở trạng thái đã tạo ạ.", [status])
+
+
+def test_saying_the_order_was_changed_needs_an_order_update_that_succeeded():
+    said = "Dạ em đã đổi size cho đơn của chị sang 38 ạ."
+    updated = {"name": "order.update", "result": {"ok": True, "data": {"order_id": "OD600001", "status": "updated"}}}
+    assert any("order_update" in r for r in guard(said).reasons)
+    assert not any("order_update" in r for r in guard(said, [updated]).reasons)
+
+
+def test_an_offer_to_place_the_order_or_an_earlier_order_is_not_the_claim():
+    for text in ("Dạ anh có muốn em lên đơn luôn không ạ?",
+                 "Dạ em lên đơn cho chị nhé.",
+                 "Dạ anh cho em xin số điện thoại để em lên đơn ạ.",
+                 "Dạ đơn anh đã đặt hôm 10/10 bên em vẫn đang theo dõi ạ.",
+                 "Dạ hôm trước em đã lên đơn máy lọc cho chị ạ.",
+                 "Dạ nếu em đã lên đơn rồi thì anh sẽ nhận được tin nhắn ạ.",
+                 "Dạ em đã lên đơn cho anh chưa ạ?"):
+        assert not placed(text), text
+
+
 # ── the harness's own lines ───────────────────────────────────────────────
 
 
@@ -146,3 +188,52 @@ async def test_a_sentence_stopped_after_the_first_is_regenerated_from_what_was_s
     assert not update["draft"]["fallback"] and "safe_lines" not in update
     assert advisor.views[1].already_said == (first,) and advisor.views[1].block_reasons
     assert update["regen_count"] == 1
+
+
+def test_an_address_that_says_there_is_none_never_reaches_a_tool():
+    from ai_agent_service.mcp.tools import NO_ADDRESS
+    from ai_agent_service.components.intake.text import plain
+    for none in ("chưa có địa chỉ", "Không rõ", "N/A", "unknown", "-", ""):
+        assert NO_ADDRESS.search(plain(none)), none
+    for real in ("Lê Chân, Hải Phòng", "12 Nguyễn Trãi, Quận 1", "<ADDR_1>", "Khu đô thị Văn Phú, Hà Đông"):
+        assert not NO_ADDRESS.search(plain(real)), real
+
+
+@pytest.mark.parametrize("one, other, same", [
+    ("Dạ mẫu quạt này đang được tặng kèm một bộ điều khiển chính hãng và bảo hành tại nhà ạ.",
+     "Dạ mẫu quạt này đang được tặng kèm một bộ điều khiển và bảo hành tại nhà ạ.", True),
+    ("Dạ vâng ạ.", "Dạ vâng ạ.", True),
+    ("Dạ vâng ạ.", "Dạ vâng chị.", False),
+    ("Dạ mẫu A giá 1.200.000đ ạ.", "Dạ mẫu B giá 1.500.000đ ạ.", False),
+    ("Dạ bên em bảo hành 24 tháng chính hãng ạ.", "Dạ bên em hỗ trợ đổi trả trong 7 ngày ạ.", False),
+])
+def test_a_regenerated_line_that_repeats_one_already_said_is_dropped(one, other, same):
+    from ai_agent_service.pipeline.hot.nodes import same_sentence
+    assert same_sentence(one, other) is same
+
+
+def test_the_same_order_change_is_not_made_twice_in_a_call():
+    change = {"order_id": "OD1", "action": "exchange_size", "new_variant_sku": "SKU-SN-CAS-40-DEN"}
+    common = dict(tier="VERIFIED", mode="speak", has_phone=True, quotes={}, orders=frozenset({"OD1"}),
+                  trusted=frozenset({"SKU-SN-CAS-40-DEN", "SKU-SN-CAS-41-DEN"}))
+    assert actions.check("order_update", change, **common).passed
+    again = actions.check("order_update", change, updated=[change], **common)
+    assert not again.passed and "không gọi lại" in again.reasons[0]
+    other = {**change, "new_variant_sku": "SKU-SN-CAS-41-DEN"}
+    assert actions.check("order_update", other, updated=[change], **common).passed
+
+
+def test_a_turn_that_placed_an_order_never_falls_back_to_no_information():
+    from ai_agent_service.pipeline.hot.nodes import _safe_line
+    placed = [{"name": "order.create", "args": {}, "result": {"ok": True, "data": {"order_id": "OD1"}}}]
+    state = {"lane": "CONTINUITY", "honorific": "chị"}
+    assert "đã tạo đơn" in _safe_line(state, placed)
+    assert "chưa có thông tin" in _safe_line(state, [])
+
+
+def test_a_blocked_delivery_time_is_told_the_sentence_to_say():
+    from ai_agent_service.components.guardrails import hard
+    by_area = {"name": "delivery_estimate", "args": {}, "result": {"ok": True, "data": {"address_known": False, "by_area": [
+        {"area": "Hà Nội, TP.HCM, Đà Nẵng", "delivery_days": 2}, {"area": "tỉnh thành khác", "delivery_days": 4}]}}}
+    verdict = hard.check(hard.GuardInput(text="Dạ đơn giao trong 4 ngày ạ.", tool_results=(by_area,), tier="VERIFIED"))
+    assert "2 ngày ở Hà Nội, TP.HCM, Đà Nẵng; 4 ngày ở tỉnh thành khác" in verdict.reasons[0]

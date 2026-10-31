@@ -7,8 +7,6 @@ never changed by an improvement round. An agent whose output is being
 improved does not also grade it (Pan et al., 2024: a generator and an
 evaluator sharing a model drift from human judgement in context).
 
-- ``score``: the organisers' rubric, J01 to J12, on live calls. Not built:
-  it returns nothing and says so.
 - ``tag``: the call's situation (``config/situations.yaml``) and outcome,
   read from the MemoryAgent's candidates.
 - ``reflect``: for one failure the organisers' grader found on a learning
@@ -91,9 +89,6 @@ class QaAgent(BaseAgent):
         if self._llm is None:
             self._llm = model_for(self.name)
         return self._llm
-
-    async def score(self, transcript: Sequence[dict[str, Any]], tool_log: Sequence[dict[str, Any]]) -> dict[str, Any]:
-        return {"status": "not built", "verdicts": []}
 
     async def tag(self, candidates: Sequence[Candidate], *, returning: bool) -> dict[str, str]:
         """{"situation": ..., "outcome": ...}."""

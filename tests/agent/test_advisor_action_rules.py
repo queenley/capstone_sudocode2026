@@ -17,4 +17,4 @@ def test_order_lookup_before_asking_for_the_code():
 
 def test_one_question_and_no_filler_closing():
     assert "Mỗi lượt tối đa một câu hỏi" in HARD_RULES
-    assert "Chưa gọi order_create thì không nói đơn đã được tạo" in HARD_RULES
+    assert "order_create chưa trả ok thì không nói đơn đã được tạo" in HARD_RULES

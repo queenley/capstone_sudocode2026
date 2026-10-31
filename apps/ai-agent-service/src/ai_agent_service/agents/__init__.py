@@ -5,7 +5,7 @@
 | ``AdvisorAgent`` | every turn | the slice of section 3.2 | a draft, tool results |
 | ``PolicyAgent`` (Jev) | every turn | draft, tool results, policy | violations |
 | ``MemoryAgent`` | after the call | transcript, current facts | what to write |
-| ``QaAgent`` | after the call | transcript, rubric | scores, a lesson |
+| ``QaAgent`` | after the call | candidates, a failure | tags, hints |
 | ``SimulatorAgent`` | evaluation only | persona, outline | the customer's turns |
 
 None of them holds state: the hot graph owns it, and hands each a slice.

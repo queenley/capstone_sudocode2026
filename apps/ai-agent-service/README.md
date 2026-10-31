@@ -206,7 +206,7 @@ apps/ai-agent-service/.venv/bin/python -m ai_agent_service.pipeline.improve publ
 
 ## Giới hạn (kế thừa từ agent tham chiếu)
 
-- `components/improvement/gaps.py` (Gap Loop) và `components/evaluation/rubric.py` còn là stub; `QaAgent.score` chưa chấm rubric. Không file nào nằm trên đường chạy của một lượt.
+- Gap Loop mới có bước tư vấn viên lưu câu trả lời thành FAQ (`runtime/calls.py`, `save_faq`); chưa gom câu hỏi chưa ai trả lời. Chưa chấm rubric J01–J12 trên cuộc gọi thật.
 - Truy hồi trên 60 câu có nhãn của BTC (`rag_eval`): Recall@3 91,5, Recall@5 93,2, từ chối đúng 75% câu không có đáp án và 60% câu nội bộ, không từ chối nhầm câu nào.
 - WER/CER của ASR chưa có lệnh xuất `hypotheses.json`: gói BTC chưa kèm audio.
 - Lệnh xóa dữ liệu khách của platform chưa xóa `pii_vault` và fact ledger của agent.

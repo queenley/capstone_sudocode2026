@@ -633,7 +633,7 @@ async def _streamed(state: HotState, context: HotContext, messages: list[Any], a
         produced += [r for r in pending if r not in produced]
         absorbed = _absorb(state, produced)
         if attempt.said:
-            line = fallback.safe_line(state.get("lane") or "NEW", _who(state))
+            line = _safe_line(state, produced)
             await _say(context, line, timing)
             return {**absorbed, "draft": {"text": " ".join([*attempt.said, line]), "streamed": True, "fallback": True,
                                           "error": _readable(error)},
@@ -650,7 +650,7 @@ async def _streamed(state: HotState, context: HotContext, messages: list[Any], a
                                "hard": {"passed": not reasons, "reasons": reasons}}
     text = " ".join(attempt.said)
     if attempt.reasons:
-        line = fallback.safe_line(state.get("lane") or "NEW", _who(state))
+        line = _safe_line(state, produced)
         await _say(context, line, timing)
         text = f"{text} {line}".strip()
         verdict["fallback"] = True
@@ -711,6 +711,22 @@ async def _stream_once(
         await stream.aclose()
 
 
+def _safe_line(state: HotState, produced: list[dict[str, Any]]) -> str:
+    """The line said when no draft could be trusted; one that says so when this turn placed an order."""
+    placed = any(r.get("name") == "order.create" and (r.get("result") or {}).get("ok") for r in produced)
+    return fallback.line("order_placed", _who(state)) if placed else fallback.safe_line(state.get("lane") or "NEW", _who(state))
+
+
+def same_sentence(one: str, other: str) -> bool:
+    """Whether two sentences say the same thing: equal, or, from five words up, the shorter one's words almost all
+    in the longer. A regeneration repeats its last line with a word or two changed, not word for word."""
+    a, b = intake_text.plain(one).split(), intake_text.plain(other).split()
+    if a == b:
+        return True
+    short, long = sorted((set(a), set(b)), key=len)
+    return len(short) >= 5 and len(short & long) >= 0.9 * len(short)
+
+
 async def _offer(state: HotState, context: HotContext, sentence: str, results: tuple[dict[str, Any], ...],
                  attempt: _Attempt, timing: dict[str, int | None]) -> bool:
     """Check one sentence and say it; False when it was blocked."""
@@ -719,7 +735,7 @@ async def _offer(state: HotState, context: HotContext, sentence: str, results: t
         if attempt.last_spoken:
             attempt.said[-1] += " " + sentence
         return True  # A citation arriving after speech is metadata, not an empty reply.
-    if any(intake_text.plain(spoken) == intake_text.plain(unmarked(said)) for said in attempt.said):
+    if any(same_sentence(spoken, unmarked(said)) for said in attempt.said):
         attempt.last_spoken = False
         return True  # already said in this answer: a regeneration going on from it repeats its last line
     if len(attempt.said) >= MAX_SENTENCES and not ORDER_SUMMARY.search(" ".join([*attempt.said, sentence])):
@@ -827,6 +843,7 @@ def guard_input(state: HotState, context: HotContext, text: str, results: tuple[
         warnings=tuple(state.get("freshness") or []) if tier == "VERIFIED" else (),
         promotions=promotions(),
         on=state.get("on"),
+        created_orders=tuple(str(o["order_id"]) for o in state.get("created_orders") or [] if o.get("order_id")),
     )
 
 

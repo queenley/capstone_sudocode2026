@@ -10,11 +10,12 @@ from langchain_core.runnables import RunnableLambda
 from ai_agent_service.agents import qa as qa_module
 from ai_agent_service.agents.advisor import shown_passages
 from ai_agent_service.agents.qa import HintDraft, QaAgent, Reflection
+from ai_agent_service.agents import simulator as simulator_module
 from ai_agent_service.agents.simulator import Customer, Observation, PersonaTurn, Session, SimulatorAgent, faithful
 from ai_agent_service.components.improvement import lessons, playbook, review, signals, versions
 from ai_agent_service.components.improvement.lessons import Card, Hint
 from ai_agent_service.components.improvement.signals import Failure
-from ai_agent_service.config.config_manager import get_models_config
+from ai_agent_service.config.config_manager import Profile, get_models_config
 from ai_agent_service.pipeline.improve import cli, explore
 
 CLEAN = Hint(trigger="khách nói lên đơn luôn", do="đọc lại sản phẩm, địa chỉ và cách thanh toán trước khi tạo đơn",
@@ -46,7 +47,10 @@ def test_profile_moves_the_agents_it_lists(monkeypatch):
     monkeypatch.setenv("AGENT_PROFILE", "local")
     for name in models.agents:
         moved = models.agent(name)
-        if name in profile.agents:
+        if name in profile.overrides:
+            own = profile.overrides[name]
+            assert (moved.provider, moved.model) == (own.provider, own.model)
+        elif name in profile.agents:
             assert (moved.provider, moved.model) == (profile.provider, profile.model)
         else:
             assert (moved.provider, moved.model) == (models.agents[name].provider, models.agents[name].model)
@@ -56,6 +60,15 @@ def test_profile_moves_the_agents_it_lists(monkeypatch):
     monkeypatch.setenv("AGENT_PROFILE", "nowhere")
     with pytest.raises(KeyError):
         models.agent("advisor")
+
+
+def test_profile_override_gives_an_agent_its_own_model():
+    profile = Profile(provider="google_genai", model="a", agents=["advisor"],
+                      overrides={"simulator": {"provider": "google_genai", "model": "b"}})
+    assert profile.overrides["simulator"].model == "b"
+    with pytest.raises(ValueError):
+        Profile(provider="google_genai", model="a", agents=["simulator"],
+                overrides={"simulator": {"provider": "google_genai", "model": "b"}})
 
 
 # ── failures ──────────────────────────────────────────────────────────────
@@ -300,7 +313,9 @@ async def _same(line):
 
 
 @pytest.mark.asyncio
-async def test_a_failed_persona_call_is_recorded_and_a_spent_quota_is_recognised():
+async def test_a_failed_persona_call_is_recorded_and_a_spent_quota_is_recognised(monkeypatch):
+    monkeypatch.setattr(simulator_module, "RETRY_PAUSE_S", 0)
+
     class Broken:
         def with_structured_output(self, schema):
             async def answer(request):
@@ -314,6 +329,60 @@ async def test_a_failed_persona_call_is_recorded_and_a_spent_quota_is_recognised
     assert (reaction, line) == ("follow", "Chốt nhé") and agent.errors and explore.EXHAUSTED.search(agent.errors[0])
     assert explore.EXHAUSTED.search("The model hit its rate limit.")  # the advisor's fallback, nodes._readable
     assert not explore.EXHAUSTED.search("ValueError: bad shape")
+
+
+def test_a_yes_or_no_fact_is_said_as_words_and_marked_as_an_answer():
+    customer = customer_for(facts_established={"has_children": False, "budget_vnd": 5000000})
+    customer.first()
+    assert customer.step(Observation(questions=[{"slot": "has_children", "type": "open"}])) == "Không."
+    assert customer.answering == ["has_children"]
+    assert customer.step(Observation(questions=[{"slot": "budget_vnd", "type": "open"}])) == "5000000"
+    assert customer.step(Observation()) == "Chốt giúp chị nhé" and customer.answering == []
+
+
+@pytest.mark.asyncio
+async def test_the_session_says_an_answer_in_the_customer_s_words():
+    voiced = []
+
+    async def say(customer, line, *, answering=()):
+        voiced.append((line, tuple(answering)))
+        return "Dạ nhà chị không có trẻ nhỏ đâu em."
+
+    agent = SimulatorAgent.__new__(SimulatorAgent)
+    agent.llm, agent.observer, agent._persona, agent.name, agent.errors = None, None, None, "simulator", []
+    agent.say = say
+    data = scenario(call_1={"customer_turns": ["Chị muốn mua máy lọc", "Chốt giúp chị nhé"], "expected_outcome": "chot_don",
+                            "facts_established": {"has_children": False}})
+    session = Session(agent, Customer(data, "call_1", seed=0), set())
+    voiced.clear()
+    session.last_line = "Chị muốn mua máy lọc"
+    session.customer.first()
+    line = await session.reply("Nhà mình có trẻ nhỏ không ạ?", [],
+                               {"questions": [{"slot": "has_children", "type": "open"}], "claims": []})
+    assert line == "Dạ nhà chị không có trẻ nhỏ đâu em." and voiced == [("Không.", ("has_children",))]
+
+
+@pytest.mark.asyncio
+async def test_a_failed_call_is_retried_once_but_not_after_a_spent_daily_quota(monkeypatch):
+    monkeypatch.setattr(simulator_module, "RETRY_PAUSE_S", 0)
+    calls = []
+
+    async def flaky():
+        calls.append(1)
+        if len(calls) == 1:
+            raise RuntimeError("503 UNAVAILABLE: the model is overloaded")
+        return "ok"
+
+    assert await simulator_module.twice(flaky, "persona") == "ok" and len(calls) == 2
+
+    async def spent():
+        calls.append(1)
+        raise RuntimeError("429 RESOURCE_EXHAUSTED: GenerateRequestsPerDayPerProjectPerModel-FreeTier")
+
+    calls.clear()
+    with pytest.raises(RuntimeError):
+        await simulator_module.twice(spent, "persona")
+    assert len(calls) == 1
 
 
 def test_a_branch_that_closes_sooner_is_preferred():

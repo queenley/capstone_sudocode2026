@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS facts (
     slot           TEXT NOT NULL,
     value          JSONB NOT NULL,
     kind           TEXT NOT NULL,
-    status         TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'invalidated', 'disputed')),
+    status         TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'invalidated', 'disputed', 'unconfirmed')),
     valid_from     DATE NOT NULL,
     valid_to       DATE,
     confidence     REAL NOT NULL DEFAULT 1.0,
@@ -68,6 +68,10 @@ CREATE TABLE IF NOT EXISTS facts (
     created_at     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS facts_customer_idx ON facts (customer_id, slot);
+-- 'unconfirmed' came after the table: a ledger made before it gets the wider check.
+ALTER TABLE facts DROP CONSTRAINT IF EXISTS facts_status_check;
+ALTER TABLE facts ADD CONSTRAINT facts_status_check
+    CHECK (status IN ('active', 'invalidated', 'disputed', 'unconfirmed'));
 -- The idempotency key of section 5.4: a replayed after_call writes nothing twice.
 CREATE UNIQUE INDEX IF NOT EXISTS facts_once_idx ON facts (
     customer_id, slot, (source->>'call_id'), (source->>'turn'), (source->>'extractor_version')
@@ -155,7 +159,7 @@ async def memory_get_profile(customer_id: str, on: str | None = None) -> dict[st
     pool = await database()
     async with pool.connection() as conn:
         cursor = await conn.execute(
-            "SELECT * FROM facts WHERE customer_id = %s AND status IN ('active', 'disputed') "
+            "SELECT * FROM facts WHERE customer_id = %s AND status IN ('active', 'disputed', 'unconfirmed') "
             "AND valid_from <= %s AND (valid_to IS NULL OR valid_to >= %s) "
             "ORDER BY valid_from, created_at",
             (customer_id, day, day),
@@ -328,6 +332,17 @@ async def _apply(conn: Any, customer_id: str, decision: dict[str, Any], day: dat
     if await _already(conn, customer_id, slot, source):
         return None
     kind = decision.get("kind", "preference")
+    if decision.get("unconfirmed"):
+        # Said by a caller who stated this customer's number and hung up unconfirmed: kept beside
+        # the customer's facts, never over them, and not a write of theirs in the trace.
+        await conn.execute(
+            "INSERT INTO facts (fact_id, customer_id, slot, value, kind, status, valid_from, valid_to, confidence, source) "
+            "VALUES (%s, %s, %s, %s, %s, 'unconfirmed', %s, %s, %s, %s)",
+            (f"F-{uuid.uuid4().hex[:12]}", customer_id, slot, json.dumps(value, ensure_ascii=False), kind, day,
+             _day(decision["valid_to"]) if decision.get("valid_to") else None,
+             float(decision.get("confidence", 1.0)), json.dumps(source, ensure_ascii=False)),
+        )
+        return None
     current = None
     if not decision.get("disputed"):
         cursor = await conn.execute(
@@ -381,6 +396,49 @@ def _write(slot: str, value: Any, op: str, source: dict[str, Any], customer_id: 
     return {"key": slot, "value": value, "op": op,
             "source": f"{source.get('call', 'call')}#turn{source.get('turn', 0)}",
             "customer_id": customer_id, "fact_id": fact_id}
+
+
+@server.tool(roles={"memory_writer"}, name="memory_settle_unconfirmed")
+async def memory_settle_unconfirmed(customer_id: str, confirm: bool, on: str) -> dict[str, Any]:
+    """Settle what an unconfirmed caller said for this customer, once the customer's own call ended.
+
+    Confirmed: each unconfirmed fact becomes the customer's, unless the call
+    gave the slot an active value of its own (that one is newer and theirs).
+    Not confirmed (the customer denied it): every unconfirmed fact is closed.
+
+    Args:
+        customer_id: The customer, confirmed in the call just ended.
+        confirm: False when the customer said the earlier contact was not theirs.
+        on: The day of the call.
+    """
+    day = _day(on)
+    pool = await database()
+    async with pool.connection() as conn:
+        async with conn.transaction():
+            await conn.execute("SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))", (f"memory:{customer_id}",))
+            if not confirm:
+                cursor = await conn.execute(
+                    "UPDATE facts SET status = 'invalidated', valid_to = %s WHERE customer_id = %s "
+                    "AND status = 'unconfirmed' RETURNING fact_id", (day, customer_id))
+                return {"customer_id": customer_id, "confirmed": 0, "closed": len(await cursor.fetchall())}
+            cursor = await conn.execute(
+                "UPDATE facts f SET status = 'invalidated', valid_to = %s WHERE f.customer_id = %s "
+                "AND f.status = 'unconfirmed' AND f.kind <> 'open_note' AND EXISTS (SELECT 1 FROM facts g "
+                "WHERE g.customer_id = f.customer_id AND g.slot = f.slot AND g.status = 'active' "
+                "AND g.kind <> 'open_note') RETURNING fact_id", (day, customer_id))
+            closed = len(await cursor.fetchall())
+            # Two unconfirmed contacts may have said the same slot: the newest is kept (one active value per slot).
+            cursor = await conn.execute(
+                "UPDATE facts f SET status = 'invalidated', valid_to = %s WHERE f.customer_id = %s "
+                "AND f.status = 'unconfirmed' AND f.kind <> 'open_note' AND EXISTS (SELECT 1 FROM facts g "
+                "WHERE g.customer_id = f.customer_id AND g.slot = f.slot AND g.status = 'unconfirmed' "
+                "AND g.kind <> 'open_note' AND (g.created_at, g.fact_id) > (f.created_at, f.fact_id)) RETURNING fact_id",
+                (day, customer_id))
+            closed += len(await cursor.fetchall())
+            cursor = await conn.execute(
+                "UPDATE facts SET status = 'active' WHERE customer_id = %s AND status = 'unconfirmed' RETURNING fact_id",
+                (customer_id,))
+            return {"customer_id": customer_id, "confirmed": len(await cursor.fetchall()), "closed": closed}
 
 
 @server.tool(roles={"memory_writer"}, name="memory_commit_episode")
@@ -447,9 +505,11 @@ async def memory_request_deletion(
 async def memory_delete_customer(customer_id: str) -> dict[str, Any]:
     """Forget a customer entirely, on their request (policy QT-06).
 
-    Facts, episodes, identities and vault rows go; a tombstone stays, so a
+    Facts, episodes, identities, vault rows and the turns of their calls go,
+    and their call rows lose every link to them; a tombstone stays, so a
     later call from a number the organisers' CRM still knows is read as a
-    stranger's (``memory_get_profile``'s ``deleted_at``).
+    stranger's (``memory_get_profile``'s ``deleted_at``). The CRM itself is
+    the organisers' read-only seed: the tombstone is what makes it ignored.
 
     Args:
         customer_id: The customer.
@@ -466,6 +526,16 @@ async def memory_delete_customer(customer_id: str) -> dict[str, Any]:
             if (await (await conn.execute("SELECT to_regclass('pii_vault') AS t")).fetchone())["t"]:
                 cursor = await conn.execute("DELETE FROM pii_vault WHERE customer_id = %s", (customer_id,))
                 counts["pii_vault"] = cursor.rowcount
+            # The API's conversation log: what was said goes, and the call rows keep no link to the
+            # customer. The rows stay (unlinked) because the call that asked is still being closed.
+            if (await (await conn.execute("SELECT to_regclass('calls') AS t")).fetchone())["t"]:
+                cursor = await conn.execute(
+                    "DELETE FROM turns WHERE call_id IN (SELECT id FROM calls WHERE customer_id = %s)", (customer_id,))
+                counts["turns"] = cursor.rowcount
+                cursor = await conn.execute(
+                    "UPDATE calls SET customer_id = NULL, customer_key = NULL, phone_last4 = NULL, "
+                    "brief = '[]'::jsonb, suggestion = NULL WHERE customer_id = %s", (customer_id,))
+                counts["calls_unlinked"] = cursor.rowcount
             cursor = await conn.execute(
                 "UPDATE deletion_requests SET done_at = now() WHERE customer_id = %s AND done_at IS NULL "
                 "RETURNING request_id", (customer_id,))

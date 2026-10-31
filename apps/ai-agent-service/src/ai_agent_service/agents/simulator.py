@@ -43,6 +43,7 @@ customer waits, the outline going on at the next turn.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import re
@@ -56,6 +57,7 @@ from langchain_core.language_models import BaseChatModel
 from pydantic import BaseModel, Field
 
 from ..components.evaluation.scorers import Extractor
+from ..components.memory.ontology import slot as slot_spec
 from ..components.improvement.signals import grader, home
 from ..config.config_manager import btc_data_dir
 from ..llm.callback_handler import text_of
@@ -64,6 +66,10 @@ from .base import BaseAgent, model_for
 logger = logging.getLogger(__name__)
 
 MAX_TURNS = 12
+#: A spent daily quota: retrying cannot pass, and the exploration must stop (``ProviderExhausted``).
+DAILY_QUOTA = re.compile(r"per ?day|perday", re.IGNORECASE)
+#: Before the one retry of a call that failed: an overloaded model often answers a moment later.
+RETRY_PAUSE_S = 2.0
 #: Patience when a persona does not say (the specification's range is 2 to 5).
 DEFAULT_PATIENCE = 3
 
@@ -147,6 +153,8 @@ class Customer:
         #: Agent replies before the customer agreed (rule 5): turns_to_commit.
         self.committed_at: int | None = None
         self.last_said = self.agent_said = ""
+        #: The slots this turn's words answer (rule 4), for the voice to say them as a customer would.
+        self.answering: list[str] = []
         self.prompt = str(persona.get("system_prompt") or "Bạn là khách hàng Việt Nam đang gọi cho shop.").replace(
             "{goal}", str(self.spec.get("customer_goal") or scenario.get("customer_goal") or "")).replace(
             "{facts}", json.dumps({**self.prior, **self.facts}, ensure_ascii=False)).replace(
@@ -167,6 +175,7 @@ class Customer:
             raise ValueError("The call is over")
         rules: list[int] = []
         said: list[str] = []
+        self.answering = []
         self.agent_said = seen.agent_text
         if seen.handed_off:
             self._finish("chuyen_may", "agent")
@@ -205,8 +214,9 @@ class Customer:
                 continue
             if slot in self.facts:
                 rules.append(4)
-                said.append(str(self.facts[slot]))
+                said.append(spoken(self.facts[slot]))
                 self.answered.add(slot)
+                self.answering.append(slot)
                 answering = True
             elif slot not in self.answered:
                 rules.append(7)
@@ -322,27 +332,64 @@ class SimulatorAgent(BaseAgent):
         request = PERSONA.format(prompt=customer.prompt, honorific=customer.honorific, dialogue=heard or "(chưa có)",
                                  agent=agent_text, upcoming=upcoming)
         try:
-            turn: PersonaTurn = await self._persona.ainvoke(request)
+            turn: PersonaTurn = await twice(lambda: self._persona.ainvoke(request), "persona")
         except Exception as error:  # noqa: BLE001 - the planned line is always a valid thing to say
             logger.warning("Simulator persona failed: %s", type(error).__name__)
             self.errors.append(f"{type(error).__name__}: {error}"[:300])
             return "follow", upcoming
         return turn.reaction, turn.line.strip().strip('"«»')
 
-    async def say(self, customer: Customer, line: str) -> str:
-        """*line* in the persona's words, or *line* itself when a rewrite would change a fact."""
+    async def say(self, customer: Customer, line: str, *, answering: Sequence[str] = ()) -> str:
+        """*line* in the persona's words, or *line* itself when a rewrite would change a fact.
+
+        *answering* names the slots the line answers, so a bare value ("Không.", "20") is said as the
+        answer to what the agent asked, as the evaluation's simulator does.
+        """
         if self.llm is None or not line.strip():
             return line
+        asked = ", ".join(dict.fromkeys((slot_spec(name).label if slot_spec(name) else name) for name in answering))
+        task = (f"Nhân viên vừa hỏi về: {asked}. Câu trả lời đúng là «{line}». Nói câu trả lời đó thành lời tự nhiên "
+                f"của khách" if asked else f"Câu khách sắp nói: «{line}»")
         request = (f"{customer.prompt}\n\nBạn là KHÁCH, không phải nhân viên. Viết lại câu khách sắp nói bằng giọng "
                    f"của nhân vật, 1-2 câu ngắn, giữ nguyên mọi con số, tên riêng và ý nghĩa, không thêm thông tin mới. "
-                   f"Chỉ trả về đúng câu nói.\n\nCâu khách sắp nói: «{line}»")
+                   f"Chỉ trả về đúng câu nói.\n\n{task}")
         try:
-            text = text_of(await self.llm.ainvoke(request)).strip().strip('"«»')
+            text = text_of(await twice(lambda: self.llm.ainvoke(request), "voice")).strip().strip('"«»')
         except Exception as error:  # noqa: BLE001 - the planned line is always a valid thing to say
             logger.warning("Simulator voice failed: %s", type(error).__name__)
             self.errors.append(f"{type(error).__name__}: {error}"[:300])
             return line
         return text if faithful(line, text) else line
+
+
+async def twice(call: Any, what: str) -> Any:
+    """*call*, and once more after a pause when it fails for a reason that may pass (an overloaded or
+    throttled model); never after a spent daily quota, which only the next day fixes.
+
+    Each attempt goes through the model's rate limiter, so the retry is counted like any call.
+    """
+    try:
+        return await call()
+    except Exception as error:  # noqa: BLE001 - the second failure is the caller's
+        if DAILY_QUOTA.search(str(error)):
+            raise
+        logger.warning("Simulator %s failed once (%s); retrying", what, type(error).__name__)
+        await asyncio.sleep(RETRY_PAUSE_S)
+        return await call()
+
+
+def _succeeded(result: Any) -> bool:
+    """A tool result that is not a refusal, in the trace's shape (the tool's data) or our envelope's."""
+    if not isinstance(result, Mapping) or not result:
+        return False
+    return bool(result.get("ok")) if "ok" in result else "error" not in result
+
+
+def spoken(value: Any) -> str:
+    """A fact the customer states, as words: a yes or no question is answered "Có." or "Không.", not "True"."""
+    if isinstance(value, bool):
+        return "Có." if value else "Không."
+    return str(value)
 
 
 class PersonaTurn(BaseModel):
@@ -399,7 +446,12 @@ class Session:
         """The agent's questions and claims, as the trace carries them."""
         if self.agent.observer is None:
             return {"questions": [], "claims": [], "set_aside": []}
-        return await self.agent.observer.label(customer_text=self.last_line, agent_text=agent_text)
+        labels = await self.agent.observer.label(customer_text=self.last_line, agent_text=agent_text)
+        if labels.get("error") and not DAILY_QUOTA.search(str(labels["error"])):
+            logger.warning("Simulator observer failed once; retrying")
+            await asyncio.sleep(RETRY_PAUSE_S)
+            labels = await self.agent.observer.label(customer_text=self.last_line, agent_text=agent_text)
+        return labels
 
     async def reply(self, agent_text: str, tool_calls: Sequence[Mapping[str, Any]],
                     labels: Mapping[str, Any]) -> str | None:
@@ -410,7 +462,7 @@ class Session:
                   if str(c.get("field", "")).startswith(("price", "list_price")) and type(c.get("value")) is int]
         offer = bool(self.wanted) and any(
             tool.get("name") == self.wanted and grader().args_match(self.args, tool.get("args") or {}) for tool in tool_calls)
-        handed = any(tool.get("name") == "handoff.transfer" and (tool.get("result") or {}).get("ok") for tool in tool_calls)
+        handed = any(tool.get("name") == "handoff.transfer" and _succeeded(tool.get("result")) for tool in tool_calls)
         self.dialogue.append(("agent", agent_text))
         reaction: Reaction = "follow"
         persona_line = ""
@@ -422,6 +474,8 @@ class Session:
                            silent=not agent_text.strip(), handed_off=handed, reaction=reaction,
                            persona_line=persona_line, agent_text=agent_text)
         line = self.customer.step(seen)
+        if line is not None and self.customer.answering:
+            line = await self.agent.say(self.customer, line, answering=self.customer.answering)
         if line is not None:
             self.last_line = line
             self.dialogue.append(("customer", line))

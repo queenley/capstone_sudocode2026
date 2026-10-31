@@ -276,10 +276,14 @@ async def _agents() -> tuple[Any, Any, Any]:
 
 async def _close() -> None:
     from ...llm import jev
+    from ...llm.factory import limiter_stats
     from ...mcp import client as mcp_client
 
     await mcp_client.close_all()
     await jev.close()
+    # How much of the run was our own queueing rather than the provider: the first thing to read when a run is slow.
+    for name, seen in limiter_stats().items():
+        print(f"  limiter {name}: attempts={seen['attempts']} failed={seen['failed']} waited={seen['waited_s']}s")
 
 
 async def _explore_round(args: argparse.Namespace, folder: Path) -> int:
@@ -401,8 +405,9 @@ def measure_dir() -> Path:
 def _one_line(branch: Any) -> str:
     log = branch.log
     reacted = ",".join(log.get("reactions") or []) or "-"
-    return (f"  {log.get('call')}: passed={branch.passed} outcome={log.get('outcome')} "
+    line = (f"  {log.get('call')}: passed={branch.passed} outcome={log.get('outcome')} "
             f"turns_to_commit={log.get('turns_to_commit')} reactions={reacted} codes={','.join(branch.codes) or '-'}")
+    return line + (f" ERROR={branch.error[:160]}" if branch.error else "")
 
 
 async def _simulate_round(args: argparse.Namespace, folder: Path) -> int:
@@ -421,6 +426,7 @@ async def _simulate_round(args: argparse.Namespace, folder: Path) -> int:
     found: list[Failure] = []
     logs: list[dict[str, Any]] = []
     passing: list[list[str]] = []
+    errored: list[list[str]] = []
     try:
         rig, _, simulator = await _agents()
         print(f"Advisor {rig.provider}/{rig.advisor.model_name}; customer {simulator.model_name}; {len(ready)} scenarios")
@@ -428,10 +434,14 @@ async def _simulate_round(args: argparse.Namespace, folder: Path) -> int:
             print(scenario.scenario_id)
             for branch in await explore.play_scenario(rig, simulator, scenario, seed=args.seed, label=f"simulate|{args.round}"):
                 rows += branch.rows
-                found += branch.failures
                 logs.append(branch.log)
-                if not branch.failures and branch.error is None:
-                    passing.append([scenario.scenario_id, str(branch.log.get("call"))])
+                # A call played on a failed model call is not a measurement: its failures are not filed.
+                if branch.error is not None:
+                    errored.append([scenario.scenario_id, str(branch.log.get("call")), branch.error[:300]])
+                else:
+                    found += branch.failures
+                    if not branch.failures:
+                        passing.append([scenario.scenario_id, str(branch.log.get("call"))])
                 print(_one_line(branch))
     finally:
         await _close()
@@ -440,7 +450,7 @@ async def _simulate_round(args: argparse.Namespace, folder: Path) -> int:
     write_jsonl(folder / "simulator.jsonl", logs)
     (folder / "source.json").write_text(json.dumps({
         "run": str(folder), "scenarios": str(args.scenarios.resolve()), "seed": args.seed, "simulated": True,
-        "harvested_at": datetime.now(timezone.utc).isoformat(), "passing_calls": passing,
+        "harvested_at": datetime.now(timezone.utc).isoformat(), "passing_calls": passing, "errored_calls": errored,
     }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     review.log("simulate", round=args.round, scenarios=[s.scenario_id for s in ready], failures=len(found))
     _summary(found)

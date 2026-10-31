@@ -394,6 +394,7 @@ class ActionGuardMiddleware(AgentMiddleware):
             lane=context.lane, flags=context.flags, now=context.now,
             last_agent_said=context.last_agent_said, customer_said=context.customer_said,
             shared_phone=context.shared_phone, created=(*context.created_orders, *_created_in(state)),
+            updated=_updated_in(state, context.tool_results),
         )
         if not verdict.passed:
             envelope = {"ok": False, "error": {"code": "PRECONDITION", "retryable": False, "message": " ".join(verdict.reasons)}}
@@ -442,6 +443,20 @@ def _created_in(state: Mapping[str, Any]) -> list[dict[str, Any]]:
             if isinstance(data, dict) and data.get("order_id"):
                 created.append({"order_id": data["order_id"], "sku": asked.get(message.tool_call_id, {}).get("sku")})
     return created
+
+
+def _updated_in(state: Mapping[str, Any], earlier: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """The arguments of every ``order_update`` that succeeded in this call: earlier turns' and this run's."""
+    done = [dict(r.get("args") or {}) for r in earlier
+            if str(r.get("name", "")).replace("_", ".", 1) == "order.update" and (r.get("result") or {}).get("ok")]
+    asked = {call["id"]: call.get("args") or {} for m in state.get("messages") or [] if isinstance(m, AIMessage)
+             for call in m.tool_calls if call.get("name") == "order_update"}
+    for message in state.get("messages") or []:
+        if isinstance(message, ToolMessage) and message.name == "order_update":
+            envelope = envelope_of(message)
+            if isinstance(envelope, dict) and envelope.get("ok"):
+                done.append(dict(asked.get(message.tool_call_id) or {}))
+    return done
 
 
 def _quotes_in(state: Mapping[str, Any]) -> dict[str, int]:

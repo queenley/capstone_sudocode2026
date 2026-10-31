@@ -76,3 +76,28 @@ async def test_previous_call_facts_reach_model_guard_and_both_trace_paths_withou
         customer_text='fixture',state=state,vault=vault,total_ms=1,first_token_ms=1,input_mode='clean')
     assert schema_errors(row)==[]
     assert row['facts_used']==['room_area_m2']
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize('lines,outcome',[
+    (['Chị cần xem xét rồi sẽ gọi lại sau nhé.'],'hen_goi_lai'),
+    (['Hết hàng à? Thôi khỏi em, chị không lấy nữa.'],'tu_choi'),
+    (['Thôi để chị xem lại.'],'tu_choi'),
+    (['Để chị gọi lại sau.','Thôi chị không mua nữa đâu.'],'tu_choi'),
+    (['Thôi không mua đâu.','À mà em gọi lại cho chị tuần sau nhé.'],'hen_goi_lai'),
+    (['Thôi chị gọi lại sau.'],'hen_goi_lai'),
+    (['Máy này giá bao nhiêu em?'],None),
+    (['Thôi không sao em, giao chậm cũng được.'],None),
+])
+async def test_outcome_from_the_customers_last_word(lines,outcome):
+    transcript=[{'speaker':'customer','turn':n,'text':text} for n,text in enumerate(lines,1)]
+    found={c.slot:c.value for c in await MemoryAgent(use_model=False).extract(transcript,[],on='2026-10-21')}
+    assert found.get('outcome')==outcome
+
+
+@pytest.mark.asyncio
+async def test_a_tool_outcome_wins_over_words():
+    transcript=[{'speaker':'customer','turn':1,'text':'Thôi khỏi.'},{'speaker':'customer','turn':2,'text':'À thôi lên đơn cho chị.'}]
+    tools=[{'name':'order.create','turn':2,'args':{'sku':'SKU-AP-Y'},'result':{'ok':True,'data':{'order_id':'OD1'}}}]
+    found={c.slot:c.value for c in await MemoryAgent(use_model=False).extract(transcript,tools,on='2026-10-21')}
+    assert found['outcome']=='chot_don'

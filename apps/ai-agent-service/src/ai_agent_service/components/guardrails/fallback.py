@@ -26,6 +26,9 @@ LINES = {
     # Section 4.8: said once as a tool round starts, so the line is not silent;
     # never the answer, never in the transcript, never counted as the first token.
     "filler": "Dạ {who} chờ em một xíu ạ.",
+    # A turn whose order was placed and whose read-back was still blocked: the customer must not
+    # hear "chưa có thông tin" about an order that exists.
+    "order_placed": "Dạ em đã tạo đơn cho {who} rồi ạ, {who} cần đổi gì trong đơn thì báo em nhé.",
 }
 
 #: Per lane; a lane not listed gets SAFE_LINE.

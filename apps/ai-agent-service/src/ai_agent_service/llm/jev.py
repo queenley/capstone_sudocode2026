@@ -182,7 +182,7 @@ async def evaluate(
         raise JevUnavailable("NO_KEY", f"{PROVIDER_ENV_VAR.get(provider, provider)} is not set")
     typesafe = config.get("api") == "typesafe"
 
-    limiter = limiter_for(provider, config["rate_limits"])
+    limiter = limiter_for(provider, config["rate_limits"], config["model"])
     if not await limiter.aacquire(blocking=False):
         raise JevUnavailable("THROTTLED", "no slot in the local rate limit")
 

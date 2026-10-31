@@ -25,7 +25,7 @@ from typing import Any, Literal
 
 import yaml
 from dotenv import load_dotenv
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 logger = logging.getLogger(__name__)
@@ -201,14 +201,36 @@ class AgentModel(BaseModel):
     generation: Generation = Field(default_factory=Generation)
 
 
+class ModelChoice(BaseModel):
+    """A provider and one of its models, nothing else."""
+
+    model_config = {"extra": "forbid"}
+
+    provider: str
+    model: str
+
+
 class Profile(BaseModel):
-    """One model for a set of agents, chosen by ``AGENT_PROFILE`` (a laptop on a free key)."""
+    """One model for a set of agents, chosen by ``AGENT_PROFILE`` (a laptop on a free key).
+
+    ``overrides`` gives an agent a model of its own instead: a free tier
+    counts requests per model and per day, so an agent that makes many calls
+    can spend another model's quota.
+    """
 
     model_config = {"extra": "forbid"}
 
     provider: str
     model: str
     agents: list[str] = Field(min_length=1)
+    overrides: dict[str, ModelChoice] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def _one_model_per_agent(self) -> "Profile":
+        both = sorted(set(self.agents) & set(self.overrides))
+        if both:
+            raise ValueError(f"{', '.join(both)} listed both in agents and in overrides; keep one")
+        return self
 
 
 #: Names the profile of ``config/models.yaml`` this process runs under; unset runs the file as written.
@@ -364,7 +386,7 @@ class ModelsConfig(BaseModel):
         }
 
     def agent(self, name: str) -> AgentModel:
-        """The routing of agent *name*, with the active profile's model when the profile lists it."""
+        """The routing of agent *name*, with the active profile's model when the profile lists or overrides it."""
         try:
             routing = self.agents[name]
         except KeyError:
@@ -374,7 +396,12 @@ class ModelsConfig(BaseModel):
                 f"Configured agents: {known}"
             ) from None
         profile = self.profile()
-        if profile is not None and name in profile.agents:
+        if profile is None:
+            return routing
+        if name in profile.overrides:
+            own = profile.overrides[name]
+            return routing.model_copy(update={"provider": own.provider, "model": own.model})
+        if name in profile.agents:
             return routing.model_copy(update={"provider": profile.provider, "model": profile.model})
         return routing
 
