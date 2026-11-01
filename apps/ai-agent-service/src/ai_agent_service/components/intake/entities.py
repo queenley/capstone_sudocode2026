@@ -2,37 +2,13 @@
 from __future__ import annotations
 
 from collections import Counter
-from datetime import datetime
 from decimal import Decimal, InvalidOperation
 import re
 import unicodedata
 from . import itn
+from .commerce import commerce, scenario_entities, VERSION as COMMERCE_EXTRACTOR_VERSION
 
 EXTRACTOR_VERSION = 'asr-entities-v2'
-
-
-def commerce(text: str) -> dict:
-    """Existing data-generation rules, now usable by the runtime/evaluator without that package."""
-    plain = itn.normalise(text.lower(), datetime(2026, 1, 1))
-    found = {}
-    money = r'(\d[\d.,]*)\s*(?:đ|đồng|vnđ|vnd)'
-    for key, cue in [('budget_vnd', r'ngân sách[^.?!]*?'), ('competitor_price_vnd', r'(?:bên kia|chỗ khác|nơi khác|rẻ hơn)[^.?!]*?'),
-                     ('price_vnd', r'giá[^.?!]*?')]:
-        match = re.search(cue + money, plain)
-        if match:
-            found[key] = int(re.sub(r'[.,]', '', match.group(1)))
-    area = re.search(r'(\d+)\s*(?:mét vuông|m2|m²)', plain)
-    if area:
-        found['room_area_m2'] = int(area.group(1))
-    if re.search(r'không (?:có )?(?:trẻ|con nhỏ|em bé|bé)', plain):
-        found['has_children'] = False
-    elif re.search(r'(?:có|nhà có) (?:trẻ|con nhỏ|em bé|bé)', plain):
-        found['has_children'] = True
-    if re.search(r'\bcod\b|thu hộ|nhận hàng.*trả tiền', plain):
-        found['payment'] = 'COD'
-    elif re.search(r'chuyển khoản|banking', plain):
-        found['payment'] = 'bank'
-    return found
 
 
 # Freeze this vocabulary independently of any reference/hypothesis pair. Only explicit units are interpreted.

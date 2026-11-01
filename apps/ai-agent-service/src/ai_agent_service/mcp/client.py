@@ -59,6 +59,17 @@ SERVERS: dict[str, str] = {
     "account": "ai_agent_service.mcp.servers.account",
 }
 
+# Only start servers containing business tools this role may use. In particular,
+# a memory writer must not load six Python processes and another embedding model.
+SERVER_ROLES: dict[str, frozenset[str]] = {
+    "memory": ROLES,
+    "catalog": frozenset({"advisor", "harness"}),
+    "crm": frozenset({"advisor", "harness"}),
+    "order": frozenset({"advisor", "harness"}),
+    "knowledge": frozenset({"harness", "admin"}),
+    "account": frozenset({"advisor"}),
+}
+
 #: Server name -> (environment variable naming its URL, default port) over HTTP.
 HTTP_URLS: dict[str, tuple[str, int]] = {
     "memory": ("MCP_MEMORY_URL", 8801),
@@ -108,6 +119,8 @@ def client_group(role: str, *, mode: str | None = None) -> ClientGroup:
 
     clients: dict[str, Client] = {}
     for name, module in SERVERS.items():
+        if role not in SERVER_ROLES[name]:
+            continue
         if mode == "stdio":
             transport = StdioTransport(
                 command=sys.executable,
@@ -117,9 +130,9 @@ def client_group(role: str, *, mode: str | None = None) -> ClientGroup:
                 # the one variable that names its role.
                 env={**os.environ, ROLE_ENV: role, "PYTHONPATH": _child_pythonpath()},
                 cwd=str(ROOT),
-                # One subprocess for the life of this client, not one per
-                # call. Each tool call opens a session over it.
-                keep_alive=True,
+                # The adapter holds the connection for its lifetime. On a
+                # failed handshake/shutdown, release the subprocess as well.
+                keep_alive=False,
                 log_file=Path(log_file) if log_file else None,
             )
         elif mode == "http":
@@ -128,7 +141,9 @@ def client_group(role: str, *, mode: str | None = None) -> ClientGroup:
             transport = StreamableHttpTransport(url, headers={ROLE_HEADER: role})
         else:
             raise ValueError(f"MCP_TRANSPORT must be stdio or http, not {mode!r}")
-        clients[name] = Client(transport)
+        # Both our servers and the adapter support the initialize handshake;
+        # avoid auto-probing a modern session then retrying initialize on it.
+        clients[name] = Client(transport, mode="legacy")
     return ClientGroup(clients)
 
 

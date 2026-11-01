@@ -67,6 +67,20 @@ def test_alignment_and_unicode_normalization():
     assert asr.normalize("CHA\u0300O, chị! 5 triệu.") == "chào chị 5 triệu"
 
 
+def test_commerce_replay_records_contract_names_and_instrument_without_gold_access(tmp_path):
+    folder = fixture(tmp_path, [{'id': 'one', 'full_text': 'màu trắng', 'entities': {'color': 'trang'}}],
+                     {'one': {'text': 'màu đen'}})
+    before = (folder / 'ground_truth.json').read_bytes()
+    report = asr.evaluate(folder, None, tmp_path / 'out')
+    assert report['main_scorer']['raw']['entity_accuracy'] == 0
+    assert report['manifest']['commerce_extractor']['version'] == 'scenario-commerce-v5'
+    assert report['manifest']['generated_entity_samples'] == 1
+    hypotheses = json.loads((tmp_path / 'out/raw/hypotheses.json').read_text())
+    assert hypotheses['one']['entities'] == {'color': 'den'}
+    assert hypotheses['one']['scenario_entities'] == {'color': 'den'}
+    assert (folder / 'ground_truth.json').read_bytes() == before
+
+
 def test_audio_reader_resamples_real_stereo_pcm_and_unlabelled_quality_stays_unknown(tmp_path, monkeypatch):
     import numpy as np
     import soundfile as sf

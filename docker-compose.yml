@@ -187,6 +187,7 @@ services:
       VOICE_GENDER: ${VOICE_GENDER:-female}
       VOICE_DEFAULT_REGION: ${VOICE_DEFAULT_REGION:-bac}
       # Where calls are recognised: the asr-service container, or a GPU host elsewhere.
+      ASR_DENOISER: ${ASR_DENOISER:-none}
       ASR_URL: ${ASR_URL:-http://asr-service:8500}
       ASR_API_KEY: ${ASR_API_KEY:-}
       # Phone hotline (profile "hotline"): the bridge proves itself with this key to pass the caller's number.

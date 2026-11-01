@@ -163,7 +163,10 @@ async def voice_proxy(websocket: WebSocket, conversation_id: str):
     try:
         upstream = await websockets.connect(url, max_size=MAX_FRAME, max_queue=8, open_timeout=5)
     except (OSError, websockets.WebSocketException):
-        await websocket.close(code=1011, reason="Upstream service is unavailable")
+        try:
+            await websocket.close(code=1011, reason="Upstream service is unavailable")
+        except (RuntimeError, WebSocketDisconnect):
+            pass  # the browser may disconnect while upstream is connecting
         return
 
     async def client_to_upstream():
@@ -201,7 +204,7 @@ async def voice_proxy(websocket: WebSocket, conversation_id: str):
         await upstream.close()
         try:
             await websocket.close(code=code)
-        except RuntimeError:
+        except (RuntimeError, WebSocketDisconnect):
             pass  # the browser already went away
 
 

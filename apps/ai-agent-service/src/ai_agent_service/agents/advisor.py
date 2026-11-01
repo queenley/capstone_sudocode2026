@@ -57,15 +57,16 @@ from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import BaseTool
 
 from ..components.context.budget import Section, assemble
-from ..components.guardrails import actions
+from ..components.guardrails import actions, purchase
 from ..components.memory.brief import BriefLine
 from ..components.intake import pii
 from ..components.intake.itn import format_vnd
+from ..components.intake.text import plain
 from ..config.config_manager import get_lanes, load_prompt, load_prompt_yaml
 from ..llm import tracing
 from ..llm.callback_handler import text_of
 from ..mcp.client import dotted
-from ..mcp.tools import LaneToolsMiddleware, ToolGuardMiddleware, envelope_of, parse_envelope
+from ..mcp.tools import LaneToolsMiddleware, ToolGuardMiddleware, envelope_of, parse_envelope, order_arguments
 from .base import BaseAgent
 
 logger = logging.getLogger(__name__)
@@ -150,6 +151,7 @@ class AgentContext:
     customer_said: str | None = None
     last_agent_said: str | None = None
     deletion_asked: bool | None = None
+    pending_purchase: Mapping[str, Any] | None = None
 
 
 @dataclass
@@ -398,6 +400,15 @@ class ActionGuardMiddleware(AgentMiddleware):
             shared_phone=context.shared_phone, created=(*context.created_orders, *_created_in(state)),
             updated=_updated_in(state, context.tool_results),
         )
+        if verdict.passed and name == "order_create":
+            business_args = order_arguments(args, context)
+            if not purchase.matches(context.pending_purchase, business_args, context):
+                details = {} if purchase.NO.search(plain(context.customer_said or "")) else {
+                    "purchase_draft": purchase.draft(business_args, context)}
+                envelope = {"ok": False, "error": {"code": "CONFIRMATION_REQUIRED", "retryable": False,
+                    "message": "Đọc lại đúng đơn và đợi khách xác nhận trong phiên này trước khi tạo đơn.", "details": details}}
+                return ToolMessage(content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=name,
+                                   additional_kwargs={"args": args, "blocked_by": "guardrail"})
         if not verdict.passed:
             envelope = {"ok": False, "error": {"code": "PRECONDITION", "retryable": False, "message": " ".join(verdict.reasons)}}
             return ToolMessage(
@@ -570,7 +581,7 @@ class AdvisorAgent(BaseAgent):
                     fresh = [m for update in chunk.values() if isinstance(update, dict) for m in update.get("messages") or []]
                     produced.extend(fresh)
                     if any(isinstance(m, ToolMessage) for m in fresh):
-                        yield AdvisorEvent("tools", results=tuple(tool_results_of(produced)))
+                        yield AdvisorEvent("tools", results=tuple(tool_results_of(produced)), draft=self._draft_of(produced, started))
                     continue
                 message, meta = chunk
                 # A model that streams sends chunks; one that does not sends its

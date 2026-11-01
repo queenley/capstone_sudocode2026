@@ -122,6 +122,7 @@ class HotState(TurnInput, total=False):
     #: The orders this call created, ``{order_id, sku}``: what a later turn
     #: corrects with ``order.update`` instead of booking the product again.
     created_orders: list[dict[str, Any]]
+    pending_purchase: dict[str, Any] | None
     deletion_recorded: bool
     deletion_awaiting_for: str | None
     #: How a customer not yet known calls themselves (anh, chị, cô, chú, bác),

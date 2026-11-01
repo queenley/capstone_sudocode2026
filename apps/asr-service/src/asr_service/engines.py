@@ -40,6 +40,9 @@ class Transcript:
     text: str
     seconds: float  # decoding time
     audio_seconds: float
+    denoise_seconds: float = 0.0
+    decoder_seconds: float | None = None
+    preprocessing: dict | None = None
 
     @property
     def rtf(self) -> float:
@@ -225,6 +228,7 @@ def metadata(name: str) -> dict:
                {"decoding_method": "CTC greedy", "streaming": False, "language_model": None})
     return {"model": name, "device": DEVICE, "threads": THREADS, "packages": packages, "decoder_options": options,
             "artifact": json.loads(path.read_text()) if path.is_file() else None,
+            "implementation_sha256": __import__("hashlib").sha256(Path(__file__).read_bytes()).hexdigest(),
             "hotwords_supported": name in {"phowhisper-small", "whisper-turbo"}}
 
 
@@ -254,3 +258,19 @@ def transcribe(name: str, samples: np.ndarray, hotwords: list[str] | None = None
         text = _loaded[name].transcribe(samples, hotwords or [])
         seconds = time.perf_counter() - started
     return Transcript(name, text, seconds, len(samples) / RATE)
+
+
+def recognize(name: str, samples: np.ndarray, hotwords: list[str] | None = None, *, denoiser: str = "none") -> Transcript:
+    """Shared HTTP/WS/local path; timing includes waveform preprocessing and decode, excluding load."""
+    from . import denoise
+    denoise.validate(denoiser)
+    if denoiser == "none":
+        return transcribe(name, samples, hotwords)
+    load(name)
+    metadata = denoise.metadata(denoiser)
+    started = time.perf_counter()
+    cleaned = denoise.process(samples, denoiser)
+    preprocessing_seconds = time.perf_counter() - started
+    result = transcribe(name, cleaned, hotwords)
+    return Transcript(result.model, result.text, result.seconds + preprocessing_seconds, result.audio_seconds,
+                      preprocessing_seconds, result.seconds, metadata)

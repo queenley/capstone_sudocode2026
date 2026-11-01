@@ -46,6 +46,7 @@ from typing import Any, Iterable, Mapping
 from langchain.agents.middleware import AgentMiddleware
 from langchain_core.messages import ToolMessage
 from ..components.intake import pii
+from ..components.guardrails import purchase
 from ..components.intake.text import plain
 
 logger = logging.getLogger(__name__)
@@ -286,6 +287,17 @@ class ToolGuardMiddleware(AgentMiddleware):
         call_id = getattr(context, "call_id", None)
         if "call_id" in accepted:
             args["call_id"] = str(call_id) if call_id is not None else None
+        if name == "order_create":
+            business_args = order_arguments(args, context)
+            for field in ("call_id", "turn_id", "purchase_authorization"):
+                args.pop(field, None)
+            if "call_id" in accepted:
+                args["call_id"] = str(context.call_id)
+            if "turn_id" in accepted:
+                args["turn_id"] = context.turn_id
+            if "purchase_authorization" in accepted:
+                args["purchase_authorization"] = purchase.receipt(
+                    getattr(context, "pending_purchase", None), business_args, context)
         if name in WRITE_TOOLS and IDEMPOTENCY_ARG in accepted:
             key = idempotency_key(context, name, args)
             if key:
@@ -332,6 +344,22 @@ def declared_defaults(schema: Mapping[str, Any], *, exclude: Iterable[str] = ())
     }
 
 
+def order_arguments(args: Mapping[str, Any], context: Any) -> dict[str, Any]:
+    """Resolve exactly the same business payload before consent and before MCP dispatch."""
+    order = dict(args)
+    address = order.get("address")
+    if isinstance(address, str) and NO_ADDRESS.search(plain(address)):
+        address = None
+    addresses = getattr(context, "addresses", None) or {}
+    vault = getattr(context, "vault", None)
+    if vault is not None:
+        addresses = {**addresses, **{token: value for token, (kind, value) in vault.entries.items() if kind == "ADDR"}}
+    order["address"] = with_addresses(address, addresses) if addresses else address
+    order["customer_phone"] = context.customer_phone
+    order["on"] = context.on
+    return purchase.payload(order)
+
+
 def idempotency_key(context: Any, name: str, args: Mapping[str, Any]) -> str | None:
     """``<call>:<turn>:<tool>:<hash of the arguments>``, or None without a call and a turn.
 
@@ -342,6 +370,8 @@ def idempotency_key(context: Any, name: str, args: Mapping[str, Any]) -> str | N
     turn_id = getattr(context, "turn_id", None)
     if not call_id or not turn_id:
         return None
+    if name == "order_create":
+        return purchase.order_key(str(call_id), args)
     payload = json.dumps({k: v for k, v in args.items() if k != IDEMPOTENCY_ARG},
                          ensure_ascii=False, sort_keys=True, default=str)
     digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
@@ -358,7 +388,7 @@ def with_args(result: Any, args: Mapping[str, Any]) -> Any:
     """
     if not isinstance(result, ToolMessage):
         return result
-    return result.model_copy(update={"additional_kwargs": {**result.additional_kwargs, "args": dict(args)}})
+    return result.model_copy(update={"additional_kwargs": {**result.additional_kwargs, "args": {k: v for k, v in args.items() if k != "purchase_authorization"}}})
 
 
 def visible_result(result: Any, request: Any) -> Any:

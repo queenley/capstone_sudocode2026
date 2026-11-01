@@ -141,7 +141,12 @@ def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes
         reasons.append(f"Chưa có báo giá hôm nay cho {sku}; gọi pricing_get_quote trước.")
     elif int(price) != quotes[sku]:
         reasons.append(f"price_vnd {format_vnd(int(price))} khác giá hôm nay của {sku} là {format_vnd(quotes[sku])}.")
-    qty = int(args.get("qty") or 1)
+    quantity = args.get("qty", 1)
+    if quantity is None:
+        quantity = 1
+    if not isinstance(quantity, int) or isinstance(quantity, bool) or quantity < 1:
+        return reasons + ["Số lượng phải là số nguyên dương."]
+    qty = quantity
     if (args.get("payment") or "COD") == "COD" and int(price) * qty > COD_LIMIT_VND:
         reasons.append(f"Đơn COD {format_vnd(int(price) * qty)} vượt giới hạn {format_vnd(COD_LIMIT_VND)}; "
                        "đề nghị chuyển khoản hoặc tách đơn.")

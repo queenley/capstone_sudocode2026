@@ -2,8 +2,9 @@
 from ai_agent_service.agents.advisor import HARD_RULES
 
 
-def test_order_is_created_when_customer_asks_to_place_it():
-    assert "gọi order_create ngay trong lượt" in HARD_RULES
+def test_order_is_prepared_then_requires_confirmation_of_the_exact_payload():
+    assert "CONFIRMATION_REQUIRED" in HARD_RULES
+    assert "mới gọi lại order_create với nguyên payload" in HARD_RULES
     assert "tự lấy từ catalog_search" in HARD_RULES
 
 

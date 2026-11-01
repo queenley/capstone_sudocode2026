@@ -108,6 +108,7 @@ def parser() -> argparse.ArgumentParser:
     parser.add_argument("--asr-hypotheses", type=Path, help="Existing hypotheses; no model/API calls.")
     parser.add_argument("--asr-transcribe", action="store_true", help="Explicitly decode existing audio with local ASR; never downloads weights.")
     parser.add_argument("--asr-model", default="zipformer-30m")
+    parser.add_argument("--asr-denoiser", choices=["none", "rnnoise"], default="none")
     parser.add_argument("--asr-entity-review", type=Path, help="Versioned canonical entity labels; pending review stays diagnostic, never self-approved.")
     parser.add_argument("--provider", help="The advisor's provider, overriding config/models.yaml.")
     parser.add_argument("--model", help="The advisor's model, overriding config/models.yaml.")
@@ -130,18 +131,18 @@ def main(argv: Sequence[str] | None = None) -> int:
                 asr.private_output(out)
                 source = prepare(args.asr_package, out / "input", unit=args.asr_unit, only=set(args.only) or None)
                 result = asr.evaluate(source, args.asr_hypotheses, out / "result", model=args.asr_model,
-                                      transcribe=args.asr_transcribe, entity_review=args.asr_entity_review)
+                                      transcribe=args.asr_transcribe, entity_review=args.asr_entity_review, denoiser=args.asr_denoiser)
                 print(json.dumps({"status": result["status"], "main_scorer": result["main_scorer"], "out": str(out)}, ensure_ascii=False, indent=2))
                 return 0 if result["status"] == "COMPLETE" else 1
             if args.asr_audio:
                 if args.asr or args.asr_hypotheses or args.asr_entity_review or not args.asr_transcribe:
                     raise ValueError("--asr-audio requires --asr-transcribe and no reference/hypotheses options")
-                result = asr.audio_smoke(args.asr_audio, out, args.asr_model)
+                result = asr.audio_smoke(args.asr_audio, out, args.asr_model, args.asr_denoiser)
                 print(json.dumps(result, ensure_ascii=False, indent=2))
                 print(f"Private evidence: {out}")
                 return 0
             result = asr.evaluate(args.asr, args.asr_hypotheses, out, model=args.asr_model,
-                                  transcribe=args.asr_transcribe, only=set(args.only) or None, entity_review=args.asr_entity_review)
+                                  transcribe=args.asr_transcribe, only=set(args.only) or None, entity_review=args.asr_entity_review, denoiser=args.asr_denoiser)
         except (ValueError, OSError, RuntimeError, ImportError) as error:
             print(f"ASR setup error: {error}")
             return 2

@@ -24,6 +24,10 @@ COPY apps/asr-service/requirements.txt ./
 RUN grep -v '^sherpa-onnx' requirements.txt > requirements-gpu.txt \
     && pip install --no-cache-dir -r requirements-gpu.txt \
     && pip install --no-cache-dir "sherpa-onnx==1.13.8+cuda" -f https://k2-fsa.github.io/sherpa/onnx/cuda.html
+ARG INSTALL_DENOISER=0
+COPY apps/asr-service/requirements-denoise.txt ./
+RUN if [ "$INSTALL_DENOISER" = "1" ]; then pip install --no-cache-dir --no-deps -r requirements-denoise.txt; fi
+COPY THIRD_PARTY_NOTICES/RNNoise.txt /app/THIRD_PARTY_NOTICES/RNNoise.txt
 COPY apps/asr-service/src/ /app/src/
 
 RUN useradd --create-home app && mkdir -p /models && chown -R app:app /app /models

@@ -58,6 +58,9 @@ async def order_create(
     customer_phone: str | None = None,
     on: str | None = None,
     idempotency_key: str | None = None,
+    call_id: str | None = None,
+    turn_id: str | None = None,
+    purchase_authorization: str | None = None,
 ) -> dict[str, Any]:
     """Place an order once the customer has agreed to buy.
 
@@ -77,10 +80,14 @@ async def order_create(
         customer_phone: Set by the system; leave it out.
         on: The day of the call. Set by the system; leave it out.
         idempotency_key: Set by the system; leave it out.
+        call_id: Set by the system; leave it out.
+        turn_id: Set by the system; leave it out.
+        purchase_authorization: Signed consent supplied by the system; leave it out.
     """
     m = btc.mock()
     return await btc.call(
         "order.create", m.order_create, idempotency_key=idempotency_key,
+        call_id=call_id, turn_id=turn_id, purchase_authorization=purchase_authorization,
         customer_phone=customer_phone, sku=sku, qty=qty, price_vnd=price_vnd,
         promo_code=promo_code, payment=payment, address=address, on=on or btc.reference_date(),
     )

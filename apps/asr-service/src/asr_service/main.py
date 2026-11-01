@@ -41,7 +41,8 @@ import numpy as np
 from fastapi import Depends, FastAPI, HTTPException, Query, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
 
-from . import engines, fetch
+from . import engines, fetch, denoise
+from typing import Literal
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("asr-service")
@@ -141,7 +142,10 @@ def _samples(body: bytes) -> np.ndarray:
 
 def _result(transcript: engines.Transcript) -> dict[str, Any]:
     return {"text": transcript.text, "model": transcript.model, "seconds": round(transcript.seconds, 3),
-            "audio_seconds": round(transcript.audio_seconds, 3), "rtf": round(transcript.rtf, 3)}
+            "audio_seconds": round(transcript.audio_seconds, 3), "rtf": round(transcript.rtf, 3),
+            "denoise_seconds": getattr(transcript, "denoise_seconds", 0.0),
+            "decoder_seconds": getattr(transcript, "decoder_seconds", None),
+            "preprocessing": getattr(transcript, "preprocessing", None) or {"name": "none", "version": "identity-v1"}}
 
 
 @app.post("/v1/transcribe", dependencies=[Depends(require_key)])
@@ -149,6 +153,7 @@ async def transcribe(
     request: Request,
     model: str = Query("zipformer-30m", max_length=64),
     hotwords: str = Query("", max_length=2000),
+    denoiser: Literal["none", "rnnoise"] = "none",
 ) -> dict[str, Any]:
     body = bytearray()
     async for chunk in request.stream():
@@ -158,13 +163,15 @@ async def transcribe(
     samples = _samples(bytes(body))
     words = [word.strip() for word in hotwords.split(",") if word.strip()]
     try:
-        transcript = await asyncio.to_thread(engines.transcribe, model, samples, words)
+        transcript = await asyncio.to_thread(engines.recognize, model, samples, words, denoiser=denoiser)
     except KeyError as error:
         raise HTTPException(404, str(error)) from error
     except FileNotFoundError as error:
         raise HTTPException(409, "Local model weights missing or incomplete") from error
     except ValueError as error:
         raise HTTPException(422, str(error)) from error
+    except RuntimeError as error:
+        raise HTTPException(503, "Optional denoiser unavailable; check local installation") from error
     return _result(transcript)
 
 
@@ -174,7 +181,9 @@ async def transcribe(
 class Stream:
     """One caller's audio as it arrives: partials while they speak, a final on "end"."""
 
-    def __init__(self, model: str, sample_rate: int, hotwords: list[str], partial_ms: int) -> None:
+    def __init__(self, model: str, sample_rate: int, hotwords: list[str], partial_ms: int, denoiser: str = "none") -> None:
+        denoise.validate(denoiser)
+        self.denoiser = denoiser
         self.model, self.hotwords = model, hotwords
         self.partial_every = max(0.2, partial_ms / 1000) * engines.RATE
         self.resampler = None
@@ -249,18 +258,20 @@ async def stream(ws: WebSocket, token: str = "") -> None:
                 or len(words) > 100 or any(not isinstance(w, str) or len(w) > 100 for w in words)):
             raise ValueError("Invalid sample rate, partial interval or hotwords")
         await asyncio.to_thread(engines.load, model)
-        session = Stream(model, rate, words, partial_ms)
+        denoiser = config.get("denoiser", "none")
+        await asyncio.to_thread(denoise.metadata, denoiser)
+        session = Stream(model, rate, words, partial_ms, denoiser)
     except WebSocketDisconnect:
         return
-    except (KeyError, ValueError, TypeError, OverflowError, FileNotFoundError, asyncio.TimeoutError):
+    except (KeyError, ValueError, TypeError, OverflowError, FileNotFoundError, RuntimeError, asyncio.TimeoutError):
         await ws.send_text(json.dumps({"type": "error", "text": "ASR configuration or local weights are unavailable"}))
         await ws.close(code=4400)
         return
-    await send({"type": "ready", "model": model, "device": engines.DEVICE})
+    await send({"type": "ready", "model": model, "device": engines.DEVICE, "denoiser": session.denoiser})
 
     async def partial(audio: np.ndarray, generation: int) -> None:
         try:
-            transcript = await asyncio.to_thread(engines.transcribe, session.model, audio, session.hotwords)
+            transcript = await asyncio.to_thread(engines.recognize, session.model, audio, session.hotwords, denoiser=session.denoiser)
         except Exception:
             if generation == session.generation:
                 await send({"type": "error", "text": "Local ASR decoding failed"})
@@ -304,7 +315,7 @@ async def stream(ws: WebSocket, token: str = "") -> None:
                 if not audio.size:
                     await send({"type": "final", "text": "", "model": session.model, "seconds": 0, "audio_seconds": 0, "rtf": 0})
                     continue
-                transcript = await asyncio.to_thread(engines.transcribe, session.model, audio, session.hotwords)
+                transcript = await asyncio.to_thread(engines.recognize, session.model, audio, session.hotwords, denoiser=session.denoiser)
                 await send({"type": "final", **_result(transcript)})
             elif control.get("type") == "reset":
                 if session.decoding is not None:

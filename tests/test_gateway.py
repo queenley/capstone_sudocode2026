@@ -1,5 +1,6 @@
 """Gateway failures and streaming contracts, with an in-memory HTTP upstream."""
 import importlib.util
+import asyncio
 import os
 from uuid import uuid4
 from pathlib import Path
@@ -7,6 +8,9 @@ from pathlib import Path
 import httpx
 import pytest
 from fastapi.testclient import TestClient
+from fastapi import WebSocketDisconnect
+from unittest.mock import AsyncMock
+from types import SimpleNamespace
 
 
 @pytest.fixture
@@ -77,6 +81,35 @@ def test_stream_is_forwarded_without_reformatting(gateway):
     result = client.post("/api/conversations/example/stream", json={})
     assert result.content == data
     assert result.headers["content-type"].startswith("text/event-stream")
+
+
+def test_voice_proxy_releases_upstream_when_browser_has_already_disconnected(gateway, monkeypatch):
+    module, _ = gateway
+
+    class Upstream:
+        close_code = 1000
+        close = AsyncMock()
+
+        async def __aiter__(self):
+            await asyncio.Event().wait()
+            yield "never"
+
+    upstream_ws = Upstream()
+    monkeypatch.setattr(module.websockets, "connect", AsyncMock(return_value=upstream_ws))
+    browser = SimpleNamespace(
+        accept=AsyncMock(), receive=AsyncMock(return_value={"type": "websocket.disconnect"}),
+        close=AsyncMock(side_effect=WebSocketDisconnect(1006)),
+    )
+    asyncio.run(module.voice_proxy(browser, "fixture"))
+    upstream_ws.close.assert_awaited_once()
+
+
+def test_voice_proxy_tolerates_browser_leaving_while_upstream_is_unavailable(gateway, monkeypatch):
+    module, _ = gateway
+    monkeypatch.setattr(module.websockets, "connect", AsyncMock(side_effect=OSError("unavailable")))
+    browser = SimpleNamespace(accept=AsyncMock(), close=AsyncMock(side_effect=WebSocketDisconnect(1006)))
+    asyncio.run(module.voice_proxy(browser, "fixture"))
+    browser.close.assert_awaited_once_with(code=1011, reason="Upstream service is unavailable")
 
 
 @pytest.mark.skipif(not os.environ.get("TEST_REDIS_URL"), reason="Requires local TEST_REDIS_URL")

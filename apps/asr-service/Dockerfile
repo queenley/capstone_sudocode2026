@@ -10,6 +10,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
 WORKDIR /app
 COPY apps/asr-service/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
+ARG INSTALL_DENOISER=0
+COPY apps/asr-service/requirements-denoise.txt ./
+RUN if [ "$INSTALL_DENOISER" = "1" ]; then pip install --no-cache-dir --no-deps -r requirements-denoise.txt; fi
+COPY THIRD_PARTY_NOTICES/RNNoise.txt /app/THIRD_PARTY_NOTICES/RNNoise.txt
 COPY apps/asr-service/src/ /app/src/
 
 RUN useradd --create-home app && mkdir -p /models && chown -R app:app /app /models

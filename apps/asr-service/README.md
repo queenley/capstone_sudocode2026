@@ -84,3 +84,22 @@ PYTHONPATH=apps/asr-service/src python -m asr_service.fetch --model zipformer-30
 `GET /v1/models/{name}/artifact` trả source revision, checksum và cấu hình decoder; inference/adapter dùng cùng contract cho web voice và `run_eval.py`. VieGem hỗ trợ tối đa 30 s một utterance trong adapter; runner WAV dài cắt theo waveform tối đa 20 s. Service vẫn giới hạn 120 s/request; model có giới hạn nhỏ hơn trả 422. Giao thức partial hiện giải mã lại prefix, chưa phải native streaming VieGem.
 
 VieGem: CC-BY-NC-SA-4.0 và điều khoản Gemma, chỉ dùng nghiên cứu phi thương mại theo model card. Hướng dẫn đo, không suy diễn SNR/DER/entity gold và các giới hạn: [ASR local](../../docs/evaluation/asr-local.md).
+
+## Neural denoiser tùy chọn
+
+Mặc định vẫn `zipformer-30m` greedy và `denoiser=none`. RNNoise là neural noise suppression, không phải acoustic echo cancellation; giữ AEC và xử lý echo của web như trước.
+
+```sh
+# Đã cài requirements.txt; chỉ cần native wheel, không dùng wrapper audiolab/AV.
+python -m pip install --no-deps -r apps/asr-service/requirements-denoise.txt
+# Docker CPU/GPU: thêm --build-arg INSTALL_DENOISER=1 khi build image ASR.
+```
+
+- HTTP: `POST /v1/transcribe?model=zipformer-30m&denoiser=rnnoise`.
+- WebSocket: thêm `"denoiser":"rnnoise"` vào frame config. Bỏ trường này thì tắt. Partials dùng offline recognizer nên xử lý lại prefix từ đầu; mỗi prefix/utterance có state lọc mới.
+- Agent web: đặt `ASR_DENOISER=rnnoise` trong môi trường ai-agent-service; ASR service phải cài optional wheel. Local in-process cần cài wheel trong venv agent. Không có denoiser/model thì trả lỗi, không tự tải hoặc âm thầm bỏ qua lựa chọn.
+- Benchmark: root `run_eval.py --asr-package ... --asr-transcribe --asr-denoiser rnnoise`; `--asr-denoiser none` là đối chứng.
+
+Input/output giữ float32 mono 16kHz và cùng số sample. RNNoise chạy ở 48kHz, hop480, với resample HQ và bù/flush một hop theo ví dụ v0.2 upstream. API trả `seconds` gồm denoise+ASR, `denoise_seconds`, `decoder_seconds`, `preprocessing` (version và hash binary). Model load và chờ queue/network không nằm trong `seconds`; benchmark ghi thêm wall time. RNNoise không nhận transcript, ground truth hoặc vocabulary entity.
+
+Kết quả/giới hạn trên audio người dùng: [so sánh neural denoiser](../../docs/evaluation/neural-denoiser-comparison.md).

@@ -40,6 +40,7 @@ COPY config/prompts/agent/ /app/agent/prompts/
 # The agent's voices by region for VOICE_TTS=elevenlabs: (one file, shared with create_data).
 COPY evaluation/data-generation/config/voices.yaml /app/agent/config/voices.yaml
 COPY apps/ai-agent-service/data/btc/ /app/agent/data/btc/
+COPY contracts/scenario/scenario-keys.yaml /app/agent/contracts/scenario/scenario-keys.yaml
 COPY apps/ai-agent-service/data/kb/ /app/agent/data/kb/
 
 RUN useradd --create-home app && mkdir -p /app/models /app/agent/runs \

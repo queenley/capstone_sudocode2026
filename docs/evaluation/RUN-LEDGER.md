@@ -335,3 +335,16 @@ Các hash report/diagnostics/log và toàn bộ provenance ở `new-v5-result.js
 `new-v7-result.json` chứa paired reports v4/v6/v7, proof mọi trường reply/tool/history ngoài nhãn giữ nguyên, error/recovery stats, audit và toàn bộ trace/report/diagnostics/log hash. `v7-protocol.json` khóa instrument/snapshot/cohort/root command; `summary.json` tổng hợp. Mọi file trong `before/`, `after/`, `after-v6/`, `after-v7/` vẫn khớp manifest; source/prompt/contracts live và main scorer/KB/pack vẫn khớp khóa sau run. Toàn bộ **10.378 ledger rows trước v7 không đổi**, gồm mọi pending. Không chạy agent, ASR, Docker, commit/push/deploy.
 
 **Ngân sách v7:** smoke 14 attempts **0,049780408 USD**; cohort 63 attempts **0,228585626 USD**; tổng **77 attempts, 0,278366034 USD**, tất cả đã settle usage, không thêm pending. Cộng v5/v6/v7 của task: **235 requests**, settled mới **0,840702901 USD**, pending v5 giữ nguyên **0,425584 USD**, tổng giữ mới **1,266286901 USD**. Ledger toàn cục: settled **10,790402384 USD**, pending **35,061494405 USD** (88 requests), tổng giữ **45,851896789/50 USD**, headroom **4,148103211 USD**. Không manual settle/reset/tăng cap. Đây là token accounting và dự phòng, chưa phải hóa đơn provider đối soát.
+
+## 01/11/2026 — RNNoise tùy chọn, đối chứng Zipformer greedy
+
+User đã thêm lại `asr_hard_vi` và yêu cầu neural denoiser tùy chọn, so bật/tắt; user chọn nhãn entity diagnostic chờ duyệt. Mặc định giữ `zipformer-30m` greedy + `none`. Không gọi provider trả phí, không ghi/reset budget ledger. Source audio/reference và nhãn riêng nằm ngoài Git.
+
+- Khóa 148 clips từ hai montage, nguyên transcript; 36 clinical terms + số/đơn vị tạo 90 nhãn diagnostic; đóng băng trước inference, không truyền reference/vocabulary cho ASR. Thêm lượt hai montage đầy đủ với segmentation theo waveform, 89 nhãn ordinal (không so trực tiếp với clip-level).
+- Mỗi mode chạy smoke một clip trước cohort; tất cả qua root `run_eval.py --asr-package ... --asr-transcribe --asr-model zipformer-30m --asr-denoiser none|rnnoise`, local CPU 4 threads. Bốn cohort COMPLETE; PCM input và boundaries từng cặp giống hệt nhau. Slice WAV có PEAK timestamp header khác, đã kiểm PCM bitwise bằng nhau; scorer main không đổi.
+- 148 clips: WER 15,9→17,8%; CER 13,1→15,1%; entity diagnostic exact-match 58,9→53,3%; core processing p95 315→1.703 ms. 19 clips tốt hơn, 43 tệ hơn, 86 bằng nhau theo số lỗi từ.
+- Hai montage: WER 17,3→22,6%; CER 14,1→19,1%; entity diagnostic 29,2→27,0%. Tổng processing 28,90→129,62 s cho 1.018,1 s audio, không dùng p95 n=2 làm SLA.
+- RNNoise tiếp tục opt-in; kết luận chỉ áp dụng cho bộ này, không suy ra mọi neural denoiser đều bất lợi. Chưa có clean reference, gold entity được duyệt, test mic/AEC thật hoặc latency study lặp/ngẫu nhiên.
+- 86 tests ASR/voice/pack BTC pass; thêm HTTP smoke native COMPLETE và dừng server tạm. Full suite chung chưa chốt khi luồng EC03 đang cập nhật guard/test độc lập.
+
+Bằng chứng private: `evaluation/runs/20261101-denoiser/{cohort-lock.json,comparison.json,source-used/manifest.json}`, entity-review riêng và mỗi run smoke/segments/montage. Hướng dẫn, số liệu và giới hạn: [neural-denoiser-comparison.md](neural-denoiser-comparison.md). Không chỉnh source ASR hoặc nhãn giữa các conditions; không commit/push/merge trong lượt tích hợp này.

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+from datetime import datetime
 import importlib.util
 import json
 import math
@@ -19,7 +20,7 @@ from ...components.voice.recognition import process
 from ...components.voice.policy import POLICY_VERSION
 from ...components.intake.lexicon import lexicon
 
-METRICS_VERSION = "asr-diagnostics-v1"
+METRICS_VERSION = "asr-diagnostics-v3-dialogue-entities"
 
 
 def normalize(text: str) -> str:
@@ -69,6 +70,61 @@ def _read(path: Path):
 
 def _sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _clock(value, field: str) -> datetime | None:
+    if value is None:
+        return None
+    if not isinstance(value, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+        raise ValueError(f"{field} must be a valid YYYY-MM-DD date")
+    try:
+        return datetime.fromisoformat(value)
+    except ValueError as error:
+        raise ValueError(f"{field} must be a valid YYYY-MM-DD date") from error
+
+
+def _context(prediction: dict, fallback: datetime | None) -> tuple[dict, datetime | None]:
+    context = prediction.get("context", {})
+    if not isinstance(context, dict):
+        raise ValueError("context must be an object")
+    if "speaker" in context and (not isinstance(context["speaker"], str) or not context["speaker"]):
+        raise ValueError("context speaker must be a nonempty string")
+    now = _clock(context.get("call_date"), "context.call_date")
+    return context, now if now is not None else fallback
+
+
+def _predicted_turns(prediction: dict) -> list[dict]:
+    turns = prediction.get("turns", [])
+    if not isinstance(turns, list):
+        raise ValueError("hypothesis turns must be a list")
+    indices = set()
+    for turn in turns:
+        if not isinstance(turn, dict) or not isinstance(turn.get("text"), str):
+            raise ValueError("Each hypothesis turn needs its own text")
+        idx = turn.get("idx")
+        if type(idx) is not int or idx < 0 or idx in indices:
+            raise ValueError("Hypothesis turn idx must be a unique nonnegative integer")
+        indices.add(idx)
+        if "entities" in turn and not isinstance(turn["entities"], dict):
+            raise ValueError("turn entities must be an object")
+        if "speaker" in turn and (not isinstance(turn["speaker"], str) or not turn["speaker"]):
+            raise ValueError("turn speaker must be a nonempty string")
+        if ("start" in turn) != ("end" in turn):
+            raise ValueError("turn start and end must be supplied together")
+        for field in ("start", "end"):
+            if field in turn:
+                value = turn[field]
+                if type(value) not in (int, float) or not math.isfinite(value) or value < 0:
+                    raise ValueError("turn timings must be finite and nonnegative")
+        if "end" in turn and turn["end"] < turn["start"]:
+            raise ValueError("turn end must not precede start")
+        _context(turn, None)
+    return turns
+
+
+def _recognition_values(recognized) -> dict[str, str]:
+    return {"raw": recognized.raw_text, "corrected": recognized.corrected_text,
+            "agent_input": recognized.agent_text}
 
 
 def _grader():
@@ -145,7 +201,7 @@ def audio_windows(samples):
         start = end
 
 
-def decode(path: Path, model: str) -> dict:
+def decode(path: Path, model: str, denoiser: str = "none") -> dict:
     from ...components.voice import asr
     if asr.remote() and urlparse(asr.url()).hostname not in {"localhost", "127.0.0.1", "::1"}:
         raise ValueError("This mode allows local ASR only; no paid/external provider")
@@ -154,15 +210,20 @@ def decode(path: Path, model: str) -> dict:
     started = time.perf_counter()
     chunks = []
     for start, end, chunk in audio_windows(samples):
-        result = asr.transcribe(model, chunk, lexicon().hotwords)
-        chunks.append({"start": start / 16000, "end": end / 16000, "text": result.text, "seconds": result.seconds})
+        result = asr.transcribe(model, chunk, lexicon().hotwords, denoiser=denoiser)
+        chunks.append({"start": start / 16000, "end": end / 16000, "text": result.text, "seconds": result.seconds,
+                       "denoise_seconds": getattr(result, "denoise_seconds", 0.0),
+                       "decoder_seconds": getattr(result, "decoder_seconds", None),
+                       "preprocessing": getattr(result, "preprocessing", None) or {"name": "none"}})
     return {"text": " ".join(c["text"].strip() for c in chunks).strip(), "seconds": sum(c["seconds"] for c in chunks), "model": model,
+            "denoiser": denoiser, "denoise_seconds": sum(c["denoise_seconds"] for c in chunks),
+            "decoder_seconds": sum(c["decoder_seconds"] if c["decoder_seconds"] is not None else c["seconds"] for c in chunks),
             "chunks": chunks, "chunking_version": "energy-min-20s-v1", "load_seconds": load_seconds,
             "model_metadata": asr.metadata(model),
             "wall_seconds": time.perf_counter() - started, **info}
 
 
-def audio_smoke(path: Path, out: Path, model: str) -> dict:
+def audio_smoke(path: Path, out: Path, model: str, denoiser: str = "none") -> dict:
     """Unlabelled audio: transcription/latency only, no invented WER reference."""
     from .cli import runs_dir
     repository = Path(__file__).resolve().parents[6]
@@ -170,7 +231,7 @@ def audio_smoke(path: Path, out: Path, model: str) -> dict:
     if out.is_relative_to(repository) and not out.is_relative_to(runs_dir().resolve()):
         raise ValueError("Write private ASR evidence under evaluation/runs or outside the repository")
     out.mkdir(parents=True, exist_ok=False)
-    result = decode(path, model)
+    result = decode(path, model, denoiser)
     recognition = process(result["text"], lexicon=lexicon())
     report = {"status": "UNLABELLED", "hypothesis": {**result, **recognition.to_dict()},
               "WER": None, "CER": None, "entity_accuracy": None,
@@ -181,8 +242,10 @@ def audio_smoke(path: Path, out: Path, model: str) -> dict:
 
 
 def evaluate(source: Path, hypotheses: Path | None, out: Path, *, model: str = "zipformer-30m",
-             transcribe: bool = False, only: set[str] | None = None, entity_review: Path | None = None) -> dict:
+             transcribe: bool = False, only: set[str] | None = None, entity_review: Path | None = None, denoiser: str = "none") -> dict:
     """Replay provided predictions or explicitly decode existing local audio. Never fetch weights."""
+    if denoiser not in ("none", "rnnoise") or (denoiser != "none" and not transcribe):
+        raise ValueError("Denoiser requires local transcription and a valid option")
     ground_truth = source / "ground_truth.json" if source.is_dir() else source
     document = _read(ground_truth)
     records = document.get("dialogues") if isinstance(document, dict) else None
@@ -195,6 +258,14 @@ def evaluate(source: Path, hypotheses: Path | None, out: Path, *, model: str = "
         raise ValueError("Dialogue IDs must be safe file names (letters, numbers, underscore, dash)")
     if any(not isinstance(record.get("full_text"), str) for record in records):
         raise ValueError("Every dialogue needs full_text; references are never invented")
+    reference_date = _clock(document.get("reference_date"), "reference_date")
+    provenance = document.get("provenance")
+    if document.get("kind") == "turns":
+        extraction_mode, mode_source = "utterance", "document.kind"
+    elif isinstance(provenance, dict) and provenance.get("unit") == "segments":
+        extraction_mode, mode_source = "utterance", "document.provenance.unit"
+    else:
+        extraction_mode, mode_source = "dialogue", "default-dialogue"
     if only and not only.issubset(set(ids)):
         raise ValueError("Unknown --only dialogue ID")
     selected = [record for record in records if not only or record["id"] in only]
@@ -225,6 +296,13 @@ def evaluate(source: Path, hypotheses: Path | None, out: Path, *, model: str = "
     variants = {variant: {} for variant in snapshots}
     rows, failures = [], []
     dictionary = lexicon()
+    from ...components.intake import commerce as commerce_extractor
+    generated_entity_samples = 0
+    entity_provenance = {"mode": extraction_mode, "mode_source": mode_source,
+                         "parent": {"generated": 0, "supplied": 0},
+                         "turns": {"samples": 0, "predicted": 0, "generated": 0, "supplied": 0},
+                         "clocks": {"context.call_date": 0, "document.reference_date": 0,
+                                    "catalogue-default": 0}}
     for record in selected:
         key = record["id"]
         try:
@@ -232,7 +310,7 @@ def evaluate(source: Path, hypotheses: Path | None, out: Path, *, model: str = "
             if transcribe:
                 filename = record.get("audio") or f"audio/{key}.wav"
                 path = (ground_truth.parent / filename).resolve()
-                prediction = decode(path, model)
+                prediction = decode(path, model, denoiser)
                 with (out / "decoded.jsonl").open("a", encoding="utf-8") as stream:
                     stream.write(json.dumps({"id": key, "prediction": prediction}, ensure_ascii=False, allow_nan=False) + "\n")
                 print(f"ASR {model}: {len(rows) + len(failures) + 1}/{len(selected)} {key}", file=sys.stderr, flush=True)
@@ -244,34 +322,71 @@ def evaluate(source: Path, hypotheses: Path | None, out: Path, *, model: str = "
                 value = prediction.get(field)
                 if value is not None and (type(value) not in (int, float) or not math.isfinite(value) or value < 0):
                     raise ValueError("timings must be finite and nonnegative")
-            context = prediction.get("context") or {}
-            if not isinstance(context, dict):
-                raise ValueError("context must be an object")
+            context, now = _context(prediction, reference_date)
+            turns = _predicted_turns(prediction)
             recognized = process(prediction["text"], lexicon=dictionary, busy=context.get("busy") is True,
                                  min_words=2, echo_text=str(context.get("echo_text") or ""))
-            values = {"raw": recognized.raw_text, "corrected": recognized.corrected_text, "agent_input": recognized.agent_text}
-            scored = {}
+            values = _recognition_values(recognized)
+            turn_values = []
+            for turn in turns:
+                turn_context, turn_now = _context(turn, now)
+                turn_recognized = process(turn["text"], lexicon=dictionary, busy=turn_context.get("busy") is True,
+                                          min_words=2, echo_text=str(turn_context.get("echo_text") or ""))
+                turn_values.append((turn, _recognition_values(turn_recognized), turn_now))
+            scored, sample_variants = {}, {}
             for variant, text in values.items():
-                variants[variant][key] = {**prediction, "text": text}
-                if entity_review:
-                    from .asr_entities import predict
-                    variants[variant][key]["entities"] = predict(text, vocabulary, version=entity_info["extractor_version"])
-                elif "entities" not in prediction:
-                    from ...components.intake.entities import commerce
-                    variants[variant][key]["entities"] = commerce(text)
-                if variant == "agent_input" and not recognized.accepted:
-                    variants[variant][key]["entities"] = {}
+                sample = {**prediction, "text": text}
+                actual_text = "\n".join(v[variant] for _, v, _ in sorted(turn_values, key=lambda item: item[0]["idx"])) if turns else text
+                if "entities" not in prediction:
+                    if entity_review:
+                        from .asr_entities import predict
+                        sample["entities"] = predict(actual_text, vocabulary, version=entity_info["extractor_version"])
+                    else:
+                        if extraction_mode == "dialogue":
+                            observed = commerce_extractor.observe_dialogue(actual_text, now=now)
+                        else:
+                            observed = commerce_extractor.observe(actual_text, now=now, speaker=context.get("speaker"))
+                        sample["entities"] = observed["asr_entities"]
+                        sample["scenario_entities"] = observed["scenario_entities"]
+                if "turns" in prediction:
+                    sample["turns"] = []
+                    for turn, transformed, turn_now in turn_values:
+                        predicted_turn = {**turn, "text": transformed[variant]}
+                        if "entities" not in turn:
+                            if entity_review:
+                                from .asr_entities import predict
+                                predicted_turn["entities"] = predict(transformed[variant], vocabulary, version=entity_info["extractor_version"])
+                            else:
+                                observed = commerce_extractor.observe(transformed[variant], now=turn_now, speaker=turn.get("speaker"))
+                                predicted_turn["entities"] = observed["asr_entities"]
+                                predicted_turn["scenario_entities"] = observed["scenario_entities"]
+                        sample["turns"].append(predicted_turn)
+                sample_variants[variant] = sample
                 scored[variant] = edits(normalize(record["full_text"]).split(), normalize(text).split())
+            for variant, sample in sample_variants.items():
+                variants[variant][key] = sample
+            parent_source = "supplied" if "entities" in prediction else "generated"
+            entity_provenance["parent"][parent_source] += 1
+            entity_provenance["turns"]["samples"] += bool(turns)
+            entity_provenance["turns"]["predicted"] += len(turns)
+            for turn in turns:
+                entity_provenance["turns"]["supplied" if "entities" in turn else "generated"] += 1
+            clock_source = "context.call_date" if context.get("call_date") is not None else "document.reference_date" if reference_date is not None else "catalogue-default"
+            entity_provenance["clocks"][clock_source] += 1
+            if not entity_review and parent_source == "generated":
+                generated_entity_samples += 1
             audio_seconds, seconds = prediction.get("audio_seconds"), prediction.get("seconds")
             rtf = seconds / audio_seconds if (isinstance(seconds, (int, float)) and seconds >= 0
                 and isinstance(audio_seconds, (int, float)) and audio_seconds > 0) else None
             rows.append({"id": key, **recognized.to_dict(), "scores": scored, "rtf": rtf,
                          "seconds": seconds, "audio_seconds": audio_seconds,
                          "wall_seconds": prediction.get("wall_seconds"),
+                         "denoise_seconds": prediction.get("denoise_seconds"), "decoder_seconds": prediction.get("decoder_seconds"),
                          "capture_profile": prediction.get("capture_profile", "recorded-audio-unverified"),
                          "noisy": record.get("noisy"), "region": record.get("customer_region"),
                          "expected_voice": record.get("voice_expectation"),
                          "entities_provided": isinstance(prediction.get("entities"), dict),
+                         "entity_extraction_mode": extraction_mode, "predicted_turns": len(turns),
                          "signal": prediction.get("signal"),
                          "chunks": prediction.get("chunks"),
                          "reference_text": record["full_text"],
@@ -303,16 +418,27 @@ def evaluate(source: Path, hypotheses: Path | None, out: Path, *, model: str = "
     diagnostics["main_scores_available"] = all(isinstance(score, dict) and score.get("status") != "unavailable" for score in official.values())
     from .asr_errors import analyze
     error_analysis = analyze(rows)
+    generated_entities = entity_provenance["parent"]["generated"] + entity_provenance["turns"]["generated"]
+    commerce_metadata = commerce_extractor.metadata() if generated_entities and not entity_review else None
+    entity_provenance["instrument"] = ({"kind": "reviewed-vocabulary", "version": entity_info["extractor_version"]}
+                                       if generated_entities and entity_review else
+                                       {"kind": "commerce", **commerce_metadata} if commerce_metadata else
+                                       {"kind": "supplied", "version": None})
     manifest = {"metrics_version": METRICS_VERSION, "policy_version": POLICY_VERSION,
-                "mode": "local-decode" if transcribe else "hypothesis-replay", "model": model if transcribe else None,
+                "commerce_extractor": commerce_metadata, "entity_extraction": entity_provenance,
+                "generated_entity_samples": generated_entity_samples,
+                "mode": "local-decode" if transcribe else "hypothesis-replay", "model": model if transcribe else None, "denoiser": denoiser,
                 "ground_truth_sha256": _sha(ground_truth), "hypotheses_sha256": _sha(hypotheses) if hypotheses else None,
                 "main_scorer_sha256": _sha(btc_data_dir() / "eval/reference_eval.py"),
                 "selected_ids": [record["id"] for record in selected],
                 "code_sha256": {p.name: _sha(p) for p in [Path(__file__), Path(process.__code__.co_filename),
                                  Path(__file__).with_name("asr_entities.py"), Path(__file__).with_name("asr_errors.py"),
                                  Path(__file__).with_name("asr_package.py"),
+                                 Path(__file__).parents[2] / "components/voice/asr.py",
                                  Path(__file__).parents[2] / "components/voice/policy.py",
                                  Path(__file__).parents[2] / "components/intake/entities.py",
+                                 Path(__file__).parents[2] / "components/intake/commerce.py",
+                                 Path(__file__).parents[2] / "components/intake/spoken.py",
                                  Path(__file__).parents[2] / "components/intake/itn.py",
                                  Path(__file__).parents[2] / "components/intake/lexicon.py"]},
                 "hotwords": dictionary.hotwords,
@@ -363,6 +489,6 @@ def summarize(rows: list[dict], *, attempted: int, failures: list) -> dict:
                                 "false_accept_rate": sum(row["accepted"] for row in negatives) / len(negatives) if negatives else None,
                                 "missed_accept_rate": sum(not row["accepted"] for row in positives) / len(positives) if positives else None},
             "entity_predictions_provided": sum(row["entities_provided"] for row in rows),
-            "entity_source": "supplied hypotheses; not inferred from reference labels",
+            "entity_source": "supplied hypothesis entities when present; otherwise extracted from actual predicted text",
             "note": "Main's scores can omit missing files: read coverage/errors. WER is undefined for empty references. "
                     "Capture AEC/NS cannot be reproduced on an already recorded file; no reference or entity labels are inferred."}

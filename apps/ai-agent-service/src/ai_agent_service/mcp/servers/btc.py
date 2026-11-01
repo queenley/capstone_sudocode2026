@@ -52,6 +52,7 @@ from types import ModuleType
 from typing import Any, Awaitable, Callable
 
 from ...config.config_manager import btc_data_dir
+from ...components.guardrails import purchase
 from ..server_base import ToolFailure, database
 
 logger = logging.getLogger(__name__)
@@ -149,6 +150,7 @@ def _serialised(state: dict[str, Any]) -> str:
 
 def run_write(
     m: ModuleType, state: dict[str, Any], fn: Callable[..., Any], arguments: dict[str, Any], key: str | None,
+    authorization: dict[str, Any] | None = None,
 ) -> tuple[Any, dict[str, Any] | None]:
     """One write against *state*: the mock's result, and the state to store (None when nothing changed).
 
@@ -156,6 +158,15 @@ def run_write(
     changes nothing. Pure, apart from the mock's globals it loads *state* into.
     """
     remembered = dict(state.get("idempotent") or {})
+    consumed = dict(state.get("purchase_consumed") or {})
+    if authorization:
+        used = consumed.get(authorization["draft_id"])
+        if used and (used != key or key not in remembered):
+            raise ToolFailure("CONFIRMATION_CONSUMED", "Purchase confirmation was already used", retryable=False)
+        if not used and authorization["expires_at"] <= purchase.now():
+            raise ToolFailure("CONFIRMATION_EXPIRED", "Purchase confirmation has expired", retryable=False)
+        if not key:
+            raise ToolFailure("CONFIRMATION_REQUIRED", "Purchase requires an idempotency key", retryable=False)
     if key and key in remembered:
         logger.info("Write replayed under its idempotency key; returning its first result")
         return remembered[key], None
@@ -164,6 +175,10 @@ def run_write(
     result = fn(**arguments)
     # A copy, so the mock's globals changing later cannot change what is stored.
     after = json.loads(_serialised(_dump(m)))
+    if authorization and isinstance(result, dict) and result.get("order_id") and not result.get("error"):
+        consumed[authorization["draft_id"]] = key
+    if consumed:
+        after["purchase_consumed"] = consumed
     if not key and _serialised(after) == before:
         return result, None
     if key:
@@ -179,7 +194,9 @@ async def _read_state(conn: Any) -> dict[str, Any]:
     return row["state"] if row else {}
 
 
-async def call(name: str, fn: Callable[..., Any], /, *, idempotency_key: str | None = None, **kwargs: Any) -> Any:
+async def call(name: str, fn: Callable[..., Any], /, *, idempotency_key: str | None = None,
+               call_id: str | None = None, turn_id: str | None = None,
+               purchase_authorization: str | None = None, **kwargs: Any) -> Any:
     """Run one mock function against the shared state; the envelope's data.
 
     Arguments left as None are dropped, so the mock's own defaults apply, as
@@ -189,6 +206,14 @@ async def call(name: str, fn: Callable[..., Any], /, *, idempotency_key: str | N
     """
     m = mock()
     arguments = {k: v for k, v in kwargs.items() if v is not None}
+    authorization = None
+    if name == "order.create":
+        try:
+            authorization = purchase.verify(purchase_authorization, arguments, call_id, turn_id)
+            if idempotency_key not in purchase.order_keys(call_id, arguments):
+                raise ValueError("Purchase idempotency key does not match this session and order")
+        except ValueError as error:
+            raise ToolFailure("CONFIRMATION_REQUIRED", str(error), retryable=False) from error
     pool = await database()
     async with pool.connection() as conn:
         if name not in WRITES:
@@ -198,7 +223,7 @@ async def call(name: str, fn: Callable[..., Any], /, *, idempotency_key: str | N
             return unwrap(name, enrich(name, fn(**arguments)))
         async with conn.transaction():
             await conn.execute("SELECT pg_advisory_xact_lock(%s)", (_LOCK_KEY,))
-            result, changed = run_write(m, await _read_state(conn), fn, arguments, idempotency_key)
+            result, changed = run_write(m, await _read_state(conn), fn, arguments, idempotency_key, authorization)
             if changed is not None:
                 await conn.execute(
                     "INSERT INTO mock_state (id, state) VALUES (1, %s) "

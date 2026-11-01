@@ -20,10 +20,10 @@ from typing import Any, Mapping, Sequence
 from langchain_core.messages import AIMessage, HumanMessage, RemoveMessage
 from langgraph.runtime import Runtime
 
-from ...agents.advisor import AdvisorFailure, AgentContext, shown_passages, _seen_in
+from ...agents.advisor import AdvisorFailure, AgentContext, Draft, shown_passages, _seen_in
 from ...agents.policy import PolicyInput, needs_review
 from ...components.context import compact
-from ...components.guardrails import actions, fallback
+from ...components.guardrails import actions, fallback, purchase
 from ...components.guardrails.hard import MAX_SENTENCES, ORDER_SUMMARY, GuardInput, check
 from ...components.guardrails.stream import SentenceSplitter
 from ...components.identity import resolver
@@ -81,6 +81,9 @@ async def perceive(state: HotState, runtime: Runtime[HotContext]) -> dict[str, A
         context.arrived = time.perf_counter()
     update: dict[str, Any] = {**TURN_KEYS, "flags": {"asr_low_conf": False, "new_key": False}}
     raw = (context.text or "").strip()
+    update["pending_purchase"] = purchase.answer(
+        state.get("pending_purchase"), call_id=str(state["call_id"]), channel=state.get("channel") or "web",
+        turn_id=state["turn_id"], said=raw, last_reply=_last_reply(state))
     if state.get("phase") == "opening" or not raw:
         return update
 
@@ -458,6 +461,7 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
     ) if tier == "VERIFIED" else frozenset())
     return AgentContext(
         call_id=str(state["call_id"]),
+        pending_purchase=state.get("pending_purchase"),
         customer_id=state.get("customer_id") if tier == "VERIFIED" else None,
         account_id=context.account_id,
         address_as=_address_as(state),
@@ -559,6 +563,7 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
     orders = list(state.get("known_orders") or [])
     created = list(state.get("created_orders") or [])
     deletion_recorded = bool(state.get("deletion_recorded"))
+    pending_purchase = state.get("pending_purchase")
     failures = int(state.get("tool_failures") or 0)
     for result in new_results:
         envelope = result.get("result") or {}
@@ -571,14 +576,17 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
                 quotes[data["sku"]] = int(data["final_price_vnd"])
             if result["name"] == "order.create" and data.get("order_id"):
                 created.append({"order_id": data["order_id"], "sku": (result.get("args") or {}).get("sku")})
+                pending_purchase = None
             for order in data.get("orders") or ([data] if data.get("order_id") else []):
                 if order.get("order_id") and order["order_id"] not in orders:
                     orders.append(order["order_id"])
+        elif result.get("blocked_by") == "guardrail" and (envelope.get("error") or {}).get("code") == "CONFIRMATION_REQUIRED":
+            pending_purchase = ((envelope["error"].get("details") or {}).get("purchase_draft"))
         elif (envelope.get("error") or {}).get("code") in INFRASTRUCTURE_CODES:
             failures += 1
     return {"tool_results": list(state.get("tool_results") or []) + new_results, "quotes": quotes,
             "known_orders": orders, "created_orders": created, "tool_failures": failures,
-            "deletion_recorded": deletion_recorded,
+            "deletion_recorded": deletion_recorded, "pending_purchase": pending_purchase,
             "trusted_skus": sorted(set(state.get("trusted_skus") or []) | codes),
             "seen_products": _products_in(new_results, state.get("seen_products") or [])}
 
@@ -696,6 +704,15 @@ async def _stream_once(
                     timing["filler_ms"] = _since(context)
             elif event.kind == "tools":
                 attempt.results = list(event.results)
+                pending = _confirmation_draft(attempt.results)
+                if pending:
+                    # This exact final question, rather than a model paraphrase, is what a later yes authorizes.
+                    question = pending["question"]
+                    await _say(context, question, timing)
+                    attempt.said.append(question)
+                    recorded = event.draft or Draft(text="", tool_results=[], model=None, model_calls=0, seconds=0)
+                    attempt.draft = replace(recorded, text=question, tool_results=attempt.results)
+                    return attempt
                 new_message = True
             elif event.kind == "done":
                 attempt.draft = event.draft
@@ -718,6 +735,14 @@ async def _stream_once(
         return attempt
     finally:
         await stream.aclose()
+
+
+def _confirmation_draft(results: Sequence[Mapping[str, Any]]) -> dict[str, Any] | None:
+    for result in reversed(results):
+        error = (result.get("result") or {}).get("error") or {}
+        if result.get("name") == "order.create" and result.get("blocked_by") == "guardrail" and error.get("code") == "CONFIRMATION_REQUIRED":
+            return (error.get("details") or {}).get("purchase_draft")
+    return None
 
 
 def _safe_line(state: HotState, produced: list[dict[str, Any]]) -> str:
@@ -919,6 +944,11 @@ async def respond(state: HotState, runtime: Runtime[HotContext]) -> dict[str, An
             "reason": brief.get("escalation_reason"),
             "brief": brief,
         }
+    pending = state.get("pending_purchase")
+    if pending and pending.get("status") == "pending" and pending.get("issued_turn_id") == turn_id:
+        if not streamed:
+            text = pending["question"]
+        used = []
     if not streamed and text:
         # Said whole: the harness's own lines, a fallback, a draft that did not stream.
         await _say(context, text, timing)

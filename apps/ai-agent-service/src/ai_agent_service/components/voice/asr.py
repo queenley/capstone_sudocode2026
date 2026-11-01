@@ -38,6 +38,9 @@ class Transcript:
     text: str
     seconds: float  # decoding time
     audio_seconds: float
+    denoise_seconds: float = 0.0
+    decoder_seconds: float | None = None
+    preprocessing: dict | None = None
 
     @property
     def rtf(self) -> float:
@@ -135,15 +138,18 @@ def metadata(name: str) -> dict:
     return _engines().metadata(name)
 
 
-def transcribe(name: str, samples: np.ndarray, hotwords: list[str] | None = None) -> Transcript:
+def transcribe(name: str, samples: np.ndarray, hotwords: list[str] | None = None, *, denoiser: str | None = None) -> Transcript:
     """One utterance, float32 mono at 16 kHz -> text."""
+    denoiser = denoiser if denoiser is not None else os.environ.get("ASR_DENOISER", "none")
+    if denoiser not in ("none", "rnnoise"):
+        raise ValueError("denoiser must be none or rnnoise")
     samples = np.ascontiguousarray(samples, dtype="<f4")
     if samples.ndim != 1 or not samples.size or not np.isfinite(samples).all():
         raise ValueError("ASR requires finite, nonempty mono samples")
     if remote():
         result = _check(_http().post(
             "/v1/transcribe",
-            params={"model": name, "hotwords": ",".join(hotwords or [])},
+            params={"model": name, "hotwords": ",".join(hotwords or []), "denoiser": denoiser},
             content=samples.tobytes(),
             headers={"Content-Type": "application/octet-stream"},
         ))
@@ -152,14 +158,27 @@ def transcribe(name: str, samples: np.ndarray, hotwords: list[str] | None = None
                        for key in ("seconds", "audio_seconds"))
                 or abs(result["audio_seconds"] - len(samples) / RATE) > .01):
             raise RuntimeError("ASR service response does not match the requested model/audio")
-        return Transcript(result["model"], result["text"], result["seconds"], result["audio_seconds"])
-    found = _engines().transcribe(name, samples, hotwords)
-    return Transcript(found.model, found.text, found.seconds, found.audio_seconds)
+        preprocessing = result.get("preprocessing") or {"name": "none"}
+        if not isinstance(preprocessing, dict) or preprocessing.get("name") != denoiser:
+            raise RuntimeError("ASR service preprocessing does not match request")
+        for key in ("denoise_seconds", "decoder_seconds"):
+            value = result.get(key)
+            if value is not None and (type(value) not in (int, float) or not math.isfinite(value) or value < 0):
+                raise RuntimeError("Invalid ASR preprocessing timing")
+            if denoiser != "none" and value is None:
+                raise RuntimeError("ASR service omitted requested denoiser timing")
+        return Transcript(result["model"], result["text"], result["seconds"], result["audio_seconds"],
+                          result.get("denoise_seconds", 0.0), result.get("decoder_seconds"), preprocessing)
+    found = (_engines().recognize(name, samples, hotwords, denoiser=denoiser) if denoiser != "none"
+             else _engines().transcribe(name, samples, hotwords))
+    return Transcript(found.model, found.text, found.seconds, found.audio_seconds,
+                      getattr(found, "denoise_seconds", 0.0), getattr(found, "decoder_seconds", None),
+                      getattr(found, "preprocessing", None))
 
 
 async def stream(
     name: str, chunks: AsyncIterator[np.ndarray], *, sample_rate: int = RATE,
-    hotwords: list[str] | None = None, partial_ms: int = 600,
+    hotwords: list[str] | None = None, partial_ms: int = 600, denoiser: str | None = None,
 ) -> AsyncIterator[dict[str, Any]]:
     """Realtime: send *chunks* (float32 mono at *sample_rate*) as they come and
     yield the service's messages, ``partial`` while audio arrives and one
@@ -170,14 +189,17 @@ async def stream(
 
     if not remote():
         raise RuntimeError("Realtime ASR needs the ASR service (ASR_URL)")
+    denoiser = denoiser if denoiser is not None else os.environ.get("ASR_DENOISER", "none")
+    if denoiser not in ("none", "rnnoise"):
+        raise ValueError("denoiser must be none or rnnoise")
     address = url().replace("http", "ws", 1) + "/v1/stream"
     async with websockets.connect(address, additional_headers=_headers(), max_size=256 * 1024,
                                   max_queue=8, open_timeout=5, proxy=None) as ws:
         await asyncio.wait_for(ws.send(json.dumps({"model": name, "sample_rate": sample_rate,
-                                                   "hotwords": hotwords or [], "partial_ms": partial_ms})), TIMEOUT)
+                                                   "hotwords": hotwords or [], "partial_ms": partial_ms, "denoiser": denoiser})), TIMEOUT)
         ready = json.loads(await asyncio.wait_for(ws.recv(), TIMEOUT))
         if (not isinstance(ready, dict) or ready.get("type") != "ready"
-                or ready.get("model", name) != name):
+                or ready.get("model", name) != name or ready.get("denoiser", "none") != denoiser):
             raise RuntimeError("ASR stream refused")
         queue: asyncio.Queue[dict[str, Any] | Exception | None] = asyncio.Queue(maxsize=8)
 
