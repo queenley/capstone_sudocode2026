@@ -216,6 +216,33 @@ test("expired responses and blur cannot leave old personal information visible",
   f.check();
 });
 
+test("a slower response cannot replace the welcome revalidated on focus", async ({ page }) => {
+  const f = await fixture(page);
+  let release!: () => void;
+  let started!: () => void;
+  const pending = new Promise<void>(resolve => release = resolve);
+  const requested = new Promise<void>(resolve => started = resolve);
+  let attempt = 0;
+  await page.route("**/backend/api/agent/welcome", async route => {
+    if (attempt++ === 0) {
+      started(); await pending;
+      return json(route, greeting("Thông tin cũ", "blocker cũ"));
+    }
+    return json(route, greeting("Khách An", "thông tin hiện tại"));
+  });
+  await page.goto("/");
+  await requested;
+  await page.evaluate(() => {
+    window.dispatchEvent(new Event("blur"));
+    window.dispatchEvent(new Event("focus"));
+  });
+  await expect(panel(page)).toContainText("thông tin hiện tại");
+  release();
+  await expect(panel(page)).not.toContainText("blocker cũ");
+  await expect(panel(page)).toContainText("Khách An");
+  f.check();
+});
+
 test("long untrusted text remains inert and readable on mobile in both themes", async ({ page }) => {
   const f = await fixture(page);
   await page.setViewportSize({ width: 320, height: 640 });
@@ -231,9 +258,12 @@ test("long untrusted text remains inert and readable on mobile in both themes", 
     const box = await panel(page).boundingBox();
     expect(box!.x).toBeGreaterThanOrEqual(0);
     expect(box!.x + box!.width).toBeLessThanOrEqual(320);
+    const close = page.getByRole("button", { name: "Đóng lời chào" });
+    const before = await close.boundingBox();
     await page.getByRole("button", { name: "Tiếp tục tư vấn" }).scrollIntoViewIfNeeded();
     expect(await page.locator(".s-returning-content").evaluate(element => element.scrollTop)).toBeGreaterThan(0);
     await expect(page.getByRole("button", { name: "Đóng lời chào" })).toBeInViewport();
+    expect((await close.boundingBox())!.y).toBeCloseTo(before!.y, 1);
     await page.screenshot({ path: test.info().outputPath(`returning-320-${theme}.png`) });
   }
   await page.getByRole("button", { name: "Đóng lời chào" }).click();

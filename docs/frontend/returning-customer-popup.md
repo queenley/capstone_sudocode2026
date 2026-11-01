@@ -84,6 +84,15 @@ PYTHONPATH=tests:packages/backend-common:apps/ai-agent-service/src apps/ai-agent
 - [Mobile synthetic](/Users/vqd/.codex/visualizations/2026/10/31/01a1935d-351d-70b0-9c4b-c4b4d1cb4e69/returning-popup/returning-mobile.png)
 - [Nội dung dài/độc hại, dark 320px](/Users/vqd/.codex/visualizations/2026/10/31/01a1935d-351d-70b0-9c4b-c4b4d1cb4e69/returning-popup/returning-320-dark.png)
 
+## Kiểm tra lại sau đồng bộ main — 01/11/2026
+
+- Giữ endpoint xác thực, đọc Memory theo chủ tài khoản và nút đóng ở header riêng ngoài vùng cuộn.
+- Provenance blocker phải có `call_id` là chuỗi không trắng hoặc số nguyên dương, và `turn` là số nguyên dương; bool, chuỗi số, số âm và số thập phân không hợp lệ.
+- Outcome `chot_don`/`tu_choi` trong episode mới hoặc cùng cuộc gọi cũng ngăn nhắc lại blocker, ngay cả khi fact outcome chưa có. Episode cũ không xóa blocker mới; mốc cuối của ngày là cận không bao gồm, tránh nhầm hai ngày liền kề là trùng nhau.
+- Thêm ca response chậm không được ghi đè lần xác thực lại khi focus. Kiểm tra tọa độ nút đóng không đổi sau khi cuộn ở mobile, cả light/dark.
+- Backend: **114 passed, 1 skipped** (Redis integration). Build production và TypeScript đạt. Chrome: **17 passed**, gồm smoke BFF/Identity thật với SQLite và ledger giả; không gọi model hoặc SMS.
+- Build/preview tách riêng ở `/private/tmp/capstone-welcome-verification-20261101/web`; không dùng `.env` hay `.next` của workspace. Ảnh synthetic: [mobile](/Users/vqd/.codex/visualizations/2026/11/01/01a196f3-fba7-7be0-9d81-65dea86f8335/returning-popup/returning-mobile.png), [cuộn nội dung dài ở dark 320px](/Users/vqd/.codex/visualizations/2026/11/01/01a196f3-fba7-7be0-9d81-65dea86f8335/returning-popup/returning-320-dark.png).
+
 ## Giới hạn
 
 Không thể biết người ngồi trước một trình duyệt vẫn đăng nhập có phải chủ tài khoản hay không; anonymous, logout, đổi tài khoản và identity shared đã được chặn. Việc thu hồi/xóa từ thiết bị khác được phát hiện khi revalidate (tối đa 30 giây khi popup đang mở), hoặc ngay khi tab được focus lại; không có push channel mới.

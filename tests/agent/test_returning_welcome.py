@@ -97,6 +97,33 @@ def test_a_newer_order_resolves_a_blocker(welcome_client):
     assert client.get("/api/agent/welcome", headers=auth).json()["blocker"] is None
 
 
+@pytest.mark.parametrize('outcome,days_ago,hidden', [
+    ('chot_don', 0, True), ('tu_choi', 0, True), ('hen_goi_lai', 0, False),
+    ('chot_don', 1, False), ('tu_choi', 1, False),
+])
+def test_episode_outcome_also_resolves_only_the_relevant_blocker(welcome_client, outcome, days_ago, hidden):
+    client, auth, _, _ = welcome_client
+    day = datetime.now(VIETNAM).date() - timedelta(days=days_ago)
+    welcome.memory.memory_get_episodes.return_value = {'episodes': [
+        {'call_id': 'synthetic-outcome-call', 'date': day.isoformat(), 'outcome': outcome}]}
+    result = client.get('/api/agent/welcome', headers=auth).json()
+    assert result['returning']
+    assert (result['blocker'] is None) == hidden
+
+
+@pytest.mark.parametrize('field,value', [
+    ('call_id', True), ('call_id', -1), ('call_id', '   '), ('call_id', ['another-call']),
+    ('turn', True), ('turn', -1), ('turn', 0), ('turn', 1.5), ('turn', '1'),
+])
+def test_invalid_provenance_does_not_personalize_with_a_blocker(welcome_client, field, value):
+    client, auth, profile, _ = welcome_client
+    profile['facts'][0]['source'][field] = value
+    result = client.get('/api/agent/welcome', headers=auth)
+    assert result.status_code == 200
+    assert result.json()['name'] == 'Khách An'
+    assert result.json()['blocker'] is None
+
+
 @pytest.mark.parametrize("marker", ["deleted_at", "deletion_pending"])
 def test_recorded_pending_and_completed_erasure_hide_even_name(welcome_client, marker):
     client, auth, profile, _ = welcome_client

@@ -81,7 +81,7 @@ def _observed(fact: dict[str, Any]) -> tuple[datetime, datetime] | None:
         return None
 
 
-def _blocker(facts: list[dict[str, Any]], now: datetime) -> WelcomeBlocker | None:
+def _blocker(facts: list[dict[str, Any]], now: datetime, episodes: list[dict[str, Any]] | None = None) -> WelcomeBlocker | None:
     blockers = [f for f in facts if f.get("slot") == "blocker" and _active(f, now.date())]
     if len(blockers) != 1:
         return None
@@ -90,13 +90,18 @@ def _blocker(facts: list[dict[str, Any]], now: datetime) -> WelcomeBlocker | Non
     text = fact.get("value")
     if not isinstance(source, dict) or isinstance(fact.get("confidence"), bool):
         return None
+    call_id, turn = source.get("call_id"), source.get("turn")
+    valid_call = ((isinstance(call_id, str) and bool(call_id.strip()))
+                  or (type(call_id) is int and call_id > 0))
+    if not valid_call or type(turn) is not int or turn < 1:
+        return None
     try:
         confidence = float(fact.get("confidence", 0))
     except (TypeError, ValueError, OverflowError):
         return None
     if (not isinstance(text, str) or not text.strip() or len(text) > 400
             or not math.isfinite(confidence) or not 0.6 <= confidence <= 1
-            or source.get("said_by") != "customer" or not source.get("call_id") or not source.get("turn")):
+            or source.get("said_by") != "customer"):
         return None
     # Enforce the ontology's TTL even on old rows which have no valid_to.
     end = date.fromisoformat(fact["valid_from"]) + timedelta(days=slot("blocker").ttl_days)
@@ -109,6 +114,13 @@ def _blocker(facts: list[dict[str, Any]], now: datetime) -> WelcomeBlocker | Non
     observed = _observed(fact)
     if observed is None or observed[0] > now:
         return None
+    for episode in episodes or []:
+        if episode.get("outcome") not in ("chot_don", "tu_choi"):
+            continue
+        when = _observed({"source": {"observed_at": episode.get("date")}})
+        if (when is None or when[1] > observed[0] or when[0] == observed[0]
+                or episode.get("call_id") == call_id):
+            return None
     for other in facts:
         if not _active(other, now.date()):
             continue
@@ -117,7 +129,7 @@ def _blocker(facts: list[dict[str, Any]], now: datetime) -> WelcomeBlocker | Non
         ):
             when = _observed(other)
             # Date-only evidence spans the whole day. Ambiguous/malformed ordering hides the blocker.
-            if when is None or when[1] >= observed[0]:
+            if when is None or when[1] > observed[0] or when[0] == observed[0]:
                 return None
     return WelcomeBlocker(text=" ".join(text.split()), valid_until=until)
 
@@ -164,7 +176,7 @@ async def welcome(request: Request, response: Response) -> Welcome:
         result = Welcome(returning=bool(facts or episodes), expires_at=empty.expires_at)
         if result.returning:
             result.name = " ".join(name.split())[:160] if name else None
-            result.blocker = _blocker(facts, now)
+            result.blocker = _blocker(facts, now, episodes)
             if result.blocker:
                 result.expires_at = min(result.expires_at, result.blocker.valid_until)
         return result
