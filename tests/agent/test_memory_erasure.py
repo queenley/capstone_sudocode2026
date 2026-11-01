@@ -61,8 +61,10 @@ async def test_eval_cli_saves_failed_trace_without_labelling_or_starting_baselin
     from ai_agent_service.mcp import client
     from ai_agent_service.llm import jev
     args = cli.parser().parse_args(['--scenarios', str(tmp_path), '--warmup', '0'])
-    monkeypatch.setattr(scenarios, 'load', lambda *args: ([SimpleNamespace(scenario_id='SYNTHETIC-1'),
-                                                        SimpleNamespace(scenario_id='SYNTHETIC-2')], []))
+    import json
+    for sid in ('SYNTHETIC-1', 'SYNTHETIC-2'):
+        (tmp_path / f'{sid}.json').write_text(json.dumps({'scenario_id': sid,
+            'calls': {'call_1': {'customer_turns': ['Synthetic request']}}}))
     monkeypatch.setattr(runner, 'build', AsyncMock(return_value=SimpleNamespace(provider='fake',
         advisor=SimpleNamespace(model_name='fake'))))
     monkeypatch.setattr(runner, 'warm_up', AsyncMock())

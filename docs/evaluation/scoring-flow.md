@@ -6,7 +6,7 @@ Một trang để biết một con số RQR, CCR, TSR hay HR đến từ đâu. 
 
 1. **Nguồn chấm được chọn là `reference_eval.py` trên main** tại `41eda490bc47577018541c7778c0e8443ed8e6c8`, chạy như một tiến trình riêng trên hai file trace. Giữ nguyên bản này theo quyết định người dùng; không khôi phục ZIP BTC và không sửa công thức. `tests/agent/test_btc_pack.py` ghim hash pack trong repo; không mặc định bản main đồng nhất với ZIP BTC gốc.
 2. **Script đó chỉ đọc trace**, không đọc hội thoại. Mọi thứ nó cần phải có sẵn trong mỗi dòng: `questions[]`, `claims[]`, `facts_used[]`, `tool_calls[]`, `latency`, `memory_writes`. BTC không phát extractor: việc trích `questions` và `claims` là của đội, và BTC chấm tay ngẫu nhiên 20 lượt để bắt extractor bỏ sót hoặc bịa.
-3. **Đổi extractor là đổi dụng cụ đo.** Hiện là `product-extractor-v7`; so full/baseline trong cùng version. Muốn so hai extractor phải `--relabel` cùng replies, giữ riêng phiên bản và kết quả; xem [RUN-LEDGER.md](RUN-LEDGER.md).
+3. **Đổi extractor là đổi dụng cụ đo.** Hiện là `product-extractor-v8`; so full/baseline trong cùng version. v8 kiểm schema nhãn trong cache và dùng file tạm riêng khi ghi cache đồng thời; prompt và quy tắc chiếu nhãn giữ nguyên v7, nhưng instrument hash đã đổi. Muốn so hai extractor phải `--relabel` cùng replies, giữ riêng phiên bản và kết quả; xem [RUN-LEDGER.md](RUN-LEDGER.md).
 
 ## 2. Luồng một lần chạy
 
@@ -15,6 +15,7 @@ run_eval.py --scenarios <thư mục> [--config ...] [--only ID] [--no-extract] -
  │
  ├─ scenarios.py   đọc từng *.json, lập kế hoạch từng cuộc: ngày (15/10/2026 + days_later hoặc call_date),
  │                 khóa nhận diện kênh, lượt khách (customer_turns_asr nếu có), seed_history
+ │                 kiểm toàn bộ lựa chọn trước model, snapshot từ dữ liệu đã nạp để chạy/chấm cùng một cohort
  │
  ├─ runner.py      với mỗi cấu hình (full rồi baseline_no_memory), mỗi kịch bản:
  │                   • xóa trạng thái trong database <tên>_eval, nạp seed_history
@@ -54,7 +55,7 @@ Sản phẩm thêm vài thứ ngoài mock: khóa idempotency cho lệnh ghi, `de
 - **Hai lượt kiểm tất định sau khi mô hình trả lời:** `spanned()` chỉ giữ item có `quote` đúng trong nguồn hiện tại; câu hỏi/claim phải từ agent, tool args chỉ chứng minh fact usage, không có lịch sử thì loại fact usage. `restrict()` dùng 34 slot ontology và extension `channel` riêng, cùng 18 trường claim + `promo_<CODE>_active`; ép kiểu claim, áp quy tắc grounding và khử trùng. `other` là sentinel câu hỏi, không phải slot thứ 35/36 của bộ nhớ. Kiểm span không chứng minh mọi slot/value đã đúng ngữ nghĩa.
 - **`facts_used`** = slot extractor thấy được dùng lại từ cuộc trước, rồi slot của các dòng brief agent đã trích dẫn `[Bn]`, mỗi slot một lần.
 - **Lỗi một lượt là lỗi của cả run:** extractor thử hai lần; vẫn lỗi thì lượt đó "unlabelled" và bảng không được in. Quote sai, slot lạ, giá trị không ép được chỉ làm item bị bỏ hoặc chỉnh, và được đếm (`extraction_dropped_items`, `extraction_changed_items`).
-- **Cache** `evaluation/runs/cache/extractor.json`, khóa theo instrument hash + model + toàn bộ đầu vào đã lọc (kể cả lịch sử). Hash gồm version, prompt, schema, source scorer/helper, vocabulary và contract; đổi dụng cụ đo sẽ không dùng nhầm nhãn cũ.
+- **Cache** `evaluation/runs/cache/extractor.json`, khóa theo instrument hash + model + toàn bộ đầu vào đã lọc (kể cả lịch sử). Hash gồm version, prompt, schema, source scorer/helper, vocabulary và contract; đổi dụng cụ đo sẽ không dùng nhầm nhãn cũ. V8 kiểm schema cả cache hit; cache sai trở thành miss, mỗi lần ghi dùng file tạm riêng rồi atomic replace. Hai process vẫn có thể mất hit do ghi snapshot cạnh tranh, trong giới hạn budget hiện có.
 - **Gắn nhãn lại không chạy lại agent:** `run_eval.py --relabel <run> --out <thư mục>` lấy lời agent đã có trong một run cũ, xóa nhãn cũ, gắn lại bằng extractor hiện tại và chấm bằng `reference_eval.py`. Đo extractor, không đo agent hiện tại; `facts_used` chỉ gồm phần extractor thấy (cận dưới của CCR).
 
 ## 5. Con số nào đến từ đâu

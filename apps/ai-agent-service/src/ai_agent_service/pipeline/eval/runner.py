@@ -34,11 +34,12 @@ import json
 import logging
 import re
 import time
+from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from types import SimpleNamespace
 from typing import Any, Awaitable, Callable, Mapping
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import parse_qsl, quote, urlencode, urlsplit, urlunsplit
 
 from langchain_core.messages import HumanMessage
 from langchain_core.tools import BaseTool, StructuredTool
@@ -88,6 +89,9 @@ Business = Callable[[str, dict[str, Any]], Awaitable[dict[str, Any]]]
 #: Emptied before every scenario and configuration, where they exist. Only
 #: ever in a database whose name ends in ``_eval``: :func:`reset` refuses any other.
 RESET_TABLES = ("mock_state", "facts", "episodes", "identities", "deletion_requests")
+
+# A run owns the database until both configurations finish; resets cannot interleave.
+EVALUATION_LOCK = 1510_0002
 
 Progress = Callable[[str], None]
 
@@ -180,6 +184,7 @@ def use_evaluation_database() -> str:
 
     import psycopg
     from psycopg import sql
+    from psycopg.conninfo import conninfo_to_dict, make_conninfo
 
     from ...config.database import configured_url
 
@@ -188,14 +193,25 @@ def use_evaluation_database() -> str:
         url, _ = configured_url()
         if not url or "://" not in url:
             raise RuntimeError("Set DATABASE_URL (a postgresql:// URL) or EVAL_DATABASE_URL in .env")
+        try:
+            original_name = conninfo_to_dict(url).get("dbname")
+        except psycopg.Error as error:
+            raise RuntimeError("DATABASE_URL is not a valid PostgreSQL URL") from error
+        if not original_name:
+            raise RuntimeError("DATABASE_URL must explicitly name a database")
         parts = urlsplit(url)
-        target = urlunsplit(parts._replace(path=f"/{parts.path.lstrip('/')}_eval"))
-    parts = urlsplit(target)
-    name = parts.path.lstrip("/")
+        target = urlunsplit(parts._replace(path="/" + quote(original_name + "_eval", safe=""),
+            query=urlencode([(key, value) for key, value in parse_qsl(parts.query) if key != "dbname"])))
+    try:
+        if urlsplit(target).scheme not in {"postgresql", "postgres"}:
+            raise RuntimeError("EVAL_DATABASE_URL must be a postgresql:// URL")
+        name = conninfo_to_dict(target).get("dbname") or ""
+    except (psycopg.Error, ValueError) as error:
+        raise RuntimeError("EVAL_DATABASE_URL is not a valid PostgreSQL URL") from error
     if not name.endswith("_eval"):
         raise RuntimeError("EVAL_DATABASE_URL must name a database ending in _eval: the run empties its tables.")
     try:
-        with psycopg.connect(urlunsplit(parts._replace(path="/postgres")), autocommit=True, connect_timeout=5) as conn:
+        with psycopg.connect(make_conninfo(target, dbname="postgres"), autocommit=True, connect_timeout=5) as conn:
             if conn.execute("SELECT 1 FROM pg_database WHERE datname = %s", (name,)).fetchone() is None:
                 conn.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(name)))
     except psycopg.OperationalError as error:
@@ -208,6 +224,24 @@ def use_evaluation_database() -> str:
     # The agent reads AGENT_DATABASE_URL first (config.database): both point here.
     os.environ["DATABASE_URL"] = os.environ["AGENT_DATABASE_URL"] = target
     return name
+
+
+@asynccontextmanager
+async def evaluation_lock():
+    """Keep other evaluations from resetting this run's database; fail before model calls."""
+    pool = await database()
+    async with pool.connection() as conn:
+        name = (await (await conn.execute("SELECT current_database() AS name")).fetchone())["name"]
+        if not name.endswith("_eval"):
+            raise RuntimeError("Evaluation lock requires a database named *_eval")
+        acquired = (await (await conn.execute("SELECT pg_try_advisory_lock(%s) AS acquired",
+                                             (EVALUATION_LOCK,))).fetchone())["acquired"]
+        if not acquired:
+            raise RuntimeError("Another evaluation is using this database. Wait for that run to finish.")
+        try:
+            yield
+        finally:
+            await conn.execute("SELECT pg_advisory_unlock(%s)", (EVALUATION_LOCK,))
 
 
 async def reset() -> None:
@@ -260,8 +294,7 @@ async def seed(rig: Rig, sessions: tuple[SeedSession, ...], *, customer_phone: s
         for slot, value in session.facts.items():
             spec = ontology.slot(slot)
             if spec is None:
-                logger.warning("Seed %s: slot %r is not in the ontology; not written", session.session_id, slot)
-                continue
+                raise scenarios.ScenarioError(f"seed {session.session_id}: unknown memory slot {slot!r}")
             if slot in held and held[slot][1] == value:
                 continue
             valid_to = (date.fromisoformat(session.day) + timedelta(days=spec.ttl_days)).isoformat() if spec.ttl_days else None
@@ -525,7 +558,11 @@ async def run_scenario(rig: Rig, scenario: Scenario, config: str, *, run_id: str
                 run.error = f"{plan.name}: {error}"
                 progress(f"  {config:<18} {scenario.scenario_id} {plan.name} seed refused: {error}")
                 return run
-        await _run_call(rig, scenario, plan, config, run=run, run_id=run_id, progress=progress)
+        try:
+            await _run_call(rig, scenario, plan, config, run=run, run_id=run_id, progress=progress)
+        except Exception as error:  # Completed turns remain evidence when a later connection or export fails.
+            logger.exception("Evaluation call %s of %s failed", plan.name, scenario.scenario_id)
+            run.error = f"{plan.name}: {type(error).__name__} while running the call"
         if run.error:
             return run
     return run

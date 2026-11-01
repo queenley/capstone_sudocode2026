@@ -86,9 +86,15 @@ async def after_call(
                 confirmed = any(CONFIRMED_CONTACT.search(str(line.get("text") or "")) for line in transcript
                                 if line.get("speaker") == "customer")
                 if denied or confirmed:
-                    await writer.data("memory_settle_unconfirmed", customer_id=remembered["customer_id"],
-                                      confirm=confirmed and not denied, on=call["on"])
-    tags = await qa.tag(candidates, returning=bool(call.get("returning")))
+                    settled_contact = await writer.data("memory_settle_unconfirmed", customer_id=remembered["customer_id"],
+                                                       confirm=confirmed and not denied, on=call["on"])
+                    if settled_contact is None:
+                        remembered = {**remembered, "status": "failed", "reason": "could not settle the prior contact"}
+    try:
+        tags = await qa.tag(candidates, returning=bool(call.get("returning")))
+    except Exception as error:
+        return {**remembered, "status": "failed", "reason": remembered.get("reason") or "QA tagging failed",
+                "error": type(error).__name__}
     return {**remembered, "tags": tags}
 
 
@@ -115,6 +121,8 @@ async def _forget(call: dict[str, Any], admin: AdminTools | None) -> dict[str, A
 async def _hold(customer_id: str, call: dict[str, Any], candidates: list[gate.Candidate], *, writer: Any) -> dict[str, Any]:
     """What a caller who stated *customer_id*'s number said, kept for them as unconfirmed; nothing is theirs yet."""
     profile = await writer.data("memory_get_profile", customer_id=customer_id, on=call["on"])
+    if profile is None:
+        return {"status": "failed", "reason": "could not read the customer's profile", "memory_writes": []}
     current = [f for f in (profile or {}).get("facts") or [] if f.get("status") == "active"]
     source = {"call_id": str(call["call_id"]), "call": "unconfirmed", "channel": call.get("channel")}
     decisions = [{**d.as_dict(), "operation": "add", "unconfirmed": True}
@@ -161,6 +169,8 @@ async def _remember(call: dict[str, Any], candidates: list[gate.Candidate], *, w
         writer.data("memory_get_profile", customer_id=customer_id, on=call["on"]),
         writer.data("memory_get_episodes", customer_id=customer_id, n=10),
     )
+    if profile is None or history is None:
+        return {"status": "failed", "reason": "could not read the customer's memory", "memory_writes": []}
     current = list((profile or {}).get("facts") or [])
     number = len((history or {}).get("episodes") or []) + 1
     source = {"call_id": str(call["call_id"]), "call": f"call_{number}", "channel": call.get("channel")}
@@ -173,12 +183,19 @@ async def _remember(call: dict[str, Any], candidates: list[gate.Candidate], *, w
         return {"status": "failed", "reason": "the ledger refused the call's facts", "memory_writes": []}
     if not episode:
         return {"status": "done", "customer_id": customer_id, "memory_writes": committed.get("memory_writes") or []}
-    episode = await memory.summarize(candidates, call_number=number, day=call["on"], channel=call.get("channel") or "web")
-    await writer.data("memory_commit_episode", customer_id=customer_id, episode={
+    writes = committed.get("memory_writes") or []
+    try:
+        episode = await memory.summarize(candidates, call_number=number, day=call["on"], channel=call.get("channel") or "web")
+    except Exception as error:
+        return {"status": "failed", "reason": "could not summarize the call", "error": type(error).__name__,
+                "customer_id": customer_id, "memory_writes": writes}
+    saved_episode = await writer.data("memory_commit_episode", customer_id=customer_id, episode={
         "call_id": str(call["call_id"]), "channel": call.get("channel"), "date": call["on"], **episode,
         "source_turn_span": [min((c.turn for c in candidates), default=0), max((c.turn for c in candidates), default=0)],
     })
-    writes = committed.get("memory_writes") or []
+    if saved_episode is None:
+        return {"status": "failed", "reason": "could not write the call's episode", "customer_id": customer_id,
+                "memory_writes": writes}
     logger.info("after_call %s: %d facts written for %s", call["call_id"], len(writes), customer_id)
     return {"status": "done", "customer_id": customer_id, "memory_writes": writes, "episode": episode["summary"]}
 

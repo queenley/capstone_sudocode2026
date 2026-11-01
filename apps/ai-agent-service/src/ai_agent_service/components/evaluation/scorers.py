@@ -42,6 +42,7 @@ import json
 import logging
 import os
 import re
+import tempfile
 from datetime import date
 from functools import lru_cache
 from pathlib import Path
@@ -59,7 +60,7 @@ from ..guardrails.hard import HUMAN
 
 logger = logging.getLogger(__name__)
 #: The instrument's version, written into every run's manifest beside :data:`prompt_sha`.
-VERSION = "product-extractor-v7"
+VERSION = "product-extractor-v8"
 AUTOMATED = re.compile(r"\b(?:em|tôi|mình)\s+là\s+(?:một\s+)?(?:trợ lý (?:ảo|tự động)|(?:chat)?bot|AI)\b", re.IGNORECASE)
 RESTOCK = re.compile(r"\b(?:về\s+kho|hàng(?:\s+(?:sẽ|sắp|mới|lại|dự\s+kiến))*\s+về|"
                      r"nhập(?:\s+(?:lại|thêm|mới))*\s+hàng|bổ\s+sung\s+(?:hàng|kho|tồn\s+kho)|"
@@ -276,8 +277,18 @@ class Extractor:
         ).hexdigest()
         raw = self._cache.get(key)
         if raw is not None:
-            self.hits += 1
-            return label_items(raw["items"], data, recovered=raw.get("recovered_errors"))
+            try:
+                cached = Items.model_validate({"items": raw["items"]})
+                recovered = raw.get("recovered_errors")
+                if recovered is not None and (not isinstance(recovered, list)
+                                              or any(not isinstance(error, str) for error in recovered)):
+                    raise ValueError("invalid recovered_errors")
+            except (KeyError, TypeError, ValueError):
+                self._cache.pop(key)
+                logger.warning("Ignoring invalid extractor cache entry")
+            else:
+                self.hits += 1
+                return label_items([item.model_dump() for item in cached.items], data, recovered=recovered)
         request = [HumanMessage(content=instructions() + MARKER + json.dumps(data, ensure_ascii=False))]
         try:
             answer, report = await self._labeller.arun(request)
@@ -310,9 +321,17 @@ class Extractor:
         if self._cache_path is None:
             return
         self._cache_path.parent.mkdir(parents=True, exist_ok=True)
-        temporary = self._cache_path.with_name(self._cache_path.name + ".tmp")
-        temporary.write_text(json.dumps(self._cache, ensure_ascii=False, indent=1), encoding="utf-8")
-        os.replace(temporary, self._cache_path)
+        # shortcut: concurrent writers may lose cache hits; use a transactional cache if that costs materially.
+        temporary = None
+        try:
+            with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=self._cache_path.parent,
+                                             prefix=self._cache_path.name + ".", suffix=".tmp", delete=False) as stream:
+                temporary = Path(stream.name)
+                json.dump(self._cache, stream, ensure_ascii=False, indent=1)
+            os.replace(temporary, self._cache_path)
+        finally:
+            if temporary is not None:
+                temporary.unlink(missing_ok=True)
 
 
 def _load_cache(path: Path | None) -> dict[str, dict[str, Any]]:

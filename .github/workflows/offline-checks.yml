@@ -19,6 +19,7 @@ jobs:
         options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 3s --health-retries 10
     env:
       TEST_DATABASE_URL: postgresql+psycopg://postgres:postgres@127.0.0.1:5432/telesales_test
+      EVAL_TEST_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/telesales_test_eval
       TEST_REDIS_URL: redis://127.0.0.1:6379/15
     steps:
       - uses: actions/checkout@v4

@@ -19,8 +19,8 @@ which keeps every type in both halves. ``--calibrate`` prints the θ that
 abstains on no answerable question of the tuning half; a person writes it into
 ``config/knowledge.yaml``.
 
-    python -m ai_agent_service.pipeline.eval.rag
-    python -m ai_agent_service.pipeline.eval.rag --calibrate
+The supported evaluation entry point is ``run_eval.py`` at the repository root;
+it includes this retrieval measurement after the agent traces are complete.
 """
 
 from __future__ import annotations
@@ -120,17 +120,12 @@ def measure(results: dict[str, Any], rows: Sequence[dict[str, Any]], into: Path)
 
 
 def _on_subset(grader: ModuleType, qa_path: Path, results_path: Path, subset: dict[str, Any]) -> dict[str, Any]:
-    """``rag_eval`` restricted to the questions in *subset*: it counts only questions it has a result for,
-    except for abstaining and false abstaining, which it counts over every question of a type; those two
-    are recomputed here on the subset alone, the same way."""
-    report = grader.rag_eval(str(qa_path), str(results_path))
-    qa = [q for q in json.loads(qa_path.read_text(encoding="utf-8"))["questions"] if q["qid"] in subset]
-    for kind in ABSTAIN_TYPES:
-        of_type = [q for q in qa if q["type"] == kind]
-        report[f"abstain_rate_{kind}"] = grader.pct(sum(1 for q in of_type if subset[q["qid"]]["abstained"]), len(of_type))
-    answerable = [q for q in qa if q["type"] not in ABSTAIN_TYPES]
-    report["false_abstain_rate"] = grader.pct(sum(1 for q in answerable if subset[q["qid"]]["abstained"]), len(answerable))
-    return report
+    """Run the unchanged grader over a frozen subset, so every denominator uses that subset."""
+    document = json.loads(qa_path.read_text(encoding="utf-8"))
+    document["questions"] = [q for q in document["questions"] if q["qid"] in subset]
+    selected = results_path.with_suffix(".qa.json")
+    selected.write_text(json.dumps(document, ensure_ascii=False, indent=1), encoding="utf-8")
+    return grader.rag_eval(str(selected), str(results_path))
 
 
 def table(report: dict[str, Any], *, mode: str) -> str:

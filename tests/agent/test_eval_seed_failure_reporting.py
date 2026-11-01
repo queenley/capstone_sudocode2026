@@ -53,8 +53,9 @@ async def test_seed_timeout_is_saved_without_labelling_baseline_retrieval_or_gra
 
     failure = "seed S-SYNTHETIC: memory_commit_facts TIMEOUT before the first turn"
     args = cli.parser().parse_args(["--scenarios", str(tmp_path), "--warmup", "0"])
-    monkeypatch.setattr(scenarios, "load", lambda *args: ([SimpleNamespace(scenario_id="SYNTHETIC-1"),
-                                                         SimpleNamespace(scenario_id="SYNTHETIC-2")], []))
+    for sid in ("SYNTHETIC-1", "SYNTHETIC-2"):
+        (tmp_path / f"{sid}.json").write_text(json.dumps({"scenario_id": sid,
+            "calls": {"call_1": {"customer_turns": ["Synthetic request"]}}}))
     monkeypatch.setattr(runner, "build", AsyncMock(return_value=SimpleNamespace(
         provider="synthetic", advisor=SimpleNamespace(model_name="synthetic"))))
     monkeypatch.setattr(runner, "warm_up", AsyncMock())
@@ -66,6 +67,7 @@ async def test_seed_timeout_is_saved_without_labelling_baseline_retrieval_or_gra
     monkeypatch.setattr(report, "grade", grade)
     monkeypatch.setattr(cli, "_retrieval", retrieval)
     monkeypatch.setattr(report, "manifest", lambda **kwargs: {"problems": kwargs["found"]})
+    monkeypatch.setattr(report, "freeze", lambda *args: tmp_path)
     monkeypatch.setattr(client, "close_all", AsyncMock())
     monkeypatch.setattr(jev, "close", AsyncMock())
     layout = cli.Layout(tmp_path, {"full": tmp_path / "full.jsonl", "baseline_no_memory": tmp_path / "baseline.jsonl"})
@@ -131,6 +133,29 @@ async def test_relabel_does_not_repair_a_seed_failure_by_relabelling_partial_rep
     label.assert_not_awaited()
     grade.assert_not_called()
     assert not (out / "report.json").exists() and not (out / "table.txt").exists()
+
+
+@pytest.mark.asyncio
+async def test_relabel_honors_prefixed_manifest_from_single_config_cli(tmp_path, fake_relabel):
+    extractor, label, grade = fake_relabel
+    source = source_run(tmp_path)
+    (source / "full.manifest.json").write_text(json.dumps({"problems": {"full": {"scenarios_stopped": 1}}}))
+    assert await relabel.relabel(source, tmp_path / "relabeled", extractor) == 1
+    label.assert_not_awaited()
+    grade.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_relabel_refuses_existing_output_before_labelling(tmp_path, fake_relabel):
+    extractor, label, grade = fake_relabel
+    source = source_run(tmp_path)
+    out = tmp_path / "relabeled"
+    out.mkdir()
+    (out / "table.txt").write_text("previous evidence")
+    assert await relabel.relabel(source, out, extractor) == 2
+    label.assert_not_awaited()
+    grade.assert_not_called()
+    assert (out / "table.txt").read_text() == "previous evidence"
 
 
 @pytest.mark.asyncio

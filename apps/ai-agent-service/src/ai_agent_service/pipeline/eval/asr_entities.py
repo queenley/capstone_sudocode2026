@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from collections import Counter
+import math
 import re
 import unicodedata
 from .asr import _read, _sha, normalize
@@ -42,12 +43,20 @@ def labels(path, selected: list[dict]) -> tuple[list[dict], dict, list[dict]]:
         raise ValueError('Entity review requires schema_version=1')
     vocabulary = document.get('vocabulary', [])
     if not isinstance(vocabulary, list) or any(not isinstance(item, dict) or not isinstance(item.get('canonical'), str)
-                                               or not isinstance(item.get('type'), str) for item in vocabulary):
+                                               or not item['canonical'].strip() or not isinstance(item.get('type'), str)
+                                               or not item['type'].strip() or ('aliases' in item and (
+                                                   not isinstance(item['aliases'], list) or any(
+                                                       not isinstance(alias, str) or not alias.strip() for alias in item['aliases'])))
+                                               for item in vocabulary):
         raise ValueError('Invalid entity vocabulary')
     records = document.get('records')
     if not isinstance(records, dict):
         raise ValueError('Entity review requires records keyed by sample ID')
     approved = document.get('status') == 'approved' and bool(document.get('reviewer'))
+    if document.get('status') == 'approved' and (
+            not isinstance(document.get('reviewer'), str) or not document['reviewer'].strip()
+            or not isinstance(document.get('source'), (str, dict)) or not document['source']):
+        raise ValueError('Approved entity labels require a named reviewer and source provenance')
     version = document.get('extractor_version', EXTRACTOR_VERSION + '+closed-clinical-v1')
     if version not in {'asr-entities-v1+closed-clinical-v1', 'asr-entities-v2+closed-clinical-v1'}:
         raise ValueError('Unsupported entity extractor version; replay with a declared implementation')
@@ -56,10 +65,11 @@ def labels(path, selected: list[dict]) -> tuple[list[dict], dict, list[dict]]:
         review = records.get(row['id'])
         if not isinstance(review, dict):
             raise ValueError(f"Entity reference missing for {row['id']}")
-        if unicodedata.normalize('NFC', row['full_text']) != unicodedata.normalize('NFC', review.get('reference_text', '')):
+        if not isinstance(review.get('reference_text'), str) or unicodedata.normalize('NFC', row['full_text']) != unicodedata.normalize('NFC', review['reference_text']):
             raise ValueError(f"Entity review reference mismatch: {row['id']}")
         entities = review.get('entities')
         if not isinstance(entities, dict) or any(not isinstance(k, str) or not isinstance(v, (str, int, float, bool))
+                                               or (isinstance(v, float) and not math.isfinite(v))
                                                for k, v in entities.items()):
             raise ValueError('Canonical entity values must be scalars, not lists accepting any value')
         n += len(entities)

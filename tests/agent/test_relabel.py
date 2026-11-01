@@ -1,11 +1,9 @@
 """A finished run's replies are labelled again by today's extractor and graded, without running the agent."""
 import json
-import shutil
 
 import pytest
 
 from ai_agent_service.components.evaluation import scorers
-from ai_agent_service.config.config_manager import btc_data_dir
 from ai_agent_service.pipeline.eval import relabel
 
 
@@ -39,7 +37,8 @@ async def test_relabel_replaces_old_labels_feeds_history_and_grades(tmp_path):
     run = tmp_path / "run"
     (run / "evidence").mkdir(parents=True)
     (run / "inputs/scenarios").mkdir(parents=True)
-    shutil.copy(btc_data_dir() / "test_set/public_sample/SAMPLE-01.json", run / "inputs/scenarios/SAMPLE-01.json")
+    (run / "inputs/scenarios/SAMPLE-01.json").write_text(json.dumps({"scenario_id": "SAMPLE-01",
+        "calls": {"call_1": {"customer_turns": ["khach"]}, "call_2": {"customer_turns": ["khach"]}}}))
     for name, config in (("full", "full"), ("baseline", "baseline_no_memory")):
         rows = [line(config, "call_2", 1, "agent 2"), line(config, "call_1", 1, "agent 1")]
         (run / f"evidence/{name}.jsonl").write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n", encoding="utf-8")

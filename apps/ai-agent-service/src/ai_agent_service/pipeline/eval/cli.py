@@ -36,12 +36,14 @@ import argparse
 import asyncio
 import json
 import os
-from dataclasses import dataclass, field
+import traceback
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Sequence
 
 from ...config.config_manager import ROOT, btc_data_dir
+from ...llm.evaluation_budget import validate_ledger
 
 
 def runs_dir() -> Path:
@@ -141,7 +143,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 if args.asr or args.asr_hypotheses or args.asr_entity_review or not args.asr_transcribe:
                     raise ValueError("--asr-audio requires --asr-transcribe and no reference/hypotheses options")
                 result = asr.audio_smoke(args.asr_audio, out, args.asr_model, args.asr_denoiser)
-                print(json.dumps(result, ensure_ascii=False, indent=2))
+                print(json.dumps({k: result.get(k) for k in ("status", "WER", "CER")}, ensure_ascii=False, indent=2))
                 print(f"Private evidence: {out}")
                 return 0
             result = asr.evaluate(args.asr, args.asr_hypotheses, out, model=args.asr_model,
@@ -159,20 +161,48 @@ def main(argv: Sequence[str] | None = None) -> int:
         print("--provider and --model go together")
         return 2
     if args.relabel:
-        if args.no_extract or args.config or args.judge:
-            print("--relabel runs only the extractor: it takes neither --no-extract, --config nor --judge")
+        if args.no_extract or args.config or args.judge or args.provider or args.model or args.only:
+            print("--relabel runs only the extractor; agent/config/selection options are not supported")
             return 2
         from . import relabel
 
         out = (args.out or RUNS / (datetime.now().strftime("%Y%m%d-%H%M%S") + "-relabel")).resolve()
+        try:
+            validate_ledger()
+        except RuntimeError as error:
+            print(error)
+            return 2
         print(f"Relabel {args.relabel.resolve()} into {out}")
-        return asyncio.run(relabel.relabel(args.relabel.resolve(), out, _extractor()))
+        try:
+            extractor = _extractor()
+        except (RuntimeError, ValueError) as error:
+            print(f"Extractor setup error: {error}")
+            return 2
+        return asyncio.run(relabel.relabel(args.relabel.resolve(), out, extractor))
     if not args.scenarios.is_dir():
         print(f"{args.scenarios} is not a directory")
         return 2
+    if args.warmup < 0:
+        print("--warmup must be nonnegative")
+        return 2
+    from . import scenarios
+
+    ready, rejected = scenarios.load(args.scenarios, set(args.only) or None)
+    if rejected or not ready:
+        for item in rejected:
+            print(f"Rejected {item.path.name}: {item.reason}")
+        if not ready:
+            print("No scenario to run")
+        return 2
+    args.prepared = ready
     run_id = datetime.now().strftime("%Y%m%d-%H%M%S")
     layout = _layout(args, run_id)
-    layout.directory.mkdir(parents=True, exist_ok=True)
+    try:
+        validate_ledger()
+        prepare_output(layout)
+    except (OSError, ValueError, RuntimeError) as error:
+        print(error)
+        return 2
 
     # Imported here: the evaluation database must be chosen before anything opens a pool.
     from . import runner
@@ -185,7 +215,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     os.environ["MCP_TRANSPORT"] = "stdio"
     os.environ["MCP_LOG_FILE"] = str(layout.side("mcp-servers.log"))
     print(f"Run {run_id}: database {database}, output {layout.directory}")
-    return asyncio.run(_evaluate(args, run_id=run_id, layout=layout, database=database))
+    try:
+        return asyncio.run(_evaluate_locked(args, run_id=run_id, layout=layout, database=database))
+    except Exception as error:
+        layout.side("evaluation-error.log").write_text(traceback.format_exc(), encoding="utf-8")
+        path = layout.side("manifest.json")
+        record = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {"run_id": run_id}
+        record.update(status="INCOMPLETE", failure={"type": type(error).__name__})
+        _write_json(path, record)
+        print(f"Evaluation failed ({type(error).__name__}); see {layout.side('evaluation-error.log')}. No table.")
+        return 1
 
 
 def _layout(args: argparse.Namespace, run_id: str) -> Layout:
@@ -197,19 +236,50 @@ def _layout(args: argparse.Namespace, run_id: str) -> Layout:
     return Layout(directory, {"full": directory / "full.jsonl", "baseline_no_memory": directory / "baseline.jsonl"})
 
 
+def prepare_output(layout: Layout) -> None:
+    """Refuse stale evidence before opening a database or paying for a model."""
+    layout.directory.mkdir(parents=True, exist_ok=True)
+    claim = layout.directory / ".eval-prepare.lock"
+    with claim.open("x", encoding="utf-8"):
+        try:
+            existing = (path for path in layout.directory.iterdir()
+                        if path != claim and path.name.startswith(layout.prefix))
+            if ((layout.directory / "run.lock").exists()
+                    or any(path.exists() for path in layout.traces.values()) or next(existing, None) is not None):
+                raise ValueError(f"Output already contains run evidence: {layout.directory}. Choose a new --out.")
+            with layout.side("run.lock").open("x", encoding="utf-8"):
+                pass
+        finally:
+            claim.unlink()
+
+
+async def _evaluate_locked(args, **kwargs) -> int:
+    from . import runner
+
+    async with runner.evaluation_lock():
+        return await _evaluate(args, **kwargs)
+
+
 async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, database: str) -> int:
     from ...llm import jev
     from ...mcp import client as mcp_client
     from . import report, runner, scenarios, trace
 
     started = datetime.now(timezone.utc)
-    ready, rejected = scenarios.load(args.scenarios, set(args.only) or None)
+    ready, rejected = (args.prepared, []) if hasattr(args, "prepared") else scenarios.load(args.scenarios, set(args.only) or None)
     for item in rejected:
         print(f"  rejected {item.path.name}: {item.reason}")
     if not ready:
         print(f"No scenario to run in {args.scenarios}" + (f" for {', '.join(args.only)}" if args.only else ""))
         return 2
+    if rejected:
+        print("Invalid scenario cohort; no model calls.")
+        return 2
+    frozen = report.freeze(ready, rejected, layout.side("scenarios"))
+    ready = [replace(s, path=frozen / s.path.name) for s in ready]
     configs = list(layout.traces)
+    _write_json(layout.side("manifest.json"), {"run_id": run_id, "status": "INCOMPLETE",
+                "configs": {config: {"memory": config == "full"} for config in configs}, "database": database})
     runs: dict[str, ConfigRun] = {}
     found: dict[str, dict[str, int]] = {}
     extractor = None
@@ -227,9 +297,19 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
                 run.rows += result.rows
                 run.diagnostics += result.diagnostics
                 run.usage += result.usage
+                # Keep paid replies even if labelling or a later scenario fails unexpectedly.
+                trace.write_jsonl(layout.traces[config], run.rows)
+                trace.write_jsonl(layout.side("diagnostics.jsonl"), [d for r in runs.values() for d in r.diagnostics])
+                _write_json(layout.side("usage.json"), {name: r.usage for name, r in runs.items()})
                 if result.error:
                     run.stopped.append({"scenario_id": scenario.scenario_id, "error": result.error})
                     break
+            if not run.stopped:
+                integrity = report.trace_errors(frozen, run.rows, config)
+                if len(run.rows) != len(run.diagnostics):
+                    integrity.append("trace/diagnostic count mismatch")
+                if integrity:
+                    run.stopped.append({"scenario_id": ready[0].scenario_id, "error": "; ".join(integrity)})
             if extractor is not None and not run.stopped:
                 await _label(run, extractor)
             if args.judge and not run.stopped:
@@ -253,14 +333,17 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
                     diagnosis["schema_errors"] = errors
             trace.write_jsonl(layout.traces[config], run.rows)
             found[config] = report.problems(run.rows, run.diagnostics, schema_errors=invalid,
-                                            rejected=len(rejected), scenario_errors=len(run.stopped))
+                                            rejected=len(rejected), scenario_errors=sum(
+                                                item.get("stage") != "extraction" for item in run.stopped))
             print(f"  -> {layout.traces[config]}")
             if run.stopped:
                 break
         advisor = {"provider": rig.provider, "model": rig.advisor.model_name}
     finally:
-        await mcp_client.close_all()
-        await jev.close()
+        try:
+            await mcp_client.close_all()
+        finally:
+            await jev.close()
 
     trace.write_jsonl(layout.side("diagnostics.jsonl"), [d for run in runs.values() for d in run.diagnostics])
     trace.write_jsonl(layout.side("scenario-errors.jsonl"),
@@ -272,7 +355,7 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
         extractor={"model": extractor.model_name, **extractor.stats()} if extractor else None,
         warmup=args.warmup, database=database, found=found,
     )
-    record["status"] = "INCOMPLETE" if report.blocking(found) else "COMPLETE"
+    record["status"] = "INCOMPLETE" if report.blocking(found) else "TRACED"
     _write_json(layout.side("manifest.json"), record)
 
     print()
@@ -286,20 +369,28 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
               + f". The traces are kept in {layout.directory}; see diagnostics.jsonl and scenario-errors.jsonl.")
         return 1
     if args.config:
+        record["status"] = "COMPLETE"
+        _write_json(layout.side("manifest.json"), record)
         return 0
-    frozen = report.freeze(ready, rejected, layout.side("scenarios"))
     retrieval = _retrieval(layout.side("rag"))
     code, table = report.grade(frozen, full=layout.traces["full"], baseline=layout.traces["baseline_no_memory"],
                                out=layout.side("report.json"), rag=layout.side("rag") / "rag_results.json")
+    if code != 0:
+        record.update(status="INCOMPLETE", failure={"stage": "scoring", "exit_code": code})
+        _write_json(layout.side("manifest.json"), record)
+        layout.side("scoring-error.txt").write_text(table + "\n", encoding="utf-8")
+        print(f"Scoring failed (exit {code}); see {layout.side('scoring-error.txt')}. No table.")
+        return 1
+    graded = json.loads(layout.side("report.json").read_text(encoding="utf-8"))
+    failures = report.errors(graded, [d for run in runs.values() for d in run.diagnostics])
+    trace.write_jsonl(layout.side("errors.jsonl"), failures)
     table = f"{table}\n\n{retrieval}"
+    layout.side("table.txt").write_text(table + "\n", encoding="utf-8")
+    record["status"] = "COMPLETE"
+    _write_json(layout.side("manifest.json"), record)
     print()
     print(table)
-    layout.side("table.txt").write_text(table + "\n", encoding="utf-8")
-    if code == 0 and layout.side("report.json").exists():
-        graded = json.loads(layout.side("report.json").read_text(encoding="utf-8"))
-        failures = report.errors(graded, [d for run in runs.values() for d in run.diagnostics])
-        trace.write_jsonl(layout.side("errors.jsonl"), failures)
-        print(f"{len(failures)} failed calls listed in {layout.side('errors.jsonl')}")
+    print(f"{len(failures)} failed calls listed in {layout.side('errors.jsonl')}")
     return code
 
 
@@ -336,6 +427,8 @@ async def _label(run: ConfigRun, extractor: Any) -> None:
     from ...components.evaluation import scorers
     from . import trace
 
+    if len(run.rows) != len(run.diagnostics):
+        raise ValueError("Every trace turn needs exactly one diagnostic before labelling")
     # A burst can reserve the remaining cap before any in-flight usage settles.
     gate = asyncio.Semaphore(1 if os.environ.get("EVAL_BUDGET_DB") else EXTRACTOR_CONCURRENCY)
     history = scorers.previous_sessions(run.rows)
@@ -350,7 +443,7 @@ async def _label(run: ConfigRun, extractor: Any) -> None:
             labels = await extractor.label(data)
             if labels.get("error"):
                 halted = True
-                run.stopped.append({"scenario_id": row["scenario_id"], "error": labels["error"]})
+                run.stopped.append({"scenario_id": row["scenario_id"], "stage": "extraction", "error": labels["error"]})
         row["questions"], row["claims"] = labels["questions"], labels["claims"]
         row["facts_used"] = trace.merged_facts_used(labels["facts_used"], row["facts_used"])
         diagnosis["extraction_items"] = labels["items"]

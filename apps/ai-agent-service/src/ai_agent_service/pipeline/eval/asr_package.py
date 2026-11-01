@@ -9,6 +9,8 @@ from . import asr
 
 def prepare(source: Path, out: Path, *, unit: str, only: set[str] | None = None) -> Path:
     import soundfile as sf
+    if unit not in {'segments', 'montage'}:
+        raise ValueError('Package unit must be segments or montage')
     source = source.resolve()
     manifest_path = source / 'manifest.json'
     manifest = asr._read(manifest_path)
@@ -16,8 +18,15 @@ def prepare(source: Path, out: Path, *, unit: str, only: set[str] | None = None)
         raise ValueError('Package requires manifest.json with files[]')
     records, hashes = [], {}
     planned = []
-    seen = set()
+    seen, files = set(), set()
     for item in manifest['files']:
+        required = ('file_id', 'audio_file', 'reference_file', 'segments_file', 'audio_sha256', 'reference_sha256')
+        if not isinstance(item, dict) or any(not isinstance(item.get(key), str) or not item[key] for key in required):
+            raise ValueError('Each package file requires nonempty file_id, paths and checksums')
+        file_id = item['file_id']
+        if not asr.re.fullmatch(r'[\w-]+', file_id) or file_id in files:
+            raise ValueError('Package file IDs must be unique safe file names')
+        files.add(file_id)
         def child(name):
             path = (source / name).resolve()
             if not path.is_relative_to(source):
@@ -30,9 +39,12 @@ def prepare(source: Path, out: Path, *, unit: str, only: set[str] | None = None)
             digest = asr._sha(path)
             if digest != expected:
                 raise ValueError(f'Package checksum mismatch: {path.name}')
-            hashes[path.name] = digest
-        rows = [json.loads(line) for line in segments_path.read_text(encoding='utf-8').splitlines() if line.strip()]
-        hashes[segments_path.name] = asr._sha(segments_path)
+            hashes[path.relative_to(source).as_posix()] = digest
+        rows = [asr._loads(line) for line in segments_path.read_text(encoding='utf-8').splitlines() if line.strip()]
+        if not rows or any(not isinstance(row, dict) or not isinstance(row.get('reference_text'), str)
+                           or any(key not in row for key in ('start_sample', 'end_sample', 'segment_id')) for row in rows):
+            raise ValueError('Each package segment requires reference_text, sample boundaries and segment_id')
+        hashes[segments_path.relative_to(source).as_posix()] = asr._sha(segments_path)
         if ' '.join(' '.join(row['reference_text'].split()) for row in rows) != ' '.join(reference.read_text(encoding='utf-8').split()):
             raise ValueError('Segment references do not match full reference')
         info = sf.info(audio)
@@ -64,7 +76,7 @@ def prepare(source: Path, out: Path, *, unit: str, only: set[str] | None = None)
         records = [r for r in records if r['id'] in only]
     if not records:
         raise ValueError('Empty package selection')
-    out.mkdir(parents=True, exist_ok=False)
+    asr.private_output(out)
     for audio, start, end, key in planned:
         samples, rate = sf.read(audio, start=start, stop=end, dtype='float32')
         (out / 'audio').mkdir(exist_ok=True)

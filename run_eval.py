@@ -25,4 +25,7 @@ from ai_agent_service.pipeline.eval.cli import main  # noqa: E402  (the path abo
 
 
 if __name__ == "__main__":
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8")
     sys.exit(main())

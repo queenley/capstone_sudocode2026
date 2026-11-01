@@ -20,6 +20,9 @@
 Từ gốc repo, với Python của agent (`apps/ai-agent-service/.venv`) và `docker compose up -d postgres`:
 
 ```bash
+# Bắt buộc cho agent/extractor: dùng ledger hiện có, không tạo lại để vượt cap
+export EVAL_BUDGET_DB=evaluation/runs/20261024-work/budget.sqlite
+
 # Chạy kịch bản qua agent (tốn phí model). Không --config: cả full và baseline_no_memory, rồi in bảng BTC
 python run_eval.py --scenarios evaluation/datasets/create-data-diagnostic-v4/scenarios --only SCN-GEN-0051 --out evaluation/runs/<tên>
 
@@ -36,11 +39,17 @@ python evaluation/rag_offline.py
 python run_eval.py --asr-package /absolute/path/package --asr-unit segments --only CLIP_ID --asr-transcribe --asr-model zipformer-30m --out evaluation/runs/asr-smoke-new
 ```
 
-Giới hạn chi tiêu: `EVAL_BUDGET_DB=<đường dẫn sổ SQLite>` đặt trần USD cho mọi request có phí (xem `llm/evaluation_budget.py`). Sổ hiện dùng nằm ở `evaluation/runs/20261024-work/budget.sqlite`. Không tạo lại sổ để chạy tiếp một ngân sách đã hết. `EVAL_RUNS_DIR` đổi chỗ ghi `runs/`.
+Giới hạn chi tiêu: `EVAL_BUDGET_DB=<đường dẫn sổ SQLite>` là bắt buộc cho agent/extractor, kể cả `--no-extract` và `--relabel`; CLI chặn ledger thiếu/hỏng/hết cap trước DB/model. Sổ hiện dùng nằm ở `evaluation/runs/20261024-work/budget.sqlite`. Không tạo lại sổ để chạy tiếp một ngân sách đã hết. SDK retry phải bằng 0 để không bỏ sót usage của request tính phí. Budget hiện hỗ trợ `openai:gpt-4.1-mini` (xem `llm/evaluation_budget.py`). ASR local/hypothesis replay không cần ledger. `EVAL_RUNS_DIR` đổi chỗ ghi `runs/`.
 
 Mã thoát: `0` đủ nhãn và đã chấm · `1` có lượt lỗi hoặc chưa gắn nhãn (không in bảng, trace vẫn được giữ) · `2` đầu vào hoặc cấu hình sai.
 
 Một run ghi: `full.jsonl`, `baseline.jsonl` (trace theo schema BTC), `diagnostics.jsonl` (từng lượt: lane, guard, và `extraction_items` kèm quote để kiểm tay), `report.json` + `table.txt` (BTC), `usage.json`, `manifest.json`, `errors.jsonl`, `rag/`.
+
+Dùng `--out` mới hoặc thư mục rỗng; CLI không ghi đè bằng chứng đã có. Run lỗi không xuất bảng: xem `scenario-errors.jsonl`, `evaluation-error.log` hoặc `scoring-error.txt` tùy bước lỗi. Manifest chỉ `COMPLETE` sau khi hoàn tất output; chi tiết kiểm thử pipeline và Windows ở [chẩn đoán seed/đường chấm](../docs/evaluation/seed-timeout-windows.md).
+
+Scenario được kiểm trước khi gọi model và snapshot từ nội dung đã nạp, cả `--config`. Database có advisory lock cho toàn bộ run, chặn hai runner reset lẫn nhau; output được giữ chỗ độc quyền. Trước extractor/scorer phải đủ đúng từng scenario/call/turn, đúng config và lời khách, không trùng hoặc trộn run. Trace được lưu sau mỗi scenario để giữ replies nếu bước sau lỗi. Relabel chỉ sửa lỗi extractor trên replies đầy đủ; lỗi seed, graph hoặc after-call vẫn chặn chấm.
+
+Extractor hiện là `product-extractor-v8`: thêm kiểm tra schema cache và ghi file tạm riêng khi chạy đồng thời. Prompt/phép chiếu nhãn giữ nguyên từ v7 nhưng instrument hash đổi; muốn so với v7 phải relabel cùng replies. Cache JSON có thể mất hit khi nhiều process ghi snapshot, làm tăng số cache miss trong cap; không làm file cache bị ghi dở.
 
 ## Quy tắc
 

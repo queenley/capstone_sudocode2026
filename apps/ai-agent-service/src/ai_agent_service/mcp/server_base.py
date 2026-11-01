@@ -36,6 +36,7 @@ import os
 from typing import Any, Awaitable, Callable, Iterable, Sequence
 
 import psycopg
+from anyio import CancelScope
 from psycopg.rows import dict_row
 from psycopg_pool import AsyncConnectionPool
 
@@ -223,8 +224,14 @@ async def database() -> AsyncConnectionPool:
                 timeout=10,
                 kwargs={"row_factory": dict_row, "autocommit": True, "connect_timeout": 10},
             )
-            await pool.open()
-            await pool.wait(timeout=12)
+            try:
+                await pool.open()
+                await pool.wait(timeout=12)
+            except BaseException:
+                # MCP cancellation must also stop this unpublished pool's workers.
+                with CancelScope(shield=True):
+                    await pool.close()
+                raise
             _pool = pool
     return _pool
 

@@ -23,12 +23,14 @@ scenarios through here.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any, Mapping
 
 from ...components import clock
+from ...components.memory import ontology
 
 #: The organisers' channel names (``scenario_format.md``, and ``web_chat`` from
 #: ``handoff_brief.schema.json``) to the product's. Anything else is refused.
@@ -102,6 +104,7 @@ def load(directory: Path, only: set[str] | None = None) -> tuple[list[Scenario],
     """The scenarios of *directory* that can run, and the ones that cannot, with the reason."""
     ready: list[Scenario] = []
     rejected: list[Rejected] = []
+    seen: set[str] = set()
     for path in sorted(directory.glob("*.json")):
         if path.name.startswith("_"):
             continue
@@ -114,15 +117,24 @@ def load(directory: Path, only: set[str] | None = None) -> tuple[list[Scenario],
         if only and scenario_id not in only:
             continue
         try:
+            if not isinstance(data, dict):
+                raise ScenarioError("a scenario must be an object")
+            if not isinstance(data.get("scenario_id"), str) or not data["scenario_id"].strip():
+                raise ScenarioError("scenario_id must be a non-empty string")
+            if scenario_id in seen:
+                raise ScenarioError(f"duplicate scenario_id {scenario_id!r}")
+            seen.add(scenario_id)
             ready.append(Scenario(path, scenario_id, data, plan(data)))
         except (ScenarioError, KeyError, TypeError, ValueError) as error:
             rejected.append(Rejected(path, scenario_id, f"{type(error).__name__}: {error}"))
+    for missing in sorted((only or set()) - seen - {item.scenario_id for item in rejected}):
+        rejected.append(Rejected(directory, missing, "requested scenario_id was not found"))
     return ready, rejected
 
 
 def plan(scenario: Mapping[str, Any]) -> tuple[CallPlan, ...]:
     """Every call of *scenario*, in order, with its day, keys, turns and prior sessions."""
-    if not isinstance(scenario.get("calls"), dict) or not scenario["calls"]:
+    if not isinstance(scenario, Mapping) or not isinstance(scenario.get("calls"), dict) or not scenario["calls"]:
         raise ScenarioError("a scenario needs calls")
     days = call_days(scenario)
     plans = []
@@ -137,7 +149,11 @@ def plan(scenario: Mapping[str, Any]) -> tuple[CallPlan, ...]:
 
 def call_names(scenario: Mapping[str, Any]) -> list[str]:
     """``call_1``, ``call_2``, ...: numbered order, no gaps."""
-    names = sorted(scenario["calls"], key=lambda name: int(str(name).split("_")[1]))
+    if len(scenario["calls"]) > 3:
+        raise ScenarioError("the BTC trace schema supports at most three calls")
+    if any(not isinstance(name, str) or not re.fullmatch(r"call_[1-9][0-9]*", name) for name in scenario["calls"]):
+        raise ScenarioError("call names must be call_1, call_2, ...")
+    names = sorted(scenario["calls"], key=lambda name: int(name.split("_")[1]))
     if names != [f"call_{i}" for i in range(1, len(names) + 1)]:
         raise ScenarioError(f"calls must run call_1, call_2, ... without gaps: {names}")
     return names
@@ -149,6 +165,8 @@ def call_days(scenario: Mapping[str, Any]) -> dict[str, str]:
     days: dict[str, str] = {}
     for name in call_names(scenario):
         spec = scenario["calls"][name]
+        if not isinstance(spec, Mapping):
+            raise ScenarioError(f"{name} must be an object")
         if spec.get("call_date"):
             current = date.fromisoformat(str(spec["call_date"])[:10])
         else:
@@ -187,10 +205,19 @@ def connection(scenario: Mapping[str, Any], spec: Mapping[str, Any]) -> tuple[st
 
 def customer_turns(spec: Mapping[str, Any]) -> tuple[list[str], str | None]:
     """The turns the system must take, and their input mode."""
-    clean = list(spec.get("customer_turns") or [])
+    for field in ("customer_turns", "customer_turns_asr"):
+        if field in spec:
+            value = spec[field]
+            if not isinstance(value, list) or any(not isinstance(text, str) or not text.strip() for text in value):
+                raise ScenarioError(f"{field} must be a list of non-empty strings")
+    clean = spec.get("customer_turns") or []
     if "customer_turns_asr" not in spec:
+        if not clean:
+            raise ScenarioError("a call needs at least one customer turn")
         return clean, None
-    noisy = list(spec.get("customer_turns_asr") or [])
+    noisy = spec["customer_turns_asr"]
+    if not noisy:
+        raise ScenarioError("a call needs at least one customer turn")
     if clean and len(noisy) != len(clean):
         raise ScenarioError("customer_turns_asr and customer_turns differ in length")
     mode = spec.get("input_mode") or "asr_transcript"
@@ -227,7 +254,13 @@ def seed_sessions(raw: Any, *, day: str, channel: str) -> tuple[SeedSession, ...
         facts = item.get("facts") if "facts" in item else item.get("facts_established")
         if facts is not None and not isinstance(facts, Mapping):
             raise ScenarioError(f"seed_history entry {index}: facts must be an object of flat slots")
-        if not facts and not item.get("summary"):
+        if any(ontology.slot(slot) is None for slot in facts or {}):
+            raise ScenarioError(f"seed_history entry {index} has an unknown memory slot")
+        for slot, value in (facts or {}).items():
+            valid, canonical = ontology.coerce(slot, value)
+            if not valid or type(canonical) is not type(value) or canonical != value:
+                raise ScenarioError(f"seed_history entry {index} has an invalid value for {slot!r}")
+        if not facts and not item.get("summary") and not item.get("order_id"):
             raise ScenarioError(f"seed_history entry {index} has neither facts nor a summary: {sorted(item)}")
         sessions.append(SeedSession(
             session_id=seed_session_id(item, index),
@@ -237,6 +270,10 @@ def seed_sessions(raw: Any, *, day: str, channel: str) -> tuple[SeedSession, ...
             outcome=str(item.get("outcome") or "khac"),
             facts=dict(facts or {}),
         ))
+        if sessions[-1].day > day:
+            raise ScenarioError(f"seed_history entry {index} is dated after its call")
+        if sessions[-1].channel not in CHANNELS.values():
+            raise ScenarioError(f"seed_history entry {index} has an unknown channel")
     return tuple(sorted(sessions, key=lambda s: s.day))
 
 

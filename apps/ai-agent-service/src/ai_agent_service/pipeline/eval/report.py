@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import platform
 import re
 import shutil
@@ -34,7 +35,7 @@ from ...components.evaluation import scorers
 from ...components.knowledge import corpus
 from ...config.config_manager import LANES_YAML, ROOT, btc_data_dir, get_knowledge_config, get_models_config, kb_dir
 from ...llm.factory import limiter_stats
-from .scenarios import Rejected, Scenario
+from .scenarios import Rejected, Scenario, load
 
 #: Counts that make a run's table untrustworthy: no table is printed.
 BLOCKING = ("failed_turns", "unlabelled_turns", "after_call_failed", "schema_errors",
@@ -143,12 +144,11 @@ def freeze(scenarios: list[Scenario], rejected: list[Rejected], into: Path) -> P
     to grade a cohort with rejected or stopped scenarios.
     """
     into.mkdir(parents=True, exist_ok=True)
-    for path in [s.path for s in scenarios] + [r.path for r in rejected]:
-        try:
-            if isinstance(json.loads(path.read_text(encoding="utf-8")).get("scenario_id"), str):
-                shutil.copy2(path, into / path.name)
-        except (OSError, ValueError, AttributeError):
-            continue
+    for scenario in scenarios:
+        (into / scenario.path.name).write_text(json.dumps(scenario.data, ensure_ascii=False, indent=2) + "\n",
+                                              encoding="utf-8")
+    for item in rejected:
+        shutil.copy2(item.path, into / item.path.name)
     return into
 
 
@@ -158,14 +158,53 @@ def grade(scenarios_dir: Path, *, full: Path, baseline: Path | None, out: Path,
     for path in (full, baseline):
         if path is not None and (not path.is_file() or not path.read_text(encoding="utf-8").strip()):
             return 1, f"Not scored: missing or empty trace {path}."
+    try:
+        for config, path in (("full", full), ("baseline_no_memory", baseline)):
+            if path is not None:
+                rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+                failures = trace_errors(scenarios_dir, rows, config)
+                if failures:
+                    return 1, "Not scored: " + "; ".join(failures)
+    except (OSError, ValueError, TypeError) as error:
+        return 1, f"Not scored: invalid input ({type(error).__name__})."
     command = [sys.executable, str(btc_data_dir() / "eval" / "reference_eval.py"), "--scenarios", str(scenarios_dir),
                "--trace", str(full), "--out", str(out)]
     if baseline is not None:
         command += ["--baseline", str(baseline)]
     if rag is not None:
         command += ["--rag", str(rag)]
-    finished = subprocess.run(command, capture_output=True, text=True)
+    finished = subprocess.run(command, capture_output=True, encoding="utf-8",
+                              env={**os.environ, "PYTHONIOENCODING": "utf-8", "PYTHONUTF8": "1"})
     return finished.returncode, (finished.stdout + finished.stderr).strip()
+
+
+def trace_errors(scenarios_dir: Path, rows: list[dict[str, Any]], config: str) -> list[str]:
+    """The scorer accepts partial traces; the harness requires every planned turn exactly once."""
+    from . import trace
+
+    scenarios, rejected = load(scenarios_dir)
+    if rejected or not scenarios:
+        return ["invalid or empty scenario cohort"]
+    expected = {(s.scenario_id, call.name, index): text
+                for s in scenarios for call in s.calls for index, text in enumerate(call.turns, 1)}
+    seen = set()
+    runs = set()
+    for row in rows:
+        if trace.schema_errors(row):
+            return [f"{config}: invalid trace schema"]
+        key = (row["scenario_id"], row["call"], row["turn"])
+        if row["config"] != config or key in seen or key not in expected:
+            return [f"{config}: unexpected or duplicate turn"]
+        if row["customer_text"] != expected[key]:
+            return [f"{config}: customer input differs from scenario"]
+        runs.add(row["run_id"])
+        seen.add(key)
+    errors = []
+    if seen != expected.keys():
+        errors.append(f"{config}: missing {len(expected.keys() - seen)} planned turns")
+    if len(runs) != 1:
+        errors.append(f"{config}: trace must contain exactly one run_id")
+    return errors
 
 
 def errors(report: Mapping[str, Any], diagnostics: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:

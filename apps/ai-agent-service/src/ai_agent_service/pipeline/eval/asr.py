@@ -57,7 +57,7 @@ def distribution(values: list[float]) -> dict:
             "warning": "fewer than 100 observations" if len(values) < 100 else None}
 
 
-def _read(path: Path):
+def _loads(text: str):
     def unique(pairs):
         result = {}
         for key, value in pairs:
@@ -65,7 +65,11 @@ def _read(path: Path):
                 raise ValueError(f"Duplicate JSON key: {key}")
             result[key] = value
         return result
-    return json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique)
+    return json.loads(text, object_pairs_hook=unique)
+
+
+def _read(path: Path):
+    return _loads(path.read_text(encoding="utf-8"))
 
 
 def _sha(path: Path) -> str:
@@ -410,9 +414,14 @@ def evaluate(source: Path, hypotheses: Path | None, out: Path, *, model: str = "
         try:
             fingerprint = json.dumps(variants[variant], ensure_ascii=False, sort_keys=True)
             if fingerprint not in score_cache:
-                score_cache[fingerprint] = _grader().wer_cer(str(folder))
+                score = _grader().wer_cer(str(folder))
+                if (not isinstance(score, dict) or score.get("n_dialogues") != len(rows)
+                        or any(type(score.get(key)) not in (int, float)
+                               or not math.isfinite(score[key]) or score[key] < 0 for key in ("WER", "CER"))):
+                    raise ValueError("Main ASR scorer returned missing or invalid scores")
+                score_cache[fingerprint] = score
             official[variant] = score_cache[fingerprint]
-        except (ValueError, TypeError, KeyError, ZeroDivisionError, AttributeError) as error:
+        except Exception as error:
             official[variant] = {"status": "unavailable", "error": type(error).__name__}
     diagnostics = summarize(rows, attempted=len(selected), failures=failures)
     diagnostics["main_scores_available"] = all(isinstance(score, dict) and score.get("status") != "unavailable" for score in official.values())
