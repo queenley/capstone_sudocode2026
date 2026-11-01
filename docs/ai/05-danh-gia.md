@@ -85,7 +85,7 @@ Một lệnh duy nhất, `run_eval.py` ở gốc repo, cũng là lệnh giám kh
 flowchart LR
     DS[("Kịch bản<br/>v4 hoặc public_sample")] --> RUN["chạy agent thật<br/>full + baseline"]
     RUN --> TR["trace BTC<br/>(tool, latency, memory)"]
-    TR --> EX["extractor v4<br/>questions, claims, facts_used"]
+    TR --> EX["extractor v5<br/>questions, claims, facts_used"]
     EX --> CK["kiểm: lượt lỗi hoặc<br/>chưa gắn nhãn thì chặn"]
     CK --> SC["reference_eval.py<br/>(BTC)"]
     SC --> OUT["bảng chỉ số + Recall@k"]
@@ -94,6 +94,9 @@ flowchart LR
 - **`facts_used`** = slot extractor thấy được dùng lại từ cuộc trước, rồi slot của các dòng brief agent đã trích dẫn `[Bn]`.
 - **`questions` và `claims`** do **extractor** trích. BTC không cung cấp extractor (đây là trách nhiệm của đội); BTC chấm tay ngẫu nhiên 20 lượt để kiểm extractor có bỏ sót không. Extractor dùng **từ vựng cố định**: 36 slot (34 của ontology, `channel` và `order_summary`) và 18 trường claim cộng `promo_<CODE>_active`, kèm kiểu giá trị; slot ngoài bộ thành `other`, claim sai kiểu bị bỏ. Từ **v5** (`product-extractor-v5`), câu đọc lại đơn trước khi tạo ("Em lên đơn AirPure X 4.890.000đ, COD, giao Quận 3, đúng không ạ?") là **một** câu xác nhận `order_summary`, không còn một câu cho mỗi chi tiết: đọc lại một lần như PB-09 và J07 yêu cầu không bị tính thừa và chỉ là một câu trong `max_agent_questions`; đọc lại lần hai mới thừa. Giá trị khách đã nói ở cuộc trước được đọc lại vẫn là `fact_usage`, nên CCR không đổi. Mỗi item kèm câu trích dẫn đúng nguyên văn để người chấm kiểm tay (`diagnostics.jsonl`).
 - **Thiếu bằng chứng không được điền 0 hay PASS.** Một lượt lỗi hoặc chưa gắn nhãn thì không in bảng.
+- **Số của nhóm, in dưới bảng BTC, không thay số chính thức:**
+  - `team_checks.json`: khóa `success_if.say_at_most` của kịch bản, số lượt agent khớp một mẫu không quá mức (ví dụ giới thiệu AIR-2ND-50 tối đa 3 lượt, không bao giờ nói sai điều kiện). `reference_eval` bỏ qua khóa này.
+  - `rqr_a1.json`: RQR theo đúng lời văn A.1 của đề, câu xác nhận không bao giờ tính là thừa. `reference_eval` tính câu xác nhận cùng một ô lần thứ hai là thừa (giải đáp câu 11 của BTC), nên số chính thức là của nó; file ghi kèm số câu xác nhận lặp và mức giảm so với baseline theo cả hai cách. Báo cáo dùng số này phải nêu lý do, theo phụ lục A.
 - **Ngân sách API:** sổ SQLite (`EVAL_BUDGET_DB`) giữ dự phòng trước mỗi request có phí, chỉ hoàn khi có usage. Hết ngân sách thì dừng, không tạo lại sổ để lách.
 
 ---

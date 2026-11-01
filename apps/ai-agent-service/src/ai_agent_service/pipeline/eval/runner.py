@@ -256,19 +256,27 @@ async def seed(rig: Rig, sessions: tuple[SeedSession, ...], *, customer_phone: s
                               "kind": spec.kind, "source": source, "replaces": held[slot][0] if slot in held else None,
                               "disputed": False, "valid_to": valid_to, "confidence": 1.0})
         if decisions:
-            written = await rig.writer.data("memory_commit_facts", customer_id=customer_id, decisions=decisions, on=session.day)
+            envelope = await rig.writer.call("memory_commit_facts", customer_id=customer_id, decisions=decisions, on=session.day)
+            written = envelope.get("data") if envelope.get("ok") else None
             if written is None:
-                raise scenarios.ScenarioError(f"seed {session.session_id}: the ledger refused its facts")
+                raise scenarios.ScenarioError(f"seed {session.session_id}: the ledger refused its facts "
+                                              f"({_why(envelope)})")
             for write in written.get("memory_writes") or []:
                 held[write["key"]] = (write.get("fact_id"), write.get("value"))
-        episode = await rig.writer.data("memory_commit_episode", customer_id=customer_id, episode={
+        episode = await rig.writer.call("memory_commit_episode", customer_id=customer_id, episode={
             "call_id": f"seed:{session.session_id}", "channel": session.channel, "date": session.day,
             "summary": session.summary or f"Phiên ngày {clock.day_label(session.day)} qua {session.channel}.",
             "outcome": session.outcome, "commitments": [], "source_turn_span": [],
         })
-        if episode is None:
-            raise scenarios.ScenarioError(f"seed {session.session_id}: the ledger refused its episode")
+        if not episode.get("ok"):
+            raise scenarios.ScenarioError(f"seed {session.session_id}: the ledger refused its episode ({_why(episode)})")
     return customer_id
+
+
+def _why(envelope: dict[str, Any]) -> str:
+    """A failed envelope's code and message, for the line that says a seed was refused."""
+    error = envelope.get("error") or {}
+    return f"{error.get('code', '?')}: {error.get('message', 'no message')}"
 
 
 async def _seed_owner(rig: Rig, phone: str | None, name: str | None) -> str:

@@ -1,6 +1,6 @@
 # 1. Pipeline xử lý
 
-[← Mục lục](README.md) · Tiếp theo: [Xử lý tình huống →](02-xu-ly-tinh-huong.md)
+[← Kiến trúc hệ thống](00-kien-truc.md) · [Mục lục](README.md) · Tiếp theo: [Xử lý tình huống →](02-xu-ly-tinh-huong.md)
 
 Trang này đi theo **một tin nhắn** từ lúc khách gõ (hoặc nói) đến lúc trợ lý trả lời, rồi xem chuyện gì xảy ra **sau khi cuộc gọi kết thúc**.
 

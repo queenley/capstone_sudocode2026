@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import platform
 import re
 import shutil
@@ -159,7 +160,9 @@ def grade(scenarios_dir: Path, *, full: Path, baseline: Path | None, out: Path,
         command += ["--baseline", str(baseline)]
     if rag is not None:
         command += ["--rag", str(rag)]
-    finished = subprocess.run(command, capture_output=True, text=True)
+    # Its table is Vietnamese; a Windows console's cp1252 would kill it at the first print.
+    finished = subprocess.run(command, capture_output=True, text=True, encoding="utf-8",
+                              env={**os.environ, "PYTHONIOENCODING": "utf-8"})
     return finished.returncode, (finished.stdout + finished.stderr).strip()
 
 
@@ -199,6 +202,121 @@ def team_table(checks: Mapping[str, Mapping[str, Any] | None]) -> str:
     for config, result in checks.items():
         lines.append(f"  {config:20} " + ("no call carries say_at_most" if result is None else
                                           f"{result['calls_failed']}/{result['calls_checked']} calls over the limit"))
+    return "\n".join(lines)
+
+
+def rqr_a1(scenarios_dir: Path, traces: Mapping[str, Path]) -> dict[str, Any]:
+    """RQR as the brief's A.1 words it, beside ``reference_eval``'s: a question is redundant only when it is OPEN on a
+    ``must_not_ask`` slot; a confirmation never is, the second one on a slot included. The organisers' script also
+    counts that second confirmation (their answer to question 11), so its number is the official one and this one
+    is the team's, reported with the reason (brief, appendix A: a different calculation is stated and explained).
+
+    Same calls (those with ``must_not_ask``), same denominator (every question). ``repeat_confirms`` is what the two
+    numbers differ by. The reduction against the baseline is the brief's relative one, (baseline - system) / baseline.
+    """
+    protected: dict[tuple[str, str], set[str]] = {}
+    for path in sorted(scenarios_dir.glob("*.json")):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        for call, spec in (data.get("calls") or {}).items():
+            if spec.get("must_not_ask"):
+                protected[(data["scenario_id"], call)] = set(spec["must_not_ask"])
+    result: dict[str, Any] = {}
+    for config, path in traces.items():
+        redundant = total = repeats = 0
+        confirmed: dict[tuple[str, str], set[str]] = {}
+        for line in (path.read_text(encoding="utf-8").splitlines() if path.is_file() else []):
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            key = (row["scenario_id"], row["call"])
+            if key not in protected:
+                continue
+            for question in row.get("questions") or []:
+                total += 1
+                if question.get("type") == "open" and question.get("slot") in protected[key]:
+                    redundant += 1
+                elif question.get("type") == "confirm":
+                    seen = confirmed.setdefault(key, set())
+                    repeats += question.get("slot") in seen
+                    seen.add(question.get("slot"))
+        result[config] = ({"value": round(100 * redundant / total, 1), "redundant": redundant, "total_questions": total,
+                           "repeat_confirms": repeats} if total else None)
+    base, system = result.get("baseline_no_memory"), result.get("full")
+    if base and system and base["value"]:
+        result["relative_reduction_pct"] = round((base["value"] - system["value"]) / base["value"] * 100, 1)
+    return result
+
+
+def rqr_a1_table(result: Mapping[str, Any], official: Mapping[str, Any] | None = None) -> str:
+    """The A.1 RQR under the organisers' table, with their reduction beside it when the report has it."""
+    lines = ["RQR as A.1 words it (confirmations never redundant; team's number, not reference_eval)"]
+    for config in ("baseline_no_memory", "full"):
+        if config in result:
+            r = result[config]
+            lines.append(f"  {config:20} " + ("no question on a call with must_not_ask" if r is None else
+                                              f"{r['value']}% ({r['redundant']}/{r['total_questions']}), "
+                                              f"{r['repeat_confirms']} repeated confirmations not counted"))
+    if "relative_reduction_pct" in result:
+        theirs = ((official or {}).get("comparison") or {}).get("rqr_relative_reduction_pct")
+        lines.append(f"  reduction vs baseline {result['relative_reduction_pct']}% (A.1) · "
+                     f"{theirs if theirs is not None else '-'}% (reference_eval) · target ≥ 40%")
+    return "\n".join(lines)
+
+
+def scenario_recall(scenarios_dir: Path, diagnostics: Iterable[Mapping[str, Any]]) -> dict[str, dict[str, Any] | None]:
+    """Retrieval against the scenarios' own labels: each call's ``relevant_policy_ids`` (the team's key, the sections
+    an ideal agent consults) against the chunks the agent's knowledge search returned on the turns of that call
+    (``diagnose``'s ``knowledge.chunks``), every turn's hits together.
+
+    The words are ``reference_eval.rag_eval``'s, without its cut at k (a call has several searches): ``recall`` is the
+    share of calls with at least one labelled section retrieved, ``full_recall`` the share with all of them;
+    ``coverage`` is the mean share of a call's sections retrieved. A diagnostic beside the organisers' numbers.
+    A turn whose diagnosis has no ``knowledge`` key (an older run) is no evidence; a call without one is left out,
+    and a configuration with none of the labelled calls is None.
+    """
+    labelled: dict[tuple[str, str], set[str]] = {}
+    for path in sorted(scenarios_dir.glob("*.json")):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        for call, spec in (data.get("calls") or {}).items():
+            if spec.get("relevant_policy_ids"):
+                labelled[(data["scenario_id"], call)] = set(spec["relevant_policy_ids"])
+    retrieved: dict[str, dict[tuple[str, str], list[str]]] = {}
+    for diagnosis in diagnostics:
+        key = (diagnosis.get("scenario_id"), diagnosis.get("call"))
+        if key not in labelled or "knowledge" not in diagnosis:
+            continue
+        chunks = retrieved.setdefault(diagnosis["config"], {}).setdefault(key, [])
+        for chunk in (diagnosis["knowledge"] or {}).get("chunks") or []:
+            if chunk and (chunk := chunk.split("#")[0]) not in chunks:
+                chunks.append(chunk)
+    result: dict[str, dict[str, Any] | None] = {}
+    for config in ("baseline_no_memory", "full"):
+        calls = retrieved.get(config)
+        if not calls:
+            result[config] = None
+            continue
+        rows = [{"scenario": sid, "call": call, "relevant": sorted(labelled[(sid, call)]), "retrieved": chunks,
+                 "missed": sorted(labelled[(sid, call)] - set(chunks))} for (sid, call), chunks in sorted(calls.items())]
+        n = len(rows)
+        result[config] = {
+            "calls": n,
+            "recall": round(100 * sum(1 for r in rows if len(r["missed"]) < len(r["relevant"])) / n, 1),
+            "full_recall": round(100 * sum(1 for r in rows if not r["missed"]) / n, 1),
+            "coverage": round(100 * sum(1 - len(r["missed"]) / len(r["relevant"]) for r in rows) / n, 1),
+            "calls_without_search": sum(1 for r in rows if not r["retrieved"]),
+            "per_call": rows,
+        }
+    return result
+
+
+def scenario_recall_table(result: Mapping[str, Mapping[str, Any] | None]) -> str:
+    """The scenario recall under the organisers' table, marked as the team's."""
+    lines = ["Retrieval on the scenarios' relevant_policy_ids (agent's searches per call; team's, not reference_eval)"]
+    for config, r in result.items():
+        lines.append(f"  {config:20} " + ("no labelled call with a knowledge diagnosis" if r is None else
+                                          f"recall {r['recall']}% · full_recall {r['full_recall']}% · coverage "
+                                          f"{r['coverage']}% over {r['calls']} calls, {r['calls_without_search']} "
+                                          f"without a search"))
     return "\n".join(lines)
 
 

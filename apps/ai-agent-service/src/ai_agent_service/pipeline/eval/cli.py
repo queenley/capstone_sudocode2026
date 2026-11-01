@@ -107,6 +107,9 @@ def parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = parser().parse_args(argv)
+    from ...mcp.server_base import use_selector_loop_on_windows
+
+    use_selector_loop_on_windows()   # async psycopg on Windows; the MCP servers then start through Popen
     if bool(args.provider) != bool(args.model):
         print("--provider and --model go together")
         return 2
@@ -226,7 +229,13 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
                                out=layout.side("report.json"), rag=layout.side("rag") / "rag_results.json")
     checks = report.team_checks(frozen, layout.traces)
     _write_json(layout.side("team_checks.json"), checks)
-    table = f"{table}\n\n{retrieval}\n\n{report.team_table(checks)}"
+    a1 = report.rqr_a1(frozen, layout.traces)
+    _write_json(layout.side("rqr_a1.json"), a1)
+    recall = report.scenario_recall(frozen, [d for run in runs.values() for d in run.diagnostics])
+    _write_json(layout.side("rag") / "scenario_recall.json", recall)
+    official = json.loads(layout.side("report.json").read_text(encoding="utf-8")) if layout.side("report.json").exists() else None
+    table = (f"{table}\n\n{retrieval}\n\n{report.scenario_recall_table(recall)}\n\n{report.team_table(checks)}"
+             f"\n\n{report.rqr_a1_table(a1, official)}")
     print()
     print(table)
     layout.side("table.txt").write_text(table + "\n", encoding="utf-8")

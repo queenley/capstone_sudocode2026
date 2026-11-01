@@ -33,6 +33,7 @@ from . import report, trace
 #: Where a run keeps its two traces and its scenarios: a harness run, then a run of this command.
 TRACES = (("evidence/full.jsonl", "evidence/baseline.jsonl"), ("full.jsonl", "baseline.jsonl"))
 SCENARIOS = ("inputs/scenarios", "scenarios")
+DIAGNOSTICS = ("evidence/diagnostics.jsonl", "diagnostics.jsonl")
 #: What an old line's extractor wrote; everything else in a line is what the run did.
 LABELS = ("questions", "claims", "facts_used")
 
@@ -101,7 +102,16 @@ async def relabel(run: Path, out: Path, extractor: Any) -> int:
                                out=out / "report.json")
     checks = report.team_checks(frozen, written)
     _write_json(out / "team_checks.json", checks)
-    table = f"{table}\n\n{report.team_table(checks)}"
+    a1 = report.rqr_a1(frozen, written)
+    _write_json(out / "rqr_a1.json", a1)
+    # The searches are the old run's: its own diagnostics hold them.
+    old = next((run / name for name in DIAGNOSTICS if (run / name).is_file()), None)
+    recall = report.scenario_recall(frozen, [json.loads(line) for line in old.read_text(encoding="utf-8").splitlines()
+                                             if line.strip()] if old else [])
+    _write_json(out / "scenario_recall.json", recall)
+    official = json.loads((out / "report.json").read_text(encoding="utf-8")) if (out / "report.json").exists() else None
+    table = (f"{table}\n\n{report.scenario_recall_table(recall)}\n\n{report.team_table(checks)}"
+             f"\n\n{report.rqr_a1_table(a1, official)}")
     (out / "table.txt").write_text(table + "\n", encoding="utf-8")
     print(table)
     return 0 if code == 0 else 1

@@ -34,7 +34,9 @@ run_eval.py --scenarios <thư mục> [--config ...] [--only ID] [--no-extract] -
  │
  └─ report.grade   python reference_eval.py --scenarios ... --trace full.jsonl --baseline baseline.jsonl
                    → report.json, table.txt  ← SỐ CHÍNH THỨC; thêm bảng Recall@k của RAG (rag.py)
+                   → rag/scenario_recall.json ← chunk agent truy hồi mỗi cuộc (diagnostics) so với relevant_policy_ids, chẩn đoán
                    → team_checks.json        ← kiểm tra của nhóm (say_at_most), chẩn đoán, in dưới bảng
+                   → rqr_a1.json             ← RQR theo lời văn A.1 (xác nhận không tính thừa), cạnh số chính thức
 ```
 
 Có `--config` thì chỉ chạy và ghi một file trace, không chấm (BTC sẽ ghép hai file rồi tự chạy `reference_eval.py`).

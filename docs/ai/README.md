@@ -10,6 +10,7 @@ Mã nguồn chính: [`apps/ai-agent-service`](../../apps/ai-agent-service/). REA
 
 | # | Tài liệu | Trả lời câu hỏi | Dành cho |
 |---|---|---|---|
+| 0 | [Kiến trúc hệ thống](00-kien-truc.md) | Trợ lý nằm ở đâu trong hệ thống? PostgreSQL, Redis, Kafka, LiveKit dùng làm gì? Chat, gọi thoại, hotline, Zalo, chốt đơn, chuyển nhân viên, sau cuộc gọi đi qua luồng nào? Embedding của tri thức lưu ở đâu, có dùng Qdrant không? | mọi người |
 | 1 | [Pipeline xử lý](01-pipeline.md) | Một tin nhắn đi qua những bước nào? Sau cuộc gọi xảy ra gì? Voice chạy ra sao? | mọi người |
 | 2 | [Xử lý tình huống](02-xu-ly-tinh-huong.md) | Khách mới, khách quen, số dùng chung, khiếu nại, hết hàng, hỏi ngoài tài liệu... được xử lý thế nào? | PM, QA, dev |
 | 3 | [Thuật toán](03-thuat-toan.md) | Truy hồi tri thức, chọn lane, guardrail, chuẩn hóa số nói, che PII, cổng ghi bộ nhớ hoạt động thế nào? | dev, người làm AI |
