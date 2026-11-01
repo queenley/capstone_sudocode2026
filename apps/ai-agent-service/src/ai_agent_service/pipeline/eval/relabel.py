@@ -61,19 +61,51 @@ def unlabelled(path: Path) -> list[dict[str, Any]]:
     return sorted(rows, key=lambda r: (r["scenario_id"], r["call"], r["turn"]))
 
 
+def source_errors(run: Path, traces: dict[str, Path], rows: dict[str, list[dict]]) -> list[str]:
+    """Relabelling repairs extraction, never missing replies or failed execution."""
+    errors = [f"{config}: empty trace" for config, items in rows.items() if not items]
+    fatal = set(report.BLOCKING) - {"unlabelled_turns"}
+    for parent in (run, run / "evidence"):
+        path = parent / "manifest.json"
+        if path.is_file():
+            manifest = json.loads(path.read_text(encoding="utf-8"))
+            for config, counts in manifest.get("problems", {}).items():
+                errors += [f"{config}: source {key}" for key in fatal if counts.get(key)]
+            errors += [f"{config}: missing source trace" for config in manifest.get("configs", {}) if config not in traces]
+        for name in ("diagnostics.jsonl", "scenario-errors.jsonl"):
+            path = parent / name
+            if not path.is_file():
+                continue
+            for line in path.read_text(encoding="utf-8").splitlines():
+                if line.strip():
+                    item = json.loads(line)
+                    if item.get("error") or (item.get("after_call") or {}).get("status") == "failed":
+                        errors.append(f"Source execution failure in {name}")
+                        break
+    return errors
+
+
 async def relabel(run: Path, out: Path, extractor: Any) -> int:
     """Label *run* again into *out* and grade it: 0 when every turn was labelled, 1 when one was not, 2 on bad input."""
     from .cli import ConfigRun, _label, _write_json
 
     try:
         traces, scenarios_dir = locate(run)
-    except ValueError as error:
+        if out.resolve().is_relative_to(run.resolve()) or run.resolve().is_relative_to(out.resolve()):
+            raise ValueError("Relabel output must be separate from the source run")
+        prepared = {config: unlabelled(path) for config, path in traces.items()}
+        failures = source_errors(run, traces, prepared)
+    except (OSError, ValueError, TypeError, AttributeError) as error:
         print(error)
         return 2
     out.mkdir(parents=True, exist_ok=True)
+    if failures:
+        _write_json(out / "relabel.json", {"source": str(run), "status": "INCOMPLETE", "source_errors": failures})
+        print("Not scored: " + "; ".join(failures) + ". Relabelling cannot repair execution; no extractor calls.")
+        return 1
     found, diagnostics, written = {}, [], {}
     for config, path in traces.items():
-        rows = unlabelled(path)
+        rows = prepared[config]
         done = ConfigRun(rows=rows, diagnostics=[{k: r[k] for k in ("config", "scenario_id", "call", "turn")} for r in rows])
         print(f"{config}: labelling {len(rows)} turns of {path}")
         await _label(done, extractor)

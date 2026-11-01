@@ -117,6 +117,9 @@ def parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = parser().parse_args(argv)
+    from ...mcp.server_base import use_selector_loop_on_windows
+
+    use_selector_loop_on_windows()
     if args.asr or args.asr_audio or args.asr_package:
         if args.relabel or args.config or args.judge or args.provider or args.model or args.no_extract:
             print("--asr is separate from agent/extractor evaluation")
@@ -260,6 +263,8 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
         await jev.close()
 
     trace.write_jsonl(layout.side("diagnostics.jsonl"), [d for run in runs.values() for d in run.diagnostics])
+    trace.write_jsonl(layout.side("scenario-errors.jsonl"),
+                      [{"config": config, **error} for config, run in runs.items() for error in run.stopped])
     _write_json(layout.side("usage.json"), {config: run.usage for config, run in runs.items()})
     record = report.manifest(
         run_id=run_id, started=started, scenarios_dir=args.scenarios, scenarios=ready, rejected=rejected,
@@ -267,6 +272,7 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
         extractor={"model": extractor.model_name, **extractor.stats()} if extractor else None,
         warmup=args.warmup, database=database, found=found,
     )
+    record["status"] = "INCOMPLETE" if report.blocking(found) else "COMPLETE"
     _write_json(layout.side("manifest.json"), record)
 
     print()
@@ -275,12 +281,9 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
     if args.no_extract:
         print("Extractor off: questions and claims are empty, so RQR and HR are not measured.")
     voided = report.blocking(found)
-    stopped = sum(len(run.stopped) for run in runs.values())
-    if stopped:
-        voided["scenarios_stopped"] = stopped
     if voided:
         print("Not scored: " + ", ".join(f"{name} {n}" for name, n in voided.items())
-              + f". The traces are kept in {layout.directory}; diagnostics.jsonl says what failed.")
+              + f". The traces are kept in {layout.directory}; see diagnostics.jsonl and scenario-errors.jsonl.")
         return 1
     if args.config:
         return 0

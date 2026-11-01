@@ -37,7 +37,8 @@ from ...llm.factory import limiter_stats
 from .scenarios import Rejected, Scenario
 
 #: Counts that make a run's table untrustworthy: no table is printed.
-BLOCKING = ("failed_turns", "unlabelled_turns", "after_call_failed", "schema_errors")
+BLOCKING = ("failed_turns", "unlabelled_turns", "after_call_failed", "schema_errors",
+            "scenarios_rejected", "scenarios_stopped", "empty_trace")
 
 #: Packages whose version changes what a run does.
 PACKAGES = ("langchain", "langgraph", "langchain-google-genai", "fastmcp", "jsonschema")
@@ -47,6 +48,7 @@ def problems(rows: Iterable[Mapping[str, Any]], diagnostics: Iterable[Mapping[st
              *, schema_errors: int, rejected: int, scenario_errors: int) -> dict[str, int]:
     """What went wrong in one configuration's run, by kind."""
     diagnostics = list(diagnostics)
+    turns = sum(1 for _ in rows)
     return {
         "failed_turns": sum(1 for d in diagnostics if d.get("error")),
         "unlabelled_turns": sum(1 for d in diagnostics if d.get("extraction_error")),
@@ -59,7 +61,8 @@ def problems(rows: Iterable[Mapping[str, Any]], diagnostics: Iterable[Mapping[st
         "extraction_changed_items": sum(d.get("extraction_changed_items") or 0 for d in diagnostics),
         "policy_skipped": sum(1 for d in diagnostics if str(d.get("policy") or "").startswith("skipped")),
         "safe_lines": sum(1 for d in diagnostics if d.get("fallback")),
-        "turns": sum(1 for _ in rows),
+        "turns": turns,
+        "empty_trace": int(turns == 0),
     }
 
 
@@ -136,8 +139,8 @@ def knowledge_record() -> dict[str, Any]:
 def freeze(scenarios: list[Scenario], rejected: list[Rejected], into: Path) -> Path:
     """Copy every scenario the run attempted, so the grader scores exactly those.
 
-    A scenario that could not be planned is copied too when it parses: the
-    grader then counts it as failed, which is the truth of the run.
+    Rejected files are retained for evidence when requested; the CLI refuses
+    to grade a cohort with rejected or stopped scenarios.
     """
     into.mkdir(parents=True, exist_ok=True)
     for path in [s.path for s in scenarios] + [r.path for r in rejected]:
@@ -152,6 +155,9 @@ def freeze(scenarios: list[Scenario], rejected: list[Rejected], into: Path) -> P
 def grade(scenarios_dir: Path, *, full: Path, baseline: Path | None, out: Path,
           rag: Path | None = None) -> tuple[int, str]:
     """``eval/reference_eval.py`` on the traces, and on the retrieval results when given: its exit code and table."""
+    for path in (full, baseline):
+        if path is not None and (not path.is_file() or not path.read_text(encoding="utf-8").strip()):
+            return 1, f"Not scored: missing or empty trace {path}."
     command = [sys.executable, str(btc_data_dir() / "eval" / "reference_eval.py"), "--scenarios", str(scenarios_dir),
                "--trace", str(full), "--out", str(out)]
     if baseline is not None:

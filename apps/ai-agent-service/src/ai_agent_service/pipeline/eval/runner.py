@@ -32,6 +32,7 @@ import asyncio
 import hashlib
 import json
 import logging
+import re
 import time
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
@@ -225,6 +226,18 @@ async def reset() -> None:
 # ── prior sessions ────────────────────────────────────────────────────────
 
 
+async def _seed_data(rig: Rig, tool: str, stage: str, **args: Any) -> dict[str, Any]:
+    """Keep a seed failure's tool/code; never turn a failed lookup into a new owner."""
+    envelope = await rig.writer.call(tool, **args)
+    if envelope.get("ok") is True and isinstance(envelope.get("data"), dict):
+        return envelope["data"]
+    code = (envelope.get("error") or {}).get("code", "BAD_ENVELOPE")
+    if not isinstance(code, str) or not re.fullmatch(r"[A-Z][A-Z0-9_]{0,47}", code):
+        code = "UNKNOWN"
+    raise scenarios.ScenarioError(f"{stage}: {tool} refused ({code}); see mcp-servers.log. "
+                                  "Seed was not retried; a timed-out write may have committed.")
+
+
 async def seed(rig: Rig, sessions: tuple[SeedSession, ...], *, customer_phone: str | None,
                customer_name: str | None) -> str:
     """Write a scenario's prior sessions to its customer's ledger, before the call (section 9.2, step 2).
@@ -256,18 +269,15 @@ async def seed(rig: Rig, sessions: tuple[SeedSession, ...], *, customer_phone: s
                               "kind": spec.kind, "source": source, "replaces": held[slot][0] if slot in held else None,
                               "disputed": False, "valid_to": valid_to, "confidence": 1.0})
         if decisions:
-            written = await rig.writer.data("memory_commit_facts", customer_id=customer_id, decisions=decisions, on=session.day)
-            if written is None:
-                raise scenarios.ScenarioError(f"seed {session.session_id}: the ledger refused its facts")
+            written = await _seed_data(rig, "memory_commit_facts", f"seed {session.session_id}",
+                                       customer_id=customer_id, decisions=decisions, on=session.day)
             for write in written.get("memory_writes") or []:
                 held[write["key"]] = (write.get("fact_id"), write.get("value"))
-        episode = await rig.writer.data("memory_commit_episode", customer_id=customer_id, episode={
+        await _seed_data(rig, "memory_commit_episode", f"seed {session.session_id}", customer_id=customer_id, episode={
             "call_id": f"seed:{session.session_id}", "channel": session.channel, "date": session.day,
             "summary": session.summary or f"Phiên ngày {clock.day_label(session.day)} qua {session.channel}.",
             "outcome": session.outcome, "commitments": [], "source_turn_span": [],
         })
-        if episode is None:
-            raise scenarios.ScenarioError(f"seed {session.session_id}: the ledger refused its episode")
     return customer_id
 
 
@@ -285,12 +295,12 @@ async def _seed_owner(rig: Rig, phone: str | None, name: str | None) -> str:
                                           "and the scenario's customer_name picks none of them")
         return str(named[0]["customer_id"])
     key = {"key_type": "phone", "key_hash": resolver.digest("phone", phone, IDENTITY_SECRET)}
-    found = await rig.writer.data("identity_find", **key)
+    found = await _seed_data(rig, "identity_find", "seed_history identity lookup", **key)
     matches = (found or {}).get("matches") or []
     if matches:
         return str(matches[0]["customer_id"])
-    confirmed = await rig.writer.data("memory_confirm_identity", keys=[key])
-    if not confirmed:
+    confirmed = await _seed_data(rig, "memory_confirm_identity", "seed_history identity creation", keys=[key])
+    if not confirmed.get("customer_id"):
         raise scenarios.ScenarioError("seed_history: the ledger could not create the customer")
     return str(confirmed["customer_id"])
 
