@@ -145,6 +145,9 @@ services:
     deploy:
       replicas: ${ASR_LOCAL:-1}
   ai-agent-service:
+    # It starts the MCP servers as child processes (stdio): an init as PID 1 reaps them and forwards stop signals,
+    # without which a dead child stayed a zombie and `docker compose stop` failed ("PID … is zombie").
+    init: true
     build:
       context: .
       dockerfile: apps/ai-agent-service/Dockerfile

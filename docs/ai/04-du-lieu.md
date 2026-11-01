@@ -146,6 +146,11 @@ Hai tình huống của nhóm (không phải ca khó BTC) kiểm các luật đ�
 |---|---|---|
 | `khach_tach_don_cod` | AirPure Pro + Samsung AX40 (AIR-2ND-50), tổng COD > 10 triệu | khách đồng ý tách: 2 × `order.create` COD, `order_group` "1"/"2", mỗi đơn ≤ 10 triệu, cùng `basket_skus` (VC-03, QT-01) |
 | `khach_chot_don_doc_lai` | cuộc 1 khách nói sẵn cách trả và nơi giao; cuộc 2 "lên đơn như hôm trước" | `must_not_ask` gồm sản phẩm, thanh toán, nơi giao; đọc lại đơn một lần (một câu `order_summary`, extractor v5); `max_agent_questions` 3 |
+| `khach_hoi_may_thu_hai` | AirPure X cho phòng chính, nhà còn phòng con khoảng 10 m², hỏi "có khuyến mãi gì không"; biến thể 2 mua thêm AirPure Mini trong cùng đơn | agent giới thiệu AIR-2ND-50 đúng điều kiện (giảm 50% máy rẻ hơn, hai máy cùng một đơn; quy tắc 23 của agent, KM-05); cụm nói sai điều kiện bị cấm; `say_at_most` của nhóm: tối đa 3 lượt nhắc |
+
+Ngoài ra, mọi cuộc tư vấn có rào cản "hỏi người nhà" kết thúc bằng `schedule.callback` vào giờ khách hẹn (PB-03).
+
+**Ngày gọi có chủ đích.** Cuộc đầu của các cuộc tư vấn và chốt đơn được đặt vào một mốc lấy từ dữ liệu BTC cho đúng sản phẩm: ngày cuối khuyến mãi, ngày sau khi khuyến mãi hết, trước hoặc đúng ngày chương trình mới bắt đầu (11/11), ngày hết hàng, đơn giao qua ngày nghỉ 26/10 (LN-03), Chủ nhật (LN-01). Các mốc xoay vòng, khoảng 70% vẫn là ngày thường làm mốc so sánh. Kịch bản nhiều cuộc chỉ nhận mốc khi giá và tồn kho giữ nguyên tới cuộc cuối; mỗi kịch bản có tag `date:<mốc>`.
 
 Danh sách đủ 15 loại: [evaluation/data-generation/README.md §3](../../evaluation/data-generation/README.md#3-hard-cases-điều-chỉnh-đề-11-and-other-situations). Với `--limit 120`: 120 kịch bản, 260 cuộc, 83 kịch bản ca khó, phủ đủ 9 cặp ngành hàng × vùng miền và 16 persona.
 

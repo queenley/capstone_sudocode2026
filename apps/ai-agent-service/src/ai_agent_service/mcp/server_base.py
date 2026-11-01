@@ -179,10 +179,22 @@ class Server:
         args = parser.parse_args(argv)
 
         logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+        use_selector_loop_on_windows()
         if args.transport == "stdio":
             self.mcp.run(transport="stdio", show_banner=False)
         else:
             self.mcp.run(transport="http", host=args.host, port=args.port, show_banner=False)
+
+
+def use_selector_loop_on_windows() -> None:
+    """On Windows, async psycopg cannot run on the default ProactorEventLoop ("Psycopg cannot use the
+    'ProactorEventLoop'"): every process that opens the pool, the servers and the evaluation harness, runs on a
+    SelectorEventLoop instead. That loop has no async subprocesses, but the MCP SDK's stdio client then starts
+    each server with its Popen-backed fallback (``mcp.os.win32.utilities.FallbackProcess``). No-op elsewhere."""
+    import sys
+
+    if sys.platform == "win32":
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
 # ── the database, for servers that keep rows ──────────────────────────────
