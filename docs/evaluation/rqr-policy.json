@@ -1,0 +1,379 @@
+{
+  "policy_id": "rqr-btc-main-41eda490-review-20261101",
+  "status": "ready",
+  "reviewed_on": "2026-11-01",
+  "timezone": "Asia/Ho_Chi_Minh",
+  "readiness_scope": "Source review complete for the supplied local materials; ready does not mean unresolved BTC interpretation questions have been answered.",
+  "companion_document": "docs/evaluation/rqr-btc-interpretation.md",
+  "scope": {
+    "owned_files": ["docs/evaluation/rqr-btc-interpretation.md", "docs/evaluation/rqr-policy.json"],
+    "main_commit": "41eda490bc47577018541c7778c0e8443ed8e6c8",
+    "reference_eval_path": "apps/ai-agent-service/data/btc/eval/reference_eval.py",
+    "reference_eval_sha256": "18f1fa0881a345b8dd01c4160ec8fc31aea5ff8385c09a3eb3db96a88372843e",
+    "scorer_change_authorized": false,
+    "model_or_paid_api_runs_performed": 0,
+    "evaluation_runs_performed": 0
+  },
+  "sources": [
+    {
+      "id": "sudo_assignment",
+      "authority": "btc_original_assignment",
+      "path": "/Users/vqd/Downloads/SUDO CODE 2026 - Đề Bài Dự Án Cuối Kì.pdf",
+      "sha256": "afe0e1837d173ed4df10d8ed69ea5b8251eb81f6710d687cf1d583d3704e8e5b",
+      "page_count": 17,
+      "line_numbers": null,
+      "locator_note": "PDF has no canonical text line numbers; use one-based pages and section headings. Page 11 was also rendered and visually checked.",
+      "references": [
+        {"section": "C.2", "pages": [5], "quote": "Không hỏi lại thông tin đã có"},
+        {"section": "C.4", "pages": [6, 7], "quote": "mỗi kịch bản gồm 2–3 cuộc gọi liên tiếp cùng 1 khách"},
+        {"section": "A.1", "pages": [11], "quote": "RQR = (Số câu hỏi thừa) / (Tổng số câu hỏi agent đặt ra) × 100%"},
+        {"section": "A.1", "pages": [11], "quote": "Chỉ câu hỏi mở"},
+        {"section": "A.1", "pages": [11], "quote": "Thông tin đã hết hạn theo quy tắc TTL nhóm tự định nghĩa"},
+        {"section": "A.1", "pages": [11], "quote": "Thông tin thực sự mới, chưa từng xuất hiện ở phiên trước."},
+        {"section": "A.1", "pages": [11], "quote": "hiểu là giảm tương đối"},
+        {"section": "A.6", "pages": [13], "quote": "chỉ khác duy nhất ở việc có nạp bộ nhớ phiên trước hay không"},
+        {"section": "B", "pages": [13, 14], "quote": "must_not_ask"},
+        {"section": "C.1 glossary: Session / phiên", "pages": [15], "quote": "Một lần tương tác trọn vẹn (một cuộc gọi, một đoạn chat)."}
+      ]
+    },
+    {
+      "id": "btc_amendment",
+      "authority": "btc_supplement",
+      "path": "/Users/vqd/Downloads/BTC-Data-Vong1-TEAMS/DIEU-CHINH-DE.md",
+      "sha256": "00841d77cc03b2f30bb2f09bdbb73ced2da76e107b84454013fe5ef27b91bea8",
+      "repo_copy": null,
+      "references": [
+        {"lines": [15, 19], "quote": "con số chính thức tính bằng `eval/reference_eval.py`"},
+        {"lines": [29, 31], "quote": "Câu xác nhận không tính là thừa, **trừ** khi xác nhận lại một slot đã được xác nhận trong cùng phiên (lần thứ 2 trở đi tính thừa)."},
+        {"lines": [31, 31], "quote": "Đọc vẹt toàn bộ thông tin cũ trong câu chào bị trừ ở tiêu chí 6."}
+      ]
+    },
+    {
+      "id": "btc_mentor",
+      "authority": "btc_clarification",
+      "path": "/Users/vqd/Downloads/BTC-Data-Vong1-TEAMS/GIAI-DAP-MENTOR.md",
+      "sha256": "d4337b44320d03ea6560f86c0300fc153a19f7b3a9a81dcc30cc8b46145e916a",
+      "repo_copy": null,
+      "references": [
+        {"section": "Team 5 question 11", "lines": [37, 38], "quote": "xác nhận lại slot đã xác nhận trong cùng phiên → tính câu hỏi thừa"},
+        {"section": "Team 8 question 1", "lines": [42, 43], "quote": "5 chỉ số bắt buộc để so giữa các team tính bằng `eval/reference_eval.py`"},
+        {"section": "Team 8 question 2", "lines": [45, 46], "quote": "Chấm chéo 5 chỉ số vẫn dùng `customer_turns` viết sẵn"},
+        {"section": "Team 10 question 1", "lines": [56, 57], "quote": "Multi-turn và **đa phiên**"}
+      ]
+    },
+    {
+      "id": "btc_readme",
+      "authority": "btc_pack_instructions",
+      "path": "/Users/vqd/Downloads/BTC-Data-Vong1-TEAMS/README.md",
+      "sha256": "6e158d4d40632b28967d6b3664ca63d783124a432848e167f2ca10f867f994d8",
+      "repo_copy": null,
+      "references": [
+        {"lines": [34, 36], "quote": "BTC chấm tay ngẫu nhiên 20 lượt để kiểm tra extractor"},
+        {"lines": [36, 36], "quote": "Phần `questions[]`/`claims[]` trong trace do extractor của team sinh"}
+      ]
+    },
+    {
+      "id": "btc_scenario_schema",
+      "authority": "btc_pack_schema",
+      "path": "apps/ai-agent-service/data/btc/schemas/scenario_format.md",
+      "external_path": "/Users/vqd/Downloads/BTC-Data-Vong1-TEAMS/schemas/scenario_format.md",
+      "sha256": "91acb65f8164cd234e3d2dfc00865d92a9af15830e6841e0e77eb76db7ec4927",
+      "repo_and_external_bytes_equal": true,
+      "references": [
+        {"lines": [13, 15], "quote": "`must_not_ask` | slot không được hỏi mở | RQR"},
+        {"lines": [21, 21], "quote": "`max_agent_questions`"}
+      ]
+    },
+    {
+      "id": "btc_trace_schema",
+      "authority": "btc_pack_schema",
+      "path": "apps/ai-agent-service/data/btc/schemas/trace_log.schema.json",
+      "external_path": "/Users/vqd/Downloads/BTC-Data-Vong1-TEAMS/schemas/trace_log.schema.json",
+      "sha256": "312c5d1dad7ac79b51af637ca746a6de94f218d317202cf1448706b384688db3",
+      "repo_and_external_bytes_equal": true,
+      "references": [
+        {"lines": [51, 59], "quote": "Mỗi câu hỏi agent đặt ra trong lượt này, gán về slot."},
+        {"lines": [62, 70], "json_pointer": "/properties/questions/items/properties", "observation": "slot is an unrestricted string; type enum is exactly open, confirm"}
+      ]
+    },
+    {
+      "id": "btc_playbook",
+      "authority": "btc_business_guidance",
+      "path": "apps/ai-agent-service/data/btc/policy/playbook-telesale.md",
+      "external_path": "/Users/vqd/Downloads/BTC-Data-Vong1-TEAMS/policy/playbook-telesale.md",
+      "sha256": "ca74b496676a1bf88c7d0caf36cfaada69c9f9003045c98055426f259a0fae0d",
+      "repo_and_external_bytes_equal": true,
+      "references": [
+        {"section": "PB-01", "lines": [5, 6], "quote": "nhắc lại tối đa **2 thông tin** liên quan nhất của phiên trước"},
+        {"section": "PB-09", "lines": [29, 30], "quote": "Trước khi gọi `order.create`: đọc lại một lần"},
+        {"section": "PB-10", "lines": [32, 33], "quote": "không hỏi thêm quá 1 câu xác nhận"}
+      ]
+    },
+    {
+      "id": "main_reference",
+      "authority": "pinned_execution_behavior",
+      "path": "apps/ai-agent-service/data/btc/eval/reference_eval.py",
+      "git_ref": "41eda490bc47577018541c7778c0e8443ed8e6c8",
+      "sha256": "18f1fa0881a345b8dd01c4160ec8fc31aea5ff8385c09a3eb3db96a88372843e",
+      "references": [
+        {"lines": [29, 40], "quote": "by[(r[\"scenario_id\"], r[\"call\"])].append(r)"},
+        {"lines": [42, 43], "quote": "return round(100.0 * a / b, 1) if b else None"},
+        {"lines": [75, 85], "quote": "RQR = câu hỏi thừa / tổng câu hỏi agent, trên các call có must_not_ask."},
+        {"lines": [83, 85], "quote": "if not mna:"},
+        {"lines": [86, 96], "quote": "confirmed = set()"},
+        {"lines": [88, 96], "quote": "total += 1"},
+        {"lines": [91, 92], "quote": "if q[\"type\"] == \"open\" and q[\"slot\"] in mna:"},
+        {"lines": [93, 96], "quote": "if q[\"slot\"] in confirmed:"},
+        {"lines": [97, 100], "quote": "\"examples\": detail[:20]"},
+        {"lines": [179, 181], "quote": "nq = sum(len(r.get(\"questions\", [])) for r in rows)"},
+        {"lines": [391, 400], "quote": "\"rqr_relative_reduction_pct\": round((rq_b - rq_s) / rq_b * 100, 1) if rq_b else None"}
+      ],
+      "external_reference": {
+        "path": "/Users/vqd/Downloads/BTC-Data-Vong1-TEAMS/eval/reference_eval.py",
+        "sha256": "818fc4900a18f9b92c1abb3adebcca997774dfc3da23083c9030bad2f7229ddc",
+        "repeat_question_rate_lines": [61, 86],
+        "repeat_question_rate_ast_equal_to_main": true,
+        "whole_file_bytes_equal_to_main": false,
+        "comparison_method": "Read-only ast.parse and ast.dump of the named function, not execution of either scorer."
+      }
+    },
+    {
+      "id": "user_ontology",
+      "authority": "user_supplied_local_ontology",
+      "path": "/Users/vqd/.codex/attachments/38619ca3-4c63-4a8b-a856-279f5606da92/Văn bản đã dán.txt",
+      "sha256": "efeedcd9500bcc6fa3e5254ff350be401d84d5ac4a48ae903532ddfb756c6461",
+      "line_basis": "One-based logical lines after removing whitespace-only lines, as requested by the user.",
+      "references": [
+        {"lines": [1, 32], "quote": "Slot chung (30)"},
+        {"lines": [33, 38], "quote": "Slot nhu cầu theo ngành (4)"}
+      ]
+    },
+    {
+      "id": "main_extractor_prompt",
+      "authority": "existing_team_instrument_convention_not_btc_rule",
+      "path": "config/prompts/evaluation/extractor.txt",
+      "git_ref": "41eda490bc47577018541c7778c0e8443ed8e6c8",
+      "sha256": "020af96706cd299da09cc7df5d65c09d616f089453d3a6080536bafe293958a1",
+      "references": [
+        {"lines": [11, 11], "quote": "No answer key, scenario, label or expectation is given to you"},
+        {"lines": [27, 33], "quote": "One item per question and per slot it asks about."},
+        {"lines": [31, 31], "quote": "Asking for a value, or asking the customer to choose between options, is \"open\""},
+        {"lines": [32, 32], "quote": "Reading back an order and asking the customer to confirm it makes one confirm item per slot it states."}
+      ]
+    },
+    {
+      "id": "main_extractor_code",
+      "authority": "existing_team_instrument_convention_not_btc_rule",
+      "path": "apps/ai-agent-service/src/ai_agent_service/components/evaluation/scorers.py",
+      "git_ref": "41eda490bc47577018541c7778c0e8443ed8e6c8",
+      "sha256": "8f237e755c35c070a4c20dd9fd8e0e3d270cdc58c48184b065bba82344cc67d6",
+      "references": [
+        {"lines": [60, 74], "quote": "VERSION = \"product-extractor-v4\""},
+        {"lines": [69, 74], "quote": "EXTRA_SLOTS: frozenset[str] = frozenset({\"channel\"})"},
+        {"lines": [288, 299], "observation": "Only agent question items become questions in the trace."},
+        {"lines": [368, 371], "observation": "Unknown question slots map to other; other questions are forced to open."},
+        {"lines": [386, 397], "observation": "Deduplication includes kind, slot, value, question_type, source_field, start, end."}
+      ]
+    },
+    {
+      "id": "repo_evaluation_rules",
+      "authority": "user_authorized_repository_execution_rules",
+      "path": "evaluation/README.md",
+      "snapshot": "Working tree read on 2026-11-01; not asserted to be the main version.",
+      "references": [
+        {"lines": [49, 49], "quote": "Giữ `reference_eval.py` tại mốc này, không khôi phục ZIP BTC và không sửa tiếp công thức."},
+        {"lines": [51, 56], "quote": "Thiếu bằng chứng không được điền 0 hay PASS."}
+      ]
+    },
+    {
+      "id": "sudo_design_notes",
+      "authority": "context_only_not_btc_scoring_authority",
+      "path": "/Users/vqd/Downloads/SUDO.pdf",
+      "sha256": "9e560cfd72df37c6288d7820f98778ce036d69a50ce3c65a3b43cdd228ac88c7",
+      "page_count": 32,
+      "references": [{"pages": [8, 9], "observation": "Design notes discuss test_cases and must_not_ask; not the official assignment or a later BTC clarification."}]
+    }
+  ],
+  "precedence": {
+    "interpretation": [
+      "Apply the BTC amendment and mentor clarification over an incompatible original-assignment statement.",
+      "Use the original assignment for requirements not changed by the supplements; use BTC schemas for trace/scenario structure.",
+      "Treat business playbook guidance separately from an implemented metric rule.",
+      "Treat team documentation, extractor prompt and ontology as declared local conventions, not new BTC rulings."
+    ],
+    "execution": "The user's instruction and repo_evaluation_rules pin main 41eda490bc47577018541c7778c0e8443ed8e6c8. Record textual ambiguities without changing or replacing the scorer.",
+    "supplement_order_note": "No publication dates are embedded in the supplied amendment or mentor clarification. They agree on repeated confirmations; do not invent a chronological ordering between them.",
+    "resolved_conflict": {
+      "original": "Original A.1 excludes confirmation questions from redundancy.",
+      "supplement": "First confirmation remains exempt, but confirmation of the same slot a second or later time in the same session is redundant.",
+      "source_ids": ["sudo_assignment", "btc_amendment", "btc_mentor"]
+    }
+  },
+  "btc_requirements": [
+    {"id": "B01", "rule": "RQR is redundant agent questions divided by total agent questions, multiplied by 100.", "source_ids": ["sudo_assignment"]},
+    {"id": "B02", "rule": "must_not_ask lists slots that must not be asked as open questions; previously valid information, genuinely new information and TTL expiry are scenario-label considerations.", "source_ids": ["sudo_assignment", "btc_scenario_schema"]},
+    {"id": "B03", "rule": "First confirmation is exempt; second and later confirmation of the same slot within the session is redundant.", "source_ids": ["btc_amendment", "btc_mentor"]},
+    {"id": "B04", "rule": "Teams extract and disclose questions/claims; BTC checks 20 random turns for omissions or fabrication.", "source_ids": ["btc_readme", "btc_trace_schema"]},
+    {"id": "B05", "rule": "The 40 percent improvement target is relative reduction from baseline under the same test/model/parameters except memory loading.", "source_ids": ["sudo_assignment"]},
+    {"id": "B06", "rule": "Reciting a whole old profile can lose experience/judge points; no source adds an independent numeric RQR penalty for a statement-only recital.", "source_ids": ["btc_amendment", "btc_mentor", "btc_playbook"]}
+  ],
+  "main_algorithm": {
+    "source_id": "main_reference",
+    "function": "repeat_question_rate",
+    "lines": [75, 100],
+    "eligible_call": "bool(set(spec.get('must_not_ask', [])))",
+    "ineligible_call_effect": "Skip every question in that call for both numerator and denominator, including repeated confirmations.",
+    "eligible_call_number_restriction": null,
+    "denominator_unit": "Every element of questions[] in every trace row of an eligible (scenario_id, call), regardless of slot/type membership in must_not_ask.",
+    "numerator_rules": [
+      "q.type == open and q.slot is in this call's must_not_ask",
+      "q.type == confirm and q.slot has appeared in a prior confirm item of this call"
+    ],
+    "confirm_membership_requires_must_not_ask": false,
+    "confirm_tracking_key": "Exact slot string only; not value, SKU, quote or speaker identity.",
+    "confirm_tracking_update": "Add q.slot whenever q.type == confirm, including the first occurrence; no customer acknowledgement is checked.",
+    "open_updates_confirm_tracking": false,
+    "row_order": "load_trace groups by (scenario_id, call) and sorts rows by turn; question-array order is retained.",
+    "state_reset": "New confirmed set for each (scenario_id, call); independent invocation for each full/baseline trace.",
+    "no_within_call_reset_for": ["new turn", "changed value", "changed product", "customer correction", "unanswered question", "TTL change", "identity change", "handoff", "new tool result"],
+    "aggregation": "Sum numerator and denominator across all eligible calls/scenarios, then divide once; no average of call percentages.",
+    "percentage": "round(100.0 * redundant / total_questions, 1) if total_questions else None",
+    "zero_denominator_result": null,
+    "result_fields": ["value", "redundant", "total_questions", "examples"],
+    "example_limit": 20,
+    "example_limit_changes_counts": false,
+    "slot_matching": "Exact string comparison; no ontology enforcement, alias normalization or semantic matching in this function.",
+    "not_inspected_by_rqr": ["agent_text semantics", "customer_text", "question value", "facts_established", "memory/TTL", "CallBrief.must_not_ask", "facts_used", "tool_calls", "previous_sessions"],
+    "trace_file_isolation": "Loader does not split by config/run_id/phone. Keep full and baseline, and separate runs, in separate input files as intended by the CLI.",
+    "schema_types": ["open", "confirm"],
+    "other": {
+      "is_slot_not_question_type": true,
+      "schema_type_other_allowed": false,
+      "open_denominator": "Counts in every eligible call.",
+      "open_numerator": "Counts only if the exact string other is in must_not_ask.",
+      "confirm_if_supplied": "The raw scorer treats it like any slot: second and later confirm items count as redundant. Existing v4 restrict instead forces other to open."
+    },
+    "multi_item_behavior": "Each array element is counted, even multiple items in one turn, multiple items for one sentence, or duplicates; no splitting or deduplication occurs in RQR.",
+    "relative_reduction": {
+      "lines": [397, 400],
+      "formula": "(baseline_value - system_value) / baseline_value * 100",
+      "input_values": "The one-decimal RQR values already returned by pct.",
+      "reported_rounding_decimals": 1,
+      "threshold": "(baseline_value - system_value) / baseline_value >= 0.40, with truthy baseline_value",
+      "zero_or_null_baseline": {"reduction": null, "meets_threshold": false},
+      "missing_system_value_with_positive_baseline": "The raw comparison expression has no None guard for system_value; do not interpret missing evidence as zero or PASS."
+    },
+    "related_tsr_count": {
+      "lines": [179, 181],
+      "rule": "If success_if.max_agent_questions is checked, count all questions[] elements across that call, without the RQR must_not_ask gate.",
+      "implication": "Changing question atomicity can change TSR as well as RQR."
+    }
+  },
+  "local_ontology": {
+    "source_id": "user_ontology",
+    "btc_schema_defines_this_closed_vocabulary": false,
+    "core_count": 30,
+    "core": ["product_advised", "alt_suggested", "variant_sku", "size", "color", "owned_sku", "quantity", "price_quoted_vnd", "quoted_on", "quoted_sku", "promo_code", "promo_expiry", "budget_vnd", "competitor_price_vnd", "blocker", "decision_maker", "objection", "objection_handling", "sentiment", "order_id", "order_ids", "payment", "address_token", "delivery_area", "phone_provided", "preferred_channel", "callback_at", "callback_time", "outcome", "commitments"],
+    "industry_count": 4,
+    "industries": {"gia-dung": ["room_area_m2", "has_children"], "thoi-trang": ["usage_need"], "me-be": ["child_age_months"]},
+    "total_memory_slots": 34,
+    "existing_v4_extractor_extension": ["channel"],
+    "outside_ontology_sentinel": "other",
+    "extension_note": "channel is an existing measurement extension, not a 31st core slot; other is a sentinel, not a memory slot. This review does not add/remove extractor slots."
+  },
+  "existing_v4_conventions_not_btc_rulings": {
+    "source_ids": ["main_extractor_prompt", "main_extractor_code"],
+    "version_at_review_start": "product-extractor-v4",
+    "question": "Agent asks the customer and expects an answer: information, confirmation or a choice. Pure greeting, filler and statement are excluded.",
+    "atomicity": "One item per question per slot; an order readback seeking confirmation gives one confirm item per stated slot.",
+    "confirm": "Agent states the candidate value and requests confirmation; the scorer does not require the candidate to come from an earlier session.",
+    "open": "Requests for a value or a choice between alternatives; yes/no form alone is not sufficient evidence of confirmation.",
+    "other": "Offers, permission requests, closing/courtesy questions outside the slot list are mapped to other/open.",
+    "deduplication": "Same observation identity at the same source/span is retained once; do not collapse genuine repeated asks at different spans/turns.",
+    "answer_key_independence": "Extractor is not given scenario labels, must_not_ask, ground truth or expectations; slot/type decisions must not depend on their scoring effect.",
+    "change_control": "A change to these conventions is an extractor-instrument change requiring an explicit version and like-for-like relabel comparison, not a BTC scorer correction."
+  },
+  "unresolved_issues": [
+    {
+      "id": "U01", "status": "open", "topic": "Repeated-confirmation rule on calls without must_not_ask",
+      "question": "Does BTC intend its session-wide wording to include calls with absent/empty must_not_ask?",
+      "source_ids": ["btc_amendment", "btc_mentor", "main_reference"],
+      "known_main_behavior": "Both numerator and denominator skip the call.",
+      "handling": "Preserve main; report the eligible-call scope explicitly."
+    },
+    {
+      "id": "U02", "status": "open", "topic": "Question atomicity and multiple slots",
+      "question": "Is one compound sentence one question, or one item for each requested slot? How should overlapping parent/child slot descriptions be handled?",
+      "source_ids": ["sudo_assignment", "btc_trace_schema", "main_extractor_prompt", "main_reference"],
+      "known_main_behavior": "Counts every supplied array element. Existing v4 uses question-by-slot items.",
+      "handling": "Declare the local convention and review compound questions manually; do not present it as an explicit BTC ruling or select granularity by the score."
+    },
+    {
+      "id": "U03", "status": "open", "topic": "Linguistic classification boundaries",
+      "question": "BTC does not exhaustively define yes/no questions, offers, permission, courtesy, rhetorical asks, imperative requests, punctuation or future proposals.",
+      "source_ids": ["btc_trace_schema", "main_extractor_prompt"],
+      "known_main_behavior": "Trusts supplied labels and never reads the utterance semantics.",
+      "handling": "Use disclosed evidence-based extractor conventions; retain real questions outside ontology, exclude pure statements, and flag ambiguous cases for review without claiming a new BTC rule."
+    },
+    {
+      "id": "U04", "status": "open", "topic": "Asked to confirm versus actually confirmed",
+      "question": "Does the wording 'slot đã được xác nhận' require an affirmative customer reply?",
+      "source_ids": ["btc_amendment", "btc_mentor", "main_reference"],
+      "known_main_behavior": "A prior confirm label is sufficient; no customer response is checked.",
+      "handling": "Preserve main's occurrence-based tracking; do not exempt unanswered confirmations."
+    },
+    {
+      "id": "U05", "status": "open", "topic": "Legitimate re-confirmation after change or at checkout",
+      "question": "Are corrections, a different product/value, stale information, identity verification or final order readback exempt from the repeated-slot rule?",
+      "source_ids": ["btc_amendment", "btc_playbook", "main_reference"],
+      "known_main_behavior": "No within-call exception; tracking is by flat slot string. PB-09 readback is business guidance, not an implemented exemption.",
+      "handling": "Keep honest confirm labels and report any business/metric tension separately; no synthetic resets or silent relabeling."
+    },
+    {
+      "id": "U06", "status": "open", "topic": "Complete slot ontology, aliases and other",
+      "question": "BTC does not supply a complete closed slot dictionary or alias policy; the user's 34 slots and the existing channel/other conventions have different provenance.",
+      "source_ids": ["btc_trace_schema", "user_ontology", "main_extractor_code"],
+      "known_main_behavior": "Exact strings, no alias resolution or unknown-slot rejection in RQR.",
+      "handling": "Use stable declared names; do not read answer labels to pick aliases. Do not silently expand the user's 30+4 ontology or describe existing local extensions as BTC mandates."
+    },
+    {
+      "id": "U07", "status": "open", "topic": "Validity/TTL or scenario-memory disagreement",
+      "question": "How should a disputed scenario label be reconciled with expired or changed actual memory?",
+      "source_ids": ["sudo_assignment", "btc_scenario_schema", "main_reference", "repo_evaluation_rules"],
+      "known_main_behavior": "Uses the static scenario must_not_ask; it does not inspect memory validity or TTL.",
+      "handling": "Record the discrepancy for the ground-truth review workflow; do not alter scenario labels or drop/reclassify questions to compensate in this task."
+    }
+  ],
+  "illustrative_labeled_sequences": [
+    {
+      "provenance": "New synthetic label sequence for explaining source code, not a conversation fixture or BTC answer label.",
+      "must_not_ask": ["size"],
+      "questions_in_order": [
+        {"slot": "size", "type": "open", "redundant": true},
+        {"slot": "size", "type": "confirm", "redundant": false},
+        {"slot": "size", "type": "confirm", "redundant": true},
+        {"slot": "payment", "type": "open", "redundant": false},
+        {"slot": "other", "type": "open", "redundant": false},
+        {"slot": "payment", "type": "confirm", "redundant": false},
+        {"slot": "payment", "type": "confirm", "redundant": true}
+      ],
+      "redundant": 3,
+      "total_questions": 7,
+      "value": 42.9
+    },
+    {
+      "provenance": "Conditional behavior for supplied items; not a BTC mandate for splitting compound sentences.",
+      "must_not_ask": ["size"],
+      "turns": [
+        {"questions": [{"slot": "size", "type": "confirm"}, {"slot": "color", "type": "confirm"}], "redundant_added": 0, "total_added": 2},
+        {"questions": [{"slot": "size", "type": "confirm"}, {"slot": "color", "type": "confirm"}], "redundant_added": 2, "total_added": 2}
+      ],
+      "next_call_first_confirm_is_redundant": false
+    }
+  ],
+  "implementation_handoff": {
+    "required_separation": ["BTC textual requirements", "pinned main behavior", "declared extractor convention", "unresolved interpretation"],
+    "do_not": ["modify reference_eval.py or BTC pack", "alter scenarios or labels in this task", "omit genuine other questions to change the denominator", "invent questions from statements to increase the denominator", "choose slots/types by whether they improve the score", "erase repeated asks at distinct spans", "reset confirmations inside a call without a scorer rule", "interpret missing data or zero denominator as zero percent or PASS"],
+    "future_paid_work_only_if_separately_authorized": "Use root run_eval.py --relabel on the same replies for an extractor comparison, record extractor_version, and retain EVAL_BUDGET_DB=evaluation/runs/20261024-work/budget.sqlite. No such run is part of this review."
+  }
+}

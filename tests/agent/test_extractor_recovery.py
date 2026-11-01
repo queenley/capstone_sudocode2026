@@ -5,6 +5,7 @@ import pytest
 from openai import LengthFinishReasonError
 from openai.types.chat import ChatCompletion
 
+from ai_agent_service.components.evaluation import scorers
 from ai_agent_service.components.evaluation.scorers import Extractor, Items, turn_input
 from ai_agent_service.llm import evaluation_budget as budget
 from ai_agent_service.llm.callback_handler import TokenTrackingCallback
@@ -48,6 +49,37 @@ async def test_the_cache_is_keyed_by_the_whole_input_so_new_history_means_new_la
                          cache_path=tmp_path/'cache.json')
     await reloaded.label(TURN)
     assert labeller.ainvoke.await_count == 2
+
+
+@pytest.mark.asyncio
+async def test_cache_is_invalidated_by_semantic_history_contract_changes(tmp_path, monkeypatch):
+    labeller = SimpleNamespace(ainvoke=AsyncMock(return_value=Items(items=[])))
+    llm = SimpleNamespace(with_structured_output=lambda *_, **__: labeller)
+    path = tmp_path / "cache.json"
+    old = Extractor(llm, model_name="mock", cache_path=path)
+    await old.label(TURN)
+    monkeypatch.setattr(scorers, "contract_hashes", lambda: {"history-contract": "new interpretation"})
+    new = Extractor(llm, model_name="mock", cache_path=path)
+    await new.label(TURN)
+    assert old.prompt_sha != new.prompt_sha
+    assert labeller.ainvoke.await_count == 2
+
+
+@pytest.mark.asyncio
+async def test_schema_is_given_to_the_provider_with_vietnamese_descriptions():
+    supplied = []
+
+    def structured(schema, **kwargs):
+        supplied.append((schema, kwargs))
+        return SimpleNamespace(ainvoke=AsyncMock(return_value=Items(items=[])))
+
+    extractor = Extractor(SimpleNamespace(with_structured_output=structured), model_name="mock")
+    await extractor.label(TURN)
+    assert supplied == [(Items.model_json_schema(), {"include_raw": True})]
+    schema = Items.model_json_schema()
+    assert "quan sát" in schema["description"]
+    assert all(field.get("description") for field in schema["$defs"]["Item"]["properties"].values())
+    assert "bằng chứng" in schema["$defs"]["Item"]["properties"]["quote"]["description"]
 
 
 @pytest.mark.asyncio

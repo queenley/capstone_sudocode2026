@@ -7,7 +7,7 @@ import { useCartItems } from "@/lib/cart-items";
 
 export default function CartPage() {
   const lines = useCart();
-  const { items, error } = useCartItems(lines);
+  const { items, error, retry } = useCartItems(lines);
   const subtotal = (items || []).reduce((sum, i) => sum + (i.row ? Number(i.row.sale_price) * i.qty : 0), 0);
   const listTotal = (items || []).reduce((sum, i) => sum + (i.row ? Number(i.row.list_price) * i.qty : 0), 0);
   const problems = (items || []).filter((i) => !i.row || i.row.available < i.qty);
@@ -26,7 +26,9 @@ export default function CartPage() {
   return (
     <div className="s-wrap s-page">
       <h1 className="s-page-title">Giỏ hàng ({lines.reduce((s, l) => s + l.qty, 0)})</h1>
-      {error && <div className="s-alert">{error}</div>}
+      <p className="s-lead">Kiểm tra sản phẩm và số lượng trước khi đặt hàng.</p>
+      {error && <div className="s-alert" role="alert">{error} <button className="s-link-btn" onClick={retry}>Thử lại</button></div>}
+      {!items && !error && <p className="s-muted" role="status">Đang kiểm tra giá và tồn kho…</p>}
       <div className="s-cart">
         <div className="s-cart-lines">
           {(items || lines.map((l) => ({ ...l, row: null }))).map((item) => (
@@ -38,7 +40,7 @@ export default function CartPage() {
                     <b>{item.row.name}</b>
                   </Link>
                 ) : (
-                  <b>{items ? `Sản phẩm ${item.sku} không còn bán` : "Đang tải…"}</b>
+                  <b>{items ? `Sản phẩm ${item.sku} không còn bán` : error ? item.sku : "Đang tải…"}</b>
                 )}
                 <span className="s-muted">
                   {item.sku}
@@ -51,17 +53,17 @@ export default function CartPage() {
                 )}
               </div>
               <div className="s-qty">
-                <button onClick={() => cart.set(item.sku, item.qty - 1)} aria-label="Giảm">
+                <button disabled={item.qty <= 1} onClick={() => cart.set(item.sku, item.qty - 1)} aria-label={`Giảm số lượng ${item.row?.name || item.sku}`}>
                   −
                 </button>
-                <span>{item.qty}</span>
-                <button onClick={() => cart.set(item.sku, item.qty + 1)} aria-label="Tăng">
+                <span aria-live="polite" aria-atomic="true">{item.qty}</span>
+                <button disabled={!item.row || item.qty >= Math.min(99, item.row.available)} onClick={() => cart.set(item.sku, item.qty + 1)} aria-label={`Tăng số lượng ${item.row?.name || item.sku}`}>
                   +
                 </button>
               </div>
               <div className="s-cart-line-price">
                 {item.row && <b>{money(Number(item.row.sale_price) * item.qty)}</b>}
-                <button className="s-link-btn" onClick={() => cart.remove(item.sku)}>
+                <button className="s-link-btn s-danger" aria-label={`Xóa ${item.row?.name || item.sku} khỏi giỏ`} onClick={() => cart.remove(item.sku)}>
                   Xóa
                 </button>
               </div>
@@ -69,10 +71,10 @@ export default function CartPage() {
           ))}
         </div>
         <aside className="s-summary">
-          <h3>Tóm tắt đơn hàng</h3>
+          <h2>Tóm tắt đơn hàng</h2>
           <div className="s-summary-row">
             <span>Tạm tính</span>
-            <span>{money(listTotal)}</span>
+            <span>{items ? money(listTotal) : "—"}</span>
           </div>
           {listTotal > subtotal && (
             <div className="s-summary-row s-good">
@@ -82,19 +84,17 @@ export default function CartPage() {
           )}
           <div className="s-summary-row">
             <span>Phí giao hàng</span>
-            <span>{subtotal >= 2_000_000 ? "Miễn phí" : "Tính khi xác nhận"}</span>
+            <span>{!items ? "—" : subtotal >= 2_000_000 ? "Miễn phí" : "Tính khi xác nhận"}</span>
           </div>
           <div className="s-summary-total">
             <span>Tổng cộng</span>
-            <b>{money(subtotal)}</b>
+            <b>{items ? money(subtotal) : "—"}</b>
           </div>
-          <Link
-            className={`s-btn s-btn-lg s-btn-block ${problems.length || !items ? "disabled" : ""}`}
-            href={problems.length || !items ? "#" : "/thanh-toan"}
-            aria-disabled={problems.length > 0 || !items}
-          >
-            Tiến hành đặt hàng
-          </Link>
+          {problems.length || !items ? (
+            <button className="s-btn s-btn-lg s-btn-block" disabled>Tiến hành đặt hàng</button>
+          ) : (
+            <Link className="s-btn s-btn-lg s-btn-block" href="/thanh-toan">Tiến hành đặt hàng</Link>
+          )}
           {problems.length > 0 && <p className="s-warn">Điều chỉnh số lượng các sản phẩm không đủ hàng để tiếp tục.</p>}
           <Link className="s-link-btn" href="/">
             ← Tiếp tục mua sắm

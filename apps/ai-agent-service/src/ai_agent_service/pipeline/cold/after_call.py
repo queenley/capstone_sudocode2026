@@ -7,8 +7,7 @@ matched nobody) creates a customer on those keys. A caller who gave a number
 that belongs to a customer and never clearly answered the confirming question
 stays unconfirmed: what they said is kept for that customer as
 *unconfirmed*, beside their facts and never over them, and the next call the
-customer makes themselves settles it (their own facts win; it becomes theirs
-unless they say the contact was not them). So a chat that leaves a number and
+customer makes themselves can restate the values or deny the contact. So a chat that leaves a number and
 goes is remembered when that number calls (Case 2, one customer across channels), and
 a stranger typing someone's number writes nothing of theirs. As for AMBIGUOUS
 at hang-up, nothing is written to anyone: a model opinion cannot grant
@@ -46,6 +45,9 @@ AdminTools = Callable[[], Awaitable[Any]]
 NOT_ME = re.compile(r"(không phải (?:tôi|em|anh|chị|mình|tui)\b|(?:tôi|em|anh|chị|mình|tui) (?:có )?(?:không|chưa) "
                     r"(?:hề )?(?:nhắn|hỏi|gọi|liên hệ)\b|nhầm (?:số|người)\b|ai (?:đó )?(?:nhắn|gọi) (?:bằng|lấy) số)",
                     re.IGNORECASE)
+CONFIRMED_CONTACT = re.compile(
+    r"(?:đúng là (?:tôi|em|anh|chị|mình)|(?:tôi|em|anh|chị|mình) (?:đã|có|vừa))\s+(?:nhắn|gọi|liên hệ)"
+    r"|(?:hôm trước|lần trước) (?:tôi|em|anh|chị|mình) (?:có |đã )?(?:nhắn|gọi|liên hệ)", re.IGNORECASE)
 
 
 async def after_call(
@@ -81,8 +83,11 @@ async def after_call(
             if remembered.get("status") == "done" and settled.get("tier") == "VERIFIED":
                 denied = any(NOT_ME.search(str(line.get("text") or "")) for line in transcript
                              if line.get("speaker") == "customer")
-                await writer.data("memory_settle_unconfirmed", customer_id=remembered["customer_id"],
-                                  confirm=not denied, on=call["on"])
+                confirmed = any(CONFIRMED_CONTACT.search(str(line.get("text") or "")) for line in transcript
+                                if line.get("speaker") == "customer")
+                if denied or confirmed:
+                    await writer.data("memory_settle_unconfirmed", customer_id=remembered["customer_id"],
+                                      confirm=confirmed and not denied, on=call["on"])
     tags = await qa.tag(candidates, returning=bool(call.get("returning")))
     return {**remembered, "tags": tags}
 

@@ -1,6 +1,7 @@
 import secrets
+import hmac
 from uuid import UUID
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import select, delete
 from src.commerce.service import OrderService
@@ -21,7 +22,7 @@ from src.db.models import (
     now,
 )
 from src.memory.service import MemoryService
-from src.db.models import CartItem, Challenge, ToolExecution
+from src.db.models import CartItem, Challenge, ToolExecution, ProcessedEvent
 from src.identity.accounts import AccountService
 from .shared import bearer, resources
 
@@ -166,6 +167,22 @@ def customer_orders(request: Request):
         ]
 
 
+@router.get("/customer/orders/by-key/{key}")
+def order_by_key(key: str, request: Request):
+    """Recover a checkout whose HTTP reply was lost, scoped to the authenticated customer."""
+    if not 8 <= len(key) <= 100:
+        raise HTTPException(422, "Invalid idempotency key")
+    db, security = resources(request)
+    with db:
+        customer_id = security.customer(db, bearer(request))
+        db.scalar(select(Customer).where(Customer.id == customer_id).with_for_update())
+        order = db.scalar(select(Order).where(Order.customer_id == customer_id,
+                          Order.idempotency_key == security.digest(customer_id + ":" + key)))
+        if order is None:
+            raise HTTPException(404, "Order not found")
+        return OrderService(db, security).serialize(order)
+
+
 @router.delete("/customer/data")
 def forget(request: Request):
     db, security = resources(request)
@@ -191,9 +208,11 @@ def forget(request: Request):
             select(CustomerAccess).where(CustomerAccess.customer_id == customer_id)
         ):
             access.revoked_at = now()
+        conversation_ids = []
         for conv in db.scalars(
             select(Conversation).where(Conversation.customer_id == customer_id)
         ):
+            conversation_ids.append(str(conv.id))
             db.execute(delete(Challenge).where(Challenge.conversation_id == conv.id))
             for msg in db.scalars(
                 select(Message).where(Message.conversation_id == conv.id)
@@ -226,14 +245,30 @@ def forget(request: Request):
             request.app.state.working.clear(str(conv.id))
         for order in db.scalars(select(Order).where(Order.customer_id == customer_id)):
             order.encrypted_shipping_address = security.encrypt("[deleted]")
-        db.add(
-            Outbox(
+        event = Outbox(
                 event_type="identity.customer.deleted",
                 aggregate_id=customer.id,
-                payload={"customer_id": str(customer.id)},
+                payload={"customer_id": str(customer.id), "conversation_ids": conversation_ids},
             )
-        )
+        db.add(event)
         db.commit()
         return {
-            "status": "personal data deleted; financial records retained without address"
+            "status": "personal data deleted; financial records retained without address",
+            "agent_data_status": "pending",
+            "deletion_id": str(event.id),
+            "deletion_token": security.digest("deletion-status:" + str(event.id)),
         }
+
+
+@router.get("/customer/deletions/{request_id}")
+def deletion_status(request_id: UUID, request: Request):
+    db, security = resources(request)
+    expected = security.digest("deletion-status:" + str(request_id))
+    if not hmac.compare_digest(bearer(request), expected):
+        raise HTTPException(403, "Invalid deletion receipt")
+    with db:
+        event = db.get(Outbox, str(request_id))
+        if event is None or event.event_type != "identity.customer.deleted":
+            raise HTTPException(404, "Deletion not found")
+        done = db.get(ProcessedEvent, str(request_id)) is not None
+        return {"status": "deleted" if done else "pending"}

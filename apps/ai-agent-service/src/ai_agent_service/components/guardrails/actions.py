@@ -64,6 +64,7 @@ def check(
     now: datetime | None = None,
     last_agent_said: str | None = None,
     customer_said: str | None = None,
+    deletion_asked: bool | None = None,
     shared_phone: bool = False,
     created: Sequence[Mapping[str, Any]] = (),
     updated: Sequence[Mapping[str, Any]] = (),
@@ -112,7 +113,8 @@ def check(
                                                     updated=updated)),
         "schedule_callback": lambda: _schedule_callback(args, now=now),
         "handoff_transfer": lambda: _handoff(args, lane=lane, flags=flags or {}),
-        "memory_request_deletion": lambda: _deletion(tier=tier, last_agent_said=last_agent_said, customer_said=customer_said),
+        "memory_request_deletion": lambda: _deletion(tier=tier, last_agent_said=last_agent_said,
+                                                     customer_said=customer_said, deletion_asked=deletion_asked),
     }
     reasons = checks[name]()
     return Verdict(not reasons, tuple(reasons))
@@ -210,15 +212,35 @@ def handoff_problems(brief: Mapping[str, Any]) -> list[str]:
     return problems[:5]
 
 
-def _deletion(*, tier: str, last_agent_said: str | None, customer_said: str | None) -> list[str]:
+def _deletion(*, tier: str, last_agent_said: str | None, customer_said: str | None,
+              deletion_asked: bool | None = None) -> list[str]:
     if tier != "VERIFIED":
         return ["Chưa xác minh danh tính nên chưa ghi nhận được yêu cầu xóa dữ liệu."]
-    asked = bool(last_agent_said and ASKED_TO_DELETE.search(plain(last_agent_said)))
+    immediate = bool(last_agent_said and ASKED_TO_DELETE.search(plain(last_agent_said)))
+    asked = immediate if deletion_asked is None else deletion_asked
     said = plain(customer_said or "")
     agreed = bool(AGREED.search(said)) and not DECLINED.search(said)
+    if not immediate:
+        agreed = agreed and bool(re.search(r'\b(?:dong y|xac nhan)\b.*\bxoa\b|\bxoa (?:di|giup|het)\b', said))
     if asked and agreed:
         return []
     return ["Hỏi khách xác nhận một câu là muốn xóa dữ liệu, đợi khách đồng ý rồi mới gọi memory_request_deletion."]
+
+
+def deletion_succeeded(name: str, envelope: Mapping[str, Any]) -> bool:
+    """Only the memory server's successful response shape is evidence of an erasure action."""
+    data = envelope.get('data')
+    if envelope.get('ok') is not True or not isinstance(data, dict):
+        return False
+    if name == 'memory.request_deletion':
+        return (data.get('status') == 'recorded' and isinstance(data.get('request_id'), str)
+                and re.fullmatch(r'D-[0-9a-f]{12}', data['request_id']) is not None
+                and type(data.get('deleted_within_hours')) is int and data['deleted_within_hours'] == 72)
+    if name == 'memory.delete_customer':
+        deleted = data.get('deleted')
+        return (isinstance(deleted, dict) and isinstance(data.get('customer_id'), str) and bool(data['customer_id'])
+                and all(isinstance(key, str) and type(count) is int and count >= 0 for key, count in deleted.items()))
+    return False
 
 
 def fill_handoff(brief: Mapping[str, Any], known: Mapping[str, Any]) -> dict[str, Any]:

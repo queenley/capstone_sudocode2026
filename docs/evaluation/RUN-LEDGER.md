@@ -147,3 +147,191 @@ Một bản thử trung gian (chỉ 30 slot lấy từ mẫu công khai BTC, tr�
 - Chi phí token đã biết: **0.123677131 USD**; **0.4223072 USD dự phòng thiếu usage**; tổng giữ **0.545984331/10 USD**. Không settle phỏng đoán, không reset sổ. **Đối soát billing/measurement tổng vẫn INCOMPLETE** dù kiểm chức năng PASS.
 - Evidence local gitignored: `evaluation/agent-evaluation/runs/20261029-web-memory/summary.json`, `R3/`, `R3-followup/`, `postgres-check.json`, `budget.sqlite`. Ảnh `R3-followup/07-call-brief.png`, `07-staff.png`, `07-customer.png`; call 36 VERIFIED, handoff accepted, memory done. Tài khoản/dữ liệu test giữ local để review; không ghi credentials/transcript vào ledger.
 - Hai dự án khác đã dừng, chỉ telesales-ai chạy. Backend source bind mount theo `compose.local.yml` trong evidence; frontend npm dev. Image base build chuẩn từng gặp Bus error sau hết ổ; dùng image local bổ sung dependency đã có trong requirements để test, chưa deploy production/commit. Ngoài phạm vi: audio, kênh ngoài web, chấm toàn bộ BTC, latency p95 và hoá đơn nhà cung cấp.
+
+
+## 01/11/2026 — Khóa cohort và đối chiếu extractor trên cùng replies
+
+**Trạng thái cuối: baseline v4 COMPLETE; smoke v5 COMPLETE; cohort v5 INCOMPLETE (77/78 lượt có nhãn).** Đây là retest development, không tăng coverage và không phải gold/holdout độc lập. Chưa chạy lại agent hiện tại.
+
+- Cohort cố định: **SAMPLE-01, SAMPLE-02, SAMPLE-03, SAMPLE-04, SAMPLE-05, SAMPLE-06, SAMPLE-07**, nguồn `apps/ai-agent-service/data/btc/test_set/public_sample/`; 13 cuộc, **39 lượt/config**, 78 lượt tổng. Không sửa byte scenario, nhãn, pack BTC hoặc `reference_eval.py`.
+- Nền bộ chấm: main `41eda490bc47577018541c7778c0e8443ed8e6c8`; SHA-256 `reference_eval.py`: `18f1fa0881a345b8dd01c4160ec8fc31aea5ff8385c09a3eb3db96a88372843e`. Không tuyên bố đây là ZIP BTC gốc.
+- `cohort-lock.json` khóa IDs, toàn bộ SHA-256, nguồn và expected tools/args cho **cả full lẫn baseline_no_memory**, giữ nguyên `success_if`; không suy diễn thiếu nhãn positive là cấm mọi tool. Call thiếu assertion giữ đúng cách main xử lý; không thêm tiêu chí sau khi thấy điểm. Nhãn public có sẵn được kế thừa, không tự chứng nhận human approval mới. Tranh chấp GT ở báo cáo 28/10 vẫn giữ nguyên.
+- PII: chỉ nguồn synthetic public của BTC; trace, bản sao input và cache ở evidence gitignored. Ledger này không chứa raw hội thoại hay key. ASR/hypotheses không thuộc phép đo này.
+
+| Scenario | SHA-256 byte của file gốc |
+|---|---|
+| SAMPLE-01 | `1602366d3e268ee918ceee3cbb6ef61bb0fecbc45d524257b8d311bd7a90ad90` |
+| SAMPLE-02 | `119007d2e4812720f02ffbd5e0805303bc62ccffb5a11be87e88abcf1673767c` |
+| SAMPLE-03 | `b010471d5c0c9c034b8ef3151e0639ac5b411a08ca8987692b9492616d25260a` |
+| SAMPLE-04 | `35aa3a66c553797fa74ead57f67905caf1690b14d27d8448d8b9d2e81a6661ef` |
+| SAMPLE-05 | `900a664f527fa989c8e5e9e1015997e24a5ebeb418f0b44d993010175574e6fa` |
+| SAMPLE-06 | `b526a378610483d69baf31459ea9608d4b761843e63d817ef1eec47256e2da23` |
+| SAMPLE-07 | `cc2d28aec00ca598122a963f317a39fae5206264fa9d514432e91a79a7a01ec0` |
+
+### Baseline được tái lập chính xác
+
+Evidence local: `evaluation/runs/20261101-rqr-extractor/`.
+
+1. Snapshot `before/` có **146 file** code/config/prompt, `product-extractor-v4`; đã đối chiếu đủ mọi hash trong manifest, không có lệch. Manifest SHA-256: `2cd70f635957ea3fc46b9c7de3fc6aa057abc1a6bca297870b53ff8c9de21709`.
+2. `bootstrap-old/sitecustomize.py` xác minh 146 hash rồi preload **package source cũ**, đặt `AGENT_HOME`, `PROMPTS_DIR`, `EXTRACTOR_PROMPT` tới snapshot. Lệnh thực thi vẫn là **`run_eval.py` tại gốc repo**, không có SDK invocation riêng. `baseline-preflight.json` xác minh scorer, structured helper, config và harness thực sự import từ snapshot. Chỉ đổi prompt cũ trên code mới không được coi là baseline.
+3. Replies lấy từ `evaluation/runs/20261028-public-sample-v4/`, full và baseline lịch sử, giữ riêng theo config. `source-lock.json` ở hai thư mục input khóa trace gốc và trace chọn lại. `environment-lock.json` khóa root command, backend common, model config, prompt, KB/pack/scorer và budget snapshot.
+4. Chạy **SAMPLE-01 trước**, rồi đủ 7 mẫu; cả hai thoát mã 0, không failed/unlabelled/schema error. `baseline-v4-smoke/`: 14 cache hits; `baseline-v4-cohort/`: **78 cache hits, 0 model calls, 0 retry**. Chi phí mới **0 USD**; ledger không đổi 10.220 requests.
+
+Lệnh baseline cohort (từ gốc repo; đổi input/output sang `*-smoke` để tái lập smoke):
+
+```bash
+EVAL_CODE_SNAPSHOT="$PWD/evaluation/runs/20261101-rqr-extractor/before" \
+PYTHONPATH="$PWD/evaluation/runs/20261101-rqr-extractor/bootstrap-old:$PWD/packages/backend-common" \
+BTC_DATA_DIR="$PWD/apps/ai-agent-service/data/btc" \
+EVAL_RUNS_DIR="$PWD/evaluation/runs" \
+EVAL_BUDGET_DB="$PWD/evaluation/runs/20261024-work/budget.sqlite" \
+apps/ai-agent-service/.venv/bin/python run_eval.py \
+  --relabel evaluation/runs/20261101-rqr-extractor/relabel-input-cohort \
+  --out evaluation/runs/20261101-rqr-extractor/baseline-v4-cohort
+```
+
+### Số baseline v4 — cùng extractor_version, cùng historical replies
+
+| Main scorer, relabel v4 | full | baseline_no_memory |
+|---|---:|---:|
+| RQR | 13,3% (2/15) | 17,6% (3/17) |
+| CCR từ extractor, cận dưới | 33,3% (7/21) | 23,8% (5/21) |
+| TSR | 28,6% (2/7) | 28,6% (2/7) |
+| HR tổng | 22,2% (6/27) | 24,0% (6/25) |
+| HR giá/KM | 17,6% (3/17) | 25,0% (3/12) |
+
+RQR full giảm tương đối **24,4%** so baseline trong **v4**, chưa đạt ngưỡng 40%. `--relabel` xóa toàn bộ `facts_used` cũ và không khôi phục citation brief, nên CCR full **33,3%** khác 38,1% của live run 28/10: đây không phải agent bị giảm chất lượng. Không so lẫn CCR live với CCR relabel. TTFT/latency trong trace là lịch sử 28/10, 39 lượt/config, dưới 100 lượt; không phải latency của lần đo hiện tại.
+
+### Protocol extractor mới và ngân sách
+
+- Chỉ bắt đầu khi **cả** `docs/evaluation/extractor-implementation.json` và `docs/evaluation/rqr-policy.json` có `status: ready`. Chụp source/model/prompt/scorer/KB trước đo và kiểm hash lại sau đo; thay đổi giữa run làm kết quả INCOMPLETE.
+- Smoke trace đầu tiên thuộc SAMPLE-01 trước cohort để kiểm auth/budget/schema. Nếu provider auth lỗi hoặc cap không đủ, **dừng**, giữ reservation, ghi INCOMPLETE; không chạy cohort tiếp và không đổi provider/model để lách ledger. Helper không retry lỗi invocation.
+- Sau smoke, `run_eval.py --relabel .../relabel-input-cohort --out ...` trên đúng 78 replies đã khóa. So **old/new extractor trên cùng replies** để đánh giá instrument; đây không phải bằng chứng agent hiện tại tốt hơn. Trong mỗi version mới so full/baseline lịch sử riêng, cùng agent/model/prompt/tools/KB, khác bộ nhớ. Nếu chạy lại product sau này cần paired run riêng, một scenario trước cohort; không gộp vào delta extractor.
+- Sổ hiện có duy nhất cho task: `evaluation/runs/20261024-work/budget.sqlite`, luôn truyền `EVAL_BUDGET_DB`. Không recreate, tăng cap, xóa request hoặc tự settle phần thiếu usage. Trước run: cap **50 USD**; usage theo token đã settle **9,949699483 USD**; **34,635910405 USD** dự phòng chưa đối soát (87 requests); tổng giữ **44,585609888 USD**; headroom **5,414390112 USD**. Đây không phải hóa đơn billing đã đối soát.
+- Đã kiểm key presence theo boolean, không ghi giá trị key. Advisor/memory/extractor giữ `openai:gpt-4.1-mini`, temperature 0 và giới hạn token của snapshot; policy giữ TypeSafe Jev theo config, không tự tắt/đổi model. Relabel chỉ cần OpenAI, không cần PostgreSQL/Redis và không đụng Docker.
+- Giá OpenAI kiểm ngày 01/11/2026: [GPT-4.1 mini](https://developers.openai.com/api/docs/models/gpt-4.1-mini), 0,40 USD/1M input, 1,60 USD/1M output, khớp budget callback. Giá cache input không dùng để giảm bảo lưu. Mỗi request extractor phải còn ít nhất 0,425584 USD reservation theo code hiện có.
+- `protocol.json` là kế hoạch và `environment-lock.json` là khóa bằng chứng; chưa có số extractor mới hoặc current-agent delta cho đến khi có manifest/trace và run hoàn tất.
+
+### Cập nhật phép đo v5 sau gate ready
+
+- Hai file readiness đã `ready`; toàn bộ hash bàn giao khớp. Snapshot mới `after/` có **150 file** source/config/prompt/contracts; instrument `product-extractor-v5`, SHA-256 `e6c9e6fe3e7dd6cdc25dcca7d1616d604c6b4ad3e88cac8ec4ab96c16c76e721`. Snapshot dùng layout `apps/ai-agent-service` để đường đọc contract bằng `ROOT.parents[1]/docs/evaluation` giữ nguyên; preflight khẳng định hash runtime khớp bản ready.
+- Root `run_eval.py` vẫn là entrypoint, `bootstrap-new/` chỉ chọn package frozen mới; model config không đổi. Chạy theo đúng thứ tự: `new-v5-api-smoke/` (1 lượt, không lấy bảng thiếu scenario làm metric) → `new-v5-smoke/` (SAMPLE-01, 14 lượt full/baseline) → `new-v5-cohort/` (78 lượt).
+- API smoke: 1 call, 0 lỗi/retry. Scenario smoke: 13 calls + 1 cache hit, 0 lỗi/retry; 7 lượt/config, không failed/unlabelled/schema error. Sau hai smoke, chi phí token mới **0,049444406 USD**, không có reservation mới chưa settle; headroom **5,364945706 USD**. Cohort mới đang chạy, chưa công bố số v5.
+- Lệnh cohort giống lệnh baseline ở trên, đổi `before` → `after`, `bootstrap-old` → `bootstrap-new`, output `baseline-v4-cohort` → `new-v5-cohort`. Không dùng trace mới sinh từ agent và không thay model/GT giữa full/baseline.
+
+### Kết quả cuối attempt v5 — INCOMPLETE, không có bảng điểm
+
+- `new-v5-cohort/` thoát **mã 1**. Đã xử lý 39 lượt full + 39 lượt baseline; **77/78 lượt đủ nhãn**. Full: 0 lỗi nhãn; baseline: **1 unlabelled**, không có lỗi schema trace/agent. Cohort dùng **62 model calls + 16 cache hits**, 1 failure, **0 retry**, 0 repair; cộng hai smoke: **76 model requests thật**, không chạy lại agent.
+- Lượt lỗi: **baseline_no_memory / SAMPLE-04 / call_2 / turn 3**. Native structured output ném `ValidationError` tại `Items.items.9`: `end phải lớn hơn start cho quote không rỗng`. Đây là lỗi validation span trong output; helper phân loại exception phát ra ở invocation là không retry. Diagnostics giữ nguyên lỗi; task này không sửa helper do luồng extractor sở hữu. Không tự gọi lại model, không đổi config, không loại lượt để lấy điểm.
+- Root command đã chặn bảng đúng quy tắc: **không có `new-v5-cohort/report.json` hay `table.txt`**. RQR/CCR/TSR/HR v5 của cohort và delta v4→v5 **CHƯA ĐO ĐỦ / INCOMPLETE**; không thay missing bằng 0 hoặc PASS. Bảng baseline v4 ở trên vẫn hợp lệ theo phạm vi đã nêu. Không dùng bảng API smoke một lượt làm kết quả scenario/cohort.
+- Toàn bộ trường trace ngoài `questions`, `claims`, `facts_used` đã đối chiếu đúng với input lịch sử cho cả smoke/cohort. Không có agent call, PostgreSQL/Redis hoặc Docker trong task này. Không sửa scenario/labels hoặc chấm trực tiếp bằng script khác root command.
+- Hai snapshot frozen trước/sau đo đều không đổi hash. Trong khi phép đo chạy, working copy `config/prompts/evaluation/extractor.txt` đổi so bản ready ban đầu; frozen `after/` và instrument đã chạy không đổi. Phép đo này gắn với snapshot v5 SHA `e6c9e6fe3e7dd6cdc25dcca7d1616d604c6b4ad3e88cac8ec4ab96c16c76e721`; không tự gán cho prompt đang sửa. Trước retest cần luồng sở hữu cập nhật ready/hash và snapshot revision mới.
+
+| Trace cohort | SHA-256 |
+|---|---|
+| v4 full | `bc95fac1432672dd75f3d9fb45bd7ed2386ce70dd9ae1c26867c8ad113ff4290` |
+| v4 baseline | `660444b0a2ee3e5cbc5afffecafc97baf70a3b69733d03e63f2ff19ada350fad` |
+| v5 full | `8f5ef89e407bbb134f3598dbab080013ab30d1edc2f6446f1029271788ea606b` |
+| v5 baseline (1 unlabelled) | `fdeff025ee2c5c7fb43ee086729fff3e8159ba00c45c6ff71a279ba7c5e209be` |
+
+Các hash report/diagnostics/log và toàn bộ provenance ở `new-v5-result.json`, `summary.json`, `environment-lock.json` trong evidence private. ASR/hypothesis hash: **không áp dụng**, không chạy ASR trong task này.
+
+**Ngân sách cuối task:** 75 request có usage đã settle **0,267342834 USD**; 1 request lỗi native parse giữ nguyên dự phòng **0,425584 USD**; tổng giữ mới **0,692926834 USD**. Không giả định request lỗi miễn phí. Ledger toàn cục: usage đã settle **10,217042317 USD**; dự phòng chưa đối soát **35,061494405 USD** (88 requests); tổng giữ **45,278536722 / 50 USD**; headroom **4,721463278 USD**. Không reset ledger, không tăng cap, không xóa/settle thủ công reservation. Đây là token accounting và dự phòng, chưa phải hóa đơn provider đã đối soát.
+
+**Bàn giao:** `new-v5-result.json` chỉ ra field lỗi để chủ sở hữu structured helper xem đường native parse/repair. Retest phải được ghi như attempt mới, giữ bằng chứng attempt INCOMPLETE này và dùng đúng cùng replies; không thay score của attempt đã đóng. Chưa có bằng chứng agent hiện tại cải thiện hoặc extractor v5 chính xác hơn; semantic labels vẫn diagnostic, không phải human-approved gold.
+
+
+### Retest v6 — 01/11/2026, cùng cohort/replies, attempt riêng
+
+**Trạng thái cuối v6: COMPLETE sau đúng một caller replay; cohort attempt đầu INCOMPLETE được giữ nguyên.** Bản v5 ở trên vẫn đóng INCOMPLETE, không ghi đè evidence hoặc giải phóng reservation.
+
+- Root đã sửa đường native parse: gửi `Items.model_json_schema()` cho provider, nhận raw/usage rồi mới Pydantic validate tại helper; lỗi output có thể repair/retry với đầy đủ lỗi. Readiness v6 báo 155 test offline, có real ChatOpenAI SDK + MockTransport sync/async tái hiện invalid span. Đây là bằng chứng regression của luồng code, không tự phê duyệt semantic gold.
+- Đã kiểm lại đủ hash trong `extractor-implementation.json` và `rqr-policy.json`, cả hai `ready`. Snapshot **`after-v6/`**, 150 file source/config/prompt/contracts, giữ nguyên prompt user đang có; `product-extractor-v6`, instrument SHA-256 **`e5502a3253b8b64b43b43a431182924efa5fdafb1853fd0579f4b2f81c1fe219`**. `before/` v4 và `after/` v5 không đổi.
+- Bootstrap `bootstrap-v6/` chọn toàn bộ package frozen; preflight runtime khớp instrument ready. Root entrypoint, model config, main scorer/KB/pack và cohort/replies giữ nguyên; không đổi GT/provider, không chạy agent hoặc ASR. Không nạp raw labels cũ vào model.
+- Khởi điểm ledger: rowid **10296**, headroom **4,721463278 USD**, 88 reservations cũ chưa settle được giữ. Mỗi command truyền `EVAL_BUDGET_DB` hiện có. Không tăng cap, không reset, không gọi SDK trực tiếp. Quy trình: root `run_eval.py --relabel .../relabel-input-smoke --out .../new-v6-smoke`, kiểm SAMPLE-01 xong rồi root `--relabel .../relabel-input-cohort --out .../new-v6-cohort`.
+- Lệnh frozen giống v5, đổi snapshot `after` → `after-v6`, bootstrap `bootstrap-new` → `bootstrap-v6`, output `new-v5-*` → `new-v6-*`. `v6-protocol.json` khóa hash readiness/snapshot/cohort/root command và trạng thái budget ban đầu.
+
+- SAMPLE-01 v6: **14/14 lượt đủ nhãn**, exit 0; **15 model calls, 1 lỗi output được retry thành công**, 0 unlabelled/schema/agent error. Chi phí **0,053286407 USD**, cả 15 attempts đều có usage và đã settle, không tạo pending mới. Bằng chứng recovery: baseline/SAMPLE-01/call_2/turn 3, `InvalidOutput` được helper xử lý; không phải retry lỗi auth/network/budget. Cohort 78 lượt bắt đầu sau gate này.
+
+- Cohort v6 lần đầu (`new-v6-cohort/`) đóng **INCOMPLETE**, exit 1, **77/78** nhãn: full/SAMPLE-05/call_2/turn 3 hết hai attempts với `InvalidOutput` / `Items.items.8` / `end phải lớn hơn start cho quote không rỗng`. Full có 1 unlabelled; baseline đủ 39 nhãn. Cohort: 65 calls + 16 cache hits, 4 output failures trong đó 2 đã recovery và 1 lượt hết hai attempts, 3 retries; không có lỗi invocation/auth/budget. Không có report/table hoặc paired metrics của attempt này.
+- Smoke + cohort v6 dùng **80 requests, tất cả đã settle usage: 0,286745232 USD**, không thêm pending mới. Hash của toàn bộ 10.296 ledger rows trước v6 không đổi; pending v5 vẫn giữ. `new-v6-r0-result.json` giữ result, errors và file hashes, không ghi đè attempt.
+- Chạy **một completion retest riêng** `new-v6-replay/` trên cùng instrument v6 và đúng 78 replies, không thay source/model/prompt/GT; 77 labels thành công dùng cache, chỉ lượt thiếu nhãn gọi lại model. Đây là xử lý thiếu output hợp lệ, không lựa nhãn theo score (attempt trước chưa có bảng). Không ghép full v5 với baseline v6 hoặc bỏ lượt lỗi. Nếu completion retest vẫn thiếu nhãn thì giữ INCOMPLETE, không lặp vô hạn.
+
+
+### Kết quả v6 hoàn tất sau một caller replay — không phải first-pass 78/78
+
+- **`new-v6-replay/`: COMPLETE, exit 0, 78/78 lượt đủ nhãn**, 39 full + 39 baseline, 0 failed/unlabelled/schema/after_call error. **77 cache hits + 2 model attempts** cho duy nhất full/SAMPLE-05/call_2/turn 3; output đầu vẫn invalid, helper retry thành công. Không sửa schema/prompt/source/contract/config hoặc nhãn giữa initial run và replay. Không có caller replay thứ hai.
+- Phân biệt độ ổn định: attempt `new-v6-cohort/` đầu tiên chỉ đạt **77/78 sau helper retries**, vẫn đóng INCOMPLETE. Replay hoàn tất dữ liệu để chấm, không biến attempt trước thành PASS hoặc chứng minh first-pass reliability 100%. Smoke + initial cohort + replay cộng **82 model attempts**, 6 output-validation failures ghi trong stats, 5 helper retries, 0 local JSON repair; tất cả attempts có usage và đã settle.
+- Mọi hash của `before/`, `after/`, `after-v6/` không đổi; live readiness/source/prompt/contracts vẫn khớp frozen v6 khi kết thúc. Hash toàn bộ **10.296 dòng ledger trước v6 không đổi**, gồm pending của v5. Root command/main scorer/KB, 7 scenario hashes và mọi trường reply/tool/history ngoài ba nhãn đều đối chiếu giữ nguyên.
+
+**Đối chiếu instrument trên đúng cùng 78 replies lịch sử**, không phải delta chất lượng agent hiện tại:
+
+| Main scorer / relabel | v4 full | v6 full | v4 baseline_no_memory | v6 baseline_no_memory |
+|---|---:|---:|---:|---:|
+| RQR | 13,3% (2/15) | 13,3% (2/15) | 17,6% (3/17) | 17,6% (3/17) |
+| CCR, extractor-only cận dưới | 33,3% (7/21) | 42,9% (9/21) | 23,8% (5/21) | 14,3% (3/21) |
+| TSR | 28,6% (2/7) | 28,6% (2/7) | 28,6% (2/7) | 28,6% (2/7) |
+| HR tổng | 22,2% (6/27) | 23,1% (6/26) | 24,0% (6/25) | 25,0% (5/20) |
+| HR giá/KM | 17,6% (3/17) | 18,8% (3/16) | 25,0% (3/12) | 20,0% (2/10) |
+
+- **Không có giảm RQR trên cohort này:** trong mỗi version, main báo full giảm tương đối **24,4%** so baseline, chưa đạt 40%; TSR và HR giá/KM full vẫn không đạt ngưỡng. RQR aggregate giữ nguyên dù hai lượt full ở eligible calls thay đổi projection slot/type; baseline eligible projection giữ nguyên. Tổng question items ở mọi call (bao gồm call bị RQR loại) đổi full **29→33**, baseline **34→35**; không đồng nhất chúng với mẫu số RQR 15/17.
+- CCR/HR đổi là **nhãn do instrument khác sinh trên lời cũ**; denominators của HR cũng đổi, nên không trình bày như agent giảm/tăng hallucination thật. Chưa có human-approved gold để kết luận v6 chính xác hơn. Claim `restock_date` tại full/SAMPLE-06/call_2/turn 2 vẫn bị main đánh sai như v4; lỗi semantic đã nêu trong báo cáo 28/10 chưa thể coi là đã hết. Không sửa GT để khớp model.
+- Current-agent delta, live CCR/citation brief và latency mới **chưa đo**. Latency trong trace là lịch sử 28/10, 39 lượt/config; không dùng như benchmark latency hiện tại. Không ghép nhãn hoặc full/baseline từ khác extractor_version.
+
+| Trace v6 hoàn tất | SHA-256 |
+|---|---|
+| full | `47147f084dcc7e9b80abd86908bd3532e667ff597e74a7f39a1507e7e806ff58` |
+| baseline | `c5bd0c650eb9a410c23085f919c2ffbeda35285dfa333161a382ece98fe1f489` |
+
+`new-v6-result.json` ghi version, paired reports theo từng instrument, mọi trace/report/diagnostic/log hash, proof giữ nguyên replies, budget và giới hạn reliability. `new-v6-r0-result.json`, `new-v5-result.json` và các thư mục attempt cũ được giữ nguyên. `summary.json` là điểm vào tổng hợp private. Không có raw hội thoại/key trong ledger này.
+
+**Ngân sách cuối v6:** 82 requests đều settle **0,294994033 USD**, trong đó replay 2 attempts **0,008248801 USD**; không thêm reservation pending. Cộng v5 + v6 của task: **158 requests**, usage đã settle **0,562336867 USD**, giữ nguyên pending v5 **0,425584 USD**; tổng giữ mới **0,987920867 USD**. Ledger toàn cục: settled **10,512036350 USD**, pending **35,061494405 USD** (88 requests), tổng giữ **45,573530755/50 USD**, headroom **4,426469245 USD**. Không reset, tăng cap, xóa request hoặc manual settle. Token accounting vẫn không phải hóa đơn provider đã đối soát.
+
+
+### Retest v7 — 01/11/2026, sửa ranh giới restock/delivery, cùng replies
+
+**Trạng thái cuối v7: COMPLETE ngay cohort attempt đầu, sau một helper output retry; không caller replay.** Giữ nguyên baseline v4, attempt v5 và mọi attempt v6, gồm v6 COMPLETE sau replay; không đổi kết quả cũ.
+
+- Audit trên development replies xác nhận lỗi cũ: cụm ngày giao được v4/v6 gán `restock_date` khi quote không chứa chủ thể nhập/bổ sung kho. Root sửa quy tắc tổng quát trong prompt và deterministic projection; không thêm ID, ngày GT hoặc giá cohort vào prompt, không sửa GT để lấy điểm. Readiness báo 11 synthetic regressions và full suite **548 passed, 9 skipped**; đây là test của chủ sở hữu code, không phải human-approved semantic gold.
+- Đã kiểm đủ readiness/hash, cả policy và implementation `ready`. Frozen **`after-v7/` 150 file**, `product-extractor-v7`, instrument SHA-256 **`0a1ac711e04f9f32f835b72da65843afead5a93c0db20e9e9fc5f1912acfb6ce`**; model config, structured helper v6, root entrypoint, main scorer/KB/pack và cohort/replies giữ nguyên. Tất cả snapshot trước vẫn khớp manifest.
+- Ngân sách trước v7: rowid **10378**, headroom **4,426469245 USD**, 88 pending cũ giữ nguyên. `v7-protocol.json` khóa hash 10.378 prior ledger rows, readiness/snapshot/cohort/root command. Mọi call qua root `run_eval.py --relabel`, luôn truyền ledger hiện có; không SDK riêng, không agent/Docker/ASR.
+- `new-v7-smoke/` dùng SAMPLE-01 (14 lượt) trước `new-v7-cohort/` (78 lượt). Nếu chỉ lỗi output còn thiếu nhãn, cho phép tối đa **một** caller replay output mới, cùng v7 và cache các lượt đạt; không replay invocation/auth/budget. Không sửa source/prompt/schema/contract trong khi đo.
+- Lệnh frozen giống v6, đổi snapshot/bootstraps sang `after-v7` / `bootstrap-v7`, output `new-v7-*`. Audit sau run phân biệt raw model items với claims cuối sau projection, kiểm lỗi ngày giao đã biết và các claim nhập kho thực sự; không coi mọi claim bị xóa là chứng minh model đúng.
+
+- SAMPLE-01 v7 smoke: **14/14 lượt đủ nhãn, exit 0**, 14 model calls, 0 lỗi/retry/repair/cache hit; tất cả 14 requests đã settle **0,049780408 USD**. Headroom trước cohort **4,376688837 USD**. Kiểm frozen hash xong mới bắt đầu cohort.
+
+
+### Kết quả v7 — COMPLETE, không caller replay
+
+- **`new-v7-cohort/`: exit 0, 78/78 lượt đủ nhãn**, 39 full + 39 baseline; không failed/unlabelled/schema/after_call error. Cohort: **63 model attempts + 16 cache hits**, 1 output failure được helper retry thành công, 0 repair. Lượt recovery: full/SAMPLE-05/call_2/turn 3, `InvalidOutput`. Không có auth/network/budget error và không dùng quyền caller replay dự phòng.
+- Đây là **78/78 ở cohort invocation đầu sau helper retry**, không phải mọi raw output đều đúng ngay lần model đầu tiên. Khác v6: v6 initial cohort 77/78 sau helper retries và cần một caller replay riêng mới complete. Không gộp hai mức reliability hoặc coi schema completeness là semantic accuracy.
+
+**Cùng 78 replies, main scorer và GT, đối chiếu ba instrument đã ghi version:**
+
+| Extractor / config | RQR | CCR, extractor-only | TSR | HR tổng | HR giá/KM |
+|---|---:|---:|---:|---:|---:|
+| v4 full | 13,3% (2/15) | 33,3% (7/21) | 28,6% (2/7) | 22,2% (6/27) | 17,6% (3/17) |
+| v6 full | 13,3% (2/15) | 42,9% (9/21) | 28,6% (2/7) | 23,1% (6/26) | 18,8% (3/16) |
+| v7 full | 13,3% (2/15) | 42,9% (9/21) | 28,6% (2/7) | 19,2% (5/26) | 18,8% (3/16) |
+| v4 baseline_no_memory | 17,6% (3/17) | 23,8% (5/21) | 28,6% (2/7) | 24,0% (6/25) | 25,0% (3/12) |
+| v6 baseline_no_memory | 17,6% (3/17) | 14,3% (3/21) | 28,6% (2/7) | 25,0% (5/20) | 20,0% (2/10) |
+| v7 baseline_no_memory | 17,6% (3/17) | 14,3% (3/21) | 28,6% (2/7) | 25,0% (5/20) | 22,2% (2/9) |
+
+- RQR và TSR **không đổi** trên cohort này. Trong mỗi version, full giảm tương đối **24,4%** RQR so baseline, vẫn dưới 40%; TSR và HR giá/KM full vẫn không đạt ngưỡng. CCR trong bảng là relabel cận dưới không có citation brief; không so lẫn live CCR 28/10.
+- HR tổng full đổi v6 **23,1% (6/26)** → v7 **19,2% (5/26)**. Đây là thay đổi nhãn/instrument trên lời cũ, không phải agent vừa giảm hallucination. Full HR giá/KM giữ 18,8%; baseline HR giá/KM đổi mẫu số 10→9 nên 20,0%→22,2% dù số claim sai vẫn 2. Không chọn nhãn, loại scenario hay sửa GT để cải thiện bảng.
+
+**Audit restock sau projection và raw model:**
+
+- Full/SAMPLE-06/call_2/turn 2: v4/v6 có claim sai `restock_date` lấy từ ngày giao; v7 **không có `restock_date` ở raw items hoặc trace cuối**. Lỗi cụ thể này không còn trong output v7 đã đo.
+- Full/SAMPLE-01/call_2/turn 3 (delivery) và full/SAMPLE-03/call_2/turn 3 (đơn hoàn về kho): raw model v7 vẫn sinh **3 restock items** (1 + 2). Chốt deterministic đã loại cả 3; trace cuối không giữ chúng. Không mô tả đây là model đã hiểu đúng cả ba câu.
+- Trên toàn 78 lượt v7: **3 raw restock items, 0 final restock claims**. Chưa có tập positive restock được human review để tính recall/sensitivity, nên số 0 không tự chứng minh extractor giữ được mọi ngày nhập kho thật. 11 synthetic regressions của root là bằng chứng code riêng; không thay cho semantic gold. `v7-restock-audit.json` giữ identity, raw items, cache key/hash và claims cuối để kiểm tay, không đưa raw hội thoại vào ledger.
+- Fresh model extraction giữa các version có thể đổi các claim khác; không suy rằng toàn bộ delta HR chỉ do một dòng deterministic code. Phạm vi kết luận là những lỗi đã audit và bảng same-reply của từng instrument; không claim semantic accuracy human-approved hoặc agent hiện tại cải thiện.
+
+| Trace v7 | SHA-256 |
+|---|---|
+| full.jsonl | `eb17ba983c2fd29945c1ffd9f8f070b91dbbb89568e5b3c6c3e1b8eac604ac18` |
+| baseline.jsonl | `7ddd2e68d0be2b247501f7d2de268917dc98c4cd2132106f84e4707b5dd42fb2` |
+
+`new-v7-result.json` chứa paired reports v4/v6/v7, proof mọi trường reply/tool/history ngoài nhãn giữ nguyên, error/recovery stats, audit và toàn bộ trace/report/diagnostics/log hash. `v7-protocol.json` khóa instrument/snapshot/cohort/root command; `summary.json` tổng hợp. Mọi file trong `before/`, `after/`, `after-v6/`, `after-v7/` vẫn khớp manifest; source/prompt/contracts live và main scorer/KB/pack vẫn khớp khóa sau run. Toàn bộ **10.378 ledger rows trước v7 không đổi**, gồm mọi pending. Không chạy agent, ASR, Docker, commit/push/deploy.
+
+**Ngân sách v7:** smoke 14 attempts **0,049780408 USD**; cohort 63 attempts **0,228585626 USD**; tổng **77 attempts, 0,278366034 USD**, tất cả đã settle usage, không thêm pending. Cộng v5/v6/v7 của task: **235 requests**, settled mới **0,840702901 USD**, pending v5 giữ nguyên **0,425584 USD**, tổng giữ mới **1,266286901 USD**. Ledger toàn cục: settled **10,790402384 USD**, pending **35,061494405 USD** (88 requests), tổng giữ **45,851896789/50 USD**, headroom **4,148103211 USD**. Không manual settle/reset/tăng cap. Đây là token accounting và dự phòng, chưa phải hóa đơn provider đối soát.

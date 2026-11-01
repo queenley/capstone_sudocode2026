@@ -43,7 +43,7 @@ class OrderInput(BaseModel):
     expected_total: Decimal = Field(ge=0, max_digits=18, decimal_places=2)
     confirmed: bool
     idempotency_key: str = Field(min_length=8, max_length=100)
-    #: None: an older client that does not choose; the order is COD, without the COD limit it predates.
+    #: Older clients may omit the choice; this means COD, including the COD limit.
     payment_method: PaymentMethod | None = None
 
     @model_validator(mode="after")

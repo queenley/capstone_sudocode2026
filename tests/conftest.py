@@ -11,6 +11,7 @@ platform transcript and the assistant-initiated handoff.
 """
 
 import os
+import socket
 from typing import Any
 
 import pytest
@@ -33,6 +34,26 @@ from ai_agent_service.runtime import calls, harness
 
 ADMIN = {"Authorization": "Bearer local-admin-change-me"}
 AGENT = {"Authorization": "Bearer local-agent-change-me"}
+
+
+@pytest.fixture(autouse=True)
+def private_improvement_store(tmp_path, monkeypatch):
+    monkeypatch.setenv("IMPROVEMENT_DIR", str(tmp_path / "improvement"))
+
+
+@pytest.fixture(autouse=True)
+def offline_network(monkeypatch):
+    """Tests may use local dependencies; provider and other public network calls are forbidden."""
+    connect = socket.socket.connect
+    def local_only(sock, address):
+        if sock.family in (socket.AF_INET, socket.AF_INET6) and address[0] not in ("127.0.0.1", "::1", "localhost"):
+            raise AssertionError("Offline tests forbid external network calls")
+        return connect(sock, address)
+    monkeypatch.setattr(socket.socket, "connect", local_only)
+    from ai_agent_service.llm.factory import LLMFactory
+    def no_provider(*args, **kwargs):
+        raise AssertionError("Offline tests require an injected fake model")
+    monkeypatch.setattr(LLMFactory, "create_llm", staticmethod(no_provider))
 
 
 class ScriptedAgent:

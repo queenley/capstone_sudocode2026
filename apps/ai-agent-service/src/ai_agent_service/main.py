@@ -27,7 +27,7 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from src.core.service_runtime import configure_service, database_ready
 
-from .api.routes import agent_calls, channels, conversations, developer, voice
+from .api.routes import agent_calls, channels, conversations, developer, voice, privacy, welcome
 from .components import voice as voice_component
 from .llm import tracing
 from .mcp import client as mcp_client
@@ -79,6 +79,7 @@ async def _reconcile_forever(app: FastAPI) -> None:
             open_ids = await calls.open_conversation_ids()
             closed = await platform.closed_conversations(app, open_ids)
             await calls.reconcile(closed)
+            await harness.remember_unfinished()
         except Exception:  # noqa: BLE001 - try again next minute
             logger.exception("Call reconciliation failed")
 
@@ -108,6 +109,8 @@ async def lifespan(app: FastAPI):
     app.state.turn_tracker.close()
     tracing.flush()
     await mcp_client.close_all()
+    from .components.voice import asr
+    asr.close()
     await db.close_pool()
     database.engine.dispose()
 
@@ -119,6 +122,8 @@ app.include_router(voice.router)
 app.include_router(agent_calls.router)
 app.include_router(developer.router)
 app.include_router(channels.router)
+app.include_router(privacy.router)
+app.include_router(welcome.router)
 
 
 @app.get("/health")

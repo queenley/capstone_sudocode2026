@@ -9,8 +9,11 @@ function Results() {
   const q = useSearchParams().get("q") || "";
   const [products, setProducts] = useState<ShopProduct[] | null>(null);
   const [error, setError] = useState("");
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
+    let active = true;
+    setError("");
     setProducts(null);
     // The catalog matches whole phrases; also try each word so "giày chạy" finds "Giày chạy bộ".
     const words = q.split(/\s+/).filter((w) => w.length > 1);
@@ -21,17 +24,19 @@ function Results() {
           const hits = words.filter((w) => (p.name + " " + p.brand).toLowerCase().includes(w.toLowerCase())).length;
           return !seen.has(p.ref) && hits >= Math.min(2, words.length) && (seen.add(p.ref), true);
         });
-        setProducts([...exact, ...extra]);
+        if (active) setProducts([...exact, ...extra]);
       })
-      .catch((e) => setError(e.message));
-  }, [q]);
+      .catch((e) => { if (active) setError(e.message); });
+    return () => { active = false; };
+  }, [q, attempt]);
 
   return (
     <div className="s-wrap s-page">
       <h1 className="s-page-title">Kết quả cho “{q}”</h1>
-      {error && <div className="s-alert">Không tìm được: {error}</div>}
       <ProductListing
         products={products}
+        error={error}
+        onRetry={() => setAttempt((value) => value + 1)}
         empty="Không tìm thấy sản phẩm. Hãy thử từ khóa khác, hoặc hỏi trợ lý để được gợi ý."
       />
       {products !== null && products.length === 0 && (

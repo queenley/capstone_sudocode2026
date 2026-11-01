@@ -171,6 +171,33 @@
         }
       }
     },
+    "/api/agent/callbacks": {
+      "get": {
+        "tags": [
+          "agent-console"
+        ],
+        "summary": "List Callbacks",
+        "description": "Call-backs the assistant booked (``schedule.callback``), soonest first.\n\nAs on a call, staff see the last four digits of the number, and the\ncustomer's name only when the number belongs to one CRM customer (a\nshared number names nobody).",
+        "operationId": "list_callbacks_api_agent_callbacks_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "type": "array",
+                  "title": "Response List Callbacks Api Agent Callbacks Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/agent/calls/{call_id}": {
       "get": {
         "tags": [
@@ -245,6 +272,47 @@
                   "additionalProperties": true,
                   "title": "Response End Call Api Agent Calls  Call Id  End Post"
                 }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agent/calls/{call_id}/context": {
+      "get": {
+        "tags": [
+          "agent-console"
+        ],
+        "summary": "Customer Context",
+        "description": "The agent's own ledger and orders; no projection from the platform's older memory tables.",
+        "operationId": "customer_context_api_agent_calls__call_id__context_get",
+        "parameters": [
+          {
+            "name": "call_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Call Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           },
@@ -414,6 +482,61 @@
         }
       }
     },
+    "/api/agent/calls/{call_id}/suggestion-feedback": {
+      "post": {
+        "tags": [
+          "agent-console"
+        ],
+        "summary": "Suggestion Feedback",
+        "description": "Rate the current suggestion; kept as a ``consultant`` signal for the improvement loop.",
+        "operationId": "suggestion_feedback_api_agent_calls__call_id__suggestion_feedback_post",
+        "parameters": [
+          {
+            "name": "call_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Call Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuggestionFeedback"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Suggestion Feedback Api Agent Calls  Call Id  Suggestion Feedback Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/agent/calls/{call_id}/faq": {
       "post": {
         "tags": [
@@ -452,6 +575,75 @@
                   "additionalProperties": true,
                   "title": "Response Save Faq Api Agent Calls  Call Id  Faq Post"
                 }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/developer/knowledge-gaps": {
+      "get": {
+        "tags": [
+          "developer"
+        ],
+        "summary": "Knowledge Gaps",
+        "operationId": "knowledge_gaps_api_developer_knowledge_gaps_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/developer/knowledge-gaps/{gap_id}/resolve": {
+      "post": {
+        "tags": [
+          "developer"
+        ],
+        "summary": "Resolve Gap",
+        "operationId": "resolve_gap_api_developer_knowledge_gaps__gap_id__resolve_post",
+        "parameters": [
+          {
+            "name": "gap_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Gap Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GapResolution"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           },
@@ -617,6 +809,112 @@
                   },
                   "type": "array",
                   "title": "Response Traces Api Developer Traces Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/developer/calls/{call_id}/trace": {
+      "get": {
+        "tags": [
+          "developer"
+        ],
+        "summary": "Call Trace",
+        "description": "One stored call as the organisers' ``trace_log`` rows, labelled with the scenario it played.\n\n``json`` returns the rows with each one's violations of\n``schemas/trace_log.schema.json``; ``jsonl`` is the file ``reference_eval.py\n--trace`` reads (append the calls of a run together).",
+        "operationId": "call_trace_api_developer_calls__call_id__trace_get",
+        "parameters": [
+          {
+            "name": "call_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Call Id"
+            }
+          },
+          {
+            "name": "scenario_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "title": "Scenario Id"
+            }
+          },
+          {
+            "name": "call",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "call_1",
+                "call_2",
+                "call_3"
+              ],
+              "type": "string",
+              "default": "call_1",
+              "title": "Call"
+            }
+          },
+          {
+            "name": "config",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "full",
+                "baseline_no_memory"
+              ],
+              "type": "string",
+              "default": "full",
+              "title": "Config"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 64,
+              "default": "run",
+              "title": "Run Id"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "json",
+                "jsonl"
+              ],
+              "type": "string",
+              "default": "json",
+              "title": "Format"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -870,6 +1168,176 @@
         }
       }
     },
+    "/api/channels/zalo/webhook": {
+      "post": {
+        "tags": [
+          "channels"
+        ],
+        "summary": "Zalo Webhook",
+        "operationId": "zalo_webhook_api_channels_zalo_webhook_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Zalo Webhook Api Channels Zalo Webhook Post"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/channels/status": {
+      "get": {
+        "tags": [
+          "channels"
+        ],
+        "summary": "Channel Status",
+        "operationId": "channel_status_api_channels_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Channel Status Api Channels Status Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/channels/zalo/messages": {
+      "get": {
+        "tags": [
+          "channels"
+        ],
+        "summary": "Zalo Messages",
+        "operationId": "zalo_messages_api_channels_zalo_messages_get",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "title": "Response Zalo Messages Api Channels Zalo Messages Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/customer-deletions": {
+      "post": {
+        "summary": "Delete Customer",
+        "operationId": "delete_customer_internal_customer_deletions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Deletion"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agent/welcome": {
+      "get": {
+        "tags": [
+          "welcome"
+        ],
+        "summary": "Welcome",
+        "operationId": "welcome_api_agent_welcome_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Welcome"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -972,6 +1440,40 @@
         "type": "object",
         "title": "BusinessDay"
       },
+      "CartLine": {
+        "properties": {
+          "sku": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Sku"
+          },
+          "qty": {
+            "type": "integer",
+            "maximum": 99.0,
+            "minimum": 1.0,
+            "title": "Qty"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 160
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sku",
+          "qty"
+        ],
+        "title": "CartLine"
+      },
       "ConsultantReply": {
         "properties": {
           "content": {
@@ -1002,6 +1504,35 @@
         ],
         "title": "ConsultantReply"
       },
+      "Deletion": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Request Id"
+          },
+          "customer_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Customer Id"
+          },
+          "conversation_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "maxItems": 10000,
+            "title": "Conversation Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "request_id",
+          "customer_id"
+        ],
+        "title": "Deletion"
+      },
       "FaqEntry": {
         "properties": {
           "question": {
@@ -1023,6 +1554,37 @@
           "answer"
         ],
         "title": "FaqEntry"
+      },
+      "GapResolution": {
+        "properties": {
+          "answer": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 3,
+            "title": "Answer"
+          },
+          "cites": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Cites"
+          },
+          "approved": {
+            "type": "boolean",
+            "const": true,
+            "title": "Approved"
+          }
+        },
+        "type": "object",
+        "required": [
+          "answer",
+          "cites",
+          "approved"
+        ],
+        "title": "GapResolution"
       },
       "HTTPValidationError": {
         "properties": {
@@ -1077,6 +1639,36 @@
         ],
         "title": "ModelSelection"
       },
+      "SuggestionFeedback": {
+        "properties": {
+          "thumb": {
+            "type": "string",
+            "enum": [
+              "up",
+              "down"
+            ],
+            "title": "Thumb"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "thumb"
+        ],
+        "title": "SuggestionFeedback",
+        "description": "The consultant's 👍/👎 on the assistant's current suggestion."
+      },
       "TurnRequest": {
         "properties": {
           "message": {
@@ -1096,6 +1688,21 @@
               }
             ],
             "title": "Selected Sku"
+          },
+          "cart": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/CartLine"
+                },
+                "type": "array",
+                "maxItems": 30
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cart"
           },
           "memory_enabled": {
             "type": "boolean",
@@ -1231,6 +1838,67 @@
         },
         "type": "object",
         "title": "VoiceUpdate"
+      },
+      "Welcome": {
+        "properties": {
+          "returning": {
+            "type": "boolean",
+            "title": "Returning",
+            "default": false
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 160
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "blocker": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WelcomeBlocker"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "expires_at"
+        ],
+        "title": "Welcome"
+      },
+      "WelcomeBlocker": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 400,
+            "title": "Text"
+          },
+          "valid_until": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Valid Until"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text",
+          "valid_until"
+        ],
+        "title": "WelcomeBlocker"
       }
     }
   }

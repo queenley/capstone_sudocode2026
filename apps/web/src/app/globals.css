@@ -140,6 +140,7 @@ body {
   color: var(--ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
 }
 button,
 input,
@@ -149,6 +150,7 @@ select {
 }
 button {
   cursor: pointer;
+  min-height: 44px;
   background: var(--brand);
   color: var(--on-brand);
   border: 0;
@@ -882,10 +884,12 @@ footer button {
     font-size: 28px;
   }
   .authbar {
-    display: block;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
   }
   .authbar button {
-    margin-top: 12px;
+    align-self: flex-start;
   }
   .messages {
     height: 330px;
@@ -940,6 +944,11 @@ footer button {
 .chat-title { flex: 1; min-width: 0; }
 .call-button { margin-left: auto; padding: 8px 12px; font-size: 11px; white-space: nowrap; }
 .call-panel { max-width: 560px; display: flex; flex-direction: column; gap: 14px; max-height: calc(100vh - 40px); }
+.voice-dialog { margin: auto; padding: 0; border: 0; background: transparent; color: var(--ink); width: min(560px, calc(100% - 24px)); max-width: none; max-height: calc(100dvh - 24px); overflow: visible; }
+.voice-dialog::backdrop { background: var(--overlay); backdrop-filter: blur(4px); }
+.voice-dialog .call-panel { max-height: calc(100dvh - 24px); overflow-y: auto; }
+.voice-dialog .call-controls { flex-shrink: 0; }
+html:has(dialog:modal) { overflow: hidden; }
 .call-top { display: flex; gap: 16px; align-items: center; }
 .call-top h2 { margin: 2px 0 4px; font-size: 20px; }
 .call-avatar { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font-size: 26px; background: var(--surface-3); color: var(--muted); }
@@ -956,9 +965,12 @@ footer button {
 .meter { height: 4px; border-radius: 4px; background: var(--surface-3); overflow: hidden; }
 .meter i { display: block; height: 100%; background: var(--green); transition: width 80ms linear; }
 .call-mic-row { display: flex; justify-content: space-between; gap: 10px; margin-top: 6px; }
+.call-mic-row { flex-wrap: wrap; align-items: center; }
+.call-mic-row label { margin: 0; }
 .call-mic-row select { max-width: 180px; font-size: 12px; }
 .call-transcript { flex: 1; min-height: 140px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 12px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; }
 .call-note { text-align: center; font-size: 11px; color: var(--muted); margin: 0; }
+.call-transcript, .call-turns { scroll-behavior: smooth; }
 .call-meta { display: block; margin-top: 6px; }
 .faded { opacity: 0.5; }
 .call-controls { display: flex; justify-content: center; gap: 12px; }
@@ -967,7 +979,7 @@ footer button {
 /* ── Call console (features/call-console.tsx) ───────────────────────── */
 .call-console .console-heading, .agent-console .console-heading { align-items: flex-end; }
 .status-dot.off { background: var(--line-strong); box-shadow: 0 0 0 4px var(--surface-3); }
-.check.inline { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; font-size: 12px; white-space: nowrap; }
+.check.inline { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; font-size: 12px; white-space: nowrap; min-height: 44px; }
 .check.inline input { width: auto; }
 .call-grid { display: grid; grid-template-columns: 260px minmax(0, 1fr) 340px; gap: 16px; margin-bottom: 50px; align-items: start; }
 .call-queue, .call-evidence { max-height: calc(100vh - 140px); overflow-y: auto; position: sticky; top: 16px; }
@@ -1035,10 +1047,22 @@ button.small { padding: 6px 12px; font-size: 11px; margin: 0 0 8px 26px; }
   .call-queue { position: static; max-height: 320px; }
   .latency-grid, .console-stats.four, .voice-form { grid-template-columns: 1fr; }
   .call-button { padding: 6px 8px; }
+  .console-heading, .panel-title, .call-action-bar { flex-wrap: wrap; align-items: flex-start; }
+  .call-queue, .call-transcript-pane, .call-evidence { padding: 18px; }
+  .call-console h1 { font-size: 28px; }
+  .topbar nav { flex-wrap: wrap; gap: 8px 16px; }
+  .topbar nav a { display: inline-flex; align-items: center; min-height: 44px; }
+  .call-console .topbar nav { order: 1; }
+  .call-console .topbar .theme-toggle { margin-left: auto; }
 }
 /* Bubbles inside panels keep their own colours (.panel p is muted). */
 .panel .message.outgoing p { color: var(--on-brand); }
 .panel .message.incoming p { color: var(--ink); }
+.call-console .message p, .call-panel .message p { font-size: 14px; line-height: 1.6; }
+.call-console .message small, .call-panel .message small { font-size: 11px; letter-spacing: 0.04em; opacity: 1; }
+.call-console .composer { padding: 12px 0; }
+.call-console .composer textarea { min-width: 0; font-size: 16px; border: 1px solid var(--line-strong); }
+.call-console .panel-title > div { min-width: 0; overflow-wrap: anywhere; }
 .brief + .facts { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
 .console-grid + .console-grid { margin-top: 16px; }
 .agent-console { padding-bottom: 50px; }
@@ -1060,3 +1084,7 @@ footer.call-controls button.hangup { background: var(--danger); color: var(--on-
   background-color: currentColor;
   vertical-align: middle;
 }
+.route-fallback { min-height: 100dvh; max-width: 680px; margin: auto; padding: 80px 24px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
+.route-fallback h1 { font-size: clamp(28px, 5vw, 40px); }
+.route-fallback > .eyebrow { margin-top: 32px; }
+.route-fallback .buttonrow a { display: inline-flex; align-items: center; padding: 10px 18px; min-height: 44px; border: 1px solid var(--brand-line); border-radius: var(--radius); color: var(--brand-ink); background: var(--surface); font-weight: 600; }

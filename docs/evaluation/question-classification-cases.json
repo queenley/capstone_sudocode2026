@@ -1,0 +1,4466 @@
+{
+  "schema_version": "question-classification-cases-v1",
+  "status": "ready",
+  "scope": "Synthetic extractor contract fixtures; not scenarios, not approved official GT, not model-produced labels.",
+  "official_gt_approved": false,
+  "main_reference": "41eda490bc47577018541c7778c0e8443ed8e6c8",
+  "contract": "docs/evaluation/question-classification-contract.md",
+  "validation": {
+    "semantic_cases": "Authored diagnostic expectations for human review; no model run performed.",
+    "deterministic_cases": "Only execution=label_items is an executable offline regression."
+  },
+  "source_catalog": {
+    "BTC-TRACE": {
+      "path": "apps/ai-agent-service/data/btc/schemas/trace_log.schema.json",
+      "locator": "properties.questions",
+      "authority": "BTC schema: per-question slot/type/text, examples for open and confirm"
+    },
+    "BTC-RQR": {
+      "path": "apps/ai-agent-service/data/btc/eval/reference_eval.py",
+      "locator": "repeat_question_rate",
+      "authority": "Main scorer formula; not a natural-language classifier"
+    },
+    "BTC-DEMO": {
+      "path": "apps/ai-agent-service/data/btc/eval/make_example_trace.py",
+      "locator": "full opening question",
+      "authority": "Illustrative generator; blocker/confirm example remains disputed"
+    },
+    "ONTOLOGY": {
+      "path": "apps/ai-agent-service/src/ai_agent_service/components/memory/ontology.py",
+      "locator": "CORE and INDUSTRIES",
+      "authority": "Current 30 core + 4 industry slots"
+    },
+    "USER-SLOTS": {
+      "path": "user-supplied attachment: Văn bản đã dán.txt",
+      "locator": "Non-whitespace rows: 30 common slots + 4 industry needs",
+      "authority": "User-supplied slot meanings; no customer data"
+    },
+    "TEAM-QUESTION": {
+      "path": "docs/evaluation/question-classification-contract.md",
+      "locator": "Taxonomy and decision rules",
+      "authority": "Team operational interpretation; not an additional BTC ruling"
+    },
+    "TEAM-BOUNDARY": {
+      "path": "apps/ai-agent-service/src/ai_agent_service/components/evaluation/scorers.py",
+      "locator": "label_items, spanned, restrict",
+      "authority": "Existing public deterministic evidence and projection contract"
+    },
+    "POLICY-A": {
+      "path": "docs/evaluation/rqr-policy.json",
+      "locator": "precedence; existing_v4_conventions_not_btc_rulings; unresolved_issues U02/U03/U06",
+      "authority": "Source review distinguishes BTC requirements, pinned main behavior and local extractor conventions."
+    }
+  },
+  "ontology": {
+    "core": [
+      {
+        "name": "product_advised",
+        "meaning_vi": "sản phẩm đã tư vấn",
+        "value_type": "str"
+      },
+      {
+        "name": "alt_suggested",
+        "meaning_vi": "sản phẩm gợi ý thêm",
+        "value_type": "str"
+      },
+      {
+        "name": "variant_sku",
+        "meaning_vi": "biến thể khách chọn",
+        "value_type": "str"
+      },
+      {
+        "name": "size",
+        "meaning_vi": "size",
+        "value_type": "size"
+      },
+      {
+        "name": "color",
+        "meaning_vi": "màu",
+        "value_type": "plain"
+      },
+      {
+        "name": "owned_sku",
+        "meaning_vi": "sản phẩm khách đang dùng",
+        "value_type": "str"
+      },
+      {
+        "name": "quantity",
+        "meaning_vi": "số lượng",
+        "value_type": "int"
+      },
+      {
+        "name": "price_quoted_vnd",
+        "meaning_vi": "giá đã báo",
+        "value_type": "int"
+      },
+      {
+        "name": "quoted_on",
+        "meaning_vi": "ngày báo giá",
+        "value_type": "date"
+      },
+      {
+        "name": "quoted_sku",
+        "meaning_vi": "sản phẩm của báo giá đã lưu",
+        "value_type": "str"
+      },
+      {
+        "name": "promo_code",
+        "meaning_vi": "khuyến mãi",
+        "value_type": "str"
+      },
+      {
+        "name": "promo_expiry",
+        "meaning_vi": "hạn khuyến mãi",
+        "value_type": "date"
+      },
+      {
+        "name": "budget_vnd",
+        "meaning_vi": "ngân sách",
+        "value_type": "int"
+      },
+      {
+        "name": "competitor_price_vnd",
+        "meaning_vi": "giá bên khác khách nêu",
+        "value_type": "int"
+      },
+      {
+        "name": "blocker",
+        "meaning_vi": "việc còn dở",
+        "value_type": "str"
+      },
+      {
+        "name": "decision_maker",
+        "meaning_vi": "người quyết định",
+        "value_type": "str"
+      },
+      {
+        "name": "objection",
+        "meaning_vi": "phản đối",
+        "value_type": "code"
+      },
+      {
+        "name": "objection_handling",
+        "meaning_vi": "cách xử lý phản đối",
+        "value_type": "str"
+      },
+      {
+        "name": "sentiment",
+        "meaning_vi": "thái độ",
+        "value_type": "code"
+      },
+      {
+        "name": "order_id",
+        "meaning_vi": "mã đơn",
+        "value_type": "str"
+      },
+      {
+        "name": "order_ids",
+        "meaning_vi": "các đơn đã tạo",
+        "value_type": "str_list"
+      },
+      {
+        "name": "payment",
+        "meaning_vi": "thanh toán",
+        "value_type": "code"
+      },
+      {
+        "name": "address_token",
+        "meaning_vi": "địa chỉ",
+        "value_type": "token"
+      },
+      {
+        "name": "delivery_area",
+        "meaning_vi": "quận/huyện, tỉnh giao hàng",
+        "value_type": "str"
+      },
+      {
+        "name": "phone_provided",
+        "meaning_vi": "khách đã cho số điện thoại",
+        "value_type": "bool"
+      },
+      {
+        "name": "preferred_channel",
+        "meaning_vi": "kênh liên hệ mong muốn",
+        "value_type": "code"
+      },
+      {
+        "name": "callback_at",
+        "meaning_vi": "hẹn gọi lại",
+        "value_type": "str"
+      },
+      {
+        "name": "callback_time",
+        "meaning_vi": "giờ khách muốn được gọi lại",
+        "value_type": "str"
+      },
+      {
+        "name": "outcome",
+        "meaning_vi": "kết quả",
+        "value_type": "code"
+      },
+      {
+        "name": "commitments",
+        "meaning_vi": "điều nhân viên đã hứa",
+        "value_type": "str"
+      }
+    ],
+    "industries": [
+      {
+        "name": "room_area_m2",
+        "meaning_vi": "diện tích phòng (m²)",
+        "value_type": "int",
+        "industry": "gia-dung"
+      },
+      {
+        "name": "has_children",
+        "meaning_vi": "nhà có trẻ nhỏ",
+        "value_type": "bool",
+        "industry": "gia-dung"
+      },
+      {
+        "name": "usage_need",
+        "meaning_vi": "mục đích dùng",
+        "value_type": "str",
+        "industry": "thoi-trang"
+      },
+      {
+        "name": "child_age_months",
+        "meaning_vi": "tuổi bé (tháng)",
+        "value_type": "int",
+        "industry": "me-be"
+      }
+    ]
+  },
+  "btc_extensions": [
+    {
+      "name": "channel",
+      "meaning_vi": "Kênh thực tế đã liên hệ; không phải sở thích liên hệ.",
+      "memory_slot": false
+    }
+  ],
+  "unresolved_ids": [
+    "ellipsis-multiple-antecedents",
+    "btc-demo-blocker-disagreement"
+  ],
+  "cases": [
+    {
+      "id": "slot-product_advised-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Lần trước em đã tư vấn cho chị sản phẩm nào ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "product_advised",
+          "type": "open",
+          "text": "Lần trước em đã tư vấn cho chị sản phẩm nào ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "sản phẩm đã tư vấn: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-product_advised-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Lần trước em tư vấn máy DEMO-P, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Lần trước em tư vấn máy DEMO-P, đúng không ạ?",
+          "candidate_value": "DEMO-P"
+        }
+      ],
+      "reason": "sản phẩm đã tư vấn: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-alt_suggested-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Ngoài máy chính, lần trước em gợi ý thêm mẫu nào ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "alt_suggested",
+          "type": "open",
+          "text": "Ngoài máy chính, lần trước em gợi ý thêm mẫu nào ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "sản phẩm gợi ý thêm: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-alt_suggested-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Mẫu gợi ý thêm lần trước là DEMO-Q, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "alt_suggested",
+          "type": "confirm",
+          "text": "Mẫu gợi ý thêm lần trước là DEMO-Q, đúng không ạ?",
+          "candidate_value": "DEMO-Q"
+        }
+      ],
+      "reason": "sản phẩm gợi ý thêm: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-variant_sku-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Mã biến thể chị đã chọn là gì ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "variant_sku",
+          "type": "open",
+          "text": "Mã biến thể chị đã chọn là gì ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "biến thể khách chọn: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-variant_sku-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Mã biến thể chị chọn là DEMO-P-L-DEN, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "variant_sku",
+          "type": "confirm",
+          "text": "Mã biến thể chị chọn là DEMO-P-L-DEN, đúng không ạ?",
+          "candidate_value": "DEMO-P-L-DEN"
+        }
+      ],
+      "reason": "biến thể khách chọn: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-size-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị chọn size nào ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "size",
+          "type": "open",
+          "text": "Chị chọn size nào ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "size: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-size-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Size chị chọn là L, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Size chị chọn là L, đúng không ạ?",
+          "candidate_value": "L"
+        }
+      ],
+      "reason": "size: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-color-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị chọn màu nào ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "color",
+          "type": "open",
+          "text": "Chị chọn màu nào ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "màu: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-color-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Màu chị chọn là đen, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "color",
+          "type": "confirm",
+          "text": "Màu chị chọn là đen, đúng không ạ?",
+          "candidate_value": "den"
+        }
+      ],
+      "reason": "màu: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-owned_sku-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị đang dùng sản phẩm nào ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "owned_sku",
+          "type": "open",
+          "text": "Chị đang dùng sản phẩm nào ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "sản phẩm khách đang dùng: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-owned_sku-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Máy chị đang dùng là DEMO-OLD, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "owned_sku",
+          "type": "confirm",
+          "text": "Máy chị đang dùng là DEMO-OLD, đúng không ạ?",
+          "candidate_value": "DEMO-OLD"
+        }
+      ],
+      "reason": "sản phẩm khách đang dùng: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-quantity-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị lấy bao nhiêu cái ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "quantity",
+          "type": "open",
+          "text": "Chị lấy bao nhiêu cái ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "số lượng: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-quantity-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị lấy hai cái, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "quantity",
+          "type": "confirm",
+          "text": "Chị lấy hai cái, đúng không ạ?",
+          "candidate_value": 2
+        }
+      ],
+      "reason": "số lượng: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-price_quoted_vnd-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Lần trước em đã báo chị giá bao nhiêu ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "price_quoted_vnd",
+          "type": "open",
+          "text": "Lần trước em đã báo chị giá bao nhiêu ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "giá đã báo: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-price_quoted_vnd-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Giá lần trước em báo là 3.700.000 đồng, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "price_quoted_vnd",
+          "type": "confirm",
+          "text": "Giá lần trước em báo là 3.700.000 đồng, đúng không ạ?",
+          "candidate_value": 3700000
+        }
+      ],
+      "reason": "giá đã báo: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-quoted_on-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị được báo giá vào ngày nào ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "quoted_on",
+          "type": "open",
+          "text": "Chị được báo giá vào ngày nào ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "ngày báo giá: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-quoted_on-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Ngày báo giá là 2026-09-03, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "quoted_on",
+          "type": "confirm",
+          "text": "Ngày báo giá là 2026-09-03, đúng không ạ?",
+          "candidate_value": "2026-09-03"
+        }
+      ],
+      "reason": "ngày báo giá: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-quoted_sku-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Báo giá đã lưu là cho sản phẩm nào ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "quoted_sku",
+          "type": "open",
+          "text": "Báo giá đã lưu là cho sản phẩm nào ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "sản phẩm của báo giá đã lưu: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-quoted_sku-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Báo giá đã lưu là của DEMO-P, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "quoted_sku",
+          "type": "confirm",
+          "text": "Báo giá đã lưu là của DEMO-P, đúng không ạ?",
+          "candidate_value": "DEMO-P"
+        }
+      ],
+      "reason": "sản phẩm của báo giá đã lưu: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-promo_code-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Mã ưu đãi chị đã được báo là mã nào ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "promo_code",
+          "type": "open",
+          "text": "Mã ưu đãi chị đã được báo là mã nào ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "khuyến mãi: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-promo_code-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Mã ưu đãi đã báo là DEMO-7, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "promo_code",
+          "type": "confirm",
+          "text": "Mã ưu đãi đã báo là DEMO-7, đúng không ạ?",
+          "candidate_value": "DEMO-7"
+        }
+      ],
+      "reason": "khuyến mãi: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-promo_expiry-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Mã ưu đãi đã báo hết hạn vào ngày nào ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "promo_expiry",
+          "type": "open",
+          "text": "Mã ưu đãi đã báo hết hạn vào ngày nào ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "hạn khuyến mãi: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-promo_expiry-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Hạn của mã đã báo là 2026-09-30, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "promo_expiry",
+          "type": "confirm",
+          "text": "Hạn của mã đã báo là 2026-09-30, đúng không ạ?",
+          "candidate_value": "2026-09-30"
+        }
+      ],
+      "reason": "hạn khuyến mãi: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-budget_vnd-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Ngân sách của chị là bao nhiêu ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Ngân sách của chị là bao nhiêu ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "ngân sách: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-budget_vnd-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Ngân sách chị dự kiến là bốn triệu, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách chị dự kiến là bốn triệu, đúng không ạ?",
+          "candidate_value": 4000000
+        }
+      ],
+      "reason": "ngân sách: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-competitor_price_vnd-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị thấy cửa hàng kia báo giá bao nhiêu ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "competitor_price_vnd",
+          "type": "open",
+          "text": "Chị thấy cửa hàng kia báo giá bao nhiêu ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "giá bên khác khách nêu: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-competitor_price_vnd-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị nói cửa hàng kia báo 3.300.000 đồng, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "competitor_price_vnd",
+          "type": "confirm",
+          "text": "Chị nói cửa hàng kia báo 3.300.000 đồng, đúng không ạ?",
+          "candidate_value": 3300000
+        }
+      ],
+      "reason": "giá bên khác khách nêu: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-blocker-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Điều gì khiến chị chưa quyết định mua ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "blocker",
+          "type": "open",
+          "text": "Điều gì khiến chị chưa quyết định mua ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "việc còn dở: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-blocker-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị còn đang chờ lương nên chưa quyết, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Chị còn đang chờ lương nên chưa quyết, đúng không ạ?",
+          "candidate_value": "chờ lương"
+        }
+      ],
+      "reason": "việc còn dở: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-decision_maker-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Ai sẽ quyết định việc mua ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "decision_maker",
+          "type": "open",
+          "text": "Ai sẽ quyết định việc mua ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "người quyết định: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-decision_maker-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Người quyết định việc mua là chồng chị, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "decision_maker",
+          "type": "confirm",
+          "text": "Người quyết định việc mua là chồng chị, đúng không ạ?",
+          "candidate_value": "chồng"
+        }
+      ],
+      "reason": "người quyết định: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-objection-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị phản đối điểm nào của đề xuất này ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "objection",
+          "type": "open",
+          "text": "Chị phản đối điểm nào của đề xuất này ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "phản đối: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-objection-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Điều chị phản đối là giá quá đắt, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "objection",
+          "type": "confirm",
+          "text": "Điều chị phản đối là giá quá đắt, đúng không ạ?",
+          "candidate_value": "dat_qua"
+        }
+      ],
+      "reason": "phản đối: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-objection_handling-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Lần trước nhân viên đã giải đáp phản đối của chị bằng cách nào ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "objection_handling",
+          "type": "open",
+          "text": "Lần trước nhân viên đã giải đáp phản đối của chị bằng cách nào ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "cách xử lý phản đối: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-objection_handling-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Lần trước nhân viên giải đáp bằng cách nêu bảo hành, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "objection_handling",
+          "type": "confirm",
+          "text": "Lần trước nhân viên giải đáp bằng cách nêu bảo hành, đúng không ạ?",
+          "candidate_value": "nêu bảo hành"
+        }
+      ],
+      "reason": "cách xử lý phản đối: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-sentiment-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị cảm thấy thế nào về lần hỗ trợ trước ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "sentiment",
+          "type": "open",
+          "text": "Chị cảm thấy thế nào về lần hỗ trợ trước ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "thái độ: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-sentiment-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị hài lòng về lần hỗ trợ trước, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "sentiment",
+          "type": "confirm",
+          "text": "Chị hài lòng về lần hỗ trợ trước, đúng không ạ?",
+          "candidate_value": "hai_long"
+        }
+      ],
+      "reason": "thái độ: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-order_id-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị cho em biết mã đơn cần tra cứu ạ.",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "order_id",
+          "type": "open",
+          "text": "Chị cho em biết mã đơn cần tra cứu ạ.",
+          "candidate_value": null
+        }
+      ],
+      "reason": "mã đơn: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-order_id-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Đơn cần tra cứu là DEMO-ORDER-A, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Đơn cần tra cứu là DEMO-ORDER-A, đúng không ạ?",
+          "candidate_value": "DEMO-ORDER-A"
+        }
+      ],
+      "reason": "mã đơn: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-order_ids-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị cho em biết tất cả các mã đơn đã tạo ạ.",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "order_ids",
+          "type": "open",
+          "text": "Chị cho em biết tất cả các mã đơn đã tạo ạ.",
+          "candidate_value": null
+        }
+      ],
+      "reason": "các đơn đã tạo: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-order_ids-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Toàn bộ đơn đã tạo gồm DEMO-ORDER-A và DEMO-ORDER-B, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "order_ids",
+          "type": "confirm",
+          "text": "Toàn bộ đơn đã tạo gồm DEMO-ORDER-A và DEMO-ORDER-B, đúng không ạ?",
+          "candidate_value": "DEMO-ORDER-A, DEMO-ORDER-B"
+        }
+      ],
+      "reason": "các đơn đã tạo: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-payment-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị muốn thanh toán theo cách nào ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "payment",
+          "type": "open",
+          "text": "Chị muốn thanh toán theo cách nào ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "thanh toán: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-payment-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Phương thức chị đã chọn là COD, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Phương thức chị đã chọn là COD, đúng không ạ?",
+          "candidate_value": "COD"
+        }
+      ],
+      "reason": "thanh toán: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-address_token-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị cho em xin địa chỉ giao hàng ạ.",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "address_token",
+          "type": "open",
+          "text": "Chị cho em xin địa chỉ giao hàng ạ.",
+          "candidate_value": null
+        }
+      ],
+      "reason": "địa chỉ: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-address_token-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Địa chỉ giao là <ADDR_1>, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "address_token",
+          "type": "confirm",
+          "text": "Địa chỉ giao là <ADDR_1>, đúng không ạ?",
+          "candidate_value": "<ADDR_1>"
+        }
+      ],
+      "reason": "địa chỉ: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-delivery_area-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị muốn giao đến quận nào ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Chị muốn giao đến quận nào ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "quận/huyện, tỉnh giao hàng: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-delivery_area-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Quận giao hàng là quận 8, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Quận giao hàng là quận 8, đúng không ạ?",
+          "candidate_value": "quận 8"
+        }
+      ],
+      "reason": "quận/huyện, tỉnh giao hàng: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-phone_provided-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị cho em xin số điện thoại liên hệ ạ.",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "phone_provided",
+          "type": "open",
+          "text": "Chị cho em xin số điện thoại liên hệ ạ.",
+          "candidate_value": null
+        }
+      ],
+      "reason": "khách đã cho số điện thoại: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-phone_provided-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị đã cung cấp số điện thoại rồi, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "phone_provided",
+          "type": "confirm",
+          "text": "Chị đã cung cấp số điện thoại rồi, đúng không ạ?",
+          "candidate_value": true
+        }
+      ],
+      "reason": "khách đã cho số điện thoại: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-preferred_channel-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị muốn được liên hệ qua kênh nào ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "preferred_channel",
+          "type": "open",
+          "text": "Chị muốn được liên hệ qua kênh nào ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "kênh liên hệ mong muốn: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-preferred_channel-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Kênh chị muốn được liên hệ là Zalo, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "preferred_channel",
+          "type": "confirm",
+          "text": "Kênh chị muốn được liên hệ là Zalo, đúng không ạ?",
+          "candidate_value": "zalo"
+        }
+      ],
+      "reason": "kênh liên hệ mong muốn: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-callback_at-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Lịch gọi lại đã hẹn với chị là lúc nào ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "callback_at",
+          "type": "open",
+          "text": "Lịch gọi lại đã hẹn với chị là lúc nào ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "hẹn gọi lại: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-callback_at-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Lịch đã hẹn là 10 giờ sáng mai, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "callback_at",
+          "type": "confirm",
+          "text": "Lịch đã hẹn là 10 giờ sáng mai, đúng không ạ?",
+          "candidate_value": "10 giờ sáng mai"
+        }
+      ],
+      "reason": "hẹn gọi lại: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-callback_time-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị muốn được gọi lại vào giờ nào ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "callback_time",
+          "type": "open",
+          "text": "Chị muốn được gọi lại vào giờ nào ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "giờ khách muốn được gọi lại: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-callback_time-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Giờ chị muốn được gọi lại là sau 19 giờ, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "callback_time",
+          "type": "confirm",
+          "text": "Giờ chị muốn được gọi lại là sau 19 giờ, đúng không ạ?",
+          "candidate_value": "sau 19 giờ"
+        }
+      ],
+      "reason": "giờ khách muốn được gọi lại: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-outcome-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Cuộc gọi trước đã kết thúc với kết quả thế nào ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "outcome",
+          "type": "open",
+          "text": "Cuộc gọi trước đã kết thúc với kết quả thế nào ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "kết quả: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-outcome-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Kết quả cuộc gọi trước là hẹn gọi lại, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "outcome",
+          "type": "confirm",
+          "text": "Kết quả cuộc gọi trước là hẹn gọi lại, đúng không ạ?",
+          "candidate_value": "hen_goi_lai"
+        }
+      ],
+      "reason": "kết quả: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-commitments-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Lần trước nhân viên đã hứa điều gì với chị ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "commitments",
+          "type": "open",
+          "text": "Lần trước nhân viên đã hứa điều gì với chị ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "điều nhân viên đã hứa: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-commitments-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "core"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Lần trước nhân viên hứa giữ giá đến thứ Sáu, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "commitments",
+          "type": "confirm",
+          "text": "Lần trước nhân viên hứa giữ giá đến thứ Sáu, đúng không ạ?",
+          "candidate_value": "giữ giá đến thứ Sáu"
+        }
+      ],
+      "reason": "điều nhân viên đã hứa: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-room_area_m2-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "gia-dung"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Phòng nhà chị rộng bao nhiêu mét vuông ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "open",
+          "text": "Phòng nhà chị rộng bao nhiêu mét vuông ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "diện tích phòng (m²): đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-room_area_m2-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "gia-dung"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Phòng nhà chị rộng 28 mét vuông, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Phòng nhà chị rộng 28 mét vuông, đúng không ạ?",
+          "candidate_value": 28
+        }
+      ],
+      "reason": "diện tích phòng (m²): đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-has_children-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "gia-dung"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Nhà mình có trẻ nhỏ không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "has_children",
+          "type": "open",
+          "text": "Nhà mình có trẻ nhỏ không ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "nhà có trẻ nhỏ: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-has_children-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "gia-dung"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Như chị đã nói, nhà mình có trẻ nhỏ, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "has_children",
+          "type": "confirm",
+          "text": "Như chị đã nói, nhà mình có trẻ nhỏ, đúng không ạ?",
+          "candidate_value": true
+        }
+      ],
+      "reason": "nhà có trẻ nhỏ: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-usage_need-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "thoi-trang"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị mua để dùng vào việc gì ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "usage_need",
+          "type": "open",
+          "text": "Chị mua để dùng vào việc gì ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "mục đích dùng: đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-usage_need-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "thoi-trang"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị mua để đi làm, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "usage_need",
+          "type": "confirm",
+          "text": "Chị mua để đi làm, đúng không ạ?",
+          "candidate_value": "đi làm"
+        }
+      ],
+      "reason": "mục đích dùng: đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-child_age_months-open",
+      "tags": [
+        "slot-coverage",
+        "open",
+        "me-be"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Bé nhà chị hiện mấy tháng tuổi ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "child_age_months",
+          "type": "open",
+          "text": "Bé nhà chị hiện mấy tháng tuổi ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "tuổi bé (tháng): đang yêu cầu giá trị còn thiếu.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "slot-child_age_months-confirm",
+      "tags": [
+        "slot-coverage",
+        "confirm",
+        "me-be"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Bé hiện 14 tháng tuổi, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "child_age_months",
+          "type": "confirm",
+          "text": "Bé hiện 14 tháng tuổi, đúng không ạ?",
+          "candidate_value": 14
+        }
+      ],
+      "reason": "tuổi bé (tháng): đưa ra một giá trị cụ thể để khách kiểm chứng.",
+      "sources": [
+        "USER-SLOTS",
+        "ONTOLOGY",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "bool-existence",
+      "tags": [
+        "yes-no",
+        "missing-value"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị có mã khuyến mãi nào không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "promo_code",
+          "type": "open",
+          "text": "Chị có mã khuyến mãi nào không ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Có/không đang hỏi mã còn thiếu; chưa đưa candidate.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "bool-phone",
+      "tags": [
+        "yes-no",
+        "identity"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị đã cho bên em số điện thoại chưa ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "phone_provided",
+          "type": "open",
+          "text": "Chị đã cho bên em số điện thoại chưa ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Hỏi trạng thái đã cung cấp hay chưa, chưa nhắc lại giá trị biết trước.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "bool-negative-missing",
+      "tags": [
+        "negation",
+        "confirm"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Nhà mình không có trẻ nhỏ phải không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "has_children",
+          "type": "confirm",
+          "text": "Nhà mình không có trẻ nhỏ phải không ạ?",
+          "candidate_value": false
+        }
+      ],
+      "reason": "Mệnh đề phủ định cụ thể được đưa ra để kiểm chứng; giá trị false không bị bỏ.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "bool-negative-presupposition",
+      "tags": [
+        "negation",
+        "choice"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Nhà mình có hay không có trẻ nhỏ ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "has_children",
+          "type": "open",
+          "text": "Nhà mình có hay không có trẻ nhỏ ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Yêu cầu chọn giá trị bool; không phải xác nhận một giá trị đã nêu.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "confirm-word-no-candidate",
+      "tags": [
+        "confirm-word",
+        "missing-value"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị xác nhận giúp em diện tích phòng là bao nhiêu ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "open",
+          "text": "Chị xác nhận giúp em diện tích phòng là bao nhiêu ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Từ xác nhận không thay thế candidate; vẫn hỏi diện tích chưa biết.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "confirm-request-no-candidate",
+      "tags": [
+        "confirm-word",
+        "imperative"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Xin chị xác nhận lại địa chỉ giao hàng ạ.",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "address_token",
+          "type": "open",
+          "text": "Xin chị xác nhận lại địa chỉ giao hàng ạ.",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Yêu cầu cung cấp/xác nhận nhưng không đọc lại địa chỉ; không được mượn địa chỉ trong GT.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "choice-concrete-values",
+      "tags": [
+        "choice",
+        "concrete-values"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị chọn size 39 hay size 40 ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "size",
+          "type": "open",
+          "text": "Chị chọn size 39 hay size 40 ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Hai lựa chọn cụ thể chưa phải một candidate đang được kiểm chứng.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "choice-payment",
+      "tags": [
+        "choice",
+        "payment"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị thanh toán COD hay chuyển khoản ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "payment",
+          "type": "open",
+          "text": "Chị thanh toán COD hay chuyển khoản ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Lựa chọn phương thức chưa biết.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "choice-suggestion",
+      "tags": [
+        "offer",
+        "quantity"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị có muốn lấy thêm một cái không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị có muốn lấy thêm một cái không ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Đề nghị mua thêm; không hỏi số lượng đã chọn.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "polite-slot-request",
+      "tags": [
+        "permission-form",
+        "missing-value"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị cho em xin mã đơn được không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "order_id",
+          "type": "open",
+          "text": "Chị cho em xin mã đơn được không ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Dù có được không, tác vụ lời nói là xin giá trị mã đơn.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "polite-action-request",
+      "tags": [
+        "permission-form",
+        "action"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị bấm nút xác nhận giúp em được không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị bấm nút xác nhận giúp em được không ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Hỏi khách có thực hiện thao tác không, không thu thập slot xác nhận.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "bare-action",
+      "tags": [
+        "action",
+        "non-question"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị bấm nút xác nhận giúp em nhé.",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [],
+      "reason": "Chỉ dẫn thao tác, không đặt câu hỏi hay yêu cầu một giá trị slot.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "bare-slot-request",
+      "tags": [
+        "imperative",
+        "punctuation"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị vui lòng cho biết số lượng cần mua.",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "quantity",
+          "type": "open",
+          "text": "Chị vui lòng cho biết số lượng cần mua.",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Yêu cầu cung cấp thông tin dù không có dấu hỏi.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "repeat-no-question",
+      "tags": [
+        "recap",
+        "non-question"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Em ghi nhận phòng rộng 28 mét vuông và chị chọn màu đen ạ.",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [],
+      "reason": "Nhắc lại thông tin mà không yêu cầu trả lời, không tự tạo confirm.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "quoted-question",
+      "tags": [
+        "quotation",
+        "non-question"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Trong tin nhắn cũ có câu “Chị chọn màu nào ạ?”; em đọc lại để kiểm tra lịch sử.",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [],
+      "reason": "Câu hỏi nằm trong trích dẫn lịch sử, agent không hỏi khách ở lượt này.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "quote-as-live-question",
+      "tags": [
+        "quotation",
+        "live-question"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Em hỏi lại câu này để chị trả lời nhé: “Chị chọn màu nào ạ?”",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "color",
+          "type": "open",
+          "text": "Em hỏi lại câu này để chị trả lời nhé: “Chị chọn màu nào ạ?”",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Câu dẫn nói rõ đang đặt lại câu hỏi cho khách; dấu ngoặc không tự loại câu.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "reported-customer-question",
+      "tags": [
+        "reported-speech",
+        "non-question"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị vừa hỏi “giá bao nhiêu?”; em sẽ tra giá rồi trả lời ạ.",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [],
+      "reason": "Tường thuật câu khách hỏi, không phải agent thu thập giá đã báo.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "rhetorical",
+      "tags": [
+        "rhetorical",
+        "non-question"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Ai mà chẳng muốn mua được món tốt, phải không nào! Em chuyển sang phần bảo hành ạ.",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [],
+      "reason": "Theo toàn phát ngôn là câu tu từ, không đợi câu trả lời cho slot.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "courtesy-help",
+      "tags": [
+        "courtesy",
+        "other"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị cần em hỗ trợ gì thêm không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị cần em hỗ trợ gì thêm không ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Câu hỏi hỗ trợ chung không nêu một rào cản mua hàng cụ thể.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "blocker-missing",
+      "tags": [
+        "blocker",
+        "missing-value"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Điều gì còn khiến chị chưa quyết định mua ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "blocker",
+          "type": "open",
+          "text": "Điều gì còn khiến chị chưa quyết định mua ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Hỏi cụ thể lý do chưa quyết mua nhưng chưa biết lý do.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "blocker-candidate",
+      "tags": [
+        "blocker",
+        "confirm"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị vẫn đang chờ lương nên chưa mua, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Chị vẫn đang chờ lương nên chưa mua, đúng không ạ?",
+          "candidate_value": "chờ lương"
+        }
+      ],
+      "reason": "Nhắc lại một rào cản cụ thể để kiểm chứng.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "identity-name",
+      "tags": [
+        "identity",
+        "other"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị là người đã nhắn cho em hôm qua, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị là người đã nhắn cho em hôm qua, đúng không ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Xác minh người gọi nhưng ontology không có slot danh tính; other/open là cách mã hóa của extractor.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "permission-handoff",
+      "tags": [
+        "permission",
+        "other"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Em chuyển chị sang nhân viên hỗ trợ nhé, được không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Em chuyển chị sang nhân viên hỗ trợ nhé, được không ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Xin phép chuyển máy, không xác nhận outcome của một cuộc trước.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "callback-unknown",
+      "tags": [
+        "callback",
+        "missing-value"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Lúc nào em gọi lại thì chị tiện nghe máy ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "callback_time",
+          "type": "open",
+          "text": "Lúc nào em gọi lại thì chị tiện nghe máy ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Hỏi giờ khách mong muốn, chưa có lịch đã chốt.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "callback-generic-offer",
+      "tags": [
+        "callback",
+        "permission"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Em gọi lại sau nhé, được không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Em gọi lại sau nhé, được không ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Đề nghị không có mốc giờ; không tạo callback_at giả.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "callback-proposed-time",
+      "tags": [
+        "callback",
+        "proposed-value"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Em hẹn gọi lại vào 10 giờ sáng mai, chị đồng ý không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "callback_at",
+          "type": "confirm",
+          "text": "Em hẹn gọi lại vào 10 giờ sáng mai, chị đồng ý không ạ?",
+          "candidate_value": "10 giờ sáng mai"
+        }
+      ],
+      "reason": "Đề xuất một lịch cụ thể để khách chấp thuận; convention hiện có, không cần suy ra ngày ISO.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "negative-not-question",
+      "tags": [
+        "negation",
+        "non-question"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Em không hỏi lại diện tích phòng của chị đâu ạ.",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [],
+      "reason": "Phủ định hành vi hỏi không phải câu hỏi về room_area_m2.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "repair-one-live-value",
+      "tags": [
+        "repair",
+        "same-slot"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Không phải size 39; ý em là size 40, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Không phải size 39; ý em là size 40, đúng không ạ?",
+          "candidate_value": 40
+        }
+      ],
+      "reason": "Tự sửa trước khi hỏi; chỉ candidate cuối đang được yêu cầu xác nhận.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "repair-now-missing",
+      "tags": [
+        "repair",
+        "missing-value"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Size 39 ghi nhầm rồi; chị chọn size nào ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "size",
+          "type": "open",
+          "text": "Size 39 ghi nhầm rồi; chị chọn size nào ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Candidate cũ đã bị rút lại; câu đang hỏi là giá trị còn thiếu.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "condition-missing",
+      "tags": [
+        "conditional",
+        "missing-value"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Nếu chị mua lần này thì chị muốn lấy bao nhiêu cái ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "quantity",
+          "type": "open",
+          "text": "Nếu chị mua lần này thì chị muốn lấy bao nhiêu cái ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Điều kiện không xóa yêu cầu số lượng đang thực sự đặt ra.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "condition-quoted-future",
+      "tags": [
+        "conditional",
+        "reported-speech"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Khi cần giao hàng, bên vận chuyển sẽ hỏi “địa chỉ nào ạ?”.",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [],
+      "reason": "Mô tả câu hỏi của người khác trong tương lai, chưa hỏi khách bây giờ.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "channel-current",
+      "tags": [
+        "btc-extension",
+        "channel"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Lần trước chị liên hệ qua kênh nào ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "channel",
+          "type": "open",
+          "text": "Lần trước chị liên hệ qua kênh nào ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Hỏi kênh thực tế đã dùng; extension BTC channel, không đổi preferred_channel.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "channel-preference",
+      "tags": [
+        "channel",
+        "choice"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Sau cuộc này chị muốn em nhắn Zalo hay gọi điện ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "preferred_channel",
+          "type": "open",
+          "text": "Sau cuộc này chị muốn em nhắn Zalo hay gọi điện ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Hỏi sở thích liên hệ tương lai, không phải kênh thực tế.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "price-today-vs-history",
+      "tags": [
+        "price",
+        "permission"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị có muốn em tra giá hiện tại không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị có muốn em tra giá hiện tại không ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Xin phép tra giá hiện tại không phải hỏi giá đã báo ở lần trước.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "variant-no-code",
+      "tags": [
+        "multi-slot",
+        "variant"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị chọn size L và màu đen, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Chị chọn size L và màu đen, đúng không ạ?",
+          "candidate_value": "L"
+        },
+        {
+          "slot": "color",
+          "type": "confirm",
+          "text": "Chị chọn size L và màu đen, đúng không ạ?",
+          "candidate_value": "den"
+        }
+      ],
+      "reason": "Hai thuộc tính độc lập; không bịa thêm variant_sku khi không nêu mã biến thể.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "multi-slot-open",
+      "tags": [
+        "multi-slot",
+        "open"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Phòng chị rộng bao nhiêu mét vuông, và chị dành ngân sách bao nhiêu ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "open",
+          "text": "Phòng chị rộng bao nhiêu mét vuông",
+          "candidate_value": null
+        },
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "chị dành ngân sách bao nhiêu ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Một câu hỏi thu thập hai slot độc lập; giữ hai item.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "mixed-recap-and-open",
+      "tags": [
+        "multi-clause",
+        "recap"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Phòng chị vẫn rộng 28 mét vuông; ngân sách lần này là bao nhiêu ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "ngân sách lần này là bao nhiêu ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Mệnh đề diện tích chỉ là lời nhắc lại, không có lực hỏi; chỉ ngân sách được hỏi.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "mixed-confirm-open",
+      "tags": [
+        "multi-slot",
+        "mixed-types"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Phòng chị rộng 28 mét vuông đúng không ạ, và ngân sách chị dự kiến bao nhiêu ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Phòng chị rộng 28 mét vuông đúng không ạ",
+          "candidate_value": 28
+        },
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "ngân sách chị dự kiến bao nhiêu ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Không ép cả câu về một type: phần đầu kiểm chứng, phần sau hỏi giá trị thiếu.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "same-slot-two-requests",
+      "tags": [
+        "same-slot",
+        "multiple-questions"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị chọn size nào ạ? Chị cho em biết size cần mua nhé.",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "size",
+          "type": "open",
+          "text": "Chị chọn size nào ạ?",
+          "candidate_value": null
+        },
+        {
+          "slot": "size",
+          "type": "open",
+          "text": "Chị cho em biết size cần mua nhé.",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Hai lần yêu cầu trả lời độc lập ở hai span; không gộp vì cùng slot.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "same-slot-two-confirms",
+      "tags": [
+        "same-slot",
+        "multiple-questions",
+        "confirm"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Size chị chọn là L đúng không ạ? Vẫn size L phải không chị?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Size chị chọn là L đúng không ạ?",
+          "candidate_value": "L"
+        },
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Vẫn size L phải không chị?",
+          "candidate_value": "L"
+        }
+      ],
+      "reason": "Hai câu xác nhận đều phải được trích; bộ chấm quyết định lần xác nhận thừa.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "same-slot-one-rephrased-request",
+      "tags": [
+        "same-slot",
+        "rephrase"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Chị chọn size nào, ý em hỏi là size giày chị đang cần ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "size",
+          "type": "open",
+          "text": "Chị chọn size nào, ý em hỏi là size giày chị đang cần ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Một yêu cầu tự diễn giải trong cùng cấu trúc, chưa tạo lần hỏi thứ hai.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "ellipsis-known-topic-missing-value",
+      "tags": [
+        "ellipsis",
+        "observable-context"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Phòng của chị ạ?",
+        "tool_texts": [],
+        "consultant_texts": [],
+        "previous_sessions": [
+          {
+            "call": "call_1",
+            "turns": [
+              {
+                "customer": "Tôi muốn trao đổi về diện tích phòng.",
+                "agent": "Phòng cần dùng rộng bao nhiêu mét vuông ạ?"
+              }
+            ]
+          }
+        ]
+      },
+      "expected_questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "open",
+          "text": "Phòng của chị ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Lượt trước trong previous_sessions đang hỏi diện tích; lượt hiện tại hỏi tiếp giá trị chưa có, không tự thành confirm.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Chủ đề diện tích xuất hiện trực tiếp trong previous_sessions; không lấy từ memory/GT."
+      ]
+    },
+    {
+      "id": "ellipsis-known-candidate",
+      "tags": [
+        "ellipsis",
+        "observable-context",
+        "confirm"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Vẫn như vậy, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": [],
+        "previous_sessions": [
+          {
+            "call": "call_1",
+            "turns": [
+              {
+                "customer": "Phòng của tôi rộng 28 mét vuông.",
+                "agent": "Em chỉ ghi nhận diện tích phòng 28 mét vuông ạ."
+              }
+            ]
+          }
+        ]
+      },
+      "expected_questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Vẫn như vậy, đúng không ạ?",
+          "candidate_value": 28
+        }
+      ],
+      "reason": "Chỉ một antecedent rõ ràng: diện tích 28 m² trong nguồn quan sát được; candidate không cần nằm cùng quote.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "previous_sessions có đúng một candidate rõ ràng; quote vẫn phải thuộc agent_text hiện tại."
+      ]
+    },
+    {
+      "id": "ellipsis-no-context",
+      "tags": [
+        "ellipsis",
+        "missing-context",
+        "other"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Còn chị thì sao ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Còn chị thì sao ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Có yêu cầu phản hồi nhưng không biết đối tượng thông tin; không đoán một slot từ câu hỏi trống ngữ cảnh.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ]
+    },
+    {
+      "id": "ellipsis-hidden-context",
+      "tags": [
+        "ellipsis",
+        "hidden-context",
+        "other"
+      ],
+      "review_status": "specified",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Còn chị thì sao ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Còn chị thì sao ạ?",
+          "candidate_value": null
+        }
+      ],
+      "reason": "Giống ca thiếu ngữ cảnh dù người gán nhãn biết chủ đề từ nơi khác: dữ liệu ngoài data không được dùng.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Giả sử người đọc biết ngoài data rằng cuộc nói chuyện về ngân sách; thông tin này cố ý không xuất hiện trong đầu vào."
+      ]
+    },
+    {
+      "id": "ellipsis-multiple-antecedents",
+      "tags": [
+        "ellipsis",
+        "ambiguous",
+        "disputed"
+      ],
+      "review_status": "unresolved",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Vẫn như vậy, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": [],
+        "previous_sessions": [
+          {
+            "call": "call_1",
+            "turns": [
+              {
+                "customer": "Phòng 28 mét vuông, ngân sách bốn triệu.",
+                "agent": "Em ghi nhận diện tích và ngân sách ạ."
+              }
+            ]
+          }
+        ]
+      },
+      "expected_questions": null,
+      "reason": "Có cả diện tích và ngân sách; không có quy tắc BTC quyết định câu rút gọn xác nhận cả hai hay chỉ một. Cần người duyệt.",
+      "sources": [
+        "TEAM-QUESTION",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ],
+      "alternatives": [
+        [
+          {
+            "slot": "other",
+            "type": "open",
+            "text": "Vẫn như vậy, đúng không ạ?",
+            "candidate_value": null
+          }
+        ],
+        [
+          {
+            "slot": "room_area_m2",
+            "type": "confirm",
+            "text": "Vẫn như vậy, đúng không ạ?",
+            "candidate_value": 28
+          },
+          {
+            "slot": "budget_vnd",
+            "type": "confirm",
+            "text": "Vẫn như vậy, đúng không ạ?",
+            "candidate_value": 4000000
+          }
+        ]
+      ]
+    },
+    {
+      "id": "btc-demo-blocker-disagreement",
+      "tags": [
+        "blocker",
+        "disputed",
+        "btc-example"
+      ],
+      "review_status": "unresolved",
+      "execution": "semantic_review",
+      "data": {
+        "agent_text": "Mình còn băn khoăn gì không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": null,
+      "reason": "make_example_trace.py ghi blocker/confirm cho câu này; không có candidate cụ thể theo tiêu chí semantic của contract. Không âm thầm lấy ví dụ làm luật tổng quát.",
+      "sources": [
+        "BTC-DEMO",
+        "BTC-TRACE",
+        "TEAM-QUESTION"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ],
+      "alternatives": [
+        [
+          {
+            "slot": "blocker",
+            "type": "open",
+            "text": "Mình còn băn khoăn gì không ạ?",
+            "candidate_value": null
+          }
+        ],
+        [
+          {
+            "slot": "blocker",
+            "type": "confirm",
+            "text": "Mình còn băn khoăn gì không ạ?",
+            "candidate_value": null
+          }
+        ]
+      ]
+    },
+    {
+      "id": "boundary-offset-repair",
+      "tags": [
+        "deterministic-boundary",
+        "grounding"
+      ],
+      "review_status": "specified",
+      "execution": "label_items",
+      "data": {
+        "agent_text": "Size chị chọn là L đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Size chị chọn là L đúng không ạ?"
+        }
+      ],
+      "reason": "Quote chỉ xuất hiện một lần được giữ, offset model sai phải được tìm lại.",
+      "sources": [
+        "TEAM-BOUNDARY",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ],
+      "raw_items": [
+        {
+          "kind": "question",
+          "slot_or_field": "size",
+          "value": "L",
+          "question_type": "confirm",
+          "speaker": "agent",
+          "source_field": "agent_text",
+          "quote": "Size chị chọn là L đúng không ạ?",
+          "start": 999,
+          "end": 1031,
+          "purpose": "Synthetic boundary fixture"
+        }
+      ]
+    },
+    {
+      "id": "boundary-absent-quote",
+      "tags": [
+        "deterministic-boundary",
+        "grounding"
+      ],
+      "review_status": "specified",
+      "execution": "label_items",
+      "data": {
+        "agent_text": "Size chị chọn là L đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [],
+      "reason": "Câu không xuất hiện trong lời agent phải bị loại, kể cả slot hợp lệ.",
+      "sources": [
+        "TEAM-BOUNDARY",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ],
+      "raw_items": [
+        {
+          "kind": "question",
+          "slot_or_field": "size",
+          "value": "XL",
+          "question_type": "confirm",
+          "speaker": "agent",
+          "source_field": "agent_text",
+          "quote": "Size chị chọn là XL đúng không ạ?",
+          "start": 999,
+          "end": 1032,
+          "purpose": "Synthetic boundary fixture"
+        }
+      ]
+    },
+    {
+      "id": "boundary-history-not-quotable",
+      "tags": [
+        "deterministic-boundary",
+        "history",
+        "grounding"
+      ],
+      "review_status": "specified",
+      "execution": "label_items",
+      "data": {
+        "agent_text": "Dạ em đã hiểu ạ.",
+        "tool_texts": [],
+        "consultant_texts": [],
+        "previous_sessions": [
+          {
+            "call": "call_1",
+            "turns": [
+              {
+                "customer": "Tôi muốn size L.",
+                "agent": "Size chị chọn là L đúng không ạ?"
+              }
+            ]
+          }
+        ]
+      },
+      "expected_questions": [],
+      "reason": "Lịch sử chỉ hỗ trợ hiểu nghĩa, không tạo câu hỏi mới của lượt hiện tại.",
+      "sources": [
+        "TEAM-BOUNDARY",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ],
+      "raw_items": [
+        {
+          "kind": "question",
+          "slot_or_field": "size",
+          "value": "L",
+          "question_type": "confirm",
+          "speaker": "agent",
+          "source_field": "previous_sessions/0",
+          "quote": "Size chị chọn là L đúng không ạ?",
+          "start": 999,
+          "end": 1031,
+          "purpose": "Synthetic boundary fixture"
+        }
+      ]
+    },
+    {
+      "id": "boundary-tool-question",
+      "tags": [
+        "deterministic-boundary",
+        "speaker",
+        "tool"
+      ],
+      "review_status": "specified",
+      "execution": "label_items",
+      "data": {
+        "agent_text": "Em đang xử lý ạ.",
+        "tool_texts": [
+          "{\"name\":\"demo.ask\",\"args\":{\"text\":\"Chị chọn size nào ạ?\"}}"
+        ],
+        "consultant_texts": []
+      },
+      "expected_questions": [],
+      "reason": "Nguồn tool quyết định speaker; model ghi speaker=agent không biến tool thành câu hỏi của agent.",
+      "sources": [
+        "TEAM-BOUNDARY",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ],
+      "raw_items": [
+        {
+          "kind": "question",
+          "slot_or_field": "size",
+          "value": null,
+          "question_type": "open",
+          "speaker": "agent",
+          "source_field": "tool_texts/0",
+          "quote": "Chị chọn size nào ạ?",
+          "start": 999,
+          "end": 1019,
+          "purpose": "Synthetic boundary fixture"
+        }
+      ]
+    },
+    {
+      "id": "boundary-consultant-question",
+      "tags": [
+        "deterministic-boundary",
+        "speaker",
+        "consultant"
+      ],
+      "review_status": "specified",
+      "execution": "label_items",
+      "data": {
+        "agent_text": "Em đang xử lý ạ.",
+        "tool_texts": [],
+        "consultant_texts": [
+          "Chị chọn size nào ạ?"
+        ]
+      },
+      "expected_questions": [],
+      "reason": "Lời người tư vấn không phải câu hỏi agent kể cả khi raw speaker bị gán sai.",
+      "sources": [
+        "TEAM-BOUNDARY",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ],
+      "raw_items": [
+        {
+          "kind": "question",
+          "slot_or_field": "size",
+          "value": null,
+          "question_type": "open",
+          "speaker": "agent",
+          "source_field": "consultant_texts/0",
+          "quote": "Chị chọn size nào ạ?",
+          "start": 999,
+          "end": 1019,
+          "purpose": "Synthetic boundary fixture"
+        }
+      ]
+    },
+    {
+      "id": "boundary-duplicate-same-observation",
+      "tags": [
+        "deterministic-boundary",
+        "dedup"
+      ],
+      "review_status": "specified",
+      "execution": "label_items",
+      "data": {
+        "agent_text": "Size chị chọn là L đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Size chị chọn là L đúng không ạ?"
+        }
+      ],
+      "reason": "Một quan sát tại cùng span do extractor lặp lại không được đếm hai lần.",
+      "sources": [
+        "TEAM-BOUNDARY",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ],
+      "raw_items": [
+        {
+          "kind": "question",
+          "slot_or_field": "size",
+          "value": "L",
+          "question_type": "confirm",
+          "speaker": "agent",
+          "source_field": "agent_text",
+          "quote": "Size chị chọn là L đúng không ạ?",
+          "start": 999,
+          "end": 1031,
+          "purpose": "Synthetic boundary fixture"
+        },
+        {
+          "kind": "question",
+          "slot_or_field": "size",
+          "value": "L",
+          "question_type": "confirm",
+          "speaker": "agent",
+          "source_field": "agent_text",
+          "quote": "Size chị chọn là L đúng không ạ?",
+          "start": 999,
+          "end": 1031,
+          "purpose": "Synthetic boundary fixture"
+        }
+      ]
+    },
+    {
+      "id": "boundary-same-slot-distinct-spans",
+      "tags": [
+        "deterministic-boundary",
+        "same-slot",
+        "dedup"
+      ],
+      "review_status": "specified",
+      "execution": "label_items",
+      "data": {
+        "agent_text": "Size chị chọn là L đúng không ạ? Vẫn size L phải không chị?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Size chị chọn là L đúng không ạ?"
+        },
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Vẫn size L phải không chị?"
+        }
+      ],
+      "reason": "Hai yêu cầu thật cùng slot ở hai span phải đi hết vào trace, không tối ưu giảm RQR.",
+      "sources": [
+        "TEAM-BOUNDARY",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ],
+      "raw_items": [
+        {
+          "kind": "question",
+          "slot_or_field": "size",
+          "value": "L",
+          "question_type": "confirm",
+          "speaker": "agent",
+          "source_field": "agent_text",
+          "quote": "Size chị chọn là L đúng không ạ?",
+          "start": 999,
+          "end": 1031,
+          "purpose": "Synthetic boundary fixture"
+        },
+        {
+          "kind": "question",
+          "slot_or_field": "size",
+          "value": "L",
+          "question_type": "confirm",
+          "speaker": "agent",
+          "source_field": "agent_text",
+          "quote": "Vẫn size L phải không chị?",
+          "start": 999,
+          "end": 1025,
+          "purpose": "Synthetic boundary fixture"
+        }
+      ]
+    },
+    {
+      "id": "boundary-multiple-slots-same-span",
+      "tags": [
+        "deterministic-boundary",
+        "multi-slot",
+        "dedup"
+      ],
+      "review_status": "specified",
+      "execution": "label_items",
+      "data": {
+        "agent_text": "Chị chọn size L và màu đen, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Chị chọn size L và màu đen, đúng không ạ?"
+        },
+        {
+          "slot": "color",
+          "type": "confirm",
+          "text": "Chị chọn size L và màu đen, đúng không ạ?"
+        }
+      ],
+      "reason": "Một span xác nhận hai thuộc tính phải giữ hai slot, không coi là duplicate.",
+      "sources": [
+        "TEAM-BOUNDARY",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ],
+      "raw_items": [
+        {
+          "kind": "question",
+          "slot_or_field": "size",
+          "value": "L",
+          "question_type": "confirm",
+          "speaker": "agent",
+          "source_field": "agent_text",
+          "quote": "Chị chọn size L và màu đen, đúng không ạ?",
+          "start": 999,
+          "end": 1040,
+          "purpose": "Synthetic boundary fixture"
+        },
+        {
+          "kind": "question",
+          "slot_or_field": "color",
+          "value": "den",
+          "question_type": "confirm",
+          "speaker": "agent",
+          "source_field": "agent_text",
+          "quote": "Chị chọn size L và màu đen, đúng không ạ?",
+          "start": 999,
+          "end": 1040,
+          "purpose": "Synthetic boundary fixture"
+        }
+      ]
+    },
+    {
+      "id": "boundary-unknown-slot",
+      "tags": [
+        "deterministic-boundary",
+        "identity",
+        "vocabulary"
+      ],
+      "review_status": "specified",
+      "execution": "label_items",
+      "data": {
+        "agent_text": "Chị là khách đã liên hệ hôm qua, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị là khách đã liên hệ hôm qua, đúng không ạ?"
+        }
+      ],
+      "reason": "Không thêm slot identity vào ontology chỉ để giữ nhãn model; dùng mã hóa other/open hiện có.",
+      "sources": [
+        "TEAM-BOUNDARY",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ],
+      "raw_items": [
+        {
+          "kind": "question",
+          "slot_or_field": "customer_identity",
+          "value": "khách hôm qua",
+          "question_type": "confirm",
+          "speaker": "agent",
+          "source_field": "agent_text",
+          "quote": "Chị là khách đã liên hệ hôm qua, đúng không ạ?",
+          "start": 999,
+          "end": 1045,
+          "purpose": "Synthetic boundary fixture"
+        }
+      ]
+    },
+    {
+      "id": "boundary-btc-channel-separate",
+      "tags": [
+        "deterministic-boundary",
+        "btc-extension",
+        "vocabulary"
+      ],
+      "review_status": "specified",
+      "execution": "label_items",
+      "data": {
+        "agent_text": "Chị dùng kênh hotline lần trước, đúng không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "channel",
+          "type": "confirm",
+          "text": "Chị dùng kênh hotline lần trước, đúng không ạ?"
+        }
+      ],
+      "reason": "Giữ extension BTC channel trong extractor, không viết nó vào 34 slot bộ nhớ.",
+      "sources": [
+        "TEAM-BOUNDARY",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ],
+      "raw_items": [
+        {
+          "kind": "question",
+          "slot_or_field": "channel",
+          "value": "hotline",
+          "question_type": "confirm",
+          "speaker": "agent",
+          "source_field": "agent_text",
+          "quote": "Chị dùng kênh hotline lần trước, đúng không ạ?",
+          "start": 999,
+          "end": 1045,
+          "purpose": "Synthetic boundary fixture"
+        }
+      ]
+    },
+    {
+      "id": "boundary-repeated-quote-distinct-occurrences",
+      "tags": [
+        "deterministic-boundary",
+        "grounding",
+        "same-slot"
+      ],
+      "review_status": "specified",
+      "execution": "label_items",
+      "data": {
+        "agent_text": "Size L phải không ạ? Size L phải không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Size L phải không ạ?"
+        },
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Size L phải không ạ?"
+        }
+      ],
+      "reason": "Cùng chữ xuất hiện hai lần: offset đúng phân biệt hai câu hỏi thật.",
+      "sources": [
+        "TEAM-BOUNDARY",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ],
+      "raw_items": [
+        {
+          "kind": "question",
+          "slot_or_field": "size",
+          "value": "L",
+          "question_type": "confirm",
+          "speaker": "agent",
+          "source_field": "agent_text",
+          "quote": "Size L phải không ạ?",
+          "start": 0,
+          "end": 20,
+          "purpose": "Synthetic boundary fixture"
+        },
+        {
+          "kind": "question",
+          "slot_or_field": "size",
+          "value": "L",
+          "question_type": "confirm",
+          "speaker": "agent",
+          "source_field": "agent_text",
+          "quote": "Size L phải không ạ?",
+          "start": 21,
+          "end": 41,
+          "purpose": "Synthetic boundary fixture"
+        }
+      ]
+    },
+    {
+      "id": "boundary-repeated-quote-ambiguous-offset",
+      "tags": [
+        "deterministic-boundary",
+        "grounding",
+        "ambiguity"
+      ],
+      "review_status": "specified",
+      "execution": "label_items",
+      "data": {
+        "agent_text": "Size L phải không ạ? Size L phải không ạ?",
+        "tool_texts": [],
+        "consultant_texts": []
+      },
+      "expected_questions": [],
+      "reason": "Quote lặp nhiều nơi và offset không chỉ đúng lần nào thì thiếu bằng chứng để chọn một span.",
+      "sources": [
+        "TEAM-BOUNDARY",
+        "BTC-TRACE"
+      ],
+      "preconditions": [
+        "Câu tự soạn tổng hợp; không có ngữ cảnh bổ sung ngoài data."
+      ],
+      "raw_items": [
+        {
+          "kind": "question",
+          "slot_or_field": "size",
+          "value": "L",
+          "question_type": "confirm",
+          "speaker": "agent",
+          "source_field": "agent_text",
+          "quote": "Size L phải không ạ?",
+          "start": 999,
+          "end": 1019,
+          "purpose": "Synthetic boundary fixture"
+        }
+      ]
+    }
+  ],
+  "source_policy": {
+    "path": "docs/evaluation/rqr-policy.json",
+    "policy_id": "rqr-btc-main-41eda490-review-20261101",
+    "status_at_read": "ready",
+    "unresolved_topics_preserved": [
+      "U02",
+      "U03",
+      "U06"
+    ],
+    "interpretation": "Specified semantic cases are team diagnostic expectations, not a resolution of BTC ambiguities."
+  }
+}

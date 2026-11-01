@@ -1,6 +1,6 @@
 "use client";
 // A filterable, sortable grid of products: brand, price band, in-stock only.
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import ProductCard from "./ProductCard";
 import { discountPercent, ShopProduct } from "@/lib/catalog";
 
@@ -13,7 +13,8 @@ const PRICE_BANDS: { label: string; min: number; max: number }[] = [
 
 type Sort = "popular" | "price-asc" | "price-desc" | "discount";
 
-export default function ProductListing({ products, empty }: { products: ShopProduct[] | null; empty?: string }) {
+export default function ProductListing({ products, empty, error, onRetry }: { products: ShopProduct[] | null; empty?: string; error?: string; onRetry?: () => void }) {
+  const filterId = useId();
   const [brands, setBrands] = useState<string[]>([]);
   const [band, setBand] = useState(-1);
   const [inStock, setInStock] = useState(false);
@@ -39,7 +40,7 @@ export default function ProductListing({ products, empty }: { products: ShopProd
 
   return (
     <div className="s-listing">
-      <aside className={`s-filters ${filtersOpen ? "open" : ""}`}>
+      <aside id={filterId} className={`s-filters ${filtersOpen ? "open" : ""}`}>
         <h3>Bộ lọc</h3>
         {allBrands.length > 1 && (
           <fieldset>
@@ -80,10 +81,10 @@ export default function ProductListing({ products, empty }: { products: ShopProd
       </aside>
       <div>
         <div className="s-listing-bar">
-          <button className="s-btn s-btn-ghost s-filter-toggle" onClick={() => setFiltersOpen(!filtersOpen)}>
+          <button className="s-btn s-btn-ghost s-filter-toggle" aria-expanded={filtersOpen} aria-controls={filterId} onClick={() => setFiltersOpen(!filtersOpen)}>
             Bộ lọc
           </button>
-          <span>{products === null ? "Đang tải…" : `${shown.length} sản phẩm`}</span>
+          <span role="status">{error ? "Chưa tải được sản phẩm" : products === null ? "Đang tải…" : `${shown.length} sản phẩm`}</span>
           <label className="s-sort">
             Sắp xếp
             <select value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
@@ -94,13 +95,19 @@ export default function ProductListing({ products, empty }: { products: ShopProd
             </select>
           </label>
         </div>
-        <div className="s-grid">
+        {error ? <div className="s-load-error" role="alert">
+          <h2>Chưa tải được sản phẩm</h2>
+          <p>{error}</p>
+          {onRetry && <button className="s-btn s-btn-outline" onClick={onRetry}>Thử lại</button>}
+        </div> : <div className="s-grid" aria-busy={products === null}>
           {products === null
-            ? Array.from({ length: 8 }, (_, i) => <div key={i} className="s-card s-skeleton" />)
+            ? Array.from({ length: 8 }, (_, i) => <div key={i} className="s-card s-skeleton" aria-hidden="true" />)
             : shown.map((p) => <ProductCard key={p.ref} product={p} />)}
-        </div>
-        {products !== null && shown.length === 0 && (
-          <div className="s-empty">{empty || "Không có sản phẩm phù hợp với bộ lọc."}</div>
+        </div>}
+        {!error && products !== null && shown.length === 0 && (
+          <div className="s-empty"><p>{empty || "Không có sản phẩm phù hợp với bộ lọc."}</p>
+            {(brands.length > 0 || band >= 0 || inStock) && <button className="s-btn s-btn-outline" onClick={() => { setBrands([]); setBand(-1); setInStock(false); }}>Xóa bộ lọc</button>}
+          </div>
         )}
       </div>
     </div>

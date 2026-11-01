@@ -149,6 +149,7 @@ class AgentContext:
     #: what the before-write checks read (a deletion needs both).
     customer_said: str | None = None
     last_agent_said: str | None = None
+    deletion_asked: bool | None = None
 
 
 @dataclass
@@ -393,6 +394,7 @@ class ActionGuardMiddleware(AgentMiddleware):
             quotes=quotes, orders=context.known_orders | orders, trusted=context.trusted_skus | codes | set(quotes),
             lane=context.lane, flags=context.flags, now=context.now,
             last_agent_said=context.last_agent_said, customer_said=context.customer_said,
+            deletion_asked=context.deletion_asked,
             shared_phone=context.shared_phone, created=(*context.created_orders, *_created_in(state)),
             updated=_updated_in(state, context.tool_results),
         )

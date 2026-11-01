@@ -166,14 +166,16 @@ async def memory_get_profile(customer_id: str, on: str | None = None) -> dict[st
         )
         rows = await cursor.fetchall()
         cursor = await conn.execute(
-            "SELECT max(done_at) AS done FROM deletion_requests WHERE customer_id = %s AND done_at IS NOT NULL",
+            "SELECT max(done_at) AS done, COALESCE(bool_or(done_at IS NULL), false) AS pending "
+            "FROM deletion_requests WHERE customer_id = %s",
             (customer_id,),
         )
-        forgotten = (await cursor.fetchone())["done"]
+        deletion = await cursor.fetchone()
+        forgotten = deletion["done"]
     # deleted_at: the customer asked to be forgotten; what any other source
     # still holds about them before that day is not memory to use (QT-06).
     return {"customer_id": customer_id, "facts": [_fact(r) for r in rows],
-            "deleted_at": forgotten.isoformat() if forgotten else None}
+            "deleted_at": forgotten.isoformat() if forgotten else None, "deletion_pending": deletion["pending"]}
 
 
 @server.tool(roles=READERS, name="memory_get_episodes")
@@ -252,7 +254,9 @@ async def identity_link_provisional(customer_id: str, key_type: KeyType, key_has
         key_hash: The keyed hash.
     """
     pool = await database()
-    async with pool.connection() as conn:
+    async with pool.connection() as conn, conn.transaction():
+        await conn.execute("SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))", (f"memory:{customer_id}",))
+        await _not_deleted(conn, customer_id)
         await conn.execute(
             "INSERT INTO identities (key_type, key_hash, customer_id) VALUES (%s, %s, %s) "
             "ON CONFLICT DO NOTHING",
@@ -273,7 +277,9 @@ async def memory_confirm_identity(
     """
     customer_id = customer_id or f"N-{uuid.uuid4().hex[:10]}"
     pool = await database()
-    async with pool.connection() as conn:
+    async with pool.connection() as conn, conn.transaction():
+        await conn.execute("SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))", (f"memory:{customer_id}",))
+        await _not_deleted(conn, customer_id)
         for key in keys:
             await conn.execute(
                 "INSERT INTO identities (key_type, key_hash, customer_id, status) "
@@ -306,6 +312,7 @@ async def memory_commit_facts(customer_id: str, decisions: list[dict[str, Any]],
     async with pool.connection() as conn:
         async with conn.transaction():
             await conn.execute("SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))", (f"memory:{customer_id}",))
+            await _not_deleted(conn, customer_id)
             for decision in decisions:
                 operation = decision.get("operation")
                 if operation == "skip":
@@ -402,9 +409,8 @@ def _write(slot: str, value: Any, op: str, source: dict[str, Any], customer_id: 
 async def memory_settle_unconfirmed(customer_id: str, confirm: bool, on: str) -> dict[str, Any]:
     """Settle what an unconfirmed caller said for this customer, once the customer's own call ended.
 
-    Confirmed: each unconfirmed fact becomes the customer's, unless the call
-    gave the slot an active value of its own (that one is newer and theirs).
-    Not confirmed (the customer denied it): every unconfirmed fact is closed.
+    Acknowledging contact leaves its facts unconfirmed; values must be restated
+    in a verified call. Denial closes every unconfirmed fact.
 
     Args:
         customer_id: The customer, confirmed in the call just ended.
@@ -427,7 +433,7 @@ async def memory_settle_unconfirmed(customer_id: str, confirm: bool, on: str) ->
                 "WHERE g.customer_id = f.customer_id AND g.slot = f.slot AND g.status = 'active' "
                 "AND g.kind <> 'open_note') RETURNING fact_id", (day, customer_id))
             closed = len(await cursor.fetchall())
-            # Two unconfirmed contacts may have said the same slot: the newest is kept (one active value per slot).
+            # Keep only the newest quarantined value for a slot.
             cursor = await conn.execute(
                 "UPDATE facts f SET status = 'invalidated', valid_to = %s WHERE f.customer_id = %s "
                 "AND f.status = 'unconfirmed' AND f.kind <> 'open_note' AND EXISTS (SELECT 1 FROM facts g "
@@ -435,10 +441,9 @@ async def memory_settle_unconfirmed(customer_id: str, confirm: bool, on: str) ->
                 "AND g.kind <> 'open_note' AND (g.created_at, g.fact_id) > (f.created_at, f.fact_id)) RETURNING fact_id",
                 (day, customer_id))
             closed += len(await cursor.fetchall())
-            cursor = await conn.execute(
-                "UPDATE facts SET status = 'active' WHERE customer_id = %s AND status = 'unconfirmed' RETURNING fact_id",
-                (customer_id,))
-            return {"customer_id": customer_id, "confirmed": len(await cursor.fetchall()), "closed": closed}
+            # Acknowledging a prior contact does not confirm each value that contact supplied.
+            # Only facts stated in the verified call enter through memory.commit_facts.
+            return {"customer_id": customer_id, "confirmed": 0, "closed": closed}
 
 
 @server.tool(roles={"memory_writer"}, name="memory_commit_episode")
@@ -452,7 +457,9 @@ async def memory_commit_episode(customer_id: str, episode: dict[str, Any]) -> di
     """
     episode_id = f"E-{uuid.uuid4().hex[:12]}"
     pool = await database()
-    async with pool.connection() as conn:
+    async with pool.connection() as conn, conn.transaction():
+        await conn.execute("SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))", (f"memory:{customer_id}",))
+        await _not_deleted(conn, customer_id)
         await conn.execute(
             "INSERT INTO episodes (episode_id, customer_id, call_id, channel, started_at, summary, outcome, "
             "objection_type, sentiment, commitments, source_turn_span) "
@@ -467,6 +474,11 @@ async def memory_commit_episode(customer_id: str, episode: dict[str, Any]) -> di
             ),
         )
     return {"episode_id": episode_id}
+
+
+async def _not_deleted(conn: Any, customer_id: str) -> None:
+    if await (await conn.execute("SELECT 1 FROM deletion_requests WHERE customer_id = %s AND done_at IS NOT NULL LIMIT 1", (customer_id,))).fetchone():
+        raise ToolFailure("DELETED", "This customer was deleted; stale work may not recreate their data.")
 
 
 @server.tool(roles={"advisor"}, name="memory_request_deletion")
@@ -502,7 +514,7 @@ async def memory_request_deletion(
 
 
 @server.tool(roles={"admin"}, name="memory_delete_customer")
-async def memory_delete_customer(customer_id: str) -> dict[str, Any]:
+async def memory_delete_customer(customer_id: str, call_ids: list[int] | None = None) -> dict[str, Any]:
     """Forget a customer entirely, on their request (policy QT-06).
 
     Facts, episodes, identities, vault rows and the turns of their calls go,
@@ -513,38 +525,86 @@ async def memory_delete_customer(customer_id: str) -> dict[str, Any]:
 
     Args:
         customer_id: The customer.
+        call_ids: Calls explicitly authorised by the platform deletion command.
     """
     pool = await database()
     async with pool.connection() as conn:
         async with conn.transaction():
             await conn.execute("SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))", (f"memory:{customer_id}",))
             counts = {}
+            related = list(call_ids or [])
+            if (await (await conn.execute("SELECT to_regclass('calls') AS t")).fetchone())["t"]:
+                rows = await (await conn.execute(
+                    "SELECT id, turn_lease_until > now() AS busy FROM calls WHERE customer_id = %s OR id = ANY(%s::bigint[]) FOR UPDATE",
+                    (customer_id, related))).fetchall()
+                if any(row["busy"] for row in rows):
+                    raise ToolFailure("DELETION_BUSY", "A turn is still running; retry the deletion.", retryable=True)
+                related = [row["id"] for row in rows]
             for table in ("facts", "episodes", "identities"):
-                cursor = await conn.execute(f"DELETE FROM {table} WHERE customer_id = %s", (customer_id,))
+                origin = " OR source->>'call_id' = ANY(%s::text[])" if table == "facts" else (
+                    " OR call_id = ANY(%s::text[])" if table == "episodes" else "")
+                params = (customer_id, [str(value) for value in related]) if origin else (customer_id,)
+                cursor = await conn.execute(f"DELETE FROM {table} WHERE customer_id = %s" + origin, params)
                 counts[table] = cursor.rowcount
             # The API's vault lives in the same database; an evaluation database has none.
             if (await (await conn.execute("SELECT to_regclass('pii_vault') AS t")).fetchone())["t"]:
-                cursor = await conn.execute("DELETE FROM pii_vault WHERE customer_id = %s", (customer_id,))
+                values = await (await conn.execute(
+                    "SELECT value_enc FROM pii_vault WHERE customer_id = %s OR call_id = ANY(%s::bigint[])",
+                    (customer_id, related))).fetchall()
+                from ...runtime.vault import _open
+                private = [_open(bytes(row["value_enc"])) for row in values]
+                if private and (await (await conn.execute("SELECT to_regclass('mock_state') AS t")).fetchone())["t"]:
+                    from .btc import _LOCK_KEY
+                    await conn.execute("SELECT pg_advisory_xact_lock(%s)", (_LOCK_KEY,))
+                    state = await (await conn.execute("SELECT id, state FROM mock_state FOR UPDATE")).fetchall()
+                    for row in state:
+                        await conn.execute("UPDATE mock_state SET state = %s WHERE id = %s",
+                                           (json.dumps(_redact(row["state"], private)), row["id"]))
+                cursor = await conn.execute("DELETE FROM pii_vault WHERE customer_id = %s OR call_id = ANY(%s::bigint[])", (customer_id, related))
                 counts["pii_vault"] = cursor.rowcount
             # The API's conversation log: what was said goes, and the call rows keep no link to the
             # customer. The rows stay (unlinked) because the call that asked is still being closed.
             if (await (await conn.execute("SELECT to_regclass('calls') AS t")).fetchone())["t"]:
                 cursor = await conn.execute(
-                    "DELETE FROM turns WHERE call_id IN (SELECT id FROM calls WHERE customer_id = %s)", (customer_id,))
+                    "DELETE FROM turns WHERE call_id = ANY(%s::bigint[])", (related,))
                 counts["turns"] = cursor.rowcount
                 cursor = await conn.execute(
-                    "UPDATE calls SET customer_id = NULL, customer_key = NULL, phone_last4 = NULL, "
-                    "brief = '[]'::jsonb, suggestion = NULL WHERE customer_id = %s", (customer_id,))
+                    "UPDATE calls SET customer_id = NULL, customer_key = NULL, phone_last4 = NULL, customer_label = NULL, "
+                    "conversation_id = NULL, channel_ref = NULL, caller_token = NULL, opened_by = NULL, "
+                    "brief = '[]'::jsonb, brief_object = NULL, suggestion = NULL, warnings = '[]'::jsonb, "
+                    "handoff_brief = NULL, handoff_reason = NULL, route_reason = NULL, after_call = NULL, "
+                    "ended_at = COALESCE(ended_at, now()), memory_status = 'deleted' WHERE id = ANY(%s::bigint[])", (related,))
                 counts["calls_unlinked"] = cursor.rowcount
+            for table in ("checkpoint_writes", "checkpoint_blobs", "checkpoints"):
+                if (await (await conn.execute("SELECT to_regclass(%s) AS t", (table,))).fetchone())["t"]:
+                    cursor = await conn.execute(f"DELETE FROM {table} WHERE thread_id = ANY(%s::text[])",
+                                                ([f"call-{value}" for value in related],))
+                    counts[table] = cursor.rowcount
             cursor = await conn.execute(
-                "UPDATE deletion_requests SET done_at = now() WHERE customer_id = %s AND done_at IS NULL "
+                "UPDATE deletion_requests SET done_at = now(), reason = NULL, call_id = NULL WHERE customer_id = %s AND done_at IS NULL "
                 "RETURNING request_id", (customer_id,))
             if not await cursor.fetchall():
                 await conn.execute(
                     "INSERT INTO deletion_requests (request_id, customer_id, reason, done_at) VALUES (%s, %s, %s, now())",
                     (f"D-{uuid.uuid4().hex[:12]}", customer_id, "deleted by an administrator"),
                 )
+            # Keep the call links if file cleanup fails, so a retry can find every artifact.
+            from ...components.improvement.gaps import forget_calls
+            forget_calls(related)
     return {"customer_id": customer_id, "deleted": counts}
+
+
+def _redact(value: Any, private: list[str]) -> Any:
+    if isinstance(value, str):
+        for secret in sorted(set(private), key=len, reverse=True):
+            if secret:
+                value = value.replace(secret, "[deleted]")
+        return value
+    if isinstance(value, list):
+        return [_redact(item, private) for item in value]
+    if isinstance(value, dict):
+        return {key: _redact(item, private) for key, item in value.items()}
+    return value
 
 
 if __name__ == "__main__":

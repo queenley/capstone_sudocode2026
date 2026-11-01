@@ -1,0 +1,122 @@
+{
+  "status": "ready",
+  "readiness_scope": "Code, Vietnamese prompt/schema and offline contract regressions complete; ready for separately authorized cohort measurement. This is not a measured model-accuracy or BTC-score result.",
+  "reviewed_on": "2026-11-01",
+  "extractor_version": "product-extractor-v7",
+  "base_main": "41eda490bc47577018541c7778c0e8443ed8e6c8",
+  "instrument_sha256": "0a1ac711e04f9f32f835b72da65843afead5a93c0db20e9e9fc5f1912acfb6ce",
+  "prompt_sha256": "0a1ac711e04f9f32f835b72da65843afead5a93c0db20e9e9fc5f1912acfb6ce",
+  "prompt_sha256_note": "Existing API name retained; now hashes VERSION, prompt, Pydantic schema, complete scorer/structured-helper source, imported HUMAN pattern/flags, vocabularies and source/classification contracts.",
+  "raw_prompt_sha256": "d15a2aa63afb732805bcfdea81505ee653f04eb7929e6e445d89082ad055ecbd",
+  "schema_sha256": "e2c1d59657237e4ec0ee48da7baee41a98e1b24db22ef9a6e3c11e332f84d42c",
+  "hashes": {
+    "apps/ai-agent-service/src/ai_agent_service/llm/structured.py": "66642c9bbf31b16a24999326d69b4d03f7cd6dc59bb4aca1511293f38f563357",
+    "apps/ai-agent-service/src/ai_agent_service/components/evaluation/scorers.py": "04846669c46031d7a2251d1332c8ead7560c2bd5a2fff53f7ec26c755ab009e8",
+    "config/prompts/evaluation/extractor.txt": "d15a2aa63afb732805bcfdea81505ee653f04eb7929e6e445d89082ad055ecbd",
+    "tests/agent/test_structured_output.py": "daaaf0b0ec19f6354d558142a1656cc094311f1400d87a3666d06a429b64c647",
+    "tests/agent/test_extractor_grounding.py": "ec6be494d615285eae4b69aa869e1d2b7067e15071b92dff6912f994e95ba991",
+    "tests/agent/test_extractor_history.py": "4b91ecfaf02fbc588c66e3c57b55a826e202a78f0085e7727679d97cd3deac93",
+    "tests/agent/test_extractor_recovery.py": "1c4665de0b9aec0d7b277992c21122652eda1d248a9144d3eeec490488de1b45",
+    "tests/agent/test_extractor_vocabulary.py": "ef2e264d6ab3fddb64d440430359ec58bb0983a151eab5e9a6058530b2be4cb6",
+    "docs/evaluation/rqr-policy.json": "51e3508896d36fb1150d3d472d0efa196252024b0d306d91d96df4919fea68fa",
+    "docs/evaluation/question-classification-contract.md": "e6e9c8f6c824802fc76f91479e0c132e7a98e00f99427887651694ca39359cd9",
+    "docs/evaluation/question-classification-cases.json": "9b61178cb125075107e235c61a1f96d6dbd03d0bb0211e72f5c5ebc8c87079c8",
+    "tests/agent/test_rqr_question_contract.py": "610adf17192a7663b3a084cfe2fb75d7eb097185bbc2d70d642eca2e758b3543",
+    "apps/ai-agent-service/data/btc/eval/reference_eval.py": "18f1fa0881a345b8dd01c4160ec8fc31aea5ff8385c09a3eb3db96a88372843e"
+  },
+  "changes": [
+    "Vietnamese Pydantic class docstrings and every field description; schema supplied through with_structured_output(Items.model_json_schema(), include_raw=True), forbids unknown keys and non-turn evidence sources. Pydantic validation runs locally after the SDK returns raw output and usage, so output validation errors receive repair/retry rather than invocation-error handling.",
+    "Local json_repair and Pydantic revalidation for text, tool_calls, invalid_tool_calls, additional_kwargs.tool_calls/function_call and provider content blocks; no model call on successful repair. Clean raw fallback is not counted as json_repair.",
+    "Invocation ValueError/ValidationError for call configuration, network/auth/budget/provider failures receive no helper retry. Provider receives a JSON Schema dictionary, preventing SDK-side Pydantic output validation before raw/usage callbacks. OutputParserException can be recovered locally from llm_output; only known output errors may consume another attempt.",
+    "Retry carries complete native and repair validation error strings, without 300/500-character truncation. Detected token truncation, including wrapped exceptions and provider finish metadata, requires a shorter complete response; partial repaired JSON is rejected.",
+    "Vietnamese semantic taxonomy uses requested information/candidate, negation/choice/scope/ellipsis/observable context; no regex-based question classifier or metric-driven relabeling added.",
+    "Exact current-source quote/offset grounding, source-derived speaker, agent-only questions/claims, no consultant fact usage, no fact_usage without supplied earlier-session context, open values normalized to null.",
+    "History whitelist excludes caller-supplied labels/GT; grouping isolates full/baseline configurations and orders calls numerically. Existing caller signatures and trace projection retained.",
+    "34 ontology slots retained (30 core + 4 industry); existing channel extension and other sentinel explicitly separate. Instrument and complete sanitized input key the cache, preventing v4 or prior-semantic-contract hits.",
+    "v7 separates stock replenishment dates from delivery/receipt/callback/returned-order dates. Prompt requires field-specific evidence including replenishment subject; deterministic projection rejects restock_date without stock-replenishment language or for returned-to-warehouse dates. Eleven synthetic regression cases preserve genuine replenishment and isolate delivery clauses. No scenario IDs, catalogue answers or ground-truth dates added to prompt."
+  ],
+  "test_commands": [
+    {
+      "command": "apps/ai-agent-service/.venv/bin/python -m pytest -q",
+      "exit_code": 0,
+      "result": "548 passed, 9 skipped in 9.32s; PostgreSQL/Redis integration not configured, skips not counted as pass. Includes 11 replenishment-vs-delivery/date regressions and sync/async real ChatOpenAI SDK MockTransport validation/usage tests. Provider factory and public network blocked."
+    },
+    {
+      "command": "git diff --check -- <owned code/prompt/tests>",
+      "exit_code": 0,
+      "result": "No whitespace errors"
+    }
+  ],
+  "paid_model_calls": 0,
+  "budget_ledger_modified": false,
+  "protected_btc_pack": "Untouched; tests/agent/test_btc_pack.py passed; main reference_eval SHA pinned in hashes.",
+  "coordination": {
+    "policy_status": "ready",
+    "question_cases_status": "ready",
+    "policy_id": "rqr-btc-main-41eda490-review-20261101",
+    "reviewed_contracts": [
+      "docs/evaluation/rqr-policy.json",
+      "docs/evaluation/question-classification-contract.md",
+      "docs/evaluation/question-classification-cases.json"
+    ]
+  },
+  "unresolved_or_limits": [
+    {
+      "topic": "Semantic quality",
+      "detail": "Unit tests exercise boundary contracts, validation, repair/retry and callback accounting. They do not show that a real model classifies every authored semantic fixture correctly. Measure/review same replies before claiming an RQR improvement."
+    },
+    {
+      "topic": "Question interpretation",
+      "case_ids": [
+        "ellipsis-multiple-antecedents",
+        "btc-demo-blocker-disagreement"
+      ],
+      "detail": "BTC generic blocker demo and ellipsis with multiple antecedents remain disclosed interpretation issues; no official gold label invented."
+    },
+    {
+      "topic": "BTC policy questions",
+      "issue_ids": [
+        "U01",
+        "U02",
+        "U03",
+        "U04",
+        "U05",
+        "U06",
+        "U07"
+      ],
+      "detail": "Follow pinned main, not an invented scorer exception; source ambiguities are documented by the policy owner."
+    },
+    {
+      "topic": "Observable history",
+      "detail": "Current API supplies previous sessions, not prior turns within the same current session/current customer turn. No hidden context is assumed; semantic use of history still requires model/human review."
+    },
+    {
+      "topic": "Grounding scope",
+      "detail": "Machine checks prove quote existence/source/offsets and selected field rules; they do not prove every value/slot is semantically supported by the quoted text or an earlier utterance. No-history fact usage is blocked deterministically."
+    },
+    {
+      "topic": "Truncation metadata",
+      "detail": "Known length exceptions and provider finish metadata are rejected. Missing provider truncation evidence cannot distinguish an accidentally unclosed string from omitted semantic items."
+    },
+    {
+      "topic": "order_ids",
+      "detail": "Existing scalar Item.value contract retained: order IDs represented by comma-separated string, while memory ontology remains str_list."
+    },
+    {
+      "topic": "Claim field semantics",
+      "detail": "Restock projection requires explicit replenishment language and rejects warehouse-return dates. Language checks do not prove every date is correctly bound when evidence includes several events; prompt requests a separate atomic clause. Human semantic calibration remains required."
+    }
+  ],
+  "handoff": {
+    "next_step": "Freeze current v7 hashes in after-v7, preserving before/, after/ v5 and after-v6. Run root run_eval.py --relabel on SAMPLE-01 before the same locked 78 development replies. Retain every prior attempt/reservation; no labels chosen by metric result.",
+    "budget_env": "EVAL_BUDGET_DB=evaluation/runs/20261024-work/budget.sqlite",
+    "do_not_recreate_budget_ledger": true,
+    "run_one_scenario_before_cohort": true,
+    "cache_note": "prompt_sha256 is now an instrument hash; raw_prompt_sha256 is the file-only hash. Contract/source edits after this readiness file require regenerating hashes before measurement."
+  },
+  "supersedes": {
+    "extractor_version": "product-extractor-v6",
+    "reason": "Post-run audit confirmed the pre-existing v4/v6 error mapping a delivery date to restock_date. v6 complete evidence remains valid for v6; remeasure v7 on the same replies. Native SDK repair/retry fix from v6 retained.",
+    "evidence": "docs/evaluation/RUN-LEDGER.md"
+  }
+}

@@ -47,9 +47,10 @@ async def retrieve(customer_id: str, on: str, tools: Any, *, crm: Mapping[str, A
         tools.data("memory_get_profile", customer_id=customer_id, on=on),
         tools.data("memory_get_episodes", customer_id=customer_id, n=3),
     )
+    if (profile or {}).get("deleted_at") or (profile or {}).get("deletion_pending"):
+        return {"facts": [], "episodes": [], "orders": [], "forgotten": True}
     episodes = list((history or {}).get("episodes") or [])
-    # Forgotten on request: whatever the CRM's seed still says about them is not memory to use.
-    crm = {} if (profile or {}).get("deleted_at") else (crm or {})
+    crm = crm or {}
     for session in crm.get("sessions") or []:
         episodes.append({
             "call_id": session.get("session_id"),

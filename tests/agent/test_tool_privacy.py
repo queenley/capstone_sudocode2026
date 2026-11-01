@@ -11,6 +11,32 @@ from ai_agent_service.pipeline.eval.trace import turn_row
 from ai_agent_service.components.memory.brief import BriefLine
 
 
+def test_model_identity_fields_are_removed_when_the_system_has_no_verified_values():
+    request = SimpleNamespace(tool_call={"name": "memory_request_deletion", "args": {
+        "customer_id": "victim", "customer_phone": "0900000001", "account_id": "victim", "call_id": "other"}},
+        runtime=SimpleNamespace(context=SimpleNamespace()),
+        tool=SimpleNamespace(args={key: {} for key in ("customer_id", "customer_phone", "account_id", "call_id")}))
+    request.override = lambda **changes: SimpleNamespace(**{**vars(request), **changes})
+    adjusted = ToolGuardMiddleware(["memory_request_deletion"], retries=0)._with_context(request)
+    assert all(value is None for value in adjusted.tool_call["args"].values())
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("raw", ['{"ok":"true","data":{}}', '{"ok":true,"data":[]}',
+                                  '{"ok":false,"error":"private result"}', 'private result'])
+async def test_malformed_tool_outputs_are_errors_without_echoing_private_payload(raw):
+    from ai_agent_service.mcp.tools import ToolBox
+    tools = ToolBox([SimpleNamespace(name="fixture", ainvoke=AsyncMock(return_value=raw))])
+    result = await tools.call("fixture")
+    assert not result["ok"] and result["error"]["code"] == "BAD_ENVELOPE"
+    assert "private result" not in json.dumps(result)
+    request = SimpleNamespace(tool_call={"name": "fixture", "id": "test", "args": {}})
+    result = await ToolGuardMiddleware(["fixture"], retries=0).awrap_tool_call(request,
+        AsyncMock(return_value=ToolMessage(tool_call_id="test", content=raw)))
+    assert json.loads(result.content)["error"]["code"] == "BAD_ENVELOPE"
+    assert "private result" not in result.content
+
+
 @pytest.mark.asyncio
 async def test_tool_receives_raw_phone_but_model_and_checkpoint_receive_token():
     vault=pii.Vault()

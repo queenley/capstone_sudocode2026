@@ -132,6 +132,47 @@ async def end_call(call_id: int, request: Request) -> dict[str, Any]:
         raise _http(error) from error
 
 
+@router.get("/calls/{call_id}/context")
+async def customer_context(call_id: int, request: Request):
+    """The agent's own ledger and orders; no projection from the platform's older memory tables."""
+    _actor(request)
+    try:
+        row, turns = await calls.call_turns(call_id, reveal_phone=False)
+    except CallError as error:
+        raise _http(error) from error
+    facts, episodes = [], []
+    order_ids = set()
+    for turn in turns:
+        meta = turn.get("meta")
+        for tool in (meta.get("tool_calls") or []) if isinstance(meta, dict) else []:
+            if not isinstance(tool, dict):
+                continue
+            result = tool.get("result") or {}
+            if not isinstance(result, dict):
+                continue
+            data = result.get("data") or {}
+            if isinstance(data, dict) and tool.get("name") in ("order.create", "order_create") and result.get("ok") and data.get("order_id"):
+                order_ids.add(str(data["order_id"]))
+    async with connection() as conn:
+        if row.get("customer_id") and row.get("tier") == "VERIFIED":
+            facts = await (await conn.execute(
+                "SELECT slot, value, status, source, valid_from, valid_to, created_at FROM facts "
+                "WHERE customer_id = %s ORDER BY created_at DESC LIMIT 100", (row["customer_id"],))).fetchall()
+            episodes = await (await conn.execute(
+                "SELECT call_id, channel, started_at, summary, outcome FROM episodes "
+                "WHERE customer_id = %s ORDER BY started_at DESC LIMIT 20", (row["customer_id"],))).fetchall()
+            for fact in facts:
+                if fact["status"] == "active" and fact["slot"] in ("order_id", "order_ids"):
+                    value = fact["value"]
+                    order_ids.update(str(item) for item in (value if isinstance(value, list) else [value]))
+        state = await btc._read_state(conn)
+    fields = ("order_id", "sku", "variant_sku", "qty", "price_vnd", "payment", "status", "estimated_delivery")
+    orders = [{"source": "agent", **{field: order.get(field) for field in fields}} for key, order in (state.get("orders") or {}).items()
+              if key in order_ids and isinstance(order, dict)]
+    return {"facts": facts, "episodes": episodes, "orders": orders,
+            "identity_confirmed": row.get("tier") == "VERIFIED", "memory_status": row.get("memory_status")}
+
+
 @router.post("/calls/{call_id}/handoff")
 async def request_handoff(call_id: int, body: HandoffRequest, request: Request) -> dict[str, Any]:
     actor = _actor(request)

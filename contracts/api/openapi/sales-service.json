@@ -678,23 +678,47 @@
       },
       "OrderInput": {
         "properties": {
+          "items": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/OrderLine"
+                },
+                "type": "array",
+                "maxItems": 20,
+                "minItems": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Items"
+          },
           "sku_code": {
-            "type": "string",
-            "maxLength": 100,
-            "minLength": 1,
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Sku Code"
           },
           "quantity": {
-            "type": "integer",
-            "maximum": 100.0,
-            "minimum": 1.0,
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 100.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Quantity"
-          },
-          "shipping_address": {
-            "type": "string",
-            "maxLength": 1000,
-            "minLength": 5,
-            "title": "Shipping Address"
           },
           "expected_unit_price": {
             "anyOf": [
@@ -705,9 +729,18 @@
               {
                 "type": "string",
                 "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,19}0*$)\\d{0,16}\\.\\d{0,2}0*$)"
+              },
+              {
+                "type": "null"
               }
             ],
             "title": "Expected Unit Price"
+          },
+          "shipping_address": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 5,
+            "title": "Shipping Address"
           },
           "expected_total": {
             "anyOf": [
@@ -731,19 +764,68 @@
             "maxLength": 100,
             "minLength": 8,
             "title": "Idempotency Key"
+          },
+          "payment_method": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "cod",
+                  "bank_transfer"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Method"
+          }
+        },
+        "type": "object",
+        "required": [
+          "shipping_address",
+          "expected_total",
+          "confirmed",
+          "idempotency_key"
+        ],
+        "title": "OrderInput",
+        "description": "One order: several lines in ``items``, or one line in the older flat form\n(``sku_code``, ``quantity``, ``expected_unit_price``)."
+      },
+      "OrderLine": {
+        "properties": {
+          "sku_code": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Sku Code"
+          },
+          "quantity": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Quantity"
+          },
+          "expected_unit_price": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,19}0*$)\\d{0,16}\\.\\d{0,2}0*$)"
+              }
+            ],
+            "title": "Expected Unit Price"
           }
         },
         "type": "object",
         "required": [
           "sku_code",
           "quantity",
-          "shipping_address",
-          "expected_unit_price",
-          "expected_total",
-          "confirmed",
-          "idempotency_key"
+          "expected_unit_price"
         ],
-        "title": "OrderInput"
+        "title": "OrderLine"
       },
       "ReviewInput": {
         "properties": {

@@ -1,8 +1,17 @@
+/** GET /api/agent/welcome: authenticated agent memory, with no call/message side effect. */
+export type ReturningCustomerWelcome = {
+  returning: boolean;
+  name: string | null;
+  blocker: { text: string; valid_until: string } | null;
+  expires_at: string;
+};
+
 export async function api<T = unknown>(
   path: string,
   token = "",
   body?: unknown,
   method?: string,
+  options: { signal?: AbortSignal } = {},
 ): Promise<T> {
   const response = await fetch("/backend" + path, {
     method: method || (body === undefined ? "GET" : "POST"),
@@ -12,6 +21,9 @@ export async function api<T = unknown>(
     },
     body: body === undefined ? undefined : JSON.stringify(body),
     cache: "no-store",
+    signal: options.signal
+      ? AbortSignal.any([options.signal, AbortSignal.timeout(30_000)])
+      : AbortSignal.timeout(30_000),
   });
   // A proxy or a crashed service answers with a text page ("Internal Server Error"), not JSON.
   const raw = await response.text();
@@ -19,20 +31,30 @@ export async function api<T = unknown>(
   try {
     result = raw ? JSON.parse(raw) : {};
   } catch {
-    throw new Error(
-      response.ok
-        ? "Máy chủ trả về dữ liệu không đọc được. Vui lòng thử lại."
-        : `Máy chủ đang gặp sự cố (${response.status}). Vui lòng thử lại sau ít phút.`,
+    throw Object.assign(
+      new Error(
+        response.ok
+          ? "Máy chủ trả về dữ liệu không đọc được. Vui lòng thử lại."
+          : `Máy chủ đang gặp sự cố (${response.status}). Vui lòng thử lại sau ít phút.`,
+      ),
+      { status: response.status },
     );
   }
   if (!response.ok)
-    throw Object.assign(new Error(
-      typeof result.detail === "string"
-        ? result.detail
-        : Array.isArray(result.detail) && typeof result.detail[0]?.msg === "string"
-          ? result.detail[0].msg
-          : JSON.stringify(result.detail || result),
-    ), { status: response.status });
+    throw Object.assign(
+      new Error(
+        typeof result.detail === "string"
+          ? result.detail
+          : Array.isArray(result.detail) &&
+              typeof result.detail[0]?.msg === "string"
+            ? result.detail[0].msg
+            : typeof (result.detail as { message?: unknown })?.message ===
+                "string"
+              ? String((result.detail as { message: string }).message)
+              : "Yêu cầu chưa thực hiện được. Vui lòng thử lại.",
+      ),
+      { status: response.status, detail: result.detail },
+    );
   return result as T;
 }
 
@@ -151,7 +173,11 @@ export type AgentCall = {
   handoff_reason: string | null;
   handoff_brief: Record<string, unknown> | null;
   accepted_by: string | null;
-  suggestion: { text: string; used_lines?: string[]; warnings?: string[] } | null;
+  suggestion: {
+    text: string;
+    used_lines?: string[];
+    warnings?: string[];
+  } | null;
   memory_status: string | null;
   after_call: Record<string, unknown> | null;
 };
@@ -165,7 +191,10 @@ export type AgentTurn = {
   created_at: string;
 };
 
-export type AgentCallDetail = AgentCall & { held_by_you: boolean; turns: AgentTurn[] };
+export type AgentCallDetail = AgentCall & {
+  held_by_you: boolean;
+  turns: AgentTurn[];
+};
 
 /** A cart line sent with a chat message: the cart lives in this browser, so the assistant
  *  only knows it from here. `name` is the product as the shop shows it. */
@@ -177,6 +206,7 @@ export async function streamTurn(
   selectedSku: string,
   onText: (text: string) => void,
   cartLines: ChatCartLine[] | null = null,
+  options: { signal?: AbortSignal; turnId?: string } = {},
 ): Promise<TurnResult> {
   const response = await fetch(
     `/backend/api/conversations/${session.conversation_id}/stream`,
@@ -186,54 +216,77 @@ export async function streamTurn(
         "Content-Type": "application/json",
         Authorization: "Bearer " + session.conversation_token,
       },
-      body: JSON.stringify({ message, selected_sku: selectedSku || null, cart: cartLines }),
+      body: JSON.stringify({
+        message,
+        selected_sku: selectedSku || null,
+        cart: cartLines,
+        turn_id: options.turnId,
+      }),
+      signal: options.signal
+        ? AbortSignal.any([options.signal, AbortSignal.timeout(120_000)])
+        : AbortSignal.timeout(120_000),
     },
   );
   if (!response.ok || !response.body)
-    throw new Error("Chat request failed. Please refresh and retry.");
+    throw Object.assign(
+      new Error("Không gửi được tin nhắn. Vui lòng tải lại cuộc trò chuyện."),
+      { status: response.status },
+    );
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "",
     text = "",
     result: TurnResult | undefined;
-  while (true) {
-    const chunk = await reader.read();
-    buffer += decoder.decode(chunk.value || new Uint8Array(), {
-      stream: !chunk.done,
-    });
-    let boundary;
-    while ((boundary = buffer.indexOf("\n\n")) >= 0) {
-      const event = buffer.slice(0, boundary);
-      buffer = buffer.slice(boundary + 2);
-      const name = event
-        .split("\n")
-        .find((line) => line.startsWith("event:"))
-        ?.slice(6)
-        .trim();
-      const data = event
-        .split("\n")
-        .filter((line) => line.startsWith("data:"))
-        .map((line) => line.slice(5).trim())
-        .join("\n");
-      if (!data) continue;
-      const payload = JSON.parse(data);
-      if (name === "delta") {
-        text += payload.text;
-        onText(text);
+  try {
+    while (true) {
+      const chunk = await reader.read();
+      buffer += decoder.decode(chunk.value || new Uint8Array(), {
+        stream: !chunk.done,
+      });
+      let boundary;
+      if (buffer.length > 2 * 1024 * 1024)
+        throw new Error("Phản hồi vượt giới hạn cho phép.");
+      let separator: RegExpExecArray | null;
+      while ((separator = /\r?\n\r?\n/.exec(buffer))) {
+        boundary = separator.index;
+        const event = buffer.slice(0, boundary).replace(/\r\n/g, "\n");
+        buffer = buffer.slice(boundary + separator[0].length);
+        const name = event
+          .split("\n")
+          .find((line) => line.startsWith("event:"))
+          ?.slice(6)
+          .trim();
+        const data = event
+          .split("\n")
+          .filter((line) => line.startsWith("data:"))
+          .map((line) => line.slice(5).trim())
+          .join("\n");
+        if (!data) continue;
+        const payload = JSON.parse(data);
+        if (name === "delta") {
+          text += payload.text;
+          onText(text);
+        }
+        if (name === "done") {
+          result = payload;
+          break;
+        }
+        if (name === "error")
+          throw new Error(
+            typeof payload.message === "string"
+              ? payload.message
+              : JSON.stringify(payload.message),
+          );
       }
-      if (name === "done") result = payload;
-      if (name === "error")
-        throw new Error(
-          typeof payload.message === "string"
-            ? payload.message
-            : JSON.stringify(payload.message),
-        );
+      if (chunk.done || result) break;
     }
-    if (chunk.done) break;
+  } finally {
+    await reader.cancel().catch(() => undefined);
+    reader.releaseLock();
   }
   if (!result)
     throw new Error(
-      "The response was interrupted. Refresh the conversation before retrying.",
+      "Phản hồi bị gián đoạn. Hãy tải lại lịch sử trước khi gửi tiếp.",
     );
   return result;
 }

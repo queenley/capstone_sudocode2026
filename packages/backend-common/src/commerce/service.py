@@ -100,12 +100,14 @@ class OrderService:
             .where(Customer.id == customer_id, Customer.deleted_at.is_(None))
             .with_for_update()
         )
+        if customer is None:
+            raise HTTPException(403, "Customer is deleted or unavailable")
         lines = sorted(data.lines(), key=lambda line: line.sku_code)
         key = self.security.digest(customer_id + ":" + data.idempotency_key)
         existing = self.db.scalar(select(Order).where(Order.idempotency_key == key))
         if existing:
             stored = sorted(
-                (sku.sku_code, item.quantity)
+                (sku.sku_code, item.quantity, item.unit_price)
                 for item, sku in self.db.execute(
                     select(OrderItem, SKU)
                     .join(SKU, SKU.id == OrderItem.sku_id)
@@ -113,9 +115,12 @@ class OrderService:
                 )
             )
             if (
-                stored != [(line.sku_code, line.quantity) for line in lines]
+                stored != [(line.sku_code, line.quantity, line.expected_unit_price) for line in lines]
                 or self.security.decrypt(existing.encrypted_shipping_address)
                 != data.shipping_address
+                or existing.payment_method != (data.payment_method or "cod")
+                or existing.subtotal - existing.discount != data.expected_total
+                or not data.confirmed
             ):
                 raise HTTPException(
                     409, "Idempotency key reused with a different order"
@@ -149,8 +154,8 @@ class OrderService:
                 {"message": "Quote changed; confirm the current total",
                  "quotes": [quote for _, _, quote in priced], "total": str(total)},
             )
-        # Only a client that chose COD gets the limit; one that predates the choice keeps its contract.
-        if data.payment_method == "cod" and total >= self.COD_LIMIT:
+        # Omitting payment_method still means COD, including its limit.
+        if total >= self.COD_LIMIT and (data.payment_method or "cod") == "cod":
             raise HTTPException(
                 422, "Cash on delivery is only for orders under 10,000,000 VND; choose bank transfer"
             )
@@ -236,6 +241,8 @@ class OrderService:
         order = self.db.scalar(
             select(Order).where(Order.id == order.id).with_for_update()
         )
+        if order is None:
+            raise HTTPException(404, "Order not found")
         if order.status == "cancelled":
             raise HTTPException(409, "Order is cancelled")
         if order.payment_status != "paid":
@@ -292,6 +299,8 @@ class OrderService:
         order = self.db.scalar(
             select(Order).where(Order.id == order.id).with_for_update()
         )
+        if order is None:
+            raise HTTPException(404, "Order not found")
         if order.status == "cancelled":
             return self.serialize(order)
         if order.status != "confirmed":

@@ -49,17 +49,21 @@ from typing import Any, Literal
 
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from ...config.config_manager import ROOT
+from ...llm import structured
 from ...llm.structured import Report, StructuredOutput, StructuredOutputError
 from ..memory.ontology import CORE, INDUSTRIES
 from ..guardrails.hard import HUMAN
 
 logger = logging.getLogger(__name__)
 #: The instrument's version, written into every run's manifest beside :data:`prompt_sha`.
-VERSION = "product-extractor-v4"
+VERSION = "product-extractor-v7"
 AUTOMATED = re.compile(r"\b(?:em|tôi|mình)\s+là\s+(?:một\s+)?(?:trợ lý (?:ảo|tự động)|(?:chat)?bot|AI)\b", re.IGNORECASE)
+RESTOCK = re.compile(r"\b(?:về\s+kho|hàng(?:\s+(?:sẽ|sắp|mới|lại|dự\s+kiến))*\s+về|"
+                     r"nhập(?:\s+(?:lại|thêm|mới))*\s+hàng|bổ\s+sung\s+(?:hàng|kho|tồn\s+kho)|"
+                     r"có(?:\s+lại\s+hàng|\s+hàng\s+trở\s+lại)|restock)\b", re.IGNORECASE)
 
 #: Section 5.2: what a question may be about, with the label the brief uses.
 SLOT_LABELS: dict[str, str] = {name: spec.label for name, spec in sorted(
@@ -111,8 +115,8 @@ MARKER = "\n[INPUT DATA]\n"
 #: The keys of a turn the model may quote; ``previous_sessions`` is context only.
 QUOTABLE = ("agent_text", "tool_texts", "consultant_texts")
 #: Said after a truncated answer: a turn's items are short, so a long answer repeats itself.
-LENGTH_HINT = ("The previous output exceeded the token limit. Label each statement once, quote only the words it "
-               "rests on, and do not repeat items or add explanations.")
+LENGTH_HINT = ("Đầu ra trước bị cắt vì vượt giới hạn token. Hãy trả lời lại đầy đủ nhưng ngắn hơn: "
+               "mỗi quan sát một lần, chỉ trích phần câu cần làm bằng chứng, không giải thích thêm.")
 
 
 def vocabulary() -> frozenset[str]:
@@ -121,28 +125,50 @@ def vocabulary() -> frozenset[str]:
 
 
 class Item(BaseModel):
-    """One atomic observation in one agent turn."""
+    """Một quan sát nguyên tử có bằng chứng nguyên văn trong lượt đang gắn nhãn."""
+
+    model_config = ConfigDict(extra="forbid")
 
     kind: Literal["question", "claim", "fact_usage"] = Field(
-        description="question: the agent asks the customer; claim: a verifiable statement of fact; "
-                    "fact_usage: the agent reuses a fact of an earlier session in its reply or a tool argument.")
-    slot_or_field: str = Field(min_length=1, description="The slot a question or fact use is about, or the field a claim states.")
+        description="question: agent hỏi khách; claim: agent khẳng định sự thật có thể kiểm chứng; "
+                    "fact_usage: dùng lại dữ kiện của cuộc trước trong lời agent hoặc tham số công cụ.")
+    slot_or_field: str = Field(min_length=1, description="Tên slot của câu hỏi/dữ kiện dùng lại, hoặc trường của claim; "
+                              "dùng other cho câu hỏi ngoài danh mục, không tự đặt alias.")
     value: str | int | float | bool | None = Field(
-        description="The value: integer VND for money, a string keeping the leading zero for a phone; null when the text gives none.")
-    question_type: Literal["open", "confirm"] | None = Field(description="open or confirm for a question; null otherwise.")
+        description="Giá trị theo kiểu slot: tiền là số nguyên VND, phone_provided chỉ là bool, địa chỉ chỉ là token; "
+                    "confirm có một giá trị/mệnh đề cụ thể được nêu; open dùng null.")
+    question_type: Literal["open", "confirm"] | None = Field(
+        description="confirm khi yêu cầu xác nhận một giá trị/mệnh đề cụ thể trong bằng chứng; "
+                    "open khi hỏi giá trị còn thiếu, lựa chọn hoặc xin phép; null nếu không phải question.")
     speaker: Literal["agent", "tool", "consultant"] = Field(
-        description="Who produced source_field: agent for agent_text, tool for tool_texts, consultant for consultant_texts.")
-    source_field: str = Field(description="agent_text, tool_texts/<index> or consultant_texts/<index>.")
-    quote: str = Field(description="The exact words from source_field this item rests on.")
-    start: int = Field(ge=0, description="Unicode code point where quote starts in source_field.")
-    end: int = Field(ge=0, description="Unicode code point where quote ends, exclusive.")
-    purpose: str = Field(description="For fact_usage, what the fact was used for; otherwise a short note.")
+        description="Người tạo nguồn: agent cho agent_text; tool cho tool_texts/INDEX; không gán lời consultant cho agent.")
+    source_field: str = Field(pattern=r"^(agent_text|tool_texts/\d+)$",
+                             description="agent_text hoặc tool_texts/INDEX (INDEX bắt đầu từ 0); không trích lịch sử.")
+    quote: str = Field(min_length=1, description="Trích nguyên văn bằng chứng; câu hỏi phải chứa cả nội dung cần hỏi "
+                       "và phạm vi phủ định/lựa chọn/xác nhận, không chỉ cắt cụm đúng không.")
+    start: int = Field(ge=0, description="Vị trí bắt đầu quote theo code point Unicode trong source_field.")
+    end: int = Field(ge=0, description="Vị trí ngay sau ký tự cuối quote; source_field[start:end] phải bằng quote.")
+    purpose: str = Field(description="Lý do ngắn theo ngôn ngữ: dữ kiện dùng để làm gì; câu hỏi xin giá trị, lựa chọn "
+                         "hay xác nhận mệnh đề nào. Không suy luận từ điểm số hoặc nhãn kịch bản.")
+
+    @model_validator(mode="after")
+    def consistent(self) -> Item:
+        if (self.kind == "question") != (self.question_type is not None):
+            raise ValueError("question phải có question_type open/confirm; claim và fact_usage phải dùng null.")
+        if self.end <= self.start:
+            raise ValueError("end phải lớn hơn start cho quote không rỗng.")
+        if self.kind == "question" and self.question_type == "open" and self.value is not None:
+            raise ValueError("Câu hỏi open phải dùng value=null; không coi lựa chọn/ví dụ là candidate đã chốt.")
+        return self
 
 
 class Items(BaseModel):
-    """Every observation in one agent turn's input data."""
+    """Toàn bộ câu hỏi, claim và dữ kiện dùng lại trong một lượt; mỗi quan sát có bằng chứng riêng."""
 
-    items: list[Item] = Field(description="Empty only when there is genuinely no question, claim or fact use.")
+    model_config = ConfigDict(extra="forbid")
+
+    items: list[Item] = Field(description="Danh sách theo thứ tự xuất hiện; chỉ rỗng khi không có câu hỏi, claim "
+                             "hoặc dữ kiện dùng lại. Không bỏ câu khó để giảm tỷ lệ hỏi thừa.")
 
 
 @lru_cache(maxsize=1)
@@ -155,10 +181,23 @@ def instructions() -> str:
 
 
 def prompt_sha() -> str:
-    """The prompt and the answer's schema: part of every cache key, so a change to either never reuses old labels."""
+    """Hash the whole measuring instrument, including semantic rules and the history contract."""
     return hashlib.sha256(
-        json.dumps([instructions(), Items.model_json_schema()], ensure_ascii=False, sort_keys=True).encode()
+        json.dumps([VERSION, instructions(), Items.model_json_schema(),
+                    Path(__file__).read_text(encoding="utf-8"),
+                    Path(structured.__file__).read_text(encoding="utf-8"),
+                    contract_hashes(),
+                    SLOT_LABELS, sorted(EXTRA_SLOTS), CLAIM_FIELDS, HUMAN.pattern, HUMAN.flags],
+                   ensure_ascii=False, sort_keys=True).encode()
     ).hexdigest()
+
+
+def contract_hashes() -> dict[str, str | None]:
+    """Pin the source policy and observable-history/classification interpretation beside the code."""
+    folder = ROOT.parents[1] / "docs" / "evaluation"
+    return {name: hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None
+            for name in ("rqr-policy.json", "question-classification-contract.md")
+            for path in [folder / name]}
 
 
 def turn_input(agent_text: str, tool_calls: list[dict[str, Any]] | None = None,
@@ -171,7 +210,10 @@ def turn_input(agent_text: str, tool_calls: list[dict[str, Any]] | None = None,
         "consultant_texts": [],
     }
     if previous_sessions:
-        data["previous_sessions"] = previous_sessions
+        # Keep only observable dialogue, even if the caller accidentally supplies labelled trace rows.
+        data["previous_sessions"] = [{"call": s["call"], "turns": [
+            {key: t[key] for key in ("customer", "agent") if key in t} for t in s.get("turns", [])]}
+            for s in previous_sessions]
     return data
 
 
@@ -181,18 +223,22 @@ def previous_sessions(rows: list[dict[str, Any]]) -> dict[int, list[dict[str, An
     Only what was said in this run: the customer's text and the agent's reply of every turn of every earlier call
     (``call_1`` before ``call_2``). A row of the first call gets none.
     """
-    calls: dict[str, dict[str, list[tuple[int, dict[str, str]]]]] = {}
+    calls: dict[tuple[str, str | None], dict[str, list[tuple[int, dict[str, str]]]]] = {}
     for row in rows:
-        calls.setdefault(row["scenario_id"], {}).setdefault(row["call"], []).append(
+        calls.setdefault((row["scenario_id"], row.get("config")), {}).setdefault(row["call"], []).append(
             (row["turn"], {"customer": row["customer_text"], "agent": row["agent_text"]}))
     out = {}
     for index, row in enumerate(rows):
-        earlier = calls[row["scenario_id"]]
+        earlier = calls[(row["scenario_id"], row.get("config"))]
         sessions = [{"call": call, "turns": [turn for _, turn in sorted(earlier[call], key=lambda pair: pair[0])]}
-                    for call in sorted(earlier) if call < row["call"]]
+                    for call in sorted(earlier, key=_call_number) if _call_number(call) < _call_number(row["call"])]
         if sessions:
             out[index] = sessions
     return out
+
+
+def _call_number(name: str) -> int:
+    return int(name.removeprefix("call_"))
 
 
 class Extractor:
@@ -200,7 +246,7 @@ class Extractor:
 
     The cache holds the model's raw items, keyed by the prompt, the model and
     the whole input. :func:`spanned` and :func:`restrict` run on every read,
-    so a change to them needs no new labels.
+    and the instrument hash prevents reusing labels from an older semantic contract.
     """
 
     def __init__(self, llm: BaseChatModel, *, model_name: str, cache_path: Path | None = None) -> None:
@@ -307,6 +353,9 @@ def label_items(raw: list[dict[str, Any]], data: dict[str, Any], *, recovered: l
     """The model's raw items, located in *data* and kept to the vocabularies, in the trace's shapes."""
     items, dropped = spanned(raw, data)
     items, changed = restrict(items)
+    if not data.get("previous_sessions"):
+        changed += sum(item["kind"] == "fact_usage" for item in items)
+        items = [item for item in items if item["kind"] != "fact_usage"]
     labels = _labels(items, dropped, changed)
     return {**labels, "recovered_errors": recovered} if recovered else labels
 
@@ -369,8 +418,10 @@ def restrict(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], int]:
                 item, changed = {**item, "slot_or_field": OTHER}, changed + 1
             if item["slot_or_field"] == OTHER and item.get("question_type") != "open":
                 item, changed = {**item, "question_type": "open"}, changed + 1
+            if item.get("question_type") == "open" and item.get("value") is not None:
+                item, changed = {**item, "value": None}, changed + 1
         elif kind == "fact_usage":
-            if slot not in allowed:
+            if slot not in allowed or item.get("speaker", "agent") not in ("agent", "tool"):
                 changed += 1
                 continue
         elif kind == "claim":
@@ -379,6 +430,9 @@ def restrict(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], int]:
             if produced is None:
                 continue
             kept.extend(produced)
+            continue
+        else:
+            changed += 1
             continue
         if kind != "question" and item.get("question_type") is not None:
             item, changed = {**item, "question_type": None}, changed + 1
@@ -411,6 +465,9 @@ def _claim(item: dict[str, Any]) -> list[dict[str, Any]] | None:
         return None
     if field == "delivery_days" and "xóa" in quote.lower():
         return None
+    if field == "restock_date" and (not RESTOCK.search(quote)
+                                   or re.search(r"\b(?:hoàn|trả)(?:\s+lại)?\s+về\s+kho\b", quote, re.IGNORECASE)):
+        return None  # A bare date or delivery estimate does not establish stock replenishment.
     if field == "price_vnd" and "phụ thu" in quote.lower() and not re.search(r"giá (?:bán|cuối|sau|là)|thanh toán", quote, re.IGNORECASE):
         return None
     claim = {**item, "value": value}

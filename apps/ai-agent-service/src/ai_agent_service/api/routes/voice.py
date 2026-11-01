@@ -44,6 +44,7 @@ import asyncio
 import base64
 import hmac
 import json
+import math
 import logging
 import os
 import time
@@ -53,7 +54,8 @@ from typing import Any
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from ...components import voice as voice_component
-from ...components.voice.policy import counts_as_turn
+from ...components.voice.recognition import process as process_recognition
+from ...components.voice.policy import POLICY_VERSION
 from ...config.config_manager import ROOT
 from ...runtime import calls, harness, options, platform
 from ...runtime.calls import Actor
@@ -88,8 +90,19 @@ async def warm() -> dict[str, Any]:
 async def voice_call(ws: WebSocket, conversation_id: str) -> None:
     await ws.accept()
     try:
-        hello = json.loads(await ws.receive_text())
-    except (WebSocketDisconnect, ValueError):
+        raw = await asyncio.wait_for(ws.receive_text(), timeout=10)
+        if len(raw.encode()) > 256 * 1024:
+            raise ValueError("Frame too large")
+        hello = json.loads(raw)
+        if not isinstance(hello, dict):
+            raise ValueError("Expected an object")
+        sample_rate = float(hello.get("sample_rate", 48_000))
+        if not math.isfinite(sample_rate) or not 8000 <= sample_rate <= 192000:
+            raise ValueError("Invalid sample rate")
+    except WebSocketDisconnect:
+        return
+    except (ValueError, TypeError, asyncio.TimeoutError):
+        await ws.close(code=1008)
         return
     try:
         conversation = await platform.authorize(ws.app, conversation_id, str(hello.get("token") or ""))
@@ -117,13 +130,38 @@ async def voice_call(ws: WebSocket, conversation_id: str) -> None:
     # The browser matters: its echo canceller decides how much of the caller
     # survives while the assistant is speaking.
     logger.info("Call %s: voice from %s, %s Hz", row["id"], ws.headers.get("user-agent", "?")[:160], hello.get("sample_rate"))
-    session = Session(ws, row, user_id=actor.id, sample_rate=float(hello.get("sample_rate") or 48_000))
+    session = Session(ws, row, user_id=actor.id, sample_rate=sample_rate)
     try:
         await session.run()
     except WebSocketDisconnect:
         pass
     finally:
         await session.close()
+
+
+def valid_control(message: Any) -> bool:
+    if not isinstance(message, dict):
+        return False
+    if message.get("type") == "hangup":
+        return True
+    if message.get("type") == "capture_settings":
+        return message.get("profile") in {"standard", "barge-in"}
+    if (message.get("type") not in {"playback_started", "playback_chunk", "playback_ended", "playback_stopped"}
+            or not isinstance(message.get("turn"), str) or not 1 <= len(message["turn"]) <= 128):
+        return False
+    if message["type"] == "playback_chunk" and (type(message.get("seq")) is not int or message["seq"] < 0):
+        return False
+    if message["type"] == "playback_started" and "seq" in message and (type(message["seq"]) is not int or message["seq"] < 0):
+        return False
+    if message["type"] == "playback_stopped":
+        if type(message.get("seq")) is not int or message["seq"] < 0:
+            return False
+        try:
+            played, duration = float(message["played_ms"]), float(message["duration_ms"])
+            return math.isfinite(played) and math.isfinite(duration) and 0 <= played <= 86_400_000 and 0 < duration <= 86_400_000
+        except (KeyError, TypeError, ValueError):
+            return False
+    return True
 
 
 class Session:
@@ -170,6 +208,12 @@ class Session:
         self.send_lock = asyncio.Lock()
         self.tasks: set[asyncio.Task[Any]] = set()
         self.hung_up = False
+        self.pause_generation = 0
+        self.recognition_generation = 0
+        self.asr_pending = 0
+        self.playback_events: list[dict[str, Any]] = []
+        self.capture_profile = "standard"
+        self.capture_settings: dict[str, Any] = {}
 
     # ── plumbing ──────────────────────────────────────────────────────────
 
@@ -206,14 +250,28 @@ class Session:
             if message["type"] == "websocket.disconnect":
                 break
             if message.get("bytes") is not None:
+                if len(message["bytes"]) > 256 * 1024 or len(message["bytes"]) % 4:
+                    await self.ws.close(code=1009)
+                    break
                 await self.audio(message["bytes"], time.perf_counter())
             elif message.get("text") is not None:
-                if await self.control(json.loads(message["text"])) == "hangup":
+                try:
+                    if len(message["text"].encode()) > 256 * 1024:
+                        raise ValueError("Frame too large")
+                    control = json.loads(message["text"])
+                    if not valid_control(control):
+                        raise ValueError("Expected an object")
+                except ValueError:
+                    await self.ws.close(code=1008)
+                    break
+                if await self.control(control) == "hangup":
                     break
 
     async def close(self) -> None:
-        for task in list(self.tasks):
+        tasks = list(self.tasks)
+        for task in tasks:
             task.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
         if self.recording:
             self._save_recording()
         if not self.hung_up:
@@ -243,7 +301,9 @@ class Session:
             elif isinstance(event, TurnEnded):
                 # Whether the agent was busy is decided now, when the caller
                 # stopped speaking, not after recognition.
-                self.spawn(self.turn(event, busy=self.busy()))
+                self.recognition_generation += 1
+                self.spawn(self.turn(event, busy=self.busy(), generation=self.recognition_generation,
+                                     pause_generation=self.pause_generation))
 
     def _save_recording(self) -> None:
         import numpy as np
@@ -275,16 +335,27 @@ class Session:
 
     async def control(self, message: dict[str, Any]) -> str | None:
         kind = message.get("type")
+        if kind == "capture_settings":
+            self.capture_profile = message["profile"]
+            self.capture_settings = {key: message[key] for key in ("echoCancellation", "noiseSuppression", "autoGainControl")
+                                     if type(message.get(key)) is bool}
+            return None
+        if kind != "hangup" and message.get("turn") not in self.timings:
+            return None
         now = time.perf_counter()
         if kind == "playback_started":
             turn = str(message["turn"])
             self.playing = turn
             self.detector.agent_started()
+            self._played(message, now)
             timing = self.timings.get(turn)
             if timing is not None and "play_start" not in timing:
                 timing["play_start"] = now
                 await self.metrics(turn)
             await self.send({"type": "state", "state": "speaking"})
+        elif kind == "playback_chunk":
+            if message["turn"] == self.playing:
+                self._played(message, now)
         elif kind == "playback_ended":
             turn = str(message["turn"])
             self.speaking.discard(turn)
@@ -299,6 +370,26 @@ class Session:
             return "hangup"
         return None
 
+    def _played(self, message: dict[str, Any], now: float) -> None:
+        chunks = self.chunks.get(str(message["turn"]), [])
+        seq = message.get("seq", 0)
+        if type(seq) is int and 0 <= seq < len(chunks):
+            chunk = chunks[seq]
+            self.playback_events.append({"at": now, "turn": message["turn"], **chunk})
+            self.playback_events = self.playback_events[-180:]
+
+    def echo_window(self, start: float, end: float) -> str:
+        seen, texts = set(), []
+        for event in self.playback_events:
+            key = (event["turn"], event["sentence"])
+            if (event["at"] <= end + 0.3 and event["at"] + (event.get("duration") or 2) >= start - 0.8
+                    and key not in seen):
+                sentences = self.spoken.get(event["turn"], [])
+                if 0 <= event["sentence"] < len(sentences):
+                    seen.add(key)
+                    texts.append(sentences[event["sentence"]])
+        return " ".join(texts)
+
     # ── turns ─────────────────────────────────────────────────────────────
 
     async def opening(self) -> None:
@@ -308,26 +399,46 @@ class Session:
         outcome = await self._take(turn_id, None, self.timings[turn_id]["origin"])
         await self._answer(turn_id, outcome)
 
-    async def turn(self, event: Any, *, busy: bool) -> None:
+    async def turn(self, event: Any, *, busy: bool, generation: int, pause_generation: int) -> None:
         from ...components.voice import asr
 
-        heard = await asyncio.to_thread(asr.transcribe, self.settings.asr, event.audio, self.lexicon.hotwords)
+        echo_text = self.echo_window(event.speech_end - len(event.audio) / 16000, event.speech_end)
+        capture = {"profile": self.capture_profile, **self.capture_settings}
+        self.asr_pending += 1
+        try:
+            heard = await asyncio.wait_for(
+                asyncio.to_thread(asr.transcribe, self.settings.asr, event.audio, self.lexicon.hotwords),
+                timeout=asr.TIMEOUT,
+            )
+        except Exception:
+            if generation == self.recognition_generation:
+                await self.send({"type": "error", "text": "Chưa nhận dạng được giọng nói. Vui lòng nói lại."})
+                if self.paused is not None and pause_generation == self.pause_generation:
+                    await self.resume()
+            return
+        finally:
+            self.asr_pending -= 1
+        if generation != self.recognition_generation or (busy and pause_generation != self.pause_generation):
+            return
         asr_done = time.perf_counter()
-        text, applied = self.lexicon.correct(heard.text)
-        taken, why = counts_as_turn(text, busy=busy, min_words=self.settings.min_interruption_words)
+        decision = process_recognition(heard.text, lexicon=self.lexicon, busy=busy,
+                                       min_words=self.settings.min_interruption_words, echo_text=echo_text)
+        text, applied = decision.agent_text, decision.corrections
+        taken, why = decision.accepted, decision.reason
         if not taken:
             # Listening sounds, a cough, the line: not a turn. A paused answer
             # carries on where it stopped.
             self.counts["ignored"] += 1
             logger.info("Call %s: not a turn (%s): %r", self.call_id, why, text)
-            await self.send({"type": "ignored", "text": text, "why": why})
+            await self.send({"type": "ignored", "text": "", "why": why,
+                             "removed_words": decision.removed_words, "policy_version": POLICY_VERSION})
             if self.paused is not None:
                 await self.resume()
             elif not self.busy():
                 await self.send({"type": "state", "state": "listening"})
             return
         self.counts["turns"] += 1
-        logger.info("Call %s: turn %r (busy=%s)", self.call_id, text, busy)
+        logger.info("Call %s: accepted voice turn (busy=%s)", self.call_id, busy)
         if self.paused is not None:
             await self.stop_paused()
         # It replaces whatever the agent was still working out.
@@ -335,13 +446,14 @@ class Session:
 
         turn_id = uuid.uuid4().hex
         timing: dict[str, Any] = {"kind": "turn", "speech_end": event.speech_end, "turn_end": event.decided,
-                                  "asr_done": asr_done, "reason": event.reason}
+                                  "asr_done": asr_done, "reason": event.reason, "capture": capture}
         self.timings[turn_id] = timing
         self.thinking.add(turn_id)
         await self.send({"type": "state", "state": "thinking"})
         await self.send({"type": "transcript", "turn": turn_id, "text": text, "raw": heard.text,
                          "corrections": applied, "asr_ms": int(heard.seconds * 1000),
-                         "audio_seconds": round(heard.audio_seconds, 2), "endpointing": event.reason})
+                         "audio_seconds": round(heard.audio_seconds, 2), "endpointing": event.reason,
+                         "removed_words": decision.removed_words, "policy_version": POLICY_VERSION})
         outcome = await self._take(turn_id, text, timing["asr_done"])
         self.thinking.discard(turn_id)
         if outcome.kind == "message" and self.row.get("conversation_id"):
@@ -455,32 +567,44 @@ class Session:
         if timing.get("kind") == "turn" and figures.get("ttfa_ms") is not None:
             await harness.record_ttfa(self.call_id, turn_id, figures["ttfa_ms"], {
                 k: figures[k] for k in ("endpoint_ms", "asr_ms", "agent_ms", "tts_first_ms") if figures.get(k) is not None
-            } | {"asr_model": self.settings.asr, "endpointing": self.settings.endpointing, "tts": self.settings.tts})
+            } | {"asr_model": self.settings.asr, "endpointing": self.settings.endpointing, "tts": self.settings.tts,
+                 "capture": timing.get("capture"), "voice_policy_version": POLICY_VERSION})
 
     async def pause(self) -> None:
         """Speech while the agent talks: hold the answer until the words say
         whether it was an interruption. No words in time resumes it."""
         turn = self.playing
-        if turn is None or self.paused is not None:
+        if turn is None or turn not in self.speaking or self.paused is not None:
             return
         self.paused = turn
+        self.pause_generation += 1
+        generation = self.pause_generation
         self.counts["pauses"] += 1
         logger.info("Call %s: speech over the answer, paused %s", self.call_id, turn)
         await self.send({"type": "pause", "turn": turn})
-        self.spawn(self._false_interruption(turn))
+        self.spawn(self._false_interruption(turn, generation))
 
-    async def _false_interruption(self, turn: str) -> None:
+    async def _false_interruption(self, turn: str, generation: int) -> None:
+        from ...components.voice import asr
         await asyncio.sleep(self.settings.false_interruption_ms / 1000)
-        if self.paused != turn:
-            return
-        if self.detector.in_turn:
-            # Still talking after all this time: that is no cough.
-            await self.stop_paused()
-        else:
+        max_turn = getattr(getattr(self.detector, "config", None), "max_turn_s", 30)
+        # A real utterance plus its decoder must get a chance to finish; VAD still never confirms it.
+        for _ in range(math.ceil((max_turn + asr.TIMEOUT) / .7)):
+            if self.paused != turn or self.pause_generation != generation:
+                return
+            if not (self.detector.in_turn or self.asr_pending):
+                # TurnEnded can have queued recognition on this same event-loop tick.
+                await asyncio.sleep(0)
+                if not (self.detector.in_turn or self.asr_pending):
+                    break
+            await asyncio.sleep(0.7)
+        if self.paused == turn and self.pause_generation == generation:
+            # VAD alone never confirms an interruption (it can be the TTS echo).
             await self.resume()
 
     async def resume(self) -> None:
         turn, self.paused = self.paused, None
+        self.pause_generation += 1
         if turn is None:
             return
         # Let a later cut-in be measured again.
@@ -491,6 +615,7 @@ class Session:
         turn, self.paused = self.paused, None
         if turn is None:
             return
+        self.pause_generation += 1
         self.cancelled.add(turn)
         self.speaking.discard(turn)
         self.detector.agent_stopped()

@@ -7,7 +7,7 @@ ai-agent-service ── POST /v1/transcribe (một câu, PCM 16 kHz) ──► a
                  ── WS   /v1/stream    (realtime: partial + final) ─►
 ```
 
-Model: Zipformer 30M và Zipformer 2025 (sherpa-onnx), PhoWhisper small và Whisper large-v3-turbo (faster-whisper). Code: `src/asr_service/engines.py` (bộ nhận dạng), `fetch.py` (tải model), `main.py` (API).
+Mặc định: Zipformer 30M int8, greedy search. Các adapter khác chỉ dùng khi được chọn rõ. Code: `src/asr_service/engines.py` (bộ nhận dạng), `fetch.py` (tải model), `main.py` (API).
 
 ## Chạy
 
@@ -33,6 +33,7 @@ Khi không đặt `ASR_URL`, agent chạy cùng các model này ngay trong tiế
 | `ASR_MODELS_DIR` | `/models` | Thư mục model |
 | `ASR_THREADS` | `4` | Số luồng CPU mỗi model |
 | `ASR_FETCH` | `1` | `0`: không tự tải model khi khởi động |
+| `ASR_FETCH_MODELS` | `zipformer-30m` | Chỉ tải nhóm model được chỉ định, mặc định duy nhất Zipformer greedy |
 | `ASR_FETCH_TURBO` | `0` | `1`: tải thêm Whisper large-v3-turbo (1,6 GB, nên dùng với GPU) |
 | `ASR_MAX_SECONDS` | `120` | Độ dài tối đa của một câu |
 
@@ -56,8 +57,8 @@ Phía agent: `ai_agent_service.components.voice.asr` (`transcribe()`, `stream()`
 ```bash
 docker build -f apps/asr-service/Dockerfile.gpu -t telesales-asr:gpu .
 docker run -d --gpus all -p 8500:8500 \
-  -e ASR_API_KEY=<chuỗi ngẫu nhiên dài> -e ASR_PRELOAD=phowhisper-small,zipformer-30m \
-  -e ASR_FETCH_TURBO=1 -v asr-models:/models telesales-asr:gpu
+  -e ASR_API_KEY=<chuỗi ngẫu nhiên dài> -e ASR_PRELOAD=zipformer-30m \
+  -e ASR_FETCH_MODELS=zipformer-30m -v asr-models:/models telesales-asr:gpu
 ```
 
 Rồi trong `.env` của máy chạy agent:
@@ -69,3 +70,17 @@ ASR_LOCAL=0                             # không chạy container asr-service tr
 ```
 
 `docker compose up -d ai-agent-service`. Kiểm tra: `GET /health` của máy GPU báo `"device": "cuda"`, và `rtf` trong kết quả `/v1/transcribe` nhỏ hơn nhiều so với CPU. `Dockerfile.gpu` chưa được chạy thử trên GPU trong dự án này.
+
+## So sánh local và model nghiên cứu
+
+VieGem đã được thêm với ID `viegem`; cần `requirements-research.txt` (Torch/Transformers) ngoài bộ service cơ bản. `zipformer-30m-beam4` là biến thể decoder dùng cùng weights của Zipformer 30M, không phải model tải thêm. Phiên bản greedy cũ vẫn giữ ID `zipformer-30m`. Trong phép so sánh research, PhoWhisper được chuyển từ bản VinAI đã ghim revision sang int8 bằng `--convert-phowhisper`; đường fetch mặc định giữ bản preconverted trên main để không cần Torch trong image gọn. Inference giữ `temperature=0` để tránh sampling fallback không tái lập.
+
+```sh
+PYTHONPATH=apps/asr-service/src python -m asr_service.fetch --model zipformer-30m --model phowhisper-small --model viegem --convert-phowhisper
+```
+
+`--model` lặp được; khi không chỉ định chỉ tải Zipformer greedy. `ASR_FETCH_MODELS=zipformer-30m,phowhisper-small,viegem` giới hạn nhóm fetch lúc service khởi động; dùng `ASR_FETCH=0` khi đánh giá. Không tự tải trong `engines.load/transcribe`. Folder thiếu weights/tokenizer không được quảng bá là model sẵn sàng.
+
+`GET /v1/models/{name}/artifact` trả source revision, checksum và cấu hình decoder; inference/adapter dùng cùng contract cho web voice và `run_eval.py`. VieGem hỗ trợ tối đa 30 s một utterance trong adapter; runner WAV dài cắt theo waveform tối đa 20 s. Service vẫn giới hạn 120 s/request; model có giới hạn nhỏ hơn trả 422. Giao thức partial hiện giải mã lại prefix, chưa phải native streaming VieGem.
+
+VieGem: CC-BY-NC-SA-4.0 và điều khoản Gemma, chỉ dùng nghiên cứu phi thương mại theo model card. Hướng dẫn đo, không suy diễn SNR/DER/entity gold và các giới hạn: [ASR local](../../docs/evaluation/asr-local.md).

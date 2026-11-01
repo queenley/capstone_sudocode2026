@@ -1,13 +1,11 @@
 from contextlib import asynccontextmanager
-from decimal import Decimal
-
-from fastapi import FastAPI, Query, Request
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 
 from src.api.routes.admin import add_product, stock, add_promotion
 from src.api.routes.seller import router as seller_router
-from src.commerce.service import CatalogService
+from src.api.routes.catalog import router as catalog_router
 from src.core.service_runtime import configure_service
 
 
@@ -40,41 +38,4 @@ def ready(request: Request):
         return JSONResponse(status_code=503, content={"status": "not ready"})
 
 
-@app.get("/api/catalog")
-def catalog(
-    request: Request,
-    q: str = Query(default="", max_length=200),
-    budget: Decimal | None = Query(default=None, ge=0),
-    category: str | None = Query(default=None, max_length=100),
-    limit: int = Query(default=50, ge=1, le=500),
-):
-    with request.app.state.database.sessions() as db:
-        return CatalogService(db).search(q, budget, category, limit)
-
-
-@app.get("/api/catalog/payment-methods")
-def payment_methods(request: Request):
-    """How a customer may pay. Declared before /api/catalog/{sku_code}, which would match it."""
-    settings = request.app.state.security.settings
-    bank = bool(settings.bank_bin and settings.bank_account_no)
-    return {
-        "cod": {"enabled": True, "max_total": "10000000"},
-        "bank_transfer": {"enabled": bank, "bank_name": settings.bank_name if bank else None},
-    }
-
-
-@app.get("/api/catalog/{sku_code}")
-def product(sku_code: str, request: Request):
-    with request.app.state.database.sessions() as db:
-        return CatalogService(db).get(sku_code)
-
-
-@app.get("/api/catalog/{sku_code}/quote")
-def quote(
-    sku_code: str,
-    request: Request,
-    quantity: int = Query(default=1, ge=1, le=100),
-    channel: str = Query(default="web", max_length=50),
-):
-    with request.app.state.database.sessions() as db:
-        return CatalogService(db).quote(sku_code, quantity, channel)
+app.include_router(catalog_router)

@@ -1,10 +1,12 @@
 "use client";
 import Link from "next/link";
+import { useState } from "react";
 import ProductArt from "./ProductArt";
 import { categoryName, discountPercent, money, ShopProduct } from "@/lib/catalog";
 import { cart } from "@/lib/cart";
 
 export default function ProductCard({ product }: { product: ShopProduct }) {
+  const [added, setAdded] = useState(0);
   const off = discountPercent(product.price, product.listPrice);
   const single = product.variants.length === 1 ? product.variants[0] : null;
   const soldOut = product.available <= 0;
@@ -31,7 +33,7 @@ export default function ProductCard({ product }: { product: ShopProduct }) {
       </Link>
       <div className="s-card-actions">
         {single && !soldOut ? (
-          <button className="s-btn s-btn-ghost" onClick={() => cart.add(single.sku_code)} aria-label={`Thêm ${product.name} vào giỏ`}>
+          <button className="s-btn s-btn-ghost" onClick={() => { cart.add(single.sku_code); setAdded((value) => value + 1); }} aria-label={`Thêm ${product.name} vào giỏ`}>
             Thêm vào giỏ
           </button>
         ) : (
@@ -39,6 +41,7 @@ export default function ProductCard({ product }: { product: ShopProduct }) {
             {soldOut ? "Xem chi tiết" : "Chọn phân loại"}
           </Link>
         )}
+        {single && !soldOut && <p className="s-card-confirmation" role="status">{added > 0 && <Link href="/gio-hang">Đã thêm {added} · Xem giỏ hàng →</Link>}</p>}
       </div>
     </article>
   );

@@ -15,7 +15,7 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 from ..components.intake.pii import Vault
 from ..config.database import derived_key
-from .db import connection
+from .db import connection, require_writable_call
 
 
 def identity_secret() -> str:
@@ -43,7 +43,8 @@ async def save(call_id: int, vault: Vault, *, customer_id: str | None = None) ->
     """Write the entries added since the vault was loaded."""
     if not vault.added:
         return
-    async with connection() as conn:
+    async with connection() as conn, conn.transaction():
+        await require_writable_call(conn, call_id)
         for token in vault.added:
             kind, value = vault.entries[token]
             await conn.execute(

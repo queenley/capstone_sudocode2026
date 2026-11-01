@@ -31,6 +31,9 @@ python run_eval.py --relabel evaluation/runs/<ngày>-work/<run> --out evaluation
 
 # Recall@k của kho tri thức, miễn phí
 python evaluation/rag_offline.py
+
+# ASR local: thử một clip của gói đã có, không provider/extractor
+python run_eval.py --asr-package /absolute/path/package --asr-unit segments --only CLIP_ID --asr-transcribe --asr-model zipformer-30m --out evaluation/runs/asr-smoke-new
 ```
 
 Giới hạn chi tiêu: `EVAL_BUDGET_DB=<đường dẫn sổ SQLite>` đặt trần USD cho mọi request có phí (xem `llm/evaluation_budget.py`). Sổ hiện dùng nằm ở `evaluation/runs/20261024-work/budget.sqlite`. Không tạo lại sổ để chạy tiếp một ngân sách đã hết. `EVAL_RUNS_DIR` đổi chỗ ghi `runs/`.
@@ -41,7 +44,9 @@ Một run ghi: `full.jsonl`, `baseline.jsonl` (trace theo schema BTC), `diagnost
 
 ## Quy tắc
 
-1. **Số chính thức chỉ là `reference_eval.py` của BTC**, chạy nguyên bản. Không viết lại công thức. Không sửa gói BTC; `test_btc_pack.py` sẽ báo nếu một byte đổi.
+ASR dùng `--asr` cho ground_truth/hypotheses BTC-compatible hoặc `--asr-package` cho manifest audio/reference. `--asr-unit montage` chia WAV theo waveform, `segments` dùng ranh giới được cung cấp và phải báo oracle segmentation. `--asr-entity-review` nhận nhãn canonical có provenance; nhãn chưa duyệt luôn diagnostic. Chi tiết phép đo, version và nguồn VoiceGo: [ASR local](../docs/evaluation/asr-local.md). Không chạy script scorer khác trong gói người dùng thay cho lệnh gốc.
+
+1. **Theo quyết định hiện tại: dùng toàn bộ test/harness/scorer trên main**, mốc đồng bộ `41eda490bc47577018541c7778c0e8443ed8e6c8`. Giữ `reference_eval.py` tại mốc này, không khôi phục ZIP BTC và không sửa tiếp công thức. Pack được `test_btc_pack.py` ghim hash; manifest mỗi run ghi `reference_eval_sha256`. Khi báo số phải nêu đây là bộ chấm của main, không mặc định đồng nhất với ZIP BTC gốc.
 2. **Đo công bằng.** `full` và `baseline_no_memory` cùng kịch bản, model, prompt, công cụ, tri thức; chỉ khác bộ nhớ.
 3. **Đổi extractor là đổi dụng cụ đo.** Số do extractor khác nhau không so trực tiếp được; ghi `extractor_version` khi so.
 4. **Không dùng đáp án của tập kiểm hay holdout để viết FAQ, playbook hay ví dụ.** Ví dụ trong prompt extractor là dữ liệu bịa.

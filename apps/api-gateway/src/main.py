@@ -1,6 +1,8 @@
 import os
 import time
 import asyncio
+import re
+import uuid
 from collections import deque
 from contextlib import asynccontextmanager
 
@@ -13,27 +15,36 @@ from redis.asyncio import Redis
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.http = httpx.AsyncClient(timeout=None)
+    app.state.http = httpx.AsyncClient(timeout=httpx.Timeout(30, connect=5, pool=5))
     redis_url = os.getenv("REDIS_URL", "")
     app.state.redis = Redis.from_url(redis_url) if redis_url else None
     app.state.rate_buckets = {}
-    yield
-    await app.state.http.aclose()
-    if app.state.redis:
-        await app.state.redis.aclose()
+    try:
+        yield
+    finally:
+        await app.state.http.aclose()
+        if app.state.redis:
+            await app.state.redis.aclose()
 
 
+MAX_BODY = 2 * 1024 * 1024
+MAX_FRAME = 256 * 1024
+RATE_PREFIX = "ratelimit"
 app = FastAPI(title="Telesales API Gateway", version="0.1.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.getenv("CORS_ORIGINS", "http://localhost:3000").split(","),
-    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+    allow_methods=["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "X-Request-ID"],
 )
 
 
 @app.middleware("http")
 async def rate_limit(request: Request, call_next):
+    supplied = request.headers.get("x-request-id", "")
+    request.state.request_id = supplied if re.fullmatch(r"[A-Za-z0-9_.-]{1,64}", supplied) else uuid.uuid4().hex
+    if request.headers.get("content-length", "").isdigit() and int(request.headers["content-length"]) > MAX_BODY:
+        return JSONResponse(status_code=413, content={"detail": "Request body is too large"})
     if request.url.path.startswith("/api/"):
         key = request.client.host if request.client else "unknown"
         now = time.monotonic()
@@ -41,10 +52,10 @@ async def rate_limit(request: Request, call_next):
         if redis:
             try:
                 minute = int(time.time() / 60)
-                bucket = f"ratelimit:{key}:{minute}"
-                count = await redis.incr(bucket)
-                if count == 1:
-                    await redis.expire(bucket, 120)
+                bucket = f"{RATE_PREFIX}:{key}:{minute}"
+                count = await redis.eval(
+                    "local n=redis.call('INCR',KEYS[1]); if n==1 then redis.call('EXPIRE',KEYS[1],ARGV[1]); end; return n",
+                    1, bucket, 120)
             except Exception:
                 return JSONResponse(
                     status_code=503, content={"detail": "Rate limiter unavailable"}
@@ -54,15 +65,18 @@ async def rate_limit(request: Request, call_next):
             queue = buckets.setdefault(key, deque())
             while queue and queue[0] < now - 60:
                 queue.popleft()
-            queue.append(now)
+            if len(queue) <= 120:
+                queue.append(now)
             count = len(queue)
             if len(buckets) > 10000:
                 for old_key, old_queue in list(buckets.items()):
                     if not old_queue or old_queue[-1] < now - 60:
                         del buckets[old_key]
         if count > 120:
-            return JSONResponse(status_code=429, content={"detail": "Too many requests"})
-    return await call_next(request)
+            return JSONResponse(status_code=429, content={"detail": "Too many requests"}, headers={"Retry-After": "60"})
+    response = await call_next(request)
+    response.headers["X-Request-ID"] = request.state.request_id
+    return response
 
 
 COMMERCE_SERVICE_URL = os.getenv(
@@ -147,7 +161,7 @@ async def voice_proxy(websocket: WebSocket, conversation_id: str):
     url = AI_AGENT_SERVICE_URL.replace("http", "ws", 1).rstrip("/")
     url += f"/api/conversations/{conversation_id}/voice"
     try:
-        upstream = await websockets.connect(url, max_size=None, open_timeout=5)
+        upstream = await websockets.connect(url, max_size=MAX_FRAME, max_queue=8, open_timeout=5)
     except (OSError, websockets.WebSocketException):
         await websocket.close(code=1011, reason="Upstream service is unavailable")
         return
@@ -158,6 +172,9 @@ async def voice_proxy(websocket: WebSocket, conversation_id: str):
             if message["type"] == "websocket.disconnect":
                 return
             data = message.get("bytes")
+            if len(data if data is not None else (message.get("text") or "").encode()) > MAX_FRAME:
+                await websocket.close(code=1009, reason="Frame too large")
+                return
             await upstream.send(data if data is not None else message.get("text") or "")
 
     async def upstream_to_client():
@@ -169,13 +186,18 @@ async def voice_proxy(websocket: WebSocket, conversation_id: str):
 
     tasks = [asyncio.create_task(client_to_upstream()), asyncio.create_task(upstream_to_client())]
     try:
-        await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+        done, _ = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+        for task in done:
+            task.result()
     except (WebSocketDisconnect, websockets.WebSocketException):
         pass
     finally:
         for task in tasks:
             task.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
         code = upstream.close_code or 1000
+        if code not in {1000, 1001, 1002, 1003, 1007, 1008, 1009, 1011, 1012, 1013, 1014} and not 3000 <= code <= 4999:
+            code = 1011
         await upstream.close()
         try:
             await websocket.close(code=code)
@@ -183,7 +205,7 @@ async def voice_proxy(websocket: WebSocket, conversation_id: str):
             pass  # the browser already went away
 
 
-@app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"])
+@app.api_route("/{path:path}", methods=["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"])
 async def proxy(path: str, request: Request):
     upstream_url = upstream_for(path)
     if upstream_url is None:
@@ -197,6 +219,12 @@ async def proxy(path: str, request: Request):
         # x-zevent-signature: Zalo signs its webhooks (api/channels/zalo/webhook).
         if key.lower() in {"authorization", "content-type", "accept", "x-request-id", "x-zevent-signature"}
     }
+    headers["x-request-id"] = request.state.request_id
+    body = bytearray()
+    async for chunk in request.stream():
+        body.extend(chunk)
+        if len(body) > MAX_BODY:
+            return JSONResponse(status_code=413, content={"detail": "Request body is too large"})
     client = request.app.state.http
     try:
         upstream = await client.send(
@@ -204,10 +232,13 @@ async def proxy(path: str, request: Request):
                 request.method,
                 url,
                 headers=headers,
-                content=await request.body(),
+                content=bytes(body),
+                timeout=120 if path.endswith(("/stream", "/turns")) else 30,
             ),
             stream=True,
         )
+    except httpx.TimeoutException:
+        return JSONResponse(status_code=504, content={"detail": "Upstream service timed out"})
     except httpx.HTTPError:
         return JSONResponse(
             status_code=502,
@@ -217,13 +248,16 @@ async def proxy(path: str, request: Request):
     response_headers = {
         key: value
         for key, value in upstream.headers.items()
-        if key.lower() in {"content-type", "cache-control", "x-accel-buffering"}
+        if key.lower() in {"content-type", "cache-control", "x-accel-buffering", "retry-after", "allow"}
     }
 
     async def body():
         try:
-            async for chunk in upstream.aiter_raw():
-                yield chunk
+            if upstream.is_stream_consumed:
+                yield upstream.content
+            else:
+                async for chunk in upstream.aiter_raw():
+                    yield chunk
         finally:
             await upstream.aclose()
 

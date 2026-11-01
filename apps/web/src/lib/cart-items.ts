@@ -6,36 +6,43 @@ import { CartLine } from "@/lib/cart";
 
 export type CartItem = CartLine & { row: CatalogRow | null };
 
-export function useCartItems(lines: CartLine[]): { items: CartItem[] | null; error: string } {
+export function useCartItems(lines: CartLine[]) {
   const [rows, setRows] = useState<Record<string, CatalogRow | null>>({});
-  const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState("");
+  const [attempt, setAttempt] = useState(0);
   const key = lines.map((l) => l.sku).sort().join(",");
 
   useEffect(() => {
+    const controller = new AbortController();
+    setError("");
     const missing = lines.map((l) => l.sku).filter((sku) => !(sku in rows));
-    if (!missing.length) {
-      setLoaded(true);
-      return;
-    }
+    if (!missing.length) return;
     Promise.all(
       missing.map((sku) =>
-        api<CatalogRow>(`/api/catalog/${encodeURIComponent(sku)}`)
+        api<CatalogRow>(`/api/catalog/${encodeURIComponent(sku)}`, "", undefined, undefined, { signal: controller.signal })
           .then((row) => [sku, row] as const)
-          .catch(() => [sku, null] as const),
+          .catch((error) => {
+            if (error.status === 404) return [sku, null] as const;
+            throw error;
+          }),
       ),
     )
       .then((pairs) => {
+        if (controller.signal.aborted) return;
         setRows((old) => ({ ...old, ...Object.fromEntries(pairs) }));
-        setLoaded(true);
       })
-      .catch((e) => setError(e.message));
+      .catch(() => {
+        if (!controller.signal.aborted)
+          setError("Chưa tải được thông tin sản phẩm. Giỏ hàng của bạn vẫn được giữ lại.");
+      });
+    return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
+  }, [key, attempt]);
 
   return {
-    items: loaded || !lines.length ? lines.map((l) => ({ ...l, row: rows[l.sku] ?? null })) : null,
+    items: lines.every((line) => line.sku in rows) ? lines.map((l) => ({ ...l, row: rows[l.sku] })) : null,
     error,
+    retry: () => setAttempt((value) => value + 1),
   };
 }
 

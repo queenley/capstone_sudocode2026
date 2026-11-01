@@ -354,12 +354,16 @@ async def test_forgetting_a_customer_also_clears_their_conversation_log(monkeypa
 
     class Cursor:
         rowcount=1
+        def __init__(self, sql): self.sql = sql
         async def fetchone(self):return {'t':'present'}
-        async def fetchall(self):return [{'request_id':'D-1'}]
+        async def fetchall(self):
+            if self.sql.startswith('SELECT id, turn_lease'): return [{'id': 1, 'busy': False}]
+            if self.sql.startswith('SELECT value_enc'): return []
+            return [{'request_id':'D-1'}]
 
     class Conn:
         async def execute(self,sql,params=()):
-            executed.append(' '.join(sql.split()));return Cursor()
+            executed.append(' '.join(sql.split()));return Cursor(sql)
         @asynccontextmanager
         async def transaction(self):yield
 
@@ -371,5 +375,5 @@ async def test_forgetting_a_customer_also_clears_their_conversation_log(monkeypa
     fn=getattr(store.memory_delete_customer,'fn',store.memory_delete_customer)
     result=await fn(customer_id='C-T')
     assert {'facts','episodes','identities','pii_vault','turns','calls_unlinked'}<=set(result['deleted'])
-    assert any(s.startswith('DELETE FROM turns WHERE call_id IN') for s in executed)
+    assert any(s.startswith('DELETE FROM turns WHERE call_id = ANY') for s in executed)
     assert any(s.startswith('UPDATE calls SET customer_id = NULL') for s in executed)

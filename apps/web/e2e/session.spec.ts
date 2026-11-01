@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 // Local session regressions; API fixtures avoid any paid model calls.
-test.use({ channel: 'chrome' });
+test.use({ channel: process.env.CI ? undefined : 'chrome' });
 const account = (name: string) => ({customer_id:name,full_name:name,phone:'0900000000',email:null,registered:true,registered_at:null});
 const conversation = {conversation_id:'test-conversation',conversation_token:'test-token',customer_id:'B'};
 

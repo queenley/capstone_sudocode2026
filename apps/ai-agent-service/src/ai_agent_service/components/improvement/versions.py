@@ -30,6 +30,7 @@ from ...config.config_manager import KNOWLEDGE_YAML, get_knowledge_config, kb_di
 from ..knowledge.corpus import entry_chunk, version_file
 from . import review
 from .lessons import Hint, screen
+from .storage import atomic_text, version_write
 
 VERSION_LINE = re.compile(r"^version:\s*(\d+)\s*$", re.MULTILINE)
 
@@ -46,7 +47,15 @@ def entries(version: int, directory: Path | None = None) -> list[dict[str, Any]]
     path = version_file(directory or kb_dir(), version)
     if not path.exists():
         raise FileNotFoundError(f"Knowledge version {version} does not exist: {path}")
-    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    for row in rows:
+        if not isinstance(row, dict):
+            raise ValueError(f"{path.name}: entry must be an object")
+        entry_chunk(row, doc=path.name)
+    ids = [row["chunk_id"] for row in rows]
+    if len(ids) != len(set(ids)):
+        raise ValueError(f"{path.name}: duplicate chunk_id")
+    return rows
 
 
 def versions(directory: Path | None = None) -> list[int]:
@@ -57,7 +66,7 @@ def versions(directory: Path | None = None) -> list[int]:
 def _point(version: int, config_path: Path) -> None:
     """Set ``version:`` in ``knowledge.yaml``, keeping every comment."""
     text = config_path.read_text(encoding="utf-8")
-    config_path.write_text(VERSION_LINE.sub(f"version: {version}", text, count=1), encoding="utf-8")
+    atomic_text(config_path, VERSION_LINE.sub(f"version: {version}", text, count=1))
     get_knowledge_config.cache_clear()
 
 
@@ -71,10 +80,11 @@ def _write(version: int, lines: Sequence[Mapping[str, Any]], directory: Path) ->
     if len(seen) != len(set(seen)):
         raise ValueError(f"{path.name} would repeat a chunk_id")
     directory.mkdir(parents=True, exist_ok=True)
-    path.write_text("".join(json.dumps(line, ensure_ascii=False) + "\n" for line in lines), encoding="utf-8")
+    atomic_text(path, "".join(json.dumps(line, ensure_ascii=False) + "\n" for line in lines))
     return path
 
 
+@version_write
 def publish(new: Sequence[Mapping[str, Any]], *, reviewer: str, note: str = "",
             directory: Path | None = None, config_path: Path = KNOWLEDGE_YAML) -> int:
     """Write the version in force plus *new* as the next version, point at it, and return its number."""
@@ -99,9 +109,13 @@ def publish(new: Sequence[Mapping[str, Any]], *, reviewer: str, note: str = "",
     return target
 
 
+@version_write
 def rollback(to: int, *, reviewer: str, reason: str,
              directory: Path | None = None, config_path: Path = KNOWLEDGE_YAML) -> int:
     """Point at version *to*, which must exist; returns the version that was in force."""
+    entries(to, directory)
+    if not reviewer.strip() or not reason.strip():
+        raise ValueError("Rollback requires a reviewer and a reason")
     if not version_file(directory or kb_dir(), to).exists():
         raise FileNotFoundError(f"Knowledge version {to} does not exist")
     previous = active(config_path)
@@ -110,10 +124,13 @@ def rollback(to: int, *, reviewer: str, reason: str,
     return previous
 
 
+@version_write
 def revoke(chunk_id: str, *, reviewer: str, reason: str,
            directory: Path | None = None, config_path: Path = KNOWLEDGE_YAML) -> int:
     """Write a new version without *chunk_id*, point at it, and return its number."""
     folder = directory or kb_dir()
+    if not reviewer.strip() or not reason.strip():
+        raise ValueError("Revocation requires a reviewer and a reason")
     current = active(config_path)
     base = entries(current, folder)
     kept = [line for line in base if line["chunk_id"] != chunk_id]

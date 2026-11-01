@@ -9,7 +9,11 @@
 import { useSyncExternalStore } from "react";
 import { api } from "@/services/api";
 import { cart } from "@/lib/cart";
-import { customerToken, forgetConversation, setCustomerToken } from "@/lib/session";
+import {
+  customerToken,
+  forgetConversation,
+  setCustomerToken,
+} from "@/lib/session";
 
 export type Account = {
   customer_id: string;
@@ -21,21 +25,32 @@ export type Account = {
   registered_at: string | null;
 };
 
-export type CodeSent = { challenge_id: string; delivery: string; development_code?: string };
+export type CodeSent = {
+  challenge_id: string;
+  delivery: string;
+  development_code?: string;
+};
 type Session = { customer_token: string; account: Account };
 
-type State = { status: "unknown" | "guest" | "signed-in"; account: Account | null };
+type State = {
+  status: "unknown" | "guest" | "signed-in";
+  account: Account | null;
+};
 
 let state: State = { status: "unknown", account: null };
 const listeners = new Set<() => void>();
 let loading: Promise<void> | null = null;
+let authGeneration = 0;
 
 function set(next: State) {
   state = next;
   listeners.forEach((listener) => listener());
 }
 
-async function begin(session: Session) {
+async function begin(session: Session, generation: number) {
+  if (generation !== authGeneration) return;
+  if (customerToken() && customerToken() !== session.customer_token)
+    cart.detach();
   setCustomerToken(session.customer_token);
   forgetConversation();
   set({ status: "signed-in", account: session.account });
@@ -43,6 +58,7 @@ async function begin(session: Session) {
 }
 
 export const account = {
+  revision: () => authGeneration,
   /** Who is signed in, from the saved token; once per page load unless forced. */
   load(force = false): Promise<void> {
     if (loading && !force) return loading;
@@ -58,7 +74,8 @@ export const account = {
         await cart.attach(token);
       })
       .catch((error) => {
-        if (customerToken() !== token || ![401, 403].includes(error?.status)) return;
+        if (customerToken() !== token || ![401, 403].includes(error?.status))
+          return;
         // Expired or revoked: the shopper is a guest again.
         setCustomerToken(null);
         forgetConversation();
@@ -68,35 +85,66 @@ export const account = {
     return loading;
   },
   async login(phone: string, password: string) {
-    await begin(await api<Session>("/api/customer/login", "", { phone, password }));
+    const generation = ++authGeneration;
+    await begin(
+      await api<Session>("/api/customer/login", "", { phone, password }),
+      generation,
+    );
   },
-  registerStart(input: { full_name: string; phone: string; password: string; email?: string }) {
+  registerStart(input: {
+    full_name: string;
+    phone: string;
+    password: string;
+    email?: string;
+  }) {
     return api<CodeSent>("/api/customer/register/start", "", input);
   },
   async registerVerify(challengeId: string, code: string) {
-    await begin(await api<Session>("/api/customer/register/verify", "", { challenge_id: challengeId, code }));
+    const generation = ++authGeneration;
+    await begin(
+      await api<Session>("/api/customer/register/verify", "", {
+        challenge_id: challengeId,
+        code,
+      }),
+      generation,
+    );
   },
   resetStart(phone: string) {
     return api<CodeSent>("/api/customer/password/reset/start", "", { phone });
   },
   async resetVerify(challengeId: string, code: string, password: string) {
-    await begin(await api<Session>("/api/customer/password/reset/verify", "", { challenge_id: challengeId, code, password }));
+    const generation = ++authGeneration;
+    await begin(
+      await api<Session>("/api/customer/password/reset/verify", "", {
+        challenge_id: challengeId,
+        code,
+        password,
+      }),
+      generation,
+    );
   },
   async update(changes: { full_name?: string; email?: string }) {
-    const me = await api<Account>("/api/customer/me", customerToken(), changes, "PATCH");
+    const token = customerToken();
+    const me = await api<Account>("/api/customer/me", token, changes, "PATCH");
+    if (customerToken() !== token) return me;
     set({ status: "signed-in", account: me });
     return me;
   },
   changePassword(current: string, next: string) {
-    return api("/api/customer/password", customerToken(), { current_password: current, new_password: next });
+    return api("/api/customer/password", customerToken(), {
+      current_password: current,
+      new_password: next,
+    });
   },
   async logout() {
+    authGeneration++;
     const token = customerToken();
     setCustomerToken(null);
     forgetConversation();
     cart.detach();
     set({ status: "guest", account: null });
-    if (token) await api("/api/customer/logout", token, {}).catch(() => undefined);
+    if (token)
+      await api("/api/customer/logout", token, {}).catch(() => undefined);
   },
   /** After the phone check at checkout or on the order page: the token is new, read who it is.
    *  The conversation stays: the code was checked on it, so it already belongs to this customer. */
@@ -109,11 +157,13 @@ export function useAccount(): State {
   return useSyncExternalStore(
     (listener) => {
       listeners.add(listener);
-      if (listeners.size === 1) window.addEventListener("storage", changedAccount);
+      if (listeners.size === 1)
+        window.addEventListener("storage", changedAccount);
       if (state.status === "unknown") account.load();
       return () => {
         listeners.delete(listener);
-        if (!listeners.size) window.removeEventListener("storage", changedAccount);
+        if (!listeners.size)
+          window.removeEventListener("storage", changedAccount);
       };
     },
     () => state,
@@ -123,6 +173,8 @@ export function useAccount(): State {
 
 function changedAccount(event: StorageEvent) {
   if (event.key !== "customer-token" && event.key !== null) return;
+  authGeneration++;
+  set({ status: "unknown", account: null });
   forgetConversation();
   cart.detach();
   void account.load(true);

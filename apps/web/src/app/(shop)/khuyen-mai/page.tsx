@@ -6,12 +6,17 @@ import { discountPercent, fetchProducts, ShopProduct } from "@/lib/catalog";
 export default function PromotionsPage() {
   const [products, setProducts] = useState<ShopProduct[] | null>(null);
   const [error, setError] = useState("");
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
+    let active = true;
+    setError("");
+    setProducts(null);
     fetchProducts()
-      .then((all) => setProducts(all.filter((p) => discountPercent(p.price, p.listPrice) > 0)))
-      .catch((e) => setError(e.message));
-  }, []);
+      .then((all) => { if (active) setProducts(all.filter((p) => discountPercent(p.price, p.listPrice) > 0)); })
+      .catch((e) => { if (active) setError(e.message); });
+    return () => { active = false; };
+  }, [attempt]);
 
   return (
     <div className="s-wrap s-page">
@@ -20,8 +25,7 @@ export default function PromotionsPage() {
         Giá dưới đây đã gồm ưu đãi áp dụng cho mọi khách. Ưu đãi riêng (theo khu vực, đổi máy cũ, khách quen) được trợ lý
         hoặc nhân viên báo khi tư vấn.
       </p>
-      {error && <div className="s-alert">Không tải được: {error}</div>}
-      <ProductListing products={products} empty="Hiện chưa có sản phẩm giảm giá." />
+      <ProductListing products={products} error={error} onRetry={() => setAttempt((value) => value + 1)} empty="Hiện chưa có sản phẩm giảm giá." />
     </div>
   );
 }

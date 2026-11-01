@@ -119,6 +119,25 @@ def test_saying_the_order_was_changed_needs_an_order_update_that_succeeded():
     assert not any("order_update" in r for r in guard(said, [updated]).reasons)
 
 
+def test_an_empty_order_read_cannot_back_a_claim_to_create_a_new_order():
+    for data in ({"orders": []}, {"orders": [{"order_id": "OD600001", "status": "created"}]}):
+        status = {"name": "order.status", "result": {"ok": True, "data": data}}
+        assert placed("Dạ em đã tạo đơn mới cho chị rồi ạ.", [status])
+    assert placed("Dạ em đã tạo đơn mới cho chị rồi ạ.", created_orders=("OD600001",))
+    assert placed("Hôm trước em báo giá rồi, em đã tạo đơn mới cho chị ạ.")
+
+
+def test_empty_or_mismatched_order_state_cannot_back_delivery_claims():
+    for data in ({"orders": []}, {"orders": [{"status": "created"}]}):
+        status = {"name": "order.status", "result": {"ok": True, "data": data}}
+        assert not guard("Dạ đơn hàng đang giao cho chị ạ.", [status]).passed
+
+
+def test_successful_write_for_another_order_does_not_back_the_claim():
+    created = {"name": "order.create", "result": {"ok": True, "data": {"order_id": "OD600001"}}}
+    assert placed("Dạ em đã tạo đơn OD600002 cho chị ạ.", [created])
+
+
 def test_an_offer_to_place_the_order_or_an_earlier_order_is_not_the_claim():
     for text in ("Dạ anh có muốn em lên đơn luôn không ạ?",
                  "Dạ em lên đơn cho chị nhé.",
@@ -237,3 +256,16 @@ def test_a_blocked_delivery_time_is_told_the_sentence_to_say():
         {"area": "Hà Nội, TP.HCM, Đà Nẵng", "delivery_days": 2}, {"area": "tỉnh thành khác", "delivery_days": 4}]}}}
     verdict = hard.check(hard.GuardInput(text="Dạ đơn giao trong 4 ngày ạ.", tool_results=(by_area,), tier="VERIFIED"))
     assert "2 ngày ở Hà Nội, TP.HCM, Đà Nẵng; 4 ngày ở tỉnh thành khác" in verdict.reasons[0]
+
+
+def test_order_state_requires_evidence_for_every_named_order():
+    from ai_agent_service.components.guardrails import hard
+    text = "Đơn OD1 và OD2 đang giao ạ."
+    for orders in ([{"order_id": "OD1", "status": "shipping"}],
+                   [{"order_id": "OD1", "status": "shipping"}, {"order_id": "OD2", "status": "created"}]):
+        tools = ({"name": "order.status", "result": {"ok": True, "data": {"orders": orders}}},)
+        assert hard._order_state(text, hard.GuardInput(text=text, tier="VERIFIED", tool_results=tools))
+    tools = tuple({"name": "order.status", "result": {"ok": True, "data": {"orders": [order]}}} for order in
+                  [{"order_id": "OD1", "status": "shipping"}, {"order_id": "OD2", "status": "delivered"}])
+    separate = "Đơn OD1 đang giao, đơn OD2 đã giao ạ."
+    assert not hard._order_state(separate, hard.GuardInput(text=separate, tier="VERIFIED", tool_results=tools))

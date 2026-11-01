@@ -14,6 +14,7 @@ const CONVERSATION = "conversation";
 const CUSTOMER = "customer-token";
 const OWNER = "conversation-customer";
 let opening: Promise<ShopSession> | null = null;
+let generation = 0;
 
 export function customerToken(): string {
   try {
@@ -24,16 +25,20 @@ export function customerToken(): string {
 }
 
 export function setCustomerToken(token: string | null) {
+  const previous = customerToken();
   try {
     if (token) localStorage.setItem(CUSTOMER, token);
     else localStorage.removeItem(CUSTOMER);
   } catch {
     /* ignore */
   }
+  if (previous !== customerToken())
+    window.dispatchEvent(new Event("shop-customer-token-changed"));
 }
 
 /** Drop this tab's conversation: the next message starts one as whoever is signed in now. */
 export function forgetConversation() {
+  generation++;
   opening = null;
   try {
     sessionStorage.removeItem(CONVERSATION);
@@ -57,8 +62,10 @@ export function savedSession(): ShopSession | null {
 
 export async function newSession(): Promise<ShopSession> {
   const token = customerToken();
+  const current = generation;
   const session = await api<ShopSession>("/api/conversations", token, {});
-  if (customerToken() !== token) throw new Error("Tài khoản đã thay đổi. Vui lòng mở lại cuộc trò chuyện.");
+  if (customerToken() !== token || current !== generation)
+    throw new Error("Tài khoản đã thay đổi. Vui lòng mở lại cuộc trò chuyện.");
   try {
     sessionStorage.setItem(CONVERSATION, JSON.stringify(session));
     sessionStorage.setItem(OWNER, token);
@@ -75,7 +82,20 @@ export type ConversationState = {
 };
 
 export function loadConversation(session: Session) {
-  return api<ConversationState>(`/api/conversations/${session.conversation_id}`, session.conversation_token);
+  return api<ConversationState>(
+    `/api/conversations/${session.conversation_id}`,
+    session.conversation_token,
+  );
+}
+
+/** OTP verified this existing conversation; retain it under the new account token. */
+export function verifiedSession(session: ShopSession) {
+  try {
+    sessionStorage.setItem(CONVERSATION, JSON.stringify(session));
+    sessionStorage.setItem(OWNER, customerToken());
+  } catch {
+    /* The current page can still use its in-memory session. */
+  }
 }
 
 /** The saved conversation if it is still open, otherwise a new one. */
@@ -89,14 +109,24 @@ export function openSession(): Promise<ShopSession> {
 }
 
 async function resumeSession(): Promise<ShopSession> {
+  const token = customerToken();
+  const current = generation;
   const saved = savedSession();
   if (saved) {
     try {
       const state = await loadConversation(saved);
-      if (state.status === "open" || state.status === "handed_off") return { ...saved, customer_id: state.customer_id };
-    } catch {
-      /* expired or deleted: start again */
+      if (current !== generation || customerToken() !== token)
+        throw new Error("Tài khoản đã thay đổi.");
+      if (state.status === "open" || state.status === "handed_off")
+        return { ...saved, customer_id: state.customer_id };
+    } catch (error) {
+      if (
+        ![401, 404, 410].includes((error as { status?: number })?.status || 0)
+      )
+        throw error;
     }
   }
+  if (current !== generation || customerToken() !== token)
+    throw new Error("Tài khoản đã thay đổi.");
   return newSession();
 }

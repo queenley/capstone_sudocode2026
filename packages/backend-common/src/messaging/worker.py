@@ -23,6 +23,7 @@ log = logging.getLogger("telesales.worker")
 EVENT_OWNERS = {
     "order.created": "commerce",
     "order.cancelled": "commerce",
+    "order.paid": "commerce",
     "identity.customer.verified": "identity",
     "identity.customer.deleted": "identity",
     "identity.staff.created": "identity",
@@ -50,6 +51,9 @@ def topic_for_event(event_type):
 def process(db, event):
     if db.get(ProcessedEvent, event["id"]):
         return False
+    if event["event_type"] == "identity.customer.deleted":
+        from src.identity.deletion import deliver
+        deliver(event, Settings())
     if event["event_type"] == "conversation.ended":
         conv = db.get(Conversation, event["payload"]["conversation_id"])
         if conv:
@@ -156,6 +160,7 @@ def run(settings=None, once=False, service="all"):
             else [f"telesales.{name}.events" for name in SERVICES]
         )
         consumer.subscribe(topics)
+    pending_message = None
     stop = False
 
     def shutdown(*_):
@@ -169,12 +174,14 @@ def run(settings=None, once=False, service="all"):
             try:
                 tick(database, producer, service)
                 if consumer:
-                    message = consumer.poll(0.5)
+                    message = pending_message or consumer.poll(0.5)
                     if message and not message.error():
+                        pending_message = message
                         with database.sessions() as db:
                             process(db, json.loads(message.value()))
                             db.commit()
                         consumer.commit(message=message, asynchronous=False)
+                        pending_message = None
             except Exception as error:
                 log.error("Worker retry: %s", type(error).__name__)
             if once:

@@ -31,7 +31,7 @@ from ..components.intake import pii
 from ..mcp import client as mcp_client
 from ..mcp.tools import ToolBox
 from . import harness, options, trace_export, vault as vaults
-from .db import connection
+from .db import connection, require_writable_call
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +70,8 @@ async def call_for_conversation(conversation_id: str, platform_channel: str, *, 
     *channel_ref* is the customer's identity on the channel (a Zalo user id):
     the agent looks the customer up by it (``harness.run_turn``).
     """
-    async with connection() as conn:
+    async with connection() as conn, conn.transaction():
+        await conn.execute("SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))", (f"conversation:{conversation_id}",))
         cursor = await conn.execute(
             "SELECT * FROM calls WHERE conversation_id = %s AND ended_at IS NULL ORDER BY id DESC LIMIT 1",
             (conversation_id,),
@@ -110,7 +111,8 @@ async def set_caller(call_id: int, number: str) -> None:
     if not token.startswith("<PHONE_"):
         return
     await vaults.save(call_id, vault)
-    async with connection() as conn:
+    async with connection() as conn, conn.transaction():
+        await require_writable_call(conn, call_id)
         await conn.execute("UPDATE calls SET caller_token = %s, phone_last4 = %s WHERE id = %s",
                            (token, phone[-4:], call_id))
 
@@ -204,10 +206,14 @@ async def hang_up(call_id: int) -> dict[str, Any]:
     async with connection() as conn:
         cursor = await conn.execute(
             "UPDATE calls SET ended_at = now(), turn_lease_until = NULL, memory_status = 'pending' "
-            "WHERE id = %s AND ended_at IS NULL RETURNING id",
+            "WHERE id = %s AND ended_at IS NULL AND (turn_lease_until IS NULL OR turn_lease_until < now()) RETURNING id",
             (call_id,),
         )
         newly = await cursor.fetchone() is not None
+    if not newly:
+        current = await call_row(call_id)
+        if current["ended_at"] is None:
+            raise CallError(409, "The assistant is still answering. Try ending the call again in a moment.")
     if newly:
         harness.spawn(harness.remember(call_id))
     return await call_row(call_id)
@@ -263,17 +269,21 @@ async def request_handoff(call_id: int, *, reason: str) -> dict[str, Any]:
         raise CallError(409, "This session has ended.")
     if row["handoff_status"] is not None:
         return row
-    async with connection() as conn:
+    async with connection() as conn, conn.transaction():
         cursor = await conn.execute("SELECT 1 FROM calls WHERE id = %s AND turn_lease_until > now()", (call_id,))
         if await cursor.fetchone() is not None:
             raise CallError(409, "The assistant is still answering. Try again in a moment.")
         turn_id = f"bridge-{call_id}"
         cursor = await conn.execute(
             "UPDATE calls SET mode = 'copilot', handoff_status = 'pending', handoff_reason = %s, "
-            "handoff_requested_at = now() WHERE id = %s AND handoff_status IS NULL RETURNING *",
+            "handoff_requested_at = now() WHERE id = %s AND handoff_status IS NULL AND ended_at IS NULL "
+            "AND (turn_lease_until IS NULL OR turn_lease_until < now()) RETURNING *",
             (reason, call_id),
         )
-        row = await cursor.fetchone() or row
+        changed = await cursor.fetchone()
+        if changed is None:
+            raise CallError(409, "The conversation changed. Refresh it before handing it off.")
+        row = changed
         await conn.execute(
             "INSERT INTO turns (call_id, turn_id, speaker, content, meta) VALUES (%s, %s, 'agent', %s, %s) "
             "ON CONFLICT (call_id, turn_id, speaker) DO NOTHING",
@@ -289,16 +299,22 @@ async def accept_handoff(call_id: int, *, actor: Actor) -> dict[str, Any]:
     async with connection() as conn:
         cursor = await conn.execute(
             "UPDATE calls SET handoff_status = 'accepted', accepted_by = %s, accepted_at = now() "
-            "WHERE id = %s AND handoff_status = 'pending' RETURNING *",
+            "WHERE id = %s AND handoff_status = 'pending' AND ended_at IS NULL RETURNING *",
             (actor.id, call_id),
         )
         row = await cursor.fetchone()
     if row is None:
         existing = await call_row(call_id)
-        if existing["handoff_status"] == "accepted":
+        if existing["ended_at"] is not None:
+            raise CallError(409, "This session has ended.")
+        if existing["handoff_status"] == "accepted" and existing["accepted_by"] == actor.id:
+            row = existing
+        elif existing["handoff_status"] == "accepted":
             raise CallError(409, "Another consultant already took this conversation.")
-        raise CallError(409, "No handoff is waiting on this conversation.")
-    async with connection() as conn:
+        else:
+            raise CallError(409, "No handoff is waiting on this conversation.")
+    async with connection() as conn, conn.transaction():
+        await require_writable_call(conn, call_id)
         await conn.execute(
             "INSERT INTO turns (call_id, turn_id, speaker, content, meta) VALUES (%s, %s, 'system', %s, %s) "
             "ON CONFLICT (call_id, turn_id, speaker) DO NOTHING",
@@ -324,10 +340,11 @@ async def consultant_reply(call_id: int, *, actor: Actor, content: str, action: 
         cursor = await conn.execute("SELECT content FROM turns WHERE call_id = %s AND speaker = 'customer'", (call_id,))
         said = tuple(r["content"] for r in await cursor.fetchall())
     verdict = check(GuardInput(text=tokenised, tool_results=(), tier=row["tier"], tokens=frozenset(vault.entries),
-                               customer_said=said))
+                               customer_said=said, check_handoff=False))
     # A consultant may quote a price the tools did not give this turn: they are accountable for it.
     warnings = [r for r in verdict.reasons if not r.startswith("Số tiền")]
-    if warnings and not force:
+    protected = ("Nhắc tới thông tin nội bộ", "Có dữ liệu cá nhân", "Có một dãy", "Có mã dữ liệu cá nhân", "Chưa xác minh danh tính")
+    if warnings and (not force or any(r.startswith(protected) for r in warnings)):
         return False, warnings, row
 
     suggestion = row["suggestion"] or {}
@@ -336,7 +353,11 @@ async def consultant_reply(call_id: int, *, actor: Actor, content: str, action: 
     turn_id = uuid.uuid4().hex
     meta = {"action": action, "consultant": actor.label or actor.id, "suggested": suggestion.get("text"),
             "signal": signal, "warnings": warnings}
-    async with connection() as conn:
+    async with connection() as conn, conn.transaction():
+        locked = await (await conn.execute("SELECT * FROM calls WHERE id = %s FOR UPDATE", (call_id,))).fetchone()
+        if (locked is None or locked["ended_at"] is not None or locked["accepted_by"] != actor.id
+                or locked["handoff_status"] != "accepted"):
+            raise CallError(409, "The conversation is no longer held by you.")
         await conn.execute(
             "INSERT INTO turns (call_id, turn_id, speaker, content, meta) VALUES (%s, %s, 'human_agent', %s, %s)",
             (call_id, turn_id, tokenised, json.dumps(meta, ensure_ascii=False)),

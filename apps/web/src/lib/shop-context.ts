@@ -7,6 +7,7 @@ type State = { sku: string; productName: string; chatOpen: boolean; draft: strin
 
 let state: State = { sku: "", productName: "", chatOpen: false, draft: "" };
 const listeners = new Set<() => void>();
+let chatTrigger: HTMLElement | null = null;
 
 function set(patch: Partial<State>) {
   state = { ...state, ...patch };
@@ -21,10 +22,14 @@ export const shopContext = {
     set({ sku: "", productName: "" });
   },
   openChat(draft = "") {
+    if (!state.chatOpen) chatTrigger = document.activeElement as HTMLElement | null;
     set({ chatOpen: true, draft });
   },
   closeChat() {
+    const trigger = chatTrigger;
+    chatTrigger = null;
     set({ chatOpen: false });
+    requestAnimationFrame(() => { if (trigger?.isConnected) trigger.focus(); });
   },
   takeDraft(): string {
     const draft = state.draft;

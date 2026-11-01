@@ -158,6 +158,29 @@ async def init_db() -> None:
         logger.info("Another process created the agent tables first; continuing")
 
 
+async def require_writable_call(conn: Any, call_id: int) -> None:
+    """A row lock serialises every persisted write with erasure, including late graph tasks."""
+    row = await (await conn.execute("SELECT memory_status FROM calls WHERE id = %s FOR UPDATE", (call_id,))).fetchone()
+    if row is None or row.get("memory_status") == "deleted":
+        raise RuntimeError("This call was deleted")
+
+
+class ErasureSafeSaver(AsyncPostgresSaver):
+    async def _write_call(self, method: str, config: Any, *args: Any, **kwargs: Any) -> Any:
+        async with (await pool()).connection() as conn, conn.transaction():
+            name = str(config.get("configurable", {}).get("thread_id", ""))
+            if name.startswith("call-") and name[5:].isdigit():
+                await require_writable_call(conn, int(name[5:]))
+            bound = AsyncPostgresSaver(conn, serde=self.serde)
+            return await getattr(bound, method)(config, *args, **kwargs)
+
+    async def aput(self, config: Any, *args: Any, **kwargs: Any) -> Any:
+        return await self._write_call("aput", config, *args, **kwargs)
+
+    async def aput_writes(self, config: Any, *args: Any, **kwargs: Any) -> Any:
+        return await self._write_call("aput_writes", config, *args, **kwargs)
+
+
 async def init_checkpointer() -> AsyncPostgresSaver:
     """The hot graph's working memory (section 3.1), over the shared pool, once."""
     global _checkpointer
@@ -165,7 +188,7 @@ async def init_checkpointer() -> AsyncPostgresSaver:
         serde = JsonPlusSerializer(
             allowed_msgpack_modules=[(cls.__module__, cls.__name__) for cls in CHECKPOINTED_TYPES]
         )
-        saver = AsyncPostgresSaver(await pool(), serde=serde)
+        saver = ErasureSafeSaver(await pool(), serde=serde)
         await saver.setup()
         _checkpointer = saver
         logger.info("Agent checkpointer ready")

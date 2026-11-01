@@ -12,20 +12,34 @@
 // open call 3 s.
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { Logo } from "@/components/brand/Logo";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 import { api, AgentCall, AgentCallDetail, AgentTurn } from "@/services/api";
+import CallContext from "@/features/call-context";
 
 const QUEUE_EVERY_MS = 5000;
 const CALL_EVERY_MS = 3000;
-const CHANNEL: Record<string, string> = { web: "Web chat", zalo: "Zalo", hotline: "Hotline", facebook: "Facebook" };
+const CHANNEL: Record<string, string> = {
+  web: "Web chat",
+  zalo: "Zalo",
+  hotline: "Hotline",
+  facebook: "Facebook",
+};
 
 type Warning = { content: string; action: string; reasons: string[] };
 type Faq = { question: string; answer: string; saved: string | null };
 
 /** ``embedded``: inside the sales workspace (/ban-hang), which has already signed the person in:
  * connect at once with that token and leave out this page's own header and token form. */
-export default function CallConsole({ embedded = false }: { embedded?: boolean }) {
+export default function CallConsole({
+  embedded = false,
+}: {
+  embedded?: boolean;
+}) {
   const [token, setToken] = useState("");
+  const [tokenReady, setTokenReady] = useState(false);
   const [connected, setConnected] = useState(false);
+  const [queueLoading, setQueueLoading] = useState(false);
   const [openOnly, setOpenOnly] = useState(false);
   const [calls, setCalls] = useState<AgentCall[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -37,31 +51,89 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
   const [warning, setWarning] = useState<Warning | null>(null);
   const [faq, setFaq] = useState<Faq | null>(null);
   // The 👍/👎 the consultant gave the suggestion on screen, keyed by its text so a new suggestion starts unrated.
-  const [rated, setRated] = useState<{ text: string; thumb: "up" | "down" } | null>(null);
+  const [rated, setRated] = useState<{
+    text: string;
+    thumb: "up" | "down";
+  } | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
+  const currentToken = useRef(token);
+  const currentCall = useRef(selectedId);
+  const queueRequest = useRef(0);
+  const detailRequest = useRef(0);
+  const sendLock = useRef(false);
+  currentToken.current = token;
+  currentCall.current = selectedId;
+
+  useEffect(
+    () => () => {
+      queueRequest.current++;
+      detailRequest.current++;
+    },
+    [],
+  );
 
   useEffect(() => {
     setToken(sessionStorage.getItem("staff-token") || "");
+    setTokenReady(true);
   }, []);
+  useEffect(() => {
+    queueRequest.current++;
+    detailRequest.current++;
+    setConnected(false);
+    setQueueLoading(false);
+    setCalls([]);
+    setSelectedId(null);
+    setDetail(null);
+    setError("");
+  }, [token]);
 
   const refreshQueue = useCallback(async () => {
+    const request = ++queueRequest.current;
+    setQueueLoading(true);
     try {
-      const list = await api<AgentCall[]>(`/api/agent/calls?open_only=${openOnly}&limit=50`, token);
+      const list = await api<AgentCall[]>(
+        `/api/agent/calls?open_only=${openOnly}&limit=50`,
+        token,
+      );
+      if (token !== currentToken.current || request !== queueRequest.current)
+        return;
       setCalls(list);
       setConnected(true);
       setSelectedId((current) => current ?? list[0]?.id ?? null);
     } catch (e) {
+      if (token !== currentToken.current || request !== queueRequest.current)
+        return;
       setError(e instanceof Error ? e.message : "Không tải được hàng chờ");
+      if ([401, 403].includes((e as { status: number }).status)) setCalls([]);
       setConnected(false);
+    } finally {
+      if (token === currentToken.current && request === queueRequest.current)
+        setQueueLoading(false);
     }
   }, [token, openOnly]);
 
   const refreshCall = useCallback(
     async (id: number | null) => {
       if (id == null) return;
+      const request = ++detailRequest.current;
       try {
-        setDetail(await api<AgentCallDetail>(`/api/agent/calls/${id}`, token));
+        const result = await api<AgentCallDetail>(
+          `/api/agent/calls/${id}`,
+          token,
+        );
+        if (
+          id === currentCall.current &&
+          token === currentToken.current &&
+          request === detailRequest.current
+        )
+          setDetail(result);
       } catch (e) {
+        if (
+          id !== currentCall.current ||
+          token !== currentToken.current ||
+          request !== detailRequest.current
+        )
+          return;
         setError(e instanceof Error ? e.message : "Không tải được cuộc gọi");
       }
     },
@@ -84,6 +156,8 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
     setDraftFrom("own");
     setWarning(null);
     setFaq(null);
+    sendLock.current = false;
+    setSending(false);
     if (!connected || selectedId == null) return;
     void refreshCall(selectedId);
     const timer = setInterval(() => refreshCall(selectedId), CALL_EVERY_MS);
@@ -91,43 +165,58 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
   }, [connected, selectedId, refreshCall]);
 
   useEffect(() => {
-    bottom.current?.scrollIntoView({ behavior: "smooth" });
+    bottom.current?.scrollIntoView({ block: "nearest" });
   }, [detail?.turns.length]);
 
-  async function run(task: () => Promise<void>) {
+  async function run(task: (current: () => boolean) => Promise<void>) {
+    const id = currentCall.current;
+    const current = () =>
+      token === currentToken.current && id === currentCall.current;
     setError("");
     try {
-      await task();
+      await task(current);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Yêu cầu thất bại");
+      if (current())
+        setError(e instanceof Error ? e.message : "Yêu cầu thất bại");
     }
   }
 
   const accept = (id: number) =>
-    run(async () => {
+    run(async (current) => {
       await api(`/api/agent/calls/${id}/accept`, token, {});
+      if (!current()) return;
       setSelectedId(id);
       await refreshQueue();
       await refreshCall(id);
     });
 
   const rate = (thumb: "up" | "down") =>
-    run(async () => {
+    run(async (current) => {
       if (!detail?.suggestion) return;
-      await api(`/api/agent/calls/${detail.id}/suggestion-feedback`, token, { thumb });
-      setRated({ text: detail.suggestion.text, thumb });
+      await api(`/api/agent/calls/${detail.id}/suggestion-feedback`, token, {
+        thumb,
+      });
+      if (current()) setRated({ text: detail.suggestion.text, thumb });
     });
 
   async function send(content: string, action: string, force = false) {
-    if (!detail || !content.trim() || sending) return;
+    if (!detail || !content.trim() || sendLock.current) return;
+    sendLock.current = true;
     setSending(true);
-    await run(async () => {
-      const question = [...detail.turns].reverse().find((t) => t.speaker === "customer")?.content;
-      const result = await api<{ sent: boolean; warnings: string[] }>(`/api/agent/calls/${detail.id}/reply`, token, {
-        content: content.trim(),
-        action,
-        force,
-      });
+    await run(async (current) => {
+      const question = [...detail.turns]
+        .reverse()
+        .find((t) => t.speaker === "customer")?.content;
+      const result = await api<{ sent: boolean; warnings: string[] }>(
+        `/api/agent/calls/${detail.id}/reply`,
+        token,
+        {
+          content: content.trim(),
+          action,
+          force,
+        },
+      );
+      if (!current()) return;
       if (!result.sent) {
         setWarning({ content, action, reasons: result.warnings });
         return;
@@ -138,14 +227,18 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
       if (question) setFaq({ question, answer: content.trim(), saved: null });
       await refreshCall(detail.id);
     });
-    setSending(false);
+    if (token === currentToken.current && detail.id === currentCall.current) {
+      sendLock.current = false;
+      setSending(false);
+    }
   }
 
   const turns = detail?.turns ?? [];
   const spoken = turns.filter((t) => t.speaker !== "system");
   const last = spoken[spoken.length - 1];
   const live = Boolean(detail && !detail.ended_at);
-  const copilot = live && detail?.handoff_status === "accepted" && detail.held_by_you;
+  const copilot =
+    live && detail?.handoff_status === "accepted" && detail.held_by_you;
   const awaitingReply = copilot && last?.speaker === "customer";
   const suggestion = awaitingReply ? detail?.suggestion : null;
   const modeLine = !detail
@@ -159,60 +252,80 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
             ? "Bạn đang phụ trách cuộc gọi này (copilot)"
             : "Một nhân viên khác đang phụ trách"
           : "Trợ lý AI đang xử lý; bạn đang quan sát";
-  const waiting = calls.filter((c) => c.handoff_status === "pending" && !c.ended_at).length;
+  const waiting = calls.filter(
+    (c) => c.handoff_status === "pending" && !c.ended_at,
+  ).length;
 
+  const Container = embedded ? "section" : "main";
+  const Heading = embedded ? "h2" : "h1";
   return (
-    <main className={"shell workspace call-console" + (embedded ? " embedded" : "")}>
+    <Container
+      id={embedded ? undefined : "calls-content"}
+      tabIndex={-1}
+      className={"shell workspace call-console" + (embedded ? " embedded" : "")}
+    >
       {!embedded && (
-      <header className="topbar">
-        <Link className="logo" href="/">
-          tiếp nối
-        </Link>
-        <nav>
-          <Link href="/login">Sign in</Link>
-          <Link href="/agent">Inbox</Link>
-          <Link href="/calls">Calls</Link>
-          <Link href="/admin">Admin</Link>
-          <Link href="/developer">Developer</Link>
-        </nav>
-      </header>
+        <>
+        <a className="skip-link" href="#calls-content">Đến nội dung chính</a>
+        <header className="topbar">
+          <Link className="logo" href="/" aria-label="Quivo, về cửa hàng">
+            <Logo height={30} title="" />
+          </Link>
+          <nav aria-label="Điều hướng nhân viên">
+            <Link href="/ban-hang">Bán hàng</Link>
+            <Link href="/agent">Hộp thư</Link>
+            <Link href="/calls" aria-current="page">Cuộc gọi</Link>
+            <Link href="/admin">Quản trị</Link>
+            <Link href="/developer">Kỹ thuật</Link>
+          </nav>
+          <ThemeToggle />
+        </header>
+        </>
       )}
       <div className="section-heading console-heading">
         <div>
-          <p className="eyebrow">AI AGENT · CONSULTANT CONSOLE</p>
-          <h1>Cuộc gọi của trợ lý</h1>
+          <p className="eyebrow">QUIVO · HỖ TRỢ KHÁCH HÀNG</p>
+          <Heading>Cuộc gọi của trợ lý</Heading>
           <p className="console-subtitle">
-            Theo dõi trợ lý đang tư vấn, nhận cuộc gọi khi trợ lý chuyển máy, và trả lời cùng gợi ý của trợ lý.
+            Theo dõi trợ lý đang tư vấn, nhận cuộc gọi khi trợ lý chuyển máy, và
+            trả lời cùng gợi ý của trợ lý.
           </p>
         </div>
         <div className="console-status">
-          <span className={"status-dot" + (connected ? "" : " off")} /> {waiting} chờ nhận
+          <span className={"status-dot" + (connected ? "" : " off")} />{" "}
+          {waiting} chờ nhận
         </div>
       </div>
       {!embedded && (
-      <form
-        className="authbar"
-        onSubmit={(e) => {
-          e.preventDefault();
-          void run(refreshQueue);
-        }}
-      >
-        <label>
-          Staff access token
-          <input
-            type="password"
-            autoComplete="off"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-            placeholder="Token của role agent hoặc admin"
-            required
-          />
-        </label>
-        <label className="check inline">
-          <input type="checkbox" checked={openOnly} onChange={(e) => setOpenOnly(e.target.checked)} /> Chỉ cuộc gọi đang mở
-        </label>
-        <button type="submit">{connected ? "Làm mới" : "Kết nối"}</button>
-      </form>
+        <form
+          className="authbar"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void run(refreshQueue);
+          }}
+        >
+          <label>
+            Staff access token
+            <input
+              type="password"
+              disabled={!tokenReady}
+              autoComplete="off"
+              value={token}
+              onChange={(e) => setToken(e.target.value)}
+              placeholder="Token của role agent hoặc admin"
+              required
+            />
+          </label>
+          <label className="check inline">
+            <input
+              type="checkbox"
+              checked={openOnly}
+              onChange={(e) => setOpenOnly(e.target.checked)}
+            />{" "}
+            Chỉ cuộc gọi đang mở
+          </label>
+          <button type="submit" disabled={!tokenReady || queueLoading} aria-busy={queueLoading}>{queueLoading ? "Đang tải…" : connected ? "Làm mới" : "Kết nối"}</button>
+        </form>
       )}
       {error && (
         <div role="alert" className="alert">
@@ -222,12 +335,21 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
       )}
 
       <div className="call-grid">
-        <aside className="panel call-queue">
+        <aside className="panel call-queue" aria-busy={queueLoading}>
           <h2>Hàng chờ</h2>
-          {calls.length === 0 && <p className="empty">{connected ? "Chưa có cuộc gọi." : "Kết nối bằng token để tải."}</p>}
+          {calls.length === 0 && (
+            <p className="empty">
+              {queueLoading ? "Đang tải hàng chờ…" : connected ? "Chưa có cuộc gọi. Cuộc mới sẽ tự xuất hiện tại đây." : "Kết nối bằng token để tải."}
+            </p>
+          )}
           {calls.map((c) => (
-            <div key={c.id} className={"queue-item" + (c.id === selectedId ? " selected" : "")}>
-              <button className="queue-row" onClick={() => setSelectedId(c.id)}>
+            <div
+              key={c.id}
+              className={
+                "queue-item" + (c.id === selectedId ? " selected" : "")
+              }
+            >
+              <button className="queue-row" aria-pressed={c.id === selectedId} onClick={() => setSelectedId(c.id)}>
                 <span className={"live-dot" + (c.ended_at ? " ended" : "")} />
                 <span className="queue-text">
                   <strong>{caller(c)}</strong>
@@ -258,16 +380,23 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
               <div className="panel-title">
                 <div>
                   <h2>
-                    {caller(detail)} · {CHANNEL[detail.channel] || detail.channel}
+                    {caller(detail)} ·{" "}
+                    {CHANNEL[detail.channel] || detail.channel}
                   </h2>
                   <p className="console-subtitle">{modeLine}</p>
                 </div>
                 <span className={"tag" + (detail.ended_at ? "" : " accent")}>
-                  {detail.ended_at ? "Ended" : detail.mode === "copilot" ? "Copilot" : "Assistant"}
+                  {detail.ended_at
+                    ? "Đã kết thúc"
+                    : detail.mode === "copilot"
+                      ? "Copilot"
+                      : "Trợ lý AI"}
                 </span>
               </div>
               <div className="messages staff-messages call-turns">
-                {spoken.length === 0 && <p className="empty">Chưa có lời nào.</p>}
+                {spoken.length === 0 && (
+                  <p className="empty">Chưa có lời nào.</p>
+                )}
                 {turns.map((t) => (
                   <TurnBubble key={t.id} turn={t} />
                 ))}
@@ -277,7 +406,9 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
               {live && detail.handoff_status === "pending" && (
                 <div className="call-action-bar">
                   <span>{detail.handoff_reason || "Trợ lý đã chuyển máy"}</span>
-                  <button onClick={() => accept(detail.id)}>Nhận cuộc gọi này</button>
+                  <button onClick={() => accept(detail.id)}>
+                    Nhận cuộc gọi này
+                  </button>
                 </div>
               )}
 
@@ -297,7 +428,13 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
                         >
                           Sửa lại
                         </button>
-                        <button className="danger" disabled={sending} onClick={() => send(warning.content, warning.action, true)}>
+                        <button
+                          className="danger"
+                          disabled={sending}
+                          onClick={() =>
+                            send(warning.content, warning.action, true)
+                          }
+                        >
                           Vẫn gửi
                         </button>
                       </div>
@@ -306,28 +443,55 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
                   {faq && !awaitingReply && (
                     <div className="card">
                       {faq.saved ? (
-                        <p>Đã lưu thành FAQ {faq.saved}. Lần sau trợ lý tự trả lời được câu này.</p>
+                        <p>
+                          Đã lưu thành FAQ {faq.saved}. Lần sau trợ lý tự trả
+                          lời được câu này.
+                        </p>
                       ) : (
                         <>
-                          <small>Lưu câu trả lời này để trợ lý dùng lần sau?</small>
+                          <small>
+                            Lưu câu trả lời này để trợ lý dùng lần sau?
+                          </small>
                           <p>Câu hỏi: {faq.question}</p>
-                          <textarea rows={2} value={faq.answer} onChange={(e) => setFaq({ ...faq, answer: e.target.value })} />
-                          <small>Xóa mọi thông tin riêng của khách trước khi lưu.</small>
+                          <textarea
+                            aria-label="Câu trả lời lưu vào FAQ"
+                            rows={2}
+                            value={faq.answer}
+                            onChange={(e) =>
+                              setFaq({ ...faq, answer: e.target.value })
+                            }
+                          />
+                          <small>
+                            Xóa mọi thông tin riêng của khách trước khi lưu.
+                          </small>
                           <div className="buttonrow">
                             <button
                               onClick={() =>
-                                run(async () => {
-                                  const saved = await api<{ chunk_id?: string }>(`/api/agent/calls/${detail.id}/faq`, token, {
-                                    question: faq.question,
-                                    answer: faq.answer,
+                                run(async (current) => {
+                                  const saved = await api<{
+                                    chunk_id?: string;
+                                  }>(
+                                    `/api/agent/calls/${detail.id}/faq`,
+                                    token,
+                                    {
+                                      question: faq.question,
+                                      answer: faq.answer,
+                                    },
+                                  );
+                                  if (!current()) return;
+                                  setFaq({
+                                    ...faq,
+                                    saved: saved.chunk_id || "mới",
                                   });
-                                  setFaq({ ...faq, saved: saved.chunk_id || "mới" });
                                 })
                               }
                             >
                               Lưu FAQ
                             </button>
-                            <button className="secondary" onClick={() => setFaq(null)}>
+                            <button
+                              className="secondary"
+                              onClick={() => setFaq(null)}
+                            >
                               Để sau
                             </button>
                           </div>
@@ -339,10 +503,21 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
                     <div className="card suggestion">
                       <small>Trợ lý gợi ý</small>
                       <p>{suggestion.text}</p>
-                      {!!suggestion.used_lines?.length && <small>Dựa trên {suggestion.used_lines.join(", ")}</small>}
-                      {!!suggestion.warnings?.length && <div className="alert">{suggestion.warnings.join(" ")}</div>}
+                      {!!suggestion.used_lines?.length && (
+                        <small>
+                          Dựa trên {suggestion.used_lines.join(", ")}
+                        </small>
+                      )}
+                      {!!suggestion.warnings?.length && (
+                        <div className="alert">
+                          {suggestion.warnings.join(" ")}
+                        </div>
+                      )}
                       <div className="buttonrow">
-                        <button disabled={sending} onClick={() => send(suggestion.text, "used")}>
+                        <button
+                          disabled={sending}
+                          onClick={() => send(suggestion.text, "used")}
+                        >
                           Gửi nguyên văn
                         </button>
                         <button
@@ -354,11 +529,18 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
                         >
                           Sửa trước khi gửi
                         </button>
-                        <span className="thumbs" role="group" aria-label="Đánh giá gợi ý">
+                        <span
+                          className="thumbs"
+                          role="group"
+                          aria-label="Đánh giá gợi ý"
+                        >
                           <button
                             className="secondary"
                             aria-label="Gợi ý tốt"
-                            aria-pressed={rated?.text === suggestion.text && rated.thumb === "up"}
+                            aria-pressed={
+                              rated?.text === suggestion.text &&
+                              rated.thumb === "up"
+                            }
                             onClick={() => rate("up")}
                           >
                             👍
@@ -366,14 +548,19 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
                           <button
                             className="secondary"
                             aria-label="Gợi ý chưa tốt"
-                            aria-pressed={rated?.text === suggestion.text && rated.thumb === "down"}
+                            aria-pressed={
+                              rated?.text === suggestion.text &&
+                              rated.thumb === "down"
+                            }
                             onClick={() => rate("down")}
                           >
                             👎
                           </button>
                         </span>
                       </div>
-                      {rated?.text === suggestion.text && <small>Đã ghi nhận đánh giá của bạn.</small>}
+                      {rated?.text === suggestion.text && (
+                        <small>Đã ghi nhận đánh giá của bạn.</small>
+                      )}
                     </div>
                   )}
                   <form
@@ -389,18 +576,24 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
                       value={draft}
                       onChange={(e) => setDraft(e.target.value)}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
+                        if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
                           e.preventDefault();
                           void send(draft, draftFrom);
                         }
                       }}
-                      placeholder={awaitingReply ? "Trả lời khách" : "Nhắn cho khách"}
+                      placeholder={
+                        awaitingReply ? "Trả lời khách" : "Nhắn cho khách"
+                      }
                     />
                     <button type="submit" disabled={sending || !draft.trim()}>
                       Gửi
                     </button>
                   </form>
-                  {draftFrom === "edited" && <small className="hint">Đang sửa gợi ý; phần khác biệt được lưu làm phản hồi.</small>}
+                  {draftFrom === "edited" && (
+                    <small className="hint">
+                      Đang sửa gợi ý; phần khác biệt được lưu làm phản hồi.
+                    </small>
+                  )}
                 </div>
               )}
 
@@ -410,8 +603,13 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
                     <button
                       className="secondary"
                       onClick={() =>
-                        run(async () => {
-                          await api(`/api/agent/calls/${detail.id}/handoff`, token, { reason: "Nhân viên chủ động nhận" });
+                        run(async (current) => {
+                          await api(
+                            `/api/agent/calls/${detail.id}/handoff`,
+                            token,
+                            { reason: "Nhân viên chủ động nhận" },
+                          );
+                          if (!current()) return;
                           await refreshCall(detail.id);
                         })
                       }
@@ -422,9 +620,19 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
                   <button
                     className="secondary"
                     onClick={() =>
-                      run(async () => {
-                        if (!window.confirm("Kết thúc cuộc gọi và chạy after-call (ghi nhớ, chấm QA)?")) return;
-                        await api(`/api/agent/calls/${detail.id}/end`, token, {});
+                      run(async (current) => {
+                        if (
+                          !window.confirm(
+                            "Kết thúc cuộc gọi và chạy after-call (ghi nhớ, chấm QA)?",
+                          )
+                        )
+                          return;
+                        await api(
+                          `/api/agent/calls/${detail.id}/end`,
+                          token,
+                          {},
+                        );
+                        if (!current()) return;
                         await refreshCall(detail.id);
                         await refreshQueue();
                       })
@@ -436,30 +644,65 @@ export default function CallConsole({ embedded = false }: { embedded?: boolean }
               )}
             </>
           ) : (
-            <p className="empty">{selectedId == null ? "Chọn một cuộc gọi." : "Đang tải…"}</p>
+            <p className="empty" role="status">
+              {selectedId == null ? "Chọn một cuộc gọi." : "Đang tải…"}
+            </p>
           )}
         </section>
 
         <aside className="panel call-evidence">
           <h2>Bằng chứng</h2>
-          {detail ? <Evidence detail={detail} /> : <p className="empty">Chọn cuộc gọi để xem brief và các lượt của trợ lý.</p>}
+          {detail ? (
+            <Evidence detail={detail} />
+          ) : (
+            <p className="empty">
+              Chọn cuộc gọi để xem brief và các lượt của trợ lý.
+            </p>
+          )}
+          {detail && <CallContext callId={detail.id} token={token} />}
         </aside>
       </div>
-    </main>
+    </Container>
   );
 }
 
 function TurnBubble({ turn }: { turn: AgentTurn }) {
   if (turn.speaker === "system")
-    return <p className="call-note">{turn.meta?.joined ? `${String(turn.meta.joined)} đã tham gia` : turn.content}</p>;
+    return (
+      <p className="call-note">
+        {turn.meta?.joined
+          ? `${String(turn.meta.joined)} đã tham gia`
+          : turn.content}
+      </p>
+    );
   const label =
-    turn.speaker === "customer" ? "KHÁCH" : turn.speaker === "human_agent" ? "NHÂN VIÊN" : "TRỢ LÝ AI";
-  const lane = turn.speaker === "agent" ? (turn.meta?.lane as string | undefined) : undefined;
+    turn.speaker === "customer"
+      ? "KHÁCH"
+      : turn.speaker === "human_agent"
+        ? "NHÂN VIÊN"
+        : "TRỢ LÝ AI";
+  const lane =
+    turn.speaker === "agent"
+      ? (turn.meta?.lane as string | undefined)
+      : undefined;
   return (
-    <div className={"message " + (turn.speaker === "customer" ? "incoming" : turn.speaker === "human_agent" ? "outgoing human" : "outgoing")}>
+    <div
+      className={
+        "message " +
+        (turn.speaker === "customer"
+          ? "incoming"
+          : turn.speaker === "human_agent"
+            ? "outgoing human"
+            : "outgoing")
+      }
+    >
       <small>
         {label}
-        {lane ? ` · ${lane}` : ""} · {new Date(turn.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}
+        {lane ? ` · ${lane}` : ""} ·{" "}
+        {new Date(turn.created_at).toLocaleTimeString("vi-VN", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
       </small>
       <p>{turn.content}</p>
     </div>
@@ -510,7 +753,11 @@ function Evidence({ detail }: { detail: AgentCallDetail }) {
       <h3>Ngữ cảnh</h3>
       <dl className="facts">
         <dt>Khách</dt>
-        <dd>{detail.customer_id ? `${detail.customer_label || ""} (${detail.customer_id})` : "chưa biết"}</dd>
+        <dd>
+          {detail.customer_id
+            ? `${detail.customer_label || ""} (${detail.customer_id})`
+            : "chưa biết"}
+        </dd>
         <dt>Tier</dt>
         <dd>{detail.tier}</dd>
         <dt>Lane</dt>
@@ -539,9 +786,19 @@ function Evidence({ detail }: { detail: AgentCallDetail }) {
       <h3>Các lượt của trợ lý</h3>
       {agentTurns.length === 0 && <p className="empty">Chưa có lượt nào.</p>}
       {agentTurns.map((t, i) => {
-        const tools = (t.meta?.tool_calls as { name: string; result?: { ok?: boolean } }[] | undefined) || [];
-        const guard = (t.meta?.guard as { passed?: boolean; hard?: { reasons?: string[] }; soft?: { reasons?: string[] } }) || {};
-        const reasons = [...(guard.hard?.reasons || []), ...(guard.soft?.reasons || [])];
+        const tools =
+          (t.meta?.tool_calls as
+            { name: string; result?: { ok?: boolean } }[] | undefined) || [];
+        const guard =
+          (t.meta?.guard as {
+            passed?: boolean;
+            hard?: { reasons?: string[] };
+            soft?: { reasons?: string[] };
+          }) || {};
+        const reasons = [
+          ...(guard.hard?.reasons || []),
+          ...(guard.soft?.reasons || []),
+        ];
         return (
           <div className="turn-evidence" key={t.id}>
             <strong>
@@ -550,7 +807,10 @@ function Evidence({ detail }: { detail: AgentCallDetail }) {
             {tools.length > 0 && (
               <div className="chips">
                 {tools.map((tool, j) => (
-                  <span key={j} className={"chip" + (tool.result?.ok ? "" : " bad")}>
+                  <span
+                    key={j}
+                    className={"chip" + (tool.result?.ok ? "" : " bad")}
+                  >
                     {tool.name}
                   </span>
                 ))}
@@ -558,11 +818,15 @@ function Evidence({ detail }: { detail: AgentCallDetail }) {
             )}
             <small>
               Guard {guard.passed === false ? "trượt" : "đạt"}
-              {Number(t.meta?.regenerations) > 0 ? ` · viết lại ${String(t.meta.regenerations)} lần` : ""}
+              {Number(t.meta?.regenerations) > 0
+                ? ` · viết lại ${String(t.meta.regenerations)} lần`
+                : ""}
               {t.meta?.fallback ? " · câu an toàn" : ""}
               {t.meta?.model ? ` · ${String(t.meta.model)}` : ""}
             </small>
-            {reasons.length > 0 && <small className="bad-text">{reasons.join(" ")}</small>}
+            {reasons.length > 0 && (
+              <small className="bad-text">{reasons.join(" ")}</small>
+            )}
           </div>
         );
       })}
@@ -570,7 +834,9 @@ function Evidence({ detail }: { detail: AgentCallDetail }) {
         <>
           <h3>Sau cuộc gọi</h3>
           <p className="empty">Ghi nhớ: {detail.memory_status || "—"}</p>
-          {detail.after_call && <pre>{JSON.stringify(detail.after_call, null, 2)}</pre>}
+          {detail.after_call && (
+            <pre>{JSON.stringify(detail.after_call, null, 2)}</pre>
+          )}
         </>
       )}
     </>
@@ -585,5 +851,10 @@ function caller(c: AgentCall) {
 }
 
 function when(iso: string) {
-  return new Date(iso).toLocaleString("vi-VN", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" });
+  return new Date(iso).toLocaleString("vi-VN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    day: "2-digit",
+    month: "2-digit",
+  });
 }

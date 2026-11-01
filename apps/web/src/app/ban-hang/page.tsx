@@ -131,6 +131,7 @@ export default function SalesPage() {
 
   return (
     <div className="sl-app">
+      <a className="skip-link" href="#sales-content">Đến nội dung chính</a>
       <aside className="sl-side">
         <Link href="/" className="sl-logo" aria-label="Quivo, về cửa hàng">
           <span>
@@ -139,7 +140,7 @@ export default function SalesPage() {
           </span>
         </Link>
         <span className="sl-side-label">Bán hàng</span>
-        <nav>
+        <nav aria-label="Khu vực bán hàng">
           {visible.map((t) => (
             <button
               key={t.id}
@@ -176,7 +177,7 @@ export default function SalesPage() {
           </div>
         </div>
       </aside>
-      <main className="sl-main">
+      <main id="sales-content" className="sl-main" tabIndex={-1}>
         <div className="sl-topbar">
           <div className="sl-topbar-title">
             <h1>{current.label}</h1>
@@ -189,9 +190,9 @@ export default function SalesPage() {
             <ThemeToggle />
           </div>
         </div>
-        {error && <div className="sl-alert">{error}</div>}
+        {error && <div className="sl-alert" role="alert">{error}</div>}
         {!checked ? (
-          <p className="sl-muted">Đang tải…</p>
+          <p className="sl-muted" role="status">Đang tải…</p>
         ) : tab === "overview" ? (
           <Overview calls={calls} orders={orders} callbacks={callbacks} waiting={waiting} go={go} />
         ) : tab === "conversations" ? (
@@ -389,8 +390,8 @@ function Orders({ orders, token, onChange }: { orders: Order[]; token: string; o
   return (
     <>
       <div className="sl-toolbar">
-        <input placeholder="Tìm mã đơn, sản phẩm, SKU…" value={query} onChange={(e) => setQuery(e.target.value)} />
-        <select value={status} onChange={(e) => setStatus(e.target.value)}>
+        <input aria-label="Tìm đơn hàng" placeholder="Tìm mã đơn, sản phẩm, SKU…" value={query} onChange={(e) => setQuery(e.target.value)} />
+        <select aria-label="Lọc trạng thái đơn hàng" value={status} onChange={(e) => setStatus(e.target.value)}>
           <option value="all">Tất cả trạng thái</option>
           {Object.entries(STATUS).map(([value, label]) => (
             <option key={value} value={value}>
@@ -398,10 +399,11 @@ function Orders({ orders, token, onChange }: { orders: Order[]; token: string; o
             </option>
           ))}
         </select>
-        <span className="sl-muted">{shown.length} đơn</span>
+        <span className="sl-muted" role="status">{shown.length} đơn</span>
       </div>
-      {error && <div className="sl-alert">{error}</div>}
+      {error && <div className="sl-alert" role="alert">{error}</div>}
       <table className="sl-table">
+        <caption className="sr-only">Đơn hàng · chọn mã đơn để xem chi tiết</caption>
         <thead>
           <tr>
             <th>Mã đơn</th>
@@ -418,7 +420,7 @@ function Orders({ orders, token, onChange }: { orders: Order[]; token: string; o
             <Fragment key={o.id}>
               <tr className={open === o.id ? "open" : ""} onClick={() => setOpen(open === o.id ? null : o.id)}>
                 <td>
-                  <b className="sl-code">#{o.id.slice(0, 8).toUpperCase()}</b>
+                  <button className="sl-order-toggle sl-code" aria-label={`Chi tiết đơn #${o.id.slice(0, 8).toUpperCase()}`} aria-expanded={open === o.id} aria-controls={`order-${o.id}`} onClick={(event) => { event.stopPropagation(); setOpen(open === o.id ? null : o.id); }}>#{o.id.slice(0, 8).toUpperCase()} <span aria-hidden="true">{open === o.id ? "−" : "+"}</span></button>
                 </td>
                 <td>{o.created_at ? new Date(o.created_at).toLocaleString("vi-VN") : "—"}</td>
                 <td>{o.items.map((i) => `${i.name} × ${i.quantity}`).join(", ")}</td>
@@ -461,7 +463,7 @@ function Orders({ orders, token, onChange }: { orders: Order[]; token: string; o
                 </td>
               </tr>
               {open === o.id && (
-                <tr className="sl-detail">
+                <tr id={`order-${o.id}`} className="sl-detail">
                   <td colSpan={7}>
                     <div className="sl-detail-grid">
                       <div>

@@ -1,0 +1,76 @@
+name: Offline checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: telesales_test
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 3s --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql+psycopg://postgres:postgres@127.0.0.1:5432/telesales_test
+      TEST_REDIS_URL: redis://127.0.0.1:6379/15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements-dev.txt
+      - run: python -m pytest -q
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run test:unit
+      - run: npm run build
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements-dev.txt
+        working-directory: .
+      - run: npx playwright install --with-deps chromium
+      - name: Production browser smoke with offline fixtures
+        working-directory: .
+        env:
+          PYTHONPATH: tests:packages/backend-common:apps/ai-agent-service/src:.
+          COMMERCE_SERVICE_URL: http://127.0.0.1:18000
+          IDENTITY_SERVICE_URL: http://127.0.0.1:18000
+          SALES_SERVICE_URL: http://127.0.0.1:18000
+          AI_AGENT_SERVICE_URL: http://127.0.0.1:18000
+          BACKEND_URL: http://127.0.0.1:18001
+          WEB_URL: http://127.0.0.1:13000
+          OFFLINE_STACK: '1'
+        run: |
+          python -m uvicorn offline_api:app --host 127.0.0.1 --port 18000 > /tmp/offline-api.log 2>&1 &
+          api_pid=$!
+          python -m uvicorn main:app --app-dir apps/api-gateway/src --host 127.0.0.1 --port 18001 > /tmp/offline-gateway.log 2>&1 &
+          gateway_pid=$!
+          (cd apps/web && npm run start -- --hostname 127.0.0.1 --port 13000) > /tmp/offline-web.log 2>&1 &
+          web_pid=$!
+          trap 'kill "$api_pid" "$gateway_pid" "$web_pid" || true' EXIT
+          for attempt in $(seq 1 60); do
+            if curl -fsS "$WEB_URL/backend/api/catalog/payment-methods" > /dev/null; then break; fi
+            sleep 1
+          done
+          cd apps/web
+          npx playwright test e2e/session.spec.ts e2e/offline-checkout.spec.ts e2e/call-console.spec.ts

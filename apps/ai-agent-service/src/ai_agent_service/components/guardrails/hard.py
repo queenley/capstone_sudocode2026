@@ -35,6 +35,7 @@ from ..intake.itn import amounts, format_vnd
 from ..intake.pii import PATTERNS, TOKEN
 from ..intake.text import plain
 from . import Verdict
+from .actions import deletion_succeeded
 
 MAX_SENTENCES = 3
 
@@ -56,7 +57,7 @@ TRANSFER_PROMISE = re.compile(
     r"\bem\b[^.?!]*?\b(chuyển|kết nối|nối máy)\b[^.?!]*?\b(máy|cuộc gọi|nhân viên|đồng nghiệp|bộ phận|tư vấn viên)\b", re.IGNORECASE)
 #: Words that make it an offer or a question rather than a promise.
 TRANSFER_OFFER = re.compile(r"(nếu|muốn|có thể|được không|có cần|\?|hay là|để em hỏi)", re.IGNORECASE)
-ORDER_CODE = re.compile(r"\bOD\d{5,}\b")
+ORDER_CODE = re.compile(r"\bOD\d+\b")
 ORDER_SUMMARY = re.compile(r"(tổng (cộng|đơn|tiền)|xác nhận đơn|lên đơn|mã đơn|đặt hàng)", re.IGNORECASE)
 VIETNAMESE = re.compile(r"[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]", re.IGNORECASE)
 SENTENCE = re.compile(r"(?<=[.!?…])\s+")
@@ -113,6 +114,7 @@ class GuardInput:
     created_orders: tuple[str, ...] = ()
     #: False for a consultant's text: they are the person, so there is no tool to wait for.
     check_handoff: bool = True
+    deletion_recorded: bool = False
 
 
 def numbers_in(value: Any) -> set[int]:
@@ -180,6 +182,7 @@ def check(view: GuardInput) -> Verdict:
     reasons += _promotions(text, view)
     reasons += _transfer(text, view)
     reasons += _completed_order(text, view)
+    reasons += _completed_deletion(text, view)
     if INTERNAL.search(text):
         reasons.append("Nhắc tới thông tin nội bộ (giá nhập, biên lợi nhuận, nhà cung cấp, giá sàn).")
     for kind, pattern in PATTERNS:
@@ -310,16 +313,39 @@ def _stock(text: str, view: GuardInput) -> list[str]:
 
 
 def _order_state(text: str, view: GuardInput) -> list[str]:
-    """An order's state comes from an order tool of the turn, like a stock claim from ``inventory.check``.
-
-    Not for a consultant's text (``check_handoff`` off): they read the order on their own screen.
-    """
-    if not view.check_handoff or not any(ORDER_STATE.search(s) and ORDER_WORD.search(s) for s in SENTENCE.split(text)):
+    """Each claimed state must match the named orders returned by this turn's tools."""
+    if not view.check_handoff:
         return []
+    records = []
     for result in view.tool_results:
-        if str(result.get("name", "")).replace("_", ".") in ORDER_TOOLS and (result.get("result") or {}).get("ok"):
-            return []
-    return ["Nói về trạng thái đơn mà chưa tra trong lượt này; gọi order_status trước, rồi nói đúng trạng thái tool trả về."]
+        envelope = result.get("result") or {}
+        if str(result.get("name", "")).replace("_", ".", 1) not in ORDER_TOOLS or not envelope.get("ok"):
+            continue
+        data = envelope.get("data")
+        if not isinstance(data, dict):
+            continue
+        orders = data.get("orders", [data])
+        if isinstance(orders, list):
+            records.extend(order for order in orders if isinstance(order, dict))
+    claims = (
+        (r"đang (?:được )?(?:giao|vận chuyển)|đang trên đường|đã (?:được )?(?:bàn giao|gửi đi)", {"shipping"}),
+        (r"đã (?:được )?giao", {"delivered"}),
+        (r"đã (?:được )?(?:hủy|huỷ)", {"cancelled"}),
+        (r"đang (?:được )?(?:xử lý|chuẩn bị)", {"created", "confirmed"}),
+        (r"chưa (?:được )?giao", {"created", "confirmed", "shipping"}),
+    )
+    for clause in re.split(r"(?<=[.!?…])\s+|[,;:]\s*", text):
+        codes = set(ORDER_CODE.findall(clause))
+        if not ORDER_STATE.search(clause) or not (ORDER_WORD.search(clause) or codes):
+            continue
+        relevant = [order for order in records if not codes or str(order.get("order_id") or order.get("id")) in codes]
+        supported = {str(order.get("order_id") or order.get("id")) for order in relevant}
+        statuses = {order.get("status") for order in relevant}
+        expected = [allowed for pattern, allowed in claims if re.search(pattern, clause, re.IGNORECASE)]
+        if (not statuses or not expected or (codes and not codes.issubset(supported))
+                or not all(statuses.issubset(allowed) for allowed in expected)):
+            return ["Nói về trạng thái đơn mà chưa tra trong lượt này; gọi order_status trước, rồi nói đúng trạng thái tool trả về."]
+    return []
 
 
 def _completed_order(text: str, view: GuardInput) -> list[str]:
@@ -332,8 +358,8 @@ def _completed_order(text: str, view: GuardInput) -> list[str]:
     """
     if not view.check_handoff:
         return []
-    for sentence in SENTENCE.split(text):
-        if HISTORY.search(sentence):
+    for sentence in re.split(r"(?<=[.!?…])\s+|[,;:]\s*", text):
+        if HISTORY.search(sentence) and not re.search(r"hôm nay|bây giờ|đơn mới|vừa", sentence, re.IGNORECASE):
             continue
         words = plain(sentence)
         creating = (_asserted(words, re.search(r"\b(da|vua) (len|tao|dat|xac nhan) (don|hang)\b", words))
@@ -341,16 +367,51 @@ def _completed_order(text: str, view: GuardInput) -> list[str]:
         updating = _asserted(words, re.search(r"\b(da|vua) (doi|cap nhat|sua) (don|size|kich co|dia chi)\b", words))
         if not creating and not updating:
             continue
-        if creating and view.created_orders:
-            continue
         tool = "order.create" if creating else "order.update"
-        backing = {tool, "order.status", "account.orders"} if creating else {tool}
-        if not any(str(r.get("name", "")).replace("_", ".", 1) in backing
-                   and (r.get("result") or {}).get("ok")
-                   and (r.get("result") or {}).get("data") for r in view.tool_results):
+        codes = set(ORDER_CODE.findall(sentence))
+        backed = set(view.created_orders) if creating and "đơn mới" not in sentence.lower() else set()
+        reported_state = False
+        for result in view.tool_results:
+            name = str(result.get("name", "")).replace("_", ".", 1)
+            envelope = result.get("result") or {}
+            data = envelope.get("data")
+            if not envelope.get("ok") or not isinstance(data, dict):
+                continue
+            if name == tool and data.get("order_id"):
+                backed.add(str(data["order_id"]))
+            # A read can support a reported state, never a claim that a new write happened.
+            if creating and name in {"order.status", "account.orders"} and "trạng thái" in sentence.lower():
+                matching = [order for order in data.get("orders") or [] if isinstance(order, dict)
+                            and order.get("status") == "created"]
+                backed.update(str(order["order_id"]) for order in matching if order.get("order_id"))
+                reported_state = bool(matching) and not codes
+        if not reported_state and (not backed or (codes and not codes.issubset(backed))):
             wire = tool.replace(".", "_")
             return [f"Nói đã thực hiện đơn hàng mà chưa có {wire} thành công; chỉ báo thành công sau kết quả tool. "
                     "Tool từ chối thì làm theo đúng lý do nó trả về (ví dụ xin số điện thoại)."]
+    return []
+
+
+def _completed_deletion(text: str, view: GuardInput) -> list[str]:
+    for sentence in SENTENCE.split(text):
+        words = plain(sentence)
+        recorded = re.search(r'\b(?:ghi nhan|tiep nhan) yeu cau xoa\b'
+                             r'|\byeu cau xoa\b[^.?!]{0,60}\b(?:da|vua) (?:duoc )?(?:ghi nhan|tiep nhan)\b', words)
+        erased = re.search(r'\b(?:da|vua) (?:duoc )?xoa (?:het |toan bo )?du lieu\b'
+                           r'|\bdu lieu\b[^.?!]{0,40}\bda (?:duoc )?xoa\b'
+                           r'|\bxoa (?:het |toan bo )?du lieu\b[^.?!]{0,40}\b(?:thanh cong|xong|roi)\b', words)
+        if erased and re.search(r'yeu cau\s*$', words[:erased.start()]):
+            erased = None
+        if recorded and re.search(r'\b(se|can|de|khi)\b', words[:recorded.start()]):
+            recorded = None
+        if not _asserted(words, recorded) and not _asserted(words, erased):
+            continue
+        expected = 'memory.delete_customer' if _asserted(words, erased) else 'memory.request_deletion'
+        if expected == 'memory.request_deletion' and view.deletion_recorded:
+            continue
+        if not any(result.get('name') == expected and deletion_succeeded(expected, result.get('result') or {})
+                   for result in view.tool_results):
+            return [f'Chỉ báo đã ghi nhận hoặc xóa dữ liệu sau khi {expected} thành công; chưa có kết quả thì không báo thành công.']
     return []
 
 

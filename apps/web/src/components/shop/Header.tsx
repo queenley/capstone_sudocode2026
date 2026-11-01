@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { Logo } from "@/components/brand/Logo";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 import { categoryName, DEPARTMENTS } from "@/lib/catalog";
@@ -19,6 +19,7 @@ export default function Header() {
   const pathname = usePathname();
   const [query, setQuery] = useState("");
   const [menu, setMenu] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setMenu(false);
@@ -52,7 +53,7 @@ export default function Header() {
         </div>
       </div>
       <div className="s-wrap s-mainbar">
-        <button className="s-menu-btn" aria-label="Danh mục" aria-expanded={menu} onClick={() => setMenu(!menu)}>
+        <button ref={menuButton} className="s-menu-btn" aria-label="Danh mục" aria-controls="shop-navigation" aria-expanded={menu} onClick={() => setMenu(!menu)}>
           ☰
         </button>
         <Link href="/" className="s-logo" aria-label="Quivo, trang chủ">
@@ -118,14 +119,19 @@ export default function Header() {
           </Link>
         </div>
       </div>
-      <nav className={`s-nav ${menu ? "open" : ""}`} aria-label="Danh mục sản phẩm">
+      <nav id="shop-navigation" className={`s-nav ${menu ? "open" : ""}`} aria-label="Danh mục sản phẩm" onKeyDown={(event) => {
+        if (event.key === "Escape" && menu) {
+          setMenu(false);
+          menuButton.current?.focus();
+        }
+      }}>
         <div className="s-wrap s-nav-inner">
-          <Link href="/" className={pathname === "/" ? "active" : undefined}>
+          <Link href="/" className={pathname === "/" ? "active" : undefined} aria-current={pathname === "/" ? "page" : undefined}>
             Trang chủ
           </Link>
           {DEPARTMENTS.map((dept) => (
             <div className="s-nav-item" key={dept.slug}>
-              <Link href={`/danh-muc/${dept.slug}`} className={active(`/danh-muc/${dept.slug}`)}>
+              <Link href={`/danh-muc/${dept.slug}`} className={active(`/danh-muc/${dept.slug}`)} aria-current={pathname === `/danh-muc/${dept.slug}` ? "page" : undefined}>
                 {categoryName(dept.slug)}
               </Link>
               {dept.children.length > 0 && (

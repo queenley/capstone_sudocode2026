@@ -42,6 +42,7 @@ from types import ModuleType
 from typing import Any, Iterable, Literal, Mapping, Sequence
 
 from ...config.config_manager import btc_data_dir
+from .storage import locked
 
 Kind = Literal["outcome", "score", "consultant", "repeat", "oos_early", "oos_late", "violation", "eval_error"]
 
@@ -62,9 +63,12 @@ async def record(kind: Kind, *, call_id: str, turn_id: str | None, value: Any) -
     """Append one signal; a row is one line, never rewritten."""
     row = {"at": datetime.now(timezone.utc).isoformat(), "kind": kind, "call_id": str(call_id), "turn_id": turn_id, "value": value}
     path = store()
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a", encoding="utf-8") as stream:
-        stream.write(json.dumps(row, ensure_ascii=False, default=str) + "\n")
+    with locked(home()):
+        forgotten = home() / "forgotten-calls.json"
+        if forgotten.exists() and str(call_id) in json.loads(forgotten.read_text()):
+            return
+        with path.open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps(row, ensure_ascii=False, default=str) + "\n")
 
 
 def read(kind: Kind | None = None) -> list[dict[str, Any]]:

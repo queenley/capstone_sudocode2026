@@ -168,9 +168,9 @@ class ToolGuardMiddleware(AgentMiddleware):
                     call, "TIMEOUT", f"{name} did not answer within {limit:g}s", retryable=True
                 )
             except Exception as error:  # noqa: BLE001 - reported to the model as data
-                logger.exception("Tool %s raised", name)
+                logger.warning("Tool %s raised %s", name, type(error).__name__)
                 result = self._envelope_message(
-                    call, "TOOL_ERROR", f"{type(error).__name__}: {error}", retryable=True
+                    call, "TOOL_ERROR", type(error).__name__, retryable=True
                 )
             if self._settle(name, result, attempt):
                 return visible_result(with_args(result, request.tool_call.get("args") or {}), request)
@@ -193,9 +193,9 @@ class ToolGuardMiddleware(AgentMiddleware):
             try:
                 result = strip_internal(handler(request))
             except Exception as error:  # noqa: BLE001
-                logger.exception("Tool %s raised", name)
+                logger.warning("Tool %s raised %s", name, type(error).__name__)
                 result = self._envelope_message(
-                    call, "TOOL_ERROR", f"{type(error).__name__}: {error}", retryable=True
+                    call, "TOOL_ERROR", type(error).__name__, retryable=True
                 )
             if self._settle(name, result, attempt):
                 return visible_result(with_args(result, request.tool_call.get("args") or {}), request)
@@ -267,7 +267,7 @@ class ToolGuardMiddleware(AgentMiddleware):
                 and getattr(context, "lane", None) == "ORDER_SERVICE"):
             # Order lookup stays on the verified caller, never a model-supplied identity.
             args = {"phone": phone}
-        if phone and "customer_phone" in accepted and name != "crm_get_customer":
+        if "customer_phone" in accepted and name != "crm_get_customer":
             args["customer_phone"] = phone
         if isinstance(args.get("address"), str) and NO_ADDRESS.search(plain(args["address"])):
             args.pop("address")
@@ -278,14 +278,14 @@ class ToolGuardMiddleware(AgentMiddleware):
         if addresses and "address" in accepted:
             args["address"] = with_addresses(args.get("address"), addresses)
         customer = getattr(context, "customer_id", None)
-        if customer and "customer_id" in accepted:
+        if "customer_id" in accepted:
             args["customer_id"] = customer
         if "account_id" in accepted:
             # The logged-in shopper of this conversation, never one the model names.
             args["account_id"] = getattr(context, "account_id", None)
         call_id = getattr(context, "call_id", None)
-        if call_id and "call_id" in accepted:
-            args["call_id"] = str(call_id)
+        if "call_id" in accepted:
+            args["call_id"] = str(call_id) if call_id is not None else None
         if name in WRITE_TOOLS and IDEMPOTENCY_ARG in accepted:
             key = idempotency_key(context, name, args)
             if key:
@@ -402,7 +402,11 @@ def strip_internal(result: Any) -> Any:
     """
     envelope = envelope_of(result)
     if envelope is None:
-        return result
+        if not isinstance(result, ToolMessage):
+            return result
+        return result.model_copy(update={"content": json.dumps({"ok": False, "error": {
+            "code": "BAD_ENVELOPE", "retryable": False, "message": "Tool returned an invalid envelope"}}),
+            "additional_kwargs": {}, "response_metadata": {}})
     cleaned = without_internal(envelope)
     if cleaned == envelope:
         return result
@@ -428,7 +432,13 @@ def parse_envelope(content: Any) -> dict[str, Any] | None:
         parsed = json.loads(content)
     except ValueError:
         return None
-    return parsed if isinstance(parsed, dict) and "ok" in parsed else None
+    if not isinstance(parsed, dict) or type(parsed.get("ok")) is not bool:
+        return None
+    if parsed["ok"] and not isinstance(parsed.get("data"), dict):
+        return None
+    if not parsed["ok"] and not isinstance(parsed.get("error"), dict):
+        return None
+    return parsed
 
 
 class ToolBox:
@@ -457,11 +467,11 @@ class ToolBox:
         except asyncio.TimeoutError:
             return {"ok": False, "error": {"code": "TIMEOUT", "retryable": True, "message": f"{name} took over {self._timeout:g}s"}}
         except Exception as error:  # noqa: BLE001 - reported as data, like the servers do
-            logger.warning("Harness call %s failed: %s", name, error)
-            return {"ok": False, "error": {"code": "TOOL_ERROR", "retryable": True, "message": f"{type(error).__name__}: {error}"}}
+            logger.warning("Harness call %s failed: %s", name, type(error).__name__)
+            return {"ok": False, "error": {"code": "TOOL_ERROR", "retryable": True, "message": type(error).__name__}}
         envelope = parse_envelope(raw)
         if envelope is None:
-            return {"ok": False, "error": {"code": "BAD_ENVELOPE", "retryable": False, "message": str(raw)[:200]}}
+            return {"ok": False, "error": {"code": "BAD_ENVELOPE", "retryable": False, "message": "Tool returned an invalid envelope"}}
         return without_internal(envelope)
 
     async def data(self, name: str, /, **args: Any) -> Any:

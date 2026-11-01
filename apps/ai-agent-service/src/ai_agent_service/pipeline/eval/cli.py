@@ -98,8 +98,17 @@ def parser() -> argparse.ArgumentParser:
     parser.add_argument("--warmup", type=int, default=3, help="Untraced turns before the first measured one (default 3).")
     parser.add_argument("--no-extract", action="store_true",
                         help="Skip the question and claim extractor: no model call for it, and RQR and HR come out empty.")
+    parser.add_argument("--judge", action="store_true", help="Also run the BTC rubric judge; diagnostic, extra model cost, never changes the BTC score.")
     parser.add_argument("--relabel", type=Path, metavar="RUN_DIR",
                         help="Label a finished run's turns again with today's extractor and grade them; the agent does not run.")
+    parser.add_argument("--asr", type=Path, help="ASR ground_truth.json or its directory; scores with main's unchanged scorer.")
+    parser.add_argument("--asr-package", type=Path, help="Supplied manifest/audio/reference package; lossless private BTC-format adapter.")
+    parser.add_argument("--asr-unit", choices=["montage", "segments"], default="montage")
+    parser.add_argument("--asr-audio", type=Path, help="One unlabelled local audio file: transcript/timing only, WER/CER stay unmeasured.")
+    parser.add_argument("--asr-hypotheses", type=Path, help="Existing hypotheses; no model/API calls.")
+    parser.add_argument("--asr-transcribe", action="store_true", help="Explicitly decode existing audio with local ASR; never downloads weights.")
+    parser.add_argument("--asr-model", default="zipformer-30m")
+    parser.add_argument("--asr-entity-review", type=Path, help="Versioned canonical entity labels; pending review stays diagnostic, never self-approved.")
     parser.add_argument("--provider", help="The advisor's provider, overriding config/models.yaml.")
     parser.add_argument("--model", help="The advisor's model, overriding config/models.yaml.")
     return parser
@@ -107,12 +116,47 @@ def parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = parser().parse_args(argv)
+    if args.asr or args.asr_audio or args.asr_package:
+        if args.relabel or args.config or args.judge or args.provider or args.model or args.no_extract:
+            print("--asr is separate from agent/extractor evaluation")
+            return 2
+        from . import asr
+        out = args.out or RUNS / (datetime.now().strftime("%Y%m%d-%H%M%S") + "-asr")
+        try:
+            if sum(bool(x) for x in (args.asr, args.asr_audio, args.asr_package)) != 1:
+                raise ValueError("Choose one ASR input mode")
+            if args.asr_package:
+                from .asr_package import prepare
+                asr.private_output(out)
+                source = prepare(args.asr_package, out / "input", unit=args.asr_unit, only=set(args.only) or None)
+                result = asr.evaluate(source, args.asr_hypotheses, out / "result", model=args.asr_model,
+                                      transcribe=args.asr_transcribe, entity_review=args.asr_entity_review)
+                print(json.dumps({"status": result["status"], "main_scorer": result["main_scorer"], "out": str(out)}, ensure_ascii=False, indent=2))
+                return 0 if result["status"] == "COMPLETE" else 1
+            if args.asr_audio:
+                if args.asr or args.asr_hypotheses or args.asr_entity_review or not args.asr_transcribe:
+                    raise ValueError("--asr-audio requires --asr-transcribe and no reference/hypotheses options")
+                result = asr.audio_smoke(args.asr_audio, out, args.asr_model)
+                print(json.dumps(result, ensure_ascii=False, indent=2))
+                print(f"Private evidence: {out}")
+                return 0
+            result = asr.evaluate(args.asr, args.asr_hypotheses, out, model=args.asr_model,
+                                  transcribe=args.asr_transcribe, only=set(args.only) or None, entity_review=args.asr_entity_review)
+        except (ValueError, OSError, RuntimeError, ImportError) as error:
+            print(f"ASR setup error: {error}")
+            return 2
+        print(json.dumps({"status": result["status"], "main_scorer": result["main_scorer"],
+                          "diagnostics": result["diagnostics"], "out": str(out)}, ensure_ascii=False, indent=2))
+        return 0 if result["status"] == "COMPLETE" else 1
+    if args.asr_hypotheses or args.asr_transcribe or args.asr_entity_review:
+        print("ASR options require --asr")
+        return 2
     if bool(args.provider) != bool(args.model):
         print("--provider and --model go together")
         return 2
     if args.relabel:
-        if args.no_extract or args.config:
-            print("--relabel runs the extractor over both configurations: it takes neither --no-extract nor --config")
+        if args.no_extract or args.config or args.judge:
+            print("--relabel runs only the extractor: it takes neither --no-extract, --config nor --judge")
             return 2
         from . import relabel
 
@@ -181,8 +225,22 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
                 run.usage += result.usage
                 if result.error:
                     run.stopped.append({"scenario_id": scenario.scenario_id, "error": result.error})
-            if extractor is not None:
+                    break
+            if extractor is not None and not run.stopped:
                 await _label(run, extractor)
+            if args.judge and not run.stopped:
+                from ...components.evaluation.judge import BtcJudge
+                from ...llm.factory import LLMFactory
+                from ...config.config_manager import get_models_config
+                judge = BtcJudge(LLMFactory.create_llm(get_models_config().agent_llm_config("extractor"), agent_name="rubric_judge"))
+                judgments = []
+                for scenario in ready:
+                    for call, spec in scenario.data["calls"].items():
+                        rows = [row for row in run.rows if row["scenario_id"] == scenario.scenario_id and row["call"] == call]
+                        if rows:
+                            judgments.append({"config": config, "scenario_id": scenario.scenario_id, "call": call,
+                                              **await judge.grade(dict(spec), call, rows)})
+                trace.write_jsonl(layout.side(f"{config}.judge.jsonl"), judgments)
             invalid = 0
             for row, diagnosis in zip(run.rows, run.diagnostics):
                 errors = trace.schema_errors(row)
@@ -193,6 +251,8 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
             found[config] = report.problems(run.rows, run.diagnostics, schema_errors=invalid,
                                             rejected=len(rejected), scenario_errors=len(run.stopped))
             print(f"  -> {layout.traces[config]}")
+            if run.stopped:
+                break
         advisor = {"provider": rig.provider, "model": rig.advisor.model_name}
     finally:
         await mcp_client.close_all()
@@ -214,6 +274,9 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
     if args.no_extract:
         print("Extractor off: questions and claims are empty, so RQR and HR are not measured.")
     voided = report.blocking(found)
+    stopped = sum(len(run.stopped) for run in runs.values())
+    if stopped:
+        voided["scenarios_stopped"] = stopped
     if voided:
         print("Not scored: " + ", ".join(f"{name} {n}" for name, n in voided.items())
               + f". The traces are kept in {layout.directory}; diagnostics.jsonl says what failed.")
@@ -272,11 +335,18 @@ async def _label(run: ConfigRun, extractor: Any) -> None:
     # A burst can reserve the remaining cap before any in-flight usage settles.
     gate = asyncio.Semaphore(1 if os.environ.get("EVAL_BUDGET_DB") else EXTRACTOR_CONCURRENCY)
     history = scorers.previous_sessions(run.rows)
+    halted = False
 
     async def one(index: int, row: dict[str, Any], diagnosis: dict[str, Any]) -> None:
+        nonlocal halted
         data = scorers.turn_input(row["agent_text"], row["tool_calls"], history.get(index))
         async with gate:
+            if halted:
+                return
             labels = await extractor.label(data)
+            if labels.get("error"):
+                halted = True
+                run.stopped.append({"scenario_id": row["scenario_id"], "error": labels["error"]})
         row["questions"], row["claims"] = labels["questions"], labels["claims"]
         row["facts_used"] = trace.merged_facts_used(labels["facts_used"], row["facts_used"])
         diagnosis["extraction_items"] = labels["items"]
@@ -293,7 +363,7 @@ async def _label(run: ConfigRun, extractor: Any) -> None:
 
     await asyncio.gather(*(one(index, row, diagnosis)
                            for index, (row, diagnosis) in enumerate(zip(run.rows, run.diagnostics))))
-    print(f"  labelled {len(run.rows)} turns ({extractor.stats()})")
+    print(f"  labelled {sum('extraction_items' in d for d in run.diagnostics)} turns ({extractor.stats()})")
 
 
 def _write_json(path: Path, value: Any) -> None:

@@ -30,7 +30,10 @@ evaluation/data-generation/**/__pycache__/
 evaluation/data-generation/**/*.py[cod]
 
 # Optional
-.github/
+.github/*
+!.github/workflows/
+.github/workflows/*
+!.github/workflows/offline-checks.yml
 
 # Evaluation runs: local evidence and the store of real agent turns to re-label, may hold customer data
 evaluation/runs/
@@ -38,6 +41,7 @@ evaluation/runs/
 /20261017-111459/
 # The agent's downloaded embedding model
 apps/ai-agent-service/models/
+apps/asr-service/models/
 
 # Local test artefacts
 scripts/dev/answer.wav
@@ -45,3 +49,7 @@ apps/web/test-results/
 
 # Consultant feedback signals (improvement loop): staff names and suggestion text
 apps/ai-agent-service/data/improvement/
+apps/ai-agent-service/data/kb/.write-lock.sqlite*
+
+# Local evaluation evidence and budget ledger
+evaluation/agent-evaluation/runs/

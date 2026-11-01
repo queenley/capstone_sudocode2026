@@ -1,9 +1,10 @@
 "use client";
+import KnowledgeGaps from "@/features/knowledge-gaps";
 // Developer console for the AI agent (`/api/developer/*`, role developer/admin):
 // the advisor's model, live sessions, latency against the organisers'
 // thresholds, the 7-node pipeline, recent turns, voice options and the
 // business day. Runtime changes live in the agent process only.
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { api } from "@/services/api";
 
@@ -48,7 +49,11 @@ type Voice = {
   min_interruption_words: number;
   tts: string;
   overridden: boolean;
-  available: { status: string; missing_packages: string[]; hint: string | null };
+  available: {
+    status: string;
+    missing_packages: string[];
+    hint: string | null;
+  };
   asr_choices: Choice[];
   endpointing_choices: Choice[];
   tts_choices: Choice[];
@@ -70,7 +75,13 @@ const FIGURES: [keyof Latency, string, string][] = [
   ["call_brief", "CallBrief", "call_brief"],
 ];
 
-export default function AgentConsole({ token, onToken }: { token: string; onToken: (value: string) => void }) {
+export default function AgentConsole({
+  token,
+  onToken,
+}: {
+  token: string;
+  onToken: (value: string) => void;
+}) {
   const [traces, setTraces] = useState<Trace[]>([]);
   const [selected, setSelected] = useState<Trace | null>(null);
   const [error, setError] = useState("");
@@ -83,27 +94,51 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
   const [voice, setVoice] = useState<Voice | null>(null);
   const [day, setDay] = useState("");
   const [dayInput, setDayInput] = useState("");
+  const context = useRef(token);
+  context.current = token;
+  const revision = useRef(0);
+  useEffect(() => {
+    revision.current++;
+    setTraces([]);
+    setSelected(null);
+    setModel(null);
+    setLatency(null);
+    setSessions(null);
+    setVoice(null);
+    setDay("");
+    setDayInput("");
+    setError("");
+    setBusy(false);
+    return () => {
+      revision.current++;
+    };
+  }, [token]);
 
   const lanes = useMemo(() => {
     const counts: Record<string, number> = {};
-    for (const t of traces) counts[t.route || "—"] = (counts[t.route || "—"] || 0) + 1;
+    for (const t of traces)
+      counts[t.route || "—"] = (counts[t.route || "—"] || 0) + 1;
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
   }, [traces]);
 
-  async function run(task: () => Promise<void>) {
+  async function run(task: (current: () => boolean) => Promise<void>) {
+    const request = ++revision.current;
+    const current = () =>
+      context.current === token && revision.current === request;
     setBusy(true);
     setError("");
     try {
-      await task();
+      await task(current);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Yêu cầu thất bại");
+      if (current())
+        setError(e instanceof Error ? e.message : "Yêu cầu thất bại");
     } finally {
-      setBusy(false);
+      if (current()) setBusy(false);
     }
   }
 
   const refresh = () =>
-    run(async () => {
+    run(async (current) => {
       const [t, m, l, s, v, c] = await Promise.all([
         api<Trace[]>("/api/developer/traces", token),
         api<ModelSelection>("/api/developer/model", token),
@@ -112,6 +147,7 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
         api<Voice>("/api/developer/voice", token),
         api<{ day: string }>("/api/developer/clock", token),
       ]);
+      if (!current()) return;
       setTraces(t);
       setModel(m);
       setModelChoice(`${m.provider}::${m.model}`);
@@ -123,17 +159,31 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
     });
 
   const applyModel = (reset = false) =>
-    run(async () => {
+    run(async (current) => {
       const [provider, ...rest] = modelChoice.split("::");
       const next = reset
-        ? await api<ModelSelection>("/api/developer/model", token, undefined, "DELETE")
-        : await api<ModelSelection>("/api/developer/model", token, { provider, model: rest.join("::") }, "PUT");
+        ? await api<ModelSelection>(
+            "/api/developer/model",
+            token,
+            undefined,
+            "DELETE",
+          )
+        : await api<ModelSelection>(
+            "/api/developer/model",
+            token,
+            { provider, model: rest.join("::") },
+            "PUT",
+          );
+      if (!current()) return;
       setModel(next);
       setModelChoice(`${next.provider}::${next.model}`);
     });
 
   const setVoiceOption = (change: Record<string, unknown>) =>
-    run(async () => setVoice(await api<Voice>("/api/developer/voice", token, change)));
+    run(async (current) => {
+      const next = await api<Voice>("/api/developer/voice", token, change);
+      if (current()) setVoice(next);
+    });
 
   return (
     <main className="shell workspace agent-console">
@@ -153,10 +203,14 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
         <div>
           <p className="eyebrow">AI AGENT · OBSERVABILITY</p>
           <h1>Agent Console</h1>
-          <p className="console-subtitle">Model, độ trễ, lane và tool của từng lượt; cấu hình voice và ngày nghiệp vụ.</p>
+          <p className="console-subtitle">
+            Model, độ trễ, lane và tool của từng lượt; cấu hình voice và ngày
+            nghiệp vụ.
+          </p>
         </div>
         <div className="console-status">
-          <span className="status-dot" /> {day ? `Ngày nghiệp vụ ${day}` : "Chưa kết nối"}
+          <span className="status-dot" />{" "}
+          {day ? `Ngày nghiệp vụ ${day}` : "Chưa kết nối"}
         </div>
       </div>
       <form
@@ -192,7 +246,11 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
         <article>
           <span>Cuộc gọi đang mở</span>
           <strong>{sessions?.open ?? "—"}</strong>
-          <small>{sessions ? `${sessions.today} cuộc gọi hôm nay` : "Theo bảng agent.calls"}</small>
+          <small>
+            {sessions
+              ? `${sessions.today} cuộc gọi hôm nay`
+              : "Theo bảng agent.calls"}
+          </small>
         </article>
         <article>
           <span>Chờ nhân viên</span>
@@ -204,12 +262,24 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
         <article>
           <span>Lượt gần đây</span>
           <strong>{traces.length}</strong>
-          <small>{lanes.slice(0, 3).map(([lane, n]) => `${lane} ${n}`).join(" · ") || "Tối đa 100 lượt"}</small>
+          <small>
+            {lanes
+              .slice(0, 3)
+              .map(([lane, n]) => `${lane} ${n}`)
+              .join(" · ") || "Tối đa 100 lượt"}
+          </small>
         </article>
         <article>
           <span>Total p95</span>
-          <strong>{latency?.total ? `${(latency.total.p95_ms / 1000).toFixed(1)} s` : "—"}</strong>
-          <small>Ngưỡng BTC {latency ? `${latency.thresholds_ms.total / 1000} s` : "8 s"}</small>
+          <strong>
+            {latency?.total
+              ? `${(latency.total.p95_ms / 1000).toFixed(1)} s`
+              : "—"}
+          </strong>
+          <small>
+            Ngưỡng BTC{" "}
+            {latency ? `${latency.thresholds_ms.total / 1000} s` : "8 s"}
+          </small>
         </article>
       </section>
 
@@ -219,7 +289,9 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
             <p className="eyebrow">ADVISOR MODEL</p>
             <h2>Model đang chạy</h2>
           </div>
-          <span>{model?.overridden ? "Runtime override" : "Theo config/models.yaml"}</span>
+          <span>
+            {model?.overridden ? "Runtime override" : "Theo config/models.yaml"}
+          </span>
         </div>
         <p className="console-subtitle">
           {!model
@@ -231,25 +303,42 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
         <div className="model-controls">
           <label>
             Provider / model
-            <select value={modelChoice} onChange={(e) => setModelChoice(e.target.value)} disabled={!model?.choices.length || busy}>
+            <select
+              value={modelChoice}
+              onChange={(e) => setModelChoice(e.target.value)}
+              disabled={!model?.choices.length || busy}
+            >
               {(model?.choices || []).map((c) => (
-                <option key={`${c.provider}::${c.model}`} value={`${c.provider}::${c.model}`}>
+                <option
+                  key={`${c.provider}::${c.model}`}
+                  value={`${c.provider}::${c.model}`}
+                >
                   {c.label || `${c.provider} · ${c.model}`}
                 </option>
               ))}
             </select>
           </label>
           <button
-            disabled={busy || !model?.choices.length || modelChoice === `${model?.provider}::${model?.model}`}
+            disabled={
+              busy ||
+              !model?.choices.length ||
+              modelChoice === `${model?.provider}::${model?.model}`
+            }
             onClick={() => void applyModel()}
           >
             Áp dụng
           </button>
-          <button className="secondary" disabled={busy || !model?.overridden} onClick={() => void applyModel(true)}>
+          <button
+            className="secondary"
+            disabled={busy || !model?.overridden}
+            onClick={() => void applyModel(true)}
+          >
             Khôi phục mặc định
           </button>
         </div>
-        <small>Chỉ hiện model có API key. Thay đổi mất khi service khởi động lại.</small>
+        <small>
+          Chỉ hiện model có API key. Thay đổi mất khi service khởi động lại.
+        </small>
       </section>
 
       <section className="panel latency-panel">
@@ -264,7 +353,13 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
             onChange={(e) => {
               setChannel(e.target.value);
               if (token)
-                void run(async () => setLatency(await api<Latency>(`/api/developer/latency?channel=${e.target.value}`, token)));
+                void run(async (current) => {
+                  const next = await api<Latency>(
+                    `/api/developer/latency?channel=${e.target.value}`,
+                    token,
+                  );
+                  if (current()) setLatency(next);
+                });
             }}
           >
             {["all", "web", "hotline", "zalo", "facebook"].map((c) => (
@@ -284,17 +379,25 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
                     <span>{label}</span>
                     <strong>{stat ? `${stat.p95_ms} ms` : "—"}</strong>
                     <small>
-                      {stat ? `p50 ${stat.p50_ms} ms · n=${stat.n}` : "chưa có số liệu"} · ngưỡng {limit} ms
+                      {stat
+                        ? `p50 ${stat.p50_ms} ms · n=${stat.n}`
+                        : "chưa có số liệu"}{" "}
+                      · ngưỡng {limit} ms
                     </small>
                     <div className="meter">
-                      <i style={{ width: `${stat ? Math.min(100, (stat.p95_ms / limit) * 100) : 0}%` }} />
+                      <i
+                        style={{
+                          width: `${stat ? Math.min(100, (stat.p95_ms / limit) * 100) : 0}%`,
+                        }}
+                      />
                     </div>
                   </article>
                 );
               })}
             </div>
             <small className="hint">
-              {latency.turns} lượt, bỏ {latency.warmup_excluded} lượt khởi động. {latency.warning || ""}
+              {latency.turns} lượt, bỏ {latency.warmup_excluded} lượt khởi động.{" "}
+              {latency.warning || ""}
             </small>
           </>
         ) : (
@@ -317,13 +420,16 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
                 <strong>{label}</strong>
                 <code>{key}</code>
               </article>
-              {index < STAGES.length - 1 && <span className="flow-arrow">→</span>}
+              {index < STAGES.length - 1 && (
+                <span className="flow-arrow">→</span>
+              )}
             </div>
           ))}
         </div>
         <p className="flow-note">
-          Lane do luật chọn (HANDOFF, CLARIFY, CONFIRM_IDENTITY, ORDER_SERVICE, OUT_OF_SCOPE, CONTINUITY, NEW) và giới hạn tool
-          mà advisor thấy. Mọi số tiền trong câu trả lời phải có trong kết quả tool của lượt đó.
+          Lane do luật chọn (HANDOFF, CLARIFY, CONFIRM_IDENTITY, ORDER_SERVICE,
+          OUT_OF_SCOPE, CONTINUITY, NEW) và giới hạn tool mà advisor thấy. Mọi
+          số tiền trong câu trả lời phải có trong kết quả tool của lượt đó.
         </p>
       </section>
 
@@ -334,12 +440,18 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
               <p className="eyebrow">AGENT TURNS</p>
               <h2>Lượt gần đây</h2>
             </div>
-            <button className="secondary" disabled={busy || !token} onClick={() => void refresh()}>
+            <button
+              className="secondary"
+              disabled={busy || !token}
+              onClick={() => void refresh()}
+            >
               Làm mới
             </button>
           </div>
           {traces.length === 0 ? (
-            <p className="empty">Kết nối bằng token để tải các lượt từ AI Agent service.</p>
+            <p className="empty">
+              Kết nối bằng token để tải các lượt từ AI Agent service.
+            </p>
           ) : (
             traces.map((t) => (
               <button
@@ -348,9 +460,14 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
                 onClick={() => setSelected(t)}
               >
                 <span className="trace-route">{t.route || "—"}</span>
-                <span>{t.tools.map((tool) => tool.name).join(", ") || "không gọi tool"}</span>
+                <span>
+                  {t.tools.map((tool) => tool.name).join(", ") ||
+                    "không gọi tool"}
+                </span>
                 <span>{t.latency_ms != null ? `${t.latency_ms} ms` : "—"}</span>
-                <code className={t.errors.length ? "bad-text" : ""}>{t.errors.length ? `${t.errors.length} lỗi` : t.trace_id}</code>
+                <code className={t.errors.length ? "bad-text" : ""}>
+                  {t.errors.length ? `${t.errors.length} lỗi` : t.trace_id}
+                </code>
               </button>
             ))
           )}
@@ -363,24 +480,45 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
               <Metric label="Trace ID" value={selected.trace_id} code />
               <Metric label="Tier" value={selected.tier || "—"} />
               <Metric label="Model" value={selected.model || "—"} code />
-              <Metric label="Latency" value={selected.latency_ms != null ? `${selected.latency_ms} ms` : "—"} />
+              <Metric
+                label="Latency"
+                value={
+                  selected.latency_ms != null
+                    ? `${selected.latency_ms} ms`
+                    : "—"
+                }
+              />
               <Metric
                 label="Model calls · regen"
                 value={`${selected.usage?.model_calls ?? 0} · ${selected.usage?.regenerations ?? 0}`}
               />
               <Metric
                 label="Tools"
-                value={selected.tools.length ? selected.tools.map((t) => `${t.name} · ${t.status}`).join("\n") : "Không gọi tool"}
+                value={
+                  selected.tools.length
+                    ? selected.tools
+                        .map((t) => `${t.name} · ${t.status}`)
+                        .join("\n")
+                    : "Không gọi tool"
+                }
                 code
               />
               <Metric
                 label="Lỗi / guard"
-                value={selected.errors.length ? selected.errors.map((e) => `${e.stage}: ${e.type}`).join("\n") : "Không có"}
+                value={
+                  selected.errors.length
+                    ? selected.errors
+                        .map((e) => `${e.stage}: ${e.type}`)
+                        .join("\n")
+                    : "Không có"
+                }
                 code
               />
             </>
           ) : (
-            <p className="empty">Chọn một lượt để xem lane, tool và kết quả guard.</p>
+            <p className="empty">
+              Chọn một lượt để xem lane, tool và kết quả guard.
+            </p>
           )}
         </aside>
       </div>
@@ -392,7 +530,13 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
               <p className="eyebrow">VOICE CHANNEL</p>
               <h2>Kênh gọi thoại</h2>
             </div>
-            <span>{voice ? (voice.available.status === "ok" ? "Sẵn sàng" : "Chưa sẵn sàng") : ""}</span>
+            <span>
+              {voice
+                ? voice.available.status === "ok"
+                  ? "Sẵn sàng"
+                  : "Chưa sẵn sàng"
+                : ""}
+            </span>
           </div>
           {!voice ? (
             <p className="empty">Kết nối để xem.</p>
@@ -407,7 +551,11 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
             <div className="voice-form">
               <label>
                 ASR
-                <select value={voice.asr} onChange={(e) => setVoiceOption({ asr: e.target.value })} disabled={busy}>
+                <select
+                  value={voice.asr}
+                  onChange={(e) => setVoiceOption({ asr: e.target.value })}
+                  disabled={busy}
+                >
                   {voice.asr_choices.map((c) => (
                     <option key={c.name} value={c.name}>
                       {c.label || c.name}
@@ -417,7 +565,13 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
               </label>
               <label>
                 Endpointing
-                <select value={voice.endpointing} onChange={(e) => setVoiceOption({ endpointing: e.target.value })} disabled={busy}>
+                <select
+                  value={voice.endpointing}
+                  onChange={(e) =>
+                    setVoiceOption({ endpointing: e.target.value })
+                  }
+                  disabled={busy}
+                >
                   {voice.endpointing_choices.map((c) => (
                     <option key={c.name} value={c.name}>
                       {c.label || c.name}
@@ -427,7 +581,11 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
               </label>
               <label>
                 Giọng đọc
-                <select value={voice.tts} onChange={(e) => setVoiceOption({ tts: e.target.value })} disabled={busy}>
+                <select
+                  value={voice.tts}
+                  onChange={(e) => setVoiceOption({ tts: e.target.value })}
+                  disabled={busy}
+                >
                   {voice.tts_choices.map((c) => (
                     <option key={c.name} value={c.name}>
                       {c.label || c.name}
@@ -443,14 +601,32 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
                   max={2000}
                   step={50}
                   defaultValue={voice.barge_in_ms}
-                  onBlur={(e) => setVoiceOption({ barge_in_ms: Number(e.target.value) })}
+                  onBlur={(e) =>
+                    setVoiceOption({ barge_in_ms: Number(e.target.value) })
+                  }
                 />
               </label>
               <div className="buttonrow">
-                <button disabled={busy} onClick={() => run(async () => void (await api("/api/developer/voice/warm", token, {})))}>
+                <button
+                  disabled={busy}
+                  onClick={() =>
+                    run(
+                      async () =>
+                        void (await api(
+                          "/api/developer/voice/warm",
+                          token,
+                          {},
+                        )),
+                    )
+                  }
+                >
                   Nạp model
                 </button>
-                <button className="secondary" disabled={busy || !voice.overridden} onClick={() => setVoiceOption({ reset: true })}>
+                <button
+                  className="secondary"
+                  disabled={busy || !voice.overridden}
+                  onClick={() => setVoiceOption({ reset: true })}
+                >
                   Khôi phục mặc định
                 </button>
               </div>
@@ -461,31 +637,55 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
           <p className="eyebrow">BUSINESS DAY</p>
           <h2>Ngày nghiệp vụ</h2>
           <p className="empty">
-            Dữ liệu BTC viết cho 2026-10-15. Đổi ngày để thử cuộc gọi thứ hai (khách quay lại, giá/khuyến mãi theo ngày).
+            Dữ liệu BTC viết cho 2026-10-15. Đổi ngày để thử cuộc gọi thứ hai
+            (khách quay lại, giá/khuyến mãi theo ngày).
           </p>
           <form
             className="model-controls"
             onSubmit={(e) => {
               e.preventDefault();
-              void run(async () => setDay((await api<{ day: string }>("/api/developer/clock", token, { day: dayInput || null })).day));
+              void run(async (current) => {
+                const next = await api<{ day: string }>(
+                  "/api/developer/clock",
+                  token,
+                  { day: dayInput || null },
+                );
+                if (current()) setDay(next.day);
+              });
             }}
           >
             <label>
               Ngày (YYYY-MM-DD)
-              <input value={dayInput} onChange={(e) => setDayInput(e.target.value)} placeholder="2026-10-15" />
+              <input
+                value={dayInput}
+                onChange={(e) => setDayInput(e.target.value)}
+                placeholder="2026-10-15"
+              />
             </label>
             <button disabled={busy || !token} type="submit">
               Đặt ngày
             </button>
           </form>
-          <small className="hint">Hiện tại: {day || "—"}. Để trống rồi bấm Đặt ngày để quay về ngày tham chiếu.</small>
+          <small className="hint">
+            Hiện tại: {day || "—"}. Để trống rồi bấm Đặt ngày để quay về ngày
+            tham chiếu.
+          </small>
         </aside>
       </div>
+      <KnowledgeGaps token={token} />
     </main>
   );
 }
 
-function Metric({ label, value, code }: { label: string; value: string; code?: boolean }) {
+function Metric({
+  label,
+  value,
+  code,
+}: {
+  label: string;
+  value: string;
+  code?: boolean;
+}) {
   return (
     <div className="detail-metric">
       <span>{label}</span>

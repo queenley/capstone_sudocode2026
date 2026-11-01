@@ -87,6 +87,7 @@ def manifest(
         "machine": platform.node(),
         "python": platform.python_version(),
         "git": _git(),
+        "reference_eval_sha256": hashlib.sha256((btc_data_dir() / "eval/reference_eval.py").read_bytes()).hexdigest(),
         "packages": {name: _version(name) for name in PACKAGES},
         "models": {
             "advisor": dict(advisor),

@@ -11,6 +11,7 @@ overridden, choices: [{provider, model}]}``.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import statistics
 from typing import Any, Literal
@@ -27,6 +28,33 @@ from ...runtime.db import connection
 
 router = APIRouter(prefix="/api/developer", tags=["developer"])
 ROLES = {"admin", "developer"}
+
+
+class GapResolution(BaseModel):
+    answer: str = Field(min_length=3, max_length=4000)
+    cites: list[str] = Field(min_length=1, max_length=20)
+    approved: Literal[True]
+
+
+@router.get("/knowledge-gaps")
+async def knowledge_gaps(request: Request):
+    _guard(request)
+    from ...components.improvement import gaps
+    return await asyncio.to_thread(gaps.list_gaps)
+
+
+@router.post("/knowledge-gaps/{gap_id}/resolve")
+async def resolve_gap(gap_id: str, body: GapResolution, request: Request):
+    _guard(request)
+    from ...components.improvement import gaps
+    try:
+        version = await asyncio.to_thread(gaps.resolve, gap_id, answer=body.answer, cites=body.cites,
+                                                       reviewer=str(request.state.actor_id))
+    except KeyError as error:
+        raise HTTPException(404, "Knowledge gap not found") from error
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
+    return {"status": "resolved", "knowledge_version": version, "reload_required": True}
 
 
 def _guard(request: Request) -> None:

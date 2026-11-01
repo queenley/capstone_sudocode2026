@@ -1,7 +1,7 @@
 # The ASR service on an NVIDIA GPU (a rented one). Build from the repo root:
 #   docker build -f apps/asr-service/Dockerfile.gpu -t telesales-asr:gpu .
 #   docker run --gpus all -p 8500:8500 -e ASR_API_KEY=<long random> \
-#       -e ASR_PRELOAD=phowhisper-small -v asr-models:/models telesales-asr:gpu
+#       -e ASR_PRELOAD=zipformer-30m -v asr-models:/models telesales-asr:gpu
 #
 # faster-whisper (CTranslate2) needs CUDA 12 with cuDNN 9, which this base
 # image has; sherpa-onnx's CUDA build runs the Zipformers on the GPU too.

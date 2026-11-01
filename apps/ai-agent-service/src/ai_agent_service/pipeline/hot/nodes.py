@@ -23,7 +23,7 @@ from langgraph.runtime import Runtime
 from ...agents.advisor import AdvisorFailure, AgentContext, shown_passages, _seen_in
 from ...agents.policy import PolicyInput, needs_review
 from ...components.context import compact
-from ...components.guardrails import fallback
+from ...components.guardrails import actions, fallback
 from ...components.guardrails.hard import MAX_SENTENCES, ORDER_SUMMARY, GuardInput, check
 from ...components.guardrails.stream import SentenceSplitter
 from ...components.identity import resolver
@@ -333,6 +333,9 @@ async def _brief(state: dict[str, Any], context: HotContext, started: float) -> 
         if crm and crm.get("ambiguous"):
             crm = next((c for c in crm.get("candidates") or [] if c["customer_id"] == customer_id), {})
     found = await recall.retrieve(customer_id, state["on"], harness, crm=crm, memory_on=memory_on)
+    if found.get("forgotten"):
+        return {"tier": "UNKNOWN", "customer_id": None, "customer_name": None, "known_orders": [],
+                "brief": {}, "brief_lines": [], "freshness": [], "crm": {}, "call_brief_latency_ms": None}
     phone = context.vault.get(state.get("phone_token") or "")
     products, orders, warnings = [], [], []
     if memory_on:
@@ -501,6 +504,8 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
         flags=dict(state.get("flags") or {}),
         customer_said=_last_customer_text(state),
         last_agent_said=_last_agent_text(state),
+        deletion_asked=bool(state.get('deletion_awaiting_for')
+                            and state['deletion_awaiting_for'] == state.get('customer_id')),
     )
 
 
@@ -553,12 +558,15 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
     quotes = dict(state.get("quotes") or {})
     orders = list(state.get("known_orders") or [])
     created = list(state.get("created_orders") or [])
+    deletion_recorded = bool(state.get("deletion_recorded"))
     failures = int(state.get("tool_failures") or 0)
     for result in new_results:
         envelope = result.get("result") or {}
         data = envelope.get("data") or {}
         if envelope.get("ok"):
             failures = 0
+            if actions.deletion_succeeded(result["name"], envelope) and result["name"] == "memory.request_deletion":
+                deletion_recorded = True
             if result["name"] == "pricing.get_quote" and data.get("sku"):
                 quotes[data["sku"]] = int(data["final_price_vnd"])
             if result["name"] == "order.create" and data.get("order_id"):
@@ -570,6 +578,7 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
             failures += 1
     return {"tool_results": list(state.get("tool_results") or []) + new_results, "quotes": quotes,
             "known_orders": orders, "created_orders": created, "tool_failures": failures,
+            "deletion_recorded": deletion_recorded,
             "trusted_skus": sorted(set(state.get("trusted_skus") or []) | codes),
             "seen_products": _products_in(new_results, state.get("seen_products") or [])}
 
@@ -844,6 +853,7 @@ def guard_input(state: HotState, context: HotContext, text: str, results: tuple[
         promotions=promotions(),
         on=state.get("on"),
         created_orders=tuple(str(o["order_id"]) for o in state.get("created_orders") or [] if o.get("order_id")),
+        deletion_recorded=bool(state.get("deletion_recorded")),
     )
 
 
@@ -928,7 +938,16 @@ async def persist(state: HotState, runtime: Runtime[HotContext]) -> dict[str, An
     store = runtime.context.store
     if store is not None:
         await store.persist(state)
-    return {}
+    owner = state.get('customer_id') if state.get('tier') == 'VERIFIED' else None
+    pending = state.get('deletion_awaiting_for')
+    said = intake_text.plain(_last_customer_text(state) or '')
+    if pending != owner or actions.DECLINED.search(said) or actions.AGREED.search(said):
+        pending = None
+    if owner and actions.ASKED_TO_DELETE.search(intake_text.plain((state.get('reply') or {}).get('text') or '')):
+        pending = owner
+    if state.get('deletion_recorded'):
+        pending = None
+    return {'deletion_awaiting_for': pending}
 
 
 # ── helpers ───────────────────────────────────────────────────────────────

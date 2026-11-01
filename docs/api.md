@@ -16,7 +16,8 @@ Mỗi service có `/docs` và `/openapi.json` trên địa chỉ nội bộ. B�
 
 ## Quy tắc chung
 
-- JSON UTF-8. Gateway chuyển tiếp các header `Authorization`, `Content-Type`, `Accept`, `X-Request-ID`.
+- JSON UTF-8. BFF `/backend/*` và gateway hỗ trợ GET/HEAD/POST/PUT/PATCH/DELETE/OPTIONS; payload tối đa 2 MiB, voice frame tối đa 256 KiB. Timeout HTTP 30 giây, lượt chat/stream 120 giây; lỗi upstream 502, timeout 504, rate limit 429 kèm `Retry-After`. Gateway tạo hoặc kiểm tra `X-Request-ID`.
+- Gateway chuyển tiếp các header `Authorization`, `Content-Type`, `Accept`, `X-Request-ID`.
 - Rate limit `/api/*` là 120 request/phút/IP. Nếu Redis đã cấu hình mà không truy cập được thì trả 503; không cấu hình Redis thì đếm trong tiến trình.
 - Xác thực bằng `Authorization: Bearer <token>`. Có ba loại token:
   - **conversation token**: trả về khi tạo conversation, dùng cho thao tác của khách trên conversation đó;
@@ -60,7 +61,9 @@ Mã lỗi: 401 token thiếu/sai · 403 thiếu quyền hoặc chưa xác minh �
 | POST | `/api/conversations/{id}/identity/challenge` | conversation | `{"kind":"phone"\|"email","value","consent":true}` |
 | POST | `/api/conversations/{id}/identity/verify` | conversation | `{"challenge_id","code"}` (6 chữ số) → `customer_token` |
 | GET | `/api/customer/profile` · `/api/customer/orders` | customer | Hồ sơ và order |
-| DELETE | `/api/customer/data` | customer | Xóa/ẩn dữ liệu cá nhân; record tài chính giữ lại đã bỏ địa chỉ |
+| GET | `/api/customer/orders/by-key/{key}` | customer | Phục hồi đơn sau mất response; chỉ chủ tài khoản đọc được, không thấy trả 404 |
+| DELETE | `/api/customer/data` | customer | Xóa/ẩn dữ liệu platform, thu hồi token; trả `deletion_id`, `deletion_token`, `agent_data_status: pending`; record tài chính giữ lại đã bỏ địa chỉ |
+| GET | `/api/customer/deletions/{request_id}` | receipt token | Bearer `deletion_token` tiếp tục dùng sau thu hồi tài khoản; `pending` tới khi agent xác nhận cleanup rồi mới `deleted` |
 | GET · POST | `/api/admin/users` | admin | Liệt kê / tạo staff (`username` 3–100 ký tự, `password` 12–200 ký tự) |
 | DELETE | `/api/admin/users/{user_id}` | admin | Vô hiệu hóa staff |
 
@@ -171,3 +174,13 @@ Các thay đổi runtime (model, voice, ngày) chỉ sống trong tiến trình 
 - Schema nằm ở `packages/backend-common/src/api/schemas.py`, `src/commerce/schemas.py` và `apps/ai-agent-service/src/ai_agent_service/api/routes/`.
 - Bảng định tuyến nằm ở `apps/api-gateway/src/main.py`.
 - Khi đổi route, cập nhật tài liệu này và chạy lại `export_contracts`.
+
+## Context, review và xóa dữ liệu nội bộ
+
+- `GET /api/agent/calls/{call_id}/context` (agent/admin): đọc facts, episodes và đơn của chính agent; hồ sơ chỉ trả khi danh tính VERIFIED. Order fields được whitelist, không trả địa chỉ hoặc số điện thoại thô.
+- `GET /api/developer/knowledge-gaps` (developer/admin): gap đã khử PII và nguồn policy công khai. `POST /api/developer/knowledge-gaps/{gap_id}/resolve` nhận `{answer,cites,approved:true}`; reviewer lấy từ token staff, không tin tên do client khai. FAQ được publish vào version mới, proposal regression vẫn chờ người duyệt. Restart dịch vụ tri thức để nạp version đã duyệt.
+- `POST /internal/customer-deletions` chỉ dùng giữa Identity worker và agent, gateway không route tới đây. Body `{request_id,customer_id,conversation_ids}` phải có `X-Deletion-Signature` HMAC-SHA256 theo APP_SECRET chung. Agent bận trả 503/Retry-After để worker retry. Consumer không commit offset khi cleanup lỗi.
+- Checkout yêu cầu expected price/total khớp quote. Cùng idempotency key phải giữ nguyên lines/quantity/price/total/address/payment/confirmation. Bỏ phương thức nghĩa là COD, vẫn chịu giới hạn dưới 10 triệu.
+- Staff chỉ reply khi đã nhận cuộc còn mở. `force` không vượt quyền sở hữu, bảo vệ PII hoặc bí mật nội bộ. Warning được override hợp lệ lưu cùng lượt trả lời.
+
+ASR local bổ sung `GET /v1/models/{name}/artifact` (cùng ASR_API_KEY) để lấy provenance và decoder options; OpenAPI ở `contracts/api/openapi/asr-service.json`. Voice control chấp nhận `capture_settings` với profile `standard|barge-in` và các flag boolean AEC/NS/AGC thực tế; `playback_started`/`playback_chunk` kèm `turn,seq` ghi nhận chunk đã thực sự phát. Mốc phát và ASR muộn bị ràng buộc theo turn/generation, không lấy câu TTS chưa phát làm bằng chứng echo. Xem `docs/evaluation/asr-local.md` về phép đo.

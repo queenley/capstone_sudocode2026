@@ -11,13 +11,17 @@ export default function CategoryPage() {
   const department = DEPARTMENTS.find((d) => slug === d.slug || slug.startsWith(d.slug + "/"));
   const [products, setProducts] = useState<ShopProduct[] | null>(null);
   const [error, setError] = useState("");
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
+    let active = true;
+    setError("");
     setProducts(null);
     fetchProducts({ category: slug })
-      .then(setProducts)
-      .catch((e) => setError(e.message));
-  }, [slug]);
+      .then((products) => { if (active) setProducts(products); })
+      .catch((e) => { if (active) setError(e.message); });
+    return () => { active = false; };
+  }, [slug, attempt]);
 
   return (
     <div className="s-wrap s-page">
@@ -42,8 +46,7 @@ export default function CategoryPage() {
           ))}
         </div>
       )}
-      {error && <div className="s-alert">Không tải được sản phẩm: {error}</div>}
-      <ProductListing products={products} empty="Danh mục này chưa có sản phẩm." />
+      <ProductListing products={products} error={error} onRetry={() => setAttempt((value) => value + 1)} empty="Danh mục này chưa có sản phẩm." />
     </div>
   );
 }

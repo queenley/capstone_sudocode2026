@@ -4,9 +4,9 @@ Một trang để biết một con số RQR, CCR, TSR hay HR đến từ đâu. 
 
 ## 1. Ba điều cần nhớ
 
-1. **Con số chính thức là `reference_eval.py` của BTC**, chạy nguyên bản như một tiến trình riêng trên hai file trace. Đội không tính lại công thức nào. Gói BTC là bản duy nhất trong repo (`apps/ai-agent-service/data/btc`), và `tests/agent/test_btc_pack.py` ghim hash từng file để nó không đổi lặng lẽ.
+1. **Nguồn chấm được chọn là `reference_eval.py` trên main** tại `41eda490bc47577018541c7778c0e8443ed8e6c8`, chạy như một tiến trình riêng trên hai file trace. Giữ nguyên bản này theo quyết định người dùng; không khôi phục ZIP BTC và không sửa công thức. `tests/agent/test_btc_pack.py` ghim hash pack trong repo; không mặc định bản main đồng nhất với ZIP BTC gốc.
 2. **Script đó chỉ đọc trace**, không đọc hội thoại. Mọi thứ nó cần phải có sẵn trong mỗi dòng: `questions[]`, `claims[]`, `facts_used[]`, `tool_calls[]`, `latency`, `memory_writes`. BTC không phát extractor: việc trích `questions` và `claims` là của đội, và BTC chấm tay ngẫu nhiên 20 lượt để bắt extractor bỏ sót hoặc bịa.
-3. **Đổi extractor là đổi dụng cụ đo.** Chỉ so các số do cùng một `extractor_version` ra (hiện `product-extractor-v4`).
+3. **Đổi extractor là đổi dụng cụ đo.** Hiện là `product-extractor-v7`; so full/baseline trong cùng version. Muốn so hai extractor phải `--relabel` cùng replies, giữ riêng phiên bản và kết quả; xem [RUN-LEDGER.md](RUN-LEDGER.md).
 
 ## 2. Luồng một lần chạy
 
@@ -46,14 +46,15 @@ Sản phẩm thêm vài thứ ngoài mock: khóa idempotency cho lệnh ghi, `de
 
 ## 4. Extractor
 
-`scorers.Extractor`, một lần gọi mô hình mỗi lượt (`gpt-4.1-mini`, temperature 0, cấu hình `agents.extractor` trong `models.yaml`), prompt [`extractor.txt`](../../config/prompts/evaluation/extractor.txt) nạp nguyên văn.
+`scorers.Extractor`, một lần gọi mô hình mỗi lượt, tối đa thêm một lần khi output không hợp lệ (`gpt-4.1-mini`, temperature 0, cấu hình `agents.extractor` trong `models.yaml`). Prompt [`extractor.txt`](../../config/prompts/evaluation/extractor.txt) tiếng Việt nạp nguyên văn.
 
 - **Đầu vào mỗi lượt:** lời agent, tên và tham số các tool đã gọi (không có kết quả), và từ call_2 trở đi `previous_sessions` (lời khách và lời agent của các cuộc trước, cùng kịch bản, cùng cấu hình; baseline chỉ thấy lời của baseline). Không bao giờ có nhãn, kỳ vọng, bộ nhớ hay đáp án.
 - **Đầu ra:** các `Item` {kind, slot_or_field, value, question_type, speaker, source_field, quote, start, end, purpose}. Ánh xạ sang trace BTC: `question` → `questions[{slot, type, text=quote}]`, `claim` → `claims[{field, value, text=quote}]`, `fact_usage` → `facts_used[slot]`.
-- **Hai lượt kiểm tất định sau khi mô hình trả lời:** `spanned()` chỉ giữ item mà `quote` tìm thấy đúng trong lời agent hoặc tham số tool (tính lại offset; quote lấy từ `previous_sessions` hay từ chỗ khác bị bỏ và đếm); `restrict()` ép về từ vựng cố định (35 slot = 34 của ontology + `channel`; 18 trường claim + `promo_<CODE>_active`), ép giá trị về đúng kiểu (`5200000` chứ không phải `"5.200.000đ"`), áp quy tắc grounding và khử trùng.
+- **Schema và sửa lỗi:** gửi `Items.model_json_schema()` qua `with_structured_output(..., include_raw=True)`; docstring và mô tả từng trường được gửi cho provider. Helper validate Pydantic tại local sau khi nhận raw/usage. JSON text hoặc tool-call args lỗi được `json_repair` rồi validate lại, sửa được không gọi model thêm. Vẫn sai thì nối nguyên văn toàn bộ lỗi vào request; bị cắt token thì yêu cầu trả đầy đủ nhưng ngắn hơn. Lỗi invocation mạng/auth/budget không được helper retry.
+- **Hai lượt kiểm tất định sau khi mô hình trả lời:** `spanned()` chỉ giữ item có `quote` đúng trong nguồn hiện tại; câu hỏi/claim phải từ agent, tool args chỉ chứng minh fact usage, không có lịch sử thì loại fact usage. `restrict()` dùng 34 slot ontology và extension `channel` riêng, cùng 18 trường claim + `promo_<CODE>_active`; ép kiểu claim, áp quy tắc grounding và khử trùng. `other` là sentinel câu hỏi, không phải slot thứ 35/36 của bộ nhớ. Kiểm span không chứng minh mọi slot/value đã đúng ngữ nghĩa.
 - **`facts_used`** = slot extractor thấy được dùng lại từ cuộc trước, rồi slot của các dòng brief agent đã trích dẫn `[Bn]`, mỗi slot một lần.
 - **Lỗi một lượt là lỗi của cả run:** extractor thử hai lần; vẫn lỗi thì lượt đó "unlabelled" và bảng không được in. Quote sai, slot lạ, giá trị không ép được chỉ làm item bị bỏ hoặc chỉnh, và được đếm (`extraction_dropped_items`, `extraction_changed_items`).
-- **Cache** `evaluation/runs/cache/extractor.json`, khóa theo prompt + model + toàn bộ đầu vào (kể cả lịch sử). Đổi prompt hay lịch sử thì tự mất hiệu lực.
+- **Cache** `evaluation/runs/cache/extractor.json`, khóa theo instrument hash + model + toàn bộ đầu vào đã lọc (kể cả lịch sử). Hash gồm version, prompt, schema, source scorer/helper, vocabulary và contract; đổi dụng cụ đo sẽ không dùng nhầm nhãn cũ.
 - **Gắn nhãn lại không chạy lại agent:** `run_eval.py --relabel <run> --out <thư mục>` lấy lời agent đã có trong một run cũ, xóa nhãn cũ, gắn lại bằng extractor hiện tại và chấm bằng `reference_eval.py`. Đo extractor, không đo agent hiện tại; `facts_used` chỉ gồm phần extractor thấy (cận dưới của CCR).
 
 ## 5. Con số nào đến từ đâu
@@ -69,7 +70,7 @@ Sản phẩm thêm vài thứ ngoài mock: khóa idempotency cho lệnh ghi, `de
 | Số lượt TB, Calls-to-Close | `avg_turns`, `calls_to_close` | số dòng trace; `order.create` trong `tool_calls` | agent |
 
 Điều cần nhớ khi viết hay sửa prompt extractor (đã kiểm trên `reference_eval.py`):
-- RQR: câu `open` về slot trong `must_not_ask` là thừa; câu `confirm` lần thứ hai trở đi về cùng slot trong một cuộc cũng thừa; `confirm` lần đầu không thừa. Mọi câu hỏi, kể cả `other`, đều vào mẫu số.
+- RQR: chỉ call có `must_not_ask` khác rỗng được tính. Trong các call đó, `open` về slot trong danh sách là thừa; `confirm` lần hai trở đi cùng slot là thừa, kể cả slot ngoài danh sách. Confirm đầu được miễn; mọi item question, kể cả `other`, vào mẫu số. Không có mẫu số thì `None`. Xem [diễn giải nguồn BTC và các điểm còn mở](rqr-btc-interpretation.md).
 - HR: chỉ claim có trường nằm trong `ground_truth_facts` của cuộc đó mới được tính, và so bằng `!=` chính xác, nên kiểu giá trị (số nguyên, bool, chuỗi) phải đúng.
 - CCR: không kiểm nguồn của `facts_used`; định nghĩa của BTC là "slot từ phiên trước được dùng có ý nghĩa".
 - Latency: BTC lấy mọi dòng, nhưng hướng dẫn đo của họ bảo bỏ 3 lượt khởi động và cần ≥ 100 lượt để p95 có ý nghĩa; lệnh chạy bỏ 3 lượt khởi động bằng `--warmup`.

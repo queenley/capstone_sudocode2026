@@ -516,6 +516,8 @@ async def run_scenario(rig: Rig, scenario: Scenario, config: str, *, run_id: str
                 progress(f"  {config:<18} {scenario.scenario_id} {plan.name} seed refused: {error}")
                 return run
         await _run_call(rig, scenario, plan, config, run=run, run_id=run_id, progress=progress)
+        if run.error:
+            return run
     return run
 
 
@@ -543,18 +545,25 @@ async def _run_call(rig: Rig, scenario: Scenario, plan: CallPlan, config: str, *
         progress(f"  {config:<18} {scenario.scenario_id} {plan.name} t{session.turn_no}  {result.total_ms:>6} ms  "
                  f"{diagnosis['tier'] or '-'}/{diagnosis['lane'] or '-'}  tools={tools}"
                  + (f"  ERROR {diagnosis['error']}" if diagnosis["error"] else ""))
+        if diagnosis["error"]:
+            run.error = f"{plan.name} t{session.turn_no}: {diagnosis['error']}"
+            run.usage.append({"config": config, "scenario_id": scenario.scenario_id, "call": plan.name,
+                              "turns": spent, "after_call": {}})
+            return
     before = token_ledger.snapshot()
     remembered = await session.hang_up()
     after_call_usage = usage_between(before, token_ledger.snapshot())
     if run.rows and run.rows[-1]["call"] == plan.name:
         run.rows[-1]["memory_writes"] = trace.memory_writes(remembered.get("memory_writes") or [])
-        run.diagnostics[-1]["after_call"] = {k: remembered.get(k) for k in ("status", "reason", "customer_id", "episode", "error")
+        run.diagnostics[-1]["after_call"] = {k: remembered.get(k) for k in ("status", "reason", "customer_id", "episode", "error", "deleted")
                                              if remembered.get(k)}
     run.usage.append({"config": config, "scenario_id": scenario.scenario_id, "call": plan.name,
                       "turns": spent, "after_call": after_call_usage})
     progress(f"  {config:<18} {scenario.scenario_id} {plan.name} after_call {remembered.get('status')}: "
              f"{len(remembered.get('memory_writes') or [])} facts"
              + (f" ({remembered['reason']})" if remembered.get("reason") else ""))
+    if remembered.get("status") == "failed":
+        run.error = f"{plan.name} after_call: {remembered.get('error') or remembered.get('reason')}"
 
 
 def diagnose(state: Mapping[str, Any], error: str | None, *, config: str, scenario_id: str, call: str,
@@ -605,4 +614,6 @@ async def warm_up(rig: Rig, scenario: Scenario, turns: int, progress: Progress) 
     for index in range(turns):
         result = await session.turn(texts[index % len(texts)])
         progress(f"  warm-up t{index + 1}  {result.total_ms:>6} ms" + (f"  ERROR {result.error}" if result.error else ""))
+        if result.error or (result.state.get("draft") or {}).get("error"):
+            raise RuntimeError("Evaluation stopped after a failed warm-up invocation")
     await reset()

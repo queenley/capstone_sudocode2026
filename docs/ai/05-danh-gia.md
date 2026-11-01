@@ -85,20 +85,22 @@ Một lệnh duy nhất, `run_eval.py` ở gốc repo, cũng là lệnh giám kh
 flowchart LR
     DS[("Kịch bản<br/>v4 hoặc public_sample")] --> RUN["chạy agent thật<br/>full + baseline"]
     RUN --> TR["trace BTC<br/>(tool, latency, memory)"]
-    TR --> EX["extractor v4<br/>questions, claims, facts_used"]
+    TR --> EX["extractor v7<br/>questions, claims, facts_used"]
     EX --> CK["kiểm: lượt lỗi hoặc<br/>chưa gắn nhãn thì chặn"]
     CK --> SC["reference_eval.py<br/>(BTC)"]
     SC --> OUT["bảng chỉ số + Recall@k"]
 ```
 
 - **`facts_used`** = slot extractor thấy được dùng lại từ cuộc trước, rồi slot của các dòng brief agent đã trích dẫn `[Bn]`.
-- **`questions` và `claims`** do **extractor** trích. BTC không cung cấp extractor (đây là trách nhiệm của đội); BTC chấm tay ngẫu nhiên 20 lượt để kiểm extractor có bỏ sót không. Extractor dùng **từ vựng cố định**: 35 slot (34 của ontology và `channel`) và 18 trường claim cộng `promo_<CODE>_active`, kèm kiểu giá trị; slot ngoài bộ thành `other`, claim sai kiểu bị bỏ. Mỗi item kèm câu trích dẫn đúng nguyên văn để người chấm kiểm tay (`diagnostics.jsonl`).
+- **`questions` và `claims`** do **extractor** trích. BTC không cung cấp extractor (đây là trách nhiệm của đội); BTC chấm tay ngẫu nhiên 20 lượt để kiểm extractor có bỏ sót không. Extractor dùng **từ vựng cố định**: 34 slot ontology, extension `channel` riêng và 18 trường claim cộng `promo_<CODE>_active`, kèm kiểu giá trị; slot ngoài bộ thành sentinel `other`, claim sai kiểu bị bỏ. Mỗi item kèm câu trích dẫn đúng nguyên văn để người chấm kiểm tay (`diagnostics.jsonl`). Schema/prompt tiếng Việt và repair/retry ở [scoring-flow](../evaluation/scoring-flow.md).
 - **Thiếu bằng chứng không được điền 0 hay PASS.** Một lượt lỗi hoặc chưa gắn nhãn thì không in bảng.
 - **Ngân sách API:** sổ SQLite (`EVAL_BUDGET_DB`) giữ dự phòng trước mỗi request có phí, chỉ hoàn khi có usage. Hết ngân sách thì dừng, không tạo lại sổ để lách.
 
 ---
 
 ## 5. Đánh giá ASR
+
+Cập nhật 01/11/2026: runner ASR local đã được bổ sung qua `run_eval.py --asr/--asr-package`, xem [ASR local](../evaluation/asr-local.md). Số mới được lưu riêng, không trộn với bảng lịch sử bên dưới.
 
 Kết quả đo ngày 24 và 25/10 bằng `wer_cer` của BTC. **Công cụ đo ASR (lệnh `asr`, bộ `asr-team-v2`, diarization) đã gỡ khỏi cây thư mục cùng bộ chấm cũ**; mã còn trong lịch sử git trước commit `358a070`. Số dưới đây là kết quả đã đo, không tái lập được từ repo hiện tại. Bộ audio của BTC (12 hội thoại) vẫn chấm được bằng `wer_cer` trong `reference_eval.py`.
 
@@ -130,7 +132,7 @@ Lỗi hay gặp: "size" → "sai/side" (27 lần), "chị" → "chỉ" (21), "Ai
 
 ## 6. Kết quả đến hiện tại
 
-> **Đọc kỹ trước khi trích dẫn.** Các số dưới đây đo bằng bộ chấm cũ (đã gỡ) với extractor v3; extractor hiện tại là v4 và chưa đo lại trên cùng kịch bản, nên chưa so được. Bằng chứng gốc còn trong `evaluation/runs/` (chưa xóa). Mọi nhãn còn là **diagnostic, chưa có người duyệt**. Các cohort nhỏ (5–16 kịch bản) và đã dùng để gỡ lỗi, nên **không phải kết quả đo độc lập**. Không so số giữa các ngày khác cấu hình (22/10 hard guard, 24/10 có Jev) hoặc khác extractor.
+> **Đọc kỹ trước khi trích dẫn.** Các số dưới đây đo bằng bộ chấm cũ (đã gỡ) với extractor v3; extractor hiện tại là v7, nên không so trực tiếp. Các phép relabel cùng replies được ghi riêng trong [RUN-LEDGER](../evaluation/RUN-LEDGER.md). Bằng chứng gốc còn trong `evaluation/runs/` (chưa xóa). Mọi nhãn còn là **diagnostic, chưa có người duyệt**. Các cohort nhỏ (5–16 kịch bản) và đã dùng để gỡ lỗi, nên **không phải kết quả đo độc lập**. Không so số giữa các ngày khác cấu hình (22/10 hard guard, 24/10 có Jev) hoặc khác extractor.
 
 ### Truy hồi tri thức (60 câu BTC, hybrid BM25 + e5-small)
 
@@ -236,7 +238,7 @@ Kết quả nằm ở thư mục `--out` (không lên Git): `table.txt` là bả
 ## 9. Còn thiếu
 
 1. **Vòng tự cải tiến**: feedback (👍/👎, kết quả cuộc gọi, điểm chấm) → đề xuất → người duyệt → áp dụng → đo → quay lui. Module `components/improvement/{lessons,playbook,versions,review,gaps}.py` còn là stub.
-2. **Kết quả chính thức**: chạy holdout; người duyệt nhãn; đo lại trên extractor v4 (đã có `--relabel`).
+2. **Kết quả chính thức**: chạy holdout; người duyệt nhãn; khóa version/hash extractor khi đo (đã có `--relabel`).
 3. **Lỗi nhãn extractor đã thấy ở `SAMPLE-01`** (chưa sửa): baseline được tính `fact_usage` cho giá trị không có ở cuộc trước; bản full bỏ sót `price_quoted_vnd` khi agent nói "giá vẫn giữ nguyên"; ngày giao dự kiến bị gắn nhầm `restock_date`.
 4. **Lỗi agent đã thấy**: hỏi lại mã sản phẩm/mã đơn dù đã có; có lượt báo "không lấy được giá"; nói giao trong 4 ngày khi ground truth là 2.
 5. **QaAgent**: chấm rubric J01–J12 sau mỗi cuộc chưa nối model.

@@ -1,5 +1,24 @@
 # Backlog cải tiến
 
+## Đợt gia cố backend/frontend
+
+Nguồn chuẩn theo người dùng: giữ toàn bộ main `41eda49`, gồm test/harness/scorer; bỏ bước khôi phục ZIP BTC. Không sửa dataset/ASR/ITN/lexicon. Việc cần model thật nằm trong [WAITING-FOR-USER.md](WAITING-FOR-USER.md).
+
+Đã triển khai, cần giữ regression test khi thay đổi tiếp:
+
+- Proxy PATCH/HEAD/OPTIONS, giới hạn request/frame, timeout, request ID, streaming cleanup và rate limit Redis có TTL nguyên tử.
+- Kiểm tra payload idempotency, COD khi thiếu phương thức, phục hồi đơn bằng key trong phạm vi khách, transaction và tranh chấp tồn kho.
+- Guard không lấy lệnh đọc đơn làm bằng chứng tạo đơn; đối chiếu mã đơn/trạng thái, không để mệnh đề lịch sử bỏ qua cam kết mới.
+- Cách ly fact chưa xác nhận; không tự nâng toàn bộ fact chỉ vì xác nhận liên hệ trước. Chặn ghi vào khách đã xóa.
+- Outbox xóa dữ liệu có chữ ký nội bộ, receipt theo dõi sau thu hồi tài khoản, cleanup call/vault/checkpoint và chặn checkpoint/ghi muộn.
+- Một cuộc mở cho mỗi conversation khi kết nối đồng thời; đóng cuộc chờ lượt đang chạy; nhận handoff idempotent, chặn force vượt bảo vệ dữ liệu.
+- Frontend chống response cũ, xác nhận lại giá/đơn, retry cùng lượt chat, SSE CRLF/Unicode, polling đúng cuộc và giải phóng tài nguyên voice.
+- Gap Loop có người duyệt/nguồn công khai, KB version atomic/serialized, đề xuất regression chưa duyệt; rubric judge tùy chọn có trạng thái INCOMPLETE.
+
+Kiểm tra local và cách tái lập được ghi trong `docs/verification.md`. Các kết quả chất lượng model và ngưỡng hiệu năng còn chờ, không đánh dấu đạt từ test giả.
+
+## Backlog nghiên cứu trước đợt gia cố
+
 Một dòng mỗi cải tiến. Khi bắt đầu làm, tạo file `NNN-ten-ngan.md` từ [mẫu](_TEMPLATE.md) và điền cột "File".
 
 Các mục dưới đây lấy từ lỗi và giới hạn **đã ghi nhận** trong [docs/ai/05-danh-gia.md](../ai/05-danh-gia.md#9-còn-thiếu). Ưu tiên chỉ là gợi ý ban đầu, nhóm tự sắp lại.

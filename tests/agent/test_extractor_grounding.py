@@ -59,3 +59,52 @@ def test_a_claim_quoted_from_a_tool_request_is_not_the_agents_claim():
     data = {"agent_text": "Dạ em lên đơn ạ.", "tool_texts": ['{"args": {"price_vnd": 4900000}, "name": "order.create"}'],
             "consultant_texts": []}
     assert label_items([item], data)["claims"] == []
+
+
+def test_no_history_means_no_carried_over_facts_even_if_the_model_says_so():
+    item = {**claim("room_area_m2", 28, "phòng 28 mét vuông"), "kind": "fact_usage"}
+    result = label_items([item], {"agent_text": "phòng 28 mét vuông", "tool_texts": []})
+    assert result["facts_used"] == [] and result["changed"] == 1
+
+
+def test_a_consultants_words_cannot_supply_an_agents_claim_or_fact_use():
+    items = [
+        {**claim("price_vnd", 4600000, "giá 4.600.000đ"), "source_field": "consultant_texts/0"},
+        {**claim("price_quoted_vnd", 4600000, "giá 4.600.000đ"), "kind": "fact_usage",
+         "source_field": "consultant_texts/0"},
+    ]
+    result = label_items(items, {"agent_text": "Dạ.", "consultant_texts": ["giá 4.600.000đ"],
+                                 "previous_sessions": [{"call": "call_1", "turns": []}]})
+    assert result["claims"] == result["facts_used"] == []
+
+
+@pytest.mark.parametrize("quote", [
+    "Đơn dự kiến giao ngày 12 tháng 6 năm 2030.",
+    "tức khoảng ngày 12 tháng 6",
+    "Mình hẹn gọi lại ngày 12 tháng 6 năm 2030.",
+    "Chị nhận hàng ngày 12 tháng 6 năm 2030.",
+    "Đơn hoàn về kho ngày 12 tháng 6 năm 2030.",
+])
+def test_delivery_or_bare_date_is_not_a_restock_claim(quote):
+    result = labels("restock_date", "2030-06-12", quote)
+    assert result["claims"] == [] and result["changed"] == 1
+
+
+@pytest.mark.parametrize("quote", [
+    "Hàng về kho ngày 12 tháng 6 năm 2030.",
+    "Hàng dự kiến sẽ về ngày 12 tháng 6 năm 2030.",
+    "Dự kiến nhập lại hàng ngày 12 tháng 6 năm 2030.",
+    "Kho sẽ bổ sung tồn kho ngày 12 tháng 6 năm 2030.",
+    "Mẫu DEMO-77 có hàng trở lại ngày 12 tháng 6 năm 2030.",
+])
+def test_explicit_restock_date_is_preserved(quote):
+    result = labels("restock_date", "2030-06-12", quote)
+    assert result["claims"] == [{"field": "restock_date", "value": "2030-06-12", "text": quote}]
+
+
+def test_stock_and_delivery_dates_keep_their_separate_evidence():
+    agent = "Hàng về kho ngày 12 tháng 6 năm 2030; giao đến khách ngày 16 tháng 6 năm 2030."
+    item = claim("restock_date", "2030-06-12", "Hàng về kho ngày 12 tháng 6 năm 2030")
+    false_item = claim("restock_date", "2030-06-16", "giao đến khách ngày 16 tháng 6 năm 2030")
+    result = label_items([item, false_item], {"agent_text": agent, "tool_texts": []})
+    assert len(result["claims"]) == 1 and result["claims"][0]["value"] == "2030-06-12"

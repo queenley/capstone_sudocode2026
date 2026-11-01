@@ -23,6 +23,7 @@ def send(client, c, h, text, **extra):
 
 
 def order_body(client):
+    enable_bank(client)
     quote = client.get("/api/catalog/ASUS-V16-BLACK/quote").json()
     return {
         "sku_code": quote["sku_code"],
@@ -32,7 +33,15 @@ def order_body(client):
         "expected_total": quote["total"],
         "confirmed": True,
         "idempotency_key": "purchase-0001",
+        "payment_method": "bank_transfer",
     }
+
+
+def enable_bank(client):
+    from dataclasses import replace
+    security = client.app.state.security
+    security.settings = replace(security.settings, bank_bin="970436", bank_account_no="0000000000",
+                                bank_name="Test bank", bank_account_name="Test shop")
 
 
 def test_health_and_catalog(client):
@@ -312,6 +321,9 @@ def test_delete_revokes_access_and_memory(client):
 
 def lines_body(client, lines, key="basket-0001", **extra):
     """A several-line order: lines as (sku, quantity)."""
+    if "payment_method" not in extra:
+        enable_bank(client)
+        extra["payment_method"] = "bank_transfer"
     quotes = [client.get(f"/api/catalog/{sku}/quote?quantity={qty}").json() for sku, qty in lines]
     return {
         "items": [
@@ -336,7 +348,7 @@ def test_basket_is_one_order_of_several_lines(client):
     assert sorted((i["sku_code"], i["quantity"]) for i in order["items"]) == [
         ("ASUS-V16-BLACK", 1), ("LENOVO-S5-SILVER", 2)]
     assert Decimal(order["total"]) == Decimal(body["expected_total"])
-    assert (order["payment_method"], order["payment_status"]) == ("cod", "unpaid")
+    assert (order["payment_method"], order["payment_status"]) == ("bank_transfer", "awaiting_transfer")
     repeat = client.post(f"/api/conversations/{c}/orders", headers=h, json=body)
     assert repeat.json()["id"] == order["id"]
     assert client.get("/api/catalog/ASUS-V16-BLACK").json()["available"] == 11

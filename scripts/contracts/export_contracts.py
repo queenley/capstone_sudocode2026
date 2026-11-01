@@ -15,8 +15,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "apps/ai-agent-service/src"))
 sys.path.insert(0, str(ROOT / "packages/backend-common"))
+sys.path.insert(0, str(ROOT / "apps/asr-service/src"))
 
 SERVICES = {
+    "asr-service": ROOT / "apps/asr-service/src/asr_service/main.py",
     "commerce-service": ROOT / "apps/commerce-service/src/main.py",
     "identity-service": ROOT / "apps/identity-service/src/main.py",
     "sales-service": ROOT / "apps/sales-service/src/main.py",
@@ -25,6 +27,9 @@ SERVICES = {
 
 
 def load_app(name: str, path: Path):
+    if name == "asr-service":
+        from asr_service.main import app
+        return app
     if name == "ai-agent-service":
         from ai_agent_service.main import app
         return app

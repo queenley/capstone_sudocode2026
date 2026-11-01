@@ -47,12 +47,16 @@ const TILES = [
 export default function HomePage() {
   const [products, setProducts] = useState<ShopProduct[] | null>(null);
   const [error, setError] = useState("");
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
+    let active = true;
+    setError("");
     fetchProducts()
-      .then(setProducts)
-      .catch((e) => setError(e.message));
-  }, []);
+      .then((products) => { if (active) setProducts(products); })
+      .catch((e) => { if (active) setError(e.message); });
+    return () => { active = false; };
+  }, [attempt]);
 
   const deals = useMemo(
     () =>
@@ -157,19 +161,20 @@ export default function HomePage() {
 
       {error && (
         <div className="s-wrap">
-          <div className="s-alert">Không tải được sản phẩm: {error}</div>
+          <div className="s-load-error" role="alert"><h2>Chưa tải được sản phẩm</h2><p>{error}</p><button className="s-btn s-btn-outline" onClick={() => setAttempt((value) => value + 1)}>Thử lại</button></div>
         </div>
       )}
 
-      {(products === null || deals.length > 0) && (
+      {!error && (products === null || deals.length > 0) && (
         <section className="s-wrap s-section">
           <div className="s-section-head">
             <h2>Đang giảm giá</h2>
             <Link href="/khuyen-mai">Xem tất cả →</Link>
           </div>
-          <div className="s-grid">
+          <p className="sr-only" role="status">{products === null ? "Đang tải sản phẩm…" : ""}</p>
+          <div className="s-grid" aria-busy={products === null}>
             {products === null
-              ? Array.from({ length: 4 }, (_, i) => <div key={i} className="s-card s-skeleton" />)
+              ? Array.from({ length: 4 }, (_, i) => <div key={i} className="s-card s-skeleton" aria-hidden="true" />)
               : deals.map((p) => <ProductCard key={p.ref} product={p} />)}
           </div>
         </section>

@@ -82,6 +82,8 @@ async def relabel(run: Path, out: Path, extractor: Any) -> int:
         written[config] = out / ("full.jsonl" if config == "full" else "baseline.jsonl")
         trace.write_jsonl(written[config], rows)
         diagnostics += done.diagnostics
+        if done.stopped:
+            break
     trace.write_jsonl(out / "diagnostics.jsonl", diagnostics)
     _write_json(out / "relabel.json", {"source": str(run), "scenarios": str(scenarios_dir),
                                        "extractor": {"model": extractor.model_name, **extractor.stats()},

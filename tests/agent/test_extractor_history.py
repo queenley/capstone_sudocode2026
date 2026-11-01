@@ -47,10 +47,30 @@ def test_scenarios_never_mix():
     assert [t["agent"] for t in history_of(rows(), "S2", "call_2", 1)[0]["turns"]] == ["S2 call_1 agent 1"]
 
 
+def test_configurations_never_mix_even_if_a_caller_passes_both_traces():
+    full = [row("S1", "call_1", 1), row("S1", "call_2", 1)]
+    baseline = {**row("S1", "call_1", 1), "config": "baseline_no_memory", "agent_text": "BASELINE ONLY"}
+    sessions = scorers.previous_sessions([full[0], baseline, full[1]])[2]
+    assert [t["agent"] for t in sessions[0]["turns"]] == ["S1 call_1 agent 1"]
+
+
+def test_call_order_is_numeric_not_lexicographic():
+    history = scorers.previous_sessions([row("S1", "call_10", 1), row("S1", "call_2", 1), row("S1", "call_1", 1)])
+    assert [s["call"] for s in history[0]] == ["call_1", "call_2"]
+    assert [s["call"] for s in history[1]] == ["call_1"]
+
+
 def test_the_model_is_never_shown_a_tools_result():
     data = scorers.turn_input("a", [{"name": "order.create", "args": {"sku": "A"}, "result": {"order_id": "SECRET"}}])
     assert set(data) <= SHOWN and "SECRET" not in json.dumps(data)
     assert data["tool_texts"] == ['{"args": {"sku": "A"}, "name": "order.create"}']
+
+
+def test_history_is_whitelisted_instead_of_passing_labels_from_callers():
+    data = scorers.turn_input("a", previous_sessions=[{"call": "call_1", "must_not_ask": ["SECRET"], "turns": [
+        {"customer": "c", "agent": "a", "claims": ["SECRET"], "ground_truth_facts": {"SECRET": True}}]}])
+    assert data["previous_sessions"] == [{"call": "call_1", "turns": [{"customer": "c", "agent": "a"}]}]
+    assert "SECRET" not in json.dumps(data)
 
 
 def test_facts_used_are_the_extractors_then_the_cited_each_once():

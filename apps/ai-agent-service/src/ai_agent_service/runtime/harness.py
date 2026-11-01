@@ -48,7 +48,7 @@ from ..pipeline.cold.after_call import after_call, _remember, requested_deletion
 from ..pipeline.hot.graph import build_graph
 from ..pipeline.hot.state import HotContext
 from . import options, vault as vaults
-from .db import checkpointer, connection
+from .db import checkpointer, connection, require_writable_call
 
 logger = logging.getLogger(__name__)
 
@@ -337,7 +337,8 @@ class CallStore:
         reply = state.get("reply")
         if reply:
             rows.append(("agent", reply["text"], self._meta(state)))
-        async with connection() as conn:
+        async with connection() as conn, conn.transaction():
+            await require_writable_call(conn, self.call_id)
             for speaker, text, meta in rows:
                 await conn.execute(
                     "INSERT INTO turns (call_id, turn_id, speaker, content, meta) VALUES (%s, %s, %s, %s, %s) "
@@ -345,6 +346,14 @@ class CallStore:
                     (self.call_id, turn_id, speaker, text, json.dumps(meta, ensure_ascii=False, default=str)),
                 )
             await self._project(conn, state)
+        found = state.get("knowledge") or {}
+        if found.get("abstain") and found.get("reason") in ("no_match", "absence") and reply:
+            from ..components.improvement import gaps
+            question = next((text for speaker, text, _ in rows if speaker == "customer"), "")
+            try:
+                await asyncio.to_thread(gaps.record, question, call_id=str(self.call_id), turn_id=turn_id)
+            except (OSError, ValueError):
+                logger.warning("Could not record a knowledge gap for call %s", self.call_id)
 
     def _meta(self, state: dict[str, Any]) -> dict[str, Any]:
         draft = state.get("draft") or {}
@@ -425,6 +434,53 @@ def _reason_label(code: str | None) -> str | None:
 
 
 async def remember(call_id: int, *, finalize: bool = True) -> dict[str, Any]:
+    """One finalizer owns the call; erasure waits until its writes have finished."""
+    if not finalize:
+        return await _remember_call(call_id, finalize=False)
+    async with connection() as conn:
+        held = await (await conn.execute(
+            "UPDATE calls SET turn_lease_until = now() + interval '5 minutes', memory_status = 'running' "
+            "WHERE id = %s AND ended_at IS NOT NULL AND (memory_status IS NULL OR memory_status IN "
+            "('pending','failed','running','deletion_pending')) AND (turn_lease_until IS NULL OR turn_lease_until < now()) "
+            "RETURNING turn_lease_until", (call_id,))).fetchone()
+    if not held:
+        return {"status": "skipped", "reason": "already finalized, deleted or being finalized", "memory_writes": []}
+    lease = held["turn_lease_until"]
+    owner = asyncio.current_task()
+    async def release():
+        async with connection() as conn:
+            await conn.execute("UPDATE calls SET turn_lease_until = NULL WHERE id = %s AND turn_lease_until = %s", (call_id, lease))
+    async def renew():
+        nonlocal lease
+        try:
+            while True:
+                await asyncio.sleep(30)
+                async with connection() as conn:
+                    renewed = await (await conn.execute(
+                        "UPDATE calls SET turn_lease_until = now() + interval '5 minutes' WHERE id = %s "
+                        "AND turn_lease_until = %s RETURNING turn_lease_until", (call_id, lease))).fetchone()
+                if not renewed:
+                    raise RuntimeError("After-call lease lost")
+                lease = renewed["turn_lease_until"]
+        except Exception:
+            if owner is not None:
+                owner.cancel()
+            raise
+    heartbeat = asyncio.create_task(renew())
+    async def before_deletion():
+        heartbeat.cancel()
+        await asyncio.gather(heartbeat, return_exceptions=True)
+        await release()
+    try:
+        return await _remember_call(call_id, finalize=True, before_deletion=before_deletion)
+    finally:
+        heartbeat.cancel()
+        await asyncio.gather(heartbeat, return_exceptions=True)
+        await release()
+
+
+async def _remember_call(call_id: int, *, finalize: bool,
+                         before_deletion: Callable[[], Awaitable[None]] | None = None) -> dict[str, Any]:
     """Save live web facts, or finalize an ended call with its episode and QA."""
     try:
         built = await ready()
@@ -460,6 +516,8 @@ async def remember(call_id: int, *, finalize: bool = True) -> dict[str, Any]:
                 "provisional": state.get("provisional"),
                 "returning": bool((state.get("brief") or {}).get("is_returning")),
             }
+            if requested_deletion(tool_log) and before_deletion is not None:
+                await before_deletion()
             if finalize or requested_deletion(tool_log):
                 result = await after_call(call, transcript, tool_log, writer=await writer(), memory=built.memory, qa=built.qa,
                                           admin=_admin)
@@ -474,7 +532,7 @@ async def remember(call_id: int, *, finalize: bool = True) -> dict[str, Any]:
         result, status = {"error": f"{type(error).__name__}: {error}"[:300]}, "failed"
     async with connection() as conn:
         await conn.execute(
-            "UPDATE calls SET memory_status = %s, after_call = %s WHERE id = %s",
+            "UPDATE calls SET memory_status = %s, after_call = %s WHERE id = %s AND memory_status IS DISTINCT FROM 'deleted'",
             (status, json.dumps(result, ensure_ascii=False, default=str), call_id),
         )
     return result
@@ -484,7 +542,8 @@ async def remember_unfinished(limit: int = 20) -> None:
     """At start: calls that ended without being remembered, or whose after_call failed."""
     async with connection() as conn:
         cursor = await conn.execute(
-            "SELECT id FROM calls WHERE ended_at IS NOT NULL AND (memory_status IS NULL OR memory_status = 'failed') "
+            "SELECT id FROM calls WHERE ended_at IS NOT NULL AND (memory_status IS NULL OR memory_status IN ('failed', 'pending', 'running', 'deletion_pending')) "
+            "AND (turn_lease_until IS NULL OR turn_lease_until < now()) "
             "AND ended_at > now() - interval '2 days' ORDER BY ended_at DESC LIMIT %s",
             (limit,),
         )
@@ -514,7 +573,8 @@ async def _store_customer_fallback(call_id: int, turn_id: str, content: str, vau
     """When the graph failed before ``persist``, the customer's words still join the transcript, tokenised."""
     cleaned, _ = intake_text.clean(content)
     tokenised = pii.tokenise(itn.normalise(cleaned, now), vault)
-    async with connection() as conn:
+    async with connection() as conn, conn.transaction():
+        await require_writable_call(conn, call_id)
         await conn.execute(
             "INSERT INTO turns (call_id, turn_id, speaker, content, meta) VALUES (%s, %s, 'customer', %s, %s) "
             "ON CONFLICT (call_id, turn_id, speaker) DO NOTHING",

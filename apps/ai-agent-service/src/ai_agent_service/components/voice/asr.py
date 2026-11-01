@@ -18,6 +18,7 @@ The call blocks, so the voice session runs it in a thread, as before.
 from __future__ import annotations
 
 import json
+import math
 import os
 import sys
 import threading
@@ -68,18 +69,25 @@ def _http():
         if _client is None:
             import httpx
 
-            _client = httpx.Client(base_url=url(), headers=_headers(), timeout=TIMEOUT)
+            _client = httpx.Client(base_url=url(), headers=_headers(), timeout=TIMEOUT, trust_env=False)
         return _client
+
+
+def close() -> None:
+    global _client
+    with _client_lock:
+        client, _client = _client, None
+    if client is not None:
+        client.close()
 
 
 def _check(response) -> Any:
     if response.status_code >= 400:
-        try:
-            detail = response.json().get("detail")
-        except ValueError:
-            detail = response.text[:200]
-        raise RuntimeError(f"ASR service {response.status_code}: {detail}")
-    return response.json()
+        raise RuntimeError(f"ASR service returned HTTP {response.status_code}")
+    try:
+        return response.json()
+    except ValueError as error:
+        raise RuntimeError("ASR service returned invalid JSON") from error
 
 
 # ── in this process ───────────────────────────────────────────────────────
@@ -121,9 +129,17 @@ def load(name: str) -> float:
     return _engines().load(name)
 
 
+def metadata(name: str) -> dict:
+    if remote():
+        return _check(_http().get(f"/v1/models/{name}/artifact"))
+    return _engines().metadata(name)
+
+
 def transcribe(name: str, samples: np.ndarray, hotwords: list[str] | None = None) -> Transcript:
     """One utterance, float32 mono at 16 kHz -> text."""
     samples = np.ascontiguousarray(samples, dtype="<f4")
+    if samples.ndim != 1 or not samples.size or not np.isfinite(samples).all():
+        raise ValueError("ASR requires finite, nonempty mono samples")
     if remote():
         result = _check(_http().post(
             "/v1/transcribe",
@@ -131,6 +147,11 @@ def transcribe(name: str, samples: np.ndarray, hotwords: list[str] | None = None
             content=samples.tobytes(),
             headers={"Content-Type": "application/octet-stream"},
         ))
+        if (not isinstance(result, dict) or result.get("model") != name or not isinstance(result.get("text"), str)
+                or any(type(result.get(key)) not in (int, float) or not math.isfinite(result[key]) or result[key] < 0
+                       for key in ("seconds", "audio_seconds"))
+                or abs(result["audio_seconds"] - len(samples) / RATE) > .01):
+            raise RuntimeError("ASR service response does not match the requested model/audio")
         return Transcript(result["model"], result["text"], result["seconds"], result["audio_seconds"])
     found = _engines().transcribe(name, samples, hotwords)
     return Transcript(found.model, found.text, found.seconds, found.audio_seconds)
@@ -150,32 +171,63 @@ async def stream(
     if not remote():
         raise RuntimeError("Realtime ASR needs the ASR service (ASR_URL)")
     address = url().replace("http", "ws", 1) + "/v1/stream"
-    async with websockets.connect(address, additional_headers=_headers(), max_size=None) as ws:
-        await ws.send(json.dumps({"model": name, "sample_rate": sample_rate,
-                                  "hotwords": hotwords or [], "partial_ms": partial_ms}))
-        ready = json.loads(await ws.recv())
-        if ready.get("type") != "ready":
-            raise RuntimeError(f"ASR stream refused: {ready}")
-        queue: asyncio.Queue[dict[str, Any] | None] = asyncio.Queue()
+    async with websockets.connect(address, additional_headers=_headers(), max_size=256 * 1024,
+                                  max_queue=8, open_timeout=5, proxy=None) as ws:
+        await asyncio.wait_for(ws.send(json.dumps({"model": name, "sample_rate": sample_rate,
+                                                   "hotwords": hotwords or [], "partial_ms": partial_ms})), TIMEOUT)
+        ready = json.loads(await asyncio.wait_for(ws.recv(), TIMEOUT))
+        if (not isinstance(ready, dict) or ready.get("type") != "ready"
+                or ready.get("model", name) != name):
+            raise RuntimeError("ASR stream refused")
+        queue: asyncio.Queue[dict[str, Any] | Exception | None] = asyncio.Queue(maxsize=8)
 
         async def read() -> None:
-            async for message in ws:
-                item = json.loads(message)
-                await queue.put(item)
-                if item.get("type") == "final":
-                    break
-            await queue.put(None)
+            try:
+                async for message in ws:
+                    item = json.loads(message)
+                    if not isinstance(item, dict) or item.get("type") not in {"partial", "final", "error"}:
+                        raise ValueError("Invalid ASR stream frame")
+                    if not isinstance(item.get("text"), str) or item.get("model", name) != name:
+                        raise ValueError("Invalid ASR transcript/model")
+                    await queue.put(item)
+                    if item["type"] == "final":
+                        break
+            except Exception as error:
+                await queue.put(error)
+            finally:
+                try:
+                    queue.put_nowait(None)
+                except asyncio.QueueFull:
+                    pass
 
-        reader = asyncio.create_task(read())
+        async def write() -> None:
+            try:
+                async for chunk in chunks:
+                    await asyncio.wait_for(ws.send(np.ascontiguousarray(chunk, dtype="<f4").tobytes()), TIMEOUT)
+                await asyncio.wait_for(ws.send(json.dumps({"type": "end"})), TIMEOUT)
+            except Exception as error:
+                await queue.put(error)
+            finally:
+                close = getattr(chunks, "aclose", None)
+                if close is not None:
+                    await close()
+
+        reader, sender = asyncio.create_task(read()), asyncio.create_task(write())
         try:
-            async for chunk in chunks:
-                await ws.send(np.ascontiguousarray(chunk, dtype="<f4").tobytes())
-                while not queue.empty():
-                    item = queue.get_nowait()
-                    if item is not None:
-                        yield item
-            await ws.send(json.dumps({"type": "end"}))
-            while (item := await queue.get()) is not None:
+            while True:
+                if reader.done() and queue.empty():
+                    raise RuntimeError("ASR stream ended without a final transcript")
+                item = await asyncio.wait_for(queue.get(), TIMEOUT)
+                if item is None:
+                    raise RuntimeError("ASR stream ended without a final transcript")
+                if isinstance(item, Exception):
+                    raise RuntimeError("ASR stream failed") from item
+                if item["type"] == "error":
+                    raise RuntimeError("ASR recognizer rejected the stream")
                 yield item
+                if item["type"] == "final":
+                    break
         finally:
-            reader.cancel()
+            for task in (reader, sender):
+                task.cancel()
+            await asyncio.gather(reader, sender, return_exceptions=True)

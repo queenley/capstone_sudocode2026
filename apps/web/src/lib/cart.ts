@@ -20,7 +20,10 @@ function read(): CartLine[] {
   try {
     const parsed = JSON.parse(localStorage.getItem(KEY) || "[]");
     cache = Array.isArray(parsed)
-      ? parsed.filter((l) => typeof l?.sku === "string" && Number.isInteger(l?.qty) && l.qty > 0)
+      ? parsed.filter(
+          (l) =>
+            typeof l?.sku === "string" && Number.isInteger(l?.qty) && l.qty > 0,
+        )
       : [];
   } catch {
     cache = [];
@@ -29,18 +32,40 @@ function read(): CartLine[] {
 }
 
 let serverToken = "";
+let generation = 0;
+let revision = 0;
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
+let saves: Promise<unknown> = Promise.resolve();
+
+function persist(token: string, lines: CartLine[], current: number) {
+  const saving = saves
+    .catch(() => undefined)
+    .then(() => {
+      if (current !== generation || token !== serverToken) return;
+      return api<{ items: CartLine[] }>(
+        "/api/customer/cart",
+        token,
+        { items: lines },
+        "PUT",
+      );
+    });
+  saves = saving;
+  return saving;
+}
 
 function save() {
   if (!serverToken) return;
   if (saveTimer) clearTimeout(saveTimer);
   const token = serverToken;
+  const current = generation;
   saveTimer = setTimeout(() => {
-    api("/api/customer/cart", token, { items: read() }, "PUT").catch(() => undefined);
+    if (current !== generation || token !== serverToken) return;
+    void persist(token, read(), current).catch(() => undefined);
   }, 400);
 }
 
 function write(lines: CartLine[], toServer = true) {
+  revision++;
   cache = lines;
   try {
     localStorage.setItem(KEY, JSON.stringify(lines));
@@ -56,10 +81,22 @@ export const cart = {
   add(sku: string, qty = 1) {
     const lines = read();
     const found = lines.find((l) => l.sku === sku);
-    write(found ? lines.map((l) => (l.sku === sku ? { ...l, qty: Math.min(99, l.qty + qty) } : l)) : [...lines, { sku, qty }]);
+    write(
+      found
+        ? lines.map((l) =>
+            l.sku === sku ? { ...l, qty: Math.min(99, l.qty + qty) } : l,
+          )
+        : [...lines, { sku, qty }],
+    );
   },
   set(sku: string, qty: number) {
-    write(qty <= 0 ? read().filter((l) => l.sku !== sku) : read().map((l) => (l.sku === sku ? { ...l, qty: Math.min(99, qty) } : l)));
+    write(
+      qty <= 0
+        ? read().filter((l) => l.sku !== sku)
+        : read().map((l) =>
+            l.sku === sku ? { ...l, qty: Math.min(99, qty) } : l,
+          ),
+    );
   },
   remove(sku: string) {
     write(read().filter((l) => l.sku !== sku));
@@ -69,29 +106,55 @@ export const cart = {
   },
   /** Signed in: merge this browser's lines into the account's cart (the larger quantity wins) and keep them in step. */
   async attach(token: string) {
+    if (serverToken === token) return;
+    const current = ++generation;
     serverToken = token;
     try {
-      const saved = await api<{ items: CartLine[] }>("/api/customer/cart", token);
+      const saved = await api<{ items: CartLine[] }>(
+        "/api/customer/cart",
+        token,
+      );
+      if (current !== generation || token !== serverToken) return;
       const merged = new Map(saved.items.map((l) => [l.sku, l.qty]));
-      for (const l of read()) merged.set(l.sku, Math.max(l.qty, merged.get(l.sku) || 0));
+      for (const l of read())
+        merged.set(l.sku, Math.max(l.qty, merged.get(l.sku) || 0));
       const lines = [...merged].map(([sku, qty]) => ({ sku, qty }));
       write(lines, false);
-      if (lines.length !== saved.items.length || lines.some((l, i) => l.qty !== saved.items[i]?.qty || l.sku !== saved.items[i]?.sku)) {
-        const stored = await api<{ items: CartLine[] }>("/api/customer/cart", token, { items: lines }, "PUT");
-        write(stored.items, false); // codes the shop no longer sells are dropped by the server
+      const merging = revision;
+      if (
+        lines.length !== saved.items.length ||
+        lines.some(
+          (l, i) =>
+            l.qty !== saved.items[i]?.qty || l.sku !== saved.items[i]?.sku,
+        )
+      ) {
+        const stored = await persist(token, lines, current);
+        if (
+          stored &&
+          current === generation &&
+          token === serverToken &&
+          merging === revision
+        )
+          write(stored.items, false);
       }
     } catch {
-      /* the cart stays local until the next page load */
+      if (current === generation && token === serverToken) serverToken = "";
     }
   },
   /** Signed out: the account's cart stays on the server, this browser forgets it. */
   detach() {
+    generation++;
     serverToken = "";
     if (saveTimer) clearTimeout(saveTimer);
     write([], false);
   },
   signedIn(): boolean {
     return Boolean(serverToken);
+  },
+  // Invalidates a pending account merge when another tab changes this cart.
+  changed() {
+    revision++;
+    cache = null;
   },
 };
 
@@ -103,7 +166,7 @@ export function useCart(): CartLine[] {
       listeners.add(listener);
       const onStorage = (event: StorageEvent) => {
         if (event.key === KEY) {
-          cache = null;
+          cart.changed();
           listener();
         }
       };
