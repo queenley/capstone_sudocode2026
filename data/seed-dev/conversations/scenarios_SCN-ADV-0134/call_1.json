@@ -1,0 +1,266 @@
+{
+  "conversation_id": "SCN-ADV-0134__call_1",
+  "scenario_id": "SCN-ADV-0134",
+  "call": "call_1",
+  "customer_id": "C039",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-11-01",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_nhieu_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần hỗ trợ đặt máy hâm sữa Fatz 4 chức năng đúng không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo em, anh muốn đặt máy hâm sữa Fatz 4 chức năng cho bé 18 tháng.",
+      "facts_stated": {
+        "product_advised": "SKU-MB-MON",
+        "child_age_months": 18
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy hâm sữa Fatz 4 chức năng bên em đang có sẵn hàng, giá 490.000đ một máy anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá khoảng 490 ngàn gì đó đúng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi anh, giá chính xác là 490.000đ và hiện shop chưa có khuyến mãi thêm cho sản phẩm này ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 490000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán là COD nhé.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh chọn thanh toán khi nhận hàng (COD), đơn hàng này được miễn phí thu hộ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giao hàng cho anh ở quận Lê Chân, Hải Phòng luôn.",
+      "facts_stated": {
+        "delivery_area": "Lê Chân, Hải Phòng"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận lại đơn: 1 máy hâm sữa Fatz 4 chức năng giá 490.000đ, giao tại Lê Chân, Hải Phòng, thanh toán COD. Dự kiến giao hàng đến ngày 05/11. Anh kiểm tra lại giúp em thông tin này đã đúng và em sẽ lên đơn ngay ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh kiểm tra lại giúp em thông tin này đã đúng và em sẽ lên đơn ngay ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 490000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Lê Chân, Hải Phòng",
+            "on": "2026-11-01"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ừ đúng rồi, em lên đơn luôn nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã tạo đơn cho anh, mã đơn OD600001. Đơn hàng sẽ giao tận nơi tại Lê Chân, Hải Phòng trước ngày 05/11 và anh thanh toán khi nhận hàng. Cảm ơn anh đã đặt mua tại shop BTC ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 490000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0930976582",
+            "sku": "SKU-MB-MON",
+            "qty": 1,
+            "price_vnd": 490000,
+            "payment": "COD",
+            "address": "Lê Chân, Hải Phòng",
+            "on": "2026-11-01"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "budget_vnd",
+          "value": 1000000,
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "child_age_months",
+          "value": 18,
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Lê Chân, Hải Phòng",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-MON",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 490000,
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_1#turn1"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-MB-MON",
+      "qty": 1,
+      "price_vnd": 490000,
+      "payment": "COD",
+      "address": "Lê Chân, Hải Phòng",
+      "order_id": "OD600001"
+    }
+  }
+}

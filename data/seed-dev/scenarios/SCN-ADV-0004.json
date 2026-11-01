@@ -1,0 +1,140 @@
+{
+  "scenario_id": "SCN-ADV-0004",
+  "level": "M2",
+  "persona": "khach_go_sai_chinh_ta",
+  "hard_case": null,
+  "customer_phone": "0952059972",
+  "customer_name": "Minh",
+  "honorific": "anh",
+  "notes": "Persona khach_go_sai_chinh_ta, biến thể sai_chinh_ta_da_kenh. call_1 (chat_fanpage): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.minh.658",
+      "call_date": "2026-10-15",
+      "input_mode": "chat_teencode",
+      "customer_goal": "Hỏi về giày chạy bộ size 41 màu xám",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về giày chạy bộ size 41 màu xám.",
+        "Cái đó giá bao nhiêu nhỉ?",
+        "Có khuyến mãi gì không em?",
+        "À, anh cần suy nghĩ thêm một chút rồi sẽ gọi lại nhé."
+      ],
+      "customer_turns_asr": [
+        "alo anh muon hoi ve giay chay bo size 41 mau xam",
+        "cai do gia bao nhiu nhir",
+        "co khuyen mai gi khong em",
+        "a anh can suy nghi them mot chut roi se goi lai nhe"
+      ],
+      "facts_established": {
+        "size": 41,
+        "color": "xam",
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1161000,
+        "variant_sku": "SKU-SN-RUN1-41-XAM",
+        "promo_code": "RUN-10",
+        "promo_expiry": "2026-10-25"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1161000,
+        "list_price_vnd": 1290000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-15"
+      },
+      "memory_expectation": {
+        "size": 41,
+        "color": "xam",
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1161000,
+        "variant_sku": "SKU-SN-RUN1-41-XAM",
+        "promo_code": "RUN-10"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "FAQ-09"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 3,
+      "customer_goal": "Xác nhận đặt hàng giày chạy bộ",
+      "customer_turns": [
+        "Chào em, hôm trước anh đã hỏi về giày chạy bộ size 41 màu xám.",
+        "Hôm nay anh muốn đặt hàng, thanh toán qua ngân hàng.",
+        "Giao hàng cho anh ở Cầu Giấy, Hà Nội nhé.",
+        "Ừm, anh đồng ý lên đơn cho anh luôn đi."
+      ],
+      "facts_established": {
+        "payment": "bank",
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1161000,
+        "variant_sku": "SKU-SN-RUN1-41-XAM",
+        "promo_code": "RUN-10",
+        "promo_expiry": "2026-10-25",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-RUN1-41-XAM",
+          "price_vnd": 1161000,
+          "payment": "bank"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1161000,
+        "list_price_vnd": 1290000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": true,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-10-20",
+        "call_date": "2026-10-18"
+      },
+      "memory_expectation": {
+        "payment": "bank",
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1161000,
+        "variant_sku": "SKU-SN-RUN1-41-XAM",
+        "promo_code": "RUN-10",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

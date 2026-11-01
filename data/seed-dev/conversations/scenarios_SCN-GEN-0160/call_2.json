@@ -1,0 +1,215 @@
+{
+  "conversation_id": "SCN-GEN-0160__call_2",
+  "scenario_id": "SCN-GEN-0160",
+  "call": "call_2",
+  "customer_id": "SYN-C019",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-31",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Ngô Văn Phúc ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có hỏi về Giày chạy bộ RunLite 2 Pro size 41 màu đen và còn để bàn với gia đình, anh muốn mình tiếp tục tư vấn như thế nào ạ?",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "variant_sku",
+        "blocker",
+        "size",
+        "order_id",
+        "owned_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 900,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, cho anh hỏi lại về giày chạy bộ RunLite 2 Pro size 41 màu đen nhé.",
+      "facts_stated": {
+        "product_advised": "SKU-SN-RUN2",
+        "variant_sku": "SKU-SN-RUN2-41-DEN",
+        "size": 41,
+        "color": "den"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giày chạy bộ RunLite 2 Pro size 41 màu đen bên em vẫn còn hàng anh nhé.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "variant_sku",
+        "size",
+        "color"
+      ],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá vẫn là 1 triệu 690 ngàn đúng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi anh, giá giày RunLite 2 Pro size 41 màu đen hiện vẫn là 1.690.000đ ạ.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "variant_sku",
+        "size",
+        "color"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có khuyến mãi gì mới không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại sản phẩm này bên em chưa có chương trình khuyến mãi mới anh nhé. Giá vẫn như báo anh là 1.690.000đ, có hỗ trợ miễn phí thu hộ khi nhận hàng.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, anh vẫn cần bàn với gia đình, tối mai em gọi lại cho anh nhé.",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận anh vẫn cần trao đổi thêm với gia đình. Em sẽ gọi lại cho anh vào tối mai để hỗ trợ tiếp, anh yên tâm mình giữ giá như báo hôm nay cho anh ạ.",
+      "questions": [],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN2",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN2-41-DEN",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1690000,
+          "op": "set",
+          "source": "call_2#turn4"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_ban_gia_dinh",
+    "objection_handling": "Xác nhận và hẹn gọi lại đúng thời điểm khách yêu cầu, cam kết giữ giá như đã báo.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "time": "tối mai",
+        "action": "gọi lại"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "time": "tối mai",
+      "reason": "Khách cần bàn với gia đình"
+    },
+    "order": null
+  }
+}

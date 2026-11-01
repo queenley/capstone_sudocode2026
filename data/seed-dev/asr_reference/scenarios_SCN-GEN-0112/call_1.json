@@ -1,0 +1,53 @@
+{
+  "scenario_id": "SCN-GEN-0112",
+  "call": "call_1",
+  "input_mode": "text",
+  "source_sha256": "c97108034bef3f34f058f16addfaad7b8a117c8da33fe5dcf21543c0181f6645",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Alo, chị muốn hỏi về bình sữa Pigeon PPSU 240ml cho bé 2 tháng tuổi.",
+      "spoken_text": "alo chị muốn hỏi về bình sữa pigeon ppsu hai trăm bốn mươi mililit cho bé hai tháng tuổi.",
+      "entities": {
+        "sku": "SKU-MB-BOT"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Giá bình sữa này là bao nhiêu vậy em?",
+      "spoken_text": "giá bình sữa này là bao nhiêu vậy em?",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Chị có ngân sách khoảng 500 ngàn thôi.",
+      "spoken_text": "chị có ngân sách khoảng năm trăm ngàn thôi.",
+      "entities": {
+        "budget_vnd": 500000
+      },
+      "reference_source": "rule",
+      "issues": [
+        "words_changed"
+      ]
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "À, chị chờ cuối tháng chị nhận lương rồi gọi lại nhé.",
+      "spoken_text": "à chị chờ cuối tháng chị nhận lương rồi gọi lại nhé.",
+      "entities": {
+        "blocker": "cho luong"
+      },
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

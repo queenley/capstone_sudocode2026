@@ -1,0 +1,219 @@
+{
+  "conversation_id": "SCN-GEN-0017__call_1",
+  "scenario_id": "SCN-GEN-0017",
+  "call": "call_1",
+  "customer_id": "C014",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-16",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_mua_nhieu_mon",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần tư vấn máy lọc không khí cho phòng khoảng 20 mét vuông đúng không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Anh cần chọn máy cho phòng khoảng 20 mét vuông đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về máy lọc không khí cho phòng khoảng 20 mét vuông.",
+      "facts_stated": {
+        "room_area_m2": 20
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với diện tích phòng 20 mét vuông, anh có thể cân nhắc máy lọc không khí AirPure Pro ạ. Máy này phù hợp phòng đến 45 mét vuông, lọc bụi mịn hiệu quả, và công suất mạnh.",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Anh dự kiến ngân sách khoảng bao nhiêu cho máy lọc không khí ạ?"
+        }
+      ],
+      "facts_used": [
+        "room_area_m2"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhà anh không có trẻ nhỏ, ngân sách tầm 8 triệu thôi.",
+      "facts_stated": {
+        "has_children": false,
+        "budget_vnd": 8000000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ AirPure Pro hiện đang có giá ưu đãi 7.690.000đ, nằm trong ngân sách của anh và đang còn hàng tại shop. Máy có khóa trẻ em, nhưng nếu nhà mình không có trẻ nhỏ thì vẫn phù hợp vì công suất lớn, lọc bụi tốt và dùng được cho phòng lớn hơn sau này ạ.",
+      "questions": [],
+      "facts_used": [
+        "budget_vnd",
+        "has_children"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại AirPure Pro đang có chương trình khuyến mãi giảm trực tiếp 300.000đ với mã AIR-OCT, áp dụng đến hết ngày 30/10. Ngoài ra, đơn hàng này cũng được miễn phí vận chuyển toàn quốc anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, anh cần suy nghĩ thêm rồi sẽ gọi lại nhé.",
+      "facts_stated": {
+        "blocker": "cần suy nghĩ thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, anh cứ cân nhắc thêm ạ. Nếu cần hỗ trợ thêm thông tin hoặc muốn đặt hàng thì anh cứ liên hệ lại cho shop bất cứ lúc nào anh nhé. Em cảm ơn anh đã quan tâm sản phẩm của bên em ạ.",
+      "questions": [],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "room_area_m2",
+          "value": 20,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "has_children",
+          "value": false,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 8000000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7690000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "promo_code",
+          "value": "AIR-OCT",
+          "op": "set",
+          "source": "call_1#turn7"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_may_loc_khong_khi",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_suy_nghi_them",
+    "objection_handling": "Đã ghi nhận khách cần suy nghĩ thêm, hướng dẫn liên hệ lại khi có nhu cầu.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

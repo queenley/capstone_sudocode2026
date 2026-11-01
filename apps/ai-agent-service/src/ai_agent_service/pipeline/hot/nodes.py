@@ -23,7 +23,7 @@ from langgraph.runtime import Runtime
 from ...agents.advisor import AdvisorFailure, AgentContext, shown_passages, _seen_in
 from ...agents.policy import PolicyInput, needs_review
 from ...components.context import compact
-from ...components.guardrails import fallback
+from ...components.guardrails import actions, fallback
 from ...components.guardrails.hard import MAX_SENTENCES, ORDER_SUMMARY, GuardInput, check
 from ...components.guardrails.stream import SentenceSplitter
 from ...components.identity import resolver
@@ -473,6 +473,7 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
         tool_results=tuple(state.get("tool_results") or []),
         quotes=dict(state.get("quotes") or {}),
         known_orders=frozenset(state.get("known_orders") or []),
+        placed_lines=tuple(state.get("placed_lines") or []),
         customer_phone=phone,
         vault=context.vault,
         shared_phone=any(k.get("kind") == "phone" and len(set(k.get("customer_ids") or [])) > 1
@@ -546,6 +547,13 @@ def _address_as(state: HotState) -> str | None:
     return " ".join(x for x in (state.get("honorific"), state.get("customer_name")) if x) or None
 
 
+def _placed(earlier: Sequence[Mapping[str, Any]], results: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """The call's order lines with the ones *results* created, one per order id."""
+    lines = {line["order_id"]: dict(line) for line in earlier}
+    lines.update({line["order_id"]: line for line in actions.placed_lines(results)})
+    return list(lines.values())
+
+
 def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     """A run's tool results added to the turn's, with today's quotes, the orders seen and the failure count."""
     new_results = [{**r, "turn": state.get("turn_no") or 0} for r in produced]
@@ -570,6 +578,7 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
             failures += 1
     return {"tool_results": list(state.get("tool_results") or []) + new_results, "quotes": quotes,
             "known_orders": orders, "created_orders": created, "tool_failures": failures,
+            "placed_lines": _placed(state.get("placed_lines") or [], new_results),
             "trusted_skus": sorted(set(state.get("trusted_skus") or []) | codes),
             "seen_products": _products_in(new_results, state.get("seen_products") or [])}
 

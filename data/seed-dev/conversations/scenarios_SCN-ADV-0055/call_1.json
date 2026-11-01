@@ -1,0 +1,268 @@
+{
+  "conversation_id": "SCN-ADV-0055__call_1",
+  "scenario_id": "SCN-ADV-0055",
+  "call": "call_1",
+  "customer_id": "C013",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-21",
+  "region": "trung",
+  "category": "gia-dung/quat",
+  "persona": "khach_hoi_freeship_theo_vung",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Trang ạ, em là trợ lý ảo của shop BTC. Em cảm ơn chị đã gọi tới hotline để hỏi về chương trình freeship cho đồ gia dụng.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Trang ở Hải Châu, Đà Nẵng nè, chị thấy trên fanpage có quảng cáo freeship cho đồ gia dụng.",
+      "facts_stated": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Hải Châu, Đà Nẵng",
+          "spoken": "Hải Châu, Đà Nẵng"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận địa chỉ giao là Hải Châu, Đà Nẵng ạ. Chương trình freeship hiện chỉ áp dụng cho đơn hàng đồ gia dụng từ 2 triệu đồng trở lên hoặc mẹ & bé từ 500.000đ. Với khu vực miền Nam, shop cũng có freeship cho một số ngành hàng, còn với địa chỉ giao của chị thì quạt Senko chưa đủ điều kiện được miễn phí vận chuyển chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "freeship",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn hỏi là quạt đứng Senko TS16 có được freeship không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại quạt đứng Senko TS16 có giá 590.000đ và còn hàng ạ. Sản phẩm này chưa đủ điều kiện nhận freeship theo chính sách của shop.",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Ngân sách dự kiến của chị cho món quà này là khoảng bao nhiêu vậy ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 590000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "freeship",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "590000",
+          "spoken": "590.000đ"
+        }
+      ],
+      "pause_before_ms": 450,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn mua làm quà cho bạn, ngân sách của chị tầm một triệu thôi.",
+      "facts_stated": {
+        "usage_need": "mua làm quà",
+        "budget_vnd": 1000000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "1000000",
+          "spoken": "một triệu"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã chia sẻ nhu cầu và ngân sách ạ. Với ngân sách khoảng một triệu, quạt đứng Senko TS16 là phù hợp và hiện giá là 590.000đ, chưa gồm phí vận chuyển. Nếu chị cần thêm gợi ý sản phẩm nào khác trong tầm giá này, em sẵn sàng hỗ trợ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 590000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "590000",
+          "spoken": "590.000đ"
+        }
+      ],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu không freeship thì phí giao hàng là bao nhiêu vậy em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với địa chỉ giao ở Hải Châu, Đà Nẵng, phí vận chuyển cho quạt Senko là 35.000đ nếu đơn dưới 2 triệu ạ. Nếu tổng đơn từ 2 triệu trở lên, shop sẽ miễn phí vận chuyển cho khu vực của chị.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "freeship",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "35000",
+          "spoken": "35.000đ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần suy nghĩ thêm rồi mới quyết định, em có thể gọi lại cho chị không?",
+      "facts_stated": {
+        "blocker": "cần suy nghĩ thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị cần thêm thời gian suy nghĩ và sẽ gọi lại hỗ trợ chị sau ạ. Em cảm ơn chị Trang đã quan tâm sản phẩm của shop, chúc chị một ngày vui vẻ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "usage_need",
+          "value": "mua làm quà",
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 1000000,
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Hải Châu, Đà Nẵng",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-FAN-SEN",
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 590000,
+          "op": "set",
+          "source": "call_1#turn4"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "cần suy nghĩ thêm",
+    "objection_handling": "Ghi nhận lý do, xác nhận sẽ gọi lại cho khách theo đúng quy trình.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "action": "hen_goi_lai"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "reason": "Khách cần suy nghĩ thêm",
+      "timeframe": null
+    },
+    "order": null
+  }
+}

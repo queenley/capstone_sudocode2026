@@ -1,0 +1,180 @@
+{
+  "conversation_id": "SCN-GEN-0101__call_1",
+  "scenario_id": "SCN-GEN-0101",
+  "call": "call_1",
+  "customer_id": "SYN-C006",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "nam",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Em sẽ kiểm tra tình trạng các đơn hàng của anh ngay bây giờ ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi tình trạng đơn hàng OD900602 của anh hiện giờ thế nào.",
+      "facts_stated": {
+        "order_id": "OD900602"
+      },
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD900602",
+          "spoken": "OD900602"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã nhận được yêu cầu của anh về đơn OD900602. Hiện tại, đơn này bên em vẫn đang trong quá trình xử lý, chưa có thông tin giao hàng mới. Anh muốn em kiểm tra thêm các đơn hàng khác không ạ?",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD900602",
+          "spoken": "OD900602"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hôm trước anh đặt ghế ngồi ô tô cho bé, không biết khi nào thì giao được nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn ghế ngồi ô tô của anh hiện vẫn đang xử lý, bên em sẽ liên hệ với anh ngay khi đơn sẵn sàng giao ạ. Anh yên tâm, em sẽ cập nhật khi có tiến trình mới từ bên vận chuyển.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh thấy đơn này vẫn đang xử lý, có thông tin gì mới không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại đơn OD900602 vẫn chưa có cập nhật mới về thời gian giao hàng, em rất xin lỗi vì sự chậm trễ này. Anh có muốn em kiểm tra tình trạng các đơn khác đã mua không ạ?",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD900602",
+          "spoken": "OD900602"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hy vọng đơn hàng này sớm được giao, vì anh cần gấp.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu anh đang cần gấp ạ. Đơn hàng OD900603 của anh, sản phẩm Nồi chiên không dầu Xiaomi 4.5L, đã giao thành công rồi ạ.",
+      "questions": [],
+      "facts_used": [
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900603"
+        },
+        {
+          "field": "order_status",
+          "value": "delivered"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900603"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD900603",
+          "spoken": "OD900603"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

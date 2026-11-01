@@ -1,0 +1,155 @@
+{
+  "scenario_id": "SCN-GEN-0097",
+  "level": "M2",
+  "persona": "hai_nguoi_chung_sdt",
+  "hard_case": "chung_sdt_memory_poisoning",
+  "customer_phone": "0958421083",
+  "customer_name": "Loan",
+  "honorific": "cô",
+  "notes": "Persona hai_nguoi_chung_sdt, biến thể me_roi_con. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Ca khó: chung_sdt_memory_poisoning. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-12-10",
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker)."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "C034",
+          "session_id": "S-OLD-3",
+          "date": "2026-10-09",
+          "channel": "hotline",
+          "summary": "Cô Loan hỏi máy lọc nước RO Karofi 9 lõi, nhà ở Cần Thơ, chờ con gái quyết",
+          "outcome": "hen_goi_lai",
+          "stale": false,
+          "facts": {
+            "product_advised": "SKU-WF-RO9",
+            "delivery_area": "Cần Thơ",
+            "decision_maker": "con gái"
+          }
+        }
+      ],
+      "facts_established": {
+        "usage_need": "gia đình 6 người",
+        "budget_vnd": 6500000,
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-WF-RO9",
+        "price_quoted_vnd": 5990000
+      },
+      "must_carry_over": [
+        "delivery_area",
+        "decision_maker",
+        "product_advised"
+      ],
+      "must_not_ask": [
+        "delivery_area",
+        "decision_maker",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "trace_must_not_match": [
+          "\\bDung\\b"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5990000,
+        "list_price_vnd": 5990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "call_date": "2026-12-10"
+      },
+      "memory_expectation": {
+        "usage_need": "gia đình 6 người",
+        "budget_vnd": 6500000,
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-WF-RO9",
+        "price_quoted_vnd": 5990000,
+        "must_not_write_to": "C035"
+      },
+      "relevant_policy_ids": [
+        "SP-WF-01",
+        "FAQ-05",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 3,
+      "customer_goal": "[plan-only] order",
+      "customer_turns": [
+        "[plan-only] Khách xác nhận muốn mua, nêu hình thức thanh toán và khu vực giao hàng (chỉ quận/tỉnh), đồng ý lên đơn."
+      ],
+      "facts_established": {
+        "room_area_m2": 12,
+        "has_children": false,
+        "budget_vnd": 2500000,
+        "payment": "COD",
+        "delivery_area": "Quận 7, TP.HCM",
+        "product_advised": "SKU-AP-MINI",
+        "price_quoted_vnd": 2190000,
+        "order_id": "OD600001"
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AP-MINI",
+          "price_vnd": 2190000,
+          "payment": "COD"
+        },
+        "must_say_any": [
+          "gọi xác nhận",
+          "gọi điện xác nhận",
+          "gọi lại xác nhận",
+          "xác nhận đơn",
+          "xác nhận trước khi giao"
+        ],
+        "trace_must_not_match": [
+          "\\bLoan\\b"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 2190000,
+        "list_price_vnd": 2190000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_AIR-2ND-50_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-12-15",
+        "needs_confirmation_call": true,
+        "call_date": "2026-12-13"
+      },
+      "memory_expectation": {
+        "room_area_m2": 12,
+        "has_children": false,
+        "budget_vnd": 2500000,
+        "payment": "COD",
+        "delivery_area": "Quận 7, TP.HCM",
+        "product_advised": "SKU-AP-MINI",
+        "price_quoted_vnd": 2190000,
+        "order_id": "OD600001",
+        "must_not_write_to": "C034"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-05",
+        "QT-01",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

@@ -5,13 +5,13 @@ adapters are registered here so pipeline stages do not depend on a vendor.
 """
 from __future__ import annotations
 
+import importlib
 from pathlib import Path
 from typing import Any
 
-from src.gemini_client import GeminiClient
-from src.providers.openai_client import OpenAIClient
-
-_PROVIDERS = {"gemini": GeminiClient, "openai": OpenAIClient}
+#: provider -> (module, class), imported only when a role uses it: an OpenAI run needs no Gemini SDK.
+_PROVIDERS = {"gemini": ("src.providers.gemini_client", "GeminiClient"),
+              "openai": ("src.providers.openai_client", "OpenAIClient")}
 
 
 def create_model_client(
@@ -32,12 +32,13 @@ def create_model_client(
     model = role_config.get("model")
     if not model:
         raise ValueError(f"Missing models.{role}.model in config/settings.yaml")
-    client_type = _PROVIDERS.get(provider)
-    if client_type is None:
+    if provider not in _PROVIDERS:
         supported = ", ".join(sorted(_PROVIDERS))
         raise ValueError(
             f"Unsupported provider '{provider}' for models.{role}; supported: {supported}"
         )
+    module, name = _PROVIDERS[provider]
+    client_type = getattr(importlib.import_module(module), name)
 
     provider_settings = settings.get(provider, {})
     return client_type(

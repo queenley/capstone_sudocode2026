@@ -20,7 +20,7 @@ Khách nhắn Zalo OA → Zalo gửi webhook → api-gateway → ai-agent /api/c
    → gửi lại qua Zalo OA API (tin tư vấn)
 ```
 
-Khi AI chuyển máy, AI im lặng; tư vấn viên trả lời trong `/ban-hang` → *Hội thoại* và câu trả lời được gửi sang Zalo cho khách.
+Khi AI chuyển máy, AI im lặng; tư vấn viên trả lời trong `/ban-hang` → *Hội thoại* và câu trả lời được gửi sang Zalo cho khách. Trang bán hàng báo ca mới (hộp thông báo, tiếng bíp, số trên tiêu đề tab, thông báo trình duyệt) và tô đỏ tin của khách cần nhân viên đọc.
 
 ### Thử ngay, chưa cần tài khoản Zalo
 

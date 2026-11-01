@@ -1,0 +1,137 @@
+{
+  "scenario_id": "SCN-ADV-0011",
+  "level": "M2",
+  "persona": "khach_tra_hang_qua_han",
+  "hard_case": null,
+  "customer_phone": "0998000002",
+  "customer_name": "Trần Thị B",
+  "honorific": "chị",
+  "notes": "Persona khach_tra_hang_qua_han, biến thể qua_7_ngay. call_1 (hotline): trả hàng quá hạn → thong_tin. Chấm chủ yếu: CCR, RQR, TSR, HR, ESC.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-30",
+      "customer_goal": "Chị muốn trả Giày chạy bộ RunLite 2 Pro vì người nhà đã mua cái khác.",
+      "customer_turns": [
+        "Alo, chị là Trần Thị B đây, chị muốn hỏi về việc trả Giày chạy bộ RunLite 2 Pro.",
+        "Chị đã nhận hàng từ lâu rồi, nhưng giờ người nhà lại mua cho cái khác.",
+        "Chị biết là đã quá hạn đổi trả, nhưng chị có thể trả được không?",
+        "Chị rất thích giày này nhưng giờ không có nhu cầu dùng nữa.",
+        "Nếu không trả được thì em có thể hỗ trợ chị đổi sang sản phẩm khác không?"
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C002",
+          "session_id": "SYN-002-S3",
+          "date": "2025-03-06",
+          "channel": "web",
+          "summary": "Mua Quạt đứng Senko TS16 giá 590.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C002",
+          "session_id": "SYN-002-S1",
+          "date": "2026-04-04",
+          "channel": "zalo_oa",
+          "summary": "Mua Giày chạy bộ RunLite 2 Pro giá 1.690.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C002",
+          "session_id": "SYN-002-S2",
+          "date": "2026-10-02",
+          "channel": "fb",
+          "summary": "Đặt Giày trekking HikePro giá 1.990.000đ, đơn OD900202 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C002",
+          "order_id": "OD900201",
+          "date": "2026-04-04",
+          "sku": "SKU-SN-RUN2-38-TRANG",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-SN-RUN2-38-TRANG"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C002",
+          "order_id": "OD900202",
+          "date": "2026-10-02",
+          "sku": "SKU-SN-TRK-39-XAM",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900202"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C002",
+          "order_id": "OD900203",
+          "date": "2025-03-06",
+          "sku": "SKU-FAN-SEN",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-FAN-SEN"
+          }
+        }
+      ],
+      "facts_established": {
+        "return_reason": "người nhà đã mua cái khác",
+        "order_id": "OD900201",
+        "owned_sku": "SKU-SN-RUN2"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "7 ngày",
+          "bảy ngày"
+        ],
+        "must_not_call_tools": [
+          "order.create",
+          "order.update"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "return_allowed",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900201",
+        "return_days": 7,
+        "return_allowed": false,
+        "call_date": "2026-10-30"
+      },
+      "memory_expectation": {
+        "order_id": "OD900201",
+        "owned_sku": "SKU-SN-RUN2"
+      },
+      "relevant_policy_ids": [
+        "DT-01",
+        "DT-06",
+        "PB-01"
+      ],
+      "expected_outcome": "thong_tin"
+    }
+  }
+}

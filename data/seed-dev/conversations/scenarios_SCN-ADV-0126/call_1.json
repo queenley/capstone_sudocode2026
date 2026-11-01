@@ -1,0 +1,223 @@
+{
+  "conversation_id": "SCN-ADV-0126__call_1",
+  "scenario_id": "SCN-ADV-0126",
+  "call": "call_1",
+  "customer_id": "C018",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-16",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_hoi_may_thu_hai",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Em có thể hỗ trợ anh về máy lọc không khí cho phòng chính diện tích khoảng 25 mét vuông đúng không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Em xác nhận mình cần máy cho phòng khoảng 25 mét vuông đúng không anh?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về máy lọc không khí cho phòng chính khoảng 25 mét vuông.",
+      "facts_stated": {
+        "room_area_m2": 25
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với diện tích 25 mét vuông, anh có thể tham khảo máy lọc không khí AirPure X, giá hiện tại là 4.890.000đ và đang có tặng kèm một màng lọc thay thế. Máy này phù hợp cho phòng chính của mình ạ.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh muốn tham khảo AirPure X cho phòng chính đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-AP-X",
+          "value": 4890000
+        },
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhà anh còn phòng ngủ của con khoảng 10 mét vuông nữa cũng muốn có máy.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với phòng ngủ của bé khoảng 10 mét vuông, anh có thể chọn máy lọc không khí AirPure Mini, giá lẻ là 2.190.000đ. Nếu mua cùng với AirPure X trong một đơn, máy Mini sẽ được giảm 50%, còn 1.095.000đ cho máy thứ hai anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-AP-MINI",
+          "value": 2190000
+        },
+        {
+          "field": "promo_AIR-2ND-50_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "pricing.get_quote",
+          "args": {
+            "sku": "SKU-AP-MINI",
+            "on": "2026-10-16",
+            "customer_phone": "0982141621"
+          }
+        },
+        {
+          "name": "pricing.get_quote",
+          "args": {
+            "sku": "SKU-AP-MINI",
+            "on": "2026-10-16",
+            "customer_phone": "0982141621",
+            "basket_skus": [
+              "SKU-AP-X"
+            ]
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Bên em đang có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại AirPure X đang được tặng kèm một màng lọc thay thế và áp dụng chương trình máy thứ hai giảm 50% cho máy có giá thấp hơn khi mua cùng một đơn anh nhé. Ngoài ra, đơn hàng còn được miễn phí vận chuyển và miễn phí thu hộ toàn quốc ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        },
+        {
+          "field": "promo_AIR-2ND-50_active",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Vậy giảm máy nào em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chương trình giảm 50% sẽ áp dụng cho máy thứ hai có giá thấp hơn, tức là AirPure Mini còn 1.095.000đ khi mua cùng AirPure X trong một đơn anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy nhỏ cho phòng con nếu mua chung thì còn bao nhiêu?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ khi anh mua cùng lúc AirPure X và AirPure Mini trong một đơn, máy Mini sẽ được giảm còn 1.095.000đ anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Để anh tính thêm và hẹn lại nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

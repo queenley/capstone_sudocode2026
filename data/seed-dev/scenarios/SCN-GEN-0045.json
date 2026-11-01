@@ -1,0 +1,115 @@
+{
+  "scenario_id": "SCN-GEN-0045",
+  "level": "M2",
+  "persona": "khach_hoi_ngoai_tai_lieu",
+  "hard_case": null,
+  "customer_phone": "0925822018",
+  "customer_name": "Quỳnh",
+  "honorific": "chị",
+  "notes": "Persona khach_hoi_ngoai_tai_lieu, biến thể ngoai_tai_lieu. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): hỏi điều tài liệu không có → thong_tin. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-17",
+      "customer_goal": "Hỏi về sản phẩm máy tiệt trùng sấy khô Moaz Bebe.",
+      "customer_turns": [
+        "Alo, chị Quỳnh đây, chị muốn hỏi về sản phẩm máy tiệt trùng sấy khô Moaz Bebe.",
+        "Em cho chị biết giá cả và có khuyến mãi gì không?",
+        "Chị có một bé 2 tháng tuổi, ngân sách khoảng 2 triệu thôi.",
+        "Chị muốn bàn với gia đình đã, có thể gọi lại cho chị tối thứ Hai (19/10) tầm 7 giờ em nhé.",
+        "Cảm ơn em, tối thứ Hai em gọi lại cho chị nhá."
+      ],
+      "facts_established": {
+        "child_age_months": 2,
+        "budget_vnd": 2000000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-MB-STER",
+        "price_quoted_vnd": 1890000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-10-19T19:00"
+        },
+        "must_say_any": [
+          "7 giờ",
+          "19 giờ",
+          "19h",
+          "7h tối"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1890000,
+        "list_price_vnd": 1890000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "callback_at": "2026-10-19T19:00",
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "child_age_months": 2,
+        "budget_vnd": 2000000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-MB-STER",
+        "price_quoted_vnd": 1890000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-03",
+        "LN-01",
+        "PB-03"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 4,
+      "customer_goal": "Hỏi về phiên bản giới hạn màu hồng của sản phẩm.",
+      "customer_turns": [
+        "Alo, chị Quỳnh đây. Chị có thắc mắc là máy tiệt trùng Moaz Bebe có phiên bản giới hạn màu hồng không em?",
+        "Nếu chưa có thông tin thì cũng không sao, chị sẽ chờ.",
+        "Em kiểm tra giúp chị nhé, cảm ơn em!",
+        "À, mà chị cũng đang cân nhắc mua sản phẩm này, nên nếu có thông tin gì mới thì báo chị biết với nhé."
+      ],
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "agent_must_say": [
+          "không có thông tin",
+          "chưa có thông tin",
+          "em chưa rõ",
+          "em không chắc",
+          "em sẽ kiểm tra",
+          "chưa nắm được"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "unknown_topic": "sản phẩm có phiên bản giới hạn màu hồng không",
+        "call_date": "2026-10-21"
+      },
+      "relevant_policy_ids": [
+        "PB-05",
+        "PB-01"
+      ],
+      "expected_outcome": "thong_tin"
+    }
+  }
+}

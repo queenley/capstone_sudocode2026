@@ -11,6 +11,8 @@
 - :func:`errors`: every scenario the grader failed, with its reasons and the
   turns to read: the material for the report's analysis of at least ten
   failures (the brief, section F).
+- :func:`team_checks`: the team's own checks of a scenario (``success_if.say_at_most``),
+  which the organisers' grader ignores: written beside its table, never in it.
 """
 
 from __future__ import annotations
@@ -18,6 +20,7 @@ from __future__ import annotations
 import hashlib
 import json
 import platform
+import re
 import shutil
 import subprocess
 import sys
@@ -158,6 +161,45 @@ def grade(scenarios_dir: Path, *, full: Path, baseline: Path | None, out: Path,
         command += ["--rag", str(rag)]
     finished = subprocess.run(command, capture_output=True, text=True)
     return finished.returncode, (finished.stdout + finished.stderr).strip()
+
+
+def team_checks(scenarios_dir: Path, traces: Mapping[str, Path]) -> dict[str, dict[str, Any] | None]:
+    """``success_if.say_at_most`` per configuration: the calls with more agent turns matching a pattern than its max.
+
+    The team's key (contracts/scenario/scenario-keys.yaml): "say AIR-2ND-50 once", "never with wrong conditions".
+    A diagnostic beside the organisers' numbers, which stay ``reference_eval``'s (evaluation/README.md rule 1).
+    A configuration whose trace holds none of the calls that carry the key is None: nothing was checked.
+    """
+    limits: dict[tuple[str, str], list[Mapping[str, Any]]] = {}
+    for path in sorted(scenarios_dir.glob("*.json")):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        for call, spec in (data.get("calls") or {}).items():
+            if (spec.get("success_if") or {}).get("say_at_most"):
+                limits[(data["scenario_id"], call)] = spec["success_if"]["say_at_most"]
+    checks: dict[str, dict[str, Any] | None] = {}
+    for config, path in traces.items():
+        said: dict[tuple[str, str], list[str]] = {}
+        for line in (path.read_text(encoding="utf-8").splitlines() if path.is_file() else []):
+            if line.strip():
+                row = json.loads(line)
+                said.setdefault((row["scenario_id"], row["call"]), []).append(row.get("agent_text") or "")
+        checked = [key for key in limits if key in said]
+        failures = [{"scenario": sid, "call": call, "pattern": limit["pattern"], "max": limit["max"], "turns": turns}
+                    for sid, call in checked for limit in limits[(sid, call)]
+                    if (turns := sum(1 for text in said[(sid, call)] if re.search(limit["pattern"], text))) > limit["max"]]
+        checks[config] = {"calls_checked": len(checked),
+                          "calls_failed": len({(f["scenario"], f["call"]) for f in failures}),
+                          "failures": failures} if checked else None
+    return checks
+
+
+def team_table(checks: Mapping[str, Mapping[str, Any] | None]) -> str:
+    """The team's checks as lines under the organisers' table, marked as a diagnostic."""
+    lines = ["Team checks (say_at_most, diagnostic, not reference_eval)"]
+    for config, result in checks.items():
+        lines.append(f"  {config:20} " + ("no call carries say_at_most" if result is None else
+                                          f"{result['calls_failed']}/{result['calls_checked']} calls over the limit"))
+    return "\n".join(lines)
 
 
 def errors(report: Mapping[str, Any], diagnostics: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:

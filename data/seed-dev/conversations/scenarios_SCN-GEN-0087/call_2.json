@@ -1,0 +1,167 @@
+{
+  "conversation_id": "SCN-GEN-0087__call_2",
+  "scenario_id": "SCN-GEN-0087",
+  "call": "call_2",
+  "customer_id": "C002",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-02",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_yeu_cau_xoa_du_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Tuấn ạ, hôm trước anh có quan tâm Giày sneaker Urban Classic và đang chờ cuối tháng nhận lương. Em là trợ lý ảo của shop BTC, hỗ trợ anh về đơn hàng và thông tin cá nhân ạ.",
+      "questions": [],
+      "facts_used": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "is_human",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em ơi, anh đang muốn hỏi là em là người thật hay máy vậy?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em là trợ lý ảo của shop BTC, hỗ trợ khách hàng dựa trên thông tin hệ thống ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "is_human",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh muốn xóa dữ liệu cá nhân của mình.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận yêu cầu xóa dữ liệu cá nhân của anh. Để xác nhận, anh vui lòng cung cấp số CCCD hoặc thông tin xác thực khác giúp em ạ.",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "anh vui lòng cung cấp số CCCD hoặc thông tin xác thực khác giúp em ạ"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Số CCCD của anh là 079188681034, mong em xác nhận giúp.",
+      "facts_stated": {},
+      "entities": [
+        {
+          "type": "cccd",
+          "value": "079188681034",
+          "spoken": "079188681034"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã xác nhận số CCCD anh cung cấp và sẽ tiến hành xóa dữ liệu cá nhân theo quy trình. Thời gian xử lý là tối đa 72 giờ, sau khi hoàn tất hệ thống sẽ thông báo lại cho anh ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "deletion_sla_hours",
+          "value": 72
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh đồng ý xóa dữ liệu sau khi em xác nhận.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận yêu cầu xóa dữ liệu cá nhân của anh và bắt đầu xử lý theo quy định. Nếu cần hỗ trợ thêm, anh có thể liên hệ lại shop bất cứ lúc nào ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "profile_state",
+          "value": "pending_deletion",
+          "op": "set",
+          "source": "call_2#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xoa_du_lieu",
+    "outcome": "xoa_du_lieu",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,188 @@
+{
+  "conversation_id": "SCN-GEN-0178__call_1",
+  "scenario_id": "SCN-GEN-0178",
+  "call": "call_1",
+  "customer_id": "C012",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-12",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_ngoai_pham_vi_chuyen_may",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần tư vấn về máy hút sữa đúng không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về máy hút sữa cho bé 12 tháng.",
+      "facts_stated": {
+        "child_age_months": 12
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, với bé 12 tháng anh có thể tham khảo máy hút sữa điện đôi Medela Swing Maxi bên em ạ. Anh cần em tư vấn về tính năng hay cách sử dụng cụ thể nào không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh cần em tư vấn về tính năng hay cách sử dụng cụ thể nào không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy hút sữa này có gì đặc biệt không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy Medela Swing Maxi là máy hút sữa điện đôi, nhỏ gọn, công nghệ 2-Phase giúp hút nhẹ nhàng và hiệu quả, có thể dùng pin hoặc adapter nên tiện mang theo ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá máy này là bao nhiêu và có khuyến mãi gì không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy này giá 5.990.000đ anh nhé, hiện đang có chương trình miễn phí vận chuyển toàn quốc cho ngành mẹ & bé. Anh đặt trong tháng 11 vẫn được áp dụng ưu đãi này ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ừ, anh cần suy nghĩ thêm một chút rồi sẽ gọi lại em nhé.",
+      "facts_stated": {
+        "blocker": "cần suy nghĩ thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, anh cứ cân nhắc thêm nhé. Nếu cần biết thêm thông tin về máy hoặc chương trình khuyến mãi, anh liên hệ lại shop bất cứ lúc nào ạ. Em ghi nhận ý kiến của anh và sẽ lưu lại thông tin để tiện hỗ trợ khi anh gọi lại.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 6500000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "child_age_months",
+          "value": 12,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-PUMP2",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5990000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_1#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_san_pham",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_suy_nghi_them",
+    "objection_handling": "Đã ghi nhận khách cần suy nghĩ thêm, hướng dẫn liên hệ lại khi cần.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

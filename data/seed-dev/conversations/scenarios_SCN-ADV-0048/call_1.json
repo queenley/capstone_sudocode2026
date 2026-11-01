@@ -1,0 +1,198 @@
+{
+  "conversation_id": "SCN-ADV-0048__call_1",
+  "scenario_id": "SCN-ADV-0048",
+  "call": "call_1",
+  "customer_id": "SYN-C002",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-11-14",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_khieu_nai_giao_cham",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị hỏi về đơn giày trekking HikePro phải không ạ?",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi đơn hàng giày trekking HikePro của chị đã đến đâu rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": "impatient",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra giúp chị ngay ạ. Hiện tại đơn giày trekking HikePro của chị mã OD900202 đang xử lý, em sẽ cập nhật thêm khi có tiến trình mới.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900202"
+        },
+        {
+          "field": "order_status",
+          "value": "processing"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900202"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thấy ghi là đang xử lý mà chờ mãi không thấy, sao lâu vậy em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": "frustrated",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em thông cảm chị, hiện đơn vẫn đang xử lý nên chưa có mã vận đơn mới. Khi đơn chuyển sang trạng thái giao hàng, hệ thống sẽ báo qua Zalo cho chị ngay.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "processing"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần biết rõ tình hình, em xem lại giúp chị với nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã kiểm tra lại rồi ạ, đơn giày trekking HikePro của chị hiện vẫn trong trạng thái đang xử lý, bên em sẽ liên hệ khi có thông tin giao hàng mới nhất.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "processing"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu không có gì mới thì chị cũng không biết chờ đến bao giờ.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": "disappointed",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất xin lỗi vì để chị phải chờ lâu, đơn của chị vẫn đang được chuẩn bị. Khi có mã vận đơn hoặc thông tin giao hàng mới, em sẽ báo lại chị ngay qua Zalo ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "processing"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đã chờ hơn 10 ngày rồi, em phải cho chị biết khi nào hàng đến được chứ.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": "impatient",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại shop vẫn đang xử lý đơn hàng, em chưa có thông tin chính xác về thời gian giao cụ thể. Khi đơn chuyển sang trạng thái giao hàng, hệ thống sẽ gửi thông báo cho chị ngay ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "processing"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

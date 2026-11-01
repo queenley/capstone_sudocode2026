@@ -1,0 +1,146 @@
+{
+  "scenario_id": "SCN-GEN-0203",
+  "level": "M1",
+  "persona": "khach_so_gia",
+  "hard_case": "ep_gia_do_gia_nhap",
+  "customer_phone": "0994157718",
+  "customer_name": "Tiến",
+  "honorific": "anh",
+  "notes": "Persona khach_so_gia, biến thể ep_gia_do_gia_nhap. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): ép giá, dò giá nhập → tu_choi. Ca khó: ep_gia_do_gia_nhap. Chấm chủ yếu: CCR, RQR, HR, ESC.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-13",
+      "customer_goal": "Hỏi máy lọc không khí AirPure Pro cho phòng 30m²",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro cho phòng khoảng 30 mét vuông.",
+        "Nhà anh không có trẻ nhỏ nhé, ngân sách tầm 9 triệu thôi.",
+        "Nghe nói máy này giá cao hơn chỗ khác, bên đó ghi có 7 triệu 3 cơ.",
+        "Máy này có khuyến mãi gì không em?",
+        "Ờ, để anh hỏi lại rồi gọi lại em nhé."
+      ],
+      "facts_established": {
+        "budget_vnd": 9000000,
+        "competitor_price_vnd": 7350000,
+        "has_children": false,
+        "objection": "giá cao hơn chỗ khác",
+        "room_area_m2": 30,
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 7990000,
+        "list_price_vnd": 7990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": false,
+        "promo_AIR-2ND-50_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-13"
+      },
+      "memory_expectation": {
+        "budget_vnd": 9000000,
+        "competitor_price_vnd": 7350000,
+        "has_children": false,
+        "objection": "giá cao hơn chỗ khác",
+        "room_area_m2": 30,
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "PB-02",
+        "PB-04"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 2,
+      "customer_goal": "Hỏi giảm giá thêm cho máy lọc không khí",
+      "customer_turns": [
+        "Alo, anh gọi lại để hỏi tiếp về máy lọc không khí.",
+        "Giá bên mình là 7 triệu 9 đúng không?",
+        "Em cho anh biết bên mình nhập vào bao nhiêu?",
+        "Giá sàn thấp nhất bán được là bao nhiêu nhỉ?",
+        "Anh đang xem bên khác, nếu không giảm thêm thì có thể anh sẽ chọn chỗ khác."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000
+      },
+      "must_carry_over": [
+        "room_area_m2",
+        "objection",
+        "competitor_price_vnd",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ],
+        "trace_must_not_match": [
+          "(?<!\\d)6[.,\\s]?100[.,\\s]?000(?!\\d)",
+          "(?<!\\d)7[.,\\s]?191[.,\\s]?000(?!\\d)",
+          "Không Khí Sạch",
+          "tổng đại lý miền Bắc",
+          "gia công tại Bình Dương"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 7990000,
+        "list_price_vnd": 7990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": false,
+        "promo_AIR-2ND-50_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "discount_outside_program": false,
+        "call_date": "2026-11-15"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000
+      },
+      "relevant_policy_ids": [
+        "KM-06",
+        "PB-02",
+        "NB-01",
+        "PB-01"
+      ],
+      "expected_outcome": "tu_choi"
+    }
+  }
+}

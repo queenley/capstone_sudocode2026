@@ -1,0 +1,246 @@
+{
+  "scenario_id": "SCN-GEN-0226",
+  "level": "M2",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "hard_case": null,
+  "customer_phone": "0998000013",
+  "customer_name": "Phạm Minh Tuấn",
+  "honorific": "anh",
+  "notes": "Persona khach_goi_lan_3_het_kien_nhan, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_3 (hotline): chốt đơn → chot_don. Chấm chủ yếu: CCR, RQR, TSR, ESC.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-26",
+      "customer_goal": "Hỏi về giày chạy bộ RunLite 2 Pro size 41 màu đen",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về giày chạy bộ RunLite 2 Pro size 41 màu đen.",
+        "Em cho anh biết giá của giày này với, có khuyến mãi gì không?",
+        "Ờ, anh thấy trên mạng có giá rẻ hơn, nhưng muốn hỏi kỹ hơn.",
+        "Thôi được, để anh suy nghĩ thêm rồi gọi lại sau nhé."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C013",
+          "session_id": "SYN-013-S1",
+          "date": "2026-05-10",
+          "channel": "hotline",
+          "summary": "Mua Nồi chiên không dầu Lock&Lock 4L giá 1.890.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C013",
+          "session_id": "SYN-013-S2",
+          "date": "2026-10-03",
+          "channel": "zalo_oa",
+          "summary": "Đặt Nồi chiên không dầu Philips 6.2L giá 3.990.000đ, đơn OD901302 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C013",
+          "order_id": "OD901301",
+          "date": "2026-05-10",
+          "sku": "SKU-AF-4L",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AF-4L"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C013",
+          "order_id": "OD901302",
+          "date": "2026-10-03",
+          "sku": "SKU-AF-6L",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901302"
+          }
+        }
+      ],
+      "facts_established": {
+        "blocker": "cần suy nghĩ thêm",
+        "color": "den",
+        "size": 41,
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-41-DEN"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1690000,
+        "list_price_vnd": 1690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-26"
+      },
+      "memory_expectation": {
+        "blocker": "cần suy nghĩ thêm",
+        "color": "den",
+        "size": 41,
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-41-DEN"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "FAQ-09",
+        "PB-01",
+        "PB-10"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 3,
+      "customer_goal": "Hỏi lại về giày chạy bộ RunLite 2 Pro size 41 màu đen",
+      "customer_turns": [
+        "Alo, anh đây, hôm trước có hỏi giày chạy bộ đó rồi.",
+        "Em cho anh biết lại giá với khuyến mãi của giày đó nhé.",
+        "Anh vẫn đang phân vân giữa cái này và cái khác.",
+        "Thế nhé, để anh suy nghĩ thêm rồi gọi lại sau."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-41-DEN"
+      },
+      "must_carry_over": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1690000,
+        "list_price_vnd": 1690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-29"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-41-DEN"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "PB-01",
+        "PB-10"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_3": {
+      "days_later": 3,
+      "customer_goal": "Xác nhận mua giày chạy bộ RunLite 2 Pro size 41 màu đen",
+      "customer_turns": [
+        "Alo, anh gọi lại để chốt đơn giày chạy bộ RunLite 2 Pro size 41 màu đen.",
+        "Hình thức thanh toán là COD nhé, em ơi.",
+        "Khu vực giao hàng là Long Biên, Hà Nội.",
+        "Chốt đơn cho anh nhé."
+      ],
+      "facts_established": {
+        "delivery_area": "Long Biên, Hà Nội",
+        "payment": "COD",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-41-DEN",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-RUN2-41-DEN",
+          "price_vnd": 1690000,
+          "payment": "COD"
+        },
+        "max_agent_questions": 2
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1690000,
+        "list_price_vnd": 1690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-12-04",
+        "call_date": "2026-12-02"
+      },
+      "memory_expectation": {
+        "delivery_area": "Long Biên, Hà Nội",
+        "payment": "COD",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-41-DEN",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "PB-01",
+        "PB-10"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

@@ -1,0 +1,210 @@
+{
+  "conversation_id": "SCN-GEN-0059__call_1",
+  "scenario_id": "SCN-GEN-0059",
+  "call": "call_1",
+  "customer_id": "SYN-C002",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "trung",
+  "category": "thoi-trang/ao-khoac",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em thấy trước chị có đặt Giày trekking HikePro, hôm nay chị cần tư vấn về áo phao lông vũ Warmly phải không ạ?",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về áo phao lông vũ Warmly size L màu navy đó.",
+      "facts_stated": {
+        "size": "L",
+        "color": "navy"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ áo phao lông vũ Warmly size L màu navy bên em đang có sẵn hàng ạ. Chị đang quan tâm mẫu này đúng không chị?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị đang quan tâm mẫu này đúng không chị?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá của áo này là bao nhiêu em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giá của áo phao lông vũ Warmly size L màu navy là 1.490.000đ chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cái này có khuyến mãi gì không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại mẫu áo này bên em chưa có chương trình khuyến mãi nào áp dụng chị ạ. Giá em báo là giá niêm yết mới nhất.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cũng đang muốn so sánh với một số mẫu khác nữa.",
+      "facts_stated": {
+        "blocker": "muốn so sánh thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, chị cứ tham khảo thêm các mẫu khác rồi khi nào cần tư vấn hoặc đặt hàng chị liên hệ lại giúp em nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ gọi lại sau nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em cảm ơn chị đã quan tâm sản phẩm bên em. Khi nào chị cần hỗ trợ thêm, em luôn sẵn sàng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "size",
+          "value": "L",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "color",
+          "value": "navy",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "blocker",
+          "value": "muốn so sánh thêm",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-JK-DWN",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1490000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-JK-DWN-L-NAVY",
+          "op": "set",
+          "source": "call_1#turn2"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_ao_khoac",
+    "outcome": "hen_goi_lai",
+    "objection_type": "muon_so_sanh_them",
+    "objection_handling": "Đồng ý để khách tham khảo thêm, hẹn gọi lại khi cần.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,222 @@
+{
+  "conversation_id": "SCN-ADV-0092__call_1",
+  "scenario_id": "SCN-ADV-0092",
+  "call": "call_1",
+  "customer_id": "C003",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-13",
+  "region": "trung",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "khach_hoi_tra_gop",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị đang quan tâm đến máy lọc nước UF Sunhouse đúng không ạ? Dạ máy này phù hợp cho gia đình 4 người đó chị.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị đang muốn tìm máy lọc nước UF Sunhouse cho gia đình 4 người đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo em ơi, chị muốn hỏi về máy lọc nước UF Sunhouse cho gia đình 4 người.",
+      "facts_stated": {
+        "product_advised": "SKU-WF-UF",
+        "usage_need": "gia đình 4 người"
+      },
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy lọc nước UF Sunhouse bên em hiện có giá là 3.290.000đ chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3290000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này giá bao nhiêu vậy em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với ngân sách khoảng 3 triệu rưỡi thì chị hoàn toàn có thể chọn mẫu này cho gia đình ạ.",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của chị là khoảng 3 triệu rưỡi đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có ngân sách khoảng 3 triệu rưỡi thôi.",
+      "facts_stated": {
+        "budget_vnd": 3500000
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã chia sẻ. Hiện tại sản phẩm chưa có chương trình khuyến mãi giảm giá, tuy nhiên vẫn được miễn phí thu hộ khi nhận hàng chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thấy có máy khác giá rẻ hơn trên mạng, không biết có khuyến mãi gì không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện shop chưa hỗ trợ trả góp qua công ty tài chính hoặc thẻ tín dụng, chị có thể chọn thanh toán chuyển khoản hoặc thanh toán khi nhận hàng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn trả góp thì em có hỗ trợ không?",
+      "facts_stated": {
+        "blocker": "muốn trả góp"
+      },
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận nhu cầu của chị, nếu chị cần tư vấn thêm hoặc quyết định mua thì chị cứ liên hệ lại shop bất cứ lúc nào nhé. Em cảm ơn chị đã quan tâm ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "usage_need",
+          "value": "gia đình 4 người",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 3500000,
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "blocker",
+          "value": "muốn trả góp",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-WF-UF",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 3290000,
+          "op": "set",
+          "source": "call_1#turn4"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ừ, thế chị sẽ để ý rồi gọi lại nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "muon_tra_gop",
+    "objection_handling": "Giải thích shop chưa hỗ trợ trả góp, hướng dẫn chuyển khoản hoặc COD.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

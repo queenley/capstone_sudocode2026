@@ -1,0 +1,104 @@
+{
+  "scenario_id": "SCN-GEN-0098",
+  "level": "M2",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "hard_case": null,
+  "customer_phone": "0901304118",
+  "customer_name": "Yến",
+  "honorific": "chị",
+  "notes": "Persona khach_quay_lai_sau_8_thang, biến thể quay_lai_sau_8_thang. call_1 (hotline): chốt đơn → chot_don; call_2 (hotline): tư vấn, chưa chốt → hen_goi_lai. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-30",
+      "customer_goal": "[plan-only] order",
+      "customer_turns": [
+        "[plan-only] Khách xác nhận muốn mua, nêu hình thức thanh toán và khu vực giao hàng (chỉ quận/tỉnh), đồng ý lên đơn."
+      ],
+      "facts_established": {
+        "child_age_months": 2,
+        "budget_vnd": 1000000,
+        "payment": "bank",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000,
+        "order_id": "OD600001"
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-MB-MON",
+          "price_vnd": 490000,
+          "payment": "bank"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 490000,
+        "list_price_vnd": 490000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_MOM-FREESHIP_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-11-04",
+        "call_date": "2026-10-30"
+      },
+      "memory_expectation": {
+        "child_age_months": 2,
+        "budget_vnd": 1000000,
+        "payment": "bank",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000,
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04"
+      ],
+      "expected_outcome": "chot_don"
+    },
+    "call_2": {
+      "days_later": 240,
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker)."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000
+      },
+      "must_carry_over": [
+        "order_id"
+      ],
+      "must_not_ask": [
+        "order_id"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 490000,
+        "list_price_vnd": 490000,
+        "promo_active": false,
+        "promo_MOM-FREESHIP_active": false,
+        "promo_COD-0_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "call_date": "2027-06-27"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000
+      },
+      "relevant_policy_ids": [
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

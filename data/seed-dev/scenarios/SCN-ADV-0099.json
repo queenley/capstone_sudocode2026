@@ -1,0 +1,228 @@
+{
+  "scenario_id": "SCN-ADV-0099",
+  "level": "M2",
+  "persona": "khach_go_sai_chinh_ta",
+  "hard_case": null,
+  "customer_phone": "0998000016",
+  "customer_name": "Nguyễn Thị Hương",
+  "honorific": "chị",
+  "notes": "Persona khach_go_sai_chinh_ta, biến thể sai_chinh_ta_da_kenh. call_1 (chat_fanpage): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.huong.915",
+      "call_date": "2026-10-17",
+      "input_mode": "chat_teencode",
+      "customer_goal": "Hỏi về máy hút sữa điện đôi Spectra S1.",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về máy hút sữa điện đôi Spectra S1, giá bao nhiêu vậy em?",
+        "Chị có ngân sách tầm 5 triệu thôi, không biết có khuyến mãi gì không nhỉ?",
+        "Chị đang cần bàn với gia đình để quyết định mua, nên hẹn em gọi lại tối thứ Hai (19/10) tầm 7 giờ nhé.",
+        "Em ghi nhớ cho chị nhé, chị sẽ bàn với gia đình rồi gọi lại cho em."
+      ],
+      "customer_turns_asr": [
+        "alo chi muon hoi ve may hut sua dien doi spectra s1 gia bao nhieu vay em",
+        "chi co ngan sach tam 5 trieu thoi khong biet co khuyen mai gi khong nhi",
+        "chi dang can ban voi gia dinh de quyet dinh mua nen hen em goi lai toi thu hai 19 10 tam 7 gio nhe",
+        "em ghi nho cho chi nhe chi se ban voi gia dinh roi goi lai cho em"
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C016",
+          "session_id": "SYN-016-S3",
+          "date": "2025-05-20",
+          "channel": "zalo_oa",
+          "summary": "Mua Quạt đứng DC inverter Panasonic F-409 giá 2.450.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C016",
+          "session_id": "SYN-016-S1",
+          "date": "2026-03-19",
+          "channel": "web",
+          "summary": "Mua Nồi chiên không dầu Xiaomi 4.5L giá 1.590.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C016",
+          "session_id": "SYN-016-S2",
+          "date": "2026-10-06",
+          "channel": "hotline",
+          "summary": "Đặt Máy lọc không khí AirPure X giá 4.890.000đ, đơn OD901602 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C016",
+          "order_id": "OD901601",
+          "date": "2026-03-19",
+          "sku": "SKU-AF-XM",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AF-XM"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C016",
+          "order_id": "OD901602",
+          "date": "2026-10-06",
+          "sku": "SKU-AP-X",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901602"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C016",
+          "order_id": "OD901603",
+          "date": "2025-05-20",
+          "sku": "SKU-FAN-DC1",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-FAN-DC1"
+          }
+        }
+      ],
+      "facts_established": {
+        "blocker": "để bàn với gia đình",
+        "budget_vnd": 5000000,
+        "child_age_months": 8,
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-10-19T19:00"
+        },
+        "must_say_any": [
+          "7 giờ",
+          "19 giờ",
+          "19h",
+          "7h tối"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 4290000,
+        "list_price_vnd": 4290000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "promo_PUMP-GIFT_active": false,
+        "in_stock": true,
+        "callback_at": "2026-10-19T19:00",
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "blocker": "để bàn với gia đình",
+        "budget_vnd": 5000000,
+        "child_age_months": 8,
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-01",
+        "FAQ-11",
+        "LN-01",
+        "PB-03",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 2,
+      "customer_goal": "Xác nhận mua máy hút sữa.",
+      "customer_turns": [
+        "Chị muốn đặt máy hút sữa điện đôi Spectra S1 đó nhé.",
+        "Hình thức thanh toán là chuyển khoản ngân hàng.",
+        "Khu vực giao hàng là Long Biên, Hà Nội.",
+        "Em lên đơn cho chị đi."
+      ],
+      "facts_established": {
+        "delivery_area": "Long Biên, Hà Nội",
+        "payment": "bank",
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-MB-PUMP1",
+          "price_vnd": 4290000,
+          "payment": "bank"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 4290000,
+        "list_price_vnd": 4290000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "promo_PUMP-GIFT_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-10-21",
+        "call_date": "2026-10-19"
+      },
+      "memory_expectation": {
+        "delivery_area": "Long Biên, Hà Nội",
+        "payment": "bank",
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000,
+        "promo_code": "MOM-FREESHIP",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

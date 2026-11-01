@@ -1,0 +1,126 @@
+{
+  "scenario_id": "SCN-ADV-0140",
+  "level": "M2",
+  "persona": "khach_mua_phu_kien_thay_the",
+  "hard_case": null,
+  "customer_phone": "0998000001",
+  "customer_name": "Nguyễn Văn A",
+  "honorific": "anh",
+  "notes": "Persona khach_mua_phu_kien_thay_the, biến thể thay_mang_loc. call_1 (hotline): chốt đơn → chot_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-12-25",
+      "customer_goal": "Hỏi về thời gian thay màng lọc và đặt mua màng lọc thay thế",
+      "customer_turns": [
+        "Alo, em chào anh, anh muốn hỏi về thời gian thay màng lọc cho máy lọc không khí AirPure X mà anh đã mua.",
+        "Máy này anh dùng cũng lâu rồi, không biết mình nên thay màng lọc sau bao lâu nhỉ?",
+        "Anh đang cần mua màng lọc thay thế AirPure X/Y, em có thể cho anh biết giá cả và cách thức thanh toán không?",
+        "Anh muốn thanh toán bằng COD, và địa chỉ giao hàng là Cầu Giấy, Hà Nội nhé."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C001",
+          "session_id": "SYN-001-S1",
+          "date": "2026-03-01",
+          "channel": "hotline",
+          "summary": "Mua Máy lọc không khí AirPure X giá 4.890.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C001",
+          "session_id": "SYN-001-S2",
+          "date": "2026-10-01",
+          "channel": "zalo_oa",
+          "summary": "Đặt Máy lọc không khí AirPure Mini giá 2.190.000đ, đơn OD900102 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C001",
+          "order_id": "OD900101",
+          "date": "2026-03-01",
+          "sku": "SKU-AP-X",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AP-X"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C001",
+          "order_id": "OD900102",
+          "date": "2026-10-01",
+          "sku": "SKU-AP-MINI",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900102"
+          }
+        }
+      ],
+      "facts_established": {
+        "budget_vnd": 1000000,
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "payment": "COD",
+        "usage_need": "mua làm quà",
+        "product_advised": "SKU-AP-FLT-X",
+        "price_quoted_vnd": 690000,
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AP-FLT-X",
+          "price_vnd": 690000,
+          "payment": "COD"
+        },
+        "must_say_any": [
+          "6–12 tháng",
+          "6-12 tháng",
+          "6 đến 12 tháng"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 690000,
+        "list_price_vnd": 690000,
+        "promo_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "promo_COD-0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-12-28",
+        "call_date": "2026-12-25"
+      },
+      "memory_expectation": {
+        "budget_vnd": 1000000,
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "payment": "COD",
+        "usage_need": "mua làm quà",
+        "product_advised": "SKU-AP-FLT-X",
+        "price_quoted_vnd": 690000,
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

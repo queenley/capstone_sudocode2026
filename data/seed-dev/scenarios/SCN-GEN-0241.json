@@ -1,0 +1,108 @@
+{
+  "scenario_id": "SCN-GEN-0241",
+  "level": "M1",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "hard_case": null,
+  "customer_phone": "0952059972",
+  "customer_name": "Minh",
+  "honorific": "anh",
+  "notes": "Persona khach_hoi_nhieu_khong_mua, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): hỏi thêm rồi từ chối → tu_choi. call_1 ngày 29/11: ngày cuối của khuyến mãi (KM-01: nói hạn, không hứa sau hôm nay). Chấm chủ yếu: CCR, RQR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-29",
+      "customer_goal": "Hỏi về bình sữa Pigeon cho bé",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về bình sữa Pigeon PPSU 240ml.",
+        "Bé nhà anh 13 tháng rồi, anh thấy bình này có tốt không?",
+        "Giá khoảng 289 ngàn, có đúng không em?",
+        "À mà anh muốn so sánh thêm với mấy loại khác nữa, nên chưa quyết được.",
+        "Em cho anh xin thêm thông tin rồi anh gọi lại nhé."
+      ],
+      "facts_established": {
+        "blocker": "muốn so sánh thêm",
+        "budget_vnd": 500000,
+        "child_age_months": 13,
+        "product_advised": "SKU-MB-BOT",
+        "price_quoted_vnd": 289000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 289000,
+        "list_price_vnd": 289000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_MOM-FREESHIP_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-29"
+      },
+      "memory_expectation": {
+        "blocker": "muốn so sánh thêm",
+        "budget_vnd": 500000,
+        "child_age_months": 13,
+        "product_advised": "SKU-MB-BOT",
+        "price_quoted_vnd": 289000
+      },
+      "relevant_policy_ids": [
+        "SP-MB-03",
+        "PB-11"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 5,
+      "customer_goal": "Hỏi thêm rồi từ chối mua",
+      "customer_turns": [
+        "Alo, anh lại gọi đây.",
+        "Em ơi, cho anh hỏi thêm một chút về bình sữa này nhé?",
+        "Anh thấy giá cũng khá cao, không biết có loại nào rẻ hơn không?",
+        "Thật ra anh cũng chưa chắc lắm, nên thôi anh không mua nữa đâu.",
+        "Cảm ơn em đã tư vấn, hẹn lần sau nhé."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-MB-BOT",
+        "price_quoted_vnd": 289000
+      },
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "max_agent_questions": 4
+      },
+      "ground_truth_facts": {
+        "price_vnd": 289000,
+        "list_price_vnd": 289000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_MOM-FREESHIP_active": false,
+        "in_stock": true,
+        "call_date": "2026-12-04"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-MB-BOT",
+        "price_quoted_vnd": 289000
+      },
+      "relevant_policy_ids": [
+        "SP-MB-03",
+        "PB-01",
+        "PB-11"
+      ],
+      "expected_outcome": "tu_choi"
+    }
+  }
+}

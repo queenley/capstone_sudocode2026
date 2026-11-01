@@ -1,0 +1,205 @@
+{
+  "conversation_id": "SCN-ADV-0004__call_1",
+  "scenario_id": "SCN-ADV-0004",
+  "call": "call_1",
+  "customer_id": "C004",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-15",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_go_sai_chinh_ta",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh quan tâm đến giày chạy bộ phải không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo anh muon hoi ve giay chay bo size 41 mau xam",
+      "facts_stated": {
+        "size": 41,
+        "color": "xam"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh muốn hỏi về giày chạy bộ RunLite 1 size 41 màu xám đúng không ạ? Hiện mẫu này bên em còn hàng anh nhé.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Dạ anh muốn hỏi về giày chạy bộ RunLite 1 size 41 màu xám đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "cai do gia bao nhiu nhir",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm giày chạy bộ RunLite 1 size 41 màu xám đang có giá ưu đãi là 1.161.000đ anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1161000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "co khuyen mai gi khong em",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại sản phẩm này đang áp dụng khuyến mãi RUN-10 giảm 10% so với giá niêm yết, giá đã giảm chỉ còn 1.161.000đ anh ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        },
+        {
+          "field": "price_vnd",
+          "value": 1161000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "a anh can suy nghi them mot chut roi se goi lai nhe",
+      "facts_stated": {
+        "blocker": "cần suy nghĩ thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, anh cân nhắc thêm giúp em nhé. Nếu cần hỗ trợ thêm, anh cứ nhắn shop bất cứ lúc nào ạ. Shop sẽ giữ giá ưu đãi này cho anh đến hết ngày 25/10.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "size",
+          "value": 41,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "color",
+          "value": "xam",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN1",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1161000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN1-41-XAM",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "promo_code",
+          "value": "RUN-10",
+          "op": "set",
+          "source": "call_1#turn7"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

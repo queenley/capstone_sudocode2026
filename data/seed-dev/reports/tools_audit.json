@@ -1,0 +1,277 @@
+{
+  "official_tools": [
+    "crm.get_customer",
+    "catalog.search",
+    "inventory.check",
+    "order.create",
+    "order.update",
+    "schedule.callback",
+    "handoff.transfer",
+    "pricing.get_quote",
+    "order.status"
+  ],
+  "tools": [
+    {
+      "tool": "catalog.search",
+      "official": true,
+      "level": "M1",
+      "mock_params": [
+        "query",
+        "category",
+        "sku",
+        "max_price_vnd",
+        "min_room_area_m2",
+        "include_discontinued"
+      ],
+      "required_params": [],
+      "used": {
+        "oracle_trace": 6,
+        "reference_transcripts": 6
+      },
+      "args_used": [
+        "query"
+      ],
+      "extra_args_not_in_btc": [],
+      "note": ""
+    },
+    {
+      "tool": "crm.get_customer",
+      "official": true,
+      "level": "M1",
+      "mock_params": [
+        "phone",
+        "zalo_id",
+        "fb_id"
+      ],
+      "required_params": [],
+      "used": {
+        "oracle_trace": 797
+      },
+      "args_used": [
+        "phone"
+      ],
+      "extra_args_not_in_btc": [],
+      "note": ""
+    },
+    {
+      "tool": "delivery_estimate",
+      "official": false,
+      "level": "team",
+      "mock_params": [],
+      "required_params": [],
+      "used": {
+        "oracle_trace": 235,
+        "reference_transcripts": 231
+      },
+      "args_used": [
+        "address",
+        "on"
+      ],
+      "extra_args_not_in_btc": [
+        "address",
+        "on"
+      ],
+      "note": ""
+    },
+    {
+      "tool": "handoff.transfer",
+      "official": true,
+      "level": "M1",
+      "mock_params": [
+        "brief"
+      ],
+      "required_params": [
+        "brief"
+      ],
+      "used": {
+        "success_if.must_not_call_tools": 21,
+        "success_if.tool_called": 20,
+        "oracle_trace": 20,
+        "reference_transcripts": 20
+      },
+      "args_used": [
+        "brief"
+      ],
+      "extra_args_not_in_btc": [],
+      "note": ""
+    },
+    {
+      "tool": "inventory.check",
+      "official": true,
+      "level": "M1",
+      "mock_params": [
+        "sku",
+        "on"
+      ],
+      "required_params": [
+        "sku"
+      ],
+      "used": {
+        "fault_injection": 15,
+        "oracle_trace": 583
+      },
+      "args_used": [
+        "on",
+        "sku"
+      ],
+      "extra_args_not_in_btc": [],
+      "note": ""
+    },
+    {
+      "tool": "order.create",
+      "official": true,
+      "level": "M1",
+      "mock_params": [
+        "customer_phone",
+        "sku",
+        "qty",
+        "price_vnd",
+        "promo_code",
+        "payment",
+        "address",
+        "on",
+        "basket_skus"
+      ],
+      "required_params": [
+        "customer_phone",
+        "sku"
+      ],
+      "used": {
+        "success_if.must_not_call_tools": 472,
+        "success_if.tool_called": 235,
+        "oracle_trace": 284,
+        "reference_transcripts": 280
+      },
+      "args_used": [
+        "address",
+        "basket_skus",
+        "customer_phone",
+        "on",
+        "order_group",
+        "payment",
+        "price_vnd",
+        "qty",
+        "sku"
+      ],
+      "extra_args_not_in_btc": [
+        "order_group"
+      ],
+      "note": ""
+    },
+    {
+      "tool": "order.status",
+      "official": true,
+      "level": "M2",
+      "mock_params": [
+        "order_id",
+        "customer_phone"
+      ],
+      "required_params": [],
+      "used": {
+        "success_if.tool_called": 47,
+        "oracle_trace": 64,
+        "reference_transcripts": 63
+      },
+      "args_used": [
+        "order_id"
+      ],
+      "extra_args_not_in_btc": [],
+      "note": ""
+    },
+    {
+      "tool": "order.update",
+      "official": true,
+      "level": "M1",
+      "mock_params": [
+        "order_id",
+        "action",
+        "new_variant_sku",
+        "reason",
+        "on"
+      ],
+      "required_params": [
+        "order_id",
+        "action"
+      ],
+      "used": {
+        "success_if.must_not_call_tools": 19,
+        "success_if.tool_called": 36,
+        "oracle_trace": 36,
+        "reference_transcripts": 36
+      },
+      "args_used": [
+        "action",
+        "new_variant_sku",
+        "on",
+        "order_id",
+        "reason"
+      ],
+      "extra_args_not_in_btc": [],
+      "note": ""
+    },
+    {
+      "tool": "pricing.get_quote",
+      "official": true,
+      "level": "M2",
+      "mock_params": [
+        "sku",
+        "on",
+        "qty",
+        "customer_phone",
+        "address",
+        "basket_skus"
+      ],
+      "required_params": [
+        "sku"
+      ],
+      "used": {
+        "success_if.tool_called": 6,
+        "oracle_trace": 601,
+        "reference_transcripts": 17
+      },
+      "args_used": [
+        "basket_skus",
+        "customer_phone",
+        "on",
+        "sku"
+      ],
+      "extra_args_not_in_btc": [],
+      "note": ""
+    },
+    {
+      "tool": "schedule.callback",
+      "official": true,
+      "level": "M1",
+      "mock_params": [
+        "customer_phone",
+        "callback_at",
+        "note"
+      ],
+      "required_params": [
+        "customer_phone",
+        "callback_at"
+      ],
+      "used": {
+        "success_if.tool_called": 87,
+        "oracle_trace": 87,
+        "reference_transcripts": 87
+      },
+      "args_used": [
+        "callback_at",
+        "customer_phone",
+        "note"
+      ],
+      "extra_args_not_in_btc": [],
+      "note": ""
+    }
+  ],
+  "not_in_btc": [
+    "delivery_estimate"
+  ],
+  "extra_params": {
+    "order.create": [
+      "order_group"
+    ]
+  },
+  "unused_official": []
+}

@@ -1,0 +1,141 @@
+{
+  "scenario_id": "SCN-ADV-0104",
+  "level": "M2",
+  "persona": "khach_bao_hanh_het_han",
+  "hard_case": null,
+  "customer_phone": "0998000008",
+  "customer_name": "Nguyễn Văn H",
+  "honorific": "anh",
+  "notes": "Persona khach_bao_hanh_het_han, biến thể loi_het_han. call_1 (zalo_oa): bảo hành hết hạn → thong_tin. Chấm chủ yếu: CCR, RQR, TSR, HR, ESC.",
+  "calls": {
+    "call_1": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_syn-c008",
+      "call_date": "2026-10-30",
+      "customer_goal": "Hỏi về bảo hành quạt đứng Senko TS16",
+      "customer_turns": [
+        "Alo, anh mua quạt đứng Senko TS16 lâu rồi, giờ nó bị kêu to và báo lỗi cảm biến.",
+        "Em ơi, anh muốn hỏi là quạt này có được bảo hành miễn phí không?",
+        "Anh thấy trên hóa đơn ghi bảo hành 12 tháng, giờ hết hạn thì có cách nào khác không?",
+        "Thật sự anh rất khó chịu với tình trạng này, em có thể giúp anh không?"
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C008",
+          "session_id": "SYN-008-S3",
+          "date": "2025-03-12",
+          "channel": "zalo_oa",
+          "summary": "Mua Quạt đứng Senko TS16 giá 590.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C008",
+          "session_id": "SYN-008-S1",
+          "date": "2026-05-22",
+          "channel": "web",
+          "summary": "Mua Giày chạy bộ RunLite 2 Pro giá 1.690.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C008",
+          "session_id": "SYN-008-S2",
+          "date": "2026-10-08",
+          "channel": "hotline",
+          "summary": "Đặt Áo phao lông vũ Warmly giá 1.530.000đ, đơn OD900802 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C008",
+          "order_id": "OD900801",
+          "date": "2026-05-22",
+          "sku": "SKU-SN-RUN2-41-DEN",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-SN-RUN2-41-DEN"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C008",
+          "order_id": "OD900802",
+          "date": "2026-10-08",
+          "sku": "SKU-JK-DWN-XL-NAVY",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900802"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C008",
+          "order_id": "OD900803",
+          "date": "2025-03-12",
+          "sku": "SKU-FAN-SEN",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-FAN-SEN"
+          }
+        }
+      ],
+      "facts_established": {
+        "issue": "máy báo lỗi cảm biến và kêu to",
+        "order_id": "OD900803",
+        "owned_sku": "SKU-FAN-SEN"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "hết hạn bảo hành",
+          "hết thời hạn bảo hành",
+          "đã hết bảo hành",
+          "quá hạn bảo hành"
+        ],
+        "must_not_call_tools": [
+          "order.create",
+          "order.update"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_warranty",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900803",
+        "warranty_months": 12,
+        "in_warranty": false,
+        "call_date": "2026-10-30"
+      },
+      "memory_expectation": {
+        "issue": "máy báo lỗi cảm biến và kêu to",
+        "order_id": "OD900803",
+        "owned_sku": "SKU-FAN-SEN"
+      },
+      "relevant_policy_ids": [
+        "BH-01",
+        "BH-02",
+        "PB-01"
+      ],
+      "expected_outcome": "thong_tin"
+    }
+  }
+}

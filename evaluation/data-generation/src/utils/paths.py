@@ -16,6 +16,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 REPO_ROOT = ROOT.parents[1]
 
+#: API keys (OPENAI_API_KEY, GEMINI_API_KEY, ELEVENLABS_API_KEY): every provider client reads this one file.
+ENV_FILE = ROOT / ".env"
+
 # Inputs (read-only; never overwritten by the pipeline except the synthetic CRM)
 CONFIG_DIR = ROOT / "config"
 #: The organisers' pack: the one copy there is, the agent's (``apps/ai-agent-service/data/btc``). ``BTC_DATA_DIR``

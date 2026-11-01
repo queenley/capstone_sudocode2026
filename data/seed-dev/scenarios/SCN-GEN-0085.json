@@ -1,0 +1,140 @@
+{
+  "scenario_id": "SCN-GEN-0085",
+  "level": "M2",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "hard_case": null,
+  "customer_phone": "0998000005",
+  "customer_name": "Nguyễn Văn E",
+  "honorific": "anh",
+  "notes": "Persona khach_co_don_chua_co_lich_su, biến thể chuan. call_1 (hotline): hỏi tình trạng đơn → cap_nhat_don; call_2 (hotline): đổi địa chỉ giao → cap_nhat_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-29",
+      "customer_goal": "Hỏi tình trạng đơn hàng Giày chạy bộ RunLite 1.",
+      "customer_turns": [
+        "Alo, anh muốn hỏi tình trạng đơn hàng Giày chạy bộ RunLite 1 mà anh đã đặt.",
+        "Đơn này anh thấy vẫn đang giao, không biết giờ đến đâu rồi?",
+        "Có tracking gì không em?",
+        "Mà cho anh hỏi luôn, dự kiến khi nào thì hàng sẽ đến tay anh nhỉ?"
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C005",
+          "session_id": "SYN-005-S1",
+          "date": "2026-07-13",
+          "channel": "hotline",
+          "summary": "Mua Áo khoác gió Windbreak giá 690.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C005",
+          "session_id": "SYN-005-S2",
+          "date": "2026-10-05",
+          "channel": "zalo_oa",
+          "summary": "Đặt Giày chạy bộ RunLite 1 giá 1.290.000đ, đơn OD900502 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C005",
+          "order_id": "OD900501",
+          "date": "2026-07-13",
+          "sku": "SKU-JK-WND-M-NAVY",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-JK-WND-M-NAVY"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C005",
+          "order_id": "OD900502",
+          "date": "2026-10-05",
+          "sku": "SKU-SN-RUN1-41-DEN",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900502"
+          }
+        }
+      ],
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD900502"
+        },
+        "must_say_any": [
+          "đang giao",
+          "đang vận chuyển",
+          "đã bàn giao"
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900502",
+        "order_status": "shipping",
+        "tracking": "VN0052TRK",
+        "call_date": "2026-10-29"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    },
+    "call_2": {
+      "days_later": 1,
+      "customer_goal": "Đổi địa chỉ giao hàng cho đơn Giày chạy bộ RunLite 1.",
+      "customer_turns": [
+        "Alo, anh gọi lại để đổi địa chỉ giao hàng cho đơn Giày chạy bộ RunLite 1.",
+        "Địa chỉ hiện tại là ở Hải Châu, Đà Nẵng, nhưng anh muốn đổi sang địa chỉ khác.",
+        "Em có thể giúp anh cập nhật địa chỉ giao hàng được không?",
+        "Anh muốn đổi địa chỉ giao hàng sang Hải Châu, Đà Nẵng nhé."
+      ],
+      "facts_established": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "OD900502",
+          "action": "update_address"
+        }
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900502",
+        "order_status": "shipping",
+        "tracking": "VN0052TRK",
+        "call_date": "2026-10-30"
+      },
+      "memory_expectation": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    }
+  }
+}

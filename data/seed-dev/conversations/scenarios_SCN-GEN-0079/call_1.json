@@ -1,0 +1,231 @@
+{
+  "conversation_id": "SCN-GEN-0079__call_1",
+  "scenario_id": "SCN-GEN-0079",
+  "call": "call_1",
+  "customer_id": "SYN-C019",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-15",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_hoi_ngoai_tai_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần tư vấn về sản phẩm nào bên em vậy ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "open",
+          "text": "Anh cần tư vấn về sản phẩm nào bên em vậy ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về xe đẩy gấp gọn Joie Pact mà em có.",
+      "facts_stated": {
+        "product_advised": "SKU-MB-STR1"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, xe đẩy gấp gọn Joie Pact bên em đang sẵn hàng anh nhé. Anh muốn hỏi thêm thông tin gì về sản phẩm không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh muốn hỏi thêm thông tin gì về sản phẩm không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá xe đẩy này là bao nhiêu em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, xe đẩy Joie Pact hiện có giá là 3.490.000đ anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có khuyến mãi gì không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại xe đẩy Joie Pact được miễn phí vận chuyển toàn quốc với chương trình MOM-FREESHIP anh ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh đang có ngân sách khoảng 4 triệu thôi.",
+      "facts_stated": {
+        "budget_vnd": 4000000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, với ngân sách khoảng 4 triệu thì xe đẩy Joie Pact bên em là phù hợp, giá 3.490.000đ đã bao gồm miễn phí vận chuyển rồi anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À không, anh phải chờ cuối tháng nhận lương rồi mới quyết định được.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em ghi nhận anh sẽ quyết định sau khi nhận lương cuối tháng ạ. Anh cứ liên hệ lại khi cần hỗ trợ thêm thông tin hoặc đặt hàng anh nhé. Em cảm ơn anh đã quan tâm sản phẩm bên em ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "child_age_months",
+          "value": 4,
+          "op": "set",
+          "source": "call_1#turn11"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 4000000,
+          "op": "set",
+          "source": "call_1#turn11"
+        },
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn11"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-STR1",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 3490000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_1#turn7"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_xe_day_joie_pact",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chua_co_quyet_dinh",
+    "objection_handling": "Ghi nhận nhu cầu chờ cuối tháng có lương, hướng dẫn liên hệ lại khi cần.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,259 @@
+{
+  "conversation_id": "SCN-ADV-0085__call_1",
+  "scenario_id": "SCN-ADV-0085",
+  "call": "call_1",
+  "customer_id": "SYN-C013",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-10-15",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_go_khong_dau",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có đặt Nồi chiên không dầu Philips 6.2L, hiện đơn hàng đang giao. Anh muốn tìm thêm sản phẩm nào hôm nay ạ?",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo anh muon hoi ve giay trekking hikepro mau xam size 42",
+      "facts_stated": {
+        "size": 42,
+        "color": "xam"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giày trekking HikePro màu xám size 42 hiện bên em còn hàng anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "gia cua doi nay la bao nhieu em nhi",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giá giày trekking HikePro màu xám size 42 là 1.990.000đ anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1990000",
+          "spoken": "1.990.000đ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "co khuyen mai gi khong",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại mẫu này chưa có chương trình khuyến mãi nào áp dụng anh nha. Bên em vẫn miễn phí vận chuyển cho đơn từ 2 triệu và hỗ trợ COD toàn quốc.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "a can ban voi gia dinh da toi mai em goi lai cho a nhe 7 gio",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 gio"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em ghi chú lại anh cần bàn với gia đình. Em sẽ gọi lại cho anh vào lúc 7 giờ tối ngày mai để hỗ trợ tiếp anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-10-16T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0998000013",
+            "callback_at": "2026-10-16T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ tối"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "em nho goi lai dung gio do nhe",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi chú, đúng 7 giờ tối mai em sẽ liên hệ lại anh. Cảm ơn anh đã quan tâm sản phẩm bên em ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "size",
+          "value": 42,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "color",
+          "value": "xam",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-TRK",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1990000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-TRK-42-XAM",
+          "op": "set",
+          "source": "call_1#turn2"
+        }
+      ],
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ tối"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_hoi_nguoi_nha",
+    "objection_handling": "Xác nhận thời gian gọi lại cụ thể, đảm bảo đúng 7 giờ tối theo yêu cầu khách.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "hẹn_gọi_lại": "2026-10-16T19:00"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "customer_phone": "0998000013",
+      "callback_at": "2026-10-16T19:00",
+      "note": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

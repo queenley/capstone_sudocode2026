@@ -110,6 +110,11 @@ def main() -> None:
     parser.add_argument("--limit", type=int, default=24, help="number of dialogues (BTC asks for ≥ 20)")
     parser.add_argument("--noisy-fraction", type=float, default=1 / 3)
     parser.add_argument("--text-only", action="store_true", help="spoken forms and ground_truth.json, without TTS")
+    parser.add_argument("--free-voices-only", action="store_true",
+                        help="use only premade voices, the ones a free ElevenLabs plan may call (English voices: "
+                             "foreign accent, no regional one)")
+    parser.add_argument("--replace-missing-voices", action="store_true",
+                        help="replace the voices the key's account lacks in config/voices.yaml (see synthesize_scenario_audio)")
     args = parser.parse_args()
 
     dataset = Dataset()
@@ -164,14 +169,27 @@ def main() -> None:
     if args.text_only:
         return
 
-    from src.elevenlabs_client import ElevenLabsClient
+    from src.providers.elevenlabs_client import ElevenLabsClient
 
     tts = ElevenLabsClient(CONFIG_DIR / "voices.yaml", ASR_DIR / "audio", settings["budget"]["max_elevenlabs_chars_per_run"])
+    if args.replace_missing_voices:
+        changes = tts.replace_missing_voices(CONFIG_DIR / "voices.yaml")
+        for group, old, new in changes:
+            print(f"  voice {group}: {old} -> {new}", flush=True)
+        print(f"Replaced {len(changes)} voice entries in config/voices.yaml (previous file: voices.yaml.bak)", flush=True)
+    missing = tts.use_available_voices()
+    if missing:
+        print(f"{len(missing)} voice IDs in config/voices.yaml are not available to this ElevenLabs key and are "
+              "skipped: " + ", ".join(missing), flush=True)
+    if args.free_voices_only:
+        free = tts.use_free_voices_only()
+        print(f"Free voices only: {len(free)} premade voices (English, so a foreign accent); library voices skipped",
+              flush=True)
     for dialogue in dialogues:
         customer_id = sources[dialogue["id"]].customer_id or split_conversation_id(sources[dialogue["id"]].conversation_id)[0]
         synthesize(dialogue, customer_id, tts, settings.get("scenario_audio", {}), ASR_DIR / "audio")
         print(f"  audio {dialogue['id']} ({dialogue['n_turns']} turns, noisy={dialogue['noisy']})", flush=True)
-    print(f"ElevenLabs characters sent: {tts.characters_sent}")
+    print(f"ElevenLabs characters sent: {tts.characters_sent} ({tts.cache_hits} lines from the TTS cache, not paid)")
 
 
 if __name__ == "__main__":

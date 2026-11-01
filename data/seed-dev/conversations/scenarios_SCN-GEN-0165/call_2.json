@@ -1,0 +1,298 @@
+{
+  "conversation_id": "SCN-GEN-0165__call_2",
+  "scenario_id": "SCN-GEN-0165",
+  "call": "call_2",
+  "customer_id": "C035",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-03",
+  "region": "trung",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Dung ạ, em là trợ lý ảo của shop BTC, rất vui được hỗ trợ chị hôm nay.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "is_human",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Dung đây, hôm trước có tư vấn cho chị về máy lọc không khí.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã gọi lại. Chị muốn tìm hiểu thêm hay mình muốn đặt mua luôn sản phẩm máy lọc không khí ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị muốn tìm hiểu thêm hay mình muốn đặt mua luôn sản phẩm máy lọc không khí ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn mua cái máy lọc không khí AirPure Mini mà em đã nói.",
+      "facts_stated": {
+        "product_advised": "SKU-AP-MINI"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị chọn máy lọc không khí AirPure Mini ạ. Giá của sản phẩm là 2.190.000đ, hiện đang có sẵn hàng và được miễn phí vận chuyển toàn quốc theo chương trình NAM-SHIP0.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "promo_NAM-SHIP0_active",
+          "value": true
+        },
+        {
+          "field": "freeship",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị chọn thanh toán qua ngân hàng, giao hàng ở Ninh Kiều, Cần Thơ nhé.",
+      "facts_stated": {
+        "payment": "bank",
+        "delivery_area": "Ninh Kiều, Cần Thơ"
+      },
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em ghi nhận đơn hàng giao tại Ninh Kiều, Cần Thơ và thanh toán chuyển khoản ngân hàng ạ. Dự kiến chị sẽ nhận được hàng trong vòng 4 ngày làm việc, khoảng ngày 07/11/2026.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "delivery_days",
+          "value": 4
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-07"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-11-03"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Và phòng chị khoảng 10 mét vuông, có trẻ nhỏ nữa.",
+      "facts_stated": {
+        "room_area_m2": 10,
+        "has_children": true
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với phòng 10m² và có trẻ nhỏ thì AirPure Mini rất phù hợp chị nhé. Em xin phép xác nhận lại: chị đặt 1 máy lọc không khí AirPure Mini, giá 2.190.000đ, giao ở Ninh Kiều, Cần Thơ, thanh toán chuyển khoản ngân hàng, nhận hàng dự kiến ngày 07/11/2026. Thông tin vậy đã đúng và chị đồng ý lên đơn giúp em nhé?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em xin phép xác nhận lại: chị đặt 1 máy lọc không khí AirPure Mini, giá 2.190.000đ, giao ở Ninh Kiều, Cần Thơ, thanh toán chuyển khoản ngân hàng, nhận hàng dự kiến ngày 07/11/2026. Thông tin vậy đã đúng và chị đồng ý lên đơn giúp em nhé?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, em lên đơn giúp chị nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã tạo đơn hàng cho chị thành công. Mã đơn OD600001, tổng số tiền 2.190.000đ. Chị vui lòng thanh toán chuyển khoản theo hướng dẫn trong tin nhắn. Cảm ơn chị Dung đã tin tưởng mua hàng tại shop BTC, chúc chị nhiều sức khỏe ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0958421083",
+            "sku": "SKU-AP-MINI",
+            "qty": 1,
+            "price_vnd": 2190000,
+            "payment": "bank",
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-11-03"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "budget_vnd",
+          "value": 2500000,
+          "op": "set",
+          "source": "call_2#turn10"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Ninh Kiều, Cần Thơ",
+          "op": "set",
+          "source": "call_2#turn10"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_2#turn10"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn10"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 10,
+          "op": "set",
+          "source": "call_2#turn10"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-MINI",
+          "op": "set",
+          "source": "call_2#turn10"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 2190000,
+          "op": "set",
+          "source": "call_2#turn10"
+        },
+        {
+          "key": "promo_code",
+          "value": "NAM-SHIP0",
+          "op": "set",
+          "source": "call_2#turn10"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn10"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_mua",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-AP-MINI",
+      "qty": 1,
+      "price_vnd": 2190000,
+      "payment": "bank",
+      "address": "Ninh Kiều, Cần Thơ",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-11-07"
+    }
+  }
+}

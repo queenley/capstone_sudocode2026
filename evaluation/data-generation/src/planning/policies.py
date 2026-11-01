@@ -25,6 +25,12 @@ COD_CONFIRM_VND = 2_000_000    # VC-05, QT-01
 COD_LIMIT_VND = 10_000_000     # VC-03
 #: Sections a person must not be told (internal notes, staff rules): their questions are "restricted".
 RESTRICTED_PREFIXES = ("NB-", "NQ-")
+#: LN-02's days off, which LN-03 says are not working days: a delivery spanning one needs LN-03.
+HOLIDAYS = ("2026-10-26", "2027-01-01")
+#: A blocker "hỏi / bàn với người nhà" (PB-03). Not a bare "hỏi": "muốn gọi hotline hỏi thêm" asks the shop.
+FAMILY = re.compile(r"chồng|vợ|ông xã|bà xã|con cháu|người nhà|gia đình|bố mẹ|hoi (?:chong|vo|nguoi nha)")
+#: A price objection (PB-02). "gia" alone would match "gia đình".
+PRICE = re.compile(r"đắt|\bgiá\b|\bdat\b|\bgia\b(?!\s*(?:đình|dinh))")
 
 KIND_POLICIES: dict[str, tuple[str, ...]] = {
     "consult": (), "decline": (), "deep_consult": (), "compare": (),
@@ -46,11 +52,11 @@ KIND_POLICIES: dict[str, tuple[str, ...]] = {
     "other_customer_info": ("PB-08",), "unverified_identity": ("PB-08",),
     "prompt_injection": ("PB-08", "KM-06", "NB-01"),
     "future_promo": ("KM-02",), "stack_promo": ("KM-03", "KM-04", "KM-09"), "regional_promo": ("KM-08", "VC-02"),
-    "gift_to_cash": ("KM-07",),
+    "gift_to_cash": ("KM-07",), "second_item_promo": ("KM-05", "FAQ-19"),
 }
 #: Kinds that are a consultation about one product: its spec and FAQ apply.
 CONSULTING = frozenset({"consult", "consult_ready", "deep_consult", "compare", "decline", "cart_quote",
-                        "consult_callback_holiday"})
+                        "consult_callback_holiday", "second_item_promo"})
 #: A product's own spec and FAQ, by catalogue category (or SKU prefix within it).
 CATEGORY_POLICIES: dict[str, tuple[str, ...]] = {
     "gia-dung/may-loc-khong-khi": ("SP-AIR-01", "SP-AIR-02"),
@@ -118,8 +124,10 @@ def for_call(kind: str, *, category: str, sku: str, persona: str, gt: Mapping[st
             ids.append("VC-04")
         if si.get("also_ordered") and category == "gia-dung/may-loc-khong-khi":
             ids += ["FAQ-19", "KM-05"]
-        if "2026-10-26" in str(gt.get("estimated_delivery", "")) or str(gt.get("estimated_delivery", "")) == "2026-10-27":
+        if any(str(gt.get("call_date", "")) < day <= str(gt.get("estimated_delivery", "")) for day in HOLIDAYS):
             ids.append("LN-03")
+    if si.get("tool_called") == "schedule.callback":
+        ids.append("LN-01")    # a callback inside working hours
     # promotions and stock on the call's day
     if gt.get("gift_sku"):
         ids.append("KM-07")
@@ -134,10 +142,12 @@ def for_call(kind: str, *, category: str, sku: str, persona: str, gt: Mapping[st
         ids.append("CL-01")
     # the customer
     blocker = str(stated.get("blocker") or "")
-    if re.search(r"hỏi|hoi|bàn|ban voi|chồng|vợ|người nhà|gia đình", blocker):
+    if FAMILY.search(blocker):
         ids.append("PB-03")
-    if re.search(r"đắt|dat|giá|gia", str(stated.get("objection") or "") + blocker):
+    if PRICE.search(f"{stated.get('objection') or ''} {blocker}"):
         ids.append("PB-02")
+    if "trả góp" in blocker:
+        ids.append("VC-04")
     if "competitor_price_vnd" in stated:
         ids.append("PB-04")
     if returning:

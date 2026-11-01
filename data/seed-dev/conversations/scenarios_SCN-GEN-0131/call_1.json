@@ -1,0 +1,258 @@
+{
+  "conversation_id": "SCN-GEN-0131__call_1",
+  "scenario_id": "SCN-GEN-0131",
+  "call": "call_1",
+  "customer_id": "C035",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-12-25",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Dung ạ, em là trợ lý ảo của shop BTC. Em có thể hỏi chị là mình đang sử dụng số điện thoại này đúng không ạ, để em hỗ trợ chính xác nhất nhé.",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị là chị Dung và đang liên hệ từ số này đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "is_human",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Dung đây. Em cho chị hỏi về máy lọc không khí cho phòng nhỏ khoảng 10 mét vuông nhé.",
+      "facts_stated": {
+        "room_area_m2": 10
+      },
+      "entities": [],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị Dung đã xác nhận ạ. Với phòng khoảng 10 mét vuông, em tư vấn chị chọn máy lọc không khí AirPure Mini, phù hợp phòng nhỏ và đang có sẵn hàng. Giá là 2.190.000đ ạ.",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Không biết chị dự kiến ngân sách khoảng bao nhiêu cho sản phẩm này ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "2190000",
+          "spoken": "2.190.000đ"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị không có bé nhỏ đâu, ngân sách tầm 2 triệu rưỡi thôi em ạ.",
+      "facts_stated": {
+        "has_children": false,
+        "budget_vnd": 2500000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "2500000",
+          "spoken": "2 triệu rưỡi"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy AirPure Mini bên em hiện phù hợp với phòng nhỏ, giá 2.190.000đ trong ngân sách của chị rồi ạ. Máy này không có khóa trẻ em nên cũng phù hợp với gia đình mình không có bé nhỏ chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "2190000",
+          "spoken": "2.190.000đ"
+        }
+      ],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này đang có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại máy AirPure Mini chưa có chương trình khuyến mãi nào áp dụng thêm chị nhé. Giá em báo là giá đã tốt nhất thời điểm này rồi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần bàn với gia đình trước đã, tối mai tầm 7 giờ em gọi lại chị nhé.",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị cần trao đổi với gia đình trước ạ. Vậy em sẽ gọi lại cho chị vào lúc 7 giờ tối mai ngày 26/12 để hỗ trợ thêm nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-12-26T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0958421083",
+            "callback_at": "2026-12-26T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "room_area_m2",
+          "value": 10,
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "has_children",
+          "value": false,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 2500000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-MINI",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 2190000,
+          "op": "set",
+          "source": "call_1#turn3"
+        }
+      ],
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_ban_voi_gia_dinh",
+    "objection_handling": "Đã xác nhận hẹn gọi lại đúng thời gian khách yêu cầu.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "callback_at": "2026-12-26T19:00"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-12-26T19:00",
+      "reason": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

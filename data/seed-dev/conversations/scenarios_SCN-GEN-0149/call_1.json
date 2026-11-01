@@ -1,0 +1,244 @@
+{
+  "conversation_id": "SCN-GEN-0149__call_1",
+  "scenario_id": "SCN-GEN-0149",
+  "call": "call_1",
+  "customer_id": "SYN-C011",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_mua_nhieu_mon",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có đặt Giày sneaker Urban Classic, em hỗ trợ mình tư vấn máy lọc không khí cho phòng 25m² nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về máy lọc không khí cho phòng diện tích khoảng 25 mét vuông.",
+      "facts_stated": {
+        "room_area_m2": 25
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với diện tích phòng 25m², em tư vấn anh máy lọc không khí AirPure Pro đang còn hàng, phù hợp cho nhà có trẻ nhỏ vì có khóa trẻ em và màng lọc HEPA. Giá đang ưu đãi 7.690.000đ, bảo hành 24 tháng ạ.",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Anh dự kiến ngân sách khoảng bao nhiêu cho máy này ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhà anh có trẻ nhỏ, ngân sách cũng tầm 9 triệu thôi.",
+      "facts_stated": {
+        "has_children": true,
+        "budget_vnd": 9000000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ trong tầm giá của mình thì AirPure Pro là lựa chọn tốt nhất ạ. Máy này có khóa trẻ em và lọc được bụi mịn, phấn hoa, phù hợp gia đình có trẻ nhỏ. Hiện shop đang có khuyến mãi AIR-OCT giảm còn 7.690.000đ, tặng miễn phí vận chuyển toàn quốc ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy đó đang có chương trình khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện đang áp dụng chương trình AIR-OCT giảm 300.000đ, giá chỉ còn 7.690.000đ cho AirPure Pro. Ngoài ra, đơn hàng trên 500.000đ như của anh sẽ được miễn phí vận chuyển toàn quốc luôn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, anh cần bàn với gia đình, tối mai tầm 7 giờ em gọi lại anh nhé.",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận anh cần trao đổi thêm với gia đình. Em sẽ gọi lại cho anh vào lúc 7 giờ tối ngày mai để hỗ trợ tiếp nhé anh.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-10-31T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0998000011",
+            "callback_at": "2026-10-31T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "room_area_m2",
+          "value": 25,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 9000000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7690000,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "promo_code",
+          "value": "AIR-OCT",
+          "op": "set",
+          "source": "call_1#turn5"
+        }
+      ],
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "cần hỏi người nhà",
+    "objection_handling": "Xác nhận sẽ gọi lại theo giờ khách hẹn, nhắc lại thời gian cụ thể.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "call": "call_1",
+        "turn": 9,
+        "commit": "Gọi lại cho khách lúc 7 giờ tối ngày 31/10"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-10-31T19:00",
+      "note": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

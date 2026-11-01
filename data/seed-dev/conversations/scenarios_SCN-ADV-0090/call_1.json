@@ -1,0 +1,283 @@
+{
+  "conversation_id": "SCN-ADV-0090__call_1",
+  "scenario_id": "SCN-ADV-0090",
+  "call": "call_1",
+  "customer_id": "SYN-C019",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-10-17",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_hoi_gio_hang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Ngô Văn Phúc ạ, em là trợ lý ảo của shop BTC. Hôm trước anh đã đặt Máy lọc không khí Samsung AX40, hiện đơn hàng đang giao. Anh cần em hỗ trợ về giỏ hàng trên web đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh cần em hỗ trợ về giỏ hàng trên web đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD901902"
+        },
+        {
+          "field": "owned_sku",
+          "value": "SKU-AP-Y"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về giỏ hàng của mình trên web.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em đã kiểm tra giỏ hàng của anh gồm Máy hút sữa điện đôi Medela Swing Maxi và Máy tiệt trùng sấy khô Moaz Bebe ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Trong giỏ hàng có máy hút sữa Medela và máy tiệt trùng Moaz Bebe.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hai sản phẩm trong giỏ hàng của anh là Máy hút sữa điện đôi Medela Swing Maxi giá 5.990.000đ và Máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-MB-PUMP2",
+          "value": 5990000
+        },
+        {
+          "field": "price_vnd:SKU-MB-STER",
+          "value": 1890000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "pricing.get_quote",
+          "args": {
+            "sku": "SKU-MB-PUMP2",
+            "on": "2026-10-17",
+            "customer_phone": "0998000019",
+            "basket_skus": [
+              "SKU-MB-STER"
+            ]
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Tổng tiền cho hai món này là bao nhiêu?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ tổng tiền cho hai sản phẩm là 7.880.000 ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "total_vnd",
+          "value": 7880000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có khuyến mãi gì khi mua cùng nhau không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại khi mua hai sản phẩm này anh sẽ được miễn phí giao hàng toàn quốc và miễn phí thu hộ ạ. Mã khuyến mãi MOM-FREESHIP đã được áp dụng cho giỏ hàng của anh rồi anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "pricing.get_quote",
+          "args": {
+            "sku": "SKU-MB-STER",
+            "on": "2026-10-17",
+            "customer_phone": "0998000019",
+            "basket_skus": [
+              "SKU-MB-PUMP2"
+            ]
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Phí giao hàng là bao nhiêu nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh được miễn phí giao hàng cho đơn này ạ, shop hỗ trợ freeship toàn quốc cho đơn hàng của anh.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh chưa đặt ngay, hẹn gọi lại sau nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận anh hẹn gọi lại sau ạ. Khi nào anh sẵn sàng đặt hàng, anh cứ nhắn lại em hỗ trợ lên đơn nhanh nhất cho mình nhé. Chương trình miễn phí giao hàng hiện còn tới 29/11 anh lưu ý giúp em.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "budget_vnd",
+          "value": 6000000,
+          "op": "set",
+          "source": "call_1#turn12"
+        },
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_1#turn12"
+        },
+        {
+          "key": "child_age_months",
+          "value": 17,
+          "op": "set",
+          "source": "call_1#turn12"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-PUMP2",
+          "op": "set",
+          "source": "call_1#turn12"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5990000,
+          "op": "set",
+          "source": "call_1#turn12"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_1#turn12"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tra_gia_gio_hang",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chua_quyet_dat",
+    "objection_handling": "Báo lại chương trình khuyến mãi còn hiệu lực, xác nhận hẹn gọi lại.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

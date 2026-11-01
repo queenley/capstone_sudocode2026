@@ -1,0 +1,218 @@
+# Every key a test scenario may carry, in one place: what it means, its type, and where it comes from.
+#
+# The shape is BTC's (apps/ai-agent-service/data/btc/test_set/public_sample/SAMPLE-0*.json and
+# schemas/scenario_format.md). The team adds keys where a situation needs one, but only through this file:
+# evaluation/data-generation refuses to write a scenario with a key, a type or a value that is not here
+# (src/schemas/keys.py), and its slot vocabulary (src/schemas/slots.py) is read from `slots` below.
+#
+# origin:  btc_sample  the key appears in BTC's public samples
+#          btc_format  named by BTC's scenario_format.md, tools.schema.json or reference_eval.py, not in a sample
+#          team        added by the team; never sent as if BTC defined it
+#
+# Adding a key (see `rules` for the details):
+#   1. pick the section; check no existing key already means it (reuse beats a synonym);
+#   2. name it by `rules.naming` and give it a `type` that matches its suffix;
+#   3. write `origin: team`, a `description` a reviewer can check, and `since` (the day it was added; keys of
+#      version 1 have none);
+#   4. run `python -m pytest tests/test_scenario_keys.py` in evaluation/data-generation.
+# Never rename a btc_* key or change its type: BTC's scorer reads those names.
+
+version: 1
+
+types:
+  int: whole number (not true/false); money in VND, areas in m², counts, days
+  bool: true or false
+  str: free text, short
+  date: YYYY-MM-DD
+  datetime: ISO 8601 with offset, e.g. 2026-10-17T19:00+07:00
+  sku: a catalogue code, SKU-...
+  list: a JSON array
+  object: a JSON object
+  "a|b": "either type; only where BTC's own data has both (size 42 or \"M\"; phone_provided true or the number)"
+
+rules:
+  naming:
+    - "snake_case, ASCII, English or the BTC Vietnamese slug already in use; no spaces"
+    - "_vnd: int, money in VND (price_vnd, budget_vnd)"
+    - "_m2: int, an area; _days, _months, _hours, _percent: int"
+    - "_date, _expiry: date; _at: datetime"
+    - "_sku: sku"
+    - "promo_<CODE>_active: bool, one promotion of catalog/promotions.json on the call's day"
+    - "price_vnd:<SKU>: int, the price of one item of a several-item order"
+  values:
+    - "a slot's value is what the customer or a tool said, normalised: 25 not '25m2', 5700000 not '5,7 triệu'"
+    - "a ground truth fact comes from the BTC pack (catalog, policy, mock_tools.py), never from a model"
+    - "keep an empty section out of the file rather than writing {} or [] (BTC's samples omit them)"
+
+# ---------------------------------------------------------------------------------------------------
+# Top level and call level
+# ---------------------------------------------------------------------------------------------------
+scenario:
+  scenario_id: {type: str, origin: btc_sample, description: "SAMPLE-01 (BTC), SCN-GEN-0001 / SCN-ADV-0001 (team)"}
+  level: {type: str, origin: btc_sample, values: [M1, M2]}
+  persona: {type: str, origin: btc_sample, description: "an id of simulator/personas.json or config/personas_advanced.yaml"}
+  hard_case: {type: str, origin: btc_sample, nullable: true}
+  customer_phone: {type: str, origin: btc_sample}
+  customer_name: {type: str, origin: btc_sample, nullable: true, description: "null for an anonymous caller"}
+  honorific: {type: str, origin: btc_sample, values: [anh, chị, cô, chú, bác, em, bạn]}
+  notes: {type: str, origin: btc_sample}
+  calls: {type: object, origin: btc_sample, description: "call_1 .. call_3"}
+
+call:
+  channel: {type: str, origin: btc_sample, values: [hotline, zalo_oa, chat_fanpage]}
+  channel_identity: {type: str, origin: btc_sample}
+  call_date: {type: date, origin: btc_sample, description: "the day of call_1 (or a fixed day of a later call)"}
+  days_later: {type: int, origin: btc_sample, description: "days after the previous call"}
+  input_mode: {type: str, origin: btc_sample, values: [text, asr_transcript, chat_teencode]}
+  customer_goal: {type: str, origin: btc_sample}
+  customer_turns: {type: list, origin: btc_sample}
+  customer_turns_asr: {type: list, origin: btc_sample}
+  seed_history: {type: list, origin: btc_format, description: "earlier sessions loaded from the CRM before the call"}
+  facts_established: {type: object, origin: btc_sample, keys: slots}
+  must_carry_over: {type: list, origin: btc_sample, items: slots}
+  must_not_ask: {type: list, origin: btc_sample, items: slots}
+  success_if: {type: object, origin: btc_sample, keys: success_if}
+  ground_truth_facts: {type: object, origin: btc_sample, keys: ground_truth_facts}
+  memory_expectation: {type: object, origin: btc_format, keys: [slots, memory_expectation]}
+  relevant_policy_ids: {type: list, origin: team, since: 2026-10-30, items: policy_sections, description: "the policy sections ([XX-nn] of policy/) an ideal agent consults on the call: the retrieval ground truth (src/planning/policies.py)"}
+  fault_injection: {type: object, origin: team, description: "{tool, mode: timeout|error}: a tool the harness makes fail"}
+  expected_outcome: {type: str, origin: btc_sample, values: expected_outcome}
+
+expected_outcome:
+  hen_goi_lai: {origin: btc_sample, description: "the customer will call back / be called back"}
+  chot_don: {origin: btc_sample, description: "an order is placed"}
+  chuyen_may: {origin: btc_format, description: "handed to a person (handoff.transfer)"}
+  tu_choi: {origin: btc_format, description: "the customer declines"}
+  khac: {origin: btc_format, description: "anything else (call_brief.schema.json); the generator writes the finer outcome below instead"}
+  cap_nhat_don: {origin: team, since: 2026-10-30, description: "an order the customer has is looked up or changed (order.status, order.update)"}
+  thong_tin: {origin: team, since: 2026-10-30, description: "the customer is informed (policy, warranty, a product not sold); nothing is ordered"}
+  xoa_du_lieu: {origin: team, since: 2026-10-30, description: "the customer's data deletion is recorded (QT-06)"}
+
+# ---------------------------------------------------------------------------------------------------
+# Slots: the keys of facts_established and memory_expectation, the items of must_carry_over / must_not_ask
+#   source:  customer (said by the customer) | agent (said by the agent from a tool) | system (CRM, orders)
+#   carry:   may be listed in must_carry_over of a later call (CCR)
+#   protect: may be listed in must_not_ask of a later call (RQR)
+# ---------------------------------------------------------------------------------------------------
+slots:
+  room_area_m2: {type: int, origin: btc_sample, source: customer, carry: true, protect: true, description: "Diện tích phòng (m²), số nguyên"}
+  has_children: {type: bool, origin: btc_sample, source: customer, carry: false, protect: true, description: "Nhà có trẻ nhỏ (true/false)"}
+  child_age_months: {type: int, origin: team, source: customer, carry: false, protect: true, description: "Tuổi bé (tháng)"}
+  budget_vnd: {type: int, origin: btc_sample, source: customer, carry: false, protect: true, description: "Ngân sách (VND, số nguyên)"}
+  usage_need: {type: str, origin: team, source: customer, carry: false, protect: true, description: "Nhu cầu sử dụng chính (ngắn)"}
+  size: {type: "int|str", origin: btc_sample, source: customer, carry: true, protect: true, description: "Size giày/áo khách mặc"}
+  color: {type: str, origin: btc_sample, source: customer, carry: false, protect: true, description: "Màu khách chọn"}
+  quantity: {type: int, origin: team, source: customer, carry: false, protect: false, description: "Số lượng muốn mua"}
+  payment: {type: str, origin: btc_sample, source: customer, carry: true, protect: true, values: [COD, bank, momo, zalopay], description: "Hình thức thanh toán, như tools.schema.json"}
+  delivery_area: {type: str, origin: team, source: customer, carry: true, protect: true, description: "Quận/huyện + tỉnh giao hàng (không ghi số nhà)"}
+  phone_provided: {type: "bool|str", origin: btc_sample, source: customer, carry: false, protect: true, description: "Khách đã cung cấp SĐT. BTC SAMPLE-04 ghi chính số; nhóm ghi true, không ghi số thật"}
+  decision_maker: {type: str, origin: team, source: customer, carry: true, protect: true, description: "Người quyết định mua (chồng, vợ, con gái…)"}
+  blocker: {type: str, origin: btc_sample, source: customer, carry: true, protect: false, description: "Lý do chưa chốt (cần hỏi chồng, chờ lương…)"}
+  objection: {type: str, origin: btc_sample, source: customer, carry: true, protect: false, description: "Phản đối chính (giá cao, sợ ồn…)"}
+  competitor_price_vnd: {type: int, origin: btc_sample, source: customer, carry: true, protect: false, description: "Giá đối thủ khách nêu (VND)"}
+  callback_time: {type: str, origin: team, source: customer, carry: false, protect: false, description: "Thời điểm khách hẹn gọi lại"}
+  preferred_channel: {type: str, origin: team, source: customer, carry: true, protect: false, values: [hotline, zalo_oa, chat_fanpage], description: "Kênh liên hệ ưu tiên"}
+  issue: {type: str, origin: team, source: customer, carry: true, protect: true, description: "Lỗi/vấn đề khách gặp với sản phẩm đã mua (ngắn)"}
+  return_reason: {type: str, origin: team, source: customer, carry: false, protect: false, description: "Lý do khách muốn trả hàng (ngắn)"}
+  product_advised: {type: sku, origin: btc_sample, source: agent, carry: true, protect: true, description: "SKU đã tư vấn"}
+  variant_sku: {type: sku, origin: btc_sample, source: agent, carry: true, protect: true, description: "SKU biến thể (size/màu) đã chọn"}
+  price_quoted_vnd: {type: int, origin: btc_sample, source: agent, carry: true, protect: false, description: "Giá cuối đã báo khách (VND)"}
+  promo_code: {type: str, origin: btc_sample, source: agent, carry: true, protect: false, description: "Mã KM đã báo khách"}
+  promo_expiry: {type: date, origin: btc_sample, source: agent, carry: false, protect: false, description: "Ngày hết hạn KM đã báo"}
+  alt_suggested: {type: sku, origin: btc_sample, source: agent, carry: false, protect: false, description: "SKU thay thế đã gợi ý"}
+  order_id: {type: str, origin: btc_sample, source: system, carry: true, protect: true, description: "Mã đơn hàng"}
+  tracking: {type: str, origin: team, source: system, carry: false, protect: false, description: "Mã vận đơn"}
+  owned_sku: {type: sku, origin: team, source: system, carry: true, protect: true, description: "SKU khách đã sở hữu (từ lịch sử đơn)"}
+  channel: {type: str, origin: btc_sample, source: system, carry: false, protect: false, description: "Kênh của cuộc gọi"}
+
+# Keys of memory_expectation that are not slots (scenario_format.md: new value, superseded value, profile not to write)
+memory_expectation:
+  superseded: {type: object, origin: btc_format, description: "{slot: the old value} the new value replaces"}
+  must_not_write_to: {type: str, origin: btc_format, description: "a customer id whose profile must not change (shared phone)"}
+  address_ttl_check: {type: bool, origin: team, description: "the stored address is past its TTL and must be confirmed"}
+  profile_state: {type: str, origin: team, description: "deletion_pending after memory.request_deletion (QT-06)"}
+
+# ---------------------------------------------------------------------------------------------------
+# success_if (scored by reference_eval.check_call). Tool names and their argument names come from
+# schemas/tools.schema.json; `team_tool_args` are optional arguments the team added (allowed by BTC).
+# ---------------------------------------------------------------------------------------------------
+success_if:
+  tool_called: {type: str, origin: btc_sample, nullable: true, values: tools, description: "the tool that must be called; null = none required"}
+  args_match: {type: object, origin: btc_sample, keys: tool_args, description: "a subset of the call's arguments, exact values"}
+  also_ordered: {type: list, origin: btc_format, items: sku, description: "the other SKUs ordered, one order.create each"}
+  total_match_vnd: {type: int, origin: btc_format, description: "Σ price_vnd × qty over every order.create"}
+  brief_must_contain: {type: list, origin: btc_format, description: "HandoffBrief fields that must be non-empty"}
+  must_say_any: {type: list, origin: btc_sample, description: "at least one phrase in the agent's words (substring)"}
+  agent_must_say: {type: list, origin: btc_format, description: "presence requires an abstain phrase (chưa có thông tin…)"}
+  must_not_call_tools: {type: list, origin: btc_format, items: tools}
+  forbidden_claims: {type: list, origin: btc_sample, description: "[{field, value}] with field a ground_truth_facts key, value \"*any*\" = every value; or a phrase"}
+  trace_must_not_match: {type: list, origin: btc_format, description: "regexes on agent text, memory writes and tool args (PII, internal data)"}
+  max_agent_questions: {type: int, origin: btc_format}
+  say_at_most: {type: list, origin: team, since: 2026-10-31, description: "[{pattern, max}]: at most max agent turns match the regex (0 = never); reference_eval ignores it, the harness writes team_checks.json (a diagnostic)"}
+
+# The team's own tools (apps/ai-agent-service mcp/servers), with their arguments.
+team_tools:
+  delivery_estimate:
+    address: {type: str, origin: team, since: 2026-10-30, description: "the delivery address; without it the answer gives each area"}
+    "on": {type: date, origin: team, since: 2026-10-30, description: "the call's day"}
+
+team_tool_args:
+  order.create:
+    basket_skus: {type: list, origin: team, since: 2026-10-30, description: "the other SKUs of the same order (AIR-2ND-50)"}
+    order_group: {type: str, origin: team, since: 2026-10-30, description: "which order of a split (QT-01): \"1\" or \"2\""}
+    "on": {type: date, origin: btc_format, description: "every tool takes on (tools.schema.json description)"}
+
+# ---------------------------------------------------------------------------------------------------
+# ground_truth_facts: the truth claims are checked against (HR). Values from the BTC pack only.
+# ---------------------------------------------------------------------------------------------------
+ground_truth_facts:
+  price_vnd: {type: int, origin: btc_sample, description: "final unit price today (pricing.get_quote final_price_vnd)"}
+  list_price_vnd: {type: int, origin: btc_sample, description: "list price before promotions"}
+  in_stock: {type: bool, origin: btc_sample}
+  promo_active: {type: bool, origin: btc_sample, description: "some promotion applies to the product today"}
+  delivery_days: {type: int, origin: btc_sample, description: "working days to deliver"}
+  return_days: {type: int, origin: btc_sample}
+  exchange_fee_vnd: {type: int, origin: btc_sample}
+  restock_date: {type: date, origin: btc_sample}
+  warranty_months: {type: int, origin: btc_sample}
+  new_size_in_stock: {type: bool, origin: btc_sample}
+  freeship: {type: bool, origin: btc_sample}
+  policy_version: {type: str, origin: btc_sample, description: "the version of the policy in force (changelog.md)"}
+  old_policy_superseded: {type: bool, origin: btc_sample}
+  call_date: {type: date, origin: team, description: "the call's day; not a claim (src/ground_truth/traces.py NON_CLAIM_FACTS)"}
+  callback_at: {type: datetime, origin: team, description: "the callback time after schedule.callback moved it"}
+  cod_allowed: {type: bool, origin: team, description: "the order's total allows COD (VC-03)"}
+  deletion_sla_hours: {type: int, origin: team, description: "data deleted within this many hours (QT-06)"}
+  discount_outside_program: {type: bool, origin: team, description: "a discount beyond the programmes exists (always false)"}
+  estimated_delivery: {type: date, origin: team, description: "order.create estimated_delivery"}
+  extended_warranty_eligible: {type: bool, origin: team, description: "the product can take the extended warranty"}
+  extended_warranty_months: {type: int, origin: team, description: "months the extended warranty adds"}
+  extended_warranty_percent: {type: int, origin: team, description: "its price, in percent of the product's price"}
+  extra_payment_vnd: {type: int, origin: team, description: "order.update: the customer pays this difference"}
+  follows_injected_instruction: {type: bool, origin: team, description: "the agent obeys an injected instruction (always false)"}
+  future_promo_disclosed: {type: bool, origin: team, description: "a programme not started yet is announced (KM-02, always false)"}
+  gift_cash_convertible: {type: bool, origin: team, description: "a gift can be exchanged for money (KM-07, always false)"}
+  gift_sku: {type: sku, origin: team, description: "the gift of a gift promotion (pricing.get_quote applied_promos)"}
+  in_warranty: {type: bool, origin: team, description: "the customer's product is still under warranty"}
+  installment_supported: {type: bool, origin: team, description: "the shop offers instalments (always false in the pack)"}
+  is_human: {type: bool, origin: team, description: "the agent is a person (always false)"}
+  new_variant_sku: {type: sku, origin: team, description: "the size or product exchanged to (order.update)"}
+  off_topic_question: {type: str, origin: team, description: "not a claim"}
+  order_id: {type: str, origin: team, description: "the order the call is about"}
+  order_status: {type: str, origin: team, description: "order.status status of that order"}
+  product_available: {type: bool, origin: team, description: "the shop sells it"}
+  promos_stacked: {type: bool, origin: team, description: "two exclusive programmes added (KM-03/04, always false)"}
+  qty: {type: int, origin: team, description: "units in the order (order.create qty)"}
+  refund_vnd: {type: int, origin: team, description: "order.update: money refunded to the customer"}
+  return_allowed: {type: bool, origin: team, description: "the return policy allows it"}
+  shares_other_customer_data: {type: bool, origin: team, description: "another customer's data is read out (always false)"}
+  successor_sku: {type: sku, origin: team, description: "the product replacing a discontinued one (inventory.check)"}
+  needs_confirmation_call: {type: bool, origin: team, since: 2026-10-31, description: "order.create needs_confirmation_call: a COD order above 2.000.000đ is confirmed by phone before delivery (VC-05, QT-01)"}
+  order_count: {type: int, origin: team, since: 2026-10-30, description: "orders the purchase is split into (QT-01)"}
+  total_vnd: {type: int, origin: team, description: "the order's total (order.create total_vnd)"}
+  tracking: {type: str, origin: team, description: "the order's tracking code"}
+  unknown_topic: {type: str, origin: team, description: "not a claim"}
+
+ground_truth_patterns:
+  "promo_<CODE>_active": {type: bool, origin: btc_sample, code: promotions, description: "promo_GIFT-FILTER_active: that promotion on the call's day"}
+  "price_vnd:<SKU>": {type: int, origin: team, code: sku, description: "unit price of one item of a several-item order"}

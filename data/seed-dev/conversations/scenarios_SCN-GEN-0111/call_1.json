@@ -1,0 +1,190 @@
+{
+  "conversation_id": "SCN-GEN-0111__call_1",
+  "scenario_id": "SCN-GEN-0111",
+  "call": "call_1",
+  "customer_id": "C018",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-31",
+  "region": "nam",
+  "category": "gia-dung/quat",
+  "persona": "khach_da_kenh_fb_hotline",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, anh đang quan tâm đến quạt tháp Xiaomi Tower Fan đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh đang muốn hỏi về quạt tháp Xiaomi Tower Fan đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo anh muon hoi ve quat thap xiaomi tower fan cho gia dinh",
+      "facts_stated": {
+        "usage_need": "dùng cho gia đình"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại quạt tháp Xiaomi Tower Fan bên em đang tạm hết hàng anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "gia cua quat nay la bao nhieu vay em",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Quạt tháp Xiaomi Tower Fan giá là 1.790.000đ anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1790000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "quat co khuyen mai gi khong",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại sản phẩm này chưa có chương trình khuyến mãi nào áp dụng anh ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "a muon goi hotline de hoi them mot so thong tin nua",
+      "facts_stated": {
+        "blocker": "muốn gọi hotline hỏi thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận nhu cầu của anh muốn được hỗ trợ thêm qua hotline. Em sẽ chuyển thông tin của anh cho nhân viên gọi lại để tư vấn chi tiết hơn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "usage_need",
+          "value": "dùng cho gia đình",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "blocker",
+          "value": "muốn gọi hotline hỏi thêm",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-FAN-TWR",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1790000,
+          "op": "set",
+          "source": "call_1#turn5"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_gia_quat_xiaomi",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "action": "hen_nhan_vien_goi_lai",
+        "channel": "hotline"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "channel": "hotline",
+      "reason": "Khách muốn gọi hotline để hỏi thêm thông tin"
+    },
+    "order": null
+  }
+}

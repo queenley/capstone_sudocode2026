@@ -1,0 +1,303 @@
+{
+  "conversation_id": "SCN-GEN-0234__call_2",
+  "scenario_id": "SCN-GEN-0234",
+  "call": "call_2",
+  "customer_id": "SYN-C012",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-29",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Trần Thị Bích ạ, hôm trước mình có hỏi Máy lọc không khí Xiaomi Smart 4 Pro và muốn để bàn với gia đình, hôm nay chị xác nhận mua đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "chị xác nhận mua Máy lọc không khí Xiaomi Smart 4 Pro đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "blocker",
+        "room_area_m2",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo em oi chi xac nhan mua may loc khong khi xiaomi smart 4 pro roi nhe",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận lại đơn cho chị: Máy lọc không khí Xiaomi Smart 4 Pro, giá 5.490.000đ, vẫn giữ mức giá hôm trước. Chị chọn thanh toán ngân hàng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Chị chọn thanh toán ngân hàng đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "price_quoted_vnd",
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5490000",
+          "spoken": "5.490.000"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chi se thanh toan bang ngan hang",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ mình giao về Quận 7, TP.HCM như thông tin trước đó chị cung cấp đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Mình giao về Quận 7, TP.HCM như thông tin trước đó chị cung cấp đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "address",
+          "value": "Quận 7, TP.HCM",
+          "spoken": "Quận 7, TP.HCM"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "giao hang cho chi o quan 7 tphcm nhe",
+      "facts_stated": {
+        "delivery_area": "Quận 7, TP.HCM"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Quận 7, TP.HCM",
+          "spoken": "quan 7 tphcm"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm hiện còn hàng chị nhé. Em xác nhận lại đơn: Máy lọc không khí Xiaomi Smart 4 Pro, số lượng 1, giá 5.490.000đ, giao về Quận 7, TP.HCM, chị thanh toán chuyển khoản ngân hàng. Dự kiến giao hàng vào ngày 01/12/2026. Thông tin như vậy đúng rồi, em tạo đơn cho chị nhé?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Thông tin như vậy đúng rồi, em tạo đơn cho chị nhé?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area",
+        "payment",
+        "price_quoted_vnd",
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-12-01"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-11-29"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5490000",
+          "spoken": "5.490.000"
+        },
+        {
+          "type": "date",
+          "value": "2026-12-01",
+          "spoken": "ngày 01/12/2026"
+        }
+      ],
+      "pause_before_ms": 900,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "mong la van con hang em nhe",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm còn hàng chị nhé, em đã lên đơn thành công. Shop sẽ gửi xác nhận qua Zalo hoặc SMS, dự kiến giao vào ngày 01/12/2026. Cảm ơn chị đã đặt hàng tại BTC ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-12-01"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000012",
+            "sku": "SKU-XM-4P",
+            "qty": 1,
+            "price_vnd": 5490000,
+            "payment": "bank",
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-11-29"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Quận 7, TP.HCM",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-XM-4P",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5490000,
+          "op": "set",
+          "source": "call_2#turn3"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn8"
+        }
+      ],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5490000",
+          "spoken": "5.490.000"
+        },
+        {
+          "type": "date",
+          "value": "2026-12-01",
+          "spoken": "ngày 01/12/2026"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-XM-4P",
+      "qty": 1,
+      "price_vnd": 5490000,
+      "payment": "bank",
+      "address": "Quận 7, TP.HCM",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-12-01"
+    }
+  }
+}

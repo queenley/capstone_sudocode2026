@@ -1,0 +1,184 @@
+{
+  "conversation_id": "SCN-ADV-0007__call_2",
+  "scenario_id": "SCN-ADV-0007",
+  "call": "call_2",
+  "customer_id": "C005",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_nhieu_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Hôm trước chị có đặt Máy hút sữa điện đôi Spectra S1 và thanh toán chuyển khoản, giao về Lê Chân, Hải Phòng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Hôm trước chị có đặt Máy hút sữa điện đôi Spectra S1 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-MB-PUMP1"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn hỏi đơn hàng mà chị đã đặt hôm trước, tình trạng thế nào rồi?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em kiểm tra đơn của chị nhé. Đơn hàng mã OD600001 Máy hút sữa điện đôi Spectra S1 đã tạo thành công và đang chờ xử lý ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "order_status",
+          "value": "created"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD600001"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị không nhớ mã đơn, nhưng chị đặt cái máy hút sữa điện đôi Spectra S1.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn của chị đã được ghi nhận thành công ạ. Đơn này đặt ngày 15/10, tổng giá 4.290.000đ, giao về Lê Chân, Hải Phòng theo hình thức chuyển khoản.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "delivery_area",
+        "payment",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "price_quoted_vnd",
+          "value": 4290000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mình đặt vào ngày 15 tháng 10, thời gian giao hàng dự kiến là khi nào?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn của chị đã tạo ngày 15/10 nên dự kiến giao từ 2 đến 4 ngày làm việc, tức là chị sẽ nhận được hàng trong khoảng ngày 17 đến 21/10, tùy đơn vị vận chuyển ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có cần chị cung cấp thêm thông tin gì không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại chị không cần cung cấp thêm gì đâu ạ, bên em sẽ chủ động liên hệ lại nếu có cập nhật mới về đơn hàng. Em cảm ơn chị đã tin tưởng shop BTC ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

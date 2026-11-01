@@ -1,0 +1,212 @@
+{
+  "conversation_id": "SCN-ADV-0009__call_1",
+  "scenario_id": "SCN-ADV-0009",
+  "call": "call_1",
+  "customer_id": "SYN-C002",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-10-17",
+  "region": "trung",
+  "category": "gia-dung/quat",
+  "persona": "khach_bao_hanh_het_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Trần Thị B, em là trợ lý ảo của shop BTC. Em thấy chị từng đặt Giày chạy bộ RunLite 2 Pro hôm trước, hôm nay chị cần hỗ trợ về quạt đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "hôm nay chị cần hỗ trợ về quạt đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Trần Thị B đây, quạt đứng Senko của chị không lên nguồn nữa.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận quạt đứng Senko của chị bị không lên nguồn. Chị mua quạt ngày 06/03/2025 phải không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Chị mua quạt ngày 06/03/2025 phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900203"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị mua cái này cũng lâu rồi, nhưng chị nghĩ mình vẫn được bảo hành miễn phí chứ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra thì quạt Senko của chị đã hết hạn bảo hành 12 tháng rồi ạ. Rất tiếc hiện tại mình không còn trong thời gian bảo hành miễn phí nữa chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "warranty_months",
+          "value": 12
+        },
+        {
+          "field": "in_warranty",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nghe nói bảo hành 12 tháng nhưng giờ hết hạn rồi, có cách nào khác không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ quạt Senko được bảo hành miễn phí trong 12 tháng theo chính sách của hãng. Khi đã hết thời hạn bảo hành, nếu chị muốn sửa chữa thì mình có thể liên hệ trung tâm bảo hành Senko hoặc tiệm điện gần nhà để được hỗ trợ tính phí ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "warranty_months",
+          "value": 12
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thấy rất bực bội vì quạt mới mua mà giờ đã hỏng.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất xin lỗi vì sự bất tiện này chị gặp phải. Thật sự sau thời gian bảo hành miễn phí, mình chỉ có thể sửa chữa tính phí thôi ạ, mong chị thông cảm.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_warranty",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": "apologetic",
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu không bảo hành thì chị phải làm sao đây?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại chị có thể mang quạt tới trung tâm bảo hành Senko để được kiểm tra và báo phí sửa chữa, hoặc gọi thợ điện uy tín gần nhà để xử lý giúp mình chị nhé. Nếu chị cần thông tin địa chỉ bảo hành, em có thể tra giúp ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "issue",
+          "value": "máy không lên nguồn",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "order_id",
+          "value": "OD900203",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "owned_sku",
+          "value": "SKU-FAN-SEN",
+          "op": "set",
+          "source": "call_1#turn2"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_bao_hanh",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,148 @@
+{
+  "conversation_id": "SCN-ADV-0150__call_1",
+  "scenario_id": "SCN-ADV-0150",
+  "call": "call_1",
+  "customer_id": "C042",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-21",
+  "region": "trung",
+  "category": "gia-dung/quat",
+  "persona": "khach_hoi_freeship_theo_vung",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, rất vui được hỗ trợ chị. Chị vừa hỏi về chương trình freeship cho đồ gia dụng đúng không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thấy trên fanpage có quảng cáo freeship cho đồ gia dụng, không biết ở Hải Châu, Đà Nẵng có được freeship không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã quan tâm. Hiện tại, với đơn hàng quạt đứng Senko TS16 giao về Hải Châu, Đà Nẵng, chương trình freeship ngành gia dụng chỉ áp dụng khu vực miền Nam thôi ạ, nên địa chỉ giao của mình ở Đà Nẵng sẽ chưa được miễn phí vận chuyển.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "freeship",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn mua quạt đứng Senko TS16, địa chỉ giao hàng là Hải Châu, Đà Nẵng.",
+      "facts_stated": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, quạt đứng Senko TS16 hiện bên em còn hàng, giá 590.000đ ạ. Nếu chị đặt giao về Hải Châu, Đà Nẵng, phí vận chuyển là 35.000đ cho đơn dưới 2 triệu theo chính sách shop.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 590000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu không freeship thì phí giao hàng là bao nhiêu em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ phí giao hàng đến Hải Châu, Đà Nẵng cho đơn quạt Senko TS16 là 35.000đ chị nhé. Đơn từ 2 triệu sẽ được freeship, còn dưới 2 triệu áp dụng mức phí này ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đang chờ cuối tháng nhận lương mới quyết định mua, nên cần biết phí giao.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị sẽ cân nhắc cuối tháng. Nếu chị cần tư vấn thêm về sản phẩm hoặc đặt hàng, chị cứ liên hệ lại shop bất kỳ lúc nào nhé. Em cảm ơn chị đã quan tâm ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_feeship_vanchuyen",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

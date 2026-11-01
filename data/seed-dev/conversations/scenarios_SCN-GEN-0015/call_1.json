@@ -1,0 +1,234 @@
+{
+  "conversation_id": "SCN-GEN-0015__call_1",
+  "scenario_id": "SCN-GEN-0015",
+  "call": "call_1",
+  "customer_id": "C034",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-31",
+  "region": "trung",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào cô Loan ạ, em là trợ lý ảo của shop BTC. Hôm trước cô có hỏi về Máy lọc nước RO Karofi 9 lõi, nhà ở Cần Thơ, đúng không ạ? Em xin phép xác nhận là mình muốn tiếp tục tư vấn về sản phẩm này phải không cô?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Hôm trước cô có hỏi về Máy lọc nước RO Karofi 9 lõi, nhà ở Cần Thơ, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area",
+        "decision_maker",
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-WF-RO9"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, cô muốn hỏi về máy lọc nước RO Karofi 9 lõi mà hôm trước mình đã nói.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ cô ơi, Máy lọc nước RO Karofi 9 lõi hiện bên em đang sẵn hàng, giá là 5.990.000đ. Sản phẩm phù hợp cho gia đình 4–6 người, dùng nước máy thành phố rất tốt ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhà cô có 5 người, ngân sách tầm 6 triệu thôi, em ơi.",
+      "facts_stated": {
+        "usage_need": "gia đình 5 người",
+        "budget_vnd": 6000000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy RO Karofi 9 lõi rất phù hợp với gia đình 5 người như nhà mình, và giá hiện tại là 5.990.000đ nằm trong ngân sách của cô luôn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại sản phẩm chưa có khuyến mãi giảm giá, nhưng cô được miễn phí thu hộ khi thanh toán COD toàn quốc ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cô cần bàn với gia đình đã, hẹn tối thứ Hai (2/11) tầm 7 giờ em gọi lại cô nhé.",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-11-02",
+          "spoken": "tối thứ Hai (2/11)"
+        },
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận, vậy em sẽ gọi lại cho cô vào lúc 7 giờ tối thứ Hai, ngày 2/11 nhé cô. Cô cứ yên tâm, giá 5.990.000đ giữ nguyên và hàng luôn sẵn. Nếu cần thêm thông tin, cô cứ nhắn cho shop bất kỳ lúc nào ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-11-02T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0958421083",
+            "callback_at": "2026-11-02T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "usage_need",
+          "value": "gia đình 5 người",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 6000000,
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-WF-RO9",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5990000,
+          "op": "set",
+          "source": "call_1#turn4"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "cần hỏi người nhà",
+    "objection_handling": "Đồng ý và chủ động đặt lịch gọi lại đúng thời gian khách mong muốn, nhắc lại giá và cam kết giữ giá.",
+    "sentiment": "neutral",
+    "decision_maker": "con gái",
+    "commitments": [
+      {
+        "time": "2026-11-02T19:00",
+        "action": "gọi lại tư vấn"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-11-02T19:00",
+      "reason": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

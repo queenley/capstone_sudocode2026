@@ -1,0 +1,263 @@
+{
+  "conversation_id": "SCN-GEN-0056__call_2",
+  "scenario_id": "SCN-GEN-0056",
+  "call": "call_2",
+  "customer_id": "C050",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-27",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Thủy ạ, hôm trước chị có quan tâm Máy lọc không khí Xiaomi Smart 4 Pro và cần hỏi chồng thêm. Em sẵn sàng hỗ trợ tiếp cho mình ạ.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "blocker",
+        "room_area_m2",
+        "decision_maker",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "promo_XM-COMBO_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Thủy đây, hôm trước em có tư vấn cho chị.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ cảm ơn chị đã gọi lại ạ. Em ghi nhận chị vẫn quan tâm đến Máy lọc không khí Xiaomi Smart 4 Pro, giá hiện tại là 5.490.000đ và vẫn còn áp dụng khuyến mãi XM-COMBO như lần trước em báo ạ.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "promo_XM-COMBO_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị quyết định mua máy lọc không khí Xiaomi Smart 4 Pro rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị chọn Xiaomi Smart 4 Pro, em chốt đơn theo giá 5.490.000đ và tặng kèm 1 màng lọc chính hãng cho mình. Em xin xác nhận lại: giao về địa chỉ Nha Trang, Khánh Hòa, thanh toán bằng COD, dự kiến nhận hàng vào ngày 31/10. Thông tin trên đã chính xác chưa để em lên đơn cho chị ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em xin xác nhận lại: giao về địa chỉ Nha Trang, Khánh Hòa, thanh toán bằng COD, dự kiến nhận hàng vào ngày 31/10. Thông tin trên đã chính xác chưa để em lên đơn cho chị ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "promo_XM-COMBO_active",
+          "value": true
+        },
+        {
+          "field": "gift_sku",
+          "value": "SKU-XM-FLT"
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-31"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-10-27"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ thanh toán bằng COD và giao hàng ở Nha Trang, Khánh Hòa nhé.",
+      "facts_stated": {
+        "payment": "COD",
+        "delivery_area": "Nha Trang, Khánh Hòa"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị xác nhận. Em sẽ tiến hành lên đơn cho mình ngay bây giờ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0956517883",
+            "sku": "SKU-XM-4P",
+            "qty": 1,
+            "price_vnd": 5490000,
+            "payment": "COD",
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-10-27"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em lên đơn giúp chị nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn của chị đã được tạo thành công. Shop sẽ gọi xác nhận đơn trước khi giao và dự kiến chị nhận hàng vào ngày 31/10. Cảm ơn chị Thủy đã tin tưởng đặt mua tại Shop BTC ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-31"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Nha Trang, Khánh Hòa",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-XM-4P",
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5490000,
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "promo_code",
+          "value": "XM-COMBO",
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-XM-4P",
+      "qty": 1,
+      "price_vnd": 5490000,
+      "payment": "COD",
+      "address": "Nha Trang, Khánh Hòa",
+      "order_id": "OD600001"
+    }
+  }
+}

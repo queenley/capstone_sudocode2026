@@ -1,0 +1,270 @@
+{
+  "conversation_id": "SCN-ADV-0006__call_2",
+  "scenario_id": "SCN-ADV-0006",
+  "call": "call_2",
+  "customer_id": "C007",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-20",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_can_tu_van_nhieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Thảo ạ, hôm trước chị có quan tâm Máy lọc không khí AirPure Y và muốn so sánh thêm, hôm nay mình quyết định mua đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Hôm nay mình quyết định mua Máy lọc không khí AirPure Y đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5200000
+        },
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-10-20"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, chị đã quyết định mua máy lọc không khí AirPure Y.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận lại chị chọn Máy lọc không khí AirPure Y, giá 5.200.000đ, hiện đang còn hàng và tặng kèm màng lọc thay thế theo chương trình khuyến mãi GIFT-FILTER. Chị muốn nhận hàng tại quận Ninh Kiều, Cần Thơ phải không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Chị muốn nhận hàng tại quận Ninh Kiều, Cần Thơ phải không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5200000
+        },
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ thanh toán bằng tiền mặt khi nhận hàng.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận phương thức thanh toán là tiền mặt khi nhận hàng ạ. Thời gian giao dự kiến đến Ninh Kiều, Cần Thơ sẽ trong 4 ngày làm việc, khoảng ngày 24/10/2026.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-24"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Địa chỉ giao hàng là quận Ninh Kiều, Cần Thơ nhé.",
+      "facts_stated": {
+        "delivery_area": "Ninh Kiều, Cần Thơ"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em tóm tắt lại đơn hàng: Máy lọc không khí AirPure Y, 1 máy, giá 5.200.000đ, tặng kèm màng lọc, giao đến quận Ninh Kiều, Cần Thơ, thanh toán khi nhận hàng. Chị kiểm tra thông tin giúp em, em tạo đơn nhé?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Chị kiểm tra lại giúp em: Máy lọc không khí AirPure Y, 1 máy, giá 5.200.000đ, tặng kèm màng lọc, giao Ninh Kiều, Cần Thơ, thanh toán khi nhận hàng. Thông tin đã đúng hết chưa để em lên đơn cho chị?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5200000
+        },
+        {
+          "field": "gift_sku",
+          "value": "SKU-AP-FLT-X"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đồng ý lên đơn cho máy AirPure Y đó em ơi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã lên đơn thành công cho chị. Shop sẽ gọi xác nhận đơn trước khi giao, dự kiến nhận hàng khoảng ngày 24/10/2026. Cảm ơn chị Thảo đã đặt hàng tại Shop BTC ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-24"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0960161055",
+            "sku": "SKU-AP-Y",
+            "qty": 1,
+            "price_vnd": 5200000,
+            "payment": "COD",
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-10-20"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Ninh Kiều, Cần Thơ",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-Y",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5200000,
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "promo_code",
+          "value": "GIFT-FILTER",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-AP-Y",
+      "qty": 1,
+      "price_vnd": 5200000,
+      "payment": "COD",
+      "address": "Ninh Kiều, Cần Thơ",
+      "estimated_delivery": "2026-10-24",
+      "order_id": "OD600001"
+    }
+  }
+}

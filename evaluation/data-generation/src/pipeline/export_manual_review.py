@@ -39,7 +39,18 @@ def _judge_ok(verdict: dict[str, Any]) -> bool:
     return bool(verdict.get("overall_pass")) and not verdict.get("needs_manual_review", True)
 
 
+def _decisions(target: Path) -> dict[str, dict[str, str]]:
+    """The reviewer's approve/notes already in *target*, by conversation, with the transcript they judged."""
+    if not target.exists():
+        return {}
+    with target.open(newline="", encoding="utf-8-sig") as stream:
+        return {r["conversation_id"]: r for r in csv.DictReader(stream) if (r.get("approve") or r.get("notes"))}
+
+
 def export(records: list[dict[str, Any]], target: Path) -> int:
+    # A run that adds data exports again: a decision already written is kept while its transcript is unchanged
+    # (a regenerated transcript is reviewed again).
+    previous = _decisions(target)
     rows = []
     for item in records:
         cid = item["conversation_id"]
@@ -55,10 +66,11 @@ def export(records: list[dict[str, Any]], target: Path) -> int:
         conversation = _read_json(conversation_path)
         preview = " | ".join(f"{t.get('speaker', '?')}: {t.get('text', '')}" for t in conversation.get("turns", []))
         scenario = _read_json(DATASET.scenarios_dir / f"{item['scenario_id']}.json")
+        kept = previous.get(cid) if previous.get(cid, {}).get("transcript_preview") == preview[:PREVIEW_CHARS] else None
         rows.append({"conversation_id": cid, "scenario_id": item["scenario_id"], "call": item.get("call", ""),
                      "persona": scenario.get("persona", ""), "reason": "; ".join(reasons) or "risk_persona",
                      "transcript_preview": preview[:PREVIEW_CHARS], "transcript_path": str(conversation_path),
-                     "approve": "", "notes": ""})
+                     "approve": (kept or {}).get("approve", ""), "notes": (kept or {}).get("notes", "")})
     with target.open("w", newline="", encoding="utf-8-sig") as stream:
         writer = csv.DictWriter(stream, fieldnames=FIELDS)
         writer.writeheader()

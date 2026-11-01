@@ -1,0 +1,143 @@
+{
+  "scenario_id": "SCN-ADV-0035",
+  "level": "M2",
+  "persona": "khach_go_khong_dau",
+  "hard_case": null,
+  "customer_phone": "0976158464",
+  "customer_name": "Thu",
+  "honorific": "chị",
+  "notes": "Persona khach_go_khong_dau, biến thể khong_dau_da_kenh. call_1 (zalo_oa): tư vấn, chưa chốt → hen_goi_lai; call_2 (chat_fanpage): chốt đơn → chot_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_thu55",
+      "call_date": "2026-10-16",
+      "input_mode": "chat_teencode",
+      "customer_goal": "Hỏi về máy tiệt trùng sấy khô Moaz Bebe.",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về máy tiệt trùng sấy khô Moaz Bebe.",
+        "Máy này có giá bao nhiêu em nhỉ?",
+        "Chị có ngân sách khoảng 2 triệu thôi.",
+        "Chị có bé 12 tháng, không biết máy này có phù hợp không?",
+        "À, chị chờ cuối tháng nhận lương rồi sẽ gọi lại nhé."
+      ],
+      "customer_turns_asr": [
+        "alo chi muon hoi ve may tiet trung say kho moaz bebe",
+        "may nay co gia bao nhieu em nhi",
+        "chi co ngan sach khoang 2 trieu thoi",
+        "chi co be 12 thang khong biet may nay co phu hop khong",
+        "a chi cho cuoi thang nhan luong roi se goi lai nhe"
+      ],
+      "facts_established": {
+        "child_age_months": 12,
+        "budget_vnd": 2500000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-MB-STER",
+        "price_quoted_vnd": 1890000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1890000,
+        "list_price_vnd": 1890000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "child_age_months": 12,
+        "budget_vnd": 2500000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-MB-STER",
+        "price_quoted_vnd": 1890000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-03"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.c023",
+      "days_later": 1,
+      "input_mode": "chat_teencode",
+      "customer_goal": "Xác nhận mua máy tiệt trùng sấy khô.",
+      "customer_turns": [
+        "Chị muốn đặt máy tiệt trùng sấy khô Moaz Bebe.",
+        "Hình thức thanh toán là chuyển khoản nhé.",
+        "Giao hàng cho chị ở Cầu Giấy, Hà Nội.",
+        "Chốt đơn luôn em nhé."
+      ],
+      "customer_turns_asr": [
+        "chi muon dat may tiet trung say kho moaz bebe",
+        "hinh thuc thanh toan la chuyen khoan nhe",
+        "giao hang cho chi o cau giay ha noi",
+        "chot don luon em nhe"
+      ],
+      "facts_established": {
+        "payment": "bank",
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "product_advised": "SKU-MB-STER",
+        "price_quoted_vnd": 1890000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-MB-STER",
+          "price_vnd": 1890000,
+          "payment": "bank"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1890000,
+        "list_price_vnd": 1890000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "freeship": true,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-10-20",
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "payment": "bank",
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "product_advised": "SKU-MB-STER",
+        "price_quoted_vnd": 1890000,
+        "promo_code": "MOM-FREESHIP",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

@@ -10,7 +10,8 @@
 | [`config/prompts/evaluation/extractor.txt`](../config/prompts/evaluation/extractor.txt) | Prompt của extractor, nạp nguyên văn |
 | `apps/ai-agent-service/data/btc/` | Gói dữ liệu của BTC, bản duy nhất trong repo; `tests/agent/test_btc_pack.py` ghim hash từng file |
 | [`datasets/`](datasets/README.md) | Kịch bản đã gán nhãn (v4, 150 kịch bản) và quy tắc duyệt nhãn |
-| [`data-generation/`](data-generation/README.md) | Sinh kịch bản theo định dạng BTC (có venv, test, prompt riêng) |
+| [`data-generation/`](data-generation/README.md) | Sinh kịch bản theo định dạng BTC (có venv, test, prompt riêng); ghi vào `data/seed-<tên>/` ở gốc repo |
+| [`../contracts/scenario/scenario-keys.yaml`](../contracts/scenario/scenario-keys.yaml) | Mọi khóa được phép của một kịch bản (kiểu, nguồn BTC/nhóm, ý nghĩa); bộ sinh từ chối khóa lạ |
 | [`rag_offline.py`](rag_offline.py) | Recall@k của kho tri thức, không cần model hay database (`make eval`) |
 | `runs/` | Bằng chứng mỗi lần chạy, cache extractor và sổ ngân sách. **Không lên Git** (có thể chứa dữ liệu khách) |
 | [`../docs/evaluation/`](../docs/evaluation/README.md) | Luồng vào bộ chấm, bản đồ hệ thống |
@@ -37,13 +38,13 @@ Giới hạn chi tiêu: `EVAL_BUDGET_DB=<đường dẫn sổ SQLite>` đặt tr
 
 Mã thoát: `0` đủ nhãn và đã chấm · `1` có lượt lỗi hoặc chưa gắn nhãn (không in bảng, trace vẫn được giữ) · `2` đầu vào hoặc cấu hình sai.
 
-Một run ghi: `full.jsonl`, `baseline.jsonl` (trace theo schema BTC), `diagnostics.jsonl` (từng lượt: lane, guard, và `extraction_items` kèm quote để kiểm tay), `report.json` + `table.txt` (BTC), `usage.json`, `manifest.json`, `errors.jsonl`, `rag/`.
+Một run ghi: `full.jsonl`, `baseline.jsonl` (trace theo schema BTC), `diagnostics.jsonl` (từng lượt: lane, guard, và `extraction_items` kèm quote để kiểm tay), `report.json` + `table.txt` (BTC), `team_checks.json` (kiểm tra riêng của nhóm, `success_if.say_at_most`: số lượt agent khớp một mẫu không quá mức cho phép, ví dụ AIR-2ND-50 nói một lần; in dưới bảng BTC, là số chẩn đoán, không phải số chính thức), `usage.json`, `manifest.json`, `errors.jsonl`, `rag/`.
 
 ## Quy tắc
 
 1. **Số chính thức chỉ là `reference_eval.py` của BTC**, chạy nguyên bản. Không viết lại công thức. Không sửa gói BTC; `test_btc_pack.py` sẽ báo nếu một byte đổi.
 2. **Đo công bằng.** `full` và `baseline_no_memory` cùng kịch bản, model, prompt, công cụ, tri thức; chỉ khác bộ nhớ.
-3. **Đổi extractor là đổi dụng cụ đo.** Số do extractor khác nhau không so trực tiếp được; ghi `extractor_version` khi so.
+3. **Đổi extractor là đổi dụng cụ đo.** Số do extractor khác nhau không so trực tiếp được; ghi `extractor_version` khi so. Hiện là `product-extractor-v5` (câu đọc lại đơn là một câu xác nhận `order_summary`); số của v4 so bằng `--relabel`.
 4. **Không dùng đáp án của tập kiểm hay holdout để viết FAQ, playbook hay ví dụ.** Ví dụ trong prompt extractor là dữ liệu bịa.
 5. **Nhãn chưa có người duyệt là diagnostic.** Đổi nhãn thì tạo revision mới (xem [`datasets/ground-truth-review`](datasets/ground-truth-review/SKILL.md)), không ghi đè revision đã dùng, và báo thay đổi nhãn tách khỏi thay đổi của agent.
 6. **Thiếu bằng chứng không được điền 0 hay PASS.** Dữ liệu thiếu thì báo thiếu.

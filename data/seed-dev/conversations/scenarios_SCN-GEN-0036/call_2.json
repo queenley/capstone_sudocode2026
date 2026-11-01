@@ -1,0 +1,336 @@
+{
+  "conversation_id": "SCN-GEN-0036__call_2",
+  "scenario_id": "SCN-GEN-0036",
+  "call": "call_2",
+  "customer_id": "C030",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-19",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_cap_nhat_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Việt ạ, hôm trước mình có quan tâm Xe đẩy 2 chiều Combi Sugocal và còn cần suy nghĩ thêm, hôm nay anh muốn tiếp tục đặt hàng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Hôm trước anh cần suy nghĩ thêm, giờ mình đã quyết định đặt hàng đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6790000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, em ơi, anh đã đổi ý rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em ghi nhận anh đã đổi ý ạ. Giá Xe đẩy 2 chiều Combi Sugocal hôm nay là 6.790.000đ, vẫn áp dụng miễn phí vận chuyển toàn quốc anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6790000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ngân sách giờ là 8 triệu 1.",
+      "facts_stated": {
+        "budget_vnd": 8100000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "8100000",
+          "spoken": "8 triệu 1"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm này phù hợp với ngân sách của anh ạ. Anh muốn giao hàng ở địa chỉ nào để em kiểm tra thời gian giao dự kiến cho mình nhé?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Anh muốn giao hàng ở địa chỉ nào để em kiểm tra thời gian giao dự kiến cho mình nhé?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giao hàng ở Thủ Đức, TP.HCM nhé.",
+      "facts_stated": {
+        "delivery_area": "Thủ Đức, TP.HCM"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Thủ Đức, TP.HCM",
+          "spoken": "Thủ Đức, TP.HCM"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra, địa chỉ Thủ Đức, TP.HCM sẽ được giao trong 2 ngày làm việc, dự kiến nhận hàng ngày 21/10 anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "delivery_days",
+          "value": 2
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-21"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Thủ Đức, TP.HCM",
+            "on": "2026-10-19"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-10-21",
+          "spoken": "21/10"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh thanh toán qua ngân hàng.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận lại đơn hàng của anh: Xe đẩy 2 chiều Combi Sugocal, 1 sản phẩm giá 6.790.000đ, giao Thủ Đức, TP.HCM, thanh toán chuyển khoản ngân hàng, dự kiến nhận ngày 21/10. Thông tin này đúng rồi anh xác nhận giúp em để em tạo đơn nhé?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh xác nhận lại giúp em đơn hàng: Xe đẩy 2 chiều Combi Sugocal, 1 sản phẩm giá 6.790.000đ, giao Thủ Đức, TP.HCM, thanh toán chuyển khoản ngân hàng, dự kiến nhận ngày 21/10 như trên đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6790000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-21"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-10-21",
+          "spoken": "21/10"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ừ đúng rồi em.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã lên đơn thành công cho anh, mã đơn OD600001. Anh chuyển khoản theo hướng dẫn shop gửi qua Zalo/SMS, shop sẽ giao hàng dự kiến ngày 21/10. Cảm ơn anh Việt đã đặt hàng ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6790000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-21"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0991280845",
+            "sku": "SKU-MB-STR2",
+            "qty": 1,
+            "price_vnd": 6790000,
+            "payment": "bank",
+            "address": "Thủ Đức, TP.HCM",
+            "on": "2026-10-19"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Thủ Đức, TP.HCM",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 8100000,
+          "op": "supersede",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-STR2",
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 6790000,
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn10"
+        }
+      ],
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD600001",
+          "spoken": "OD600001"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-21",
+          "spoken": "21/10"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xac_nhan_mua",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "budget_vnd",
+        "old_value": 7500000,
+        "new_value": 8100000
+      }
+    ],
+    "callback": null,
+    "order": {
+      "sku": "SKU-MB-STR2",
+      "qty": 1,
+      "price_vnd": 6790000,
+      "payment": "bank",
+      "address": "Thủ Đức, TP.HCM",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-10-21"
+    }
+  }
+}

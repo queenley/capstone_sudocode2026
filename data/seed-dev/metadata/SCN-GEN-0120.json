@@ -1,0 +1,63 @@
+{
+  "scenario_id": "SCN-GEN-0120",
+  "persona_source": "btc",
+  "customer_id": "C036",
+  "region": "nam",
+  "category": "gia-dung/noi-chien",
+  "difficulty": "hard",
+  "tags": [
+    "cap_nhat_thong_tin",
+    "hard_case",
+    "hen_giai_quyet",
+    "order_status",
+    "supersede",
+    "thong_tin_san_pham",
+    "tu_van",
+    "variant:ba_phien_doi_thong_tin"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "consult",
+      "outcome_detail": "hen_goi_lai",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Nồi chiên không dầu Lock&Lock 4L",
+        "price_vnd": 1890000,
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 4
+    },
+    "call_2": {
+      "kind": "order",
+      "outcome_detail": "chot_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Nồi chiên không dầu Lock&Lock 4L",
+        "price_vnd": 1890000,
+        "promo": "NAM-SHIP0",
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 3
+    },
+    "call_3": {
+      "kind": "order_status",
+      "outcome_detail": "cap_nhat_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "order_status": "created"
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 2
+    }
+  }
+}

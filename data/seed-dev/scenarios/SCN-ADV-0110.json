@@ -1,0 +1,113 @@
+{
+  "scenario_id": "SCN-ADV-0110",
+  "level": "M2",
+  "persona": "khach_hoi_tra_gop",
+  "hard_case": null,
+  "customer_phone": "0913301756",
+  "customer_name": "Vy",
+  "honorific": "chị",
+  "notes": "Persona khach_hoi_tra_gop, biến thể hoi_tra_gop. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (zalo_oa): hỏi trả góp → thong_tin. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-30",
+      "customer_goal": "Hỏi về máy hút sữa điện đôi",
+      "customer_turns": [
+        "Alo em, chị muốn hỏi về máy hút sữa điện đôi Spectra S1.",
+        "Chị có bé được một tháng rồi, ngân sách chị chỉ tầm 5 triệu thôi.",
+        "Máy này có khuyến mãi gì không em?",
+        "Ừm, chị đang muốn mua nhưng muốn trả góp.",
+        "Để chị suy nghĩ thêm rồi chị gọi lại nhé."
+      ],
+      "facts_established": {
+        "blocker": "muốn trả góp",
+        "budget_vnd": 5000000,
+        "child_age_months": 1,
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 4290000,
+        "list_price_vnd": 4290000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "promo_PUMP-GIFT_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-30"
+      },
+      "memory_expectation": {
+        "blocker": "muốn trả góp",
+        "budget_vnd": 5000000,
+        "child_age_months": 1,
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-01",
+        "FAQ-11",
+        "VC-04"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_vy79",
+      "days_later": 2,
+      "customer_goal": "Hỏi về trả góp cho máy hút sữa",
+      "customer_turns": [
+        "Alo em, hôm trước chị đã hỏi về máy hút sữa đó rồi.",
+        "Chị muốn biết là có hỗ trợ trả góp 0% qua thẻ tín dụng không?",
+        "Nếu không có thì chị sẽ cân nhắc lại.",
+        "Chị muốn mua nhưng ngân sách eo hẹp quá, nên cần trả góp.",
+        "Chị sẽ gọi lại sau khi suy nghĩ nhé."
+      ],
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "chưa hỗ trợ trả góp",
+          "không hỗ trợ trả góp",
+          "chưa có trả góp",
+          "chưa hỗ trợ hình thức trả góp"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "installment_supported",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "installment_supported": false,
+        "call_date": "2026-11-01"
+      },
+      "relevant_policy_ids": [
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "thong_tin"
+    }
+  }
+}

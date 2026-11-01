@@ -1,0 +1,194 @@
+{
+  "scenario_id": "SCN-GEN-0154",
+  "level": "M1",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "hard_case": "doi_khuyen_mai_het_han",
+  "customer_phone": "0998000013",
+  "customer_name": "Phạm Minh Tuấn",
+  "honorific": "anh",
+  "notes": "Persona khach_hoi_nhieu_khong_mua, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): hỏi thêm rồi từ chối → tu_choi. Ca khó: doi_khuyen_mai_het_han. call_2: giá đổi 7.690.000đ → 7.990.000đ. call_2: KM AIR-OCT không còn áp dụng. Chấm chủ yếu: CCR, RQR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-29",
+      "customer_goal": "Hỏi về máy lọc không khí cho phòng 25m²",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro cho phòng khoảng 25 mét vuông.",
+        "Nhà anh có trẻ nhỏ, ngân sách tầm 8 triệu thôi.",
+        "Máy này có khuyến mãi gì không em?",
+        "Anh cần so sánh với máy khác nữa, nên sẽ gọi lại sau nhé."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C013",
+          "session_id": "SYN-013-S1",
+          "date": "2026-05-10",
+          "channel": "hotline",
+          "summary": "Mua Nồi chiên không dầu Lock&Lock 4L giá 1.890.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C013",
+          "session_id": "SYN-013-S2",
+          "date": "2026-10-03",
+          "channel": "zalo_oa",
+          "summary": "Đặt Nồi chiên không dầu Philips 6.2L giá 3.990.000đ, đơn OD901302 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C013",
+          "order_id": "OD901301",
+          "date": "2026-05-10",
+          "sku": "SKU-AF-4L",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AF-4L"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C013",
+          "order_id": "OD901302",
+          "date": "2026-10-03",
+          "sku": "SKU-AF-6L",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901302"
+          }
+        }
+      ],
+      "facts_established": {
+        "blocker": "muốn so sánh thêm",
+        "budget_vnd": 8000000,
+        "has_children": true,
+        "room_area_m2": 25,
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT",
+        "promo_expiry": "2026-10-30"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 7690000,
+        "list_price_vnd": 7990000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": true,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-29"
+      },
+      "memory_expectation": {
+        "blocker": "muốn so sánh thêm",
+        "budget_vnd": 8000000,
+        "has_children": true,
+        "room_area_m2": 25,
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT"
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "FAQ-02",
+        "PB-01",
+        "PB-11"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 5,
+      "customer_goal": "Hỏi thêm chi tiết rồi từ chối mua",
+      "customer_turns": [
+        "Alo, anh gọi lại để hỏi thêm về máy lọc không khí đó.",
+        "Giá máy AirPure Pro là bao nhiêu vậy em?",
+        "Mà em cho anh biết máy này có hoạt động êm không?",
+        "Thực ra anh đang muốn tìm một cái khác, nên chắc là chưa mua đâu."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000
+      },
+      "must_carry_over": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "price_vnd",
+            "value": 7690000
+          },
+          {
+            "field": "promo_AIR-OCT_active",
+            "value": true
+          }
+        ],
+        "max_agent_questions": 4
+      },
+      "ground_truth_facts": {
+        "price_vnd": 7990000,
+        "list_price_vnd": 7990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-03"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000,
+        "superseded": {
+          "price_quoted_vnd": 7690000
+        }
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "KM-01",
+        "CL-02",
+        "PB-01",
+        "PB-11"
+      ],
+      "expected_outcome": "tu_choi"
+    }
+  }
+}

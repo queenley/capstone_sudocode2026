@@ -1,0 +1,244 @@
+{
+  "conversation_id": "SCN-ADV-0042__call_1",
+  "scenario_id": "SCN-ADV-0042",
+  "call": "call_1",
+  "customer_id": "C028",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-17",
+  "region": "bac",
+  "category": "thoi-trang/ao-khoac",
+  "persona": "khach_tra_hang_trong_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, em có thể hỗ trợ anh đặt áo khoác gió Windbreak size S màu navy ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn mua áo khoác gió Windbreak size S màu navy.",
+      "facts_stated": {
+        "size": "S",
+        "color": "navy",
+        "product_advised": "SKU-JK-WND"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ áo khoác gió Windbreak size S màu navy hiện đang còn hàng, giá là 690.000đ ạ. Anh muốn lấy 1 áo đúng không để em lên đơn cho anh nhé?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em xác nhận đơn của anh: 1 áo khoác gió Windbreak size S màu navy, giá 690.000đ, giao tại Cầu Giấy, Hà Nội, thanh toán chuyển khoản ngân hàng, dự kiến giao ngày 20/10. Anh xác nhận giúp em các thông tin trên đúng chưa ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-17"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán của anh là chuyển khoản ngân hàng nhé.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận anh chọn thanh toán chuyển khoản ngân hàng ạ. Địa chỉ giao hàng là Cầu Giấy, Hà Nội đúng không anh?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Anh xác nhận lại giúp em địa chỉ giao hàng là Cầu Giấy, Hà Nội đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giao hàng cho anh ở Cầu Giấy, Hà Nội.",
+      "facts_stated": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã đủ thông tin để lên đơn cho anh rồi ạ. Em sẽ tiến hành tạo đơn nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0922808864",
+            "sku": "SKU-JK-WND-S-NAVY",
+            "qty": 1,
+            "price_vnd": 690000,
+            "payment": "bank",
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-17"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "size",
+          "value": "S",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "color",
+          "value": "navy",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Cầu Giấy, Hà Nội",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-JK-WND",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 690000,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-JK-WND-S-NAVY",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_1#turn7"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đã đủ thông tin để lên đơn chưa em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã lên đơn thành công cho anh. Áo sẽ được giao tới Cầu Giấy, Hà Nội dự kiến ngày 20/10. Cảm ơn anh đã đặt hàng tại shop BTC ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-20"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001",
+      "products": [
+        {
+          "sku": "SKU-JK-WND-S-NAVY",
+          "qty": 1,
+          "price_vnd": 690000
+        }
+      ],
+      "total_vnd": 690000,
+      "payment": "bank",
+      "delivery_area": "Cầu Giấy, Hà Nội",
+      "estimated_delivery": "2026-10-20"
+    }
+  }
+}

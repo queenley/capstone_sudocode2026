@@ -1,0 +1,207 @@
+{
+  "scenario_id": "SCN-GEN-0026",
+  "level": "M2",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "hard_case": "het_hang_luc_khach_quyet",
+  "customer_phone": "0960454146",
+  "customer_name": "Kiên",
+  "honorific": "anh",
+  "notes": "Persona khach_goi_lan_3_het_kien_nhan, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_3 (hotline): tư vấn, chưa chốt → hen_goi_lai. Ca khó: het_hang_luc_khach_quyet. call_3: hết hàng đúng lúc khách quyết → hẹn lại. Chấm chủ yếu: CCR, RQR, TSR, HR, ESC.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-16",
+      "customer_goal": "Hỏi về giày chạy bộ size 41 màu đen.",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về giày chạy bộ RunLite 2 Pro size 41 màu đen.",
+        "Giá của đôi giày này là bao nhiêu em?",
+        "Có khuyến mãi gì không?",
+        "À mà, anh cần suy nghĩ thêm rồi gọi lại nhé."
+      ],
+      "facts_established": {
+        "size": 41,
+        "color": "den",
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1521000,
+        "variant_sku": "SKU-SN-RUN2-41-DEN",
+        "promo_code": "RUN-10",
+        "promo_expiry": "2026-10-25"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1521000,
+        "list_price_vnd": 1690000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": true,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "size": 41,
+        "color": "den",
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1521000,
+        "variant_sku": "SKU-SN-RUN2-41-DEN",
+        "promo_code": "RUN-10"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "FAQ-09",
+        "PB-10"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 1,
+      "customer_goal": "Hỏi lại về giày chạy bộ size 41 màu đen.",
+      "customer_turns": [
+        "Alo, anh đây. Hôm qua anh có hỏi giày chạy bộ size 41 màu đen.",
+        "Còn hàng không em? Anh cần biết giá và khuyến mãi.",
+        "Nếu không có hàng thì khi nào có lại?",
+        "À thôi, anh cần suy nghĩ thêm, hẹn gọi lại sau nhé."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1521000,
+        "variant_sku": "SKU-SN-RUN2-41-DEN",
+        "promo_code": "RUN-10",
+        "promo_expiry": "2026-10-25"
+      },
+      "must_carry_over": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "24/10",
+          "ngày 24"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_stock",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1521000,
+        "list_price_vnd": 1690000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": true,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": false,
+        "restock_date": "2026-10-24",
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1521000,
+        "variant_sku": "SKU-SN-RUN2-41-DEN",
+        "promo_code": "RUN-10"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "FAQ-17",
+        "PB-01",
+        "PB-10"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_3": {
+      "days_later": 3,
+      "customer_goal": "Xác nhận mua giày chạy bộ size 41 màu đen.",
+      "customer_turns": [
+        "Alo, em ơi, anh muốn hỏi về giày chạy bộ size 41 màu đen.",
+        "Anh quyết định mua rồi, nhưng có còn hàng không?",
+        "Nếu không có hàng thì khi nào có lại?",
+        "Hẹn anh gọi lại vào ngày dự kiến có hàng nhé."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1521000,
+        "variant_sku": "SKU-SN-RUN2-41-DEN",
+        "promo_code": "RUN-10",
+        "promo_expiry": "2026-10-25"
+      },
+      "must_carry_over": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "24/10",
+          "ngày 24"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_stock",
+            "value": true
+          }
+        ],
+        "max_agent_questions": 2
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1521000,
+        "list_price_vnd": 1690000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": true,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": false,
+        "restock_date": "2026-10-24",
+        "freeship": false,
+        "call_date": "2026-10-20"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1521000,
+        "variant_sku": "SKU-SN-RUN2-41-DEN",
+        "promo_code": "RUN-10"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "FAQ-17",
+        "PB-01",
+        "PB-10"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

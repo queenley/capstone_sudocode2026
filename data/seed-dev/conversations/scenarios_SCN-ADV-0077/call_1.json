@@ -1,0 +1,186 @@
+{
+  "conversation_id": "SCN-ADV-0077__call_1",
+  "scenario_id": "SCN-ADV-0077",
+  "call": "call_1",
+  "customer_id": "SYN-C004",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-11-27",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_khieu_nai_giao_cham",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Phạm Thị D ạ, em là trợ lý ảo của shop BTC. Dạ hôm trước chị mình có đặt Máy lọc không khí Samsung AX40, em hỗ trợ chị về đơn hàng này nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900402"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị gọi để hỏi về đơn hàng máy lọc không khí mà chị đặt, nó giao chậm quá.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": "annoyed",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra thì đơn Máy lọc không khí của chị đang xử lý ạ. Em rất xin lỗi chị vì đơn hàng giao chậm hơn dự kiến.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "processing"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900402"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": "apologetic",
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đặt từ hôm 4 tháng 10 mà đến giờ vẫn chưa thấy hàng, không biết đơn đó đang ở đâu nhỉ?",
+      "facts_stated": {},
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-10-04",
+          "spoken": "hôm 4 tháng 10"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": "annoyed",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng của chị mã OD900402 hiện vẫn trong trạng thái đang xử lý, bên em chưa có mã vận đơn từ đơn vị vận chuyển ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900402"
+        },
+        {
+          "field": "order_status",
+          "value": "processing"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD900402",
+          "spoken": "mã OD900402"
+        }
+      ],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thấy trên hệ thống ghi là đang xử lý, mà sao lâu thế?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": "annoyed",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất xin lỗi vì để chị chờ lâu ạ. Đơn hàng vẫn đang chuẩn bị, khi có mã vận đơn bên em sẽ gửi ngay cho chị trên Zalo để chị tiện theo dõi trạng thái giao hàng nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "processing"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": "apologetic",
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có cách nào để chị biết chính xác khi nào hàng sẽ đến không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại bên em chưa nhận được thông tin từ đơn vị vận chuyển nên chưa thể xác nhận ngày giao chính xác, nhưng khi có cập nhật mới nhất em sẽ chủ động thông báo cho chị ngay trên Zalo ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tra_cuu_don_hang",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "channel": "zalo_oa",
+        "content": "Khi có mã vận đơn hoặc cập nhật về giao hàng sẽ chủ động báo khách trên Zalo."
+      }
+    ],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

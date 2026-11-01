@@ -1,0 +1,172 @@
+{
+  "conversation_id": "SCN-GEN-0035__call_1",
+  "scenario_id": "SCN-GEN-0035",
+  "call": "call_1",
+  "customer_id": "SYN-C002",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-16",
+  "region": "trung",
+  "category": "gia-dung/quat",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Trần Thị B ạ, em là trợ lý ảo của shop BTC. Hôm trước chị có đặt Giày trekking HikePro, em kiểm tra thông tin đơn hàng giúp chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Trần Thị B đây, chị muốn hỏi về đơn hàng OD900202 của chị.",
+      "facts_stated": {
+        "order_id": "OD900202"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị hỏi về đơn hàng OD900202 đúng không ạ, em xác nhận lại thông tin giúp chị.",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Dạ chị hỏi về đơn hàng OD900202 đúng không ạ, em xác nhận lại thông tin giúp chị."
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900203"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900203"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em không biết đơn hàng đó hiện tại đang ở đâu vậy?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra hệ thống thì đơn hàng mã OD900203 của chị đã giao thành công rồi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900203"
+        },
+        {
+          "field": "order_status",
+          "value": "delivered"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đã đặt giày trekking HikePro rồi, mà bây giờ chưa thấy giao.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị, đơn hàng OD900203 là Quạt đứng Senko, đã giao cho mình ạ. Đơn Giày trekking HikePro mã OD900202 hiện đang được xử lý, khi giao bên em sẽ báo qua Zalo hoặc gọi điện cho chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900203"
+        },
+        {
+          "field": "order_status",
+          "value": "delivered"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có thể biết khi nào thì được giao hàng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện em chưa có thông tin chính xác về thời gian giao hàng cho đơn Giày trekking HikePro của chị. Khi đơn chuyển sang trạng thái giao, shop sẽ liên hệ báo trước cho chị ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 650,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_tinh_trang_don_hang",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

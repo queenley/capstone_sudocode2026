@@ -1,0 +1,152 @@
+{
+  "scenario_id": "SCN-GEN-0050",
+  "level": "M2",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "hard_case": "asr_loi_tool_timeout",
+  "customer_phone": "0932568855",
+  "customer_name": "Lâm",
+  "honorific": "anh",
+  "notes": "Persona khach_asr_nhiem_tool_timeout, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): tư vấn, chưa chốt → hen_goi_lai. Ca khó: asr_loi_tool_timeout. call_2: hết hàng đúng lúc khách quyết → hẹn lại. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-16",
+      "input_mode": "asr_transcript",
+      "customer_goal": "Hỏi về xe đẩy gấp gọn cho bé.",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về xe đẩy gấp gọn cho bé.",
+        "Bé nhà anh được 14 tháng rồi, anh đang tìm xe đẩy phù hợp.",
+        "Anh có ngân sách khoảng 3 triệu rưỡi thôi.",
+        "Xe này có khuyến mãi gì không em?",
+        "Ờ, anh cần bàn với gia đình nữa, tối mai tầm 7 giờ em gọi lại anh nhé."
+      ],
+      "customer_turns_asr": [
+        "alo anh muon hoi ve xe day gap gon cho be",
+        "be nha anh duoc 14 thang roi anh dang tim xe day phu hop",
+        "anh co ngan sach khoang 3 trieu rưỡi thoi",
+        "xe nay co khuyen mai gi khong em",
+        "o anh can ban voi gia dinh nua toi mai tam 7 gio em goi lai anh nhe"
+      ],
+      "facts_established": {
+        "child_age_months": 14,
+        "budget_vnd": 3500000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-10-17T19:00"
+        },
+        "must_say_any": [
+          "7 giờ",
+          "19 giờ",
+          "19h",
+          "7h tối"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 3490000,
+        "list_price_vnd": 3490000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "callback_at": "2026-10-17T19:00",
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "child_age_months": 14,
+        "budget_vnd": 3500000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-02",
+        "FAQ-12",
+        "LN-01",
+        "PB-03"
+      ],
+      "fault_injection": {
+        "tool": "inventory.check",
+        "mode": "timeout"
+      },
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 9,
+      "input_mode": "asr_transcript",
+      "customer_goal": "Hỏi về xe đẩy nhưng biết hàng đã hết.",
+      "customer_turns": [
+        "Alo, anh đây, hôm trước em tư vấn cho anh về xe đẩy Joie Pact.",
+        "Anh muốn mua xe này nhưng thấy trên web không còn hàng.",
+        "Khi nào thì có hàng lại em nhỉ?",
+        "Thế thì mình hẹn lại nhé, anh không đặt được đơn lần này."
+      ],
+      "customer_turns_asr": [
+        "alo anh day hom truoc em tu van cho anh ve xe day joie pact",
+        "anh muon mua xe nay nhung thay tren web khong con hang",
+        "khi nao thi co hang lai em nhi",
+        "the thi minh hen lai nhe anh khong dat duoc don lan nay"
+      ],
+      "facts_established": {
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_stock",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 3490000,
+        "list_price_vnd": 3490000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": false,
+        "freeship": true,
+        "call_date": "2026-10-25"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-02",
+        "FAQ-12",
+        "FAQ-17",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

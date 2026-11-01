@@ -1,0 +1,280 @@
+{
+  "conversation_id": "SCN-GEN-0236__call_2",
+  "scenario_id": "SCN-GEN-0236",
+  "call": "call_2",
+  "customer_id": "SYN-C017",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-29",
+  "region": "trung",
+  "category": "gia-dung/quat",
+  "persona": "khach_cap_nhat_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop. Hôm trước anh có quan tâm Quạt đứng DC inverter Panasonic F-409 và muốn suy nghĩ thêm, hôm nay em rất vui được hỗ trợ mình tiếp tục đặt hàng.",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2450000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, anh đổi ý rồi, muốn mua quạt đứng DC inverter Panasonic F-409.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, quạt đứng DC inverter Panasonic F-409 hiện bên em còn hàng, giá 2.450.000đ ạ. Anh muốn nhận hàng tại TP Huế đúng không ạ? Em sẽ kiểm tra thời gian giao dự kiến cho anh.",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Anh muốn nhận hàng tại TP Huế đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2450000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "TP Huế",
+            "on": "2026-10-29"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán anh dùng là chuyển khoản ngân hàng.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận thanh toán chuyển khoản ngân hàng. Đơn hàng giao về TP Huế sẽ nhận trong khoảng 4 ngày làm việc, dự kiến đến ngày 03/11/2026 anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-03"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là TP Huế nhé.",
+      "facts_stated": {
+        "delivery_area": "TP Huế"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "TP Huế",
+          "spoken": "TP Huế"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, anh xác nhận nhận hàng tại TP Huế. Tổng đơn là 2.450.000đ và được miễn phí vận chuyển toàn quốc anh nhé. Em xin phép đọc lại đơn hàng để anh kiểm tra giúp em ạ: Quạt đứng DC inverter Panasonic F-409, số lượng 1 chiếc, giá 2.450.000đ, giao tại TP Huế, thanh toán chuyển khoản ngân hàng, nhận hàng dự kiến ngày 03/11/2026. Anh kiểm tra lại giúp em thông tin trên đã đúng và chốt đơn chưa ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh kiểm tra lại giúp em thông tin trên đã đúng và chốt đơn chưa ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2450000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-03"
+        },
+        {
+          "field": "freeship",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ngân sách giờ là 2.900.000đ em ạ.",
+      "facts_stated": {
+        "budget_vnd": 2900000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "2900000",
+          "spoken": "2.900.000đ"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã xác nhận. Em lên đơn Quạt đứng DC inverter Panasonic F-409, tổng 2.450.000đ, thanh toán chuyển khoản, giao tại TP Huế, nhận dự kiến ngày 03/11/2026. Shop sẽ gửi thông tin chuyển khoản và cập nhật trạng thái đơn qua Zalo hoặc SMS cho anh. Cảm ơn anh đã đặt hàng tại Shop BTC ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2450000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-03"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000017",
+            "sku": "SKU-FAN-DC1",
+            "qty": 1,
+            "price_vnd": 2450000,
+            "payment": "bank",
+            "address": "TP Huế",
+            "on": "2026-10-29"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "budget_vnd",
+          "value": 2900000,
+          "op": "supersede",
+          "source": "call_2#turn9"
+        },
+        {
+          "key": "delivery_area",
+          "value": "TP Huế",
+          "op": "set",
+          "source": "call_2#turn7"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn5"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-FAN-DC1",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 2450000,
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_mua_quat",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "budget_vnd",
+        "old_value": 3000000,
+        "new_value": 2900000
+      }
+    ],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001",
+      "sku": "SKU-FAN-DC1",
+      "qty": 1,
+      "price_vnd": 2450000,
+      "payment": "bank",
+      "address": "TP Huế",
+      "estimated_delivery": "2026-11-03"
+    }
+  }
+}

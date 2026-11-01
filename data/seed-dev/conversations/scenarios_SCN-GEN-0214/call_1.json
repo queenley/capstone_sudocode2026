@@ -1,0 +1,220 @@
+{
+  "conversation_id": "SCN-GEN-0214__call_1",
+  "scenario_id": "SCN-GEN-0214",
+  "call": "call_1",
+  "customer_id": "SYN-C001",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-05",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_kenh_mau_thuan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có đặt Máy lọc không khí AirPure Mini, hiện đang giao. Anh cần tư vấn về giày chạy bộ đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh cần tư vấn về giày chạy bộ phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về giày chạy bộ RunLite 2 Pro size 42 màu đen.",
+      "facts_stated": {
+        "product_advised": "SKU-SN-RUN2",
+        "size": 42,
+        "color": "den"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giày chạy bộ RunLite 2 Pro size 42 màu đen bên em đang có sẵn hàng ạ. Giá đang được giảm còn 1.352.000đ theo chương trình RUN2-SALE, áp dụng đến ngày 7/10.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1352000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "promo_RUN2-SALE_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Trên Fanpage thấy ghi giá là 1 triệu 352 ngàn, nhưng bên chỗ khác anh thấy ghi 1 triệu 240 ngàn.",
+      "facts_stated": {
+        "competitor_price_vnd": 1240000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã phản hồi. Bên em luôn bán hàng chính hãng, giá đã áp dụng khuyến mãi tốt nhất và kèm chính sách đổi trả 7 ngày, bảo hành 12 tháng theo hãng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1352000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có khuyến mãi gì không em, anh thấy giá bên đó có vẻ thấp hơn.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại anh được giảm giá còn 1.352.000đ theo chương trình RUN2-SALE. Ngoài ra, đơn từ 500.000đ sẽ được miễn phí vận chuyển và thu hộ COD ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_RUN2-SALE_active",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá bên em sao lại cao hơn chỗ khác nhỉ? Anh cần phải tìm hiểu thêm rồi gọi lại nhé.",
+      "facts_stated": {
+        "objection": "giá cao hơn chỗ khác"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ. Anh cứ tham khảo thêm, nếu cần hỗ trợ gì về sản phẩm, chính sách đổi trả hoặc bảo hành thì anh nhắn lại cho em bất cứ lúc nào nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "color",
+          "value": "den",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "competitor_price_vnd",
+          "value": 1240000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "objection",
+          "value": "giá cao hơn chỗ khác",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "size",
+          "value": 42,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN2",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1352000,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN2-42-DEN",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "promo_code",
+          "value": "RUN2-SALE",
+          "op": "set",
+          "source": "call_1#turn2"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_gia_giay",
+    "outcome": "hen_goi_lai",
+    "objection_type": "so_sanh_gia",
+    "objection_handling": "Nêu giá trị bảo hành, đổi trả, khuyến mãi hiện hành, không so sánh hoặc nói xấu đối thủ.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,351 @@
+{
+  "conversation_id": "SCN-GEN-0230__call_3",
+  "scenario_id": "SCN-GEN-0230",
+  "call": "call_3",
+  "customer_id": "SYN-C011",
+  "session_index": 3,
+  "channel": "hotline",
+  "date": "2026-10-27",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_kenh_mau_thuan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Nguyễn Văn An ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có quan tâm đến Giày chạy bộ RunLite 2 Pro và từng phản hồi giá cao hơn chỗ khác; hôm nay anh muốn chốt đơn đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Hôm nay anh muốn chốt đơn đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "objection",
+        "size",
+        "competitor_price_vnd",
+        "variant_sku",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 900,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh gọi lại để đặt giày chạy bộ RunLite 2 Pro size 42 màu đen nhé.",
+      "facts_stated": {
+        "product_advised": "SKU-SN-RUN2",
+        "size": 42,
+        "color": "den"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận anh chọn Giày chạy bộ RunLite 2 Pro size 42 màu đen ạ. Sản phẩm hiện còn hàng tại shop.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "size",
+        "color"
+      ],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán sẽ là COD, giao hàng ở Hải Châu, Đà Nẵng.",
+      "facts_stated": {
+        "payment": "COD",
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xác nhận địa chỉ giao hàng là Hải Châu, Đà Nẵng và anh chọn thanh toán khi nhận hàng (COD) ạ. Đơn của anh sẽ được giao dự kiến trong 2 ngày làm việc, khoảng ngày 29/10.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "delivery_days",
+          "value": 2
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-29"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Hải Châu, Đà Nẵng",
+            "on": "2026-10-27"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chắc chắn là anh muốn mua, giá bao nhiêu vậy?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giá hiện tại của Giày chạy bộ RunLite 2 Pro size 42 màu đen là 1.690.000đ anh nhé. Giá này đã áp dụng theo chính sách hiện hành, không còn chương trình giảm giá RUN-10 như trước ạ.",
+      "questions": [],
+      "facts_used": [
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "promo_RUN-10_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1690000",
+          "spoken": "1.690.000đ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu mọi thứ ổn, anh sẽ chốt đơn ngay.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em xin phép xác nhận lại đơn: Giày chạy bộ RunLite 2 Pro size 42 màu đen, 1 đôi, giá 1.690.000đ, giao tại Hải Châu, Đà Nẵng và thanh toán COD khi nhận hàng, dự kiến giao ngày 29/10. Anh xác nhận giúp em thông tin trên trước khi em lên đơn nhé?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh xác nhận giúp em các thông tin trên trước khi em lên đơn nhé?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "size",
+        "color",
+        "delivery_area",
+        "payment",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "delivery_days",
+          "value": 2
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-29"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1690000",
+          "spoken": "1.690.000đ"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-29",
+          "spoken": "29/10"
+        }
+      ],
+      "pause_before_ms": 850,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh xác nhận, lên đơn giúp anh nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã lên đơn thành công cho anh. Mã đơn của anh là OD600001, shop sẽ giao hàng dự kiến ngày 29/10 và miễn phí thu hộ COD. Cảm ơn anh đã đặt hàng tại BTC, chúc anh nhiều sức khỏe và niềm vui ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-29"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000011",
+            "sku": "SKU-SN-RUN2-42-DEN",
+            "qty": 1,
+            "price_vnd": 1690000,
+            "payment": "COD",
+            "address": "Hải Châu, Đà Nẵng",
+            "on": "2026-10-27"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Hải Châu, Đà Nẵng",
+          "op": "set",
+          "source": "call_3#turn9"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_3#turn9"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN2",
+          "op": "set",
+          "source": "call_3#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1690000,
+          "op": "set",
+          "source": "call_3#turn9"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN2-42-DEN",
+          "op": "set",
+          "source": "call_3#turn9"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_3#turn9"
+        }
+      ],
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD600001",
+          "spoken": "OD600001"
+        }
+      ],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xac_nhan_dat_giay_runlite_2",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "price_quoted_vnd",
+        "old_value": 1521000,
+        "new_value": 1690000
+      }
+    ],
+    "callback": null,
+    "order": {
+      "sku": "SKU-SN-RUN2-42-DEN",
+      "qty": 1,
+      "price_vnd": 1690000,
+      "payment": "COD",
+      "address": "Hải Châu, Đà Nẵng",
+      "order_id": "OD600001"
+    }
+  }
+}

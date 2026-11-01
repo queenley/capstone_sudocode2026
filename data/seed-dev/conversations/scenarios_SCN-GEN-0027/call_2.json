@@ -1,0 +1,289 @@
+{
+  "conversation_id": "SCN-GEN-0027__call_2",
+  "scenario_id": "SCN-GEN-0027",
+  "call": "call_2",
+  "customer_id": "C017",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-20",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_da_kenh_fb_hotline",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Hạnh ạ, hôm trước chị có quan tâm Xe đẩy gấp gọn Joie Pact và muốn gọi hotline hỏi thêm đúng không ạ? Em là trợ lý ảo của shop, chị cần hỗ trợ lên đơn ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "hôm trước chị có quan tâm Xe đẩy gấp gọn Joie Pact và muốn gọi hotline hỏi thêm đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn đặt xe đẩy gấp gọn Joie Pact.",
+      "facts_stated": {
+        "product_advised": "SKU-MB-STR1"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ xe đẩy gấp gọn Joie Pact đang còn hàng, giá 3.490.000đ, được miễn phí vận chuyển toàn quốc theo chương trình MOM-FREESHIP. Em xác nhận chị muốn lấy 1 xe Joie Pact đúng không ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em xác nhận chị muốn lấy 1 xe Joie Pact đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán là COD nhé.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị chọn thanh toán COD. Chị muốn giao về Quận 7, TP.HCM đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Chị muốn giao về Quận 7, TP.HCM đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giao hàng ở Quận 7, TP.HCM.",
+      "facts_stated": {
+        "delivery_area": "Quận 7, TP.HCM"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Quận 7, TP.HCM",
+          "spoken": "Quận 7, TP.HCM"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng sẽ được giao dự kiến trong 2 ngày làm việc, khoảng ngày 22/10. Đơn dưới 10 triệu nên chị thanh toán khi nhận hàng, được kiểm tra ngoại quan trước khi thanh toán ạ. Trước khi giao, sẽ có nhân viên gọi xác nhận đơn với chị.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "delivery_days",
+          "value": 2
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-22"
+        },
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-10-20"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đồng ý lên đơn luôn.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em đã tạo đơn cho chị: 1 xe đẩy Joie Pact, giá 3.490.000đ, giao về Quận 7, TP.HCM, thanh toán COD. Dự kiến nhận hàng ngày 22/10. Nhân viên sẽ gọi xác nhận đơn trước khi giao ạ. Em cảm ơn chị đã đặt hàng tại shop!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-22"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0994893949",
+            "sku": "SKU-MB-STR1",
+            "qty": 1,
+            "price_vnd": 3490000,
+            "payment": "COD",
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-10-20"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Quận 7, TP.HCM",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-STR1",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 3490000,
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-MB-STR1",
+      "qty": 1,
+      "price_vnd": 3490000,
+      "payment": "COD",
+      "address": "Quận 7, TP.HCM",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-10-22"
+    }
+  }
+}

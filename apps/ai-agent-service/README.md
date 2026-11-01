@@ -44,7 +44,7 @@ flowchart LR
 Giao diện trên web:
 
 - khách bấm **☏ Gọi cửa hàng** để gọi thoại;
-- nhân viên dùng `/calls` (hàng chờ, nhận handoff, gợi ý copilot, lưu FAQ, bằng chứng);
+- nhân viên dùng `/calls` (hàng chờ, nhận handoff, gợi ý copilot, lưu FAQ, bằng chứng); tin khách khiến AI chuyển máy và tin gửi lúc chờ được tô đỏ (`turns.meta.handoff`), ca mới được báo bằng thông báo;
 - developer dùng `/developer` (model, độ trễ p95, lượt, voice, ngày nghiệp vụ).
 
 Khi cuộc gọi kết thúc, after_call chạy MemoryAgent (ghi fact ledger) và QaAgent (chấm điểm cuộc gọi). Cuộc gọi kết thúc khi nhân viên bấm kết thúc, khi Sales đóng conversation, hoặc sau 30 phút im lặng; reconciler kiểm tra mỗi phút.
@@ -107,6 +107,8 @@ Thư mục ngoài `src/`:
 | order | `order_status`, `order_update` |
 | memory | `identity_find`, `identity_link_provisional`, `memory_get_profile`, `memory_get_episodes`, `memory_get_open_items`, `memory_commit_*`, `memory_confirm_identity`, `memory_request_deletion`, `memory_delete_customer` |
 | knowledge | `kb_search` (harness, admin), `kb_upsert` (chỉ admin) |
+
+`order_create` nhận thêm hai tham số tùy chọn của nhóm (BTC cho phép thêm): `basket_skus` (các món khác trong cùng đơn, chuyển thẳng cho mock để máy thứ hai được AIR-2ND-50) và `order_group` ("1"/"2" khi khách đồng ý tách một đơn COD trên 10 triệu; không gửi xuống mock, guard đọc nó). `delivery_estimate` là hàm thuần trong `mcp/servers/delivery.py`, để bộ sinh dữ liệu dùng chung đúng quy tắc giao hàng.
 
 Catalog, CRM và order bọc `mock_tools.py` của BTC. Trạng thái mock (đơn đã tạo, lịch gọi lại, khuyến mãi đã dùng) lưu ở một dòng `mock_state` có khóa advisory, nên ba tiến trình thấy cùng một trạng thái và vẫn còn sau restart. Nhờ vậy giá, khuyến mãi, tồn kho và giới hạn COD luôn khớp với cách BTC chấm. Trên dây, tên tool dùng dấu chấm (`catalog.search`) như trong đề.
 

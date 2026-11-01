@@ -1,0 +1,305 @@
+{
+  "scenario_id": "SCN-GEN-0214",
+  "level": "M2",
+  "persona": "khach_da_kenh_mau_thuan",
+  "hard_case": "ba_kenh_bao_gia_lech",
+  "customer_phone": "0998000001",
+  "customer_name": "Nguyễn Văn A",
+  "honorific": "anh",
+  "notes": "Persona khach_da_kenh_mau_thuan, biến thể ba_kenh_lech_gia. call_1 (chat_fanpage): tư vấn, chưa chốt → hen_goi_lai; call_2 (zalo_oa): tư vấn, chưa chốt → hen_goi_lai; call_3 (hotline): chốt đơn → chot_don. Ca khó: ba_kenh_bao_gia_lech. call_2: giá đổi 1.352.000đ → 1.521.000đ. call_2: KM RUN2-SALE không còn áp dụng. call_3: giá đổi 1.521.000đ → 1.690.000đ. call_3: KM RUN-10 không còn áp dụng. Chấm chủ yếu: CCR, RQR, TSR, HR, ESC.",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.a.900",
+      "call_date": "2026-10-05",
+      "customer_goal": "Hỏi về giày chạy bộ RunLite 2 Pro size 42 màu đen.",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về giày chạy bộ RunLite 2 Pro size 42 màu đen.",
+        "Trên Fanpage thấy ghi giá là 1 triệu 352 ngàn, nhưng bên chỗ khác anh thấy ghi 1 triệu 240 ngàn.",
+        "Có khuyến mãi gì không em, anh thấy giá bên đó có vẻ thấp hơn.",
+        "Giá bên em sao lại cao hơn chỗ khác nhỉ? Anh cần phải tìm hiểu thêm rồi gọi lại nhé."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C001",
+          "session_id": "SYN-001-S1",
+          "date": "2026-03-01",
+          "channel": "hotline",
+          "summary": "Mua Máy lọc không khí AirPure X giá 4.890.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C001",
+          "session_id": "SYN-001-S2",
+          "date": "2026-10-01",
+          "channel": "zalo_oa",
+          "summary": "Đặt Máy lọc không khí AirPure Mini giá 2.190.000đ, đơn OD900102 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C001",
+          "order_id": "OD900101",
+          "date": "2026-03-01",
+          "sku": "SKU-AP-X",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AP-X"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C001",
+          "order_id": "OD900102",
+          "date": "2026-10-01",
+          "sku": "SKU-AP-MINI",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900102"
+          }
+        }
+      ],
+      "facts_established": {
+        "color": "den",
+        "competitor_price_vnd": 1240000,
+        "objection": "giá cao hơn chỗ khác",
+        "size": 42,
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1352000,
+        "variant_sku": "SKU-SN-RUN2-42-DEN",
+        "promo_code": "RUN2-SALE",
+        "promo_expiry": "2026-10-07"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1352000,
+        "list_price_vnd": 1690000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_RUN2-SALE_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-05"
+      },
+      "memory_expectation": {
+        "color": "den",
+        "competitor_price_vnd": 1240000,
+        "objection": "giá cao hơn chỗ khác",
+        "size": 42,
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1352000,
+        "variant_sku": "SKU-SN-RUN2-42-DEN",
+        "promo_code": "RUN2-SALE"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "FAQ-09",
+        "PB-02",
+        "PB-04",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_a01",
+      "days_later": 10,
+      "customer_goal": "Hỏi lại về giày chạy bộ RunLite 2 Pro.",
+      "customer_turns": [
+        "Chào em, hôm trước anh có hỏi về giày chạy bộ RunLite 2 Pro.",
+        "Giá hôm trước em báo là 1 triệu 521 ngàn, có khuyến mãi gì không nhỉ?",
+        "Anh muốn biết thêm thông tin, nhưng thực sự giá vẫn cao hơn giá chỗ khác.",
+        "Anh cần suy nghĩ thêm rồi sẽ gọi lại nhé."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1521000,
+        "variant_sku": "SKU-SN-RUN2-42-DEN",
+        "promo_code": "RUN-10",
+        "promo_expiry": "2026-10-25"
+      },
+      "must_carry_over": [
+        "size",
+        "objection",
+        "competitor_price_vnd",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "price_vnd",
+            "value": 1352000
+          },
+          {
+            "field": "promo_RUN2-SALE_active",
+            "value": true
+          },
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1521000,
+        "list_price_vnd": 1690000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": true,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-15"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1521000,
+        "variant_sku": "SKU-SN-RUN2-42-DEN",
+        "promo_code": "RUN-10",
+        "superseded": {
+          "price_quoted_vnd": 1352000,
+          "promo_code": "RUN2-SALE",
+          "promo_expiry": "2026-10-07"
+        }
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "KM-01",
+        "CL-02",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_3": {
+      "days_later": 12,
+      "customer_goal": "Xác nhận mua giày chạy bộ RunLite 2 Pro.",
+      "customer_turns": [
+        "Alo, anh muốn đặt giày chạy bộ RunLite 2 Pro size 42 màu đen.",
+        "Hình thức thanh toán là COD, anh giao hàng ở quận Lê Chân, Hải Phòng.",
+        "Anh thấy giá là 1 triệu 690 ngàn, cho anh hỏi lại có khuyến mãi gì không?",
+        "Ok, anh đồng ý lên đơn cho anh nhé."
+      ],
+      "facts_established": {
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "payment": "COD",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-42-DEN",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "size",
+        "objection",
+        "competitor_price_vnd",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-RUN2-42-DEN",
+          "price_vnd": 1690000,
+          "payment": "COD"
+        },
+        "forbidden_claims": [
+          {
+            "field": "price_vnd",
+            "value": 1521000
+          },
+          {
+            "field": "promo_RUN-10_active",
+            "value": true
+          },
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1690000,
+        "list_price_vnd": 1690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-10-31",
+        "call_date": "2026-10-27"
+      },
+      "memory_expectation": {
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "payment": "COD",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-42-DEN",
+        "order_id": "OD600001",
+        "superseded": {
+          "price_quoted_vnd": 1521000
+        }
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "KM-01",
+        "CL-02",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

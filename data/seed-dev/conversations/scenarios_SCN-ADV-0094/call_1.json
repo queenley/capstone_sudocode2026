@@ -1,0 +1,212 @@
+{
+  "conversation_id": "SCN-ADV-0094__call_1",
+  "scenario_id": "SCN-ADV-0094",
+  "call": "call_1",
+  "customer_id": "C005",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-11-12",
+  "region": "bac",
+  "category": "thoi-trang/ao-khoac",
+  "persona": "khach_hoi_thong_tin_nguoi_khac",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Hương ạ, em là trợ lý ảo của shop BTC, chị cần tư vấn về áo phao lông vũ Warmly đúng không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Hương đây, em ơi cho chị hỏi về áo phao lông vũ Warmly size M màu be.",
+      "facts_stated": {
+        "size": "M",
+        "color": "be"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ áo phao lông vũ Warmly size M màu be bên em hiện còn hàng chị nhé. Áo này là dáng dài, chất lông vũ tự nhiên, rất nhẹ và giữ ấm tốt ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có thấy trên trang có ghi là áo này 1 triệu 490 ngàn, đúng không em?",
+      "facts_stated": {},
+      "entities": [
+        {
+          "type": "money",
+          "value": "1490000",
+          "spoken": "1 triệu 490 ngàn"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi chị, giá áo phao lông vũ Warmly size M màu be hiện tại là 1.490.000đ chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có còn hàng không em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ áo bên em còn hàng sẵn kho luôn chị ạ, chị có thể đặt bất cứ lúc nào mình cần nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đang chờ cuối tháng mới nhận lương, nên chưa thể chốt đơn được.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị Hương đang chờ cuối tháng nhận lương rồi ạ. Khi nào chị thuận tiện, mình cứ nhắn lại cho shop là em hỗ trợ giữ thông tin sản phẩm cho chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em lưu số cho chị nhé, chị sẽ gọi lại sau khi nhận lương.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã lưu thông tin chị Hương muốn tư vấn áo Warmly size M màu be và sẽ chờ chị liên hệ lại sau khi nhận lương ạ. Em cảm ơn chị, chúc chị một ngày vui vẻ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "size",
+          "value": "M",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "color",
+          "value": "be",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-JK-DWN",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1490000,
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-JK-DWN-M-BE",
+          "op": "set",
+          "source": "call_1#turn10"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

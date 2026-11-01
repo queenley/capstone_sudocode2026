@@ -1,0 +1,289 @@
+{
+  "conversation_id": "SCN-ADV-0018__call_2",
+  "scenario_id": "SCN-ADV-0018",
+  "call": "call_2",
+  "customer_id": "ANON-001",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-19",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_chua_co_danh_tinh",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị, hôm trước chị có quan tâm Xe đẩy gấp gọn Joie Pact và còn để bàn với gia đình ạ; hôm nay chị muốn xác nhận đặt mua đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Hôm trước chị có quan tâm Xe đẩy gấp gọn Joie Pact và còn để bàn với gia đình ạ; hôm nay chị muốn xác nhận đặt mua đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, chị muốn xác nhận mua xe đẩy gấp gọn Joie Pact.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, hiện Xe đẩy gấp gọn Joie Pact đang còn hàng với giá 3.490.000đ, được miễn phí vận chuyển toàn quốc theo chương trình MOM-FREESHIP. Em ghi nhận chị chọn thanh toán qua ngân hàng nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thanh toán qua ngân hàng nhé.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị nhận hàng tại Thủ Đức, TP.HCM đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Chị nhận hàng tại Thủ Đức, TP.HCM đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giao hàng cho chị ở Thủ Đức, TP.HCM.",
+      "facts_stated": {
+        "delivery_area": "Thủ Đức, TP.HCM"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Đơn của chị gồm 1 xe đẩy gấp gọn Joie Pact, giá 3.490.000đ, thanh toán chuyển khoản, giao miễn phí tới Thủ Đức, TP.HCM dự kiến ngày 21/10. Chị kiểm tra lại giúp em, thông tin đã đúng hết chưa để em lên đơn cho chị nhé?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Đơn của chị gồm 1 xe đẩy gấp gọn Joie Pact, giá 3.490.000đ, thanh toán chuyển khoản, giao miễn phí tới Thủ Đức, TP.HCM dự kiến ngày 21/10. Chị kiểm tra lại giúp em, thông tin đã đúng hết chưa để em lên đơn cho chị nhé?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "delivery_days",
+          "value": 2
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-21"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Thủ Đức, TP.HCM",
+            "on": "2026-10-19"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-10-21",
+          "spoken": "21/10"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chốt đơn cho chị nhé!",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã tạo đơn hàng cho chị rồi ạ. Cảm ơn chị đã mua Xe đẩy gấp gọn Joie Pact tại shop, có mã đơn OD600001, shop sẽ giao hàng dự kiến vào ngày 21/10. Nếu cần hỗ trợ thêm, chị cứ liên hệ lại cho bên em nhé!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-21"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0977000000",
+            "sku": "SKU-MB-STR1",
+            "qty": 1,
+            "price_vnd": 3490000,
+            "payment": "bank",
+            "address": "Thủ Đức, TP.HCM",
+            "on": "2026-10-19"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Thủ Đức, TP.HCM",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-STR1",
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 3490000,
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn8"
+        }
+      ],
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD600001",
+          "spoken": "OD600001"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-21",
+          "spoken": "21/10"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xac_nhan_mua_xe_day",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-MB-STR1",
+      "qty": 1,
+      "price_vnd": 3490000,
+      "payment": "bank",
+      "address": "Thủ Đức, TP.HCM",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-10-21"
+    }
+  }
+}

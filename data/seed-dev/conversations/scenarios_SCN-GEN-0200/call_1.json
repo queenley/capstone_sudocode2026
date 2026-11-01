@@ -1,0 +1,227 @@
+{
+  "conversation_id": "SCN-GEN-0200__call_1",
+  "scenario_id": "SCN-GEN-0200",
+  "call": "call_1",
+  "customer_id": "C042",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-13",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em hỗ trợ chị về máy lọc không khí Xiaomi Smart 4 Pro cho phòng 40 mét vuông đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Em xác nhận chị đang quan tâm máy lọc không khí Xiaomi Smart 4 Pro cho phòng 40 mét vuông đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo chi muon hoi ve may loc khong khi xiaomi smart 4 pro cho phong khoang 40 met vuong",
+      "facts_stated": {
+        "room_area_m2": 40
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với phòng khoảng 40 mét vuông, Xiaomi Smart 4 Pro là mẫu phù hợp chị nhé. Máy có khoá trẻ em, lọc bụi mịn, khử mùi và còn hàng sẵn tại shop ạ.",
+      "questions": [
+        {
+          "slot": "has_children",
+          "type": "confirm",
+          "text": "Nhà mình có bé nhỏ đúng không chị?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "nha chi co be nho ngan sach khoang 6 trieu rưỡi thoi",
+      "facts_stated": {
+        "has_children": true,
+        "budget_vnd": 6500000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giá máy đang là 5.490.000đ, nằm trong ngân sách của chị. Chị có thể cân nhắc chương trình tặng kèm màng lọc thay thế khi mua máy trong hôm nay và ngày mai ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "promo_XM-COMBO_active",
+          "value": true
+        },
+        {
+          "field": "promo_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5490000",
+          "spoken": "5.490.000"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "may nay hien co khuyen mai gi khong em",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại mua Xiaomi Smart 4 Pro chị được tặng kèm một màng lọc thay thế chính hãng, chương trình áp dụng hết ngày mai ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_XM-COMBO_active",
+          "value": true
+        },
+        {
+          "field": "gift_sku",
+          "value": "SKU-XM-FLT"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chi cho cuoi thang nhan luong roi goi lai em nhe",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận, chị có thể gọi lại khi thuận tiện hoặc nếu cần giữ khuyến mãi em sẽ hỗ trợ kiểm tra lại chương trình giúp chị trước khi đặt. Em cảm ơn chị đã quan tâm ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 6500000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 40,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-XM-4P",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5490000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "promo_code",
+          "value": "XM-COMBO",
+          "op": "set",
+          "source": "call_1#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chờ lương",
+    "objection_handling": "Nhắc khách chương trình còn đến ngày mai, hẹn khách liên hệ lại khi thuận tiện.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

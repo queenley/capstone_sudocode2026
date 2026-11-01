@@ -1,0 +1,227 @@
+{
+  "conversation_id": "SCN-GEN-0010__call_3",
+  "scenario_id": "SCN-GEN-0010",
+  "call": "call_3",
+  "customer_id": "C004",
+  "session_index": 3,
+  "channel": "hotline",
+  "date": "2026-10-20",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Minh ạ, hôm trước anh có hỏi về máy lọc không khí AirPure Pro và đang chờ cuối tháng nhận lương đúng không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Hôm trước anh nói đang chờ cuối tháng nhận lương, hiện mình muốn tiếp tục tư vấn sản phẩm không ạ?"
+        }
+      ],
+      "facts_used": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh gọi lại về máy lọc không khí AirPure Pro.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ AirPure Pro hiện vẫn chưa có hàng anh ạ, bên em dự kiến về lại vào ngày 21/10.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        },
+        {
+          "field": "restock_date",
+          "value": "2026-10-21"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hôm trước em nói máy hết hàng, giờ có chưa?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giá máy AirPure Pro hiện là 7.690.000đ, đã áp dụng khuyến mãi AIR-OCT. Giá này giữ đến hết chương trình ngày 30/10 anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "7690000",
+          "spoken": "7.690.000đ"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá vẫn là 7 triệu 6 đúng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy dự kiến có hàng lại vào ngày 21/10 anh nhé. Anh có muốn em giữ thông tin và báo lại khi hàng về không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh có muốn em giữ thông tin và báo lại khi hàng về không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "restock_date",
+          "value": "2026-10-21"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu có hàng thì khi nào mới có lại?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em ghi nhận lại thông tin của anh. Khi máy AirPure Pro về hàng ngày 21/10, em sẽ liên hệ lại để báo anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "restock_date",
+          "value": "2026-10-21"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_3#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7690000,
+          "op": "set",
+          "source": "call_3#turn9"
+        },
+        {
+          "key": "promo_code",
+          "value": "AIR-OCT",
+          "op": "set",
+          "source": "call_3#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thôi, để anh gọi lại sau nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "remind_on_restock": "2026-10-21"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "date": "2026-10-21",
+      "reason": "Báo lại khi AirPure Pro về hàng"
+    },
+    "order": null
+  }
+}

@@ -1,0 +1,287 @@
+{
+  "conversation_id": "SCN-GEN-0136__call_2",
+  "scenario_id": "SCN-GEN-0136",
+  "call": "call_2",
+  "customer_id": "SYN-C001",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-16",
+  "region": "bac",
+  "category": "gia-dung/combo",
+  "persona": "khach_cap_nhat_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Nguyễn Văn A ạ, hôm trước anh có hỏi về Combo AirPure Y + 2 màng lọc nhưng còn chờ cuối tháng nhận lương. Em báo lại là chương trình 11-11 đã hết hiệu lực, giá hiện tại là 6.390.000đ ạ.",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6390000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh đổi ý rồi em, anh muốn đặt cái Combo AirPure Y luôn.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, Combo AirPure Y + 2 màng lọc hiện vẫn còn hàng anh nhé. Em lên đơn cho anh luôn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán thì anh chọn COD nhé.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh chọn thanh toán khi nhận hàng, em ghi nhận ạ. Anh xác nhận giúp em địa chỉ giao hàng vẫn là Cầu Giấy, Hà Nội đúng không anh?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Anh xác nhận giúp em địa chỉ giao hàng vẫn là Cầu Giấy, Hà Nội đúng không anh?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là Cầu Giấy, Hà Nội.",
+      "facts_stated": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Cầu Giấy, Hà Nội",
+          "spoken": "Cầu Giấy, Hà Nội"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã xác nhận. Tổng đơn là 6.390.000đ, giao về Cầu Giấy, Hà Nội và thanh toán COD. Anh xác nhận lại các thông tin này để em lên đơn nhé?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Tổng đơn là 6.390.000đ, giao Cầu Giấy, Hà Nội, thanh toán COD. Anh xác nhận lại các thông tin này để em lên đơn nhé?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6390000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ngân sách của anh giờ là 7 triệu bảy trăm nghìn.",
+      "facts_stated": {
+        "budget_vnd": 7700000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "7700000",
+          "spoken": "7 triệu bảy trăm nghìn"
+        }
+      ],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em lên đơn cho anh với giá 6.390.000đ, sẽ giao dự kiến trong 2 ngày tới, khoảng ngày 18/11. Đơn này cần nhân viên bên em gọi xác nhận trước khi giao anh nhé.",
+      "questions": [],
+      "facts_used": [
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6390000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-18"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000001",
+            "sku": "SKU-BDL-AIR",
+            "qty": 1,
+            "price_vnd": 6390000,
+            "payment": "COD",
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-11-16"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mong là hàng sẽ giao nhanh cho anh.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã tạo đơn thành công, dự kiến giao ngày 18/11 anh nhé. Nhân viên bên em sẽ gọi xác nhận đơn trước khi giao ạ. Em cảm ơn anh đã đặt hàng tại shop!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-18"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Cầu Giấy, Hà Nội",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 7700000,
+          "op": "supersede",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-BDL-AIR",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 6390000,
+          "op": "supersede",
+          "source": "call_2#turn7"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "budget_vnd",
+        "old_value": 6500000,
+        "new_value": 7700000
+      },
+      {
+        "slot": "price_quoted_vnd",
+        "old_value": 5431500,
+        "new_value": 6390000
+      }
+    ],
+    "callback": null,
+    "order": {
+      "sku": "SKU-BDL-AIR",
+      "qty": 1,
+      "price_vnd": 6390000,
+      "payment": "COD",
+      "delivery_area": "Cầu Giấy, Hà Nội",
+      "order_id": "OD600001"
+    }
+  }
+}

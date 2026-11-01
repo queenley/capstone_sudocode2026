@@ -1,0 +1,171 @@
+{
+  "conversation_id": "SCN-GEN-0038__call_2",
+  "scenario_id": "SCN-GEN-0038",
+  "call": "call_2",
+  "customer_id": "C042",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-25",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Nga ạ, em là trợ lý ảo của shop BTC. Hôm trước chị quan tâm Xe đẩy gấp gọn Joie Pact nhưng còn cần hỏi chồng, em rất vui được hỗ trợ lại chị hôm nay.",
+      "questions": [],
+      "facts_used": [
+        "decision_maker",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Nga đây. Em gọi lại chị đúng giờ đấy nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã giữ liên hệ với shop ạ. Em xin cập nhật với chị, hiện tại Xe đẩy Joie Pact đang tạm hết hàng, nên mình chưa lên đơn được ngay chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hôm trước em có tư vấn cho chị về xe đẩy Joie Pact, nhưng nghe nói hết hàng rồi đúng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi chị ạ, sản phẩm Xe đẩy gấp gọn Joie Pact mình quan tâm hiện đang hết hàng tại shop. Em rất tiếc vì bất tiện này, chị thông cảm giúp em nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn biết khi nào có hàng lại để chị đặt.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện em chưa có thông tin cụ thể về ngày hàng về tiếp theo. Em đã ghi nhận nhu cầu của chị và sẽ liên hệ báo ngay khi Xe đẩy Joie Pact có hàng trở lại ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu có hàng lại thì em báo chị sớm nhé, chị cần gấp lắm.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em sẽ ưu tiên báo ngay cho chị khi có hàng mới về. Cảm ơn chị Nga đã quan tâm sản phẩm của shop, chúc chị một ngày tốt lành ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-STR1",
+          "op": "set",
+          "source": "call_2#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 3490000,
+          "op": "set",
+          "source": "call_2#turn9"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_2#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": "chồng",
+    "commitments": [
+      {
+        "promise": "báo lại khi có hàng"
+      }
+    ],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

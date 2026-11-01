@@ -1,0 +1,60 @@
+[
+  {
+    "name": "delivery_estimate",
+    "args": {
+      "address": "Hải Châu, Đà Nẵng",
+      "on": "2026-10-23"
+    },
+    "result": {
+      "address_known": true,
+      "delivery_days": 2,
+      "estimated_delivery": "2026-10-27"
+    }
+  },
+  {
+    "name": "order.create",
+    "args": {
+      "customer_phone": "0925877188",
+      "sku": "SKU-AP-PRO",
+      "qty": 1,
+      "price_vnd": 7690000,
+      "payment": "COD",
+      "address": "Hải Châu, Đà Nẵng",
+      "on": "2026-10-23",
+      "basket_skus": [
+        "SKU-SS-AX40"
+      ],
+      "order_group": "1"
+    },
+    "result": {
+      "order_id": "OD600001",
+      "status": "created",
+      "total_vnd": 7690000,
+      "needs_confirmation_call": true,
+      "estimated_delivery": "2026-10-27"
+    }
+  },
+  {
+    "name": "order.create",
+    "args": {
+      "customer_phone": "0925877188",
+      "sku": "SKU-SS-AX40",
+      "qty": 1,
+      "price_vnd": 3245000,
+      "payment": "COD",
+      "address": "Hải Châu, Đà Nẵng",
+      "on": "2026-10-23",
+      "basket_skus": [
+        "SKU-AP-PRO"
+      ],
+      "order_group": "2"
+    },
+    "result": {
+      "order_id": "OD600002",
+      "status": "created",
+      "total_vnd": 3245000,
+      "needs_confirmation_call": true,
+      "estimated_delivery": "2026-10-27"
+    }
+  }
+]

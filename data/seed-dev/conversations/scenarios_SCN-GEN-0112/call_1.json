@@ -1,0 +1,178 @@
+{
+  "conversation_id": "SCN-GEN-0112__call_1",
+  "scenario_id": "SCN-GEN-0112",
+  "call": "call_1",
+  "customer_id": "C023",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-29",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_ngoai_pham_vi_chuyen_may",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, chị cần tư vấn về sản phẩm nào cho bé ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về bình sữa Pigeon PPSU 240ml cho bé 2 tháng tuổi.",
+      "facts_stated": {
+        "child_age_months": 2
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ bình sữa Pigeon PPSU 240ml phù hợp cho bé sơ sinh và trẻ nhỏ, chị nhé. Sản phẩm này hiện đang có sẵn tại shop ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá bình sữa này là bao nhiêu vậy em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, bình sữa này giá 289.000đ chị nhé. Giá đã bao gồm thuế và shop có hỗ trợ miễn phí thu hộ khi thanh toán COD toàn quốc ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 289000
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có ngân sách khoảng 500 ngàn thôi.",
+      "facts_stated": {
+        "budget_vnd": 500000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm này nằm trong ngân sách của chị, nếu chị cần thêm lựa chọn cho bé, em có thể tư vấn thêm các dòng bình khác phù hợp ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, chị chờ cuối tháng chị nhận lương rồi gọi lại nhé.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em ghi nhận chị sẽ gọi lại khi thuận tiện hơn ạ. Em luôn sẵn sàng hỗ trợ khi chị cần tư vấn thêm cho bé nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "child_age_months",
+          "value": 2,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 500000,
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-BOT",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 289000,
+          "op": "set",
+          "source": "call_1#turn4"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_gia_binh_sua",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chua_muon_mua",
+    "objection_handling": "Ghi nhận và hẹn khách gọi lại khi thuận tiện.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

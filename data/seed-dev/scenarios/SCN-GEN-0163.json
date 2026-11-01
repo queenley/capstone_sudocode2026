@@ -1,0 +1,132 @@
+{
+  "scenario_id": "SCN-GEN-0163",
+  "level": "M2",
+  "persona": "khach_hoi_ngoai_tai_lieu",
+  "hard_case": "phien_ban_chinh_sach_cu",
+  "customer_phone": "0984726714",
+  "customer_name": "Hoa",
+  "honorific": "chị",
+  "notes": "Persona khach_hoi_ngoai_tai_lieu, biến thể chinh_sach_cu. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): dẫn chính sách cũ → thong_tin. Ca khó: phien_ban_chinh_sach_cu. call_1 ngày 15/10: ngày sản phẩm hết hàng tạm thời (FAQ-17: báo ngày có lại, không tạo đơn). Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-15",
+      "customer_goal": "Hỏi về máy lọc không khí Xiaomi Smart 4 Pro",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về cái máy lọc không khí Xiaomi Smart 4 Pro.",
+        "Chị có phòng khoảng 15 mét vuông á.",
+        "Ngân sách của chị tầm 6 triệu rưỡi, không biết máy này có khuyến mãi gì không?",
+        "Chị nghe nói máy này hết hàng, không biết khi nào có lại?",
+        "Chị cần phải chờ cuối tháng mới nhận lương, chị sẽ gọi lại sau nhé."
+      ],
+      "facts_established": {
+        "blocker": "chờ cuối tháng nhận lương",
+        "budget_vnd": 6500000,
+        "has_children": false,
+        "room_area_m2": 15,
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "promo_code": "XM-COMBO",
+        "promo_expiry": "2026-11-14"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "19/10",
+          "ngày 19"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_stock",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5490000,
+        "list_price_vnd": 5490000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_XM-COMBO_active": true,
+        "gift_sku": "SKU-XM-FLT",
+        "in_stock": false,
+        "restock_date": "2026-10-19",
+        "call_date": "2026-10-15"
+      },
+      "memory_expectation": {
+        "blocker": "chờ cuối tháng nhận lương",
+        "budget_vnd": 6500000,
+        "has_children": false,
+        "room_area_m2": 15,
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "promo_code": "XM-COMBO"
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "KM-07",
+        "FAQ-17"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 3,
+      "customer_goal": "Xác nhận chính sách đổi trả",
+      "customer_turns": [
+        "Chị đọc trên web thấy ghi là có thể đổi trả trong 14 ngày.",
+        "Và hình như phí đổi size là 20 nghìn đúng không em?",
+        "Chị muốn chắc chắn lại vì chị thấy chính sách cũ có vẻ khác.",
+        "Chị không biết chính sách này có còn hiệu lực không nữa."
+      ],
+      "must_carry_over": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "7 ngày",
+          "bảy ngày"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "return_days",
+            "value": 14
+          },
+          {
+            "field": "exchange_fee_vnd",
+            "value": 20000
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "return_days": 7,
+        "exchange_fee_vnd": 0,
+        "policy_version": "2026-10",
+        "call_date": "2026-10-18"
+      },
+      "relevant_policy_ids": [
+        "CL-01",
+        "DT-01",
+        "DT-03",
+        "DT-OLD-01",
+        "DT-OLD-03",
+        "PB-01"
+      ],
+      "expected_outcome": "thong_tin"
+    }
+  }
+}

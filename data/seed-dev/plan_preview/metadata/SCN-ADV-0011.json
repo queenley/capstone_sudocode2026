@@ -1,0 +1,35 @@
+{
+  "scenario_id": "SCN-ADV-0011",
+  "persona_source": "advanced",
+  "customer_id": "SYN-C002",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "difficulty": "normal",
+  "tags": [
+    "date:ordinary",
+    "expired",
+    "return",
+    "variant:qua_7_ngay"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR",
+    "ESC"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "return_expired",
+      "outcome_detail": "thong_tin",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "return_days": 7,
+        "return_allowed": false
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_tra_hang_qua_han",
+      "patience_start": 2
+    }
+  }
+}

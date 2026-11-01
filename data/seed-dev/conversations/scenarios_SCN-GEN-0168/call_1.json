@@ -1,0 +1,251 @@
+{
+  "conversation_id": "SCN-GEN-0168__call_1",
+  "scenario_id": "SCN-GEN-0168",
+  "call": "call_1",
+  "customer_id": "C007",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-14",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, chị muốn tìm hiểu về máy lọc không khí Xiaomi Smart 4 Pro đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn hỏi về máy lọc không khí Xiaomi Smart 4 Pro đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo chi muon hoi ve may loc khong khi xiaomi smart 4 pro",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ cảm ơn chị, hiện máy Xiaomi Smart 4 Pro bên em đang sẵn hàng, dùng tốt cho phòng 20 mét vuông. Chị cần tư vấn thêm về thông số hoặc lựa chọn phù hợp cho nhà có bé nhỏ không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Phòng mình khoảng 20 mét vuông đúng không chị?"
+        },
+        {
+          "slot": "has_children",
+          "type": "confirm",
+          "text": "Nhà mình có bé nhỏ đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chi dang can cho phong 20 met vuong nha co be nho",
+      "facts_stated": {
+        "room_area_m2": 20,
+        "has_children": true
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy Xiaomi Smart 4 Pro phù hợp với phòng 20 mét vuông, lọc bụi mịn và có app điều khiển tiện cho gia đình có trẻ nhỏ. Giá hiện tại là 5.490.000đ, đang có chương trình tặng màng lọc thay thế. Ngân sách của chị tầm 5 triệu rưỡi đúng không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của chị là khoảng 5 triệu rưỡi đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "promo_XM-COMBO_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5490000",
+          "spoken": "5.490.000"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "ngan sach tam 5 trieu ruoi co khuyen mai gi khong em",
+      "facts_stated": {
+        "budget_vnd": 5500000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "5500000",
+          "spoken": "5 triệu rưỡi"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với ngân sách 5 triệu rưỡi, chị mua Xiaomi Smart 4 Pro giá 5.490.000đ sẽ được tặng kèm một màng lọc thay thế chính hãng, tổng giá trị không phát sinh thêm. Chương trình khuyến mãi XM-COMBO đang áp dụng hôm nay.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "promo_XM-COMBO_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5490000",
+          "spoken": "5.490.000"
+        }
+      ],
+      "pause_before_ms": 650,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chi thi cuoi thang moi nhan luong nen hoi ngai chot don",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị muốn cân nhắc và cuối tháng mới chốt đơn. Chương trình tặng màng lọc thay thế vẫn áp dụng hôm nay, nếu có thay đổi em sẽ báo lại. Khi nào chị sẵn sàng, chị gọi lại hoặc nhắn shop em hỗ trợ lên đơn nhanh nhất ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_XM-COMBO_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 5500000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 20,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-XM-4P",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5490000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "promo_code",
+          "value": "XM-COMBO",
+          "op": "set",
+          "source": "call_1#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_san_pham",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chua_nhan_luong",
+    "objection_handling": "Ghi nhận thời điểm khách muốn chờ cuối tháng, nhấn mạnh khuyến mãi hiện tại và hướng dẫn liên hệ lại khi sẵn sàng.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

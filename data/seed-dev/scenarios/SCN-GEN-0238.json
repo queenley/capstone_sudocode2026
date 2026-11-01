@@ -1,0 +1,140 @@
+{
+  "scenario_id": "SCN-GEN-0238",
+  "level": "M1",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "hard_case": null,
+  "customer_phone": "0984726714",
+  "customer_name": "Hoa",
+  "honorific": "chị",
+  "notes": "Persona khach_do_du_hoi_nguoi_nha, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-26",
+      "customer_goal": "Hỏi thông tin giày chạy bộ size 42 màu đen",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về đôi giày chạy bộ size 42 màu đen mà em có.",
+        "Em cho chị biết giá của đôi giày này với ạ?",
+        "Có chương trình khuyến mãi nào không em?",
+        "À, chị cần hỏi chồng trước đã, tối mai tầm 7 giờ em gọi lại cho chị nhé."
+      ],
+      "facts_established": {
+        "blocker": "cần hỏi chồng",
+        "color": "den",
+        "decision_maker": "chồng",
+        "size": 42,
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1290000,
+        "variant_sku": "SKU-SN-RUN1-42-DEN"
+      },
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-11-27T19:00"
+        },
+        "must_say_any": [
+          "7 giờ",
+          "19 giờ",
+          "19h",
+          "7h tối"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1290000,
+        "list_price_vnd": 1290000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "in_stock": true,
+        "callback_at": "2026-11-27T19:00",
+        "call_date": "2026-11-26"
+      },
+      "memory_expectation": {
+        "blocker": "cần hỏi chồng",
+        "color": "den",
+        "decision_maker": "chồng",
+        "size": 42,
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1290000,
+        "variant_sku": "SKU-SN-RUN1-42-DEN"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "FAQ-09",
+        "LN-01",
+        "PB-03"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 1,
+      "customer_goal": "Xác nhận mua giày chạy bộ size 42 màu đen",
+      "customer_turns": [
+        "Chào em, hôm qua chị đã hỏi về đôi giày chạy bộ size 42 màu đen.",
+        "Chị muốn thanh toán bằng COD.",
+        "Khu vực giao hàng là Lê Chân, Hải Phòng.",
+        "Vậy chị đồng ý đặt hàng nhé."
+      ],
+      "facts_established": {
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "payment": "COD",
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1290000,
+        "variant_sku": "SKU-SN-RUN1-42-DEN",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "size",
+        "decision_maker",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "decision_maker",
+        "product_advised",
+        "variant_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-RUN1-42-DEN",
+          "price_vnd": 1290000,
+          "payment": "COD"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1290000,
+        "list_price_vnd": 1290000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-12-02",
+        "call_date": "2026-11-27"
+      },
+      "memory_expectation": {
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "payment": "COD",
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1290000,
+        "variant_sku": "SKU-SN-RUN1-42-DEN",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "PB-01",
+        "PB-03"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

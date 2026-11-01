@@ -1,0 +1,186 @@
+{
+  "conversation_id": "SCN-GEN-0159__call_2",
+  "scenario_id": "SCN-GEN-0159",
+  "call": "call_2",
+  "customer_id": "SYN-C018",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-07",
+  "region": "nam",
+  "category": "thoi-trang/ao-khoac",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Trịnh Thị Lan ạ, hôm trước chị có quan tâm Áo khoác gió Windbreak size L màu be và muốn so sánh thêm, em sẵn sàng hỗ trợ chị tiếp nhé!",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "variant_sku",
+        "blocker",
+        "size",
+        "color",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em ơi, chị muốn hỏi thêm một chút về áo khoác Windbreak màu be size L.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ áo khoác gió Windbreak màu be size L hiện còn hàng chị nhé, giá 690.000đ. Chị muốn hỏi thêm chi tiết gì về sản phẩm này không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị muốn hỏi thêm chi tiết gì về sản phẩm này không ạ?"
+        }
+      ],
+      "facts_used": [
+        "variant_sku"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thấy áo này có vẻ đẹp, nhưng giá hơi cao so với ngân sách của chị.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ, dòng Windbreak của shop là áo khoác chống gió chất liệu polyester, thiết kế nhẹ và thoáng, phù hợp nhiều dáng người. Ngoài ra, giá đã bao gồm phí vận chuyển toàn quốc cho đơn từ 500.000đ rồi chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có thấy một số mẫu khác cũng đẹp nhưng giá rẻ hơn trên mạng.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xin phép chia sẻ, áo bên shop chính hãng bảo hành 12 tháng, hỗ trợ đổi trả trong 7 ngày nếu chưa sử dụng và giữ nguyên tem mác. Ngoài ra, shop có nhiều mẫu và thường xuyên cập nhật sản phẩm mới, chị yên tâm về chất lượng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thôi, chị không mua nữa đâu, cảm ơn em nhé!",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng em ghi nhận ý kiến của chị. Nếu chị cần hỗ trợ thêm về sản phẩm khác, chị cứ liên hệ lại shop bất cứ lúc nào ạ. Chúc chị một ngày vui vẻ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-JK-WND",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 690000,
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-JK-WND-L-BE",
+          "op": "set",
+          "source": "call_2#turn1"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "khach_tu_choi_mua",
+    "outcome": "tu_choi",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

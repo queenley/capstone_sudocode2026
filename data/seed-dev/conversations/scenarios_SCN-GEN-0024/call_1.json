@@ -1,0 +1,322 @@
+{
+  "conversation_id": "SCN-GEN-0024__call_1",
+  "scenario_id": "SCN-GEN-0024",
+  "call": "call_1",
+  "customer_id": "C015",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_mua_doi_size",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Vy ạ, em là trợ lý ảo của shop BTC. Chị muốn xác nhận lại đơn hàng giày chạy bộ đã đặt phải không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn xác nhận lại đơn hàng giày chạy bộ RunLite 2 Pro đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1521000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Vy đây, hôm nay chị muốn xác nhận đơn hàng giày chạy bộ mà chị đã đặt.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị chọn size 42 và màu đen phải không ạ? Giá sau ưu đãi RUN-10 là 1.521.000đ, hiện sản phẩm đang sẵn kho.",
+      "questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Chị chọn size 42 đúng không ạ?"
+        },
+        {
+          "slot": "color",
+          "type": "confirm",
+          "text": "Màu đen đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1521000
+        },
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị chọn size 42 và màu đen nhé.",
+      "facts_stated": {
+        "size": 42,
+        "color": "den"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận, chị muốn nhận hàng tại Thủ Đức, TP.HCM và thanh toán COD đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Chị nhận hàng ở Thủ Đức, TP.HCM đúng không ạ?"
+        },
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Chị thanh toán khi nhận hàng (COD) đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán là COD, chị sẽ nhận hàng ở Thủ Đức, TP.HCM.",
+      "facts_stated": {
+        "payment": "COD",
+        "delivery_area": "Thủ Đức, TP.HCM"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị xác nhận. Em xin phép đọc lại đơn hàng: 1 đôi giày chạy bộ RunLite 2 Pro size 42 màu đen, giá sau khuyến mãi là 1.521.000đ, giao tới Thủ Đức, TP.HCM, thanh toán COD. Dự kiến giao hàng trong 2 ngày làm việc, khoảng ngày 20/10/2026. Thông tin đã đúng hết chưa chị?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Chị kiểm tra lại giúp em: giày RunLite 2 Pro size 42 màu đen, giá 1.521.000đ, giao Thủ Đức, COD, nhận khoảng ngày 20/10/2026. Thông tin này đã chính xác chưa chị?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "color",
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1521000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-20"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Thủ Đức, TP.HCM",
+            "on": "2026-10-17"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1521000",
+          "spoken": "1.521.000đ"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-20",
+          "spoken": "20/10/2026"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em xác nhận giúp chị nhé, chị muốn lên đơn ngay.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã tạo đơn hàng cho chị thành công. Mã đơn của chị là OD600001. Đơn sẽ được giao dự kiến vào ngày 20/10/2026 tại Thủ Đức, TP.HCM, chị nhận hàng rồi thanh toán cho bên vận chuyển ạ. Cảm ơn chị Vy đã đặt hàng tại shop BTC!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1521000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-20"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0913301756",
+            "sku": "SKU-SN-RUN2-42-DEN",
+            "qty": 1,
+            "price_vnd": 1521000,
+            "payment": "COD",
+            "address": "Thủ Đức, TP.HCM",
+            "on": "2026-10-17"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "size",
+          "value": 42,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "color",
+          "value": "den",
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Thủ Đức, TP.HCM",
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN2",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1521000,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN2-42-DEN",
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "promo_code",
+          "value": "RUN-10",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_1#turn9"
+        }
+      ],
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD600001",
+          "spoken": "OD600001"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-20",
+          "spoken": "20/10/2026"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xac_nhan_dat_giay",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001",
+      "sku": "SKU-SN-RUN2-42-DEN",
+      "qty": 1,
+      "price_vnd": 1521000,
+      "payment": "COD",
+      "delivery_area": "Thủ Đức, TP.HCM",
+      "estimated_delivery": "2026-10-20"
+    }
+  }
+}

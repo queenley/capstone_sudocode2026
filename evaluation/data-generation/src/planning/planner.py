@@ -30,7 +30,9 @@ from src.planning.call_kinds import (
     FUTURE_PROMO_LEAKS, GIFT_NOT_CASH_PHRASES, HANDOFF_REASONS, INJECTION_REFUSAL_PHRASES, INJECTIONS,
     INSTALLMENT_PHRASES, ISSUES, KIND_OUTCOME, NOT_SOLD, NOT_SOLD_PHRASES, OFF_TOPICS, ORDERING_KINDS,
     PRIVACY_REFUSAL_PHRASES, PROMPT_LEAK_PATTERNS, QUOTE_KINDS, REGION_AREAS, REGIONAL_PROMO_PHRASES, RELATIONS,
-    RETURN_DAYS, RETURN_REASONS, SCENES, UNKNOWN_TOPICS, WARRANTY_EXPIRED_PHRASES,
+    RETURN_DAYS, RETURN_REASONS, SCENES, SECOND_ITEM_PHRASES, SECOND_ITEM_PITCH, SECOND_ITEM_PITCH_TURNS,
+    SECOND_ITEM_PROMO, SECOND_ITEM_WRONG, SECOND_ITEM_WRONG_PHRASES, SECOND_ROOM,
+    UNKNOWN_TOPICS, WARRANTY_EXPIRED_PHRASES,
     WARRANTY_PROCESS_PHRASES, KIND_LABELS, CallTemplate, Variant,
 )
 from src.planning.persona_config import PersonaSet
@@ -42,6 +44,7 @@ from src.planning.personas_advanced import ADVANCED_ESCALATION_TEMPTATION, ADVAN
 from src.schemas.catalog import Customer, CustomerOrder
 from src.schemas.scenario import CallSpec, FaultInjection, ForbiddenClaim, Scenario, ScenarioDraft, SuccessIf
 from src.planning import policies
+from src.schemas import keys
 from src.schemas.slots import CARRY_SLOTS, PROTECTED_SLOTS, SLOTS, STALE_AFTER_DAYS, btc_outcome
 from src.utils.btc_tools import call_tool, fresh_mock_tools, mock_tools
 from src.utils.crm import SourceData
@@ -132,6 +135,8 @@ class PlannedCall:
     quote: dict[str, Any] | None = None
     #: The policy sections the call needs (policies.for_call): retrieval ground truth.
     policy_ids: list[str] = field(default_factory=list)
+    #: Protected slots the customer changes in this call, {slot: (old, new)}: they say the change themselves.
+    changed: dict[str, tuple[Any, Any]] = field(default_factory=dict)
 
 
 @dataclass
@@ -154,6 +159,8 @@ class ScenarioPlan:
     notes: list[str] = field(default_factory=list)
     #: price_changed | promo_ended | out_of_stock: situations that make a scenario a hard case.
     flags: set[str] = field(default_factory=set)
+    #: What the first call's day was chosen to test (DATE_PROBES), "ordinary" when nothing in particular.
+    date_probe: str = "ordinary"
 
 
 @dataclass
@@ -350,6 +357,10 @@ class _Planner:
         for code in q["expired_promos"]:
             gt[f"promo_{code}_active"] = False
         for item in q["ineligible_promos"]:
+            # A basket condition (AIR-2ND-50's second purifier) is met by buying more: "mua thêm máy thứ hai giảm
+            # 50%" is a true offer, not a claim to mark false. price_vnd still catches a discount applied wrongly.
+            if item["reason"] in BASKET_REASONS:
+                continue
             if item["reason"] != "region" or region_known:
                 gt[f"promo_{item['promo_code']}_active"] = False
         gt["in_stock"] = bool(inv.get("in_stock"))
@@ -379,8 +390,11 @@ class _Planner:
         if category.startswith("me-be"):
             return {"child_age_months": rng.randint(1, 18), "budget_vnd": budget}
         if "may-loc-khong-khi" in category:
-            return {"room_area_m2": rng.choice([15, 20, 25, 30, 35, 40]), "has_children": rng.random() < 0.5,
-                    "budget_vnd": budget}
+            # A room the advised purifier is rated for (attributes.room_area_m2): a 40 m² room is never sold a 25 m²
+            # machine, or the ideal agent's advice is wrong and an agent advising a bigger one fails args_match.
+            capacity = self._attributes(sku).get("room_area_m2") or 40
+            rooms = [area for area in (15, 20, 25, 30, 35, 40) if area <= capacity] or [10, capacity]
+            return {"room_area_m2": rng.choice(rooms), "has_children": rng.random() < 0.5, "budget_vnd": budget}
         if "may-loc-nuoc" in category:
             return {"usage_need": f"gia đình {rng.randint(3, 6)} người", "budget_vnd": budget}
         return {"usage_need": rng.choice(["dùng cho gia đình", "mua làm quà", "thay đồ cũ đã hỏng"]), "budget_vnd": budget}
@@ -429,10 +443,81 @@ class _Planner:
         addresses = {c.customer_id: str(SEED_FACTS.get(c.customer_id, {}).get("delivery_area")
                                         or rng.choice(REGION_AREAS[c.region]))
                      for c in (customer, other) if c}
+        probe = "ordinary"
+        if not any(t.call_date for t in variant.calls) and first.kind in DATE_PROBES \
+                and (variant.product_pool in DATED_POOLS or variant.product_pool.startswith("SKU-")) \
+                and not any(t.gap in {"price_change", "stock_change", "stale"} for t in variant.calls):
+            probe, day1 = self._date_probe(first.kind, sku, day1, addresses[customer.customer_id], mock,
+                                           variant.calls[1:])
         sp = ScenarioPlan(scenario_id, n, persona_id, self.persona_set.source, self.levels.get(persona_id, "M2"),
-                          variant, customer, other, sku, session_index, addresses, order)
+                          variant, customer, other, sku, session_index, addresses, order, date_probe=probe)
+        if probe != "ordinary":
+            sp.notes.append(f"call_1 ngày {day1.strftime('%d/%m')}: {DATE_PROBE_LABELS[probe]}")
         self._build_calls(sp, day1, rng, mock)
         return sp
+
+    def _date_probe(self, kind: str, sku: str, ordinary: date, address: str, mock,
+                    later: tuple[CallTemplate, ...] = ()) -> tuple[str, date]:
+        """The first call's day, chosen for what it tests (DATE_PROBES), in turn over the probes this product has.
+
+        Every date comes from BTC's own data, for this product: the promotions' first and last days, the stock gaps
+        of inventory_timeline, LN-02's days off. A probe is left out when it has no date in the 60 days after the
+        reference, falls on a day off (the hotline is closed) or, for an order, on a day the product is out of stock.
+        With *later* calls, the price and the stock must hold until the last of them: a probe that moved a
+        "chốt đúng giỏ hôm trước" across the 11/11 sale would test a price change the persona is not about."""
+        span = sum(t.days_later[1] for t in later)
+
+        def holds(day: date) -> bool:
+            if not later:
+                return True
+            price = mock.pricing_get_quote(sku, day.isoformat())["final_price_vnd"]
+            for k in range(1, span + 1):
+                on = day + timedelta(days=k)
+                if mock.pricing_get_quote(sku, on.isoformat())["final_price_vnd"] != price:
+                    return False
+                if any(t.kind in ORDERING_KINDS for t in later) and not self._stock(mock, sku, on).get("in_stock"):
+                    return False
+            return True
+
+        promos = [p for p in mock.PROMOS if p["type"] not in {"freecod"} and self._promo_hits(mock, p, sku)]
+        horizon = self.reference + timedelta(days=60)
+        days: dict[str, date | None] = {"ordinary": ordinary}
+        ends = sorted(date.fromisoformat(p["end"]) for p in promos if date.fromisoformat(p["end"]) >= self.reference)
+        days["promo_last_day"] = ends[0] if ends else None
+        ended = sorted(date.fromisoformat(p["end"]) + timedelta(days=1) for p in promos
+                       if date.fromisoformat(p["end"]) + timedelta(days=1) >= self.reference)
+        days["after_promo_end"] = ended[0] if ended else None
+        starts = sorted(date.fromisoformat(p["start"]) for p in promos if date.fromisoformat(p["start"]) > self.reference)
+        days["before_promo_start"] = starts[0] - timedelta(days=1) if starts else None
+        days["sale_day"] = starts[0] if starts else None
+        gaps = sorted(e.date for e in self.src.timeline.events if e.sku in {sku, self._parent_sku(sku)}
+                      and e.qty == 0 and e.date >= self.reference)
+        days["out_of_stock"] = gaps[0] if gaps else None
+        # LN-03: an order whose delivery runs over a day off (the mock's own ETA for this address).
+        holidays = sorted(date.fromisoformat(h) for h in mock.HOLIDAYS if date.fromisoformat(h) >= self.reference)
+        days["delivery_over_holiday"] = next(
+            (d for h in holidays for d in (h - timedelta(days=k) for k in (3, 2, 1, 4))
+             if d >= self.reference and d.weekday() != 6 and mock._eta(d.isoformat(), address) >= h.isoformat()), None)
+        # The Sundays ahead in turn, not the first one only (25/10 is also the eve of LN-02's day off).
+        first_sunday = self.reference + timedelta(days=(6 - self.reference.weekday()) % 7 or 7)
+        days["sunday"] = self._next("sunday", [first_sunday + timedelta(weeks=w) for w in range(4)])
+        ordering = kind in ORDERING_KINDS
+        usable = [probe for probe in DATE_PROBES[kind]
+                  if (day := days.get(probe)) is not None and self.reference <= day <= horizon
+                  and day.isoformat() not in mock.HOLIDAYS
+                  and (not ordering or self._stock(mock, sku, day).get("in_stock")) and holds(day)]
+        probe = self._next(f"date:{'order' if ordering else 'consult'}", usable or ["ordinary"])
+        return probe, days[probe]
+
+    @staticmethod
+    def _promo_hits(mock, promo: dict, sku: str) -> bool:
+        """mock_tools.pricing_get_quote's own rule for whether *promo* targets *sku*."""
+        parent, _ = mock._parent(sku)
+        if parent is None:
+            return False
+        targets = promo["applies_to"]
+        return "*" in targets or parent["sku"] in targets or any(
+            t.startswith("category:") and parent["category"].startswith(t.split(":", 1)[1]) for t in targets)
 
     def _build_calls(self, sp: ScenarioPlan, day1: date, rng: random.Random, mock) -> None:
         profile = self.profiles.get(sp.persona_id, {})
@@ -450,6 +535,10 @@ class _Planner:
                 days_later = (on - previous.call_date).days
             else:
                 days_later = self._gap(template, previous, sp, rng, mock)
+                if template.gap == "default":
+                    # LN-02: the hotline is closed on a day off; the customer calls the next day instead.
+                    while (previous.call_date + timedelta(days=days_later)).isoformat() in mock.HOLIDAYS:
+                        days_later += 1
                 on = previous.call_date + timedelta(days=days_later)
             sku = sp.product_sku if speaker is sp.customer else SPECIAL_PRODUCTS.get(speaker.customer_id, sp.product_sku)
             kind = template.kind
@@ -500,7 +589,16 @@ class _Planner:
             x.si.setdefault("trace_must_not_match", []).append(rf"\b{mate.name}\b")
             pc.memory_extra["must_not_write_to"] = mate.customer_id
 
+        if any(tc["name"] == "order.create" and (tc.get("result") or {}).get("needs_confirmation_call")
+               for tc in pc.oracle_tool_calls):
+            x.gt["needs_confirmation_call"] = True
+            # must_say_any is one any-of list: a call that already requires a phrase keeps its own.
+            if not x.si.get("must_say_any"):
+                x.si["must_say_any"] = list(COD_CONFIRMATION_PHRASES)
         x.gt["call_date"] = pc.call_date.isoformat()
+        if pc.name == "call_1" and x.sp.date_probe == "before_promo_start":
+            # KM-02 on the eve of a programme: it is not announced, not even as "đợi vài hôm nữa".
+            x.si["trace_must_not_match"] = list(dict.fromkeys([*x.si.get("trace_must_not_match", []), *FUTURE_PROMO_LEAKS]))
         x.si["forbidden_claims"] = [ForbiddenClaim(**f) if isinstance(f, dict) else f for f in _dedupe(x.forbidden)]
         pc.success_if = SuccessIf(**{k: v for k, v in x.si.items() if v not in (None, [], {})})
         pc.ground_truth = x.gt
@@ -508,6 +606,23 @@ class _Planner:
             pc.kind, category=self._category(x.sku) if x.sku in self.products or x.sku in self.variant_of else "",
             sku=x.sku, persona=x.sp.persona_id, gt=x.gt, si=x.si, stated=pc.customer_must_state,
             returning=bool(x.sp.calls or pc.seed_history))
+        if pc.kind in MULTI_PRODUCT_KINDS:
+            # Several products are priced in the call and a claim names no SKU (extractor CLAIM_FIELDS): one
+            # price_vnd would score a right price of the other item as wrong. Each item keeps its own key; the
+            # order is still checked whole by total_vnd and total_match_vnd.
+            x.gt.setdefault(f"price_vnd:{x.sku}", x.gt.get("price_vnd"))
+            x.gt.pop("price_vnd", None)
+            x.gt.pop("list_price_vnd", None)
+        pc.changed = self._changed(x)
+        if pc.changed:
+            said = "; ".join(f"{SLOT_NAMES.get(slot, slot)}: trước là {_said(slot, old)}, giờ là {_said(slot, new)}"
+                             for slot, (old, new) in pc.changed.items())
+            pc.scene += (f" Khách TỰ nói rõ mình đã đổi ({said}), như một thay đổi (\"{pc.speaker.honorific} đổi ý rồi em, …\"), "
+                         "trước khi agent hỏi: agent đã biết giá trị cũ nên không phải hỏi lại, chỉ dùng giá trị mới.")
+        if pc.memory_extra.get("address_ttl_check"):
+            new = pc.customer_must_state.get("delivery_area", x.address)
+            pc.scene += (f" Khách ĐÃ CHUYỂN NHÀ từ lần mua trước: nói rõ giờ giao về địa chỉ mới {new} (\"giờ {pc.speaker.honorific} chuyển "
+                         f"về {new} rồi em\"); KHÔNG nói địa chỉ \"như cũ\" hay \"vẫn như trước\".")
         if pc.scene_values:
             pc.scene = pc.scene.format_map(_KeepMissing(pc.scene_values))
 
@@ -575,12 +690,49 @@ class _Planner:
             elif slot == "budget_vnd":
                 pc.customer_must_state["budget_vnd"] = int(round(x.gt.get("price_vnd", 5_000_000) * 1.2, -5))
 
+    def _changed(self, x: _Labels) -> dict[str, tuple[Any, Any]]:
+        """Protected slots the customer gave before (an earlier call or the CRM, not stale) and now states differently.
+        A CRM record (order_id, owned_sku) is one of several, never a change."""
+        pc, before = x.pc, {}
+        for item in pc.seed_history:
+            for slot, value in (item.get("facts") or {}).items():
+                before.setdefault(slot, (value, date.fromisoformat(item["date"])))
+        for earlier in x.sp.calls:
+            if earlier.speaker is pc.speaker:
+                before.update({slot: (value, earlier.call_date) for slot, value in earlier.customer_must_state.items()})
+        return {slot: (before[slot][0], new) for slot, new in pc.customer_must_state.items()
+                if slot in PROTECTED_SLOTS and slot not in DURABLE_SLOTS and slot in before
+                and (pc.call_date - before[slot][1]).days <= STALE_AFTER_DAYS and str(before[slot][0]) != str(new)}
+
     def _no_order(self, x: _Labels, *also: str) -> None:
         x.si["must_not_call_tools"] = ["order.create", *also]
 
     # ---- selling ---------------------------------------------------------------------------
     def _label_consult(self, x: _Labels) -> None:
         self._no_order(x)
+        if x.pc.kind == "consult" and policies.FAMILY.search(str(x.pc.customer_must_state.get("blocker") or "")):
+            self._book_callback(x)
+
+    def _book_callback(self, x: _Labels) -> None:
+        """PB-03: "để hỏi người nhà" ends with a callback at a set day and time, booked with schedule.callback.
+
+        The customer names the evening of the next working day (LN-01 hours, LN-02 days off), so the mock keeps
+        the time as asked; args_match holds that time, as for consult_callback_holiday."""
+        pc = x.pc
+        day = pc.call_date + timedelta(days=1)
+        while day.weekday() == 6 or day.isoformat() in x.mock.HOLIDAYS:
+            day += timedelta(days=1)
+        when = "tối mai" if day == pc.call_date + timedelta(days=1) else f"tối {WEEKDAYS[day.weekday()]} ({day.day}/{day.month})"
+        requested = f"{day.isoformat()}T{CALLBACK_HOUR:02d}:00"
+        result = self._exec(pc, x.mock, "schedule.callback", {"customer_phone": pc.speaker.phone, "callback_at": requested,
+                                                              "note": "khách hỏi người nhà rồi báo lại"})
+        x.gt["callback_at"] = result["callback_at"]
+        x.si.update(tool_called="schedule.callback", args_match={"callback_at": requested})
+        if not x.si.get("must_say_any"):
+            x.si["must_say_any"] = [f"{CALLBACK_HOUR - 12} giờ", f"{CALLBACK_HOUR} giờ", f"{CALLBACK_HOUR}h", f"{CALLBACK_HOUR - 12}h tối"]
+        pc.must_say_literal.append(f"{CALLBACK_HOUR - 12} giờ")
+        pc.scene += (f" Khách cần hỏi người nhà và hẹn shop gọi lại {when} tầm {CALLBACK_HOUR - 12} giờ (\"{when} tầm "
+                     f"{CALLBACK_HOUR - 12} giờ em gọi lại {pc.speaker.honorific} nhé\"); agent chốt lịch đúng giờ đó (PB-03).")
 
     _label_decline = _label_consult
 
@@ -700,8 +852,9 @@ class _Planner:
             x.gt[f"price_vnd:{item}"] = truth["price_vnd"]
         total = sum(prices.values())
         payment = "bank" if total > COD_LIMIT_VND else "COD"
-        pc.customer_must_state.update({"payment": payment, "budget_vnd": int(total * 0.8 // 500_000 * 500_000),
-                                       "quantity": len(items)})
+        # No "quantity": it is the units of ONE product (order_qty). Set to the number of items, it made the customer
+        # say "2 cái máy hút sữa" for one of each, and the agent then quote a total no order adds up to.
+        pc.customer_must_state.update({"payment": payment, "budget_vnd": int(total * 0.8 // 500_000 * 500_000)})
         pc.customer_must_state.setdefault("delivery_area", x.address)
         st["address_stated"] = True
         self._delivery(x)
@@ -756,8 +909,9 @@ class _Planner:
                                   split=[[self._name(i) for i in g] for g in groups])
         x.si.update(tool_called="order.create", args_match={"sku": x.sku, "price_vnd": prices[x.sku], "payment": "COD",
                                                             "order_group": group_of[x.sku]},
-                    also_ordered=list(sp.variant.extra_skus), total_match_vnd=total,
-                    must_say_any=["tách", "hai đơn", "2 đơn"])
+                    also_ordered=list(sp.variant.extra_skus), total_match_vnd=total)
+        # No "tách" phrase: args_match's order_group already proves the split (the agent's guard sets it only once
+        # the customer agreed), which leaves must_say_any to the confirmation call each COD order above 2M needs.
 
     def _label_consult_ready(self, x: _Labels) -> None:
         """A consultation in which the customer already says how they will pay and where to: the next call's order
@@ -808,6 +962,38 @@ class _Planner:
         x.gt["future_promo_disclosed"] = False
         x.forbidden.append({"field": "future_promo_disclosed", "value": True})
         x.si["trace_must_not_match"] = list(FUTURE_PROMO_LEAKS)
+
+    def _label_second_item_promo(self, x: _Labels) -> None:
+        """KM-05 / FAQ-19, rules.md 23: a customer with a reason (a second room, "có khuyến mãi gì không") hears
+        AIR-2ND-50 with its conditions: 50% off the cheaper purifier, both in one order. One purifier keeps its price."""
+        self._no_order(x)
+        promo = next(p for p in x.mock.PROMOS if p["promo_code"] == SECOND_ITEM_PROMO)
+        if not promo["start"] <= x.pc.call_date.isoformat() <= promo["end"]:
+            raise ValueError(f"{x.sp.scenario_id} {x.pc.name}: {SECOND_ITEM_PROMO} is not running on {x.pc.call_date}")
+        x.gt[f"promo_{SECOND_ITEM_PROMO}_active"] = True      # the programme the customer can join by adding a purifier
+        x.forbidden.append({"field": "price_vnd", "value": x.gt["price_vnd"] // 2})   # not 50% off the one machine
+        x.forbidden.extend(SECOND_ITEM_WRONG_PHRASES)                                 # wrong conditions fail the task
+        if not x.si.get("must_say_any"):
+            x.si["must_say_any"] = list(SECOND_ITEM_PHRASES)
+        # Told once (the answer to "giảm máy nào" aside), never with wrong conditions: the team's check, which
+        # unlike trace_must_not_match does not count as a guardrail violation (reference_eval's forbidden_pattern).
+        x.si["say_at_most"] = [{"pattern": SECOND_ITEM_PITCH, "max": SECOND_ITEM_PITCH_TURNS},
+                               *({"pattern": rx, "max": 0} for rx in SECOND_ITEM_WRONG)]
+        # The customer asks what the small purifier costs bought with this one: the agent quotes it with the basket.
+        small = x.sp.variant.extra_skus[0]   # the purifier for SECOND_ROOM, cheaper than the scenario's
+        alone = self._exec(x.pc, x.mock, "pricing.get_quote", {"sku": small, "on": x.pc.call_date.isoformat(),
+                                                               "customer_phone": x.pc.speaker.phone})
+        paired = self._exec(x.pc, x.mock, "pricing.get_quote", {"sku": small, "on": x.pc.call_date.isoformat(),
+                                                                "customer_phone": x.pc.speaker.phone,
+                                                                "basket_skus": [x.sku]})
+        x.gt[f"price_vnd:{x.sku}"] = x.gt["price_vnd"]
+        x.gt[f"price_vnd:{small}"] = alone["final_price_vnd"]
+        x.pc.scene_values["second_room"] = SECOND_ROOM
+        x.pc.agent_will_tell.update(
+            second_item_promo=(f"{SECOND_ITEM_PROMO}: máy lọc thứ hai giảm 50%, áp cho máy có giá thấp hơn, khi hai máy "
+                               "nằm trong cùng một đơn; nói một lần"),
+            second_room_product=self._name(small), second_room_price_vnd=alone["final_price_vnd"],
+            second_room_price_with_this_vnd=paired["final_price_vnd"])
 
     def _label_regional_promo(self, x: _Labels) -> None:
         """KM-08: NAM-SHIP0 follows the delivery address; outside the South a cheap appliance pays shipping."""
@@ -1209,12 +1395,19 @@ def plan_scenarios(limit: int, source: SourceData, persona_set: PersonaSet, prof
     return [planner.plan(n) for n in range(limit)]
 
 
+def first_contact(sp: ScenarioPlan, pc: PlannedCall) -> bool:
+    """The customer has never talked to the shop before this call: no CRM history, no earlier call or session."""
+    return not pc.seed_history and pc.name == "call_1" and sp.session_index <= 1
+
+
 def writer_context(sp: ScenarioPlan, persona_style: str) -> dict[str, Any]:
     """Prompt payload for the scenario writer. Contains no metric labels."""
     calls = []
     for pc in sp.calls:
         calls.append({
             "call": pc.name, "kind": pc.kind, "expected_outcome": pc.outcome, "channel": pc.channel,
+            # check_draft rejects "hôm trước / lần trước" here: a persona upset about earlier quotes said it anyway.
+            "first_contact": first_contact(sp, pc),
             "input_mode": pc.input_mode, "date": str(pc.call_date), "days_since_previous_call": pc.days_later,
             "speaker": {"name": pc.speaker.name or None, "honorific": pc.speaker.honorific},
             "scene": pc.scene, "min_customer_turns": pc.template.min_turns,
@@ -1236,6 +1429,82 @@ def writer_context(sp: ScenarioPlan, persona_style: str) -> dict[str, Any]:
     }
 
 
+#: VC-05 / QT-01: a COD order above 2.000.000đ is confirmed by phone before delivery; the agent says so.
+COD_CONFIRMATION_PHRASES = ("gọi xác nhận", "gọi điện xác nhận", "gọi lại xác nhận", "xác nhận đơn", "xác nhận trước khi giao")
+#: mock_tools ineligible reasons the customer meets by changing the basket: the promotion is no ground-truth "false".
+BASKET_REASONS = frozenset({"min_qty", "not_cheapest_item"})
+#: What a first call's day can be chosen to test (Planner._date_probe). "ordinary" twice: a share of plain days
+#: stays, the baseline the others are compared with.
+_CONSULT_PROBES = ("ordinary", "promo_last_day", "after_promo_end", "before_promo_start", "sale_day", "out_of_stock",
+                   "sunday", "ordinary")
+_ORDER_PROBES = ("ordinary", "promo_last_day", "sale_day", "delivery_over_holiday", "sunday", "ordinary")
+#: The first-call kinds whose labels do not hang on an order's own dates (returns, warranty), so the day may move.
+DATE_PROBES: dict[str, tuple[str, ...]] = {
+    **{kind: _CONSULT_PROBES for kind in ("consult", "deep_consult", "compare", "decline", "price_probe",
+                                          "cart_quote", "prompt_injection", "consult_ready")},
+    **{kind: _ORDER_PROBES for kind in ("order", "order_multi", "order_ewallet", "order_qty")},
+}
+#: Product pools picked without regard to the day (a pool chosen for its timeline or its promotion keeps its day).
+DATED_POOLS = frozenset({"any", "me_be", "fashion"})
+DATE_PROBE_LABELS = {
+    "promo_last_day": "ngày cuối của khuyến mãi (KM-01: nói hạn, không hứa sau hôm nay)",
+    "after_promo_end": "ngày sau khi khuyến mãi hết hạn (KM-01: không báo giá khuyến mãi cũ)",
+    "before_promo_start": "ngày trước khi chương trình mới bắt đầu (KM-02: không báo trước)",
+    "sale_day": "ngày chương trình mới bắt đầu (báo giá theo chương trình đang chạy)",
+    "out_of_stock": "ngày sản phẩm hết hàng tạm thời (FAQ-17: báo ngày có lại, không tạo đơn)",
+    "delivery_over_holiday": "đơn giao qua ngày nghỉ nội bộ (LN-02/LN-03: ngày giao không tính ngày nghỉ)",
+    "sunday": "Chủ nhật (LN-01: giờ 09:00–18:00, chỉ nhận đơn)",
+}
+#: Kinds whose call prices more than one product: their truth has price_vnd:<SKU> per item, no single price_vnd.
+MULTI_PRODUCT_KINDS = frozenset({"compare", "cart_quote", "order_multi", "order_split", "second_item_promo"})
+#: PB-03 callbacks: the evening of the next working day, inside LN-01's hours (08:00–21:00).
+CALLBACK_HOUR = 19
+WEEKDAYS = ("thứ Hai", "thứ Ba", "thứ Tư", "thứ Năm", "thứ Sáu", "thứ Bảy", "Chủ nhật")
+#: How the customer names a slot when they say it changed.
+SLOT_NAMES = {"budget_vnd": "ngân sách", "payment": "cách thanh toán", "delivery_area": "nơi giao", "size": "size",
+              "color": "màu", "quantity": "số lượng", "usage_need": "nhu cầu", "room_area_m2": "diện tích phòng"}
+#: Customer slots whose stated value must be the planned one, word for word (payment: COD|bank|momo|zalopay).
+EXACT_SLOTS = frozenset({"payment", "quantity", "size", "color"})
+#: Words a customer uses to say a value changed ("đổi ý", "giờ … rồi", "tăng lên", "thôi …").
+CHANGED_WORDS = re.compile(r"đổi|thay|giờ|bây giờ|nâng|tăng|giảm|thôi|chuyển|không .{0,20}nữa|lại", re.I)
+
+
+#: A long run of digits in a stated value: a bank account or a CCCD the customer read out (PB-08, QT-04).
+ID_NUMBER = re.compile(r"\d{9,}")
+
+
+def _usable_stated(facts: list[Any]) -> dict[str, Any]:
+    """The facts the writer listed beyond the plan, as labels: one the registry refuses for its slot, or that holds
+    an account or ID number, is dropped. Such numbers are never a fact to keep (gpt-4o-mini filed the refund
+    account "190157371104" under payment); the planned slots override the rest."""
+    return {fact.slot: fact.value for fact in facts
+            if keys.slot_value_ok(fact.slot, fact.value) and not ID_NUMBER.search(str(fact.value))}
+
+
+def _said(slot: str, value: Any) -> str:
+    return f"{vnd(value)}đ" if slot.endswith("_vnd") and isinstance(value, (int, float)) else str(value)
+
+#: The customer says they moved (address TTL: the stored address is old and was replaced).
+MOVED = re.compile(r"chuyển|dọn|đổi (?:nhà|chỗ|địa chỉ)|nhà mới|địa chỉ mới|không ở .{0,20}nữa", re.I)
+#: ... and does not call the new address the old one.
+SAME_AS_BEFORE = re.compile(r"như cũ|như trước|như lần trước|\bvẫn\b", re.I)
+
+
+def moved_address_errors(turns: list[str], area: str | None) -> list[str]:
+    """A customer whose stored address is past its TTL has moved: they say so, and never that the new address is
+    "như cũ". Only sentences about the address are checked ("mua lại như lần trước" is about the product)."""
+    district = (area or "").split(",")[0].strip().lower()
+    errors = []
+    for sentence in (s for turn in turns for s in re.split(r"[.!?]", turn)):
+        lower = sentence.lower()
+        about_address = "địa chỉ" in lower or "giao" in lower or (district and district in lower)
+        if about_address and SAME_AS_BEFORE.search(lower):
+            errors.append(f"the customer has moved: the address is new, never 'như cũ / vẫn như trước' ({sentence.strip()!r})")
+    if not MOVED.search(" ".join(turns)):
+        errors.append(f"the customer must say they moved and now live at {area} (\"giờ chị chuyển về ... rồi\")")
+    return errors
+
+
 def check_draft(sp: ScenarioPlan, draft: ScenarioDraft) -> list[str]:
     """Deterministic checks on LLM output; a non-empty list triggers a retry."""
     errors = []
@@ -1245,19 +1514,32 @@ def check_draft(sp: ScenarioPlan, draft: ScenarioDraft) -> list[str]:
         stated = {fact.slot for fact in dc.facts_stated}
         missing = sorted(set(pc.customer_must_state) - stated)
         if missing:
-            errors.append(f"{pc.name}: facts_stated must include {missing} and the turns must say them")
+            required = {slot: pc.customer_must_state[slot] for slot in missing}
+            errors.append(f"{pc.name}: facts_stated must include {json.dumps(required, ensure_ascii=False)} and the turns must say them")
+        # The planned value overrides what the draft states, so a contradiction would reach the labels unseen
+        # ("trả tiền khi nhận hàng" for a bank transfer). Only slots with exact values: an area or a budget is said
+        # in many right ways.
+        said = {fact.slot: fact.value for fact in dc.facts_stated}
+        wrong = sorted(slot for slot in EXACT_SLOTS & set(pc.customer_must_state) & set(said)
+                       if str(said[slot]).strip().lower() != str(pc.customer_must_state[slot]).strip().lower())
+        if wrong:
+            errors.append(f"{pc.name}: the customer must say " + ", ".join(
+                f"{slot} = {pc.customer_must_state[slot]!r} (not {said[slot]!r})" for slot in wrong))
         if len(dc.customer_turns) < pc.template.min_turns:
             errors.append(f"{pc.name}: needs at least {pc.template.min_turns} customer_turns")
         if pc.input_mode != "text" and len(dc.customer_turns_asr) != len(dc.customer_turns):
-            errors.append(f"{pc.name}: customer_turns_asr must have one {pc.input_mode} line per customer_turn")
+            errors.append(f"{pc.name}: customer_turns_asr must have exactly {len(dc.customer_turns)} {pc.input_mode} lines (got {len(dc.customer_turns_asr)}), one per customer_turn")
         if pc.input_mode == "text" and dc.customer_turns_asr:
             errors.append(f"{pc.name}: customer_turns_asr must be empty for input_mode=text")
         text = " ".join(dc.customer_turns)
         for literal in pc.must_say_literal:
             if literal.lower() not in text.lower():
                 errors.append(f"{pc.name}: customer turns must contain verbatim: {literal}")
-        has_history = bool(pc.seed_history) or pc.name != "call_1" or sp.session_index > 1
-        if not has_history and re.search(r"hôm trước|lần trước|bữa trước|đã gọi", text, re.I):
+        if pc.memory_extra.get("address_ttl_check"):
+            errors += [f"{pc.name}: {e}" for e in moved_address_errors(dc.customer_turns, pc.customer_must_state.get("delivery_area"))]
+        if pc.changed and not CHANGED_WORDS.search(text):
+            errors.append(f"{pc.name}: the customer must say they changed {sorted(pc.changed)} (\"đổi ý rồi\", \"giờ … rồi\")")
+        if first_contact(sp, pc) and re.search(r"hôm trước|lần trước|bữa trước|đã gọi", text, re.I):
             errors.append(f"{pc.name}: customer has no prior conversation; do not say 'hôm trước/lần trước'")
         if re.search(PHONE_PATTERN, text):
             errors.append(f"{pc.name}: customer turns must not contain a phone number")
@@ -1334,9 +1616,12 @@ def _call_brief(sp: ScenarioPlan, pc: PlannedCall, memory: dict[str, tuple[Any, 
     honor = pc.speaker.honorific
     who = f"{honor} {pc.speaker.name}" if pc.speaker.name else honor
     product_txt = _product_name(products[0]["sku"]) if products else "sản phẩm"
-    opening = f"Dạ em chào {who}, em gọi lại về {product_txt} {honor} đang quan tâm ạ"
+    # The customer is the caller (PB-01 "khách gọi lại"), so the opening picks up their last call, as the agent's
+    # brief.opening does; "em gọi lại về…" is rejected in the reference dialogue (validate_rules outbound_opening).
+    opening = f"Dạ em chào {who}, hôm trước {honor} có quan tâm {product_txt}"
     if blockers:
-        opening += f", không biết {blockers[0]} chưa ạ?"
+        opening += f", còn {blockers[0]}"
+    opening += f"; {honor} muốn mình tiếp tục thế nào ạ?"
     return {"customer_phone": pc.speaker.phone, "customer_id": pc.speaker.customer_id,
             "customer_name": pc.speaker.name or None, "honorific": honor,
             "is_returning": True, "n_previous_sessions": len(sessions) + len(earlier), "last_session": last_session,
@@ -1357,7 +1642,7 @@ def assemble(sp: ScenarioPlan, draft: ScenarioDraft | None) -> Scenario:
             for slot, value in (item.get("facts") or {}).items():
                 memory.setdefault(slot, (value, date.fromisoformat(item["date"])))
         dc = draft.calls[i] if draft else None
-        stated = {fact.slot: fact.value for fact in dc.facts_stated} if dc else {}
+        stated = _usable_stated(dc.facts_stated) if dc else {}
         facts = {**stated, **pc.customer_must_state, **pc.agent_facts}
 
         def is_stale(slot: str) -> bool:
@@ -1367,8 +1652,9 @@ def assemble(sp: ScenarioPlan, draft: ScenarioDraft | None) -> Scenario:
         must_carry_over = [slot for slot in active if slot in CARRY_SLOTS]
         must_not_ask = [slot for slot in active if slot in PROTECTED_SLOTS]
         brief = _call_brief(sp, pc, memory, must_not_ask, sp.calls[:i])
+        # A CRM record (order_id, owned_sku) is one of the customer's several: a new order supersedes none.
         superseded = {slot: memory[slot][0] for slot, value in facts.items()
-                      if slot in memory and str(memory[slot][0]) != str(value)}
+                      if slot in memory and slot not in DURABLE_SLOTS and str(memory[slot][0]) != str(value)}
         for slot, value in facts.items():
             memory[slot] = (value, pc.call_date)
 
@@ -1409,7 +1695,7 @@ def assemble(sp: ScenarioPlan, draft: ScenarioDraft | None) -> Scenario:
     if not hard and "out_of_stock" in sp.flags:
         hard = "het_hang_luc_khach_quyet"
     tags = sorted({*sp.variant.tags, *(draft.tags if draft else []), f"variant:{sp.variant.name}",
-                   *(["hard_case"] if hard else [])})
+                   f"date:{sp.date_probe}", *(["hard_case"] if hard else [])})
     return Scenario(
         scenario_id=sp.scenario_id, level=sp.level, persona=sp.persona_id, persona_source=sp.persona_source,
         hard_case=hard, customer_id=customer.customer_id, customer_phone=customer.phone,

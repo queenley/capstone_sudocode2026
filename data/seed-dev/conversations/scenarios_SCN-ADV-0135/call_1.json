@@ -1,0 +1,216 @@
+{
+  "conversation_id": "SCN-ADV-0135__call_1",
+  "scenario_id": "SCN-ADV-0135",
+  "call": "call_1",
+  "customer_id": "SYN-C007",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-14",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_bao_hanh_trong_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị G ạ, em là trợ lý ảo của shop. Chị hôm trước có mua Máy lọc không khí Samsung AX40 phải không ạ? Em sẵn sàng hỗ trợ chị về sản phẩm này ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900701"
+        },
+        {
+          "field": "owned_sku",
+          "value": "SKU-SS-AX40"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900701"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị G đây, chị muốn hỏi về sản phẩm Máy lọc không khí Samsung AX40 mà chị đã mua.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã kiểm tra, đơn hàng mua Máy lọc không khí Samsung AX40 của chị vẫn còn trong thời hạn bảo hành 24 tháng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900701"
+        },
+        {
+          "field": "owned_sku",
+          "value": "SKU-SS-AX40"
+        },
+        {
+          "field": "warranty_months",
+          "value": 24
+        },
+        {
+          "field": "in_warranty",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Bây giờ máy bị lỗi, quạt trong máy rung mạnh quá, không biết còn bảo hành không em nhỉ?",
+      "facts_stated": {
+        "issue": "quạt trong máy rung mạnh"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy của chị còn bảo hành chị nhé. Với lỗi quạt rung mạnh, chị có thể gửi máy về shop hoặc mang trực tiếp đến trung tâm bảo hành hãng đều được ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_warranty",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị không rõ quy trình bảo hành như thế nào, gửi về shop hay là trung tâm bảo hành hãng?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị có thể lựa chọn gửi về shop, bên em sẽ hỗ trợ chuyển đến trung tâm bảo hành hãng giúp chị hoặc chị gửi trực tiếp đến trung tâm bảo hành Samsung đều được ạ. Thời gian xử lý bảo hành là 7–15 ngày làm việc chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu gửi đi thì mất bao lâu để sửa ạ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ thời gian xử lý bảo hành là 7–15 ngày làm việc, khi hoàn tất bên em sẽ liên hệ lại để chị nhận máy ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có cần làm gì thêm không hay chỉ cần gửi máy là được?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị chỉ cần gửi máy và kèm theo hóa đơn mua hàng hoặc thông tin đơn OD900701 là được ạ. Bên em sẽ hỗ trợ kiểm tra và gửi bảo hành cho chị.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900701"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "issue",
+          "value": "quạt trong máy rung mạnh",
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "order_id",
+          "value": "OD900701",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "owned_sku",
+          "value": "SKU-SS-AX40",
+          "op": "set",
+          "source": "call_1#turn2"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "ho_tro_bao_hanh",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,191 @@
+{
+  "conversation_id": "SCN-GEN-0152__call_2",
+  "scenario_id": "SCN-GEN-0152",
+  "call": "call_2",
+  "customer_id": "SYN-C014",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-25",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Lê Thị Hoa, hôm trước chị có hỏi về xe đẩy gấp gọn Joie Pact và cần hỏi chồng thêm ạ. Em rất vui được hỗ trợ chị tiếp tục ạ.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "blocker",
+        "decision_maker",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị gọi lại để hỏi về xe đẩy Joie Pact hôm trước.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã gọi lại. Hiện tại xe đẩy Joie Pact đang hết hàng ở shop, giá niêm yết vẫn là 3.490.000đ và vẫn áp dụng miễn phí vận chuyển toàn quốc chương trình MOM-FREESHIP cho đơn từ 500.000đ ạ.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        },
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em ơi, chị muốn mua xe đẩy này rồi, nhưng có nói là hết hàng đúng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi chị, hiện tại sản phẩm này đang tạm hết hàng nên bên em chưa thể lên đơn mới cho mình ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khi nào thì có hàng lại vậy em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại bên em chưa có thông tin chính xác về ngày xe Joie Pact sẽ về hàng lại, nếu có cập nhật mới em sẽ báo ngay cho chị ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn đặt hàng, nhưng nếu chưa có, thì em gọi cho chị khi nào có nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận nhu cầu của chị về xe đẩy Joie Pact. Khi có hàng mới về, em sẽ chủ động liên hệ lại để báo cho chị ngay nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-STR1",
+          "op": "set",
+          "source": "call_2#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 3490000,
+          "op": "set",
+          "source": "call_2#turn9"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_2#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": "chồng",
+    "commitments": [
+      {
+        "action": "callback_when_in_stock",
+        "product": "SKU-MB-STR1"
+      }
+    ],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

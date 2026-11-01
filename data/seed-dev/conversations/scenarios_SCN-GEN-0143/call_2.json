@@ -1,0 +1,283 @@
+{
+  "conversation_id": "SCN-GEN-0143__call_2",
+  "scenario_id": "SCN-GEN-0143",
+  "call": "call_2",
+  "customer_id": "SYN-C005",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-14",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_da_kenh_fb_hotline",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có hỏi về Bình sữa Pigeon PPSU 240ml và muốn gọi hotline để được hỗ trợ thêm. Em sẵn sàng hỗ trợ anh lên đơn ạ.",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 289000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn đặt bình sữa Pigeon mà hôm qua em tư vấn.",
+      "facts_stated": {
+        "product_advised": "SKU-MB-BOT"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng anh, Bình sữa Pigeon PPSU 240ml hiện đang còn hàng, giá 289.000đ. Em sẽ hỗ trợ anh đặt đơn theo thông tin hôm qua mình trao đổi nhé.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 289000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán là COD nhé.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh chọn thanh toán khi nhận hàng COD, phí thu hộ 0đ. Mình sẽ nhận hàng và kiểm tra ngoại quan trước khi thanh toán ạ.",
+      "questions": [],
+      "facts_used": [
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là TP Huế.",
+      "facts_stated": {
+        "delivery_area": "TP Huế"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận địa chỉ giao hàng tại TP Huế. Dự kiến giao trong 4 ngày làm việc, tức khoảng ngày 19/11 anh nhận được hàng ạ.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "delivery_days",
+          "value": 4
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-19"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "TP Huế",
+            "on": "2026-11-14"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mong em giúp anh lên đơn nhanh nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em tóm tắt lại đơn của anh: Bình sữa Pigeon PPSU 240ml, số lượng 1, giá 289.000đ, giao tại TP Huế, thanh toán COD khi nhận hàng, dự kiến giao ngày 19/11. Anh xác nhận giúp em thông tin trên đúng chưa để em tiến hành lên đơn ngay ạ.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh xác nhận giúp em thông tin trên đúng chưa để em tiến hành lên đơn ngay ạ."
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd",
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 289000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-19"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi em.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em đã tạo đơn thành công cho anh, mã đơn OD600001. Đơn sẽ được giao về TP Huế khoảng ngày 19/11, bên em sẽ nhắn mã vận đơn khi gửi hàng. Cảm ơn anh đã đặt hàng tại shop BTC ạ!",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000005",
+            "sku": "SKU-MB-BOT",
+            "qty": 1,
+            "price_vnd": 289000,
+            "payment": "COD",
+            "address": "TP Huế",
+            "on": "2026-11-14"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "delivery_area",
+          "value": "TP Huế",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-BOT",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 289000,
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn10"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_hang_binh_sua_pigeon",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001",
+      "sku": "SKU-MB-BOT",
+      "qty": 1,
+      "price_vnd": 289000,
+      "payment": "COD",
+      "address": "TP Huế",
+      "estimated_delivery": "2026-11-19"
+    }
+  }
+}

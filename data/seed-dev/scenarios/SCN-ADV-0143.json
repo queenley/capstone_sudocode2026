@@ -1,0 +1,128 @@
+{
+  "scenario_id": "SCN-ADV-0143",
+  "level": "M2",
+  "persona": "khach_khieu_nai_giao_cham",
+  "hard_case": null,
+  "customer_phone": "0998000006",
+  "customer_name": "Trần Văn F",
+  "honorific": "anh",
+  "notes": "Persona khach_khieu_nai_giao_cham, biến thể giao_cham. call_1 (zalo_oa): hỏi tình trạng đơn → cap_nhat_don. Chấm chủ yếu: CCR, RQR, TSR, ESC.",
+  "calls": {
+    "call_1": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_syn-c006",
+      "call_date": "2026-11-13",
+      "customer_goal": "Hỏi đơn hàng ghế ngồi ô tô đang ở đâu",
+      "customer_turns": [
+        "Alo, anh muốn hỏi đơn hàng ghế ngồi ô tô của anh sao chưa thấy giao.",
+        "Hôm trước anh đặt mà giờ vẫn chưa thấy, sao mà chậm thế.",
+        "Đơn này đang ở đâu rồi, sao không thấy cập nhật gì hết vậy em?",
+        "Nếu không có hàng thì phải báo cho anh chứ, đợi lâu quá rồi.",
+        "À, em cho anh biết tình trạng đơn hàng và mã vận đơn đi nhé."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C006",
+          "session_id": "SYN-006-S3",
+          "date": "2025-07-10",
+          "channel": "web",
+          "summary": "Mua Nồi chiên không dầu Xiaomi 4.5L giá 1.590.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C006",
+          "session_id": "SYN-006-S1",
+          "date": "2026-03-16",
+          "channel": "zalo_oa",
+          "summary": "Mua Máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C006",
+          "session_id": "SYN-006-S2",
+          "date": "2026-10-06",
+          "channel": "fb",
+          "summary": "Đặt Ghế ngồi ô tô cho bé Chicco giá 4.990.000đ, đơn OD900602 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C006",
+          "order_id": "OD900601",
+          "date": "2026-03-16",
+          "sku": "SKU-MB-STER",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-MB-STER"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C006",
+          "order_id": "OD900602",
+          "date": "2026-10-06",
+          "sku": "SKU-MB-CAR",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900602"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C006",
+          "order_id": "OD900603",
+          "date": "2025-07-10",
+          "sku": "SKU-AF-XM",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AF-XM"
+          }
+        }
+      ],
+      "facts_established": {
+        "issue": "giao chậm"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD900602"
+        },
+        "must_say_any": [
+          "đang xử lý",
+          "đang chuẩn bị"
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900602",
+        "order_status": "processing",
+        "call_date": "2026-11-13"
+      },
+      "memory_expectation": {
+        "issue": "giao chậm"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01",
+        "PB-10"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    }
+  }
+}

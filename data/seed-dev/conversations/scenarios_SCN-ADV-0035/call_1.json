@@ -1,0 +1,225 @@
+{
+  "conversation_id": "SCN-ADV-0035__call_1",
+  "scenario_id": "SCN-ADV-0035",
+  "call": "call_1",
+  "customer_id": "C023",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-10-16",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_go_khong_dau",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị, em là trợ lý ảo của shop BTC đây ạ. Chị muốn hỏi về máy tiệt trùng sấy khô Moaz Bebe đúng không chị? Em sẵn sàng hỗ trợ chị nhé.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn hỏi về máy tiệt trùng sấy khô Moaz Bebe đúng không chị?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo chi muon hoi ve may tiet trung say kho moaz bebe",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy Moaz Bebe đang có giá 1.890.000đ chị nhé. Hiện shop đang có freeship cho đơn này luôn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "may nay co gia bao nhieu em nhi",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Chị có ngân sách khoảng 2 triệu đúng không ạ? Máy này giá 1.890.000đ nên nằm trong tầm ngân sách của mình luôn chị nha.",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Chị có ngân sách khoảng 2 triệu đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chi co ngan sach khoang 2 trieu thoi",
+      "facts_stated": {
+        "budget_vnd": 2000000
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Nhà mình có bé 12 tháng thì dùng máy Moaz Bebe là phù hợp chị nhé. Máy tiệt trùng được 6 bình, có chế độ sấy, dùng an toàn cho bé nhỏ luôn ạ.",
+      "questions": [
+        {
+          "slot": "child_age_months",
+          "type": "confirm",
+          "text": "Nhà mình có bé 12 tháng đúng không chị?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chi co be 12 thang khong biet may nay co phu hop khong",
+      "facts_stated": {
+        "child_age_months": 12
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị chờ cuối tháng nhận lương rồi sẽ gọi lại nhé. Máy còn hàng và freeship đến cuối tháng nên chị yên tâm ạ. Em giữ lại thông tin ngân sách và sản phẩm chị quan tâm để hỗ trợ nhanh cho lần sau.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "child_age_months",
+          "value": 12,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 2500000,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-STER",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1890000,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_1#turn7"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "a chi cho cuoi thang nhan luong roi se goi lai nhe",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_tu_van_san_pham",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chờ cuối tháng nhận lương",
+    "objection_handling": "Xác nhận lại và cam kết giữ thông tin, khuyến mãi còn hiệu lực tới cuối tháng.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

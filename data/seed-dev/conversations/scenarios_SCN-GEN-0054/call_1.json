@@ -1,0 +1,247 @@
+{
+  "conversation_id": "SCN-GEN-0054__call_1",
+  "scenario_id": "SCN-GEN-0054",
+  "call": "call_1",
+  "customer_id": "C041",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần hỗ trợ về ghế ngồi ô tô cho bé Chicco đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh cần tư vấn ghế ngồi ô tô cho bé Chicco đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về ghế ngồi ô tô cho bé Chicco.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại ghế ngồi ô tô Chicco đang còn hàng anh nhé. Sản phẩm phù hợp cho bé từ sơ sinh đến 18kg, dùng được đến khoảng 4 tuổi, giá là 4.990.000đ.",
+      "questions": [
+        {
+          "slot": "child_age_months",
+          "type": "open",
+          "text": "Anh cho em hỏi bé nhà mình hiện được bao nhiêu tháng rồi ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "4990000",
+          "spoken": "4.990.000"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Bé nhà anh được 18 tháng rồi, ngân sách khoảng 5 triệu rưỡi.",
+      "facts_stated": {
+        "child_age_months": 18,
+        "budget_vnd": 5500000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "5500000",
+          "spoken": "5 triệu rưỡi"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với bé 18 tháng, ghế Chicco rất phù hợp anh nhé. Giá hiện tại của sản phẩm là 4.990.000đ, nằm trong ngân sách của mình ạ.",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Hiện tại anh muốn mình báo luôn các chương trình khuyến mãi đang áp dụng cho sản phẩm này không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "4990000",
+          "spoken": "4.990.000"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ghế này có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại khi anh mua ghế Chicco sẽ được miễn phí vận chuyển toàn quốc theo chương trình MOM-FREESHIP, chưa có thêm khuyến mãi giảm giá khác anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh đang muốn so sánh thêm với một số sản phẩm khác nữa.",
+      "facts_stated": {
+        "blocker": "muốn so sánh thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, anh cứ tham khảo thêm các lựa chọn. Nếu cần so sánh thông tin chi tiết hoặc giá từng sản phẩm, anh có thể liên hệ lại shop bất cứ lúc nào ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Vậy để anh xem xét rồi sẽ gọi lại nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã quan tâm sản phẩm của shop. Khi nào anh cần hỗ trợ thêm hoặc quyết định mua, anh cứ liên hệ lại bên em nhé, em luôn sẵn sàng hỗ trợ anh ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "child_age_months",
+          "value": 18,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 5500000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "blocker",
+          "value": "muốn so sánh thêm",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-CAR",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 4990000,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_1#turn7"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_tu_van_ghe_o_to_tre_em",
+    "outcome": "hen_goi_lai",
+    "objection_type": "muon_so_sanh_them",
+    "objection_handling": "Đã ghi nhận ý định so sánh thêm, nhắc khách liên hệ lại khi cần, không tạo áp lực.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,199 @@
+{
+  "scenario_id": "SCN-GEN-0224",
+  "level": "M1",
+  "persona": "khach_da_mua_doi_size",
+  "hard_case": "doi_san_pham_hoan_chenh_lech",
+  "customer_phone": "0998000005",
+  "customer_name": "Nguyễn Văn E",
+  "honorific": "anh",
+  "notes": "Persona khach_da_mua_doi_size, biến thể doi_san_pham_hoan_chenh_lech. call_1 (hotline): chốt đơn → chot_don; call_2 (hotline): đổi sản phẩm, hoàn chênh lệch → cap_nhat_don. Ca khó: doi_san_pham_hoan_chenh_lech. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-27",
+      "customer_goal": "Xác nhận mua giày chạy bộ RunLite 2 Pro size 42 màu đen.",
+      "customer_turns": [
+        "Alo, anh muốn xác nhận đơn hàng giày chạy bộ RunLite 2 Pro size 42 màu đen.",
+        "Hình thức thanh toán là chuyển khoản ngân hàng nhé.",
+        "Khu vực giao hàng là TP Huế.",
+        "Mong là sản phẩm còn hàng, anh đồng ý lên đơn ngay bây giờ."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C005",
+          "session_id": "SYN-005-S1",
+          "date": "2026-07-13",
+          "channel": "hotline",
+          "summary": "Mua Áo khoác gió Windbreak giá 690.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C005",
+          "session_id": "SYN-005-S2",
+          "date": "2026-10-05",
+          "channel": "zalo_oa",
+          "summary": "Đặt Giày chạy bộ RunLite 1 giá 1.290.000đ, đơn OD900502 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C005",
+          "order_id": "OD900501",
+          "date": "2026-07-13",
+          "sku": "SKU-JK-WND-M-NAVY",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-JK-WND-M-NAVY"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C005",
+          "order_id": "OD900502",
+          "date": "2026-10-05",
+          "sku": "SKU-SN-RUN1-41-DEN",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900502"
+          }
+        }
+      ],
+      "facts_established": {
+        "color": "den",
+        "delivery_area": "TP Huế",
+        "payment": "bank",
+        "size": 42,
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-42-DEN",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-RUN2-42-DEN",
+          "price_vnd": 1690000,
+          "payment": "bank"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1690000,
+        "list_price_vnd": 1690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-12-02",
+        "call_date": "2026-11-27"
+      },
+      "memory_expectation": {
+        "color": "den",
+        "delivery_area": "TP Huế",
+        "payment": "bank",
+        "size": 42,
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-42-DEN",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    },
+    "call_2": {
+      "days_later": 2,
+      "customer_goal": "Muốn đổi sang giày sneaker Urban Classic size 42 màu đen và hỏi hoàn tiền.",
+      "customer_turns": [
+        "Alo, anh muốn đổi sản phẩm sang giày sneaker Urban Classic size 42 màu đen.",
+        "Giá của đôi giày đó bao nhiêu vậy em?",
+        "Và anh muốn hỏi hoàn tiền chênh lệch là bao nhiêu?",
+        "À, số tài khoản ngân hàng của anh là 190223466063 để nhận hoàn tiền."
+      ],
+      "facts_established": {
+        "payment": "bank"
+      },
+      "must_carry_over": [
+        "size",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "variant_sku",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "OD600001",
+          "new_variant_sku": "SKU-SN-CAS-42-DEN",
+          "action": "exchange_product"
+        },
+        "must_say_any": [
+          "800.000",
+          "800000"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "exchange_fee_vnd",
+            "value": 30000
+          }
+        ],
+        "trace_must_not_match": [
+          "190223466063"
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD600001",
+        "new_variant_sku": "SKU-SN-CAS-42-DEN",
+        "exchange_fee_vnd": 0,
+        "refund_vnd": 800000,
+        "extra_payment_vnd": 0,
+        "new_size_in_stock": true,
+        "return_days": 7,
+        "call_date": "2026-11-29"
+      },
+      "memory_expectation": {
+        "payment": "bank"
+      },
+      "relevant_policy_ids": [
+        "DT-01",
+        "DT-04",
+        "QT-03",
+        "QT-04",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    }
+  }
+}

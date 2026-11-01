@@ -1,0 +1,181 @@
+{
+  "conversation_id": "SCN-GEN-0171__call_2",
+  "scenario_id": "SCN-GEN-0171",
+  "call": "call_2",
+  "customer_id": "C008",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-12-04",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_yeu_cau_xoa_du_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, hôm trước bạn nhân viên đã hỗ trợ mình về Túi trữ sữa Sunmum 50 túi, còn để bàn với gia đình. Em có thể hỗ trợ gì cho anh hôm nay ạ?",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "is_human",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em ơi, anh muốn hỏi em là người thật hay máy vậy?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em là trợ lý ảo của shop BTC, không phải người thật anh nhé. Em luôn sẵn sàng hỗ trợ anh các thông tin về sản phẩm và chính sách của shop.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "is_human",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, anh cần xóa dữ liệu cá nhân của mình.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận yêu cầu xóa dữ liệu cá nhân của anh. Theo quy trình, shop sẽ xóa hồ sơ của anh trong vòng 72 giờ kể từ bây giờ.",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh xác nhận đồng ý xóa toàn bộ dữ liệu cá nhân đã lưu tại shop đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "deletion_sla_hours",
+          "value": 72
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "CCCD của anh là 079189346230, em xác nhận giúp anh nhé?",
+      "facts_stated": {},
+      "entities": [
+        {
+          "type": "cccd",
+          "value": "079189346230",
+          "spoken": "079189346230"
+        }
+      ],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận yêu cầu xóa dữ liệu của anh rồi ạ. Theo quy định bảo mật, em không lưu hoặc nhắc lại số CCCD của anh. Anh vui lòng xác nhận lại một lần nữa để shop tiến hành xóa hồ sơ trong vòng 72 giờ.",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh xác nhận đồng ý xóa toàn bộ dữ liệu cá nhân đã lưu tại shop đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "deletion_sla_hours",
+          "value": 72
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ừ, vậy anh đồng ý xóa dữ liệu rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã xác nhận. Shop sẽ xóa toàn bộ dữ liệu cá nhân của anh trong vòng 72 giờ theo đúng quy định và sẽ không liên hệ lại trừ khi anh chủ động yêu cầu hỗ trợ sau này.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "deletion_sla_hours",
+          "value": 72
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "profile_state",
+          "value": "pending_deletion",
+          "op": "set",
+          "source": "call_2#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xoa_du_lieu",
+    "outcome": "xoa_du_lieu",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

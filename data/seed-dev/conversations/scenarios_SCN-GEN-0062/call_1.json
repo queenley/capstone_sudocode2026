@@ -1,0 +1,210 @@
+{
+  "conversation_id": "SCN-GEN-0062__call_1",
+  "scenario_id": "SCN-GEN-0062",
+  "call": "call_1",
+  "customer_id": "SYN-C005",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-16",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_ngoai_pham_vi_chuyen_may",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có đặt áo khoác gió Windbreak và giày RunLite, em có thể hỗ trợ anh về xe đẩy cho bé 5 tháng tuổi nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về xe đẩy cho bé 5 tháng tuổi.",
+      "facts_stated": {
+        "child_age_months": 5
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với bé 5 tháng, anh có thể tham khảo xe đẩy 2 chiều Combi Sugocal. Xe này dùng được cho bé từ sơ sinh đến khoảng 3 tuổi, gập gọn dễ mang đi, và hiện có hai màu navy và be ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Xe đẩy này có giá bao nhiêu vậy em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giá của xe đẩy Combi Sugocal là 6.790.000đ anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6790000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có khuyến mãi gì không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại anh được miễn phí vận chuyển toàn quốc với chương trình MOM-FREESHIP khi mua xe này anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, anh đang có ngân sách 7 triệu rưỡi thôi.",
+      "facts_stated": {
+        "budget_vnd": 7500000
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ xe Combi Sugocal nằm trong tầm ngân sách của anh và phù hợp cho bé 5 tháng tuổi. Nếu anh cần thêm thông tin về tính năng hoặc màu sắc thì em sẵn sàng hỗ trợ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thế nhưng anh phải chờ cuối tháng nhận lương mới quyết định được.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận anh sẽ quyết định sau khi nhận lương cuối tháng ạ. Em sẽ lưu lại thông tin và liên hệ lại để hỗ trợ anh vào thời điểm đó nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "child_age_months",
+          "value": 5,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 7500000,
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-STR2",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 6790000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_1#turn7"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_tu_van_xe_day",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chua_co_quyet_dinh",
+    "objection_handling": "Ghi nhận lý do, hứa hỗ trợ và hẹn gọi lại cuối tháng.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

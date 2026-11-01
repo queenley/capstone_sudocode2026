@@ -1,0 +1,191 @@
+{
+  "conversation_id": "SCN-ADV-0049__call_2",
+  "scenario_id": "SCN-ADV-0049",
+  "call": "call_2",
+  "customer_id": "SYN-C003",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_chuyen_giua_nguoi_va_ai",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop. Em ghi nhận hôm qua anh đã được nhân viên hỗ trợ về đơn hàng OD900302 rồi ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900302"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo em, hôm qua anh đã gặp nhân viên rồi, giờ anh muốn hỏi đơn hàng của mình đến đâu rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, để em kiểm tra giúp anh tình trạng đơn hàng của mình ngay ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900302"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900302"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mà em nhớ nhé, anh không muốn kể lại từ đầu đâu đấy.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ, anh yên tâm, em đã có đầy đủ thông tin đơn hàng rồi. Đơn hàng của anh đang vận chuyển, mã vận đơn là VN0032TRK, bên vận chuyển sẽ liên hệ khi giao hàng tới nơi ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "shipping"
+        },
+        {
+          "field": "tracking",
+          "value": "VN0032TRK"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "VN0032TRK",
+          "spoken": "VN0032TRK"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đơn hàng của anh là VN0032TRK, anh cần biết là đang ở đâu.",
+      "facts_stated": {
+        "order_id": "OD900302"
+      },
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "VN0032TRK",
+          "spoken": "VN0032TRK"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn VN0032TRK của anh hiện đang giao, khi tới nơi bên vận chuyển sẽ gọi anh nhận hàng nhé ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "shipping"
+        },
+        {
+          "field": "tracking",
+          "value": "VN0032TRK"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "VN0032TRK",
+          "spoken": "VN0032TRK"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hy vọng là không có gì trục trặc nữa.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận ý kiến của anh, nếu có vấn đề phát sinh anh cứ liên hệ lại shop để được hỗ trợ kịp thời ạ. Em cảm ơn anh đã liên hệ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

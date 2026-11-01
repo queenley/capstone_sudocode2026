@@ -1,0 +1,159 @@
+{
+  "conversation_id": "SCN-ADV-0112__call_2",
+  "scenario_id": "SCN-ADV-0112",
+  "call": "call_2",
+  "customer_id": "C017",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-09",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_chuyen_giua_nguoi_va_ai",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Hạnh ạ, hôm trước chị có quan tâm đến Giày trekking HikePro size 41 màu xám và còn cần suy nghĩ thêm. Em là trợ lý ảo của shop, chị muốn mình hỗ trợ như thế nào tiếp theo ạ?",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "size",
+        "color",
+        "blocker",
+        "price_quoted_vnd",
+        "variant_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn gặp người thật để hỏi thêm về sản phẩm.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ý chị, nếu chị muốn trao đổi trực tiếp với nhân viên, em sẽ chuyển máy ngay để bạn nhân viên hỗ trợ chị chi tiết hơn về sản phẩm nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em là AI hay người thật vậy?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em là trợ lý ảo của shop BTC, hỗ trợ tư vấn thông tin sản phẩm và đơn hàng. Nếu chị cần trao đổi với nhân viên thật, em sẽ chuyển máy ngay cho mình ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "is_human",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chuyển máy cho bạn nhân viên đi em ơi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em sẽ chuyển máy cho nhân viên để hỗ trợ chị kỹ hơn về sản phẩm Giày trekking HikePro ạ. Chị vui lòng giữ máy trong giây lát nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "handoff.transfer",
+          "args": {
+            "brief": {
+              "customer_phone": "0994893949",
+              "customer_name": "Hạnh",
+              "escalation_reason": "khach_yeu_cau_gap_nguoi",
+              "conversation_summary": "Khách đang được tư vấn Giày trekking HikePro size 41 xam và yêu cầu nói chuyện với nhân viên.",
+              "product_advised": "SKU-SN-TRK",
+              "price_quoted_vnd": 1990000,
+              "open_questions": [
+                "khách muốn nhân viên tư vấn trực tiếp"
+              ],
+              "next_action": "Nhân viên gọi lại tư vấn tiếp Giày trekking HikePro size 41 xam",
+              "generated_at": "2026-11-09T10:00:00+07:00",
+              "channel": "hotline"
+            }
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ đợi để nói chuyện với bạn nhân viên.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_human",
+      "text": "Dạ em chào chị Hạnh, em là nhân viên hỗ trợ trực tiếp của shop. Em đã nhận được yêu cầu của chị về Giày trekking HikePro và sẵn sàng hỗ trợ chị chi tiết hơn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "gap_nhan_vien",
+    "outcome": "chuyen_may",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

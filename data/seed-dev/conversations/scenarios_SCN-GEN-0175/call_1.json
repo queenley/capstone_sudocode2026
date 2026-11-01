@@ -1,0 +1,197 @@
+{
+  "conversation_id": "SCN-GEN-0175__call_1",
+  "scenario_id": "SCN-GEN-0175",
+  "call": "call_1",
+  "customer_id": "C006",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-12",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần tư vấn về giày chạy bộ size 38 màu trắng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh cần tư vấn về giày chạy bộ size 38 màu trắng đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về giày chạy bộ size 38 màu trắng mà em có.",
+      "facts_stated": {
+        "product_advised": "SKU-SN-RUN1",
+        "size": 38,
+        "color": "trang"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giày chạy bộ RunLite 1 size 38 màu trắng bên em hiện còn hàng anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá của đôi giày này là bao nhiêu vậy?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giá của giày chạy bộ RunLite 1 size 38 màu trắng là 1.290.000đ anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1290000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1290000",
+          "spoken": "1.290.000đ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có khuyến mãi gì cho sản phẩm này không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại mẫu giày này bên em chưa có chương trình khuyến mãi nào áp dụng anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, anh cần so sánh thêm với một vài mẫu khác trước khi quyết định, có được không?",
+      "facts_stated": {
+        "blocker": "muốn so sánh thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh cứ tham khảo thêm các mẫu khác thoải mái ạ, khi nào anh quyết định thì cứ liên hệ lại shop hỗ trợ nhanh nhất cho mình anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "muốn so sánh thêm",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "color",
+          "value": "trang",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "size",
+          "value": 38,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN1",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1290000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN1-38-TRANG",
+          "op": "set",
+          "source": "call_1#turn2"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_giay_chay_bo",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_so_sanh_them",
+    "objection_handling": "Đã đồng ý để khách tham khảo thêm, mời liên hệ lại khi quyết định.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,191 @@
+{
+  "conversation_id": "SCN-ADV-0130__call_1",
+  "scenario_id": "SCN-ADV-0130",
+  "call": "call_1",
+  "customer_id": "C029",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-11-01",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_go_khong_dau",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị, em là trợ lý ảo của shop BTC. Chị muốn hỏi về giày chạy bộ đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn tư vấn về giày chạy bộ RunLite 2 Pro phải không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo em chi muon hoi ve giay chay bo size 38 mau den",
+      "facts_stated": {
+        "size": 38,
+        "color": "den",
+        "product_advised": "SKU-SN-RUN2"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giày chạy bộ RunLite 2 Pro size 38 màu đen bên em đang còn hàng chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "gia giay nay la bao nhieu em nhi",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giá giày này hiện là 1.690.000đ chị ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "co khuyen mai gi khong em",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Hiện tại mẫu giày này chưa có chương trình khuyến mãi nào áp dụng chị nhé. Tuy nhiên, đơn từ 500.000đ bên em miễn phí vận chuyển toàn quốc cho sản phẩm mẹ & bé và thời trang ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chi can suy nghi them roi se goi lai nhe",
+      "facts_stated": {
+        "blocker": "cần suy nghĩ thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, chị cứ suy nghĩ thêm. Khi nào cần đặt hàng hoặc cần hỗ trợ gì thêm thì nhắn lại cho em bất cứ lúc nào chị nhé. Em cảm ơn chị đã quan tâm sản phẩm bên em ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "color",
+          "value": "den",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "size",
+          "value": 38,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN2",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1690000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN2-38-DEN",
+          "op": "set",
+          "source": "call_1#turn2"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_giay_chay_bo",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_suy_nghi",
+    "objection_handling": "Tôn trọng quyết định của khách, nhắc lại có thể liên hệ khi cần.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

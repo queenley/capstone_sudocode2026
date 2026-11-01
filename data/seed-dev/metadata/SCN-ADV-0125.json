@@ -1,0 +1,68 @@
+{
+  "scenario_id": "SCN-ADV-0125",
+  "persona_source": "advanced",
+  "customer_id": "C026",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "normal",
+  "tags": [
+    "COD",
+    "cod_limit",
+    "date:ordinary",
+    "multi_item",
+    "máy_lọc_không_khí",
+    "split_order",
+    "tách_đơn",
+    "tư_vấn",
+    "variant:hai_may_loc_vuot_cod"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "consult",
+      "outcome_detail": "hen_goi_lai",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Máy lọc không khí AirPure Pro",
+        "price_vnd": 7690000,
+        "promo": "AIR-OCT",
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_tach_don_cod",
+      "patience_start": 3
+    },
+    "call_2": {
+      "kind": "order_split",
+      "outcome_detail": "chot_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Máy lọc không khí AirPure Pro",
+        "price_vnd": 7690000,
+        "promo": "AIR-OCT",
+        "in_stock": true,
+        "items": [
+          "Máy lọc không khí AirPure Pro: 7.690.000đ",
+          "Máy lọc không khí Samsung AX40: 3.245.000đ"
+        ],
+        "total_vnd": 10935000,
+        "split": [
+          [
+            "Máy lọc không khí AirPure Pro"
+          ],
+          [
+            "Máy lọc không khí Samsung AX40"
+          ]
+        ]
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_tach_don_cod",
+      "patience_start": 3
+    }
+  }
+}

@@ -1,0 +1,284 @@
+{
+  "conversation_id": "SCN-GEN-0057__call_2",
+  "scenario_id": "SCN-GEN-0057",
+  "call": "call_2",
+  "customer_id": "C046",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-31",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_so_gia",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Xuân ạ, hôm trước bạn nhân viên đã hỗ trợ mình về Máy lọc không khí AirPure Pro. Em cập nhật lại giá hiện tại là 7.990.000đ, đã hết khuyến mãi AIR-OCT như lần trước, và sản phẩm vẫn còn hàng chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "room_area_m2",
+        "objection",
+        "competitor_price_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-10-31"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị gọi lại để đặt máy lọc không khí AirPure Pro.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận, chị chọn thanh toán qua ngân hàng và giao hàng về Ninh Kiều, Cần Thơ đúng không ạ? Đơn giá là 7.990.000đ, đã áp dụng miễn phí vận chuyển toàn quốc theo chương trình NAM-SHIP0 cho khu vực miền Nam, giao dự kiến trước ngày 05/11.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em xác nhận lại: Máy lọc không khí AirPure Pro, giá 7.990.000đ, giao về Ninh Kiều, Cần Thơ, thanh toán chuyển khoản ngân hàng, giao dự kiến trước 05/11. Thông tin như vậy đã đúng hết chưa chị?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        },
+        {
+          "field": "promo_NAM-SHIP0_active",
+          "value": true
+        },
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-05"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thanh toán qua ngân hàng và giao hàng ở Ninh Kiều, Cần Thơ nhé.",
+      "facts_stated": {
+        "payment": "bank",
+        "delivery_area": "Ninh Kiều, Cần Thơ"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại giá máy là 7.990.000đ, đã hết khuyến mãi AIR-OCT giảm giá như trước, nhưng đang có chương trình miễn phí vận chuyển NAM-SHIP0 áp dụng cho khu vực của chị. Giá này là tốt nhất hiện tại rồi chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": false
+        },
+        {
+          "field": "promo_NAM-SHIP0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị đã đồng ý đặt hàng, em sẽ tiến hành lên đơn ngay cho mình ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0965237355",
+            "sku": "SKU-AP-PRO",
+            "qty": 1,
+            "price_vnd": 7990000,
+            "payment": "bank",
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-10-31"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ừm, chị đồng ý đặt hàng rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn của chị đã được tạo thành công. Máy sẽ được giao về Ninh Kiều, Cần Thơ trước ngày 05/11. Em cảm ơn chị đã đặt hàng tại shop, chúc chị một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-05"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Ninh Kiều, Cần Thơ",
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7990000,
+          "op": "supersede",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "promo_code",
+          "value": "NAM-SHIP0",
+          "op": "supersede",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần lên đơn cho chị nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_may_loc_khong_khi",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "price_quoted_vnd",
+        "old": 7690000,
+        "new": 7990000
+      },
+      {
+        "slot": "promo_code",
+        "old": "AIR-OCT",
+        "new": "NAM-SHIP0"
+      }
+    ],
+    "callback": null,
+    "order": {
+      "sku": "SKU-AP-PRO",
+      "qty": 1,
+      "price_vnd": 7990000,
+      "payment": "bank",
+      "address": "Ninh Kiều, Cần Thơ",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-11-05"
+    }
+  }
+}

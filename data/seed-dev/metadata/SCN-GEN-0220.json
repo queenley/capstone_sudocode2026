@@ -1,0 +1,63 @@
+{
+  "scenario_id": "SCN-GEN-0220",
+  "persona_source": "btc",
+  "customer_id": "SYN-C007",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "difficulty": "hard",
+  "tags": [
+    "customer_inquiry",
+    "date:ordinary",
+    "hard_case",
+    "order_confirmation",
+    "order_status",
+    "order_status_check",
+    "supersede",
+    "update_contact_channel",
+    "variant:ba_phien_doi_thong_tin"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "consult",
+      "outcome_detail": "hen_goi_lai",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Giày trekking HikePro size 38 trang",
+        "price_vnd": 1990000,
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 4
+    },
+    "call_2": {
+      "kind": "order",
+      "outcome_detail": "chot_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Giày trekking HikePro size 38 trang",
+        "price_vnd": 1990000,
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 3
+    },
+    "call_3": {
+      "kind": "order_status",
+      "outcome_detail": "cap_nhat_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "order_status": "created"
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 2
+    }
+  }
+}

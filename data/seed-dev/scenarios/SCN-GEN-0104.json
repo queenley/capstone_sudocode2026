@@ -1,0 +1,111 @@
+{
+  "scenario_id": "SCN-GEN-0104",
+  "level": "M1",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "hard_case": null,
+  "customer_phone": "0960454146",
+  "customer_name": "Kiên",
+  "honorific": "anh",
+  "notes": "Persona khach_hoi_nhieu_khong_mua, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): hỏi thêm rồi từ chối → tu_choi. Chấm chủ yếu: CCR, RQR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-30",
+      "customer_goal": "Hỏi về áo khoác gió Windbreak size M màu đen",
+      "customer_turns": [
+        "Alo, anh gọi để hỏi về áo khoác gió Windbreak size M màu đen.",
+        "Em cho anh biết áo này có khuyến mãi gì không?",
+        "Giá của áo này là bao nhiêu vậy em?",
+        "Anh muốn so sánh thêm trước khi quyết định, có gì em gọi lại cho anh nhé."
+      ],
+      "facts_established": {
+        "size": "M",
+        "color": "den",
+        "blocker": "muốn so sánh thêm",
+        "product_advised": "SKU-JK-WND",
+        "price_quoted_vnd": 690000,
+        "variant_sku": "SKU-JK-WND-M-DEN"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 690000,
+        "list_price_vnd": 690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-30"
+      },
+      "memory_expectation": {
+        "size": "M",
+        "color": "den",
+        "blocker": "muốn so sánh thêm",
+        "product_advised": "SKU-JK-WND",
+        "price_quoted_vnd": 690000,
+        "variant_sku": "SKU-JK-WND-M-DEN"
+      },
+      "relevant_policy_ids": [
+        "SP-JK-01",
+        "PB-11"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 7,
+      "customer_goal": "Từ chối mua áo khoác gió Windbreak",
+      "customer_turns": [
+        "Alo, anh vừa xem lại và cảm thấy không cần thiết phải mua áo này nữa.",
+        "Giá hơi cao so với dự định của anh.",
+        "Cảm ơn em đã tư vấn, nhưng anh quyết định không mua nữa.",
+        "Hy vọng lần sau có dịp khác sẽ mua hàng của em."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-JK-WND",
+        "price_quoted_vnd": 690000,
+        "variant_sku": "SKU-JK-WND-M-DEN"
+      },
+      "must_carry_over": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "max_agent_questions": 4
+      },
+      "ground_truth_facts": {
+        "price_vnd": 690000,
+        "list_price_vnd": 690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-11-06"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-JK-WND",
+        "price_quoted_vnd": 690000,
+        "variant_sku": "SKU-JK-WND-M-DEN"
+      },
+      "relevant_policy_ids": [
+        "SP-JK-01",
+        "PB-01",
+        "PB-11"
+      ],
+      "expected_outcome": "tu_choi"
+    }
+  }
+}

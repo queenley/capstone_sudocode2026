@@ -24,7 +24,7 @@ import json
 
 from src.planning.persona_config import load_persona_set, load_persona_sets, load_profiles
 from src.planning.planner import ScenarioPlan, assemble, check_draft, plan_scenarios, writer_context
-from src.schemas.scenario import ScenarioDraft
+from src.schemas.scenario import ScenarioDraft, as_draft, draft_schema
 from src.utils.crm import SourceData
 from src.utils.dataset import Dataset
 from src.utils.io import write_json
@@ -44,22 +44,6 @@ class DraftRejected(RuntimeError):
         self.scenario_id, self.errors = scenario_id, errors
 
 
-def align_calls(sp, draft: ScenarioDraft) -> ScenarioDraft:
-    """Keep the planned calls, matched by their ``call`` label, when the model wrote extra ones.
-
-    A persona with old CRM history ("khách quay lại sau 8 tháng") tempts the
-    model to write that old session as one more call. When every planned
-    call is present by name, the extras are dropped instead of the draft.
-    """
-    planned = [pc.name for pc in sp.calls]
-    if len(draft.calls) <= len(planned):
-        return draft
-    by_name = {c.call: c for c in draft.calls if c.call}
-    if all(name in by_name for name in planned):
-        return draft.model_copy(update={"calls": [by_name[name] for name in planned]})
-    return draft
-
-
 def _structure(sp) -> str:
     return ", ".join(f"{pc.name} ({pc.kind}, ≥{pc.template.min_turns} customer_turns)" for pc in sp.calls)
 
@@ -72,16 +56,27 @@ def write_draft(client, template: str, context: dict, sp, params: dict) -> Scena
     for attempt in range(1, MAX_DRAFT_ATTEMPTS + 1):
         # Context is already PII-safe (writer_context redacts CRM history); test CCCD/STK strings must stay verbatim.
         prompt = f"{template}\n\nINPUT:\n{json.dumps(context, ensure_ascii=False)}{feedback}"
-        draft = align_calls(sp, client.generate(prompt, ScenarioDraft, temperature=temperature,
-                                                max_output_tokens=params["max_output_tokens"]))
+        shape = tuple((pc.name, tuple(sorted(pc.customer_must_state)), pc.input_mode != "text") for pc in sp.calls)
+        answer = client.generate(prompt, draft_schema(shape), temperature=temperature,
+                                 max_output_tokens=params["max_output_tokens"])
+        draft = as_draft(answer, shape)
         errors = check_draft(sp, draft)
         if not errors:
             return draft
         print(f"  {sp.scenario_id} draft attempt {attempt} rejected: {errors}", flush=True)
+        repair = []
+        for pc, dc in zip(sp.calls, draft.calls):
+            missing = sorted(set(pc.customer_must_state) - {fact.slot for fact in dc.facts_stated})
+            if missing:
+                required = {slot: pc.customer_must_state[slot] for slot in missing}
+                repair.append(f"{pc.name}: add facts_stated entries exactly for {json.dumps(required, ensure_ascii=False)} and state each value in customer_turns")
+            if pc.input_mode != "text":
+                repair.append(f"{pc.name}: output exactly {len(dc.customer_turns)} customer_turns_asr strings, one aligned line for each customer_turn")
         feedback = (
             "\n\nYOUR PREVIOUS OUTPUT WAS REJECTED. Fix exactly these problems:\n- " + "\n- ".join(errors)
-            + f"\n\nREQUIRED STRUCTURE: `calls` has exactly {len(sp.calls)} objects, in this order, each with its "
-            f"`call` field set: {_structure(sp)}. crm_history is the past: never write it as a call."
+            + ("\n\nTARGETED REPAIR CHECKLIST:\n- " + "\n- ".join(repair) if repair else "")
+            + f"\n\nREQUIRED STRUCTURE: one key per planned call, {_structure(sp)}. "
+            "crm_history is the past: never write it as a call."
         )
         temperature = min(temperature, RETRY_TEMPERATURE)
     raise DraftRejected(sp.scenario_id, errors)

@@ -1,0 +1,167 @@
+{
+  "conversation_id": "SCN-GEN-0101__call_2",
+  "scenario_id": "SCN-GEN-0101",
+  "call": "call_2",
+  "customer_id": "SYN-C006",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-31",
+  "region": "nam",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Dạ em đã ghi nhận thông tin đơn hàng trước của anh rồi ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, hôm nay anh gọi lại để đổi địa chỉ giao cho đơn hàng OD900602.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh muốn đổi địa chỉ cho đơn hàng OD900602 đúng không ạ? Anh vui lòng cho em biết địa chỉ giao hàng mới để em hỗ trợ cập nhật cho anh nhé.",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Anh vui lòng cho em biết địa chỉ giao hàng mới để em hỗ trợ cập nhật cho anh nhé."
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Địa chỉ cũ không còn phù hợp, anh muốn chuyển sang Quận 7, TP.HCM.",
+      "facts_stated": {
+        "delivery_area": "Quận 7, TP.HCM"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Quận 7, TP.HCM",
+          "spoken": "Quận 7, TP.HCM"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận địa chỉ mới là Quận 7, TP.HCM cho anh. Em sẽ tiến hành cập nhật ngay trên hệ thống để đảm bảo đơn hàng được xử lý đúng địa chỉ mới.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD900603",
+            "action": "update_address",
+            "on": "2026-10-31"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mong là đổi địa chỉ này không làm ảnh hưởng đến thời gian giao hàng nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh yên tâm, việc đổi sang Quận 7, TP.HCM sẽ không ảnh hưởng đến thời gian giao hàng của đơn đã xử lý xong đâu ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "delivered"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh đã nói với em về đơn hàng này hôm qua rồi, nên hy vọng việc thay đổi sẽ nhanh chóng.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận đã cập nhật địa chỉ mới thành công cho đơn hàng của anh rồi ạ. Nếu cần hỗ trợ thêm, anh cứ liên hệ shop bất cứ lúc nào nhé!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Quận 7, TP.HCM",
+          "op": "set",
+          "source": "call_2#turn4"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

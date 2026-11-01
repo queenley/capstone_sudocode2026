@@ -1,0 +1,190 @@
+{
+  "conversation_id": "SCN-GEN-0198__call_2",
+  "scenario_id": "SCN-GEN-0198",
+  "call": "call_2",
+  "customer_id": "C037",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2027-07-12",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Toàn ạ, hôm trước anh có quan tâm xe đẩy gấp gọn Joie Pact và đang chờ cuối tháng nhận lương. Em có thể hỗ trợ anh về sản phẩm này ạ.",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi lại về xe đẩy Joie Pact, xe này còn không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại xe đẩy gấp gọn Joie Pact bên em đang tạm hết hàng anh nhé. Khi có hàng lại, em sẽ báo ngay cho anh ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hôm trước em bảo hết hàng, giờ có hàng chưa?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra thì đến hôm nay bên em vẫn chưa về hàng xe Joie Pact anh ạ. Anh yên tâm, khi có hàng mới về em sẽ chủ động liên hệ lại cho anh ngay.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá xe này là bao nhiêu em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giá xe đẩy Joie Pact hiện tại bên em là 3.490.000đ anh nhé. Nếu có chương trình khuyến mãi mới hoặc hàng về, em cũng sẽ cập nhật cho anh luôn ạ.",
+      "questions": [],
+      "facts_used": [
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh đang muốn mua nhưng phải đợi cuối tháng mới có tiền, em cho anh biết khi nào có hàng nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận lại nhu cầu của anh. Khi xe Joie Pact về lại kho, em sẽ chủ động gọi báo cho anh để anh tiện sắp xếp đặt hàng anh nha. Em cảm ơn anh đã quan tâm sản phẩm bên em ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "supersede",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-STR1",
+          "op": "supersede",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 3490000,
+          "op": "supersede",
+          "source": "call_2#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "type": "callback_when_in_stock",
+        "product": "Xe đẩy gấp gọn Joie Pact"
+      }
+    ],
+    "supersedes": [
+      {
+        "slot": "blocker",
+        "old_value": "chờ cuối tháng nhận lương",
+        "new_value": "chờ cuối tháng nhận lương"
+      },
+      {
+        "slot": "product_advised",
+        "old_value": "SKU-MB-STR1",
+        "new_value": "SKU-MB-STR1"
+      },
+      {
+        "slot": "price_quoted_vnd",
+        "old_value": 3490000,
+        "new_value": 3490000
+      }
+    ],
+    "callback": {
+      "reason": "Báo lại khi sản phẩm về hàng",
+      "time": null
+    },
+    "order": null
+  }
+}

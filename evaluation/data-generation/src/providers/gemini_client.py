@@ -9,6 +9,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import TypeVar
 from dotenv import load_dotenv
+from src.utils.paths import ENV_FILE
 from pydantic import BaseModel, ValidationError
 
 T = TypeVar("T", bound=BaseModel)
@@ -40,7 +41,7 @@ class GeminiClient:
     def __init__(self, model: str, cache_dir: Path, log_path: Path, retries: int = 3,
                  rpm_limit: int = 10, rpd_limit: int = 100,
                  retry_backoff_seconds: float = 2):
-        load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+        load_dotenv(ENV_FILE)
         key = os.getenv("GEMINI_API_KEY")
         if not key:
             raise RuntimeError("GEMINI_API_KEY is not set; copy config/.env.example to .env and configure it")
@@ -105,6 +106,7 @@ class GeminiClient:
                 self._log({"model": self.model, "cache_hit": False, "attempt": attempt + 1, "json_repaired": repaired,
                     "prompt_tokens": getattr(getattr(response, "usage_metadata", None), "prompt_token_count", None),
                     "output_tokens": getattr(getattr(response, "usage_metadata", None), "candidates_token_count", None),
+                    "cached_tokens": getattr(getattr(response, "usage_metadata", None), "cached_content_token_count", None),
                     "elapsed_seconds": round(time.monotonic() - started, 3), "error": None})
                 return result
             except (ValidationError, ValueError) as exc:

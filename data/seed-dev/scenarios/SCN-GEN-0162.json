@@ -1,0 +1,108 @@
+{
+  "scenario_id": "SCN-GEN-0162",
+  "level": "M2",
+  "persona": "khach_ngoai_pham_vi_chuyen_may",
+  "hard_case": null,
+  "customer_phone": "0936270107",
+  "customer_name": "Tuấn",
+  "honorific": "anh",
+  "notes": "Persona khach_ngoai_pham_vi_chuyen_may, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): câu hỏi y tế, chuyển nhân viên → chuyen_may. call_1 ngày 29/11: ngày cuối của khuyến mãi (KM-01: nói hạn, không hứa sau hôm nay). Chấm chủ yếu: CCR, RQR, TSR, ESC.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-29",
+      "customer_goal": "Hỏi máy hút sữa điện đôi cho bé 16 tháng.",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về máy hút sữa điện đôi Spectra S1.",
+        "Giá của máy này là bao nhiêu em nhỉ?",
+        "Thấy trên mạng có khuyến mãi gì không em?",
+        "Ngân sách của anh tầm 5 triệu thôi.",
+        "Anh cần chờ cuối tháng nhận lương mới quyết định được.",
+        "Thôi để anh gọi lại sau nhé."
+      ],
+      "facts_established": {
+        "blocker": "chờ cuối tháng nhận lương",
+        "budget_vnd": 5000000,
+        "child_age_months": 16,
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 4290000,
+        "list_price_vnd": 4290000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "promo_PUMP-GIFT_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-29"
+      },
+      "memory_expectation": {
+        "blocker": "chờ cuối tháng nhận lương",
+        "budget_vnd": 5000000,
+        "child_age_months": 16,
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-01",
+        "FAQ-11"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 2,
+      "customer_goal": "Hỏi về an toàn khi dùng sản phẩm cho người thân.",
+      "customer_turns": [
+        "Alo, anh có câu hỏi về sản phẩm này.",
+        "Người nhà anh đang dùng thuốc, không biết có dùng được máy này không?",
+        "Có ảnh hưởng gì không nếu sử dụng chung với thuốc?",
+        "Anh cần thông tin rõ hơn trước khi quyết định."
+      ],
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "handoff.transfer",
+        "brief_must_contain": [
+          "customer_phone",
+          "customer_name",
+          "escalation_reason",
+          "conversation_summary",
+          "product_advised",
+          "price_quoted_vnd",
+          "open_questions",
+          "next_action",
+          "generated_at"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "call_date": "2026-12-01"
+      },
+      "relevant_policy_ids": [
+        "PB-06",
+        "PB-01"
+      ],
+      "expected_outcome": "chuyen_may"
+    }
+  }
+}

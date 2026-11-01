@@ -1,0 +1,223 @@
+{
+  "conversation_id": "SCN-GEN-0237__call_1",
+  "scenario_id": "SCN-GEN-0237",
+  "call": "call_1",
+  "customer_id": "SYN-C015",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-14",
+  "region": "nam",
+  "category": "gia-dung/quat",
+  "persona": "khach_yeu_cau_xoa_du_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Khải ạ, em là trợ lý ảo của shop BTC. Anh đang quan tâm đến quạt đứng Senko TS16 đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh đang muốn hỏi về quạt đứng Senko TS16 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, em ơi, anh muốn hỏi về quạt đứng Senko TS16.",
+      "facts_stated": {
+        "product_advised": "SKU-FAN-SEN"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, quạt đứng Senko TS16 hiện bên em còn hàng anh nhé. Anh cần em tư vấn thêm về thông số hay tính năng nào của quạt không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 650,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá của quạt này là bao nhiêu vậy em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ quạt đứng Senko TS16 giá là 590.000đ anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 590000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Quạt này có khuyến mãi gì không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại quạt Senko TS16 chưa có chương trình khuyến mãi anh ạ. Tuy nhiên, đơn từ 500.000đ vẫn được miễn phí vận chuyển nội thành và đơn từ 2 triệu thì miễn phí toàn quốc ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 750,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, anh cần bàn với gia đình đã, em có thể gọi lại cho anh tối thứ Hai (16/11) tầm 7 giờ được không?",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-11-16",
+          "spoken": "tối thứ Hai (16/11)"
+        },
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em sẽ gọi lại cho anh vào 7 giờ tối thứ Hai ngày 16/11 nhé. Cảm ơn anh đã quan tâm, chúc anh buổi tối vui vẻ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-11-16T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0998000015",
+            "callback_at": "2026-11-16T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 1000000,
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "usage_need",
+          "value": "thay đồ cũ đã hỏng",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-FAN-SEN",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 590000,
+          "op": "set",
+          "source": "call_1#turn5"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_hoi_nguoi_nha",
+    "objection_handling": "Đã xác nhận thời gian gọi lại cụ thể và lên lịch hẹn cho khách.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "hứa_gọi_lại": "2026-11-16T19:00"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "customer_phone": "0998000015",
+      "callback_at": "2026-11-16T19:00",
+      "note": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

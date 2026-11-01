@@ -1,0 +1,300 @@
+{
+  "conversation_id": "SCN-ADV-0101__call_1",
+  "scenario_id": "SCN-ADV-0101",
+  "call": "call_1",
+  "customer_id": "SYN-C019",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-22",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_can_tu_van_nhieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có quan tâm Máy lọc không khí AirPure Y và hiện tại đơn Samsung AX40 của anh đang vận chuyển; em có thể hỗ trợ anh so sánh các mẫu anh đang phân vân nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về máy lọc không khí mà em tư vấn hôm trước.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng ạ, anh đang muốn tìm máy lọc cho phòng diện tích bao nhiêu mét vuông và ngân sách mình dự kiến khoảng bao nhiêu vậy anh?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "open",
+          "text": "anh đang muốn tìm máy lọc cho phòng diện tích bao nhiêu mét vuông"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh đang phân vân giữa máy lọc không khí AirPure Y và AirPure X, em thấy cái nào hơn?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ cả hai mẫu AirPure Y và AirPure X đều phù hợp cho phòng đến 25m² như anh, tuy nhiên AirPure Y có thêm than hoạt tính giúp khử mùi tốt hơn, có app điều khiển và khóa trẻ em, giá cao hơn X là 310.000đ. AirPure X thì đơn giản hơn, giá tốt hơn. Anh thích tính năng nào hơn ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-AP-Y",
+          "value": 5200000
+        },
+        {
+          "field": "price_vnd:SKU-AP-X",
+          "value": 4890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy Samsung AX40 thì sao, có gì khác với hai cái kia không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ Samsung AX40 cũng phù hợp cho phòng 25m², có màng than hoạt tính, khóa trẻ em và app điều khiển như AirPure Y, công suất lớn hơn một chút, nhưng giá là 6.490.000đ cao hơn hai mẫu kia. Anh cần ưu tiên thêm tính năng nào không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-SS-AX40",
+          "value": 6490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ngân sách của anh khoảng 5 triệu rưỡi thôi, vậy có máy nào trong tầm giá không?",
+      "facts_stated": {
+        "budget_vnd": 5500000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ trong khoảng 5 triệu rưỡi thì AirPure Y giá 5.200.000đ đang vừa ngân sách anh, tặng kèm màng lọc thay thế; AirPure X giá 4.890.000đ, chưa có quà tặng. Hai máy đều phù hợp nhu cầu phòng 25m² của anh.",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2",
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-AP-Y",
+          "value": 5200000
+        },
+        {
+          "field": "price_vnd:SKU-AP-X",
+          "value": 4890000
+        },
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em có thể nói rõ hơn về ưu nhược điểm của từng loại không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ để em tóm tắt ạ: AirPure Y hơn AirPure X ở chỗ có màng than hoạt tính khử mùi, app điều khiển qua điện thoại và khóa trẻ em, thích hợp cho gia đình có trẻ nhỏ. AirPure X thì không có ba tính năng này nhưng giá thấp hơn, vẫn lọc bụi mịn và dùng màng lọc như Y. Cả hai đều bảo hành 24 tháng.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh thấy trên Fanpage có máy AirPure Y đang khuyến mãi gì nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi anh, AirPure Y hiện tặng kèm một màng lọc thay thế chính hãng khi mua trong hôm nay, chương trình quà tặng GIFT-FILTER đang còn hiệu lực. Quà số lượng có hạn theo chương trình.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thế còn về độ bền của máy, cái nào tốt hơn?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ ba mẫu này đều bảo hành 24 tháng chính hãng, chất lượng tương đương nhau vì cùng đạt tiêu chuẩn lọc HEPA H13. Anh yên tâm sử dụng lâu dài ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, anh muốn so sánh thêm trước khi quyết định, em có thể tư vấn thêm không?",
+      "facts_stated": {
+        "blocker": "muốn so sánh thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ tất nhiên rồi anh, khi nào anh cần thêm thông tin hoặc muốn chốt mẫu nào thì nhắn em trên Fanpage hoặc gọi hotline shop, em luôn sẵn sàng hỗ trợ anh so sánh chi tiết hơn ạ. Em ghi nhận anh muốn so sánh thêm trước khi quyết định nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "muốn so sánh thêm",
+          "op": "set",
+          "source": "call_1#turn15"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 5500000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 25,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-Y",
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5200000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "promo_code",
+          "value": "GIFT-FILTER",
+          "op": "set",
+          "source": "call_1#turn11"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "so_sanh_may_loc_khong_khi",
+    "outcome": "hen_goi_lai",
+    "objection_type": "cần_so_sánh_thêm",
+    "objection_handling": "Ghi nhận khách muốn so sánh thêm, hẹn khách liên hệ lại khi quyết định.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,213 @@
+{
+  "scenario_id": "SCN-GEN-0067",
+  "level": "M2",
+  "persona": "khach_mua_nhieu_mon",
+  "hard_case": "16_luot_4_san_pham_vuot_cod",
+  "customer_phone": "0998000007",
+  "customer_name": "Lê Thị G",
+  "honorific": "chị",
+  "notes": "Persona khach_mua_nhieu_mon, biến thể bon_san_pham_vuot_cod. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt nhiều món → chot_don. Ca khó: 16_luot_4_san_pham_vuot_cod. call_1 ngày 01/11: Chủ nhật (LN-01: giờ 09:00–18:00, chỉ nhận đơn). Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-01",
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker). Khách cần hỏi người nhà và hẹn shop gọi lại tối mai tầm 7 giờ (\"tối mai tầm 7 giờ em gọi lại chị nhé\"); agent chốt lịch đúng giờ đó (PB-03)."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C007",
+          "session_id": "SYN-007-S1",
+          "date": "2026-04-19",
+          "channel": "fb",
+          "summary": "Mua Máy lọc không khí Samsung AX40 giá 6.490.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C007",
+          "session_id": "SYN-007-S2",
+          "date": "2026-10-07",
+          "channel": "web",
+          "summary": "Đặt Máy lọc nước RO Kangaroo 10 lõi giá 6.890.000đ, đơn OD900702 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C007",
+          "order_id": "OD900701",
+          "date": "2026-04-19",
+          "sku": "SKU-SS-AX40",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-SS-AX40"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C007",
+          "order_id": "OD900702",
+          "date": "2026-10-07",
+          "sku": "SKU-WF-RO10",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900702"
+          }
+        }
+      ],
+      "facts_established": {
+        "room_area_m2": 30,
+        "has_children": true,
+        "budget_vnd": 9000000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-11-02T19:00"
+        },
+        "must_say_any": [
+          "7 giờ",
+          "19 giờ",
+          "19h",
+          "7h tối"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 7990000,
+        "list_price_vnd": 7990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "callback_at": "2026-11-02T19:00",
+        "call_date": "2026-11-01"
+      },
+      "memory_expectation": {
+        "room_area_m2": 30,
+        "has_children": true,
+        "budget_vnd": 9000000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "FAQ-02",
+        "LN-01",
+        "PB-03",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 2,
+      "customer_goal": "[plan-only] order_multi",
+      "customer_turns": [
+        "[plan-only] Khách mua nhiều món cho nhà mới, nói lan man, lần lượt chốt TẤT CẢ sản phẩm trong agent_will_tell.items, mỗi món MỘT cái (không nói \"2 cái\" cho một món), hỏi tổng tiền, muốn trả COD và nhắc ngân sách của mình. Khách TỰ nói rõ mình đã đổi (ngân sách: trước là 9.000.000đ, giờ là 8.500.000đ), như một thay đổi (\"chị đổi ý rồi em, …\"), trước khi agent hỏi: agent đã biết giá trị cũ nên không phải hỏi lại, chỉ dùng giá trị mới."
+      ],
+      "facts_established": {
+        "payment": "bank",
+        "budget_vnd": 8500000,
+        "delivery_area": "Long Biên, Hà Nội",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000,
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AP-PRO",
+          "price_vnd": 7990000
+        },
+        "also_ordered": [
+          "SKU-AF-XM",
+          "SKU-FAN-SEN",
+          "SKU-AP-FLT-P"
+        ],
+        "total_match_vnd": 11160000,
+        "must_say_any": [
+          "10 triệu",
+          "10.000.000",
+          "chuyển khoản"
+        ]
+      },
+      "ground_truth_facts": {
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "price_vnd:SKU-AP-PRO": 7990000,
+        "price_vnd:SKU-AF-XM": 1590000,
+        "price_vnd:SKU-FAN-SEN": 590000,
+        "price_vnd:SKU-AP-FLT-P": 990000,
+        "delivery_days": 2,
+        "total_vnd": 11160000,
+        "cod_allowed": false,
+        "estimated_delivery": "2026-11-05",
+        "call_date": "2026-11-03"
+      },
+      "memory_expectation": {
+        "payment": "bank",
+        "budget_vnd": 8500000,
+        "delivery_area": "Long Biên, Hà Nội",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000,
+        "order_id": "OD600001",
+        "superseded": {
+          "budget_vnd": 9000000
+        }
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-03",
+        "VC-04",
+        "FAQ-19",
+        "KM-05",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

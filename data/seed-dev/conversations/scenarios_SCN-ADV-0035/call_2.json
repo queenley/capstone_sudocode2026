@@ -1,0 +1,283 @@
+{
+  "conversation_id": "SCN-ADV-0035__call_2",
+  "scenario_id": "SCN-ADV-0035",
+  "call": "call_2",
+  "customer_id": "C023",
+  "session_index": 2,
+  "channel": "chat_fanpage",
+  "date": "2026-10-17",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_go_khong_dau",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Thu ạ, hôm trước chị có quan tâm Máy tiệt trùng sấy khô Moaz Bebe và bảo chờ cuối tháng nhận lương, giờ mình tiếp tục đặt luôn đúng không chị?",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chi muon dat may tiet trung say kho moaz bebe",
+      "facts_stated": {
+        "product_advised": "SKU-MB-STER"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm Máy tiệt trùng sấy khô Moaz Bebe hiện còn hàng, giá 1.890.000đ, được miễn phí vận chuyển toàn quốc qua chương trình MOM-FREESHIP ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "hinh thuc thanh toan la chuyen khoan nhe",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị chọn thanh toán chuyển khoản nhé. Chị muốn gửi hàng về địa chỉ nào ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Chị muốn gửi hàng về địa chỉ nào ạ?"
+        }
+      ],
+      "facts_used": [
+        "payment"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "giao hang cho chi o cau giay ha noi",
+      "facts_stated": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, với địa chỉ Cầu Giấy, Hà Nội, dự kiến nhận hàng trong 2 ngày làm việc, khoảng ngày 20/10 ạ. Em đọc lại đơn: Máy tiệt trùng sấy khô Moaz Bebe, 1 máy, giá 1.890.000đ, giao về Cầu Giấy, Hà Nội, thanh toán chuyển khoản, miễn phí vận chuyển, dự kiến nhận hàng ngày 20/10. Chị kiểm tra lại giúp em thông tin trên đúng chưa để em lên đơn nhé?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Chị kiểm tra lại giúp em thông tin trên đúng chưa để em lên đơn nhé?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "delivery_days",
+          "value": 2
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-20"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-17"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chot don luon em nhe",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã lên đơn thành công cho chị, mã đơn OD600001. Shop sẽ gửi hướng dẫn chuyển khoản và cập nhật trạng thái qua tin nhắn, dự kiến nhận hàng ngày 20/10 chị nhé. Cảm ơn chị đã đặt hàng tại shop ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-20"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0976158464",
+            "sku": "SKU-MB-STER",
+            "qty": 1,
+            "price_vnd": 1890000,
+            "payment": "bank",
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-17"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Cầu Giấy, Hà Nội",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-STER",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1890000,
+          "op": "set",
+          "source": "call_2#turn3"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_2#turn3"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_hang",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-MB-STER",
+      "qty": 1,
+      "price_vnd": 1890000,
+      "payment": "bank",
+      "address": "Cầu Giấy, Hà Nội",
+      "order_id": "OD600001"
+    }
+  }
+}

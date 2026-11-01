@@ -1,0 +1,285 @@
+{
+  "conversation_id": "SCN-ADV-0133__call_2",
+  "scenario_id": "SCN-ADV-0133",
+  "call": "call_2",
+  "customer_id": "C037",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-08",
+  "region": "nam",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_can_tu_van_nhieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh, em là trợ lý ảo của shop BTC. Hôm trước anh có quan tâm Nồi chiên không dầu Philips 6.2L và còn muốn so sánh thêm; hôm nay mình đã quyết định rồi ạ, em rất sẵn sàng hỗ trợ anh chốt đơn.",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh đã quyết định chọn nồi chiên không dầu Philips 6.2L rồi.",
+      "facts_stated": {
+        "product_advised": "SKU-AF-6L"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em ghi nhận anh chọn Nồi chiên không dầu Philips 6.2L, giá hiện tại là 3.990.000đ và hàng đang sẵn kho. Anh muốn thanh toán như thế nào để em lên đơn cho anh luôn ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "open",
+          "text": "Anh muốn thanh toán như thế nào để em lên đơn cho anh luôn ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh muốn thanh toán bằng COD nhé.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận anh chọn thanh toán COD ạ. Anh giao hàng tại khu vực nào để em kiểm tra thời gian giao dự kiến cho mình luôn anh nhé?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Anh giao hàng tại khu vực nào để em kiểm tra thời gian giao dự kiến cho mình luôn anh nhé?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là Quận 7, TP.HCM, em ghi giúp anh.",
+      "facts_stated": {
+        "delivery_area": "Quận 7, TP.HCM"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận địa chỉ giao Quận 7, TP.HCM. Đơn của anh sẽ được giao dự kiến trong 2 ngày làm việc, tức là khoảng ngày 10/11/2026, và được miễn phí vận chuyển ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "delivery_days",
+          "value": 2
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-10"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-11-08"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giúp anh lên đơn hàng cho nồi chiên này nhé, cảm ơn em nhiều!",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em xin phép đọc lại đơn hàng để anh xác nhận: Nồi chiên không dầu Philips 6.2L, số lượng 1, giá cuối cùng 3.990.000đ, giao tại Quận 7, TP.HCM, thanh toán COD và dự kiến nhận hàng ngày 10/11/2026. Anh vui lòng xác nhận giúp em thông tin trên đã đúng chưa ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh vui lòng xác nhận giúp em thông tin trên đã đúng chưa ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3990000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-10"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi em, lên đơn giúp anh nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã tạo đơn cho anh thành công. Đơn hàng sẽ được giao khoảng ngày 10/11/2026, trước khi giao sẽ có nhân viên gọi xác nhận đơn với anh ạ. Cảm ơn anh đã đặt hàng tại shop BTC, chúc anh nhiều sức khỏe và sử dụng sản phẩm thật hài lòng.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-10"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0911265844",
+            "sku": "SKU-AF-6L",
+            "qty": 1,
+            "price_vnd": 3990000,
+            "payment": "COD",
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-11-08"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Quận 7, TP.HCM",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AF-6L",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 3990000,
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn12"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-AF-6L",
+      "qty": 1,
+      "price_vnd": 3990000,
+      "payment": "COD",
+      "address": "Quận 7, TP.HCM",
+      "order_id": "OD600001"
+    }
+  }
+}

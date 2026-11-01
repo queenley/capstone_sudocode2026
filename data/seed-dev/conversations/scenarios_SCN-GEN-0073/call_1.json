@@ -1,0 +1,280 @@
+{
+  "conversation_id": "SCN-GEN-0073__call_1",
+  "scenario_id": "SCN-GEN-0073",
+  "call": "call_1",
+  "customer_id": "SYN-C013",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-15",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_so_gia",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, hôm trước anh có đặt Nồi chiên không dầu Philips 6.2L, anh cần tư vấn máy lọc không khí cho phòng khoảng 30 mét vuông đúng không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Anh cần tư vấn máy cho phòng khoảng 30 mét vuông đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về máy lọc không khí cho phòng khoảng 30 mét vuông.",
+      "facts_stated": {
+        "room_area_m2": 30
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với diện tích phòng 30m², em tư vấn anh máy lọc không khí AirPure Y, phù hợp diện tích này và có than hoạt tính khử mùi ạ. Máy đang có sẵn giá 5.200.000đ, bảo hành 24 tháng chính hãng.",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Anh dự kiến ngân sách cho máy lọc không khí là khoảng bao nhiêu ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5200000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5200000",
+          "spoken": "5.200.000đ"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhà anh không có trẻ nhỏ, ngân sách tầm 6 triệu thôi.",
+      "facts_stated": {
+        "has_children": false,
+        "budget_vnd": 6000000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "6000000",
+          "spoken": "6 triệu"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ AirPure Y phù hợp cho phòng 30m², không có trẻ nhỏ cũng rất ok anh nhé. Máy có app điều khiển và khóa trẻ em, nhưng nhà mình không cần thì vẫn dùng thoải mái ạ. Giá bên em 5.200.000đ, trong ngân sách anh đặt ra.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5200000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5200000",
+          "spoken": "5.200.000đ"
+        }
+      ],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại máy AirPure Y tặng kèm một màng lọc thay thế chính hãng khi mua trong tuần này, anh nhận hàng sẽ được luôn quà tặng ạ. Ngoài ra, shop miễn phí vận chuyển toàn quốc và miễn phí thu hộ khi nhận hàng.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hôm trước anh thấy bên chỗ khác bán có 4 triệu rưỡi.",
+      "facts_stated": {
+        "competitor_price_vnd": 4580000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "4580000",
+          "spoken": "4 triệu rưỡi"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất hiểu tâm lý so sánh giá, bên shop em cam kết hàng chính hãng, bảo hành 24 tháng và tặng màng lọc chính hãng kèm theo. Giá em báo là giá cuối đã gồm khuyến mãi tốt nhất cho khách ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5200000
+        },
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5200000",
+          "spoken": "5.200.000đ"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá bên mình cao hơn chỗ khác, anh cần hỏi thêm rồi sẽ gọi lại nhé.",
+      "facts_stated": {
+        "objection": "giá cao hơn chỗ khác"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em ghi nhận ý kiến của anh. Anh cứ tham khảo thêm, nếu cần hỗ trợ hoặc muốn đặt hàng anh cứ liên hệ lại shop bất cứ lúc nào ạ. Em cảm ơn anh đã quan tâm sản phẩm bên em.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "room_area_m2",
+          "value": 30,
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "has_children",
+          "value": false,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 6000000,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "competitor_price_vnd",
+          "value": 4580000,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "objection",
+          "value": "giá cao hơn chỗ khác",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-Y",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5200000,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "promo_code",
+          "value": "GIFT-FILTER",
+          "op": "set",
+          "source": "call_1#turn5"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "giá cao hơn chỗ khác",
+    "objection_handling": "Nhấn mạnh hàng chính hãng, bảo hành và quà tặng; cam kết giá đã gồm khuyến mãi tốt nhất, không so sánh giá với đối thủ.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

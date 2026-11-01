@@ -1,0 +1,240 @@
+{
+  "conversation_id": "SCN-GEN-0052__call_1",
+  "scenario_id": "SCN-GEN-0052",
+  "call": "call_1",
+  "customer_id": "C039",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-15",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, rất vui được hỗ trợ mình. Anh muốn tư vấn về bình sữa Pigeon PPSU 240ml đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh muốn tư vấn về bình sữa Pigeon PPSU 240ml đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về bình sữa Pigeon PPSU 240ml cho bé nhà anh.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, bình sữa Pigeon PPSU 240ml hiện bên em đang có sẵn hàng, giá là 289.000đ ạ. Sản phẩm phù hợp cho bé từ sơ sinh đến trên 12 tháng, chất liệu an toàn và chịu nhiệt tốt.",
+      "questions": [
+        {
+          "slot": "child_age_months",
+          "type": "open",
+          "text": "Bé nhà mình hiện được bao nhiêu tháng rồi anh nhỉ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 289000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Bé nhà anh 18 tháng rồi, ngân sách tầm 500 nghìn thôi.",
+      "facts_stated": {
+        "child_age_months": 18,
+        "budget_vnd": 500000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, bình Pigeon này giá 289.000đ phù hợp với ngân sách của anh và sử dụng tốt cho bé 18 tháng tuổi. Hiện tại sản phẩm chưa có chương trình khuyến mãi giảm giá, nhưng đang áp dụng miễn phí thu hộ khi nhận hàng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 289000
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Không biết cái này có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại bình sữa Pigeon PPSU 240ml chưa có chương trình khuyến mãi giảm giá, nhưng anh được miễn phí thu hộ khi thanh toán COD ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, anh cần hỏi vợ một chút, tối mai tầm 7 giờ em gọi lại anh nhé.",
+      "facts_stated": {
+        "blocker": "cần hỏi vợ",
+        "decision_maker": "vợ"
+      },
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng anh, em sẽ gọi lại cho mình vào 7 giờ tối ngày mai để anh trao đổi thêm với vợ nhé. Em đã ghi chú lại yêu cầu của anh ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-10-16T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0930976582",
+            "callback_at": "2026-10-16T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "child_age_months",
+          "value": 18,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 500000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "decision_maker",
+          "value": "vợ",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "blocker",
+          "value": "cần hỏi vợ",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-BOT",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 289000,
+          "op": "set",
+          "source": "call_1#turn4"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "cần hỏi người nhà",
+    "objection_handling": "Đồng ý hẹn gọi lại vào 7 giờ tối hôm sau, ghi chú rõ thời gian và lý do cần hỏi vợ.",
+    "sentiment": "neutral",
+    "decision_maker": "vợ",
+    "commitments": [
+      {
+        "text": "Gọi lại vào 19 giờ ngày 16/10/2026"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-10-16T19:00",
+      "reason": "khách hỏi vợ rồi báo lại"
+    },
+    "order": null
+  }
+}

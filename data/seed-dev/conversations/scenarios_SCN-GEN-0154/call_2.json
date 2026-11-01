@@ -1,0 +1,180 @@
+{
+  "conversation_id": "SCN-GEN-0154__call_2",
+  "scenario_id": "SCN-GEN-0154",
+  "call": "call_2",
+  "customer_id": "SYN-C013",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-03",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Phạm Minh Tuấn ạ, hôm trước anh có hỏi Máy lọc không khí AirPure Pro và muốn so sánh thêm. Hiện chương trình AIR-OCT đã hết hiệu lực, giá máy bây giờ là 7.990.000đ anh nhé.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd",
+        "blocker",
+        "room_area_m2",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh gọi lại để hỏi thêm về máy lọc không khí đó.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh đang muốn tìm hiểu thêm về AirPure Pro phải không ạ? Em có thể hỗ trợ anh thông tin chi tiết hoặc so sánh các dòng máy phù hợp với nhu cầu của mình ạ.",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Anh vẫn đang muốn so sánh thêm đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá máy AirPure Pro là bao nhiêu vậy em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, AirPure Pro hiện tại giá 7.990.000đ, chưa có chương trình khuyến mãi nào áp dụng cho mã này tại thời điểm này anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mà em cho anh biết máy này có hoạt động êm không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, AirPure Pro hoạt động rất êm, độ ồn chỉ từ 25 đến 55 dB nên phù hợp dùng cả trong phòng ngủ anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thực ra anh đang muốn tìm một cái khác, nên chắc là chưa mua đâu.",
+      "facts_stated": {
+        "blocker": "muốn so sánh thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ, khi nào anh cần thêm thông tin hoặc muốn tham khảo các dòng máy khác thì cứ liên hệ lại với bên em anh nhé. Chúc anh một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7990000,
+          "op": "supersede",
+          "source": "call_2#turn1"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_them_tu_choi_mua",
+    "outcome": "tu_choi",
+    "objection_type": "dang_can_nhac",
+    "objection_handling": "Nhận thông tin khách còn muốn so sánh, không gây áp lực, sẵn sàng hỗ trợ khi khách cần.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "price_quoted_vnd",
+        "old_value": 7690000,
+        "new_value": 7990000
+      }
+    ],
+    "callback": null,
+    "order": null
+  }
+}

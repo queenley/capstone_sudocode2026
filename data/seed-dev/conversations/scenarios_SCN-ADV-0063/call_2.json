@@ -1,0 +1,209 @@
+{
+  "conversation_id": "SCN-ADV-0063__call_2",
+  "scenario_id": "SCN-ADV-0063",
+  "call": "call_2",
+  "customer_id": "C037",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-01",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_hoi_ngoai_chu_de",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Toàn ạ, em là trợ lý ảo của shop. Hôm trước anh có hỏi về máy hút sữa Medela Swing Maxi, anh muốn em tư vấn thêm chi tiết nào ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo em, hôm trước anh có nghe về máy hút sữa Medela Swing Maxi, em có thể cho anh biết thêm về giá và khuyến mãi không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy hút sữa điện đôi Medela Swing Maxi hiện đang có giá 5.990.000đ, còn hàng tại shop anh nhé. Giá này đã áp dụng chương trình miễn phí vận chuyển toàn quốc cho ngành mẹ & bé, anh không phải trả thêm phí ship ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5990000",
+          "spoken": "5.990.000"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá của máy đó hiện tại là bao nhiêu nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giá máy Medela Swing Maxi hiện là 5.990.000đ anh nhé, giá đã gồm ưu đãi freeship cho ngành mẹ & bé. Nếu anh cần thêm thông tin về tính năng hay cách sử dụng, em có thể hỗ trợ tiếp ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5990000",
+          "spoken": "5.990.000"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, ngân sách của anh là 7 triệu đồng, không biết có phù hợp không?",
+      "facts_stated": {
+        "budget_vnd": 7000000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "7000000",
+          "spoken": "7 triệu đồng"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, với ngân sách 7 triệu đồng thì mình mua máy Medela Swing Maxi hoàn toàn phù hợp anh nhé. Anh vẫn còn dư để mua thêm phụ kiện nếu cần ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "7000000",
+          "spoken": "7 triệu đồng"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh vẫn chưa quyết định, có lẽ chờ đến cuối tháng nhận lương rồi sẽ gọi lại em nhé.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em ghi nhận là anh sẽ cân nhắc và có thể liên hệ lại sau khi nhận lương cuối tháng. Em luôn sẵn sàng hỗ trợ khi anh cần thêm thông tin ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "budget_vnd",
+          "value": 7000000,
+          "op": "set",
+          "source": "call_2#turn7"
+        },
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_2#turn9"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-PUMP2",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5990000,
+          "op": "set",
+          "source": "call_2#turn3"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_2#turn3"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chua_co_tien",
+    "objection_handling": "Xác nhận lý do khách chờ lương, lịch sự ghi nhận và hẹn khách liên hệ lại khi thuận tiện.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

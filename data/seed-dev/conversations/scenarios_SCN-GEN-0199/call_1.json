@@ -1,0 +1,199 @@
+{
+  "conversation_id": "SCN-GEN-0199__call_1",
+  "scenario_id": "SCN-GEN-0199",
+  "call": "call_1",
+  "customer_id": "C028",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-31",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_mua_nhieu_mon",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, em hỗ trợ anh về máy lọc không khí AirPure Pro cho phòng 35 mét vuông ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro cho phòng khoảng 35 mét vuông.",
+      "facts_stated": {
+        "room_area_m2": 35
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với diện tích phòng khoảng 35 mét vuông như anh nói, AirPure Pro là lựa chọn phù hợp, máy có khóa trẻ em rất an toàn cho gia đình có trẻ nhỏ ạ. Giá máy hiện tại là 7.990.000đ, hàng sẵn kho và bảo hành 24 tháng chính hãng anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhà anh có trẻ nhỏ nên cần cái này, ngân sách tầm 8 triệu rưỡi thôi.",
+      "facts_stated": {
+        "has_children": true,
+        "budget_vnd": 8500000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã chia sẻ nhu cầu, với ngân sách 8 triệu rưỡi thì AirPure Pro là vừa khớp luôn anh ạ. Hiện tại máy không có chương trình giảm giá, nhưng được miễn phí vận chuyển toàn quốc và nhận hàng kiểm tra ngoại quan trước khi thanh toán.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này có khuyến mãi gì không em ơi?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại máy chưa có chương trình khuyến mãi giảm giá nào áp dụng anh nhé. Tuy nhiên, anh được miễn phí vận chuyển và hỗ trợ COD không phí thu hộ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, anh đang chờ cuối tháng mới nhận lương, nên chưa thể quyết định ngay được.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận là anh sẽ cân nhắc và chờ cuối tháng nhận lương rồi mới quyết định ạ. Khi nào anh sẵn sàng, anh cứ liên hệ lại shop, em sẽ giữ thông tin tư vấn cho anh nhé. Chúc anh một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 8500000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 35,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7990000,
+          "op": "set",
+          "source": "call_1#turn3"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chua_nhan_luong",
+    "objection_handling": "Ghi nhận nhu cầu và dặn khách liên hệ lại sau khi nhận lương.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

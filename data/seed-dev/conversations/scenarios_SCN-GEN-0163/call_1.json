@@ -1,0 +1,219 @@
+{
+  "conversation_id": "SCN-GEN-0163__call_1",
+  "scenario_id": "SCN-GEN-0163",
+  "call": "call_1",
+  "customer_id": "C001",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-15",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_hoi_ngoai_tai_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em hỗ trợ tư vấn về máy lọc không khí Xiaomi Smart 4 Pro cho chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về cái máy lọc không khí Xiaomi Smart 4 Pro.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị đang quan tâm đến máy Xiaomi Smart 4 Pro đúng không ạ? Cho em hỏi chị dùng cho phòng diện tích khoảng bao nhiêu mét vuông để em tư vấn phù hợp.",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "open",
+          "text": "Cho em hỏi chị dùng cho phòng diện tích khoảng bao nhiêu mét vuông để em tư vấn phù hợp."
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có phòng khoảng 15 mét vuông á.",
+      "facts_stated": {
+        "room_area_m2": 15
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ phòng 15 mét vuông thì máy Xiaomi Smart 4 Pro là dư công suất, đáp ứng tốt nhu cầu của chị ạ. Chị có ngân sách dự kiến cho sản phẩm này chưa để em kiểm tra khuyến mãi phù hợp?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Chị có ngân sách dự kiến cho sản phẩm này chưa để em kiểm tra khuyến mãi phù hợp?"
+        }
+      ],
+      "facts_used": [
+        "room_area_m2"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ngân sách của chị tầm 6 triệu rưỡi, không biết máy này có khuyến mãi gì không?",
+      "facts_stated": {
+        "budget_vnd": 6500000
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm Xiaomi Smart 4 Pro bên em giá 5.490.000đ, hiện đang áp dụng khuyến mãi combo lọc không khí tặng kèm màng lọc chính hãng. Giá và quà tặng này còn áp dụng đến 14/11 nên chị yên tâm ạ.",
+      "questions": [],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "promo_XM-COMBO_active",
+          "value": true
+        },
+        {
+          "field": "gift_sku",
+          "value": "SKU-XM-FLT"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị nghe nói máy này hết hàng, không biết khi nào có lại?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi chị, hiện tại máy Xiaomi Smart 4 Pro đang tạm hết hàng. Dự kiến đến ngày 19/10 bên em sẽ nhập lại hàng mới, chị có thể cân nhắc đặt sau ngày 19 tháng này ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        },
+        {
+          "field": "restock_date",
+          "value": "2026-10-19"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần phải chờ cuối tháng mới nhận lương, chị sẽ gọi lại sau nhé.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận, khi nào chị thuận tiện cứ liên hệ lại với shop để được giữ chương trình khuyến mãi tốt nhất cho mình ạ. Em chúc chị ngày mới vui vẻ!",
+      "questions": [],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 6500000,
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 15,
+          "op": "set",
+          "source": "call_1#turn4"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_may_loc_khong_khi_xiaomi_4_pro",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chua_co_luong",
+    "objection_handling": "Ghi nhận nhu cầu và tư vấn chương trình khuyến mãi còn hiệu lực.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

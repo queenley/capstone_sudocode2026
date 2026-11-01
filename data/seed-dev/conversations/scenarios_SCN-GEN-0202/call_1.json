@@ -1,0 +1,182 @@
+{
+  "conversation_id": "SCN-GEN-0202__call_1",
+  "scenario_id": "SCN-GEN-0202",
+  "call": "call_1",
+  "customer_id": "C029",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-12",
+  "region": "bac",
+  "category": "thoi-trang/ao-khoac",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em có thể hỗ trợ chị về áo phao lông vũ size M màu be ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về áo phao lông vũ size M màu be.",
+      "facts_stated": {
+        "size": "M",
+        "color": "be",
+        "product_advised": "SKU-JK-DWN"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ áo phao lông vũ Warmly size M màu be hiện bên em còn hàng chị nhé. Chị cần em tư vấn thêm về chất liệu hay chính sách bảo hành của sản phẩm không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị cần em tư vấn thêm về chất liệu hay chính sách bảo hành của sản phẩm không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cái áo này có giá bao nhiêu em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, áo phao lông vũ Warmly size M màu be đang có giá 1.490.000đ chị nhé. Hiện chưa có khuyến mãi nào áp dụng cho sản phẩm này ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thấy trên mạng có nhiều nơi bán mà không biết chỗ nào uy tín.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị yên tâm, sản phẩm bên em là hàng chính hãng, có tem bảo hành và đầy đủ hóa đơn. Chị được đổi trả trong 7 ngày nếu chưa sử dụng và bảo hành lên đến 12 tháng theo chính sách của shop ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ờ, chị cần hỏi chồng trước rồi tối mai em gọi lại cho chị nhé, khoảng 7 giờ.",
+      "facts_stated": {
+        "blocker": "cần hỏi chồng",
+        "decision_maker": "chồng"
+      },
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận ạ, em sẽ gọi lại cho chị vào lúc 7 giờ tối mai nha chị. Nếu cần thêm thông tin trong hôm nay, chị cứ liên hệ lại shop nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0930048764",
+            "callback_at": "2026-11-13T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em ghi lại giờ đó nhé, tối mai chị gọi lại cho em.",
+      "facts_stated": {},
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "tối mai"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "hỏi người nhà",
+    "objection_handling": "Đã xác nhận lý do và đặt lịch gọi lại đúng thời gian khách mong muốn.",
+    "sentiment": "neutral",
+    "decision_maker": "chồng",
+    "commitments": [
+      {
+        "callback_at": "2026-11-13T19:00"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-11-13T19:00",
+      "note": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

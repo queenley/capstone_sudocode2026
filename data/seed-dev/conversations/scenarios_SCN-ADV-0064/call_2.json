@@ -1,0 +1,255 @@
+{
+  "conversation_id": "SCN-ADV-0064__call_2",
+  "scenario_id": "SCN-ADV-0064",
+  "call": "call_2",
+  "customer_id": "SYN-C003",
+  "session_index": 2,
+  "channel": "chat_fanpage",
+  "date": "2026-11-14",
+  "region": "nam",
+  "category": "gia-dung/quat",
+  "persona": "khach_go_khong_dau",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh, hôm trước anh có hỏi về Quạt đứng Senko TS16 và chờ cuối tháng nhận lương. Hiện sản phẩm này còn hàng, giá mới là 590.000đ anh nhé. Mình đặt luôn hôm nay đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Mình đặt Quạt đứng Senko TS16 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 590000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chao em anh muon dat mua quat dung senko ts16",
+      "facts_stated": {
+        "product_advised": "SKU-FAN-SEN"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh chọn Quạt đứng Senko TS16, giá hiện tại là 590.000đ. Anh muốn thanh toán COD đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Anh muốn thanh toán COD đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 590000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "hinh thuc thanh toan la cod nhe",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận thanh toán COD. Anh nhận hàng ở Quận 7, TP.HCM đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Anh nhận hàng ở Quận 7, TP.HCM đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "giao hang cho anh o quan 7 tp hcm",
+      "facts_stated": {
+        "delivery_area": "Quận 7, TP.HCM"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận lại đơn: Quạt đứng Senko TS16, 1 cái, giá 590.000đ, giao Quận 7, TP.HCM, thanh toán COD. Thời gian giao dự kiến 2 ngày làm việc, khoảng 17/11 anh nhận hàng nhé. Em lên đơn cho anh luôn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 590000
+        },
+        {
+          "field": "delivery_days",
+          "value": 2
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-17"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-11-14"
+          }
+        },
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000003",
+            "sku": "SKU-FAN-SEN",
+            "qty": 1,
+            "price_vnd": 590000,
+            "payment": "COD",
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-11-14"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Quận 7, TP.HCM",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-FAN-SEN",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 590000,
+          "op": "supersede",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn10"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "mong la quat nay se giao nhanh cho anh",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã lên đơn thành công cho anh. Đơn sẽ giao trong 2 ngày làm việc, dự kiến anh nhận hàng ngày 17/11. Cảm ơn anh đã đặt hàng tại shop ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-17"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "price_quoted_vnd",
+        "old_value": 501500,
+        "new_value": 590000
+      }
+    ],
+    "callback": null,
+    "order": {
+      "sku": "SKU-FAN-SEN",
+      "qty": 1,
+      "price_vnd": 590000,
+      "payment": "COD",
+      "address": "Quận 7, TP.HCM",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-11-17"
+    }
+  }
+}

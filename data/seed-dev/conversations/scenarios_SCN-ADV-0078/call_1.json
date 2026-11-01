@@ -1,0 +1,205 @@
+{
+  "conversation_id": "SCN-ADV-0078__call_1",
+  "scenario_id": "SCN-ADV-0078",
+  "call": "call_1",
+  "customer_id": "C011",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-31",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_chuyen_giua_nguoi_va_ai",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em có thể hỗ trợ chị về máy hút sữa điện đôi Spectra S1 ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về máy hút sữa điện đôi Spectra S1.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại máy hút sữa điện đôi Spectra S1 bên em đang có hàng và giá là 4.290.000đ chị nhé. Sản phẩm này có chế độ hút đôi, động cơ kín, pin sạc dùng 3 tiếng và bảo hành 12 tháng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4290000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có bé 5 tháng, ngân sách khoảng 5 triệu thôi.",
+      "facts_stated": {
+        "child_age_months": 5,
+        "budget_vnd": 5000000
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy Spectra S1 rất phù hợp cho bé sơ sinh và mẹ muốn hút đôi, trong ngân sách của chị luôn ạ. Ngoài ra, bên em đang có chương trình miễn phí vận chuyển toàn quốc cho sản phẩm này đó chị.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4290000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện máy Spectra S1 áp dụng chương trình miễn phí vận chuyển toàn quốc cho các đơn từ 500.000đ chị nhé, ngoài ra chưa có quà tặng kèm ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "promo_PUMP-GIFT_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần suy nghĩ thêm nên sẽ gọi lại em sau nhé.",
+      "facts_stated": {
+        "blocker": "cần suy nghĩ thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, chị cứ cân nhắc thêm ạ. Nếu cần hỗ trợ hoặc có quyết định, chị liên hệ lại shop bất cứ lúc nào nhé. Em sẽ ghi nhận lại thông tin và giữ báo giá ưu đãi cho chị trong thời gian khuyến mãi.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4290000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "child_age_months",
+          "value": 5,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 5000000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-PUMP1",
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 4290000,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_1#turn5"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_thong_tin_san_pham",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_suy_nghi_them",
+    "objection_handling": "Đã xác nhận và hướng dẫn khách gọi lại khi cần hỗ trợ thêm.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

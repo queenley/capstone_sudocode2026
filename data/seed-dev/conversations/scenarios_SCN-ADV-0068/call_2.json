@@ -1,0 +1,157 @@
+{
+  "conversation_id": "SCN-ADV-0068__call_2",
+  "scenario_id": "SCN-ADV-0068",
+  "call": "call_2",
+  "customer_id": "SYN-C005",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-01",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_nhieu_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Em đã ghi nhận anh vừa hỏi về đơn hàng giày chạy bộ RunLite 1, em xin cập nhật cho anh ngay đây ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "size",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi tình trạng đơn hàng giày chạy bộ RunLite 1 của anh.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng giày chạy bộ RunLite 1 của anh hiện đã tạo và đang ở trạng thái khởi tạo trên hệ thống ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "created"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD600001"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đơn OD900502 vẫn đang trong quá trình giao đúng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn OD900502 của anh đúng là vẫn đang trong quá trình giao tới địa chỉ TP Huế anh đã cung cấp ạ.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em có thông tin gì mới về đơn hàng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Hiện tại đơn hàng của anh vẫn đang ở trạng thái đã tạo và chưa có cập nhật mới nào thêm ạ. Khi đơn chuyển sang trạng thái giao hàng, hệ thống sẽ gửi SMS cho anh.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "created"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh cần biết khi nào thì nhận được hàng, cảm ơn nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em thông tin thêm, khi đơn hàng được bàn giao cho đơn vị vận chuyển thì anh sẽ nhận được mã vận đơn và dự kiến nhận hàng trong 2–4 ngày làm việc tại TP Huế ạ. Anh cứ yên tâm chờ giúp em nhé.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

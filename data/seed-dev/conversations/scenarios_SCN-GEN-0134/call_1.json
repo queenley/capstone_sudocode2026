@@ -1,0 +1,304 @@
+{
+  "conversation_id": "SCN-GEN-0134__call_1",
+  "scenario_id": "SCN-GEN-0134",
+  "call": "call_1",
+  "customer_id": "C048",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị muốn tìm hiểu về máy lọc không khí Xiaomi Smart 4 Pro đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị đang quan tâm đến máy lọc không khí Xiaomi Smart 4 Pro đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo chi muon hoi ve may loc khong khi xiaomi smart 4 pro",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy Xiaomi Smart 4 Pro phù hợp phòng đến 43 mét vuông, nên dùng rất tốt cho phòng 30 mét vuông của chị ạ.",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Phòng của mình khoảng 30 mét vuông đúng không chị?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-XM-4P"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 650,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chi can cho phong khoang 30 met vuong day",
+      "facts_stated": {
+        "room_area_m2": 30
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ nhà mình có trẻ nhỏ, chị ưu tiên máy có khóa trẻ em phải không ạ? Máy Xiaomi 4 Pro tuy không có khóa trẻ em, nhưng có chế độ điều khiển qua app rất tiện. Ngân sách của chị là khoảng 6 triệu đúng không ạ?",
+      "questions": [
+        {
+          "slot": "has_children",
+          "type": "confirm",
+          "text": "Nhà mình có trẻ nhỏ đúng không chị?"
+        },
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của mình là khoảng 6 triệu đúng không chị?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "nha chi co tre nho ngan sach khoang 6 trieu thoi",
+      "facts_stated": {
+        "has_children": true,
+        "budget_vnd": 6000000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy Xiaomi Smart 4 Pro bên em đang bán giá 5.490.000đ, hiện có quà tặng màng lọc chính hãng đi kèm. Chương trình khuyến mãi XM-COMBO đang áp dụng đến ngày 14/11, chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "promo_XM-COMBO_active",
+          "value": true
+        },
+        {
+          "field": "gift_sku",
+          "value": "SKU-XM-FLT"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5490000",
+          "spoken": "5.490.000"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "em co biet may nay dang co khuyen mai gi khong",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, ngoài giá ưu đãi, chị còn được miễn phí vận chuyển toàn quốc và được kiểm tra hàng khi nhận. Nếu cần trao đổi thêm với gia đình, em có thể hẹn gọi lại chị lúc 7 giờ tối ngày mai được không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Em có thể hẹn gọi lại chị lúc 7 giờ tối ngày mai được không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ tối"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chi can ban voi gia dinh da co the hen lai toi mai tam 7 gio em goi lai chi nhe",
+      "facts_stated": {},
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 gio"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi chú, em sẽ gọi lại cho chị vào lúc 7 giờ tối ngày mai để chị trao đổi với gia đình xong nhé. Cảm ơn chị đã quan tâm sản phẩm của shop BTC ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-10-31T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0954742843",
+            "callback_at": "2026-10-31T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "room_area_m2",
+          "value": 30,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 6000000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-XM-4P",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5490000,
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "promo_code",
+          "value": "XM-COMBO",
+          "op": "set",
+          "source": "call_1#turn6"
+        }
+      ],
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ tối"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_hoi_nguoi_nha",
+    "objection_handling": "Hẹn giờ gọi lại đúng lịch khách yêu cầu, nhắc thời hạn khuyến mãi.",
+    "sentiment": "neutral",
+    "decision_maker": "gia_dinh",
+    "commitments": [
+      {
+        "tool": "schedule.callback",
+        "args": {
+          "customer_phone": "0954742843",
+          "callback_at": "2026-10-31T19:00",
+          "note": "khách hỏi người nhà rồi báo lại"
+        }
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-10-31T19:00",
+      "reason": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

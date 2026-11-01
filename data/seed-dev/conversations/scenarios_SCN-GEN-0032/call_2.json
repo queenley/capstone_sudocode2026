@@ -1,0 +1,193 @@
+{
+  "conversation_id": "SCN-GEN-0032__call_2",
+  "scenario_id": "SCN-GEN-0032",
+  "call": "call_2",
+  "customer_id": "C038",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2027-06-13",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Diệp ạ, hôm trước chị có mua Giày trekking HikePro size 38 màu trắng, thanh toán chuyển khoản và nhận hàng ở TP Huế phải không chị? Em là trợ lý ảo của shop BTC, em hỗ trợ chị đây ạ.",
+      "questions": [
+        {
+          "slot": "color",
+          "type": "confirm",
+          "text": "Chị xác nhận là mình đã mua giày màu trắng phải không ạ?"
+        },
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Và địa chỉ nhận hàng là ở TP Huế đúng không chị?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "product_advised",
+        "variant_sku",
+        "size",
+        "color",
+        "delivery_area",
+        "payment",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, em ơi, hôm trước chị mua giày trekking HikePro, em có biết giày này còn khuyến mãi không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại Giày trekking HikePro đang có giá 1.990.000đ và bên em chưa có chương trình khuyến mãi nào áp dụng cho sản phẩm này trong hôm nay ạ. Nếu có ưu đãi mới, em sẽ chủ động thông báo để chị nắm được nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1990000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn biết thêm về chất liệu và các màu sắc khác nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giày trekking HikePro có upper vải chống thấm, đế cao su kiểu Vibram, cổ cao và form rộng, đi rất chắc chân chị nhé. Mẫu này hiện tại bên em còn màu trắng, đen và xám, đủ các size từ 38 đến 43.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Với giày này, chị thấy giá khá cao, có chỗ nào bán rẻ hơn không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã góp ý ạ. Giá bán tại shop là chính hãng, bảo hành đầy đủ và có đổi trả trong 7 ngày nếu chưa sử dụng. Mình còn được hỗ trợ vận chuyển toàn quốc và hậu mãi tốt nữa chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ gọi lại sau khi xem thêm thông tin nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, khi nào chị cần hỗ trợ thêm về sản phẩm hoặc chương trình mới, chị cứ liên hệ lại cho shop BTC nhé. Em chúc chị một ngày vui vẻ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-TRK",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1990000,
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-TRK-38-TRANG",
+          "op": "set",
+          "source": "call_2#turn1"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_san_pham",
+    "outcome": "hen_goi_lai",
+    "objection_type": "gia_cao",
+    "objection_handling": "Agent nhấn mạnh sản phẩm chính hãng, bảo hành đầy đủ, hỗ trợ đổi trả và hậu mãi.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

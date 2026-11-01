@@ -1,0 +1,223 @@
+{
+  "conversation_id": "SCN-GEN-0209__call_1",
+  "scenario_id": "SCN-GEN-0209",
+  "call": "call_1",
+  "customer_id": "C045",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-13",
+  "region": "trung",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần tư vấn về máy lọc nước RO Kangaroo 10 lõi đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh cần tư vấn về máy lọc nước RO Kangaroo 10 lõi đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về máy lọc nước RO Kangaroo 10 lõi.",
+      "facts_stated": {
+        "product_advised": "SKU-WF-RO10"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy lọc nước RO Kangaroo 10 lõi hiện bên em còn hàng anh nhé. Máy sử dụng công nghệ RO với 10 lõi lọc, phù hợp cho gia đình 4–6 người sử dụng.",
+      "questions": [
+        {
+          "slot": "usage_need",
+          "type": "open",
+          "text": "Anh mua cho mấy người dùng ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này giá bao nhiêu em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giá của máy lọc nước RO Kangaroo 10 lõi là 6.890.000đ anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "6890000",
+          "spoken": "6.890.000"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhà anh có 6 người, cần máy đủ dùng cho gia đình.",
+      "facts_stated": {
+        "usage_need": "gia đình 6 người"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy Kangaroo 10 lõi đáp ứng tốt cho gia đình 6 người anh nhé. Công suất lọc tiêu chuẩn 12 lít/giờ, phù hợp dùng cho cả nhà mình.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh thấy có nhiều loại lắm, không biết em có khuyến mãi gì không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại máy Kangaroo 10 lõi đang bán giá niêm yết, bên em chưa có khuyến mãi cho sản phẩm này. Tuy nhiên, anh được miễn phí thu hộ khi chọn COD toàn quốc ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, anh muốn so sánh thêm với một số sản phẩm khác, để anh tìm hiểu kỹ hơn.",
+      "facts_stated": {
+        "blocker": "muốn so sánh thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, anh cứ tham khảo thêm thông tin các sản phẩm khác. Khi nào cần hỗ trợ hoặc cần tư vấn chi tiết hơn, anh liên hệ lại giúp em nhé. Em sẽ lưu lại nhu cầu và giá máy cho anh ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "muốn so sánh thêm",
+          "op": "set",
+          "source": "call_1#turn11"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 7000000,
+          "op": "set",
+          "source": "call_1#turn11"
+        },
+        {
+          "key": "usage_need",
+          "value": "gia đình 6 người",
+          "op": "set",
+          "source": "call_1#turn11"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-WF-RO10",
+          "op": "set",
+          "source": "call_1#turn11"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 6890000,
+          "op": "set",
+          "source": "call_1#turn11"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_may_loc_nuoc",
+    "outcome": "hen_goi_lai",
+    "objection_type": "muon_so_sanh",
+    "objection_handling": "Ghi nhận nhu cầu so sánh, lưu lại thông tin và hướng dẫn khách liên hệ lại khi cần hỗ trợ.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

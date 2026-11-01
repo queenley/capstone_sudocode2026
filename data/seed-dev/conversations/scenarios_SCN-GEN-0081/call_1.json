@@ -1,0 +1,299 @@
+{
+  "conversation_id": "SCN-GEN-0081__call_1",
+  "scenario_id": "SCN-GEN-0081",
+  "call": "call_1",
+  "customer_id": "C035",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-28",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Dung ạ, em là trợ lý ảo của shop BTC. Em xác nhận chị là Dung, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Em xác nhận chị là Dung, đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "is_human",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo em, chị Dung đây, hôm trước chị có hỏi về máy lọc không khí AirPure Mini.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã gọi lại. Máy lọc không khí AirPure Mini phù hợp cho phòng tối đa 12 mét vuông nên dùng cho phòng 10 mét vuông rất hợp lý ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn biết máy này có phù hợp cho phòng khoảng 10 mét vuông không em?",
+      "facts_stated": {
+        "room_area_m2": 10
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị không có trẻ nhỏ và ngân sách khoảng 2 triệu rưỡi đúng không ạ?",
+      "questions": [
+        {
+          "slot": "has_children",
+          "type": "confirm",
+          "text": "Chị không có trẻ nhỏ đúng không ạ?"
+        },
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của chị khoảng 2 triệu rưỡi đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị không có trẻ nhỏ, ngân sách của chị tầm 2 triệu rưỡi.",
+      "facts_stated": {
+        "has_children": false,
+        "budget_vnd": 2500000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "2500000",
+          "spoken": "2 triệu rưỡi"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Hiện tại giá máy AirPure Mini là 2.190.000đ chị nhé. Sản phẩm có sẵn hàng, phù hợp với nhu cầu của chị. Nếu mình mua COD thì được miễn phí thu hộ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "2190000",
+          "spoken": "2.190.000đ"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này đang có khuyến mãi gì không em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại máy AirPure Mini chưa có chương trình khuyến mãi giảm giá nào, nhưng chị được miễn phí thu hộ khi thanh toán COD ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần bàn với gia đình, có thể hẹn gọi lại tối thứ Hai (30/11) tầm 7 giờ em gọi lại chị nhé.",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-11-30",
+          "spoken": "tối thứ Hai (30/11)"
+        },
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận, em sẽ gọi lại cho chị vào lúc 7 giờ tối Thứ Hai ngày 30/11 để chị bàn với gia đình xong rồi mình trao đổi tiếp ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-11-30T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0958421083",
+            "callback_at": "2026-11-30T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "room_area_m2",
+          "value": 10,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "has_children",
+          "value": false,
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 2500000,
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-MINI",
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 2190000,
+          "op": "set",
+          "source": "call_1#turn8"
+        }
+      ],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-11-30",
+          "spoken": "30/11"
+        },
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "hoi_gia_dinh",
+    "objection_handling": "Lịch hẹn gọi lại đúng giờ khách yêu cầu, xác nhận rõ thời gian.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "hứa_gọi_lại": {
+          "thời_gian": "2026-11-30T19:00"
+        }
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-11-30T19:00",
+      "reason": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

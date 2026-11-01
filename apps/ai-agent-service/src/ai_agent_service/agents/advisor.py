@@ -112,6 +112,8 @@ class AgentContext:
     #: Today's price per sku from every quote in this call, for the order check.
     quotes: Mapping[str, int] = field(default_factory=dict)
     known_orders: frozenset[str] = frozenset()
+    #: Order lines created earlier in this call (``actions.placed_lines``): the COD limit is on the whole order.
+    placed_lines: tuple[Mapping[str, Any], ...] = ()
     #: The customer's phone, raw. Filled into tools by the harness; never shown to the model.
     customer_phone: str | None = None
     shared_phone: bool = False
@@ -395,6 +397,7 @@ class ActionGuardMiddleware(AgentMiddleware):
             last_agent_said=context.last_agent_said, customer_said=context.customer_said,
             shared_phone=context.shared_phone, created=(*context.created_orders, *_created_in(state)),
             updated=_updated_in(state, context.tool_results),
+            placed=placed_this_call(context, state),
         )
         if not verdict.passed:
             envelope = {"ok": False, "error": {"code": "PRECONDITION", "retryable": False, "message": " ".join(verdict.reasons)}}
@@ -403,6 +406,14 @@ class ActionGuardMiddleware(AgentMiddleware):
                 additional_kwargs={"args": args, "blocked_by": "guardrail"},
             )
         return await handler(request.override(tool_call={**call, "args": args}))
+
+
+def placed_this_call(context: AgentContext, state: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Order lines created this call: earlier turns, earlier runs of this turn, this run; one per order id."""
+    lines = {line["order_id"]: dict(line) for line in context.placed_lines}
+    lines.update({line["order_id"]: line for line in actions.placed_lines(
+        [*context.tool_results, *tool_results_of(state.get("messages") or [])])})
+    return list(lines.values())
 
 
 def _seen_in(state: Mapping[str, Any], earlier: Sequence[Mapping[str, Any]]) -> tuple[frozenset[str], frozenset[str]]:

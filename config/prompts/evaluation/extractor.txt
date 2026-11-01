@@ -26,10 +26,10 @@ Scope
 
 Questions (kind = "question", source_field = agent_text)
 3. A question is something the agent asks the customer and expects an answer to: asking for information, asking to confirm a value, asking for a choice. A greeting, a filler ("dạ", "ạ"), a statement and anything the customer says is not a question.
-4. One item per question and per slot it asks about. One sentence that asks about two slots gives two items. Never merge questions and never leave one out: the scorer divides by every question you list, and an extractor that omits questions is cheating.
+4. One item per question and per slot it asks about. One sentence that asks about two slots gives two items, except an order read back (rule 7). Never merge questions and never leave one out: the scorer divides by every question you list, and an extractor that omits questions is cheating.
 5. slot_or_field is a name from the SLOT LIST, the thing the question is about. A question about none of them is "other".
 6. question_type is "confirm" only when the agent itself states the value and asks the customer to confirm it ("vẫn là phòng 25 m² đúng không ạ?"). Asking for a value, or asking the customer to choose between options, is "open" ("phòng rộng bao nhiêu m² ạ?", "COD hay chuyển khoản ạ?").
-7. An offer, a request for permission, a closing question and a courtesy question ("có muốn em ... không", "cần em hỗ trợ gì thêm không", "em gọi lại sau nhé" with no time named) has slot "other" and question_type "open". Reading back an order and asking the customer to confirm it makes one confirm item per slot it states.
+7. An offer, a request for permission, a closing question and a courtesy question ("có muốn em ... không", "cần em hỗ trợ gì thêm không", "em gọi lại sau nhé" with no time named) has slot "other" and question_type "open". Reading back an order before placing it (PB-09), the details stated together and one confirmation asked ("Em lên đơn AirPure X giá 4.890.000đ, COD, giao về <ADDR_1>, đúng không ạ?"), is ONE question: slot order_summary, question_type "confirm", value null. The facts it repeats from previous_sessions are still fact_usage items (rule 18). A separate question about one detail is its own item ("vẫn trả COD đúng không ạ?" is payment).
 8. quote is the question itself, copied exactly. value is the value the agent states in a confirm question, written as the slot defines; otherwise null.
 
 Claims (kind = "claim", source_field = agent_text)
@@ -95,6 +95,8 @@ Use these names exactly, for questions and reused facts. Each line: name (type):
 - preferred_channel (code): how the customer wants to be contacted. Value: zalo, phone or sms. Ask: "Chị muốn em liên hệ qua Zalo hay gọi điện ạ?"
 - channel (code): the channel the customer is contacting through. Value: hotline, chat_fanpage, zalo_oa, web_chat or other. Confirm: "Hôm trước chị nhắn bên Facebook đúng không ạ?" (chat_fanpage)
 - callback_time (str): the time the customer would like a call back. Value: as said ("tối mai sau 8 giờ"). Ask: "Mình tiện nghe máy lúc mấy giờ ạ?"
+
+- order_summary (str): the whole order read back once before it is placed (PB-09); questions only, never a fact_usage. Value: null. Confirm: "Em lên đơn AirPure X giá 4.890.000đ, thanh toán COD, giao về <ADDR_1>, đúng không ạ?"
 
 ## Call record
 - callback_at (str): a callback appointment already agreed or proposed. Value: as the agent states it ("9 giờ sáng mai"). Confirm: "Em hẹn gọi lại 9 giờ sáng mai được không ạ?"

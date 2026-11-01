@@ -8,6 +8,7 @@ a tool error with the reason, and nothing happens in the business.
 |---|---|
 | ``order.create`` | a phone to order for; the tier allows it; the product code is trusted (it came from a tool this call or from the brief, never made up from a name); the unit price equals today's ``pricing.get_quote`` for that code; COD total at most 10.000.000đ; not the same product as an order this call already created, unless the customer asks for more (an address or payment added afterwards is an ``order.update``) |
 | ``order.update`` | the order is one this customer has, or one a tool showed this call; the new variant is trusted; not the same change as one this call already made (a second exchange is charged, DT-03). An order this call created may be corrected by its caller whatever the tier |
+| ``order.update`` | the order is one this customer has, or one a tool showed this call; the new variant is trusted |
 | ``schedule.callback`` | an ISO 8601 time with +07:00, inside working hours (LN-01, LN-02) and not in the past; otherwise the nearest working slot, for the model to propose |
 | ``handoff.transfer`` | only in lane HANDOFF, on a PB-06 topic, when the customer asked for a person, or on a serious complaint (a transfer anywhere else is graded ``over_escalation``); the brief validates against ``schemas/handoff_brief.schema.json`` itself (required fields, enums, phone pattern, summary length), after the harness filled in what it knows |
 | ``memory.request_deletion`` | the agent's previous turn asked to confirm the deletion and the customer just agreed (QT-06) |
@@ -47,6 +48,8 @@ ONE_MORE = re.compile(
 ASKED_TO_DELETE = re.compile(r"\bxoa\b.*\?|\bxac nhan\b.*\bxoa\b")
 AGREED = re.compile(r"\b(dong y|dung roi|dung vay|xoa di|xoa giup|xoa het|ok|oke|vang|da|u|uh|co)\b")
 DECLINED = re.compile(r"\b(khong|thoi|chua|de sau)\b")
+#: Splitting an order was proposed or asked for (QT-01: only if the customer agrees).
+SPLIT = re.compile(r"\btach\b")
 
 
 def check(
@@ -67,6 +70,7 @@ def check(
     shared_phone: bool = False,
     created: Sequence[Mapping[str, Any]] = (),
     updated: Sequence[Mapping[str, Any]] = (),
+    placed: Sequence[Mapping[str, Any]] = (),
 ) -> Verdict:
     """Whether a write tool may run with *args*; the reasons if not.
 
@@ -78,6 +82,7 @@ def check(
     product twice unless they ask for more. *updated* is the arguments of the
     ``order_update`` calls that succeeded in this call: the same change is not
     made twice.
+    *placed* are the order lines already created this call (:func:`placed_lines`).
     """
     created_ids = frozenset(str(o["order_id"]) for o in created if o.get("order_id"))
     if name in CUSTOMER_READ_TOOLS:
@@ -105,7 +110,8 @@ def check(
         return Verdict(False, ("Chế độ copilot: tư vấn viên thực hiện thao tác này, trợ lý chỉ gợi ý.",))
     checks = {
         "order_create": lambda: _order_create(args, tier=tier, has_phone=has_phone, quotes=quotes, trusted=trusted,
-                                              created=created, customer_said=customer_said),
+                                              created=created, customer_said=customer_said, placed=placed,
+                                              said=f"{last_agent_said or ''} {customer_said or ''}"),
         "order_update": lambda: (["Xác nhận danh tính trước khi sửa đơn."]
                                  if tier != "VERIFIED" and args.get("order_id") not in created_ids
                                  else _order_update(args, orders=orders | created_ids, trusted=trusted,
@@ -118,11 +124,54 @@ def check(
     return Verdict(not reasons, tuple(reasons))
 
 
+def placed_lines(results: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """The order lines created by *results* (tool results, organisers' names), one per order id."""
+    lines: dict[str, dict[str, Any]] = {}
+    for result in results:
+        envelope = result.get("result") or {}
+        order_id = (envelope.get("data") or {}).get("order_id")
+        if result.get("name") != "order.create" or not envelope.get("ok") or not order_id:
+            continue
+        args = result.get("args") or {}
+        lines[order_id] = {"order_id": order_id, "sku": args.get("sku"), "qty": int(args.get("qty") or 1),
+                           "price_vnd": int(args.get("price_vnd") or 0), "payment": args.get("payment") or "COD",
+                           "order_group": args.get("order_group")}
+    return list(lines.values())
+
+
+def _cod_order(args: Mapping[str, Any], line: int, placed: Sequence[Mapping[str, Any]], said: str) -> list[str]:
+    """VC-03 on the whole order: the COD lines of this call in the same ``order_group`` with this one.
+
+    QT-01: an order above the limit may be split, if the customer agrees; the
+    agent's previous turn proposed it or the customer asked (``tach``), or an
+    earlier line of the call is already in a group.
+    """
+    group = args.get("order_group")
+    if group is not None and not SPLIT.search(plain(said)) and not any(p.get("order_group") for p in placed):
+        return ["Chỉ tách đơn khi khách đã đồng ý; hỏi khách có muốn tách thành hai đơn không trước khi đặt order_group."]
+    if (args.get("payment") or "COD") != "COD":
+        return []
+    same = [p for p in placed if p.get("order_group") == group and p.get("payment") == "COD"]
+    total = line + sum(int(p["price_vnd"]) * int(p["qty"]) for p in same)
+    if total <= COD_LIMIT_VND:
+        return []
+    with_placed = f" (gồm {len(same)} món đã đặt trong cuộc gọi)" if same else ""
+    if group is None:
+        return [f"Đơn COD {format_vnd(total)}{with_placed} vượt giới hạn {format_vnd(COD_LIMIT_VND)}; đề nghị chuyển "
+                "khoản, hoặc hỏi khách có muốn tách thành hai đơn, mỗi đơn COD tối đa 10.000.000đ (order_group \"1\", \"2\")."]
+    return [f"Đơn tách {group} COD {format_vnd(total)}{with_placed} vẫn vượt giới hạn {format_vnd(COD_LIMIT_VND)}; "
+            "xếp lại các món giữa hai đơn hoặc đề nghị chuyển khoản."]
+
+
 def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes: Mapping[str, int],
                   trusted: frozenset[str] | None, created: Sequence[Mapping[str, Any]] = (),
-                  customer_said: str | None = None) -> list[str]:
+                  customer_said: str | None = None, placed: Sequence[Mapping[str, Any]] = (),
+                  said: str = "") -> list[str]:
     again = [o for o in created if o.get("sku") and o.get("sku") == args.get("sku")]
-    if again and not ONE_MORE.search(plain(customer_said or "")):
+    # The same sku in the other half of a split order (QT-01) is the order the customer agreed to, not a repeat.
+    other_half = args.get("order_group") is not None and all(
+        p.get("order_group") != args.get("order_group") for p in placed if p.get("sku") == args.get("sku"))
+    if again and not other_half and not ONE_MORE.search(plain(customer_said or "")):
         return [f"Đơn {again[-1]['order_id']} cho {args.get('sku')} đã tạo trong cuộc này. Khách bổ sung hay đổi địa chỉ, "
                 "thanh toán thì gọi order_update trên đơn đó; chỉ tạo đơn mới khi khách muốn mua thêm."]
     reasons = []
@@ -140,10 +189,7 @@ def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes
     elif int(price) != quotes[sku]:
         reasons.append(f"price_vnd {format_vnd(int(price))} khác giá hôm nay của {sku} là {format_vnd(quotes[sku])}.")
     qty = int(args.get("qty") or 1)
-    if (args.get("payment") or "COD") == "COD" and int(price) * qty > COD_LIMIT_VND:
-        reasons.append(f"Đơn COD {format_vnd(int(price) * qty)} vượt giới hạn {format_vnd(COD_LIMIT_VND)}; "
-                       "đề nghị chuyển khoản hoặc tách đơn.")
-    return reasons
+    return reasons + _cod_order(args, int(price) * qty, placed, said)
 
 
 def _order_update(args: Mapping[str, Any], *, orders: frozenset[str], trusted: frozenset[str] | None,

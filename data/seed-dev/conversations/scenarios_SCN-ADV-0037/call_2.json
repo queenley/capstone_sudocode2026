@@ -1,0 +1,288 @@
+{
+  "conversation_id": "SCN-ADV-0037__call_2",
+  "scenario_id": "SCN-ADV-0037",
+  "call": "call_2",
+  "customer_id": "C012",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "bac",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "khach_hoi_ky_san_pham",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Khoa ạ, hôm trước anh có quan tâm Máy lọc nước RO Kangaroo 10 lõi và còn băn khoăn việc để bàn với gia đình, hôm nay anh muốn đặt luôn sản phẩm đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Hôm trước anh hỏi về Máy lọc nước RO Kangaroo 10 lõi, anh xác nhận chọn sản phẩm này đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-17"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh gọi lại để đặt máy lọc nước RO Kangaroo 10 lõi.",
+      "facts_stated": {
+        "product_advised": "SKU-WF-RO10"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, máy lọc nước RO Kangaroo 10 lõi bên em giá 6.890.000đ, hiện đang còn hàng. Anh muốn chọn phương thức thanh toán nào ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "open",
+          "text": "Anh muốn chọn phương thức thanh toán nào ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán là COD nhé.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, anh chọn thanh toán khi nhận hàng (COD) ạ. Anh vui lòng cho em biết địa chỉ giao hàng mình nhận ở đâu nhé?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Anh vui lòng cho em biết địa chỉ giao hàng mình nhận ở đâu nhé?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là Cầu Giấy, Hà Nội.",
+      "facts_stated": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận địa chỉ giao hàng là Cầu Giấy, Hà Nội. Máy sẽ được giao dự kiến trong 2 ngày làm việc, khoảng ngày 20/10. Trước khi giao, nhân viên bên em sẽ gọi xác nhận đơn với anh một lần nữa ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "delivery_days",
+          "value": 2
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-20"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mong là giao hàng nhanh chóng, anh đồng ý lên đơn.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xin phép đọc lại đơn hàng: Máy lọc nước RO Kangaroo 10 lõi, số lượng 1, giá 6.890.000đ, giao tại Cầu Giấy, Hà Nội, thanh toán khi nhận hàng. Dự kiến giao ngày 20/10. Anh xác nhận giúp em các thông tin trên đúng chưa ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh xác nhận giúp em các thông tin trên đúng chưa ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd",
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6890000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-20"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh xác nhận đúng rồi em nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã lên đơn thành công cho anh. Trong ngày giao dự kiến, sẽ có nhân viên gọi xác nhận đơn trước khi giao hàng tới anh ạ. Cảm ơn anh đã đặt mua tại shop!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0922264686",
+            "sku": "SKU-WF-RO10",
+            "qty": 1,
+            "price_vnd": 6890000,
+            "payment": "COD",
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-17"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Cầu Giấy, Hà Nội",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-WF-RO10",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 6890000,
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn12"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_hang",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-WF-RO10",
+      "qty": 1,
+      "price_vnd": 6890000,
+      "payment": "COD",
+      "delivery_area": "Cầu Giấy, Hà Nội",
+      "order_id": "OD600001"
+    }
+  }
+}

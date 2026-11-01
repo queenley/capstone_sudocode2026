@@ -1,0 +1,67 @@
+{
+  "scenario_id": "SCN-ADV-0030",
+  "call": "call_1",
+  "input_mode": "text",
+  "source_sha256": "450db4ae7337f68e17eb74f5c9c0175f5462ac53affbf163ee5edf9ec36cbc41",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Alo, chị muốn hỏi về máy lọc không khí cho phòng khoảng 30 mét vuông.",
+      "spoken_text": "alo chị muốn hỏi về máy lọc không khí cho phòng khoảng ba mươi mét vuông.",
+      "entities": {
+        "room_area_m2": 30,
+        "has_children": false
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Nhà chị không có trẻ nhỏ, ngân sách tầm 8 triệu thôi.",
+      "spoken_text": "nhà chị không có trẻ nhỏ ngân sách tầm tám triệu thôi.",
+      "entities": {
+        "has_children": false,
+        "budget_vnd": 8000000
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Máy lọc không khí AirPure Pro có khuyến mãi gì không em?",
+      "spoken_text": "máy lọc không khí e pia pro có khuyến mãi gì không em?",
+      "entities": {
+        "sku": "SKU-AP-PRO"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "Chị thấy giá 7 triệu 690 ngàn, có đúng không?",
+      "spoken_text": "chị thấy giá bảy triệu sáu trăm chín mươi ngàn có đúng không?",
+      "entities": {
+        "competitor_price_vnd": 7690000,
+        "blocker": "so sanh gia"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 5,
+      "speaker": "C",
+      "text": "Chị đang chờ cuối tháng mới nhận lương, nên chưa quyết định được.",
+      "spoken_text": "chị đang chờ cuối tháng mới nhận lương nên chưa quyết định được.",
+      "entities": {
+        "blocker": "cho luong"
+      },
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

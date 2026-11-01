@@ -1,0 +1,271 @@
+{
+  "conversation_id": "SCN-GEN-0088__call_2",
+  "scenario_id": "SCN-GEN-0088",
+  "call": "call_2",
+  "customer_id": "C001",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-01",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Hoa ạ, hôm trước bạn nhân viên đã hỗ trợ mình về Xe đẩy 2 chiều Combi Sugocal và mình cần hỏi chồng. Em rất vui được hỗ trợ chị tiếp nhé.",
+      "questions": [],
+      "facts_used": [
+        "decision_maker",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6790000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Hoa đây, hôm trước chị đã hỏi về xe đẩy Combi Sugocal.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng chị, hiện xe đẩy Combi Sugocal vẫn còn hàng tại shop, giá là 6.790.000đ và đang được miễn phí vận chuyển toàn quốc với chương trình MOM-FREESHIP. Chị muốn em hỗ trợ đặt hàng luôn không ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em xin phép xác nhận lại: chị đặt 1 xe đẩy 2 chiều Combi Sugocal, giá 6.790.000đ, giao về Long Biên, Hà Nội, thanh toán chuyển khoản ngân hàng, dự kiến giao khoảng ngày 03/11. Thông tin như vậy đã đúng và chị muốn em lên đơn luôn đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6790000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-03"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Long Biên, Hà Nội",
+            "on": "2026-11-01"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn mua xe này, hình thức thanh toán sẽ là chuyển khoản ngân hàng.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận chị chọn chuyển khoản ngân hàng. Đơn hàng sẽ được giao miễn phí về Long Biên, Hà Nội trong khoảng 2 ngày làm việc, dự kiến nhận vào 03/11 chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6790000
+        },
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-03"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là Long Biên, Hà Nội nhé.",
+      "facts_stated": {
+        "delivery_area": "Long Biên, Hà Nội"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, thông tin giao hàng là Long Biên, Hà Nội đã được xác nhận. Em xin phép tiến hành đặt đơn ngay cho chị ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em giúp chị lên đơn hàng được không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã đặt đơn hàng cho chị: 1 xe đẩy 2 chiều Combi Sugocal, giá 6.790.000đ, giao miễn phí về Long Biên, Hà Nội, thanh toán chuyển khoản ngân hàng. Đơn dự kiến giao đến chị vào ngày 03/11.",
+      "questions": [],
+      "facts_used": [
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6790000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0984726714",
+            "sku": "SKU-MB-STR2",
+            "qty": 1,
+            "price_vnd": 6790000,
+            "payment": "bank",
+            "address": "Long Biên, Hà Nội",
+            "on": "2026-11-01"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Long Biên, Hà Nội",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-STR2",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 6790000,
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": "chồng",
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-MB-STR2",
+      "qty": 1,
+      "price_vnd": 6790000,
+      "payment": "bank",
+      "address": "Long Biên, Hà Nội",
+      "order_id": "OD600001",
+      "promo_code": "MOM-FREESHIP"
+    }
+  }
+}

@@ -1,0 +1,197 @@
+{
+  "conversation_id": "SCN-GEN-0031__call_1",
+  "scenario_id": "SCN-GEN-0031",
+  "call": "call_1",
+  "customer_id": "C035",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-29",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Không biết em đang được hỗ trợ đúng chị Dung không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Không biết em đang được hỗ trợ đúng chị Dung không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi máy lọc không khí AirPure Mini cho phòng khoảng 10 mét vuông.",
+      "facts_stated": {
+        "room_area_m2": 10
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với diện tích phòng khoảng 10 mét vuông, chị chọn AirPure Mini là rất phù hợp ạ. Máy này sử dụng tốt cho phòng nhỏ, hoạt động êm và tiết kiệm điện.",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị không có trẻ nhỏ đâu, ngân sách khoảng 2 triệu rưỡi.",
+      "facts_stated": {
+        "has_children": false,
+        "budget_vnd": 2500000
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã chia sẻ ạ. Máy lọc không khí AirPure Mini phù hợp với nhu cầu và ngân sách của chị, không cần tính năng khóa trẻ em.",
+      "questions": [],
+      "facts_used": [
+        "has_children",
+        "budget_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này có giá bao nhiêu và có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại máy lọc không khí AirPure Mini có giá 2.190.000đ chị nhé. Giá này đang là giá niêm yết, hiện chưa có chương trình khuyến mãi thêm ngoài miễn phí thu hộ khi nhận hàng COD toàn quốc ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đang chờ cuối tháng nhận lương, nên sẽ gọi lại sau nhé.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị sẽ liên hệ lại khi nhận lương nha. Nếu cần hỗ trợ gì thêm, chị cứ gọi shop bất cứ lúc nào ạ. Em chúc chị một ngày vui vẻ!",
+      "questions": [],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "room_area_m2",
+          "value": 10,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "has_children",
+          "value": false,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 2500000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-MINI",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 2190000,
+          "op": "set",
+          "source": "call_1#turn6"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_may_loc_khong_khi_airpure_mini",
+    "outcome": "hen_goi_lai",
+    "objection_type": "cần thêm thời gian/chờ lương",
+    "objection_handling": "Ghi nhận lý do khách chưa mua, hẹn khách chủ động liên hệ lại",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "scenario_id": "SCN-GEN-0204",
+  "level": "M1",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "hard_case": null,
+  "customer_phone": "0925822018",
+  "customer_name": "Quỳnh",
+  "honorific": "chị",
+  "notes": "Persona khach_hoi_nhieu_khong_mua, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): hỏi thêm rồi từ chối → tu_choi. Chấm chủ yếu: CCR, RQR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-14",
+      "customer_goal": "Hỏi giày chạy bộ size 38 màu trắng",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về giày chạy bộ size 38 màu trắng mà em có.",
+        "Giá của đôi giày này là bao nhiêu hả em?",
+        "Có khuyến mãi gì cho sản phẩm này không?",
+        "Chị cần so sánh thêm với mấy mẫu khác trước khi quyết định, em nhé.",
+        "Chị sẽ gọi lại sau khi xem thêm."
+      ],
+      "facts_established": {
+        "blocker": "muốn so sánh thêm",
+        "color": "trang",
+        "size": 38,
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1290000,
+        "variant_sku": "SKU-SN-RUN1-38-TRANG"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1290000,
+        "list_price_vnd": 1290000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-14"
+      },
+      "memory_expectation": {
+        "blocker": "muốn so sánh thêm",
+        "color": "trang",
+        "size": 38,
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1290000,
+        "variant_sku": "SKU-SN-RUN1-38-TRANG"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "FAQ-09",
+        "PB-11"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 6,
+      "customer_goal": "Từ chối mua giày sau khi đã hỏi thêm",
+      "customer_turns": [
+        "Chị đã xem xét và cảm ơn em đã tư vấn.",
+        "Nhưng chị không mua đôi giày này nữa.",
+        "Chị thấy giá hơi cao so với dự kiến của mình.",
+        "Chị sẽ tìm hiểu thêm và quyết định sau.",
+        "Cảm ơn em đã hỗ trợ."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1290000,
+        "variant_sku": "SKU-SN-RUN1-38-TRANG"
+      },
+      "must_carry_over": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "max_agent_questions": 4
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1290000,
+        "list_price_vnd": 1290000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-20"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1290000,
+        "variant_sku": "SKU-SN-RUN1-38-TRANG"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "PB-01",
+        "PB-11"
+      ],
+      "expected_outcome": "tu_choi"
+    }
+  }
+}

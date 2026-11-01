@@ -1,0 +1,198 @@
+{
+  "conversation_id": "SCN-GEN-0165__call_1",
+  "scenario_id": "SCN-GEN-0165",
+  "call": "call_1",
+  "customer_id": "C034",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-01",
+  "region": "trung",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào cô Loan ạ, em là trợ lý ảo của shop. Hôm trước cô có hỏi về máy lọc nước RO Karofi 9 lõi, em có thể hỗ trợ tiếp thông tin cho cô nhé.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "delivery_area",
+        "decision_maker"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, cô Loan đây, hôm trước cô có hỏi máy lọc nước RO Karofi 9 lõi, em ơi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn cô đã gọi lại ạ. Máy lọc nước RO Karofi 9 lõi hiện đang có sẵn hàng, giá là 5.990.000đ cô nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cô đang cần máy cho gia đình 5 người, ngân sách tầm 6 triệu rưỡi.",
+      "facts_stated": {
+        "usage_need": "gia đình 5 người",
+        "budget_vnd": 6500000
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với gia đình 5 người thì máy RO Karofi 9 lõi đáp ứng tốt nhu cầu sử dụng, và mức giá hiện tại là 5.990.000đ nằm trong ngân sách của cô ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại máy lọc nước RO Karofi 9 lõi chưa có chương trình khuyến mãi giảm giá nào, nhưng cô được miễn phí vận chuyển toàn quốc và hỗ trợ thanh toán khi nhận hàng COD không mất phí thu hộ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, cô cần bàn với gia đình, tối mai tầm 7 giờ em gọi lại cô nhé.",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận cô cần trao đổi thêm với gia đình. Em sẽ gọi lại cho cô vào lúc 7 giờ tối mai để hỗ trợ tiếp ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-11-02T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0958421083",
+            "callback_at": "2026-11-02T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_1#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_hoi_nguoi_nha",
+    "objection_handling": "Dạ em sẽ gọi lại cho cô vào đúng thời gian cô hẹn để hỗ trợ tiếp ạ.",
+    "sentiment": "neutral",
+    "decision_maker": "con gái",
+    "commitments": [
+      {
+        "text": "Sẽ gọi lại cho cô vào lúc 7 giờ tối ngày mai."
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-11-02T19:00",
+      "reason": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

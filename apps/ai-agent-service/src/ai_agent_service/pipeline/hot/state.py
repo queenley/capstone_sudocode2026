@@ -113,6 +113,8 @@ class HotState(TurnInput, total=False):
     draft: dict[str, Any] | None
     #: Today's price per sku from every quote this call.
     quotes: dict[str, int]
+    #: Order lines created this call, retained across turn resets (``actions.placed_lines``).
+    placed_lines: list[dict[str, Any]]
     #: Public catalogue codes seen in this call, retained across turn resets.
     trusted_skus: list[str]
     #: The products tools showed this call, latest last: ``{sku, name, price_vnd}``.

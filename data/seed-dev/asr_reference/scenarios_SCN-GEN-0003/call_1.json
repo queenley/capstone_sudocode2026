@@ -1,0 +1,55 @@
+{
+  "scenario_id": "SCN-GEN-0003",
+  "call": "call_1",
+  "input_mode": "text",
+  "source_sha256": "6c9b123d06020473281ff956e0827aeedf45ca3107ac7a2b81997a6b328e21f6",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Alo, chị Loan đây, hôm trước em có báo chị nồi chiên không dầu Xiaomi 4.5L giá 1 triệu 590 nghìn.",
+      "spoken_text": "alo chị loan đây hôm trước em có báo chị nồi chiên không dầu xiaomi bốn phẩy năm lít giá một triệu năm trăm chín mươi nghìn",
+      "entities": {
+        "sku": "SKU-AF-XM",
+        "price_vnd": 1590000
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Chị muốn biết thêm về nồi này, nó có khuyến mãi gì không?",
+      "spoken_text": "chị muốn biết thêm về nồi này nó có khuyến mãi gì không",
+      "entities": {
+        "sku": "SKU-AF-XM"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Chị cần dùng cho gia đình, ngân sách tầm 2 triệu thôi.",
+      "spoken_text": "chị cần dùng cho gia đình ngân sách tầm hai triệu thôi",
+      "entities": {
+        "has_children": true,
+        "budget_vnd": 2000000
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "À, nhưng chị phải chờ cuối tháng nhận lương mới quyết định được.",
+      "spoken_text": "à nhưng chị phải chờ cuối tháng nhận lương mới quyết định được",
+      "entities": {
+        "blocker": "cho luong"
+      },
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "scenario_id": "SCN-ADV-0069",
+  "level": "M2",
+  "persona": "khach_bao_hanh_trong_han",
+  "hard_case": null,
+  "customer_phone": "0998000004",
+  "customer_name": "Phạm Thị D",
+  "honorific": "chị",
+  "notes": "Persona khach_bao_hanh_trong_han, biến thể loi_trong_han. call_1 (hotline): bảo hành còn hạn → thong_tin. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-14",
+      "customer_goal": "Hỏi về quy trình bảo hành máy lọc không khí AirPure Pro.",
+      "customer_turns": [
+        "Alo, chị D đây. Hôm nay chị gọi để hỏi về Máy lọc không khí AirPure Pro mà chị đã mua.",
+        "Bây giờ quạt trong máy bị rung mạnh, không biết là còn bảo hành không nhỉ?",
+        "Chị muốn biết quy trình bảo hành thế nào, gửi lại hàng cho shop hay là trung tâm nào đó?",
+        "Nếu gửi hàng thì mất bao lâu để xử lý vậy em?"
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C004",
+          "session_id": "SYN-004-S3",
+          "date": "2025-05-08",
+          "channel": "zalo_oa",
+          "summary": "Mua Nồi chiên không dầu Lock&Lock 4L giá 1.890.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C004",
+          "session_id": "SYN-004-S1",
+          "date": "2026-06-10",
+          "channel": "web",
+          "summary": "Mua Máy lọc không khí AirPure Pro giá 7.990.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C004",
+          "session_id": "SYN-004-S2",
+          "date": "2026-10-04",
+          "channel": "hotline",
+          "summary": "Đặt Máy lọc không khí Samsung AX40 giá 6.490.000đ, đơn OD900402 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C004",
+          "order_id": "OD900401",
+          "date": "2026-06-10",
+          "sku": "SKU-AP-PRO",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AP-PRO"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C004",
+          "order_id": "OD900402",
+          "date": "2026-10-04",
+          "sku": "SKU-SS-AX40",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900402"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C004",
+          "order_id": "OD900403",
+          "date": "2025-05-08",
+          "sku": "SKU-AF-4L",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AF-4L"
+          }
+        }
+      ],
+      "facts_established": {
+        "issue": "quạt trong máy rung mạnh",
+        "order_id": "OD900401",
+        "owned_sku": "SKU-AP-PRO"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "7–15 ngày",
+          "7-15 ngày",
+          "7 đến 15 ngày",
+          "15 ngày làm việc"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_warranty",
+            "value": false
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900401",
+        "warranty_months": 24,
+        "in_warranty": true,
+        "call_date": "2026-11-14"
+      },
+      "memory_expectation": {
+        "issue": "quạt trong máy rung mạnh",
+        "order_id": "OD900401",
+        "owned_sku": "SKU-AP-PRO"
+      },
+      "relevant_policy_ids": [
+        "BH-01",
+        "BH-02",
+        "BH-03",
+        "PB-01"
+      ],
+      "expected_outcome": "thong_tin"
+    }
+  }
+}

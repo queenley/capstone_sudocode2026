@@ -1,0 +1,66 @@
+{
+  "scenario_id": "SCN-ADV-0110",
+  "call": "call_1",
+  "input_mode": "text",
+  "source_sha256": "e6c5cc231598c9be6539ba05ea15071cb6a0d158a6f56429d0d8d946aee1cc0c",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Alo em, chị muốn hỏi về máy hút sữa điện đôi Spectra S1.",
+      "spoken_text": "alo em, chị muốn hỏi về máy hút sữa điện đôi spectra ét một.",
+      "entities": {},
+      "reference_source": "rule",
+      "issues": [
+        "digit_left"
+      ]
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Chị có bé được một tháng rồi, ngân sách chị chỉ tầm 5 triệu thôi.",
+      "spoken_text": "chị có bé được một tháng rồi ngân sách chị chỉ tầm năm triệu thôi",
+      "entities": {
+        "has_children": true,
+        "budget_vnd": 5000000
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Máy này có khuyến mãi gì không em?",
+      "spoken_text": "máy này có khuyến mãi gì không em",
+      "entities": {
+        "sku": "SKU-MB-PUMP1"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "Ừm, chị đang muốn mua nhưng muốn trả góp.",
+      "spoken_text": "ừm chị đang muốn mua nhưng muốn trả góp",
+      "entities": {
+        "blocker": "can suy nghi them",
+        "sku": "SKU-MB-PUMP1"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 5,
+      "speaker": "C",
+      "text": "Để chị suy nghĩ thêm rồi chị gọi lại nhé.",
+      "spoken_text": "để chị suy nghĩ thêm rồi chị gọi lại nhé",
+      "entities": {
+        "blocker": "can suy nghi them"
+      },
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

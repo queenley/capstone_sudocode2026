@@ -53,7 +53,8 @@ Những điểm hay bị hỏi:
 | **Hỏi còn hàng** | gọi `inventory_check` trước khi nói "còn hàng" | hard guard `STOCK`: câu "còn hàng/hết hàng/chỉ còn N" cần tool của lượt nói giống vậy | `hard.py` |
 | **Chưa biết chọn mẫu nào** | hỏi nhu cầu còn thiếu, mỗi lượt **một** câu hỏi; đối chiếu nhu cầu với thuộc tính sản phẩm (`room_area_m2`, `child_safe_lock`...) | prompt quy tắc 19; ngân sách "tầm, khoảng" được nới ~10% | `advisor.py` |
 | **Đồng ý mua** | trong cùng lượt: `pricing_get_quote` → `delivery_estimate` → `order_create` với đúng giá cuối, rồi đọc lại đơn một lần | prompt quy tắc 12 + guard trước khi ghi kiểm mã SKU tin cậy, đơn giá = báo giá hôm nay | `actions.py` |
-| **Đơn COD > 10 triệu** | đề nghị chuyển khoản hoặc tách đơn | guard trước khi ghi chặn COD > 10.000.000đ (VC-03) | `actions.py` |
+| **Nhiều sản phẩm** | báo giá từng món với `basket_skus` là các món còn lại, rồi `order_create` từng món với cùng `basket_skus` (máy lọc thứ hai được AIR-2ND-50) | prompt quy tắc 12; `order_create` chuyển `basket_skus` cho mock | `crm.py` |
+| **Đơn COD > 10 triệu** | đề nghị chuyển khoản, hoặc hỏi khách có muốn **tách thành hai đơn**; chỉ khi khách đồng ý mới đặt `order_group` "1"/"2" cho từng món | guard cộng mọi món COD đã đặt trong **cả cuộc gọi** (cùng `order_group`) với món đang đặt: vượt 10.000.000đ thì chặn (VC-03). Tách đơn chỉ được khi lượt trước của agent hoặc lời khách có "tách", hoặc cuộc đã có một món trong nhóm (QT-01) | `actions.py` (`_cod_order`, `placed_lines`) |
 | **Đơn COD > 2 triệu** | báo thêm "nhân viên sẽ gọi xác nhận trước khi giao" | prompt, theo cờ `needs_confirmation_call` của tool | `advisor.py` |
 | **Mua nhiều món** (4 sản phẩm, 16 lượt) | mỗi món một báo giá + một đơn; giới hạn 20 tool/lượt đủ cho chuỗi này | giới hạn middleware; chặn đơn trùng bằng idempotency key | `advisor.py` |
 | **Hết hàng lúc khách quyết** | không tạo đơn; nói ngày dự kiến có lại nếu tool có; gợi ý mẫu khác hoặc hẹn báo lại | prompt quy tắc 11 (FAQ-10, FAQ-17) | `advisor.py` |
@@ -133,6 +134,7 @@ flowchart LR
 - Một **hard guard** chặn câu *hứa* chuyển máy ("em sẽ chuyển máy cho nhân viên") khi tool chưa chạy trong lượt. Câu *đề nghị* ("nếu anh muốn em có thể chuyển...?") thì được.
 - Chat web không có số điện thoại được miễn trường số trong brief; hotline thì bắt buộc phải xin số.
 - Ở copilot, nhân viên bấm 👍/👎 cạnh gợi ý; việc dùng / sửa / tự viết cũng được ghi thành tín hiệu ngầm ([improvement/signals.py](../../apps/ai-agent-service/src/ai_agent_service/components/improvement/signals.py)).
+- **Nhân viên được báo và thấy tin cần đọc.** Khi lưu lượt, agent gắn `meta.handoff` vào tin của khách ([harness.py](../../apps/ai-agent-service/src/ai_agent_service/runtime/harness.py) `handoff_mark`): `trigger` là tin ngay trước khi AI chuyển (kèm lý do), hoặc tin cuối khi nhân viên tự bấm "Yêu cầu chuyển"; `waiting` là tin khách gửi trong lúc chờ người nhận. Console (`/ban-hang` → Hội thoại, `/calls`) tô đỏ các tin này, tô đỏ cuộc đang chờ trong hàng chờ, và báo ca mới bằng hộp thông báo, tiếng bíp, số trên tiêu đề tab và thông báo của trình duyệt ([handoff-alerts.tsx](../../apps/web/src/features/handoff-alerts.tsx)). Khi đã có người nhận, tin mới không còn bị đánh dấu.
 
 ---
 

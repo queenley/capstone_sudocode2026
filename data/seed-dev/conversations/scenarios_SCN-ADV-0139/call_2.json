@@ -1,0 +1,351 @@
+{
+  "conversation_id": "SCN-ADV-0139__call_2",
+  "scenario_id": "SCN-ADV-0139",
+  "call": "call_2",
+  "customer_id": "C041",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-19",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_hoi_gio_hang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Thắng ạ, hôm trước anh có quan tâm Máy hút sữa điện đôi Medela Swing Maxi và còn chờ cuối tháng nhận lương. Em sẵn sàng hỗ trợ anh chốt đơn hôm nay ạ.",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-MB-PUMP2",
+          "value": 5990000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh gọi lại để chốt đơn hàng hôm qua đó.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận anh muốn mua Máy hút sữa điện đôi Medela Swing Maxi và Máy tiệt trùng sấy khô Moaz Bebe ạ. Cả hai sản phẩm đều đang sẵn hàng, anh muốn lấy mỗi loại 1 cái đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh muốn lấy mỗi loại 1 cái đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh muốn mua 1 cái máy hút sữa Medela Swing Maxi và 1 cái máy tiệt trùng Moaz Bebe.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ tổng tiền hai sản phẩm là 7.880.000đ, đã áp dụng miễn phí vận chuyển chương trình MOM-FREESHIP ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "total_vnd",
+          "value": 7880000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "freeship",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Tổng tiền là bao nhiêu em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh chọn thanh toán COD đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Anh chọn thanh toán COD đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "cod_allowed",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh sẽ thanh toán bằng COD.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ địa chỉ nhận hàng là Ninh Kiều, Cần Thơ phải không anh?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Địa chỉ nhận hàng là Ninh Kiều, Cần Thơ phải không anh?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhà anh ở Ninh Kiều, Cần Thơ.",
+      "facts_stated": {
+        "delivery_area": "Ninh Kiều, Cần Thơ"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận đơn gồm Máy hút sữa điện đôi Medela Swing Maxi giá 5.990.000đ và Máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ, tổng cộng 7.880.000đ, giao về Ninh Kiều, Cần Thơ, thanh toán COD. Dự kiến giao hàng ngày 23/10/2026. Đơn COD trên 2 triệu nên nhân viên bên em sẽ gọi xác nhận đơn trước khi giao ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-MB-PUMP2",
+          "value": 5990000
+        },
+        {
+          "field": "price_vnd:SKU-MB-STER",
+          "value": 1890000
+        },
+        {
+          "field": "total_vnd",
+          "value": 7880000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-23"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-10-19"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Vậy chốt đơn cho anh nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã lên đơn thành công cho anh. Cảm ơn anh đã đặt hàng tại shop, chúc anh một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0905154382",
+            "sku": "SKU-MB-PUMP2",
+            "qty": 1,
+            "price_vnd": 5990000,
+            "payment": "COD",
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-10-19",
+            "basket_skus": [
+              "SKU-MB-STER"
+            ]
+          }
+        },
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0905154382",
+            "sku": "SKU-MB-STER",
+            "qty": 1,
+            "price_vnd": 1890000,
+            "payment": "COD",
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-10-19",
+            "basket_skus": [
+              "SKU-MB-PUMP2"
+            ]
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "budget_vnd",
+          "value": 6000000,
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Ninh Kiều, Cần Thơ",
+          "op": "set",
+          "source": "call_2#turn10"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-PUMP2",
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5990000,
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn12"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "products": [
+        {
+          "sku": "SKU-MB-PUMP2",
+          "qty": 1,
+          "price_vnd": 5990000
+        },
+        {
+          "sku": "SKU-MB-STER",
+          "qty": 1,
+          "price_vnd": 1890000
+        }
+      ],
+      "total_vnd": 7880000,
+      "payment": "COD",
+      "delivery_area": "Ninh Kiều, Cần Thơ",
+      "estimated_delivery": "2026-10-23"
+    }
+  }
+}

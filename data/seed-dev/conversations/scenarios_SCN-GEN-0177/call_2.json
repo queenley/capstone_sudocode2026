@@ -1,0 +1,299 @@
+{
+  "conversation_id": "SCN-GEN-0177__call_2",
+  "scenario_id": "SCN-GEN-0177",
+  "call": "call_2",
+  "customer_id": "C011",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-11",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_kenh_fb_hotline",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Mai ạ, em là trợ lý ảo của shop. Hôm trước chị có quan tâm Giày chạy bộ RunLite 2 Pro và muốn gọi hotline hỏi thêm, chị muốn mình tiếp tục thế nào ạ?",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "size",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị gọi lại để mua đôi giày chạy bộ đó.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận lại, chị muốn mua Giày chạy bộ RunLite 2 Pro size 40 màu đen đúng không ạ? Giá hiện tại là 1.690.000đ và còn hàng sẵn kho chị nhé.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn mua Giày chạy bộ RunLite 2 Pro size 40 màu đen đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ thanh toán qua ngân hàng.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận hình thức thanh toán chuyển khoản ngân hàng cho đơn hàng này ạ. Chị cho em xin khu vực giao hàng của mình với ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Chị cho em xin khu vực giao hàng của mình với ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là Ninh Kiều, Cần Thơ nhé.",
+      "facts_stated": {
+        "delivery_area": "Ninh Kiều, Cần Thơ"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Ninh Kiều, Cần Thơ",
+          "spoken": "Ninh Kiều, Cần Thơ"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã cung cấp thông tin. Đơn hàng sẽ được giao về Ninh Kiều, Cần Thơ, dự kiến nhận hàng vào ngày 16/11/2026, chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-16"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-11-11"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chốt đơn cho chị luôn đi em.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đọc lại thông tin đơn hàng để chị kiểm tra giúp em: Giày chạy bộ RunLite 2 Pro size 40 màu đen, giá 1.690.000đ, giao tại Ninh Kiều, Cần Thơ, thanh toán chuyển khoản ngân hàng, dự kiến nhận hàng ngày 16/11/2026. Thông tin này đúng chưa chị để em lên đơn ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Giày chạy bộ RunLite 2 Pro size 40 màu đen, giá 1.690.000đ, giao tại Ninh Kiều, Cần Thơ, thanh toán chuyển khoản ngân hàng, dự kiến nhận hàng ngày 16/11/2026. Thông tin này đúng chưa chị để em lên đơn ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-16"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi em.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em tạo đơn thành công cho chị. Mã đơn là OD600001, tổng đơn 1.690.000đ. Đơn sẽ được giao về Ninh Kiều, Cần Thơ vào khoảng ngày 16/11/2026. Cảm ơn chị đã đặt hàng tại shop, chúc chị nhiều sức khỏe và luôn hài lòng với sản phẩm!",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "payment",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-16"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0980737028",
+            "sku": "SKU-SN-RUN2-40-DEN",
+            "qty": 1,
+            "price_vnd": 1690000,
+            "payment": "bank",
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-11-11"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Ninh Kiều, Cần Thơ",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN2",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1690000,
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN2-40-DEN",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn11"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-SN-RUN2-40-DEN",
+      "qty": 1,
+      "price_vnd": 1690000,
+      "payment": "bank",
+      "address": "Ninh Kiều, Cần Thơ",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-11-16"
+    }
+  }
+}

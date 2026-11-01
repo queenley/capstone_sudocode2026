@@ -1,0 +1,179 @@
+{
+  "conversation_id": "SCN-GEN-0021__call_1",
+  "scenario_id": "SCN-GEN-0021",
+  "call": "call_1",
+  "customer_id": "C011",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_yeu_cau_xoa_du_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị cần tư vấn về máy lọc không khí AirPure Mini phải không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị cần tư vấn về máy lọc không khí AirPure Mini phải không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo em, chị muốn hỏi về máy lọc không khí AirPure Mini đó.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, với diện tích phòng khoảng 10 mét vuông như của chị thì AirPure Mini là lựa chọn phù hợp ạ. Máy này không có khóa trẻ em, nhưng phòng chị không có trẻ nhỏ nên mình yên tâm nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Phòng chị khoảng 10 mét vuông và nhà không có trẻ nhỏ.",
+      "facts_stated": {
+        "room_area_m2": 10,
+        "has_children": false
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy lọc không khí AirPure Mini bên em đang có giá 2.190.000đ, hiện còn hàng tại shop. Với ngân sách 2 triệu rưỡi của chị thì vừa vặn luôn ạ.",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Chị có ngân sách tầm 2 triệu rưỡi đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này giá bao nhiêu em nhỉ? Chị có ngân sách tầm 2 triệu rưỡi.",
+      "facts_stated": {
+        "budget_vnd": 2500000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu, chị cứ cân nhắc thêm nhé. Nếu chị cần tư vấn lại hoặc có quyết định mua vào cuối tháng, em rất sẵn sàng hỗ trợ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "room_area_m2",
+          "value": 10,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "has_children",
+          "value": false,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 2500000,
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-MINI",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 2190000,
+          "op": "set",
+          "source": "call_1#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thấy trên mạng có nhiều cái hay quá, nhưng chưa chốt được. Chị phải chờ cuối tháng nhận lương rồi mới quyết định.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_gia_may_loc_khong_khi",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chua_chot_tai_chinh",
+    "objection_handling": "Ghi nhận nhu cầu chờ lương, đề nghị hỗ trợ lại khi khách sẵn sàng.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

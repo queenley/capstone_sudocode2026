@@ -1,0 +1,167 @@
+{
+  "conversation_id": "SCN-ADV-0017__call_2",
+  "scenario_id": "SCN-ADV-0017",
+  "call": "call_2",
+  "customer_id": "C011",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-18",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_chuyen_giua_nguoi_va_ai",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Mai ạ, hôm trước chị có quan tâm Máy hút sữa điện đôi Medela Swing Maxi và đang chờ cuối tháng nhận lương.",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "is_human",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em ơi, chị muốn gặp người thật, chuyển máy cho chị với.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em là trợ lý ảo của shop BTC, em ghi nhận yêu cầu được gặp nhân viên thật của chị và sẽ chuyển máy ngay cho chị ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "is_human",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị không biết em là ai, là người hay máy nữa.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em là trợ lý AI của shop, không phải người thật ạ. Em sẽ chuyển máy cho nhân viên hỗ trợ chị ngay.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "is_human",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn trò chuyện với nhân viên, có thể chuyển máy cho chị không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận chị muốn trao đổi trực tiếp với nhân viên. Em sẽ chuyển máy ngay cho chị ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "handoff.transfer",
+          "args": {
+            "brief": {
+              "customer_phone": "0980737028",
+              "customer_name": "Mai",
+              "escalation_reason": "khach_yeu_cau_gap_nguoi",
+              "conversation_summary": "Khách đang được tư vấn Máy hút sữa điện đôi Medela Swing Maxi và yêu cầu nói chuyện với nhân viên.",
+              "product_advised": "SKU-MB-PUMP2",
+              "price_quoted_vnd": 5990000,
+              "open_questions": [
+                "khách muốn nhân viên tư vấn trực tiếp"
+              ],
+              "next_action": "Nhân viên gọi lại tư vấn tiếp Máy hút sữa điện đôi Medela Swing Maxi",
+              "generated_at": "2026-10-18T10:00:00+07:00",
+              "channel": "hotline"
+            }
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ đợi, không sao đâu.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_human",
+      "text": "Dạ em chào chị Mai, em là nhân viên của shop BTC. Em đã nhận được yêu cầu hỗ trợ Máy hút sữa điện đôi Medela Swing Maxi của chị.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 650,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "gap_nhan_vien",
+    "outcome": "chuyen_may",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

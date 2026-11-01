@@ -1,0 +1,174 @@
+{
+  "conversation_id": "SCN-GEN-0102__call_1",
+  "scenario_id": "SCN-GEN-0102",
+  "call": "call_1",
+  "customer_id": "C015",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-20",
+  "region": "nam",
+  "category": "gia-dung/quat",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, chị cần tư vấn quạt đứng DC inverter Panasonic F-409 đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị cần tư vấn quạt đứng DC inverter Panasonic F-409 đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về quạt đứng DC inverter Panasonic F-409 em nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, quạt này là dòng DC inverter, tiết kiệm điện, có điều khiển từ xa và 9 mức gió, rất phù hợp cho gia đình mình ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Quạt này có giá là bao nhiêu em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị, quạt đứng DC inverter Panasonic F-409 hiện giá là 2.450.000đ, sản phẩm đang còn hàng tại shop ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2450000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đang cần thay cái quạt cũ đã hỏng, ngân sách khoảng 3 triệu thôi.",
+      "facts_stated": {
+        "usage_need": "thay đồ cũ đã hỏng",
+        "budget_vnd": 3000000
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, với ngân sách khoảng 3 triệu thì mẫu quạt Panasonic F-409 này rất phù hợp chị nhé. Nếu cần so sánh thêm mẫu nào khác, chị cứ báo em ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em có thể gọi lại cho chị vào thứ Hai tuần sau tầm 9 giờ sáng được không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận lịch hẹn gọi lại cho chị vào 9 giờ sáng thứ Hai, tuy nhiên ngày 26/10 shop nghỉ nội bộ nên em sẽ hẹn lại cho chị vào 9 giờ sáng thứ Ba, ngày 27/10 nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0913301756",
+            "callback_at": "2026-10-26T09:00",
+            "note": "khách hẹn gọi lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "usage_need",
+          "value": "thay đồ cũ đã hỏng",
+          "op": "set",
+          "source": "call#turn6"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 3000000,
+          "op": "set",
+          "source": "call#turn6"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "hẹn_gọi_lại": "2026-10-27T09:00"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-10-27T09:00",
+      "note": "khách hẹn gọi lại"
+    },
+    "order": null
+  }
+}

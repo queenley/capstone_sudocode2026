@@ -1,0 +1,171 @@
+{
+  "conversation_id": "SCN-ADV-0105__call_2",
+  "scenario_id": "SCN-ADV-0105",
+  "call": "call_2",
+  "customer_id": "C001",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-12-17",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_tra_hang_trong_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Hoa, hôm trước chị có đặt Giày sneaker Urban Classic, em là trợ lý ảo của shop BTC xin hỗ trợ mình ạ.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "variant_sku",
+        "order_id",
+        "size",
+        "payment",
+        "delivery_area",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị vừa nhận hàng giày hôm trước nhưng không ưng.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ, chị muốn trả lại đôi giày này đúng không ạ? Em xin phép ghi nhận lý do trả hàng để hỗ trợ chị nhanh nhất.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Người nhà đã mua cái khác nên chị muốn trả hàng.",
+      "facts_stated": {
+        "return_reason": "người nhà đã mua cái khác"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận lý do trả hàng là người nhà đã mua cái khác. Em sẽ tiến hành yêu cầu trả hàng trên hệ thống cho chị ngay bây giờ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "refund_vnd",
+          "value": 890000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD600001",
+            "action": "return",
+            "reason": "người nhà đã mua cái khác",
+            "on": "2026-12-17"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần biết hoàn lại bao nhiêu tiền và bao lâu thì nhận được.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với đơn hàng này, sau khi shop nhận lại và kiểm tra sản phẩm đạt điều kiện, chị sẽ được hoàn 890.000 đồng về tài khoản trong 3-5 ngày làm việc ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "refund_vnd",
+          "value": 890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Làm ơn cho chị biết quy trình hoàn hàng nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ quy trình là bên em sẽ gửi đơn vị vận chuyển qua lấy lại sản phẩm trong 1-2 ngày làm việc. Sau khi shop nhận và kiểm tra hàng đạt điều kiện đổi trả, số tiền 890.000 sẽ được hoàn trong vòng 3-5 ngày làm việc qua tài khoản chị đã thanh toán trước đó ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "refund_vnd",
+          "value": 890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tra_hang_hoan_tien",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

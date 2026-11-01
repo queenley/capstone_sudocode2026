@@ -1,0 +1,271 @@
+{
+  "conversation_id": "SCN-ADV-0045__call_1",
+  "scenario_id": "SCN-ADV-0045",
+  "call": "call_1",
+  "customer_id": "SYN-C004",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-31",
+  "region": "bac",
+  "category": "gia-dung/phu-kien",
+  "persona": "khach_mua_phu_kien_thay_the",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Phạm Thị D ạ, em là trợ lý ảo của shop BTC. Hôm trước chị có đặt máy lọc không khí AirPure Pro, hôm nay chị muốn hỏi về việc thay màng lọc đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Hôm trước chị có đặt máy lọc không khí AirPure Pro, hôm nay chị muốn hỏi về việc thay màng lọc đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị là Phạm Thị D, hôm nay chị muốn hỏi về việc thay màng lọc cho máy lọc không khí AirPure Pro.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ. Màng lọc của máy AirPure Pro chị nên thay sau khoảng 6–12 tháng sử dụng, tùy môi trường phòng chị. Em kiểm tra, shop hiện có sẵn màng lọc thay thế chính hãng cho dòng máy này.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị dùng máy này cũng lâu rồi, không biết bao lâu thì phải thay màng lọc nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với điều kiện sử dụng thông thường, màng lọc AirPure Pro nên thay mỗi 6–12 tháng chị nhé. Nếu phòng có nhiều bụi hay nuôi thú cưng thì có thể thay sớm hơn một chút ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần mua màng lọc thay thế, giá khoảng 990.000đ có ổn không em?",
+      "facts_stated": {},
+      "entities": [
+        {
+          "type": "money",
+          "value": "990000",
+          "spoken": "990.000đ"
+        }
+      ],
+      "pause_before_ms": 450,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi chị, màng lọc thay thế AirPure Pro bên em đang bán giá 990.000đ, hàng chính hãng mới 100%. Giá này đúng như chị báo ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán thì chị chọn chuyển khoản ngân hàng nhé.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị chọn thanh toán chuyển khoản ngân hàng, em đã ghi nhận. Để em đọc lại đơn hàng: 1 màng lọc thay thế AirPure Pro, giá 990.000đ, giao tại Cầu Giấy, Hà Nội, thanh toán chuyển khoản ngân hàng và dự kiến giao ngày 03/11/2026. Chị xác nhận giúp em thông tin này đúng chưa ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em đọc lại đơn hàng: 1 màng lọc thay thế AirPure Pro, giá 990.000đ, giao tại Cầu Giấy, Hà Nội, thanh toán chuyển khoản ngân hàng và dự kiến giao ngày 03/11/2026. Chị xác nhận giúp em thông tin này đúng chưa ạ?"
+        }
+      ],
+      "facts_used": [
+        "payment",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-03"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-31"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là Cầu Giấy, Hà Nội, em có thể giao được không?",
+      "facts_stated": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Cầu Giấy, Hà Nội",
+          "spoken": "Cầu Giấy, Hà Nội"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ shop giao hàng tận nơi tại Cầu Giấy, Hà Nội chị nhé. Em sẽ lên đơn ngay cho mình với thông tin vừa xác nhận.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000004",
+            "sku": "SKU-AP-FLT-P",
+            "qty": 1,
+            "price_vnd": 990000,
+            "payment": "bank",
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-31"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "usage_need",
+          "value": "thay đồ cũ đã hỏng",
+          "op": "set",
+          "source": "call_1#turn13"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 1000000,
+          "op": "set",
+          "source": "call_1#turn13"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_1#turn13"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Cầu Giấy, Hà Nội",
+          "op": "set",
+          "source": "call_1#turn13"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-FLT-P",
+          "op": "set",
+          "source": "call_1#turn13"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 990000,
+          "op": "set",
+          "source": "call_1#turn13"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_1#turn13"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_mua_phu_kien_may_loc_khong_khi",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001",
+      "sku": "SKU-AP-FLT-P",
+      "qty": 1,
+      "price_vnd": 990000,
+      "payment": "bank",
+      "address": "Cầu Giấy, Hà Nội",
+      "estimated_delivery": "2026-11-03"
+    }
+  }
+}

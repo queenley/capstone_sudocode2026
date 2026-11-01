@@ -1,0 +1,211 @@
+{
+  "conversation_id": "SCN-GEN-0204__call_1",
+  "scenario_id": "SCN-GEN-0204",
+  "call": "call_1",
+  "customer_id": "C040",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-14",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em nghe chị hỏi về giày chạy bộ size 38 màu trắng, em sẵn sàng hỗ trợ mình ngay đây ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về giày chạy bộ size 38 màu trắng mà em có.",
+      "facts_stated": {
+        "size": 38,
+        "color": "trang",
+        "product_advised": "SKU-SN-RUN1"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại shop có sẵn giày chạy bộ RunLite 1 size 38 màu trắng chị nhé. Sản phẩm này thiết kế form ôm chân, phù hợp với chiều dài bàn chân khoảng 24 cm.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá của đôi giày này là bao nhiêu hả em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giày chạy bộ RunLite 1 size 38 màu trắng hiện có giá là 1.290.000đ chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1290000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có khuyến mãi gì cho sản phẩm này không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra thì hiện tại sản phẩm này chưa có chương trình khuyến mãi giảm giá riêng chị ạ. Tuy nhiên, đơn hàng trên 500.000đ sẽ được miễn phí vận chuyển toàn quốc cho ngành mẹ & bé, và mình được thanh toán khi nhận hàng không mất phí thu hộ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần so sánh thêm với mấy mẫu khác trước khi quyết định, em nhé.",
+      "facts_stated": {
+        "blocker": "muốn so sánh thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ, chị cứ tham khảo thêm các mẫu khác cho yên tâm. Khi nào chị cần tư vấn thêm hoặc muốn đặt hàng, chị cứ gọi lại cho shop bất cứ lúc nào trong giờ làm việc chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ gọi lại sau khi xem thêm.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em ghi nhận nhu cầu của chị là muốn so sánh thêm trước khi quyết định. Em rất mong có cơ hội hỗ trợ chị khi cần ạ, chúc chị một ngày vui vẻ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "muốn so sánh thêm",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "color",
+          "value": "trang",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "size",
+          "value": 38,
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN1",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1290000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN1-38-TRANG",
+          "op": "set",
+          "source": "call_1#turn1"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_giay_chay_bo",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,290 @@
+{
+  "conversation_id": "SCN-GEN-0043__call_2",
+  "scenario_id": "SCN-GEN-0043",
+  "call": "call_2",
+  "customer_id": "C027",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-16",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_da_kenh_fb_hotline",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Chi ạ, hôm trước chị có quan tâm Máy hâm sữa Fatz 4 chức năng và muốn gọi hotline hỏi thêm.",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 650,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, hôm qua chị đã hỏi về máy hâm sữa Fatz.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, sản phẩm Máy hâm sữa Fatz 4 chức năng bên em đang có sẵn hàng với giá là 490.000đ ạ. Chị muốn đặt hàng, em sẽ hỗ trợ lên đơn cho mình nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn đặt hàng cái đó, hình thức thanh toán là chuyển khoản.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị chọn thanh toán chuyển khoản, em ghi nhận ạ. Chị nhận hàng tại đâu để em báo thời gian giao dự kiến luôn chị nhé?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Chị nhận hàng tại đâu để em báo thời gian giao dự kiến luôn chị nhé?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là Lê Chân, Hải Phòng nhé.",
+      "facts_stated": {
+        "delivery_area": "Lê Chân, Hải Phòng"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Lê Chân, Hải Phòng",
+          "spoken": "Lê Chân, Hải Phòng"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị. Đơn của mình sẽ được giao tại Lê Chân, Hải Phòng trong khoảng 4 ngày làm việc, dự kiến nhận hàng vào ngày 21/10/2026. Em xin phép đọc lại thông tin đơn hàng để chị xác nhận giúp em nhé: Máy hâm sữa Fatz 4 chức năng, số lượng 1, giá 490.000đ, giao tại Lê Chân, Hải Phòng, thanh toán chuyển khoản, giao dự kiến ngày 21/10/2026. Thông tin này đúng chưa chị?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em xin phép đọc lại thông tin đơn hàng để chị xác nhận giúp em nhé: Máy hâm sữa Fatz 4 chức năng, số lượng 1, giá 490.000đ, giao tại Lê Chân, Hải Phòng, thanh toán chuyển khoản, giao dự kiến ngày 21/10/2026. Thông tin này đúng chưa chị?"
+        }
+      ],
+      "facts_used": [
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-21"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Lê Chân, Hải Phòng",
+            "on": "2026-10-16"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "address",
+          "value": "Lê Chân, Hải Phòng",
+          "spoken": "Lê Chân, Hải Phòng"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-21",
+          "spoken": "21/10/2026"
+        }
+      ],
+      "pause_before_ms": 750,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đồng ý lên đơn cho chị nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã lên đơn hàng Máy hâm sữa Fatz 4 chức năng với giá 490.000đ, giao tại Lê Chân, Hải Phòng và thanh toán chuyển khoản cho chị rồi ạ. Đơn dự kiến giao ngày 21/10/2026. Cảm ơn chị đã đặt hàng tại shop BTC, có thông tin mới em sẽ báo lại chị qua Zalo hoặc điện thoại nhé!",
+      "questions": [],
+      "facts_used": [
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-21"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0992566636",
+            "sku": "SKU-MB-MON",
+            "qty": 1,
+            "price_vnd": 490000,
+            "payment": "bank",
+            "address": "Lê Chân, Hải Phòng",
+            "on": "2026-10-16"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Lê Chân, Hải Phòng",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-MON",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 490000,
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn8"
+        }
+      ],
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD600001",
+          "spoken": "OD600001"
+        },
+        {
+          "type": "address",
+          "value": "Lê Chân, Hải Phòng",
+          "spoken": "Lê Chân, Hải Phòng"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-21",
+          "spoken": "21/10/2026"
+        }
+      ],
+      "pause_before_ms": 900,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_hang",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-MB-MON",
+      "qty": 1,
+      "price_vnd": 490000,
+      "payment": "bank",
+      "address": "Lê Chân, Hải Phòng",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-10-21"
+    }
+  }
+}

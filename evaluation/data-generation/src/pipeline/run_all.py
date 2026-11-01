@@ -36,6 +36,7 @@ STAGES = [
     "export_manual_review",          # 8  human gate CSV
     "synthesize_scenario_audio",     # 9  ElevenLabs per-turn WAV, up to the target hours
     "build_asr_testset",             # 10 team ASR set (only with --asr-dialogues N)
+    "audio_report",                  # 10b clean / noisy audio of both ASR sets (offline)
     "eval_rag",                      # 11 Recall@3/@5 baseline on rag/qa_labeled.json (offline)
     "summarize_dataset",             # 12 coverage JSON/CSV/dashboard + M2 targets
     "report",                        # 13 Markdown + HTML report
@@ -73,6 +74,10 @@ def main() -> None:
     parser.add_argument("--skip-audio", action="store_true")
     parser.add_argument("--plan-only", action="store_true", help="labels + oracle check only (no API calls)")
     parser.add_argument("--asr-dialogues", type=int, default=0, help="build a team ASR set of N dialogues (TTS)")
+    parser.add_argument("--free-voices-only", action="store_true",
+                        help="audio with premade ElevenLabs voices only (a free plan; English voices)")
+    parser.add_argument("--replace-missing-voices", action="store_true",
+                        help="before the audio, replace the voices the ElevenLabs account lacks in config/voices.yaml")
     args = parser.parse_args()
     if args.seed and args.seed != SEED:
         # Paths are fixed when src.utils.paths is imported: run again with the seed set, for this and every stage.
@@ -109,6 +114,10 @@ def main() -> None:
             options += personas + (["--fresh"] if args.fresh else [])
         if stage == "build_asr_testset":
             options += ["--limit", str(args.asr_dialogues)] + (["--text-only"] if args.skip_audio else [])
+        if stage in {"synthesize_scenario_audio", "build_asr_testset"} and args.free_voices_only:
+            options.append("--free-voices-only")
+        if stage == "synthesize_scenario_audio" and args.replace_missing_voices:
+            options.append("--replace-missing-voices")   # once: build_asr_testset then reads the rewritten file
         if stage in RESUMABLE and (args.resume or args.only_failed):
             options.append("--resume")
         code = run(stage, *options)

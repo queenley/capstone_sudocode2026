@@ -1,0 +1,218 @@
+{
+  "scenario_id": "SCN-GEN-0074",
+  "level": "M1",
+  "persona": "khach_da_mua_doi_size",
+  "hard_case": "km_loai_tru_size",
+  "customer_phone": "0998000014",
+  "customer_name": "Lê Thị Hoa",
+  "honorific": "chị",
+  "notes": "Persona khach_da_mua_doi_size, biến thể size_43_loai_tru_km. call_1 (hotline): chốt đơn → chot_don; call_2 (hotline): đổi size → cap_nhat_don. Ca khó: km_loai_tru_size. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-15",
+      "customer_goal": "Xác nhận mua giày chạy bộ size 43 màu đen.",
+      "customer_turns": [
+        "Alo em ơi, chị muốn xác nhận mua giày chạy bộ RunLite 2 Pro size 43 màu đen nhé.",
+        "Hình thức thanh toán chị chọn là COD, em nhé.",
+        "Chị sẽ giao hàng khu vực Hải Châu, Đà Nẵng.",
+        "Mong em giúp chị lên đơn nhanh nhé."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C014",
+          "session_id": "SYN-014-S3",
+          "date": "2025-03-18",
+          "channel": "web",
+          "summary": "Mua Quạt đứng Senko TS16 giá 590.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C014",
+          "session_id": "SYN-014-S1",
+          "date": "2026-06-13",
+          "channel": "zalo_oa",
+          "summary": "Mua Giày chạy bộ RunLite 2 Pro giá 1.740.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C014",
+          "session_id": "SYN-014-S2",
+          "date": "2026-10-04",
+          "channel": "fb",
+          "summary": "Đặt Giày sneaker Urban Classic giá 940.000đ, đơn OD901402 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C014",
+          "order_id": "OD901401",
+          "date": "2026-06-13",
+          "sku": "SKU-SN-RUN2-43-XAM",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-SN-RUN2-43-XAM"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C014",
+          "order_id": "OD901402",
+          "date": "2026-10-04",
+          "sku": "SKU-SN-CAS-43-DEN",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901402"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C014",
+          "order_id": "OD901403",
+          "date": "2025-03-18",
+          "sku": "SKU-FAN-SEN",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-FAN-SEN"
+          }
+        }
+      ],
+      "facts_established": {
+        "size": 43,
+        "color": "den",
+        "payment": "COD",
+        "delivery_area": "Hải Châu, Đà Nẵng",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1740000,
+        "variant_sku": "SKU-SN-RUN2-43-DEN",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-RUN2-43-DEN",
+          "price_vnd": 1740000,
+          "payment": "COD"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1740000,
+        "list_price_vnd": 1740000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN2-SALE_active": false,
+        "promo_RUN-10_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-10-17",
+        "call_date": "2026-10-15"
+      },
+      "memory_expectation": {
+        "size": 43,
+        "color": "den",
+        "payment": "COD",
+        "delivery_area": "Hải Châu, Đà Nẵng",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1740000,
+        "variant_sku": "SKU-SN-RUN2-43-DEN",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    },
+    "call_2": {
+      "days_later": 4,
+      "customer_goal": "Đổi giày sang size 42.",
+      "customer_turns": [
+        "Chào em, chị đổi ý rồi em ơi, giày này size 43 bị chật quá.",
+        "Chị muốn đổi sang size 42 màu đen nhé.",
+        "Chị đã nhận hàng rồi, mà không vừa nên muốn đổi.",
+        "Mong em nhanh chóng giúp chị cập nhật đơn hàng."
+      ],
+      "facts_established": {
+        "size": 42
+      },
+      "must_carry_over": [
+        "size",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "variant_sku",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "OD600001",
+          "new_variant_sku": "SKU-SN-RUN2-42-DEN",
+          "action": "exchange_size"
+        },
+        "must_say_any": [
+          "219.000",
+          "219000"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "exchange_fee_vnd",
+            "value": 30000
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD600001",
+        "new_variant_sku": "SKU-SN-RUN2-42-DEN",
+        "exchange_fee_vnd": 0,
+        "refund_vnd": 219000,
+        "extra_payment_vnd": 0,
+        "new_size_in_stock": true,
+        "return_days": 7,
+        "call_date": "2026-10-19"
+      },
+      "memory_expectation": {
+        "size": 42,
+        "superseded": {
+          "size": 43
+        }
+      },
+      "relevant_policy_ids": [
+        "DT-03",
+        "QT-03",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    }
+  }
+}

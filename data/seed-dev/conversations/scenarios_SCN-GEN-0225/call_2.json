@@ -1,0 +1,164 @@
+{
+  "conversation_id": "SCN-GEN-0225__call_2",
+  "scenario_id": "SCN-GEN-0225",
+  "call": "call_2",
+  "customer_id": "SYN-C006",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-12-07",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Trần Văn F ạ, hôm trước anh có quan tâm Máy hâm sữa Fatz 4 chức năng và muốn so sánh thêm; hôm nay em hỗ trợ anh tiếp nhé.",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh đã xem thông tin máy hâm sữa rồi nhưng vẫn có vài điều thắc mắc.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh cứ thoải mái hỏi thêm về Máy hâm sữa Fatz 4 chức năng ạ, em sẽ giải đáp những điều anh còn băn khoăn.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này có an toàn cho trẻ nhỏ không em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy hâm sữa Fatz được thiết kế sử dụng an toàn cho trẻ nhỏ, đạt tiêu chuẩn chất lượng của hãng. Tuy nhiên về các chứng nhận y tế hoặc tác dụng đặc biệt cho trẻ, hiện shop chưa có thông tin cụ thể để tư vấn thêm ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chức năng của máy có dễ sử dụng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy Fatz này có 4 chức năng: hâm sữa, hâm thức ăn, tiệt trùng và rã đông; thao tác đơn giản với nút xoay điều chỉnh, phù hợp sử dụng hàng ngày cho gia đình có bé nhỏ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thực ra anh có thể tìm sản phẩm khác phù hợp hơn nên anh xin từ chối mua lần này.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ, cảm ơn anh đã dành thời gian tìm hiểu sản phẩm bên em. Nếu sau này anh cần tư vấn thêm về máy hâm sữa hoặc các thiết bị mẹ & bé, cứ liên hệ shop bất cứ lúc nào anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-MON",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 490000,
+          "op": "set",
+          "source": "call_2#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cảm ơn em đã tư vấn nhé, hẹn gặp lại lần sau!",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "khach_tu_choi_mua",
+    "outcome": "tu_choi",
+    "objection_type": "muon_tim_sp_khac",
+    "objection_handling": "Giải thích và cảm ơn khách, không tạo áp lực mua.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

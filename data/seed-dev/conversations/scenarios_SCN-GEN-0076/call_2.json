@@ -1,0 +1,201 @@
+{
+  "conversation_id": "SCN-GEN-0076__call_2",
+  "scenario_id": "SCN-GEN-0076",
+  "call": "call_2",
+  "customer_id": "SYN-C016",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-18",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "blocker",
+        "room_area_m2",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, hôm trước chị hỏi về máy lọc không khí AirPure Pro ấy.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận chị đang quan tâm Máy lọc không khí AirPure Pro ạ. Hiện sản phẩm này đang hết hàng, dự kiến có lại vào ngày 21/10 chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        },
+        {
+          "field": "restock_date",
+          "value": "2026-10-21"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị vẫn muốn biết giá và khuyến mãi của máy này.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy AirPure Pro hiện giá 7.690.000đ, đang áp dụng khuyến mãi AIR-OCT giảm 300.000đ đến hết ngày 30/10. Khi có hàng em sẽ giữ nguyên mức giá và ưu đãi này cho chị nếu đặt trong thời gian còn hiệu lực ạ.",
+      "questions": [],
+      "facts_used": [
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "7690000",
+          "spoken": "7.690.000"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị không có trẻ nhỏ, ngân sách cũng vẫn như trước.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã lưu thông tin ngân sách và nhu cầu của chị. Khi sản phẩm về ngày 21/10, em sẽ liên hệ lại để hỗ trợ chị đặt hàng nếu chị vẫn quan tâm ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "restock_date",
+          "value": "2026-10-21"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần suy nghĩ thêm, em có thể gọi lại cho chị sau không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em sẽ chủ động gọi lại cho chị khi máy AirPure Pro có hàng vào ngày 21/10. Cảm ơn chị đã quan tâm, chúc chị một ngày tốt lành ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "restock_date",
+          "value": "2026-10-21"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7690000,
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "promo_code",
+          "value": "AIR-OCT",
+          "op": "set",
+          "source": "call_2#turn1"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "action": "gọi lại khi có hàng",
+        "date": "2026-10-21"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "time": "2026-10-21",
+      "reason": "Hàng về, khách cần suy nghĩ thêm"
+    },
+    "order": null
+  }
+}

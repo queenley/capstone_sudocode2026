@@ -1,0 +1,188 @@
+{
+  "conversation_id": "SCN-GEN-0229__call_1",
+  "scenario_id": "SCN-GEN-0229",
+  "call": "call_1",
+  "customer_id": "SYN-C016",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-01",
+  "region": "bac",
+  "category": "thoi-trang/ao-khoac",
+  "persona": "khach_hoi_ngoai_tai_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Hương ạ, em là trợ lý ảo của shop BTC. Chị cần tư vấn về áo phao lông vũ màu xanh navy size XL đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị cần tư vấn về áo phao lông vũ màu xanh navy size XL đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Hương đây, hôm nay chị muốn hỏi về chiếc áo phao lông vũ màu xanh navy size XL.",
+      "facts_stated": {
+        "color": "navy",
+        "size": "XL",
+        "product_advised": "SKU-JK-DWN"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ áo phao lông vũ Warmly size XL màu xanh navy bên em hiện đang còn hàng, chị nhé. Sản phẩm này giá là 1.530.000đ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "price_vnd",
+          "value": 1530000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em có biết áo này đang giá bao nhiêu không nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giá niêm yết cho áo phao lông vũ Warmly size XL navy là 1.530.000đ chị nhé. Hiện tại sản phẩm này chưa có khuyến mãi giảm giá, nhưng shop có miễn phí vận chuyển cho đơn từ 500.000đ và miễn phí thu hộ khi chị nhận hàng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1530000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị nghe nói có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị muốn tham khảo trước, khi nào nhận lương cuối tháng mình gọi lại đặt đơn cũng được chị nhé. Giá và thông tin sản phẩm em đã lưu lại cho chị.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "color",
+          "value": "navy",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "size",
+          "value": "XL",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-JK-DWN",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1530000,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-JK-DWN-XL-NAVY",
+          "op": "set",
+          "source": "call_1#turn7"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À mà chị đang chờ cuối tháng mới nhận lương, nên em cho chị biết rồi chị gọi lại nhé.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chờ nhận lương",
+    "objection_handling": "Ghi nhận lý do, lưu lại thông tin và hẹn khách gọi lại khi sẵn sàng.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

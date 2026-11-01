@@ -1,0 +1,275 @@
+{
+  "conversation_id": "SCN-ADV-0139__call_1",
+  "scenario_id": "SCN-ADV-0139",
+  "call": "call_1",
+  "customer_id": "C041",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-10-18",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_hoi_gio_hang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần em hỗ trợ thông tin về giỏ hàng trên website đúng không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi tổng tiền cho giỏ hàng trên website của mình.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh có thể cho em biết trong giỏ hàng của mình gồm những sản phẩm nào không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Dạ anh có thể cho em biết trong giỏ hàng của mình gồm những sản phẩm nào không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Trong giỏ hàng có máy hút sữa Medela Swing Maxi và máy tiệt trùng Moaz Bebe.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra cho anh nhé. Máy hút sữa điện đôi Medela Swing Maxi hiện giá 5.990.000đ, máy tiệt trùng sấy khô Moaz Bebe là 1.890.000đ. Tổng hai sản phẩm là 7.880.000 ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-MB-PUMP2",
+          "value": 5990000
+        },
+        {
+          "field": "price_vnd:SKU-MB-STER",
+          "value": 1890000
+        },
+        {
+          "field": "total_vnd",
+          "value": 7880000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "pricing.get_quote",
+          "args": {
+            "sku": "SKU-MB-PUMP2",
+            "on": "2026-10-18",
+            "customer_phone": "0905154382",
+            "basket_skus": [
+              "SKU-MB-STER"
+            ]
+          }
+        },
+        {
+          "name": "pricing.get_quote",
+          "args": {
+            "sku": "SKU-MB-STER",
+            "on": "2026-10-18",
+            "customer_phone": "0905154382",
+            "basket_skus": [
+              "SKU-MB-PUMP2"
+            ]
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhà anh có bé 15 tháng tuổi, ngân sách tầm 6 triệu thôi.",
+      "facts_stated": {
+        "child_age_months": 15,
+        "budget_vnd": 6000000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã chia sẻ. Tổng giá hai sản phẩm hiện tại là 7.880.000đ, cao hơn ngân sách mình đề ra một chút ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "total_vnd",
+          "value": 7880000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có khuyến mãi nào khi mua cả hai không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại bên em có chương trình MOM-FREESHIP, miễn phí vận chuyển toàn quốc cho đơn từ 500.000đ ngành mẹ & bé, áp dụng cho anh luôn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Phí giao hàng có tính không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ phí giao hàng đã được miễn cho đơn này rồi anh nhé, mình không mất thêm chi phí vận chuyển ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ừ, để anh chờ cuối tháng nhận lương rồi gọi lại nhé.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận anh chờ cuối tháng nhận lương rồi sẽ cân nhắc đặt đơn ạ. Khi nào anh sẵn sàng mình nhắn lại cho shop, giá và khuyến mãi hiện tại giữ đến 29/11/2026 anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn13"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 6000000,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "child_age_months",
+          "value": 15,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-PUMP2",
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5990000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_1#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_gia_gio_hang_khuyen_mai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chua_nhan_luong",
+    "objection_handling": "Ghi nhận anh đợi cuối tháng nhận lương rồi cân nhắc đặt đơn, thông báo thời hạn giữ giá và khuyến mãi.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

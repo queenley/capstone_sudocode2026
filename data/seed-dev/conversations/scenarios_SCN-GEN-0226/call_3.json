@@ -1,0 +1,266 @@
+{
+  "conversation_id": "SCN-GEN-0226__call_3",
+  "scenario_id": "SCN-GEN-0226",
+  "call": "call_3",
+  "customer_id": "SYN-C013",
+  "session_index": 3,
+  "channel": "hotline",
+  "date": "2026-12-02",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, hôm trước anh có hỏi về Giày chạy bộ RunLite 2 Pro và cần suy nghĩ thêm, giờ mình muốn chốt đơn đúng không anh?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh xác nhận lại giúp em: Giày chạy bộ RunLite 2 Pro size 41 màu đen, giá 1.690.000đ, giao tại Long Biên, Hà Nội và thanh toán COD, đúng như anh đặt không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "blocker",
+        "size",
+        "variant_sku",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Long Biên, Hà Nội",
+            "on": "2026-12-02"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh gọi lại để chốt đơn giày chạy bộ RunLite 2 Pro size 41 màu đen.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, sản phẩm này đang còn hàng anh nhé. Giá là 1.690.000đ, phí thu hộ COD là 0đ, tổng đơn không phát sinh thêm chi phí.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán là COD nhé, em ơi.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận anh chọn thanh toán khi nhận hàng (COD) ạ. Đơn này được áp dụng miễn phí thu hộ, anh nhận hàng kiểm tra ngoại quan rồi thanh toán giúp em.",
+      "questions": [],
+      "facts_used": [
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 550,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là Long Biên, Hà Nội.",
+      "facts_stated": {
+        "delivery_area": "Long Biên, Hà Nội"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, khu vực Long Biên, Hà Nội sẽ giao trong 1 đến 2 ngày làm việc, dự kiến nhận hàng vào ngày 04/12/2026 anh nhé.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-12-04"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chốt đơn cho anh nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em lên đơn cho anh: Giày chạy bộ RunLite 2 Pro size 41 màu đen, giá 1.690.000đ, giao tại Long Biên, Hà Nội, thanh toán COD, dự kiến nhận 04/12/2026. Em tiến hành tạo đơn ngay cho anh ạ.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "delivery_area",
+        "payment",
+        "price_quoted_vnd",
+        "variant_sku"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-12-04"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000013",
+            "sku": "SKU-SN-RUN2-41-DEN",
+            "qty": 1,
+            "price_vnd": 1690000,
+            "payment": "COD",
+            "address": "Long Biên, Hà Nội",
+            "on": "2026-12-02"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Long Biên, Hà Nội",
+          "op": "set",
+          "source": "call_3#turn6"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_3#turn4"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN2",
+          "op": "set",
+          "source": "call_3#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1690000,
+          "op": "set",
+          "source": "call_3#turn1"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN2-41-DEN",
+          "op": "set",
+          "source": "call_3#turn1"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_3#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001",
+      "sku": "SKU-SN-RUN2-41-DEN",
+      "qty": 1,
+      "price_vnd": 1690000,
+      "payment": "COD",
+      "address": "Long Biên, Hà Nội",
+      "estimated_delivery": "2026-12-04"
+    }
+  }
+}

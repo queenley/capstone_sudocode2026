@@ -1,0 +1,227 @@
+{
+  "conversation_id": "SCN-GEN-0002__call_2",
+  "scenario_id": "SCN-GEN-0002",
+  "call": "call_2",
+  "customer_id": "C032",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-18",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em thấy mình đang có đơn hàng cần hỗ trợ, chị muốn đổi địa chỉ giao hàng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Chị muốn đổi địa chỉ giao hàng cho đơn hàng này đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD301177"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có thể đổi địa chỉ giao hàng cho đơn hàng đó được không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hỗ trợ đổi địa chỉ giao hàng cho chị ạ. Chị vui lòng cho em biết địa chỉ mới mình muốn nhận hàng nhé.",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Chị vui lòng cho em biết địa chỉ mới mình muốn nhận hàng nhé."
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD301177"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Địa chỉ mới của chị là Hải Châu, Đà Nẵng.",
+      "facts_stated": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Hải Châu, Đà Nẵng",
+          "spoken": "Hải Châu, Đà Nẵng"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã nhận thông tin địa chỉ mới là Hải Châu, Đà Nẵng. Đơn của chị đang trong quá trình vận chuyển, em sẽ cập nhật lại ngay để đảm bảo giao đúng địa chỉ mới cho mình.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD301177"
+        },
+        {
+          "field": "order_status",
+          "value": "shipping"
+        },
+        {
+          "field": "tracking",
+          "value": "GHN7781234"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD301177",
+            "action": "update_address",
+            "on": "2026-10-18"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "address",
+          "value": "Hải Châu, Đà Nẵng",
+          "spoken": "Hải Châu, Đà Nẵng"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần cái này giao nhanh chút xíu nếu được nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng của chị đang được giao bởi GHN, mã vận đơn GHN7781234. Bên em sẽ cập nhật địa chỉ mới để bên vận chuyển xử lý nhanh nhất có thể giúp chị ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "shipping"
+        },
+        {
+          "field": "tracking",
+          "value": "GHN7781234"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em có thể cập nhật địa chỉ cho chị ngay được không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em vừa cập nhật địa chỉ mới Hải Châu, Đà Nẵng cho đơn hàng OD301177 rồi chị nhé. Bên vận chuyển sẽ giao theo địa chỉ này, chị yên tâm ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD301177"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Hải Châu, Đà Nẵng",
+          "op": "set",
+          "source": "call_2#turn4"
+        }
+      ],
+      "entities": [
+        {
+          "type": "address",
+          "value": "Hải Châu, Đà Nẵng",
+          "spoken": "Hải Châu, Đà Nẵng"
+        },
+        {
+          "type": "order_id",
+          "value": "OD301177",
+          "spoken": "OD301177"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,231 @@
+{
+  "conversation_id": "SCN-GEN-0047__call_1",
+  "scenario_id": "SCN-GEN-0047",
+  "call": "call_1",
+  "customer_id": "C034",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-13",
+  "region": "trung",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào cô Loan ạ, hôm trước bạn nhân viên đã hỗ trợ mình về Máy lọc nước RO Karofi 9 lõi. Cô muốn em tư vấn thêm thông tin nào nữa không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Cô muốn em tư vấn thêm thông tin nào nữa không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "delivery_area",
+        "decision_maker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 650,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, cô muốn hỏi thêm về máy lọc nước RO Karofi 9 lõi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy lọc nước RO Karofi 9 lõi bên em đang còn hàng, giá là 5.990.000đ ạ. Dạ không biết cô đang quan tâm về chức năng, công suất hay có nhu cầu sử dụng như thế nào để em hỗ trợ kỹ hơn ạ?",
+      "questions": [
+        {
+          "slot": "usage_need",
+          "type": "open",
+          "text": "Cô đang quan tâm về chức năng, công suất hay có nhu cầu sử dụng như thế nào để em hỗ trợ kỹ hơn ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5990000",
+          "spoken": "5.990.000đ"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cô ở Cần Thơ, nhà có 6 người trong gia đình.",
+      "facts_stated": {
+        "delivery_area": "Cần Thơ",
+        "usage_need": "gia đình 6 người"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với gia đình 6 người ở Cần Thơ, máy RO Karofi 9 lõi đáp ứng tốt nhu cầu sử dụng nước sạch mỗi ngày ạ. Dạ cho em hỏi thêm là mình dự kiến mức ngân sách khoảng bao nhiêu để em kiểm tra ưu đãi phù hợp cho cô nhé?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Mình dự kiến mức ngân sách khoảng bao nhiêu để em kiểm tra ưu đãi phù hợp cho cô nhé?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ngân sách của cô là 7 triệu, không biết có khuyến mãi gì không?",
+      "facts_stated": {
+        "budget_vnd": 7000000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "7000000",
+          "spoken": "7 triệu"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ cô, hiện tại máy lọc nước RO Karofi 9 lõi bên em giá 5.990.000đ, nằm trong ngân sách của mình. Đơn hàng trên 500.000đ khu vực Cần Thơ sẽ được miễn phí vận chuyển ạ. Sản phẩm hiện chưa có chương trình khuyến mãi giảm giá thêm, nhưng vẫn được hỗ trợ đổi trả trong 7 ngày nếu có lỗi từ nhà sản xuất ạ.",
+      "questions": [],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5990000",
+          "spoken": "5.990.000đ"
+        }
+      ],
+      "pause_before_ms": 850,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cô cần suy nghĩ thêm rồi sẽ gọi lại em nhé.",
+      "facts_stated": {
+        "blocker": "cần suy nghĩ thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, cô cứ suy nghĩ thêm giúp em ạ. Khi nào cần thêm thông tin hoặc quyết định đặt hàng, cô cứ gọi lại cho shop bất kỳ lúc nào, em luôn sẵn sàng hỗ trợ cô.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "usage_need",
+          "value": "gia đình 6 người",
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 7000000,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-WF-RO9",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5990000,
+          "op": "set",
+          "source": "call_1#turn3"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "cần suy nghĩ thêm",
+    "objection_handling": "Đã ghi nhận và động viên khách suy nghĩ thêm, mời khách liên hệ lại khi cần.",
+    "sentiment": "neutral",
+    "decision_maker": "con gái",
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

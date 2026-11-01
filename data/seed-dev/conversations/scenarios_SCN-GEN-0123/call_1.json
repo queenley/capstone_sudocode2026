@@ -1,0 +1,197 @@
+{
+  "conversation_id": "SCN-GEN-0123__call_1",
+  "scenario_id": "SCN-GEN-0123",
+  "call": "call_1",
+  "customer_id": "C037",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-31",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_so_gia",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần hỗ trợ về sản phẩm nào ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về giày chạy bộ RunLite 2 Pro size 38 màu xám.",
+      "facts_stated": {
+        "size": 38,
+        "color": "xam"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh quan tâm tới giày chạy bộ RunLite 2 Pro size 38 màu xám phải không ạ? Hiện mẫu này bên em đang tạm hết hàng, em có thể tư vấn thêm nếu anh cần chọn size hoặc màu khác ạ.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh xác nhận mình hỏi về giày chạy bộ RunLite 2 Pro size 38 màu xám đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá của đôi này là bao nhiêu em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giá của giày chạy bộ RunLite 2 Pro size 38 màu xám bên em là 1.690.000đ anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh thấy bên khác đang bán 1 triệu 550, mà bên em lại 1 triệu 690. Sao lại cao hơn vậy?",
+      "facts_stated": {
+        "competitor_price_vnd": 1550000,
+        "objection": "giá cao hơn chỗ khác"
+      },
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã góp ý ạ. Giá bên em là giá chính hãng, hàng mới 100%, bảo hành đúng theo quy định hãng và được đổi trả trong 7 ngày nếu có lỗi. Ngoài ra, anh sẽ được miễn phí vận chuyển toàn quốc cho đơn hàng từ 500.000đ trở lên.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh chưa chốt ngay đâu, cần suy nghĩ thêm một chút, để anh nghĩ lại rồi gọi lại nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 900,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, anh cứ cân nhắc thêm ạ. Nếu cần tư vấn hoặc có hàng trở lại, bên em sẽ hỗ trợ anh ngay.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "size",
+          "value": 38,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "color",
+          "value": "xam",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "competitor_price_vnd",
+          "value": 1550000,
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "objection",
+          "value": "giá cao hơn chỗ khác",
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN2",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1690000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN2-38-XAM",
+          "op": "set",
+          "source": "call_1#turn2"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_gia_giay",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "scenario_id": "SCN-ADV-0149",
+  "level": "M2",
+  "persona": "khach_hoi_khuyen_mai_sap_toi",
+  "hard_case": null,
+  "customer_phone": "0932448452",
+  "customer_name": "Diệp",
+  "honorific": "chị",
+  "notes": "Persona khach_hoi_khuyen_mai_sap_toi, biến thể hoi_sale_11_11_hotline. call_1 (hotline): hỏi khuyến mãi sắp tới (11/11) → hen_goi_lai. Chấm chủ yếu: HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-22",
+      "customer_goal": "Hỏi máy lọc không khí và khuyến mãi ngày 11/11",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về máy lọc không khí AirPure Y, giá hiện tại là bao nhiêu em nhỉ?",
+        "Chị thấy ghi trên mạng là 5 triệu 2, không biết bên mình có khuyến mãi gì không?",
+        "Ngày 11/11 bên em có sale không, chị đợi đến lúc đó có rẻ hơn không?",
+        "Em biết thì nói chị nghe đi, chị cần cân nhắc thêm trước khi quyết định."
+      ],
+      "facts_established": {
+        "blocker": "cần suy nghĩ thêm",
+        "budget_vnd": 5500000,
+        "has_children": true,
+        "room_area_m2": 20,
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "promo_code": "GIFT-FILTER",
+        "promo_expiry": "2026-10-22"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "future_promo_disclosed",
+            "value": true
+          }
+        ],
+        "trace_must_not_match": [
+          "11/11",
+          "11-11",
+          "11\\.11",
+          "(?i)mười một tháng mười một",
+          "(?i)ngày độc thân"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5200000,
+        "list_price_vnd": 5200000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_GIFT-FILTER_active": true,
+        "gift_sku": "SKU-AP-FLT-X",
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "future_promo_disclosed": false,
+        "call_date": "2026-10-22"
+      },
+      "memory_expectation": {
+        "blocker": "cần suy nghĩ thêm",
+        "budget_vnd": 5500000,
+        "has_children": true,
+        "room_area_m2": 20,
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "promo_code": "GIFT-FILTER"
+      },
+      "relevant_policy_ids": [
+        "KM-02",
+        "KM-07"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

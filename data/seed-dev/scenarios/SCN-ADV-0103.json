@@ -1,0 +1,140 @@
+{
+  "scenario_id": "SCN-ADV-0103",
+  "level": "M2",
+  "persona": "khach_bao_hanh_trong_han",
+  "hard_case": null,
+  "customer_phone": "0998000006",
+  "customer_name": "Trần Văn F",
+  "honorific": "anh",
+  "notes": "Persona khach_bao_hanh_trong_han, biến thể loi_trong_han. call_1 (hotline): bảo hành còn hạn → thong_tin. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-29",
+      "customer_goal": "Hỏi quy trình bảo hành cho Máy tiệt trùng sấy khô Moaz Bebe",
+      "customer_turns": [
+        "Alo, anh gọi để hỏi về quy trình bảo hành cho máy tiệt trùng sấy khô Moaz Bebe mà anh đã mua.",
+        "Máy này đang bị lỗi, bánh xe bị kẹt, không hoạt động được.",
+        "Mới mua cách đây chưa đầy một năm, không biết còn bảo hành không em?",
+        "Quy trình bảo hành như thế nào, gửi về shop hay trung tâm bảo hành hãng?",
+        "Thời gian bảo hành mất bao lâu nhỉ? 7 hay 15 ngày làm việc?"
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C006",
+          "session_id": "SYN-006-S3",
+          "date": "2025-07-10",
+          "channel": "web",
+          "summary": "Mua Nồi chiên không dầu Xiaomi 4.5L giá 1.590.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C006",
+          "session_id": "SYN-006-S1",
+          "date": "2026-03-16",
+          "channel": "zalo_oa",
+          "summary": "Mua Máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C006",
+          "session_id": "SYN-006-S2",
+          "date": "2026-10-06",
+          "channel": "fb",
+          "summary": "Đặt Ghế ngồi ô tô cho bé Chicco giá 4.990.000đ, đơn OD900602 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C006",
+          "order_id": "OD900601",
+          "date": "2026-03-16",
+          "sku": "SKU-MB-STER",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-MB-STER"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C006",
+          "order_id": "OD900602",
+          "date": "2026-10-06",
+          "sku": "SKU-MB-CAR",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900602"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C006",
+          "order_id": "OD900603",
+          "date": "2025-07-10",
+          "sku": "SKU-AF-XM",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AF-XM"
+          }
+        }
+      ],
+      "facts_established": {
+        "issue": "bánh xe bị kẹt",
+        "order_id": "OD900601",
+        "owned_sku": "SKU-MB-STER"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "7–15 ngày",
+          "7-15 ngày",
+          "7 đến 15 ngày",
+          "15 ngày làm việc"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_warranty",
+            "value": false
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900601",
+        "warranty_months": 12,
+        "in_warranty": true,
+        "call_date": "2026-10-29"
+      },
+      "memory_expectation": {
+        "issue": "bánh xe bị kẹt",
+        "order_id": "OD900601",
+        "owned_sku": "SKU-MB-STER"
+      },
+      "relevant_policy_ids": [
+        "BH-01",
+        "BH-02",
+        "BH-03",
+        "PB-01"
+      ],
+      "expected_outcome": "thong_tin"
+    }
+  }
+}

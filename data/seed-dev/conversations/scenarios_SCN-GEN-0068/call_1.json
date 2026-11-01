@@ -1,0 +1,203 @@
+{
+  "conversation_id": "SCN-GEN-0068__call_1",
+  "scenario_id": "SCN-GEN-0068",
+  "call": "call_1",
+  "customer_id": "SYN-C008",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-16",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh, em là trợ lý ảo của shop BTC. Hôm trước anh có đặt Áo phao lông vũ Warmly, em hỗ trợ anh về máy lọc không khí Xiaomi Smart 4 Pro luôn ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo anh muon hoi ve may loc khong khi xiaomi smart 4 pro",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy lọc không khí Xiaomi Smart 4 Pro là mẫu mới của hãng, phù hợp cho phòng từ 35 mét vuông trở lên. Tuy nhiên, hiện tại sản phẩm này bên em đang tạm hết hàng, dự kiến về lại vào ngày 19/10 anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "restock_date",
+          "value": "2026-10-19"
+        },
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "may nay phu hop cho phong 35 met vuong khong em",
+      "facts_stated": {
+        "room_area_m2": 35
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy Xiaomi Smart 4 Pro đáp ứng tốt phòng diện tích 35 mét vuông anh nhé, lọc bụi mịn và có app điều khiển tiện lợi. Ngoài ra, máy có tốc độ lọc CADR cao, phù hợp với không gian của mình.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "nha anh co tre nho co khuyen mai gi khong",
+      "facts_stated": {
+        "has_children": true
+      },
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại máy Xiaomi Smart 4 Pro có áp dụng chương trình khuyến mãi XM-COMBO còn hiệu lực, khi mua sẽ được tặng kèm một màng lọc thay thế chính hãng. Anh cũng được miễn phí vận chuyển toàn quốc.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_XM-COMBO_active",
+          "value": true
+        },
+        {
+          "field": "promo_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 650,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "gia bao nhieu vay um anh can suy nghi them roi se goi lai",
+      "facts_stated": {
+        "budget_vnd": 6000000,
+        "blocker": "cần suy nghĩ thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giá máy lọc không khí Xiaomi Smart 4 Pro hiện là 5.490.000đ chưa giảm, tặng kèm một màng lọc chính hãng và dự kiến có hàng lại vào ngày 19/10. Nếu anh cần tư vấn thêm hoặc đặt hàng, anh cứ liên hệ lại shop bất cứ lúc nào ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "room_area_m2",
+          "value": 35,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 6000000,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-XM-4P",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5490000,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "promo_code",
+          "value": "XM-COMBO",
+          "op": "set",
+          "source": "call_1#turn5"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_may_loc_khong_khi",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_suy_nghi_them",
+    "objection_handling": "Dạ em ghi nhận, anh cứ liên hệ lại khi cần tư vấn thêm ạ.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,298 @@
+{
+  "conversation_id": "SCN-GEN-0168__call_2",
+  "scenario_id": "SCN-GEN-0168",
+  "call": "call_2",
+  "customer_id": "C007",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-16",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Thảo ạ. Hôm trước chị có hỏi về Máy lọc không khí Xiaomi Smart 4 Pro và còn băn khoăn chờ cuối tháng nhận lương phải không ạ? Hiện giá máy là 5.490.000đ, hàng vẫn còn sẵn kho và chương trình khuyến mãi cũ XM-COMBO đã hết hiệu lực, em báo lại để mình yên tâm đặt đơn nhé.",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "room_area_m2"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "promo_XM-COMBO_active",
+          "value": false
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-11-16"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chi goi lai de mua may loc khong khi ma hom truoc em tu van",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, chị chọn Máy lọc không khí Xiaomi Smart 4 Pro giá 5.490.000đ đúng không ạ? Đơn này sẽ giao về Ninh Kiều, Cần Thơ và chị muốn thanh toán COD phải không chị? Em xin xác nhận lại trước khi đặt đơn ạ.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Chị xác nhận giúp em: Máy lọc không khí Xiaomi Smart 4 Pro, giá 5.490.000đ, giao Ninh Kiều, Cần Thơ, thanh toán COD, nhận hàng dự kiến ngày 20/11. Thông tin như vậy đúng chưa chị?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd",
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        },
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-20"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chi muon thanh toan bang cod",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận thanh toán COD cho chị ạ. Máy có miễn phí vận chuyển toàn quốc, dự kiến giao ngày 20/11. Đơn COD trên 2 triệu sẽ có nhân viên gọi xác nhận đơn trước khi giao hàng chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        },
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "giao hang cho chi o ninh kieu can tho nhe",
+      "facts_stated": {
+        "delivery_area": "Ninh Kiều, Cần Thơ"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Ninh Kiều, Cần Thơ",
+          "spoken": "ninh kieu can tho"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em sẽ giao hàng về địa chỉ Ninh Kiều, Cần Thơ cho chị. Tổng số tiền cần thanh toán khi nhận hàng là 5.490.000đ chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "freeship",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "bay gio chi dong y len don roi",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em lên đơn cho chị luôn ạ.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "payment",
+        "delivery_area",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0960161055",
+            "sku": "SKU-XM-4P",
+            "qty": 1,
+            "price_vnd": 5490000,
+            "payment": "COD",
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-11-16"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Ninh Kiều, Cần Thơ",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-XM-4P",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5490000,
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Đơn của chị đã được tạo thành công. Sẽ có nhân viên gọi xác nhận đơn trước khi giao hàng, chị chú ý điện thoại giúp em nhé. Em cảm ơn chị Thảo đã đặt hàng tại shop ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xac_nhan_mua",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-XM-4P",
+      "price_vnd": 5490000,
+      "payment": "COD",
+      "address": "Ninh Kiều, Cần Thơ",
+      "qty": 1,
+      "order_id": "OD600001"
+    }
+  }
+}

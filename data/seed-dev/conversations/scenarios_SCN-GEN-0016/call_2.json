@@ -1,0 +1,155 @@
+{
+  "conversation_id": "SCN-GEN-0016__call_2",
+  "scenario_id": "SCN-GEN-0016",
+  "call": "call_2",
+  "customer_id": "C031",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-31",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Oanh ạ, hôm trước chị đã đặt Máy lọc không khí AirPure X, giao về Cầu Giấy, thanh toán chuyển khoản.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "delivery_area",
+        "payment",
+        "room_area_m2",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, chị Oanh đây, hôm trước chị đã đặt hàng máy lọc không khí.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, chị hỏi về tình trạng đơn hàng đúng không ạ? Để em kiểm tra thông tin đơn hàng OD600001 đã tạo cho chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD600001"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn hỏi xem đơn hàng của chị hiện tại đang ở đâu rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng của chị OD600001 đã tạo và đang trong trạng thái chờ xử lý, bên em sẽ sớm gửi hàng cho chị. Khi đơn được bàn giao cho bên vận chuyển, chị sẽ nhận được mã vận đơn qua Zalo hoặc SMS ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Không biết đơn hàng của chị có vấn đề gì không nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại đơn hàng của chị không có vấn đề gì, hệ thống đã ghi nhận và sẽ xử lý theo thứ tự. Nếu có thay đổi gì bên em sẽ liên hệ lại ngay với chị ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị chưa nhận được thông tin gì về đơn hàng cả.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận ý kiến của chị, bên em sẽ cập nhật thông tin đơn hàng qua Zalo hoặc SMS khi đơn được gửi đi. Em cảm ơn chị đã liên hệ shop ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_tinh_trang_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

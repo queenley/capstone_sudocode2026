@@ -1,0 +1,401 @@
+{
+  "conversation_id": "SCN-ADV-0073__call_2",
+  "scenario_id": "SCN-ADV-0073",
+  "call": "call_2",
+  "customer_id": "C049",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_hoi_gio_hang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Trung ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có quan tâm Máy lọc không khí AirPure Y và để bàn với gia đình, hôm nay mình muốn chốt đơn đúng không anh?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Hôm nay mình muốn chốt đơn đúng không anh?"
+        }
+      ],
+      "facts_used": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-AP-Y"
+        },
+        {
+          "field": "price_quoted_vnd",
+          "value": 5200000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo em, anh gọi để chốt đơn hàng hôm qua.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận anh muốn đặt Máy lọc không khí AirPure Y và AirPure Mini, mỗi món một cái ạ. Để em kiểm tra lại thông tin đơn hàng cho anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-AP-Y",
+          "value": 5200000
+        },
+        {
+          "field": "price_vnd:SKU-AP-MINI",
+          "value": 1095000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh muốn đặt máy lọc không khí AirPure Y và AirPure Mini, mỗi món một cái.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ tổng tiền hai sản phẩm là 6.295.000đ, đã áp dụng freeship toàn quốc cho anh. Máy AirPure Y giá 5.200.000đ, AirPure Mini giá 1.095.000đ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "total_vnd",
+          "value": 6295000
+        },
+        {
+          "field": "promo_NAM-SHIP0_active",
+          "value": true
+        },
+        {
+          "field": "freeship",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Tổng tiền lại là bao nhiêu em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu, anh muốn điều chỉnh ngân sách xuống còn 5 triệu đúng không ạ? Với mức này, em xin phép tư vấn lại sản phẩm phù hợp cho anh.",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Anh muốn điều chỉnh ngân sách xuống còn 5 triệu đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "budget_vnd",
+          "value": 5000000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh đã đổi ý rồi, ngân sách giờ chỉ còn 5 triệu thôi.",
+      "facts_stated": {
+        "budget_vnd": 5000000
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với ngân sách 5 triệu, hiện Máy lọc không khí AirPure Y giá 5.200.000đ, nên vượt ngân sách một chút. Anh muốn cân nhắc chọn mẫu khác, hay mình vẫn giữ AirPure Y ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh muốn cân nhắc chọn mẫu khác, hay mình vẫn giữ AirPure Y ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-AP-Y",
+          "value": 5200000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán là COD nhé.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận anh chọn thanh toán COD. Đơn hàng của anh đủ điều kiện nhận hàng và kiểm tra ngoại quan trước khi thanh toán ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "cod_allowed",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Địa chỉ giao hàng là Thủ Đức, TP.HCM.",
+      "facts_stated": {
+        "delivery_area": "Thủ Đức, TP.HCM"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Thủ Đức, TP.HCM",
+          "spoken": "Thủ Đức, TP.HCM"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận địa chỉ giao hàng là Thủ Đức, TP.HCM. Dự kiến giao hàng trong 2 ngày làm việc, khoảng ngày 2/11 ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "delivery_days",
+          "value": 2
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-02"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Thủ Đức, TP.HCM",
+            "on": "2026-10-30"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em sẽ tiến hành tạo đơn hàng cho anh: Máy lọc không khí AirPure Y giá 5.200.000đ, thanh toán COD, giao tại Thủ Đức, TP.HCM. Đơn hàng sẽ được nhân viên gọi xác nhận trước khi giao ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0928144976",
+            "sku": "SKU-AP-Y",
+            "qty": 1,
+            "price_vnd": 5200000,
+            "payment": "COD",
+            "address": "Thủ Đức, TP.HCM",
+            "on": "2026-10-30",
+            "basket_skus": [
+              "SKU-AP-MINI"
+            ]
+          }
+        },
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0928144976",
+            "sku": "SKU-AP-MINI",
+            "qty": 1,
+            "price_vnd": 1095000,
+            "payment": "COD",
+            "address": "Thủ Đức, TP.HCM",
+            "on": "2026-10-30",
+            "basket_skus": [
+              "SKU-AP-Y"
+            ]
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_2#turn13"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 5000000,
+          "op": "supersede",
+          "source": "call_2#turn9"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Thủ Đức, TP.HCM",
+          "op": "set",
+          "source": "call_2#turn11"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-Y",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5200000,
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "promo_code",
+          "value": "NAM-SHIP0",
+          "op": "set",
+          "source": "call_2#turn5"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn13"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã hoàn tất lên đơn cho anh. Nhân viên bên em sẽ gọi xác nhận đơn trước khi giao hàng. Cảm ơn anh đã đặt hàng tại shop BTC ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "budget_vnd",
+        "old_value": 6000000,
+        "new_value": 5000000
+      }
+    ],
+    "callback": null,
+    "order": {
+      "items": [
+        {
+          "sku": "SKU-AP-Y",
+          "qty": 1,
+          "price_vnd": 5200000
+        },
+        {
+          "sku": "SKU-AP-MINI",
+          "qty": 1,
+          "price_vnd": 1095000
+        }
+      ],
+      "total_vnd": 6295000,
+      "payment": "COD",
+      "delivery_area": "Thủ Đức, TP.HCM",
+      "estimated_delivery": "2026-11-02"
+    }
+  }
+}

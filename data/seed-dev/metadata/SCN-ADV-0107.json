@@ -1,0 +1,62 @@
+{
+  "scenario_id": "SCN-ADV-0107",
+  "persona_source": "advanced",
+  "customer_id": "C004",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "normal",
+  "tags": [
+    "cart",
+    "cross_channel",
+    "date:after_promo_end",
+    "giao_hang",
+    "hoan_tat_don",
+    "khach_hang",
+    "mua_online",
+    "multi_item",
+    "variant:gio_hai_may_loc"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "cart_quote",
+      "outcome_detail": "hen_goi_lai",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Máy lọc không khí AirPure Y",
+        "price_vnd": 5200000,
+        "in_stock": true,
+        "items": [
+          "Máy lọc không khí AirPure Y: 5.200.000đ",
+          "Máy lọc không khí AirPure Mini: 1.095.000đ"
+        ],
+        "total_vnd": 6295000
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_hoi_gio_hang",
+      "patience_start": 3
+    },
+    "call_2": {
+      "kind": "order_multi",
+      "outcome_detail": "chot_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Máy lọc không khí AirPure Y",
+        "price_vnd": 5200000,
+        "in_stock": true,
+        "items": [
+          "Máy lọc không khí AirPure Y: 5.200.000đ",
+          "Máy lọc không khí AirPure Mini: 1.095.000đ"
+        ],
+        "total_vnd": 6295000
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_hoi_gio_hang",
+      "patience_start": 3
+    }
+  }
+}

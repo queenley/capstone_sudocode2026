@@ -1,0 +1,171 @@
+{
+  "conversation_id": "SCN-GEN-0109__call_2",
+  "scenario_id": "SCN-GEN-0109",
+  "call": "call_2",
+  "customer_id": "C020",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-05",
+  "region": "bac",
+  "category": "gia-dung/quat",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, anh Sơn hôm trước mình có hỏi về Quạt đứng Senko TS16 và còn muốn so sánh thêm, em có thể hỗ trợ anh tiếp tục nhé.",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 590000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo em, anh gọi lại để hỏi thêm về quạt Senko TS16.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng anh ạ, Quạt đứng Senko TS16 bên em đang còn hàng, giá hiện tại là 590.000đ. Anh cần em tư vấn thông tin nào cụ thể về sản phẩm không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 590000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thực ra, anh thấy giá cũng cao so với những quạt khác, có thể rẻ hơn không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã góp ý, mức giá 590.000đ là giá niêm yết hiện tại bên em cho Quạt Senko TS16, chưa có chương trình khuyến mãi giảm giá cho sản phẩm này ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 590000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em có thể cho anh biết thêm về độ ồn của quạt không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ quạt Senko TS16 có 3 mức gió, không remote và độ ồn ở mức thấp nhất là khoảng 45 dB theo thông số từ hãng, phù hợp sử dụng trong gia đình ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cảm ơn em, nhưng anh không quyết định mua nữa, thôi để sau nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã quan tâm sản phẩm bên em, nếu sau này anh cần hỗ trợ thêm cứ liên hệ với shop bất cứ lúc nào anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-FAN-SEN",
+          "op": "set",
+          "source": "call_2#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 590000,
+          "op": "set",
+          "source": "call_2#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_them_tu_choi",
+    "outcome": "tu_choi",
+    "objection_type": "gia_cao",
+    "objection_handling": "Giải thích giá niêm yết hiện tại và chưa có khuyến mãi áp dụng.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

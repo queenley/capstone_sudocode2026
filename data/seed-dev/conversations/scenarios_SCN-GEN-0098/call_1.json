@@ -1,0 +1,298 @@
+{
+  "conversation_id": "SCN-GEN-0098__call_1",
+  "scenario_id": "SCN-GEN-0098",
+  "call": "call_1",
+  "customer_id": "C021",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Yến ạ, em là trợ lý ảo của shop BTC. Chị gọi lại để xác nhận đơn máy hâm sữa Fatz 4 chức năng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị gọi lại để xác nhận đơn máy hâm sữa Fatz 4 chức năng đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Yến gọi lại để xác nhận mua máy hâm sữa Fatz 4 chức năng.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận đơn hàng máy hâm sữa Fatz 4 chức năng giá 490.000đ vẫn còn hàng ạ. Chị chọn thanh toán qua ngân hàng phải không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Chị chọn thanh toán qua ngân hàng phải không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "490000",
+          "spoken": "490.000đ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ thanh toán qua ngân hàng.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận phương thức thanh toán qua ngân hàng cho chị. Địa chỉ giao hàng của mình là Nha Trang, Khánh Hòa đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Địa chỉ giao hàng của mình là Nha Trang, Khánh Hòa đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là Nha Trang, Khánh Hòa nhé.",
+      "facts_stated": {
+        "delivery_area": "Nha Trang, Khánh Hòa"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Nha Trang, Khánh Hòa",
+          "spoken": "Nha Trang, Khánh Hòa"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã xác nhận địa chỉ giao hàng tại Nha Trang, Khánh Hòa. Đơn hàng sẽ được giao dự kiến vào ngày 04/11/2026. Tổng giá trị đơn là 490.000đ, miễn phí thu hộ, chị kiểm tra hàng trước khi nhận giúp em nhé. Em đọc lại thông tin đơn: 1 máy hâm sữa Fatz 4 chức năng, giao Nha Trang, Khánh Hòa, thanh toán chuyển khoản ngân hàng, nhận hàng dự kiến 04/11/2026. Chị kiểm tra lại giúp em thông tin trên đã đúng chưa ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em đọc lại thông tin đơn: 1 máy hâm sữa Fatz 4 chức năng, giao Nha Trang, Khánh Hòa, thanh toán chuyển khoản ngân hàng, nhận hàng dự kiến 04/11/2026. Chị kiểm tra lại giúp em thông tin trên đã đúng chưa ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-10-30"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "490000",
+          "spoken": "490.000đ"
+        },
+        {
+          "type": "date",
+          "value": "2026-11-04",
+          "spoken": "04/11/2026"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đồng ý lên đơn luôn á.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã lên đơn cho chị, mã đơn hàng là OD600001. Đơn hàng sẽ giao đến Nha Trang, Khánh Hòa dự kiến ngày 04/11/2026. Cảm ơn chị Yến đã mua hàng tại shop BTC, có gì chị cứ liên hệ lại nếu cần hỗ trợ thêm ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0901304118",
+            "sku": "SKU-MB-MON",
+            "qty": 1,
+            "price_vnd": 490000,
+            "payment": "bank",
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-10-30"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "child_age_months",
+          "value": 2,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 1000000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Nha Trang, Khánh Hòa",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-MON",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 490000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_1#turn9"
+        }
+      ],
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD600001",
+          "spoken": "OD600001"
+        },
+        {
+          "type": "money",
+          "value": "490000",
+          "spoken": "490.000đ"
+        },
+        {
+          "type": "date",
+          "value": "2026-11-04",
+          "spoken": "04/11/2026"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xac_nhan_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001",
+      "product": "Máy hâm sữa Fatz 4 chức năng",
+      "qty": 1,
+      "price_vnd": 490000,
+      "delivery_area": "Nha Trang, Khánh Hòa",
+      "payment": "bank",
+      "estimated_delivery": "2026-11-04"
+    }
+  }
+}

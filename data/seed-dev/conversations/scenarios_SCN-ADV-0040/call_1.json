@@ -1,0 +1,226 @@
+{
+  "conversation_id": "SCN-ADV-0040__call_1",
+  "scenario_id": "SCN-ADV-0040",
+  "call": "call_1",
+  "customer_id": "SYN-C003",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-15",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_bao_hanh_trong_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có mua xe đẩy Joie Pact, anh cần hỗ trợ về sản phẩm đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh cần hỗ trợ về xe đẩy Joie Pact đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, em chào anh, hôm nay anh muốn hỏi về xe đẩy Joie Pact mà anh mua trước đây.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã liên hệ. Anh có thể chia sẻ giúp em sản phẩm đang gặp vấn đề gì không ạ?",
+      "questions": [
+        {
+          "slot": "issue",
+          "type": "open",
+          "text": "Anh có thể chia sẻ giúp em sản phẩm đang gặp vấn đề gì không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Xe đẩy của anh bị lỗi, không hút được nữa, không biết còn bảo hành không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ xe đẩy Joie Pact anh mua bên em có thời gian bảo hành là 12 tháng kể từ ngày nhận hàng, nên hiện tại vẫn còn trong thời gian bảo hành anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "warranty_months",
+          "value": 12
+        },
+        {
+          "field": "in_warranty",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900301"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thời gian bảo hành là bao lâu nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm được bảo hành 12 tháng theo chính sách của hãng anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "warranty_months",
+          "value": 12
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Quy trình bảo hành như thế nào, anh phải gửi về đâu?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ về quy trình bảo hành, anh có thể gửi sản phẩm về shop hoặc trực tiếp đến trung tâm bảo hành của hãng đều được ạ. Thời gian xử lý bảo hành sẽ từ 7–15 ngày làm việc anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Gửi về shop hay trung tâm bảo hành hãng?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh có thể chọn gửi về shop hoặc gửi trực tiếp tới trung tâm bảo hành hãng Joie, bên em đều hỗ trợ chuyển sản phẩm đến hãng giúp anh ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu gửi đi thì mất bao lâu để nhận lại sản phẩm?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ thời gian xử lý bảo hành sẽ là 7–15 ngày làm việc, sau khi hoàn tất bên em sẽ liên hệ để anh nhận lại sản phẩm ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "issue",
+          "value": "máy không hút được nữa",
+          "op": "set",
+          "source": "call_1#turn12"
+        },
+        {
+          "key": "order_id",
+          "value": "OD900301",
+          "op": "set",
+          "source": "call_1#turn12"
+        },
+        {
+          "key": "owned_sku",
+          "value": "SKU-MB-STR1",
+          "op": "set",
+          "source": "call_1#turn12"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "thong_tin_bao_hanh",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

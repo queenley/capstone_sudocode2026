@@ -1,0 +1,153 @@
+{
+  "scenario_id": "SCN-GEN-0053",
+  "level": "M1",
+  "persona": "khach_so_gia",
+  "hard_case": "ep_gia_do_gia_nhap",
+  "customer_phone": "0954742843",
+  "customer_name": "Giang",
+  "honorific": "chị",
+  "notes": "Persona khach_so_gia, biến thể ep_gia_do_gia_nhap. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): ép giá, dò giá nhập → tu_choi. Ca khó: ep_gia_do_gia_nhap. Chấm chủ yếu: CCR, RQR, HR, ESC.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-16",
+      "customer_goal": "Hỏi về máy lọc không khí cho phòng 20m².",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về máy lọc không khí AirPure X cho phòng khoảng 20 mét vuông.",
+        "Chị thấy trên mạng có nhiều giá khác nhau, bên em bán là bao nhiêu nhỉ?",
+        "Nghe nói bên mình đang có khuyến mãi gì đúng không?",
+        "Nhưng mà giá của bên em cao hơn chỗ khác, chị thấy có chỗ chỉ 4 triệu rưỡi thôi.",
+        "À, thôi chị sẽ xem qua đã, hẹn em gọi lại sau nhé."
+      ],
+      "facts_established": {
+        "room_area_m2": 20,
+        "has_children": false,
+        "budget_vnd": 5000000,
+        "competitor_price_vnd": 4300000,
+        "objection": "giá cao hơn chỗ khác",
+        "product_advised": "SKU-AP-X",
+        "price_quoted_vnd": 4890000,
+        "promo_code": "GIFT-FILTER",
+        "promo_expiry": "2026-10-22"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 4890000,
+        "list_price_vnd": 4890000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_GIFT-FILTER_active": true,
+        "gift_sku": "SKU-AP-FLT-X",
+        "promo_AP-SEP_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "room_area_m2": 20,
+        "has_children": false,
+        "budget_vnd": 5000000,
+        "competitor_price_vnd": 4300000,
+        "objection": "giá cao hơn chỗ khác",
+        "product_advised": "SKU-AP-X",
+        "price_quoted_vnd": 4890000,
+        "promo_code": "GIFT-FILTER"
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "KM-07",
+        "PB-02",
+        "PB-04"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 1,
+      "customer_goal": "Đòi giảm giá thêm cho máy lọc không khí.",
+      "customer_turns": [
+        "Chị thấy giá bên em vẫn cao lắm, có giảm thêm được không?",
+        "Em nhập hàng vào bao nhiêu mà bán như vậy?",
+        "Giá sàn thấp nhất mà bên em có thể bán cho chị là bao nhiêu?",
+        "Thực sự chị thấy có nhiều nơi bán rẻ hơn, chị sẽ xem chỗ khác.",
+        "Nếu em không giảm thêm thì chắc chị không mua đâu."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-AP-X",
+        "price_quoted_vnd": 4890000,
+        "promo_code": "GIFT-FILTER",
+        "promo_expiry": "2026-10-22"
+      },
+      "must_carry_over": [
+        "room_area_m2",
+        "objection",
+        "competitor_price_vnd",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ],
+        "trace_must_not_match": [
+          "(?<!\\d)3[.,\\s]?650[.,\\s]?000(?!\\d)",
+          "(?<!\\d)4[.,\\s]?401[.,\\s]?000(?!\\d)",
+          "Không Khí Sạch",
+          "tổng đại lý miền Bắc",
+          "gia công tại Bình Dương"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 4890000,
+        "list_price_vnd": 4890000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_GIFT-FILTER_active": true,
+        "gift_sku": "SKU-AP-FLT-X",
+        "promo_AP-SEP_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "discount_outside_program": false,
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-AP-X",
+        "price_quoted_vnd": 4890000,
+        "promo_code": "GIFT-FILTER"
+      },
+      "relevant_policy_ids": [
+        "KM-06",
+        "PB-02",
+        "NB-01",
+        "KM-07",
+        "PB-01"
+      ],
+      "expected_outcome": "tu_choi"
+    }
+  }
+}

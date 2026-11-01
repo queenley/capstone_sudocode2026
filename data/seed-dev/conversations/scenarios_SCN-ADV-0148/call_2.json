@@ -1,0 +1,327 @@
+{
+  "conversation_id": "SCN-ADV-0148__call_2",
+  "scenario_id": "SCN-ADV-0148",
+  "call": "call_2",
+  "customer_id": "C027",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-15",
+  "region": "bac",
+  "category": "thoi-trang/ao-khoac",
+  "persona": "khach_lon_tuoi",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Chi ạ, hôm trước chị có hỏi về Áo khoác gió Windbreak size L màu navy, cần hỏi lại ý kiến con cháu. Hôm nay chị muốn đặt áo này đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Hôm nay chị muốn đặt áo này đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "color",
+        "decision_maker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "blocker"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo chi goi lai de dat cai ao khoac gio mau navy size l",
+      "facts_stated": {
+        "size": "L",
+        "color": "navy",
+        "product_advised": "SKU-JK-WND",
+        "variant_sku": "SKU-JK-WND-L-NAVY"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị đặt 1 Áo khoác gió Windbreak size L màu navy. Giá là 690.000đ, hiện còn hàng chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chau noi lai cho chi nghe cai ao do gia bao nhieu nhir",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, Áo khoác gió Windbreak size L màu navy đang có giá 690.000đ chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chi cung muon thanh toan qua ngan hang",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 450,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị chọn thanh toán qua ngân hàng ạ. Địa chỉ nhận hàng mình để như lần trước đúng không chị?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Địa chỉ nhận hàng mình để như lần trước đúng không chị?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "khu vuc giao hang la le chan hai phong nhe chau",
+      "facts_stated": {
+        "delivery_area": "Lê Chân, Hải Phòng"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Lê Chân, Hải Phòng",
+          "spoken": "le chan hai phong"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em sẽ giao Áo khoác gió Windbreak size L màu navy về Lê Chân, Hải Phòng. Dự kiến giao hàng trong 4 ngày làm việc, khoảng ngày 19/11 chị nhận giúp em nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "delivery_days",
+          "value": 4
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-19"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Lê Chân, Hải Phòng",
+            "on": "2026-11-15"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-11-19",
+          "spoken": "19/11"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "u chi dong y dat hang roi do",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em chốt lại với chị: 1 Áo khoác gió Windbreak size L màu navy, giá 690.000đ, giao về Lê Chân, Hải Phòng và thanh toán qua ngân hàng. Thời gian giao dự kiến là ngày 19/11. Chị xác nhận giúp em thông tin trên đúng chưa ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Chị xác nhận giúp em thông tin trên đúng chưa ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area",
+        "payment",
+        "product_advised",
+        "price_quoted_vnd",
+        "variant_sku"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "dong y",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận đơn hàng cho chị. Shop sẽ liên hệ khi giao hàng, cảm ơn chị đã đặt mua áo khoác tại BTC ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0992566636",
+            "sku": "SKU-JK-WND-L-NAVY",
+            "qty": 1,
+            "price_vnd": 690000,
+            "payment": "bank",
+            "address": "Lê Chân, Hải Phòng",
+            "on": "2026-11-15"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Lê Chân, Hải Phòng",
+          "op": "set",
+          "source": "call_2#turn7"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn5"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-JK-WND",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 690000,
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-JK-WND-L-NAVY",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn11"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_hang",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": "con",
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-JK-WND-L-NAVY",
+      "qty": 1,
+      "price_vnd": 690000,
+      "payment": "bank",
+      "address": "Lê Chân, Hải Phòng",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-11-19"
+    }
+  }
+}

@@ -1,0 +1,277 @@
+{
+  "conversation_id": "SCN-GEN-0092__call_3",
+  "scenario_id": "SCN-GEN-0092",
+  "call": "call_3",
+  "customer_id": "C014",
+  "session_index": 3,
+  "channel": "hotline",
+  "date": "2026-11-05",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Huy ạ, hôm trước anh có quan tâm Giày chạy bộ RunLite 2 Pro size 41 màu đen và cần suy nghĩ thêm, hôm nay anh muốn đặt luôn đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Hôm nay anh muốn đặt luôn đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn đặt giày chạy bộ RunLite 2 Pro size 41 màu đen.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh chọn Giày chạy bộ RunLite 2 Pro size 41 màu đen, giá 1.690.000đ. Sản phẩm hiện đang còn hàng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán là chuyển khoản ngân hàng.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận anh chọn thanh toán chuyển khoản ngân hàng ạ. Anh muốn nhận hàng tại Nha Trang, Khánh Hòa đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Anh muốn nhận hàng tại Nha Trang, Khánh Hòa đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giao hàng đến Nha Trang, Khánh Hòa nhé.",
+      "facts_stated": {
+        "delivery_area": "Nha Trang, Khánh Hòa"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Nha Trang, Khánh Hòa",
+          "spoken": "Nha Trang, Khánh Hòa"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận lại đơn hàng: Giày chạy bộ RunLite 2 Pro size 41 màu đen, 1 đôi, giá 1.690.000đ, giao đến Nha Trang, Khánh Hòa, thanh toán chuyển khoản. Dự kiến anh nhận hàng vào ngày 10/11/2026. Thông tin như vậy đúng chưa anh để em lên đơn ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Thông tin như vậy đúng chưa anh để em lên đơn ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-11-05"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1690000",
+          "spoken": "1.690.000đ"
+        },
+        {
+          "type": "date",
+          "value": "2026-11-10",
+          "spoken": "10/11/2026"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mong sớm nhận được hàng.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã tạo đơn thành công cho anh. Shop sẽ gửi thông tin đơn hàng và hướng dẫn chuyển khoản qua Zalo hoặc SMS cho anh. Anh vui lòng theo dõi để hoàn tất giao dịch, hàng sẽ giao dự kiến ngày 10/11/2026 ạ. Cảm ơn anh đã đặt hàng tại shop!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0925877188",
+            "sku": "SKU-SN-RUN2-41-DEN",
+            "qty": 1,
+            "price_vnd": 1690000,
+            "payment": "bank",
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-11-05"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_3#turn4"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Nha Trang, Khánh Hòa",
+          "op": "set",
+          "source": "call_3#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN2",
+          "op": "set",
+          "source": "call_3#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1690000,
+          "op": "set",
+          "source": "call_3#turn1"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN2-41-DEN",
+          "op": "set",
+          "source": "call_3#turn1"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_3#turn9"
+        }
+      ],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1690000",
+          "spoken": "1.690.000đ"
+        },
+        {
+          "type": "date",
+          "value": "2026-11-10",
+          "spoken": "10/11/2026"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_giay_runlite2",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-SN-RUN2-41-DEN",
+      "qty": 1,
+      "price_vnd": 1690000,
+      "payment": "bank",
+      "address": "Nha Trang, Khánh Hòa",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-11-10"
+    }
+  }
+}

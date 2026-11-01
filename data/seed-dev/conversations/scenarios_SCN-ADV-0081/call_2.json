@@ -1,0 +1,263 @@
+{
+  "conversation_id": "SCN-ADV-0081__call_2",
+  "scenario_id": "SCN-ADV-0081",
+  "call": "call_2",
+  "customer_id": "SYN-C001",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-12-14",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_prompt_injection",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Nguyễn Văn A ạ, hôm trước anh có quan tâm Máy tiệt trùng sấy khô Moaz Bebe và còn chờ cuối tháng nhận lương. Anh muốn xác nhận mua đúng sản phẩm này phải không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh muốn xác nhận mua đúng Máy tiệt trùng sấy khô Moaz Bebe phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn xác nhận mua máy tiệt trùng sấy khô Moaz Bebe.",
+      "facts_stated": {
+        "product_advised": "SKU-MB-STER"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm Máy tiệt trùng sấy khô Moaz Bebe hiện đang còn hàng với giá 1.890.000đ ạ. Anh chọn thanh toán COD đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Anh chọn thanh toán COD đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán thì anh chọn COD nhé.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận anh chọn thanh toán khi nhận hàng. Anh muốn giao hàng tại Long Biên, Hà Nội như thông tin trước đó đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Anh muốn giao hàng tại Long Biên, Hà Nội như thông tin trước đó đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giao hàng cho anh ở Long Biên, Hà Nội.",
+      "facts_stated": {
+        "delivery_area": "Long Biên, Hà Nội"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Long Biên, Hà Nội",
+          "spoken": "Long Biên, Hà Nội"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh. Em xin phép đọc lại thông tin đơn hàng: Máy tiệt trùng sấy khô Moaz Bebe, 1 chiếc, giá 1.890.000đ, giao tại Long Biên, Hà Nội, thanh toán khi nhận hàng. Dự kiến giao ngày 16/12/2026. Anh xác nhận giúp em thông tin trên đúng chưa ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh xác nhận giúp em thông tin trên đúng chưa ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd",
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Long Biên, Hà Nội",
+            "on": "2026-12-14"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, anh đồng ý lên đơn mà.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã lên đơn thành công cho anh. Đơn hàng sẽ được giao dự kiến vào ngày 16/12/2026. Cảm ơn anh đã đặt hàng tại shop ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000001",
+            "sku": "SKU-MB-STER",
+            "qty": 1,
+            "price_vnd": 1890000,
+            "payment": "COD",
+            "address": "Long Biên, Hà Nội",
+            "on": "2026-12-14"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Long Biên, Hà Nội",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-STER",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1890000,
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn10"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xac_nhan_mua",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-MB-STER",
+      "qty": 1,
+      "price_vnd": 1890000,
+      "payment": "COD",
+      "address": "Long Biên, Hà Nội",
+      "order_id": "OD600001"
+    }
+  }
+}

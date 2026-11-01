@@ -1,0 +1,167 @@
+{
+  "scenario_id": "SCN-GEN-0235",
+  "level": "M2",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "hard_case": null,
+  "customer_phone": "0998000014",
+  "customer_name": "Lê Thị Hoa",
+  "honorific": "chị",
+  "notes": "Persona khach_co_don_chua_co_lich_su, biến thể chuan. call_1 (hotline): hỏi tình trạng đơn → cap_nhat_don; call_2 (hotline): đổi địa chỉ giao → cap_nhat_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-26",
+      "customer_goal": "Hỏi tình trạng đơn hàng giày sneaker Urban Classic",
+      "customer_turns": [
+        "Alo, chị muốn hỏi tình trạng đơn hàng giày sneaker Urban Classic mà chị đã đặt.",
+        "Chị không nhớ mã đơn, nhưng đơn đó đang xử lý, em xem giúp chị với.",
+        "Hôm trước chị có gọi hỏi rồi, mà chưa thấy cập nhật gì mới.",
+        "Chị chỉ muốn biết khi nào thì nhận được hàng thôi."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C014",
+          "session_id": "SYN-014-S3",
+          "date": "2025-03-18",
+          "channel": "web",
+          "summary": "Mua Quạt đứng Senko TS16 giá 590.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C014",
+          "session_id": "SYN-014-S1",
+          "date": "2026-06-13",
+          "channel": "zalo_oa",
+          "summary": "Mua Giày chạy bộ RunLite 2 Pro giá 1.740.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C014",
+          "session_id": "SYN-014-S2",
+          "date": "2026-10-04",
+          "channel": "fb",
+          "summary": "Đặt Giày sneaker Urban Classic giá 940.000đ, đơn OD901402 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C014",
+          "order_id": "OD901401",
+          "date": "2026-06-13",
+          "sku": "SKU-SN-RUN2-43-XAM",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-SN-RUN2-43-XAM"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C014",
+          "order_id": "OD901402",
+          "date": "2026-10-04",
+          "sku": "SKU-SN-CAS-43-DEN",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901402"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C014",
+          "order_id": "OD901403",
+          "date": "2025-03-18",
+          "sku": "SKU-FAN-SEN",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-FAN-SEN"
+          }
+        }
+      ],
+      "facts_established": {
+        "issue": "hỏi tình trạng đơn hàng"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD901403"
+        },
+        "must_say_any": [
+          "đã giao",
+          "giao thành công"
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD901403",
+        "order_status": "delivered",
+        "call_date": "2026-11-26"
+      },
+      "memory_expectation": {
+        "issue": "hỏi tình trạng đơn hàng"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    },
+    "call_2": {
+      "days_later": 1,
+      "customer_goal": "Muốn đổi địa chỉ giao hàng",
+      "customer_turns": [
+        "Alo, chị gọi lại để thay đổi địa chỉ giao hàng cho đơn hàng giày sneaker.",
+        "Chị muốn đổi thành Hải Châu, Đà Nẵng nhé, em ghi giúp chị.",
+        "Đơn hàng vẫn đang xử lý phải không em?",
+        "Chị cần nhanh chóng nhận hàng, mong em giúp chị với."
+      ],
+      "facts_established": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "must_carry_over": [
+        "issue",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "issue",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "OD901403",
+          "action": "update_address"
+        }
+      },
+      "ground_truth_facts": {
+        "order_id": "OD901403",
+        "order_status": "delivered",
+        "call_date": "2026-11-27"
+      },
+      "memory_expectation": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    }
+  }
+}

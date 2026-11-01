@@ -1,0 +1,128 @@
+{
+  "scenario_id": "SCN-ADV-0108",
+  "level": "M2",
+  "persona": "khach_mua_phu_kien_thay_the",
+  "hard_case": null,
+  "customer_phone": "0998000019",
+  "customer_name": "Ngô Văn Phúc",
+  "honorific": "anh",
+  "notes": "Persona khach_mua_phu_kien_thay_the, biến thể thay_mang_loc. call_1 (hotline): chốt đơn → chot_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-14",
+      "customer_goal": "Hỏi mua màng lọc thay thế cho máy lọc không khí",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về màng lọc thay thế cho máy lọc không khí AirPure Y mà anh đã mua.",
+        "Ở đây có màng lọc AirPure X/Y không em?",
+        "Giá màng lọc này là bao nhiêu hả em?",
+        "Anh muốn đặt mua luôn màng lọc đó, thanh toán COD nhé.",
+        "Giao hàng đến Cầu Giấy, Hà Nội thì mất bao lâu?",
+        "Cảm ơn em, anh chốt đơn này nhé."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C019",
+          "session_id": "SYN-019-S1",
+          "date": "2026-06-01",
+          "channel": "fb",
+          "summary": "Mua Máy lọc không khí AirPure Y giá 5.200.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C019",
+          "session_id": "SYN-019-S2",
+          "date": "2026-10-09",
+          "channel": "web",
+          "summary": "Đặt Máy lọc không khí Samsung AX40 giá 6.490.000đ, đơn OD901902 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C019",
+          "order_id": "OD901901",
+          "date": "2026-06-01",
+          "sku": "SKU-AP-Y",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AP-Y"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C019",
+          "order_id": "OD901902",
+          "date": "2026-10-09",
+          "sku": "SKU-SS-AX40",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901902"
+          }
+        }
+      ],
+      "facts_established": {
+        "budget_vnd": 1000000,
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "payment": "COD",
+        "usage_need": "dùng cho gia đình",
+        "product_advised": "SKU-AP-FLT-X",
+        "price_quoted_vnd": 690000,
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AP-FLT-X",
+          "price_vnd": 690000,
+          "payment": "COD"
+        },
+        "must_say_any": [
+          "6–12 tháng",
+          "6-12 tháng",
+          "6 đến 12 tháng"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 690000,
+        "list_price_vnd": 690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-11-17",
+        "call_date": "2026-11-14"
+      },
+      "memory_expectation": {
+        "budget_vnd": 1000000,
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "payment": "COD",
+        "usage_need": "dùng cho gia đình",
+        "product_advised": "SKU-AP-FLT-X",
+        "price_quoted_vnd": 690000,
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

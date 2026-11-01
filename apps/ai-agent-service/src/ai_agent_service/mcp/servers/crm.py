@@ -55,15 +55,22 @@ async def order_create(
     promo_code: str | None = None,
     payment: Literal["COD", "bank", "momo", "zalopay"] = "COD",
     address: str | None = None,
+    basket_skus: list[str] | None = None,
+    order_group: str | None = None,
     customer_phone: str | None = None,
     on: str | None = None,
     idempotency_key: str | None = None,
 ) -> dict[str, Any]:
-    """Place an order once the customer has agreed to buy.
+    """Place one line of an order once the customer has agreed to buy.
 
-    price_vnd is the unit price after promotions, exactly the final_price_vnd
-    pricing_get_quote gave for this sku today; any other number is refused.
-    Cash on delivery (COD) is refused above 10.000.000đ in total.
+    Several products: one call per product, each with the others in
+    basket_skus. price_vnd is the unit price after promotions, exactly the
+    final_price_vnd pricing_get_quote gave for this sku today (with the same
+    basket_skus); any other number is refused. Cash on delivery (COD) is
+    refused when the order's total, every COD line of the call together, is
+    above 10.000.000đ: offer a bank transfer, or ask the customer whether to
+    split it into two orders, and only once they agree give each line its
+    order_group ("1" or "2"), each order at most 10.000.000đ.
 
     Args:
         sku: The product sku or variant_sku being bought.
@@ -74,15 +81,19 @@ async def order_create(
             Call Brief records; COD when neither says, read back so the customer
             can change it. Never a reason to wait with the order.
         address: The delivery address the customer gave; leave it out when none was given.
+        basket_skus: The other skus in the same order, as when quoting (the second purifier's AIR-2ND-50).
+        order_group: Only for an order split with the customer's agreement: which of the orders this line is in.
         customer_phone: Set by the system; leave it out.
         on: The day of the call. Set by the system; leave it out.
         idempotency_key: Set by the system; leave it out.
     """
     m = btc.mock()
+    # order_group is the team's own: the organisers' mock does not take it (the guard reads it, section 4.4).
     return await btc.call(
         "order.create", m.order_create, idempotency_key=idempotency_key,
         customer_phone=customer_phone, sku=sku, qty=qty, price_vnd=price_vnd,
         promo_code=promo_code, payment=payment, address=address, on=on or btc.reference_date(),
+        basket_skus=basket_skus or None,
     )
 
 

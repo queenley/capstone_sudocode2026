@@ -1,0 +1,113 @@
+{
+  "scenario_id": "SCN-GEN-0032",
+  "level": "M2",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "hard_case": null,
+  "customer_phone": "0932448452",
+  "customer_name": "Diệp",
+  "honorific": "chị",
+  "notes": "Persona khach_quay_lai_sau_8_thang, biến thể quay_lai_sau_8_thang. call_1 (hotline): chốt đơn → chot_don; call_2 (hotline): tư vấn, chưa chốt → hen_goi_lai. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-16",
+      "customer_goal": "Xác nhận mua giày trekking.",
+      "customer_turns": [
+        "Alo em, chị muốn đặt một đôi giày trekking size 38 màu trắng.",
+        "Giá cả như thế nào em nhỉ?",
+        "Chị sẽ thanh toán qua ngân hàng và giao hàng tại TP Huế nhé.",
+        "Chị đồng ý lên đơn cho chị luôn."
+      ],
+      "facts_established": {
+        "size": 38,
+        "color": "trang",
+        "payment": "bank",
+        "delivery_area": "TP Huế",
+        "product_advised": "SKU-SN-TRK",
+        "price_quoted_vnd": 1990000,
+        "variant_sku": "SKU-SN-TRK-38-TRANG",
+        "order_id": "OD600001"
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-TRK-38-TRANG",
+          "price_vnd": 1990000,
+          "payment": "bank"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1990000,
+        "list_price_vnd": 1990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-10-21",
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "size": 38,
+        "color": "trang",
+        "payment": "bank",
+        "delivery_area": "TP Huế",
+        "product_advised": "SKU-SN-TRK",
+        "price_quoted_vnd": 1990000,
+        "variant_sku": "SKU-SN-TRK-38-TRANG",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04"
+      ],
+      "expected_outcome": "chot_don"
+    },
+    "call_2": {
+      "days_later": 240,
+      "customer_goal": "Hỏi thông tin sản phẩm.",
+      "customer_turns": [
+        "Alo, em ơi, hôm trước chị mua giày trekking HikePro, em có biết giày này còn khuyến mãi không?",
+        "Chị muốn biết thêm về chất liệu và các màu sắc khác nhé.",
+        "Với giày này, chị thấy giá khá cao, có chỗ nào bán rẻ hơn không?",
+        "Chị sẽ gọi lại sau khi xem thêm thông tin nhé."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-SN-TRK",
+        "price_quoted_vnd": 1990000,
+        "variant_sku": "SKU-SN-TRK-38-TRANG"
+      },
+      "must_carry_over": [
+        "order_id"
+      ],
+      "must_not_ask": [
+        "order_id"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1990000,
+        "list_price_vnd": 1990000,
+        "promo_active": false,
+        "promo_COD-0_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "call_date": "2027-06-13"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-SN-TRK",
+        "price_quoted_vnd": 1990000,
+        "variant_sku": "SKU-SN-TRK-38-TRANG"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

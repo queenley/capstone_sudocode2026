@@ -37,7 +37,9 @@ Mua nhiều cái cùng loại                 khach_mua_so_luong: order.create q
 Số lạ xưng khách cũ (PB-08)             khach_goi_so_moi_xung_khach_cu: không đọc đơn, SĐT của khách kia
 Tách đơn COD trên 10 triệu (QT-01)      khach_tach_don_cod: hai order.create, order_group "1"/"2", mỗi đơn ≤ 10 triệu
 Chốt đơn, đọc lại một lần (PB-09)       khach_chot_don_doc_lai: không hỏi lại sản phẩm/thanh toán/nơi giao;
-                                        đọc lại đơn một lần (xác nhận lần đầu không tính RQR), ≤ 5 câu hỏi
+                                        đọc lại đơn một lần (một câu order_summary), ≤ 3 câu hỏi
+Có phòng thứ hai, hỏi khuyến mãi (KM-05) khach_hoi_may_thu_hai: nói AIR-2ND-50 đúng điều kiện (máy rẻ hơn,
+                                        cùng một đơn), không giảm 50% cho một máy; rồi mua hai máy một đơn
 ======================================  ==========================================================
 
 Most variants start on Zalo or Facebook and continue on the hotline, so the
@@ -209,13 +211,23 @@ ADVANCED_PLANS: dict[str, PersonaPlan] = {p.persona_id: p for p in (
     )),
     # COD above 10.000.000đ split in two orders (VC-03, QT-01, order_group); an order read back once (PB-09, RQR).
     PersonaPlan("khach_tach_don_cod", (
-        V("hai_may_loc_vuot_cod", (T("consult"), T("order_split", days_later=(1, 3), min_turns=6)),
+        # Dated after AirPure Pro's stock gap (18–20/10, inventory_timeline): the call is about the split, not stock.
+        V("hai_may_loc_vuot_cod", (T("consult", call_date="2026-10-21"), T("order_split", days_later=(1, 3), min_turns=6)),
           product_pool="SKU-AP-PRO", extra_skus=("SKU-SS-AX40",), tags=("multi_item", "cod_limit", "split_order")),
     )),
+    # KM-05 / FAQ-19, rules.md 23: a second room and "có khuyến mãi gì không" are the reason to tell AIR-2ND-50.
+    PersonaPlan("khach_hoi_may_thu_hai", (
+        V("phong_thu_hai_hoi_khuyen_mai", (T("second_item_promo", call_date="2026-10-16"),),
+          product_pool="SKU-AP-X", extra_skus=("SKU-AP-MINI",), tags=("promotion", "second_item")),
+        V("phong_thu_hai_roi_mua_hai_may", (T("second_item_promo", channel="zalo_oa", call_date="2026-10-16"),
+                                            T("order_multi", days_later=(1, 3))),
+          product_pool="SKU-AP-X", extra_skus=("SKU-AP-MINI",), customer_pool="zalo",
+          tags=("promotion", "second_item", "multi_item", "cross_channel")),
+    )),
     PersonaPlan("khach_chot_don_doc_lai", (
-        # A read-back states product, price, payment and area: one confirm each, so 5 leaves one more question.
+        # The read-back is one confirm question (extractor v5: order_summary), so 3 leaves two more.
         V("chot_nhu_hom_truoc", (T("consult_ready", channel="zalo_oa"),
-                                 T("order_readback", days_later=(1, 3), max_agent_questions=5)),
+                                 T("order_readback", days_later=(1, 3), max_agent_questions=3)),
           customer_pool="zalo", tags=("readback", "rqr_confirm", "cross_channel")),
     )),
     PersonaPlan("khach_lon_tuoi", (

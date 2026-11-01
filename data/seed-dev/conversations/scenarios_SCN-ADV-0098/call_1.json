@@ -1,0 +1,238 @@
+{
+  "conversation_id": "SCN-ADV-0098__call_1",
+  "scenario_id": "SCN-ADV-0098",
+  "call": "call_1",
+  "customer_id": "C009",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-10-18",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_go_khong_dau",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, chị muốn tư vấn về túi trữ sữa cho bé 10 tháng tuổi đúng không ạ? Em là trợ lý ảo của shop, em hỗ trợ chị ngay đây.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn tư vấn về túi trữ sữa cho bé 10 tháng tuổi đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo chi muon hoi ve tui tru sua cho be muoi thang tuoi",
+      "facts_stated": {
+        "child_age_months": 10,
+        "product_advised": "SKU-MB-BAG"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với bé 10 tháng, chị có thể dùng túi trữ sữa Sunmum loại 50 túi. Sản phẩm này đang có giá 119.000đ và hiện còn hàng tại shop chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 119000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "119000",
+          "spoken": "119.000đ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "ngan sach cua chi tam nam tram thoi",
+      "facts_stated": {
+        "budget_vnd": 500000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "500000",
+          "spoken": "nam tram"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ ngân sách của chị 500.000đ thì túi Sunmum 50 túi rất phù hợp, giá chỉ 119.000đ thôi ạ. Hiện sản phẩm không có khuyến mãi thêm, nhưng giá này là giá niêm yết tốt nhất rồi chị nha.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 119000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "119000",
+          "spoken": "119.000đ"
+        },
+        {
+          "type": "money",
+          "value": "500000",
+          "spoken": "500.000đ"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "em cho chi hoi tui nay gia bao nhieu va co khuyen mai gi khong",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm hiện là 119.000đ cho 50 túi chị nha. Giá này đã là giá chuẩn, hiện shop không có chương trình khuyến mãi nào khác cho túi Sunmum ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 119000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "119000",
+          "spoken": "119.000đ"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chi dang cho cuoi thang nhan luong nen chua quyet dinh duoc",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị đang chờ cuối tháng nhận lương rồi mới quyết định. Khi nào chị sẵn sàng, chị nhắn lại shop hỗ trợ giữ giá 119.000đ cho chị nhé. Em cảm ơn chị đã quan tâm sản phẩm của shop ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 119000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 500000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "child_age_months",
+          "value": 10,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-BAG",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 119000,
+          "op": "set",
+          "source": "call_1#turn7"
+        }
+      ],
+      "entities": [
+        {
+          "type": "money",
+          "value": "119000",
+          "spoken": "119.000đ"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_sp",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

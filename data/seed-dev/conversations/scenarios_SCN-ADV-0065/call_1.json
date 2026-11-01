@@ -1,0 +1,196 @@
+{
+  "conversation_id": "SCN-ADV-0065__call_1",
+  "scenario_id": "SCN-ADV-0065",
+  "call": "call_1",
+  "customer_id": "C040",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-16",
+  "region": "nam",
+  "category": "gia-dung/quat",
+  "persona": "khach_go_sai_chinh_ta",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị muốn tìm quạt tháp Xiaomi dùng cho gia đình đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn tìm quạt tháp Xiaomi dùng cho gia đình đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-FAN-TWR"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo chi muon hoi quat thap xiaomi a dung cho gia dinh ay",
+      "facts_stated": {
+        "product_advised": "SKU-FAN-TWR",
+        "usage_need": "dùng cho gia đình"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, quạt tháp Xiaomi Tower Fan rất phù hợp cho gia đình, giá hiện tại là 1.790.000đ ạ. Dạ hiện tại sản phẩm này chưa có chương trình khuyến mãi nào áp dụng chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1790000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chi co ngan sach khoang 2 trieu thoi quat nay co chuong trinh khuyen mai gi khong em",
+      "facts_stated": {
+        "budget_vnd": 2000000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra thì quạt tháp Xiaomi Tower Fan hiện tại đang tạm hết hàng, chị thông cảm giúp em ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "quat nay hien co hang khong nhi",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Nếu chị cần, em có thể đặt lịch để ngày mai tầm 7 giờ tối em gọi lại cho chị khi có hàng hoặc có thông tin mới ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-10-17T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0925822018",
+            "callback_at": "2026-10-17T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "usage_need",
+          "value": "dùng cho gia đình",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 2000000,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-FAN-TWR",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1790000,
+          "op": "set",
+          "source": "call_1#turn3"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "u neu co hang thi toi mai tam 7 gio em goi lai chi nhe",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "action": "gọi lại tư vấn khi có hàng hoặc có thông tin mới vào 19 giờ ngày 17/10"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-10-17T19:00",
+      "reason": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

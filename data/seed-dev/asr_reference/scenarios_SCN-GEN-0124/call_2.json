@@ -1,0 +1,51 @@
+{
+  "scenario_id": "SCN-GEN-0124",
+  "call": "call_2",
+  "input_mode": "text",
+  "source_sha256": "6e30211cd2f95e701117ea66177d8629c242d0a1a9d396d8bc8aea6fd28bedfa",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Chào em, anh muốn đổi giày sang sản phẩm khác rẻ hơn.",
+      "spoken_text": "chào em anh muốn đổi giày sang sản phẩm khác rẻ hơn",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Cái giày sneaker Urban Classic size 42 màu đen được không em?",
+      "spoken_text": "cái giày sneaker urban classic size bốn mươi hai màu đen được không em",
+      "entities": {
+        "size_old": 42,
+        "color": "den",
+        "sku": "SKU-SN-CAS"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Mình hoàn lại chênh lệch bao nhiêu nhỉ?",
+      "spoken_text": "mình hoàn lại chênh lệch bao nhiêu nhỉ",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "À, anh có số tài khoản ngân hàng để nhận hoàn tiền nhé: 190123100429.",
+      "spoken_text": "à, anh có số tài khoản ngân hàng để nhận hoàn tiền nhé: một chín không một hai ba một không không bốn hai chín.",
+      "entities": {},
+      "reference_source": "rule",
+      "issues": [
+        "entity_not_stated:phone"
+      ]
+    }
+  ]
+}

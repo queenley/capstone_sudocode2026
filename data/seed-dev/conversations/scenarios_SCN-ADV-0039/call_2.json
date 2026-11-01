@@ -1,0 +1,160 @@
+{
+  "conversation_id": "SCN-ADV-0039__call_2",
+  "scenario_id": "SCN-ADV-0039",
+  "call": "call_2",
+  "customer_id": "C027",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-19",
+  "region": "bac",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "khach_nhieu_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Chi ạ, em là trợ lý ảo của shop BTC. Hôm trước chị đã đặt Máy lọc nước UF Sunhouse, em xin hỗ trợ về đơn hàng của mình ạ.",
+      "questions": [],
+      "facts_used": [
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị gọi để hỏi đơn hàng máy lọc nước chị đã đặt hôm trước.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã kiểm tra, đơn hàng của chị đã tạo và hiện đang ở trạng thái chờ xác nhận để xử lý tiếp ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "created"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD600001"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Bây giờ đơn hàng của chị đang ở trạng thái nào nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng mã OD600001 của chị đã tạo, hiện shop đang chuẩn bị xử lý và sẽ gửi mã vận đơn khi đơn được bàn giao cho đơn vị vận chuyển ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "order_status",
+          "value": "created"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD600001",
+          "spoken": "OD600001"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị không nhớ mã đơn nhưng hôm trước chị đã chốt rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ không sao chị nhé, em đã xác nhận được đơn hàng của mình rồi ạ. Nếu cần xác nhận thêm thông tin, chị chỉ cần cung cấp họ tên hoặc số điện thoại đã đặt hàng với shop là được ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có gì cần xác nhận không, chị sẵn sàng cung cấp thông tin.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại mọi thông tin đơn hàng đã đầy đủ, shop sẽ chủ động liên hệ nếu cần xác nhận thêm trước khi giao hàng chị nhé. Em cảm ơn chị đã gọi tới shop ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

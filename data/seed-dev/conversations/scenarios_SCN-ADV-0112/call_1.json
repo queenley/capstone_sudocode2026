@@ -1,0 +1,217 @@
+{
+  "conversation_id": "SCN-ADV-0112__call_1",
+  "scenario_id": "SCN-ADV-0112",
+  "call": "call_1",
+  "customer_id": "C017",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-11-08",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_chuyen_giua_nguoi_va_ai",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, em hỗ trợ thông tin về giày trekking HikePro cho chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về giày trekking HikePro size 41 màu xám.",
+      "facts_stated": {
+        "product_advised": "SKU-SN-TRK",
+        "size": 41,
+        "color": "xam"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị đang quan tâm giày trekking HikePro size 41 màu xám đúng không ạ? Em kiểm tra thì sản phẩm này hiện còn hàng, form rộng, chị chọn đúng size là vừa nhé.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Dạ chị đang quan tâm giày trekking HikePro size 41 màu xám đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em cho chị biết giá của giày này là bao nhiêu nhé?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giá của giày trekking HikePro size 41 màu xám hiện tại là 1.990.000đ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có khuyến mãi gì cho sản phẩm này không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại sản phẩm này chưa có chương trình khuyến mãi nào áp dụng ạ. Tuy nhiên, chị được miễn phí thu hộ khi nhận hàng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần suy nghĩ thêm một chút rồi sẽ gọi lại.",
+      "facts_stated": {
+        "blocker": "cần suy nghĩ thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, chị cứ cân nhắc thêm ạ. Khi nào mình quyết định hoặc cần hỗ trợ gì thêm, chị nhắn lại cho shop nhé. Em ghi nhận chị đang cần suy nghĩ thêm về sản phẩm này ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "color",
+          "value": "xam",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "size",
+          "value": 41,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-TRK",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1990000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-TRK-41-XAM",
+          "op": "set",
+          "source": "call_1#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Trên Fanpage thấy có nhiều thông tin nhưng không rõ lắm.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ các thông tin chính xác về sản phẩm và giá đều được cập nhật tại shop, chị cần tư vấn gì thêm có thể hỏi trực tiếp em hoặc xem trên website chính thức của shop BTC nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_giay_trekking",
+    "outcome": "hen_goi_lai",
+    "objection_type": "cần suy nghĩ thêm",
+    "objection_handling": "Ghi nhận khách cần suy nghĩ thêm và hẹn khách chủ động liên hệ lại khi quyết định.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

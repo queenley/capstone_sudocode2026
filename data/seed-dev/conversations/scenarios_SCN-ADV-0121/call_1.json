@@ -1,0 +1,245 @@
+{
+  "conversation_id": "SCN-ADV-0121__call_1",
+  "scenario_id": "SCN-ADV-0121",
+  "call": "call_1",
+  "customer_id": "C021",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-10-16",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_doi_qua_thanh_tien",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị cần tư vấn về máy lọc không khí AirPure Y và quà tặng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị đang quan tâm tới máy lọc không khí AirPure Y đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về máy lọc không khí AirPure Y đang có quà tặng.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy AirPure Y bên em đang có giá 5.200.000đ, tặng kèm một màng lọc thay thế chính hãng chị nhé. Chương trình quà tặng này đang áp dụng và hàng vẫn còn sẵn.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5200000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        },
+        {
+          "field": "gift_sku",
+          "value": "SKU-AP-FLT-X"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5200000",
+          "spoken": "5.200.000đ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị không lấy quà thì có được trừ tiền cho chị không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chương trình quà tặng không quy đổi thành tiền hoặc trừ vào giá sản phẩm chị nhé. Nếu chị không nhận quà thì giá máy vẫn là 5.200.000đ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "gift_cash_convertible",
+          "value": false
+        },
+        {
+          "field": "price_vnd",
+          "value": 5200000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5200000",
+          "spoken": "5.200.000đ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu mà không quy đổi thành tiền thì chị cũng cần suy nghĩ thêm.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu chị muốn cân nhắc thêm ạ. Chương trình quà tặng còn đến ngày 22/10 nên nếu chị quyết định trước thời gian đó sẽ vẫn được nhận ưu đãi. Em sẽ lưu lại thông tin để hỗ trợ chị khi cần nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-10-22",
+          "spoken": "22/10"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị không muốn quà tặng, chỉ cần máy thôi, giá có thể thấp hơn không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ rất tiếc, bên em chưa áp dụng giảm giá khi không lấy quà, nên giá máy sẽ giữ nguyên ạ. Nếu chị cần thêm thông tin hoặc quyết định đặt đơn, em luôn sẵn sàng hỗ trợ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5200000
+        },
+        {
+          "field": "gift_cash_convertible",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 5500000,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "has_children",
+          "value": false,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 15,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-Y",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5200000,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "promo_code",
+          "value": "GIFT-FILTER",
+          "op": "set",
+          "source": "call_1#turn7"
+        }
+      ],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5200000",
+          "spoken": "giá máy sẽ giữ nguyên"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_qua_tang_giam_gia",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

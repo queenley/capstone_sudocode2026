@@ -1,0 +1,242 @@
+{
+  "scenario_id": "SCN-GEN-0239",
+  "level": "M1",
+  "persona": "khach_so_gia",
+  "hard_case": "doi_khuyen_mai_het_han",
+  "customer_phone": "0998000020",
+  "customer_name": "Lê Văn Bình",
+  "honorific": "chú",
+  "notes": "Persona khach_so_gia, biến thể km_het_han. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Ca khó: doi_khuyen_mai_het_han. call_2: KM XM-COMBO không còn áp dụng. Chấm chủ yếu: CCR, RQR, TSR, HR, ESC.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-13",
+      "customer_goal": "Hỏi về máy lọc không khí Xiaomi",
+      "customer_turns": [
+        "Alo, chú muốn hỏi về máy lọc không khí Xiaomi Smart 4 Pro.",
+        "Giá của máy này là bao nhiêu vậy?",
+        "Chú thấy bên kia đang bán 4 triệu 830 nghìn, sao bên mình lại 5 triệu 490 nghìn vậy?",
+        "Chú có ngân sách khoảng 6 triệu rưỡi thôi, mà giá này có khuyến mãi gì không?",
+        "Chú có một bé nhỏ ở nhà, cần máy này lắm, nhưng nếu giá cao quá thì chắc chú phải suy nghĩ lại.",
+        "Để chú hỏi thử lại rồi gọi lại cho em nhé."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C020",
+          "session_id": "SYN-020-S3",
+          "date": "2025-03-24",
+          "channel": "zalo_oa",
+          "summary": "Mua Quạt đứng Senko TS16 giá 590.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C020",
+          "session_id": "SYN-020-S1",
+          "date": "2026-07-04",
+          "channel": "web",
+          "summary": "Mua Giày chạy bộ RunLite 2 Pro giá 1.690.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C020",
+          "session_id": "SYN-020-S2",
+          "date": "2026-10-10",
+          "channel": "hotline",
+          "summary": "Đặt Áo khoác gió Windbreak giá 690.000đ, đơn OD902002 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C020",
+          "order_id": "OD902001",
+          "date": "2026-07-04",
+          "sku": "SKU-SN-RUN2-40-TRANG",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-SN-RUN2-40-TRANG"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C020",
+          "order_id": "OD902002",
+          "date": "2026-10-10",
+          "sku": "SKU-JK-WND-L-BE",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD902002"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C020",
+          "order_id": "OD902003",
+          "date": "2025-03-24",
+          "sku": "SKU-FAN-SEN",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-FAN-SEN"
+          }
+        }
+      ],
+      "facts_established": {
+        "budget_vnd": 6500000,
+        "competitor_price_vnd": 4830000,
+        "has_children": true,
+        "objection": "giá cao hơn chỗ khác",
+        "room_area_m2": 25,
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "promo_code": "XM-COMBO",
+        "promo_expiry": "2026-11-14"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5490000,
+        "list_price_vnd": 5490000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_XM-COMBO_active": true,
+        "gift_sku": "SKU-XM-FLT",
+        "promo_AIR-2ND-50_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-13"
+      },
+      "memory_expectation": {
+        "budget_vnd": 6500000,
+        "competitor_price_vnd": 4830000,
+        "has_children": true,
+        "objection": "giá cao hơn chỗ khác",
+        "room_area_m2": 25,
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "promo_code": "XM-COMBO"
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "FAQ-02",
+        "KM-07",
+        "PB-02",
+        "PB-04",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 2,
+      "customer_goal": "Xác nhận mua máy lọc không khí",
+      "customer_turns": [
+        "Alo, chú gọi lại để xác nhận đơn hàng máy lọc không khí.",
+        "Chú muốn thanh toán qua ngân hàng và giao hàng ở Nha Trang, Khánh Hòa.",
+        "Máy Xiaomi Smart 4 Pro là sản phẩm mà chú đã chọn, phải không?",
+        "Chú đồng ý đặt hàng luôn nhé."
+      ],
+      "facts_established": {
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "payment": "bank",
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "room_area_m2",
+        "objection",
+        "competitor_price_vnd",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-XM-4P",
+          "price_vnd": 5490000,
+          "payment": "bank"
+        },
+        "forbidden_claims": [
+          {
+            "field": "promo_XM-COMBO_active",
+            "value": true
+          },
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5490000,
+        "list_price_vnd": 5490000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_XM-COMBO_active": false,
+        "promo_AIR-2ND-50_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-11-19",
+        "call_date": "2026-11-15"
+      },
+      "memory_expectation": {
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "payment": "bank",
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04",
+        "KM-01",
+        "CL-02",
+        "PB-01",
+        "PB-02"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

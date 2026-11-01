@@ -1,0 +1,205 @@
+{
+  "conversation_id": "SCN-GEN-0185__call_1",
+  "scenario_id": "SCN-GEN-0185",
+  "call": "call_1",
+  "customer_id": "SYN-C011",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-13",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có đặt Áo khoác gió Windbreak, em hỗ trợ anh về đơn hàng giày sneaker đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Em hỗ trợ anh về đơn hàng giày sneaker đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo em ơi, anh gọi để hỏi tình trạng đơn hàng giày sneaker anh đã đặt.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, anh vui lòng chờ em kiểm tra tình trạng đơn hàng giúp anh ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD901102"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mã đơn là OD901102, em kiểm tra giúp anh với.",
+      "facts_stated": {
+        "order_id": "OD901102"
+      },
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD901102",
+          "spoken": "OD901102"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã kiểm tra, đơn hàng giày sneaker mã OD901102 của anh đang giao ạ. Đơn này đã được bàn giao cho đơn vị vận chuyển, mã vận đơn là VN0112TRK.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD901102"
+        },
+        {
+          "field": "order_status",
+          "value": "shipping"
+        },
+        {
+          "field": "tracking",
+          "value": "VN0112TRK"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đơn này đang giao đến đâu rồi nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại đơn hàng của anh đang trên đường vận chuyển, mã vận đơn là VN0112TRK. Anh có thể theo dõi trạng thái chi tiết trên website của đơn vị vận chuyển bằng mã này ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD901102"
+        },
+        {
+          "field": "order_status",
+          "value": "shipping"
+        },
+        {
+          "field": "tracking",
+          "value": "VN0112TRK"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nghe nói có thể theo dõi được, cho anh xin thông tin với nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh có thể tra cứu đơn hàng bằng mã vận đơn VN0112TRK trên website của đơn vị vận chuyển hoặc đợi shop gửi thông báo khi đơn được bàn giao. Nếu cần hỗ trợ thêm, anh cứ liên hệ shop bất cứ lúc nào ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD901102"
+        },
+        {
+          "field": "order_status",
+          "value": "shipping"
+        },
+        {
+          "field": "tracking",
+          "value": "VN0112TRK"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "issue",
+          "value": "đơn hàng đang giao",
+          "op": "set",
+          "source": "call_1#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

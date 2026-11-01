@@ -1,0 +1,154 @@
+{
+  "conversation_id": "SCN-ADV-0134__call_2",
+  "scenario_id": "SCN-ADV-0134",
+  "call": "call_2",
+  "customer_id": "C039",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-02",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_nhieu_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Cường ạ, em là trợ lý ảo của shop BTC. Em đã tiếp nhận thông tin anh hỏi về tình trạng đơn hàng Máy hâm sữa Fatz 4 chức năng hôm qua, đơn đặt tại địa chỉ Lê Chân, Hải Phòng và thanh toán COD. Em kiểm tra ngay cho anh nhé.",
+      "questions": [],
+      "facts_used": [
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "order_id",
+        "price_quoted_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh Cường đây, anh muốn hỏi tình trạng đơn hàng của mình.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng mã OD600001 của anh đã tạo và đang chờ xử lý ạ. Máy hâm sữa hiện trạng thái là \"đã tạo\", bên em sẽ sớm bàn giao cho đơn vị vận chuyển và gửi mã vận đơn cho anh qua Zalo hoặc SMS khi có thông tin.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "order_status",
+          "value": "created"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD600001"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hôm qua anh đã đặt máy hâm sữa mà chưa thấy thông tin gì.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em báo lại là hiện chưa có mã vận đơn vì đơn hàng của anh đang chuẩn bị và sẽ được chuyển cho đơn vị vận chuyển trong hôm nay hoặc ngày mai. Khi đơn hàng được bàn giao, anh sẽ nhận được thông báo qua Zalo hoặc SMS ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chưa có ai gọi hay nhắn tin cho anh cả, không biết đơn hàng đang ở đâu nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh yên tâm, shop đã ghi nhận đơn hàng của anh và hiện trạng thái là \"đã tạo\", chưa bàn giao cho đơn vị vận chuyển nên chưa có thông tin giao hàng chi tiết. Khi nào có mã vận đơn, em sẽ gửi ngay cho anh.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "created"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có cần anh cung cấp thêm thông tin gì không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại anh không cần cung cấp thêm thông tin gì nữa ạ, shop đã có đầy đủ dữ liệu đơn hàng của anh rồi. Cảm ơn anh Cường đã liên hệ shop BTC, nếu cần hỗ trợ thêm anh cứ nhắn em nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tra_cuu_don_hang",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "conversation_id": "SCN-GEN-0242__call_2",
+  "scenario_id": "SCN-GEN-0242",
+  "call": "call_2",
+  "customer_id": "C003",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-29",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Lan ạ, hôm trước chị có hỏi về Máy lọc không khí AirPure Pro và còn chờ cuối tháng nhận lương. Em sẵn sàng hỗ trợ chị tiếp tục nhé.",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, hôm trước chị có hỏi về máy lọc không khí AirPure Pro.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại Máy lọc không khí AirPure Pro bên em vẫn có giá 7.990.000đ chị nhé. Giá này giữ nguyên so với lần trước em báo cho chị.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá bây giờ có thay đổi gì không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị vẫn chưa chốt vì chờ nhận lương cuối tháng. Khi nào thuận tiện chị liên hệ lại, bên em sẽ giữ thông tin tư vấn cho chị.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị vẫn chưa chốt, chờ nhận lương cuối tháng.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, sản phẩm Máy lọc không khí AirPure Pro hiện vẫn còn hàng chị nhé. Khi chị quyết định mua, em sẽ hỗ trợ đặt đơn ngay cho mình.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_2#turn7"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7990000,
+          "op": "set",
+          "source": "call_2#turn7"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mà máy này còn hàng không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chờ lương/cuối tháng",
+    "objection_handling": "Ghi nhận lý do khách chưa chốt, nhắc giữ thông tin tư vấn và sẵn sàng hỗ trợ khi khách quyết định.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

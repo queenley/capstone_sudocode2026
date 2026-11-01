@@ -1,0 +1,270 @@
+{
+  "conversation_id": "SCN-GEN-0239__call_2",
+  "scenario_id": "SCN-GEN-0239",
+  "call": "call_2",
+  "customer_id": "SYN-C020",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-15",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_so_gia",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chú Lê Văn Bình ạ, hôm trước bạn nhân viên đã hỗ trợ chú về Máy lọc không khí Xiaomi Smart 4 Pro, hôm nay chú muốn xác nhận đơn hàng đúng không ạ?",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "order_id",
+        "room_area_m2",
+        "objection",
+        "competitor_price_vnd",
+        "price_quoted_vnd",
+        "promo_code",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 750,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chú gọi lại để xác nhận đơn hàng máy lọc không khí.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận đơn hàng máy lọc không khí Xiaomi Smart 4 Pro với giá 5.490.000đ ạ. Hiện sản phẩm đang còn hàng và giá đúng như chú đã được báo trước đó.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chú muốn thanh toán qua ngân hàng và giao hàng ở Nha Trang, Khánh Hòa.",
+      "facts_stated": {
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "payment": "bank"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Nha Trang, Khánh Hòa",
+          "spoken": "Nha Trang, Khánh Hòa"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng sẽ giao về địa chỉ Nha Trang, Khánh Hòa và chú chọn thanh toán chuyển khoản ngân hàng đúng không ạ? Dự kiến giao hàng vào ngày 19/11/2026 ạ.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em xin phép xác nhận lại: chú đặt 1 Máy lọc không khí Xiaomi Smart 4 Pro, giá 5.490.000đ, giao về Nha Trang, Khánh Hòa, thanh toán chuyển khoản ngân hàng, nhận hàng khoảng 19/11/2026 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-11-15"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 650,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy Xiaomi Smart 4 Pro là sản phẩm mà chú đã chọn, phải không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi chú, sản phẩm chú đặt là Máy lọc không khí Xiaomi Smart 4 Pro ạ. Nếu chú đồng ý, em sẽ tiến hành lên đơn luôn cho mình nhé.",
+      "questions": [],
+      "facts_used": [
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chú đồng ý đặt hàng luôn nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã tạo đơn hàng Máy lọc không khí Xiaomi Smart 4 Pro, giá 5.490.000đ, giao Nha Trang, Khánh Hòa và thanh toán chuyển khoản ngân hàng. Shop sẽ gửi thông tin chuyển khoản và cập nhật trạng thái đơn cho chú qua Zalo hoặc điện thoại ạ.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "payment",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000020",
+            "sku": "SKU-XM-4P",
+            "qty": 1,
+            "price_vnd": 5490000,
+            "payment": "bank",
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-11-15"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Nha Trang, Khánh Hòa",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-XM-4P",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5490000,
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xac_nhan_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "text": "Shop sẽ gửi thông tin chuyển khoản và cập nhật trạng thái đơn cho chú qua Zalo hoặc điện thoại"
+      }
+    ],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-XM-4P",
+      "qty": 1,
+      "price_vnd": 5490000,
+      "payment": "bank",
+      "address": "Nha Trang, Khánh Hòa",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-11-19"
+    }
+  }
+}

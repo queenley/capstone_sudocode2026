@@ -1,0 +1,168 @@
+{
+  "conversation_id": "SCN-ADV-0062__call_1",
+  "scenario_id": "SCN-ADV-0062",
+  "call": "call_1",
+  "customer_id": "SYN-C001",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-11-27",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_hoi_san_pham_khong_ban",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Nguyễn Văn A ạ, cảm ơn anh đã quay lại với shop. Hôm trước anh có đặt Máy lọc không khí AirPure Mini, hiện đơn hàng đang giao ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi mua máy rửa bát để bàn, không biết bên mình có không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ rất tiếc bên em hiện chưa kinh doanh máy rửa bát để bàn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "product_available",
+          "value": false
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "catalog.search",
+          "args": {
+            "query": "máy rửa bát"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, mà anh thấy trên trang có ghi là không bán mặt hàng này. Vậy có máy nào gần giống không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại bên em chưa có máy rửa bát để bàn, nhưng em có thể giới thiệu máy hút sữa điện đôi Spectra S1 nếu anh quan tâm ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh đang tìm cái nào mà dễ sử dụng cho gia đình nhỏ ấy.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy hút sữa điện đôi Spectra S1 dễ sử dụng, phù hợp cho gia đình nhỏ và có nhiều chế độ tiện lợi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nghe nói máy hút sữa điện đôi Spectra S1 cũng được, em có thông tin gì về máy đó không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy Spectra S1 là máy hút đôi, có pin sạc dùng liên tục khoảng 3 tiếng, lực hút 270 mmHg, và có 2 chế độ massage và hút. Máy nhẹ, dễ vệ sinh và phụ kiện thay thế cũng dễ tìm ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thế em có thể gửi cho anh thông tin chi tiết qua Zalo được không? Anh sẽ liên hệ lại sau nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em sẽ gửi thông tin chi tiết máy Spectra S1 qua Zalo cho anh ngay ạ. Anh cần thêm thông tin nào nữa thì cứ nhắn cho em bất cứ lúc nào nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_mat_hang_khong_ban",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "send_info": "máy hút sữa điện đôi Spectra S1"
+      }
+    ],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

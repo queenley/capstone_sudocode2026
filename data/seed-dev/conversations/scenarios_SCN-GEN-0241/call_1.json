@@ -1,0 +1,200 @@
+{
+  "conversation_id": "SCN-GEN-0241__call_1",
+  "scenario_id": "SCN-GEN-0241",
+  "call": "call_1",
+  "customer_id": "C004",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-29",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh Minh cần tư vấn về bình sữa Pigeon PPSU 240ml đúng không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về bình sữa Pigeon PPSU 240ml.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ bình sữa Pigeon PPSU 240ml hiện bên em đang có sẵn hàng anh nhé. Anh cần tư vấn cho bé mấy tháng tuổi ạ?",
+      "questions": [
+        {
+          "slot": "child_age_months",
+          "type": "open",
+          "text": "Anh cần tư vấn cho bé mấy tháng tuổi ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Bé nhà anh 13 tháng rồi, anh thấy bình này có tốt không?",
+      "facts_stated": {
+        "child_age_months": 13
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ bình sữa Pigeon PPSU 240ml phù hợp cho bé từ sơ sinh đến khoảng 2 tuổi, chất liệu PPSU rất bền, không chứa BPA, chịu nhiệt tốt và dễ làm sạch ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá khoảng 289 ngàn, có đúng không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi anh, giá bình sữa Pigeon PPSU 240ml hiện tại là 289.000đ anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 289000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À mà anh muốn so sánh thêm với mấy loại khác nữa, nên chưa quyết được.",
+      "facts_stated": {
+        "blocker": "muốn so sánh thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ, anh muốn tham khảo thêm các loại bình sữa khác trước khi quyết định.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em cho anh xin thêm thông tin rồi anh gọi lại nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em đã gửi thông tin chi tiết về bình sữa Pigeon PPSU 240ml cho anh rồi. Anh cần thêm gì cứ liên hệ lại shop bất cứ lúc nào ạ, em luôn sẵn sàng hỗ trợ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "muốn so sánh thêm",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 500000,
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "child_age_months",
+          "value": 13,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-BOT",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 289000,
+          "op": "set",
+          "source": "call_1#turn5"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_binh_sua",
+    "outcome": "hen_goi_lai",
+    "objection_type": "muon_so_sanh_them",
+    "objection_handling": "Ghi nhận khách muốn so sánh thêm, chủ động lưu lại thông tin.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

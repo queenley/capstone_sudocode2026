@@ -1,0 +1,70 @@
+{
+  "scenario_id": "SCN-ADV-0055",
+  "level": "M2",
+  "persona": "khach_hoi_freeship_theo_vung",
+  "hard_case": null,
+  "customer_phone": "0964252477",
+  "customer_name": "Trang",
+  "honorific": "chị",
+  "notes": "Persona khach_hoi_freeship_theo_vung, biến thể freeship_mien_nam_hoi_tu_mien_trung. call_1 (hotline): hỏi freeship của vùng khác → hen_goi_lai. Chấm chủ yếu: TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-21",
+      "customer_goal": "Hỏi về freeship cho quạt đứng Senko TS16",
+      "customer_turns": [
+        "Alo, chị Trang ở Hải Châu, Đà Nẵng nè, chị thấy trên fanpage có quảng cáo freeship cho đồ gia dụng.",
+        "Chị muốn hỏi là quạt đứng Senko TS16 có được freeship không em?",
+        "Chị muốn mua làm quà cho bạn, ngân sách của chị tầm một triệu thôi.",
+        "Nếu không freeship thì phí giao hàng là bao nhiêu vậy em?",
+        "Chị cần suy nghĩ thêm rồi mới quyết định, em có thể gọi lại cho chị không?"
+      ],
+      "facts_established": {
+        "usage_need": "mua làm quà",
+        "budget_vnd": 1000000,
+        "blocker": "cần suy nghĩ thêm",
+        "delivery_area": "Hải Châu, Đà Nẵng",
+        "product_advised": "SKU-FAN-SEN",
+        "price_quoted_vnd": 590000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "miền Nam",
+          "địa chỉ giao"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "freeship",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 590000,
+        "list_price_vnd": 590000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "call_date": "2026-10-21"
+      },
+      "memory_expectation": {
+        "usage_need": "mua làm quà",
+        "budget_vnd": 1000000,
+        "blocker": "cần suy nghĩ thêm",
+        "delivery_area": "Hải Châu, Đà Nẵng",
+        "product_advised": "SKU-FAN-SEN",
+        "price_quoted_vnd": 590000
+      },
+      "relevant_policy_ids": [
+        "KM-08",
+        "VC-02"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

@@ -1,0 +1,275 @@
+{
+  "conversation_id": "SCN-GEN-0158__call_1",
+  "scenario_id": "SCN-GEN-0158",
+  "call": "call_1",
+  "customer_id": "SYN-C017",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_mua_doi_size",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Duy ạ, em là trợ lý ảo của shop BTC. Anh vừa gọi về đơn giày chạy bộ, em hỗ trợ anh xác nhận đơn nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh Duy đây, mình muốn xác nhận đơn giày chạy bộ size 42 màu đen.",
+      "facts_stated": {
+        "size": 42,
+        "color": "den"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi anh, đơn giày chạy bộ RunLite 2 Pro size 42 màu đen. Anh muốn nhận hàng ở khu vực nào và chọn thanh toán như thế nào ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Anh muốn nhận hàng ở khu vực nào ạ?"
+        },
+        {
+          "slot": "payment",
+          "type": "open",
+          "text": "Anh chọn thanh toán như thế nào ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mình sẽ thanh toán COD nhé, giao hàng ở Hải Châu, Đà Nẵng.",
+      "facts_stated": {
+        "delivery_area": "Hải Châu, Đà Nẵng",
+        "payment": "COD"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Hải Châu, Đà Nẵng",
+          "spoken": "Hải Châu, Đà Nẵng"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận anh chọn nhận hàng ở Hải Châu, Đà Nẵng và thanh toán COD. Để em kiểm tra tồn kho giày size 42 màu đen cho anh ạ.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh đã thấy giày này trên website rồi, có hàng chưa?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm giày chạy bộ RunLite 2 Pro size 42 màu đen hiện đang còn hàng, giá 1.690.000đ. Thời gian giao dự kiến là 2 ngày, khoảng ngày 2 tháng 11 anh nhận được hàng ạ.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em đọc lại: 1 đôi giày chạy bộ RunLite 2 Pro size 42 màu đen, giá 1.690.000đ, giao tới Hải Châu, Đà Nẵng và anh thanh toán COD khi nhận hàng. Anh xác nhận giúp em thông tin này đúng chưa ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-02"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Hải Châu, Đà Nẵng",
+            "on": "2026-10-30"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1690000",
+          "spoken": "1.690.000đ"
+        },
+        {
+          "type": "date",
+          "value": "2026-11-02",
+          "spoken": "2 tháng 11"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ừ, anh đồng ý lên đơn cho mình nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã tạo đơn hàng cho anh rồi ạ. Cảm ơn anh Duy đã đặt mua tại shop BTC, có mã đơn OD600001. Nếu cần hỗ trợ thêm, anh cứ liên hệ shop nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000017",
+            "sku": "SKU-SN-RUN2-42-DEN",
+            "qty": 1,
+            "price_vnd": 1690000,
+            "payment": "COD",
+            "address": "Hải Châu, Đà Nẵng",
+            "on": "2026-10-30"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "color",
+          "value": "den",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Hải Châu, Đà Nẵng",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "size",
+          "value": 42,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN2",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1690000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN2-42-DEN",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_1#turn9"
+        }
+      ],
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD600001",
+          "spoken": "OD600001"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xac_nhan_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-SN-RUN2-42-DEN",
+      "qty": 1,
+      "price_vnd": 1690000,
+      "payment": "COD",
+      "address": "Hải Châu, Đà Nẵng",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-11-02"
+    }
+  }
+}

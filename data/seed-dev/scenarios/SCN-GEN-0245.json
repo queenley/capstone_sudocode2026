@@ -1,0 +1,107 @@
+{
+  "scenario_id": "SCN-GEN-0245",
+  "level": "M2",
+  "persona": "khach_hoi_ngoai_tai_lieu",
+  "hard_case": null,
+  "customer_phone": "0992298369",
+  "customer_name": "Ngọc",
+  "honorific": "chị",
+  "notes": "Persona khach_hoi_ngoai_tai_lieu, biến thể ngoai_tai_lieu. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): hỏi điều tài liệu không có → thong_tin. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-27",
+      "customer_goal": "Hỏi về quạt tháp Xiaomi cho gia đình",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về quạt tháp Xiaomi á, dùng cho gia đình ấy mà.",
+        "Ngân sách của chị chỉ tầm 2 triệu thôi, có quạt nào phù hợp không em?",
+        "Quạt này có khuyến mãi gì không hả em?",
+        "Chị đang chờ cuối tháng nhận lương, nên chưa chốt ngay được đâu nhé."
+      ],
+      "facts_established": {
+        "blocker": "chờ cuối tháng nhận lương",
+        "budget_vnd": 2000000,
+        "usage_need": "dùng cho gia đình",
+        "product_advised": "SKU-FAN-TWR",
+        "price_quoted_vnd": 1790000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_stock",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1790000,
+        "list_price_vnd": 1790000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": false,
+        "call_date": "2026-11-27"
+      },
+      "memory_expectation": {
+        "blocker": "chờ cuối tháng nhận lương",
+        "budget_vnd": 2000000,
+        "usage_need": "dùng cho gia đình",
+        "product_advised": "SKU-FAN-TWR",
+        "price_quoted_vnd": 1790000
+      },
+      "relevant_policy_ids": [
+        "SP-FAN-01",
+        "FAQ-08",
+        "FAQ-17"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 4,
+      "customer_goal": "Hỏi linh kiện của quạt được sản xuất ở đâu",
+      "customer_turns": [
+        "Chị có câu hỏi này, không biết linh kiện của quạt tháp này được sản xuất ở nhà máy nào nhỉ?",
+        "Nếu không có thông tin thì cũng không sao, chị chỉ thắc mắc thôi.",
+        "Chị muốn biết rõ một chút để yên tâm hơn về chất lượng sản phẩm.",
+        "Thế em kiểm tra giúp chị nhé, chị sẽ gọi lại sau."
+      ],
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "agent_must_say": [
+          "không có thông tin",
+          "chưa có thông tin",
+          "em chưa rõ",
+          "em không chắc",
+          "em sẽ kiểm tra",
+          "chưa nắm được"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "unknown_topic": "linh kiện của máy được sản xuất ở nhà máy nào",
+        "call_date": "2026-12-01"
+      },
+      "relevant_policy_ids": [
+        "PB-05",
+        "PB-01"
+      ],
+      "expected_outcome": "thong_tin"
+    }
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "scenario_id": "SCN-ADV-0048",
+  "level": "M2",
+  "persona": "khach_khieu_nai_giao_cham",
+  "hard_case": null,
+  "customer_phone": "0998000002",
+  "customer_name": "Trần Thị B",
+  "honorific": "chị",
+  "notes": "Persona khach_khieu_nai_giao_cham, biến thể giao_cham. call_1 (zalo_oa): hỏi tình trạng đơn → cap_nhat_don. Chấm chủ yếu: CCR, RQR, TSR, ESC.",
+  "calls": {
+    "call_1": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_syn-c002",
+      "call_date": "2026-11-14",
+      "customer_goal": "Hỏi về đơn hàng giày trekking đang giao.",
+      "customer_turns": [
+        "Alo, chị muốn hỏi đơn hàng giày trekking HikePro của chị đã đến đâu rồi.",
+        "Chị thấy ghi là đang xử lý mà chờ mãi không thấy, sao lâu vậy em?",
+        "Chị cần biết rõ tình hình, em xem lại giúp chị với nhé.",
+        "Nếu không có gì mới thì chị cũng không biết chờ đến bao giờ.",
+        "Chị đã chờ hơn 10 ngày rồi, em phải cho chị biết khi nào hàng đến được chứ."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C002",
+          "session_id": "SYN-002-S3",
+          "date": "2025-03-06",
+          "channel": "web",
+          "summary": "Mua Quạt đứng Senko TS16 giá 590.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C002",
+          "session_id": "SYN-002-S1",
+          "date": "2026-04-04",
+          "channel": "zalo_oa",
+          "summary": "Mua Giày chạy bộ RunLite 2 Pro giá 1.690.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C002",
+          "session_id": "SYN-002-S2",
+          "date": "2026-10-02",
+          "channel": "fb",
+          "summary": "Đặt Giày trekking HikePro giá 1.990.000đ, đơn OD900202 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C002",
+          "order_id": "OD900201",
+          "date": "2026-04-04",
+          "sku": "SKU-SN-RUN2-38-TRANG",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-SN-RUN2-38-TRANG"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C002",
+          "order_id": "OD900202",
+          "date": "2026-10-02",
+          "sku": "SKU-SN-TRK-39-XAM",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900202"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C002",
+          "order_id": "OD900203",
+          "date": "2025-03-06",
+          "sku": "SKU-FAN-SEN",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-FAN-SEN"
+          }
+        }
+      ],
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD900202"
+        },
+        "must_say_any": [
+          "đang xử lý",
+          "đang chuẩn bị"
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900202",
+        "order_status": "processing",
+        "call_date": "2026-11-14"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01",
+        "PB-10"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    }
+  }
+}

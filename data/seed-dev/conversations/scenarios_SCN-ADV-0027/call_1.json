@@ -1,0 +1,183 @@
+{
+  "conversation_id": "SCN-ADV-0027__call_1",
+  "scenario_id": "SCN-ADV-0027",
+  "call": "call_1",
+  "customer_id": "C017",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-10-17",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_thanh_toan_vi_dien_tu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, rất sẵn lòng hỗ trợ chị về xe đẩy Combi Sugocal ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về xe đẩy 2 chiều Combi Sugocal, cái này có phù hợp cho bé 12 tháng không em?",
+      "facts_stated": {
+        "child_age_months": 12
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, xe đẩy 2 chiều Combi Sugocal phù hợp cho bé từ sơ sinh đến 3 tuổi nên bé 12 tháng dùng rất tốt chị nhé. Xe có thiết kế 2 chiều, gập gọn, chịu tải tới 15kg, rất an toàn cho bé nhà mình ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá của xe này là bao nhiêu vậy?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, xe đẩy Combi Sugocal hiện có giá 6.790.000đ chị nhé. Shop đang áp dụng chương trình miễn phí vận chuyển toàn quốc cho ngành mẹ & bé nên chị sẽ được freeship luôn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6790000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thấy trên mạng có khuyến mãi gì không, có freeship không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại, shop đang có chương trình MOM-FREESHIP áp dụng miễn phí vận chuyển toàn quốc cho đơn từ 500.000đ ngành mẹ & bé, và đơn này của mình đủ điều kiện chị nhé. Ngoài ra, giá đã là giá tốt nhất tại thời điểm này rồi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "price_vnd",
+          "value": 6790000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, chị đang chờ cuối tháng nhận lương mới quyết định được, em cho chị biết thêm thông tin nhé.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận là chị sẽ cân nhắc sau khi nhận lương cuối tháng. Em sẽ giữ lại thông tin và đến gần cuối tháng em nhắn lại để hỗ trợ chị đặt hàng nhé. Nếu chị cần thêm thông tin về sản phẩm hay chương trình khuyến mãi, mình cứ nhắn qua Zalo cho shop bất cứ lúc nào ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "child_age_months",
+          "value": 12,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-STR2",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 6790000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_1#turn5"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chờ cuối tháng nhận lương",
+    "objection_handling": "Ghi nhận thời điểm khách cân nhắc, hẹn nhắn lại hỗ trợ đặt hàng cuối tháng.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": {
+      "timeframe": "cuối tháng 10/2026",
+      "reason": "Khách chờ nhận lương mới quyết định đặt hàng"
+    },
+    "order": null
+  }
+}

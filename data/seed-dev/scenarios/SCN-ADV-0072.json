@@ -1,0 +1,136 @@
+{
+  "scenario_id": "SCN-ADV-0072",
+  "level": "M2",
+  "persona": "khach_tra_hang_qua_han",
+  "hard_case": null,
+  "customer_phone": "0998000008",
+  "customer_name": "Nguyễn Văn H",
+  "honorific": "anh",
+  "notes": "Persona khach_tra_hang_qua_han, biến thể qua_7_ngay. call_1 (hotline): trả hàng quá hạn → thong_tin. Chấm chủ yếu: CCR, RQR, TSR, HR, ESC.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-17",
+      "customer_goal": "Hỏi về việc trả giày đã nhận do người nhà đã mua cái khác.",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về việc trả lại đôi giày chạy bộ RunLite 2 Pro mà anh đã mua.",
+        "Anh đã nhận hàng từ lâu rồi, nhưng giờ người nhà anh đã mua cái khác rồi.",
+        "Có cách nào để đổi trả không em? Anh biết là đã quá hạn nhưng rất cần.",
+        "Người nhà anh không cần giày nữa, nên anh muốn trả lại, có được không?"
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C008",
+          "session_id": "SYN-008-S3",
+          "date": "2025-03-12",
+          "channel": "zalo_oa",
+          "summary": "Mua Quạt đứng Senko TS16 giá 590.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C008",
+          "session_id": "SYN-008-S1",
+          "date": "2026-05-22",
+          "channel": "web",
+          "summary": "Mua Giày chạy bộ RunLite 2 Pro giá 1.690.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C008",
+          "session_id": "SYN-008-S2",
+          "date": "2026-10-08",
+          "channel": "hotline",
+          "summary": "Đặt Áo phao lông vũ Warmly giá 1.530.000đ, đơn OD900802 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C008",
+          "order_id": "OD900801",
+          "date": "2026-05-22",
+          "sku": "SKU-SN-RUN2-41-DEN",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-SN-RUN2-41-DEN"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C008",
+          "order_id": "OD900802",
+          "date": "2026-10-08",
+          "sku": "SKU-JK-DWN-XL-NAVY",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900802"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C008",
+          "order_id": "OD900803",
+          "date": "2025-03-12",
+          "sku": "SKU-FAN-SEN",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-FAN-SEN"
+          }
+        }
+      ],
+      "facts_established": {
+        "return_reason": "người nhà đã mua cái khác",
+        "order_id": "OD900801",
+        "owned_sku": "SKU-SN-RUN2"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "7 ngày",
+          "bảy ngày"
+        ],
+        "must_not_call_tools": [
+          "order.create",
+          "order.update"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "return_allowed",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900801",
+        "return_days": 7,
+        "return_allowed": false,
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "order_id": "OD900801",
+        "owned_sku": "SKU-SN-RUN2"
+      },
+      "relevant_policy_ids": [
+        "DT-01",
+        "DT-06",
+        "PB-01"
+      ],
+      "expected_outcome": "thong_tin"
+    }
+  }
+}

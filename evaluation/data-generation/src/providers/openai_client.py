@@ -14,6 +14,8 @@ from pathlib import Path
 from typing import TypeVar
 
 from dotenv import load_dotenv
+from src.utils.paths import ENV_FILE
+from openai import BadRequestError
 from pydantic import BaseModel, ValidationError
 
 T = TypeVar("T", bound=BaseModel)
@@ -23,7 +25,7 @@ class OpenAIClient:
     def __init__(self, model: str, cache_dir: Path, log_path: Path, retries: int = 3,
                  rpm_limit: int = 10, rpd_limit: int = 100,
                  retry_backoff_seconds: float = 2):
-        load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+        load_dotenv(ENV_FILE)
         key = os.getenv("OPENAI_API_KEY")
         if not key:
             raise RuntimeError("OPENAI_API_KEY is not set; configure it in evaluation/data-generation/.env")
@@ -36,6 +38,8 @@ class OpenAIClient:
         self._call_times: list[float] = []
         self._call_day = datetime.now(timezone.utc).date()
         self._calls_today = self._read_calls_today()
+        #: Schemas the API refused in strict mode (a free-form object such as a tool's args): sent non-strict.
+        self._not_strict: set[str] = set()
         cache_dir.mkdir(parents=True, exist_ok=True)
 
     def generate(self, prompt: str, schema: type[T], *, temperature: float = 0.7,
@@ -51,29 +55,43 @@ class OpenAIClient:
                        "elapsed_seconds": 0, "error": None})
             return schema.model_validate_json(cache_file.read_text(encoding="utf-8"))
 
+        # The cache key above names the schema, not how it is enforced: strict mode allows no answer the schema
+        # does not, so answers cached before it stay valid.
         prior_error = ""
         for attempt in range(self.retries):
             self._wait_for_rate_limit()
             started = time.monotonic()
+            strict = self._strict_schema(schema)
             try:
                 response = self.client.chat.completions.create(
                     model=self.model,
                     messages=[{"role": "user", "content": prompt +
                                (f"\n\nPrevious output validation error: {prior_error}" if prior_error else "")}],
                     response_format={"type": "json_schema", "json_schema": {
-                        "name": schema.__name__, "strict": False, "schema": response_schema}},
+                        "name": schema.__name__, "strict": strict is not None, "schema": strict or response_schema}},
                     temperature=temperature,
                     max_tokens=max_output_tokens,
+                    # One key per stage: requests that share the fixed prefix (instructions, policies) go to the
+                    # same cache, which bills those tokens at the cached rate. The answer does not depend on it.
+                    prompt_cache_key=f"datagen-{schema.__name__}",
                 )
                 result, repaired = parse_output(response.choices[0].message.content or "", schema)
                 cache_file.write_text(result.model_dump_json(indent=2), encoding="utf-8")
                 usage = response.usage
+                details = getattr(usage, "prompt_tokens_details", None)
                 self._log({"provider": "openai", "model": self.model, "cache_hit": False,
                            "attempt": attempt + 1, "json_repaired": repaired,
                            "prompt_tokens": getattr(usage, "prompt_tokens", None),
+                           "cached_tokens": getattr(details, "cached_tokens", None),
                            "output_tokens": getattr(usage, "completion_tokens", None),
                            "elapsed_seconds": round(time.monotonic() - started, 3), "error": None})
                 return result
+            except BadRequestError as exc:
+                if strict is None:
+                    raise
+                # The API's strict mode takes a subset of JSON Schema: this schema goes non-strict from now on.
+                self._not_strict.add(schema.__name__)
+                self._log_failure(attempt, started, f"strict schema refused, sent non-strict: {exc}")
             except (ValidationError, ValueError) as exc:
                 prior_error = str(exc)
                 if attempt + 1 >= self.retries:
@@ -88,6 +106,21 @@ class OpenAIClient:
                 self._log_failure(attempt, started, error, delay)
                 time.sleep(delay)
         raise RuntimeError("OpenAI output could not be validated after retries")
+
+    def _strict_schema(self, schema: type[BaseModel]) -> dict | None:
+        """*schema* for Structured Outputs' strict mode, in which the API makes the model answer in exactly that
+        shape (non-strict, gpt-4o-mini wrote ``{"asr_transcript": ...}`` for a string and keys where none belong).
+        None when the SDK cannot convert it or the API refused it before."""
+        if schema.__name__ in self._not_strict:
+            return None
+        try:
+            from openai.lib._pydantic import to_strict_json_schema   # the SDK's own converter (a private module)
+            converted = to_strict_json_schema(schema)
+        except Exception:   # an SDK without it, or a type it cannot express
+            self._not_strict.add(schema.__name__)
+            return None
+        _shape_only(converted)   # the shape is enforced; value limits stay with Pydantic
+        return converted
 
     def _wait_for_rate_limit(self) -> None:
         utc_day = datetime.now(timezone.utc).date()
@@ -128,3 +161,26 @@ class OpenAIClient:
             except (ValueError, TypeError):
                 continue
         return count
+
+
+#: Keywords left out of the strict schema: value limits the API's strict mode may refuse. The schema still sets
+#: the shape (types, required keys, enums), and Pydantic checks the limits on the answer, as before.
+VALUE_LIMITS = frozenset({"default", "minLength", "maxLength", "minItems", "maxItems", "pattern", "format",
+                          "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum"})
+
+
+def _shape_only(node: object) -> None:
+    """Remove VALUE_LIMITS from a JSON schema in place. The keys of "properties" and "$defs" are names, not
+    keywords (a field may be called "format"): only the schemas under them are walked."""
+    if isinstance(node, dict):
+        for key in VALUE_LIMITS:
+            node.pop(key, None)
+        for key, value in node.items():
+            if key in ("properties", "$defs") and isinstance(value, dict):
+                for child in value.values():
+                    _shape_only(child)
+            else:
+                _shape_only(value)
+    elif isinstance(node, list):
+        for value in node:
+            _shape_only(value)

@@ -1,0 +1,169 @@
+{
+  "conversation_id": "SCN-ADV-0022__call_2",
+  "scenario_id": "SCN-ADV-0022",
+  "call": "call_2",
+  "customer_id": "C019",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-23",
+  "region": "trung",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_hoi_khuyen_mai_sap_toi",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Hôm trước chị có hỏi về Nồi chiên không dầu Lock&Lock 4L và còn để bàn với gia đình, hôm nay em hỗ trợ tiếp thông tin cho chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, hôm trước chị có hỏi về nồi chiên không dầu rồi đó.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, sản phẩm Nồi chiên không dầu Lock&Lock 4L bên em hiện đang còn hàng chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn biết thêm về giá và khuyến mãi hiện tại.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giá nồi chiên Lock&Lock 4L hiện là 1.890.000đ. Đợt này bên em chưa có chương trình khuyến mãi nào áp dụng cho sản phẩm này ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nó có còn hàng không? Chị cũng đang phân vân không biết có nên mua ngay không.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, sản phẩm vẫn còn hàng sẵn tại kho chị nhé. Nếu chị mua trong hôm nay thì giá vẫn giữ là 1.890.000đ, giao hàng nội thành từ 1–2 ngày làm việc. Chị cân nhắc thêm cũng được ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị dự định mua làm quà, chưa chốt được đâu, phải hỏi ý kiến gia đình đã.",
+      "facts_stated": {
+        "usage_need": "mua làm quà"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị đang cân nhắc và cần hỏi thêm ý kiến gia đình. Khi nào chị quyết định, cứ liên hệ lại shop, em sẽ hỗ trợ giữ giá và kiểm tra tồn kho cho mình ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-AF-4L",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1890000,
+          "op": "set",
+          "source": "call_2#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "phai_hoi_gia_dinh",
+    "objection_handling": "Xác nhận sẽ giữ giá và kiểm tra tồn kho khi khách liên hệ lại, không tạo áp lực.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

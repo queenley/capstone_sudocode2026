@@ -1,0 +1,161 @@
+{
+  "conversation_id": "SCN-GEN-0228__call_2",
+  "scenario_id": "SCN-GEN-0228",
+  "call": "call_2",
+  "customer_id": "SYN-C009",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-29",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_ngoai_pham_vi_chuyen_may",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Phạm Thị I ạ, hôm trước bạn nhân viên đã hỗ trợ mình về Máy hâm sữa Fatz 4 chức năng và chị còn băn khoăn về để bàn với gia đình. Em sẵn sàng hỗ trợ các câu hỏi của chị ạ.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "blocker",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có một câu hỏi về an toàn, lần trước em có nói là sản phẩm này tốt rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ, chị đang quan tâm đến vấn đề an toàn khi sử dụng Máy hâm sữa Fatz đúng không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Chị đang quan tâm đến vấn đề an toàn khi sử dụng Máy hâm sữa Fatz đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhưng mà chị đang lo là người nhà chị đang dùng thuốc, không biết có dùng được máy này không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với những câu hỏi liên quan đến việc dùng thuốc và an toàn sức khỏe, em xin phép chuyển máy cho dược sĩ hoặc nhân viên chuyên môn hỗ trợ tư vấn kỹ hơn cho chị ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có thể chuyển máy cho chị gặp bác sĩ không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em sẽ chuyển thông tin và câu hỏi của chị cho bộ phận chuyên môn. Nhân viên phụ trách sẽ gọi lại để tư vấn y tế và đảm bảo an toàn cho người nhà chị sử dụng sản phẩm ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "handoff.transfer",
+          "args": {
+            "brief": {
+              "customer_phone": "0998000009",
+              "customer_name": "Phạm Thị I",
+              "escalation_reason": "cau_hoi_y_te",
+              "conversation_summary": "Khách hỏi Máy hâm sữa Fatz 4 chức năng, có câu hỏi y tế/an toàn cần chuyên môn.",
+              "product_advised": "SKU-MB-MON",
+              "price_quoted_vnd": 490000,
+              "open_questions": [
+                "câu hỏi y tế của khách"
+              ],
+              "next_action": "Dược sĩ/nhân viên phụ trách gọi lại tư vấn",
+              "generated_at": "2026-11-29T10:00:00+07:00",
+              "channel": "hotline"
+            }
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn chắc chắn là sản phẩm không ảnh hưởng đến sức khỏe của người nhà chị.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_human",
+      "text": "Dạ em là nhân viên bộ phận chuyên môn, cảm ơn chị đã chờ. Em đã nhận được câu hỏi của chị về an toàn khi dùng Máy hâm sữa Fatz cho người nhà đang dùng thuốc. Em sẽ tư vấn chi tiết cho chị ngay sau đây ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chuyen_may",
+    "outcome": "chuyen_may",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

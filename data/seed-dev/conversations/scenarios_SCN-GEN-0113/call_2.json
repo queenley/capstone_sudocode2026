@@ -1,0 +1,155 @@
+{
+  "conversation_id": "SCN-GEN-0113__call_2",
+  "scenario_id": "SCN-GEN-0113",
+  "call": "call_2",
+  "customer_id": "C042",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-02",
+  "region": "trung",
+  "category": "thoi-trang/ao-khoac",
+  "persona": "khach_hoi_ngoai_tai_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Nga ạ, hôm trước chị có quan tâm Áo phao lông vũ Warmly màu navy size L và còn chờ cuối tháng nhận lương. Chị muốn mình tiếp tục trao đổi về sản phẩm này đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn mình tiếp tục trao đổi về sản phẩm này đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có câu hỏi này, áo phao này được sản xuất ở đâu vậy em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã hỏi, hiện em chưa có thông tin về nơi sản xuất cụ thể của Áo phao lông vũ Warmly. Trong tài liệu shop chỉ có thông số kỹ thuật và bảng size thôi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em có biết là linh kiện của máy này được làm ở nhà máy nào không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ về phần linh kiện thì em cũng chưa có thông tin về nhà máy sản xuất của các bộ phận này chị nhé. Nếu có cập nhật mới, em sẽ báo lại cho chị ngay ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "unknown_topic",
+          "value": "linh kiện của máy được sản xuất ở nhà máy nào"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thấy thông tin đó chưa có trong tài liệu em gửi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi chị, hiện tại trong tài liệu của shop em cũng chưa có thông tin về xuất xứ nhà máy hoặc linh kiện của sản phẩm này ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu chưa có em cứ kiểm tra rồi báo cho chị sau nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận câu hỏi của chị và sẽ kiểm tra với bộ phận liên quan. Khi có thông tin mới, em sẽ liên hệ lại báo cho chị ngay ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "unknown_topic",
+          "value": "linh kiện của máy được sản xuất ở nhà máy nào",
+          "op": "set",
+          "source": "call_2#turn4"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tra_loi_cau_hoi_ngoai_tai_lieu",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "commitment": "kiểm tra thêm và báo lại nếu có thông tin"
+      }
+    ],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

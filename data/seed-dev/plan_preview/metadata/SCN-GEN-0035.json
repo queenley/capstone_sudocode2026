@@ -1,0 +1,42 @@
+{
+  "scenario_id": "SCN-GEN-0035",
+  "persona_source": "btc",
+  "customer_id": "SYN-C002",
+  "region": "trung",
+  "category": "gia-dung/quat",
+  "difficulty": "normal",
+  "tags": [
+    "date:ordinary",
+    "order",
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "order_status",
+      "outcome_detail": "cap_nhat_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "order_status": "delivered"
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_co_don_chua_co_lich_su",
+      "patience_start": 4
+    },
+    "call_2": {
+      "kind": "address_change",
+      "outcome_detail": "cap_nhat_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "order_status": "delivered"
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_co_don_chua_co_lich_su",
+      "patience_start": 3
+    }
+  }
+}

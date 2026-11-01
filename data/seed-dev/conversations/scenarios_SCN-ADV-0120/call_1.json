@@ -1,0 +1,274 @@
+{
+  "conversation_id": "SCN-ADV-0120__call_1",
+  "scenario_id": "SCN-ADV-0120",
+  "call": "call_1",
+  "customer_id": "C025",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-16",
+  "region": "bac",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_hoi_freeship_theo_vung",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị muốn hỏi về nồi chiên không dầu Xiaomi 4.5L đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn hỏi về nồi chiên không dầu Xiaomi 4.5L đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1590000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về nồi chiên không dầu Xiaomi 4.5L, chị thấy quảng cáo freeship trên fanpage.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xác nhận chị đang quan tâm đến nồi chiên không dầu Xiaomi 4.5L ạ. Sản phẩm này hiện đang có giá 1.590.000đ và còn hàng tại shop. Chị muốn giao về địa chỉ nào để em kiểm tra chính sách freeship cho mình ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Chị muốn giao về địa chỉ nào để em kiểm tra chính sách freeship cho mình ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1590000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1590000",
+          "spoken": "1.590.000đ"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị ở Cầu Giấy, Hà Nội, không biết có freeship cho khu vực này không em?",
+      "facts_stated": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Cầu Giấy, Hà Nội",
+          "spoken": "Cầu Giấy, Hà Nội"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã cung cấp địa chỉ giao là Cầu Giấy, Hà Nội. Hiện tại, chương trình freeship chỉ áp dụng cho một số ngành hàng hoặc khu vực miền Nam thôi ạ. Với nồi chiên không dầu Xiaomi 4.5L giao về Hà Nội, đơn hàng dưới 2 triệu sẽ có phí vận chuyển 25.000đ chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "freeship",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "address",
+          "value": "Cầu Giấy, Hà Nội",
+          "spoken": "Cầu Giấy, Hà Nội"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu không có freeship thì phí giao hàng sẽ là bao nhiêu nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, với đơn hàng giao nội thành Hà Nội như của chị, phí vận chuyển là 25.000đ cho đơn dưới 2 triệu ạ. Nếu đơn từ 2 triệu trở lên thì sẽ được miễn phí vận chuyển.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "freeship",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "25000",
+          "spoken": "25.000đ"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đang tính mua làm quà, ngân sách của chị tầm 2 triệu thôi.",
+      "facts_stated": {
+        "usage_need": "mua làm quà",
+        "budget_vnd": 2000000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "2000000",
+          "spoken": "2 triệu"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, với ngân sách 2 triệu của chị thì nồi chiên không dầu Xiaomi 4.5L rất phù hợp ạ. Giá sản phẩm là 1.590.000đ, chưa gồm phí vận chuyển. Nếu chị cần tư vấn thêm về tính năng hoặc so sánh với các mẫu khác, em sẵn sàng hỗ trợ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1590000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1590000",
+          "spoken": "1.590.000đ"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị chờ cuối tháng mới nhận lương nên cần cân nhắc kĩ, em nhé.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ, chị cứ cân nhắc thêm nhé. Khi nào chị quyết định mua hoặc cần hỗ trợ, chị nhắn lại cho shop bất cứ lúc nào cũng được ạ. Em cảm ơn chị đã quan tâm sản phẩm của shop BTC!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn11"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 2000000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Cầu Giấy, Hà Nội",
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "usage_need",
+          "value": "mua làm quà",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AF-XM",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1590000,
+          "op": "set",
+          "source": "call_1#turn3"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_feeship",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chờ lương",
+    "objection_handling": "Xác nhận lý do, dặn khách cân nhắc và liên hệ lại khi cần.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

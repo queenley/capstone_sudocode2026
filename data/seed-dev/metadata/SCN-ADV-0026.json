@@ -1,0 +1,54 @@
+{
+  "scenario_id": "SCN-ADV-0026",
+  "persona_source": "advanced",
+  "customer_id": "C015",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "normal",
+  "tags": [
+    "cross_channel",
+    "gift",
+    "giảm_giá",
+    "máy_lọc_không_khí",
+    "promotion",
+    "quà_tặng",
+    "variant:bo_qua_lay_tien_roi_mua",
+    "đặt_hàng"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "gift_to_cash",
+      "outcome_detail": "hen_goi_lai",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Máy lọc không khí AirPure Y",
+        "price_vnd": 5200000,
+        "promo": "GIFT-FILTER",
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_doi_qua_thanh_tien",
+      "patience_start": 3
+    },
+    "call_2": {
+      "kind": "order",
+      "outcome_detail": "chot_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Máy lọc không khí AirPure Y",
+        "price_vnd": 5200000,
+        "promo": "GIFT-FILTER",
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_doi_qua_thanh_tien",
+      "patience_start": 3
+    }
+  }
+}

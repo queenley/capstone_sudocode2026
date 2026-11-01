@@ -1,0 +1,138 @@
+{
+  "scenario_id": "SCN-ADV-0122",
+  "level": "M2",
+  "persona": "khach_thanh_toan_vi_dien_tu",
+  "hard_case": null,
+  "customer_phone": "0976158464",
+  "customer_name": "Thu",
+  "honorific": "chị",
+  "notes": "Persona khach_thanh_toan_vi_dien_tu, biến thể tu_van_roi_tra_bang_vi. call_1 (zalo_oa): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn, trả bằng ví điện tử → chot_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_thu55",
+      "call_date": "2026-11-13",
+      "customer_goal": "Hỏi về giày chạy bộ size 41 màu đen.",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về giày chạy bộ size 41 màu đen em ơi.",
+        "Em có biết giá của đôi giày này không?",
+        "Giày này đang có khuyến mãi gì không nhỉ?",
+        "Chị cần bàn với gia đình rồi sẽ gọi lại, tối mai tầm 7 giờ em gọi lại chị nhé."
+      ],
+      "facts_established": {
+        "blocker": "để bàn với gia đình",
+        "color": "den",
+        "size": 41,
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1290000,
+        "variant_sku": "SKU-SN-RUN1-41-DEN"
+      },
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-11-14T19:00"
+        },
+        "must_say_any": [
+          "7 giờ",
+          "19 giờ",
+          "19h",
+          "7h tối"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1290000,
+        "list_price_vnd": 1290000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "in_stock": true,
+        "callback_at": "2026-11-14T19:00",
+        "call_date": "2026-11-13"
+      },
+      "memory_expectation": {
+        "blocker": "để bàn với gia đình",
+        "color": "den",
+        "size": 41,
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1290000,
+        "variant_sku": "SKU-SN-RUN1-41-DEN"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "FAQ-09",
+        "LN-01",
+        "PB-03"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 3,
+      "customer_goal": "Đặt hàng giày chạy bộ và thanh toán bằng ví MoMo.",
+      "customer_turns": [
+        "Chị đã bàn với gia đình và muốn mua đôi giày chạy bộ đó.",
+        "Em có thể cho chị biết là có thể thanh toán bằng ví MoMo được không?",
+        "Chị muốn giao hàng sớm hơn, có được không?",
+        "Khu vực giao hàng là Long Biên, Hà Nội nhé."
+      ],
+      "facts_established": {
+        "delivery_area": "Long Biên, Hà Nội",
+        "payment": "momo",
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1290000,
+        "variant_sku": "SKU-SN-RUN1-41-DEN",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-RUN1-41-DEN",
+          "price_vnd": 1290000,
+          "payment": "momo"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1290000,
+        "list_price_vnd": 1290000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-11-18",
+        "call_date": "2026-11-16"
+      },
+      "memory_expectation": {
+        "delivery_area": "Long Biên, Hà Nội",
+        "payment": "momo",
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1290000,
+        "variant_sku": "SKU-SN-RUN1-41-DEN",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

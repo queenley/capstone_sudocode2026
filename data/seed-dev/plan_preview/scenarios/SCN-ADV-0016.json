@@ -1,0 +1,98 @@
+{
+  "scenario_id": "SCN-ADV-0016",
+  "level": "M2",
+  "persona": "khach_khieu_nai_giao_cham",
+  "hard_case": null,
+  "customer_phone": "0998000001",
+  "customer_name": "Nguyễn Văn A",
+  "honorific": "anh",
+  "notes": "Persona khach_khieu_nai_giao_cham, biến thể giao_cham. call_1 (zalo_oa): hỏi tình trạng đơn → cap_nhat_don. Chấm chủ yếu: CCR, RQR, TSR, ESC.",
+  "calls": {
+    "call_1": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_a01",
+      "call_date": "2026-11-12",
+      "customer_goal": "[plan-only] order_status",
+      "customer_turns": [
+        "[plan-only] Khách bực vì đơn hàng giao chậm hơn dự kiến, phàn nàn, hỏi đơn đang ở đâu và bao giờ tới; dịu lại khi được báo đúng trạng thái và mã vận đơn; KHÔNG đòi gặp quản lý."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C001",
+          "session_id": "SYN-001-S1",
+          "date": "2026-03-01",
+          "channel": "hotline",
+          "summary": "Mua Máy lọc không khí AirPure X giá 4.890.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C001",
+          "session_id": "SYN-001-S2",
+          "date": "2026-10-01",
+          "channel": "zalo_oa",
+          "summary": "Đặt Máy lọc không khí AirPure Mini giá 2.190.000đ, đơn OD900102 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C001",
+          "order_id": "OD900101",
+          "date": "2026-03-01",
+          "sku": "SKU-AP-X",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AP-X"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C001",
+          "order_id": "OD900102",
+          "date": "2026-10-01",
+          "sku": "SKU-AP-MINI",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900102"
+          }
+        }
+      ],
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD900102"
+        },
+        "must_say_any": [
+          "đang giao",
+          "đang vận chuyển",
+          "đã bàn giao"
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900102",
+        "order_status": "shipping",
+        "tracking": "VN0012TRK",
+        "call_date": "2026-11-12"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01",
+        "PB-10"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    }
+  }
+}

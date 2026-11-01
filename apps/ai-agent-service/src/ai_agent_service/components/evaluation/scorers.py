@@ -58,7 +58,7 @@ from ..guardrails.hard import HUMAN
 
 logger = logging.getLogger(__name__)
 #: The instrument's version, written into every run's manifest beside :data:`prompt_sha`.
-VERSION = "product-extractor-v4"
+VERSION = "product-extractor-v5"
 AUTOMATED = re.compile(r"\b(?:em|tôi|mình)\s+là\s+(?:một\s+)?(?:trợ lý (?:ảo|tự động)|(?:chat)?bot|AI)\b", re.IGNORECASE)
 
 #: Section 5.2: what a question may be about, with the label the brief uses.
@@ -68,7 +68,11 @@ SLOTS: tuple[str, ...] = tuple(SLOT_LABELS)
 
 #: Slots BTC's scenarios use that the memory ontology does not keep: ``channel`` is in BTC's
 #: ``facts_established`` (SAMPLE-04) and in the handoff brief. Only the extractor knows them.
-EXTRA_SLOTS: frozenset[str] = frozenset({"channel"})
+#: ``order_summary`` (v5): an order read back once before it is placed (PB-09) is one confirm question, not one
+#: per detail, so the read-back PB-09 and BTC's J07 require is one question and a second read-back the redundant one.
+EXTRA_SLOTS: frozenset[str] = frozenset({"channel", "order_summary"})
+#: Slots a question may be about but no fact is: nothing is carried over under them.
+QUESTION_ONLY: frozenset[str] = frozenset({"order_summary"})
 
 #: A question about nothing the ledger keeps: an offer, a closing question, a pleasantry.
 OTHER = "other"
@@ -370,7 +374,7 @@ def restrict(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], int]:
             if item["slot_or_field"] == OTHER and item.get("question_type") != "open":
                 item, changed = {**item, "question_type": "open"}, changed + 1
         elif kind == "fact_usage":
-            if slot not in allowed:
+            if slot not in allowed or slot in QUESTION_ONLY:
                 changed += 1
                 continue
         elif kind == "claim":

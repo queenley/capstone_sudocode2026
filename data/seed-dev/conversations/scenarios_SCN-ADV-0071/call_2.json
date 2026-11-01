@@ -1,0 +1,190 @@
+{
+  "conversation_id": "SCN-ADV-0071__call_2",
+  "scenario_id": "SCN-ADV-0071",
+  "call": "call_2",
+  "customer_id": "C046",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-21",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_tra_hang_trong_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Xuân ạ, hôm trước chị có đặt Xe đẩy gấp gọn Joie Pact với giá 3.490.000đ tại shop. Em là trợ lý ảo của shop, chị cần hỗ trợ trả hàng đúng không ạ?",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd",
+        "payment",
+        "delivery_area",
+        "promo_code",
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "price_quoted_vnd",
+          "value": 3490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị vừa nhận hàng mấy hôm trước nhưng không ưng.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ. Chị nhận hàng chưa ưng ý, mình muốn trả lại sản phẩm đúng không chị?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Người nhà chị đã mua cái khác rồi.",
+      "facts_stated": {
+        "return_reason": "người nhà đã mua cái khác"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận lý do giúp chị là người nhà mình đã mua sản phẩm khác rồi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn hỏi là mình có thể trả hàng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị hoàn toàn có thể trả hàng trong vòng 7 ngày kể từ khi nhận, miễn là sản phẩm còn nguyên tem, chưa sử dụng và đầy đủ hộp ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu trả hàng thì chị sẽ được hoàn lại bao nhiêu tiền?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 450,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ khi trả hàng đủ điều kiện, chị sẽ được hoàn lại toàn bộ số tiền là 3.490.000đ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "refund_vnd",
+          "value": 3490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 450,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ nhận tiền lại trong bao lâu?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ bên em sẽ hoàn tiền cho chị trong 3-5 ngày làm việc kể từ khi shop nhận lại hàng và kiểm tra đạt điều kiện ạ. Em sẽ tạo yêu cầu trả hàng cho mình ngay bây giờ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD600001",
+            "action": "return",
+            "reason": "người nhà đã mua cái khác",
+            "on": "2026-10-21"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "yeu_cau_tra_hang",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "refund_vnd": 3490000
+      },
+      {
+        "refund_days": "3-5 ngày làm việc"
+      }
+    ],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

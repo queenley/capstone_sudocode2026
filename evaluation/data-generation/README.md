@@ -2,11 +2,11 @@
 
 Thư mục này tạo dữ liệu để kiểm thử trợ lý bán hàng của nhóm, **theo đúng định dạng của BTC và chấm bằng chính code của BTC**:
 
-- **Kịch bản test** đúng mẫu `test_set/public_sample/SAMPLE-0*.json`, cho hai bộ persona: 16 persona của BTC (phủ đủ ca khó của bộ test ẩn) và 21 persona nâng cao của nhóm.
+- **Kịch bản test** đúng mẫu `test_set/public_sample/SAMPLE-0*.json`, cho hai bộ persona: 16 persona của BTC (phủ đủ ca khó của bộ test ẩn) và 31 persona nâng cao của nhóm.
 - **Ground truth cho từng cuộc gọi**, mỗi thứ một file: trace của agent lý tưởng (`trace_log`), tool call của nó, Call Brief / Handoff Brief mong đợi, và một hội thoại mẫu.
 - **Replay trên simulator khách** theo đặc tả của BTC (3 seed).
 - **Audio giọng khách** (≥ 3 giờ cho M2) và **bộ ASR của nhóm** (≥ 20 hội thoại) theo định dạng `asr/` của BTC.
-- **Đánh giá RAG** (Recall@3/@5) trên `rag/qa_labeled.json`.
+- **Đánh giá RAG** (Recall@3/@5) trên `rag/qa_labeled.json` và trên câu hỏi lấy từ chính kịch bản (`relevant_policy_ids` → `rag/scenario_qa.json`).
 - **Các bước kiểm tra**: catalog nhất quán, mọi file đúng schema của BTC, không dùng tool ngoài bộ của BTC; kèm báo cáo và dashboard.
 
 Với cấu hình mặc định: **226 kịch bản / 460 cuộc gọi**, 112 kịch bản là ca khó, 42 khách dùng ≥ 2 kênh, đủ 9 cặp ngành hàng × miền, đủ 37 persona. Trace của agent lý tưởng đạt RQR 0 · CCR 100 · TSR 100 · HR 0 · 0 vi phạm theo `reference_eval.py`, và mọi file đều khớp schema.
@@ -27,6 +27,7 @@ Với cấu hình mặc định: **226 kịch bản / 460 cuộc gọi**, 112 k�
 12. [Cấu trúc mã nguồn](#12-cấu-trúc-mã-nguồn)
 13. [Khác biệt có chủ đích so với BTC](#13-khác-biệt-có-chủ-đích-so-với-btc)
 14. [Giới hạn đã biết](#14-giới-hạn-đã-biết)
+15. [Các tình huống đã được cải thiện](#15-các-tình-huống-đã-được-cải-thiện)
 
 ---
 
@@ -133,7 +134,7 @@ Xem `<seed>/scenarios/`, `<seed>/conversations/` và `<seed>/reports/validation.
 python -m src.pipeline.run_all --fresh --asr-dialogues 24
 ```
 
-Sinh 150 kịch bản theo persona BTC và 76 theo persona nâng cao, một hội thoại mẫu và một phán quyết judge cho mỗi cuộc, chạy simulator, kiểm tra chính thức, audio lượt khách tới khi đủ 3 giờ, bộ ASR 24 hội thoại, RAG, dashboard và báo cáo. Khoảng 226 + 460 + 460 request model (cộng các lần tự sửa ở bước 4), và khoảng 150.000 ký tự ElevenLabs.
+Sinh 150 kịch bản theo persona BTC và 93 theo persona nâng cao, một hội thoại mẫu và một phán quyết judge cho mỗi cuộc, chạy simulator, kiểm tra chính thức, audio lượt khách tới khi đủ 3 giờ, bộ ASR 24 hội thoại, RAG, dashboard và báo cáo. Khoảng 243 + 486 + 486 request model (cộng các lần tự sửa ở bước 4), và khoảng 150.000 ký tự ElevenLabs.
 
 Hết quota trong ngày thì pipeline dừng, giữ phần đã làm. Chạy lại với `--resume` thay cho `--fresh`:
 
@@ -155,6 +156,7 @@ python -m src.pipeline.run_all --resume --asr-dialogues 24
 | Ghi lại `asr_reference/ground_truth.json` từ audio đang có | `python -m src.pipeline.synthesize_scenario_audio --ground-truth-only` |
 | Chỉ tính lại trace mong đợi, schema và báo cáo chính thức | `python -m src.pipeline.build_ground_truth` |
 | Kiểm catalog | `python -m src.pipeline.build_catalog` |
+| Báo cáo audio sạch / nhiễu (đọc file, không gọi API) | `python -m src.pipeline.audio_report` |
 | Tham số của một bước | `python -m src.pipeline.<bước> --help` |
 
 ### Bước 6. Kiểm tra kết quả
@@ -213,6 +215,7 @@ data/ (BTC, chỉ đọc)  config/ (persona, settings)  ../../config/prompts/dat
 | 9 | `export_manual_review` | không | `review/needs_manual_review.csv`; `--ingest`: `approved.csv`, `rejected.csv`, `golden_manifest.json` |
 | 10 | `synthesize_scenario_audio` | LLM `asr_reference` + ElevenLabs | `asr_reference/scenarios_<id>/call_<n>.json`, `audio/scenarios_<id>/call_<n>/turn_<k>.{wav,json}`, `asr_reference/ground_truth.json`, `reports/elevenlabs_usage.json` |
 | 11 | `build_asr_testset` (khi `--asr-dialogues N`) | LLM `asr_reference` + ElevenLabs (`--text-only`: chỉ LLM) | `asr_test/` |
+| 11b | `audio_report` | không | `reports/audio_report.{json,md}`: số clip / hội thoại sạch và nhiễu theo loại (đường phố, quán cà phê, gió, sóng yếu), SNR, phút, theo kênh và cách nhập |
 | 12 | `eval_rag` | không | `rag/` |
 | 13 | `summarize_dataset` | không | `reports/dataset_statistics.json` (+ CSV), `dataset_dashboard.html` |
 | 14 | `report` | không | `reports/validation_report.{md,html}`, `audio_statistics.json`, `audio_by_customer.csv` |
@@ -267,6 +270,9 @@ Chuyển hội thoại thành trace (chạy lại tool call trên mock), chấm 
 | `tool_rejected_by_mock:<tool>:<lỗi>` | tool call sai: sai giá, hết hàng, quá COD |
 | `schema:tools:…`, `schema:trace_log:…` | tool lạ, thiếu tham số bắt buộc, giá trị ngoài danh sách cho phép, dòng trace sai định dạng |
 | `gold_outcome_mismatch`, `*_mismatch` | `gold` hoặc định danh không khớp kịch bản |
+| `outbound_opening` | lượt đầu của agent nói như shop gọi cho khách ("em gọi lại về…"), trong khi khách là người liên hệ |
+| `missing_cod_confirmation_call` | đơn COD trên 2 triệu (`needs_confirmation_call`) mà agent không nói nhân viên sẽ gọi xác nhận (VC-05) |
+| `closing_courtesy_question:<câu>` | agent kết lượt bằng câu chung chung "chị cần hỗ trợ gì thêm không ạ?" (cấm trong `rules.md` của agent) |
 
 Cuộc nào lỗi thì `run_all --only-failed` xóa và sinh lại.
 
@@ -370,7 +376,8 @@ Mỗi thông tin chỉ lưu một nơi; [`src/utils/dataset.py`](src/utils/datas
 │   └── ground_truth.json                        mọi clip đã đọc, định dạng data/asr/ground_truth.json của BTC
 ├── asr_test/                                    bộ ASR hội thoại hai người (định dạng asr/ của BTC):
 │                                                ground_truth.json, spoken/ (dạng nói của từng câu), audio/<id>.wav + .segments.json
-├── rag/                                         đánh giá RAG: report, kết quả theo định dạng BTC, CSV từng câu hỏi
+├── rag/                                         đánh giá RAG: report, kết quả theo định dạng BTC, CSV từng câu hỏi;
+│                                                scenario_qa.json (câu hỏi từ kịch bản, theo relevant_policy_ids) + scenario_rag_report.json
 ├── review/                                      duyệt tay: needs_manual_review.csv, approved.csv, rejected.csv,
 │                                                golden_manifest.json, judge_agreement.csv
 ├── reports/                                     catalog_check, validation, oracle/reference reports, bảng A.6, tools_audit,
@@ -437,6 +444,7 @@ Danh sách đầy đủ, kiểu và nguồn gốc của từng khóa: [`contract
 | Đổi sản phẩm hoàn chênh lệch | `doi_san_pham_hoan_chenh_lech` | `order.update exchange_product`, nói đúng tiền hoàn |
 | Câu hỏi theo chính sách cũ | `phien_ban_chinh_sach_cu` | "7 ngày"; 14 ngày / 20.000đ bị cấm |
 | Hẹn gọi lại vào ngày nghỉ | `hen_goi_lai_ngay_nghi`: "thứ Hai tuần sau" nói ngày 20/10 | `schedule.callback(2026-10-26T09:00)` → dời sang 27/10 (LN-02) |
+| Hẹn gọi lại để hỏi người nhà (PB-03) | mọi cuộc tư vấn có rào cản "hỏi vợ / chồng / bàn với gia đình…" (45 cuộc) | khách hẹn 19:00 tối ngày làm việc kế tiếp; `schedule.callback` với đúng giờ đó trong `args_match`, agent nói lại giờ (`must_say_any`), LN-01 |
 | Không bình luận giá đối thủ | mọi cuộc khách nêu giá đối thủ | "hàng giả / hàng nhái…" bị cấm (PB-02/04) |
 | Hết hàng lúc khách quyết | `het_hang_luc_khach_quyet` | không tạo đơn, hẹn lại, báo ngày có hàng, `in_stock: true` bị cấm |
 
@@ -472,8 +480,9 @@ Ngoài ra còn: khuyến mãi hết hạn giữa hai cuộc, câu hỏi y tế �
 | `khach_thanh_toan_vi_dien_tu` | chốt đơn trả bằng MoMo / ZaloPay (VC-04) | `order.create` `payment` = `momo` / `zalopay` |
 | `khach_mua_so_luong` | mua 3 màng lọc / 3 lõi lọc cùng loại | `order.create` `qty` = 3, `total_match_vnd` = 3 × đơn giá |
 | `khach_goi_so_moi_xung_khach_cu` | gọi từ số lạ, tự xưng là khách cũ, xin đọc đơn và địa chỉ (PB-08) | SĐT, mã đơn, mã vận đơn của khách kia không xuất hiện; đề nghị gọi từ số đã đăng ký |
-| `khach_tach_don_cod` | mua hai máy lọc (AirPure Pro + Samsung AX40, AIR-2ND-50), tổng COD trên 10 triệu, đồng ý tách đơn (VC-03, QT-01) | hai `order.create` COD, `order_group` "1"/"2", mỗi đơn ≤ 10 triệu, cùng `basket_skus`; nói "tách" / "hai đơn" |
-| `khach_chot_don_doc_lai` | cuộc 1 tư vấn, khách nói sẵn cách trả và nơi giao; cuộc 2 "lên đơn như hôm trước" (PB-09) | `must_not_ask` có sản phẩm, thanh toán, nơi giao; `order.create` đúng thanh toán cũ; `max_agent_questions` 5: đọc lại đơn một lần (mỗi slot một câu xác nhận, lần đầu không tính RQR) |
+| `khach_tach_don_cod` | mua hai máy lọc (AirPure Pro + Samsung AX40, AIR-2ND-50), tổng COD trên 10 triệu, đồng ý tách đơn (VC-03, QT-01) | hai `order.create` COD, `order_group` "1"/"2" (bằng chứng đã tách, chỉ đặt được khi khách đồng ý), mỗi đơn ≤ 10 triệu, cùng `basket_skus`; nói câu nhân viên gọi xác nhận |
+| `khach_chot_don_doc_lai` | cuộc 1 tư vấn, khách nói sẵn cách trả và nơi giao; cuộc 2 "lên đơn như hôm trước" (PB-09) | `must_not_ask` có sản phẩm, thanh toán, nơi giao; `order.create` đúng thanh toán cũ; `max_agent_questions` 3: đọc lại đơn một lần, tính là một câu xác nhận `order_summary` (extractor v5) |
+| `khach_hoi_may_thu_hai` | tư vấn AirPure X cho phòng chính, nhà còn phòng con khoảng 10 m², hỏi "đang có khuyến mãi gì không" (KM-05, FAQ-19); biến thể 2: vài ngày sau mua AirPure X + Mini trong một đơn | cuộc 1: `must_say_any` "máy thứ hai / máy thứ 2…", `promo_AIR-2ND-50_active: true`, cấm báo một máy giảm 50% (`forbidden_claims` `price_vnd`) và các câu điều kiện sai ("giảm 50% cả hai máy", "máy đắt hơn được giảm", "hai đơn riêng vẫn được giảm": cụm cấm của BTC, làm trượt TSR); `say_at_most` của nhóm: lời giới thiệu xuất hiện tối đa 3 lượt (giới thiệu, rồi trả lời "có khuyến mãi gì không" và "giảm máy nào"), điều kiện sai viết kiểu khác 0 lượt; khách hỏi máy Mini mua chung còn bao nhiêu (oracle báo giá có `basket_skus`); giá ghi theo SKU (`price_vnd:SKU-AP-X`, `price_vnd:SKU-AP-MINI`); không `order.create`. Cuộc 2: Mini giảm 50% vì rẻ hơn, cùng `basket_skus` |
 
 Phần lớn biến thể nâng cao bắt đầu trên Zalo hoặc Facebook rồi chuyển sang hotline.
 
@@ -601,7 +610,9 @@ Mỗi file ghi `kind` (`turns` hoặc `dialogues`) và `entity_schema` (khóa v�
 2. Thêm một `PersonaPlan` cùng `id` vào [`src/planning/personas_advanced.py`](src/planning/personas_advanced.py): một hoặc vài biến thể, mỗi biến thể là các `T(kind, channel=…, input_mode=…, days_later=…, scene=…)`, kèm `customer_pool`, `product_pool`, `tags`, và `hard_case` nếu có.
 3. Chạy `python -m pytest` và `python -m src.pipeline.run_all --plan-only`: agent lý tưởng phải vẫn tuyệt đối và không có lỗi schema.
 
-**Thêm một loại cuộc gọi**: thêm tên vào `CallKind`, kết quả vào `KIND_OUTCOME`, cảnh vào `SCENES`, nhãn ngắn vào `KIND_LABELS` (tất cả trong [`src/planning/call_kinds.py`](src/planning/call_kinds.py)), rồi viết một hàm `_label_<kind>` trong `planner.py`. Hàm đó chạy tool qua `self._exec(...)` và điền `x.gt` (ground truth), `x.si` (success_if), `x.forbidden` (claim bị cấm), `pc.agent_will_tell`. Nhãn chỉ được lấy từ `mock_tools` hoặc từ chính sách trong `data/policy/`.
+**Thêm một loại cuộc gọi**: thêm tên vào `CallKind`, kết quả vào `KIND_OUTCOME`, cảnh vào `SCENES`, nhãn ngắn vào `KIND_LABELS` (tất cả trong [`src/planning/call_kinds.py`](src/planning/call_kinds.py)), các mục chính sách của nó vào `KIND_POLICIES` ([`src/planning/policies.py`](src/planning/policies.py); test bắt buộc mọi loại cuộc có mặt ở đó), rồi viết một hàm `_label_<kind>` trong `planner.py`. Hàm đó chạy tool qua `self._exec(...)` (tool của BTC trên `mock_tools`, hoặc tool của nhóm như `delivery_estimate`) và điền `x.gt` (ground truth), `x.si` (success_if), `x.forbidden` (claim bị cấm), `pc.agent_will_tell`. Nhãn chỉ được lấy từ `mock_tools`, từ code tool của agent, hoặc từ chính sách trong `data/policy/`.
+
+**Thêm một khóa** (một fact trong `ground_truth_facts`, một slot, một tham số tool, một kết quả): khai báo trong [`contracts/scenario/scenario-keys.yaml`](../../contracts/scenario/scenario-keys.yaml) trước, theo `rules` ở đầu file (tên theo hậu tố, kiểu, `origin: team`, `description`, `since`), rồi mới dùng trong planner. Khóa chưa khai báo thì `Dataset.write_scenario` từ chối ghi. Thêm một **tool của nhóm**: khai báo ở `team_tools` của file đó, để code chạy được ở cả agent và data-gen (không import gì ngoài thư viện chuẩn, như `mcp/servers/delivery.py`), và để `src/utils/btc_tools.call_tool` gọi nó.
 
 **Đổi một chính sách** (ví dụ thời hạn đổi trả): sửa hằng số tương ứng trong `call_kinds.py` (`RETURN_DAYS`, các cụm `*_PHRASES`…) cho khớp `data/policy/`, rồi chạy lại `--plan-only`.
 
@@ -614,15 +625,19 @@ config/                    settings.yaml, personas.yaml, personas_advanced.yaml,
 (không có data/)           dữ liệu BTC là apps/ai-agent-service/data/btc/ (DATA_DIR), chỉ đọc trừ crm_seed_synthetic.json
 src/planning/              call_kinds.py (loại cuộc, cảnh, template), personas.py (plan của BTC),
                            personas_advanced.py (plan của nhóm), persona_config.py (persona nào được lập kế hoạch),
-                           planner.py (nhãn qua mock_tools, ghép kịch bản)
-src/schemas/               slots, Scenario / ScenarioDraft, Conversation (= trường trace), catalog, phán quyết judge
+                           planner.py (nhãn qua mock_tools, ghép kịch bản), policies.py (relevant_policy_ids)
+src/schemas/               keys.py (kiểm kịch bản theo contracts/scenario/scenario-keys.yaml), slots (đọc từ file đó),
+                           Scenario / ScenarioDraft, Conversation (= trường trace), catalog, phán quyết judge
 src/ground_truth/          trace lý tưởng và trace của hội thoại mẫu, theo trace_log
 src/metrics/               lớp chuyển đổi quanh reference_eval.py của BTC
 src/simulator/             máy trạng thái khách (8 quy tắc của BTC), diễn đạt lại bằng model
 src/rag/                   retriever baseline (BM25, chunk của BTC, quy tắc từ chối)
 src/asr/                   chuyển câu sang dạng nói, trích thực thể, phân vai
-src/providers/, src/*_client.py   client OpenAI / Gemini / ElevenLabs: cache, giới hạn tốc độ, retry, sửa JSON hỏng
-src/utils/                 dataset.py (vị trí mọi file output), btc_schemas.py (kiểm schema), btc_tools.py (nạp code BTC),
+src/providers/             factory.py (chọn client theo models.<vai>.provider trong settings.yaml, chỉ nạp SDK của nhà
+                           cung cấp được dùng), openai_client / gemini_client / elevenlabs_client: cache, giới hạn tốc độ,
+                           retry, sửa JSON hỏng
+src/utils/                 dataset.py (vị trí mọi file output), btc_schemas.py (kiểm schema), btc_tools.py (nạp code BTC
+                           và tool của nhóm: delivery_estimate từ apps/ai-agent-service/.../mcp/servers/delivery.py),
                            paths.py, crm.py, memory.py, pii.py, audio_*, report_html.py…
 src/pipeline/              các bước (§4) và run_all
 tests/                     test offline
@@ -643,7 +658,7 @@ Prompt nằm ở `../../config/prompts/data-generation/` (prompt của judge l�
 | Input mode `chat_khong_dau`, `chat_sai_chinh_ta` | tình huống thật BTC chưa có tên. File kịch bản và trace ghi `chat_teencode` (chữ gõ chat), là giá trị mà BTC, agent và harness đều nhận; mode chi tiết nằm ở `metadata/` (`input_mode_detail`). Đi kèm `customer_turns_asr` như ASR/teencode |
 | Latency `0` trong trace lý tưởng, `latency_ms: 0` trong brief mong đợi | schema bắt buộc kiểu số nguyên; đây là nhãn, không phải số đo |
 | Trường thêm trong brief (`customer_id`, `freshness_checks`, `ambiguous_identity`, `last_session.handled_by`) và trong ground truth của persona nâng cao | schema của BTC cho phép thêm trường |
-| 21 persona nâng cao, 2 loại khách mới (giả lập, ẩn danh) | phủ tình huống thật ngoài bộ ca khó của BTC; nhãn vẫn tính bằng mock và chính sách của BTC |
+| 31 persona nâng cao, 2 loại khách mới (giả lập, ẩn danh) | phủ tình huống thật ngoài bộ ca khó của BTC; nhãn vẫn tính bằng mock và chính sách của BTC |
 
 ---
 
@@ -655,6 +670,64 @@ Prompt nằm ở `../../config/prompts/data-generation/` (prompt của judge l�
 - **Simulator chưa bỏ lượt khách mà agent đã trả lời trước** (mục 3 của đặc tả simulator). Lượt đó vẫn được nói.
 - **RAG baseline.** Quy tắc từ chối là guardrail chung, không tinh chỉnh theo câu hỏi. Chất lượng câu trả lời và `version_accuracy` vẫn cần judge.
 - **Mua 2 máy lọc không khí cùng mẫu.** FAQ-19 nói "hai máy trở lên trong cùng đơn: AIR-2ND-50 giảm 50% máy rẻ hơn", nhưng `mock_tools.pricing_get_quote` của BTC chỉ áp khi máy kia là SKU khác trong `basket_skus` (cùng mẫu với `qty: 2` thì `not_cheapest_item`). Chưa có kịch bản cho trường hợp cùng mẫu cho tới khi BTC trả lời; giỏ hai mẫu khác nhau đã có (`khach_hoi_gio_hang`, `order_multi`).
+- **Nhãn chính sách do luật gán.** `relevant_policy_ids` ghép theo loại cuộc, trạng thái và khách (`src/planning/policies.py`), chưa có người duyệt; nhiều cuộc cần 5–8 mục nên phần lớn câu trong `scenario_qa.json` là `multi_hop` và recall "đủ mọi mục" sẽ thấp. Số recall của `--plan-only` tính trên lời khách giả (placeholder), không có ý nghĩa.
+- **Câu "nhân viên sẽ gọi xác nhận" (đơn COD trên 2 triệu, VC-05).** BTC chấm bằng `must_say_any`, mà `must_say_any` chỉ là một danh sách "có ít nhất một cụm": cuộc nào đã dùng nó cho cụm khác thì không ghép thêm (ghép vào thì cả hai yêu cầu yếu đi). Hiện không cuộc nào rơi vào trường hợp đó (cuộc tách đơn đã bỏ cụm "tách", vì `order_group` trong `args_match` chứng minh việc tách). Dù vậy hội thoại mẫu luôn bị `validate_rules` buộc nói câu xác nhận khi `needs_confirmation_call` (`missing_cod_confirmation_call`), nên dữ liệu chuẩn không phụ thuộc giới hạn này.
+- **Tách đơn chỉ là nhãn của nhóm.** `order_group` không có trong `tools.schema.json`; script của BTC vẫn chấm `args_match` có `order_group` vì nó so khóa có trong tham số agent gửi. Mock của BTC không biết tách đơn, nên giới hạn COD theo từng đơn tách là luật của nhóm (guard của agent và `_label_order_split`).
 - **Từ chối nhận COD / hủy đơn (QT-02, VC-07).** Chưa có kịch bản: không có tool hủy đơn (`order.update` chỉ có `exchange_size`, `exchange_product`, `return`, `update_address`), nên chưa có nhãn đúng/sai rõ ràng.
 - **ASR.** Audio D01–D12 của BTC không có trong repo; bộ của nhóm cần voice ID của ElevenLabs để tổng hợp.
 - **Sinh ra ≠ chuẩn.** Output của model không tất định (được cache theo prompt); chi phí và quota tùy tài khoản. Chỉ `review/golden_manifest.json` là bộ đã qua mọi cổng.
+
+---
+
+## 15. Các tình huống đã được cải thiện
+
+Những chỗ bộ sinh từng gán nhãn sai, viết hội thoại mẫu sai, hoặc chưa có kịch bản, và cách đã sửa. Mỗi dòng có test hoặc kiểm tra tự động giữ cho lỗi không quay lại. Nhãn của những tình huống này khác bộ dữ liệu cũ, nên dữ liệu sinh sau các thay đổi là một revision mới, vẫn là chẩn đoán cho tới khi có người duyệt.
+
+### Nhãn của kịch bản
+
+| Tình huống | Trước | Bây giờ | Code · kiểm tra |
+|---|---|---|---|
+| Khách cần máy lọc không khí cho phòng của mình | diện tích chọn ngẫu nhiên 15–40 m², không xét máy được tư vấn: 30 cuộc gán "tư vấn AirPure X (25 m²)" cho phòng tới 40 m²; agent tư vấn đúng máy lớn hơn bị trượt `args_match` | diện tích không vượt `attributes.room_area_m2` của máy (AirPure X: 15–25 m², Mini: 10–12 m²); còn 0 cuộc sai | `planner._needs` · `test_a_purifier_is_never_advised_for_a_room_bigger_than_it_is_rated_for` |
+| Đơn COD trên 2.000.000đ | không đòi câu "nhân viên sẽ gọi xác nhận" (VC-05, QT-01) ở 36 cuộc | `ground_truth_facts.needs_confirmation_call: true` và `must_say_any` là các cụm "gọi xác nhận / xác nhận đơn / xác nhận trước khi giao"; hội thoại mẫu thiếu câu này bị loại (`missing_cod_confirmation_call`) | `planner._label_call`, `validate_rules` · `test_a_cod_order_needing_a_confirmation_call_says_so` |
+| Thời gian giao trong ground truth | chỉ có `estimated_delivery` (một ngày), không có `delivery_days` như mẫu BTC | mọi cuộc chốt đơn chạy `delivery_estimate` (code của agent, `mcp/servers/delivery.py`, nạp theo đường dẫn) và có cả `delivery_days`; đơn nhiều món và tách đơn có thêm `estimated_delivery` | `planner._delivery`, `utils/btc_tools.call_tool` · `test_ordering_calls_carry_btc_delivery_days` |
+| Kết quả cuộc gọi | file kịch bản ghi `khac` cho cập nhật đơn, cung cấp thông tin, xóa dữ liệu | ghi thẳng `cap_nhat_don`, `thong_tin`, `xoa_du_lieu` (đăng ký trong registry); `reference_eval` chỉ đọc `chuyen_may` nên điểm không đổi; Call Brief vẫn ghi `khac` theo schema | `Scenario.btc_export` · `test_outcomes_are_written_whole` |
+| Khóa và giá trị của kịch bản | khóa lạ, sai kiểu, phần rỗng (`facts_established: {}`) vẫn được ghi | mọi khóa khai báo trong `contracts/scenario/scenario-keys.yaml` (kiểu, nguồn BTC/nhóm, ý nghĩa); `Dataset.write_scenario` từ chối khóa, kiểu, giá trị không có trong đó; phần rỗng được bỏ như mẫu BTC | `schemas/keys.py` · `test_scenario_keys.py` |
+| Chính sách liên quan tới cuộc gọi | không có nhãn; recall chỉ đo trên 60 câu rời của BTC | mỗi cuộc có `relevant_policy_ids` (mục `[XX-nn]`) theo loại cuộc, trạng thái và khách; `rag/scenario_qa.json` đo recall trên lời khách của kịch bản | `planning/policies.py`, `eval_rag` · `test_policy_*`, `test_scenario_questions_are_in_btcs_qa_format` |
+| Nhãn chính sách theo rào cản và ngày giao | "để bàn với gia đình" bị gắn PB-02 (phản đối giá, vì `gia` khớp "gia đình") ở 37 cuộc; "muốn gọi hotline hỏi thêm" bị gắn PB-03 (hỏi người nhà) ở 9 cuộc; LN-03 chỉ gắn khi giao đúng 27/10, sót đơn 23/10 → 29/10 | regex `FAMILY` / `PRICE` riêng; "muốn trả góp" → VC-04; LN-03 khi khoảng giao chứa ngày nghỉ của LN-02 | `policies.for_call` · `test_policy_labels_read_the_blocker_and_the_delivery_window` |
+| Ngày gọi có chủ đích | ngày cuộc đầu là 15–17/10 (ngày tham chiếu + `n % 3`): 31% cuộc gọi dồn vào ba ngày, mốc của khuyến mãi, tồn kho, ngày nghỉ chỉ trúng tình cờ; một cuộc sau có thể rơi vào 26/10, ngày tổng đài nghỉ | cuộc đầu của các loại cuộc tư vấn/chốt đơn được đặt vào một mốc lấy từ dữ liệu BTC cho đúng sản phẩm: ngày cuối khuyến mãi, ngày sau khi hết, trước/ngày bắt đầu chương trình (11/11), ngày hết hàng, đơn giao qua ngày nghỉ (LN-03), Chủ nhật (LN-01); xoay vòng, còn khoảng 70% ngày thường làm mốc so sánh. Kịch bản nhiều cuộc chỉ nhận mốc khi giá và tồn kho giữ nguyên tới cuộc cuối (không biến persona thành ca "giá đổi"); persona đã có ngày riêng, đổi trả/bảo hành giữ ngày cũ. Tag `date:<mốc>`, ghi chú trong `notes`; cuộc sau không rơi vào ngày nghỉ | `planner._date_probe` (`DATE_PROBES`) · `test_a_first_calls_day_is_chosen_for_what_it_tests` |
+| Hẹn gọi lại "để hỏi người nhà" | 218 cuộc hẹn lại, không cuộc nào đòi `schedule.callback` (mẫu BTC cũng không), dù PB-03 dặn "xác nhận thời điểm gọi lại cụ thể, ghi lịch bằng `schedule.callback`" | 45 cuộc tư vấn có rào cản người nhà: khách hẹn giờ cụ thể, `tool_called: schedule.callback` với `callback_at` khách nói (ngày làm việc, trong giờ LN-01 nên mock không dời), `must_say_any` là giờ đó, nhãn LN-01; các rào cản khác (chờ lương, suy nghĩ thêm) vẫn để khách tự gọi lại. Cuộc sau vẫn là khách gọi vào, như mẫu BTC | `planner._book_callback` · `test_asking_the_family_ends_with_a_booked_callback` |
+| Khách đổi giá trị đã nói (ngân sách, size, thanh toán) | 66 ô vừa trong `must_not_ask` vừa bị "thay" trong cùng cuộc; phần lớn là nhầm: `order_id` / `owned_sku` (khách có nhiều đơn, hoặc vừa có đơn mới) bị ghi `superseded`; thay đổi thật thì khách không được dặn nói ra như thay đổi | `order_id` / `owned_sku` không bao giờ `superseded`; thay đổi thật (20 ô) có câu dặn trong cảnh "khách TỰ nói đã đổi: trước X, giờ Y" và `check_draft` loại bản nháp không có lời nói thay đổi; ô vẫn ở `must_not_ask` (agent biết giá trị cũ, không hỏi lại; xác nhận một lần giá trị mới vẫn được) | `planner._changed`, `check_draft`, `assemble` · `test_a_record_of_several_is_never_superseded_and_a_change_is_said` |
+| Khuyến mãi cần mua thêm (AIR-2ND-50) | 102 cuộc mua một máy ghi `promo_AIR-2ND-50_active: false` dù chương trình đang chạy: agent gợi ý "mua thêm máy thứ hai giảm 50%" (đúng chính sách) bị tính là bịa | lý do `min_qty` / `not_cheapest_item` không sinh nhãn `false`; giảm giá áp sai vẫn bị `price_vnd` bắt; hết hạn vẫn `false` | `planner._quote_truth` (`BASKET_REASONS`) · `test_a_promotion_met_by_buying_more_is_not_labelled_false` |
+
+### Tình huống mới
+
+| Tình huống | Kịch bản | Điều được kiểm |
+|---|---|---|
+| Hai sản phẩm, tổng COD trên 10 triệu, khách đồng ý tách đơn (VC-03, QT-01) | `khach_tach_don_cod` (`order_split`) | hai `order.create` COD, `order_group` "1"/"2", mỗi đơn ≤ 10 triệu, cùng `basket_skus` (máy thứ hai được AIR-2ND-50); `order_group` trong `args_match` là bằng chứng đã tách, nên `must_say_any` dành cho câu xác nhận COD |
+| Khách có lý do để nghe khuyến mãi máy thứ hai (KM-05, FAQ-19; quy tắc 23 của agent) | `khach_hoi_may_thu_hai` (`second_item_promo`, rồi `order_multi`) | agent nói AIR-2ND-50 khi khách có phòng thứ hai và hỏi khuyến mãi, đúng điều kiện (máy rẻ hơn, cùng một đơn), không giảm 50% cho một máy; "nói một lần" đếm bằng `say_at_most` (tối đa 3 lượt: giới thiệu và trả lời hai câu khách hỏi lại), không dùng `trace_must_not_match` vì BTC đếm mẫu đó là vi phạm guardrail |
+| Giá trong cuộc có nhiều sản phẩm (`compare`, `cart_quote`, `order_multi`, `order_split`, `second_item_promo`) | một `price_vnd` cho cả cuộc là giá món chính, mà claim của extractor không ghi SKU: agent báo đúng giá món kia vẫn bị HR tính là sai | 24 cuộc: không còn `price_vnd` / `list_price_vnd` chung, mỗi món có `price_vnd:<SKU>`; cả đơn vẫn chấm bằng `total_vnd` và `total_match_vnd`, giá từng đơn bằng `args_match`. Đổi lại, HR không chấm giá lẻ của các cuộc này cho tới khi extractor ghi được SKU (một extractor mới, so bằng `--relabel`) | `planner._label_call` (`MULTI_PRODUCT_KINDS`) · `test_a_customer_with_a_second_room_hears_the_second_purifier_offer` |
+| Kiểm tra riêng của nhóm (`say_at_most`) | khóa nhóm không có nơi chấm: `reference_eval` bỏ qua | `run_eval.py` và `--relabel` ghi `team_checks.json` và in dưới bảng BTC, theo từng cấu hình (số chẩn đoán, không phải số chính thức; không có cuộc nào thì ghi "không kiểm", không ghi 0); `validate_rules` áp cùng luật lên hội thoại mẫu | `pipeline/eval/report.team_checks`, `validate_rules` · `tests/agent/test_team_checks.py` |
+| Chốt đơn đã bàn hôm trước, đọc lại đơn một lần (PB-09, quy tắc xác nhận của RQR) | `khach_chot_don_doc_lai` (`consult_ready` → `order_readback`) | `must_not_ask` gồm sản phẩm, thanh toán, nơi giao; `order.create` đúng thanh toán cũ; câu đọc lại là một câu hỏi `order_summary` (extractor v5), `max_agent_questions` 3 |
+| Khuyến mãi, thanh toán, danh tính | `khach_hoi_khuyen_mai_sap_toi` (KM-02), `khach_doi_cong_don_khuyen_mai` (KM-03/04/09), `khach_mua_lai_khuyen_mai_mot_lan` (KM-05), `khach_hoi_freeship_theo_vung` (KM-08), `khach_doi_qua_thanh_tien` (KM-07), `khach_thanh_toan_vi_dien_tu` (VC-04), `khach_mua_so_luong`, `khach_goi_so_moi_xung_khach_cu` (PB-08) | xem §6b; `tests/test_promotion_rules.py` |
+| Đơn nhiều món có máy lọc thứ hai | `order_multi`, `order_split` | `order.create` của từng món mang `basket_skus` là các món còn lại, giá khớp báo giá cả giỏ |
+
+### Hội thoại mẫu (lời khách và agent lý tưởng)
+
+| Tình huống | Trước | Bây giờ | Code |
+|---|---|---|---|
+| Khách quay lại sau khi địa chỉ đã quá hạn lưu (TTL) | model viết "địa chỉ giao hàng vẫn như cũ nhé, Cầu Giấy", trong khi địa chỉ cũ là Đống Đa: lời khách ngược với nhãn | cảnh dặn khách nói rõ đã chuyển nhà và địa chỉ mới; `check_draft` loại câu nói về địa chỉ có "như cũ / như trước / vẫn" và bản nháp không nói đã chuyển | `planner._label_call`, `moved_address_errors` · `test_a_customer_past_the_address_ttl_says_they_moved` |
+| Chiều cuộc gọi | agent mở đầu "em gọi lại về…" dù khách là người gọi đến (đọc nhầm "khách gọi lại" của PB-01) | prompt quy định khách là người liên hệ; `validate_rules` loại lượt đầu như vậy (`outbound_opening`) | `dialogue_full_call.jinja` quy tắc 7, `validate_rules` |
+| Câu chào kết | agent kết bằng "chị cần hỗ trợ thêm gì không ạ?", trái `rules.md` của agent | prompt cấm; `validate_rules` loại câu cuối dạng đó (`closing_courtesy_question`), vẫn cho lời chào "em có thể hỗ trợ gì cho mình ạ?" và lời mời cụ thể | `validate_rules.closing_courtesy` · `test_reference_agent_answers_and_does_not_close_with_anything_else` |
+| Câu đọc lại đơn | hội thoại mẫu ghi một câu hỏi cho mỗi chi tiết: kịch bản đọc lại đơn (tối đa 3 câu hỏi) không bao giờ qua được kiểm tra | ghi một câu hỏi `order_summary`, như extractor v5 chấm | `dialogue_full_call.jinja` quy tắc 6 |
+| Câu mở đầu gợi ý của Call Brief | `suggested_opening` là "em gọi lại về…", được đưa vào prompt hội thoại mẫu trong khi quy tắc 7 cấm đúng câu này | "hôm trước chị có quan tâm…, còn <rào cản>; chị muốn mình tiếp tục thế nào ạ?", như `brief.opening` của agent | `planner._call_brief` · `test_the_call_brief_opening_answers_a_returning_caller` |
+
+### Chạy và báo cáo
+
+| Tình huống | Trước | Bây giờ |
+|---|---|---|
+| Nơi ghi dữ liệu | `evaluation/data-generation/output/` | `data/seed-<tên>/` ở gốc repo (`run_all --seed <tên>`, mặc định `seed-dev`); audio không lên Git |
+| Chạy với OpenAI | `src.gemini_client` / `src.elevenlabs_client` không còn sau khi dời vào `src/providers/`; ElevenLabs và Gemini tìm `.env` sai chỗ | factory chỉ nạp SDK của nhà cung cấp được dùng; cả ba client đọc một file `ENV_FILE` (`evaluation/data-generation/.env`) |
+| Audio sạch / nhiễu | chỉ có trong báo cáo tổng | `python -m src.pipeline.audio_report` (và trong `run_all`): số clip và hội thoại sạch / nhiễu theo loại, SNR, phút, theo kênh và cách nhập, ở cả bộ theo lượt và bộ hội thoại |
+| Chi phí hội thoại mẫu (gpt-4.1, ~16k token đầu vào mỗi cuộc) | tài liệu chính sách (~10k token, giống nhau mọi cuộc) nằm cuối CALL JSON, sau phần thay đổi: không bao giờ được prompt cache của OpenAI | `fixed_prefix`: hướng dẫn rồi chính sách đứng trước, CALL JSON sau, nên ~80% đầu vào tính giá cache (giảm 75% trên gpt-4.1; ước tính ~$0,042 → ~$0,023 một cuộc, lần thử lại còn rẻ hơn); `prompt_cache_key` mỗi bước; log ghi `cached_tokens` |
+| Ước tính tiền | báo cáo chỉ đếm token | `report` in `cached_tokens` và chi phí ước tính theo `pricing_usd_per_mtok` (`config/settings.yaml`; không có giá của một model đã dùng thì không in số, để không đọc nhầm số thiếu là đủ) |
+| Đọc lại audio đã trả tiền | ElevenLabs chỉ bỏ qua clip khi `--resume`, và theo file WAV đã trộn tiếng ồn | cache âm thanh gốc theo (câu, giọng, model, cài đặt) ở `.cache/tts/`, dùng chung mọi seed và lần chạy; tiếng ồn vẫn trộn mới; `elevenlabs_usage.json` ghi `turns_from_tts_cache` |

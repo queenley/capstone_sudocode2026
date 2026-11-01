@@ -1,0 +1,165 @@
+{
+  "conversation_id": "SCN-GEN-0037__call_2",
+  "scenario_id": "SCN-GEN-0037",
+  "call": "call_2",
+  "customer_id": "C023",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-19",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_yeu_cau_xoa_du_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Thu ạ, em là trợ lý ảo của shop BTC. Hôm trước chị có quan tâm Máy lọc không khí Xiaomi Smart 4 Lite và muốn chờ cuối tháng nhận lương, chị muốn mình trao đổi thế nào tiếp ạ?",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "is_human",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn hỏi em là người thật hay máy vậy?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em là trợ lý ảo của shop BTC, được lập trình để hỗ trợ chị tư vấn và xử lý thông tin nhanh chóng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "is_human",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu là máy thì chị không muốn nói chuyện đâu.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ. Nếu chị có yêu cầu nào, em sẽ hỗ trợ chuyển thông tin sang nhân viên thật nếu cần chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn xóa dữ liệu cá nhân của mình.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận yêu cầu xóa dữ liệu cá nhân của chị. Theo quy trình, shop sẽ tiến hành xóa hồ sơ trong vòng 72 giờ kể từ lúc tiếp nhận yêu cầu của chị ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "deletion_sla_hours",
+          "value": 72
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Số CCCD của chị là 079188285084, em xác nhận giúp chị nhé.",
+      "facts_stated": {},
+      "entities": [
+        {
+          "type": "cccd",
+          "value": "079188285084",
+          "spoken": "079188285084"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận rồi ạ. Theo chính sách bảo mật, em không đọc lại số CCCD, hồ sơ của chị sẽ được xóa trong 72 giờ. Sau khi hoàn tất, mọi thông tin cá nhân của chị sẽ được xóa khỏi hệ thống theo quy định.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "deletion_sla_hours",
+          "value": 72
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "profile_state",
+          "value": "pending_deletion",
+          "op": "set",
+          "source": "call_2#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xoa_du_lieu",
+    "outcome": "xoa_du_lieu",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,230 @@
+{
+  "conversation_id": "SCN-GEN-0127__call_2",
+  "scenario_id": "SCN-GEN-0127",
+  "call": "call_2",
+  "customer_id": "C029",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-31",
+  "region": "bac",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_da_kenh_fb_hotline",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Hà ạ, hôm trước chị có quan tâm Nồi chiên không dầu Philips 6.2L và muốn gọi hotline hỏi thêm phải không ạ? Em là trợ lý ảo của shop, sẵn sàng hỗ trợ chị đặt hàng ạ.",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, chị muốn đặt nồi chiên không dầu Philips 6.2L.",
+      "facts_stated": {
+        "product_advised": "SKU-AF-6L"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm Nồi chiên không dầu Philips 6.2L đang còn hàng, giá 3.990.000đ ạ. Chị muốn thanh toán và nhận hàng thế nào để em ghi nhận đúng cho mình ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ thanh toán qua ngân hàng.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị chọn chuyển khoản ngân hàng, em ghi nhận ạ. Chị nhận hàng ở khu vực nào giúp em để em báo thời gian giao dự kiến luôn nhé?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giao hàng cho chị ở quận Long Biên, Hà Nội nhé.",
+      "facts_stated": {
+        "delivery_area": "Long Biên, Hà Nội"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với địa chỉ Long Biên, Hà Nội, dự kiến shop giao trong 2 ngày làm việc, khoảng ngày 03/11 ạ. Em xin đọc lại đơn hàng: Nồi chiên không dầu Philips 6.2L, số lượng 1, giá 3.990.000đ, giao tại Long Biên, Hà Nội, thanh toán chuyển khoản ngân hàng, nhận hàng từ ngày 03/11. Thông tin như vậy đúng chưa chị để em lên đơn luôn ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em xin đọc lại đơn hàng: Nồi chiên không dầu Philips 6.2L, số lượng 1, giá 3.990.000đ, giao tại Long Biên, Hà Nội, thanh toán chuyển khoản ngân hàng, nhận hàng từ ngày 03/11. Thông tin như vậy đúng chưa chị để em lên đơn luôn ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3990000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Long Biên, Hà Nội",
+            "on": "2026-10-31"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chốt đơn cho chị luôn em nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã lên đơn thành công cho chị, mã đơn OD600001, tổng cộng 3.990.000đ, shop sẽ giao đến Long Biên khoảng ngày 03/11. Cảm ơn chị Hà đã đặt hàng tại shop ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3990000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0930048764",
+            "sku": "SKU-AF-6L",
+            "qty": 1,
+            "price_vnd": 3990000,
+            "payment": "bank",
+            "address": "Long Biên, Hà Nội",
+            "on": "2026-10-31"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Long Biên, Hà Nội",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AF-6L",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 3990000,
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 900,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_hang",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-AF-6L",
+      "qty": 1,
+      "price_vnd": 3990000,
+      "payment": "bank",
+      "address": "Long Biên, Hà Nội",
+      "order_id": "OD600001"
+    }
+  }
+}

@@ -92,7 +92,7 @@ flowchart LR
 ```
 
 - **`facts_used`** = slot extractor thấy được dùng lại từ cuộc trước, rồi slot của các dòng brief agent đã trích dẫn `[Bn]`.
-- **`questions` và `claims`** do **extractor** trích. BTC không cung cấp extractor (đây là trách nhiệm của đội); BTC chấm tay ngẫu nhiên 20 lượt để kiểm extractor có bỏ sót không. Extractor dùng **từ vựng cố định**: 35 slot (34 của ontology và `channel`) và 18 trường claim cộng `promo_<CODE>_active`, kèm kiểu giá trị; slot ngoài bộ thành `other`, claim sai kiểu bị bỏ. Mỗi item kèm câu trích dẫn đúng nguyên văn để người chấm kiểm tay (`diagnostics.jsonl`).
+- **`questions` và `claims`** do **extractor** trích. BTC không cung cấp extractor (đây là trách nhiệm của đội); BTC chấm tay ngẫu nhiên 20 lượt để kiểm extractor có bỏ sót không. Extractor dùng **từ vựng cố định**: 36 slot (34 của ontology, `channel` và `order_summary`) và 18 trường claim cộng `promo_<CODE>_active`, kèm kiểu giá trị; slot ngoài bộ thành `other`, claim sai kiểu bị bỏ. Từ **v5** (`product-extractor-v5`), câu đọc lại đơn trước khi tạo ("Em lên đơn AirPure X 4.890.000đ, COD, giao Quận 3, đúng không ạ?") là **một** câu xác nhận `order_summary`, không còn một câu cho mỗi chi tiết: đọc lại một lần như PB-09 và J07 yêu cầu không bị tính thừa và chỉ là một câu trong `max_agent_questions`; đọc lại lần hai mới thừa. Giá trị khách đã nói ở cuộc trước được đọc lại vẫn là `fact_usage`, nên CCR không đổi. Mỗi item kèm câu trích dẫn đúng nguyên văn để người chấm kiểm tay (`diagnostics.jsonl`).
 - **Thiếu bằng chứng không được điền 0 hay PASS.** Một lượt lỗi hoặc chưa gắn nhãn thì không in bảng.
 - **Ngân sách API:** sổ SQLite (`EVAL_BUDGET_DB`) giữ dự phòng trước mỗi request có phí, chỉ hoàn khi có usage. Hết ngân sách thì dừng, không tạo lại sổ để lách.
 
@@ -144,6 +144,8 @@ Lỗi hay gặp: "size" → "sai/side" (27 lần), "chị" → "chỉ" (21), "Ai
 | Từ chối nhầm | **0%** | 6,4% |
 
 Số đo 17/10 (`config/knowledge.yaml`): chỉ từ khóa Recall@3 83 / Recall@5 88; hybrid 91,5 / 93,2. Embedding là phần làm tăng Recall@3 rõ nhất.
+
+**Câu hỏi lấy từ kịch bản (mới, chưa có số):** bộ sinh dữ liệu gắn cho mỗi cuộc `relevant_policy_ids` và xuất `rag/scenario_qa.json` theo định dạng `qa_labeled.json` (một câu mỗi cuộc, nội dung là lời khách), chấm bằng cùng `rag_eval` của BTC. Cần sinh lời khách thật (`run_all --seed <tên>`) mới có số; nhãn chưa có người duyệt.
 
 ### End-to-end: tiến triển trên cohort dev M2 (24/10, 12 kịch bản, cùng cohort)
 
@@ -236,7 +238,7 @@ Kết quả nằm ở thư mục `--out` (không lên Git): `table.txt` là bả
 ## 9. Còn thiếu
 
 1. **Vòng tự cải tiến**: feedback (👍/👎, kết quả cuộc gọi, điểm chấm) → đề xuất → người duyệt → áp dụng → đo → quay lui. Module `components/improvement/{lessons,playbook,versions,review,gaps}.py` còn là stub.
-2. **Kết quả chính thức**: chạy holdout; người duyệt nhãn; đo lại trên extractor v4 (đã có `--relabel`).
+2. **Kết quả chính thức**: chạy holdout; người duyệt nhãn; đo lại trên extractor v5 (`--relabel`, chỉ tốn lượt gọi extractor). Chưa kiểm extractor v5 có gom câu đọc lại đơn đúng trên model thật.
 3. **Lỗi nhãn extractor đã thấy ở `SAMPLE-01`** (chưa sửa): baseline được tính `fact_usage` cho giá trị không có ở cuộc trước; bản full bỏ sót `price_quoted_vnd` khi agent nói "giá vẫn giữ nguyên"; ngày giao dự kiến bị gắn nhầm `restock_date`.
 4. **Lỗi agent đã thấy**: hỏi lại mã sản phẩm/mã đơn dù đã có; có lượt báo "không lấy được giá"; nói giao trong 4 ngày khi ground truth là 2.
 5. **QaAgent**: chấm rubric J01–J12 sau mỗi cuộc chưa nối model.

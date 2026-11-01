@@ -1,0 +1,238 @@
+{
+  "conversation_id": "SCN-ADV-0138__call_1",
+  "scenario_id": "SCN-ADV-0138",
+  "call": "call_1",
+  "customer_id": "SYN-C014",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_tra_hang_qua_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Lê Thị Hoa ạ, em là trợ lý ảo của shop. Chị muốn hỏi về Giày chạy bộ RunLite 2 Pro đã mua trước đây đúng không ạ?",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Lê Thị Hoa đây, em ơi chị muốn hỏi về giày chạy bộ RunLite 2 Pro mà chị đã mua.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra đơn Giày chạy bộ RunLite 2 Pro của chị đã nhận từ tháng 6. Mình cần hỗ trợ về sản phẩm này đúng không ạ?",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD901401"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD901401"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị nhận hàng từ lâu rồi, giờ chị thấy màu nó không hợp với nội thất nhà chị.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ. Chị muốn đổi trả vì lý do không hợp màu sắc đúng không chị?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị biết là đã quá hạn đổi trả nhưng mà chị không thích màu này, có cách nào giúp chị không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất tiếc, theo chính sách của shop, giày chỉ được đổi trả trong vòng 7 ngày kể từ ngày nhận hàng thôi ạ. Hiện tại đơn của chị đã vượt quá thời hạn bảy ngày nên bên em không hỗ trợ trả hàng được nữa chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "return_allowed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị rất thích kiểu dáng nhưng màu sắc thì không hợp, em xem có cách nào để chị trả hàng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em thông cảm với mong muốn của chị, nhưng hiện tại bên em chỉ nhận đổi trả trong 7 ngày đầu sau khi nhận hàng, và sản phẩm phải còn nguyên tem, chưa sử dụng. Đơn của chị đã nhận từ tháng 6 nên đã quá hạn hỗ trợ rồi chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "return_allowed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đã thử đi rồi nhưng không thấy thoải mái, ừm, chị thật sự muốn trả lại mà.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất tiếc chị đã không hài lòng, nhưng theo quy định, shop không thể nhận lại giày đã sử dụng ngoài thời hạn 7 ngày. Nếu chị cần hỗ trợ về bảo hành hoặc tư vấn thêm về sản phẩm, em luôn sẵn sàng giúp chị ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "return_allowed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đã đọc chính sách đổi trả nhưng chị mong em giúp chị vì chị đã thích giày này trước đây mà giờ không hợp nữa.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất mong chị thông cảm, chính sách đổi trả giày chỉ áp dụng trong bảy ngày kể từ ngày nhận hàng thôi ạ. Nếu có vấn đề về chất lượng hoặc cần tư vấn bảo hành, chị cứ liên hệ em hỗ trợ nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "return_allowed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD901401",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "owned_sku",
+          "value": "SKU-SN-RUN2",
+          "op": "set",
+          "source": "call_1#turn1"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_doi_tra_qua_han",
+    "outcome": "thong_tin",
+    "objection_type": "qua_han_doi_tra",
+    "objection_handling": "Giải thích chính sách đổi trả chỉ trong 7 ngày, xin lỗi và đề nghị hỗ trợ bảo hành nếu cần.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

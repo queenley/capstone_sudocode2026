@@ -1,0 +1,188 @@
+{
+  "conversation_id": "SCN-ADV-0144__call_1",
+  "scenario_id": "SCN-ADV-0144",
+  "call": "call_1",
+  "customer_id": "SYN-C007",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-11-28",
+  "region": "bac",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "khach_chuyen_giua_nguoi_va_ai",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Lê Thị G ạ, em là trợ lý ảo của shop BTC. Em đã ghi nhận chị từng đặt Máy lọc nước RO Kangaroo 10 lõi, đơn OD900702 của chị đang trong quá trình giao hàng. Chị muốn khiếu nại về đơn hàng này đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị muốn khiếu nại về đơn hàng này đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900702"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900702"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Lê đây, chị muốn khiếu nại về đơn hàng của mình.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xin lỗi vì đơn hàng OD900702 của chị giao chậm, em hiểu cảm giác không hài lòng của chị. Em sẽ chuyển thông tin này lên bộ phận có thẩm quyền để kiểm tra và xử lý cho chị trong ngày hôm nay.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900702"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đơn hàng này giao chậm lần thứ hai rồi, chị không hài lòng chút nào.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận thêm, gói hàng của chị khi nhận bị móp méo là không đúng tiêu chuẩn đóng gói của shop. Em sẽ báo cáo sự việc này để bộ phận liên quan xử lý ngay và có phản hồi cho chị sớm nhất.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Gói hàng còn bị móp méo nữa, thật sự chị rất bực mình.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất xin lỗi vì trải nghiệm không tốt này. Chị yên tâm, em sẽ chuyển khiếu nại của chị đến người phụ trách giải quyết ngay và đảm bảo có nhân viên gọi lại cho chị trong ngày để hỗ trợ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "handoff.transfer",
+          "args": {
+            "brief": {
+              "customer_phone": "0998000007",
+              "customer_name": "Lê Thị G",
+              "escalation_reason": "khieu_nai_nghiem_trong",
+              "conversation_summary": "Khách khiếu nại đơn OD900702 (Máy lọc nước RO Kangaroo 10 lõi): giao chậm, hàng móp méo, muốn người có thẩm quyền giải quyết.",
+              "product_advised": "SKU-WF-RO10",
+              "price_quoted_vnd": 6890000,
+              "open_questions": [
+                "khách muốn được bồi thường cho đơn giao chậm"
+              ],
+              "next_action": "Nhân viên phụ trách gọi lại xử lý khiếu nại đơn OD900702 trong ngày",
+              "generated_at": "2026-11-28T10:00:00+07:00",
+              "channel": "chat_fanpage"
+            }
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn gặp người có thẩm quyền giải quyết chuyện này ngay, chứ không thể chờ thêm nữa.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_human",
+      "text": "Dạ em chào chị Lê, em là nhân viên phụ trách khiếu nại đơn OD900702. Em đã nhận được thông tin chị phản ánh về việc giao hàng chậm và hàng bị móp méo. Em sẽ kiểm tra và liên hệ lại với chị trong hôm nay để giải quyết cho mình ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_human",
+      "text": "Cảm ơn chị đã phản hồi, bên em sẽ xử lý nhanh nhất có thể và thông báo kết quả đến chị trong ngày hôm nay ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "khieu_nai_don_hang",
+    "outcome": "chuyen_may",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "negative",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

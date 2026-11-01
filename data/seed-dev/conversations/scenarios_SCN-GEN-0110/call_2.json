@@ -1,0 +1,186 @@
+{
+  "conversation_id": "SCN-GEN-0110__call_2",
+  "scenario_id": "SCN-GEN-0110",
+  "call": "call_2",
+  "customer_id": "C038",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-03",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Diệp ạ, hôm trước chị có hỏi về Máy lọc không khí AirPure Pro và có chia sẻ là chờ cuối tháng nhận lương.",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị gọi lại để hỏi về máy lọc không khí AirPure Pro.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm Máy lọc không khí AirPure Pro hiện giá là 7.990.000đ ạ. Khuyến mãi AIR-OCT hôm trước đã hết hiệu lực, nên giá này là giá niêm yết hiện tại chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hôm trước em báo giá là bao nhiêu nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hôm trước em báo giá là 7.690.000đ khi có khuyến mãi AIR-OCT, nhưng chương trình đó đã kết thúc ngày 30/10 nên hiện tại không còn áp dụng nữa chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có thấy khuyến mãi gì không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại Máy lọc không khí AirPure Pro bên em không có chương trình khuyến mãi nào áp dụng chị ạ. Nếu chị đặt hàng hôm nay vẫn được miễn phí vận chuyển và COD toàn quốc ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị vẫn chưa quyết định được, chờ thêm một thời gian nữa nhé.",
+      "facts_stated": {
+        "blocker": "chờ thêm một thời gian"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em ghi nhận chị muốn chờ thêm thời gian. Khi nào mình cần tư vấn lại hoặc có chương trình mới em sẽ chủ động báo chị nhé. Em cảm ơn chị đã quan tâm sản phẩm của shop ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ thêm một thời gian",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7990000,
+          "op": "supersede",
+          "source": "call_2#turn3"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "cần thêm thời gian",
+    "objection_handling": "Đồng ý để khách cân nhắc thêm, hẹn khi nào có chương trình mới sẽ báo lại.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "price_quoted_vnd",
+        "old": 7690000,
+        "new": 7990000
+      }
+    ],
+    "callback": null,
+    "order": null
+  }
+}

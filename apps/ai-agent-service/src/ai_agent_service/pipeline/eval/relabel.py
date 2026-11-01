@@ -99,6 +99,9 @@ async def relabel(run: Path, out: Path, extractor: Any) -> int:
             (frozen / path.name).write_bytes(path.read_bytes())
     code, table = report.grade(frozen, full=written["full"], baseline=written.get("baseline_no_memory"),
                                out=out / "report.json")
+    checks = report.team_checks(frozen, written)
+    _write_json(out / "team_checks.json", checks)
+    table = f"{table}\n\n{report.team_table(checks)}"
     (out / "table.txt").write_text(table + "\n", encoding="utf-8")
     print(table)
     return 0 if code == 0 else 1

@@ -1,0 +1,214 @@
+{
+  "conversation_id": "SCN-GEN-0176__call_1",
+  "scenario_id": "SCN-GEN-0176",
+  "call": "call_1",
+  "customer_id": "C019",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-13",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, chị cần tư vấn về sản phẩm nào ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "open",
+          "text": "Chị cần tư vấn về sản phẩm nào ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về máy lọc không khí AirPure Pro ấy.",
+      "facts_stated": {
+        "product_advised": "SKU-AP-PRO"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị quan tâm đến máy lọc không khí AirPure Pro đúng không ạ? Chị có thể cho em biết diện tích phòng mình khoảng bao nhiêu mét vuông để em tư vấn chính xác hơn không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "open",
+          "text": "Chị có thể cho em biết diện tích phòng mình khoảng bao nhiêu mét vuông để em tư vấn chính xác hơn không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 650,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Phòng chị khoảng 15 mét vuông, mà nhà có trẻ nhỏ nữa.",
+      "facts_stated": {
+        "room_area_m2": 15,
+        "has_children": true
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với phòng 15 mét vuông và nhà có trẻ nhỏ, AirPure Pro là lựa chọn rất phù hợp vì có khóa trẻ em, lọc bụi mịn, phấn hoa và khử mùi tốt. Chị dự định ngân sách khoảng bao nhiêu để em xem giá và ưu đãi cho mình ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Chị dự định ngân sách khoảng bao nhiêu để em xem giá và ưu đãi cho mình ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 650,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ngân sách tầm 8 triệu rưỡi, không biết máy này có khuyến mãi gì không?",
+      "facts_stated": {
+        "budget_vnd": 8500000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại máy lọc không khí AirPure Pro đang có giá 7.990.000đ, trong tầm ngân sách của chị. Sản phẩm này chưa có khuyến mãi giảm giá thêm, nhưng được miễn phí vận chuyển toàn quốc và thanh toán COD không mất phí thu hộ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ừ, để chị suy nghĩ thêm rồi gọi lại nhé.",
+      "facts_stated": {
+        "blocker": "cần suy nghĩ thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, chị cứ cân nhắc thêm ạ. Khi nào cần hỗ trợ hoặc đặt hàng, chị liên hệ lại shop BTC bất cứ lúc nào nhé. Em cảm ơn chị đã quan tâm ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 8500000,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 15,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7990000,
+          "op": "set",
+          "source": "call_1#turn7"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_may_loc_khong_khi",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_suy_nghi_them",
+    "objection_handling": "Đã xác nhận lý do khách cần suy nghĩ thêm, hướng dẫn liên hệ lại khi cần.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

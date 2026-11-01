@@ -1,0 +1,167 @@
+{
+  "scenario_id": "SCN-ADV-0088",
+  "level": "M2",
+  "persona": "khach_nhieu_thong_tin",
+  "hard_case": null,
+  "customer_phone": "0998000017",
+  "customer_name": "Vũ Quốc Duy",
+  "honorific": "anh",
+  "notes": "Persona khach_nhieu_thong_tin, biến thể noi_het_mot_lan. call_1 (zalo_oa): chốt đơn → chot_don; call_2 (hotline): hỏi tình trạng đơn → cap_nhat_don. call_1 ngày 01/11: Chủ nhật (LN-01: giờ 09:00–18:00, chỉ nhận đơn). Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_duy17",
+      "call_date": "2026-11-01",
+      "customer_goal": "[plan-only] order",
+      "customer_turns": [
+        "[plan-only] Khách nói rất nhiều thông tin ngay từ đầu: trong 1–2 lượt đầu nêu đủ nhu cầu, sản phẩm muốn mua, hình thức thanh toán và khu vực giao (chỉ quận/tỉnh) trong customer_must_state, rồi muốn chốt đơn nhanh; khó chịu nếu bị hỏi lại điều đã nói."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C017",
+          "session_id": "SYN-017-S1",
+          "date": "2026-04-22",
+          "channel": "hotline",
+          "summary": "Mua Áo khoác gió Windbreak giá 690.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C017",
+          "session_id": "SYN-017-S2",
+          "date": "2026-10-07",
+          "channel": "zalo_oa",
+          "summary": "Đặt Áo phao lông vũ Warmly giá 1.490.000đ, đơn OD901702 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C017",
+          "order_id": "OD901701",
+          "date": "2026-04-22",
+          "sku": "SKU-JK-WND-M-BE",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-JK-WND-M-BE"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C017",
+          "order_id": "OD901702",
+          "date": "2026-10-07",
+          "sku": "SKU-JK-DWN-S-DEN",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901702"
+          }
+        }
+      ],
+      "facts_established": {
+        "child_age_months": 6,
+        "budget_vnd": 500000,
+        "payment": "bank",
+        "delivery_area": "TP Huế",
+        "product_advised": "SKU-MB-BOT",
+        "price_quoted_vnd": 289000,
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-MB-BOT",
+          "price_vnd": 289000,
+          "payment": "bank"
+        },
+        "max_agent_questions": 1
+      },
+      "ground_truth_facts": {
+        "price_vnd": 289000,
+        "list_price_vnd": 289000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_MOM-FREESHIP_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-11-05",
+        "call_date": "2026-11-01"
+      },
+      "memory_expectation": {
+        "child_age_months": 6,
+        "budget_vnd": 500000,
+        "payment": "bank",
+        "delivery_area": "TP Huế",
+        "product_advised": "SKU-MB-BOT",
+        "price_quoted_vnd": 289000,
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    },
+    "call_2": {
+      "days_later": 2,
+      "customer_goal": "[plan-only] order_status",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tình trạng đơn hàng hiện có; không tự đọc mã đơn trừ khi được hỏi xác nhận."
+      ],
+      "must_carry_over": [
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD600001"
+        },
+        "must_say_any": [
+          "đã tạo",
+          "đang xử lý",
+          "đang chuẩn bị",
+          "đã ghi nhận"
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD600001",
+        "order_status": "created",
+        "call_date": "2026-11-03"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    }
+  }
+}

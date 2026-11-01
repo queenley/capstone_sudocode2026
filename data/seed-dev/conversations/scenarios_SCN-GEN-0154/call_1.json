@@ -1,0 +1,223 @@
+{
+  "conversation_id": "SCN-GEN-0154__call_1",
+  "scenario_id": "SCN-GEN-0154",
+  "call": "call_1",
+  "customer_id": "SYN-C013",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-29",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có đặt Nồi chiên không dầu Lock&Lock 4L và Philips 6.2L, hôm nay anh muốn tìm hiểu về máy lọc không khí đúng không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Anh cần tư vấn cho phòng khoảng 25 mét vuông đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro cho phòng khoảng 25 mét vuông.",
+      "facts_stated": {
+        "room_area_m2": 25
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với phòng 25m², AirPure Pro là lựa chọn phù hợp anh nhé. Máy có công suất mạnh, lọc tối đa cho diện tích tới 45m², có khóa trẻ em và app điều khiển.",
+      "questions": [
+        {
+          "slot": "has_children",
+          "type": "open",
+          "text": "Nhà mình có trẻ nhỏ không anh?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhà anh có trẻ nhỏ, ngân sách tầm 8 triệu thôi.",
+      "facts_stated": {
+        "has_children": true,
+        "budget_vnd": 8000000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy AirPure Pro đang có giá ưu đãi còn 7.690.000đ, nằm trong ngân sách của anh. Máy có khóa trẻ em, rất an toàn cho nhà có bé nhỏ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại máy AirPure Pro được giảm ngay 300.000đ khi áp dụng khuyến mãi AIR-OCT, còn 7.690.000đ anh nhé. Ngoài ra, đơn trên 2 triệu được miễn phí vận chuyển và có thể thanh toán khi nhận hàng.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh cần so sánh với máy khác nữa, nên sẽ gọi lại sau nhé.",
+      "facts_stated": {
+        "blocker": "muốn so sánh thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận anh muốn so sánh thêm. Nếu cần tư vấn thêm về các mẫu như AirPure Y, Xiaomi 4 Pro hay Samsung AX40, anh cứ liên hệ lại shop bất kỳ lúc nào ạ. Em sẽ lưu lại nhu cầu của anh để hỗ trợ tốt hơn khi anh gọi lại.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "muốn so sánh thêm",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 8000000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 25,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7690000,
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "promo_code",
+          "value": "AIR-OCT",
+          "op": "set",
+          "source": "call_1#turn6"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_may_loc_khong_khi",
+    "outcome": "hen_goi_lai",
+    "objection_type": "muốn_so_sánh_thêm",
+    "objection_handling": "Nhấn mạnh ưu điểm máy, báo giá và khuyến mãi, đề nghị hỗ trợ thêm khi khách cần so sánh.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

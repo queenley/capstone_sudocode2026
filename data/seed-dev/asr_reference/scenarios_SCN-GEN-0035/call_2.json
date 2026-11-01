@@ -1,0 +1,49 @@
+{
+  "scenario_id": "SCN-GEN-0035",
+  "call": "call_2",
+  "input_mode": "text",
+  "source_sha256": "f8ba9f75824b03063dc56dbfc6e1197ceb58d3f59104602f9768e81cbb748319",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Chào em, chị muốn đổi địa chỉ giao hàng cho đơn hàng OD900202.",
+      "spoken_text": "chào em, chị muốn đổi địa chỉ giao hàng cho đơn hàng ô đê chín trăm nghìn hai trăm linh hai.",
+      "entities": {},
+      "reference_source": "rule",
+      "issues": [
+        "entity_not_stated:order_id"
+      ]
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Địa chỉ cũ là ở Đà Nẵng, nhưng chị muốn chuyển sang Hải Châu nhé.",
+      "spoken_text": "địa chỉ cũ là ở đà nẵng nhưng chị muốn chuyển sang hải châu nhé",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Chị đã đặt giày trekking, mà giờ địa chỉ có chút thay đổi.",
+      "spoken_text": "chị đã đặt giày trekking mà giờ địa chỉ có chút thay đổi",
+      "entities": {
+        "sku": "SKU-SN-TRK"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "Em có thể giúp chị cập nhật địa chỉ này không?",
+      "spoken_text": "em có thể giúp chị cập nhật địa chỉ này không",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

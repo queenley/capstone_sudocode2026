@@ -1,0 +1,136 @@
+{
+  "scenario_id": "SCN-GEN-0211",
+  "level": "M2",
+  "persona": "khach_da_kenh_fb_hotline",
+  "hard_case": "teencode_da_kenh",
+  "customer_phone": "0963279264",
+  "customer_name": "Đạt",
+  "honorific": "anh",
+  "notes": "Persona khach_da_kenh_fb_hotline, biến thể chuan. call_1 (chat_fanpage): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Ca khó: teencode_da_kenh. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.c047",
+      "call_date": "2026-11-12",
+      "input_mode": "chat_teencode",
+      "customer_goal": "Hỏi về giày chạy bộ size 38 màu đen",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về giày chạy bộ size 38 màu đen.",
+        "Giá của đôi giày này là bao nhiêu vậy em?",
+        "Em có biết có khuyến mãi gì không?",
+        "À, anh muốn gọi hotline hỏi thêm nữa."
+      ],
+      "customer_turns_asr": [
+        "alo anh muon hoi ve giay chay bo size 38 mau den",
+        "gia cua doi giay nay la bao nhieu vay em",
+        "em co biet co khuyen mai gi khong",
+        "a anh muon goi hotline hoi them nua"
+      ],
+      "facts_established": {
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "color": "den",
+        "phone_provided": true,
+        "size": 38,
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-38-DEN"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1690000,
+        "list_price_vnd": 1690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-12"
+      },
+      "memory_expectation": {
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "color": "den",
+        "size": 38,
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-38-DEN"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "FAQ-09"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 1,
+      "customer_goal": "Xác nhận mua giày và thông tin giao hàng",
+      "customer_turns": [
+        "Alo, anh gọi lại để mua giày chạy bộ size 38 màu đen.",
+        "Hình thức thanh toán là COD nhé.",
+        "Giao hàng cho anh ở quận Lê Chân, Hải Phòng.",
+        "Mong là giao hàng nhanh nhé!"
+      ],
+      "facts_established": {
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "payment": "COD",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-38-DEN",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "phone_provided",
+        "product_advised",
+        "variant_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-RUN2-38-DEN",
+          "price_vnd": 1690000,
+          "payment": "COD"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1690000,
+        "list_price_vnd": 1690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-11-18",
+        "call_date": "2026-11-13"
+      },
+      "memory_expectation": {
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "payment": "COD",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-38-DEN",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

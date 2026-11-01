@@ -1,0 +1,154 @@
+{
+  "conversation_id": "SCN-GEN-0236__call_1",
+  "scenario_id": "SCN-GEN-0236",
+  "call": "call_1",
+  "customer_id": "SYN-C017",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-25",
+  "region": "trung",
+  "category": "gia-dung/quat",
+  "persona": "khach_cap_nhat_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có đặt Áo phao lông vũ Warmly, đơn hàng đang giao phải không anh? Anh cần em hỗ trợ về quạt đứng DC inverter Panasonic F-409 đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh cần em hỗ trợ về quạt đứng DC inverter Panasonic F-409 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về quạt đứng DC inverter Panasonic F-409.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, quạt đứng DC inverter Panasonic F-409 là mẫu quạt tiết kiệm điện, chạy rất êm và có 9 mức gió, remote điều khiển từ xa, phù hợp dùng trong gia đình anh ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này dùng có ổn không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, sản phẩm này được nhiều khách đánh giá chạy ổn định, độ ồn thấp chỉ 22 dB ở mức thấp nhất, công suất 25W, bảo hành 12 tháng chính hãng anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá của nó là bao nhiêu vậy?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, quạt đứng DC inverter Panasonic F-409 hiện bên em đang bán giá 2.450.000đ anh nhé. Sản phẩm đang có sẵn hàng tại shop.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2450000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, anh cần suy nghĩ thêm một chút rồi sẽ gọi lại nhé.",
+      "facts_stated": {
+        "blocker": "cần suy nghĩ thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, anh cứ suy nghĩ thêm ạ. Khi nào anh có quyết định hoặc cần hỗ trợ gì thêm về quạt Panasonic F-409, anh cứ liên hệ lại với shop em nhé. Em sẽ lưu lại thông tin để hỗ trợ anh lần tới.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm",
+          "op": "set",
+          "source": "call_1#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_san_pham",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chua_quyet_dinh",
+    "objection_handling": "Đã ghi nhận khách cần suy nghĩ thêm, hẹn khách khi nào quyết định liên hệ lại",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

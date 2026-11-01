@@ -1,0 +1,306 @@
+{
+  "conversation_id": "SCN-GEN-0065__call_2",
+  "scenario_id": "SCN-GEN-0065",
+  "call": "call_2",
+  "customer_id": "C035",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-29",
+  "region": "trung",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, em có thể hỗ trợ chị Dung ạ.",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Em có thể hỗ trợ chị Dung về sản phẩm nào ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Dung đây, hôm trước cô Loan đã hỏi máy lọc nước, bây giờ chị muốn đặt hàng.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị Dung đã gọi lại cho shop. Chị muốn đặt sản phẩm nào ạ, em kiểm tra hàng và giá cho chị ngay.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "open",
+          "text": "Chị muốn đặt sản phẩm nào ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị quyết định mua máy lọc không khí AirPure Mini, giá bao nhiêu vậy em?",
+      "facts_stated": {
+        "product_advised": "SKU-AP-MINI"
+      },
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy lọc không khí AirPure Mini hiện đang có sẵn, giá là 2.190.000đ ạ. Sản phẩm được miễn phí vận chuyển toàn quốc và giao dự kiến trong 2–4 ngày làm việc tùy khu vực.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "delivery_days",
+          "value": 2
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Thủ Đức, TP.HCM",
+            "on": "2026-11-29"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "2190000",
+          "spoken": "2.190.000đ"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thanh toán bằng COD, và khu vực giao hàng là Thủ Đức, TP.HCM.",
+      "facts_stated": {
+        "payment": "COD",
+        "delivery_area": "Thủ Đức, TP.HCM"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Thủ Đức, TP.HCM",
+          "spoken": "Thủ Đức, TP.HCM"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận chị chọn thanh toán COD và giao hàng tại Thủ Đức, TP.HCM. Đơn hàng sẽ được giao dự kiến vào ngày 01/12/2026. Với đơn trên 2 triệu thanh toán COD, nhân viên bên em sẽ gọi xác nhận đơn trước khi giao ạ.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em xin phép đọc lại: Máy lọc không khí AirPure Mini, giá 2.190.000đ, giao tại Thủ Đức, TP.HCM, thanh toán COD, giao dự kiến ngày 01/12/2026. Chị xác nhận giúp em thông tin này đúng chưa ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-12-01"
+        },
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "2190000",
+          "spoken": "2.190.000đ"
+        },
+        {
+          "type": "address",
+          "value": "Thủ Đức, TP.HCM",
+          "spoken": "Thủ Đức, TP.HCM"
+        },
+        {
+          "type": "date",
+          "value": "2026-12-01",
+          "spoken": "01/12/2026"
+        }
+      ],
+      "pause_before_ms": 1000,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Vậy thì chị đồng ý lên đơn nhé, cảm ơn em!",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận đơn hàng máy lọc không khí AirPure Mini cho chị, giá 2.190.000đ thanh toán COD, giao dự kiến ngày 01/12/2026. Nhân viên bên em sẽ gọi xác nhận đơn trước khi giao ạ. Em cảm ơn chị Dung đã đặt hàng tại shop BTC!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        },
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-12-01"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0958421083",
+            "sku": "SKU-AP-MINI",
+            "qty": 1,
+            "price_vnd": 2190000,
+            "payment": "COD",
+            "address": "Thủ Đức, TP.HCM",
+            "on": "2026-11-29"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "room_area_m2",
+          "value": 12,
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "has_children",
+          "value": false,
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 2500000,
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Thủ Đức, TP.HCM",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-MINI",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 2190000,
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn1"
+        }
+      ],
+      "entities": [
+        {
+          "type": "money",
+          "value": "2190000",
+          "spoken": "2.190.000đ"
+        },
+        {
+          "type": "date",
+          "value": "2026-12-01",
+          "spoken": "01/12/2026"
+        }
+      ],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-AP-MINI",
+      "qty": 1,
+      "price_vnd": 2190000,
+      "payment": "COD",
+      "address": "Thủ Đức, TP.HCM",
+      "estimated_delivery": "2026-12-01",
+      "order_id": "OD600001"
+    }
+  }
+}

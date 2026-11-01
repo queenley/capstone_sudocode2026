@@ -1,0 +1,189 @@
+{
+  "scenario_id": "SCN-GEN-0075",
+  "level": "M1",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "hard_case": null,
+  "customer_phone": "0998000012",
+  "customer_name": "Trần Thị Bích",
+  "honorific": "chị",
+  "notes": "Persona khach_hoi_nhieu_khong_mua, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): hỏi thêm rồi từ chối → tu_choi. Chấm chủ yếu: CCR, RQR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-17",
+      "customer_goal": "Hỏi về máy lọc nước RO cho gia đình.",
+      "customer_turns": [
+        "Alo, chị Bích đây, chị muốn hỏi về máy lọc nước RO ấy.",
+        "Nhà chị có 4 người, nên cần loại nào phù hợp, em tư vấn cho chị nhé.",
+        "Máy này có giá bao nhiêu và có khuyến mãi gì không em?",
+        "Chị còn muốn so sánh thêm với một số sản phẩm khác nữa.",
+        "Chị sẽ gọi lại sau nhé, để chị tham khảo thêm."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C012",
+          "session_id": "SYN-012-S3",
+          "date": "2025-07-16",
+          "channel": "zalo_oa",
+          "summary": "Mua Nồi chiên không dầu Xiaomi 4.5L giá 1.590.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C012",
+          "session_id": "SYN-012-S1",
+          "date": "2026-04-07",
+          "channel": "web",
+          "summary": "Mua Máy hút sữa điện đôi Medela Swing Maxi giá 5.990.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C012",
+          "session_id": "SYN-012-S2",
+          "date": "2026-10-02",
+          "channel": "hotline",
+          "summary": "Đặt Máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ, đơn OD901202 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C012",
+          "order_id": "OD901201",
+          "date": "2026-04-07",
+          "sku": "SKU-MB-PUMP2",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-MB-PUMP2"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C012",
+          "order_id": "OD901202",
+          "date": "2026-10-02",
+          "sku": "SKU-MB-STER",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901202"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C012",
+          "order_id": "OD901203",
+          "date": "2025-07-16",
+          "sku": "SKU-AF-XM",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AF-XM"
+          }
+        }
+      ],
+      "facts_established": {
+        "usage_need": "gia đình 4 người",
+        "budget_vnd": 7000000,
+        "blocker": "muốn so sánh thêm",
+        "product_advised": "SKU-WF-RO9",
+        "price_quoted_vnd": 5990000
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5990000,
+        "list_price_vnd": 5990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "usage_need": "gia đình 4 người",
+        "budget_vnd": 7000000,
+        "blocker": "muốn so sánh thêm",
+        "product_advised": "SKU-WF-RO9",
+        "price_quoted_vnd": 5990000
+      },
+      "relevant_policy_ids": [
+        "SP-WF-01",
+        "FAQ-05",
+        "PB-01",
+        "PB-11"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 7,
+      "customer_goal": "Hỏi thêm chi tiết rồi từ chối mua.",
+      "customer_turns": [
+        "Chị đã xem lại thông tin về máy lọc nước, nhưng chị vẫn chưa quyết định.",
+        "Em cho chị hỏi thêm chút nữa, máy này có tính năng lọc gì đặc biệt không?",
+        "Chị thấy giá cũng cao, không biết có cách nào khác tiết kiệm hơn không?",
+        "Thực ra chị đã tham khảo vài nơi rồi, nên chị quyết định không mua nữa.",
+        "Cảm ơn em đã tư vấn, nhưng giờ chị chưa muốn mua đâu."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-WF-RO9",
+        "price_quoted_vnd": 5990000
+      },
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "max_agent_questions": 4
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5990000,
+        "list_price_vnd": 5990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-24"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-WF-RO9",
+        "price_quoted_vnd": 5990000
+      },
+      "relevant_policy_ids": [
+        "SP-WF-01",
+        "FAQ-05",
+        "PB-01",
+        "PB-11"
+      ],
+      "expected_outcome": "tu_choi"
+    }
+  }
+}

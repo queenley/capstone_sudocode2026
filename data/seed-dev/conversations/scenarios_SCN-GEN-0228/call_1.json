@@ -1,0 +1,235 @@
+{
+  "conversation_id": "SCN-GEN-0228__call_1",
+  "scenario_id": "SCN-GEN-0228",
+  "call": "call_1",
+  "customer_id": "SYN-C009",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-28",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_ngoai_pham_vi_chuyen_may",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, hôm trước chị có đặt Combo Spectra S1 và máy hâm sữa Fatz bên em ạ. Em là trợ lý ảo của shop, chị cần tư vấn về máy hâm sữa Fatz đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị cần tư vấn về máy hâm sữa Fatz 4 chức năng đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về máy hâm sữa Fatz 4 chức năng mà em đã tư vấn hôm trước.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy hâm sữa Fatz 4 chức năng hiện bên em còn hàng, giá là 490.000đ chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "490000",
+          "spoken": "490.000đ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này giá khoảng bao nhiêu em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm này hiện có giá niêm yết là 490.000đ ạ. Chị dự kiến ngân sách khoảng bao nhiêu để em tư vấn phù hợp hơn cho mình ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Chị dự kiến ngân sách khoảng bao nhiêu để em tư vấn phù hợp hơn cho mình ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "490000",
+          "spoken": "490.000đ"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có ngân sách tầm một triệu thôi.",
+      "facts_stated": {
+        "budget_vnd": 1000000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "1000000",
+          "spoken": "một triệu"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với ngân sách một triệu, chị chọn máy hâm sữa Fatz 4 chức năng là hợp lý rồi ạ. Nếu chị cần thêm tư vấn các dòng khác, em cũng sẵn sàng hỗ trợ thêm cho mình nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1000000",
+          "spoken": "một triệu"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cũng cần bàn với gia đình, hẹn em gọi lại tối thứ Hai (30/11) tầm 7 giờ nhé.",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-11-30",
+          "spoken": "tối thứ Hai (30/11)"
+        },
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị sẽ trao đổi với gia đình và hẹn gọi lại cho chị vào lúc 7 giờ tối thứ Hai, ngày 30/11 nhé. Em sẽ liên hệ đúng khung giờ chị mong muốn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-11-30T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0998000009",
+            "callback_at": "2026-11-30T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_1#turn9"
+        }
+      ],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-11-30",
+          "spoken": "30/11"
+        },
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_hoi_nguoi_nha",
+    "objection_handling": "Đã xác nhận thời điểm gọi lại theo yêu cầu và ghi chú lại.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-11-30T19:00",
+      "note": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

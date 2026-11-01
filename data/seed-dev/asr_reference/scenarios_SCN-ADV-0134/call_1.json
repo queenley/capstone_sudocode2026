@@ -1,0 +1,53 @@
+{
+  "scenario_id": "SCN-ADV-0134",
+  "call": "call_1",
+  "input_mode": "text",
+  "source_sha256": "d64a326a02b44a2d4367775a2252b646477a43cb6bd6f76b98249d3fe16f863a",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Alo em, anh muốn đặt máy hâm sữa Fatz 4 chức năng cho bé 18 tháng.",
+      "spoken_text": "alo em anh muốn đặt máy hâm sữa fatz bốn chức năng cho bé mười tám tháng",
+      "entities": {
+        "sku": "SKU-MB-MON"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Giá khoảng 490 ngàn gì đó đúng không?",
+      "spoken_text": "giá khoảng bốn trăm chín mươi ngàn gì đó đúng không?",
+      "entities": {
+        "price_vnd": 490000
+      },
+      "reference_source": "rule",
+      "issues": [
+        "words_changed"
+      ]
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Hình thức thanh toán là COD nhé.",
+      "spoken_text": "hình thức thanh toán là cê ô đê nhé",
+      "entities": {
+        "payment": "COD"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "Giao hàng cho anh ở quận Lê Chân, Hải Phòng luôn.",
+      "spoken_text": "giao hàng cho anh ở quận lê chân hải phòng luôn",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

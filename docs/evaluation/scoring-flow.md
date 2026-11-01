@@ -6,7 +6,7 @@ Một trang để biết một con số RQR, CCR, TSR hay HR đến từ đâu. 
 
 1. **Con số chính thức là `reference_eval.py` của BTC**, chạy nguyên bản như một tiến trình riêng trên hai file trace. Đội không tính lại công thức nào. Gói BTC là bản duy nhất trong repo (`apps/ai-agent-service/data/btc`), và `tests/agent/test_btc_pack.py` ghim hash từng file để nó không đổi lặng lẽ.
 2. **Script đó chỉ đọc trace**, không đọc hội thoại. Mọi thứ nó cần phải có sẵn trong mỗi dòng: `questions[]`, `claims[]`, `facts_used[]`, `tool_calls[]`, `latency`, `memory_writes`. BTC không phát extractor: việc trích `questions` và `claims` là của đội, và BTC chấm tay ngẫu nhiên 20 lượt để bắt extractor bỏ sót hoặc bịa.
-3. **Đổi extractor là đổi dụng cụ đo.** Chỉ so các số do cùng một `extractor_version` ra (hiện `product-extractor-v4`).
+3. **Đổi extractor là đổi dụng cụ đo.** Chỉ so các số do cùng một `extractor_version` ra (hiện `product-extractor-v5`: từ v5, câu đọc lại đơn trước khi tạo là **một** câu xác nhận `order_summary`, không còn một câu cho mỗi chi tiết; số của v4 so với v5 bằng `run_eval.py --relabel`).
 
 ## 2. Luồng một lần chạy
 
@@ -34,6 +34,7 @@ run_eval.py --scenarios <thư mục> [--config ...] [--only ID] [--no-extract] -
  │
  └─ report.grade   python reference_eval.py --scenarios ... --trace full.jsonl --baseline baseline.jsonl
                    → report.json, table.txt  ← SỐ CHÍNH THỨC; thêm bảng Recall@k của RAG (rag.py)
+                   → team_checks.json        ← kiểm tra của nhóm (say_at_most), chẩn đoán, in dưới bảng
 ```
 
 Có `--config` thì chỉ chạy và ghi một file trace, không chấm (BTC sẽ ghép hai file rồi tự chạy `reference_eval.py`).

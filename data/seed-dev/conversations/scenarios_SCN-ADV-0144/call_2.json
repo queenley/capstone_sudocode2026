@@ -1,0 +1,181 @@
+{
+  "conversation_id": "SCN-ADV-0144__call_2",
+  "scenario_id": "SCN-ADV-0144",
+  "call": "call_2",
+  "customer_id": "SYN-C007",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-30",
+  "region": "bac",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "khach_chuyen_giua_nguoi_va_ai",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop. Hôm trước bạn nhân viên đã hỗ trợ chị về đơn Máy lọc nước RO Kangaroo 10 lõi rồi, em xin cập nhật tình trạng đơn cho mình ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900702"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 900,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, hôm trước chị đã khiếu nại với nhân viên rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã kiểm tra, đơn hàng của chị đang vận chuyển rồi ạ. Đơn mã OD900702, bên vận chuyển đã nhận hàng và đang giao đến cho mình, mã vận đơn là VN0072TRK chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "shipping"
+        },
+        {
+          "field": "order_id",
+          "value": "OD900702"
+        },
+        {
+          "field": "tracking",
+          "value": "VN0072TRK"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn hỏi đơn hàng của mình bây giờ đến đâu rồi nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn của chị hiện đã bàn giao cho đơn vị vận chuyển và đang trên đường giao đến địa chỉ của mình ạ. Nếu cần tra cứu nhanh, chị có thể dùng mã VN0072TRK để kiểm tra trên hệ thống vận chuyển.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "shipping"
+        },
+        {
+          "field": "tracking",
+          "value": "VN0072TRK"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị không muốn kể lại từ đầu đâu, chỉ cần biết tình trạng thôi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị yên tâm, em chỉ cập nhật tình trạng: đơn của mình đang giao, dự kiến giao trong 2–4 ngày làm việc tùy khu vực, bên vận chuyển sẽ liên hệ trước khi giao ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "shipping"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em có thể cho chị biết đơn hàng đang ở đâu không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại đơn hàng của chị đang trên đường vận chuyển, mã vận đơn VN0072TRK. Khi hàng tới gần nơi giao, bên vận chuyển sẽ gọi cho mình trước ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "shipping"
+        },
+        {
+          "field": "tracking",
+          "value": "VN0072TRK"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

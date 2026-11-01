@@ -1,0 +1,142 @@
+{
+  "scenario_id": "SCN-GEN-0119",
+  "level": "M2",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "hard_case": null,
+  "customer_phone": "0998000007",
+  "customer_name": "Lê Thị G",
+  "honorific": "chị",
+  "notes": "Persona khach_co_don_chua_co_lich_su, biến thể chuan. call_1 (hotline): hỏi tình trạng đơn → cap_nhat_don; call_2 (hotline): đổi địa chỉ giao → cap_nhat_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-30",
+      "customer_goal": "Hỏi tình trạng đơn hàng đang giao",
+      "customer_turns": [
+        "Alo chị, chị muốn hỏi tình trạng đơn hàng của mình.",
+        "Chị đặt máy lọc nước RO hôm 7 tháng 10, không biết giờ giao đến đâu rồi?",
+        "Chị thấy trên web ghi là đang giao hàng mà, em có thông tin gì không?",
+        "Có khi nào bị trễ không em?",
+        "Chị cần biết để chuẩn bị nhận hàng."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C007",
+          "session_id": "SYN-007-S1",
+          "date": "2026-04-19",
+          "channel": "fb",
+          "summary": "Mua Máy lọc không khí Samsung AX40 giá 6.490.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C007",
+          "session_id": "SYN-007-S2",
+          "date": "2026-10-07",
+          "channel": "web",
+          "summary": "Đặt Máy lọc nước RO Kangaroo 10 lõi giá 6.890.000đ, đơn OD900702 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C007",
+          "order_id": "OD900701",
+          "date": "2026-04-19",
+          "sku": "SKU-SS-AX40",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-SS-AX40"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C007",
+          "order_id": "OD900702",
+          "date": "2026-10-07",
+          "sku": "SKU-WF-RO10",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900702"
+          }
+        }
+      ],
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD900702"
+        },
+        "must_say_any": [
+          "đang giao",
+          "đang vận chuyển",
+          "đã bàn giao"
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900702",
+        "order_status": "shipping",
+        "tracking": "VN0072TRK",
+        "call_date": "2026-10-30"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    },
+    "call_2": {
+      "days_later": 1,
+      "customer_goal": "Đổi địa chỉ giao hàng cho đơn hàng",
+      "customer_turns": [
+        "Chị gọi lại để thay đổi địa chỉ giao hàng cho đơn hàng đó.",
+        "Địa chỉ cũ là quận Hoàn Kiếm, chị muốn chuyển sang Long Biên, Hà Nội.",
+        "Chị đã gửi thông tin địa chỉ trước đó rồi, mà giờ cần đổi lại.",
+        "Em có thể cập nhật địa chỉ mới cho chị không?",
+        "Chị đang chờ đơn hàng đó về."
+      ],
+      "facts_established": {
+        "delivery_area": "Long Biên, Hà Nội"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "OD900702",
+          "action": "update_address"
+        }
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900702",
+        "order_status": "shipping",
+        "tracking": "VN0072TRK",
+        "call_date": "2026-10-31"
+      },
+      "memory_expectation": {
+        "delivery_area": "Long Biên, Hà Nội"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    }
+  }
+}

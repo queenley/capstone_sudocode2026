@@ -1,0 +1,334 @@
+{
+  "conversation_id": "SCN-ADV-0001__call_2",
+  "scenario_id": "SCN-ADV-0001",
+  "call": "call_2",
+  "customer_id": "C001",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-16",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_hoi_san_pham_khong_ban",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Hoa ạ, em là trợ lý ảo của shop BTC. Hôm trước chị có hỏi về tủ lạnh, hôm nay em sẵn sàng hỗ trợ chị về máy lọc không khí AirPure X ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, hôm qua chị hỏi về tủ lạnh nhưng không có, hôm nay chị muốn hỏi về máy lọc không khí AirPure X.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện mẫu AirPure X bên em đang có sẵn hàng chị nhé. Không biết chị cần tư vấn cho diện tích phòng bao nhiêu mét vuông ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "open",
+          "text": "Không biết chị cần tư vấn cho diện tích phòng bao nhiêu mét vuông ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần máy lọc không khí cho phòng khoảng 25 mét vuông.",
+      "facts_stated": {
+        "room_area_m2": 25
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với phòng 25 mét vuông, AirPure X là lựa chọn phù hợp chị nhé. Nhà mình có trẻ nhỏ, em xin hỏi chị ưu tiên tính năng gì đặc biệt không ạ?",
+      "questions": [
+        {
+          "slot": "has_children",
+          "type": "confirm",
+          "text": "Nhà mình có trẻ nhỏ, em xin hỏi chị ưu tiên tính năng gì đặc biệt không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-AP-X"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhà chị có bé nhỏ nên muốn tìm cái nào tốt một chút.",
+      "facts_stated": {
+        "has_children": true
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ. AirPure X lọc tốt bụi mịn, phù hợp cho gia đình có em bé. Giá máy hôm nay là 4.890.000đ, tặng kèm một màng lọc thay thế trị giá 500.000đ chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4890000
+        },
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        },
+        {
+          "field": "gift_sku",
+          "value": "SKU-AP-FLT-X"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "4890000",
+          "spoken": "4.890.000đ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá của máy này là bao nhiêu và có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xin nhắc lại, AirPure X hiện giá 4.890.000đ, đang có khuyến mãi tặng màng lọc chính hãng. Ngoài ra, bên em miễn phí vận chuyển với đơn này cho chị luôn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4890000
+        },
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "4890000",
+          "spoken": "4.890.000đ"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có ngân sách khoảng 5 triệu thôi, mà vẫn chưa chốt được, cần bàn với gia đình đã.",
+      "facts_stated": {
+        "budget_vnd": 5000000,
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "5000000",
+          "spoken": "5 triệu"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận ngân sách của chị là khoảng 5 triệu, mức giá hiện tại của AirPure X là 4.890.000đ nên nằm trong tầm chị dự kiến. Nếu chị cần thêm thời gian bàn với gia đình, em có thể hẹn gọi lại cho mình.",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị muốn em gọi lại vào thời gian nào thuận tiện cho chị ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "4890000",
+          "spoken": "4.890.000đ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn hẹn lại tối mai tầm 7 giờ em gọi lại cho chị nhé.",
+      "facts_stated": {},
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận, tối mai lúc 7 giờ em sẽ gọi lại cho chị để hỗ trợ thêm thông tin về AirPure X ạ. Chúc chị một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-10-17T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0984726714",
+            "callback_at": "2026-10-17T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "room_area_m2",
+          "value": 25,
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 5000000,
+          "op": "set",
+          "source": "call_2#turn10"
+        },
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_2#turn10"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-X",
+          "op": "set",
+          "source": "call_2#turn5"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 4890000,
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "promo_code",
+          "value": "GIFT-FILTER",
+          "op": "set",
+          "source": "call_2#turn8"
+        }
+      ],
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": {
+      "customer_phone": "0984726714",
+      "callback_at": "2026-10-17T19:00",
+      "note": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

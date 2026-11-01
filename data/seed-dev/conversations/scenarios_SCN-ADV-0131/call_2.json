@@ -1,0 +1,272 @@
+{
+  "conversation_id": "SCN-ADV-0131__call_2",
+  "scenario_id": "SCN-ADV-0131",
+  "call": "call_2",
+  "customer_id": "C016",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-14",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_go_sai_chinh_ta",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Phúc ạ, hôm qua anh có hỏi về Giày sneaker Urban Classic size 41 màu đen và để bàn với gia đình. Dạ anh muốn mình tiếp tục đặt luôn sản phẩm này đúng không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Anh muốn mình tiếp tục đặt luôn sản phẩm này đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "size",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh đây.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã quay lại. Sản phẩm Giày sneaker Urban Classic size 41 màu đen hiện còn hàng, giá 890.000đ. Anh xác nhận giúp em thông tin đơn hàng: 1 đôi giày Urban Classic size 41 màu đen, giao tại Lê Chân, Hải Phòng, thanh toán COD, nhận dự kiến trong 4 ngày, tổng giá 890.000đ đúng không ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh xác nhận giúp em thông tin đơn hàng: 1 đôi giày Urban Classic size 41 màu đen, giao tại Lê Chân, Hải Phòng, thanh toán COD, nhận dự kiến trong 4 ngày, tổng giá 890.000đ đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area",
+        "payment",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Lê Chân, Hải Phòng",
+            "on": "2026-11-14"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hôm qua em tư vấn cho anh về giày sneaker Urban Classic size 41 màu đen, anh muốn mua.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận ạ. Anh chọn hình thức thanh toán là COD phải không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Anh chọn hình thức thanh toán là COD phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "payment"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán là COD.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, địa chỉ giao hàng là Lê Chân, Hải Phòng đúng không anh?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Địa chỉ giao hàng là Lê Chân, Hải Phòng đúng không anh?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là Lê Chân, Hải Phòng.",
+      "facts_stated": {
+        "delivery_area": "Lê Chân, Hải Phòng"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Lê Chân, Hải Phòng",
+          "spoken": "Lê Chân, Hải Phòng"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đặt đơn cho anh luôn ạ. Anh sẽ nhận giày Urban Classic size 41 màu đen tại Lê Chân, Hải Phòng, thanh toán COD, dự kiến giao trong 4 ngày với giá 890.000đ. Em đã gửi xác nhận đơn cho anh, cảm ơn anh đã đặt hàng tại shop!",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "payment",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 890000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0920525898",
+            "sku": "SKU-SN-CAS-41-DEN",
+            "qty": 1,
+            "price_vnd": 890000,
+            "payment": "COD",
+            "address": "Lê Chân, Hải Phòng",
+            "on": "2026-11-14"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Lê Chân, Hải Phòng",
+          "op": "set",
+          "source": "call_2#turn9"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_2#turn7"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-CAS",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 890000,
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-CAS-41-DEN",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xac_nhan_mua_giay_urban_classic",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-SN-CAS-41-DEN",
+      "qty": 1,
+      "price_vnd": 890000,
+      "payment": "COD",
+      "address": "Lê Chân, Hải Phòng",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-11-19"
+    }
+  }
+}

@@ -1,0 +1,278 @@
+{
+  "conversation_id": "SCN-GEN-0223__call_1",
+  "scenario_id": "SCN-GEN-0223",
+  "call": "call_1",
+  "customer_id": "SYN-C010",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-26",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_so_gia",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần tư vấn về máy lọc không khí đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh muốn hỏi về máy lọc không khí AirPure X đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về cái máy lọc không khí mà em đã tư vấn hôm trước.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã quan tâm. Anh có thể cho em biết diện tích phòng mình và có trẻ nhỏ không để em tư vấn loại phù hợp nhất ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "open",
+          "text": "Anh cho em hỏi diện tích phòng mình khoảng bao nhiêu mét vuông ạ?"
+        },
+        {
+          "slot": "has_children",
+          "type": "open",
+          "text": "Nhà mình có bé nhỏ đúng không anh?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Phòng của anh khoảng 20 mét vuông, có bé nhỏ nên cần máy xài cho an toàn.",
+      "facts_stated": {
+        "room_area_m2": 20,
+        "has_children": true
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với phòng 20 mét vuông và có bé nhỏ, anh chọn máy lọc không khí AirPure X là hợp lý ạ. Máy này phù hợp phòng tối đa 25m², lọc bụi mịn và có chế độ ngủ êm, tuy không có khóa trẻ em nhưng vẫn an toàn cho gia đình mình.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-AP-X"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá máy này là bao nhiêu vậy?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giá máy lọc không khí AirPure X hiện tại là 4.890.000đ anh nhé. Giá này đã là giá tốt nhất của shop rồi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "4890000",
+          "spoken": "4.890.000đ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hôm trước thấy em báo là 4 triệu 8 nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi anh, giá máy AirPure X em báo hôm trước là 4.890.000đ và hiện tại vẫn giữ nguyên mức giá này anh nhé. Shop mình luôn bán đúng giá niêm yết, không tăng giá dịp cuối năm ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_quoted_vnd",
+          "value": 4890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "4890000",
+          "spoken": "4.890.000đ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhưng mà anh thấy chỗ khác có giá 4 triệu rưỡi, em có giảm thêm không?",
+      "facts_stated": {
+        "competitor_price_vnd": 4500000,
+        "objection": "giá cao hơn chỗ khác"
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "4500000",
+          "spoken": "4 triệu rưỡi"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất hiểu mong muốn của anh. Tuy nhiên giá bên em là giá niêm yết chính hãng, đã tối ưu rồi nên hiện tại chưa có chương trình giảm thêm cho sản phẩm này. Mình mua tại shop sẽ được bảo hành 24 tháng và hỗ trợ đổi trả trong 7 ngày nếu có lỗi kỹ thuật anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À chưa chốt đâu, để anh hỏi lại một chút rồi gọi lại nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, anh cứ cân nhắc thêm ạ. Nếu cần hỗ trợ gì thêm hoặc quyết định đặt hàng, anh gọi lại cho shop bất cứ lúc nào nhé. Em cảm ơn anh đã quan tâm sản phẩm bên em ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "budget_vnd",
+          "value": 5500000,
+          "op": "set",
+          "source": "call_1#turn13"
+        },
+        {
+          "key": "competitor_price_vnd",
+          "value": 4500000,
+          "op": "set",
+          "source": "call_1#turn13"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn13"
+        },
+        {
+          "key": "objection",
+          "value": "giá cao hơn chỗ khác",
+          "op": "set",
+          "source": "call_1#turn13"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 20,
+          "op": "set",
+          "source": "call_1#turn13"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-X",
+          "op": "set",
+          "source": "call_1#turn13"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 4890000,
+          "op": "set",
+          "source": "call_1#turn13"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "so_sanh_gia",
+    "objection_handling": "Giải thích giá niêm yết chính hãng, nêu bảo hành và đổi trả, không giảm thêm.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

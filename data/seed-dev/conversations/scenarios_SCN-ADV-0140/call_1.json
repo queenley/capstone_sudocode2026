@@ -1,0 +1,304 @@
+{
+  "conversation_id": "SCN-ADV-0140__call_1",
+  "scenario_id": "SCN-ADV-0140",
+  "call": "call_1",
+  "customer_id": "SYN-C001",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-12-25",
+  "region": "bac",
+  "category": "gia-dung/phu-kien",
+  "persona": "khach_mua_phu_kien_thay_the",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có mua Máy lọc không khí AirPure X, em có thể hỗ trợ mình về thời gian thay màng lọc và đặt mua màng lọc thay thế ạ.",
+      "questions": [],
+      "facts_used": [
+        "owned_sku",
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, em chào anh, anh muốn hỏi về thời gian thay màng lọc cho máy lọc không khí AirPure X mà anh đã mua.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ màng lọc cho AirPure X khuyến nghị thay sau 6–12 tháng tùy môi trường sử dụng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này anh dùng cũng lâu rồi, không biết mình nên thay màng lọc sau bao lâu nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với AirPure X, anh nên thay màng lọc mỗi 6–12 tháng để đảm bảo hiệu quả lọc tốt nhất ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh đang cần mua màng lọc thay thế AirPure X/Y, em có thể cho anh biết giá cả và cách thức thanh toán không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ màng lọc thay thế AirPure X/Y bên em hiện có sẵn với giá 690.000đ một chiếc ạ. Anh có thể thanh toán COD khi nhận hàng hoặc chuyển khoản ngân hàng tuỳ ý mình.",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "open",
+          "text": "Anh muốn thanh toán COD hay chuyển khoản ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "690000",
+          "spoken": "690.000đ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh muốn thanh toán bằng COD, và địa chỉ giao hàng là Cầu Giấy, Hà Nội nhé.",
+      "facts_stated": {
+        "payment": "COD",
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Cầu Giấy, Hà Nội",
+          "spoken": "Cầu Giấy, Hà Nội"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận lại: anh đặt 1 màng lọc thay thế AirPure X/Y giá 690.000đ, giao về Cầu Giấy, Hà Nội, thanh toán COD khi nhận hàng. Đơn hàng sẽ được giao dự kiến trong 2 ngày làm việc, khoảng 28/12 ạ. Em xin phép lên đơn cho mình luôn anh nhé.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh kiểm tra lại thông tin đơn giúp em: 1 màng lọc AirPure X/Y, giá 690.000đ, giao Cầu Giấy, Hà Nội, thanh toán COD, nhận hàng dự kiến 28/12 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-12-25"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "690000",
+          "spoken": "690.000đ"
+        },
+        {
+          "type": "date",
+          "value": "2026-12-28",
+          "spoken": "28/12"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Vâng, đúng rồi em.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã lên đơn hàng mã OD600001 cho anh, tổng tiền 690.000đ, giao về Cầu Giấy, Hà Nội và thanh toán COD. Anh sẽ nhận hàng dự kiến khoảng ngày 28/12. Em cảm ơn anh đã đặt hàng tại BTC, cần hỗ trợ gì thêm anh cứ liên hệ em nhé!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 690000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000001",
+            "sku": "SKU-AP-FLT-X",
+            "qty": 1,
+            "price_vnd": 690000,
+            "payment": "COD",
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-12-25"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "budget_vnd",
+          "value": 1000000,
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Cầu Giấy, Hà Nội",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "usage_need",
+          "value": "mua làm quà",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-FLT-X",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 690000,
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_1#turn10"
+        }
+      ],
+      "entities": [
+        {
+          "type": "money",
+          "value": "690000",
+          "spoken": "690.000đ"
+        },
+        {
+          "type": "order_id",
+          "value": "OD600001",
+          "spoken": "OD600001"
+        },
+        {
+          "type": "date",
+          "value": "2026-12-28",
+          "spoken": "28/12"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_mua_mang_loc",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-AP-FLT-X",
+      "qty": 1,
+      "price_vnd": 690000,
+      "payment": "COD",
+      "address": "Cầu Giấy, Hà Nội",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-12-28"
+    }
+  }
+}

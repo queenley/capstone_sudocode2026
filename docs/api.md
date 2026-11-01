@@ -143,7 +143,7 @@ Giao diện: trang `/calls` của web (`src/features/call-console.tsx`).
 | Method | Path | Mô tả |
 |---|---|---|
 | GET | `/api/agent/calls?open_only=&limit=` | Danh sách cuộc gọi: lane, tier, trạng thái handoff, brief |
-| GET | `/api/agent/calls/{call_id}` | Cuộc gọi, transcript và `held_by_you`; số điện thoại chỉ hiện 4 số cuối |
+| GET | `/api/agent/calls/{call_id}` | Cuộc gọi, transcript và `held_by_you`; số điện thoại chỉ hiện 4 số cuối. Tin khách có thể mang `meta.handoff`: `{"role":"trigger","reason","label"}` (tin ngay trước khi chuyển máy) hoặc `{"role":"waiting","label"}` (gửi lúc chờ nhân viên), để console tô đỏ |
 | POST | `/api/agent/calls/{call_id}/handoff` | `{"reason"}`: yêu cầu chuyển nhân viên |
 | POST | `/api/agent/calls/{call_id}/accept` | Nhân viên nhận cuộc gọi |
 | POST | `/api/agent/calls/{call_id}/reply` | `{"content","action":"used"\|"edited"\|"own","force"}`; cùng hard guard như agent, trả `warnings` nếu không `force`. Khi gửi được, câu trả lời hiện trong chat của khách (speaker `agent`) |

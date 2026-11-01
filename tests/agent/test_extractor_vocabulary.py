@@ -102,6 +102,16 @@ def test_channel_keeps_its_slot():
     assert changed == 0
 
 
+def test_an_order_read_back_is_one_confirm_question_and_never_a_fact():
+    kept, changed = scorers.restrict([item("question", "order_summary", "confirm"),
+                                      item("fact_usage", "order_summary", start=3, end=4),
+                                      item("fact_usage", "payment", start=5, end=6)])
+    assert [(i["kind"], i["slot_or_field"], i["question_type"]) for i in kept] == [
+        ("question", "order_summary", "confirm"), ("fact_usage", "payment", None)]
+    assert changed == 1
+    assert "order_summary" in prompt() and scorers.VERSION.endswith("v5")
+
+
 def test_a_fact_use_outside_the_vocabulary_is_dropped():
     kept, _ = scorers.restrict([item("fact_usage", "date"), item("fact_usage", "order_id", start=2, end=3)])
     assert [i["slot_or_field"] for i in kept] == ["order_id"]

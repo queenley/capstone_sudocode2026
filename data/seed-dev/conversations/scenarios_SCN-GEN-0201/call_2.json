@@ -1,0 +1,184 @@
+{
+  "conversation_id": "SCN-GEN-0201__call_2",
+  "scenario_id": "SCN-GEN-0201",
+  "call": "call_2",
+  "customer_id": "SYN-C012",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-16",
+  "region": "nam",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Bích ạ, em là trợ lý ảo của shop BTC. Em đã thấy chị có đơn hàng gần đây rồi ạ, chị cần hỗ trợ đổi địa chỉ giao hàng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị cần hỗ trợ đổi địa chỉ giao hàng đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD901203"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị Bích đây, hôm trước chị đã hỏi về đơn hàng, giờ chị muốn đổi địa chỉ giao hàng một chút.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị muốn đổi địa chỉ giao hàng cho đơn đã giao sang Quận 7, TP.HCM đúng không ạ? Em sẽ hỗ trợ cập nhật ngay cho chị.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD901203",
+            "action": "update_address",
+            "on": "2026-11-16"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đang ở Quận 7, TP.HCM, mà đơn hàng thì lại giao sang chỗ khác, em giúp chị đổi được không?",
+      "facts_stated": {
+        "delivery_area": "Quận 7, TP.HCM"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Quận 7, TP.HCM",
+          "spoken": "Quận 7, TP.HCM"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã cập nhật địa chỉ giao hàng mới cho chị sang Quận 7, TP.HCM thành công rồi ạ. Đơn hàng của chị đã được giao trước đó, nếu cần hỗ trợ thêm về đơn hàng hoặc giao lại, chị báo em nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "delivered"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị nghĩ là có thể giao đến địa chỉ mới trong khu vực này được không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng đã được giao thành công trước đó rồi ạ. Nếu chị cần đặt lại hàng để giao đến địa chỉ mới, em sẵn sàng hỗ trợ chị tạo đơn mới ngay nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_status"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "delivered"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần hàng gấp cho con, nên mong em giúp chị nhanh nhanh nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu nhu cầu gấp của chị ạ. Nếu chị cần đặt lại đơn hàng để giao nhanh đến Quận 7, em sẽ hỗ trợ chị lên đơn mới ngay và ưu tiên xử lý nhanh nhất có thể cho chị.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Quận 7, TP.HCM",
+          "op": "set",
+          "source": "call_2#turn4"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

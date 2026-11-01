@@ -1,0 +1,220 @@
+{
+  "conversation_id": "SCN-ADV-0032__call_2",
+  "scenario_id": "SCN-ADV-0032",
+  "call": "call_2",
+  "customer_id": "C019",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-01",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_chot_don_doc_lai",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Linh ạ, hôm trước bạn nhân viên đã hỗ trợ mình về giày sneaker Urban Classic, chị đã để bàn với gia đình rồi đúng không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "chị đã để bàn với gia đình rồi đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "size",
+        "payment",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, hôm nay chị gọi lại để chốt đơn giày sneaker như hôm trước em tư vấn.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em lên đơn Giày sneaker Urban Classic size 42 màu xám, giá 890.000đ, giao tại TP Huế và thanh toán khi nhận hàng cho chị nhé. Hàng này hiện có sẵn, em sẽ đọc lại thông tin đơn hàng, chị nghe giúp em xác nhận nhé.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Chị xác nhận giúp em: Giày sneaker Urban Classic size 42 xám, 1 đôi, giá 890.000đ, giao tại TP Huế, thanh toán COD, dự kiến nhận hàng vào ngày 05/11/2026 đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "TP Huế",
+            "on": "2026-11-01"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Lên đơn như hôm trước em nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 650,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận đơn hàng. Em sẽ tạo đơn Giày sneaker Urban Classic size 42 xám, giá 890.000đ, giao TP Huế, thanh toán COD cho chị ngay bây giờ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 890000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0905218549",
+            "sku": "SKU-SN-CAS-42-XAM",
+            "qty": 1,
+            "price_vnd": 890000,
+            "payment": "COD",
+            "address": "TP Huế",
+            "on": "2026-11-01"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị nghe nhân viên đọc lại đơn hàng, đúng rồi em.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng của chị đã được tạo thành công. Dự kiến chị sẽ nhận được hàng vào ngày 05/11/2026 tại TP Huế. Khi nhận hàng chị kiểm tra ngoại quan rồi thanh toán giúp em, shop hỗ trợ miễn phí thu hộ COD cho đơn này ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-CAS",
+          "op": "set",
+          "source": "call_2#turn5"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 890000,
+          "op": "set",
+          "source": "call_2#turn5"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-CAS-42-XAM",
+          "op": "set",
+          "source": "call_2#turn5"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn5"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cảm ơn em, vậy chị chờ hàng nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-SN-CAS-42-XAM",
+      "qty": 1,
+      "price_vnd": 890000,
+      "payment": "COD",
+      "address": "TP Huế",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-11-05"
+    }
+  }
+}

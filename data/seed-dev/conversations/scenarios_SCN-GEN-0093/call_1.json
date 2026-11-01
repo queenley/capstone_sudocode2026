@@ -1,0 +1,199 @@
+{
+  "conversation_id": "SCN-GEN-0093__call_1",
+  "scenario_id": "SCN-GEN-0093",
+  "call": "call_1",
+  "customer_id": "C008",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-31",
+  "region": "nam",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "khach_da_kenh_fb_hotline",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chào anh ạ, em là trợ lý ảo của shop BTC, anh cần tư vấn về máy lọc nước đúng không ạ?",
+      "questions": [
+        {
+          "slot": "usage_need",
+          "type": "open",
+          "text": "Anh muốn dùng cho mấy người trong gia đình hay nhu cầu như thế nào ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo anh muon hoi ve may loc nuoc uf sunhouse cho gia dinh 5 nguoi",
+      "facts_stated": {
+        "usage_need": "gia đình 5 người"
+      },
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, với gia đình 5 người thì máy lọc nước UF Sunhouse là phù hợp anh nhé. Máy dùng công nghệ UF, không cần điện, lọc được nước máy đạt chuẩn, công suất lọc 15 lít/giờ.",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Anh dự định chi khoảng bao nhiêu cho máy lọc nước này ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3290000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "ngan sach cua anh tam 3 trieu rưỡi thoi",
+      "facts_stated": {
+        "budget_vnd": 3500000
+      },
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại máy UF Sunhouse giá 3.290.000đ, nằm trong ngân sách của anh nhé. Máy đang có sẵn hàng tại shop.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3290000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "may nay co khuyen mai gi khong em nhi",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra thì hiện tại máy lọc nước UF Sunhouse chưa có chương trình khuyến mãi nào áp dụng. Tuy nhiên, đơn từ 500.000đ sẽ được miễn phí vận chuyển toàn quốc anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "a anh muon goi hotline hoi them mot so thong tin nua",
+      "facts_stated": {
+        "blocker": "muốn gọi hotline hỏi thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, anh có thể gọi hotline của shop để được hỗ trợ thêm chi tiết. Em đã ghi nhận nhu cầu và thông tin của anh rồi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "usage_need",
+          "value": "gia đình 5 người",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 3500000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "blocker",
+          "value": "muốn gọi hotline hỏi thêm",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-WF-UF",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 3290000,
+          "op": "set",
+          "source": "call_1#turn6"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

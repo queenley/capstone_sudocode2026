@@ -47,12 +47,12 @@ import logging
 import os
 import re
 import unicodedata
-from datetime import date, timedelta
 from types import ModuleType
 from typing import Any, Awaitable, Callable
 
 from ...config.config_manager import btc_data_dir
 from ..server_base import ToolFailure, database
+from . import delivery
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +72,7 @@ WRITES = frozenset({"order.create", "order.update", "schedule.callback", "handof
 
 #: Areas of the mock's delivery rule (``mock_tools._eta``), named as a
 #: customer would hear them, each with an address the rule places there.
-DELIVERY_AREAS = (("Hà Nội, TP.HCM, Đà Nẵng", "Hà Nội"), ("tỉnh thành khác", None))
+DELIVERY_AREAS = delivery.DELIVERY_AREAS
 
 _mock: ModuleType | None = None
 
@@ -313,10 +313,7 @@ async def search_catalog(args: dict[str, Any], search: Callable[[dict[str, Any]]
 
 def _working_days(start: str, end: str) -> int:
     """Days after *start*, up to and including *end*, that the mock delivers on."""
-    first, last = date.fromisoformat(start), date.fromisoformat(end)
-    holidays = mock().HOLIDAYS
-    days = (first + timedelta(days=n) for n in range(1, (last - first).days + 1))
-    return sum(1 for d in days if d.weekday() != 6 and d.isoformat() not in holidays)
+    return delivery.working_days(mock(), start, end)
 
 
 def delivery_estimate(address: str | None, on: str) -> dict[str, Any]:
@@ -327,12 +324,4 @@ def delivery_estimate(address: str | None, on: str) -> dict[str, Any]:
     both areas are given and no single figure is: a number for an address
     nobody gave would be a promise nobody made.
     """
-    m = mock()
-    if address:
-        estimated = m._eta(on, address)
-        return {"address_known": True, "delivery_days": _working_days(on, estimated), "estimated_delivery": estimated}
-    areas = []
-    for area, example in DELIVERY_AREAS:
-        estimated = m._eta(on, example)
-        areas.append({"area": area, "delivery_days": _working_days(on, estimated), "estimated_delivery": estimated})
-    return {"address_known": False, "delivery_days": None, "estimated_delivery": None, "by_area": areas}
+    return delivery.estimate(mock(), address, on)

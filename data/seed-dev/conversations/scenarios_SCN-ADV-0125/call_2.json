@@ -1,0 +1,340 @@
+{
+  "conversation_id": "SCN-ADV-0125__call_2",
+  "scenario_id": "SCN-ADV-0125",
+  "call": "call_2",
+  "customer_id": "C026",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-24",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_tach_don_cod",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Dũng ạ, hôm trước anh có quan tâm Máy lọc không khí AirPure Pro và đang chờ cuối tháng nhận lương. Anh muốn mình tiếp tục đặt hàng hai máy đúng không ạ?",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-AP-PRO",
+          "value": 7690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn mua hai máy lọc không khí mà mình đã nói hôm trước.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, anh chọn Máy lọc không khí AirPure Pro và một máy nữa đúng không ạ? Anh muốn hỏi thêm gì về sản phẩm hay chương trình ưu đãi hiện tại không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh muốn hỏi thêm gì về sản phẩm hay chương trình ưu đãi hiện tại không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Một máy AirPure Pro và một máy Samsung AX40, anh muốn trả tiền mặt khi nhận hàng.",
+      "facts_stated": {
+        "product_advised": "SKU-AP-PRO",
+        "quantity": 2,
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra đơn giúp anh: tổng giá hai máy là 10.935.000đ, gồm Máy lọc không khí AirPure Pro giá 7.690.000đ và Samsung AX40 giá 3.245.000đ. Tuy nhiên, đơn tổng trên 10 triệu thì chính sách bên em chưa hỗ trợ COD anh nhé, mình cần chuyển khoản trước hoặc tách thành hai đơn nếu anh muốn trả tiền mặt khi nhận.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-AP-PRO",
+          "value": 7690000
+        },
+        {
+          "field": "price_vnd:SKU-SS-AX40",
+          "value": 3245000
+        },
+        {
+          "field": "total_vnd",
+          "value": 10935000
+        },
+        {
+          "field": "cod_allowed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em nói tổng đơn trên 10 triệu không COD được, vậy mình tách ra thành hai đơn giúp anh nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ được anh, em sẽ tách thành hai đơn: một đơn Máy AirPure Pro và một đơn Samsung AX40, đều trả COD. Địa chỉ giao hàng của anh vẫn là Nha Trang, Khánh Hòa phải không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Địa chỉ giao hàng của anh vẫn là Nha Trang, Khánh Hòa phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Địa chỉ giao hàng là Nha Trang, Khánh Hòa nhé.",
+      "facts_stated": {
+        "delivery_area": "Nha Trang, Khánh Hòa"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Nha Trang, Khánh Hòa",
+          "spoken": "Nha Trang, Khánh Hòa"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận lại đơn cho anh: một máy AirPure Pro giá 7.690.000đ, một máy Samsung AX40 giá 3.245.000đ, đều trả COD và giao về Nha Trang, Khánh Hòa. Dự kiến giao hàng trong 4 ngày làm việc, khoảng 30/10. Đơn từ 2.000.000đ sẽ được miễn phí vận chuyển. Trước khi giao, nhân viên bên em sẽ gọi xác nhận đơn hàng với anh ạ. Anh kiểm tra lại giúp em thông tin đơn trên đã đúng chưa anh?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh kiểm tra lại giúp em thông tin đơn trên đã đúng chưa anh?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        },
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "delivery_days",
+          "value": 4
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-30"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-10-24"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Vậy để anh xác nhận lại, một máy AirPure Pro và một máy Samsung AX40, đều trả COD, phải không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi anh, em sẽ lên đơn cho mình ngay ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0910285940",
+            "sku": "SKU-AP-PRO",
+            "qty": 1,
+            "price_vnd": 7690000,
+            "payment": "COD",
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-10-24",
+            "basket_skus": [
+              "SKU-SS-AX40"
+            ],
+            "order_group": "1"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi, em tách hai đơn giúp anh nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã tạo thành công hai đơn: Máy lọc không khí AirPure Pro và Samsung AX40, đều trả COD và giao về Nha Trang, Khánh Hòa. Nhân viên bên em sẽ gọi xác nhận đơn trước khi giao hàng, anh yên tâm nhé. Em cảm ơn anh đã đặt hàng tại Shop BTC ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0910285940",
+            "sku": "SKU-SS-AX40",
+            "qty": 1,
+            "price_vnd": 3245000,
+            "payment": "COD",
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-10-24",
+            "basket_skus": [
+              "SKU-AP-PRO"
+            ],
+            "order_group": "2"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Nha Trang, Khánh Hòa",
+          "op": "set",
+          "source": "call_2#turn9"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_2#turn5"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_2#turn3"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7690000,
+          "op": "set",
+          "source": "call_2#turn3"
+        },
+        {
+          "key": "promo_code",
+          "value": "AIR-OCT",
+          "op": "set",
+          "source": "call_2#turn3"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn11"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_hang_2_may_loc_khong_khi",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

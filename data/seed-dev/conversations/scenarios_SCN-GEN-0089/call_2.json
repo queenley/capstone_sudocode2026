@@ -1,0 +1,292 @@
+{
+  "conversation_id": "SCN-GEN-0089__call_2",
+  "scenario_id": "SCN-GEN-0089",
+  "call": "call_2",
+  "customer_id": "C013",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-15",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_so_gia",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Trang ạ, hôm trước chị có quan tâm Máy lọc không khí Xiaomi Smart 4 Pro đúng không ạ? Hiện tại mã khuyến mãi XM-COMBO đã hết hiệu lực, giá sản phẩm là 5.490.000đ, máy vẫn còn hàng chị nhé.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Hôm trước chị có quan tâm Máy lọc không khí Xiaomi Smart 4 Pro đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "objection",
+        "competitor_price_vnd",
+        "room_area_m2"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "promo_XM-COMBO_active",
+          "value": false
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "TP Huế",
+            "on": "2026-11-15"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, chị muốn mua máy lọc không khí Xiaomi Smart 4 Pro mà hôm trước đã hỏi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, chị muốn thanh toán chuyển khoản đúng không ạ? Máy có sẵn, giá 5.490.000đ và mình sẽ được miễn phí vận chuyển về TP Huế, giao khoảng 4 ngày làm việc, dự kiến nhận ngày 19/11. Em đọc lại đơn hàng: 1 Máy lọc không khí Xiaomi Smart 4 Pro, giá 5.490.000đ, giao tại TP Huế, thanh toán chuyển khoản, nhận dự kiến ngày 19/11. Chị xác nhận giúp em thông tin này để em lên đơn nhé.",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Chị muốn thanh toán chuyển khoản đúng không ạ?"
+        },
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em đọc lại đơn hàng: 1 Máy lọc không khí Xiaomi Smart 4 Pro, giá 5.490.000đ, giao tại TP Huế, thanh toán chuyển khoản, nhận dự kiến ngày 19/11. Chị xác nhận giúp em thông tin này để em lên đơn nhé."
+        }
+      ],
+      "facts_used": [
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "delivery_days",
+          "value": 4
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-19"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán thì chị sẽ chuyển khoản.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã ghi nhận thanh toán chuyển khoản và địa chỉ nhận hàng là TP Huế. Đơn hàng sẽ được giao miễn phí trong vòng 4 ngày làm việc, dự kiến chị nhận vào ngày 19/11 ạ.",
+      "questions": [],
+      "facts_used": [
+        "payment",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "delivery_days",
+          "value": 4
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-19"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị ở TP Huế, nhờ em giao hàng tới giúp chị nhé.",
+      "facts_stated": {
+        "delivery_area": "TP Huế"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận lại, chị đặt 1 Máy lọc không khí Xiaomi Smart 4 Pro, giá 5.490.000đ, giao miễn phí tới TP Huế, thanh toán chuyển khoản. Em sẽ lên đơn hàng ngay cho chị ạ.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "product_advised",
+        "price_quoted_vnd",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0964252477",
+            "sku": "SKU-XM-4P",
+            "qty": 1,
+            "price_vnd": 5490000,
+            "payment": "bank",
+            "address": "TP Huế",
+            "on": "2026-11-15"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Vâng, chị đồng ý lên đơn cho chị nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã tạo đơn thành công cho chị. Đơn hàng sẽ được giao tới TP Huế, dự kiến chị nhận vào ngày 19/11. Cảm ơn chị đã đặt hàng tại shop BTC ạ!",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-19"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "delivery_area",
+          "value": "TP Huế",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-XM-4P",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5490000,
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn7"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_mua",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-XM-4P",
+      "qty": 1,
+      "price_vnd": 5490000,
+      "payment": "bank",
+      "delivery_area": "TP Huế",
+      "order_id": "OD600001"
+    }
+  }
+}

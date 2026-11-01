@@ -1,0 +1,194 @@
+{
+  "conversation_id": "SCN-GEN-0241__call_2",
+  "scenario_id": "SCN-GEN-0241",
+  "call": "call_2",
+  "customer_id": "C004",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-12-04",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Minh ạ, hôm trước anh có quan tâm Bình sữa Pigeon PPSU 240ml và muốn so sánh thêm. Anh muốn mình tiếp tục thế nào ạ?",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 289000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh lại gọi đây.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, anh cần hỏi thêm về Bình sữa Pigeon PPSU 240ml đúng không ạ? Em sẵn sàng hỗ trợ anh mọi thông tin về sản phẩm này.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh cần hỏi thêm về Bình sữa Pigeon PPSU 240ml đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 289000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em ơi, cho anh hỏi thêm một chút về bình sữa này nhé?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, Bình sữa Pigeon PPSU 240ml hiện có giá là 289.000đ anh nhé. Sản phẩm còn hàng, chất liệu PPSU an toàn, dung tích 240ml phù hợp cho bé đang lớn. Anh muốn em tư vấn thêm điều gì về bình sữa này không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh muốn em tư vấn thêm điều gì về bình sữa này không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 289000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh thấy giá cũng khá cao, không biết có loại nào rẻ hơn không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận ý kiến của anh ạ. Hiện tại shop có nhiều lựa chọn bình sữa với mức giá khác nhau, tuy nhiên Bình sữa Pigeon PPSU 240ml là dòng cao cấp, chất liệu PPSU rất bền và an toàn cho bé. Nếu anh muốn tham khảo bình sữa giá tốt hơn, em có thể giới thiệu các mẫu nhựa PP hoặc dung tích nhỏ hơn.",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh muốn em gợi ý thêm sản phẩm nào phù hợp hơn không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thật ra anh cũng chưa chắc lắm, nên thôi anh không mua nữa đâu.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ, khi nào anh cần tư vấn thêm về bình sữa hay sản phẩm cho bé thì cứ liên hệ lại shop nhé. Em cảm ơn anh đã quan tâm ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-BOT",
+          "op": "set",
+          "source": "call_2#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 289000,
+          "op": "set",
+          "source": "call_2#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cảm ơn em đã tư vấn, hẹn lần sau nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_them_tu_choi",
+    "outcome": "tu_choi",
+    "objection_type": "gia_cao",
+    "objection_handling": "Giải thích lý do giá và đề xuất các lựa chọn khác phù hợp hơn.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

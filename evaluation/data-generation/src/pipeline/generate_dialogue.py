@@ -17,13 +17,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from typing import Any
 
 from src.ground_truth.traces import conversation_rows
-from src.pipeline.validate_rules import validate
+from src.pipeline.validate_rules import closing_courtesy, validate
 from src.planning.persona_config import load_profiles
 from src.schemas.conversation import Conversation, ConversationDraft, conversation_id
 from src.schemas.scenario import Scenario
+from src.schemas.slots import SLOTS
 from src.utils.btc_tools import fresh_mock_tools
 from src.utils.crm import load_customers
 from src.utils.dataset import Dataset
@@ -41,7 +43,9 @@ FIXES = {
     "customer_script_not_followed": "copy every customer_script line as one customer turn, verbatim and in order",
     "ccr_missing": "list every slot of call.must_carry_over in the first agent turn's facts_used",
     "redundant_question": "do not ask about that slot again: it is known (memory) or was already confirmed once",
-    "unverified_spoken_price": "say only amounts that are in ground_truth_facts, agent_will_tell or the tool results",
+    "unverified_spoken_price": "say only amounts that are in ground_truth_facts, agent_will_tell or the tool results "
+                               "(the error lists this call's amounts by name); a figure that is none of them, such as "
+                               "the value of a gift, is left out, not replaced by another guess",
     "tsr": "satisfy call.success_if exactly: the tool with args_match, one of required_phrases word for word",
     "hr": "claim only keys and values of ground_truth_facts; never a forbidden claim",
     "tool_rejected_by_mock": "copy tool calls and their args from call.oracle_tool_calls",
@@ -57,7 +61,7 @@ def customer_script(scenario: Scenario, call_name: str) -> list[str]:
     return call.customer_turns_asr if call.input_mode != "text" and call.customer_turns_asr else call.customer_turns
 
 
-def build_context(scenario: Scenario, call_name: str, customer, persona_style: str, policies: dict) -> dict:
+def build_context(scenario: Scenario, call_name: str, customer, persona_style: str) -> dict:
     call = scenario.calls[call_name]
     call_payload = call.model_dump(mode="json", exclude={"simulator_persona_key", "patience_start", "speaker_customer_id",
                                                          "customer_turns", "customer_turns_asr", "agent_will_tell"})
@@ -79,8 +83,13 @@ def build_context(scenario: Scenario, call_name: str, customer, persona_style: s
         if call.speaker_customer_id or (customer and customer.shared_phone_with) else None,
         "customer_known_to_shop": customer is not None,
         "persona_style": persona_style,
-        "policy_documents": policies,
     }
+
+
+def fixed_prefix(template: str, policies: dict) -> str:
+    """What every call's prompt starts with: the instructions, then the policy documents. The same bytes each time,
+    so OpenAI's prompt cache bills them at the cached rate (75% off on gpt-4.1); only the CALL JSON after them varies."""
+    return f"{template}\n\nPOLICY DOCUMENTS (trusted, the same for every call):\n{json.dumps(policies, ensure_ascii=False)}"
 
 
 def feedback(errors: list[str], script: list[str]) -> str:
@@ -94,6 +103,37 @@ def feedback(errors: list[str], script: list[str]) -> str:
                   "in this order, with the agent's turns between them:",
                   *(f"{i}. {line}" for i, line in enumerate(script, start=1))]
     return "\n".join(lines)
+
+
+#: The slots a question may be filed under, as the extractor's vocabulary (scorers.EXTRA_SLOTS): the registry's
+#: slots, the read-back and the channel; anything else is "other" (extractor rule 5).
+QUESTION_SLOTS = frozenset(SLOTS) | {"order_summary", "channel", "other"}
+
+
+def set_labels(conversation: Conversation, carry_over: list[str]) -> None:
+    """What the rules fix, done here rather than asked of the model, which kept missing it (a gpt-4.1 retry each):
+
+    * rule 1: the first agent turn's ``facts_used`` holds every ``must_carry_over`` slot, said aloud or not;
+    * a question about slot "other" (an offer, a permission) is "open", as the extractor files it (extractor rule 7):
+      the model's "confirm" made two offers a repeated confirmation;
+    * rule 7: a turn does not end with a courtesy question ("anh cần hỗ trợ thêm gì không ạ?"). That last sentence
+      carries no fact, claim or tool, so it is dropped, with its question label, when the turn says something else.
+    """
+    for turn in conversation.agent_turns():
+        sentences = re.split(r"(?<=[.!?])\s+", turn.text.strip())
+        if len(sentences) > 1 and closing_courtesy(turn.text):
+            dropped = sentences[-1]
+            turn.text = " ".join(sentences[:-1])
+            turn.questions = [q for q in turn.questions if not (q.text and (q.text in dropped or dropped in q.text))]
+    agent = [turn for turn in conversation.agent_turns() if turn.speaker == "agent_ai"]
+    if agent:
+        agent[0].facts_used = list(dict.fromkeys([*agent[0].facts_used, *carry_over]))
+    for turn in conversation.agent_turns():
+        for question in turn.questions:
+            if question.slot not in QUESTION_SLOTS:   # "order_create": a name the extractor files under "other"
+                question.slot = "other"
+            if question.slot == "other":
+                question.type = "open"
 
 
 class Writer:
@@ -127,6 +167,7 @@ class Writer:
                 call=call_name, customer_id=speaker_of(scenario, call_name), session_index=session_index,
                 channel=call.channel, date=call.call_date, region=scenario.region, category=scenario.category,
                 persona=scenario.persona, turns=draft.turns, gold=draft.gold)
+            set_labels(conversation, call.must_carry_over)
             errors = self._checked(scenario, call_name, conversation)
             if best is None or len(errors) < len(best[1]):
                 best = (conversation, errors)
@@ -151,7 +192,7 @@ def main() -> None:
     styles = {pid: p.get("style", "") for pid, p in load_profiles().items()}
     policies = load_customer_policy(POLICY_DIR)
     dataset = Dataset()
-    writer = Writer(model_client("dialogue", settings), template, sampling(settings), dataset)
+    writer = Writer(model_client("dialogue", settings), fixed_prefix(template, policies), sampling(settings), dataset)
 
     written, still_rejected = 0, 0
     failures: list[dict] = []
@@ -168,7 +209,7 @@ def main() -> None:
                 except ValueError:
                     pass  # old schema: regenerate
             customer = customers.get(speaker_of(scenario, call_name))
-            context = build_context(scenario, call_name, customer, styles.get(scenario.persona, ""), policies)
+            context = build_context(scenario, call_name, customer, styles.get(scenario.persona, ""))
             try:
                 conversation, errors = writer.write(scenario, call_name, session_index, context)
             except DailyLimitReached:

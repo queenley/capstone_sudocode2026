@@ -1,0 +1,52 @@
+{
+  "scenario_id": "SCN-GEN-0074",
+  "persona_source": "btc",
+  "customer_id": "SYN-C014",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "difficulty": "hard",
+  "tags": [
+    "chot_don",
+    "exchange",
+    "giay",
+    "hard_case",
+    "hoan_tat_don",
+    "khach_hang",
+    "variant:size_43_loai_tru_km",
+    "variant_surcharge"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "order",
+      "outcome_detail": "chot_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Giày chạy bộ RunLite 2 Pro size 43 den",
+        "price_vnd": 1740000,
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_da_mua_doi_size",
+      "patience_start": 4
+    },
+    "call_2": {
+      "kind": "exchange_size",
+      "outcome_detail": "cap_nhat_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "new_product": "Giày chạy bộ RunLite 2 Pro size 42 den",
+        "refund_vnd": 219000,
+        "fee_vnd": 0
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_da_mua_doi_size",
+      "patience_start": 3
+    }
+  }
+}

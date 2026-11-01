@@ -1,0 +1,185 @@
+{
+  "scenario_id": "SCN-GEN-0143",
+  "level": "M2",
+  "persona": "khach_da_kenh_fb_hotline",
+  "hard_case": "teencode_da_kenh",
+  "customer_phone": "0998000005",
+  "customer_name": "Nguyễn Văn E",
+  "honorific": "anh",
+  "notes": "Persona khach_da_kenh_fb_hotline, biến thể chuan. call_1 (chat_fanpage): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Ca khó: teencode_da_kenh. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.syn-c005",
+      "call_date": "2026-11-13",
+      "input_mode": "chat_teencode",
+      "customer_goal": "Hỏi về bình sữa Pigeon cho bé 9 tháng.",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về bình sữa Pigeon cho bé 9 tháng á.",
+        "Ngân sách của anh tầm 500 ngàn thôi, không biết có khuyến mãi gì không?",
+        "Bình này có sẵn hàng không em?",
+        "À, anh muốn gọi hotline để hỏi thêm một số thông tin nữa."
+      ],
+      "customer_turns_asr": [
+        "alo anh muon hoi ve binh sua pigeon cho be 9 thang a",
+        "ngan sach cua anh tam 500 ngan thoi ko biet co khuyen mai gi ko",
+        "binh nay co san hang ko em",
+        "a anh muon goi hotline de hoi them mot so thong tin nua"
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C005",
+          "session_id": "SYN-005-S1",
+          "date": "2026-07-13",
+          "channel": "hotline",
+          "summary": "Mua Áo khoác gió Windbreak giá 690.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C005",
+          "session_id": "SYN-005-S2",
+          "date": "2026-10-05",
+          "channel": "zalo_oa",
+          "summary": "Đặt Giày chạy bộ RunLite 1 giá 1.290.000đ, đơn OD900502 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C005",
+          "order_id": "OD900501",
+          "date": "2026-07-13",
+          "sku": "SKU-JK-WND-M-NAVY",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-JK-WND-M-NAVY"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C005",
+          "order_id": "OD900502",
+          "date": "2026-10-05",
+          "sku": "SKU-SN-RUN1-41-DEN",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900502"
+          }
+        }
+      ],
+      "facts_established": {
+        "child_age_months": 9,
+        "budget_vnd": 500000,
+        "phone_provided": true,
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "product_advised": "SKU-MB-BOT",
+        "price_quoted_vnd": 289000
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 289000,
+        "list_price_vnd": 289000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_MOM-FREESHIP_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-13"
+      },
+      "memory_expectation": {
+        "child_age_months": 9,
+        "budget_vnd": 500000,
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "product_advised": "SKU-MB-BOT",
+        "price_quoted_vnd": 289000
+      },
+      "relevant_policy_ids": [
+        "SP-MB-03",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 1,
+      "customer_goal": "Xác nhận mua bình sữa Pigeon.",
+      "customer_turns": [
+        "Alo, anh muốn đặt bình sữa Pigeon mà hôm qua em tư vấn.",
+        "Hình thức thanh toán là COD nhé.",
+        "Khu vực giao hàng là TP Huế.",
+        "Mong em giúp anh lên đơn nhanh nhé."
+      ],
+      "facts_established": {
+        "payment": "COD",
+        "delivery_area": "TP Huế",
+        "product_advised": "SKU-MB-BOT",
+        "price_quoted_vnd": 289000,
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "phone_provided",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-MB-BOT",
+          "price_vnd": 289000,
+          "payment": "COD"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 289000,
+        "list_price_vnd": 289000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_MOM-FREESHIP_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-11-19",
+        "call_date": "2026-11-14"
+      },
+      "memory_expectation": {
+        "payment": "COD",
+        "delivery_area": "TP Huế",
+        "product_advised": "SKU-MB-BOT",
+        "price_quoted_vnd": 289000,
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

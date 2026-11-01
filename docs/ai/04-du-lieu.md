@@ -96,8 +96,11 @@ flowchart LR
 ```
 
 - **Mã đơn, số tiền hoàn, lịch dời, ETA, lỗi COD đều là kết quả của chính mock BTC**, vì planner thực sự chạy `order.create`, `order.update`, `schedule.callback`... Một lệnh bị từ chối (sai giá, hết hàng, quá COD) làm dừng việc lập kế hoạch.
+- **Tool của nhóm cũng được chạy, bằng đúng code của agent**: `delivery_estimate` là [`mcp/servers/delivery.py`](../../apps/ai-agent-service/src/ai_agent_service/mcp/servers/delivery.py) nạp theo đường dẫn, cho `delivery_days` (như mẫu BTC) của mọi cuộc chốt đơn; `order.create` nhận thêm `basket_skus` (giá máy thứ hai) và `order_group` (tách đơn).
+- **Khóa nào cũng phải khai báo**: [`contracts/scenario/scenario-keys.yaml`](../../contracts/scenario/scenario-keys.yaml) liệt kê mọi khóa của `facts_established`, `must_carry_over`, `must_not_ask`, `memory_expectation`, `success_if`, `ground_truth_facts`, `expected_outcome` kèm kiểu và nguồn (`btc_sample`, `btc_format`, `team`); kịch bản có khóa lạ không được ghi. `expected_outcome` ghi đúng kết quả (`cap_nhat_don`, `thong_tin`, `xoa_du_lieu` thay vì `khac`).
+- **Chính sách liên quan**: mỗi cuộc có `relevant_policy_ids` (mục `[XX-nn]` của `policy/`), ghép theo loại cuộc, trạng thái (COD > 2 triệu → `QT-01`, > 10 triệu → `VC-03`, có quà → `KM-07`…) và khách (để hỏi người nhà → `PB-03`…). Đây là đáp án recall cho câu hỏi lấy từ kịch bản (`rag/scenario_qa.json`).
 - **LLM không bao giờ thấy nhãn**, chỉ được nói fact trong bộ slot cố định.
-- **Oracle**: từ nhãn dựng trace của agent lý tưởng, chấm bằng `reference_eval.py`. Phải ra RQR 0, CCR 100, TSR 100, HR 0, 0 vi phạm. Kết quả: **hoàn hảo trên 218 kịch bản / 448 cuộc** (150 theo persona BTC + 68 theo persona nâng cao của nhóm), tức mọi nhãn đều khả thi và nhất quán với logic BTC.
+- **Oracle**: từ nhãn dựng trace của agent lý tưởng, chấm bằng `reference_eval.py`. Phải ra RQR 0, CCR 100, TSR 100, HR 0, 0 vi phạm. Kết quả: **hoàn hảo trên 243 kịch bản / 486 cuộc** (150 theo persona BTC + 93 theo persona nâng cao của nhóm, `--plan-only` ngày 30/10), tức mọi nhãn đều khả thi và nhất quán với logic BTC.
 - **Số dùng chung**: bộ nhớ được theo dõi **theo người nói**, nên fact của người kia không bao giờ bị mang sang (`must_not_write_to`).
 
 ### 14 bước pipeline
@@ -106,7 +109,7 @@ flowchart LR
 |---|---|---|---|
 | 1 | `build_catalog` | không | kiểm catalog nhất quán (giá, biến thể, tồn kho, khuyến mãi) và khớp bản của agent |
 | 2 | `generate_synthetic_customers` | LLM (tên) | 10 khách giả lập thêm vào 50 khách BTC, `crm_seed_synthetic.json` |
-| 3 | `generate_scenarios` | LLM, 1/kịch bản | `output/scenarios/` (định dạng mẫu BTC), `metadata/`, `call_brief/`, `handoff_brief/`, `tools/` |
+| 3 | `generate_scenarios` | LLM, 1/kịch bản | `data/seed-<tên>/scenarios/` (định dạng mẫu BTC), `metadata/`, `call_brief/`, `handoff_brief/`, `tools/` |
 | 4 | `generate_dialogue` | LLM, 1/cuộc | transcript tham chiếu |
 | 5 | `simulate_replays` | không (tùy chọn LLM) | replay theo simulator BTC × 3 seed |
 | 6 | `validate_rules` | không | chấm chính thức, phải hoàn hảo |
@@ -115,11 +118,11 @@ flowchart LR
 | 9 | `export_manual_review` | không | CSV cho người duyệt |
 | 10 | `synthesize_scenario_audio` | ElevenLabs | WAV từng lượt khách, tới khi đủ 3 giờ |
 | 11 | `build_asr_testset` | ElevenLabs | bộ ASR định dạng BTC |
-| 12 | `eval_rag` | không | Recall@k baseline |
+| 12 | `eval_rag` | không | Recall@k baseline trên 60 câu BTC và trên câu hỏi từ kịch bản (`scenario_qa.json`) |
 | 13 | `summarize_dataset` | không | dashboard HTML |
 | 14 | `report` | không | báo cáo `.md` + `.html` |
 
-`--plan-only` chạy bước lập kế hoạch + nhãn + kiểm oracle mà **không tốn API**.
+`--plan-only` chạy bước lập kế hoạch + nhãn + kiểm oracle mà **không tốn API**. Mọi thứ sinh ra nằm ở `data/seed-<tên>/` ở gốc repo (`run_all --seed <tên>`, mặc định `seed-dev`); audio của seed không lên Git.
 
 ### Sinh kịch bản test
 
@@ -136,6 +139,13 @@ Mỗi trong **16 persona** có các **biến thể** ([personas.py](../../evalua
 | `phien_ban_chinh_sach_cu` | đơn đặt trước 01/10 | "7 ngày"; "14 ngày / 20.000đ" bị cấm |
 | `ep_gia_do_gia_nhap` | khách dò giá nhập | không lộ giá nhập, giá sàn, nhà cung cấp |
 | `het_hang_luc_khach_quyet` | MB-STR1 hết hàng 10 ngày sau | hạ kết quả thành `hen_goi_lai`, ngày có lại |
+
+Hai tình huống của nhóm (không phải ca khó BTC) kiểm các luật đặt đơn:
+
+| Persona | Dữ liệu cụ thể | Điều được kiểm |
+|---|---|---|
+| `khach_tach_don_cod` | AirPure Pro + Samsung AX40 (AIR-2ND-50), tổng COD > 10 triệu | khách đồng ý tách: 2 × `order.create` COD, `order_group` "1"/"2", mỗi đơn ≤ 10 triệu, cùng `basket_skus` (VC-03, QT-01) |
+| `khach_chot_don_doc_lai` | cuộc 1 khách nói sẵn cách trả và nơi giao; cuộc 2 "lên đơn như hôm trước" | `must_not_ask` gồm sản phẩm, thanh toán, nơi giao; đọc lại đơn một lần (một câu `order_summary`, extractor v5); `max_agent_questions` 3 |
 
 Danh sách đủ 15 loại: [evaluation/data-generation/README.md §3](../../evaluation/data-generation/README.md#3-hard-cases-điều-chỉnh-đề-11-and-other-situations). Với `--limit 120`: 120 kịch bản, 260 cuộc, 83 kịch bản ca khó, phủ đủ 9 cặp ngành hàng × vùng miền và 16 persona.
 

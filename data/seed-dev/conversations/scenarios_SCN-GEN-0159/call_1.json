@@ -1,0 +1,198 @@
+{
+  "conversation_id": "SCN-GEN-0159__call_1",
+  "scenario_id": "SCN-GEN-0159",
+  "call": "call_1",
+  "customer_id": "SYN-C018",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-01",
+  "region": "nam",
+  "category": "thoi-trang/ao-khoac",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Trịnh Thị Lan ạ, hôm trước chị có đặt Máy hút sữa điện đôi Medela Swing Maxi, đơn đang xử lý. Chị muốn mình hỗ trợ về áo khoác gió Windbreak màu be size L đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn mình hỗ trợ về áo khoác gió Windbreak màu be size L đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về áo khoác gió Windbreak màu be size L đó em.",
+      "facts_stated": {
+        "color": "be",
+        "size": "L",
+        "product_advised": "SKU-JK-WND"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ áo khoác gió Windbreak màu be size L bên em đang sẵn hàng chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá của áo này là bao nhiêu vậy? Chị thấy trên web có nhiều giá khác nhau.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giá của áo khoác gió Windbreak size L màu be là 690.000đ chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Áo này có khuyến mãi gì không, hay là hàng mới nên chưa có?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại áo khoác gió Windbreak này chưa có chương trình khuyến mãi nào áp dụng chị ạ. Tuy nhiên chị mua sẽ được miễn phí vận chuyển với đơn trên 500.000đ toàn quốc.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn so sánh thêm với một vài mẫu khác rồi sẽ gọi lại sau nhé.",
+      "facts_stated": {
+        "blocker": "muốn so sánh thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận, chị cứ tham khảo thêm các mẫu khác, khi nào cần tư vấn hoặc đặt hàng chị cứ liên hệ lại với em nhé. Em cảm ơn chị đã quan tâm sản phẩm của shop ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "muốn so sánh thêm",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "color",
+          "value": "be",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "size",
+          "value": "L",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-JK-WND",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 690000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-JK-WND-L-BE",
+          "op": "set",
+          "source": "call_1#turn1"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tuvan_ao_khoac",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

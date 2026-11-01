@@ -1,0 +1,201 @@
+{
+  "conversation_id": "SCN-ADV-0072__call_1",
+  "scenario_id": "SCN-ADV-0072",
+  "call": "call_1",
+  "customer_id": "SYN-C008",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_tra_hang_qua_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh hỏi về việc trả lại đôi giày chạy bộ RunLite 2 Pro đã mua đúng không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Anh hỏi về đơn hàng OD900801 mua Giày chạy bộ RunLite 2 Pro đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900801"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900801"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về việc trả lại đôi giày chạy bộ RunLite 2 Pro mà anh đã mua.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã kiểm tra, đơn hàng OD900801 anh nhận từ ngày 22/05. Theo chính sách đổi trả của shop, thời gian đổi hoặc trả sản phẩm là 7 ngày kể từ khi nhận hàng, nên hiện tại đơn này đã quá hạn đổi trả rồi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900801"
+        },
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "return_allowed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh đã nhận hàng từ lâu rồi, nhưng giờ người nhà anh đã mua cái khác rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất tiếc là trường hợp của anh đã quá thời hạn 7 ngày nên bên em không thể hỗ trợ trả lại đôi giày theo quy định ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "return_allowed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có cách nào để đổi trả không em? Anh biết là đã quá hạn nhưng rất cần.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em thông cảm với nhu cầu của anh, nhưng hiện tại shop chỉ hỗ trợ đổi trả trong vòng 7 ngày kể từ ngày nhận hàng thôi ạ. Sau thời gian này, shop không nhận lại sản phẩm nữa anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "return_allowed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Người nhà anh không cần giày nữa, nên anh muốn trả lại, có được không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ rất mong anh thông cảm, sản phẩm đã quá thời hạn đổi trả 7 ngày nên bên em không thể hỗ trợ trả lại theo chính sách của shop ạ. Nếu anh cần hỗ trợ thêm về bảo hành hoặc sản phẩm khác, em luôn sẵn sàng hỗ trợ anh.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "return_allowed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD900801",
+          "op": "set",
+          "source": "call_1#turn0"
+        },
+        {
+          "key": "owned_sku",
+          "value": "SKU-SN-RUN2",
+          "op": "set",
+          "source": "call_1#turn0"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_chinh_sach_doi_tra",
+    "outcome": "thong_tin",
+    "objection_type": "qua_han_doi_tra",
+    "objection_handling": "Xin lỗi lịch sự, giải thích đúng chính sách và xác nhận quá hạn 7 ngày, không nhận lại hàng.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

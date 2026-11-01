@@ -1,0 +1,216 @@
+{
+  "conversation_id": "SCN-GEN-0207__call_1",
+  "scenario_id": "SCN-GEN-0207",
+  "call": "call_1",
+  "customer_id": "C041",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-14",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_so_gia",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần tư vấn về máy lọc không khí Xiaomi Smart 4 Pro đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh cần hỏi về máy lọc không khí Xiaomi Smart 4 Pro đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh có thể hỏi về máy lọc không khí Xiaomi Smart 4 Pro không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy lọc không khí Xiaomi Smart 4 Pro bên em hiện còn hàng, phù hợp cho phòng diện tích đến 60 mét vuông. Anh muốn dùng cho phòng khoảng bao nhiêu mét vuông và nhà mình có trẻ nhỏ đúng không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "open",
+          "text": "Anh muốn dùng cho phòng khoảng bao nhiêu mét vuông ạ?"
+        },
+        {
+          "slot": "has_children",
+          "type": "confirm",
+          "text": "Nhà mình có trẻ nhỏ đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhà anh có trẻ nhỏ, anh đang tìm cái nào cho phòng khoảng 35 mét vuông.",
+      "facts_stated": {
+        "has_children": true,
+        "room_area_m2": 35
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, với phòng khoảng 35 mét vuông và có trẻ nhỏ, Xiaomi Smart 4 Pro là lựa chọn phù hợp anh nhé. Máy có khóa trẻ em, lọc bụi mịn và khử mùi hiệu quả.",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2",
+        "has_children"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh thấy bên chỗ khác giá 4 triệu 830 ngàn, bên mình sao lại 5 triệu 490 ngàn nhỉ?",
+      "facts_stated": {
+        "competitor_price_vnd": 4830000
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã phản hồi. Giá bên em là 5.490.000đ, hàng chính hãng, bảo hành 12 tháng và được đổi trả trong 7 ngày nếu có lỗi từ nhà sản xuất. Ngoài ra, bên em có tặng kèm màng lọc chính hãng khi mua máy trong hôm nay ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thế có chương trình khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại khi mua Xiaomi Smart 4 Pro, anh được tặng kèm một màng lọc chính hãng và miễn phí vận chuyển toàn quốc. Giá đã áp dụng chương trình khuyến mãi XM-COMBO rồi anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_XM-COMBO_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá này anh cần hỏi lại vợ đã, hẹn em một lát nhé.",
+      "facts_stated": {
+        "objection": "giá cao hơn chỗ khác"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, anh cứ trao đổi thêm với vợ rồi liên hệ lại bên em bất cứ lúc nào ạ. Em giữ giá và ưu đãi cho anh trong hôm nay, nếu cần hỗ trợ thêm anh cứ gọi em nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "room_area_m2",
+          "value": 35,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "competitor_price_vnd",
+          "value": 4830000,
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "objection",
+          "value": "giá cao hơn chỗ khác",
+          "op": "set",
+          "source": "call_1#turn10"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "giá cao hơn chỗ khác",
+    "objection_handling": "Giải thích giá chính hãng, bảo hành, quà tặng, giữ giá và ưu đãi cho khách cân nhắc.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

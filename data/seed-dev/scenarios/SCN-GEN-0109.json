@@ -1,0 +1,107 @@
+{
+  "scenario_id": "SCN-GEN-0109",
+  "level": "M1",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "hard_case": null,
+  "customer_phone": "0924410646",
+  "customer_name": "Sơn",
+  "honorific": "anh",
+  "notes": "Persona khach_hoi_nhieu_khong_mua, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): hỏi thêm rồi từ chối → tu_choi. Chấm chủ yếu: CCR, RQR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-29",
+      "customer_goal": "Hỏi về quạt đứng Senko TS16",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về quạt đứng Senko TS16 mà hôm trước em tư vấn ấy.",
+        "Giá của quạt này là bao nhiêu em nhỉ?",
+        "Anh muốn dùng cho gia đình, ngân sách khoảng 1 triệu thôi.",
+        "Có khuyến mãi gì không em?",
+        "À, anh cần so sánh thêm trước khi quyết định, nên hẹn gọi lại em nhé."
+      ],
+      "facts_established": {
+        "usage_need": "dùng cho gia đình",
+        "budget_vnd": 1000000,
+        "blocker": "muốn so sánh thêm",
+        "product_advised": "SKU-FAN-SEN",
+        "price_quoted_vnd": 590000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 590000,
+        "list_price_vnd": 590000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-29"
+      },
+      "memory_expectation": {
+        "usage_need": "dùng cho gia đình",
+        "budget_vnd": 1000000,
+        "blocker": "muốn so sánh thêm",
+        "product_advised": "SKU-FAN-SEN",
+        "price_quoted_vnd": 590000
+      },
+      "relevant_policy_ids": [
+        "SP-FAN-01",
+        "FAQ-08",
+        "PB-11"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 7,
+      "customer_goal": "Hỏi thêm chi tiết rồi từ chối mua",
+      "customer_turns": [
+        "Alo em, anh gọi lại để hỏi thêm về quạt Senko TS16.",
+        "Thực ra, anh thấy giá cũng cao so với những quạt khác, có thể rẻ hơn không?",
+        "Em có thể cho anh biết thêm về độ ồn của quạt không?",
+        "Cảm ơn em, nhưng anh không quyết định mua nữa, thôi để sau nhé."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-FAN-SEN",
+        "price_quoted_vnd": 590000
+      },
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "max_agent_questions": 4
+      },
+      "ground_truth_facts": {
+        "price_vnd": 590000,
+        "list_price_vnd": 590000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-11-05"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-FAN-SEN",
+        "price_quoted_vnd": 590000
+      },
+      "relevant_policy_ids": [
+        "SP-FAN-01",
+        "FAQ-08",
+        "PB-01",
+        "PB-11"
+      ],
+      "expected_outcome": "tu_choi"
+    }
+  }
+}

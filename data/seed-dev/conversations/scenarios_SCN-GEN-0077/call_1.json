@@ -1,0 +1,246 @@
+{
+  "conversation_id": "SCN-GEN-0077__call_1",
+  "scenario_id": "SCN-GEN-0077",
+  "call": "call_1",
+  "customer_id": "SYN-C017",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-16",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_kenh_fb_hotline",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có đặt Áo khoác gió Windbreak, hôm nay anh cần tư vấn về giày chạy bộ đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh cần hỏi về giày chạy bộ RunLite 1 phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo anh muon hoi ve giay chay bo size 42 mau xam",
+      "facts_stated": {
+        "size": 42,
+        "color": "xam"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giày chạy bộ RunLite 1 size 42 màu xám bên em đang còn hàng anh nhé. Anh muốn hỏi thêm thông tin gì về sản phẩm này không ạ?",
+      "questions": [],
+      "facts_used": [
+        "size",
+        "color"
+      ],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "gia cua doi giay nay la bao nhieu vay em",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giá của đôi giày này hiện tại là 1.161.000đ anh nhé. Giá đã áp dụng khuyến mãi RUN-10 giảm 10% từ giá niêm yết 1.290.000đ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1161000
+        },
+        {
+          "field": "list_price_vnd",
+          "value": 1290000
+        },
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "co khuyen mai gi khong",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại anh được giảm 10% với mã RUN-10, giá còn 1.161.000đ. Ngoài ra, đơn từ 500.000đ sẽ được miễn phí vận chuyển toàn quốc anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        },
+        {
+          "field": "price_vnd",
+          "value": 1161000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "a muon goi hotline hoi them mot so thong tin nua",
+      "facts_stated": {
+        "blocker": "muốn gọi hotline hỏi thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, anh có thể gọi hotline của shop để được hỗ trợ thêm chi tiết nhé. Nếu cần, em có thể giữ lại thông tin tư vấn hôm nay để anh tiện trao đổi khi gọi tổng đài ạ.",
+      "questions": [],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "the em co the cho anh biet la co hang khong nhe",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giày chạy bộ RunLite 1 size 42 màu xám hiện vẫn còn hàng anh nhé. Khi nào anh cần đặt, chỉ cần nhắn lại hoặc gọi hotline là được ạ.",
+      "questions": [],
+      "facts_used": [
+        "size",
+        "color"
+      ],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "size",
+          "value": 42,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "color",
+          "value": "xam",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "blocker",
+          "value": "muốn gọi hotline hỏi thêm",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN1",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1161000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN1-42-XAM",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "promo_code",
+          "value": "RUN-10",
+          "op": "set",
+          "source": "call_1#turn5"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_giay_chay_bo",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

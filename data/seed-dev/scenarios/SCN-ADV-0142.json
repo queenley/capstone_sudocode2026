@@ -1,0 +1,114 @@
+{
+  "scenario_id": "SCN-ADV-0142",
+  "level": "M2",
+  "persona": "khach_hoi_tra_gop",
+  "hard_case": null,
+  "customer_phone": "0932568855",
+  "customer_name": "Lâm",
+  "honorific": "anh",
+  "notes": "Persona khach_hoi_tra_gop, biến thể hoi_tra_gop. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (zalo_oa): hỏi trả góp → thong_tin. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-29",
+      "customer_goal": "Hỏi về xe đẩy 2 chiều Combi Sugocal",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về xe đẩy 2 chiều Combi Sugocal mà em đã tư vấn hôm trước.",
+        "Giá hiện tại là bao nhiêu em nhỉ?",
+        "Có khuyến mãi gì không?",
+        "Ừ, nhưng ngân sách của anh chỉ khoảng 7 triệu thôi.",
+        "Anh muốn trả góp thì làm thế nào nhỉ?",
+        "Em tư vấn cho anh thêm được không?",
+        "Thế thì để anh suy nghĩ thêm rồi gọi lại nhé."
+      ],
+      "facts_established": {
+        "blocker": "muốn trả góp",
+        "budget_vnd": 7000000,
+        "child_age_months": 11,
+        "product_advised": "SKU-MB-STR2",
+        "price_quoted_vnd": 6790000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 6790000,
+        "list_price_vnd": 6790000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-29"
+      },
+      "memory_expectation": {
+        "blocker": "muốn trả góp",
+        "budget_vnd": 7000000,
+        "child_age_months": 11,
+        "product_advised": "SKU-MB-STR2",
+        "price_quoted_vnd": 6790000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-02",
+        "FAQ-12",
+        "VC-04"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_lâm94",
+      "days_later": 3,
+      "customer_goal": "Hỏi về hình thức trả góp cho xe đẩy",
+      "customer_turns": [
+        "Chào em, hôm trước anh đã hỏi về xe đẩy 2 chiều.",
+        "Anh muốn mua nhưng có trả góp 0% không?",
+        "Nếu không có thì anh sẽ cân nhắc lại.",
+        "Em có thông tin gì về việc này không?",
+        "Thế thì để anh suy nghĩ thêm rồi hẹn gọi lại nhé."
+      ],
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "chưa hỗ trợ trả góp",
+          "không hỗ trợ trả góp",
+          "chưa có trả góp",
+          "chưa hỗ trợ hình thức trả góp"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "installment_supported",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "installment_supported": false,
+        "call_date": "2026-11-01"
+      },
+      "relevant_policy_ids": [
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "thong_tin"
+    }
+  }
+}

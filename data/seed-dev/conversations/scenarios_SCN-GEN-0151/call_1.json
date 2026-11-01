@@ -1,0 +1,174 @@
+{
+  "conversation_id": "SCN-GEN-0151__call_1",
+  "scenario_id": "SCN-GEN-0151",
+  "call": "call_1",
+  "customer_id": "SYN-C009",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-12",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Phạm Thị I ạ, em là trợ lý ảo của shop. Đơn hàng máy hút sữa điện đôi Spectra S1 của chị mã OD900902 hôm trước vẫn đang trong quá trình giao hàng phải không ạ.",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Đơn hàng máy hút sữa điện đôi Spectra S1 của chị mã OD900902 hôm trước vẫn đang trong quá trình giao hàng phải không ạ."
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900902"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Phạm Thị I đây, chị muốn hỏi tình trạng đơn hàng của mình.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, đơn hàng máy hút sữa điện đôi Spectra S1 của chị mã OD900902 hiện đang giao ạ. Bên vận chuyển đã nhận hàng và đang trong quá trình vận chuyển đến cho chị.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900902"
+        },
+        {
+          "field": "order_status",
+          "value": "shipping"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900902"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đơn hàng của chị là máy hút sữa điện đôi Spectra S1 đó.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi chị, đơn Spectra S1 của chị hiện đang vận chuyển. Dự kiến sẽ giao trong 1–4 ngày làm việc tùy địa chỉ, chị vui lòng chờ thêm giúp em nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "shipping"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thấy nó vẫn đang trong quá trình giao hàng, không biết bao giờ mới tới ạ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện hệ thống báo đơn hàng của chị đã được bàn giao cho đơn vị vận chuyển và đang giao ạ. Thông thường, thời gian giao hàng nội thành là 1–2 ngày làm việc, liên tỉnh là 2–4 ngày làm việc không kể Chủ nhật, ngày lễ. Nếu cần gấp chị có thể liên hệ trực tiếp bên vận chuyển qua mã vận đơn em gửi nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "shipping"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em có thông tin gì về mã số vận chuyển không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ mã vận đơn của chị là VN0092TRK, chị có thể dùng mã này để tra cứu trạng thái giao hàng trên website của đơn vị vận chuyển hoặc liên hệ tổng đài bên vận chuyển để được hỗ trợ nhanh nhất ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "tracking",
+          "value": "VN0092TRK"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_tinh_trang_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

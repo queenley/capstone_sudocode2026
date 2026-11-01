@@ -1,0 +1,158 @@
+{
+  "conversation_id": "SCN-GEN-0235__call_2",
+  "scenario_id": "SCN-GEN-0235",
+  "call": "call_2",
+  "customer_id": "SYN-C014",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-27",
+  "region": "trung",
+  "category": "gia-dung/quat",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Lê Thị Hoa ạ, em là trợ lý ảo của shop. Em ghi nhận chị muốn thay đổi địa chỉ giao hàng cho đơn giày sneaker.",
+      "questions": [],
+      "facts_used": [
+        "issue",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị gọi lại để thay đổi địa chỉ giao hàng cho đơn hàng giày sneaker.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị muốn đổi địa chỉ giao hàng sang Hải Châu, Đà Nẵng đúng không ạ? Em sẽ tiến hành cập nhật giúp chị ngay.",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Chị muốn đổi địa chỉ giao hàng sang Hải Châu, Đà Nẵng đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD901403",
+            "action": "update_address",
+            "on": "2026-11-27"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn đổi thành Hải Châu, Đà Nẵng nhé, em ghi giúp chị.",
+      "facts_stated": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Hải Châu, Đà Nẵng",
+          "spoken": "Hải Châu, Đà Nẵng"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã cập nhật địa chỉ giao hàng thành Hải Châu, Đà Nẵng cho đơn hàng của chị. Đơn hàng của chị hiện đang được xử lý, khi bàn giao cho đơn vị vận chuyển bên em sẽ gửi mã vận đơn qua SMS hoặc Zalo cho chị theo chính sách.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "delivered"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đơn hàng vẫn đang xử lý phải không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng của chị đã được giao thành công rồi ạ. Nếu chị cần hỗ trợ thêm về đơn hàng khác, chị có thể cung cấp giúp em mã đơn để em kiểm tra nhanh nhất nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "delivered"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Hải Châu, Đà Nẵng",
+          "op": "set",
+          "source": "call_2#turn4"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần nhanh chóng nhận hàng, mong em giúp chị với.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

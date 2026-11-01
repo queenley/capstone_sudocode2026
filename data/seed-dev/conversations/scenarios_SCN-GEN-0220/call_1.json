@@ -1,0 +1,228 @@
+{
+  "conversation_id": "SCN-GEN-0220__call_1",
+  "scenario_id": "SCN-GEN-0220",
+  "call": "call_1",
+  "customer_id": "SYN-C007",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-26",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_cap_nhat_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Lê Thị G ạ, hôm trước chị có mua Máy lọc không khí Samsung AX40 bên em. Hôm nay chị cần em hỗ trợ về sản phẩm nào ạ?",
+      "questions": [],
+      "facts_used": [
+        "owned_sku",
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "owned_sku",
+          "value": "SKU-SS-AX40"
+        },
+        {
+          "field": "order_id",
+          "value": "OD900702"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về giày trekking màu trắng size 38 em ơi.",
+      "facts_stated": {
+        "color": "trang",
+        "size": 38,
+        "product_advised": "SKU-SN-TRK"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại bên em có giày trekking HikePro size 38 màu trắng, form rộng, chất liệu chống thấm nhẹ, phù hợp đi địa hình. Chị quan tâm mẫu này đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị quan tâm mẫu giày trekking HikePro size 38 màu trắng này đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá hiện tại là bao nhiêu vậy? Có khuyến mãi gì không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giá hiện tại của giày trekking HikePro size 38 màu trắng là 1.990.000đ chị nhé. Sản phẩm này hiện chưa có chương trình khuyến mãi nào đang áp dụng, nhưng đặt hàng sẽ được miễn phí thu hộ COD ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1990000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 420,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần bàn với gia đình trước đã, tối mai khoảng 7 giờ em gọi lại cho chị nhé.",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em sẽ gọi lại cho chị vào 7 giờ tối mai ngày 27/11 để chị trao đổi với gia đình xong nhé. Em đã ghi chú lại nội dung chị cần tư vấn về giày trekking HikePro size 38 màu trắng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-11-27T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0998000007",
+            "callback_at": "2026-11-27T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đã mua máy lọc không khí bên em rồi, hy vọng giày này cũng tốt.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã tin tưởng sản phẩm bên em. Khi cần thêm thông tin về giày trekking hoặc các sản phẩm khác, chị cứ liên hệ shop bất cứ lúc nào nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "color",
+          "value": "trang",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "size",
+          "value": 38,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-TRK",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1990000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-TRK-38-TRANG",
+          "op": "set",
+          "source": "call_1#turn2"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_hoi_nguoi_nha",
+    "objection_handling": "Ghi nhận lý do, xác nhận thời gian gọi lại vào 7 giờ tối mai.",
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "callback_time": "2026-11-27T19:00"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-11-27T19:00",
+      "reason": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

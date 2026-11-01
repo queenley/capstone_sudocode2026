@@ -1,0 +1,397 @@
+{
+  "conversation_id": "SCN-ADV-0118__call_1",
+  "scenario_id": "SCN-ADV-0118",
+  "call": "call_1",
+  "customer_id": "C031",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-16",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_doi_cong_don_khuyen_mai",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Oanh ạ, hôm trước chị có mua Máy lọc không khí AirPure X bản 2024 bên em. Em cảm ơn chị đã quay lại và quan tâm dòng AirPure Pro mới nhất ạ.",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Phòng mình vẫn khoảng 20 mét vuông như trước đúng không chị?"
+        }
+      ],
+      "facts_used": [
+        "owned_sku",
+        "room_area_m2"
+      ],
+      "claims": [
+        {
+          "field": "owned_sku",
+          "value": "SKU-AP-X-2024"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Oanh đây. Em ơi, chị muốn mua Máy lọc không khí AirPure Pro.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị chọn AirPure Pro là hợp lý ạ. Máy này phù hợp phòng 30–45 mét vuông, có khóa trẻ em, và đang có chương trình thu cũ đổi mới giảm 400.000đ cho khách từng mua AirPure X như chị.",
+      "questions": [],
+      "facts_used": [
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "promo_TRADE-IN-AP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đã thấy chương trình giảm giá tháng 10 rồi, có được cộng với chương trình thu cũ đổi mới không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em thông tin với chị: chương trình giảm giá tháng 10 và thu cũ đổi mới không cộng dồn, bên em sẽ áp dụng mức giảm có lợi nhất cho chị là thu cũ đổi mới TRADE-IN-AP, giá cuối cùng còn 7.590.000đ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7590000
+        },
+        {
+          "field": "promos_stacked",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "7590000",
+          "spoken": "7.590.000"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cũng muốn biết là giá máy này bao nhiêu, em nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giá máy AirPure Pro sau ưu đãi thu cũ đổi mới là 7.590.000đ chị nhé. Giá niêm yết là 7.990.000đ, hiện chị được giảm 400.000đ vì đã từng mua AirPure X bên em.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7590000
+        },
+        {
+          "field": "promo_TRADE-IN-AP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "7590000",
+          "spoken": "7.590.000"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giờ chị chuyển về Cầu Giấy, Hà Nội rồi, em giao hàng về đó cho chị.",
+      "facts_stated": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Cầu Giấy, Hà Nội",
+          "spoken": "Cầu Giấy, Hà Nội"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận địa chỉ giao hàng mới là Cầu Giấy, Hà Nội. Dự kiến giao trong 2 ngày làm việc, khoảng ngày 19/10 chị nhận được hàng ạ.",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "open",
+          "text": "Chị muốn thanh toán chuyển khoản hay nhận hàng trả tiền mặt ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "delivery_days",
+          "value": 2
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-19"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-16"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-10-19",
+          "spoken": "19/10"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có ngân sách khoảng 8 triệu rưỡi và sẽ thanh toán qua ngân hàng.",
+      "facts_stated": {
+        "budget_vnd": 8500000,
+        "payment": "bank"
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "8500000",
+          "spoken": "8 triệu rưỡi"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ ngân sách của chị hoàn toàn đủ để mua AirPure Pro với giá ưu đãi 7.590.000đ. Thanh toán chuyển khoản sẽ được ưu tiên xử lý và giao nhanh hơn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7590000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "7590000",
+          "spoken": "7.590.000"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, chị còn chờ cuối tháng mới nhận lương, nhưng chị muốn chốt đơn ngay bây giờ.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em lên đơn ngay cho chị. Em xác nhận lại: Máy lọc không khí AirPure Pro, giá 7.590.000đ, giao về Cầu Giấy, Hà Nội, thanh toán chuyển khoản, dự kiến nhận hàng ngày 19/10. Em tạo đơn cho chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7590000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-19"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0985003703",
+            "sku": "SKU-AP-PRO",
+            "qty": 1,
+            "price_vnd": 7590000,
+            "payment": "bank",
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-16"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn13"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 8500000,
+          "op": "set",
+          "source": "call_1#turn11"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Cầu Giấy, Hà Nội",
+          "op": "supersede",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_1#turn11"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 20,
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7590000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "promo_code",
+          "value": "TRADE-IN-AP",
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_1#turn13"
+        }
+      ],
+      "entities": [
+        {
+          "type": "money",
+          "value": "7590000",
+          "spoken": "7.590.000"
+        },
+        {
+          "type": "address",
+          "value": "Cầu Giấy, Hà Nội",
+          "spoken": "Cầu Giấy, Hà Nội"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-19",
+          "spoken": "19/10"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "delivery_area",
+        "old": "Đống Đa, Hà Nội",
+        "new": "Cầu Giấy, Hà Nội"
+      }
+    ],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001",
+      "sku": "SKU-AP-PRO",
+      "qty": 1,
+      "price_vnd": 7590000,
+      "payment": "bank",
+      "address": "Cầu Giấy, Hà Nội",
+      "estimated_delivery": "2026-10-19"
+    }
+  }
+}

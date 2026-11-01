@@ -114,6 +114,15 @@ def _value(where: str, value: Any, spec: dict[str, Any], errors: list[str]) -> N
         errors.append(f"{where}: {value!r} is not one of {allowed}")
 
 
+def slot_value_ok(slot: str, value: Any) -> bool:
+    """*value* is one the registry allows for *slot* (its type and listed values)."""
+    spec = registry()["slots"].get(slot)
+    errors: list[str] = []
+    if spec is not None:
+        _value(slot, value, spec, errors)
+    return spec is not None and not errors
+
+
 def _section(where: str, payload: dict[str, Any], specs: dict[str, Any], errors: list[str]) -> None:
     for key, value in payload.items():
         spec = specs.get(key)

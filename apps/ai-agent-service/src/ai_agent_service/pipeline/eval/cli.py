@@ -224,7 +224,9 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
     retrieval = _retrieval(layout.side("rag"))
     code, table = report.grade(frozen, full=layout.traces["full"], baseline=layout.traces["baseline_no_memory"],
                                out=layout.side("report.json"), rag=layout.side("rag") / "rag_results.json")
-    table = f"{table}\n\n{retrieval}"
+    checks = report.team_checks(frozen, layout.traces)
+    _write_json(layout.side("team_checks.json"), checks)
+    table = f"{table}\n\n{retrieval}\n\n{report.team_table(checks)}"
     print()
     print(table)
     layout.side("table.txt").write_text(table + "\n", encoding="utf-8")

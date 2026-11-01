@@ -11,8 +11,9 @@ capstone_sudocode2026/
 ├── apps/                 Các service chạy được (web, gateway, AI, nghiệp vụ, thoại)
 ├── packages/             Code dùng chung cho các service backend
 ├── config/prompts/       Toàn bộ prompt đưa cho model
-├── contracts/            Hợp đồng giữa các service: OpenAPI, sự kiện Kafka
+├── contracts/            Hợp đồng: OpenAPI, sự kiện Kafka, khóa của kịch bản test (scenario/)
 ├── data/seed/catalog/    Dữ liệu sản phẩm demo cho trang mua hàng
+├── data/seed-<tên>/      Bộ dữ liệu test do evaluation/data-generation sinh (run_all --seed <tên>)
 ├── evaluation/           Đánh giá chất lượng AI: harness chấm điểm và bộ sinh dữ liệu test
 ├── scripts/              Script vận hành: seed dữ liệu, tạo admin, migration, deploy, dev
 ├── tests/                Test tự động (pytest) cho backend và agent
@@ -137,7 +138,8 @@ scripts/
 ```text
 contracts/
 ├── api/openapi/          OpenAPI của từng service (sinh tự động)
-└── kafka/                Schema sự kiện chung và danh sách topic
+├── kafka/                Schema sự kiện chung và danh sách topic
+└── scenario/             scenario-keys.yaml: mọi khóa được phép của một kịch bản test (kiểu, nguồn BTC/nhóm, ý nghĩa)
 
 infra/
 ├── compose/              Docker Compose cho máy chủ cloud, Caddy (HTTPS)

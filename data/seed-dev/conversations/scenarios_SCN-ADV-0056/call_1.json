@@ -1,0 +1,221 @@
+{
+  "conversation_id": "SCN-ADV-0056__call_1",
+  "scenario_id": "SCN-ADV-0056",
+  "call": "call_1",
+  "customer_id": "C043",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-10-16",
+  "region": "trung",
+  "category": "gia-dung/quat",
+  "persona": "khach_thanh_toan_vi_dien_tu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, anh cần tư vấn về quạt đứng DC inverter Panasonic F-409 đúng không ạ? Dòng này tiết kiệm điện, chạy êm và có remote điều khiển anh nhé.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh muốn hỏi về quạt đứng DC inverter Panasonic F-409 đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về quạt đứng DC inverter Panasonic F-409 em ơi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ quạt Panasonic F-409 hiện bên em đang còn hàng sẵn kho ạ. Anh cần em báo giá chi tiết không anh?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh cần em báo giá chi tiết không anh?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá của quạt này là bao nhiêu vậy?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giá quạt Panasonic F-409 là 2.450.000đ anh nhé. Giá đã bao gồm VAT và bảo hành 12 tháng chính hãng.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2450000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh có ngân sách khoảng 3 triệu thôi, quạt này có khuyến mãi gì không?",
+      "facts_stated": {
+        "budget_vnd": 3000000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại quạt Panasonic F-409 bên em chưa có chương trình khuyến mãi giảm giá nào, nhưng đơn từ 500.000đ sẽ được miễn phí vận chuyển toàn quốc anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, anh cần phải bàn với gia đình đã, tối mai tầm 7 giờ em gọi lại anh nhé.",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận, tối mai 7 giờ em sẽ gọi lại cho anh để hỗ trợ tiếp nhé. Chúc anh và gia đình buổi tối vui vẻ ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-10-17T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0994157718",
+            "callback_at": "2026-10-17T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "usage_need",
+          "value": "mua làm quà",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 3000000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-FAN-DC1",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 2450000,
+          "op": "set",
+          "source": "call_1#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_hoi_gia_dinh",
+    "objection_handling": "Xác nhận thời điểm gọi lại cụ thể, hẹn 7 giờ tối hôm sau.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "text": "Gọi lại cho khách lúc 7 giờ tối mai"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-10-17T19:00",
+      "reason": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

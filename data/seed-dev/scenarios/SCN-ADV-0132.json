@@ -1,0 +1,129 @@
+{
+  "scenario_id": "SCN-ADV-0132",
+  "level": "M2",
+  "persona": "khach_hoi_ky_san_pham",
+  "hard_case": null,
+  "customer_phone": "0957990659",
+  "customer_name": "Bảo",
+  "honorific": "anh",
+  "notes": "Persona khach_hoi_ky_san_pham, biến thể hoi_ky_roi_mua. call_1 (hotline): hỏi rất kỹ sản phẩm → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-31",
+      "customer_goal": "Hỏi kỹ về giày trekking HikePro size 39 xám.",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về giày trekking HikePro size 39 xám này, bảo hành bao lâu vậy em?",
+        "Giày này có dùng cho diện tích nào không, anh đi bộ đường dài mà.",
+        "Tính năng của nó như thế nào, có khóa trẻ em không?",
+        "Chất liệu của giày này là gì, có bền không em?",
+        "Đang có khuyến mãi gì cho sản phẩm này không?",
+        "Giao hàng nhanh không em, anh cần đi gấp.",
+        "À, để anh suy nghĩ thêm rồi gọi lại nhé."
+      ],
+      "facts_established": {
+        "blocker": "cần suy nghĩ thêm",
+        "color": "xam",
+        "size": 39,
+        "product_advised": "SKU-SN-TRK",
+        "price_quoted_vnd": 1990000,
+        "variant_sku": "SKU-SN-TRK-39-XAM"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "7 ngày",
+          "bảy ngày"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1990000,
+        "list_price_vnd": 1990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "return_days": 7,
+        "call_date": "2026-10-31"
+      },
+      "memory_expectation": {
+        "blocker": "cần suy nghĩ thêm",
+        "color": "xam",
+        "size": 39,
+        "product_advised": "SKU-SN-TRK",
+        "price_quoted_vnd": 1990000,
+        "variant_sku": "SKU-SN-TRK-39-XAM"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "FAQ-09"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 3,
+      "customer_goal": "Xác nhận mua giày trekking HikePro.",
+      "customer_turns": [
+        "Alo, anh muốn đặt giày trekking HikePro size 39 xám đó.",
+        "Hình thức thanh toán sẽ là COD nhé.",
+        "Khu vực giao hàng là Ninh Kiều, Cần Thơ.",
+        "Mong là giao hàng nhanh để anh có thể sử dụng ngay."
+      ],
+      "facts_established": {
+        "delivery_area": "Ninh Kiều, Cần Thơ",
+        "payment": "COD",
+        "product_advised": "SKU-SN-TRK",
+        "price_quoted_vnd": 1990000,
+        "variant_sku": "SKU-SN-TRK-39-XAM",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-TRK-39-XAM",
+          "price_vnd": 1990000,
+          "payment": "COD"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1990000,
+        "list_price_vnd": 1990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-11-07",
+        "call_date": "2026-11-03"
+      },
+      "memory_expectation": {
+        "delivery_area": "Ninh Kiều, Cần Thơ",
+        "payment": "COD",
+        "product_advised": "SKU-SN-TRK",
+        "price_quoted_vnd": 1990000,
+        "variant_sku": "SKU-SN-TRK-39-XAM",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

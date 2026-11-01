@@ -1,0 +1,167 @@
+{
+  "scenario_id": "SCN-GEN-0081",
+  "level": "M2",
+  "persona": "hai_nguoi_chung_sdt",
+  "hard_case": "chung_sdt_memory_poisoning",
+  "customer_phone": "0958421083",
+  "customer_name": "Dung",
+  "honorific": "chị",
+  "notes": "Persona hai_nguoi_chung_sdt, biến thể con_roi_me. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Ca khó: chung_sdt_memory_poisoning. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-28",
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker). Khách cần hỏi người nhà và hẹn shop gọi lại tối thứ Hai (30/11) tầm 7 giờ (\"tối thứ Hai (30/11) tầm 7 giờ em gọi lại chị nhé\"); agent chốt lịch đúng giờ đó (PB-03)."
+      ],
+      "facts_established": {
+        "room_area_m2": 10,
+        "has_children": false,
+        "budget_vnd": 2500000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AP-MINI",
+        "price_quoted_vnd": 2190000
+      },
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-11-30T19:00"
+        },
+        "must_say_any": [
+          "7 giờ",
+          "19 giờ",
+          "19h",
+          "7h tối"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "trace_must_not_match": [
+          "\\bLoan\\b"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 2190000,
+        "list_price_vnd": 2190000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_AIR-2ND-50_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "callback_at": "2026-11-30T19:00",
+        "call_date": "2026-11-28"
+      },
+      "memory_expectation": {
+        "room_area_m2": 10,
+        "has_children": false,
+        "budget_vnd": 2500000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AP-MINI",
+        "price_quoted_vnd": 2190000,
+        "must_not_write_to": "C034"
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "LN-01",
+        "PB-03"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 1,
+      "customer_goal": "[plan-only] order",
+      "customer_turns": [
+        "[plan-only] Khách xác nhận muốn mua, nêu hình thức thanh toán và khu vực giao hàng (chỉ quận/tỉnh), đồng ý lên đơn."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "C034",
+          "session_id": "S-OLD-3",
+          "date": "2026-10-09",
+          "channel": "hotline",
+          "summary": "Cô Loan hỏi máy lọc nước RO Karofi 9 lõi, nhà ở Cần Thơ, chờ con gái quyết",
+          "outcome": "hen_goi_lai",
+          "stale": false,
+          "facts": {
+            "product_advised": "SKU-WF-RO9",
+            "delivery_area": "Cần Thơ",
+            "decision_maker": "con gái"
+          }
+        }
+      ],
+      "facts_established": {
+        "usage_need": "gia đình 4 người",
+        "budget_vnd": 6000000,
+        "payment": "COD",
+        "delivery_area": "Cần Thơ",
+        "product_advised": "SKU-WF-RO9",
+        "price_quoted_vnd": 5990000,
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "delivery_area",
+        "decision_maker",
+        "product_advised"
+      ],
+      "must_not_ask": [
+        "delivery_area",
+        "decision_maker",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-WF-RO9",
+          "price_vnd": 5990000,
+          "payment": "COD"
+        },
+        "must_say_any": [
+          "gọi xác nhận",
+          "gọi điện xác nhận",
+          "gọi lại xác nhận",
+          "xác nhận đơn",
+          "xác nhận trước khi giao"
+        ],
+        "trace_must_not_match": [
+          "\\bDung\\b"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5990000,
+        "list_price_vnd": 5990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-12-03",
+        "needs_confirmation_call": true,
+        "call_date": "2026-11-29"
+      },
+      "memory_expectation": {
+        "usage_need": "gia đình 4 người",
+        "budget_vnd": 6000000,
+        "payment": "COD",
+        "delivery_area": "Cần Thơ",
+        "product_advised": "SKU-WF-RO9",
+        "price_quoted_vnd": 5990000,
+        "order_id": "OD600001",
+        "must_not_write_to": "C035"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-05",
+        "QT-01",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

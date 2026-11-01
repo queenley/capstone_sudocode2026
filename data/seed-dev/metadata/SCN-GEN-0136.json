@@ -1,0 +1,64 @@
+{
+  "scenario_id": "SCN-GEN-0136",
+  "persona_source": "btc",
+  "customer_id": "SYN-C001",
+  "region": "bac",
+  "category": "gia-dung/combo",
+  "difficulty": "hard",
+  "tags": [
+    "hard_case",
+    "khách_hàng",
+    "máy_lọc_không_khí",
+    "order_status",
+    "supersede",
+    "tư_vấn",
+    "variant:ba_phien_doi_thong_tin",
+    "đặt_hàng"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "consult",
+      "outcome_detail": "hen_goi_lai",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Combo AirPure Y + 2 màng lọc",
+        "price_vnd": 5431500,
+        "promo": "11-11",
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 4
+    },
+    "call_2": {
+      "kind": "order",
+      "outcome_detail": "chot_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Combo AirPure Y + 2 màng lọc",
+        "price_vnd": 6390000,
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 3
+    },
+    "call_3": {
+      "kind": "order_status",
+      "outcome_detail": "cap_nhat_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "order_status": "created"
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 2
+    }
+  }
+}

@@ -1,0 +1,214 @@
+{
+  "conversation_id": "SCN-GEN-0243__call_1",
+  "scenario_id": "SCN-GEN-0243",
+  "call": "call_1",
+  "customer_id": "C002",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-11-30",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_da_kenh_fb_hotline",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh, em là trợ lý ảo của shop BTC. Anh cần tư vấn về ghế ngồi ô tô cho bé Chicco đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh cần tư vấn về ghế ngồi ô tô cho bé Chicco đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo anh muon hoi ve ghe ngoi o to cho be chicco a",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại ghế ngồi ô tô cho bé Chicco đang còn hàng tại shop, giá là 4.990.000đ. Anh cho em hỏi bé nhà mình được mấy tháng tuổi và mình dự kiến ngân sách khoảng bao nhiêu để em tư vấn kỹ hơn nhé?",
+      "questions": [
+        {
+          "slot": "child_age_months",
+          "type": "open",
+          "text": "Anh cho em hỏi bé nhà mình được mấy tháng tuổi và mình dự kiến ngân sách khoảng bao nhiêu để em tư vấn kỹ hơn nhé?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "be nha anh duoc 8 thang ngan sach tam 5 trieu thoi",
+      "facts_stated": {
+        "child_age_months": 8,
+        "budget_vnd": 5000000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm ghế ngồi ô tô Chicco phù hợp cho bé từ sơ sinh đến 18kg, giá 4.990.000đ trong tầm ngân sách của mình ạ. Anh muốn biết thêm về ưu điểm hay chương trình khuyến mãi hiện tại không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh muốn biết thêm về ưu điểm hay chương trình khuyến mãi hiện tại không ạ?"
+        }
+      ],
+      "facts_used": [
+        "child_age_months",
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "ghe nay bay gio co khuyen mai gi khong em",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra thì hiện tại sản phẩm này chưa có chương trình khuyến mãi giảm giá nào anh nhé. Giá bán là 4.990.000đ, đã áp dụng mức tốt nhất theo chính sách của shop rồi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4990000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "a ma anh muon goi hotline hoi them em cho anh so voi nhe",
+      "facts_stated": {
+        "blocker": "muốn gọi hotline hỏi thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em đã ghi nhận anh muốn gọi hotline để được tư vấn thêm. Em sẽ nhờ nhân viên gọi lại cho anh trong thời gian sớm nhất nhé ạ.",
+      "questions": [],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "muốn gọi hotline hỏi thêm",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 5000000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "child_age_months",
+          "value": 8,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-CAR",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 4990000,
+          "op": "set",
+          "source": "call_1#turn3"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "action": "hẹn nhân viên gọi lại"
+      }
+    ],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

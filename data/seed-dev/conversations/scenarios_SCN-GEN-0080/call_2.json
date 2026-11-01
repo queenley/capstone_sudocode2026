@@ -1,0 +1,231 @@
+{
+  "conversation_id": "SCN-GEN-0080__call_2",
+  "scenario_id": "SCN-GEN-0080",
+  "call": "call_2",
+  "customer_id": "SYN-C020",
+  "session_index": 2,
+  "channel": "zalo_oa",
+  "date": "2026-10-15",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_kenh_mau_thuan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chú ạ, em là trợ lý ảo của shop BTC.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "promo_code",
+        "objection",
+        "competitor_price_vnd",
+        "order_id",
+        "owned_sku",
+        "size",
+        "color"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1521000
+        },
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        },
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, chú gọi lại để hỏi về giày chạy bộ hôm trước.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại Giày chạy bộ RunLite 2 Pro size 42 màu đen còn hàng, giá ưu đãi là 1.521.000đ áp dụng mã RUN-10 đến ngày 25/10 ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1521000
+        },
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hôm trước em báo giá 1 triệu 521 ngàn, có khuyến mãi gì không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại đang có khuyến mãi mã RUN-10 giảm 10%, giá còn 1.521.000đ cho mình chú nhé. Mã này áp dụng đến hết ngày 25/10 ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1521000
+        },
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chú thấy giá này vẫn cao hơn chỗ khác.",
+      "facts_stated": {
+        "competitor_price_vnd": 1240000,
+        "objection": "giá cao hơn chỗ khác"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu tâm lý so sánh giá ạ. Bên shop là hàng chính hãng, bảo hành 12 tháng, đổi trả trong 7 ngày nếu chưa sử dụng. Giá bên em đã áp dụng mức ưu đãi tốt nhất hiện tại rồi chú nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1521000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chú cần thời gian suy nghĩ thêm, hẹn em gọi lại sau nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em ghi nhận chú cần suy nghĩ thêm. Chương trình ưu đãi mã RUN-10 đến hết ngày 25/10, chú cân nhắc rồi mình liên hệ lại giúp em nhé, em luôn sẵn sàng hỗ trợ chú ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN2",
+          "op": "set",
+          "source": "call_2#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1521000,
+          "op": "set",
+          "source": "call_2#turn9"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN2-42-DEN",
+          "op": "set",
+          "source": "call_2#turn9"
+        },
+        {
+          "key": "promo_code",
+          "value": "RUN-10",
+          "op": "set",
+          "source": "call_2#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "competitor_price_vnd",
+    "objection_handling": "Giải thích giá đã ưu đãi và nêu giá trị chính hãng, bảo hành, đổi trả.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "price_quoted_vnd",
+        "old_value": 1352000,
+        "new_value": 1521000
+      },
+      {
+        "slot": "promo_code",
+        "old_value": "RUN2-SALE",
+        "new_value": "RUN-10"
+      },
+      {
+        "slot": "promo_expiry",
+        "old_value": "2026-10-07",
+        "new_value": "2026-10-25"
+      }
+    ],
+    "callback": null,
+    "order": null
+  }
+}

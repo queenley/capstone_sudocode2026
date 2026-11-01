@@ -1,0 +1,175 @@
+{
+  "conversation_id": "SCN-GEN-0066__call_2",
+  "scenario_id": "SCN-GEN-0066",
+  "call": "call_2",
+  "customer_id": "SYN-C006",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2027-06-14",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, bạn nhân viên đã hỗ trợ mình hôm trước về máy lọc không khí Samsung AX40, hôm nay em là trợ lý ảo của shop tiếp tục hỗ trợ anh nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh gọi lại để hỏi về máy lọc không khí Samsung AX40.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, hiện tại Máy lọc không khí Samsung AX40 bên em đang có giá 6.490.000đ, hàng còn sẵn tại shop và phù hợp cho phòng đến 40m². Em xác nhận lại, trước đây mình quan tâm sản phẩm này cho phòng ở Thủ Đức, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Em xác nhận lại, trước đây mình quan tâm sản phẩm này cho phòng ở Thủ Đức, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này hiện tại có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra thì hiện tại sản phẩm này bên em chưa có chương trình khuyến mãi nào đang áp dụng ạ. Giá hiện hành là 6.490.000đ và mình được miễn phí vận chuyển toàn quốc anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "price_vnd",
+          "value": 6490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 450,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh muốn biết thêm về tính năng của máy, ở nhà có trẻ nhỏ nên cần máy tốt.",
+      "facts_stated": {
+        "has_children": true
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, Samsung AX40 có công suất lọc 400 m³/giờ, phù hợp phòng 30–40m², trang bị màng HEPA H13 lọc bụi mịn PM2.5, có màng than hoạt tính khử mùi và có khóa trẻ em, rất an toàn cho nhà có trẻ nhỏ. Máy cũng có app điều khiển thông minh và bảo hành 24 tháng chính hãng anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thế anh sẽ gọi lại sau nhé, cần hỏi thêm vài thứ.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng anh, em ghi nhận nhu cầu của mình về Máy lọc không khí Samsung AX40, khi nào anh cần tư vấn thêm hoặc đặt hàng, cứ liên hệ shop bất cứ lúc nào ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-SS-AX40",
+          "op": "set",
+          "source": "call_2#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 6490000,
+          "op": "set",
+          "source": "call_2#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_san_pham",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

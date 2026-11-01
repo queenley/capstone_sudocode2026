@@ -1,0 +1,163 @@
+{
+  "scenario_id": "SCN-ADV-0062",
+  "level": "M2",
+  "persona": "khach_hoi_san_pham_khong_ban",
+  "hard_case": null,
+  "customer_phone": "0998000001",
+  "customer_name": "Nguyễn Văn A",
+  "honorific": "anh",
+  "notes": "Persona khach_hoi_san_pham_khong_ban, biến thể khong_ban_roi_tu_van. call_1 (zalo_oa): hỏi sản phẩm shop không bán → thong_tin; call_2 (hotline): tư vấn, chưa chốt → hen_goi_lai. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_a01",
+      "call_date": "2026-11-27",
+      "customer_goal": "Hỏi về máy rửa bát để bàn.",
+      "customer_turns": [
+        "Alo, anh muốn hỏi mua máy rửa bát để bàn, không biết bên mình có không?",
+        "À, mà anh thấy trên trang có ghi là không bán mặt hàng này. Vậy có máy nào gần giống không em?",
+        "Anh đang tìm cái nào mà dễ sử dụng cho gia đình nhỏ ấy.",
+        "Nghe nói máy hút sữa điện đôi Spectra S1 cũng được, em có thông tin gì về máy đó không?",
+        "Thế em có thể gửi cho anh thông tin chi tiết qua Zalo được không? Anh sẽ liên hệ lại sau nhé."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C001",
+          "session_id": "SYN-001-S1",
+          "date": "2026-03-01",
+          "channel": "hotline",
+          "summary": "Mua Máy lọc không khí AirPure X giá 4.890.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C001",
+          "session_id": "SYN-001-S2",
+          "date": "2026-10-01",
+          "channel": "zalo_oa",
+          "summary": "Đặt Máy lọc không khí AirPure Mini giá 2.190.000đ, đơn OD900102 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C001",
+          "order_id": "OD900101",
+          "date": "2026-03-01",
+          "sku": "SKU-AP-X",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AP-X"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C001",
+          "order_id": "OD900102",
+          "date": "2026-10-01",
+          "sku": "SKU-AP-MINI",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900102"
+          }
+        }
+      ],
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "chưa kinh doanh",
+          "không kinh doanh",
+          "chưa có mặt hàng",
+          "chưa bán"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "product_available",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "product_available": false,
+        "call_date": "2026-11-27"
+      },
+      "relevant_policy_ids": [
+        "PB-05",
+        "FAQ-15",
+        "PB-01"
+      ],
+      "expected_outcome": "thong_tin"
+    },
+    "call_2": {
+      "days_later": 3,
+      "customer_goal": "Hỏi tư vấn về máy hút sữa điện đôi.",
+      "customer_turns": [
+        "Alo em, anh gọi lại để hỏi về máy hút sữa điện đôi Spectra S1.",
+        "Em có thể cho anh biết giá của máy này không?",
+        "Và hiện tại có khuyến mãi gì không em?",
+        "Ngân sách của anh khoảng 5 triệu thôi, không biết có đủ không?",
+        "À, anh chờ cuối tháng nhận lương rồi mới quyết định mua được, em có thể tư vấn thêm không?",
+        "Em có thể ghi lại cho anh nhé, anh sẽ gọi lại sau."
+      ],
+      "facts_established": {
+        "child_age_months": 8,
+        "budget_vnd": 5000000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 4290000,
+        "list_price_vnd": 4290000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_MOM-FREESHIP_active": false,
+        "promo_PUMP-GIFT_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-30"
+      },
+      "memory_expectation": {
+        "child_age_months": 8,
+        "budget_vnd": 5000000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000
+      },
+      "relevant_policy_ids": [
+        "SP-MB-01",
+        "FAQ-11",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "conversation_id": "SCN-ADV-0096__call_1",
+  "scenario_id": "SCN-ADV-0096",
+  "call": "call_1",
+  "customer_id": "C007",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-11-28",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_hoi_san_pham_khong_ban",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em cảm ơn chị đã liên hệ với shop.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi mua tủ lạnh Inverter khoảng 300 lít, nhưng em thấy trên website không có.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại bên em chưa kinh doanh tủ lạnh Inverter khoảng 300 lít nên chưa có mặt hàng này trong danh mục ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "product_available",
+          "value": false
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "catalog.search",
+          "args": {
+            "query": "tủ lạnh"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị chắc chắn là em không bán cái đó hả?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận là shop chưa bán tủ lạnh nên hiện tại không có sản phẩm này chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "product_available",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thế thì có sản phẩm nào gần giống không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện bên em không có tủ lạnh, tuy nhiên nếu chị quan tâm sản phẩm gia dụng khác thì bên em có giày chạy bộ RunLite 2 Pro, size 39 màu xám đang sẵn hàng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nghe nói có giày chạy bộ RunLite 2 Pro, size 39 xám, em có thể tư vấn cho chị không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giày chạy bộ RunLite 2 Pro, size 39 màu xám hiện bên em đang có hàng. Đây là mẫu giày form ôm, nhẹ, chất liệu knit thoáng khí, phù hợp chạy bộ chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_mat_hang_khong_ban",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}
