@@ -11,30 +11,12 @@ from langchain_core.messages import HumanMessage
 from ai_agent_service.agents.advisor import AdvisorEvent, Draft
 from ai_agent_service.components.guardrails import actions, fallback
 from ai_agent_service.components.guardrails.hard import GuardInput, check
-from ai_agent_service.components.orchestration.rules import RouteInput, decide
 from ai_agent_service.config.config_manager import get_lanes
 from ai_agent_service.pipeline.hot import nodes
 from ai_agent_service.pipeline.hot.state import HotContext
 
 
-def routed(said, **extra):
-    base = dict(tier="VERIFIED", has_brief=True, has_order=True, asr_low_conf=False, tool_failures=0, safe_lines=0,
-                customer_said=said)
-    return decide(RouteInput(**{**base, **extra}))
-
-
 # ── routing ───────────────────────────────────────────────────────────────
-
-
-def test_an_answer_to_the_agents_order_question_stays_with_the_order():
-    answer = "Địa chỉ mới là quận 3 nhé em."
-    assert routed(answer).lane == "CONTINUITY"
-    kept = routed(answer, previous_lane="ORDER_SERVICE", answering=True)
-    assert (kept.lane, kept.rule) == ("ORDER_SERVICE", 4)
-    assert routed(answer, previous_lane="ORDER_SERVICE", answering=False).lane == "CONTINUITY"
-    assert routed(answer, previous_lane="CONTINUITY", answering=True).lane == "CONTINUITY"
-    assert routed(answer, previous_lane="ORDER_SERVICE", answering=True, has_order=False).lane == "CONTINUITY"
-    assert routed(answer, previous_lane="ORDER_SERVICE", answering=True, must_transfer=True).lane == "OUT_OF_SCOPE"
 
 
 def test_the_sales_lanes_can_correct_an_order_the_call_created():
@@ -140,7 +122,8 @@ def test_fallback_lines_address_the_customer_and_promise_no_call_back():
         said = fallback.line(name, "anh")
         assert "{who}" not in said and "anh" in said
         assert "nhắn lại anh" not in said and "phản hồi" not in said
-    assert fallback.safe_line("HANDOFF", "chị") == fallback.LINES["bridging"]
+    # The bridging line is said only after handoff.transfer succeeded, never as a fallback.
+    assert not fallback.is_bridging(fallback.safe_line("HANDOFF", "chị"))
 
 
 def test_the_harness_addresses_an_unknown_customer_as_they_called_themselves():
@@ -237,3 +220,21 @@ def test_a_blocked_delivery_time_is_told_the_sentence_to_say():
         {"area": "Hà Nội, TP.HCM, Đà Nẵng", "delivery_days": 2}, {"area": "tỉnh thành khác", "delivery_days": 4}]}}}
     verdict = hard.check(hard.GuardInput(text="Dạ đơn giao trong 4 ngày ạ.", tool_results=(by_area,), tier="VERIFIED"))
     assert "2 ngày ở Hà Nội, TP.HCM, Đà Nẵng; 4 ngày ở tỉnh thành khác" in verdict.reasons[0]
+
+
+def test_a_change_made_in_an_earlier_turn_is_not_made_again():
+    # The duplicate check reads the whole call, not the turn: three "đổi sang L" over three turns were
+    # three charged exchanges (FIX-05, 2026-11-01).
+    earlier = [{"order_id": "OD1", "action": "exchange_size", "new_variant_sku": "SKU-L"}]
+    again = {"order_id": "OD1", "action": "exchange_size", "new_variant_sku": "SKU-L"}
+    verdict = actions.check("order_update", again, tier="VERIFIED", mode="speak", has_phone=True, quotes={},
+                            orders=frozenset({"OD1"}), trusted=frozenset({"SKU-L"}), updated=earlier)
+    assert not verdict.passed and "OD1" in verdict.reasons[0]
+
+
+def test_absorb_keeps_the_changes_of_the_call():
+    state = {"turn_no": 2, "updated_orders": [{"order_id": "OD0", "action": "return", "new_variant_sku": None}]}
+    result = {"name": "order.update", "args": {"order_id": "OD1", "action": "exchange_size", "new_variant_sku": "SKU-L"},
+              "result": {"ok": True, "data": {"order_id": "OD1", "fee_vnd": 0}}}
+    update = nodes._absorb(state, [result])
+    assert [c["order_id"] for c in update["updated_orders"]] == ["OD0", "OD1"]

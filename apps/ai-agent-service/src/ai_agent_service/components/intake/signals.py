@@ -1,22 +1,20 @@
-"""What the customer's words signal, by rule. ``docs/design.md`` sections 4.1 (the turn's flags) and 4.3.
+"""What the customer's words hint at, by rule: notes for the advisor, never a decision. ``docs/design.md`` 4.1, 4.3.
 
 Each detector reads the turn as intake left it (cleaned, NFC), lower case
-and without diacritics, so "khong", "ko" and "không" are one word. They are
-cheap, deterministic and explainable, which is why routing and the
-before-write checks lean on them rather than on a model:
+and without diacritics, so "khong", "ko" and "không" are one word.
 
 | Signal | Used by |
 |---|---|
 | ``impatient`` ("hỏi rồi mà", "lâu quá") | the PB-10 note on the lane (section 4.3) |
-| ``wants_person``, ``complaint`` | the only reasons, besides PB-06 and HANDOFF, ``handoff.transfer`` may run (section 4.4) |
-| ``asks_if_human`` | the PB-07 reminder |
-| ``wants_deletion`` | the QT-06 flow before ``memory.request_deletion`` |
-| ``must_transfer`` | route rule 5: medical, pregnancy, medicine, legal (PB-06) |
+| ``must_transfer`` (medical, pregnancy, medicine, legal words) | the PB-06 note on the lane |
+| ``ORDER_TALK`` | the knowledge search's policy version, by the day the order was placed |
 
-Each is a category the shop's policy defines, not a reading of what one
-customer meant: whether a question is for the documents or for a tool, and
-whether the documents answer it, are the advisor's to judge, by its
-instructions.
+A word list only adds a note the advisor reads. Nothing here allows or
+refuses an action: whether the customer wants a person, agreed to a
+deletion or wants one more order is read in context by the PolicyAgent on
+Jev (``agents/policy.py``, ``INTENTS``). Word lists made those decisions
+until 2026-11-01 and got them wrong both ways (a request for a person not
+heard, a product question taken for a medical one).
 """
 
 from __future__ import annotations
@@ -29,24 +27,22 @@ from .text import plain
 IMPATIENT = re.compile(
     r"\b(hoi roi ma|noi roi ma|noi roi|da noi|hoi roi|lau qua|mat thoi gian|bao nhieu lan|may lan roi|nhac lai mai|"
     r"chan qua|met qua|bo tay|nhanh len)\b")
-WANTS_PERSON = re.compile(
-    r"\b(chuyen may|gap (nhan vien|nguoi that|quan ly|tu van vien|nguoi phu trach)|"
-    r"noi chuyen (voi|cung) (nhan vien|nguoi that|quan ly)|(chuyen|noi) (cho|sang|qua) (nhan vien|nguoi that|quan ly)|"
-    r"cho (toi|chi|anh|em|minh) (gap|noi chuyen voi) (nhan vien|nguoi that|quan ly))\b")
-COMPLAINT = re.compile(
-    r"\b(khieu nai|to cao|lua dao|boi thuong|kien (ra toa|cong ty|shop|ben em)|hang gia|hang dom|chay no|bi thuong|"
-    r"nguy hiem|phan anh len|len bao)\b")
-ASKS_IF_HUMAN = re.compile(
-    r"\b(nguoi hay (la )?may|nguoi that (hay|khong|a)|co phai (la )?(nguoi|may|bot|robot|tro ly ao|ai)\b|"
-    r"(em|ban) la (nguoi|may|bot|robot|ai)\b|dang noi chuyen voi (may|bot|nguoi))")
-WANTS_DELETION = re.compile(
-    r"\b(xoa|huy|go)\b[^.?!]*\b(du lieu|thong tin|so dien thoai|sdt|ho so|tai khoan)\b|"
-    r"\bkhong (muon|cho) (luu|giu)\b")
-#: PB-06: questions that must go to a person, whatever the documents say.
+
+#: PB-06: words of a topic that may have to go to a person. A note for the advisor, never a lane:
+#: "máy hút sữa cho con bú" names the topic and is a product question (PB-06 itself says to
+#: give the maker's specifications for mother-and-baby products).
 #: Whole phrases: without diacritics "thuốc" and "thuộc" look alike.
 MUST_TRANSFER = re.compile(
-    r"\b(cho con bu|dang bau|mang thai|co thai|benh nhan|bi benh|benh ly|uong thuoc|thuoc men|di ung|"
+    r"\b(cho con bu|dang bau|ba bau|me bau|mang thai|co thai|benh nhan|bi benh|benh ly|uong thuoc|thuoc men|di ung|"
     r"hen suyen|bac si|y te|phap ly|kien tung|luat su)\b")
+
+#: The turn mentions an order: picks the policy version in force on that order's day for the
+#: knowledge search. Not routing: the advisor reads what the turn is about.
+ORDER_TALK = re.compile(
+    r"\b(don hang|don cua|ma don|od\d+|dang giao|giao chua|giao den dau|den dau roi|khi nao giao|doi size|"
+    r"doi sang|doi mau|doi san pham|tra hang|hoan tien|doi dia chi|sua dia chi|trang thai don|nhan hang|"
+    r"van don|chat qua|rong qua|bi loi)\b"
+)
 
 
 @dataclass(frozen=True)
@@ -54,10 +50,6 @@ class Signals:
     """What one turn of the customer signals."""
 
     impatient: bool = False
-    wants_person: bool = False
-    complaint: bool = False
-    asks_if_human: bool = False
-    wants_deletion: bool = False
     must_transfer: bool = False
 
     def as_flags(self) -> dict[str, bool]:
@@ -71,9 +63,5 @@ def read(text: str | None) -> Signals:
     said = plain(text)
     return Signals(
         impatient=bool(IMPATIENT.search(said)),
-        wants_person=bool(WANTS_PERSON.search(said)),
-        complaint=bool(COMPLAINT.search(said)),
-        asks_if_human=bool(ASKS_IF_HUMAN.search(said)),
-        wants_deletion=bool(WANTS_DELETION.search(said)),
         must_transfer=bool(MUST_TRANSFER.search(said)),
     )

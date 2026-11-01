@@ -6,12 +6,11 @@ a tool error with the reason, and nothing happens in the business.
 
 | Tool | Checked |
 |---|---|
-| ``order.create`` | a phone to order for; the tier allows it; the product code is trusted (it came from a tool this call or from the brief, never made up from a name); the unit price equals today's ``pricing.get_quote`` for that code; COD total at most 10.000.000đ; not the same product as an order this call already created, unless the customer asks for more (an address or payment added afterwards is an ``order.update``) |
-| ``order.update`` | the order is one this customer has, or one a tool showed this call; the new variant is trusted; not the same change as one this call already made (a second exchange is charged, DT-03). An order this call created may be corrected by its caller whatever the tier |
-| ``order.update`` | the order is one this customer has, or one a tool showed this call; the new variant is trusted |
+| ``order.create`` | a phone to order for; the tier allows it; the product code is trusted (it came from a tool this call or from the brief, never made up from a name); the unit price equals today's ``pricing.get_quote`` for that code; COD total at most 10.000.000đ; not the same product as an order this call already created, unless the customer wants one more (*intents* ``one_more``, read by Jev; the word list :data:`ONE_MORE` only when Jev gave no answer) |
+| ``order.update`` | the order is one this customer has, or one a tool showed this call; the new variant is trusted; not the same change as one this call already made, in any turn (a second exchange is charged, DT-03); the customer asked for this change or agreed to it (*intents* ``change``, read by Jev: a complaint alone, "size M hơi chật", is not a choice yet). An order this call created may be corrected by its caller whatever the tier |
 | ``schedule.callback`` | an ISO 8601 time with +07:00, inside working hours (LN-01, LN-02) and not in the past; otherwise the nearest working slot, for the model to propose |
-| ``handoff.transfer`` | only in lane HANDOFF, on a PB-06 topic, when the customer asked for a person, or on a serious complaint (a transfer anywhere else is graded ``over_escalation``); the brief validates against ``schemas/handoff_brief.schema.json`` itself (required fields, enums, phone pattern, summary length), after the harness filled in what it knows |
-| ``memory.request_deletion`` | the agent's previous turn asked to confirm the deletion and the customer just agreed (QT-06) |
+| ``handoff.transfer`` | the advisor decides; outside lane HANDOFF Jev checks the transfer is warranted (*intents* ``handoff``: a request for a person, medical or legal advice, a serious complaint, a question the documents and tools do not answer); no answer from Jev leaves the advisor's decision standing. The brief validates against ``schemas/handoff_brief.schema.json`` itself (required fields, enums, phone pattern, summary length), after the harness filled in what it knows |
+| ``memory.request_deletion`` | VERIFIED, and the customer agreed when asked to confirm (QT-06): *intents* ``delete``, read by Jev; the word lists only when Jev gave no answer |
 | any write tool in copilot mode | refused: the consultant acts, the advisor only suggests (section 4.6) |
 
 A customer the shop has never met may order on their own line: UNKNOWN with
@@ -38,13 +37,15 @@ COD_LIMIT_VND = 10_000_000
 
 UPDATE_ACTIONS = frozenset({"exchange_size", "exchange_product", "return", "update_address"})
 
-#: The customer asks for one more of what was ordered, on the plain (unaccented) text: a second
+#: The fallback when Jev gives no answer (*intents* ``one_more``). The customer asks for one more of
+#: what was ordered, on the plain (unaccented) text: a second
 #: order of the same product is theirs to ask for, never the agent's way of adding an address.
 ONE_MORE = re.compile(
     r"\b(mua them|dat them|lay them|them (?:mot|1|hai|2|ba|3) (?:cai|chiec|bo|don)|them (?:cai|chiec|don)|"
     r"(?:mot|1|hai|2) (?:cai|chiec|don) nua|cai nua|chiec nua|don (?:khac|moi|thu hai|nua))\b")
 
-#: The agent asked to confirm a deletion; the customer agreed (QT-06).
+#: The fallback when Jev gives no answer (*intents* ``delete``): the agent asked to confirm a deletion;
+#: the customer agreed (QT-06).
 ASKED_TO_DELETE = re.compile(r"\bxoa\b.*\?|\bxac nhan\b.*\bxoa\b")
 AGREED = re.compile(r"\b(dong y|dung roi|dung vay|xoa di|xoa giup|xoa het|ok|oke|vang|da|u|uh|co)\b")
 DECLINED = re.compile(r"\b(khong|thoi|chua|de sau)\b")
@@ -63,7 +64,7 @@ def check(
     orders: frozenset[str] = frozenset(),
     trusted: frozenset[str] | None = None,
     lane: str | None = None,
-    flags: Mapping[str, Any] | None = None,
+    intents: Mapping[str, bool | None] | None = None,
     now: datetime | None = None,
     last_agent_said: str | None = None,
     customer_said: str | None = None,
@@ -76,7 +77,10 @@ def check(
 
     *trusted* is every product code this call has seen from a tool or the
     brief; None skips that check (a caller without the call's history).
-    *flags* are the turn's signals (``components.intake.signals``).
+    *intents* is what the customer means, where an action depends on it,
+    read by the PolicyAgent on Jev (``handoff``, ``delete``, ``one_more``):
+    True, False, or None when it gave no answer (a word list decides then,
+    or, for a transfer, the advisor's decision stands).
     *created* is the orders this call created, ``{order_id, sku}``: the
     caller may correct those whatever the tier, and is not booked the same
     product twice unless they ask for more. *updated* is the arguments of the
@@ -111,14 +115,16 @@ def check(
     checks = {
         "order_create": lambda: _order_create(args, tier=tier, has_phone=has_phone, quotes=quotes, trusted=trusted,
                                               created=created, customer_said=customer_said, placed=placed,
-                                              said=f"{last_agent_said or ''} {customer_said or ''}"),
+                                              said=f"{last_agent_said or ''} {customer_said or ''}",
+                                              wants_more=(intents or {}).get("one_more")),
         "order_update": lambda: (["Xác nhận danh tính trước khi sửa đơn."]
                                  if tier != "VERIFIED" and args.get("order_id") not in created_ids
                                  else _order_update(args, orders=orders | created_ids, trusted=trusted,
-                                                    updated=updated)),
+                                                    updated=updated, agreed=(intents or {}).get("change"))),
         "schedule_callback": lambda: _schedule_callback(args, now=now),
-        "handoff_transfer": lambda: _handoff(args, lane=lane, flags=flags or {}),
-        "memory_request_deletion": lambda: _deletion(tier=tier, last_agent_said=last_agent_said, customer_said=customer_said),
+        "handoff_transfer": lambda: _handoff(args, lane=lane, warranted=(intents or {}).get("handoff")),
+        "memory_request_deletion": lambda: _deletion(tier=tier, agreed=(intents or {}).get("delete"),
+                                                     last_agent_said=last_agent_said, customer_said=customer_said),
     }
     reasons = checks[name]()
     return Verdict(not reasons, tuple(reasons))
@@ -166,12 +172,14 @@ def _cod_order(args: Mapping[str, Any], line: int, placed: Sequence[Mapping[str,
 def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes: Mapping[str, int],
                   trusted: frozenset[str] | None, created: Sequence[Mapping[str, Any]] = (),
                   customer_said: str | None = None, placed: Sequence[Mapping[str, Any]] = (),
-                  said: str = "") -> list[str]:
+                  said: str = "", wants_more: bool | None = None) -> list[str]:
     again = [o for o in created if o.get("sku") and o.get("sku") == args.get("sku")]
     # The same sku in the other half of a split order (QT-01) is the order the customer agreed to, not a repeat.
     other_half = args.get("order_group") is not None and all(
         p.get("order_group") != args.get("order_group") for p in placed if p.get("sku") == args.get("sku"))
-    if again and not other_half and not ONE_MORE.search(plain(customer_said or "")):
+    if wants_more is None:
+        wants_more = bool(ONE_MORE.search(plain(customer_said or "")))  # Jev gave no answer
+    if again and not other_half and not wants_more:
         return [f"Đơn {again[-1]['order_id']} cho {args.get('sku')} đã tạo trong cuộc này. Khách bổ sung hay đổi địa chỉ, "
                 "thanh toán thì gọi order_update trên đơn đó; chỉ tạo đơn mới khi khách muốn mua thêm."]
     reasons = []
@@ -193,7 +201,7 @@ def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes
 
 
 def _order_update(args: Mapping[str, Any], *, orders: frozenset[str], trusted: frozenset[str] | None,
-                  updated: Sequence[Mapping[str, Any]] = ()) -> list[str]:
+                  updated: Sequence[Mapping[str, Any]] = (), agreed: bool | None = None) -> list[str]:
     order_id, action = args.get("order_id"), args.get("action")
     if not order_id:
         return ["Thiếu order_id."]
@@ -213,6 +221,9 @@ def _order_update(args: Mapping[str, Any], *, orders: frozenset[str], trusted: f
             reasons.append("Đổi size hay đổi sản phẩm cần new_variant_sku.")
         elif trusted is not None and new not in trusted:
             reasons.append(f"Mã {new} chưa xuất hiện trong kết quả tool của cuộc gọi; tra catalog_search hoặc inventory_check trước.")
+    if agreed is False:
+        reasons.append("Khách chưa chọn hay đồng ý thay đổi này: đề xuất cách xử lý (đổi size, đổi sản phẩm, trả hàng) "
+                       "kèm phí theo chính sách, hỏi khách chọn, chỉ gọi order_update khi khách đồng ý (luật 20).")
     return reasons
 
 
@@ -228,12 +239,12 @@ def _schedule_callback(args: Mapping[str, Any], *, now: datetime | None) -> list
             f"({clock.iso_local(slot)}) rồi mới đặt lịch."]
 
 
-def _handoff(args: Mapping[str, Any], *, lane: str | None, flags: Mapping[str, Any]) -> list[str]:
+def _handoff(args: Mapping[str, Any], *, lane: str | None, warranted: bool | None) -> list[str]:
     reasons = []
-    allowed = (lane == "HANDOFF" or flags.get("must_transfer") or flags.get("wants_person") or flags.get("complaint"))
-    if not allowed:
-        reasons.append("Chỉ chuyển máy khi khách muốn gặp người, câu hỏi về sức khỏe hay y tế (PB-06), khiếu nại "
-                       "nghiêm trọng, hoặc hệ thống lỗi; câu ngoài tài liệu thì nói \"chưa có thông tin\" và hẹn phản hồi.")
+    if lane != "HANDOFF" and warranted is False:
+        reasons.append("Cuộc này chưa cần chuyển máy: khách không xin gặp người, không xin lời khuyên y tế, thuốc hay "
+                       "pháp lý, không khiếu nại nghiêm trọng, và câu hỏi trả lời được bằng tài liệu hoặc tool. Tư vấn "
+                       "tiếp bằng tool (sản phẩm mẹ và bé: nêu thông số hãng).")
     return reasons + handoff_problems(args.get("brief") or {})
 
 
@@ -256,13 +267,14 @@ def handoff_problems(brief: Mapping[str, Any]) -> list[str]:
     return problems[:5]
 
 
-def _deletion(*, tier: str, last_agent_said: str | None, customer_said: str | None) -> list[str]:
+def _deletion(*, tier: str, agreed: bool | None, last_agent_said: str | None, customer_said: str | None) -> list[str]:
     if tier != "VERIFIED":
         return ["Chưa xác minh danh tính nên chưa ghi nhận được yêu cầu xóa dữ liệu."]
-    asked = bool(last_agent_said and ASKED_TO_DELETE.search(plain(last_agent_said)))
-    said = plain(customer_said or "")
-    agreed = bool(AGREED.search(said)) and not DECLINED.search(said)
-    if asked and agreed:
+    if agreed is None:  # Jev gave no answer: the word lists decide
+        asked = bool(last_agent_said and ASKED_TO_DELETE.search(plain(last_agent_said)))
+        said = plain(customer_said or "")
+        agreed = asked and bool(AGREED.search(said)) and not DECLINED.search(said)
+    if agreed:
         return []
     return ["Hỏi khách xác nhận một câu là muốn xóa dữ liệu, đợi khách đồng ý rồi mới gọi memory_request_deletion."]
 

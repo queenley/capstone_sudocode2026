@@ -5,6 +5,8 @@ agent is the scripted stand-in from ``conftest``.
 """
 
 from decimal import Decimal
+
+import pytest
 from datetime import timedelta
 from sqlalchemy import select
 from src.db.models import Handoff, ProfileFact, Outbox, Promotion, Proposal, SKU, now
@@ -308,6 +310,42 @@ def test_delete_revokes_access_and_memory(client):
     assert client.get(f"/api/conversations/{c}", headers=h).status_code == 404
     with client.app.state.database.sessions() as db:
         assert db.scalars(select(ProfileFact)).all() == []
+        # The AI agent keeps its own memory: the event names the conversations it must forget (QT-06).
+        event = db.scalar(select(Outbox).where(Outbox.event_type == "identity.customer.deleted"))
+        assert event.payload["conversation_ids"] == [str(c)]
+
+
+def test_the_worker_tells_the_agent_to_forget_and_retries_on_failure(monkeypatch):
+    from src.messaging import worker
+
+    sent = []
+
+    class Reply:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+    def urlopen(request, timeout):
+        sent.append((request.full_url, request.get_header("Authorization"), request.data))
+        return Reply()
+
+    monkeypatch.setenv("AI_AGENT_SERVICE_URL", "http://agent:8400")
+    monkeypatch.setattr(worker.urllib.request, "urlopen", urlopen)
+    worker.forget_in_agent({"customer_id": "x", "conversation_ids": ["c-1"]})
+    assert sent[0][0] == "http://agent:8400/api/agent/customers/forget"
+    assert sent[0][1].startswith("Bearer ") and b"c-1" in sent[0][2]
+
+    def down(request, timeout):
+        raise OSError("connection refused")
+
+    monkeypatch.setattr(worker.urllib.request, "urlopen", down)
+    # Raised, so the event stays unprocessed and the worker tries again.
+    with pytest.raises(OSError):
+        worker.forget_in_agent({"customer_id": "x", "conversation_ids": ["c-1"]})
 
 
 def lines_body(client, lines, key="basket-0001", **extra):

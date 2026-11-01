@@ -40,6 +40,9 @@ type Latency = {
   ttfa_client: Stat;
 };
 type Sessions = { open: number; today: number; handoffs_waiting: number };
+// Knowledge Gap Loop (docs/design.md 10.2): answers consultants saved, waiting for a person's approval.
+type GapEntry = { chunk_id: string; question: string; answer: string; saved_at: string; gate: string[];
+  provenance: { call_id?: number; saved_by?: string } };
 type Choice = { name: string; label?: string };
 type Voice = {
   asr: string;
@@ -83,6 +86,7 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
   const [voice, setVoice] = useState<Voice | null>(null);
   const [day, setDay] = useState("");
   const [dayInput, setDayInput] = useState("");
+  const [gapEntries, setGapEntries] = useState<GapEntry[]>([]);
 
   const lanes = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -104,13 +108,14 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
 
   const refresh = () =>
     run(async () => {
-      const [t, m, l, s, v, c] = await Promise.all([
+      const [t, m, l, s, v, c, g] = await Promise.all([
         api<Trace[]>("/api/developer/traces", token),
         api<ModelSelection>("/api/developer/model", token),
         api<Latency>(`/api/developer/latency?channel=${channel}`, token),
         api<Sessions>("/api/developer/sessions", token),
         api<Voice>("/api/developer/voice", token),
         api<{ day: string }>("/api/developer/clock", token),
+        api<{ entries: GapEntry[] }>("/api/developer/knowledge-gap", token),
       ]);
       setTraces(t);
       setModel(m);
@@ -120,6 +125,7 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
       setVoice(v);
       setDay(c.day);
       setDayInput(c.day);
+      setGapEntries(g.entries);
     });
 
   const applyModel = (reset = false) =>
@@ -130,6 +136,12 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
         : await api<ModelSelection>("/api/developer/model", token, { provider, model: rest.join("::") }, "PUT");
       setModel(next);
       setModelChoice(`${next.provider}::${next.model}`);
+    });
+
+  const reviewGapEntry = (chunkId: string, decision: "approve" | "reject") =>
+    run(async () => {
+      await api(`/api/developer/knowledge-gap/${encodeURIComponent(chunkId)}`, token, { decision });
+      setGapEntries((await api<{ entries: GapEntry[] }>("/api/developer/knowledge-gap", token)).entries);
     });
 
   const setVoiceOption = (change: Record<string, unknown>) =>
@@ -322,7 +334,7 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
           ))}
         </div>
         <p className="flow-note">
-          Lane do luật chọn (HANDOFF, CLARIFY, CONFIRM_IDENTITY, ORDER_SERVICE, OUT_OF_SCOPE, CONTINUITY, NEW) và giới hạn tool
+          Lane do luật chọn theo trạng thái (HANDOFF, CLARIFY, CONFIRM_IDENTITY, CONTINUITY, NEW) và giới hạn tool
           mà advisor thấy. Mọi số tiền trong câu trả lời phải có trong kết quả tool của lượt đó.
         </p>
       </section>
@@ -455,6 +467,38 @@ export default function AgentConsole({ token, onToken }: { token: string; onToke
                 </button>
               </div>
             </div>
+          )}
+        </section>
+        <section className="panel">
+          <p className="eyebrow">KNOWLEDGE GAP LOOP</p>
+          <h2>Câu trả lời chờ duyệt</h2>
+          <p className="empty">
+            Tư vấn viên lưu câu trả lời cho câu trợ lý chưa trả lời được. Trợ lý chỉ dùng sau khi được duyệt; lúc duyệt, cổng kiểm
+            tra chặn mục có số tiền, mã khuyến mãi, tồn kho hoặc chủ đề phải chuyển người (PB-06).
+          </p>
+          {gapEntries.length === 0 ? (
+            <p className="empty">Không có mục nào đang chờ.</p>
+          ) : (
+            gapEntries.map((entry) => (
+              <div className="card" key={entry.chunk_id}>
+                <small>
+                  {entry.chunk_id}
+                  {entry.provenance.call_id ? ` · cuộc gọi ${entry.provenance.call_id}` : ""}
+                  {entry.provenance.saved_by ? ` · ${entry.provenance.saved_by}` : ""}
+                </small>
+                <p>Câu hỏi: {entry.question}</p>
+                <p>Trả lời: {entry.answer}</p>
+                {entry.gate.length > 0 && <div className="alert">{entry.gate.join(" ")}</div>}
+                <div className="buttonrow">
+                  <button disabled={busy || entry.gate.length > 0} onClick={() => reviewGapEntry(entry.chunk_id, "approve")}>
+                    Duyệt
+                  </button>
+                  <button className="danger" disabled={busy} onClick={() => reviewGapEntry(entry.chunk_id, "reject")}>
+                    Từ chối
+                  </button>
+                </div>
+              </div>
+            ))
           )}
         </section>
         <aside className="panel">

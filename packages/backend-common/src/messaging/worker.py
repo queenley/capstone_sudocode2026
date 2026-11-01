@@ -4,6 +4,7 @@ import logging
 import os
 import signal
 import time
+import urllib.request
 from sqlalchemy import select
 from src.core.config import Settings
 from src.db.session import Database
@@ -47,9 +48,34 @@ def topic_for_event(event_type):
     return f"telesales.{owner}.events"
 
 
+def forget_in_agent(payload):
+    """The customer deleted their data: the AI agent forgets them too (policy QT-06).
+
+    The agent keeps its own memory (facts, episodes, identities) and its own
+    transcripts of the conversations, apart from the platform's tables. It is
+    told which conversations were the customer's and finds its own records
+    from them. A failure raises: the event is then not marked processed and
+    the worker tries again.
+    """
+    url = os.getenv("AI_AGENT_SERVICE_URL")
+    if not url or not payload.get("conversation_ids"):
+        return
+    request = urllib.request.Request(
+        url.rstrip("/") + "/api/agent/customers/forget",
+        data=json.dumps({"conversation_ids": payload["conversation_ids"]}).encode(),
+        method="POST",
+        headers={"Content-Type": "application/json", "Authorization": "Bearer " + Settings().admin_token},
+    )
+    with urllib.request.urlopen(request, timeout=30) as response:
+        if response.status >= 300:
+            raise RuntimeError(f"The agent did not forget the customer: HTTP {response.status}")
+
+
 def process(db, event):
     if db.get(ProcessedEvent, event["id"]):
         return False
+    if event["event_type"] == "identity.customer.deleted":
+        forget_in_agent(event["payload"])
     if event["event_type"] == "conversation.ended":
         conv = db.get(Conversation, event["payload"]["conversation_id"])
         if conv:

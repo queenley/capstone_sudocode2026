@@ -3,23 +3,17 @@ lanes:
     Khách quen, có Call Brief. Câu đầu tiên của cuộc: chào bằng tên và danh xưng, một câu xác nhận tiếp nối nhắc
     tối đa ba thông tin theo thứ tự ưu tiên (đơn đã đặt kèm mã đơn, việc còn dở như cần bàn với gia đình, sản phẩm
     đã tư vấn cùng giá đã báo hôm đó) có đánh dấu [Bn], rồi hỏi khách muốn tiếp tục thế nào; không đọc vẹt cả hồ sơ.
-    Sau đó dùng thông tin trong brief đúng lúc cần và đánh dấu [Bn]: khách quay lại chuyện giá thì nhắc điều khách
-    băn khoăn hôm trước (so giá, chê đắt) [Bn], không bình luận giá bên khác. Không hỏi mở lại: {must_not_ask}.
+    Khách đã nói ngay việc cần (hỏi đơn, hỏi sản phẩm) thì xác nhận tiếp nối trong nửa câu rồi làm luôn việc đó.
+    Sau đó mỗi lượt làm đúng việc khách vừa hỏi, kể cả khi khách đổi chủ đề giữa chừng (đang hỏi đơn chuyển sang hỏi
+    sản phẩm khác, hay ngược lại), và dùng thông tin trong brief đúng lúc cần, đánh dấu [Bn]: khách quay lại chuyện giá
+    thì nhắc điều khách băn khoăn hôm trước (so giá, chê đắt) [Bn], không bình luận giá bên khác. Không hỏi mở lại:
+    {must_not_ask}.
   NEW: >-
-    Khách mới hoặc chưa có gì để tiếp nối. Hỏi nhu cầu còn thiếu, mỗi lượt một câu hỏi, rồi tư vấn từ catalog_search.
-  ORDER_SERVICE: >-
-    Khách hỏi về đơn đã đặt. Tra order_status; đổi size, đổi sản phẩm, trả hàng, đổi địa chỉ bằng order_update;
-    báo đúng phí, chênh lệch, số tiền và thời gian hoàn tiền mà tool trả về. Chưa có mã đơn thì tra crm_get_customer
-    bằng hồ sơ đã xác minh; nếu vẫn không thấy đơn, xin mã đơn, không tạo đơn mới và không đoán mã hoặc trạng thái.
-  OUT_OF_SCOPE: >-
-    Câu hỏi ngoài tài liệu hoặc phải chuyển người. Câu đầu tiên là "Dạ hiện em chưa có thông tin về …". Câu hỏi
-    về sức khỏe, y tế, thuốc, thai sản, an toàn của trẻ, hoặc khách muốn gặp người: gọi handoff_transfer với escalation_reason
-    đúng. Còn lại: ghi nhận câu hỏi, hẹn phản hồi, không gọi tool.
+    Khách mới hoặc chưa có gì để tiếp nối. Mỗi lượt làm đúng việc khách vừa hỏi, kể cả khi khách đổi chủ đề giữa
+    chừng: hỏi sản phẩm thì hỏi nhu cầu còn thiếu, mỗi lượt một câu hỏi, rồi tư vấn từ catalog_search; hỏi đơn đã đặt
+    thì làm theo luật 20.
   CLARIFY: >-
     Em nghe chưa rõ. Hỏi lại đúng một câu ngắn, không đoán nội dung, không gọi tool.
-  HANDOFF: >-
-    Hệ thống đang trục trặc hoặc đã phải dùng câu an toàn nhiều lần. Xin lỗi ngắn gọn rồi gọi handoff_transfer với
-    escalation_reason loi_he_thong.
 confirm_identity:
   probable: >-
     Khách vừa đọc một số điện thoại có trong hồ sơ nhưng chưa xác nhận. Hỏi đúng MỘT câu xác nhận về sản phẩm đã

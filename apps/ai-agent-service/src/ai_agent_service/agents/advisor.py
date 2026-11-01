@@ -41,7 +41,7 @@ import logging
 import time
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, AsyncIterator, Literal, Mapping, Sequence
+from typing import Any, AsyncIterator, Awaitable, Callable, Literal, Mapping, Sequence
 
 from langchain.agents import create_agent
 from langchain.agents.middleware import (
@@ -144,6 +144,8 @@ class AgentContext:
     seen_products: tuple[Mapping[str, Any], ...] = ()
     #: The orders earlier turns of this call created: ``{order_id, sku}``.
     created_orders: tuple[Mapping[str, Any], ...] = ()
+    #: The changes ``order_update`` made in earlier turns of this call: ``{order_id, action, new_variant_sku}``.
+    updated_orders: tuple[Mapping[str, Any], ...] = ()
     #: How an unknown customer calls themselves, and whether the agent asked.
     self_called: str | None = None
     honorific_asked: bool = False
@@ -151,6 +153,12 @@ class AgentContext:
     #: what the before-write checks read (a deletion needs both).
     customer_said: str | None = None
     last_agent_said: str | None = None
+    #: The last few messages, ``(speaker, text)`` tokenised: what Jev reads when an action
+    #: depends on what the customer means (a transfer, a deletion, one more order).
+    recent: tuple[tuple[str, str], ...] = ()
+    #: ``PolicyAgent.judge``: what the customer means for one action, None without an answer.
+    judge: Callable[[str, Mapping[str, Any]], Awaitable[bool | None]] | None = field(default=None, repr=False,
+                                                                                       compare=False)
 
 
 @dataclass
@@ -252,10 +260,11 @@ def system_prompt(context: AgentContext, *, max_tokens: int = 3000) -> tuple[str
             + f"\n{lane_instruction(context)}"
         ).strip()),
         Section("products", _products_block(context.seen_products)),
-        Section("orders", _orders_block(context.created_orders)),
+        Section("orders", _orders_block(context.created_orders, context.updated_orders)),
         Section("brief", f"Call Brief:\n{brief}" if brief else ""),
         Section("summary", f"Tóm tắt các lượt trước:\n{context.working_summary}" if context.working_summary else ""),
-        Section("knowledge", _knowledge_block("Tài liệu liên quan", policy) or context.knowledge_note or ""),
+        Section("knowledge", "\n".join(x for x in (_knowledge_block("Tài liệu liên quan", policy),
+                                                    context.knowledge_note) if x)),
         Section("playbook", _knowledge_block("Kinh nghiệm xử lý đã được duyệt", playbook)),
         Section("tool_results", _tool_block(context.tool_results)),
         Section("opening", OPENING[bool(context.brief_lines)] if context.phase == "opening" else ""),
@@ -313,13 +322,19 @@ def _blocked_block(context: AgentContext) -> str:
     return f"Câu trả lời trước của em đã bị chặn vì: {reasons} Hãy soạn lại, tránh đúng những điểm đó."
 
 
-def _orders_block(orders: Sequence[Mapping[str, Any]]) -> str:
-    """The orders this call created: a later address or payment corrects them, it is not a new order."""
-    if not orders:
-        return ""
-    lines = [f"- {o['order_id']}" + (f": {o['sku']}" if o.get("sku") else "") for o in orders]
-    return ("Đơn đã tạo trong cuộc này (khách bổ sung địa chỉ, đổi thanh toán thì gọi order_update trên đơn đó, "
-            "không tạo đơn mới):\n" + "\n".join(lines))
+def _orders_block(orders: Sequence[Mapping[str, Any]], changes: Sequence[Mapping[str, Any]] = ()) -> str:
+    """The orders this call created and the changes it made: neither is done a second time."""
+    parts = []
+    if orders:
+        lines = [f"- {o['order_id']}" + (f": {o['sku']}" if o.get("sku") else "") for o in orders]
+        parts.append("Đơn đã tạo trong cuộc này (khách bổ sung địa chỉ, đổi thanh toán thì gọi order_update trên đơn "
+                     "đó, không tạo đơn mới):\n" + "\n".join(lines))
+    if changes:
+        lines = [f"- {c.get('order_id')}: {c.get('action')}" + (f" sang {c['new_variant_sku']}" if c.get("new_variant_sku") else "")
+                 for c in changes]
+        parts.append("Thay đổi đã thực hiện trong cuộc này (đã xong, không gọi order_update lại cho cùng thay đổi; "
+                     "khách hỏi lại thì báo kết quả và phí của lần đó):\n" + "\n".join(lines))
+    return "\n".join(parts)
 
 
 def _products_block(products: Sequence[Mapping[str, Any]]) -> str:
@@ -390,13 +405,15 @@ class ActionGuardMiddleware(AgentMiddleware):
         state = getattr(request, "state", None) or {}
         quotes = {**context.quotes, **_quotes_in(state)}
         codes, orders = _seen_in(state, context.tool_results)
+        created = (*context.created_orders, *_created_in(state))
+        intents = await _intents(name, args, context, created)
         verdict = actions.check(
             name, args, tier=context.tier, mode=context.mode, has_phone=bool(context.customer_phone),
             quotes=quotes, orders=context.known_orders | orders, trusted=context.trusted_skus | codes | set(quotes),
-            lane=context.lane, flags=context.flags, now=context.now,
+            lane=context.lane, intents=intents, now=context.now,
             last_agent_said=context.last_agent_said, customer_said=context.customer_said,
-            shared_phone=context.shared_phone, created=(*context.created_orders, *_created_in(state)),
-            updated=_updated_in(state, context.tool_results),
+            shared_phone=context.shared_phone, created=created,
+            updated=(*context.updated_orders, *_updated_in(state, context.tool_results)),
             placed=placed_this_call(context, state),
         )
         if not verdict.passed:
@@ -414,6 +431,38 @@ def placed_this_call(context: AgentContext, state: Mapping[str, Any]) -> list[di
     lines.update({line["order_id"]: line for line in actions.placed_lines(
         [*context.tool_results, *tool_results_of(state.get("messages") or [])])})
     return list(lines.values())
+
+
+async def _intents(name: str, args: Mapping[str, Any], context: AgentContext,
+                   created: Sequence[Mapping[str, Any]]) -> dict[str, bool | None]:
+    """What the customer means, for the one action about to run, read by Jev (section 4.4).
+
+    Asked only when the action depends on it: a transfer outside lane
+    HANDOFF, a deletion, a change to an order, an order for a product this
+    call already ordered.
+    Every other tool call asks nothing.
+    """
+    if context.judge is None:
+        return {}
+    said = [{"speaker": who, "text": text[:600]} for who, text in context.recent]
+    if name == "handoff_transfer" and context.lane != "HANDOFF":
+        brief = args.get("brief") or {}
+        documents = [str(p.get("text") or "")[:400] for p in context.knowledge[:3] if p.get("text")]
+        return {"handoff": await context.judge("handoff", {
+            "recent_messages": said,
+            "reason_given": {"escalation_reason": brief.get("escalation_reason"),
+                             "detail": brief.get("escalation_reason_detail")},
+            "shop_documents_found": documents or [context.knowledge_note or "no passage was relevant"],
+        })}
+    if name == "memory_request_deletion" and context.tier == "VERIFIED":
+        return {"delete": await context.judge("delete", {"recent_messages": said})}
+    if name == "order_update":
+        change = {k: args.get(k) for k in ("order_id", "action", "new_variant_sku", "new_address") if args.get(k)}
+        return {"change": await context.judge("change", {"recent_messages": said, "change": change})}
+    if name == "order_create" and any(o.get("sku") and o.get("sku") == args.get("sku") for o in created):
+        return {"one_more": await context.judge("one_more", {"recent_messages": said,
+                                                             "already_ordered": args.get("sku")})}
+    return {}
 
 
 def _seen_in(state: Mapping[str, Any], earlier: Sequence[Mapping[str, Any]]) -> tuple[frozenset[str], frozenset[str]]:

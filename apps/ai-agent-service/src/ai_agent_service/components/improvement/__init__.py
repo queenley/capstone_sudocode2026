@@ -6,7 +6,8 @@ how the bot applies a rule it has, through playbook entries; it learns from
 the failures the organisers' grader finds on a learning run, fixed in
 exploration, and an entry goes live after verification and a person's
 approval. The Knowledge Gap Loop so far is its live step only: a consultant
-saves the answer they gave as a FAQ entry (``runtime/calls.save_faq``).
+saves the answer they gave as a Knowledge Gap Loop entry, which waits for a
+person's approval (``runtime/calls.save_gap_entry``).
 
 **The founding rule:** a lesson from one call may be true only for that
 customer. One call is one vote of evidence, never a rule; an entry needs the

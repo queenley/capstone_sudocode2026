@@ -2,7 +2,7 @@
 
 | Change | Approved before it goes live by | After |
 |---|---|---|
-| FAQ entry | a person, entry by entry, after the gate of section 10.2 | revocable; adds a growth case |
+| Knowledge Gap Loop entry | a person, entry by entry, after the gate of section 10.2 | revocable; adds a growth case |
 | Playbook entry from Reflection | the PolicyAgent checks, then a person | revocable |
 
 **No agent both writes and approves.** The QaAgent writes hints and cards,
