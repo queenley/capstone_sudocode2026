@@ -1,0 +1,159 @@
+{
+  "scenario_id": "SCN-ADV-0148",
+  "level": "M2",
+  "persona": "khach_lon_tuoi",
+  "hard_case": null,
+  "customer_phone": "0992566636",
+  "customer_name": "Chi",
+  "honorific": "chị",
+  "notes": "Persona khach_lon_tuoi, biến thể noi_cham_hoi_lai. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-12",
+      "input_mode": "asr_transcript",
+      "customer_goal": "Hỏi về áo khoác gió size L màu navy.",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về cái áo khoác gió màu navy size L đó em.",
+        "Giá cái áo đó là bao nhiêu vậy cháu?",
+        "Chị có thấy ghi trên mạng là đang có khuyến mãi gì không?",
+        "Chị cần hỏi con cháu trước đã, không biết cái này có hợp không.",
+        "Cháu có thể gọi lại cho chị vào tối mai tầm 7 giờ được không?",
+        "Ừ, vậy chị hẹn cháu tối mai nhé!"
+      ],
+      "customer_turns_asr": [
+        "alo chi muon hoi ve cai ao khoac gio mau navy size l do em",
+        "gia cai ao do la bao nhieu vay chau",
+        "chi co thay ghi tren mang la dang co khuyen mai gi khong",
+        "chi can hoi con chau truoc da khong biet cai nay co hop khong",
+        "chau co the goi lai cho chi vao toi mai tam 7 gio duoc khong",
+        "u vay chi hen chau toi mai nhe"
+      ],
+      "facts_established": {
+        "blocker": "cần hỏi con cháu",
+        "color": "navy",
+        "decision_maker": "con",
+        "size": "L",
+        "product_advised": "SKU-JK-WND",
+        "price_quoted_vnd": 690000,
+        "variant_sku": "SKU-JK-WND-L-NAVY"
+      },
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-11-13T19:00"
+        },
+        "must_say_any": [
+          "7 giờ",
+          "19 giờ",
+          "19h",
+          "7h tối"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 690000,
+        "list_price_vnd": 690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "callback_at": "2026-11-13T19:00",
+        "call_date": "2026-11-12"
+      },
+      "memory_expectation": {
+        "blocker": "cần hỏi con cháu",
+        "color": "navy",
+        "decision_maker": "con",
+        "size": "L",
+        "product_advised": "SKU-JK-WND",
+        "price_quoted_vnd": 690000,
+        "variant_sku": "SKU-JK-WND-L-NAVY"
+      },
+      "relevant_policy_ids": [
+        "SP-JK-01",
+        "LN-01",
+        "PB-03",
+        "PB-10"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 3,
+      "input_mode": "asr_transcript",
+      "customer_goal": "Đặt hàng áo khoác gió size L màu navy.",
+      "customer_turns": [
+        "Alo, chị gọi lại để đặt cái áo khoác gió màu navy, size L.",
+        "Cháu nói lại cho chị nghe, cái áo đó giá bao nhiêu nhỉ?",
+        "Chị cũng muốn thanh toán qua ngân hàng.",
+        "Khu vực giao hàng là Lê Chân, Hải Phòng nhé cháu.",
+        "Ừ, chị đồng ý đặt hàng rồi đó."
+      ],
+      "customer_turns_asr": [
+        "alo chi goi lai de dat cai ao khoac gio mau navy size l",
+        "chau noi lai cho chi nghe cai ao do gia bao nhieu nhir",
+        "chi cung muon thanh toan qua ngan hang",
+        "khu vuc giao hang la le chan hai phong nhe chau",
+        "u chi dong y dat hang roi do"
+      ],
+      "facts_established": {
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "payment": "bank",
+        "product_advised": "SKU-JK-WND",
+        "price_quoted_vnd": 690000,
+        "variant_sku": "SKU-JK-WND-L-NAVY",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "size",
+        "decision_maker",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "decision_maker",
+        "product_advised",
+        "variant_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-JK-WND-L-NAVY",
+          "price_vnd": 690000,
+          "payment": "bank"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 690000,
+        "list_price_vnd": 690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-11-19",
+        "call_date": "2026-11-15"
+      },
+      "memory_expectation": {
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "payment": "bank",
+        "product_advised": "SKU-JK-WND",
+        "price_quoted_vnd": 690000,
+        "variant_sku": "SKU-JK-WND-L-NAVY",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04",
+        "PB-01",
+        "PB-10"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

@@ -1,0 +1,171 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0010",
+    "call": "call_3",
+    "turn": 1
+  },
+  "customer_text": "Alo, cho anh hỏi máy lọc không khí AirPure Pro đã về hàng chưa?",
+  "agent_text": "Dạ máy lọc không khí AirPure Pro hiện bên em đang tạm hết hàng, dự kiến về lại vào ngày 21 tháng 10 năm 2026 ạ. Anh Minh có muốn em tư vấn máy lọc không khí khác đang có sẵn không ạ?",
+  "customer_id": "C004",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0010/call_3/1/10",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0010",
+        "call": "call_3",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/73"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0010/call_3/1/10",
+      "request": {
+        "name": "crm.get_customer",
+        "args": {
+          "phone": "0952059972"
+        }
+      },
+      "on": "2026-10-20",
+      "started_at": "2026-10-17T04:35:06.839410+00:00",
+      "finished_at": "2026-10-17T04:35:06.840022+00:00",
+      "outcome": "success",
+      "result": {
+        "found": true,
+        "ambiguous": false,
+        "customer_id": "C004",
+        "name": "Minh",
+        "honorific": "anh",
+        "phone": "0952059972",
+        "identities": {
+          "zalo_id": null,
+          "fb_id": "fb.minh.658"
+        },
+        "orders": [],
+        "sessions": []
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0010/call_3/1/11",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0010",
+        "call": "call_3",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/80"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0010/call_3/1/11",
+      "request": {
+        "name": "catalog.search",
+        "args": {
+          "query": "AirPure Pro",
+          "category": "gia-dung/may-loc-khong-khi"
+        }
+      },
+      "on": "2026-10-20",
+      "started_at": "2026-10-17T04:35:08.013191+00:00",
+      "finished_at": "2026-10-17T04:35:08.013191+00:00",
+      "outcome": "success",
+      "result": {
+        "items": [
+          {
+            "sku": "SKU-AP-PRO",
+            "name": "Máy lọc không khí AirPure Pro",
+            "category": "gia-dung/may-loc-khong-khi",
+            "list_price_vnd": 7990000,
+            "attributes": {
+              "room_area_m2": 45,
+              "features": "HEPA H13, UV, diệt khuẩn",
+              "warranty_months": 24,
+              "child_safe_lock": true
+            },
+            "variants": []
+          }
+        ],
+        "total": 1
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0010/call_3/1/12",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0010",
+        "call": "call_3",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/83"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0010/call_3/1/12",
+      "request": {
+        "name": "inventory.check",
+        "args": {
+          "sku": "SKU-AP-PRO",
+          "on": "2026-10-20"
+        }
+      },
+      "on": "2026-10-20",
+      "started_at": "2026-10-17T04:35:08.768206+00:00",
+      "finished_at": "2026-10-17T04:35:08.768206+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-AP-PRO",
+        "in_stock": false,
+        "qty": 0,
+        "restock_expected": "2026-10-21"
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"phone\": \"0952059972\"}, \"name\": \"crm.get_customer\"}",
+    "{\"args\": {\"category\": \"gia-dung/may-loc-khong-khi\", \"query\": \"AirPure Pro\"}, \"name\": \"catalog.search\"}",
+    "{\"args\": {\"on\": \"2026-10-20\", \"sku\": \"SKU-AP-PRO\"}, \"name\": \"inventory.check\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/76"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/84"
+    }
+  ]
+}

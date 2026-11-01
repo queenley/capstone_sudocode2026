@@ -1,0 +1,304 @@
+{
+  "conversation_id": "SCN-GEN-0243__call_2",
+  "scenario_id": "SCN-GEN-0243",
+  "call": "call_2",
+  "customer_id": "C002",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-12-03",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_da_kenh_fb_hotline",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop. Hôm trước anh có quan tâm Ghế ngồi ô tô cho bé Chicco và muốn gọi hotline hỏi thêm, mình tiếp tục với sản phẩm này đúng không anh?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Mình tiếp tục với Ghế ngồi ô tô cho bé Chicco đúng không anh?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh gọi lại để đặt ghế ngồi ô tô cho bé Chicco nhé.",
+      "facts_stated": {
+        "product_advised": "SKU-MB-CAR"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm Ghế ngồi ô tô cho bé Chicco đang có sẵn hàng với giá 4.990.000đ ạ. Anh muốn thanh toán bằng chuyển khoản ngân hàng hay hình thức khác ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "open",
+          "text": "Anh muốn thanh toán bằng chuyển khoản ngân hàng hay hình thức khác ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "4990000",
+          "spoken": "4.990.000"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán là chuyển khoản ngân hàng.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận thanh toán chuyển khoản ngân hàng ạ. Anh giao hàng đến địa chỉ nào giúp em với ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Anh giao hàng đến địa chỉ nào giúp em với ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giao hàng đến Ninh Kiều, Cần Thơ nha em.",
+      "facts_stated": {
+        "delivery_area": "Ninh Kiều, Cần Thơ"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Ninh Kiều, Cần Thơ",
+          "spoken": "Ninh Kiều, Cần Thơ"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em báo anh thời gian giao dự kiến là khoảng 4 ngày làm việc, tức anh sẽ nhận hàng vào ngày 08/12/2026 tại Ninh Kiều, Cần Thơ ạ. Đơn hàng tổng cộng là 4.990.000đ, anh xác nhận giúp em lên đơn luôn nhé?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em đọc lại: Ghế ngồi ô tô cho bé Chicco, 1 chiếc, giá 4.990.000đ, giao tại Ninh Kiều, Cần Thơ, thanh toán chuyển khoản ngân hàng, nhận hàng dự kiến ngày 08/12/2026 đúng không anh?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-12-08"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-12-03"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-12-08",
+          "spoken": "08/12/2026"
+        },
+        {
+          "type": "money",
+          "value": "4990000",
+          "spoken": "4.990.000"
+        }
+      ],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ừm, anh đồng ý lên đơn cho anh luôn nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã lên đơn cho anh thành công. Mã đơn của mình là OD600001, tổng cộng 4.990.000đ. Anh sẽ nhận hàng dự kiến vào ngày 08/12/2026 tại Ninh Kiều, Cần Thơ. Cảm ơn anh đã đặt hàng tại shop ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-12-08"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0936270107",
+            "sku": "SKU-MB-CAR",
+            "qty": 1,
+            "price_vnd": 4990000,
+            "payment": "bank",
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-12-03"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Ninh Kiều, Cần Thơ",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-CAR",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 4990000,
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn8"
+        }
+      ],
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD600001",
+          "spoken": "OD600001"
+        },
+        {
+          "type": "money",
+          "value": "4990000",
+          "spoken": "4.990.000"
+        },
+        {
+          "type": "date",
+          "value": "2026-12-08",
+          "spoken": "08/12/2026"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-MB-CAR",
+      "qty": 1,
+      "price_vnd": 4990000,
+      "payment": "bank",
+      "address": "Ninh Kiều, Cần Thơ",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-12-08"
+    }
+  }
+}

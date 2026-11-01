@@ -1,0 +1,134 @@
+{
+  "scenario_id": "SCN-GEN-0085",
+  "level": "M2",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "hard_case": null,
+  "customer_phone": "0998000005",
+  "customer_name": "Nguyễn Văn E",
+  "honorific": "anh",
+  "notes": "Persona khach_co_don_chua_co_lich_su, biến thể chuan. call_1 (hotline): hỏi tình trạng đơn → cap_nhat_don; call_2 (hotline): đổi địa chỉ giao → cap_nhat_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-29",
+      "customer_goal": "[plan-only] order_status",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tình trạng đơn hàng hiện có; không tự đọc mã đơn trừ khi được hỏi xác nhận."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C005",
+          "session_id": "SYN-005-S1",
+          "date": "2026-07-13",
+          "channel": "hotline",
+          "summary": "Mua Áo khoác gió Windbreak giá 690.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C005",
+          "session_id": "SYN-005-S2",
+          "date": "2026-10-05",
+          "channel": "zalo_oa",
+          "summary": "Đặt Giày chạy bộ RunLite 1 giá 1.290.000đ, đơn OD900502 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C005",
+          "order_id": "OD900501",
+          "date": "2026-07-13",
+          "sku": "SKU-JK-WND-M-NAVY",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-JK-WND-M-NAVY"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C005",
+          "order_id": "OD900502",
+          "date": "2026-10-05",
+          "sku": "SKU-SN-RUN1-41-DEN",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900502"
+          }
+        }
+      ],
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD900502"
+        },
+        "must_say_any": [
+          "đang giao",
+          "đang vận chuyển",
+          "đã bàn giao"
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900502",
+        "order_status": "shipping",
+        "tracking": "VN0052TRK",
+        "call_date": "2026-10-29"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    },
+    "call_2": {
+      "days_later": 1,
+      "customer_goal": "[plan-only] address_change",
+      "customer_turns": [
+        "[plan-only] Khách muốn đổi địa chỉ giao cho đơn đang xử lý/đang giao sang khu vực trong customer_must_state."
+      ],
+      "facts_established": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "OD900502",
+          "action": "update_address"
+        }
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900502",
+        "order_status": "shipping",
+        "tracking": "VN0052TRK",
+        "call_date": "2026-10-30"
+      },
+      "memory_expectation": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    }
+  }
+}

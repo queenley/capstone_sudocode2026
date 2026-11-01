@@ -42,7 +42,7 @@ async def test_tool_receives_raw_phone_but_model_and_checkpoint_receive_token():
     vault=pii.Vault()
     phone='0900000001'
     vault.put('PHONE',phone)
-    ctx=AgentContext(call_id='fixture',tier='VERIFIED',lane='ORDER_SERVICE',customer_phone=phone,vault=vault)
+    ctx=AgentContext(call_id='fixture',tier='VERIFIED',lane='CONTINUITY',customer_phone=phone,vault=vault)
     request=SimpleNamespace(tool_call={'name':'order_status','id':'lookup','args':{}},
         runtime=SimpleNamespace(context=ctx),tool=SimpleNamespace(args={'customer_phone':{}}))
     request.override=lambda **changes:SimpleNamespace(**{**vars(request),**changes})
@@ -108,7 +108,7 @@ async def test_crm_episode_pii_is_masked_before_checkpoint_brief():
 
 @pytest.mark.asyncio
 async def test_shared_phone_crm_result_shows_only_verified_customer_profile():
-    ctx=AgentContext(call_id='fixture',tier='VERIFIED',lane='ORDER_SERVICE',customer_phone='0900000001',
+    ctx=AgentContext(call_id='fixture',tier='VERIFIED',lane='CONTINUITY',customer_phone='0900000001',
                      customer_id='C-OWN',shared_phone=True)
     request=SimpleNamespace(tool_call={'name':'crm_get_customer','id':'lookup','args':{}},
         runtime=SimpleNamespace(context=ctx),tool=SimpleNamespace(args={'phone':{}}))

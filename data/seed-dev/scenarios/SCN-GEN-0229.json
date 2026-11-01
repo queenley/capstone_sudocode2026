@@ -1,0 +1,192 @@
+{
+  "scenario_id": "SCN-GEN-0229",
+  "level": "M2",
+  "persona": "khach_hoi_ngoai_tai_lieu",
+  "hard_case": "phien_ban_chinh_sach_cu",
+  "customer_phone": "0998000016",
+  "customer_name": "Nguyễn Thị Hương",
+  "honorific": "chị",
+  "notes": "Persona khach_hoi_ngoai_tai_lieu, biến thể chinh_sach_cu. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): dẫn chính sách cũ → thong_tin. Ca khó: phien_ban_chinh_sach_cu. call_1 ngày 01/11: Chủ nhật (LN-01: giờ 09:00–18:00, chỉ nhận đơn). Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-01",
+      "customer_goal": "Hỏi về áo phao lông vũ màu xanh navy size XL",
+      "customer_turns": [
+        "Alo, chị Hương đây, hôm nay chị muốn hỏi về chiếc áo phao lông vũ màu xanh navy size XL.",
+        "Em có biết áo này đang giá bao nhiêu không nhỉ?",
+        "Chị nghe nói có khuyến mãi gì không em?",
+        "À mà chị đang chờ cuối tháng mới nhận lương, nên em cho chị biết rồi chị gọi lại nhé."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C016",
+          "session_id": "SYN-016-S3",
+          "date": "2025-05-20",
+          "channel": "zalo_oa",
+          "summary": "Mua Quạt đứng DC inverter Panasonic F-409 giá 2.450.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C016",
+          "session_id": "SYN-016-S1",
+          "date": "2026-03-19",
+          "channel": "web",
+          "summary": "Mua Nồi chiên không dầu Xiaomi 4.5L giá 1.590.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C016",
+          "session_id": "SYN-016-S2",
+          "date": "2026-10-06",
+          "channel": "hotline",
+          "summary": "Đặt Máy lọc không khí AirPure X giá 4.890.000đ, đơn OD901602 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C016",
+          "order_id": "OD901601",
+          "date": "2026-03-19",
+          "sku": "SKU-AF-XM",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AF-XM"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C016",
+          "order_id": "OD901602",
+          "date": "2026-10-06",
+          "sku": "SKU-AP-X",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901602"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C016",
+          "order_id": "OD901603",
+          "date": "2025-05-20",
+          "sku": "SKU-FAN-DC1",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-FAN-DC1"
+          }
+        }
+      ],
+      "facts_established": {
+        "blocker": "chờ cuối tháng nhận lương",
+        "color": "navy",
+        "size": "XL",
+        "product_advised": "SKU-JK-DWN",
+        "price_quoted_vnd": 1530000,
+        "variant_sku": "SKU-JK-DWN-XL-NAVY"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1530000,
+        "list_price_vnd": 1530000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-11-01"
+      },
+      "memory_expectation": {
+        "blocker": "chờ cuối tháng nhận lương",
+        "color": "navy",
+        "size": "XL",
+        "product_advised": "SKU-JK-DWN",
+        "price_quoted_vnd": 1530000,
+        "variant_sku": "SKU-JK-DWN-XL-NAVY"
+      },
+      "relevant_policy_ids": [
+        "SP-JK-01",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 4,
+      "customer_goal": "Hỏi về chính sách đổi trả hàng",
+      "customer_turns": [
+        "Alo, em ơi, chị đọc trên web thấy có ghi đổi trả trong 14 ngày đúng không?",
+        "Mà phí đổi size là 20 nghìn, chị muốn chắc chắn lại em ơi.",
+        "Chị cũng thấy thông tin này trên trang web, không biết chính sách có thay đổi không nhỉ?",
+        "Chờ chị xem lại thông tin rồi sẽ quyết định."
+      ],
+      "must_carry_over": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "7 ngày",
+          "bảy ngày"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "return_days",
+            "value": 14
+          },
+          {
+            "field": "exchange_fee_vnd",
+            "value": 20000
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "return_days": 7,
+        "exchange_fee_vnd": 0,
+        "policy_version": "2026-10",
+        "call_date": "2026-11-05"
+      },
+      "relevant_policy_ids": [
+        "CL-01",
+        "DT-01",
+        "DT-03",
+        "DT-OLD-01",
+        "DT-OLD-03",
+        "PB-01"
+      ],
+      "expected_outcome": "thong_tin"
+    }
+  }
+}

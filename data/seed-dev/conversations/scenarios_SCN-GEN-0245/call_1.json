@@ -1,0 +1,193 @@
+{
+  "conversation_id": "SCN-GEN-0245__call_1",
+  "scenario_id": "SCN-GEN-0245",
+  "call": "call_1",
+  "customer_id": "C009",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-27",
+  "region": "trung",
+  "category": "gia-dung/quat",
+  "persona": "khach_hoi_ngoai_tai_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, rất vui được hỗ trợ chị về quạt tháp Xiaomi cho gia đình.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về quạt tháp Xiaomi á, dùng cho gia đình ấy mà.",
+      "facts_stated": {
+        "usage_need": "dùng cho gia đình"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị đang quan tâm quạt tháp Xiaomi Tower Fan đúng không ạ? Em kiểm tra thì sản phẩm này phù hợp cho gia đình, có thiết kế hiện đại, gió êm và tiết kiệm điện.",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Chị dự kiến ngân sách khoảng bao nhiêu cho quạt ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1790000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ngân sách của chị chỉ tầm 2 triệu thôi, có quạt nào phù hợp không em?",
+      "facts_stated": {
+        "budget_vnd": 2000000
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với ngân sách khoảng 2 triệu, quạt tháp Xiaomi Tower Fan đang có giá 1.790.000đ và rất phù hợp cho gia đình ạ. Tuy nhiên, hiện tại sản phẩm đang tạm hết hàng tại shop, em chưa có thông tin về ngày về hàng mới. Nếu chị quan tâm, em có thể ghi chú lại và báo chị ngay khi có hàng.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1790000
+        },
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Quạt này có khuyến mãi gì không hả em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại quạt tháp Xiaomi Tower Fan chưa có chương trình khuyến mãi riêng nào, giá đang là 1.790.000đ. Tuy nhiên, đơn từ 2 triệu sẽ được miễn phí vận chuyển toàn quốc ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1790000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đang chờ cuối tháng nhận lương, nên chưa chốt ngay được đâu nhé.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị đang chờ cuối tháng nhận lương. Em sẽ ghi chú lại và chủ động liên hệ lại khi sản phẩm có hàng hoặc khi chị sẵn sàng đặt nhé. Nếu chị cần thêm thông tin, em luôn sẵn sàng hỗ trợ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 2000000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "usage_need",
+          "value": "dùng cho gia đình",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-FAN-TWR",
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1790000,
+          "op": "set",
+          "source": "call_1#turn5"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_quat_xiaomi",
+    "outcome": "hen_goi_lai",
+    "objection_type": "khach_cho_nhan_luong",
+    "objection_handling": "Dạ em ghi nhận và sẽ liên hệ lại khi chị sẵn sàng hoặc sản phẩm có hàng.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

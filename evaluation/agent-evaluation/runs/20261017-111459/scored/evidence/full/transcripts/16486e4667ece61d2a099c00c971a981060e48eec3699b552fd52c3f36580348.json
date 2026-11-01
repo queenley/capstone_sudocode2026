@@ -1,0 +1,334 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0013",
+    "call": "call_2",
+    "turn": 1
+  },
+  "customer_text": "Chị có thắc mắc là máy này có lọc được khí radon không em?",
+  "agent_text": "Dạ, theo tài liệu bên em, máy lọc không khí hiện tại không có thông tin chính xác về khả năng lọc khí radon ạ. Em có thể giúp chị hỏi thêm hoặc hỗ trợ vấn đề khác không ạ?",
+  "customer_id": "C005",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0013/call_2/1/6",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0013",
+        "call": "call_2",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/299"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0013/call_2/1/6",
+      "request": {
+        "name": "crm.get_customer",
+        "args": {
+          "phone": "0979298416"
+        }
+      },
+      "on": "2026-10-18",
+      "started_at": "2026-10-17T04:23:00.128417+00:00",
+      "finished_at": "2026-10-17T04:23:00.128417+00:00",
+      "outcome": "success",
+      "result": {
+        "found": true,
+        "ambiguous": false,
+        "customer_id": "C005",
+        "name": "Hương",
+        "honorific": "chị",
+        "phone": "0979298416",
+        "identities": {
+          "zalo_id": "zalo_hương95",
+          "fb_id": null
+        },
+        "orders": [],
+        "sessions": []
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0013/call_2/1/7",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0013",
+        "call": "call_2",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/302"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0013/call_2/1/7",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-SN-RUN1-40-TRANG",
+          "on": "2026-10-18",
+          "customer_phone": "0979298416"
+        }
+      },
+      "on": "2026-10-18",
+      "started_at": "2026-10-17T04:23:00.154717+00:00",
+      "finished_at": "2026-10-17T04:23:00.154717+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-SN-RUN1-40-TRANG",
+        "list_price_vnd": 1290000,
+        "final_price_vnd": 1161000,
+        "applied_promos": [
+          {
+            "promo_code": "COD-0",
+            "type": "freecod",
+            "discount_vnd": 0
+          },
+          {
+            "promo_code": "RUN-10",
+            "type": "percent",
+            "discount_vnd": 129000
+          }
+        ],
+        "expired_promos": [],
+        "ineligible_promos": [],
+        "not_applied_exclusive": [],
+        "freeship": false,
+        "_internal_price_floor_vnd": 1032000
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0013/call_2/1/8",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0013",
+        "call": "call_2",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/305"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0013/call_2/1/8",
+      "request": {
+        "name": "inventory.check",
+        "args": {
+          "sku": "SKU-SN-RUN1-40-TRANG",
+          "on": "2026-10-18"
+        }
+      },
+      "on": "2026-10-18",
+      "started_at": "2026-10-17T04:23:00.161721+00:00",
+      "finished_at": "2026-10-17T04:23:00.161721+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-SN-RUN1-40-TRANG",
+        "in_stock": true,
+        "qty": 2
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0013/call_2/1/9",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0013",
+        "call": "call_2",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/308"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0013/call_2/1/9",
+      "request": {
+        "name": "catalog.search",
+        "args": {
+          "sku": "SKU-SN-RUN1-40-TRANG"
+        }
+      },
+      "on": "2026-10-18",
+      "started_at": "2026-10-17T04:23:00.167249+00:00",
+      "finished_at": "2026-10-17T04:23:00.167249+00:00",
+      "outcome": "success",
+      "result": {
+        "items": [
+          {
+            "sku": "SKU-SN-RUN1",
+            "name": "Giày chạy bộ RunLite 1",
+            "category": "thoi-trang/giay",
+            "list_price_vnd": 1290000,
+            "attributes": {
+              "material": "vải lưới + đế EVA",
+              "return_days": 7
+            },
+            "variants": [
+              {
+                "variant_sku": "SKU-SN-RUN1-38-DEN",
+                "size": 38,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-38-TRANG",
+                "size": 38,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-38-XAM",
+                "size": 38,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-39-DEN",
+                "size": 39,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-39-TRANG",
+                "size": 39,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-39-XAM",
+                "size": 39,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-40-DEN",
+                "size": 40,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-40-TRANG",
+                "size": 40,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-40-XAM",
+                "size": 40,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-41-DEN",
+                "size": 41,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-41-TRANG",
+                "size": 41,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-41-XAM",
+                "size": 41,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-42-DEN",
+                "size": 42,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-42-TRANG",
+                "size": 42,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-42-XAM",
+                "size": 42,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-43-DEN",
+                "size": 43,
+                "color": "den",
+                "price_delta_vnd": 50000
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-43-TRANG",
+                "size": 43,
+                "color": "trang",
+                "price_delta_vnd": 50000
+              },
+              {
+                "variant_sku": "SKU-SN-RUN1-43-XAM",
+                "size": 43,
+                "color": "xam",
+                "price_delta_vnd": 50000
+              }
+            ]
+          }
+        ],
+        "total": 1
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"phone\": \"0979298416\"}, \"name\": \"crm.get_customer\"}",
+    "{\"args\": {\"customer_phone\": \"0979298416\", \"on\": \"2026-10-18\", \"sku\": \"SKU-SN-RUN1-40-TRANG\"}, \"name\": \"pricing.get_quote\"}",
+    "{\"args\": {\"on\": \"2026-10-18\", \"sku\": \"SKU-SN-RUN1-40-TRANG\"}, \"name\": \"inventory.check\"}",
+    "{\"args\": {\"sku\": \"SKU-SN-RUN1-40-TRANG\"}, \"name\": \"catalog.search\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/311"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/313"
+    }
+  ]
+}

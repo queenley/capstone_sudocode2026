@@ -1,0 +1,202 @@
+{
+  "scenario_id": "SCN-GEN-0077",
+  "level": "M2",
+  "persona": "khach_da_kenh_fb_hotline",
+  "hard_case": "teencode_da_kenh",
+  "customer_phone": "0998000017",
+  "customer_name": "Vũ Quốc Duy",
+  "honorific": "anh",
+  "notes": "Persona khach_da_kenh_fb_hotline, biến thể chuan. call_1 (chat_fanpage): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Ca khó: teencode_da_kenh. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.syn-c017",
+      "call_date": "2026-10-16",
+      "input_mode": "chat_teencode",
+      "customer_goal": "Hỏi về giày chạy bộ size 42 màu xám.",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về giày chạy bộ size 42 màu xám.",
+        "Giá của đôi giày này là bao nhiêu vậy em?",
+        "Có khuyến mãi gì không?",
+        "À, anh muốn gọi hotline hỏi thêm một số thông tin nữa.",
+        "Thế em có thể cho anh biết là có hàng không nhé?"
+      ],
+      "customer_turns_asr": [
+        "alo anh muon hoi ve giay chay bo size 42 mau xam",
+        "gia cua doi giay nay la bao nhieu vay em",
+        "co khuyen mai gi khong",
+        "a muon goi hotline hoi them mot so thong tin nua",
+        "the em co the cho anh biet la co hang khong nhe"
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C017",
+          "session_id": "SYN-017-S1",
+          "date": "2026-04-22",
+          "channel": "hotline",
+          "summary": "Mua Áo khoác gió Windbreak giá 690.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C017",
+          "session_id": "SYN-017-S2",
+          "date": "2026-10-07",
+          "channel": "zalo_oa",
+          "summary": "Đặt Áo phao lông vũ Warmly giá 1.490.000đ, đơn OD901702 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C017",
+          "order_id": "OD901701",
+          "date": "2026-04-22",
+          "sku": "SKU-JK-WND-M-BE",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-JK-WND-M-BE"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C017",
+          "order_id": "OD901702",
+          "date": "2026-10-07",
+          "sku": "SKU-JK-DWN-S-DEN",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901702"
+          }
+        }
+      ],
+      "facts_established": {
+        "size": 42,
+        "color": "xam",
+        "phone_provided": true,
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1161000,
+        "variant_sku": "SKU-SN-RUN1-42-XAM",
+        "promo_code": "RUN-10",
+        "promo_expiry": "2026-10-25"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1161000,
+        "list_price_vnd": 1290000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "size": 42,
+        "color": "xam",
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1161000,
+        "variant_sku": "SKU-SN-RUN1-42-XAM",
+        "promo_code": "RUN-10"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "FAQ-09",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 3,
+      "customer_goal": "Xác nhận mua giày và cung cấp thông tin giao hàng.",
+      "customer_turns": [
+        "Alo, anh muốn đặt mua đôi giày chạy bộ size 42 màu xám.",
+        "Hình thức thanh toán là COD nhé.",
+        "Giao hàng đến Nha Trang, Khánh Hòa.",
+        "Mong là sẽ nhận được hàng sớm!"
+      ],
+      "facts_established": {
+        "payment": "COD",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1161000,
+        "variant_sku": "SKU-SN-RUN1-42-XAM",
+        "promo_code": "RUN-10",
+        "promo_expiry": "2026-10-25",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "phone_provided",
+        "product_advised",
+        "variant_sku",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-RUN1-42-XAM",
+          "price_vnd": 1161000,
+          "payment": "COD"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1161000,
+        "list_price_vnd": 1290000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": true,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-10-23",
+        "call_date": "2026-10-19"
+      },
+      "memory_expectation": {
+        "payment": "COD",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "product_advised": "SKU-SN-RUN1",
+        "price_quoted_vnd": 1161000,
+        "variant_sku": "SKU-SN-RUN1-42-XAM",
+        "promo_code": "RUN-10",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

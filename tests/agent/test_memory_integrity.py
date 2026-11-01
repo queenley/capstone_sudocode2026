@@ -327,6 +327,16 @@ def test_the_brief_shows_unconfirmed_facts_as_a_question_and_counts_them_when_ci
     assert brief.used_slots([line.id],[l.as_dict() for l in lines],data['profile_facts'])==['product_advised']
 
 
+
+def test_the_brief_shows_the_delivery_area_and_the_product_the_customer_owns():
+    facts=[fact('delivery_area','quận 7'),fact('owned_sku','SKU-AP-X')]
+    data,lines=brief.render(customer={'customer_id':'C-T','name':'Mai','honorific':'chị'},facts=facts,
+                            episodes=[],orders=[],products=[],warnings=[],now=datetime(2026,10,16,10,tzinfo=timezone.utc),latency_ms=1)
+    area=next(l for l in lines if 'quận 7' in l.text)
+    owned=next(l for l in lines if 'SKU-AP-X' in l.text)
+    assert area.fact_ids==('fact-delivery_area',) and owned.fact_ids==('fact-owned_sku',)
+    assert brief.used_slots([area.id,owned.id],[l.as_dict() for l in lines],data['profile_facts'])==['delivery_area','owned_sku']
+
 @pytest.mark.parametrize('slot_name, value, lapses', [
     ('address_token', '<ADDR_1>', '2027-04-13'),     # 180 days: an address may have changed
     ('blocker', 'cần hỏi chồng', '2026-11-14'),        # 30 days: a pending matter goes stale

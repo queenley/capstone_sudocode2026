@@ -25,10 +25,12 @@ def test_schema_checks_catch_what_btc_rejects():
     assert "config" in found and "ttft_ms" in found
 
 
-def test_scenarios_use_btc_outcomes_and_memory_writes_say_how(all_scenarios):
-    from src.schemas.slots import BTC_OUTCOMES
+def test_scenarios_use_registered_outcomes_and_memory_writes_say_how(all_scenarios):
+    from src.schemas import keys
 
-    assert {c["expected_outcome"] for s in all_scenarios for c in s.btc_export()["calls"].values()} <= set(BTC_OUTCOMES)
+    outcomes = {c["expected_outcome"] for s in all_scenarios for c in s.btc_export()["calls"].values()}
+    # The outcome itself, never BTC's catch-all "khac": the finer ones are registered (scenario-keys.yaml).
+    assert outcomes <= set(keys.registry()["expected_outcome"]) - {"khac"}
     writes = [w for s in all_scenarios for r in oracle_rows(s) for w in r["memory_writes"]]
     assert writes and all({"key", "value", "op", "source", "customer_id"} <= set(w) for w in writes)
     assert {w["op"] for w in writes} <= {"set", "supersede"} and any(w["op"] == "supersede" for w in writes)

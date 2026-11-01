@@ -1,0 +1,107 @@
+{
+  "scenario_id": "SCN-GEN-0091",
+  "level": "M1",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "hard_case": null,
+  "customer_phone": "0952059972",
+  "customer_name": "Minh",
+  "honorific": "anh",
+  "notes": "Persona khach_hoi_nhieu_khong_mua, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): hỏi thêm rồi từ chối → tu_choi. Chấm chủ yếu: CCR, RQR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-29",
+      "customer_goal": "Hỏi về máy lọc nước cho gia đình.",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về máy lọc nước RO Kangaroo 10 lõi.",
+        "Nhà anh có 6 người, nên cần máy này cho gia đình.",
+        "Giá của máy này là bao nhiêu em nhỉ?",
+        "Máy có khuyến mãi gì không?",
+        "Anh cần so sánh thêm với một số máy khác trước khi quyết định."
+      ],
+      "facts_established": {
+        "usage_need": "gia đình 6 người",
+        "budget_vnd": 7000000,
+        "blocker": "muốn so sánh thêm",
+        "product_advised": "SKU-WF-RO10",
+        "price_quoted_vnd": 6890000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 6890000,
+        "list_price_vnd": 6890000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-29"
+      },
+      "memory_expectation": {
+        "usage_need": "gia đình 6 người",
+        "budget_vnd": 7000000,
+        "blocker": "muốn so sánh thêm",
+        "product_advised": "SKU-WF-RO10",
+        "price_quoted_vnd": 6890000
+      },
+      "relevant_policy_ids": [
+        "SP-WF-01",
+        "FAQ-05",
+        "PB-11"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 5,
+      "customer_goal": "Hỏi thêm chi tiết rồi từ chối mua.",
+      "customer_turns": [
+        "Alo, anh gọi lại để hỏi thêm một vài chi tiết về máy lọc nước.",
+        "Máy này có bảo hành lâu không em?",
+        "Chất lượng nước lọc ra có đảm bảo không?",
+        "Cảm ơn em, nhưng sau khi xem xét, anh quyết định không mua nữa."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-WF-RO10",
+        "price_quoted_vnd": 6890000
+      },
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "max_agent_questions": 4
+      },
+      "ground_truth_facts": {
+        "price_vnd": 6890000,
+        "list_price_vnd": 6890000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-11-03"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-WF-RO10",
+        "price_quoted_vnd": 6890000
+      },
+      "relevant_policy_ids": [
+        "SP-WF-01",
+        "FAQ-05",
+        "PB-01",
+        "PB-11"
+      ],
+      "expected_outcome": "tu_choi"
+    }
+  }
+}

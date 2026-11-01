@@ -1,0 +1,246 @@
+{
+  "conversation_id": "SCN-ADV-0018__call_1",
+  "scenario_id": "SCN-ADV-0018",
+  "call": "call_1",
+  "customer_id": "ANON-001",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_chua_co_danh_tinh",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em có thể hỗ trợ chị về xe đẩy gấp gọn cho bé ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về xe đẩy gấp gọn cho bé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại shop đang có xe đẩy gấp gọn Joie Pact phù hợp cho bé từ sơ sinh đến khoảng 4 tuổi, giá là 3.490.000đ. Xe còn hàng, phù hợp với ngân sách của chị và có thể dùng được cho bé 4 tháng tuổi ạ.",
+      "questions": [
+        {
+          "slot": "child_age_months",
+          "type": "open",
+          "text": "Bé nhà mình mấy tháng tuổi rồi chị ha?"
+        },
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Chị dự tính ngân sách cho xe đẩy khoảng bao nhiêu ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Bé nhà chị 4 tháng tuổi, ngân sách khoảng 4 triệu thôi.",
+      "facts_stated": {
+        "child_age_months": 4,
+        "budget_vnd": 4000000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ xe đẩy Joie Pact hiện đang có chương trình miễn phí vận chuyển toàn quốc, áp dụng đơn từ 500.000đ cho ngành mẹ & bé nên chị sẽ được freeship ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Xe này có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại ngoài chương trình miễn phí vận chuyển MOM-FREESHIP thì xe đẩy Joie Pact chưa có thêm khuyến mãi giảm giá nào khác chị nha. Giá bán là 3.490.000đ và còn áp dụng thêm chương trình miễn phí thu hộ khi nhận hàng luôn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần bàn với gia đình đã, tối thứ Hai (19/10) tầm 7 giờ em gọi lại chị nhé.",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-10-19",
+          "spoken": "tối thứ Hai (19/10)"
+        },
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận, tối thứ Hai ngày 19/10 lúc 7 giờ em sẽ gọi lại cho chị nhé. Em để lịch hẹn gọi lại đúng 19 giờ để thuận tiện cho chị ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-10-19T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0977000000",
+            "callback_at": "2026-10-19T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "child_age_months",
+          "value": 4,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 4000000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-STR1",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 3490000,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_1#turn5"
+        }
+      ],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-10-19",
+          "spoken": "tối thứ Hai ngày 19/10"
+        },
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_ban_gia_dinh",
+    "objection_handling": "Xác nhận lại thời điểm gọi lại cụ thể là 19 giờ ngày 19/10 và đã lên lịch hẹn.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "callback_at": "2026-10-19T19:00"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-10-19T19:00",
+      "reason": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

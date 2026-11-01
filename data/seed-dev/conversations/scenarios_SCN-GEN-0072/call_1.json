@@ -1,0 +1,280 @@
+{
+  "conversation_id": "SCN-GEN-0072__call_1",
+  "scenario_id": "SCN-GEN-0072",
+  "call": "call_1",
+  "customer_id": "SYN-C009",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-15",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Hôm trước chị có hỏi về xe đẩy gấp gọn Joie Pact, em sẵn sàng hỗ trợ chị tiếp tục ạ.",
+      "questions": [],
+      "facts_used": [
+        "owned_sku",
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về xe đẩy gấp gọn Joie Pact hôm trước em có tư vấn á.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị đang quan tâm xe đẩy Joie Pact đúng không ạ? Dòng này bên em còn hàng, thiết kế gấp gọn rất tiện lợi khi di chuyển ạ.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Dạ chị đang quan tâm xe đẩy Joie Pact đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá xe này là bao nhiêu em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ xe đẩy gấp gọn Joie Pact hiện giá là 3.490.000đ chị nhé. Đơn từ 500.000đ bên em còn áp dụng miễn phí vận chuyển toàn quốc cho mẹ & bé nữa ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "3490000",
+          "spoken": "3.490.000đ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có ngân sách khoảng 4 triệu thôi.",
+      "facts_stated": {
+        "budget_vnd": 4000000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "4000000",
+          "spoken": "4 triệu"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với ngân sách của chị thì Joie Pact rất phù hợp ạ, giá hiện tại chỉ 3.490.000đ thôi chị nhé. Xe chịu tải tới 22kg, dùng được cho bé từ sơ sinh đến khoảng 4 tuổi luôn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "3490000",
+          "spoken": "3.490.000đ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có bé 11 tháng, nên cần một chiếc xe tiện lợi.",
+      "facts_stated": {
+        "child_age_months": 11
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ Joie Pact phù hợp cho bé 11 tháng tuổi chị nhé, xe gấp gọn một tay, nhẹ 6kg, có mái che chống nắng và dễ điều khiển khi đi chơi hoặc du lịch ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, chị cần hỏi chồng trước rồi tối mai tầm 7 giờ em gọi lại cho chị nhé.",
+      "facts_stated": {
+        "decision_maker": "chồng",
+        "blocker": "cần hỏi chồng"
+      },
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị cần hỏi ý kiến chồng trước ạ. Em sẽ gọi lại cho chị vào lúc 7 giờ tối ngày mai, tức 19 giờ ngày 16/10, để chị tiện trao đổi thêm nhé. Trong thời gian chờ, nếu chị cần tư vấn thêm thông tin gì về sản phẩm, chị nhắn em bất cứ lúc nào cũng được ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-10-16T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0998000009",
+            "callback_at": "2026-10-16T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "decision_maker",
+          "value": "chồng",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "blocker",
+          "value": "cần hỏi chồng",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "child_age_months",
+          "value": 11,
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 4000000,
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-STR1",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 3490000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_1#turn4"
+        }
+      ],
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-16",
+          "spoken": "ngày mai"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "cần hỏi người nhà",
+    "objection_handling": "Đồng ý hẹn gọi lại, xác nhận thời gian, không tạo áp lực.",
+    "sentiment": "neutral",
+    "decision_maker": "chồng",
+    "commitments": [],
+    "supersedes": [],
+    "callback": {
+      "customer_phone": "0998000009",
+      "callback_at": "2026-10-16T19:00",
+      "note": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

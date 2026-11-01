@@ -1,0 +1,116 @@
+{
+  "scenario_id": "SCN-ADV-0109",
+  "level": "M2",
+  "persona": "khach_hoi_bao_hanh_mo_rong",
+  "hard_case": null,
+  "customer_phone": "0964252477",
+  "customer_name": "Trang",
+  "honorific": "chị",
+  "notes": "Persona khach_hoi_bao_hanh_mo_rong, biến thể mua_roi_hoi_bh_mo_rong. call_1 (hotline): chốt đơn → chot_don; call_2 (zalo_oa): hỏi bảo hành mở rộng → thong_tin. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-26",
+      "customer_goal": "Chị muốn xác nhận đơn hàng nồi chiên không dầu.",
+      "customer_turns": [
+        "Alo, chị muốn xác nhận đơn hàng nồi chiên không dầu Philips 6.2L.",
+        "Cái này chị sẽ thanh toán qua ngân hàng nhé.",
+        "Chị cần giao hàng ở Hải Châu, Đà Nẵng.",
+        "Ngân sách chị không quá 4 triệu rưỡi đâu."
+      ],
+      "facts_established": {
+        "budget_vnd": 4500000,
+        "delivery_area": "Hải Châu, Đà Nẵng",
+        "payment": "bank",
+        "usage_need": "thay đồ cũ đã hỏng",
+        "product_advised": "SKU-AF-6L",
+        "price_quoted_vnd": 3990000,
+        "order_id": "OD600001"
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AF-6L",
+          "price_vnd": 3990000,
+          "payment": "bank"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 3990000,
+        "list_price_vnd": 3990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-11-28",
+        "call_date": "2026-11-26"
+      },
+      "memory_expectation": {
+        "budget_vnd": 4500000,
+        "delivery_area": "Hải Châu, Đà Nẵng",
+        "payment": "bank",
+        "usage_need": "thay đồ cũ đã hỏng",
+        "product_advised": "SKU-AF-6L",
+        "price_quoted_vnd": 3990000,
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04"
+      ],
+      "expected_outcome": "chot_don"
+    },
+    "call_2": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_trang63",
+      "days_later": 8,
+      "customer_goal": "Chị hỏi thêm về gói bảo hành mở rộng.",
+      "customer_turns": [
+        "Alo, chị Trang đây, vừa mua nồi chiên không dầu hôm trước.",
+        "Chị muốn hỏi thêm về gói bảo hành mở rộng, giá bao nhiêu vậy?",
+        "Gói bảo hành này thêm bao nhiêu tháng nhỉ?",
+        "Chị cần bảo hành để yên tâm hơn."
+      ],
+      "must_carry_over": [
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "order_id"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "8%",
+          "8 phần trăm",
+          "tám phần trăm"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "extended_warranty_months": 12,
+        "extended_warranty_percent": 8,
+        "extended_warranty_eligible": true,
+        "call_date": "2026-12-04"
+      },
+      "relevant_policy_ids": [
+        "BH-05",
+        "PB-01"
+      ],
+      "expected_outcome": "thong_tin"
+    }
+  }
+}

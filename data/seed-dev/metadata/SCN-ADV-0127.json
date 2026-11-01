@@ -1,0 +1,52 @@
+{
+  "scenario_id": "SCN-ADV-0127",
+  "persona_source": "advanced",
+  "customer_id": "C025",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "normal",
+  "tags": [
+    "chot_don",
+    "cross_channel",
+    "date:ordinary",
+    "hoan_tat",
+    "may_loc_khong_khi",
+    "readback",
+    "rqr_confirm",
+    "variant:chot_nhu_hom_truoc",
+    "zalo"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "consult_ready",
+      "outcome_detail": "hen_goi_lai",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Máy lọc không khí AirPure Pro",
+        "price_vnd": 7990000,
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_chot_don_doc_lai",
+      "patience_start": 3
+    },
+    "call_2": {
+      "kind": "order_readback",
+      "outcome_detail": "chot_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Máy lọc không khí AirPure Pro",
+        "price_vnd": 7990000,
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_chot_don_doc_lai",
+      "patience_start": 2
+    }
+  }
+}

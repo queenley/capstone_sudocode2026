@@ -1,0 +1,128 @@
+{
+  "notice": "P2 execution only; not BTC trace, scorer, runtime isolation proof or quality acceptance",
+  "run_id": "PRODUCT-19b14436a3986b92",
+  "fixture": false,
+  "configs": [
+    "full",
+    "baseline_no_memory"
+  ],
+  "execution_complete": false,
+  "bindings": [
+    {
+      "config": "full",
+      "scenario_id": "SCN-GEN-0002",
+      "type": "bound",
+      "capabilities": [
+        "after_call_barrier",
+        "briefs",
+        "business_tools",
+        "memory_isolation",
+        "memory_read_gate",
+        "snapshots",
+        "timestamps",
+        "usage"
+      ],
+      "retry": {
+        "agent": 0,
+        "tool": 0
+      },
+      "code_sha256": "1007f0df6f6935d1a81d708a5b88af412b57543b491e7ecff278e92fa4134be9",
+      "pid": 5548
+    },
+    {
+      "config": "baseline_no_memory",
+      "scenario_id": "SCN-GEN-0002",
+      "type": "bound",
+      "capabilities": [
+        "after_call_barrier",
+        "briefs",
+        "business_tools",
+        "memory_isolation",
+        "memory_read_gate",
+        "snapshots",
+        "timestamps",
+        "usage"
+      ],
+      "retry": {
+        "agent": 0,
+        "tool": 0
+      },
+      "code_sha256": "1007f0df6f6935d1a81d708a5b88af412b57543b491e7ecff278e92fa4134be9",
+      "pid": 17076
+    }
+  ],
+  "calls": [],
+  "attempted_calls": 0,
+  "completed_calls": 0,
+  "failed_calls": 0,
+  "errors": [
+    {
+      "code": "EXECUTION_ERROR",
+      "config": "full",
+      "scenario_id": "SCN-GEN-0002",
+      "context": null,
+      "phase": "open_scenario",
+      "error": "TimeoutError: Adapter timeout at open_scenario; no retry",
+      "reconciliation_required": true,
+      "retry": 0
+    },
+    {
+      "code": "EXECUTION_ERROR",
+      "config": "baseline_no_memory",
+      "scenario_id": "SCN-GEN-0002",
+      "context": null,
+      "phase": "open_scenario",
+      "error": "TimeoutError: Adapter timeout at open_scenario; no retry",
+      "reconciliation_required": true,
+      "retry": 0
+    }
+  ],
+  "coverage": {
+    "expected_ids": [
+      "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_1/1",
+      "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_1/2",
+      "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_2/1",
+      "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_2/2",
+      "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_1/1",
+      "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_1/2",
+      "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_2/1",
+      "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_2/2"
+    ],
+    "observed_ids": [],
+    "missing_ids": [
+      "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_1/1",
+      "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_1/2",
+      "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_2/1",
+      "PRODUCT-19b14436a3986b92/baseline_no_memory/SCN-GEN-0002/call_2/2",
+      "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_1/1",
+      "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_1/2",
+      "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_2/1",
+      "PRODUCT-19b14436a3986b92/full/SCN-GEN-0002/call_2/2"
+    ],
+    "duplicate_ids": [],
+    "unknown_ids": []
+  },
+  "validation_status": {
+    "verdict": "PASS",
+    "completeness": "COMPLETE",
+    "reason_codes": []
+  },
+  "evaluation_status": {
+    "verdict": "UNDETERMINED",
+    "completeness": "INCOMPLETE",
+    "reason_codes": [
+      "P3_EVIDENCE_AND_TRACE_PENDING"
+    ]
+  },
+  "deferred": [
+    {
+      "id": "btc.validator",
+      "reason": "DEFERRED_BY_USER_2026_10_04"
+    },
+    {
+      "id": "btc.audio_segments",
+      "reason": "DEFERRED_BY_USER_2026_10_04"
+    }
+  ],
+  "btc_full_readiness": "INCOMPLETE"
+}

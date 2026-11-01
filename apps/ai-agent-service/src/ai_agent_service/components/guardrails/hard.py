@@ -5,7 +5,7 @@ guarantee, and it can be shown live.
 
 | Check | How |
 |---|---|
-| money | every amount, in digits or in words (read by the ITN the customer's words go through), must come from a valid source: this turn's tool results, today's quotes earlier in the call, the passages read this turn, the customer's own words, a quantity times a unit price, or the difference of two amounts. A price from the brief only as history ("hôm trước bên em báo"), and only when VERIFIED |
+| money | every amount, in digits or in words (read by the ITN the customer's words go through), must come from a valid source: this turn's tool results, today's quotes earlier in the call, the organisers' policy passages read this turn (never a Knowledge Gap Loop or playbook entry), a quantity times a unit price, the difference of two amounts of one object (a quote's list and final price, an order's fees) or of today's quote and the price the brief says was quoted. An amount the customer said passes here: whether a sentence states it as the shop's own price is a reading of meaning, the PolicyAgent's (``unquoted_price``). A price from the brief only as history ("hôm trước bên em báo"), and only when VERIFIED |
 | days, months | "giao trong 2 ngày", "đổi trả 7 ngày", "bảo hành 24 tháng" must match a tool result, a passage of the turn, the customer's words or a rule the prompt states |
 | discontinued | "ngừng bán" needs a tool of the turn reporting the product discontinued: a passage names its own model only |
 | delivery by area | without an address ``delivery.estimate`` answers per area; a sentence stating one area's days names that area or gives them all |
@@ -97,8 +97,10 @@ class GuardInput:
     tier: Literal["VERIFIED", "PROBABLE", "AMBIGUOUS", "UNKNOWN"]
     #: The customer's own words in this call, tokenised.
     customer_said: tuple[str, ...] = ()
-    #: The knowledge passages read this turn.
+    #: The knowledge passages read this turn: durations and the policy review read them.
     policy_texts: tuple[str, ...] = ()
+    #: The passages of the organisers' documents among them: the only passages an amount may come from.
+    priced_texts: tuple[str, ...] = ()
     #: Prices the brief holds: history, never a current price.
     brief_prices: tuple[int, ...] = ()
     #: This call's vault tokens, the only ones the text may carry.
@@ -139,22 +141,50 @@ def numbers_in(value: Any) -> set[int]:
 
 
 def allowed_amounts(view: GuardInput) -> set[int]:
-    """Every amount the reply may state.
+    """Every amount the reply may state as the shop's.
 
-    Arithmetic is allowed on what the tools returned only: a quantity times a
-    unit price, the difference of two prices (a discount, a change since the
-    last quote). An amount from the customer or a passage stands as written:
-    combined with a price it could make almost any number (5.200.000đ less a
-    passage's 300.000đ is 4.900.000đ).
+    Arithmetic is allowed only where the operands belong together: a
+    quantity times a unit price, the difference of two amounts of one object
+    of a tool result (a quote's list and final price, an order's old and new
+    price), and today's quote against the price the brief says was quoted (a
+    change since the last call). The difference of any two numbers of a turn
+    is not: a search listing eight products would make dozens of numbers
+    "derived", a fabricated discount among them. An amount from a passage
+    counts only from the organisers' documents: a Knowledge Gap Loop or playbook entry
+    written in the console is not a source of prices (section 10.2, gate 2).
+    The customer's amounts are not here: :func:`_money` lets them through, and
+    the PolicyAgent judges whether a sentence passes one off as the shop's.
     """
     tools: set[int] = set(view.quotes.values())
+    groups: list[set[int]] = []
     for result in view.tool_results:
         tools |= numbers_in(result.get("result"))
+        groups += amount_groups(result.get("result"))
     base = {a for a in tools if a >= 1_000}
-    found = tools | {a * q for a in base for q in range(2, 6)} | {abs(a - b) for a in base for b in base if a != b}
-    for text in (*view.customer_said, *view.policy_texts):
+    found = tools | {a * q for a in base for q in range(2, 6)}
+    for group in groups:
+        found |= {abs(a - b) for a in group for b in group if a != b}
+    found |= {abs(q - b) for q in view.quotes.values() for b in view.brief_prices if q != b}
+    for text in view.priced_texts:
         found.update(amounts(text))
     return found
+
+
+def amount_groups(value: Any) -> list[set[int]]:
+    """The amounts that belong together: those held directly by one object of a tool result."""
+    groups: list[set[int]] = []
+    if isinstance(value, dict):
+        own = {int(v) for v in value.values()
+               if isinstance(v, (int, float)) and not isinstance(v, bool) and float(v).is_integer() and v >= 1_000}
+        if len(own) > 1:
+            groups.append(own)
+        for item in value.values():
+            if isinstance(item, (dict, list)):
+                groups += amount_groups(item)
+    elif isinstance(value, list):
+        for item in value:
+            groups += amount_groups(item)
+    return groups
 
 
 def allowed_counts(view: GuardInput) -> set[int]:
@@ -209,6 +239,7 @@ def _money(text: str, view: GuardInput) -> list[str]:
     reasons = []
     allowed = allowed_amounts(view)
     history = set(view.brief_prices)
+    theirs = {value for said in view.customer_said for value in amounts(said)}
     for sentence in SENTENCE.split(text):
         for value in amounts(sentence):
             if value in allowed:
@@ -217,8 +248,10 @@ def _money(text: str, view: GuardInput) -> list[str]:
                 if view.tier != "VERIFIED":
                     reasons.append(f"Chưa xác minh danh tính nên không được nhắc giá đã báo {format_vnd(value)}.")
                 continue
+            if value in theirs:
+                continue  # the customer's own figure; the PolicyAgent checks it is not stated as the shop's
             reasons.append(
-                f"Số tiền {format_vnd(value)} không có trong kết quả tool của lượt này, lời khách hay chính sách; "
+                f"Số tiền {format_vnd(value)} không có trong kết quả tool của lượt này hay tài liệu chính sách; "
                 "gọi tool để lấy số đúng hoặc bỏ con số."
             )
     return reasons

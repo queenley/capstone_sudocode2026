@@ -1,0 +1,242 @@
+{
+  "conversation_id": "SCN-ADV-0059__call_1",
+  "scenario_id": "SCN-ADV-0059",
+  "call": "call_1",
+  "customer_id": "C014",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-21",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_tach_don_cod",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần tư vấn về máy lọc không khí cho phòng khoảng 35 mét vuông đúng không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Anh cần tư vấn về máy lọc không khí cho phòng khoảng 35 mét vuông đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về máy lọc không khí cho phòng khoảng 35 mét vuông.",
+      "facts_stated": {
+        "room_area_m2": 35
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với diện tích phòng khoảng 35m², anh nên chọn máy lọc không khí AirPure Pro. Máy này phù hợp phòng đến 45m², đang có giá ưu đãi 7.690.000đ, tặng thêm khuyến mãi AIR-OCT. Anh có muốn em tư vấn chi tiết về tính năng hoặc chương trình khuyến mãi không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Anh có ngân sách dự kiến cho sản phẩm này không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhà anh không có trẻ nhỏ, ngân sách tầm 8 triệu thôi.",
+      "facts_stated": {
+        "has_children": false,
+        "budget_vnd": 8000000
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy AirPure Pro rất phù hợp, máy này có khoá trẻ em nhưng nếu không cần thì vẫn tối ưu cho phòng lớn, công suất mạnh. Giá ưu đãi hiện tại là 7.690.000đ, nằm trong ngân sách của anh và còn chương trình AIR-OCT giảm 300.000đ đến hết ngày 30/10. Anh quan tâm thêm về tính năng hay muốn biết chi tiết khuyến mãi nào không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh muốn em tư vấn chi tiết về chương trình khuyến mãi hiện tại không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy lọc này có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại máy AirPure Pro đang có chương trình khuyến mãi AIR-OCT giảm ngay 300.000đ, giá chỉ còn 7.690.000đ đến hết ngày 30/10. Ngoài ra, đơn của anh được miễn phí vận chuyển và nhận hàng kiểm tra ngoại quan trước khi thanh toán. Nếu anh có mã máy cũ AirPure X bản 2024 sẽ được thêm ưu đãi thu cũ đổi mới, anh có nhu cầu không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        },
+        {
+          "field": "promo_TRADE-IN-AP_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, anh cần bàn với gia đình rồi hẹn lại em tối mai tầm 7 giờ nhé.",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em ghi nhận anh cần trao đổi với gia đình. Em sẽ gọi lại cho anh vào lúc 7 giờ tối mai, ngày 22/10. Nếu anh đổi ý về khung giờ, cứ nhắn lại giúp em nhé ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-10-22T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0925877188",
+            "callback_at": "2026-10-22T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em có thể gọi lại đúng giờ đó không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh yên tâm, em sẽ gọi lại đúng 7 giờ tối mai để hỗ trợ anh nhé. Cảm ơn anh đã quan tâm sản phẩm của shop BTC ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-10-22T19:00"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cảm ơn em, anh sẽ chờ cuộc gọi của em.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_hoi_nguoi_nha",
+    "objection_handling": "Đã xác nhận thời điểm gọi lại cụ thể cho khách và nhắc lại khuyến mãi.",
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "hứa gọi lại": "2026-10-22T19:00"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-10-22T19:00",
+      "note": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

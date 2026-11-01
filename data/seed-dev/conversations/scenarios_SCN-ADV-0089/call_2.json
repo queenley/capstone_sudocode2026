@@ -1,0 +1,170 @@
+{
+  "conversation_id": "SCN-ADV-0089__call_2",
+  "scenario_id": "SCN-ADV-0089",
+  "call": "call_2",
+  "customer_id": "SYN-C010",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-04",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_tra_hang_trong_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có đặt Ghế ngồi ô tô Chicco, em hỗ trợ anh về đơn hàng này ạ.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "order_id",
+        "payment",
+        "delivery_area",
+        "price_quoted_vnd",
+        "promo_code",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, anh vừa nhận hàng hôm trước nhưng thấy không ưng.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ. Anh muốn trả hàng cho đơn OD600001 đúng không ạ? Em sẽ tạo yêu cầu trả hàng giúp anh ngay bây giờ.",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Anh muốn trả hàng cho đơn OD600001 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Người nhà đã mua cái khác rồi, nên anh muốn trả hàng.",
+      "facts_stated": {
+        "return_reason": "người nhà đã mua cái khác"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận lý do trả hàng là người nhà đã mua cái khác. Em sẽ tiến hành cập nhật yêu cầu trả hàng lên hệ thống cho anh ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD600001",
+            "action": "return",
+            "reason": "người nhà đã mua cái khác",
+            "on": "2026-11-04"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em cho anh hỏi, anh sẽ được hoàn bao nhiêu tiền?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh sẽ được hoàn 4.990.000 đồng sau khi shop nhận lại và kiểm tra hàng đạt điều kiện trả ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "refund_vnd",
+          "value": 4990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thời gian nhận lại tiền là bao lâu vậy?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ thời gian hoàn tiền là trong vòng 3-5 ngày làm việc kể từ khi shop nhận lại hàng đạt điều kiện, anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tra_hang_hoan_tien",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

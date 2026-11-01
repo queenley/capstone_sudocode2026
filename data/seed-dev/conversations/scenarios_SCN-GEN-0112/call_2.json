@@ -1,0 +1,164 @@
+{
+  "conversation_id": "SCN-GEN-0112__call_2",
+  "scenario_id": "SCN-GEN-0112",
+  "call": "call_2",
+  "customer_id": "C023",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_ngoai_pham_vi_chuyen_may",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Thu ạ, hôm trước chị có quan tâm Bình sữa Pigeon PPSU 240ml và bảo là chờ cuối tháng nhận lương.",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 550,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có một câu hỏi về an toàn, nếu bé nhà chị đang dùng thuốc thì có dùng bình sữa này được không nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 450,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ câu hỏi của chị về an toàn khi bé đang dùng thuốc và sử dụng bình sữa này là câu hỏi chuyên môn y tế, em xin phép chuyển cho nhân viên phụ trách để hỗ trợ chị tốt nhất ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 550,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em có thể cho chị biết thêm thông tin về điều này không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại em chưa có đủ thông tin chuyên môn về vấn đề này, em sẽ nhờ dược sĩ hoặc nhân viên phụ trách tư vấn kỹ hơn cho chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị rất lo lắng về sức khỏe của bé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 450,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em hiểu sự lo lắng của chị và sẽ chuyển câu hỏi của chị để nhân viên có chuyên môn liên hệ lại sớm nhất, đảm bảo tư vấn chính xác cho bé nhà chị ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu không được thì chị sẽ không mua đâu.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận ạ, em sẽ chuyển thông tin và nhờ nhân viên chuyên môn gọi lại tư vấn đầy đủ cho chị trước khi chị quyết định mua hàng nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "handoff.transfer",
+          "args": {
+            "brief": {
+              "customer_phone": "0976158464",
+              "customer_name": "Thu",
+              "escalation_reason": "cau_hoi_y_te",
+              "conversation_summary": "Khách hỏi Bình sữa Pigeon PPSU 240ml, có câu hỏi y tế/an toàn cần chuyên môn.",
+              "product_advised": "SKU-MB-BOT",
+              "price_quoted_vnd": 289000,
+              "open_questions": [
+                "câu hỏi y tế của khách"
+              ],
+              "next_action": "Dược sĩ/nhân viên phụ trách gọi lại tư vấn",
+              "generated_at": "2026-10-30T10:00:00+07:00",
+              "channel": "hotline"
+            }
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_human",
+      "text": "Chào chị Thu, em là nhân viên phụ trách tư vấn sức khỏe. Em đã nhận được câu hỏi của chị về việc dùng bình sữa khi bé đang uống thuốc, em sẽ hỗ trợ chị ngay ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 450,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_y_te",
+    "outcome": "chuyen_may",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

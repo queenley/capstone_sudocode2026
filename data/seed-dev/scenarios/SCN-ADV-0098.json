@@ -1,0 +1,132 @@
+{
+  "scenario_id": "SCN-ADV-0098",
+  "level": "M2",
+  "persona": "khach_go_khong_dau",
+  "hard_case": null,
+  "customer_phone": "0992298369",
+  "customer_name": "Ngọc",
+  "honorific": "chị",
+  "notes": "Persona khach_go_khong_dau, biến thể khong_dau_da_kenh. call_1 (zalo_oa): tư vấn, chưa chốt → hen_goi_lai; call_2 (chat_fanpage): chốt đơn → chot_don. call_1 ngày 18/10: Chủ nhật (LN-01: giờ 09:00–18:00, chỉ nhận đơn). Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_ngọc53",
+      "call_date": "2026-10-18",
+      "input_mode": "chat_teencode",
+      "customer_goal": "Hỏi về túi trữ sữa cho bé 10 tháng tuổi",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về túi trữ sữa cho bé 10 tháng tuổi.",
+        "Ngân sách của chị tầm 500 nghìn thôi.",
+        "Em cho chị hỏi túi này giá bao nhiêu và có khuyến mãi gì không?",
+        "Chị đang chờ cuối tháng nhận lương nên chưa quyết định được."
+      ],
+      "customer_turns_asr": [
+        "alo chi muon hoi ve tui tru sua cho be muoi thang tuoi",
+        "ngan sach cua chi tam nam tram thoi",
+        "em cho chi hoi tui nay gia bao nhieu va co khuyen mai gi khong",
+        "chi dang cho cuoi thang nhan luong nen chua quyet dinh duoc"
+      ],
+      "facts_established": {
+        "blocker": "chờ cuối tháng nhận lương",
+        "budget_vnd": 500000,
+        "child_age_months": 10,
+        "product_advised": "SKU-MB-BAG",
+        "price_quoted_vnd": 119000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 119000,
+        "list_price_vnd": 119000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_MOM-FREESHIP_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-18"
+      },
+      "memory_expectation": {
+        "blocker": "chờ cuối tháng nhận lương",
+        "budget_vnd": 500000,
+        "child_age_months": 10,
+        "product_advised": "SKU-MB-BAG",
+        "price_quoted_vnd": 119000
+      },
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.c009",
+      "days_later": 3,
+      "input_mode": "chat_teencode",
+      "customer_goal": "Xác nhận mua túi trữ sữa và cung cấp thông tin thanh toán",
+      "customer_turns": [
+        "Alo em, chị muốn đặt mua túi trữ sữa Sunmum 50 túi.",
+        "Chị sẽ thanh toán qua ngân hàng.",
+        "Khu vực giao hàng là TP Huế nhé.",
+        "Chốt đơn giúp chị nhé!"
+      ],
+      "customer_turns_asr": [
+        "alo em chi muon dat mua tui tru sua sunmum nam muoi tui",
+        "chi se thanh toan qua ngan hang",
+        "khu vuc giao hang la tp hue nhe",
+        "chot don giup chi nhe"
+      ],
+      "facts_established": {
+        "delivery_area": "TP Huế",
+        "payment": "bank",
+        "product_advised": "SKU-MB-BAG",
+        "price_quoted_vnd": 119000,
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-MB-BAG",
+          "price_vnd": 119000,
+          "payment": "bank"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 119000,
+        "list_price_vnd": 119000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_MOM-FREESHIP_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-10-27",
+        "call_date": "2026-10-21"
+      },
+      "memory_expectation": {
+        "delivery_area": "TP Huế",
+        "payment": "bank",
+        "product_advised": "SKU-MB-BAG",
+        "price_quoted_vnd": 119000,
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04",
+        "LN-03",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "scenario_id": "SCN-ADV-0073",
+  "level": "M2",
+  "persona": "khach_hoi_gio_hang",
+  "hard_case": null,
+  "customer_phone": "0928144976",
+  "customer_name": "Trung",
+  "honorific": "anh",
+  "notes": "Persona khach_hoi_gio_hang, biến thể gio_hai_may_loc. call_1 (chat_fanpage): hỏi giỏ hàng trên web → hen_goi_lai; call_2 (hotline): chốt nhiều món → chot_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.trung.122",
+      "call_date": "2026-10-29",
+      "customer_goal": "Hỏi tổng tiền và khuyến mãi cho giỏ hàng.",
+      "customer_turns": [
+        "Alo em, anh muốn hỏi tổng tiền cho giỏ hàng trên website.",
+        "Trong giỏ hàng có máy lọc không khí AirPure Y và AirPure Mini.",
+        "Khuyến mãi khi mua cả hai món này là gì em nhỉ?",
+        "Còn phí giao hàng thì sao, anh cần biết rõ.",
+        "À, anh chưa đặt ngay nhưng hẹn gọi lại để chốt đơn nhé."
+      ],
+      "facts_established": {
+        "room_area_m2": 25,
+        "has_children": true,
+        "budget_vnd": 6000000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000
+      },
+      "success_if": {
+        "tool_called": "pricing.get_quote",
+        "args_match": {
+          "sku": "SKU-AP-Y"
+        },
+        "must_say_any": [
+          "6.295.000"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_GIFT-FILTER_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "price_vnd:SKU-AP-Y": 5200000,
+        "price_vnd:SKU-AP-MINI": 1095000,
+        "total_vnd": 6295000,
+        "call_date": "2026-10-29"
+      },
+      "memory_expectation": {
+        "room_area_m2": 25,
+        "has_children": true,
+        "budget_vnd": 6000000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "FAQ-02",
+        "PB-03"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 1,
+      "customer_goal": "Chốt đơn cho các sản phẩm trong giỏ hàng.",
+      "customer_turns": [
+        "Alo em, anh gọi để chốt đơn hàng hôm qua.",
+        "Anh muốn đặt máy lọc không khí AirPure Y và AirPure Mini, mỗi món một cái.",
+        "Tổng tiền lại là bao nhiêu em nhỉ?",
+        "Anh đã đổi ý rồi, ngân sách giờ chỉ còn 5 triệu thôi.",
+        "Hình thức thanh toán là COD nhé.",
+        "Địa chỉ giao hàng là Thủ Đức, TP.HCM."
+      ],
+      "facts_established": {
+        "payment": "COD",
+        "budget_vnd": 5000000,
+        "delivery_area": "Thủ Đức, TP.HCM",
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "promo_code": "NAM-SHIP0",
+        "promo_expiry": "2026-11-05",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AP-Y",
+          "price_vnd": 5200000
+        },
+        "also_ordered": [
+          "SKU-AP-MINI"
+        ],
+        "total_match_vnd": 6295000,
+        "must_say_any": [
+          "gọi xác nhận",
+          "gọi điện xác nhận",
+          "gọi lại xác nhận",
+          "xác nhận đơn",
+          "xác nhận trước khi giao"
+        ]
+      },
+      "ground_truth_facts": {
+        "promo_active": true,
+        "promo_NAM-SHIP0_active": true,
+        "promo_COD-0_active": true,
+        "promo_GIFT-FILTER_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "price_vnd:SKU-AP-Y": 5200000,
+        "price_vnd:SKU-AP-MINI": 1095000,
+        "delivery_days": 2,
+        "total_vnd": 6295000,
+        "cod_allowed": true,
+        "estimated_delivery": "2026-11-02",
+        "needs_confirmation_call": true,
+        "call_date": "2026-10-30"
+      },
+      "memory_expectation": {
+        "payment": "COD",
+        "budget_vnd": 5000000,
+        "delivery_area": "Thủ Đức, TP.HCM",
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "promo_code": "NAM-SHIP0",
+        "order_id": "OD600001",
+        "superseded": {
+          "budget_vnd": 6000000
+        }
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-05",
+        "QT-01",
+        "FAQ-19",
+        "KM-05",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

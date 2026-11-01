@@ -1,0 +1,233 @@
+{
+  "conversation_id": "SCN-ADV-0106__call_1",
+  "scenario_id": "SCN-ADV-0106",
+  "call": "call_1",
+  "customer_id": "SYN-C011",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-29",
+  "region": "trung",
+  "category": "thoi-trang/ao-khoac",
+  "persona": "khach_tra_hang_qua_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Nguyễn Văn An ạ, em là trợ lý ảo của shop. Em thấy anh đã từng mua Áo khoác gió Windbreak; mình cần hỗ trợ về sản phẩm này phải không anh?",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, em ơi, anh muốn hỏi về cái áo khoác gió mà anh đã mua.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ý anh, mình muốn hỏi về Áo khoác gió Windbreak đã mua trước đây đúng không ạ? Anh có thể cho em biết mình đang gặp vấn đề gì với sản phẩm không ạ?",
+      "questions": [
+        {
+          "slot": "return_reason",
+          "type": "open",
+          "text": "Anh có thể cho em biết mình đang gặp vấn đề gì với sản phẩm không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Áo này anh nhận từ lâu rồi nhưng giờ không hợp màu nội thất nhà mình.",
+      "facts_stated": {
+        "return_reason": "không hợp màu nội thất nhà mình"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã chia sẻ lý do ạ. Cho em hỏi hiện tại anh muốn đổi hay trả lại áo khoác này đúng không ạ?",
+      "questions": [
+        {
+          "slot": "return_reason",
+          "type": "confirm",
+          "text": "Anh muốn đổi hay trả lại áo khoác này đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chẳng nhẽ giờ không trả lại được à? Mặc vào thấy không hợp lắm.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xin phép kiểm tra lại thông tin đơn hàng của anh ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD901101"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra thì đơn hàng Áo khoác gió Windbreak của anh đã nhận từ ngày 04/03/2026, hiện đã qua thời hạn đổi trả là 7 ngày theo chính sách của shop rồi ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "return_allowed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh biết là đã qua thời hạn, nhưng thật sự không thích màu này.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất tiếc, theo quy định, sản phẩm chỉ hỗ trợ đổi trả trong vòng 7 ngày kể từ khi nhận hàng thôi anh ạ. Trường hợp của mình đã quá thời hạn nên hiện shop chưa hỗ trợ trả lại áo khoác được anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "return_allowed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hôm trước, thấy bên em có chính sách đổi trả mà? Anh có thể trả được không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng anh, chính sách đổi trả áp dụng trong vòng bảy ngày kể từ ngày nhận hàng, anh nhận trước đó khá lâu nên hiện bên em không thể nhận lại sản phẩm được ạ. Nếu cần hỗ trợ thêm về sản phẩm, anh cứ liên hệ lại bên em nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "return_allowed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD901101",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "owned_sku",
+          "value": "SKU-JK-WND-XL-NAVY",
+          "op": "set",
+          "source": "call_1#turn1"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_chinh_sach_doi_tra",
+    "outcome": "thong_tin",
+    "objection_type": "qua_han_doi_tra",
+    "objection_handling": "Xin lỗi, giải thích hết hạn và nhắc lại thời hạn đổi trả bảy ngày.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

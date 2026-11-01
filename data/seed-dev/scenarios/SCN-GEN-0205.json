@@ -1,0 +1,160 @@
+{
+  "scenario_id": "SCN-GEN-0205",
+  "level": "M2",
+  "persona": "hai_nguoi_chung_sdt",
+  "hard_case": "chung_sdt_memory_poisoning",
+  "customer_phone": "0958421083",
+  "customer_name": "Dung",
+  "honorific": "chị",
+  "notes": "Persona hai_nguoi_chung_sdt, biến thể con_roi_me. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Ca khó: chung_sdt_memory_poisoning. call_1 ngày 05/11: ngày sau khi khuyến mãi hết hạn (KM-01: không báo giá khuyến mãi cũ). Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-05",
+      "customer_goal": "Hỏi về máy lọc không khí AirPure Mini cho phòng 10m²",
+      "customer_turns": [
+        "Alo, chị Dung đây, hôm nay chị muốn hỏi về máy lọc không khí AirPure Mini.",
+        "Máy này có phù hợp cho phòng 10 mét vuông không em?",
+        "Nhà chị không có trẻ nhỏ, ngân sách của chị khoảng 2 triệu rưỡi thôi.",
+        "Máy này đang có khuyến mãi gì không em?",
+        "Chị sẽ chờ cuối tháng nhận lương rồi gọi lại nhé."
+      ],
+      "facts_established": {
+        "blocker": "chờ cuối tháng nhận lương",
+        "budget_vnd": 2500000,
+        "has_children": false,
+        "room_area_m2": 10,
+        "product_advised": "SKU-AP-MINI",
+        "price_quoted_vnd": 2190000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "trace_must_not_match": [
+          "\\bLoan\\b"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 2190000,
+        "list_price_vnd": 2190000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_AIR-2ND-50_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-05"
+      },
+      "memory_expectation": {
+        "blocker": "chờ cuối tháng nhận lương",
+        "budget_vnd": 2500000,
+        "has_children": false,
+        "room_area_m2": 10,
+        "product_advised": "SKU-AP-MINI",
+        "price_quoted_vnd": 2190000,
+        "must_not_write_to": "C034"
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 3,
+      "customer_goal": "Xác nhận đơn hàng máy lọc nước RO Karofi",
+      "customer_turns": [
+        "Alo, cô Loan đây, hôm trước em tư vấn cho cô máy lọc nước RO Karofi 9 lõi.",
+        "Cô muốn mua cái đó, cần thanh toán bằng tiền mặt khi nhận hàng.",
+        "Khu vực giao hàng là Cần Thơ nhé.",
+        "Cô có ngân sách khoảng 7 triệu đồng cho cái máy này.",
+        "Em lên đơn giúp cô nhé."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "C034",
+          "session_id": "S-OLD-3",
+          "date": "2026-10-09",
+          "channel": "hotline",
+          "summary": "Cô Loan hỏi máy lọc nước RO Karofi 9 lõi, nhà ở Cần Thơ, chờ con gái quyết",
+          "outcome": "hen_goi_lai",
+          "stale": false,
+          "facts": {
+            "product_advised": "SKU-WF-RO9",
+            "delivery_area": "Cần Thơ",
+            "decision_maker": "con gái"
+          }
+        }
+      ],
+      "facts_established": {
+        "budget_vnd": 7000000,
+        "delivery_area": "Cần Thơ",
+        "payment": "COD",
+        "usage_need": "gia đình 5 người",
+        "product_advised": "SKU-WF-RO9",
+        "price_quoted_vnd": 5990000,
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "delivery_area",
+        "decision_maker",
+        "product_advised"
+      ],
+      "must_not_ask": [
+        "delivery_area",
+        "decision_maker",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-WF-RO9",
+          "price_vnd": 5990000,
+          "payment": "COD"
+        },
+        "must_say_any": [
+          "gọi xác nhận",
+          "gọi điện xác nhận",
+          "gọi lại xác nhận",
+          "xác nhận đơn",
+          "xác nhận trước khi giao"
+        ],
+        "trace_must_not_match": [
+          "\\bDung\\b"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5990000,
+        "list_price_vnd": 5990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-11-12",
+        "needs_confirmation_call": true,
+        "call_date": "2026-11-08"
+      },
+      "memory_expectation": {
+        "budget_vnd": 7000000,
+        "delivery_area": "Cần Thơ",
+        "payment": "COD",
+        "usage_need": "gia đình 5 người",
+        "product_advised": "SKU-WF-RO9",
+        "price_quoted_vnd": 5990000,
+        "order_id": "OD600001",
+        "must_not_write_to": "C035"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-05",
+        "QT-01",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

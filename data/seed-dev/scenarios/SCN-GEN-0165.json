@@ -1,0 +1,163 @@
+{
+  "scenario_id": "SCN-GEN-0165",
+  "level": "M2",
+  "persona": "hai_nguoi_chung_sdt",
+  "hard_case": "chung_sdt_memory_poisoning",
+  "customer_phone": "0958421083",
+  "customer_name": "Loan",
+  "honorific": "cô",
+  "notes": "Persona hai_nguoi_chung_sdt, biến thể me_roi_con. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Ca khó: chung_sdt_memory_poisoning. call_1 ngày 01/11: Chủ nhật (LN-01: giờ 09:00–18:00, chỉ nhận đơn). Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-01",
+      "customer_goal": "Hỏi về máy lọc nước RO cho gia đình.",
+      "customer_turns": [
+        "Alo, cô Loan đây, hôm trước cô có hỏi máy lọc nước RO Karofi 9 lõi, em ơi.",
+        "Cô đang cần máy cho gia đình 5 người, ngân sách tầm 6 triệu rưỡi.",
+        "Máy này có khuyến mãi gì không em?",
+        "À, cô cần bàn với gia đình, tối mai tầm 7 giờ em gọi lại cô nhé."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "C034",
+          "session_id": "S-OLD-3",
+          "date": "2026-10-09",
+          "channel": "hotline",
+          "summary": "Cô Loan hỏi máy lọc nước RO Karofi 9 lõi, nhà ở Cần Thơ, chờ con gái quyết",
+          "outcome": "hen_goi_lai",
+          "stale": false,
+          "facts": {
+            "product_advised": "SKU-WF-RO9",
+            "delivery_area": "Cần Thơ",
+            "decision_maker": "con gái"
+          }
+        }
+      ],
+      "facts_established": {
+        "blocker": "để bàn với gia đình",
+        "budget_vnd": 6500000,
+        "usage_need": "gia đình 5 người",
+        "product_advised": "SKU-WF-RO9",
+        "price_quoted_vnd": 5990000
+      },
+      "must_carry_over": [
+        "delivery_area",
+        "decision_maker",
+        "product_advised"
+      ],
+      "must_not_ask": [
+        "delivery_area",
+        "decision_maker",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-11-02T19:00"
+        },
+        "must_say_any": [
+          "7 giờ",
+          "19 giờ",
+          "19h",
+          "7h tối"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "trace_must_not_match": [
+          "\\bDung\\b"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5990000,
+        "list_price_vnd": 5990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "callback_at": "2026-11-02T19:00",
+        "call_date": "2026-11-01"
+      },
+      "memory_expectation": {
+        "blocker": "để bàn với gia đình",
+        "budget_vnd": 6500000,
+        "usage_need": "gia đình 5 người",
+        "product_advised": "SKU-WF-RO9",
+        "price_quoted_vnd": 5990000,
+        "must_not_write_to": "C035"
+      },
+      "relevant_policy_ids": [
+        "SP-WF-01",
+        "FAQ-05",
+        "LN-01",
+        "PB-03",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 2,
+      "customer_goal": "Xác nhận mua máy lọc không khí.",
+      "customer_turns": [
+        "Alo, chị Dung đây, hôm trước có tư vấn cho chị về máy lọc không khí.",
+        "Chị muốn mua cái máy lọc không khí AirPure Mini mà em đã nói.",
+        "Chị chọn thanh toán qua ngân hàng, giao hàng ở Ninh Kiều, Cần Thơ nhé.",
+        "Và phòng chị khoảng 10 mét vuông, có trẻ nhỏ nữa."
+      ],
+      "facts_established": {
+        "budget_vnd": 2500000,
+        "delivery_area": "Ninh Kiều, Cần Thơ",
+        "has_children": true,
+        "payment": "bank",
+        "room_area_m2": 10,
+        "product_advised": "SKU-AP-MINI",
+        "price_quoted_vnd": 2190000,
+        "promo_code": "NAM-SHIP0",
+        "promo_expiry": "2026-11-05",
+        "order_id": "OD600001"
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AP-MINI",
+          "price_vnd": 2190000,
+          "payment": "bank"
+        },
+        "trace_must_not_match": [
+          "\\bLoan\\b"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 2190000,
+        "list_price_vnd": 2190000,
+        "promo_active": true,
+        "promo_NAM-SHIP0_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "freeship": true,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-11-07",
+        "call_date": "2026-11-03"
+      },
+      "memory_expectation": {
+        "budget_vnd": 2500000,
+        "delivery_area": "Ninh Kiều, Cần Thơ",
+        "has_children": true,
+        "payment": "bank",
+        "room_area_m2": 10,
+        "product_advised": "SKU-AP-MINI",
+        "price_quoted_vnd": 2190000,
+        "promo_code": "NAM-SHIP0",
+        "order_id": "OD600001",
+        "must_not_write_to": "C034"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

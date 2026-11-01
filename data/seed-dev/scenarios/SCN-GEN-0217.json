@@ -1,0 +1,234 @@
+{
+  "scenario_id": "SCN-GEN-0217",
+  "level": "M2",
+  "persona": "khach_mua_nhieu_mon",
+  "hard_case": "16_luot_4_san_pham_vuot_cod",
+  "customer_phone": "0998000004",
+  "customer_name": "Phạm Thị D",
+  "honorific": "chị",
+  "notes": "Persona khach_mua_nhieu_mon, biến thể bon_san_pham_vuot_cod. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt nhiều món → chot_don. Ca khó: 16_luot_4_san_pham_vuot_cod. call_1 ngày 31/10: ngày sau khi khuyến mãi hết hạn (KM-01: không báo giá khuyến mãi cũ). Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-31",
+      "customer_goal": "Hỏi về máy lọc không khí AirPure Pro cho phòng 15m²",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về cái máy lọc không khí AirPure Pro cho phòng khách 15 mét vuông.",
+        "Chị có bé nhỏ nên cần máy lọc sạch không khí ấy.",
+        "Em cho chị hỏi cái này giá bao nhiêu nhỉ?",
+        "Máy này có khuyến mãi gì không?",
+        "Chị cũng cần suy nghĩ thêm về việc mua nữa, nên có thể gọi lại cho em sau nhé."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C004",
+          "session_id": "SYN-004-S3",
+          "date": "2025-05-08",
+          "channel": "zalo_oa",
+          "summary": "Mua Nồi chiên không dầu Lock&Lock 4L giá 1.890.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C004",
+          "session_id": "SYN-004-S1",
+          "date": "2026-06-10",
+          "channel": "web",
+          "summary": "Mua Máy lọc không khí AirPure Pro giá 7.990.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C004",
+          "session_id": "SYN-004-S2",
+          "date": "2026-10-04",
+          "channel": "hotline",
+          "summary": "Đặt Máy lọc không khí Samsung AX40 giá 6.490.000đ, đơn OD900402 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C004",
+          "order_id": "OD900401",
+          "date": "2026-06-10",
+          "sku": "SKU-AP-PRO",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AP-PRO"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C004",
+          "order_id": "OD900402",
+          "date": "2026-10-04",
+          "sku": "SKU-SS-AX40",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900402"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C004",
+          "order_id": "OD900403",
+          "date": "2025-05-08",
+          "sku": "SKU-AF-4L",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AF-4L"
+          }
+        }
+      ],
+      "facts_established": {
+        "blocker": "cần suy nghĩ thêm",
+        "budget_vnd": 8000000,
+        "has_children": true,
+        "room_area_m2": 15,
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 7990000,
+        "list_price_vnd": 7990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-31"
+      },
+      "memory_expectation": {
+        "blocker": "cần suy nghĩ thêm",
+        "budget_vnd": 8000000,
+        "has_children": true,
+        "room_area_m2": 15,
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "FAQ-02",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 2,
+      "customer_goal": "Mua nhiều món cho nhà mới",
+      "customer_turns": [
+        "Alo em, hôm trước chị đã suy nghĩ rồi, giờ chị muốn mua một cái máy lọc không khí AirPure Pro.",
+        "Còn chị cũng muốn thêm một cái nồi chiên không dầu Xiaomi 4.5L nữa.",
+        "Và chị cũng cần một cái quạt đứng Senko TS16 cho nhà mới.",
+        "À, chị cũng cần một cái màng lọc thay thế cho máy AirPure Pro.",
+        "Chị đã đổi ý rồi, ngân sách giờ là 8.500.000 đồng.",
+        "Em cho chị biết tổng tiền cho cả 4 món này là bao nhiêu nhé?",
+        "Chị muốn thanh toán bằng chuyển khoản ngân hàng.",
+        "Giao hàng cho chị ở Cầu Giấy, Hà Nội nhé."
+      ],
+      "facts_established": {
+        "budget_vnd": 8500000,
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "payment": "bank",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000,
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AP-PRO",
+          "price_vnd": 7990000
+        },
+        "also_ordered": [
+          "SKU-AF-XM",
+          "SKU-FAN-SEN",
+          "SKU-AP-FLT-P"
+        ],
+        "total_match_vnd": 11160000,
+        "must_say_any": [
+          "10 triệu",
+          "10.000.000",
+          "chuyển khoản"
+        ]
+      },
+      "ground_truth_facts": {
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "price_vnd:SKU-AP-PRO": 7990000,
+        "price_vnd:SKU-AF-XM": 1590000,
+        "price_vnd:SKU-FAN-SEN": 590000,
+        "price_vnd:SKU-AP-FLT-P": 990000,
+        "delivery_days": 2,
+        "total_vnd": 11160000,
+        "cod_allowed": false,
+        "estimated_delivery": "2026-11-04",
+        "call_date": "2026-11-02"
+      },
+      "memory_expectation": {
+        "budget_vnd": 8500000,
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "payment": "bank",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000,
+        "order_id": "OD600001",
+        "superseded": {
+          "budget_vnd": 8000000
+        }
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-03",
+        "VC-04",
+        "FAQ-19",
+        "KM-05",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

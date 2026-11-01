@@ -1,8 +1,9 @@
 """The generated dataset on disk. This module is the only one that knows where a file goes.
 
-Each fact is stored once::
+Each fact is stored once, under the seed folder (``data/seed-<name>/`` at the repository root,
+``src/utils/paths.py``)::
 
-    output/
+    <seed>/
       scenarios/<id>.json                          the test case, BTC sample format (Scenario.btc_export)
       metadata/<id>.json                           the pipeline's fields: customer id, region, tags, call kinds
       call_brief/scenarios_<id>/call_<n>.json      expected CallBrief at the start of a call the agent has context for
@@ -15,7 +16,7 @@ Each fact is stored once::
 
 :meth:`Dataset.write_scenario` splits a :class:`Scenario` into the first five;
 :meth:`Dataset.load_scenario` puts it back together for the later stages.
-``Dataset(root)`` writes the same layout elsewhere (``--plan-only`` uses ``output/plan_preview``).
+``Dataset(root)`` writes the same layout elsewhere (``--plan-only`` uses ``<seed>/plan_preview``).
 """
 from __future__ import annotations
 
@@ -28,6 +29,7 @@ from typing import Any, Iterator
 
 from pydantic import ValidationError
 
+from src.schemas import keys
 from src.schemas.conversation import Conversation, split_conversation_id
 from src.schemas.scenario import CallSpec, Scenario
 from src.utils.io import load_model, write_json
@@ -76,7 +78,13 @@ class Dataset:
         sid = scenario.scenario_id
         for artifact in SCENARIO_CALL_ARTIFACTS:   # a regenerated scenario may have lost a brief
             shutil.rmtree(self.root / artifact / call_folder(sid), ignore_errors=True)
-        write_json(self.scenarios_dir / f"{sid}.json", scenario.btc_export())
+        exported = scenario.btc_export()
+        # Every key, type and value as contracts/scenario/scenario-keys.yaml allows: a new key is added there first.
+        errors = keys.check_scenario(exported)
+        if errors:
+            raise ValueError(f"{sid} breaks {keys.KEYS_FILE.name}: " + "; ".join(errors[:8])
+                             + (f" (+{len(errors) - 8} more)" if len(errors) > 8 else ""))
+        write_json(self.scenarios_dir / f"{sid}.json", exported)
         write_json(self.metadata_dir / f"{sid}.json", scenario.metadata())
         for name, call in scenario.ordered_calls():
             for artifact, value in (("call_brief", call.expected_call_brief),

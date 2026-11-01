@@ -1,0 +1,67 @@
+{
+  "scenario_id": "SCN-GEN-0100",
+  "call": "call_1",
+  "input_mode": "asr_transcript",
+  "source_sha256": "9aac7b4555ce7d10ad3d7fa3575044257ff4e7f86c95edbdd26ec025ba68e2f5",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Alo, anh muốn hỏi về máy lọc không khí Xiaomi Smart 4 Pro.",
+      "spoken_text": "alo anh muốn hỏi về máy lọc không khí xi a mi smart bốn pro",
+      "entities": {
+        "sku": "SKU-XM-4P"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Phòng anh tầm 15 mét vuông, có trẻ nhỏ ở nhà.",
+      "spoken_text": "phòng anh tầm mười lăm mét vuông có trẻ nhỏ ở nhà",
+      "entities": {
+        "room_area_m2": 15,
+        "has_children": true
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Ngân sách của anh khoảng 5 triệu rưỡi thôi.",
+      "spoken_text": "ngân sách của anh khoảng năm triệu rưỡi thôi.",
+      "entities": {
+        "budget_vnd": 5500000
+      },
+      "reference_source": "rule",
+      "issues": [
+        "words_changed"
+      ]
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "Máy này có khuyến mãi gì không em?",
+      "spoken_text": "máy này có khuyến mãi gì không em",
+      "entities": {
+        "sku": "SKU-XM-4P"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 5,
+      "speaker": "C",
+      "text": "Thế này nhé, anh cần bàn với gia đình rồi hẹn lại, tối mai tầm 7 giờ em gọi lại anh nhé.",
+      "spoken_text": "thế này nhé anh cần bàn với gia đình rồi hẹn lại tối mai tầm bảy giờ em gọi lại anh nhé",
+      "entities": {
+        "blocker": "can hoi nguoi nha"
+      },
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

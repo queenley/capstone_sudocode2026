@@ -1,0 +1,291 @@
+{
+  "conversation_id": "SCN-GEN-0066__call_1",
+  "scenario_id": "SCN-GEN-0066",
+  "call": "call_1",
+  "customer_id": "SYN-C006",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước bạn nhân viên đã hỗ trợ mình đặt Ghế ngồi ô tô Chicco, hôm nay anh muốn xác nhận đơn hàng Máy lọc không khí Samsung AX40 đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Hôm nay anh muốn xác nhận đơn hàng Máy lọc không khí Samsung AX40 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "is_human",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn xác nhận đặt mua máy lọc không khí Samsung AX40.",
+      "facts_stated": {
+        "product_advised": "SKU-SS-AX40"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm Máy lọc không khí Samsung AX40 đang có giá 6.490.000đ, hiện đang còn hàng tại shop. Máy phù hợp phòng 40m², có khóa trẻ em, bảo hành 24 tháng chính hãng và tặng miễn phí vận chuyển toàn quốc. Anh xác nhận lại giúp em thông tin này với ạ.",
+      "questions": [
+        {
+          "slot": "price_quoted_vnd",
+          "type": "confirm",
+          "text": "Anh xác nhận lại giúp em giá và thông tin sản phẩm này với ạ."
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "promo_NAM-SHIP0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá là 6 triệu 490 ngàn đúng không em?",
+      "facts_stated": {
+        "price_quoted_vnd": 6490000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "6490000",
+          "spoken": "6 triệu 490 ngàn"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi anh, giá máy Samsung AX40 là 6.490.000đ, được miễn phí vận chuyển về Thủ Đức, TP.HCM. Anh chọn thanh toán COD, đơn hàng sẽ được giao dự kiến vào ngày 20/10 nhé ạ.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em xác nhận lại: Máy lọc không khí Samsung AX40, 1 chiếc, giá 6.490.000đ, giao Thủ Đức, TP.HCM, thanh toán COD, nhận hàng trong ngày 20/10 đúng không anh?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6490000
+        },
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-20"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Thủ Đức, TP.HCM",
+            "on": "2026-10-17"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "6490000",
+          "spoken": "6.490.000đ"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-20",
+          "spoken": "20/10"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán thì anh chọn COD. Giao hàng khu vực Thủ Đức, TP.HCM nhé.",
+      "facts_stated": {
+        "payment": "COD",
+        "delivery_area": "Thủ Đức, TP.HCM"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã xác nhận. Đơn hàng COD sẽ được nhân viên bên em gọi xác nhận trước khi giao, anh vui lòng để ý điện thoại giúp em nhé. Em sẽ tiến hành lên đơn ngay cho mình ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000006",
+            "sku": "SKU-SS-AX40",
+            "qty": 1,
+            "price_vnd": 6490000,
+            "payment": "COD",
+            "address": "Thủ Đức, TP.HCM",
+            "on": "2026-10-17"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em lên đơn cho anh luôn nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng Máy lọc không khí Samsung AX40 đã được tạo thành công cho anh. Cảm ơn anh đã đặt mua tại shop BTC, chúc anh một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "room_area_m2",
+          "value": 40,
+          "op": "set",
+          "source": "call#turn2"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call#turn2"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 6500000,
+          "op": "set",
+          "source": "call#turn2"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call#turn6"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Thủ Đức, TP.HCM",
+          "op": "set",
+          "source": "call#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SS-AX40",
+          "op": "set",
+          "source": "call#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 6490000,
+          "op": "set",
+          "source": "call#turn4"
+        },
+        {
+          "key": "promo_code",
+          "value": "NAM-SHIP0",
+          "op": "set",
+          "source": "call#turn4"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-SS-AX40",
+      "qty": 1,
+      "price_vnd": 6490000,
+      "payment": "COD",
+      "address": "Thủ Đức, TP.HCM",
+      "order_id": "OD600001"
+    }
+  }
+}

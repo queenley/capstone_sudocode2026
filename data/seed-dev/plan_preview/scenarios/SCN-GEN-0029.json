@@ -1,0 +1,124 @@
+{
+  "scenario_id": "SCN-GEN-0029",
+  "level": "M2",
+  "persona": "khach_hoi_ngoai_tai_lieu",
+  "hard_case": "phien_ban_chinh_sach_cu",
+  "customer_phone": "0910285940",
+  "customer_name": "Dũng",
+  "honorific": "anh",
+  "notes": "Persona khach_hoi_ngoai_tai_lieu, biến thể chinh_sach_cu. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): dẫn chính sách cũ → thong_tin. Ca khó: phien_ban_chinh_sach_cu. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-16",
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker). Khách cần hỏi người nhà và hẹn shop gọi lại tối mai tầm 7 giờ (\"tối mai tầm 7 giờ em gọi lại anh nhé\"); agent chốt lịch đúng giờ đó (PB-03)."
+      ],
+      "facts_established": {
+        "room_area_m2": 30,
+        "has_children": false,
+        "budget_vnd": 8000000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT",
+        "promo_expiry": "2026-10-30"
+      },
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-10-17T19:00"
+        },
+        "must_say_any": [
+          "7 giờ",
+          "19 giờ",
+          "19h",
+          "7h tối"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 7690000,
+        "list_price_vnd": 7990000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": true,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "callback_at": "2026-10-17T19:00",
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "room_area_m2": 30,
+        "has_children": false,
+        "budget_vnd": 8000000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT"
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "LN-01",
+        "PB-03"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 2,
+      "customer_goal": "[plan-only] old_policy",
+      "customer_turns": [
+        "[plan-only] Khách khẳng định đọc trên web là được đổi trả trong 14 ngày và phí đổi size 20 nghìn (chính sách CŨ đã hết hiệu lực); khách hỏi lại cho chắc."
+      ],
+      "must_carry_over": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "7 ngày",
+          "bảy ngày"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "return_days",
+            "value": 14
+          },
+          {
+            "field": "exchange_fee_vnd",
+            "value": 20000
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "return_days": 7,
+        "exchange_fee_vnd": 0,
+        "policy_version": "2026-10",
+        "call_date": "2026-10-18"
+      },
+      "relevant_policy_ids": [
+        "CL-01",
+        "DT-01",
+        "DT-03",
+        "DT-OLD-01",
+        "DT-OLD-03",
+        "PB-01"
+      ],
+      "expected_outcome": "thong_tin"
+    }
+  }
+}

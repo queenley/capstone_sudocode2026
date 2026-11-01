@@ -1,0 +1,197 @@
+{
+  "scenario_id": "SCN-GEN-0072",
+  "level": "M1",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "hard_case": "het_hang_luc_khach_quyet",
+  "customer_phone": "0998000009",
+  "customer_name": "Phạm Thị I",
+  "honorific": "chị",
+  "notes": "Persona khach_do_du_hoi_nguoi_nha, biến thể het_hang_luc_quyet. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): tư vấn, chưa chốt → hen_goi_lai. Ca khó: het_hang_luc_khach_quyet. call_2: hết hàng đúng lúc khách quyết → hẹn lại. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-15",
+      "customer_goal": "Hỏi về xe đẩy gấp gọn Joie Pact.",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về xe đẩy gấp gọn Joie Pact hôm trước em có tư vấn á.",
+        "Giá xe này là bao nhiêu em nhỉ?",
+        "Chị có ngân sách khoảng 4 triệu thôi.",
+        "Chị có bé 11 tháng, nên cần một chiếc xe tiện lợi.",
+        "À, chị cần hỏi chồng trước rồi tối mai tầm 7 giờ em gọi lại cho chị nhé."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C009",
+          "session_id": "SYN-009-S1",
+          "date": "2026-06-25",
+          "channel": "hotline",
+          "summary": "Mua Combo Spectra S1 + máy hâm sữa Fatz + 50 túi trữ sữa giá 4.790.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C009",
+          "session_id": "SYN-009-S2",
+          "date": "2026-10-09",
+          "channel": "zalo_oa",
+          "summary": "Đặt Máy hút sữa điện đôi Spectra S1 giá 4.290.000đ, đơn OD900902 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C009",
+          "order_id": "OD900901",
+          "date": "2026-06-25",
+          "sku": "SKU-BDL-MOM",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-BDL-MOM"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C009",
+          "order_id": "OD900902",
+          "date": "2026-10-09",
+          "sku": "SKU-MB-PUMP1",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900902"
+          }
+        }
+      ],
+      "facts_established": {
+        "child_age_months": 11,
+        "budget_vnd": 4000000,
+        "decision_maker": "chồng",
+        "blocker": "cần hỏi chồng",
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-10-16T19:00"
+        },
+        "must_say_any": [
+          "7 giờ",
+          "19 giờ",
+          "19h",
+          "7h tối"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 3490000,
+        "list_price_vnd": 3490000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "callback_at": "2026-10-16T19:00",
+        "call_date": "2026-10-15"
+      },
+      "memory_expectation": {
+        "child_age_months": 11,
+        "budget_vnd": 4000000,
+        "decision_maker": "chồng",
+        "blocker": "cần hỏi chồng",
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-02",
+        "FAQ-12",
+        "LN-01",
+        "PB-03",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 10,
+      "customer_goal": "Muốn mua xe đẩy Joie Pact nhưng hết hàng.",
+      "customer_turns": [
+        "Alo, chị gọi lại đây em ơi, chị muốn đặt xe đẩy Joie Pact.",
+        "Hôm trước em bảo hàng có sẵn mà giờ sao lại hết vậy?",
+        "Khi nào thì có hàng lại em nhỉ?",
+        "Chị đồng ý hẹn lại, nhưng chị cũng hơi sốt ruột đó."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "must_carry_over": [
+        "decision_maker",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "decision_maker",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_stock",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 3490000,
+        "list_price_vnd": 3490000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": false,
+        "freeship": true,
+        "call_date": "2026-10-25"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-02",
+        "FAQ-12",
+        "FAQ-17",
+        "PB-01",
+        "PB-03"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

@@ -43,7 +43,7 @@ OBJECTIONS = {"dat_qua": "chê đắt", "so_sanh_gia": "so sánh giá với nơi
 #: what the brief exists to stop the advisor asking again.
 LINE_ORDER: tuple[str, ...] = NEEDS + (
     "variant_sku", "size", "color", "payment", "decision_maker", "blocker", "objection",
-    "competitor_price_vnd", "callback_at", "order_id", "address_token",
+    "competitor_price_vnd", "callback_at", "order_id", "address_token", "delivery_area", "owned_sku",
 )
 
 
@@ -96,6 +96,8 @@ def _line(name: str, fact: Mapping[str, Any]) -> str:
         "callback_at": f"Đã hẹn gọi lại: {value}.",
         "order_id": f"Mã đơn đã tạo: {value}.",
         "address_token": "Đã có địa chỉ giao hàng của khách.",
+        "delivery_area": f"Khu vực giao hàng khách đã nói: {value} (dùng khi báo thời gian giao, không hỏi lại).",
+        "owned_sku": f"Sản phẩm khách đang dùng: {value}.",
     }.get(name, f"{_label(name).capitalize()}: {value}.")
 
 

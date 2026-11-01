@@ -36,9 +36,13 @@ def _json(value: Any) -> str:
 
 
 def payload(args: Mapping[str, Any]) -> dict[str, Any]:
-    return {"sku": args.get("sku"), "price_vnd": int(args["price_vnd"]), "qty": int(1 if args.get("qty") is None else args["qty"]),
+    values = {"sku": args.get("sku"), "price_vnd": int(args["price_vnd"]), "qty": int(1 if args.get("qty") is None else args["qty"]),
             "payment": args.get("payment") or "COD", "promo_code": args.get("promo_code") or None,
             "address": args.get("address") or None, "customer_phone": args.get("customer_phone"), "on": args.get("on")}
+    for field in ('basket_skus', 'order_group'):
+        if args.get(field):
+            values[field] = args[field]
+    return values
 
 
 def fingerprint(args: Mapping[str, Any]) -> str:
@@ -73,6 +77,9 @@ def draft(args: Mapping[str, Any], context: Any) -> dict[str, Any]:
     question = (f"Anh/chị xác nhận đặt {order['qty']} sản phẩm {label}, đơn giá {format_vnd(order['price_vnd'])}, "
                 f"tổng {format_vnd(order['price_vnd'] * order['qty'])}, thanh toán {payment}, "
                 f"mã khuyến mãi: {order['promo_code'] or 'không dùng mã riêng'}, địa chỉ giao hàng: {address}, đồng ý không ạ?")
+    if order.get('basket_skus') or order.get('order_group'):
+        details = ', '.join(str(x) for x in order.get('basket_skus', [])) or 'không có'
+        question = f"Sản phẩm cùng giỏ: {details}; nhóm đơn: {order.get('order_group') or 'chung'}. " + question
     return {"draft_id": uuid4().hex, "call_id": context.call_id, "channel": context.channel,
             "owner": _owner(context), "issued_turn_id": context.turn_id, "action_type": "order_create",
             "target_id": order["sku"], "payload_hash": fingerprint(order), "expires_at": now() + TTL_SECONDS,

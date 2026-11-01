@@ -68,7 +68,7 @@ Tắt hệ thống: `docker compose down` (giữ dữ liệu) hoặc `docker com
 | `/chinh-sach` | Khách | Tóm tắt chính sách đổi trả, giao hàng, thanh toán, bảo hành |
 | Khung chat (mọi trang) | Khách | Chat với AI, nút ☏ gọi thoại trên trình duyệt, link Zalo |
 | `/login` | Nhân viên | Đăng nhập bằng tài khoản tạo ở bước 4 |
-| `/ban-hang` | Bán hàng, tư vấn viên | **Trang bán hàng**: tổng quan, hội thoại & chuyển máy (web, Zalo, hotline), đơn hàng, hẹn gọi lại |
+| `/ban-hang` | Bán hàng, tư vấn viên | **Trang bán hàng**: tổng quan, hội thoại & chuyển máy (web, Zalo, hotline), đơn hàng, hẹn gọi lại. Ca khách cần nhân viên được báo ngay (thông báo, tiếng bíp, tiêu đề tab) và tin của khách liên quan được tô đỏ |
 | `/calls` | Nhân viên tư vấn | Console tư vấn viên riêng (cùng nội dung mục "Hội thoại" của `/ban-hang`) |
 | `/agent` | Nhân viên tư vấn | Hộp thư các cuộc trò chuyện |
 | `/seller` | Nhân viên bán hàng | Xem và hủy đơn hàng |

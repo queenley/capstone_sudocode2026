@@ -1,0 +1,114 @@
+{
+  "scenario_id": "SCN-GEN-0166",
+  "level": "M2",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "hard_case": null,
+  "customer_phone": "0952059972",
+  "customer_name": "Minh",
+  "honorific": "anh",
+  "notes": "Persona khach_quay_lai_sau_8_thang, biến thể quay_lai_sau_8_thang. call_1 (hotline): chốt đơn → chot_don; call_2 (hotline): tư vấn, chưa chốt → hen_goi_lai. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-12",
+      "customer_goal": "Xác nhận mua áo phao lông vũ size XL màu navy",
+      "customer_turns": [
+        "Alo, anh muốn xác nhận đơn mua áo phao lông vũ size XL màu navy.",
+        "Hình thức thanh toán thì anh sẽ chuyển khoản.",
+        "Khu vực giao hàng là Lê Chân, Hải Phòng nhé.",
+        "Khi nào sẽ có hàng gửi về cho anh vậy?",
+        "Cảm ơn em, anh đồng ý lên đơn."
+      ],
+      "facts_established": {
+        "color": "navy",
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "payment": "bank",
+        "size": "XL",
+        "product_advised": "SKU-JK-DWN",
+        "price_quoted_vnd": 1530000,
+        "variant_sku": "SKU-JK-DWN-XL-NAVY",
+        "order_id": "OD600001"
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-JK-DWN-XL-NAVY",
+          "price_vnd": 1530000,
+          "payment": "bank"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1530000,
+        "list_price_vnd": 1530000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-11-17",
+        "call_date": "2026-11-12"
+      },
+      "memory_expectation": {
+        "color": "navy",
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "payment": "bank",
+        "size": "XL",
+        "product_advised": "SKU-JK-DWN",
+        "price_quoted_vnd": 1530000,
+        "variant_sku": "SKU-JK-DWN-XL-NAVY",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04"
+      ],
+      "expected_outcome": "chot_don"
+    },
+    "call_2": {
+      "days_later": 240,
+      "customer_goal": "Hỏi lại về áo phao lông vũ size XL navy",
+      "customer_turns": [
+        "Alo, em ơi, cho anh hỏi về áo phao lông vũ size XL navy mà hôm trước mình đã nói nhé.",
+        "Mình có khuyến mãi gì không em?",
+        "Giá khoảng bao nhiêu em nhỉ?",
+        "Anh cần suy nghĩ thêm một chút, hẹn em gọi lại sau nhé."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-JK-DWN",
+        "price_quoted_vnd": 1530000,
+        "variant_sku": "SKU-JK-DWN-XL-NAVY"
+      },
+      "must_carry_over": [
+        "order_id"
+      ],
+      "must_not_ask": [
+        "order_id"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1530000,
+        "list_price_vnd": 1530000,
+        "promo_active": false,
+        "promo_COD-0_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "call_date": "2027-07-10"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-JK-DWN",
+        "price_quoted_vnd": 1530000,
+        "variant_sku": "SKU-JK-DWN-XL-NAVY"
+      },
+      "relevant_policy_ids": [
+        "SP-JK-01",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

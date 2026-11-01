@@ -1,0 +1,48 @@
+{
+  "scenario_id": "SCN-GEN-0016",
+  "persona_source": "btc",
+  "customer_id": "C031",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "hard",
+  "tags": [
+    "date:promo_last_day",
+    "discontinued",
+    "hard_case",
+    "trade_in",
+    "ttl",
+    "variant:c031_ttl_trade_in"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "order",
+      "outcome_detail": "chot_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Máy lọc không khí AirPure X",
+        "price_vnd": 4490000,
+        "promo": "TRADE-IN-AP",
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_quay_lai_sau_8_thang",
+      "patience_start": 4
+    },
+    "call_2": {
+      "kind": "order_status",
+      "outcome_detail": "cap_nhat_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "order_status": "created"
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_quay_lai_sau_8_thang",
+      "patience_start": 3
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "scenario_id": "SCN-ADV-0033",
+  "persona_source": "advanced",
+  "customer_id": "C021",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "difficulty": "normal",
+  "tags": [
+    "cross_channel",
+    "hen_goi_lai",
+    "khong_ban",
+    "not_sold",
+    "tu_van",
+    "variant:khong_ban_roi_tu_van",
+    "zalo_oa"
+  ],
+  "metric_focus": [
+    "TSR",
+    "HR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "not_sold",
+      "outcome_detail": "thong_tin",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "not_sold": "điện thoại iPhone đời mới",
+        "alternative": "Giày trekking HikePro size 39 xam"
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_hoi_san_pham_khong_ban",
+      "patience_start": 3
+    },
+    "call_2": {
+      "kind": "consult",
+      "outcome_detail": "hen_goi_lai",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Giày trekking HikePro size 39 xam",
+        "price_vnd": 1990000,
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_hoi_san_pham_khong_ban",
+      "patience_start": 3
+    }
+  }
+}

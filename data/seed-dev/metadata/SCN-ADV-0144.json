@@ -1,0 +1,50 @@
+{
+  "scenario_id": "SCN-ADV-0144",
+  "persona_source": "advanced",
+  "customer_id": "SYN-C007",
+  "region": "bac",
+  "category": "gia-dung/may-loc-nuoc",
+  "difficulty": "hard",
+  "tags": [
+    "chuyển_may",
+    "complaint",
+    "cross_channel",
+    "date:ordinary",
+    "dịch_vụ",
+    "handoff",
+    "hard_case",
+    "human_to_ai",
+    "khiếu_nại",
+    "variant:khieu_nai_nang_roi_ai_theo_doi",
+    "đơn_hàng"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "ESC"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "complaint_handoff",
+      "outcome_detail": "chuyen_may",
+      "input_mode_detail": "text",
+      "agent_will_tell": {},
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_chuyen_giua_nguoi_va_ai",
+      "patience_start": 3
+    },
+    "call_2": {
+      "kind": "order_status",
+      "outcome_detail": "cap_nhat_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "order_status": "shipping",
+        "tracking": "VN0072TRK"
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_chuyen_giua_nguoi_va_ai",
+      "patience_start": 2
+    }
+  }
+}

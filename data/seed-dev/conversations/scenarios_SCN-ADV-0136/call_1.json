@@ -1,0 +1,225 @@
+{
+  "conversation_id": "SCN-ADV-0136__call_1",
+  "scenario_id": "SCN-ADV-0136",
+  "call": "call_1",
+  "customer_id": "SYN-C010",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-11-12",
+  "region": "bac",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_bao_hanh_het_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Trần Văn J, em là trợ lý ảo của shop BTC. Em đã ghi nhận anh từng mua Nồi chiên không dầu Xiaomi bên em ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD901003"
+        },
+        {
+          "field": "owned_sku",
+          "value": "SKU-AF-XM"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị là Trần Văn J, nồi chiên không dầu Xiaomi của tôi bị lỗi rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã tiếp nhận thông tin nồi chiên không dầu Xiaomi của anh bị lỗi. Anh có thể cho em biết cụ thể máy bị lỗi như thế nào không ạ?",
+      "questions": [
+        {
+          "slot": "issue",
+          "type": "open",
+          "text": "Anh có thể cho em biết cụ thể máy bị lỗi như thế nào không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy không lên nguồn, không biết có cách nào bảo hành miễn phí được không?",
+      "facts_stated": {
+        "issue": "máy không lên nguồn"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra thì đơn hàng của anh mua ngày 14/05/2025, sản phẩm này có thời hạn bảo hành 12 tháng theo chính sách của hãng và shop. Hiện tại đã hết hạn bảo hành nên rất tiếc bên em không thể hỗ trợ bảo hành miễn phí cho anh được ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "warranty_months",
+          "value": 12
+        },
+        {
+          "field": "in_warranty",
+          "value": false
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD901003"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Tôi thấy bảo hành có 12 tháng thôi, giờ hết hạn rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi anh, sản phẩm đã quá hạn bảo hành nên bên em không còn hỗ trợ bảo hành miễn phí nữa ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_warranty",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có cách nào để được hỗ trợ không? Tôi không hài lòng với việc này lắm.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất xin lỗi vì bất tiện này. Hiện tại bên em chỉ nhận bảo hành miễn phí trong thời hạn quy định, anh có thể liên hệ trung tâm bảo hành của hãng Xiaomi để được hỗ trợ sửa chữa tính phí ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy mới mua được một thời gian, đáng lẽ phải bảo hành chứ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu cảm giác của anh. Tuy nhiên theo chính sách, sản phẩm đã hết hạn bảo hành nên bên em không thể hỗ trợ bảo hành miễn phí nữa. Nếu cần thông tin liên hệ trung tâm bảo hành hãng, em sẽ gửi cho anh ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_warranty",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "issue",
+          "value": "máy không lên nguồn",
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "order_id",
+          "value": "OD901003",
+          "op": "supersede",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "owned_sku",
+          "value": "SKU-AF-XM",
+          "op": "supersede",
+          "source": "call_1#turn1"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_bao_hanh",
+    "outcome": "thong_tin",
+    "objection_type": "het_han_bao_hanh",
+    "objection_handling": "Giải thích rõ thời hạn bảo hành và hướng dẫn liên hệ hãng Xiaomi để sửa chữa tính phí.",
+    "sentiment": "negative",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "order_id",
+        "old": "OD901002",
+        "new": "OD901003"
+      },
+      {
+        "slot": "owned_sku",
+        "old": "SKU-AF-XM",
+        "new": "SKU-AF-XM"
+      }
+    ],
+    "callback": null,
+    "order": null
+  }
+}

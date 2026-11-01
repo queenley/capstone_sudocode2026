@@ -1,0 +1,131 @@
+{
+  "scenario_id": "SCN-ADV-0021",
+  "call": "call_2",
+  "input_mode": "asr_transcript",
+  "source_sha256": "122ed0119925c374fa73c9ca076cd65838c403cc1a3688b527615e67675b3486",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "A",
+      "text": "Dạ em chào cô ạ, em là trợ lý ảo của shop BTC. Hôm trước cô có hỏi về máy lọc không khí Samsung AX40, cần hỏi lại ý kiến con cháu, hôm nay mình muốn đặt máy đúng không ạ?",
+      "spoken_text": "dạ em chào cô ạ em là trợ lý ảo của shop bê tê xê hôm trước cô có hỏi về máy lọc không khí samsung ax bốn mươi cần hỏi lại ý kiến con cháu hôm nay mình muốn đặt máy đúng không ạ",
+      "entities": {
+        "blocker": "can hoi nguoi nha",
+        "sku": "SKU-SS-AX40"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "alo chau chau noi lai co nghe co vua hoi may loc khong khi samsung ax40 dung khong",
+      "spoken_text": "alo chau chau noi lai co nghe co vua hoi may loc khong khi samsung ax bốn mươi dung khong",
+      "entities": {
+        "sku": "SKU-SS-AX40"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 3,
+      "speaker": "A",
+      "text": "Dạ cô nghe rõ ạ, máy lọc không khí Samsung AX40 hiện đang có hàng với giá 6.490.000đ, được freeship toàn quốc. Cô muốn đặt một máy đúng không ạ?",
+      "spoken_text": "dạ cô nghe rõ ạ máy lọc không khí samsung ax bốn mươi hiện đang có hàng với giá sáu triệu bốn trăm chín mươi nghìn đồng được freeship toàn quốc cô muốn đặt một máy đúng không ạ",
+      "entities": {
+        "sku": "SKU-SS-AX40",
+        "price_vnd": 6490000,
+        "in_stock": true
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "co dong y mua may nay roi",
+      "spoken_text": "co dong y mua may nay roi",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 5,
+      "speaker": "A",
+      "text": "Dạ cô cho cháu xác nhận lại, mình lấy 1 máy Samsung AX40 giá 6.490.000đ, giao tại Quận 7, TP.HCM và thanh toán khi nhận hàng đúng không ạ? Đơn này sẽ được miễn phí vận chuyển và dự kiến giao ngày 22/10. Cô xác nhận giúp cháu thông tin này nhé.",
+      "spoken_text": "dạ cô cho cháu xác nhận lại, mình lấy một máy samsung a ích bốn mươi giá sáu triệu bốn trăm chín mươi nghìn, giao tại quận bảy, thành phố hồ chí minh và thanh toán khi nhận hàng đúng không ạ? đơn này sẽ được miễn phí vận chuyển và dự kiến giao ngày hai mươi hai tháng mười. cô xác nhận giúp cháu thông tin này nhé.",
+      "entities": {
+        "price_vnd": 6490000
+      },
+      "reference_source": "rule",
+      "issues": [
+        "entity_not_stated:min_free_ship_vnd"
+      ]
+    },
+    {
+      "idx": 6,
+      "speaker": "C",
+      "text": "co se thanh toan bang tien mat khi nhan hang nhe",
+      "spoken_text": "co se thanh toan bang tien mat khi nhan hang nhe",
+      "entities": {
+        "payment": "COD"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 7,
+      "speaker": "A",
+      "text": "Dạ cháu đã ghi nhận cô chọn thanh toán khi nhận hàng ạ. Cháu sẽ tiến hành lên đơn cho mình ngay bây giờ.",
+      "spoken_text": "dạ cháu đã ghi nhận cô chọn thanh toán khi nhận hàng ạ cháu sẽ tiến hành lên đơn cho mình ngay bây giờ",
+      "entities": {
+        "payment": "COD"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 8,
+      "speaker": "C",
+      "text": "khu vuc giao hang la quan 7 tp hcm nhe chau",
+      "spoken_text": "khu vuc giao hang la quan bảy tp hcm nhe chau",
+      "entities": {},
+      "reference_source": "rule",
+      "issues": [
+        "words_changed"
+      ]
+    },
+    {
+      "idx": 9,
+      "speaker": "A",
+      "text": "Dạ cháu xác nhận địa chỉ giao hàng là Quận 7, TP.HCM ạ. Đơn hàng sẽ được giao dự kiến ngày 22/10. Vì đơn này thanh toán khi nhận hàng trên 2 triệu, sẽ có nhân viên gọi xác nhận đơn trước khi giao cho cô nhé.",
+      "spoken_text": "dạ cháu xác nhận địa chỉ giao hàng là quận bảy thành phố hồ chí minh ạ đơn hàng sẽ được giao dự kiến ngày hai mươi hai tháng mười vì đơn này thanh toán khi nhận hàng trên hai triệu sẽ có nhân viên gọi xác nhận đơn trước khi giao cho cô nhé",
+      "entities": {
+        "payment": "COD",
+        "promo_expiry": "2023-10-22",
+        "min_free_ship_vnd": 2000000
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 10,
+      "speaker": "C",
+      "text": "cam on chau nhieu co cho hang ve",
+      "spoken_text": "cam on chau nhieu co cho hang ve",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 11,
+      "speaker": "A",
+      "text": "Dạ cháu cảm ơn cô đã đặt hàng tại shop BTC. Khi có nhân viên gọi xác nhận đơn, cô nghe máy giúp cháu nhé. Chúc cô nhiều sức khỏe ạ!",
+      "spoken_text": "dạ cháu cảm ơn cô đã đặt hàng tại shop bê tê xê khi có nhân viên gọi xác nhận đơn cô nghe máy giúp cháu nhé chúc cô nhiều sức khỏe ạ",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

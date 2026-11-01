@@ -1,0 +1,228 @@
+{
+  "conversation_id": "SCN-ADV-0012__call_1",
+  "scenario_id": "SCN-ADV-0012",
+  "call": "call_1",
+  "customer_id": "C013",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-17",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_hoi_gio_hang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, sẵn sàng hỗ trợ chị về giỏ hàng trên website.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "is_human",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về giỏ hàng trên website của mình.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị đang quan tâm đến sản phẩm nào trong giỏ hàng để em kiểm tra tổng tiền và các ưu đãi cho mình ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Dạ chị đang quan tâm đến sản phẩm nào trong giỏ hàng để em kiểm tra tổng tiền và các ưu đãi cho mình ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thấy có máy lọc không khí AirPure Y và AirPure Mini, cho chị hỏi tổng tiền là bao nhiêu?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với giỏ hàng gồm Máy lọc không khí AirPure Y và AirPure Mini, tổng tiền sau khuyến mãi là 6.295.000đ chị nhé. Giá AirPure Y hiện là 5.200.000đ và Mini là 1.095.000đ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-AP-Y",
+          "value": 5200000
+        },
+        {
+          "field": "price_vnd:SKU-AP-MINI",
+          "value": 1095000
+        },
+        {
+          "field": "total_vnd",
+          "value": 6295000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "pricing.get_quote",
+          "args": {
+            "sku": "SKU-AP-Y",
+            "on": "2026-10-17",
+            "customer_phone": "0964252477",
+            "basket_skus": [
+              "SKU-AP-MINI"
+            ]
+          }
+        },
+        {
+          "name": "pricing.get_quote",
+          "args": {
+            "sku": "SKU-AP-MINI",
+            "on": "2026-10-17",
+            "customer_phone": "0964252477",
+            "basket_skus": [
+              "SKU-AP-Y"
+            ]
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy lọc không khí AirPure Y giá 5 triệu 200, còn Mini là 1 triệu 95 đúng không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị xác nhận đúng ạ: Máy lọc không khí AirPure Y giá 5.200.000đ, Mini là 1.095.000đ, tổng cộng 6.295.000đ đã áp dụng đủ khuyến mãi hiện hành.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-AP-Y",
+          "value": 5200000
+        },
+        {
+          "field": "price_vnd:SKU-AP-MINI",
+          "value": 1095000
+        },
+        {
+          "field": "total_vnd",
+          "value": 6295000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cũng muốn biết có khuyến mãi gì khi mua cả hai không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ khi chị mua cả hai sản phẩm, AirPure Mini được giảm 50% nhờ chương trình AIR-2ND-50, và riêng AirPure Y tặng kèm một màng lọc chính hãng SKU-AP-FLT-X chị nhé. Tất cả đã được tính vào tổng tiền 6.295.000đ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, phí giao hàng thì sao em? Chị chưa muốn đặt ngay, hẹn gọi lại nhé.",
+      "facts_stated": {
+        "blocker": "cần suy nghĩ thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng trên 500.000đ nên chị được miễn phí giao hàng toàn quốc khi mua hai máy này ạ. Em đã ghi nhận chị cần suy nghĩ thêm, khi nào chị sẵn sàng đặt đơn, chị nhắn lại để em hỗ trợ nhanh nhất nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm",
+          "op": "set",
+          "source": "call_1#turn11"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_gio_hang",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

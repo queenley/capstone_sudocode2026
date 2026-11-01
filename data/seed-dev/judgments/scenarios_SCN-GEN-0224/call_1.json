@@ -1,0 +1,36 @@
+{
+  "scenario_id": "SCN-GEN-0224",
+  "conversation_id": "SCN-GEN-0224__call_1",
+  "rubric_id": "btc_llm_judge_rubric",
+  "criteria_applied": [
+    "J02_no_fabrication",
+    "J06_tone_vietnamese",
+    "J07_closing_summary",
+    "J08_over_confirmation"
+  ],
+  "verdicts": [
+    {
+      "criterion_id": "J02_no_fabrication",
+      "verdict": "PASS",
+      "evidence": "Giá là 1.690.000đ, shop sẽ giao hàng về TP Huế trong khoảng 4 ngày làm việc."
+    },
+    {
+      "criterion_id": "J06_tone_vietnamese",
+      "verdict": "PASS",
+      "evidence": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC."
+    },
+    {
+      "criterion_id": "J07_closing_summary",
+      "verdict": "FAIL",
+      "evidence": "Agent không đọc lại thông tin sản phẩm, giá, địa chỉ, thanh toán, thời gian giao trước khi tạo đơn."
+    },
+    {
+      "criterion_id": "J08_over_confirmation",
+      "verdict": "PASS",
+      "evidence": "Agent không xác nhận lại cùng một slot quá 1 lần trong cuộc."
+    }
+  ],
+  "overall_pass": false,
+  "needs_manual_review": true,
+  "reasons": "FAIL J07_closing_summary"
+}

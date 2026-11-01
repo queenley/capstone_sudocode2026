@@ -1,0 +1,81 @@
+{
+  "scenario_id": "SCN-ADV-0057",
+  "level": "M2",
+  "persona": "khach_mua_so_luong",
+  "hard_case": null,
+  "customer_phone": "0932568855",
+  "customer_name": "Lâm",
+  "honorific": "anh",
+  "notes": "Persona khach_mua_so_luong, biến thể mua_ba_loi_loc_nuoc. call_1 (zalo_oa): chốt đơn nhiều cái cùng loại → chot_don. Chấm chủ yếu: TSR.",
+  "calls": {
+    "call_1": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_lâm94",
+      "call_date": "2026-10-17",
+      "customer_goal": "Hỏi mua 3 cái Bộ lõi lọc thay thế RO 1-2-3",
+      "customer_turns": [
+        "Alo, anh muốn mua 3 cái Bộ lõi lọc thay thế RO 1-2-3.",
+        "Mỗi cái giá bao nhiêu vậy em?",
+        "Tổng tiền cho 3 cái là bao nhiêu nhỉ?",
+        "Có giảm giá gì khi mua nhiều không?",
+        "Anh định thanh toán qua ngân hàng và giao hàng ở Hải Châu, Đà Nẵng nhé.",
+        "Nhu cầu là để thay đồ cũ đã hỏng, nên anh cũng muốn chốt đơn luôn.",
+        "Để anh bàn với gia đình trước rồi sẽ gọi lại.",
+        "Ừ, nếu mà có giảm giá thì anh sẽ chốt đơn."
+      ],
+      "facts_established": {
+        "usage_need": "thay đồ cũ đã hỏng",
+        "budget_vnd": 500000,
+        "blocker": "để bàn với gia đình",
+        "payment": "bank",
+        "delivery_area": "Hải Châu, Đà Nẵng",
+        "quantity": 3,
+        "product_advised": "SKU-WF-CORE",
+        "price_quoted_vnd": 390000,
+        "order_id": "OD600001"
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-WF-CORE",
+          "price_vnd": 390000,
+          "payment": "bank",
+          "qty": 3
+        },
+        "total_match_vnd": 1170000
+      },
+      "ground_truth_facts": {
+        "price_vnd": 390000,
+        "list_price_vnd": 390000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-10-20",
+        "qty": 3,
+        "total_vnd": 1170000,
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "usage_need": "thay đồ cũ đã hỏng",
+        "budget_vnd": 500000,
+        "blocker": "để bàn với gia đình",
+        "payment": "bank",
+        "delivery_area": "Hải Châu, Đà Nẵng",
+        "product_advised": "SKU-WF-CORE",
+        "price_quoted_vnd": 390000,
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "KM-05",
+        "VC-04",
+        "PB-03"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

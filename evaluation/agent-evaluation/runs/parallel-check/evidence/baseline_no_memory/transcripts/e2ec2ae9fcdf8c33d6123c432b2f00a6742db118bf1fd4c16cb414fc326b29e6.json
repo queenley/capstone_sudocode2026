@@ -1,0 +1,83 @@
+{
+  "context": {
+    "run_id": "PRODUCT-70a8f17c2a91c3b1",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0010",
+    "call": "call_1",
+    "turn": 2
+  },
+  "customer_text": "Phòng anh khoảng 25 mét vuông, không có trẻ nhỏ.",
+  "agent_text": "Máy lọc không khí AirPure Pro phù hợp cho phòng đến 45 mét vuông, có màng lọc HEPA H13, UV diệt khuẩn và khóa an toàn cho trẻ em ạ. Anh muốn em báo giá và kiểm tra tồn kho cho anh nhé?",
+  "customer_id": "C004",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-70a8f17c2a91c3b1/baseline_no_memory/SCN-GEN-0010/call_1/2/2",
+      "run_id": "PRODUCT-70a8f17c2a91c3b1",
+      "context": {
+        "run_id": "PRODUCT-70a8f17c2a91c3b1",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0010",
+        "call": "call_1",
+        "turn": 2
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "84dbdbb61f87e56f616d16b2ce1774f6865b34b7f6e180febc24f67788daf1f5",
+          "pointer": "/17"
+        }
+      ],
+      "event_id": "PRODUCT-70a8f17c2a91c3b1/baseline_no_memory/SCN-GEN-0010/call_1/2/2",
+      "request": {
+        "name": "catalog.search",
+        "args": {
+          "query": "AirPure Pro",
+          "category": "gia-dung/may-loc-khong-khi",
+          "min_room_area_m2": 25
+        }
+      },
+      "on": "2026-10-15",
+      "started_at": "2026-10-17T04:08:28.449046+00:00",
+      "finished_at": "2026-10-17T04:08:28.450046+00:00",
+      "outcome": "success",
+      "result": {
+        "items": [
+          {
+            "sku": "SKU-AP-PRO",
+            "name": "Máy lọc không khí AirPure Pro",
+            "category": "gia-dung/may-loc-khong-khi",
+            "list_price_vnd": 7990000,
+            "attributes": {
+              "room_area_m2": 45,
+              "features": "HEPA H13, UV, diệt khuẩn",
+              "warranty_months": 24,
+              "child_safe_lock": true
+            },
+            "variants": []
+          }
+        ],
+        "total": 1
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"category\": \"gia-dung/may-loc-khong-khi\", \"min_room_area_m2\": 25, \"query\": \"AirPure Pro\"}, \"name\": \"catalog.search\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "84dbdbb61f87e56f616d16b2ce1774f6865b34b7f6e180febc24f67788daf1f5",
+      "pointer": "/13"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "84dbdbb61f87e56f616d16b2ce1774f6865b34b7f6e180febc24f67788daf1f5",
+      "pointer": "/18"
+    }
+  ]
+}

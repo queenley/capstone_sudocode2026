@@ -1,0 +1,58 @@
+[
+  {
+    "name": "delivery_estimate",
+    "args": {
+      "address": "Ninh Kiều, Cần Thơ",
+      "on": "2026-10-19"
+    },
+    "result": {
+      "address_known": true,
+      "delivery_days": 4,
+      "estimated_delivery": "2026-10-23"
+    }
+  },
+  {
+    "name": "order.create",
+    "args": {
+      "customer_phone": "0905154382",
+      "sku": "SKU-MB-PUMP2",
+      "qty": 1,
+      "price_vnd": 5990000,
+      "payment": "COD",
+      "address": "Ninh Kiều, Cần Thơ",
+      "on": "2026-10-19",
+      "basket_skus": [
+        "SKU-MB-STER"
+      ]
+    },
+    "result": {
+      "order_id": "OD600001",
+      "status": "created",
+      "total_vnd": 5990000,
+      "needs_confirmation_call": true,
+      "estimated_delivery": "2026-10-23"
+    }
+  },
+  {
+    "name": "order.create",
+    "args": {
+      "customer_phone": "0905154382",
+      "sku": "SKU-MB-STER",
+      "qty": 1,
+      "price_vnd": 1890000,
+      "payment": "COD",
+      "address": "Ninh Kiều, Cần Thơ",
+      "on": "2026-10-19",
+      "basket_skus": [
+        "SKU-MB-PUMP2"
+      ]
+    },
+    "result": {
+      "order_id": "OD600002",
+      "status": "created",
+      "total_vnd": 1890000,
+      "needs_confirmation_call": false,
+      "estimated_delivery": "2026-10-23"
+    }
+  }
+]

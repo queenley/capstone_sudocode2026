@@ -1,14 +1,14 @@
 """Stage 7b — the ideal agent's trace for every call, proven perfect with BTC's official script.
 
 Writes (layout: ``src/utils/dataset.py``)
-* ``output/trace_log/scenarios_<id>/call_<n>.jsonl``  the ideal agent (``trace_log`` rows) built from the labels
-* ``output/reports/oracle_report.json``               ``reference_eval.evaluate`` on that trace
-* ``output/reports/reference_report.json``            the same on the reference transcripts (if generated)
-* ``output/reports/a6_oracle.txt``                    A.6 table printed by the official CLI on the oracle
-* ``output/reports/tools_audit.{json,md}``            tools/params we use that are not in the BTC tool set
-* ``output/reports/schema_check.json``                every brief, tool call and trace row checked against
+* ``<seed>/trace_log/scenarios_<id>/call_<n>.jsonl``  the ideal agent (``trace_log`` rows) built from the labels
+* ``<seed>/reports/oracle_report.json``               ``reference_eval.evaluate`` on that trace
+* ``<seed>/reports/reference_report.json``            the same on the reference transcripts (if generated)
+* ``<seed>/reports/a6_oracle.txt``                    A.6 table printed by the official CLI on the oracle
+* ``<seed>/reports/tools_audit.{json,md}``            tools/params we use that are not in the BTC tool set
+* ``<seed>/reports/schema_check.json``                every brief, tool call and trace row checked against
                                                       ``data/schemas`` (call_brief, handoff_brief, tools, trace_log)
-* ``output/reports/ground_truth_summary.json``        the scores, the hard cases, the audit's and schemas' verdicts
+* ``<seed>/reports/ground_truth_summary.json``        the scores, the hard cases, the audit's and schemas' verdicts
 
 The oracle must score CCR 100 · RQR 0 · TSR 100 · HR 0 · 0 guardrail violations, and every file must
 match BTC's schemas; anything else means a label (not the agent) is wrong, and the stage exits non-zero.
@@ -125,7 +125,7 @@ def tools_audit_markdown(audit: dict[str, Any]) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--root", type=Path, default=OUTPUT_DIR,
-                        help="dataset root: output (default) or output/plan_preview")
+                        help="dataset root: output (default) or <seed>/plan_preview")
     parser.add_argument("--allow-imperfect", action="store_true", help="do not fail when the oracle is not perfect")
     args = parser.parse_args()
     dataset = Dataset(args.root)

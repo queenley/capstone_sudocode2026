@@ -1,0 +1,153 @@
+{
+  "conversation_id": "SCN-ADV-0046__call_2",
+  "scenario_id": "SCN-ADV-0046",
+  "call": "call_2",
+  "customer_id": "C037",
+  "session_index": 2,
+  "channel": "zalo_oa",
+  "date": "2026-10-23",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_hoi_bao_hanh_mo_rong",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Toàn ạ, hôm trước anh có mua Máy lọc không khí AirPure Pro bên em. Anh cần hỗ trợ thêm thông tin về bảo hành mở rộng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh cần hỗ trợ thêm thông tin về bảo hành mở rộng đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "room_area_m2",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh vừa mua máy lọc không khí AirPure Pro hôm trước.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh hỏi rất đúng thời điểm, bên em có gói bảo hành mở rộng cho Máy lọc không khí AirPure Pro. Gói này kéo dài thêm 12 tháng so với bảo hành tiêu chuẩn.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "extended_warranty_months",
+          "value": 12
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh muốn hỏi về gói bảo hành mở rộng, có thể cho anh biết thêm thông tin không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Phí mua bảo hành mở rộng là 8% giá sản phẩm, áp dụng cho các dòng gia dụng từ 3 triệu trở lên và mua trong vòng 15 ngày kể từ khi nhận hàng. Anh sẽ được cộng thêm 12 tháng bảo hành, tổng thời gian bảo hành là 24 tháng tiêu chuẩn cộng thêm 12 tháng mở rộng.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "extended_warranty_percent",
+          "value": 8
+        },
+        {
+          "field": "extended_warranty_eligible",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá bảo hành này là bao nhiêu và thêm bao nhiêu tháng vậy nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh có thể mua thêm bảo hành mở rộng, bên em vẫn hỗ trợ đăng ký cho đơn hàng của anh trong vòng 15 ngày kể từ ngày nhận máy. Anh có muốn đăng ký gói bảo hành mở rộng này không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh có muốn đăng ký gói bảo hành mở rộng này không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "extended_warranty_eligible",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mình có thể mua thêm bảo hành này không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_bao_hanh_mo_rong",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,304 @@
+{
+  "conversation_id": "SCN-GEN-0107__call_2",
+  "scenario_id": "SCN-GEN-0107",
+  "call": "call_2",
+  "customer_id": "C026",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-31",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_so_gia",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Dũng ạ, em là trợ lý ảo của shop. Hôm trước anh đã quan tâm Máy lọc không khí AirPure Pro và có thắc mắc về giá, hôm nay mình muốn tiến hành đặt đơn đúng không anh?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Hôm nay mình muốn tiến hành đặt đơn đúng không anh?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "objection",
+        "competitor_price_vnd",
+        "price_quoted_vnd",
+        "promo_code",
+        "room_area_m2"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-AP-PRO"
+        },
+        {
+          "field": "price_quoted_vnd",
+          "value": 7690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh Dũng đây, hôm qua anh đã hỏi về máy lọc không khí.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã quay lại ạ. Em xin thông báo giá Máy lọc không khí AirPure Pro hôm nay là 7.990.000đ, chương trình giảm giá hôm qua đã hết hiệu lực. Máy hiện còn hàng và sẵn sàng giao cho anh.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": false
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh quyết định mua máy này rồi, hình thức thanh toán là chuyển khoản.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận đơn hàng Máy lọc không khí AirPure Pro, giá 7.990.000đ, thanh toán chuyển khoản. Anh cho em xin địa chỉ nhận hàng để em kiểm tra thời gian giao dự kiến nhé.",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Anh cho em xin địa chỉ nhận hàng để em kiểm tra thời gian giao dự kiến nhé."
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Địa chỉ giao hàng là Hải Châu, Đà Nẵng.",
+      "facts_stated": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra địa chỉ Hải Châu, Đà Nẵng, đơn hàng sẽ được giao trong 2 ngày làm việc, dự kiến nhận hàng ngày 03/11/2026 ạ.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "delivery_days",
+          "value": 2
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-03"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Hải Châu, Đà Nẵng",
+            "on": "2026-10-31"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có gì cần xác nhận thêm không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ trước khi lên đơn, em xin phép đọc lại thông tin đặt hàng: Máy lọc không khí AirPure Pro, số lượng 1, giá 7.990.000đ, giao tại Hải Châu, Đà Nẵng, thanh toán chuyển khoản, dự kiến giao ngày 03/11/2026. Anh xác nhận giúp em thông tin trên đúng chưa ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh xác nhận giúp em thông tin trên đúng chưa ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd",
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mong em giúp anh lên đơn nhanh nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã tạo đơn thành công cho anh. Số đơn của anh là OD600001, tổng thanh toán 7.990.000đ, bên em sẽ liên hệ khi đơn được giao cho đơn vị vận chuyển. Cảm ơn anh Dũng đã đặt hàng tại Shop BTC ạ!",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        },
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0910285940",
+            "sku": "SKU-AP-PRO",
+            "qty": 1,
+            "price_vnd": 7990000,
+            "payment": "bank",
+            "address": "Hải Châu, Đà Nẵng",
+            "on": "2026-10-31"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn12"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Hải Châu, Đà Nẵng",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7990000,
+          "op": "supersede",
+          "source": "call_2#turn3"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn12"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_hang",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "price_quoted_vnd",
+        "old_value": 7690000,
+        "new_value": 7990000
+      }
+    ],
+    "callback": null,
+    "order": {
+      "sku": "SKU-AP-PRO",
+      "qty": 1,
+      "price_vnd": 7990000,
+      "payment": "bank",
+      "address": "Hải Châu, Đà Nẵng",
+      "order_id": "OD600001"
+    }
+  }
+}

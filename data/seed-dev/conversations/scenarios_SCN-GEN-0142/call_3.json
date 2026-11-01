@@ -1,0 +1,307 @@
+{
+  "conversation_id": "SCN-GEN-0142__call_3",
+  "scenario_id": "SCN-GEN-0142",
+  "call": "call_3",
+  "customer_id": "SYN-C007",
+  "session_index": 3,
+  "channel": "hotline",
+  "date": "2026-11-16",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Lê Thị G, hôm trước chị có quan tâm Máy lọc không khí AirPure Pro và còn để bàn với gia đình; em rất vui được hỗ trợ chị tiếp tục hôm nay ạ.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "blocker",
+        "room_area_m2",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn xác nhận mua máy lọc không khí AirPure Pro.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, Máy lọc không khí AirPure Pro giá 7.990.000đ hiện đang còn hàng. Em sẽ lên đơn theo thông tin hôm trước chị đã cung cấp. Chị chọn thanh toán và nhận hàng ở địa chỉ nào ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "open",
+          "text": "Chị chọn thanh toán và nhận hàng ở địa chỉ nào ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị chọn thanh toán COD và giao hàng ở Long Biên, Hà Nội.",
+      "facts_stated": {
+        "payment": "COD",
+        "delivery_area": "Long Biên, Hà Nội"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Long Biên, Hà Nội",
+          "spoken": "Long Biên, Hà Nội"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận đơn hàng: Máy lọc không khí AirPure Pro, giá 7.990.000đ, thanh toán COD, giao tại Long Biên, Hà Nội. Dự kiến giao ngày 18/11. Em lên đơn ngay cho chị, sau đó sẽ có nhân viên gọi xác nhận đơn trước khi giao ạ. Chị vui lòng xác nhận lại thông tin giúp em nhé?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Chị vui lòng xác nhận lại thông tin đơn hàng: Máy lọc không khí AirPure Pro, giá 7.990.000đ, thanh toán COD, giao tại Long Biên, Hà Nội, giao dự kiến ngày 18/11 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-18"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Long Biên, Hà Nội",
+            "on": "2026-11-16"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "7990000",
+          "spoken": "7.990.000đ"
+        },
+        {
+          "type": "date",
+          "value": "2026-11-18",
+          "spoken": "18/11"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đã bàn với gia đình rồi, nên giờ chị muốn lên đơn.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em lên đơn hàng ngay cho chị. Đơn của chị sẽ được giao dự kiến vào ngày 18/11 và nhân viên sẽ gọi xác nhận trước khi giao ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-18"
+        },
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000007",
+            "sku": "SKU-AP-PRO",
+            "qty": 1,
+            "price_vnd": 7990000,
+            "payment": "COD",
+            "address": "Long Biên, Hà Nội",
+            "on": "2026-11-16"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "7990000",
+          "spoken": "7.990.000đ"
+        },
+        {
+          "type": "date",
+          "value": "2026-11-18",
+          "spoken": "18/11"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mong em giúp chị nhanh chóng nhé!",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã hoàn tất đơn hàng cho chị, cảm ơn chị đã tin tưởng shop. Chị lưu ý sẽ có nhân viên gọi xác nhận đơn trước khi giao. Chúc chị một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        },
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_3#turn4"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Long Biên, Hà Nội",
+          "op": "set",
+          "source": "call_3#turn4"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_3#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7990000,
+          "op": "set",
+          "source": "call_3#turn2"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_3#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "text": "Sẽ có nhân viên gọi xác nhận đơn trước khi giao."
+      }
+    ],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-AP-PRO",
+      "qty": 1,
+      "price_vnd": 7990000,
+      "payment": "COD",
+      "address": "Long Biên, Hà Nội",
+      "estimated_delivery": "2026-11-18",
+      "order_id": "OD600001"
+    }
+  }
+}

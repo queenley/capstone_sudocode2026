@@ -1,0 +1,137 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0018",
+    "call": "call_1",
+    "turn": 3
+  },
+  "customer_text": "co khuyen mai gi khong",
+  "agent_text": "Dạ hiện tại xe đẩy gấp gọn Joie Pact có khuyến mãi miễn phí vận chuyển và miễn phí thu hộ tiền ạ, giá vẫn là 3.490.000 đồng anh nhé. Anh có muốn em hỗ trợ đặt hàng luôn không ạ?",
+  "customer_id": "C010",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0018/call_1/3/4",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0018",
+        "call": "call_1",
+        "turn": 3
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/552"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0018/call_1/3/4",
+      "request": {
+        "name": "catalog.search",
+        "args": {
+          "query": "xe đẩy gấp gọn"
+        }
+      },
+      "on": "2026-10-17",
+      "started_at": "2026-10-17T04:44:41.643739+00:00",
+      "finished_at": "2026-10-17T04:44:41.643739+00:00",
+      "outcome": "success",
+      "result": {
+        "items": [
+          {
+            "sku": "SKU-MB-STR1",
+            "name": "Xe đẩy gấp gọn Joie Pact",
+            "category": "me-be",
+            "list_price_vnd": 3490000,
+            "attributes": {
+              "max_weight_kg": 22,
+              "warranty_months": 12
+            },
+            "variants": []
+          }
+        ],
+        "total": 1
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0018/call_1/3/5",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0018",
+        "call": "call_1",
+        "turn": 3
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/555"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0018/call_1/3/5",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-MB-STR1",
+          "on": "2026-10-17",
+          "customer_phone": "0993186032"
+        }
+      },
+      "on": "2026-10-17",
+      "started_at": "2026-10-17T04:44:42.527676+00:00",
+      "finished_at": "2026-10-17T04:44:42.527676+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-MB-STR1",
+        "list_price_vnd": 3490000,
+        "final_price_vnd": 3490000,
+        "applied_promos": [
+          {
+            "promo_code": "MOM-FREESHIP",
+            "type": "freeship",
+            "discount_vnd": 0
+          },
+          {
+            "promo_code": "COD-0",
+            "type": "freecod",
+            "discount_vnd": 0
+          }
+        ],
+        "expired_promos": [],
+        "ineligible_promos": [],
+        "not_applied_exclusive": [],
+        "freeship": true,
+        "_internal_price_floor_vnd": 3210800
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"query\": \"xe đẩy gấp gọn\"}, \"name\": \"catalog.search\"}",
+    "{\"args\": {\"customer_phone\": \"0993186032\", \"on\": \"2026-10-17\", \"sku\": \"SKU-MB-STR1\"}, \"name\": \"pricing.get_quote\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/548"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/556"
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "scenario_id": "SCN-ADV-0047",
+  "level": "M2",
+  "persona": "khach_hoi_tra_gop",
+  "hard_case": null,
+  "customer_phone": "0930976582",
+  "customer_name": "Cường",
+  "honorific": "anh",
+  "notes": "Persona khach_hoi_tra_gop, biến thể hoi_tra_gop. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (zalo_oa): hỏi trả góp → thong_tin. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-16",
+      "customer_goal": "Hỏi tư vấn về máy lọc không khí Samsung AX40",
+      "customer_turns": [
+        "Alo em, anh muốn hỏi về cái máy lọc không khí Samsung AX40.",
+        "Máy này có giá khoảng bao nhiêu em nhỉ?",
+        "Nhà anh có trẻ nhỏ, diện tích phòng khoảng 35 mét vuông.",
+        "Anh đang có ngân sách tầm 7 triệu, nhưng em cho anh hỏi máy này có khuyến mãi gì không?",
+        "À mà, anh muốn trả góp thì sao, có được không em?",
+        "Thế thì để anh suy nghĩ thêm rồi gọi lại nhé."
+      ],
+      "facts_established": {
+        "room_area_m2": 35,
+        "has_children": true,
+        "budget_vnd": 7000000,
+        "blocker": "muốn trả góp",
+        "product_advised": "SKU-SS-AX40",
+        "price_quoted_vnd": 6490000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 6490000,
+        "list_price_vnd": 6490000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "room_area_m2": 35,
+        "has_children": true,
+        "budget_vnd": 7000000,
+        "blocker": "muốn trả góp",
+        "product_advised": "SKU-SS-AX40",
+        "price_quoted_vnd": 6490000
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "FAQ-02",
+        "VC-04"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_cường76",
+      "days_later": 2,
+      "customer_goal": "Hỏi về hình thức trả góp cho máy lọc không khí",
+      "customer_turns": [
+        "Alo em ơi, hôm trước anh hỏi máy lọc không khí Samsung AX40 rồi đấy.",
+        "Anh muốn mua máy này nhưng không biết có trả góp 0% qua thẻ tín dụng không.",
+        "Nếu không có thì có cách nào khác không em?",
+        "À, để anh cân nhắc rồi sẽ gọi lại nhé."
+      ],
+      "must_carry_over": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "chưa hỗ trợ trả góp",
+          "không hỗ trợ trả góp",
+          "chưa có trả góp",
+          "chưa hỗ trợ hình thức trả góp"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "installment_supported",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "installment_supported": false,
+        "call_date": "2026-10-18"
+      },
+      "relevant_policy_ids": [
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "thong_tin"
+    }
+  }
+}

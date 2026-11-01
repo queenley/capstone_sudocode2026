@@ -1,0 +1,71 @@
+{
+  "report_kind": "product-evaluate-v1",
+  "stages": [
+    {
+      "stage": "prepare",
+      "settings": "C:\\Users\\mt200\\OneDrive\\Desktop\\AI_egineering\\sudocode\\capstone_sudocode2026\\scripts\\evaluation\\runs\\smoke-openai-0002b\\inputs\\settings.json",
+      "run_id": "PRODUCT-a421e5c3096f4bce",
+      "execution_gate": {
+        "allowed": true,
+        "blocking_codes": [],
+        "nonblocking_dispute_codes": [],
+        "binding_verified": false,
+        "runtime_checks": "NOT_RUN_PREFLIGHT_ONLY",
+        "notice": "Input gate only; does not certify Agent/criteria or permit test fallback"
+      },
+      "planned_turns": 8
+    },
+    {
+      "stage": "run",
+      "execution_complete": true,
+      "completed_calls": 4,
+      "failed_calls": 0,
+      "errors": []
+    },
+    {
+      "stage": "collect",
+      "status": {
+        "verdict": "UNDETERMINED",
+        "completeness": "INCOMPLETE",
+        "reason_codes": [
+          "COVERAGE_GAP",
+          "EXTRACTION_MISSING_OR_INVALID",
+          "EXTRACTOR_AUDIT_PENDING",
+          "USAGE_MISSING"
+        ]
+      },
+      "trace_rows": 7,
+      "trace_wire_complete": false
+    },
+    {
+      "stage": "score",
+      "status": {
+        "verdict": "FAIL",
+        "completeness": "INCOMPLETE",
+        "reason_codes": [
+          "ASSERTION_COVERAGE",
+          "CALL_COVERAGE",
+          "CLAIM_GT_MISSING",
+          "CLAIM_VALUE_WRONG",
+          "COVERAGE_GAP",
+          "EXTRACTION_COVERAGE",
+          "EXTRACTION_MISSING_OR_INVALID",
+          "EXTRACTOR_AUDIT_PENDING",
+          "FACT_GT_OR_USAGE_MISSING",
+          "FACT_VALUE_WRONG_OR_UNUSED",
+          "HANDOFF_CONTENT_REVIEW_PENDING",
+          "PII_POLICY_NOT_LABELLED",
+          "TOOL_ACCURACY",
+          "TOOL_EVIDENCE_COVERAGE",
+          "TRACE_COVERAGE",
+          "USAGE_MISSING"
+        ]
+      },
+      "official_report_available": true
+    }
+  ],
+  "pipeline_error": null,
+  "quality_accepted": false,
+  "table": "scored/scorer.stdout.txt",
+  "notice": "The team's agent on generated diagnostic scenarios whose labels await QA; not BTC acceptance. P6 (report) is not run."
+}

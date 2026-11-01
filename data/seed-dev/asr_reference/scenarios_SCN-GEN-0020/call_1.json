@@ -1,0 +1,78 @@
+{
+  "scenario_id": "SCN-GEN-0020",
+  "call": "call_1",
+  "input_mode": "text",
+  "source_sha256": "34ea29deb31296930e6cf5e2af0687e23a840c67430d752aa5e6c257415c9cb9",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Alo, chị muốn hỏi về máy lọc không khí AirPure Y em ơi.",
+      "spoken_text": "alo chị muốn hỏi về máy lọc không khí e pia y em ơi.",
+      "entities": {
+        "sku": "SKU-AP-Y"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Cho chị hỏi máy này có khuyến mãi gì không nhỉ?",
+      "spoken_text": "cho chị hỏi máy này có khuyến mãi gì không nhỉ?",
+      "entities": {
+        "sku": "SKU-AP-Y"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Giá của máy này là bao nhiêu vậy?",
+      "spoken_text": "giá của máy này là bao nhiêu vậy?",
+      "entities": {
+        "sku": "SKU-AP-Y"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "Chị đang cần máy cho phòng 15 mét vuông có trẻ nhỏ.",
+      "spoken_text": "chị đang cần máy cho phòng mười lăm mét vuông có trẻ nhỏ.",
+      "entities": {
+        "room_area_m2": 15,
+        "has_children": true
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 5,
+      "speaker": "C",
+      "text": "Chị có ngân sách tầm 5 triệu rưỡi thôi.",
+      "spoken_text": "chị có ngân sách tầm năm triệu rưỡi thôi.",
+      "entities": {
+        "budget_vnd": 5500000
+      },
+      "reference_source": "rule",
+      "issues": [
+        "words_changed"
+      ]
+    },
+    {
+      "idx": 6,
+      "speaker": "C",
+      "text": "Chị sẽ gọi lại sau vì đang chờ cuối tháng nhận lương.",
+      "spoken_text": "chị sẽ gọi lại sau vì đang chờ cuối tháng nhận lương.",
+      "entities": {
+        "blocker": "cho luong"
+      },
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

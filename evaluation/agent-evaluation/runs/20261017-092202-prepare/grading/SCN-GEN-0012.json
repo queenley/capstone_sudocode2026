@@ -1,0 +1,120 @@
+{
+  "schema_version": "1.0.0",
+  "scenario": {
+    "path": "scenarios/SCN-GEN-0012.json",
+    "sha256": "744c60c40ca10b4d214d0ecf22bc6abe96234782b3cdd1ad6846605828597291",
+    "pointer": ""
+  },
+  "scenario_id": "SCN-GEN-0012",
+  "level": "M2",
+  "required_evidence": [
+    "trace",
+    "memory"
+  ],
+  "calls": [
+    {
+      "call": "call_1",
+      "official_success_if": {
+        "path": "scenarios/SCN-GEN-0012.json",
+        "sha256": "744c60c40ca10b4d214d0ecf22bc6abe96234782b3cdd1ad6846605828597291",
+        "pointer": "/calls/call_1/success_if"
+      },
+      "mode": "assertion_only",
+      "suites": [
+        {
+          "id": "fixed_turn",
+          "applicable": true,
+          "reason": "Generated diagnostic GT pending QA"
+        }
+      ],
+      "checks": [
+        {
+          "check_id": "tool_accuracy_full",
+          "kind": "tool_accuracy",
+          "params": {
+            "expected_calls": {
+              "path": "expected-tools/full/SCN-GEN-0012/call_1.json",
+              "sha256": "0b7a4c9d6ad596f51ea26b47bb274573698d9684fafc70754c010fda23bf770d",
+              "pointer": ""
+            }
+          },
+          "required_evidence": []
+        },
+        {
+          "check_id": "tool_accuracy_baseline_no_memory",
+          "kind": "tool_accuracy",
+          "params": {
+            "expected_calls": {
+              "path": "expected-tools/baseline_no_memory/SCN-GEN-0012/call_1.json",
+              "sha256": "462941cb3d372e4709668f294b6852c55b5d9db515ec5b51fe656f6280f4804d",
+              "pointer": ""
+            }
+          },
+          "required_evidence": []
+        }
+      ],
+      "criteria": [],
+      "aggregation": "assertion",
+      "ground_truth": [
+        {
+          "path": "scenarios/SCN-GEN-0012.json",
+          "sha256": "744c60c40ca10b4d214d0ecf22bc6abe96234782b3cdd1ad6846605828597291",
+          "pointer": ""
+        }
+      ],
+      "dispute_ids": []
+    },
+    {
+      "call": "call_2",
+      "official_success_if": {
+        "path": "scenarios/SCN-GEN-0012.json",
+        "sha256": "744c60c40ca10b4d214d0ecf22bc6abe96234782b3cdd1ad6846605828597291",
+        "pointer": "/calls/call_2/success_if"
+      },
+      "mode": "assertion_only",
+      "suites": [
+        {
+          "id": "fixed_turn",
+          "applicable": true,
+          "reason": "Generated diagnostic GT pending QA"
+        }
+      ],
+      "checks": [
+        {
+          "check_id": "tool_accuracy_full",
+          "kind": "tool_accuracy",
+          "params": {
+            "expected_calls": {
+              "path": "expected-tools/full/SCN-GEN-0012/call_2.json",
+              "sha256": "a661c9eda5cdc9c6123f85d05d3c509a58eac98b8b987739ff072c90fa7feaed",
+              "pointer": ""
+            }
+          },
+          "required_evidence": []
+        },
+        {
+          "check_id": "tool_accuracy_baseline_no_memory",
+          "kind": "tool_accuracy",
+          "params": {
+            "expected_calls": {
+              "path": "expected-tools/baseline_no_memory/SCN-GEN-0012/call_2.json",
+              "sha256": "6d462bd12811854bdf4732d1219d7eaf894fcbdadc43357d0e0340b81333ec83",
+              "pointer": ""
+            }
+          },
+          "required_evidence": []
+        }
+      ],
+      "criteria": [],
+      "aggregation": "assertion",
+      "ground_truth": [
+        {
+          "path": "scenarios/SCN-GEN-0012.json",
+          "sha256": "744c60c40ca10b4d214d0ecf22bc6abe96234782b3cdd1ad6846605828597291",
+          "pointer": ""
+        }
+      ],
+      "dispute_ids": []
+    }
+  ]
+}

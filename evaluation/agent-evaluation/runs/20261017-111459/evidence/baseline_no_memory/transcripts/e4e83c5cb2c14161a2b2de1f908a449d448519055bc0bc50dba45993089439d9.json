@@ -1,0 +1,130 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0021",
+    "call": "call_1",
+    "turn": 1
+  },
+  "customer_text": "Alo, chị muốn hỏi về máy lọc không khí AirPure Mini.",
+  "agent_text": "Dạ chị Mai, máy lọc không khí AirPure Mini phù hợp cho phòng khoảng 12 mét vuông, có màng lọc HEPA H11 và bảo hành 24 tháng ạ. Chị muốn em tư vấn thêm về giá hay tính năng cụ thể nào không ạ?",
+  "customer_id": "C011",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0021/call_1/1/1",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0021",
+        "call": "call_1",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/683"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0021/call_1/1/1",
+      "request": {
+        "name": "crm.get_customer",
+        "args": {
+          "phone": "0980737028"
+        }
+      },
+      "on": "2026-10-17",
+      "started_at": "2026-10-17T04:47:26.778405+00:00",
+      "finished_at": "2026-10-17T04:47:26.778405+00:00",
+      "outcome": "success",
+      "result": {
+        "found": true,
+        "ambiguous": false,
+        "customer_id": "C011",
+        "name": "Mai",
+        "honorific": "chị",
+        "phone": "0980737028",
+        "identities": {
+          "zalo_id": "zalo_mai37",
+          "fb_id": null
+        },
+        "orders": [],
+        "sessions": []
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0021/call_1/1/2",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0021",
+        "call": "call_1",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/690"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0021/call_1/1/2",
+      "request": {
+        "name": "catalog.search",
+        "args": {
+          "query": "AirPure Mini",
+          "category": "gia-dung/may-loc-khong-khi"
+        }
+      },
+      "on": "2026-10-17",
+      "started_at": "2026-10-17T04:47:31.043028+00:00",
+      "finished_at": "2026-10-17T04:47:31.043028+00:00",
+      "outcome": "success",
+      "result": {
+        "items": [
+          {
+            "sku": "SKU-AP-MINI",
+            "name": "Máy lọc không khí AirPure Mini",
+            "category": "gia-dung/may-loc-khong-khi",
+            "list_price_vnd": 2190000,
+            "attributes": {
+              "room_area_m2": 12,
+              "features": "HEPA H11, để bàn",
+              "warranty_months": 24,
+              "child_safe_lock": false
+            },
+            "variants": []
+          }
+        ],
+        "total": 1
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"phone\": \"0980737028\"}, \"name\": \"crm.get_customer\"}",
+    "{\"args\": {\"category\": \"gia-dung/may-loc-khong-khi\", \"query\": \"AirPure Mini\"}, \"name\": \"catalog.search\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/686"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/691"
+    }
+  ]
+}

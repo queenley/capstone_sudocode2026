@@ -1,0 +1,240 @@
+{
+  "scenario_id": "SCN-GEN-0234",
+  "level": "M2",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "hard_case": "asr_loi_tool_timeout",
+  "customer_phone": "0998000012",
+  "customer_name": "Trần Thị Bích",
+  "honorific": "chị",
+  "notes": "Persona khach_asr_nhiem_tool_timeout, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Ca khó: asr_loi_tool_timeout. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-28",
+      "input_mode": "asr_transcript",
+      "customer_goal": "Hỏi về máy lọc không khí Xiaomi Smart 4 Pro cho phòng 35m²",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về máy lọc không khí Xiaomi Smart 4 Pro cho phòng khoảng 35 mét vuông.",
+        "Nhà chị có trẻ nhỏ, ngân sách tầm 5 triệu thôi.",
+        "Máy này đang có khuyến mãi gì không em?",
+        "À, chị cần bàn với gia đình đã, em gọi lại chị vào tối thứ Hai (30/11) tầm 7 giờ nhé."
+      ],
+      "customer_turns_asr": [
+        "alo chi muon hoi ve may loc khong khi xiaomi smart 4 pro cho phong khoang 35 met vuong",
+        "nha chi co tre nho ngan sach tam 5 trieu thoi",
+        "may nay dang co khuyen mai gi khong em",
+        "a chi can ban voi gia dinh da em goi lai chi vao toi thu hai 30 11 tam 7 gio nhe"
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C012",
+          "session_id": "SYN-012-S3",
+          "date": "2025-07-16",
+          "channel": "zalo_oa",
+          "summary": "Mua Nồi chiên không dầu Xiaomi 4.5L giá 1.590.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C012",
+          "session_id": "SYN-012-S1",
+          "date": "2026-04-07",
+          "channel": "web",
+          "summary": "Mua Máy hút sữa điện đôi Medela Swing Maxi giá 5.990.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C012",
+          "session_id": "SYN-012-S2",
+          "date": "2026-10-02",
+          "channel": "hotline",
+          "summary": "Đặt Máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ, đơn OD901202 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C012",
+          "order_id": "OD901201",
+          "date": "2026-04-07",
+          "sku": "SKU-MB-PUMP2",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-MB-PUMP2"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C012",
+          "order_id": "OD901202",
+          "date": "2026-10-02",
+          "sku": "SKU-MB-STER",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901202"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C012",
+          "order_id": "OD901203",
+          "date": "2025-07-16",
+          "sku": "SKU-AF-XM",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AF-XM"
+          }
+        }
+      ],
+      "facts_established": {
+        "blocker": "để bàn với gia đình",
+        "budget_vnd": 5500000,
+        "has_children": true,
+        "room_area_m2": 35,
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-11-30T19:00"
+        },
+        "must_say_any": [
+          "7 giờ",
+          "19 giờ",
+          "19h",
+          "7h tối"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5490000,
+        "list_price_vnd": 5490000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_XM-COMBO_active": false,
+        "promo_AIR-2ND-50_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "callback_at": "2026-11-30T19:00",
+        "call_date": "2026-11-28"
+      },
+      "memory_expectation": {
+        "blocker": "để bàn với gia đình",
+        "budget_vnd": 5500000,
+        "has_children": true,
+        "room_area_m2": 35,
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "FAQ-02",
+        "LN-01",
+        "PB-03",
+        "PB-01"
+      ],
+      "fault_injection": {
+        "tool": "inventory.check",
+        "mode": "timeout"
+      },
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 1,
+      "input_mode": "asr_transcript",
+      "customer_goal": "Xác nhận mua máy lọc không khí và thông tin thanh toán",
+      "customer_turns": [
+        "Alo em ơi, chị xác nhận mua máy lọc không khí Xiaomi Smart 4 Pro rồi nhé.",
+        "Chị sẽ thanh toán bằng ngân hàng.",
+        "Giao hàng cho chị ở Quận 7, TP.HCM nhé.",
+        "Mong là vẫn còn hàng, em nhé!"
+      ],
+      "customer_turns_asr": [
+        "alo em oi chi xac nhan mua may loc khong khi xiaomi smart 4 pro roi nhe",
+        "chi se thanh toan bang ngan hang",
+        "giao hang cho chi o quan 7 tphcm nhe",
+        "mong la van con hang em nhe"
+      ],
+      "facts_established": {
+        "delivery_area": "Quận 7, TP.HCM",
+        "payment": "bank",
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-XM-4P",
+          "price_vnd": 5490000,
+          "payment": "bank"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5490000,
+        "list_price_vnd": 5490000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_XM-COMBO_active": false,
+        "promo_AIR-2ND-50_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-12-01",
+        "call_date": "2026-11-29"
+      },
+      "memory_expectation": {
+        "delivery_area": "Quận 7, TP.HCM",
+        "payment": "bank",
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000,
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

@@ -1,0 +1,153 @@
+{
+  "scenario_id": "SCN-GEN-0069",
+  "level": "M2",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "hard_case": null,
+  "customer_phone": "0998000004",
+  "customer_name": "Phạm Thị D",
+  "honorific": "chị",
+  "notes": "Persona khach_co_don_chua_co_lich_su, biến thể chuan. call_1 (hotline): hỏi tình trạng đơn → cap_nhat_don; call_2 (hotline): đổi địa chỉ giao → cap_nhat_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-31",
+      "customer_goal": "[plan-only] order_status",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tình trạng đơn hàng hiện có; không tự đọc mã đơn trừ khi được hỏi xác nhận."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C004",
+          "session_id": "SYN-004-S3",
+          "date": "2025-05-08",
+          "channel": "zalo_oa",
+          "summary": "Mua Nồi chiên không dầu Lock&Lock 4L giá 1.890.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C004",
+          "session_id": "SYN-004-S1",
+          "date": "2026-06-10",
+          "channel": "web",
+          "summary": "Mua Máy lọc không khí AirPure Pro giá 7.990.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C004",
+          "session_id": "SYN-004-S2",
+          "date": "2026-10-04",
+          "channel": "hotline",
+          "summary": "Đặt Máy lọc không khí Samsung AX40 giá 6.490.000đ, đơn OD900402 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C004",
+          "order_id": "OD900401",
+          "date": "2026-06-10",
+          "sku": "SKU-AP-PRO",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AP-PRO"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C004",
+          "order_id": "OD900402",
+          "date": "2026-10-04",
+          "sku": "SKU-SS-AX40",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900402"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C004",
+          "order_id": "OD900403",
+          "date": "2025-05-08",
+          "sku": "SKU-AF-4L",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AF-4L"
+          }
+        }
+      ],
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD900403"
+        },
+        "must_say_any": [
+          "đã giao",
+          "giao thành công"
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900403",
+        "order_status": "delivered",
+        "call_date": "2026-10-31"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    },
+    "call_2": {
+      "days_later": 2,
+      "customer_goal": "[plan-only] address_change",
+      "customer_turns": [
+        "[plan-only] Khách muốn đổi địa chỉ giao cho đơn đang xử lý/đang giao sang khu vực trong customer_must_state."
+      ],
+      "facts_established": {
+        "delivery_area": "Long Biên, Hà Nội"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "OD900403",
+          "action": "update_address"
+        }
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900403",
+        "order_status": "delivered",
+        "call_date": "2026-11-02"
+      },
+      "memory_expectation": {
+        "delivery_area": "Long Biên, Hà Nội"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "scenario_id": "SCN-ADV-0127",
+  "call": "call_1",
+  "input_mode": "text",
+  "source_sha256": "13e53b93f5901c4dba7741c6102514a3071207643f106c5a48fed9ae0ad6b4d2",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Chị muốn hỏi về máy lọc không khí AirPure Pro mà em tư vấn hôm trước.",
+      "spoken_text": "chị muốn hỏi về máy lọc không khí máy lọc không khí e pia pro mà em tư vấn hôm trước.",
+      "entities": {
+        "sku": "SKU-AP-PRO"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Máy đó chị định mua cho phòng diện tích 40 mét vuông.",
+      "spoken_text": "máy đó chị định mua cho phòng diện tích bốn mươi mét vuông.",
+      "entities": {
+        "room_area_m2": 40
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Nhà chị có bé nhỏ, nên cũng cần máy tốt một chút.",
+      "spoken_text": "nhà chị có bé nhỏ, nên cũng cần máy tốt một chút.",
+      "entities": {
+        "has_children": true
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "Chị sẽ trả tiền qua chuyển khoản, nhưng mà... chị chờ cuối tháng nhận lương rồi mới mua được nhé.",
+      "spoken_text": "chị sẽ trả tiền qua chuyển khoản, nhưng mà... chị chờ cuối tháng nhận lương rồi mới mua được nhé.",
+      "entities": {
+        "payment": "bank",
+        "blocker": "cho luong"
+      },
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

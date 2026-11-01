@@ -1,0 +1,138 @@
+{
+  "scenario_id": "SCN-GEN-0022",
+  "level": "M1",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "hard_case": "hen_goi_lai_ngay_nghi",
+  "customer_phone": "0929486628",
+  "customer_name": "Nam",
+  "honorific": "anh",
+  "notes": "Persona khach_do_du_hoi_nguoi_nha, biến thể hen_ngay_nghi. call_1 (hotline): tư vấn, hẹn gọi lại vào ngày nghỉ → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Ca khó: hen_goi_lai_ngay_nghi. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-20",
+      "customer_goal": "Hỏi về giày sneaker Urban Classic size 38 màu trắng.",
+      "customer_turns": [
+        "Alo, em chào anh. Anh muốn hỏi về giày sneaker Urban Classic size 38 màu trắng.",
+        "Giày này còn hàng không em? Anh thấy trên website ghi là có.",
+        "À, giá cả như thế nào nhỉ? Anh muốn biết thêm về khuyến mãi nếu có.",
+        "Thứ Hai tuần sau tầm 9 giờ sáng em gọi lại anh nhé."
+      ],
+      "facts_established": {
+        "size": 38,
+        "color": "trang",
+        "decision_maker": "vợ",
+        "blocker": "cần hỏi vợ",
+        "product_advised": "SKU-SN-CAS",
+        "price_quoted_vnd": 890000,
+        "variant_sku": "SKU-SN-CAS-38-TRANG"
+      },
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-10-26T09:00"
+        },
+        "must_say_any": [
+          "27/10",
+          "thứ Ba",
+          "Thứ Ba"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 890000,
+        "list_price_vnd": 890000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "callback_at": "2026-10-27T09:00",
+        "call_date": "2026-10-20"
+      },
+      "memory_expectation": {
+        "size": 38,
+        "color": "trang",
+        "decision_maker": "vợ",
+        "blocker": "cần hỏi vợ",
+        "product_advised": "SKU-SN-CAS",
+        "price_quoted_vnd": 890000,
+        "variant_sku": "SKU-SN-CAS-38-TRANG"
+      },
+      "relevant_policy_ids": [
+        "LN-01",
+        "LN-02",
+        "SP-SN-01",
+        "FAQ-09",
+        "PB-03"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 7,
+      "customer_goal": "Xác nhận mua giày sneaker Urban Classic.",
+      "customer_turns": [
+        "Alo, em ơi, anh muốn xác nhận mua giày sneaker Urban Classic size 38 màu trắng.",
+        "Hình thức thanh toán là COD nhé, anh không có thẻ.",
+        "Khu vực giao hàng là Lê Chân, Hải Phòng.",
+        "Mong là giày sẽ được giao nhanh, anh rất thích mẫu này."
+      ],
+      "facts_established": {
+        "payment": "COD",
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "product_advised": "SKU-SN-CAS",
+        "price_quoted_vnd": 890000,
+        "variant_sku": "SKU-SN-CAS-38-TRANG",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "size",
+        "decision_maker",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "decision_maker",
+        "product_advised",
+        "variant_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-CAS-38-TRANG",
+          "price_vnd": 890000,
+          "payment": "COD"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 890000,
+        "list_price_vnd": 890000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-10-31",
+        "call_date": "2026-10-27"
+      },
+      "memory_expectation": {
+        "payment": "COD",
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "product_advised": "SKU-SN-CAS",
+        "price_quoted_vnd": 890000,
+        "variant_sku": "SKU-SN-CAS-38-TRANG",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "PB-01",
+        "PB-03"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

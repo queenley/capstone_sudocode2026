@@ -1,0 +1,49 @@
+{
+  "scenario_id": "SCN-ADV-0102",
+  "persona_source": "advanced",
+  "customer_id": "C011",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "normal",
+  "tags": [
+    "cross_channel",
+    "customer_info",
+    "date:ordinary",
+    "info_rich",
+    "order",
+    "quick_decision",
+    "variant:noi_het_mot_lan",
+    "zalo"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "order",
+      "outcome_detail": "chot_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Máy lọc không khí AirPure Mini",
+        "price_vnd": 2190000,
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_nhieu_thong_tin",
+      "patience_start": 2
+    },
+    "call_2": {
+      "kind": "order_status",
+      "outcome_detail": "cap_nhat_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "order_status": "created"
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_nhieu_thong_tin",
+      "patience_start": 2
+    }
+  }
+}

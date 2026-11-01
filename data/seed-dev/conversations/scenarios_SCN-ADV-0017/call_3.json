@@ -1,0 +1,268 @@
+{
+  "conversation_id": "SCN-ADV-0017__call_3",
+  "scenario_id": "SCN-ADV-0017",
+  "call": "call_3",
+  "customer_id": "C011",
+  "session_index": 3,
+  "channel": "hotline",
+  "date": "2026-10-21",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_chuyen_giua_nguoi_va_ai",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Mai ạ, cảm ơn chị đã quay lại với shop. Em thấy hôm trước bạn nhân viên đã hỗ trợ mình về Máy hút sữa điện đôi Medela Swing Maxi, chị còn chờ cuối tháng nhận lương. Hôm nay chị muốn mình tiến hành đặt đơn đúng không ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Dạ chị xác nhận giúp em mình đặt 1 Máy hút sữa điện đôi Medela Swing Maxi giá 5.990.000đ, giao về Ninh Kiều, Cần Thơ và thanh toán qua ngân hàng, nhận hàng dự kiến ngày 27/10. Em tạo đơn ngay cho mình nhé?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "freeship",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-10-21"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hôm trước bạn nhân viên đã tư vấn cho chị rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã xác nhận ạ. Đơn hàng sẽ được miễn phí vận chuyển nhờ chương trình MOM-FREESHIP, và giá giữ nguyên 5.990.000đ như báo trước đó. Thời gian nhận hàng dự kiến là ngày 27/10, shop sẽ gửi thông tin đơn qua Zalo/SMS khi bàn giao cho đơn vị vận chuyển.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-27"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giờ chị đồng ý chốt đơn máy hút sữa điện đôi đó.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị chọn thanh toán qua ngân hàng đúng không ạ? Em sẽ tiến hành tạo đơn ngay cho mình, sản phẩm còn hàng và giữ giá ưu đãi cho mình ạ.",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Dạ chị xác nhận giúp em mình thanh toán qua ngân hàng đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ thanh toán qua ngân hàng.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em đã tiếp nhận thông tin, em tạo đơn cho chị ngay bây giờ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0980737028",
+            "sku": "SKU-MB-PUMP2",
+            "qty": 1,
+            "price_vnd": 5990000,
+            "payment": "bank",
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-10-21"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là Ninh Kiều, Cần Thơ nhé.",
+      "facts_stated": {
+        "delivery_area": "Ninh Kiều, Cần Thơ"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Ninh Kiều, Cần Thơ",
+          "spoken": "Ninh Kiều, Cần Thơ"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận địa chỉ giao hàng Ninh Kiều, Cần Thơ. Đơn hàng mã OD600001 sẽ được chuyển đi trong ngày, dự kiến chị nhận hàng ngày 27/10. Cảm ơn chị đã đặt hàng tại shop, chị cần hỗ trợ gì thêm có thể liên hệ tổng đài ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-27"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_3#turn6"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Ninh Kiều, Cần Thơ",
+          "op": "set",
+          "source": "call_3#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-PUMP2",
+          "op": "set",
+          "source": "call_3#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5990000,
+          "op": "set",
+          "source": "call_3#turn1"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_3#turn1"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_3#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001",
+      "sku": "SKU-MB-PUMP2",
+      "qty": 1,
+      "price_vnd": 5990000,
+      "payment": "bank",
+      "delivery_area": "Ninh Kiều, Cần Thơ",
+      "estimated_delivery": "2026-10-27"
+    }
+  }
+}

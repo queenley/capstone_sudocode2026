@@ -1,0 +1,254 @@
+{
+  "conversation_id": "SCN-GEN-0022__call_1",
+  "scenario_id": "SCN-GEN-0022",
+  "call": "call_1",
+  "customer_id": "C006",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-20",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần tư vấn về giày sneaker Urban Classic đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh cần tư vấn về giày sneaker Urban Classic đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, em chào anh. Anh muốn hỏi về giày sneaker Urban Classic size 38 màu trắng.",
+      "facts_stated": {
+        "size": 38,
+        "color": "trang",
+        "product_advised": "SKU-SN-CAS"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, giày sneaker Urban Classic size 38 màu trắng bên em còn hàng anh nhé. Anh đang quan tâm mẫu này đúng không ạ?",
+      "questions": [
+        {
+          "slot": "variant_sku",
+          "type": "confirm",
+          "text": "Anh đang quan tâm mẫu này đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giày này còn hàng không em? Anh thấy trên website ghi là có.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giày Urban Classic size 38 màu trắng hiện còn hàng anh nhé. Giá là 890.000đ, hiện chưa có chương trình khuyến mãi nào áp dụng cho mẫu này ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "price_vnd",
+          "value": 890000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "890000",
+          "spoken": "890.000"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, giá cả như thế nào nhỉ? Anh muốn biết thêm về khuyến mãi nếu có.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận anh muốn chờ để hỏi ý kiến vợ trước khi quyết định. Nếu anh muốn đặt lịch gọi lại vào Thứ Hai tuần sau lúc 9 giờ sáng, thì bên em sẽ chuyển lịch sang Thứ Ba, ngày 27/10 vì Thứ Hai công ty nghỉ nội bộ anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-10-27T09:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0929486628",
+            "callback_at": "2026-10-26T09:00",
+            "note": "khách hẹn gọi lại"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-10-27",
+          "spoken": "27/10"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thứ Hai tuần sau tầm 9 giờ sáng em gọi lại anh nhé.",
+      "facts_stated": {},
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-10-26",
+          "spoken": "Thứ Hai tuần sau tầm 9 giờ sáng"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, vậy em sẽ lên lịch gọi lại cho anh vào lúc 9 giờ sáng Thứ Ba, ngày 27/10 anh nhé. Em cảm ơn anh đã quan tâm sản phẩm của shop BTC, chúc anh một ngày tốt lành ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-10-27T09:00"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "size",
+          "value": 38,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "color",
+          "value": "trang",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "decision_maker",
+          "value": "vợ",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "blocker",
+          "value": "cần hỏi vợ",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-CAS",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 890000,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-CAS-38-TRANG",
+          "op": "set",
+          "source": "call_1#turn2"
+        }
+      ],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-10-27",
+          "spoken": "27/10"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "cần hỏi người nhà",
+    "objection_handling": "Xác nhận lịch gọi lại theo đề nghị khách, chủ động chuyển sang Thứ Ba 27/10 do lịch nghỉ.",
+    "sentiment": "neutral",
+    "decision_maker": "vợ",
+    "commitments": [
+      {
+        "commitment": "Gọi lại cho khách sáng Thứ Ba 27/10 lúc 9 giờ."
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-10-27T09:00",
+      "reason": "khách hẹn gọi lại, lịch nghỉ chuyển sang Thứ Ba"
+    },
+    "order": null
+  }
+}

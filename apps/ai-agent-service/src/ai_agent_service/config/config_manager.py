@@ -61,6 +61,19 @@ def btc_data_dir() -> Path:
     return Path(raw).expanduser().resolve() if raw else ROOT / "data" / "btc"
 
 
+
+def handoff_auto_accept() -> bool:
+    """``HANDOFF_AUTO_ACCEPT``: a handoff is accepted by the system the moment it is made, for test runs.
+
+    Off (the product): ``handoff.transfer`` waits for a consultant to accept in
+    the console, and the agent only drafts for them (copilot). On: the transfer
+    is still made and recorded (ticket, Handoff Brief, the trace's
+    ``handoff.transfer``), accepted by ``auto``, and the agent goes on
+    answering, so a scripted or UI test runs to its end without a person and
+    can be repeated. Read on every handoff, so a restart is not needed.
+    """
+    return os.environ.get("HANDOFF_AUTO_ACCEPT", "").strip().lower() in ("1", "true", "yes", "on")
+
 def kb_dir() -> Path:
     """The approved knowledge versions, ``data/kb/v<N>.jsonl`` (``docs/design.md`` section 7.5)."""
     return ROOT / "data" / "kb"

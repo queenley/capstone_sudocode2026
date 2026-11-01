@@ -1,0 +1,170 @@
+{
+  "conversation_id": "SCN-GEN-0124__call_2",
+  "scenario_id": "SCN-GEN-0124",
+  "call": "call_2",
+  "customer_id": "C028",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-02",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_mua_doi_size",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Tú ạ, hôm trước anh có quan tâm Giày chạy bộ RunLite 2 Pro. Anh muốn mình tiếp tục thế nào ạ?",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "variant_sku",
+        "order_id",
+        "size",
+        "color",
+        "payment",
+        "delivery_area",
+        "price_quoted_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, anh muốn đổi giày sang sản phẩm khác rẻ hơn.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng anh, anh muốn đổi sang sản phẩm nào để em kiểm tra và hỗ trợ cập nhật đơn cho mình ạ.",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh muốn đổi sang sản phẩm nào để em kiểm tra và hỗ trợ cập nhật đơn cho mình ạ."
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cái giày sneaker Urban Classic size 42 màu đen được không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giày sneaker Urban Classic size 42 màu đen hiện còn hàng anh nhé. Đổi sang sản phẩm này, anh sẽ được hoàn lại 800.000 đồng, không mất phí đổi trả ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "new_variant_sku",
+          "value": "SKU-SN-CAS-42-DEN"
+        },
+        {
+          "field": "refund_vnd",
+          "value": 800000
+        },
+        {
+          "field": "exchange_fee_vnd",
+          "value": 0
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD600001",
+            "action": "exchange_product",
+            "new_variant_sku": "SKU-SN-CAS-42-DEN",
+            "on": "2026-11-02"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mình hoàn lại chênh lệch bao nhiêu nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh sẽ được hoàn lại 800.000 đồng sau khi shop nhận lại giày cũ và kiểm tra đạt điều kiện đổi trả. Thời gian hoàn tiền là 3 đến 5 ngày làm việc anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "refund_vnd",
+          "value": 800000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, anh có số tài khoản ngân hàng để nhận hoàn tiền nhé: 190123100429.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận yêu cầu đổi sản phẩm và hoàn tiền cho anh. Bộ phận kế toán sẽ liên hệ xác nhận thông tin tài khoản trước khi chuyển khoản hoàn tiền cho mình ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "doi_san_pham_va_hoan_tien",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

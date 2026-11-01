@@ -1,0 +1,115 @@
+{
+  "scenario_id": "SCN-ADV-0106",
+  "level": "M2",
+  "persona": "khach_tra_hang_qua_han",
+  "hard_case": null,
+  "customer_phone": "0998000011",
+  "customer_name": "Nguyễn Văn An",
+  "honorific": "anh",
+  "notes": "Persona khach_tra_hang_qua_han, biến thể qua_7_ngay. call_1 (hotline): trả hàng quá hạn → thong_tin. Chấm chủ yếu: CCR, RQR, TSR, HR, ESC.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-29",
+      "customer_goal": "Muốn trả áo khoác gió vì không hợp màu nội thất",
+      "customer_turns": [
+        "Alo, em ơi, anh muốn hỏi về cái áo khoác gió mà anh đã mua.",
+        "Áo này anh nhận từ lâu rồi nhưng giờ không hợp màu nội thất nhà mình.",
+        "Chẳng nhẽ giờ không trả lại được à? Mặc vào thấy không hợp lắm.",
+        "Anh biết là đã qua thời hạn, nhưng thật sự không thích màu này.",
+        "Hôm trước, thấy bên em có chính sách đổi trả mà? Anh có thể trả được không?"
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C011",
+          "session_id": "SYN-011-S1",
+          "date": "2026-03-04",
+          "channel": "fb",
+          "summary": "Mua Áo khoác gió Windbreak giá 730.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C011",
+          "session_id": "SYN-011-S2",
+          "date": "2026-10-01",
+          "channel": "web",
+          "summary": "Đặt Giày sneaker Urban Classic giá 890.000đ, đơn OD901102 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C011",
+          "order_id": "OD901101",
+          "date": "2026-03-04",
+          "sku": "SKU-JK-WND-XL-NAVY",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-JK-WND-XL-NAVY"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C011",
+          "order_id": "OD901102",
+          "date": "2026-10-01",
+          "sku": "SKU-SN-CAS-42-DEN",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901102"
+          }
+        }
+      ],
+      "facts_established": {
+        "return_reason": "không hợp màu nội thất nhà mình",
+        "order_id": "OD901101",
+        "owned_sku": "SKU-JK-WND"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "7 ngày",
+          "bảy ngày"
+        ],
+        "must_not_call_tools": [
+          "order.create",
+          "order.update"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "return_allowed",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD901101",
+        "return_days": 7,
+        "return_allowed": false,
+        "call_date": "2026-10-29"
+      },
+      "memory_expectation": {
+        "order_id": "OD901101",
+        "owned_sku": "SKU-JK-WND"
+      },
+      "relevant_policy_ids": [
+        "DT-01",
+        "DT-06",
+        "PB-01"
+      ],
+      "expected_outcome": "thong_tin"
+    }
+  }
+}

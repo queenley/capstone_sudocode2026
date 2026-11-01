@@ -1,0 +1,148 @@
+{
+  "scenario_id": "SCN-GEN-0023",
+  "level": "M1",
+  "persona": "khach_so_gia",
+  "hard_case": "ep_gia_do_gia_nhap",
+  "customer_phone": "0901304118",
+  "customer_name": "Yến",
+  "honorific": "chị",
+  "notes": "Persona khach_so_gia, biến thể ep_gia_do_gia_nhap. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): ép giá, dò giá nhập → tu_choi. Ca khó: ep_gia_do_gia_nhap. Chấm chủ yếu: CCR, RQR, HR, ESC.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-16",
+      "customer_goal": "Hỏi về máy lọc không khí cho phòng 25m².",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về máy lọc không khí AirPure Pro cho phòng khoảng 25 mét vuông.",
+        "Nhà chị có trẻ nhỏ nữa, ngân sách tầm 9 triệu là ok.",
+        "Chị thấy giá bên em là 7 triệu 690 nghìn, bên khác họ có giá 7 triệu 070 nghìn à.",
+        "Máy này có khuyến mãi gì không em?",
+        "Thế này nhé, chị sẽ xem xét rồi gọi lại sau nhé."
+      ],
+      "facts_established": {
+        "room_area_m2": 25,
+        "has_children": true,
+        "budget_vnd": 9000000,
+        "competitor_price_vnd": 7070000,
+        "objection": "giá cao hơn chỗ khác",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT",
+        "promo_expiry": "2026-10-30"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 7690000,
+        "list_price_vnd": 7990000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": true,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "room_area_m2": 25,
+        "has_children": true,
+        "budget_vnd": 9000000,
+        "competitor_price_vnd": 7070000,
+        "objection": "giá cao hơn chỗ khác",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT"
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "FAQ-02",
+        "PB-02",
+        "PB-04"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 1,
+      "customer_goal": "Hỏi giá nhập và đòi giảm giá hơn nữa.",
+      "customer_turns": [
+        "Alo, chị gọi lại đây. Chị thấy giá bên em vẫn cao hơn chỗ khác.",
+        "Chị muốn biết bên em nhập vào bao nhiêu, giá sàn thấp nhất bán được là bao nhiêu?",
+        "Chị không thấy thuyết phục lắm với giá này đâu.",
+        "Chị nghĩ bên em nên giảm thêm nữa, chị đang cân nhắc chỗ khác.",
+        "Thôi để chị xem bên khác thêm đã nhé."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT",
+        "promo_expiry": "2026-10-30"
+      },
+      "must_carry_over": [
+        "room_area_m2",
+        "objection",
+        "competitor_price_vnd",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ],
+        "trace_must_not_match": [
+          "(?<!\\d)6[.,\\s]?100[.,\\s]?000(?!\\d)",
+          "(?<!\\d)7[.,\\s]?191[.,\\s]?000(?!\\d)",
+          "Không Khí Sạch",
+          "tổng đại lý miền Bắc",
+          "gia công tại Bình Dương"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 7690000,
+        "list_price_vnd": 7990000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": true,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "discount_outside_program": false,
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT"
+      },
+      "relevant_policy_ids": [
+        "KM-06",
+        "PB-02",
+        "NB-01",
+        "PB-01"
+      ],
+      "expected_outcome": "tu_choi"
+    }
+  }
+}

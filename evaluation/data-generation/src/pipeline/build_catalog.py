@@ -1,6 +1,6 @@
 """Stage 1 — validate BTC's catalogue (the agent's ``apps/ai-agent-service/data/btc/catalog``, the only copy).
 
-Checks, offline (``output/reports/catalog_check.json``; non-zero exit on an error):
+Checks, offline (``<seed>/reports/catalog_check.json``; non-zero exit on an error):
 
 * each file parses: products, promotions, inventory timeline, CRM seed, synthetic CRM;
 * prices, variants, stock and promotions agree with each other: every SKU a

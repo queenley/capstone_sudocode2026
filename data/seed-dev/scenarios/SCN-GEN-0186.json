@@ -1,0 +1,188 @@
+{
+  "scenario_id": "SCN-GEN-0186",
+  "level": "M2",
+  "persona": "khach_cap_nhat_thong_tin",
+  "hard_case": "ba_phien_doi_thong_tin",
+  "customer_phone": "0982141621",
+  "customer_name": "Quân",
+  "honorific": "anh",
+  "notes": "Persona khach_cap_nhat_thong_tin, biến thể ba_phien_doi_thong_tin. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don; call_3 (hotline): hỏi tình trạng đơn → cap_nhat_don. Ca khó: ba_phien_doi_thong_tin. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-14",
+      "customer_goal": "Hỏi về giày sneaker Urban Classic size 42 màu đen",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về đôi giày sneaker Urban Classic size 42 màu đen em ơi.",
+        "Giá của đôi giày này là bao nhiêu vậy?",
+        "Trên Fanpage thấy ghi đang có khuyến mãi gì không em?",
+        "À, anh cần bàn với gia đình đã, hẹn em gọi lại tối thứ Hai (16/11) tầm 7 giờ nhé."
+      ],
+      "facts_established": {
+        "blocker": "để bàn với gia đình",
+        "color": "den",
+        "size": 42,
+        "product_advised": "SKU-SN-CAS",
+        "price_quoted_vnd": 890000,
+        "variant_sku": "SKU-SN-CAS-42-DEN"
+      },
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-11-16T19:00"
+        },
+        "must_say_any": [
+          "7 giờ",
+          "19 giờ",
+          "19h",
+          "7h tối"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 890000,
+        "list_price_vnd": 890000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "callback_at": "2026-11-16T19:00",
+        "call_date": "2026-11-14"
+      },
+      "memory_expectation": {
+        "blocker": "để bàn với gia đình",
+        "color": "den",
+        "size": 42,
+        "product_advised": "SKU-SN-CAS",
+        "price_quoted_vnd": 890000,
+        "variant_sku": "SKU-SN-CAS-42-DEN"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "FAQ-09",
+        "LN-01",
+        "PB-03"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 2,
+      "customer_goal": "Xác nhận mua giày sneaker Urban Classic",
+      "customer_turns": [
+        "Alo, anh đây, hôm trước em tư vấn cho anh giày sneaker Urban Classic size 42 màu đen đó.",
+        "Anh muốn thanh toán bằng chuyển khoản ngân hàng.",
+        "Khu vực giao hàng là Quận 7, TP.HCM nhé.",
+        "Được rồi, anh đồng ý lên đơn cho anh nhé."
+      ],
+      "facts_established": {
+        "budget_vnd": 1100000,
+        "delivery_area": "Quận 7, TP.HCM",
+        "payment": "bank",
+        "product_advised": "SKU-SN-CAS",
+        "price_quoted_vnd": 890000,
+        "variant_sku": "SKU-SN-CAS-42-DEN",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-CAS-42-DEN",
+          "price_vnd": 890000,
+          "payment": "bank"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 890000,
+        "list_price_vnd": 890000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-11-18",
+        "call_date": "2026-11-16"
+      },
+      "memory_expectation": {
+        "budget_vnd": 1100000,
+        "delivery_area": "Quận 7, TP.HCM",
+        "payment": "bank",
+        "product_advised": "SKU-SN-CAS",
+        "price_quoted_vnd": 890000,
+        "variant_sku": "SKU-SN-CAS-42-DEN",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    },
+    "call_3": {
+      "days_later": 2,
+      "customer_goal": "Hỏi tình trạng đơn hàng giày sneaker",
+      "customer_turns": [
+        "Alo, anh muốn kiểm tra tình trạng đơn hàng giày sneaker Urban Classic mà anh đã đặt.",
+        "Hôm trước em có lên đơn cho anh rồi đúng không?",
+        "Bây giờ đơn hàng của anh đang ở đâu vậy em?",
+        "Có vấn đề gì không hay đơn hàng vẫn bình thường?"
+      ],
+      "must_carry_over": [
+        "size",
+        "payment",
+        "delivery_area",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "order_id"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "size",
+        "color",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "variant_sku",
+        "order_id"
+      ],
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD600001"
+        },
+        "must_say_any": [
+          "đã tạo",
+          "đang xử lý",
+          "đang chuẩn bị",
+          "đã ghi nhận"
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD600001",
+        "order_status": "created",
+        "call_date": "2026-11-18"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    }
+  }
+}

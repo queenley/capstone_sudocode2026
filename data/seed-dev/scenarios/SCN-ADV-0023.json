@@ -1,0 +1,130 @@
+{
+  "scenario_id": "SCN-ADV-0023",
+  "level": "M2",
+  "persona": "khach_doi_cong_don_khuyen_mai",
+  "hard_case": null,
+  "customer_phone": "0985003703",
+  "customer_name": "Oanh",
+  "honorific": "chị",
+  "notes": "Persona khach_doi_cong_don_khuyen_mai, biến thể thu_cu_cong_giam_thang_10. call_1 (hotline): đòi cộng dồn hai khuyến mãi → chot_don. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-16",
+      "customer_goal": "Mua máy lọc không khí AirPure Pro và áp dụng khuyến mãi.",
+      "customer_turns": [
+        "Alo, chị Oanh đây, hôm nay chị muốn mua máy lọc không khí AirPure Pro.",
+        "Chị đã thấy chương trình giảm giá tháng 10 và khuyến mãi thu cũ đổi mới, em ơi.",
+        "Chị muốn áp dụng cả hai chương trình này cho đơn hàng của chị nhé, cộng cả hai cho chị nhé!",
+        "À, chị đã chuyển nhà rồi, bây giờ chị giao ở Cầu Giấy, Hà Nội nhé.",
+        "Chị có ngân sách khoảng 8 triệu rưỡi thôi.",
+        "Nhà chị có trẻ nhỏ đó, em ghi chú cho chị cái này nhé.",
+        "Chị chờ cuối tháng này nhận lương rồi thanh toán qua ngân hàng nhé."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "C031",
+          "session_id": "S-OLD-1",
+          "date": "2026-02-17",
+          "channel": "hotline",
+          "summary": "Mua AirPure X bản 2024 giá 4.290.000đ, phòng 20m², địa chỉ giao: 12 ngõ 38 Hoàng Cầu, Đống Đa, Hà Nội",
+          "outcome": "chot_don",
+          "stale": true,
+          "facts": {
+            "owned_sku": "SKU-AP-X-2024",
+            "room_area_m2": 20,
+            "delivery_area": "Đống Đa, Hà Nội"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "C031",
+          "order_id": "OD188213",
+          "date": "2026-02-17",
+          "sku": "SKU-AP-X-2024",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AP-X-2024"
+          }
+        }
+      ],
+      "facts_established": {
+        "room_area_m2": 15,
+        "has_children": true,
+        "budget_vnd": 8500000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "payment": "bank",
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7590000,
+        "promo_code": "TRADE-IN-AP",
+        "promo_expiry": "2026-12-14",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AP-PRO",
+          "price_vnd": 7590000,
+          "payment": "bank"
+        },
+        "forbidden_claims": [
+          {
+            "field": "price_vnd",
+            "value": 7290000
+          },
+          {
+            "field": "promos_stacked",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 7590000,
+        "list_price_vnd": 7990000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_TRADE-IN-AP_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "promos_stacked": false,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-10-19",
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "room_area_m2": 15,
+        "has_children": true,
+        "budget_vnd": 8500000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "payment": "bank",
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7590000,
+        "promo_code": "TRADE-IN-AP",
+        "order_id": "OD600001",
+        "superseded": {
+          "room_area_m2": 20,
+          "delivery_area": "Đống Đa, Hà Nội"
+        },
+        "address_ttl_check": true
+      },
+      "relevant_policy_ids": [
+        "KM-03",
+        "KM-04",
+        "KM-09",
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "scenario_id": "SCN-ADV-0015",
+  "level": "M2",
+  "persona": "khach_hoi_tra_gop",
+  "hard_case": null,
+  "customer_phone": "0992298369",
+  "customer_name": "Ngọc",
+  "honorific": "chị",
+  "notes": "Persona khach_hoi_tra_gop, biến thể hoi_tra_gop. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (zalo_oa): hỏi trả góp → thong_tin. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-17",
+      "customer_goal": "Hỏi về máy lọc không khí cho phòng 20m²",
+      "customer_turns": [
+        "Alo, chị Ngọc đây, chị muốn hỏi về máy lọc không khí AirPure Y em ơi.",
+        "Chị có phòng 20 mét vuông, không có trẻ nhỏ đâu.",
+        "Giá máy này khoảng bao nhiêu vậy em?",
+        "Chị thấy cần phải có khuyến mãi gì không?",
+        "Chị đang có ngân sách tầm 5 triệu rưỡi, mà muốn trả góp nữa.",
+        "Thế chị sẽ gọi lại sau nhé, chị cần cân nhắc thêm."
+      ],
+      "facts_established": {
+        "room_area_m2": 20,
+        "has_children": false,
+        "budget_vnd": 5500000,
+        "blocker": "muốn trả góp",
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "promo_code": "GIFT-FILTER",
+        "promo_expiry": "2026-10-22"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5200000,
+        "list_price_vnd": 5200000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_GIFT-FILTER_active": true,
+        "gift_sku": "SKU-AP-FLT-X",
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "room_area_m2": 20,
+        "has_children": false,
+        "budget_vnd": 5500000,
+        "blocker": "muốn trả góp",
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "promo_code": "GIFT-FILTER"
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "KM-07",
+        "VC-04"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_ngọc53",
+      "days_later": 1,
+      "customer_goal": "Hỏi về hình thức trả góp cho máy lọc không khí",
+      "customer_turns": [
+        "Chị gọi lại đây, hôm qua em tư vấn cho chị máy lọc không khí đó.",
+        "Chị muốn hỏi là có hình thức trả góp 0% qua thẻ tín dụng không em?",
+        "Nếu không có trả góp thì chị sẽ cân nhắc lại.",
+        "Chị cũng muốn biết có công ty tài chính nào hỗ trợ không?",
+        "Chị cần thêm thông tin để quyết định nữa, em nhé.",
+        "Chị sẽ gọi lại sau khi suy nghĩ thêm."
+      ],
+      "must_carry_over": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "chưa hỗ trợ trả góp",
+          "không hỗ trợ trả góp",
+          "chưa có trả góp",
+          "chưa hỗ trợ hình thức trả góp"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "installment_supported",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "installment_supported": false,
+        "call_date": "2026-10-18"
+      },
+      "relevant_policy_ids": [
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "thong_tin"
+    }
+  }
+}

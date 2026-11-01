@@ -1,0 +1,212 @@
+{
+  "conversation_id": "SCN-ADV-0143__call_1",
+  "scenario_id": "SCN-ADV-0143",
+  "call": "call_1",
+  "customer_id": "SYN-C006",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-11-13",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_khieu_nai_giao_cham",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Em đã nhận được thông tin anh hỏi về đơn hàng ghế ngồi ô tô có mã OD900602, anh cần em kiểm tra tình trạng đơn đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh cần em kiểm tra tình trạng đơn đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900602"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi đơn hàng ghế ngồi ô tô của anh sao chưa thấy giao.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra cho anh ngay ạ. Đơn ghế ngồi ô tô của anh có mã OD900602 hiện vẫn đang xử lý, bên em chưa bàn giao cho đơn vị vận chuyển nên chưa có mã vận đơn. Em rất xin lỗi vì đơn bị giao chậm ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900602"
+        },
+        {
+          "field": "order_status",
+          "value": "processing"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900602"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hôm trước anh đặt mà giờ vẫn chưa thấy, sao mà chậm thế.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu cảm giác của anh khi phải đợi lâu. Hiện đơn của anh vẫn đang chuẩn bị, shop sẽ cố gắng xử lý sớm nhất cho anh ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "processing"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": "apologetic",
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đơn này đang ở đâu rồi, sao không thấy cập nhật gì hết vậy em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Đơn hàng của anh vẫn đang ở trạng thái xử lý trên hệ thống, chưa chuyển sang giai đoạn giao hàng nên hệ thống chưa cập nhật mã vận đơn. Khi đơn được bàn giao cho đơn vị vận chuyển, bên em sẽ gửi thông báo và mã vận đơn cho anh ngay qua Zalo ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "processing"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu không có hàng thì phải báo cho anh chứ, đợi lâu quá rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận đơn ghế ngồi ô tô của anh vẫn còn hàng và đang xử lý, không phải do hết hàng đâu ạ. Em sẽ theo dõi sát và báo anh ngay khi có cập nhật mới nhất.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "processing"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, em cho anh biết tình trạng đơn hàng và mã vận đơn đi nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Hiện tại đơn ghế ngồi ô tô của anh mã OD900602 vẫn đang xử lý nên chưa có mã vận đơn anh nhé. Khi đơn được chuyển sang đơn vị vận chuyển, bên em sẽ gửi mã vận đơn qua Zalo để anh tiện theo dõi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900602"
+        },
+        {
+          "field": "order_status",
+          "value": "processing"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "issue",
+          "value": "giao chậm",
+          "op": "set",
+          "source": "call_1#turn11"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

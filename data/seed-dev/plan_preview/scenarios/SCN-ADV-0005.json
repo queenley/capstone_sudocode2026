@@ -1,0 +1,124 @@
+{
+  "scenario_id": "SCN-ADV-0005",
+  "level": "M2",
+  "persona": "khach_hoi_ky_san_pham",
+  "hard_case": null,
+  "customer_phone": "0981933190",
+  "customer_name": "Lan",
+  "honorific": "chị",
+  "notes": "Persona khach_hoi_ky_san_pham, biến thể hoi_ky_roi_mua. call_1 (hotline): hỏi rất kỹ sản phẩm → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-30",
+      "customer_goal": "[plan-only] deep_consult",
+      "customer_turns": [
+        "[plan-only] Khách tìm hiểu rất kỹ trước khi mua: hỏi ÍT NHẤT 5 câu khác nhau về sản phẩm, mỗi lượt một câu (bảo hành bao lâu, dùng cho diện tích/nhu cầu nào, tính năng, khóa trẻ em hoặc chất liệu, có khuyến mãi gì, giao bao lâu), hỏi lại khi chưa rõ; cuối cùng nói để suy nghĩ thêm (blocker)."
+      ],
+      "facts_established": {
+        "size": 39,
+        "color": "den",
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-39-DEN"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "7 ngày",
+          "bảy ngày"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1690000,
+        "list_price_vnd": 1690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": true,
+        "return_days": 7,
+        "call_date": "2026-10-30"
+      },
+      "memory_expectation": {
+        "size": 39,
+        "color": "den",
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-39-DEN"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "FAQ-09"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 1,
+      "customer_goal": "[plan-only] order",
+      "customer_turns": [
+        "[plan-only] Khách xác nhận muốn mua, nêu hình thức thanh toán và khu vực giao hàng (chỉ quận/tỉnh), đồng ý lên đơn."
+      ],
+      "facts_established": {
+        "payment": "COD",
+        "delivery_area": "TP Huế",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-39-DEN",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-RUN2-39-DEN",
+          "price_vnd": 1690000,
+          "payment": "COD"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1690000,
+        "list_price_vnd": 1690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-11-05",
+        "call_date": "2026-10-31"
+      },
+      "memory_expectation": {
+        "payment": "COD",
+        "delivery_area": "TP Huế",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-39-DEN",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

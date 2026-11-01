@@ -7,34 +7,53 @@ from ai_agent_service.components.intake import signals
 from ai_agent_service.components.orchestration.rules import RouteInput, decide
 
 
-def route(**changes):
-    view = dict(tier="UNKNOWN", has_brief=False, has_order=False,
-                asr_low_conf=False, tool_failures=0, safe_lines=0, customer_said="xin chào")
+def route(customer_said="xin chào", **changes):
+    view = dict(tier="UNKNOWN", has_brief=False, asr_low_conf=False, tool_failures=0)
     view.update(changes)
     # As perceive reads it: a PB-06 topic is a signal of the customer's words.
-    view.setdefault("must_transfer", signals.read(view["customer_said"]).must_transfer)
+    view.setdefault("must_transfer", signals.read(customer_said).must_transfer)
     return decide(RouteInput(**view))
 
 
 @pytest.mark.parametrize("changes,lane,rule", [
-    ({}, "NEW", 7),
+    ({}, "NEW", 5),
     ({"tool_failures": 2}, "HANDOFF", 1),
-    ({"safe_lines": 2}, "HANDOFF", 1),
+    ({"model_failures": 2}, "HANDOFF", 1),
     ({"asr_low_conf": True}, "CLARIFY", 2),
     ({"tier": "PROBABLE"}, "CONFIRM_IDENTITY", 3),
     ({"tier": "AMBIGUOUS"}, "CONFIRM_IDENTITY", 3),
-    ({"has_order": True, "customer_said": "đơn hàng của anh tới đâu rồi"}, "ORDER_SERVICE", 4),
-    ({"customer_said": "tôi muốn khiếu nại pháp lý"}, "OUT_OF_SCOPE", 5),
-    ({"tier": "VERIFIED", "has_brief": True}, "CONTINUITY", 6),
+    ({"tier": "VERIFIED", "has_brief": True}, "CONTINUITY", 4),
 ])
 def test_lane_table(changes, lane, rule):
     decision = route(**changes)
     assert (decision.lane, decision.rule) == (lane, rule)
 
 
+def test_safe_lines_never_hand_the_call_over():
+    # A guard that blocked wrongly twice must not become a transfer (over_escalation).
+    assert decide(RouteInput(tier="VERIFIED", has_brief=True, asr_low_conf=False, tool_failures=0)).lane == "CONTINUITY"
+    assert not hasattr(RouteInput, "safe_lines")
+
+
 def test_first_matching_rule_wins():
     # Failing tools hand off even for a verified returning customer.
     assert route(tier="VERIFIED", has_brief=True, tool_failures=3).lane == "HANDOFF"
+
+
+@pytest.mark.parametrize("said", ["Đơn hàng của anh tới đâu rồi?", "Thôi chị đổi sang hỏi áo khoác nhé",
+                                  "Cho chị hỏi máy lọc nước loại nào tốt", "Tôi muốn khiếu nại pháp lý"])
+def test_the_words_never_choose_the_lane(said):
+    # What a turn is about is the advisor's to read: the same state routes the same whatever is said.
+    assert route(said, tier="VERIFIED", has_brief=True).lane == "CONTINUITY"
+    assert route(said).lane == "NEW"
+
+
+def test_a_pb06_topic_is_a_note_not_a_lane():
+    # "cho con bú" names the topic of a product the shop sells; the advisor tells advice from a product question.
+    decision = route("Máy hút sữa cho con bú loại nào êm vậy em?", tier="VERIFIED", has_brief=True)
+    assert decision.lane == "CONTINUITY"
+    assert any("PB-06" in note for note in decision.notes)
+    assert not any("PB-06" in note for note in route("Máy lọc nước loại nào tốt").notes)
 
 
 QUOTE = ({"name": "pricing.get_quote", "result": {"ok": True, "data": {"final_price_vnd": 17_500_000}}},)
@@ -54,6 +73,40 @@ def test_prices_must_come_from_this_turns_tools():
 def test_customer_stated_amounts_may_be_repeated():
     assert guard("Dạ với ngân sách 20.000.000đ em gợi ý mẫu này ạ.",
                  customer_said=("ngân sách 20.000.000đ",)).passed
+    assert guard("Dạ bên kia báo 3.200.000đ thì em chưa so sánh được ạ.",
+                 customer_said=("bên kia bán có 3.200.000đ thôi",)).passed
+
+
+def test_whether_a_customer_amount_is_passed_off_as_the_shops_is_the_policy_agents_call():
+    # A word list cannot tell "khuyến mãi giảm 500.000đ đã hết" from "bên em giảm 500.000đ" (SAMPLE-05):
+    # the hard check lets the customer's figure through, and Jev reads what the sentence means.
+    from ai_agent_service.agents.policy import QUESTIONS, THRESHOLDS
+    said = ("Sao hôm trước em bảo giảm 500k mà?",)
+    assert guard("Dạ khuyến mãi giảm 500.000đ hôm trước đã hết hạn rồi ạ.", customer_said=said).passed
+    assert "unquoted_price" in QUESTIONS and THRESHOLDS["unquoted_price"] < 1
+
+
+SEARCH = ({"name": "catalog.search", "result": {"ok": True, "data": {"items": [
+    {"sku": "SKU-X", "list_price_vnd": 4_890_000}, {"sku": "SKU-Y", "list_price_vnd": 5_200_000}]}}},)
+QUOTED = ({"name": "pricing.get_quote", "result": {"ok": True, "data": {
+    "sku": "SKU-AP-PRO", "list_price_vnd": 7_990_000, "final_price_vnd": 7_690_000,
+    "applied_promos": [{"promo_code": "AIR-OCT", "discount_vnd": 300_000}]}}},)
+
+
+def test_a_difference_needs_operands_that_belong_together():
+    # A quote's list and final price: the saving is derived.
+    assert guard("Dạ máy được giảm 300.000đ, còn 7.690.000đ ạ.", QUOTED).passed
+    # Two unrelated products of a search: their difference is not a discount anyone gave.
+    assert not guard("Dạ mẫu này đang được giảm 310.000đ ạ.", SEARCH).passed
+    # Today's quote against the price the brief says was quoted: a change since the last call.
+    assert guard("Dạ giá hôm nay thấp hơn hôm trước 310.000đ ạ.", tier="VERIFIED",
+                 quotes={"SKU-AP-PRO": 7_690_000}, brief_prices=(8_000_000,)).passed
+
+
+def test_only_the_organisers_documents_are_a_source_of_amounts():
+    faq = "Phí lắp đặt tại nhà là 200.000đ."
+    assert not guard("Dạ phí lắp đặt là 200.000đ ạ.", policy_texts=(faq,)).passed
+    assert guard("Dạ phí lắp đặt là 200.000đ ạ.", policy_texts=(faq,), priced_texts=(faq,)).passed
 
 
 @pytest.mark.parametrize("text,tier", [

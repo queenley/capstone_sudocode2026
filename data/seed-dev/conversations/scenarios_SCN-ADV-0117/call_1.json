@@ -1,0 +1,155 @@
+{
+  "conversation_id": "SCN-ADV-0117__call_1",
+  "scenario_id": "SCN-ADV-0117",
+  "call": "call_1",
+  "customer_id": "C010",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-20",
+  "region": "nam",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_hoi_khuyen_mai_sap_toi",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, rất vui được hỗ trợ anh. Anh đang quan tâm nồi chiên không dầu Lock&Lock 4L đúng không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về nồi chiên không dầu Lock&Lock 4L, giá hiện tại bao nhiêu em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại nồi chiên không dầu Lock&Lock 4L bên em có giá là 1.890.000đ anh nhé. Sản phẩm đang có sẵn hàng tại shop ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, 1 triệu 890 ngàn hả? Thế 11/11 bên em có sale không, chị đợi đến lúc đó có rẻ không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xin phép trả lời theo quy định, các chương trình ưu đãi mới chỉ công bố khi bắt đầu, em chưa có thông tin về chương trình sắp tới ạ. Giá hiện tại áp dụng đến khi có thông báo mới anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "future_promo_disclosed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em biết thì nói chị nghe đi, chị đợi để mua cho gia đình.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ thật sự em chưa có thông tin gì về chương trình sắp tới anh ạ. Nếu có ưu đãi mới, bên em sẽ cập nhật công khai trên fanpage và website để anh tiện theo dõi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "future_promo_disclosed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ok, để anh bàn với gia đình rồi gọi lại nhé.",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em ghi nhận anh sẽ trao đổi thêm với gia đình. Khi nào anh quyết định, nhắn lại cho shop để được giữ giá tốt nhất hiện tại anh nha. Em cảm ơn anh đã quan tâm sản phẩm của shop ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_1#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_gia_khuyen_mai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

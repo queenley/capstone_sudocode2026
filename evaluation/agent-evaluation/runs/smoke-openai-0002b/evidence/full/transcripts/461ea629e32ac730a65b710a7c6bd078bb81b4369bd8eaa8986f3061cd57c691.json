@@ -1,0 +1,192 @@
+{
+  "context": {
+    "run_id": "PRODUCT-a421e5c3096f4bce",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0002",
+    "call": "call_1",
+    "turn": 1
+  },
+  "customer_text": "Chị muốn đặt hàng máy hút sữa điện đôi Spectra S1.",
+  "agent_text": "Dạ máy hút sữa điện đôi Spectra S1 bên em hôm nay giá 4 triệu 290 nghìn đồng, có miễn phí vận chuyển ạ. Chị muốn đặt bao nhiêu máy ạ?",
+  "customer_id": "C032",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_1/1/1",
+      "run_id": "PRODUCT-a421e5c3096f4bce",
+      "context": {
+        "run_id": "PRODUCT-a421e5c3096f4bce",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0002",
+        "call": "call_1",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "a393cd6691eb35f9224e0266e645716c685fa97b071c68cf9015365d4e0ed18b",
+          "pointer": "/7"
+        }
+      ],
+      "event_id": "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_1/1/1",
+      "request": {
+        "name": "crm.get_customer",
+        "args": {
+          "phone": "0965384535"
+        }
+      },
+      "on": "2026-10-15",
+      "started_at": "2026-10-17T01:06:29.497217+00:00",
+      "finished_at": "2026-10-17T01:06:29.497217+00:00",
+      "outcome": "success",
+      "result": {
+        "found": true,
+        "ambiguous": false,
+        "customer_id": "C032",
+        "name": "Tâm",
+        "honorific": "chị",
+        "phone": "0965384535",
+        "identities": {
+          "zalo_id": null,
+          "fb_id": null
+        },
+        "orders": [
+          {
+            "order_id": "OD301177",
+            "sku": "SKU-MB-PUMP1",
+            "price_vnd": 4290000,
+            "date": "2026-10-03",
+            "status": "shipping",
+            "tracking": "GHN7781234"
+          }
+        ],
+        "sessions": []
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_1/1/2",
+      "run_id": "PRODUCT-a421e5c3096f4bce",
+      "context": {
+        "run_id": "PRODUCT-a421e5c3096f4bce",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0002",
+        "call": "call_1",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "a393cd6691eb35f9224e0266e645716c685fa97b071c68cf9015365d4e0ed18b",
+          "pointer": "/10"
+        }
+      ],
+      "event_id": "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_1/1/2",
+      "request": {
+        "name": "order.status",
+        "args": {
+          "customer_phone": "0965384535"
+        }
+      },
+      "on": "2026-10-15",
+      "started_at": "2026-10-17T01:06:29.607037+00:00",
+      "finished_at": "2026-10-17T01:06:29.607037+00:00",
+      "outcome": "success",
+      "result": {
+        "orders": [
+          {
+            "order_id": "OD301177",
+            "sku": "SKU-MB-PUMP1",
+            "price_vnd": 4290000,
+            "date": "2026-10-03",
+            "status": "shipping",
+            "tracking": "GHN7781234"
+          }
+        ]
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_1/1/3",
+      "run_id": "PRODUCT-a421e5c3096f4bce",
+      "context": {
+        "run_id": "PRODUCT-a421e5c3096f4bce",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0002",
+        "call": "call_1",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "a393cd6691eb35f9224e0266e645716c685fa97b071c68cf9015365d4e0ed18b",
+          "pointer": "/17"
+        }
+      ],
+      "event_id": "PRODUCT-a421e5c3096f4bce/full/SCN-GEN-0002/call_1/1/3",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-MB-PUMP1",
+          "on": "2026-10-15",
+          "customer_phone": "0965384535"
+        }
+      },
+      "on": "2026-10-15",
+      "started_at": "2026-10-17T01:06:35.104758+00:00",
+      "finished_at": "2026-10-17T01:06:35.104758+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-MB-PUMP1",
+        "list_price_vnd": 4290000,
+        "final_price_vnd": 4290000,
+        "applied_promos": [
+          {
+            "promo_code": "MOM-FREESHIP",
+            "type": "freeship",
+            "discount_vnd": 0
+          },
+          {
+            "promo_code": "COD-0",
+            "type": "freecod",
+            "discount_vnd": 0
+          }
+        ],
+        "expired_promos": [
+          "PUMP-GIFT"
+        ],
+        "ineligible_promos": [],
+        "not_applied_exclusive": [],
+        "freeship": true,
+        "_internal_price_floor_vnd": 3946800
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"phone\": \"0965384535\"}, \"name\": \"crm.get_customer\"}",
+    "{\"args\": {\"customer_phone\": \"0965384535\"}, \"name\": \"order.status\"}",
+    "{\"args\": {\"customer_phone\": \"0965384535\", \"on\": \"2026-10-15\", \"sku\": \"SKU-MB-PUMP1\"}, \"name\": \"pricing.get_quote\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "a393cd6691eb35f9224e0266e645716c685fa97b071c68cf9015365d4e0ed18b",
+      "pointer": "/13"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "a393cd6691eb35f9224e0266e645716c685fa97b071c68cf9015365d4e0ed18b",
+      "pointer": "/18"
+    }
+  ]
+}

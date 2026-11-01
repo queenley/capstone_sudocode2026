@@ -1,12 +1,12 @@
 """Stage 9 — speak every customer turn of the scenarios, until the audio reaches its target length.
 
-Output: ``output/audio/scenarios_<id>/call_<n>/turn_<k>.wav`` (16 kHz mono) and a
+Output: ``<seed>/audio/scenarios_<id>/call_<n>/turn_<k>.wav`` (16 kHz mono) and a
 ``.json`` beside each with its text, the spoken form the voice read, its entities, voice, noise and duration.
 
 The voice does not read the written turn ("5.200.000đ", "AirPure X"). It reads the spoken form
 ("năm triệu hai trăm nghìn", "e pia x"). A model writes that form first (``src/asr/reference.py``,
-``output/asr_reference/scenarios_<id>/call_<n>.json``), so the ASR reference is exactly what was said.
-After the run, ``output/asr_reference/ground_truth.json`` lists every spoken clip in BTC's
+``<seed>/asr_reference/scenarios_<id>/call_<n>.json``), so the ASR reference is exactly what was said.
+After the run, ``<seed>/asr_reference/ground_truth.json`` lists every spoken clip in BTC's
 ``data/asr/ground_truth.json`` format. Typed chat (teencode, no diacritics) is read as written and left out.
 
 Scenarios are taken in id order until the audio on disk reaches
@@ -80,6 +80,12 @@ def main() -> None:
     parser.add_argument("--clean", action="store_true", help="Do not add background noise")
     parser.add_argument("--noise-type", choices=NOISE_TYPES, help="Use one noise type for every turn")
     parser.add_argument("--resume", action="store_true", help="Skip turns whose WAV and JSON already exist")
+    parser.add_argument("--free-voices-only", action="store_true",
+                        help="use only premade voices, the ones a free ElevenLabs plan may call (English voices: "
+                             "foreign accent, no regional one)")
+    parser.add_argument("--replace-missing-voices", action="store_true",
+                        help="Rewrite config/voices.yaml (old one kept as .bak): each voice the key's account lacks becomes "
+                             "one of its Vietnamese voices of the same gender, region accent and age band")
     parser.add_argument("--reference-only", action="store_true", help="Write the spoken forms only (model, no TTS)")
     parser.add_argument("--ground-truth-only", action="store_true", help="Rewrite ground_truth.json from the clips on disk")
     args = parser.parse_args()
@@ -108,16 +114,26 @@ def main() -> None:
         for scenario in Dataset().iter_scenarios(args.limit):
             for call_name, call in scenario.ordered_calls():
                 written += load_or_build(reference_client, scenario, call_name, call, names) is not None
-        print(f"Spoken forms on disk for {written} calls -> output/asr_reference/")
+        print(f"Spoken forms on disk for {written} calls -> <seed>/asr_reference/")
         return
 
-    from src.elevenlabs_client import ElevenLabsClient
+    from src.providers.elevenlabs_client import ElevenLabsClient
 
     tts = ElevenLabsClient(ROOT / "config/voices.yaml", AUDIO_DIR, budget)
-    missing = tts.missing_voices()
+    if args.replace_missing_voices:
+        changes = tts.replace_missing_voices(ROOT / "config/voices.yaml")
+        for group, old, new in changes:
+            print(f"  voice {group}: {old} -> {new}", flush=True)
+        print(f"Replaced {len(changes)} voice entries in config/voices.yaml (previous file: voices.yaml.bak)", flush=True)
+    missing = tts.use_available_voices()
     if missing:
-        raise SystemExit("These voice IDs in config/voices.yaml are not available to this ElevenLabs key "
-                         "(add them to My Voices or remove them):\n  " + "\n  ".join(missing))
+        # The voices the key can use speak instead (pick_voice: the nearest group that has one).
+        print(f"{len(missing)} voice IDs in config/voices.yaml are not available to this ElevenLabs key and are "
+              "skipped (add them to My Voices to use them): " + ", ".join(missing), flush=True)
+    if args.free_voices_only:
+        free = tts.use_free_voices_only()
+        print(f"Free voices only: {len(free)} premade voices (English, so a foreign accent); library voices skipped",
+              flush=True)
     by_id = {customer.customer_id: customer for customer in load_customers()}
     seconds = spoken_seconds()
     generated = 0
@@ -172,13 +188,19 @@ def main() -> None:
                 }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
                 seconds += duration
                 generated += 1
+                print(f"  audio {scenario.scenario_id}/{call_name}/turn_{turn_index}: {duration:.1f}s, "
+                      f"voice …{voice[-4:]}, {noise_type or 'clean'} · {generated} clips this run, "
+                      f"{seconds / 3600:.2f}/{target_seconds / 3600:.1f} h, {tts.characters_sent} chars sent"
+                      f"{f', {tts.cache_hits} from cache' if tts.cache_hits else ''}", flush=True)
     report = REPORTS_DIR / "elevenlabs_usage.json"
     report.parent.mkdir(parents=True, exist_ok=True)
     report.write_text(json.dumps({"characters_sent": tts.characters_sent, "budget": budget,
                                   "mode": "scenario_customer_turns", "turns_generated": generated,
+                                  "turns_from_tts_cache": tts.cache_hits,
                                   "audio_hours": round(seconds / 3600, 3), "target_hours": round(target_seconds / 3600, 3)},
                                  indent=2), encoding="utf-8")
-    print(f"Scenario turn audio generated: {generated}; characters sent: {tts.characters_sent}/{budget}; "
+    print(f"Scenario turn audio generated: {generated}; characters sent: {tts.characters_sent}/{budget} "
+          f"({tts.cache_hits} turns from the TTS cache, not paid); "
           f"audio on disk: {seconds / 3600:.2f} h (target {target_seconds / 3600:.1f} h)")
     print(f"ASR ground truth: {write_ground_truth()}")
 

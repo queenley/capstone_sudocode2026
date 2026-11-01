@@ -1,0 +1,255 @@
+{
+  "conversation_id": "SCN-ADV-0096__call_2",
+  "scenario_id": "SCN-ADV-0096",
+  "call": "call_2",
+  "customer_id": "C007",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-30",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_hoi_san_pham_khong_ban",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Thảo ạ, em là trợ lý ảo của shop. Hôm trước chị có quan tâm giày chạy bộ RunLite 2 Pro size 39 màu xám, chị muốn mình tiếp tục tư vấn sản phẩm này đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Hôm trước chị có quan tâm giày chạy bộ RunLite 2 Pro size 39 màu xám, chị muốn mình tiếp tục tư vấn sản phẩm này đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn hỏi thêm về giày chạy bộ RunLite 2 Pro, size 39 xám mà hôm trước em đã nói.",
+      "facts_stated": {
+        "product_advised": "SKU-SN-RUN2",
+        "size": 39,
+        "color": "xam"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng chị, giày chạy bộ RunLite 2 Pro size 39 màu xám bên em còn hàng, phù hợp chiều dài chân 24.0–24.5cm, form ôm chân và nhẹ, dùng tốt cho chạy bộ đường dài. Chị muốn hỏi thêm thông tin gì về sản phẩm này không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị muốn hỏi thêm thông tin gì về sản phẩm này không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có thể biết giá của giày này không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giá giày chạy bộ RunLite 2 Pro size 39 màu xám hiện tại là 1.690.000đ chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1690000",
+          "spoken": "1.690.000đ"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có khuyến mãi gì cho sản phẩm này không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại sản phẩm này chưa có chương trình khuyến mãi, giá đang là 1.690.000đ chị nhé. Tuy nhiên đơn từ 500.000đ được miễn phí vận chuyển toàn quốc và được kiểm tra hàng khi nhận ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1690000",
+          "spoken": "1.690.000đ"
+        }
+      ],
+      "pause_before_ms": 650,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần bàn với gia đình đã, hẹn em tối mai tầm 7 giờ chị gọi lại nhé.",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị sẽ gọi lại vào 7 giờ tối mai, ngày 01/12. Em sẽ giữ thông tin sản phẩm và giá cho mình đến khi chị liên hệ lại ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-12-01T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0960161055",
+            "callback_at": "2026-12-01T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_2#turn9"
+        },
+        {
+          "key": "color",
+          "value": "xam",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "size",
+          "value": 39,
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN2",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1690000,
+          "op": "set",
+          "source": "call_2#turn5"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN2-39-XAM",
+          "op": "set",
+          "source": "call_2#turn2"
+        }
+      ],
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        },
+        {
+          "type": "date",
+          "value": "2026-12-01",
+          "spoken": "mai"
+        }
+      ],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_ban_voi_gia_dinh",
+    "objection_handling": "Đã xác nhận lý do, hẹn lại thời gian cụ thể 7 giờ tối mai.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "callback_at": "2026-12-01T19:00"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-12-01T19:00",
+      "reason": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

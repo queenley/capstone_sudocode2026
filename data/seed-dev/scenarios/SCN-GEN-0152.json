@@ -1,0 +1,219 @@
+{
+  "scenario_id": "SCN-GEN-0152",
+  "level": "M1",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "hard_case": "het_hang_luc_khach_quyet",
+  "customer_phone": "0998000014",
+  "customer_name": "Lê Thị Hoa",
+  "honorific": "chị",
+  "notes": "Persona khach_do_du_hoi_nguoi_nha, biến thể het_hang_luc_quyet. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): tư vấn, chưa chốt → hen_goi_lai. Ca khó: het_hang_luc_khach_quyet. call_2: hết hàng đúng lúc khách quyết → hẹn lại. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-15",
+      "customer_goal": "Hỏi về xe đẩy gấp gọn cho con 12 tháng tuổi",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về xe đẩy gấp gọn Joie Pact cho bé nhà chị.",
+        "Bé nhà chị được 12 tháng rồi, ngân sách thì khoảng 3 triệu rưỡi thôi.",
+        "Giá xe này là bao nhiêu em nhỉ?",
+        "Có khuyến mãi gì không cho sản phẩm này không em?",
+        "À, chị cần hỏi chồng trước đã, tối mai tầm 7 giờ em gọi lại chị nhé."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C014",
+          "session_id": "SYN-014-S3",
+          "date": "2025-03-18",
+          "channel": "web",
+          "summary": "Mua Quạt đứng Senko TS16 giá 590.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C014",
+          "session_id": "SYN-014-S1",
+          "date": "2026-06-13",
+          "channel": "zalo_oa",
+          "summary": "Mua Giày chạy bộ RunLite 2 Pro giá 1.740.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C014",
+          "session_id": "SYN-014-S2",
+          "date": "2026-10-04",
+          "channel": "fb",
+          "summary": "Đặt Giày sneaker Urban Classic giá 940.000đ, đơn OD901402 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C014",
+          "order_id": "OD901401",
+          "date": "2026-06-13",
+          "sku": "SKU-SN-RUN2-43-XAM",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-SN-RUN2-43-XAM"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C014",
+          "order_id": "OD901402",
+          "date": "2026-10-04",
+          "sku": "SKU-SN-CAS-43-DEN",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901402"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C014",
+          "order_id": "OD901403",
+          "date": "2025-03-18",
+          "sku": "SKU-FAN-SEN",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-FAN-SEN"
+          }
+        }
+      ],
+      "facts_established": {
+        "blocker": "cần hỏi chồng",
+        "budget_vnd": 3500000,
+        "child_age_months": 12,
+        "decision_maker": "chồng",
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-10-16T19:00"
+        },
+        "must_say_any": [
+          "7 giờ",
+          "19 giờ",
+          "19h",
+          "7h tối"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 3490000,
+        "list_price_vnd": 3490000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "callback_at": "2026-10-16T19:00",
+        "call_date": "2026-10-15"
+      },
+      "memory_expectation": {
+        "blocker": "cần hỏi chồng",
+        "budget_vnd": 3500000,
+        "child_age_months": 12,
+        "decision_maker": "chồng",
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-02",
+        "FAQ-12",
+        "LN-01",
+        "PB-03",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 10,
+      "customer_goal": "Hỏi về xe đẩy gấp gọn Joie Pact nhưng đã hết hàng",
+      "customer_turns": [
+        "Alo, chị gọi lại để hỏi về xe đẩy Joie Pact hôm trước.",
+        "Em ơi, chị muốn mua xe đẩy này rồi, nhưng có nói là hết hàng đúng không?",
+        "Khi nào thì có hàng lại vậy em?",
+        "Chị muốn đặt hàng, nhưng nếu chưa có, thì em gọi cho chị khi nào có nhé."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "must_carry_over": [
+        "decision_maker",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "decision_maker",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_stock",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 3490000,
+        "list_price_vnd": 3490000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": false,
+        "freeship": true,
+        "call_date": "2026-10-25"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-02",
+        "FAQ-12",
+        "FAQ-17",
+        "PB-01",
+        "PB-03"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

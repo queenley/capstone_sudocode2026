@@ -1,0 +1,134 @@
+{
+  "scenario_id": "SCN-GEN-0040",
+  "level": "M1",
+  "persona": "khach_da_mua_doi_size",
+  "hard_case": "km_loai_tru_size",
+  "customer_phone": "0990853801",
+  "customer_name": "Nhung",
+  "honorific": "chị",
+  "notes": "Persona khach_da_mua_doi_size, biến thể size_43_loai_tru_km. call_1 (hotline): chốt đơn → chot_don; call_2 (hotline): đổi size → cap_nhat_don. Ca khó: km_loai_tru_size. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-15",
+      "customer_goal": "[plan-only] order",
+      "customer_turns": [
+        "[plan-only] Khách xác nhận muốn mua, nêu hình thức thanh toán và khu vực giao hàng (chỉ quận/tỉnh), đồng ý lên đơn."
+      ],
+      "facts_established": {
+        "size": 43,
+        "color": "den",
+        "payment": "bank",
+        "delivery_area": "Long Biên, Hà Nội",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1740000,
+        "variant_sku": "SKU-SN-RUN2-43-DEN",
+        "order_id": "OD600001"
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-RUN2-43-DEN",
+          "price_vnd": 1740000,
+          "payment": "bank"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1740000,
+        "list_price_vnd": 1740000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN2-SALE_active": false,
+        "promo_RUN-10_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-10-17",
+        "call_date": "2026-10-15"
+      },
+      "memory_expectation": {
+        "size": 43,
+        "color": "den",
+        "payment": "bank",
+        "delivery_area": "Long Biên, Hà Nội",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1740000,
+        "variant_sku": "SKU-SN-RUN2-43-DEN",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04"
+      ],
+      "expected_outcome": "chot_don"
+    },
+    "call_2": {
+      "days_later": 5,
+      "customer_goal": "[plan-only] exchange_size",
+      "customer_turns": [
+        "[plan-only] Khách nhận giày bị chật/rộng, muốn đổi sang size trong customer_must_state; khó chịu nếu bị hỏi lại mã đơn hoặc sản phẩm đã mua. Khách TỰ nói rõ mình đã đổi (size: trước là 43, giờ là 42), như một thay đổi (\"chị đổi ý rồi em, …\"), trước khi agent hỏi: agent đã biết giá trị cũ nên không phải hỏi lại, chỉ dùng giá trị mới."
+      ],
+      "facts_established": {
+        "size": 42
+      },
+      "must_carry_over": [
+        "size",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "order_id"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "variant_sku",
+        "order_id"
+      ],
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "OD600001",
+          "new_variant_sku": "SKU-SN-RUN2-42-DEN",
+          "action": "exchange_size"
+        },
+        "must_say_any": [
+          "219.000",
+          "219000"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "exchange_fee_vnd",
+            "value": 30000
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD600001",
+        "new_variant_sku": "SKU-SN-RUN2-42-DEN",
+        "exchange_fee_vnd": 0,
+        "refund_vnd": 219000,
+        "extra_payment_vnd": 0,
+        "new_size_in_stock": true,
+        "return_days": 7,
+        "call_date": "2026-10-20"
+      },
+      "memory_expectation": {
+        "size": 42,
+        "superseded": {
+          "size": 43
+        }
+      },
+      "relevant_policy_ids": [
+        "DT-03",
+        "QT-03",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    }
+  }
+}

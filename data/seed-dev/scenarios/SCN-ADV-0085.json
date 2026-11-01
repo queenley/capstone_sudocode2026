@@ -1,0 +1,215 @@
+{
+  "scenario_id": "SCN-ADV-0085",
+  "level": "M2",
+  "persona": "khach_go_khong_dau",
+  "hard_case": null,
+  "customer_phone": "0998000013",
+  "customer_name": "Phạm Minh Tuấn",
+  "honorific": "anh",
+  "notes": "Persona khach_go_khong_dau, biến thể khong_dau_da_kenh. call_1 (zalo_oa): tư vấn, chưa chốt → hen_goi_lai; call_2 (chat_fanpage): chốt đơn → chot_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_tuan13",
+      "call_date": "2026-10-15",
+      "input_mode": "chat_teencode",
+      "customer_goal": "Hỏi về giày trekking HikePro màu xám.",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về giày trekking HikePro màu xám, size 42.",
+        "Giá của đôi này là bao nhiêu em nhỉ?",
+        "Có khuyến mãi gì không?",
+        "À, anh cần bàn với gia đình đã, tối mai em gọi lại cho anh nhé, 7 giờ.",
+        "Em nhớ gọi lại đúng giờ đó nhé."
+      ],
+      "customer_turns_asr": [
+        "alo anh muon hoi ve giay trekking hikepro mau xam size 42",
+        "gia cua doi nay la bao nhieu em nhi",
+        "co khuyen mai gi khong",
+        "a can ban voi gia dinh da toi mai em goi lai cho a nhe 7 gio",
+        "em nho goi lai dung gio do nhe"
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C013",
+          "session_id": "SYN-013-S1",
+          "date": "2026-05-10",
+          "channel": "hotline",
+          "summary": "Mua Nồi chiên không dầu Lock&Lock 4L giá 1.890.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C013",
+          "session_id": "SYN-013-S2",
+          "date": "2026-10-03",
+          "channel": "zalo_oa",
+          "summary": "Đặt Nồi chiên không dầu Philips 6.2L giá 3.990.000đ, đơn OD901302 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C013",
+          "order_id": "OD901301",
+          "date": "2026-05-10",
+          "sku": "SKU-AF-4L",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AF-4L"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C013",
+          "order_id": "OD901302",
+          "date": "2026-10-03",
+          "sku": "SKU-AF-6L",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901302"
+          }
+        }
+      ],
+      "facts_established": {
+        "size": 42,
+        "color": "xam",
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-SN-TRK",
+        "price_quoted_vnd": 1990000,
+        "variant_sku": "SKU-SN-TRK-42-XAM"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-10-16T19:00"
+        },
+        "must_say_any": [
+          "7 giờ",
+          "19 giờ",
+          "19h",
+          "7h tối"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1990000,
+        "list_price_vnd": 1990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "callback_at": "2026-10-16T19:00",
+        "call_date": "2026-10-15"
+      },
+      "memory_expectation": {
+        "size": 42,
+        "color": "xam",
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-SN-TRK",
+        "price_quoted_vnd": 1990000,
+        "variant_sku": "SKU-SN-TRK-42-XAM"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "FAQ-09",
+        "LN-01",
+        "PB-03",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.tuan.912",
+      "days_later": 1,
+      "input_mode": "chat_teencode",
+      "customer_goal": "Xác nhận đặt hàng giày trekking.",
+      "customer_turns": [
+        "Chào em, anh muốn đặt đôi giày trekking HikePro màu xám size 42.",
+        "Hình thức thanh toán là chuyển khoản ngân hàng.",
+        "Khu vực giao hàng là Long Biên, Hà Nội.",
+        "Mong là hàng sẽ đến nhanh nhé!",
+        "Chốt đơn cho anh nhé!"
+      ],
+      "customer_turns_asr": [
+        "chao em anh muon dat doi giay trekking hikepro mau xam size 42",
+        "hinh thuc thanh toan la chuyen khoan ngan hang",
+        "khu vuc giao hang la long bien ha noi",
+        "mong la hang se den nhanh nhe",
+        "chot don cho anh nhe"
+      ],
+      "facts_established": {
+        "payment": "bank",
+        "delivery_area": "Long Biên, Hà Nội",
+        "product_advised": "SKU-SN-TRK",
+        "price_quoted_vnd": 1990000,
+        "variant_sku": "SKU-SN-TRK-42-XAM",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-TRK-42-XAM",
+          "price_vnd": 1990000,
+          "payment": "bank"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1990000,
+        "list_price_vnd": 1990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-10-19",
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "payment": "bank",
+        "delivery_area": "Long Biên, Hà Nội",
+        "product_advised": "SKU-SN-TRK",
+        "price_quoted_vnd": 1990000,
+        "variant_sku": "SKU-SN-TRK-42-XAM",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

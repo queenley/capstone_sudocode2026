@@ -1,0 +1,55 @@
+{
+  "scenario_id": "SCN-ADV-0061",
+  "call": "call_1",
+  "input_mode": "text",
+  "source_sha256": "b3194a247ba4ddf8adaf6f5267aec7cc1a91f7fe168493b1b9a3d5e0975f6b1c",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Alo, anh muốn hỏi về sản phẩm túi trữ sữa mà em đã tư vấn.",
+      "spoken_text": "alo anh muốn hỏi về sản phẩm túi trữ sữa sunmum năm mươi túi mà em đã tư vấn.",
+      "entities": {
+        "sku": "SKU-MB-BAG"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Anh có bé 7 tháng, dự kiến mua tầm 500 ngàn.",
+      "spoken_text": "anh có bé bảy tháng, dự kiến mua tầm năm trăm ngàn.",
+      "entities": {
+        "has_children": true
+      },
+      "reference_source": "rule",
+      "issues": [
+        "words_changed"
+      ]
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Có thể thanh toán qua chuyển khoản và giao về Quận 7 được không?",
+      "spoken_text": "có thể thanh toán qua chuyển khoản và giao về quận bảy được không?",
+      "entities": {
+        "payment": "bank"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "À, anh cần suy nghĩ thêm một chút, hẹn gọi lại nhé.",
+      "spoken_text": "à anh cần suy nghĩ thêm một chút hẹn gọi lại nhé.",
+      "entities": {
+        "blocker": "can suy nghi them"
+      },
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

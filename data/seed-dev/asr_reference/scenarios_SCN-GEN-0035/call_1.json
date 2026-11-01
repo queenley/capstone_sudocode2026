@@ -1,0 +1,49 @@
+{
+  "scenario_id": "SCN-GEN-0035",
+  "call": "call_1",
+  "input_mode": "text",
+  "source_sha256": "bb8a949ef80e83f34fe7102bbce722a394c9d586451cfaca2b3dc63d8ef4787d",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Alo, chị Trần Thị B đây, chị muốn hỏi về đơn hàng OD900202 của chị.",
+      "spoken_text": "alo, chị trần thị b đây, chị muốn hỏi về đơn hàng ô đê chín trăm nghìn hai trăm linh hai của chị.",
+      "entities": {},
+      "reference_source": "rule",
+      "issues": [
+        "entity_not_stated:order_id"
+      ]
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Em không biết đơn hàng đó hiện tại đang ở đâu vậy?",
+      "spoken_text": "em không biết đơn hàng đó hiện tại đang ở đâu vậy",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Chị đã đặt giày trekking HikePro rồi, mà bây giờ chưa thấy giao.",
+      "spoken_text": "chị đã đặt giày trekking hikepro rồi mà bây giờ chưa thấy giao",
+      "entities": {
+        "sku": "SKU-SN-TRK"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "Chị có thể biết khi nào thì được giao hàng không?",
+      "spoken_text": "chị có thể biết khi nào thì được giao hàng không",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

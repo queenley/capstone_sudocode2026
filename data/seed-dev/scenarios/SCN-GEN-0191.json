@@ -1,0 +1,110 @@
+{
+  "scenario_id": "SCN-GEN-0191",
+  "level": "M1",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "hard_case": null,
+  "customer_phone": "0910285940",
+  "customer_name": "Dũng",
+  "honorific": "anh",
+  "notes": "Persona khach_hoi_nhieu_khong_mua, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): hỏi thêm rồi từ chối → tu_choi. Chấm chủ yếu: CCR, RQR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-13",
+      "customer_goal": "Hỏi máy lọc nước cho gia đình 4 người.",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về máy lọc nước RO Karofi 9 lõi cho gia đình mình.",
+        "Nhà anh có 4 người, không biết máy này có đủ không nhỉ?",
+        "Giá em báo là bao nhiêu vậy? Có khuyến mãi gì không?",
+        "À, anh muốn so sánh thêm với vài sản phẩm khác, hẹn lần sau em nhé."
+      ],
+      "facts_established": {
+        "blocker": "muốn so sánh thêm",
+        "budget_vnd": 7000000,
+        "usage_need": "gia đình 4 người",
+        "product_advised": "SKU-WF-RO9",
+        "price_quoted_vnd": 5990000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5990000,
+        "list_price_vnd": 5990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-13"
+      },
+      "memory_expectation": {
+        "blocker": "muốn so sánh thêm",
+        "budget_vnd": 7000000,
+        "usage_need": "gia đình 4 người",
+        "product_advised": "SKU-WF-RO9",
+        "price_quoted_vnd": 5990000
+      },
+      "relevant_policy_ids": [
+        "SP-WF-01",
+        "FAQ-05",
+        "PB-11"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 3,
+      "customer_goal": "Từ chối mua hàng sau khi hỏi thêm chi tiết.",
+      "customer_turns": [
+        "Alo, anh vừa hỏi thêm về máy lọc nước hôm trước ấy.",
+        "Nhưng mà sau khi xem xét lại, anh không định mua nữa.",
+        "Giá vẫn cao quá so với ngân sách của anh.",
+        "Cảm ơn em đã tư vấn, nhưng anh sẽ không mua đâu."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-WF-RO9",
+        "price_quoted_vnd": 5990000
+      },
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "max_agent_questions": 4
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5990000,
+        "list_price_vnd": 5990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-16"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-WF-RO9",
+        "price_quoted_vnd": 5990000
+      },
+      "relevant_policy_ids": [
+        "SP-WF-01",
+        "FAQ-05",
+        "PB-01",
+        "PB-11"
+      ],
+      "expected_outcome": "tu_choi"
+    }
+  }
+}

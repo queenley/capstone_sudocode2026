@@ -1,0 +1,132 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0014",
+    "call": "call_3",
+    "turn": 4
+  },
+  "customer_text": "Ok, chị đồng ý lên đơn.",
+  "agent_text": "Dạ em đã đặt đơn giày RunLite 2 Pro size 42 màu đen cho chị với giá 1.690.000 đồng, thanh toán COD, giao tại TP Huế, dự kiến giao ngày 31 tháng 10 năm 2026 ạ. Chị cần em hỗ trợ thêm gì không ạ?",
+  "customer_id": "C013",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0014/call_3/4/19",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0014",
+        "call": "call_3",
+        "turn": 4
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/432"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0014/call_3/4/19",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-SN-RUN2-42-DEN",
+          "on": "2026-10-27",
+          "customer_phone": "0964252477"
+        }
+      },
+      "on": "2026-10-27",
+      "started_at": "2026-10-17T04:24:52.073218+00:00",
+      "finished_at": "2026-10-17T04:24:52.073218+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-SN-RUN2-42-DEN",
+        "list_price_vnd": 1690000,
+        "final_price_vnd": 1690000,
+        "applied_promos": [
+          {
+            "promo_code": "COD-0",
+            "type": "freecod",
+            "discount_vnd": 0
+          }
+        ],
+        "expired_promos": [
+          "RUN-10",
+          "RUN2-SALE"
+        ],
+        "ineligible_promos": [],
+        "not_applied_exclusive": [],
+        "freeship": false,
+        "_internal_price_floor_vnd": 1352000
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0014/call_3/4/20",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0014",
+        "call": "call_3",
+        "turn": 4
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/435"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0014/call_3/4/20",
+      "request": {
+        "name": "order.create",
+        "args": {
+          "sku": "SKU-SN-RUN2-42-DEN",
+          "price_vnd": 1690000,
+          "qty": 1,
+          "payment": "COD",
+          "customer_phone": "0964252477",
+          "address": "TP Huế",
+          "on": "2026-10-27"
+        }
+      },
+      "on": "2026-10-27",
+      "started_at": "2026-10-17T04:24:53.330561+00:00",
+      "finished_at": "2026-10-17T04:24:53.330561+00:00",
+      "outcome": "success",
+      "result": {
+        "order_id": "OD600002",
+        "status": "created",
+        "total_vnd": 1690000,
+        "needs_confirmation_call": false,
+        "estimated_delivery": "2026-10-31"
+      },
+      "error": null,
+      "side_effect": true,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"customer_phone\": \"0964252477\", \"on\": \"2026-10-27\", \"sku\": \"SKU-SN-RUN2-42-DEN\"}, \"name\": \"pricing.get_quote\"}",
+    "{\"args\": {\"address\": \"TP Huế\", \"customer_phone\": \"0964252477\", \"on\": \"2026-10-27\", \"payment\": \"COD\", \"price_vnd\": 1690000, \"qty\": 1, \"sku\": \"SKU-SN-RUN2-42-DEN\"}, \"name\": \"order.create\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/428"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/436"
+    }
+  ]
+}

@@ -1,0 +1,354 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0020",
+    "call": "call_3",
+    "turn": 1
+  },
+  "customer_text": "Alo em, chị gọi để hỏi tình trạng đơn hàng của mình.",
+  "agent_text": "Đơn hàng của chị Linh hiện đang ở trạng thái đã tạo, chưa được xử lý tiếp ạ. Chị cần em hỗ trợ gì thêm không ạ?",
+  "customer_id": "C019",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0020/call_3/1/15",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0020",
+        "call": "call_3",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/731"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0020/call_3/1/15",
+      "request": {
+        "name": "crm.get_customer",
+        "args": {
+          "phone": "0905218549"
+        }
+      },
+      "on": "2026-10-23",
+      "started_at": "2026-10-17T04:29:44.229050+00:00",
+      "finished_at": "2026-10-17T04:29:44.229050+00:00",
+      "outcome": "success",
+      "result": {
+        "found": true,
+        "ambiguous": false,
+        "customer_id": "C019",
+        "name": "Linh",
+        "honorific": "chị",
+        "phone": "0905218549",
+        "identities": {
+          "zalo_id": "zalo_linh18",
+          "fb_id": "fb.linh.398"
+        },
+        "orders": [
+          {
+            "order_id": "OD600001",
+            "customer_phone": "0905218549",
+            "sku": "SKU-XM-4L",
+            "qty": 1,
+            "price_vnd": 2990000,
+            "total_vnd": 2990000,
+            "promos": [
+              "COD-0"
+            ],
+            "payment": "COD",
+            "address": "Hải Châu, Đà Nẵng",
+            "created_on": "2026-10-20",
+            "status": "created"
+          }
+        ],
+        "sessions": []
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0020/call_3/1/16",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0020",
+        "call": "call_3",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/734"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0020/call_3/1/16",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-XM-4L",
+          "on": "2026-10-23",
+          "customer_phone": "0905218549"
+        }
+      },
+      "on": "2026-10-23",
+      "started_at": "2026-10-17T04:29:44.264527+00:00",
+      "finished_at": "2026-10-17T04:29:44.264527+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-XM-4L",
+        "list_price_vnd": 2990000,
+        "final_price_vnd": 2990000,
+        "applied_promos": [
+          {
+            "promo_code": "COD-0",
+            "type": "freecod",
+            "discount_vnd": 0
+          }
+        ],
+        "expired_promos": [],
+        "ineligible_promos": [
+          {
+            "promo_code": "AIR-2ND-50",
+            "reason": "min_qty"
+          },
+          {
+            "promo_code": "NAM-SHIP0",
+            "reason": "region"
+          }
+        ],
+        "not_applied_exclusive": [],
+        "freeship": true,
+        "_internal_price_floor_vnd": 2691000
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0020/call_3/1/17",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0020",
+        "call": "call_3",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/737"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0020/call_3/1/17",
+      "request": {
+        "name": "inventory.check",
+        "args": {
+          "sku": "SKU-XM-4L",
+          "on": "2026-10-23"
+        }
+      },
+      "on": "2026-10-23",
+      "started_at": "2026-10-17T04:29:44.277023+00:00",
+      "finished_at": "2026-10-17T04:29:44.277023+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-XM-4L",
+        "in_stock": true,
+        "qty": 12
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0020/call_3/1/18",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0020",
+        "call": "call_3",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/740"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0020/call_3/1/18",
+      "request": {
+        "name": "catalog.search",
+        "args": {
+          "sku": "SKU-XM-4L"
+        }
+      },
+      "on": "2026-10-23",
+      "started_at": "2026-10-17T04:29:44.287776+00:00",
+      "finished_at": "2026-10-17T04:29:44.287776+00:00",
+      "outcome": "success",
+      "result": {
+        "items": [
+          {
+            "sku": "SKU-XM-4L",
+            "name": "Máy lọc không khí Xiaomi Smart 4 Lite",
+            "category": "gia-dung/may-loc-khong-khi",
+            "list_price_vnd": 2990000,
+            "attributes": {
+              "room_area_m2": 43,
+              "features": "HEPA, app Mi Home",
+              "warranty_months": 24,
+              "child_safe_lock": false
+            },
+            "variants": []
+          }
+        ],
+        "total": 1
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0020/call_3/1/19",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0020",
+        "call": "call_3",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/743"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0020/call_3/1/19",
+      "request": {
+        "name": "order.status",
+        "args": {
+          "customer_phone": "0905218549"
+        }
+      },
+      "on": "2026-10-23",
+      "started_at": "2026-10-17T04:29:44.301859+00:00",
+      "finished_at": "2026-10-17T04:29:44.301859+00:00",
+      "outcome": "success",
+      "result": {
+        "orders": [
+          {
+            "order_id": "OD600001",
+            "customer_phone": "0905218549",
+            "sku": "SKU-XM-4L",
+            "qty": 1,
+            "price_vnd": 2990000,
+            "total_vnd": 2990000,
+            "promos": [
+              "COD-0"
+            ],
+            "payment": "COD",
+            "address": "Hải Châu, Đà Nẵng",
+            "created_on": "2026-10-20",
+            "status": "created"
+          }
+        ]
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0020/call_3/1/20",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0020",
+        "call": "call_3",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/750"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0020/call_3/1/20",
+      "request": {
+        "name": "order.status",
+        "args": {
+          "order_id": "OD600001",
+          "customer_phone": "0905218549"
+        }
+      },
+      "on": "2026-10-23",
+      "started_at": "2026-10-17T04:29:45.639237+00:00",
+      "finished_at": "2026-10-17T04:29:45.639779+00:00",
+      "outcome": "success",
+      "result": {
+        "orders": [
+          {
+            "order_id": "OD600001",
+            "customer_phone": "0905218549",
+            "sku": "SKU-XM-4L",
+            "qty": 1,
+            "price_vnd": 2990000,
+            "total_vnd": 2990000,
+            "promos": [
+              "COD-0"
+            ],
+            "payment": "COD",
+            "address": "Hải Châu, Đà Nẵng",
+            "created_on": "2026-10-20",
+            "status": "created"
+          }
+        ]
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"phone\": \"0905218549\"}, \"name\": \"crm.get_customer\"}",
+    "{\"args\": {\"customer_phone\": \"0905218549\", \"on\": \"2026-10-23\", \"sku\": \"SKU-XM-4L\"}, \"name\": \"pricing.get_quote\"}",
+    "{\"args\": {\"on\": \"2026-10-23\", \"sku\": \"SKU-XM-4L\"}, \"name\": \"inventory.check\"}",
+    "{\"args\": {\"sku\": \"SKU-XM-4L\"}, \"name\": \"catalog.search\"}",
+    "{\"args\": {\"customer_phone\": \"0905218549\"}, \"name\": \"order.status\"}",
+    "{\"args\": {\"customer_phone\": \"0905218549\", \"order_id\": \"OD600001\"}, \"name\": \"order.status\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/746"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/751"
+    }
+  ]
+}

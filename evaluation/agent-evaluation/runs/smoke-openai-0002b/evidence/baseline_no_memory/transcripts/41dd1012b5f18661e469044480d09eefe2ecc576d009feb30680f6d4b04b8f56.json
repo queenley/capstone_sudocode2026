@@ -1,0 +1,86 @@
+{
+  "context": {
+    "run_id": "PRODUCT-a421e5c3096f4bce",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0002",
+    "call": "call_2",
+    "turn": 1
+  },
+  "customer_text": "Cho chị hỏi tình trạng đơn hàng OD301177 của chị.",
+  "agent_text": "Dạ chị Tâm, để em kiểm tra giúp chị ạ. Vì đây là thông tin đơn hàng, em cần xác nhận thêm một số thông tin cá nhân của chị để bảo mật. Chị vui lòng chờ em một chút nhé.",
+  "customer_id": "C032",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_2/1/4",
+      "run_id": "PRODUCT-a421e5c3096f4bce",
+      "context": {
+        "run_id": "PRODUCT-a421e5c3096f4bce",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0002",
+        "call": "call_2",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "ef5c654946a196520d69a88afa2d5e2366c173da347d567e33e631280f5ef486",
+          "pointer": "/28"
+        }
+      ],
+      "event_id": "PRODUCT-a421e5c3096f4bce/baseline_no_memory/SCN-GEN-0002/call_2/1/4",
+      "request": {
+        "name": "crm.get_customer",
+        "args": {
+          "phone": "0965384535"
+        }
+      },
+      "on": "2026-10-16",
+      "started_at": "2026-10-17T01:07:24.862880+00:00",
+      "finished_at": "2026-10-17T01:07:24.862880+00:00",
+      "outcome": "success",
+      "result": {
+        "found": true,
+        "ambiguous": false,
+        "customer_id": "C032",
+        "name": "Tâm",
+        "honorific": "chị",
+        "phone": "0965384535",
+        "identities": {
+          "zalo_id": null,
+          "fb_id": null
+        },
+        "orders": [
+          {
+            "order_id": "OD301177",
+            "sku": "SKU-MB-PUMP1",
+            "price_vnd": 4290000,
+            "date": "2026-10-03",
+            "status": "shipping",
+            "tracking": "GHN7781234"
+          }
+        ],
+        "sessions": []
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"phone\": \"0965384535\"}, \"name\": \"crm.get_customer\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "ef5c654946a196520d69a88afa2d5e2366c173da347d567e33e631280f5ef486",
+      "pointer": "/31"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "ef5c654946a196520d69a88afa2d5e2366c173da347d567e33e631280f5ef486",
+      "pointer": "/33"
+    }
+  ]
+}

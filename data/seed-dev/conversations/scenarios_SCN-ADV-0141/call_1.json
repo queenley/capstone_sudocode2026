@@ -1,0 +1,354 @@
+{
+  "conversation_id": "SCN-ADV-0141__call_1",
+  "scenario_id": "SCN-ADV-0141",
+  "call": "call_1",
+  "customer_id": "C043",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-14",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_hoi_bao_hanh_mo_rong",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần hỗ trợ xác nhận đơn hàng phải không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh muốn xác nhận mua máy hút sữa điện đôi Medela Swing Maxi đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "is_human",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn xác nhận mua máy hút sữa điện đôi Medela Swing Maxi.",
+      "facts_stated": {
+        "product_advised": "SKU-MB-PUMP2"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy hút sữa điện đôi Medela Swing Maxi bên em đang còn hàng với giá 5.990.000đ, được miễn phí vận chuyển toàn quốc theo chương trình MOM-FREESHIP ạ. Anh muốn thanh toán theo hình thức nào để em lên đơn cho mình?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "open",
+          "text": "Anh muốn thanh toán theo hình thức nào để em lên đơn cho mình?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5990000",
+          "spoken": "5.990.000đ"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh sẽ thanh toán bằng hình thức COD nhé.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, anh chọn giao hàng thu tiền tận nơi COD đúng không ạ? Địa chỉ nhận là quận Hải Châu, Đà Nẵng phải không anh?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Địa chỉ nhận là quận Hải Châu, Đà Nẵng phải không anh?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "payment",
+          "value": "COD"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giao hàng đến quận Hải Châu, Đà Nẵng được không em?",
+      "facts_stated": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, bên em giao hàng miễn phí đến quận Hải Châu, Đà Nẵng anh nhé. Dự kiến nhận hàng ngày 17/11. Ngân sách của anh là 7 triệu đồng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của anh là 7 triệu đồng đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-17"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Hải Châu, Đà Nẵng",
+            "on": "2026-11-14"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "address",
+          "value": "Hải Châu, Đà Nẵng",
+          "spoken": "quận Hải Châu, Đà Nẵng"
+        },
+        {
+          "type": "date",
+          "value": "2026-11-17",
+          "spoken": "17/11"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, ngân sách của anh là 7 triệu đồng.",
+      "facts_stated": {
+        "budget_vnd": 7000000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "7000000",
+          "spoken": "7 triệu đồng"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ cảm ơn anh đã xác nhận. Em xin phép đọc lại đơn hàng: 1 máy hút sữa điện đôi Medela Swing Maxi, giá 5.990.000đ, giao miễn phí về quận Hải Châu, Đà Nẵng, thanh toán COD khi nhận hàng, dự kiến giao ngày 17/11. Anh vui lòng kiểm tra lại thông tin và xác nhận giúp em nhé, đúng hết chưa ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh vui lòng kiểm tra lại thông tin và xác nhận giúp em nhé, đúng hết chưa ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-17"
+        },
+        {
+          "field": "payment",
+          "value": "COD"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5990000",
+          "spoken": "5.990.000đ"
+        },
+        {
+          "type": "address",
+          "value": "Hải Châu, Đà Nẵng",
+          "spoken": "quận Hải Châu, Đà Nẵng"
+        },
+        {
+          "type": "date",
+          "value": "2026-11-17",
+          "spoken": "17/11"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mong là máy này sẽ giúp vợ anh thuận lợi hơn trong việc nuôi con.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em đã đặt đơn hàng thành công cho anh. Nhân viên bên em sẽ gọi xác nhận đơn trước khi giao nhé. Cảm ơn anh đã tin tưởng shop BTC, chúc gia đình mình luôn mạnh khỏe và hạnh phúc ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0994157718",
+            "sku": "SKU-MB-PUMP2",
+            "qty": 1,
+            "price_vnd": 5990000,
+            "payment": "COD",
+            "address": "Hải Châu, Đà Nẵng",
+            "on": "2026-11-14"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "budget_vnd",
+          "value": 7000000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "child_age_months",
+          "value": 5,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Hải Châu, Đà Nẵng",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-PUMP2",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5990000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_1#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-MB-PUMP2",
+      "qty": 1,
+      "price_vnd": 5990000,
+      "payment": "COD",
+      "address": "Hải Châu, Đà Nẵng",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-11-17"
+    }
+  }
+}

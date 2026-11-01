@@ -1,0 +1,279 @@
+{
+  "conversation_id": "SCN-GEN-0234__call_1",
+  "scenario_id": "SCN-GEN-0234",
+  "call": "call_1",
+  "customer_id": "SYN-C012",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-28",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Trần Thị Bích ạ, bạn nhân viên đã hỗ trợ mình hôm trước đặt Máy tiệt trùng sấy khô Moaz Bebe rồi, hôm nay chị muốn hỏi về máy lọc không khí Xiaomi Smart 4 Pro cho phòng 35 mét vuông đúng không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "chị muốn tìm máy cho phòng khoảng 35 mét vuông đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo chi muon hoi ve may loc khong khi xiaomi smart 4 pro cho phong khoang 35 met vuong",
+      "facts_stated": {
+        "room_area_m2": 35
+      },
+      "entities": [],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, với diện tích phòng 35 mét vuông và nhà mình có trẻ nhỏ, em tư vấn máy lọc không khí Xiaomi Smart 4 Pro phù hợp, giá là 5.490.000đ. Máy hiện còn hàng ạ.",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Ngân sách của mình tầm bao nhiêu để em tư vấn thêm cho phù hợp ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5490000",
+          "spoken": "5.490.000"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "nha chi co tre nho ngan sach tam 5 trieu thoi",
+      "facts_stated": {
+        "has_children": true,
+        "budget_vnd": 5000000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "5000000",
+          "spoken": "5 triệu"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, dòng Xiaomi Smart 4 Pro hiện là dòng hợp lý nhất cho diện tích 35 mét vuông, so với các mẫu nhỏ hơn thì máy này lọc nhanh và có thể điều khiển qua app. Giá 5.490.000đ hơi vượt ngân sách một chút, nhưng sản phẩm này phù hợp gia đình có trẻ nhỏ và đang chưa có khuyến mãi thêm ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5490000",
+          "spoken": "5.490.000"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "may nay dang co khuyen mai gi khong em",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại bên em chưa có chương trình khuyến mãi cho dòng Xiaomi Smart 4 Pro, giá vẫn là 5.490.000đ ạ. Tuy nhiên, đơn trên 2 triệu sẽ được miễn phí vận chuyển toàn quốc và hỗ trợ COD không phí thu hộ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5490000",
+          "spoken": "5.490.000"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "a chi can ban voi gia dinh da em goi lai chi vao toi thu hai 30 11 tam 7 gio nhe",
+      "facts_stated": {},
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-11-30",
+          "spoken": "30 11"
+        },
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 gio"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi chú lại, tối Thứ Hai ngày 30/11 lúc 7 giờ em sẽ gọi lại cho chị để chị bàn với gia đình nhé. Cám ơn chị đã quan tâm, chúc chị buổi tối vui vẻ ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-11-30T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0998000012",
+            "callback_at": "2026-11-30T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 5500000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 35,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-XM-4P",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5490000,
+          "op": "set",
+          "source": "call_1#turn9"
+        }
+      ],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-11-30",
+          "spoken": "30/11"
+        },
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_ban_gia_dinh",
+    "objection_handling": "Đặt lịch gọi lại đúng thời gian khách hẹn, nhắc lại thời gian rõ ràng.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "text": "Gọi lại cho khách lúc 19 giờ ngày 30/11"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "customer_phone": "0998000012",
+      "callback_at": "2026-11-30T19:00",
+      "note": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

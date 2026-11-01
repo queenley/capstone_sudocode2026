@@ -1,0 +1,86 @@
+{
+  "scenario_id": "SCN-ADV-0123",
+  "level": "M2",
+  "persona": "khach_mua_so_luong",
+  "hard_case": null,
+  "customer_phone": "0994893949",
+  "customer_name": "Hạnh",
+  "honorific": "chị",
+  "notes": "Persona khach_mua_so_luong, biến thể mua_ba_mang_loc. call_1 (hotline): chốt đơn nhiều cái cùng loại → chot_don. Chấm chủ yếu: TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-14",
+      "customer_goal": "Mua 3 cái màng lọc thay thế AirPure X/Y",
+      "customer_turns": [
+        "Alo em ơi, chị muốn mua 3 cái màng lọc thay thế AirPure X/Y để dùng dần.",
+        "Mỗi cái giá bao nhiêu em nhỉ?",
+        "Chị có ngân sách khoảng 1 triệu thôi, mua nhiều có giảm không?",
+        "Chị muốn thanh toán COD và khu vực giao là Ninh Kiều, Cần Thơ nhé.",
+        "Để chị bàn với gia đình rồi chốt đơn cho em."
+      ],
+      "facts_established": {
+        "blocker": "để bàn với gia đình",
+        "budget_vnd": 1000000,
+        "delivery_area": "Ninh Kiều, Cần Thơ",
+        "payment": "COD",
+        "quantity": 3,
+        "usage_need": "thay đồ cũ đã hỏng",
+        "product_advised": "SKU-AP-FLT-X",
+        "price_quoted_vnd": 690000,
+        "order_id": "OD600001"
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AP-FLT-X",
+          "price_vnd": 690000,
+          "payment": "COD",
+          "qty": 3
+        },
+        "total_match_vnd": 2070000,
+        "must_say_any": [
+          "gọi xác nhận",
+          "gọi điện xác nhận",
+          "gọi lại xác nhận",
+          "xác nhận đơn",
+          "xác nhận trước khi giao"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 690000,
+        "list_price_vnd": 690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-11-19",
+        "qty": 3,
+        "total_vnd": 2070000,
+        "needs_confirmation_call": true,
+        "call_date": "2026-11-14"
+      },
+      "memory_expectation": {
+        "blocker": "để bàn với gia đình",
+        "budget_vnd": 1000000,
+        "delivery_area": "Ninh Kiều, Cần Thơ",
+        "payment": "COD",
+        "usage_need": "thay đồ cũ đã hỏng",
+        "product_advised": "SKU-AP-FLT-X",
+        "price_quoted_vnd": 690000,
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "KM-05",
+        "VC-05",
+        "QT-01",
+        "PB-03"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

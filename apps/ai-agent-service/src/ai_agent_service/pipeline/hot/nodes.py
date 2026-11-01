@@ -31,7 +31,8 @@ from ...components.intake import honorific, itn, lexicon, pii, signals, text as 
 from ...components.memory import brief as briefs
 from ...components.memory import recall
 from ...components.memory.brief import BriefLine
-from ...components.orchestration.rules import ORDER_TALK, RouteInput, decide
+from ...components.orchestration.rules import MODEL_FAILURES, RouteInput, decide
+from ...config.config_manager import handoff_auto_accept
 from ...mcp.servers import btc
 from ...mcp.tools import INFRASTRUCTURE_CODES
 from .state import TURN_KEYS, HotContext, HotState
@@ -156,7 +157,7 @@ async def _knowledge(state: dict[str, Any], context: HotContext, said: str) -> d
 def _order_date(state: dict[str, Any], said: str) -> str | None:
     """The day the order a question is about was placed, when it is about one this customer has."""
     orders = [o for o in (state.get("brief") or {}).get("orders") or [] if o.get("order_id")]
-    if not orders or not (ORDER_TALK.search(intake_text.plain(said)) or "OD" in said):
+    if not orders or not (signals.ORDER_TALK.search(intake_text.plain(said)) or "OD" in said):
         return None
     named = next((o for o in orders if o["order_id"] in said), None)
     chosen = named or max(orders, key=lambda o: str(o.get("date") or o.get("created_at") or ""))
@@ -259,10 +260,36 @@ async def _settle(state: HotState, context: HotContext, answer: str) -> dict[str
         return {**bound, **await _brief({**state, **bound}, context, time.perf_counter())}
 
     profile = resolver.Match(str(state.get("customer_id") or ""), state.get("customer_name"), state.get("honorific"))
-    confirmed = resolver.confirms(answer) is True or resolver.pick_by_name(answer, [profile]) is not None
+    confirmed = resolver.pick_by_name(answer, [profile]) is not None or await _confirms(state, context, answer)
     if not confirmed or not profile.customer_id:
         return dict(STRANGER)
     return {"tier": "VERIFIED", "awaiting": None, **await _brief(state, context, time.perf_counter())}
+
+
+async def _confirms(state: HotState, context: HotContext, answer: str) -> bool:
+    """Whether the answer to the confirming question confirms who the caller is (section 4.2).
+
+    Read by Jev with the question asked; the word list (``resolver.confirms``)
+    only when Jev gives no answer in time. A wrong "yes" would open someone
+    else's data, so its threshold is the higher one (``INTENT_THRESHOLDS``).
+    """
+    if context.policy is not None:
+        verdict = await context.policy.judge("identity", {"recent_messages": [
+            {"speaker": "assistant", "text": _last_reply(state) or ""}, {"speaker": "customer", "text": answer}]})
+        if verdict is not None:
+            return verdict
+    return resolver.confirms(answer) is True
+
+
+def _recent(state: HotState, limit: int = 6) -> tuple[tuple[str, str], ...]:
+    """The last *limit* messages, ``(speaker, text)``, tokenised as the state holds them."""
+    out = []
+    for message in (state.get("messages") or [])[-limit:]:
+        if isinstance(message, HumanMessage):
+            out.append(("customer", str(message.content)))
+        elif isinstance(message, AIMessage) and message.content:
+            out.append(("assistant", str(message.content)))
+    return tuple(out)
 
 
 def _keys(state: HotState, context: HotContext, *, connection: bool) -> list[resolver.Key]:
@@ -375,17 +402,13 @@ async def route(state: HotState) -> dict[str, Any]:
     decision = decide(RouteInput(
         tier=state.get("tier") or "UNKNOWN",
         has_brief=bool(state.get("brief_lines")),
-        has_order=bool(state.get("known_orders")),
         asr_low_conf=bool(flags.get("asr_low_conf")),
         tool_failures=int(state.get("tool_failures") or 0),
-        safe_lines=int(state.get("safe_lines") or 0),
-        customer_said=_last_customer_text(state),
+        model_failures=int(state.get("model_failures") or 0),
         must_transfer=bool(flags.get("must_transfer")),
         impatient=bool(flags.get("impatient")),
         sessions_without_close=int((state.get("brief") or {}).get("sessions_without_close") or 0),
         awaiting_identity=bool(state.get("awaiting")),
-        previous_lane=state.get("lane"),
-        answering="?" in (_last_reply(state) or ""),
     ))
     return {"lane": decision.lane, "route_rule": decision.rule, "route_reason": decision.reason,
             "route_notes": list(decision.notes)}
@@ -424,6 +447,11 @@ async def advisor(state: HotState, runtime: Runtime[HotContext]) -> dict[str, An
         return update
 
     agent_context = _agent_context(state, context, summary)
+    if state.get("lane") == "HANDOFF":
+        # Rule 1: tools or the model keep failing. The model is what may be failing, so the
+        # harness puts the call through itself, and the bridging line is said only when it did.
+        update.update(await _transfer(state, context, agent_context, [], summary=summary))
+        return update
     turn_messages = messages or [HumanMessage(content="(Khách vừa bắt máy.)", id="opening")]
     if (state.get("mode") or "speak") == "speak" and hasattr(context.advisor, "stream"):
         update.update(await _streamed(state, context, turn_messages, agent_context))
@@ -432,14 +460,79 @@ async def advisor(state: HotState, runtime: Runtime[HotContext]) -> dict[str, An
         draft = await context.advisor.draft(turn_messages, agent_context, user_id=context.user_id)
     except Exception as error:  # noqa: BLE001 - section 4.9: a failure is never silence
         logger.exception("Advisor failed on call %s", state.get("call_id"))
-        if isinstance(error, AdvisorFailure):
-            update.update(_absorb(state, error.partial.tool_results))
-        update["draft"] = {"text": fallback.line("model_error", _who(state)), "fallback": True, "error": _readable(error)}
+        produced = list(error.partial.tool_results) if isinstance(error, AdvisorFailure) else []
+        update.update(await _model_failed(state, context, agent_context, produced, error, summary=summary))
         return update
     update.update(_absorb(state, draft.tool_results))
     update["draft"] = {"text": draft.text, "model": draft.model, "model_calls": draft.model_calls,
                        "seconds": round(draft.seconds, 3)}
+    update["model_failures"] = 0
     return update
+
+
+async def _model_failed(state: HotState, context: HotContext, agent_context: AgentContext,
+                        produced: Sequence[Mapping[str, Any]], error: BaseException, *,
+                        summary: str | None) -> dict[str, Any]:
+    """Section 4.9: the model gave no draft. Ask again once; a second turn in a row goes to a person.
+
+    Counted like a tool failure (route rule 1), and acted on in the same turn: a
+    customer who heard "nhắc lại giúp em" once is not asked a second time.
+    """
+    failures = int(state.get("model_failures") or 0) + 1
+    if failures >= MODEL_FAILURES:
+        return await _transfer(state, context, agent_context, produced, summary=summary,
+                               detail=f"Trợ lý tự động lỗi {failures} lượt liên tiếp ({_readable(error)}).")
+    return {**_absorb(state, produced), "model_failures": failures,
+            "draft": {"text": fallback.line("model_error", _who(state)), "fallback": True, "error": _readable(error)}}
+
+
+async def _transfer(state: HotState, context: HotContext, agent_context: AgentContext,
+                    produced: Sequence[Mapping[str, Any]], *, summary: str | None,
+                    detail: str | None = None) -> dict[str, Any]:
+    """Put the call through to a person by the harness itself, with a Handoff Brief made from the state.
+
+    The bridging line is said only after ``handoff.transfer`` succeeded: a
+    line that promises a person must never stand for one that was not called.
+    A call already handed over is not handed over twice; a failed transfer
+    says the system is slow and promises nothing.
+    """
+    if state.get("handoff"):
+        return {**_absorb(state, produced), "model_failures": 0,
+                "draft": {"text": fallback.line("tool_down", _who(state)), "fallback": True}}
+    reason = detail or _HANDOFF_DETAIL.get(state.get("route_reason") or "", "Trợ lý tự động không trả lời tiếp được.")
+    said = [str(m.content) for m in state.get("messages") or [] if isinstance(m, HumanMessage)]
+    story = " ".join(x for x in (reason, (summary or "").strip(),
+                                 f"Khách vừa nhắn: \"{said[-1].strip()}\"." if said else "") if x)
+    brief = actions.fill_handoff({
+        "escalation_reason": "loi_he_thong",
+        "escalation_reason_detail": reason,
+        "conversation_summary": story[:800],
+        "open_questions": [said[-1].strip()[:300]] if said else [],
+        "next_action": "Xin lỗi khách vì hệ thống trục trặc rồi trả lời tiếp câu khách đang hỏi.",
+    }, agent_context.handoff_defaults)
+    if context.harness is None:
+        envelope: dict[str, Any] = {"ok": False, "error": {"code": "NO_TOOL", "retryable": False,
+                                                            "message": "No harness tools"}}
+    else:
+        envelope = await context.harness.call("handoff_transfer", brief=brief)
+    entry = {"name": "handoff.transfer", "args": {"brief": brief}, "result": envelope, "by": "harness"}
+    update = _absorb(state, [*produced, entry])
+    update["model_failures"] = 0
+    if envelope.get("ok"):
+        update["draft"] = {"text": fallback.LINES["bridging"], "model": None, "model_calls": 0, "seconds": 0.0,
+                           "fixed": True}
+    else:
+        logger.warning("Call %s: the harness could not transfer the call: %s", state.get("call_id"),
+                       (envelope.get("error") or {}).get("message"))
+        update["draft"] = {"text": fallback.line("tool_down", _who(state)), "fallback": True}
+    return update
+
+
+#: Why route rule 1 fired, in the words a consultant reads first.
+_HANDOFF_DETAIL = {
+    "tools failing": "Hệ thống tra cứu lỗi nhiều lần liên tiếp nên trợ lý tự động không trả lời tiếp được.",
+    "the model failing": "Trợ lý tự động lỗi nhiều lượt liên tiếp.",
+}
 
 
 def _agent_context(state: HotState, context: HotContext, summary: str | None) -> AgentContext:
@@ -480,6 +573,7 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
         tool_results=tuple(state.get("tool_results") or []),
         quotes=dict(state.get("quotes") or {}),
         known_orders=frozenset(state.get("known_orders") or []),
+        placed_lines=tuple(state.get("placed_lines") or []),
         customer_phone=phone,
         vault=context.vault,
         shared_phone=any(k.get("kind") == "phone" and len(set(k.get("customer_ids") or [])) > 1
@@ -503,6 +597,7 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
         trusted_skus=trusted | frozenset(p["sku"] for p in state.get("seen_products") or []),
         seen_products=tuple(state.get("seen_products") or ()),
         created_orders=tuple(state.get("created_orders") or ()),
+        updated_orders=tuple(state.get("updated_orders") or ()),
         self_called=None if tier == "VERIFIED" else state.get("honorific_said"),
         honorific_asked=bool(state.get("honorific_asked")),
         flags=dict(state.get("flags") or {}),
@@ -510,6 +605,8 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
         last_agent_said=_last_agent_text(state),
         deletion_asked=bool(state.get('deletion_awaiting_for')
                             and state['deletion_awaiting_for'] == state.get('customer_id')),
+        recent=_recent(state),
+        judge=context.policy.judge if context.policy is not None else None,
     )
 
 
@@ -555,6 +652,13 @@ def _address_as(state: HotState) -> str | None:
     return " ".join(x for x in (state.get("honorific"), state.get("customer_name")) if x) or None
 
 
+def _placed(earlier: Sequence[Mapping[str, Any]], results: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """The call's order lines with the ones *results* created, one per order id."""
+    lines = {line["order_id"]: dict(line) for line in earlier}
+    lines.update({line["order_id"]: line for line in actions.placed_lines(results)})
+    return list(lines.values())
+
+
 def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     """A run's tool results added to the turn's, with today's quotes, the orders seen and the failure count."""
     new_results = [{**r, "turn": state.get("turn_no") or 0} for r in produced]
@@ -564,6 +668,7 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
     created = list(state.get("created_orders") or [])
     deletion_recorded = bool(state.get("deletion_recorded"))
     pending_purchase = state.get("pending_purchase")
+    updated = list(state.get("updated_orders") or [])
     failures = int(state.get("tool_failures") or 0)
     for result in new_results:
         envelope = result.get("result") or {}
@@ -577,6 +682,9 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
             if result["name"] == "order.create" and data.get("order_id"):
                 created.append({"order_id": data["order_id"], "sku": (result.get("args") or {}).get("sku")})
                 pending_purchase = None
+            if result["name"] == "order.update":
+                asked = result.get("args") or {}
+                updated.append({k: asked.get(k) for k in ("order_id", "action", "new_variant_sku")})
             for order in data.get("orders") or ([data] if data.get("order_id") else []):
                 if order.get("order_id") and order["order_id"] not in orders:
                     orders.append(order["order_id"])
@@ -585,8 +693,9 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
         elif (envelope.get("error") or {}).get("code") in INFRASTRUCTURE_CODES:
             failures += 1
     return {"tool_results": list(state.get("tool_results") or []) + new_results, "quotes": quotes,
-            "known_orders": orders, "created_orders": created, "tool_failures": failures,
+            "known_orders": orders, "created_orders": created, "updated_orders": updated, "tool_failures": failures,
             "deletion_recorded": deletion_recorded, "pending_purchase": pending_purchase,
+            "placed_lines": _placed(state.get("placed_lines") or [], new_results),
             "trusted_skus": sorted(set(state.get("trusted_skus") or []) | codes),
             "seen_products": _products_in(new_results, state.get("seen_products") or [])}
 
@@ -604,6 +713,24 @@ class _Attempt:
     reasons: list[str] = field(default_factory=list)
     blocked: str = ""
     draft: Any = None
+    #: The PolicyAgent's verdict on each sentence it reviewed, for the trace.
+    soft: list[Any] = field(default_factory=list)
+
+
+def _soft_summary(reviews: Sequence[Any]) -> dict[str, Any] | None:
+    """The PolicyAgent's verdicts on a streamed answer's sentences, as one record for the trace."""
+    if not reviews:
+        return None
+    questions = {name for review in reviews for name in review.probabilities}
+    decided = [review.decided_by for review in reviews]
+    return {
+        "passed": all(review.passed for review in reviews),
+        "reasons": sorted({reason for review in reviews for reason in review.reasons}),
+        "decided_by": "jev" if "jev" in decided else decided[-1],
+        "probabilities": {name: max(review.probabilities.get(name, 0.0) for review in reviews) for name in sorted(questions)},
+        "seconds": round(sum(review.seconds for review in reviews), 3),
+        "sentences": len(reviews),
+    }
 
 
 async def _streamed(state: HotState, context: HotContext, messages: list[Any], agent_context: AgentContext) -> dict[str, Any]:
@@ -628,12 +755,15 @@ async def _streamed(state: HotState, context: HotContext, messages: list[Any], a
     view = agent_context
     #: Sentences said by runs whose next sentence was blocked: the next run goes on after them.
     carried: list[str] = []
+    #: Every PolicyAgent verdict of the turn, abandoned runs' included: why a run was regenerated.
+    soft_reviews: list[Any] = []
     try:
         while True:
             # A retry is checked against every tool result of the turn, the abandoned runs' included.
             attempt = _Attempt(said=list(carried), last_spoken=bool(carried))
             await _stream_once(state, context, messages, view, earlier + tuple(produced), timing, attempt)
             produced += [r for r in attempt.results if r not in produced]
+            soft_reviews += attempt.soft
             if not attempt.reasons:
                 break
             reasons = attempt.reasons
@@ -648,16 +778,18 @@ async def _streamed(state: HotState, context: HotContext, messages: list[Any], a
         logger.exception("Advisor failed on call %s", state.get("call_id"))
         pending = error.partial.tool_results if isinstance(error, AdvisorFailure) else attempt.results
         produced += [r for r in pending if r not in produced]
-        absorbed = _absorb(state, produced)
         if attempt.said:
+            # Part of the answer was heard: finish it safely; rule 1 counts the failure for the next turn.
+            absorbed = _absorb(state, produced)
             line = _safe_line(state, produced)
             await _say(context, line, timing)
             return {**absorbed, "draft": {"text": " ".join([*attempt.said, line]), "streamed": True, "fallback": True,
                                           "error": _readable(error)},
-                    "guard": {"passed": True, "streamed": True, "fallback": True}, "latency": timing}
-        return {**absorbed, "draft": {"text": fallback.line("model_error", _who(state)), "fallback": True,
-                                      "error": _readable(error)},
-                "latency": timing}
+                    "guard": {"passed": True, "streamed": True, "fallback": True}, "latency": timing,
+                    "model_failures": int(state.get("model_failures") or 0) + 1}
+        failed = await _model_failed(state, context, agent_context, produced, error,
+                                     summary=state.get("working_summary"))
+        return {**failed, "latency": timing}
 
     update = _absorb(state, produced)
     draft = attempt.draft
@@ -665,6 +797,9 @@ async def _streamed(state: HotState, context: HotContext, messages: list[Any], a
              "seconds": round(getattr(draft, "seconds", 0.0), 3), "streamed": True}
     verdict: dict[str, Any] = {"passed": not attempt.reasons, "streamed": True, "sentences": len(attempt.said),
                                "hard": {"passed": not reasons, "reasons": reasons}}
+    soft = _soft_summary(soft_reviews)
+    if soft is not None:
+        verdict["soft"] = soft
     text = " ".join(attempt.said)
     if attempt.reasons:
         line = _safe_line(state, produced)
@@ -681,6 +816,7 @@ async def _streamed(state: HotState, context: HotContext, messages: list[Any], a
         block_reasons=reasons,
         regen_count=regenerations,
         latency=timing,
+        model_failures=0,
     )
     return update
 
@@ -780,6 +916,7 @@ async def _offer(state: HotState, context: HotContext, sentence: str, results: t
     if not reasons and context.policy is not None and needs_review(spoken):
         soft = await context.policy.review(PolicyInput(text=spoken, tool_results=results, tier=view.tier,
                                                        policy_snippets=view.policy_texts))
+        attempt.soft.append(soft)
         reasons += list(soft.reasons)
     if reasons:
         attempt.reasons, attempt.blocked = reasons, " ".join([*attempt.said, sentence])
@@ -864,13 +1001,15 @@ def guard_input(state: HotState, context: HotContext, text: str, results: tuple[
     brief = state.get("brief") or {}
     tier = state.get("tier") or "UNKNOWN"
     policy, playbook = shown_passages(_passages(state))
-    passages = tuple(str(p["text"]) for p in (*policy, *playbook) if p.get("text") and not p.get("restricted"))
+    shown = [p for p in (*policy, *playbook) if p.get("text") and not p.get("restricted")]
+    passages = tuple(str(p["text"]) for p in shown)
     return GuardInput(
         text=text,
         tool_results=results,
         tier=tier,
         customer_said=tuple(str(m.content) for m in state.get("messages") or [] if isinstance(m, HumanMessage)),
         policy_texts=passages,
+        priced_texts=tuple(str(p["text"]) for p in shown if (p.get("source") or "policy") == "policy"),
         brief_prices=tuple(int(p["price_quoted_vnd"]) for p in brief.get("products_advised") or [] if p.get("price_quoted_vnd")),
         tokens=frozenset(context.vault.entries),
         quotes=dict(state.get("quotes") or {}),
@@ -937,13 +1076,18 @@ async def respond(state: HotState, runtime: Runtime[HotContext]) -> dict[str, An
             if streamed:
                 await _say(context, fallback.LINES["bridging"], timing)
         brief = (handoff.get("args") or {}).get("brief") or {}
-        update["mode"] = "copilot"
+        # HANDOFF_AUTO_ACCEPT (test runs): the system accepts at once and the agent goes on answering.
+        auto = handoff_auto_accept()
+        update["mode"] = "speak" if auto else "copilot"
         update["handoff"] = {
-            "status": "pending",
+            "status": "accepted" if auto else "pending",
+            "accepted_by": AUTO_ACCEPTOR if auto else None,
             "ticket_id": ((handoff.get("result") or {}).get("data") or {}).get("ticket_id"),
             "reason": brief.get("escalation_reason"),
             "brief": brief,
         }
+        # A person has the call now: the failures that sent it there are theirs to judge, not rule 1's again.
+        update.update(tool_failures=0, model_failures=0, safe_lines=0)
     pending = state.get("pending_purchase")
     if pending and pending.get("status") == "pending" and pending.get("issued_turn_id") == turn_id:
         if not streamed:
@@ -957,6 +1101,9 @@ async def respond(state: HotState, runtime: Runtime[HotContext]) -> dict[str, An
     update["latency"] = timing
     return update
 
+
+#: Who accepts a handoff when ``HANDOFF_AUTO_ACCEPT`` is on: no person, and the record says so.
+AUTO_ACCEPTOR = "auto"
 
 # ── 7. persist ────────────────────────────────────────────────────────────
 
@@ -998,9 +1145,26 @@ def _passages(state: HotState) -> tuple[dict[str, Any], ...]:
     return tuple(found["hits"])
 
 
+#: The knowledge search found the documents do not answer the turn (nothing relevant, or a passage
+#: saying the documents have no information on it): what the advisor does then, by BTC's answer
+#: (DIEU-CHINH-DE 4: a transfer is a success for an out-of-scope question). Said next to the
+#: passages, where the model reads them, because a passage that says "phải nói không có thông tin"
+#: otherwise outweighs rule 4 (FIX-07, 2026-11-01).
+NO_ANSWER = ("Tài liệu không trả lời câu khách vừa hỏi. Nếu tool cũng không trả lời được: nói \"Dạ hiện em chưa có "
+             "thông tin về …\" rồi gọi handoff_transfer (escalation_reason ngoai_pham_vi_tai_lieu) ngay trong lượt "
+             "này để nhân viên trả lời khách.")
+
+
 def _knowledge_note(state: HotState) -> str | None:
+    """What the search says when the documents have no answer: a fact of the retrieval, not of the words."""
     found = state.get("knowledge") or {}
-    return NOTHING_RELEVANT if found and found.get("reason") == "no_match" else None
+    if not found:
+        return None
+    if found.get("reason") == "no_match":
+        return f"{NOTHING_RELEVANT} {NO_ANSWER}"
+    if found.get("abstain") and found.get("reason") == "absence":
+        return NO_ANSWER
+    return None
 
 
 def _last_customer_text(state: HotState) -> str | None:

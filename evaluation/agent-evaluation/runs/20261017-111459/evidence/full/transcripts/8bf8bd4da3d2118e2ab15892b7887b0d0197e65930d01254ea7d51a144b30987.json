@@ -1,0 +1,388 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0014",
+    "call": "call_3",
+    "turn": 1
+  },
+  "customer_text": "Alo, chị quyết định mua giày chạy bộ RunLite 2 Pro size 42 màu đen.",
+  "agent_text": "Dạ chị Trang, giá hôm nay của giày RunLite 2 Pro size 42 màu đen là 1.690.000 đồng, khuyến mãi RUN-10 trước chị được báo đã hết rồi ạ. Em có thể giúp chị đặt hàng luôn ạ?",
+  "customer_id": "C013",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0014/call_3/1/11",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0014",
+        "call": "call_3",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/395"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0014/call_3/1/11",
+      "request": {
+        "name": "crm.get_customer",
+        "args": {
+          "phone": "0964252477"
+        }
+      },
+      "on": "2026-10-27",
+      "started_at": "2026-10-17T04:24:41.700862+00:00",
+      "finished_at": "2026-10-17T04:24:41.701886+00:00",
+      "outcome": "success",
+      "result": {
+        "found": true,
+        "ambiguous": false,
+        "customer_id": "C013",
+        "name": "Trang",
+        "honorific": "chị",
+        "phone": "0964252477",
+        "identities": {
+          "zalo_id": "zalo_trang63",
+          "fb_id": "fb.trang.394"
+        },
+        "orders": [],
+        "sessions": []
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0014/call_3/1/12",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0014",
+        "call": "call_3",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/398"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0014/call_3/1/12",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-SN-RUN2-42-DEN",
+          "on": "2026-10-27",
+          "customer_phone": "0964252477"
+        }
+      },
+      "on": "2026-10-27",
+      "started_at": "2026-10-17T04:24:41.791694+00:00",
+      "finished_at": "2026-10-17T04:24:41.791694+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-SN-RUN2-42-DEN",
+        "list_price_vnd": 1690000,
+        "final_price_vnd": 1690000,
+        "applied_promos": [
+          {
+            "promo_code": "COD-0",
+            "type": "freecod",
+            "discount_vnd": 0
+          }
+        ],
+        "expired_promos": [
+          "RUN-10",
+          "RUN2-SALE"
+        ],
+        "ineligible_promos": [],
+        "not_applied_exclusive": [],
+        "freeship": false,
+        "_internal_price_floor_vnd": 1352000
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0014/call_3/1/13",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0014",
+        "call": "call_3",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/401"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0014/call_3/1/13",
+      "request": {
+        "name": "inventory.check",
+        "args": {
+          "sku": "SKU-SN-RUN2-42-DEN",
+          "on": "2026-10-27"
+        }
+      },
+      "on": "2026-10-27",
+      "started_at": "2026-10-17T04:24:41.816130+00:00",
+      "finished_at": "2026-10-17T04:24:41.816130+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-SN-RUN2-42-DEN",
+        "in_stock": true,
+        "qty": 2
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0014/call_3/1/14",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0014",
+        "call": "call_3",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/404"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0014/call_3/1/14",
+      "request": {
+        "name": "catalog.search",
+        "args": {
+          "sku": "SKU-SN-RUN2-42-DEN"
+        }
+      },
+      "on": "2026-10-27",
+      "started_at": "2026-10-17T04:24:41.838734+00:00",
+      "finished_at": "2026-10-17T04:24:41.838734+00:00",
+      "outcome": "success",
+      "result": {
+        "items": [
+          {
+            "sku": "SKU-SN-RUN2",
+            "name": "Giày chạy bộ RunLite 2 Pro",
+            "category": "thoi-trang/giay",
+            "list_price_vnd": 1690000,
+            "attributes": {
+              "material": "vải lưới + đế EVA",
+              "return_days": 7
+            },
+            "variants": [
+              {
+                "variant_sku": "SKU-SN-RUN2-38-DEN",
+                "size": 38,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-38-TRANG",
+                "size": 38,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-38-XAM",
+                "size": 38,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-39-DEN",
+                "size": 39,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-39-TRANG",
+                "size": 39,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-39-XAM",
+                "size": 39,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-40-DEN",
+                "size": 40,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-40-TRANG",
+                "size": 40,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-40-XAM",
+                "size": 40,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-41-DEN",
+                "size": 41,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-41-TRANG",
+                "size": 41,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-41-XAM",
+                "size": 41,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-42-DEN",
+                "size": 42,
+                "color": "den",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-42-TRANG",
+                "size": 42,
+                "color": "trang",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-42-XAM",
+                "size": 42,
+                "color": "xam",
+                "price_delta_vnd": 0
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-43-DEN",
+                "size": 43,
+                "color": "den",
+                "price_delta_vnd": 50000
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-43-TRANG",
+                "size": 43,
+                "color": "trang",
+                "price_delta_vnd": 50000
+              },
+              {
+                "variant_sku": "SKU-SN-RUN2-43-XAM",
+                "size": 43,
+                "color": "xam",
+                "price_delta_vnd": 50000
+              }
+            ]
+          }
+        ],
+        "total": 1
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0014/call_3/1/15",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0014",
+        "call": "call_3",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/411"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0014/call_3/1/15",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-SN-RUN2-42-DEN",
+          "on": "2026-10-27",
+          "customer_phone": "0964252477"
+        }
+      },
+      "on": "2026-10-27",
+      "started_at": "2026-10-17T04:24:43.220490+00:00",
+      "finished_at": "2026-10-17T04:24:43.220490+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-SN-RUN2-42-DEN",
+        "list_price_vnd": 1690000,
+        "final_price_vnd": 1690000,
+        "applied_promos": [
+          {
+            "promo_code": "COD-0",
+            "type": "freecod",
+            "discount_vnd": 0
+          }
+        ],
+        "expired_promos": [
+          "RUN-10",
+          "RUN2-SALE"
+        ],
+        "ineligible_promos": [],
+        "not_applied_exclusive": [],
+        "freeship": false,
+        "_internal_price_floor_vnd": 1352000
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"phone\": \"0964252477\"}, \"name\": \"crm.get_customer\"}",
+    "{\"args\": {\"customer_phone\": \"0964252477\", \"on\": \"2026-10-27\", \"sku\": \"SKU-SN-RUN2-42-DEN\"}, \"name\": \"pricing.get_quote\"}",
+    "{\"args\": {\"on\": \"2026-10-27\", \"sku\": \"SKU-SN-RUN2-42-DEN\"}, \"name\": \"inventory.check\"}",
+    "{\"args\": {\"sku\": \"SKU-SN-RUN2-42-DEN\"}, \"name\": \"catalog.search\"}",
+    "{\"args\": {\"customer_phone\": \"0964252477\", \"on\": \"2026-10-27\", \"sku\": \"SKU-SN-RUN2-42-DEN\"}, \"name\": \"pricing.get_quote\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/407"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/412"
+    }
+  ]
+}

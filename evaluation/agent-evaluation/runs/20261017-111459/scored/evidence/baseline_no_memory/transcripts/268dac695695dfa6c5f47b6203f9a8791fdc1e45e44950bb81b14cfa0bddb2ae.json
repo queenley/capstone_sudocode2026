@@ -1,0 +1,96 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0020",
+    "call": "call_1",
+    "turn": 2
+  },
+  "customer_text": "Nhà chị không có trẻ nhỏ, ngân sách khoảng 5 triệu rưỡi thôi.",
+  "agent_text": "Dạ chị Linh, bên em có máy lọc không khí Xiaomi Smart 4 Lite phù hợp phòng 43 mét vuông, giá niêm yết 2 triệu 990 nghìn đồng, và Xiaomi Smart 4 Pro cho phòng 60 mét vuông, giá 5 triệu 490 nghìn đồng. Chị muốn em báo giá chi tiết cho mẫu nào ạ?",
+  "customer_id": "C019",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0020/call_1/2/2",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0020",
+        "call": "call_1",
+        "turn": 2
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/615"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0020/call_1/2/2",
+      "request": {
+        "name": "catalog.search",
+        "args": {
+          "category": "gia-dung/may-loc-khong-khi",
+          "min_room_area_m2": 35,
+          "max_price_vnd": 5500000
+        }
+      },
+      "on": "2026-10-16",
+      "started_at": "2026-10-17T04:46:03.938731+00:00",
+      "finished_at": "2026-10-17T04:46:03.938731+00:00",
+      "outcome": "success",
+      "result": {
+        "items": [
+          {
+            "sku": "SKU-XM-4L",
+            "name": "Máy lọc không khí Xiaomi Smart 4 Lite",
+            "category": "gia-dung/may-loc-khong-khi",
+            "list_price_vnd": 2990000,
+            "attributes": {
+              "room_area_m2": 43,
+              "features": "HEPA, app Mi Home",
+              "warranty_months": 24,
+              "child_safe_lock": false
+            },
+            "variants": []
+          },
+          {
+            "sku": "SKU-XM-4P",
+            "name": "Máy lọc không khí Xiaomi Smart 4 Pro",
+            "category": "gia-dung/may-loc-khong-khi",
+            "list_price_vnd": 5490000,
+            "attributes": {
+              "room_area_m2": 60,
+              "features": "HEPA, màn OLED, app Mi Home",
+              "warranty_months": 24,
+              "child_safe_lock": false
+            },
+            "variants": []
+          }
+        ],
+        "total": 2
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"category\": \"gia-dung/may-loc-khong-khi\", \"max_price_vnd\": 5500000, \"min_room_area_m2\": 35}, \"name\": \"catalog.search\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/611"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/616"
+    }
+  ]
+}

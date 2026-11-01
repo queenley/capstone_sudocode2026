@@ -26,7 +26,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Iterable, Literal, Mapping
 
-Source = Literal["policy", "faq", "playbook"]
+Source = Literal["policy", "faq", "gap", "playbook"]
 
 #: ``## [DT-03] Đổi size / màu`` -> ("DT-03", "Đổi size / màu"); also DT-OLD-01, SP-AIR-01.
 SECTION = re.compile(r"^## \[([A-Z]+(?:-[A-Z]+)?-\d+)\]\s*(.*)$", re.MULTILINE)
@@ -196,14 +196,14 @@ def entry_chunk(entry: Mapping[str, Any], *, doc: str) -> Chunk:
     if missing:
         raise ValueError(f"{doc}: entry {entry.get('chunk_id') or '?'} lacks {', '.join(missing)}")
     source = str(entry["source"])
-    if source not in ("faq", "playbook"):
-        raise ValueError(f"{doc}: entry {entry['chunk_id']} has source {source!r}; only faq and playbook are added")
+    if source not in ("faq", "gap", "playbook"):
+        raise ValueError(f"{doc}: entry {entry['chunk_id']} has source {source!r}; only faq, gap and playbook are added")
     title = str(entry["title"])
     known = {"chunk_id", "source", "title", "text", "situation", "persona", "valid_from", "valid_to"}
     return Chunk(
         chunk_id=str(entry["chunk_id"]),
         doc=doc,
-        doc_title="Câu hỏi thường gặp" if source == "faq" else "Kịch bản xử lý tình huống",
+        doc_title="Câu hỏi thường gặp" if source in ("faq", "gap") else "Kịch bản xử lý tình huống",
         title=title,
         text=str(entry["text"]),
         source=source,  # type: ignore[arg-type]

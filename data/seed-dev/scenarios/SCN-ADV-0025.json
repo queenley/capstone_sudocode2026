@@ -1,0 +1,72 @@
+{
+  "scenario_id": "SCN-ADV-0025",
+  "level": "M2",
+  "persona": "khach_hoi_freeship_theo_vung",
+  "hard_case": null,
+  "customer_phone": "0952059972",
+  "customer_name": "Minh",
+  "honorific": "anh",
+  "notes": "Persona khach_hoi_freeship_theo_vung, biến thể freeship_mien_nam_hoi_tu_mien_bac. call_1 (chat_fanpage): hỏi freeship của vùng khác → hen_goi_lai. Chấm chủ yếu: TSR, HR.",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.minh.658",
+      "call_date": "2026-10-16",
+      "customer_goal": "Hỏi về chương trình freeship cho nồi chiên không dầu ở Lê Chân, Hải Phòng.",
+      "customer_turns": [
+        "Alo, anh thấy quảng cáo freeship cho đồ gia dụng trên fanpage, không biết nồi chiên không dầu Xiaomi 4.5L có được freeship không em?",
+        "Địa chỉ giao hàng là Lê Chân, Hải Phòng nhé.",
+        "Nếu không freeship thì phí giao hàng là bao nhiêu vậy?",
+        "À, anh đang cần thay cái nồi cũ đã hỏng, mà chỉ có ngân sách tầm 2 triệu thôi.",
+        "Em cho anh biết phí giao hàng để anh cân nhắc nhé."
+      ],
+      "facts_established": {
+        "usage_need": "thay đồ cũ đã hỏng",
+        "budget_vnd": 2000000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "product_advised": "SKU-AF-XM",
+        "price_quoted_vnd": 1590000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "miền Nam",
+          "địa chỉ giao"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "freeship",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1590000,
+        "list_price_vnd": 1590000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "usage_need": "thay đồ cũ đã hỏng",
+        "budget_vnd": 2000000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "product_advised": "SKU-AF-XM",
+        "price_quoted_vnd": 1590000
+      },
+      "relevant_policy_ids": [
+        "KM-08",
+        "VC-02"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

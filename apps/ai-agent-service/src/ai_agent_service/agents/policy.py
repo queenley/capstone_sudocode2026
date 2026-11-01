@@ -20,6 +20,15 @@ When Jev gives no answer in time (no key, throttled, timed out) the draft
 passes on the hard check alone and the verdict says so: a late answer costs
 the customer more than a skipped soft check, and the hard check has already
 held the numbers to the tools.
+
+It also reads **what the customer means** where an action depends on it
+(:meth:`PolicyAgent.judge`, :data:`INTENTS`): whether a transfer to a person
+is warranted, whether the customer agreed to a deletion, wants one more
+order, or confirmed who they are. Those were word lists matched against the
+customer's message, which read "cho chị nói chuyện với người hiểu chuyện
+này" as no request for a person and "đang cho con bú, muốn mua máy hút sữa"
+as a medical question (2026-11-01). Jev is asked only when the action is
+about to happen, so an ordinary turn costs nothing more.
 """
 
 from __future__ import annotations
@@ -28,7 +37,7 @@ import json
 import logging
 import re
 from dataclasses import dataclass, field
-from typing import Any, Literal
+from typing import Any, Literal, Mapping
 
 from ..components.intake.text import plain
 from ..llm.jev import Boolean, JevUnavailable
@@ -81,13 +90,28 @@ QUESTIONS = {
             "soon) that the tool results do not confirm?"
         ),
     ),
+    "unquoted_price": Boolean(
+        instructions=(
+            "Does the reply state, as this shop's own current price, discount, fee or refund, an amount of "
+            "money that is not in the tool results?"
+        ),
+        criteria={
+            "true": "An amount given as what this shop charges, discounts or refunds now, and the tool results "
+                    "do not contain it.",
+            "false": "Every such amount is in the tool results, or the amount is clearly someone else's: the "
+                     "customer's budget, another shop's price, a price the customer remembers, an offer said "
+                     "to have ended.",
+        },
+    ),
 }
 
 #: Per question, from the lab's leave-one-out choice. ``unsupported_absence`` came later and is set
 #: on four hand-written cases only (2026-10-31: 0.87 for a claim with no search, 0.93 against a search
 #: that found the product, 0.50 after one that found nothing): set it again on the team's labelled set.
+#: ``unquoted_price`` (2026-11-01) starts at 0.8, between the lab's true cases (from 0.92) and its
+#: false alarms (under 0.66); it replaced a word list that blocked correct sentences (SAMPLE-05).
 THRESHOLDS = {"over_promise": 0.9, "stale_policy": 0.9, "competitor": 0.9, "unsupported_absence": 0.8,
-              "false_pressure": 0.9}
+              "false_pressure": 0.9, "unquoted_price": 0.8}
 
 REASONS = {
     "over_promise": "Hứa điều chính sách và kết quả tool không xác nhận.",
@@ -96,7 +120,83 @@ REASONS = {
     "unsupported_absence": "Nói shop không có, không còn bán hoặc không có thông tin về sản phẩm mà tool chưa cho thấy vậy; "
                            "tra catalog_search trước.",
     "false_pressure": "Tạo áp lực khan hiếm hoặc gấp mà tool không xác nhận.",
+    "unquoted_price": "Nói một số tiền như giá, mức giảm hoặc phí của shop mà kết quả tool không có (số khách nói "
+                      "chỉ được nhắc như lời của khách); gọi tool để lấy số đúng.",
 }
+
+
+#: Section 4.4: actions whose condition is what the customer means, read in context. Each is
+#: asked alone, only when its action is about to run; the state is the last few messages,
+#: tokenised (no raw personal data reaches Jev).
+INTENTS = {
+    "handoff": Boolean(
+        instructions=(
+            "Should this conversation be handed to a human colleague now? Read the customer's recent "
+            "messages, the assistant's replies, the reason the assistant gives for the transfer and the "
+            "shop documents it found."
+        ),
+        criteria={
+            "true": "The customer asks to speak to a person; or asks for medical, medicine, pregnancy, "
+                    "breastfeeding-safety, child-safety or legal advice; or makes a serious complaint; or asks "
+                    "something the shop documents and the assistant's tools do not answer, so a person must answer it.",
+            "false": "The customer asks about products, prices, stock, delivery, orders or policies that the "
+                     "documents or tools answer, including a product for mothers or babies (a breast pump, a "
+                     "bottle) when they ask for the product, its specifications or its price rather than for "
+                     "health advice.",
+        },
+    ),
+    "delete": Boolean(
+        instructions=(
+            "The assistant asked the customer to confirm that their personal data should be deleted. Has the "
+            "customer clearly agreed?"
+        ),
+        criteria={
+            "true": "The customer says yes to the deletion.",
+            "false": "The customer declines, hesitates, postpones, asks something else, or was never asked.",
+        },
+    ),
+    "one_more": Boolean(
+        instructions=(
+            "An order for this product was already created in this conversation. Does the customer want to "
+            "buy it again as an additional order?"
+        ),
+        criteria={
+            "true": "The customer asks for one more, another unit or a second order of it.",
+            "false": "The customer adds or corrects details of the order already placed (address, payment, size, "
+                     "colour, quantity of that same order) or only confirms it.",
+        },
+    ),
+    "change": Boolean(
+        instructions=(
+            "The assistant is about to change an order the customer already has (the change is given). Has "
+            "the customer asked for this change or agreed to it?"
+        ),
+        criteria={
+            "true": "The customer asked for this change (\"đổi sang size L\", \"giao về quận 3\") or said yes "
+                    "when the assistant proposed it.",
+            "false": "The customer only described a problem (too tight, faulty, late) without choosing what to do, "
+                     "is still asking about the options, or declined.",
+        },
+    ),
+    "identity": Boolean(
+        instructions=(
+            "The assistant asked whether the customer is the person named, the one who contacted the shop "
+            "before. Does the customer answer yes, that it is them?"
+        ),
+        criteria={
+            "true": "The customer says yes, it is them.",
+            "false": "The customer says no, says it is someone else or that they call for another person, or "
+                     "does not answer.",
+        },
+    ),
+}
+
+#: Provisional (2026-11-01), from a first probe of Jev, no labelled set yet: 0.5 where a wrong "no"
+#: costs the customer a person or an order; higher where a wrong "yes" opens private data or deletes
+#: it. The identity probe put "Ừ đúng rồi em" at 0.72 and "Đúng, chị đây" at 0.98, every refusal at
+#: 0.06 or less (asked as a list of messages; asked as two fields it gave 0.38): hence 0.6.
+#: Set again on the FIX scenarios and the team's labels.
+INTENT_THRESHOLDS = {"handoff": 0.5, "delete": 0.7, "one_more": 0.5, "change": 0.5, "identity": 0.6}
 
 
 @dataclass(frozen=True)
@@ -158,3 +258,19 @@ class PolicyAgent(BaseAgent):
         the reason, because this agent can be wrong too.
         """
         return await self.review(PolicyInput(text=text, tool_results=(), tier="VERIFIED", policy_snippets=policy_snippets))
+
+    async def judge(self, intent: str, state: Mapping[str, Any]) -> bool | None:
+        """What the customer means for one action (:data:`INTENTS`); None when Jev gave no answer in time.
+
+        The caller decides what None means: its word list as a fallback, or, for a transfer, letting
+        the advisor's decision stand.
+        """
+        try:
+            decision = await self.evaluate(json.loads(json.dumps(dict(state), ensure_ascii=False, default=str)),
+                                           {intent: INTENTS[intent]})
+        except JevUnavailable as unavailable:
+            logger.info("Intent check %s skipped: %s", intent, unavailable)
+            return None
+        probability = float(decision.answers[intent].probability or 0.0)
+        logger.info("Intent check %s: %.2f (threshold %.2f)", intent, probability, INTENT_THRESHOLDS[intent])
+        return probability >= INTENT_THRESHOLDS[intent]

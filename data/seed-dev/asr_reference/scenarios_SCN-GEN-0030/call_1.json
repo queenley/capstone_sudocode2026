@@ -1,0 +1,57 @@
+{
+  "scenario_id": "SCN-GEN-0030",
+  "call": "call_1",
+  "input_mode": "text",
+  "source_sha256": "db8f0d6236c4d99bc29fa21fa80a7f5840f992c5e11112c81f90d6617b6c71f8",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Alo, em ơi, anh muốn hỏi về giày chạy bộ size 42 màu đen.",
+      "spoken_text": "alo em ơi anh muốn hỏi về giày chạy bộ size bốn mươi hai màu đen",
+      "entities": {
+        "size_new": 42,
+        "color": "den",
+        "sku": "SKU-SN-RUN2"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Trên Fanpage thấy ghi giá là 1 triệu 3 trăm 20 ngàn, nhưng chỗ khác có giá 1 triệu 190 ngàn.",
+      "spoken_text": "trên fanpage thấy ghi giá là một triệu ba trăm hai mươi ngàn, nhưng chỗ khác có giá một triệu một trăm chín mươi ngàn.",
+      "entities": {
+        "competitor_price_vnd": 1190000,
+        "price_vnd": 1320000
+      },
+      "reference_source": "rule",
+      "issues": [
+        "words_changed",
+        "entity_not_stated:price_vnd"
+      ]
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Giá bên mình sao lại cao hơn vậy nhỉ? Có khuyến mãi gì không?",
+      "spoken_text": "giá bên mình sao lại cao hơn vậy nhỉ có khuyến mãi gì không",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "À, giá cao hơn chỗ khác nên anh cần suy nghĩ thêm, sẽ gọi lại sau nhé.",
+      "spoken_text": "à giá cao hơn chỗ khác nên anh cần suy nghĩ thêm sẽ gọi lại sau nhé",
+      "entities": {
+        "blocker": "can suy nghi them"
+      },
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

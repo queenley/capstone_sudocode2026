@@ -1,0 +1,62 @@
+{
+  "scenario_id": "SCN-GEN-0241",
+  "call": "call_1",
+  "input_mode": "text",
+  "source_sha256": "b58f55190d607407bf02f54eeb32eae86eafd67873684f60b904ad294cd69357",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Alo, anh muốn hỏi về bình sữa Pigeon PPSU 240ml.",
+      "spoken_text": "alo anh muốn hỏi về bình sữa pigeon ppsu hai trăm bốn mươi mililit",
+      "entities": {
+        "sku": "SKU-MB-BOT"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Bé nhà anh 13 tháng rồi, anh thấy bình này có tốt không?",
+      "spoken_text": "bé nhà anh mười ba tháng rồi anh thấy bình này có tốt không",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Giá khoảng 289 ngàn, có đúng không em?",
+      "spoken_text": "giá khoảng hai trăm tám mươi chín ngàn, có đúng không em?",
+      "entities": {
+        "price_vnd": 289000
+      },
+      "reference_source": "rule",
+      "issues": [
+        "words_changed"
+      ]
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "À mà anh muốn so sánh thêm với mấy loại khác nữa, nên chưa quyết được.",
+      "spoken_text": "à mà anh muốn so sánh thêm với mấy loại khác nữa nên chưa quyết được",
+      "entities": {
+        "blocker": "so sanh gia"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 5,
+      "speaker": "C",
+      "text": "Em cho anh xin thêm thông tin rồi anh gọi lại nhé.",
+      "spoken_text": "em cho anh xin thêm thông tin rồi anh gọi lại nhé",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

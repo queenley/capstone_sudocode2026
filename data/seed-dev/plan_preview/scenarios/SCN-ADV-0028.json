@@ -1,0 +1,75 @@
+{
+  "scenario_id": "SCN-ADV-0028",
+  "level": "M2",
+  "persona": "khach_mua_so_luong",
+  "hard_case": null,
+  "customer_phone": "0979298416",
+  "customer_name": "Hương",
+  "honorific": "chị",
+  "notes": "Persona khach_mua_so_luong, biến thể mua_ba_mang_loc. call_1 (hotline): chốt đơn nhiều cái cùng loại → chot_don. call_1 ngày 11/11: ngày chương trình mới bắt đầu (báo giá theo chương trình đang chạy). Chấm chủ yếu: TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-11",
+      "customer_goal": "[plan-only] order_qty",
+      "customer_turns": [
+        "[plan-only] Khách muốn mua 3 cái Màng lọc thay thế AirPure X/Y cùng loại (để thay dần / dùng cho nhiều phòng), hỏi giá mỗi cái, tổng tiền và có giảm khi mua nhiều không; nêu hình thức thanh toán, khu vực giao và chốt đơn đúng 3 cái."
+      ],
+      "facts_established": {
+        "usage_need": "dùng cho gia đình",
+        "budget_vnd": 1000000,
+        "blocker": "cần suy nghĩ thêm",
+        "payment": "bank",
+        "delivery_area": "Long Biên, Hà Nội",
+        "quantity": 3,
+        "product_advised": "SKU-AP-FLT-X",
+        "price_quoted_vnd": 586500,
+        "promo_code": "11-11",
+        "promo_expiry": "2026-11-12",
+        "order_id": "OD600001"
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AP-FLT-X",
+          "price_vnd": 586500,
+          "payment": "bank",
+          "qty": 3
+        },
+        "total_match_vnd": 1759500
+      },
+      "ground_truth_facts": {
+        "price_vnd": 586500,
+        "list_price_vnd": 690000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_11-11_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-11-13",
+        "qty": 3,
+        "total_vnd": 1759500,
+        "call_date": "2026-11-11"
+      },
+      "memory_expectation": {
+        "usage_need": "dùng cho gia đình",
+        "budget_vnd": 1000000,
+        "blocker": "cần suy nghĩ thêm",
+        "payment": "bank",
+        "delivery_area": "Long Biên, Hà Nội",
+        "product_advised": "SKU-AP-FLT-X",
+        "price_quoted_vnd": 586500,
+        "promo_code": "11-11",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "KM-05",
+        "VC-04"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

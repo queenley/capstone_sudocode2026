@@ -1,0 +1,195 @@
+{
+  "conversation_id": "SCN-GEN-0001__call_2",
+  "scenario_id": "SCN-GEN-0001",
+  "call": "call_2",
+  "customer_id": "C031",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_quay_lai_sau_8_thang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Oanh ạ, em là trợ lý ảo của shop BTC. Em hỗ trợ chị về đơn hàng Máy lọc không khí AirPure X đã đặt hôm kia ạ.",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn hỏi đơn hàng của chị bây giờ thế nào rồi?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị cho em xác nhận lại, chị đang hỏi về đơn Máy lọc không khí AirPure X đặt ngày 15/10, giao tại Cầu Giấy, Hà Nội đúng không ạ? Em kiểm tra ngay giúp chị nhé.",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "chị đang hỏi về đơn Máy lọc không khí AirPure X đặt ngày 15/10, giao tại Cầu Giấy, Hà Nội đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "delivery_area",
+        "product_advised"
+      ],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD600001"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị không nhớ mã đơn, nhưng em có thể kiểm tra giúp chị được không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ không sao ạ, em đã kiểm tra và đơn hàng Máy lọc không khí AirPure X của chị đã tạo và đang chờ xử lý chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "created"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hôm kia chị đã đặt hàng mà.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, đơn hàng của chị đã được ghi nhận ngày 15/10, hiện trạng thái là đã tạo. Shop sẽ gọi xác nhận và giao trong 1–2 ngày làm việc tại Cầu Giấy, Hà Nội ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "created"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị chỉ nhớ là chị đã đặt máy lọc không khí AirPure X thôi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi chị, đơn hàng Máy lọc không khí AirPure X của chị đã tạo trên hệ thống, bên em đang chuẩn bị và sẽ giao sớm nhất. Nếu cần thay đổi gì chị báo em nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "created"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có gì mới không em? Chị cần biết để chuẩn bị sẵn.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại đơn của chị đã ghi nhận trên hệ thống và đang ở trạng thái đã tạo, chưa có thay đổi mới chị nhé. Khi đơn chuyển sang trạng thái giao hàng, shop sẽ báo mã vận đơn cho chị qua SMS.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "created"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

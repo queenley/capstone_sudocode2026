@@ -3,8 +3,8 @@
 Admit first, never guess a number, and promise nothing the agent cannot do:
 it speaks only when the customer does, so no line says it will call or write
 back. The safe line is said when a draft is still blocked after two
-regenerations; a second one in the same call sends the next turn to HANDOFF
-(route, rule 1). The other lines are the table's, for the harness to say
+regenerations; it is counted for the trace, and never sends the call to a
+person by itself (route, rule 1). The other lines are the table's, for the harness to say
 without a model. ``{who}`` is how the customer is addressed ("chị", or
 "anh/chị" while it is not known).
 """
@@ -31,10 +31,10 @@ LINES = {
     "order_placed": "Dạ em đã tạo đơn cho {who} rồi ạ, {who} cần đổi gì trong đơn thì báo em nhé.",
 }
 
-#: Per lane; a lane not listed gets SAFE_LINE.
+#: Per lane; a lane not listed gets SAFE_LINE. None is the bridging line: it is said only
+#: after ``handoff.transfer`` succeeded (``respond``), never in place of one.
 BY_LANE = {
     "CLARIFY": LINES["asr_unclear"],
-    "HANDOFF": LINES["bridging"],
 }
 
 
@@ -51,4 +51,5 @@ def line(name: str, who: str = "anh/chị") -> str:
 def is_bridging(text: str) -> bool:
     """Whether a line is the handoff line in some form."""
     lowered = " ".join(text.lower().split())
-    return "kết nối" in lowered and any(w in lowered for w in ("đồng nghiệp", "nhân viên", "tư vấn viên", "người phụ trách"))
+    return (any(w in lowered for w in ("kết nối", "chuyển máy", "chuyển cho"))
+            and any(w in lowered for w in ("đồng nghiệp", "nhân viên", "tư vấn viên", "người phụ trách")))

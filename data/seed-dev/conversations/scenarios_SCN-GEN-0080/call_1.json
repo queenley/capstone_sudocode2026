@@ -1,0 +1,261 @@
+{
+  "conversation_id": "SCN-GEN-0080__call_1",
+  "scenario_id": "SCN-GEN-0080",
+  "call": "call_1",
+  "customer_id": "SYN-C020",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-05",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_kenh_mau_thuan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chú Lê Văn Bình, em là trợ lý ảo của shop. Hôm trước chú có hỏi về Giày chạy bộ RunLite 2 Pro, chú muốn mình hỗ trợ sản phẩm này đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Hôm trước chú có hỏi về Giày chạy bộ RunLite 2 Pro, chú muốn mình hỗ trợ sản phẩm này đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chú muốn hỏi về giày chạy bộ RunLite 2 Pro size 42 màu đen.",
+      "facts_stated": {
+        "size": 42,
+        "color": "den",
+        "product_advised": "SKU-SN-RUN2"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, sản phẩm Giày chạy bộ RunLite 2 Pro size 42 màu đen bên em đang sẵn hàng. Giá ưu đãi hiện tại là 1.352.000đ áp dụng chương trình RUN2-SALE đến hết ngày 7/10 ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1352000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "promo_RUN2-SALE_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1352000",
+          "spoken": "1.352.000đ"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-07",
+          "spoken": "7/10"
+        }
+      ],
+      "pause_before_ms": 450,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Trên Fanpage thấy ghi giá 1 triệu 352 ngàn, nhưng hôm trước chú thấy chỗ khác ghi 1 triệu 240 ngàn.",
+      "facts_stated": {
+        "competitor_price_vnd": 1240000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "1352000",
+          "spoken": "1 triệu 352 ngàn"
+        },
+        {
+          "type": "money",
+          "value": "1240000",
+          "spoken": "1 triệu 240 ngàn"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận ý kiến của chú. Bên em cam kết bán hàng chính hãng, bảo hành theo tiêu chuẩn hãng và hỗ trợ đổi trả trong 7 ngày nếu chưa sử dụng. Giá bên em đang áp dụng là giá khuyến mãi tốt nhất hiện tại rồi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1352000
+        },
+        {
+          "field": "promo_RUN2-SALE_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại sản phẩm này đang có chương trình RUN2-SALE giảm còn 1.352.000đ đến hết ngày 7/10, tặng miễn phí vận chuyển và hỗ trợ đổi size lần đầu hoàn toàn miễn phí cho chú luôn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1352000
+        },
+        {
+          "field": "promo_RUN2-SALE_active",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1352000",
+          "spoken": "1.352.000đ"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-07",
+          "spoken": "7/10"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá này cao hơn chỗ khác, chú cần suy nghĩ thêm một chút.",
+      "facts_stated": {
+        "objection": "giá cao hơn chỗ khác"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, chú cứ cân nhắc thêm giúp em nhé. Nếu chú cần hỗ trợ thêm hoặc quyết định đặt hàng, em luôn sẵn sàng hỗ trợ ạ. Em ghi nhận lại ý kiến và giữ lại thông tin tư vấn cho chú đến khi chú liên hệ lại.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "size",
+          "value": 42,
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "color",
+          "value": "den",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "competitor_price_vnd",
+          "value": 1240000,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "objection",
+          "value": "giá cao hơn chỗ khác",
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN2",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1352000,
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN2-42-DEN",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "promo_code",
+          "value": "RUN2-SALE",
+          "op": "set",
+          "source": "call_1#turn1"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_gia_giay_khuyen_mai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "gia_cao_hon_cho_khac",
+    "objection_handling": "Nêu giá trị đi kèm: hàng chính hãng, bảo hành, đổi trả, giải thích giá đã là tốt nhất.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

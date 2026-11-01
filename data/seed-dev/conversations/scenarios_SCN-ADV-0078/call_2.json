@@ -1,0 +1,152 @@
+{
+  "conversation_id": "SCN-ADV-0078__call_2",
+  "scenario_id": "SCN-ADV-0078",
+  "call": "call_2",
+  "customer_id": "C011",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-01",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_chuyen_giua_nguoi_va_ai",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Mai ạ, em là trợ lý ảo của shop. Hôm trước chị có quan tâm Máy hút sữa điện đôi Spectra S1, còn cần suy nghĩ thêm; chị muốn mình tiếp tục thế nào ạ?",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn hỏi máy hút sữa này có an toàn cho người đang dùng thuốc không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với câu hỏi về an toàn khi dùng thuốc, hiện em chưa có thông tin cụ thể từ hãng. Em xin phép chuyển chị gặp nhân viên tư vấn y tế để được hỗ trợ chuyên sâu và chính xác hơn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu bé có dị ứng thì có sao không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ những câu hỏi liên quan đến dị ứng hoặc sức khỏe của bé, shop sẽ cần nhân viên có chuyên môn tư vấn trực tiếp cho chị để đảm bảo an toàn. Em sẽ chuyển câu hỏi của chị cho dược sĩ hoặc nhân viên phụ trách gọi lại hỗ trợ sớm nhất ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em có thể chuyển cho chị gặp nhân viên tư vấn y tế không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận yêu cầu của chị và sẽ chuyển ngay cho nhân viên tư vấn y tế hỗ trợ. Nhân viên bên em sẽ liên hệ trực tiếp với chị để tư vấn chi tiết về vấn đề này ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "handoff.transfer",
+          "args": {
+            "brief": {
+              "customer_phone": "0980737028",
+              "customer_name": "Mai",
+              "escalation_reason": "cau_hoi_y_te",
+              "conversation_summary": "Khách hỏi Máy hút sữa điện đôi Spectra S1, có câu hỏi y tế/an toàn cần chuyên môn.",
+              "product_advised": "SKU-MB-PUMP1",
+              "price_quoted_vnd": 4290000,
+              "open_questions": [
+                "câu hỏi y tế của khách"
+              ],
+              "next_action": "Dược sĩ/nhân viên phụ trách gọi lại tư vấn",
+              "generated_at": "2026-11-01T10:00:00+07:00",
+              "channel": "hotline"
+            }
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn được tư vấn kỹ hơn về vấn đề này.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_human",
+      "text": "Dạ chào chị Mai, em là nhân viên tư vấn y tế của shop. Em đã nhận được câu hỏi của chị về Máy hút sữa điện đôi Spectra S1 và vấn đề an toàn khi dùng thuốc, dị ứng. Chị có thể chia sẻ cụ thể hơn về loại thuốc chị đang dùng hoặc tình trạng dị ứng của bé để em hỗ trợ chính xác nhất ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_chuyen_mon_y_te",
+    "outcome": "chuyen_may",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

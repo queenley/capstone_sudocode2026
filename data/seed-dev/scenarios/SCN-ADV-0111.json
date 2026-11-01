@@ -1,0 +1,108 @@
+{
+  "scenario_id": "SCN-ADV-0111",
+  "level": "M2",
+  "persona": "khach_khieu_nai_giao_cham",
+  "hard_case": null,
+  "customer_phone": "0998000005",
+  "customer_name": "Nguyễn Văn E",
+  "honorific": "anh",
+  "notes": "Persona khach_khieu_nai_giao_cham, biến thể giao_cham. call_1 (zalo_oa): hỏi tình trạng đơn → cap_nhat_don. Chấm chủ yếu: CCR, RQR, TSR, ESC.",
+  "calls": {
+    "call_1": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_e05",
+      "call_date": "2026-11-14",
+      "customer_goal": "Hỏi đơn hàng giày chạy bộ đang ở đâu",
+      "customer_turns": [
+        "Alo, anh gọi để hỏi đơn hàng giày chạy bộ của anh đang ở đâu rồi.",
+        "Lúc đặt thì bảo giao nhanh mà giờ vẫn chưa thấy gì, bực ghê.",
+        "Có mã vận đơn gì không để anh kiểm tra?",
+        "Em kiểm tra cho anh coi, chứ chờ lâu quá rồi.",
+        "Ừ, anh cần biết rõ nó đang ở đâu và khi nào giao hàng nhé."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C005",
+          "session_id": "SYN-005-S1",
+          "date": "2026-07-13",
+          "channel": "hotline",
+          "summary": "Mua Áo khoác gió Windbreak giá 690.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C005",
+          "session_id": "SYN-005-S2",
+          "date": "2026-10-05",
+          "channel": "zalo_oa",
+          "summary": "Đặt Giày chạy bộ RunLite 1 giá 1.290.000đ, đơn OD900502 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C005",
+          "order_id": "OD900501",
+          "date": "2026-07-13",
+          "sku": "SKU-JK-WND-M-NAVY",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-JK-WND-M-NAVY"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C005",
+          "order_id": "OD900502",
+          "date": "2026-10-05",
+          "sku": "SKU-SN-RUN1-41-DEN",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900502"
+          }
+        }
+      ],
+      "facts_established": {
+        "issue": "đơn hàng giao chậm"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD900502"
+        },
+        "must_say_any": [
+          "đang giao",
+          "đang vận chuyển",
+          "đã bàn giao"
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900502",
+        "order_status": "shipping",
+        "tracking": "VN0052TRK",
+        "call_date": "2026-11-14"
+      },
+      "memory_expectation": {
+        "issue": "đơn hàng giao chậm"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01",
+        "PB-10"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    }
+  }
+}

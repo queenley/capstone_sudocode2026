@@ -1,0 +1,161 @@
+{
+  "scenario_id": "SCN-GEN-0012",
+  "level": "M2",
+  "persona": "khach_ngoai_pham_vi_chuyen_may",
+  "customer_id": "C008",
+  "customer_phone": "0975475177",
+  "customer_name": "Long",
+  "honorific": "anh",
+  "region": "nam",
+  "category": "me-be",
+  "difficulty": "normal",
+  "tags": [
+    "chuyển_may",
+    "câu_hỏi_y_tế",
+    "handoff",
+    "hẹn_gọi_lại",
+    "safety",
+    "tư_vấn_sản_phẩm",
+    "variant:chuan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "ESC"
+  ],
+  "notes": "variant=chuan; session_index=1",
+  "calls": {
+    "call_1": {
+      "channel": "hotline",
+      "call_date": "2026-10-17",
+      "input_mode": "text",
+      "customer_goal": "Hỏi về máy hút sữa cho bé 12 tháng",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về máy hút sữa điện đôi Spectra S1 cho bé 12 tháng.",
+        "Ngân sách của anh là khoảng 4 triệu rưỡi.",
+        "Máy này đang có khuyến mãi gì không em?",
+        "Anh sẽ bàn với gia đình rồi gọi lại nhé."
+      ],
+      "facts_established": {
+        "child_age_months": 12,
+        "budget_vnd": 4500000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "expected_outcome": "hen_goi_lai",
+      "ground_truth_facts": {
+        "price_vnd": 4290000,
+        "list_price_vnd": 4290000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "promo_PUMP-GIFT_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "child_age_months": 12,
+        "budget_vnd": 4500000,
+        "blocker": "để bàn với gia đình",
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      }
+    },
+    "call_2": {
+      "channel": "hotline",
+      "call_date": "2026-10-20",
+      "days_later": 3,
+      "input_mode": "text",
+      "customer_goal": "Hỏi về tính an toàn của sản phẩm cho người thân đang dùng thuốc",
+      "customer_turns": [
+        "Alo, anh có câu hỏi về tính an toàn của máy hút sữa dành cho người thân đang dùng thuốc.",
+        "Liệu sử dụng sản phẩm này có vấn đề gì không em?",
+        "Nếu không có vấn đề gì thì anh sẽ đồng ý chuyển máy."
+      ],
+      "expected_outcome": "chuyen_may",
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "ground_truth_facts": {
+        "call_date": "2026-10-20"
+      },
+      "expected_call_brief": {
+        "customer_phone": "0975475177",
+        "customer_id": "C008",
+        "is_returning": true,
+        "n_previous_sessions": 1,
+        "last_session": {
+          "date": "2026-10-17",
+          "channel": "hotline",
+          "outcome": "hen_goi_lai"
+        },
+        "products_advised": [
+          "SKU-MB-PUMP1"
+        ],
+        "open_blockers": [
+          "để bàn với gia đình"
+        ],
+        "must_not_ask": [
+          "child_age_months",
+          "budget_vnd",
+          "product_advised"
+        ],
+        "suggested_opening": "Dạ em chào anh Long, em gọi lại về SKU-MB-PUMP1 anh đang quan tâm ạ, không biết để bàn với gia đình chưa ạ?",
+        "freshness_checks": {},
+        "ambiguous_identity": false,
+        "generated_at": "2026-10-20T08:00:00",
+        "latency_ms": null
+      },
+      "expected_handoff_brief": {
+        "customer_phone": "0975475177",
+        "customer_name": "Long",
+        "escalation_reason": "cau_hoi_y_te_ngoai_pham_vi",
+        "conversation_summary": "Khách hỏi Máy hút sữa điện đôi Spectra S1, có câu hỏi y tế/an toàn cần chuyên môn.",
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000,
+        "open_questions": [
+          "câu hỏi y tế của khách"
+        ],
+        "next_action": "Dược sĩ/nhân viên phụ trách gọi lại tư vấn",
+        "generated_at": "2026-10-20T10:00:00"
+      },
+      "success_if": {
+        "tool_called": "handoff.transfer",
+        "brief_must_contain": [
+          "customer_phone",
+          "customer_name",
+          "escalation_reason",
+          "conversation_summary",
+          "product_advised",
+          "price_quoted_vnd",
+          "open_questions",
+          "next_action",
+          "generated_at"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      }
+    }
+  },
+  "hard_case": null
+}

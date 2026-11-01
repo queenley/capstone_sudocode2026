@@ -26,15 +26,21 @@ sampling:
   max_output_tokens: 8192
 # Provider rate limits (requests per minute / per UTC day) and retries.
 openai:
-  rpm_limit: 10
-  rpd_limit: 1000
+  rpm_limit: 100
+  rpd_limit: 10000
   retries: 5
   retry_backoff_seconds: 2
 gemini:
-  rpm_limit: 10
-  rpd_limit: 100
+  rpm_limit: 100
+  rpd_limit: 10000
   retries: 5
   retry_backoff_seconds: 2
+# USD per million tokens, for the report's cost estimate only (check the provider's price page before relying on it).
+# cached: the prompt-cache rate for a repeated prefix (generate_dialogue.fixed_prefix).
+pricing_usd_per_mtok:
+  gpt-4.1: {input: 2.00, cached: 0.50, output: 8.00}
+  gpt-4.1-mini: {input: 0.40, cached: 0.10, output: 1.60}
+  gpt-4o-mini: {input: 0.15, cached: 0.075, output: 0.60}
 budget:
   # 3 hours of customer speech is about 150.000 characters.
   max_elevenlabs_chars_per_run: 250000

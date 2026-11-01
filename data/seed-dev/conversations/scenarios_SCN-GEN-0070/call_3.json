@@ -1,0 +1,197 @@
+{
+  "conversation_id": "SCN-GEN-0070__call_3",
+  "scenario_id": "SCN-GEN-0070",
+  "call": "call_3",
+  "customer_id": "SYN-C010",
+  "session_index": 3,
+  "channel": "hotline",
+  "date": "2026-10-19",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_cap_nhat_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, hôm trước anh có đặt Máy hút sữa điện đôi Spectra S1 và còn chờ cuối tháng nhận lương. Anh cần em kiểm tra tình trạng đơn đúng không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Anh xác nhận cần kiểm tra đơn hàng mã OD600001 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "blocker",
+        "product_advised",
+        "payment",
+        "delivery_area",
+        "price_quoted_vnd",
+        "promo_code",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "product_advised",
+          "value": "SKU-MB-PUMP1"
+        },
+        {
+          "field": "blocker",
+          "value": "chờ cuối tháng nhận lương"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo em, anh gọi để hỏi tình trạng đơn hàng của mình.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em kiểm tra đơn hàng mã OD600001 của anh ngay đây ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD600001"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đơn hàng quạt đứng Senko OD901002 đang xử lý đúng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh thông cảm, hiện em chỉ hỗ trợ kiểm tra đơn Máy hút sữa điện đôi Spectra S1 mã OD600001 mà anh vừa hỏi. Đơn này đã tạo và đang xử lý anh nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "order_status",
+          "value": "created"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Không biết khi nào thì mình nhận được hàng nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng đã được ghi nhận trên hệ thống và sẽ giao theo phương thức thanh toán chuyển khoản tận nơi tại Cầu Giấy, Hà Nội. Khi đơn được bàn giao cho đơn vị vận chuyển, anh sẽ nhận mã vận đơn qua SMS hoặc Zalo để theo dõi trạng thái giao hàng.",
+      "questions": [],
+      "facts_used": [
+        "payment",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "payment",
+          "value": "bank"
+        },
+        {
+          "field": "delivery_area",
+          "value": "Cầu Giấy, Hà Nội"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh mong sớm nhận được hàng, em kiểm tra giúp anh với.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã kiểm tra và đơn của anh đang chuẩn bị, shop sẽ giao hàng trong thời gian sớm nhất có thể. Em cảm ơn anh đã liên hệ shop BTC ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "created"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

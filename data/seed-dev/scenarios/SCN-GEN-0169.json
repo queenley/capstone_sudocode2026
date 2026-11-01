@@ -1,0 +1,167 @@
+{
+  "scenario_id": "SCN-GEN-0169",
+  "level": "M2",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "hard_case": null,
+  "customer_phone": "0998000010",
+  "customer_name": "Trần Văn J",
+  "honorific": "anh",
+  "notes": "Persona khach_co_don_chua_co_lich_su, biến thể chuan. call_1 (hotline): hỏi tình trạng đơn → cap_nhat_don; call_2 (hotline): đổi địa chỉ giao → cap_nhat_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-12",
+      "customer_goal": "Hỏi tình trạng đơn hàng Quạt đứng Senko TS16",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về tình trạng đơn hàng quạt đứng Senko TS16 mà anh đã đặt.",
+        "Đơn hàng này đang trong quá trình xử lý đúng không em?",
+        "Thời gian giao hàng dự kiến là khi nào nhỉ?",
+        "Anh có thấy thông tin gì trên trang web không?"
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C010",
+          "session_id": "SYN-010-S3",
+          "date": "2025-05-14",
+          "channel": "web",
+          "summary": "Mua Nồi chiên không dầu Xiaomi 4.5L giá 1.590.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C010",
+          "session_id": "SYN-010-S1",
+          "date": "2026-07-01",
+          "channel": "zalo_oa",
+          "summary": "Mua Máy lọc nước UF Sunhouse giá 3.290.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C010",
+          "session_id": "SYN-010-S2",
+          "date": "2026-10-10",
+          "channel": "fb",
+          "summary": "Đặt Quạt đứng Senko TS16 giá 590.000đ, đơn OD901002 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C010",
+          "order_id": "OD901001",
+          "date": "2026-07-01",
+          "sku": "SKU-WF-UF",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-WF-UF"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C010",
+          "order_id": "OD901002",
+          "date": "2026-10-10",
+          "sku": "SKU-FAN-SEN",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901002"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C010",
+          "order_id": "OD901003",
+          "date": "2025-05-14",
+          "sku": "SKU-AF-XM",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AF-XM"
+          }
+        }
+      ],
+      "facts_established": {
+        "issue": "đơn hàng đang xử lý"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD901003"
+        },
+        "must_say_any": [
+          "đã giao",
+          "giao thành công"
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD901003",
+        "order_status": "delivered",
+        "call_date": "2026-11-12"
+      },
+      "memory_expectation": {
+        "issue": "đơn hàng đang xử lý"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    },
+    "call_2": {
+      "days_later": 1,
+      "customer_goal": "Muốn đổi địa chỉ giao hàng cho đơn hàng Quạt đứng",
+      "customer_turns": [
+        "Alo, anh gọi lại để đổi địa chỉ giao hàng cho đơn quạt đứng.",
+        "Hiện tại đơn hàng vẫn chưa giao đúng không em?",
+        "Địa chỉ mới là Cầu Giấy, Hà Nội nhé.",
+        "Nhờ em cập nhật giúp anh với!"
+      ],
+      "facts_established": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "must_carry_over": [
+        "issue",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "issue",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "OD901003",
+          "action": "update_address"
+        }
+      },
+      "ground_truth_facts": {
+        "order_id": "OD901003",
+        "order_status": "delivered",
+        "call_date": "2026-11-13"
+      },
+      "memory_expectation": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    }
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "scenario_id": "SCN-ADV-0117",
+  "level": "M2",
+  "persona": "khach_hoi_khuyen_mai_sap_toi",
+  "hard_case": null,
+  "customer_phone": "0993186032",
+  "customer_name": "Đức",
+  "honorific": "anh",
+  "notes": "Persona khach_hoi_khuyen_mai_sap_toi, biến thể hoi_sale_11_11_roi_tu_van. call_1 (chat_fanpage): hỏi khuyến mãi sắp tới (11/11) → hen_goi_lai; call_2 (hotline): tư vấn, chưa chốt → hen_goi_lai. Chấm chủ yếu: CCR, RQR, HR.",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.đức.146",
+      "call_date": "2026-10-20",
+      "customer_goal": "Hỏi về nồi chiên không dầu và chương trình khuyến mãi 11/11",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về nồi chiên không dầu Lock&Lock 4L, giá hiện tại bao nhiêu em nhỉ?",
+        "À, 1 triệu 890 ngàn hả? Thế 11/11 bên em có sale không, chị đợi đến lúc đó có rẻ không?",
+        "Em biết thì nói chị nghe đi, chị đợi để mua cho gia đình.",
+        "Ok, để anh bàn với gia đình rồi gọi lại nhé."
+      ],
+      "facts_established": {
+        "blocker": "để bàn với gia đình",
+        "budget_vnd": 2500000,
+        "usage_need": "dùng cho gia đình",
+        "product_advised": "SKU-AF-4L",
+        "price_quoted_vnd": 1890000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "future_promo_disclosed",
+            "value": true
+          }
+        ],
+        "trace_must_not_match": [
+          "11/11",
+          "11-11",
+          "11\\.11",
+          "(?i)mười một tháng mười một",
+          "(?i)ngày độc thân"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1890000,
+        "list_price_vnd": 1890000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "future_promo_disclosed": false,
+        "call_date": "2026-10-20"
+      },
+      "memory_expectation": {
+        "blocker": "để bàn với gia đình",
+        "budget_vnd": 2500000,
+        "usage_need": "dùng cho gia đình",
+        "product_advised": "SKU-AF-4L",
+        "price_quoted_vnd": 1890000
+      },
+      "relevant_policy_ids": [
+        "KM-02",
+        "PB-03"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 2,
+      "customer_goal": "Hỏi thêm về nồi chiên không dầu và khuyến mãi",
+      "customer_turns": [
+        "Chào em, hôm trước anh hỏi nồi chiên không dầu Lock&Lock, giờ anh muốn biết thêm thông tin.",
+        "Giá vẫn là 1 triệu 890 ngàn đúng không?",
+        "11/11 có khuyến mãi gì đặc biệt không?",
+        "Ờ, anh cần hỏi thêm gia đình nữa rồi sẽ quyết định sau nhé."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-AF-4L",
+        "price_quoted_vnd": 1890000
+      },
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1890000,
+        "list_price_vnd": 1890000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-22"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-AF-4L",
+        "price_quoted_vnd": 1890000
+      },
+      "relevant_policy_ids": [
+        "SP-AF-01",
+        "FAQ-07",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

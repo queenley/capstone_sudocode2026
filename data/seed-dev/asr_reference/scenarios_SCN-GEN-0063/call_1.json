@@ -1,0 +1,66 @@
+{
+  "scenario_id": "SCN-GEN-0063",
+  "call": "call_1",
+  "input_mode": "text",
+  "source_sha256": "f85bdc3fe5e0a4700d5ee2fad822e9b473d16c259c090c74e3434bc0d6b81b7f",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Alo, anh muốn hỏi về túi trữ sữa Sunmum mà em có ấy.",
+      "spoken_text": "alo anh muốn hỏi về túi trữ sữa sunmum mà em có ấy.",
+      "entities": {
+        "sku": "SKU-MB-BAG"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Giá của túi này là bao nhiêu em nhỉ?",
+      "spoken_text": "giá của túi này là bao nhiêu em nhỉ?",
+      "entities": {
+        "sku": "SKU-MB-BAG"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Anh có ngân sách khoảng 500 ngàn thôi.",
+      "spoken_text": "anh có ngân sách khoảng năm trăm ngàn thôi.",
+      "entities": {
+        "budget_vnd": 500000
+      },
+      "reference_source": "rule",
+      "issues": [
+        "words_changed"
+      ]
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "À, cho anh hỏi là cái này có khuyến mãi gì không?",
+      "spoken_text": "à cho anh hỏi là cái này có khuyến mãi gì không?",
+      "entities": {
+        "sku": "SKU-MB-BAG"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 5,
+      "speaker": "C",
+      "text": "Anh cần suy nghĩ thêm về cái này rồi gọi lại nhé.",
+      "spoken_text": "anh cần suy nghĩ thêm về cái này rồi gọi lại nhé.",
+      "entities": {
+        "blocker": "can suy nghi them"
+      },
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

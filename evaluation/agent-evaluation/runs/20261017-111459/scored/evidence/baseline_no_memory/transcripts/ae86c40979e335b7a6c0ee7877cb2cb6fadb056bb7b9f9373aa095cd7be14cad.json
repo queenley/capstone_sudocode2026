@@ -1,0 +1,77 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0010",
+    "call": "call_2",
+    "turn": 1
+  },
+  "customer_text": "Alo, anh gọi lại để hỏi về máy lọc không khí AirPure Pro.",
+  "agent_text": "Dạ anh Minh, anh muốn em tư vấn chi tiết về máy lọc không khí AirPure Pro hay anh cần biết giá và tồn kho hiện tại ạ?",
+  "customer_id": "C004",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0010/call_2/1/6",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0010",
+        "call": "call_2",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/43"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0010/call_2/1/6",
+      "request": {
+        "name": "crm.get_customer",
+        "args": {
+          "phone": "0952059972"
+        }
+      },
+      "on": "2026-10-18",
+      "started_at": "2026-10-17T04:34:58.409593+00:00",
+      "finished_at": "2026-10-17T04:34:58.409593+00:00",
+      "outcome": "success",
+      "result": {
+        "found": true,
+        "ambiguous": false,
+        "customer_id": "C004",
+        "name": "Minh",
+        "honorific": "anh",
+        "phone": "0952059972",
+        "identities": {
+          "zalo_id": null,
+          "fb_id": "fb.minh.658"
+        },
+        "orders": [],
+        "sessions": []
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"phone\": \"0952059972\"}, \"name\": \"crm.get_customer\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/46"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/48"
+    }
+  ]
+}

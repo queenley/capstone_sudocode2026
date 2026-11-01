@@ -1,0 +1,54 @@
+{
+  "scenario_id": "SCN-GEN-0156",
+  "call": "call_1",
+  "input_mode": "text",
+  "source_sha256": "27d77af7c090c35c90e831e497c4e8e3b29c2c5758d6ba8ca5980715e6b50060",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Alo, anh muốn hỏi về máy lọc không khí Xiaomi Smart 4 Lite mà em tư vấn hôm trước.",
+      "spoken_text": "alo, anh muốn hỏi về máy lọc không khí xiaomi smart bốn lite mà em tư vấn hôm trước.",
+      "entities": {},
+      "reference_source": "rule",
+      "issues": [
+        "words_changed"
+      ]
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Máy này có đủ cho diện tích phòng 40 mét vuông không em?",
+      "spoken_text": "máy này có đủ cho diện tích phòng bốn mươi mét vuông không em",
+      "entities": {
+        "room_area_m2": 40
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Nhà anh có trẻ nhỏ, ngân sách khoảng 3 triệu đồng thôi.",
+      "spoken_text": "nhà anh có trẻ nhỏ ngân sách khoảng ba triệu đồng thôi",
+      "entities": {
+        "has_children": true,
+        "budget_vnd": 3000000
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "Máy này đang có khuyến mãi gì không nhỉ? À mà anh cần hỏi vợ đã rồi hẹn lại em nhé, tối thứ Hai (2/11) tầm 7 giờ em gọi lại anh nhé.",
+      "spoken_text": "máy này đang có khuyến mãi gì không nhỉ à mà anh cần hỏi vợ đã rồi hẹn lại em nhé tối thứ hai hai tháng mười một tầm bảy giờ em gọi lại anh nhé",
+      "entities": {
+        "blocker": "can hoi vo"
+      },
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

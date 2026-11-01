@@ -23,5 +23,6 @@ sys.path[:0] = [str(ROOT / "apps" / "ai-agent-service" / "src"), str(ROOT / "pac
 
 from ai_agent_service.pipeline.eval.cli import main  # noqa: E402  (the path above first)
 
+
 if __name__ == "__main__":
     sys.exit(main())

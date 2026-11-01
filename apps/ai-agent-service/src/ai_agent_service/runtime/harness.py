@@ -339,7 +339,12 @@ class CallStore:
             rows.append(("agent", reply["text"], self._meta(state)))
         async with connection() as conn, conn.transaction():
             await require_writable_call(conn, self.call_id)
+            cursor = await conn.execute("SELECT handoff_status FROM calls WHERE id = %s", (self.call_id,))
+            before = ((await cursor.fetchone()) or {}).get("handoff_status")
             for speaker, text, meta in rows:
+                mark = handoff_mark(state, before) if speaker == "customer" else None
+                if mark:
+                    meta = {**meta, "handoff": mark}
                 await conn.execute(
                     "INSERT INTO turns (call_id, turn_id, speaker, content, meta) VALUES (%s, %s, %s, %s, %s) "
                     "ON CONFLICT (call_id, turn_id, speaker) DO NOTHING",
@@ -371,7 +376,7 @@ class CallStore:
             "guard": state.get("guard") or {}, "blocked_drafts": state.get("blocked_drafts") or [],
             "regenerations": state.get("regen_count") or 0,
             "call_brief_latency_ms": state.get("call_brief_latency_ms"),
-            "handoff": state.get("handoff") if (state.get("handoff") or {}).get("status") == "pending" else None,
+            "handoff": state.get("handoff") if (state.get("handoff") or {}).get("status") in ("pending", "accepted") else None,
             "turn_no": state.get("turn_no"),
         }
 
@@ -398,9 +403,11 @@ class CallStore:
             "brief = %(brief)s, brief_object = %(brief_object)s, warnings = %(warnings)s, "
             "route_reason = %(route_reason)s, mode = %(mode)s, "
             "suggestion = CASE WHEN %(copilot)s THEN %(suggestion)s ELSE suggestion END, "
-            "handoff_status = CASE WHEN %(handoff)s AND handoff_status IS NULL THEN 'pending' ELSE handoff_status END, "
+            "accepted_by = CASE WHEN %(handoff)s AND handoff_status IS NULL THEN %(accepted_by)s ELSE accepted_by END, "
+            "accepted_at = CASE WHEN %(handoff)s AND %(auto)s AND handoff_status IS NULL THEN now() ELSE accepted_at END, "
             "handoff_reason = CASE WHEN %(handoff)s AND handoff_status IS NULL THEN %(reason)s ELSE handoff_reason END, "
             "handoff_requested_at = CASE WHEN %(handoff)s AND handoff_status IS NULL THEN now() ELSE handoff_requested_at END, "
+            "handoff_status = CASE WHEN %(handoff)s AND handoff_status IS NULL THEN %(handoff_status)s ELSE handoff_status END, "
             "handoff_brief = CASE WHEN %(handoff)s THEN %(handoff_brief)s ELSE handoff_brief END "
             "WHERE id = %(id)s",
             {
@@ -417,13 +424,35 @@ class CallStore:
                 "mode": state.get("mode") or "speak",
                 "copilot": state.get("mode") == "copilot",
                 "suggestion": json.dumps(state.get("suggestion"), ensure_ascii=False) if state.get("suggestion") else None,
-                "handoff": handoff.get("status") == "pending",
+                "handoff": handoff.get("status") in ("pending", "accepted"),
+                # "accepted" only with HANDOFF_AUTO_ACCEPT (test runs): no consultant took it.
+                "handoff_status": handoff.get("status"),
+                "accepted_by": handoff.get("accepted_by"),
+                "auto": bool(handoff.get("accepted_by")),
                 "reason": _reason_label(handoff.get("reason")),
                 # Tokenised like the transcript: the brief carries the phone.
                 "handoff_brief": json.dumps(pii.tokenise_data(handoff.get("brief"), self.vault), ensure_ascii=False, default=str)
                 if handoff else None,
             },
         )
+
+
+def handoff_mark(state: dict[str, Any], before: str | None) -> dict[str, Any] | None:
+    """What the staff screen highlights on a customer message (``turns.meta.handoff``).
+
+    ``trigger``: the message after which the assistant handed over (a successful
+    ``handoff.transfer`` this turn, on a call not handed over yet). ``waiting``:
+    a message written while the handoff waits for a person, which the assistant
+    only drafts for. Once a consultant holds the call, nothing is marked.
+    """
+    if before == "pending":
+        return {"role": "waiting", "label": "Khách nhắn khi đang chờ nhân viên"}
+    handed = next((r for r in state.get("tool_results") or []
+                   if r.get("name") == "handoff.transfer" and (r.get("result") or {}).get("ok")), None)
+    if before is None and handed is not None:
+        code = ((handed.get("args") or {}).get("brief") or {}).get("escalation_reason") or "khac"
+        return {"role": "trigger", "reason": code, "label": REASONS.get(code, code)}
+    return None
 
 
 def _reason_label(code: str | None) -> str | None:

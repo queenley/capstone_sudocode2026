@@ -1,0 +1,3197 @@
+{
+  "description": "Bộ ASR hội thoại của team: 24 cuộc gọi hai người nói (agent + khách) sinh từ reference transcript; LLM viết từng câu ở dạng nói rồi TTS đọc đúng câu đó (268 câu LLM, 3 câu theo luật); 8 hội thoại băng thông điện thoại có nhiễu.",
+  "hypotheses_format": "asr/hypotheses.json = {\"D01\": {\"text\": \"<transcript toàn hội thoại>\", \"entities\": {\"price_vnd\": 4890000, ...}, \"turns\": [{\"speaker\": \"A|C\", \"start\": 0.0, \"end\": 3.2, \"text\": \"...\"}]}}. turns là tùy chọn (M2 diarization).",
+  "normalization_rule": "Trước khi tính WER/CER: lowercase, NFC, bỏ dấu câu, gộp khoảng trắng. Ground truth viết số bằng chữ như lời nói; nếu ASR trả về chữ số thì nhóm phải chuẩn hóa về cùng một dạng (nêu rõ chọn dạng nào) trước khi tính WER. Entity so exact-match sau ITN.",
+  "reference_date": "2026-10-15",
+  "kind": "dialogues",
+  "entity_schema": {
+    "additionalProperties": false,
+    "description": "Values a line states, in BTC's ``asr/ground_truth.json`` keys (D01–D04); null when the line does not say it.",
+    "properties": {
+      "room_area_m2": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Diện tích phòng, m² (\"hai mươi lăm mét vuông\" → 25)",
+        "title": "Room Area M2"
+      },
+      "has_children": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Nhà có (true) / không có (false) trẻ nhỏ",
+        "title": "Has Children"
+      },
+      "budget_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Ngân sách khách nói, đồng (\"năm triệu\" → 5000000)",
+        "title": "Budget Vnd"
+      },
+      "competitor_price_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Giá chỗ khác khách đưa ra để so sánh, đồng",
+        "title": "Competitor Price Vnd"
+      },
+      "payment": {
+        "anyOf": [
+          {
+            "enum": [
+              "COD",
+              "bank"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Cách trả tiền: COD (thu hộ) hoặc bank (chuyển khoản)",
+        "title": "Payment"
+      },
+      "blocker": {
+        "anyOf": [
+          {
+            "enum": [
+              "can hoi chong",
+              "can hoi vo",
+              "can hoi nguoi nha",
+              "so sanh gia",
+              "vuot ngan sach",
+              "cho luong",
+              "can suy nghi them"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Lý do chưa chốt mà câu nói rõ; null khi câu không nêu lý do",
+        "title": "Blocker"
+      },
+      "size_old": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Size đang có khi khách muốn đổi",
+        "title": "Size Old"
+      },
+      "size_new": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Size khách muốn đổi sang",
+        "title": "Size New"
+      },
+      "color": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Màu được chọn, không dấu, chữ thường (\"den\")",
+        "title": "Color"
+      },
+      "phone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Số điện thoại được đọc, 10 chữ số",
+        "title": "Phone"
+      },
+      "sku": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Mã sản phẩm được nhắc tới, CHỈ lấy từ danh sách products được gửi",
+        "title": "Sku"
+      },
+      "order_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Mã đơn được đọc, viết hoa như OD312456",
+        "title": "Order Id"
+      },
+      "price_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Giá bán agent báo, đồng",
+        "title": "Price Vnd"
+      },
+      "promo_expiry": {
+        "anyOf": [
+          {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Hạn khuyến mãi agent báo, YYYY-MM-DD",
+        "title": "Promo Expiry"
+      },
+      "delivery_days": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Số ngày giao hàng agent báo",
+        "title": "Delivery Days"
+      },
+      "warranty_months": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Số tháng bảo hành agent báo",
+        "title": "Warranty Months"
+      },
+      "return_days": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Số ngày được đổi trả agent báo",
+        "title": "Return Days"
+      },
+      "min_free_ship_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Giá trị đơn tối thiểu để miễn phí giao, đồng",
+        "title": "Min Free Ship Vnd"
+      },
+      "bulky_fee_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Phụ phí hàng cồng kềnh, đồng",
+        "title": "Bulky Fee Vnd"
+      },
+      "exchange_fee_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Phí đổi hàng, đồng (0 khi miễn phí)",
+        "title": "Exchange Fee Vnd"
+      },
+      "refund_vnd": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Số tiền hoàn lại, đồng",
+        "title": "Refund Vnd"
+      },
+      "in_stock": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Agent báo còn hàng (true) / hết hàng (false)",
+        "title": "In Stock"
+      },
+      "restock_date": {
+        "anyOf": [
+          {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Ngày có hàng lại agent báo, YYYY-MM-DD",
+        "title": "Restock Date"
+      }
+    },
+    "title": "SpokenEntities",
+    "type": "object"
+  },
+  "dialogues": [
+    {
+      "id": "T01",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": "f",
+      "agent_region": "bac",
+      "scenario_ref": "SCN-ADV-0001 call_1",
+      "noisy": false,
+      "note": "khach_hoi_san_pham_khong_ban; normal",
+      "entities": {
+        "sku": "SKU-AP-X"
+      },
+      "full_text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê em có thể hỗ trợ chị hoa alo chị muốn hỏi mua tủ lạnh inverter khoảng ba trăm lít em có không dạ chị thông cảm hiện tại shop em chưa kinh doanh tủ lạnh inverter khoảng ba trăm lít ạ chị nghe nói tủ lạnh này rất tiết kiệm điện mà không biết ở shop mình có không dạ rất tiếc shop em chưa có mặt hàng tủ lạnh inverter hiện chưa bán sản phẩm này ạ chị tìm mãi mà không thấy tủ lạnh này ở đâu cả có giống gì không em dạ hiện tại bên em không kinh doanh tủ lạnh nhưng chị có thể tham khảo các sản phẩm gia dụng khác như máy lọc không khí e pia x cũng rất tiết kiệm điện và phù hợp gia đình ạ em có sản phẩm nào gần giống không chị muốn tham khảo thêm dạ với phân khúc gia dụng tiết kiệm điện bên em có máy lọc không khí e pia x nếu chị quan tâm em gửi thông tin chi tiết để chị tham khảo nhé",
+      "n_turns": 9,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê em có thể hỗ trợ chị hoa",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "alo chị muốn hỏi mua tủ lạnh inverter khoảng ba trăm lít em có không",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ chị thông cảm hiện tại shop em chưa kinh doanh tủ lạnh inverter khoảng ba trăm lít ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "chị nghe nói tủ lạnh này rất tiết kiệm điện mà không biết ở shop mình có không",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ rất tiếc shop em chưa có mặt hàng tủ lạnh inverter hiện chưa bán sản phẩm này ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "chị tìm mãi mà không thấy tủ lạnh này ở đâu cả có giống gì không em",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ hiện tại bên em không kinh doanh tủ lạnh nhưng chị có thể tham khảo các sản phẩm gia dụng khác như máy lọc không khí e pia x cũng rất tiết kiệm điện và phù hợp gia đình ạ",
+          "entities": {
+            "sku": "SKU-AP-X"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "em có sản phẩm nào gần giống không chị muốn tham khảo thêm",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ với phân khúc gia dụng tiết kiệm điện bên em có máy lọc không khí e pia x nếu chị quan tâm em gửi thông tin chi tiết để chị tham khảo nhé",
+          "entities": {
+            "sku": "SKU-AP-X"
+          },
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T02",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": "f",
+      "agent_region": "bac",
+      "scenario_ref": "SCN-ADV-0002 call_1",
+      "noisy": false,
+      "note": "khach_hoi_ngoai_chu_de; normal",
+      "entities": {},
+      "full_text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê em có thể hỗ trợ gì cho chị hôm nay ạ alo chị đang tìm công thức nấu phở bò mà nghe bảo có nhiều cách làm lắm dạ chị ơi hiện em chưa có thông tin về công thức nấu phở bò ạ em sẽ ghi nhận câu hỏi của chị để chuyển đến bộ phận phù hợp hỗ trợ thêm nhé em có biết công thức nào ngon không dạ chị thông cảm em chưa nắm được các công thức nấu phở bò ngon đâu ạ nếu chị cần tư vấn sản phẩm hoặc chính sách của shop thì em hỗ trợ được ngay ạ chị nghe bạn bè bảo là phải có nước dùng ngon thì phở mới ngon phải không em dạ về cách nấu nước dùng hay bí quyết riêng thì em chưa có thông tin cụ thể ạ nếu chị quan tâm đến sản phẩm của shop hoặc cần tư vấn gì thêm chị cứ nhắn em nhé à mà em có sản phẩm gì không cho chị biết luôn nhé dạ hiện tại bên em chưa kinh doanh sản phẩm liên quan đến nấu phở bò chị nha nếu chị có nhu cầu về sản phẩm gia dụng hoặc mẹ và bé thì em sẵn sàng hỗ trợ ạ",
+      "n_turns": 9,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê em có thể hỗ trợ gì cho chị hôm nay ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "alo chị đang tìm công thức nấu phở bò mà nghe bảo có nhiều cách làm lắm",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ chị ơi hiện em chưa có thông tin về công thức nấu phở bò ạ em sẽ ghi nhận câu hỏi của chị để chuyển đến bộ phận phù hợp hỗ trợ thêm nhé",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "em có biết công thức nào ngon không",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ chị thông cảm em chưa nắm được các công thức nấu phở bò ngon đâu ạ nếu chị cần tư vấn sản phẩm hoặc chính sách của shop thì em hỗ trợ được ngay ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "chị nghe bạn bè bảo là phải có nước dùng ngon thì phở mới ngon phải không em",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ về cách nấu nước dùng hay bí quyết riêng thì em chưa có thông tin cụ thể ạ nếu chị quan tâm đến sản phẩm của shop hoặc cần tư vấn gì thêm chị cứ nhắn em nhé",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "à mà em có sản phẩm gì không cho chị biết luôn nhé",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ hiện tại bên em chưa kinh doanh sản phẩm liên quan đến nấu phở bò chị nha nếu chị có nhu cầu về sản phẩm gia dụng hoặc mẹ và bé thì em sẵn sàng hỗ trợ ạ",
+          "entities": {},
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T03",
+      "customer_region": "trung",
+      "customer_gender": "f",
+      "agent_gender": "f",
+      "agent_region": "trung",
+      "scenario_ref": "SCN-ADV-0005 call_1",
+      "noisy": true,
+      "note": "khach_hoi_ky_san_pham; normal",
+      "entities": {
+        "size_new": 39,
+        "color": "den",
+        "sku": "SKU-SN-RUN2",
+        "price_vnd": 1690000,
+        "in_stock": true,
+        "return_days": 7,
+        "has_children": false,
+        "payment": "COD",
+        "blocker": "can suy nghi them"
+      },
+      "full_text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê em hỗ trợ chị về giày chạy bộ runlite hai pro size ba mươi chín màu đen ạ alo chị muốn hỏi một chút về giày chạy bộ runlite hai pro size ba mươi chín màu đen dạ sản phẩm giày chạy bộ runlite hai pro size ba mươi chín màu đen hiện shop đang còn hàng với giá một triệu sáu trăm chín mươi nghìn đồng ạ giày này bảo hành bao lâu vậy em dạ giày chạy bộ runlite hai pro được áp dụng chính sách đổi trả trong bảy ngày kể từ khi nhận hàng chị nhé chị dùng giày này cho diện tích hoặc nhu cầu nào nhỉ dạ mẫu giày này phù hợp cho chạy bộ ngoài trời luyện tập thể thao hoặc đi bộ hàng ngày ạ tính năng của giày này như thế nào dạ giày runlite hai pro có thiết kế nhẹ đế eva đàn hồi tốt phần upper vải lưới thoáng khí phù hợp chạy bộ đường dài ngoài ra đế có tấm carbon hỗ trợ vận động hiệu quả hơn ạ có khóa trẻ em không em dạ sản phẩm này không có khóa trẻ em chị nhé chất liệu giày này là gì vậy dạ giày sử dụng chất liệu upper vải lưới knit và đế eva kết hợp tấm carbon giúp nhẹ và bền cho việc chạy bộ chị ạ giày này có khuyến mãi gì không em dạ hiện tại mẫu giày này chưa có chương trình khuyến mãi nào chị nhé tuy nhiên chị mua sẽ được miễn phí thu hộ khi thanh toán cê ô đê toàn quốc ạ ừm để chị suy nghĩ thêm đã nhé dạ vâng chị cứ suy nghĩ thêm ạ khi nào cần hỗ trợ hoặc đặt hàng chị liên hệ lại shop nhé em cảm ơn chị đã quan tâm sản phẩm ạ",
+      "n_turns": 17,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê em hỗ trợ chị về giày chạy bộ runlite hai pro size ba mươi chín màu đen ạ",
+          "entities": {
+            "size_new": 39,
+            "color": "den",
+            "sku": "SKU-SN-RUN2"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "alo chị muốn hỏi một chút về giày chạy bộ runlite hai pro size ba mươi chín màu đen",
+          "entities": {
+            "size_new": 39,
+            "color": "den",
+            "sku": "SKU-SN-RUN2"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ sản phẩm giày chạy bộ runlite hai pro size ba mươi chín màu đen hiện shop đang còn hàng với giá một triệu sáu trăm chín mươi nghìn đồng ạ",
+          "entities": {
+            "size_new": 39,
+            "color": "den",
+            "sku": "SKU-SN-RUN2",
+            "price_vnd": 1690000,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "giày này bảo hành bao lâu vậy em",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ giày chạy bộ runlite hai pro được áp dụng chính sách đổi trả trong bảy ngày kể từ khi nhận hàng chị nhé",
+          "entities": {
+            "sku": "SKU-SN-RUN2",
+            "return_days": 7
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "chị dùng giày này cho diện tích hoặc nhu cầu nào nhỉ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ mẫu giày này phù hợp cho chạy bộ ngoài trời luyện tập thể thao hoặc đi bộ hàng ngày ạ",
+          "entities": {
+            "sku": "SKU-SN-RUN2"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "tính năng của giày này như thế nào",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ giày runlite hai pro có thiết kế nhẹ đế eva đàn hồi tốt phần upper vải lưới thoáng khí phù hợp chạy bộ đường dài ngoài ra đế có tấm carbon hỗ trợ vận động hiệu quả hơn ạ",
+          "entities": {
+            "sku": "SKU-SN-RUN2"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 10,
+          "speaker": "C",
+          "text": "có khóa trẻ em không em",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 11,
+          "speaker": "A",
+          "text": "dạ sản phẩm này không có khóa trẻ em chị nhé",
+          "entities": {
+            "has_children": false,
+            "sku": "SKU-SN-RUN2"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 12,
+          "speaker": "C",
+          "text": "chất liệu giày này là gì vậy",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 13,
+          "speaker": "A",
+          "text": "dạ giày sử dụng chất liệu upper vải lưới knit và đế eva kết hợp tấm carbon giúp nhẹ và bền cho việc chạy bộ chị ạ",
+          "entities": {
+            "sku": "SKU-SN-RUN2"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 14,
+          "speaker": "C",
+          "text": "giày này có khuyến mãi gì không em",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 15,
+          "speaker": "A",
+          "text": "dạ hiện tại mẫu giày này chưa có chương trình khuyến mãi nào chị nhé tuy nhiên chị mua sẽ được miễn phí thu hộ khi thanh toán cê ô đê toàn quốc ạ",
+          "entities": {
+            "payment": "COD",
+            "sku": "SKU-SN-RUN2"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 16,
+          "speaker": "C",
+          "text": "ừm để chị suy nghĩ thêm đã nhé",
+          "entities": {
+            "blocker": "can suy nghi them"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 17,
+          "speaker": "A",
+          "text": "dạ vâng chị cứ suy nghĩ thêm ạ khi nào cần hỗ trợ hoặc đặt hàng chị liên hệ lại shop nhé em cảm ơn chị đã quan tâm sản phẩm ạ",
+          "entities": {},
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T04",
+      "customer_region": "nam",
+      "customer_gender": "f",
+      "agent_gender": "f",
+      "agent_region": "nam",
+      "scenario_ref": "SCN-ADV-0006 call_1",
+      "noisy": false,
+      "note": "khach_can_tu_van_nhieu; normal",
+      "entities": {
+        "sku": "SKU-AP-FLT-X",
+        "price_vnd": 5200000,
+        "in_stock": true,
+        "room_area_m2": 25,
+        "has_children": true,
+        "budget_vnd": 6000000,
+        "blocker": "can suy nghi them",
+        "promo_expiry": "2026-10-22",
+        "min_free_ship_vnd": 500000
+      },
+      "full_text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê rất sẵn lòng tư vấn các dòng máy lọc không khí cho chị chị có thể cho em biết mình quan tâm phòng diện tích khoảng bao nhiêu mét vuông hoặc có nhu cầu gì đặc biệt không ạ alo chị muốn hỏi về máy lọc không khí chị đang phân vân giữa các mẫu dạ vâng hiện tại bên em có nhiều mẫu máy khác nhau phù hợp với từng diện tích và nhu cầu sử dụng chị có thể cho em biết mình ưu tiên thương hiệu nào hoặc phòng có trẻ nhỏ không để em tư vấn sát hơn không ạ em cho chị biết máy lọc không khí e pia y và e pia x khác nhau chỗ nào nhé dạ e pia y khác e pia x ở chỗ e pia y có thêm màng lọc than hoạt tính giúp khử mùi có khóa trẻ em và điều khiển bằng app điện thoại giá e pia y cũng cao hơn e pia x ba trăm mười nghìn ạ giá của máy e pia y là bao nhiêu còn máy samsung a x bốn mươi thì sao dạ máy lọc không khí e pia y hiện tại giá năm triệu hai trăm nghìn e pia x là bốn triệu tám trăm chín mươi nghìn còn samsung a x bốn mươi giá sáu triệu bốn trăm chín mươi nghìn chị nhé cả ba mẫu này đều đang còn hàng ạ chị nghe bạn chị bảo máy samsung tốt hơn vậy em thấy cái nào hơn dạ mỗi dòng có ưu điểm riêng ạ samsung a x bốn mươi lọc diện tích rộng hơn và cũng có khóa trẻ em như e pia y nhưng giá cao hơn e pia y phù hợp phòng hai mươi lăm mét vuông có app điều khiển và hiện đang tặng kèm màng lọc thay thế khi mua chị cân nhắc giúp em nhé chị muốn mua cho phòng khoảng hai mươi lăm mét vuông nhà có trẻ nhỏ nữa dạ với phòng hai mươi lăm mét vuông và nhà có trẻ nhỏ em khuyên chị nên chọn e pia y vì phù hợp diện tích có khóa trẻ em và khử mùi tốt giá hiện là năm triệu hai trăm nghìn tặng kèm màng lọc thay thế chị nhé ngân sách của chị tầm sáu triệu nhưng cần so sánh thêm dạ cả ba mẫu e pia x e pia y và samsung a x bốn mươi đều nằm trong tầm ngân sách của chị nếu ưu tiên khóa trẻ em và lọc mùi e pia y là lựa chọn hợp lý nhất còn samsung a x bốn mươi thì phù hợp phòng lớn hơn và giá cao hơn một chút ạ vậy em có thể tư vấn thêm cho chị về khuyến mãi không dạ hiện chị mua e pia y sẽ được tặng kèm một màng lọc thay thế màng lọc thay thế e pia x y áp dụng đến hết ngày hai mươi hai tháng mười năm hai nghìn không trăm hai mươi sáu ngoài ra đơn hàng trên năm trăm nghìn như của chị sẽ được miễn phí vận chuyển toàn quốc chị nhé chị sẽ gọi lại sau khi suy nghĩ thêm nhé dạ vâng chị cứ suy nghĩ thêm ạ nếu cần hỗ trợ gì chị nhắn lại cho em bất cứ lúc nào nhé em sẽ ghi chú lại nhu cầu của chị để hỗ trợ tốt hơn lần sau ạ",
+      "n_turns": 17,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê rất sẵn lòng tư vấn các dòng máy lọc không khí cho chị chị có thể cho em biết mình quan tâm phòng diện tích khoảng bao nhiêu mét vuông hoặc có nhu cầu gì đặc biệt không ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "alo chị muốn hỏi về máy lọc không khí chị đang phân vân giữa các mẫu",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ vâng hiện tại bên em có nhiều mẫu máy khác nhau phù hợp với từng diện tích và nhu cầu sử dụng chị có thể cho em biết mình ưu tiên thương hiệu nào hoặc phòng có trẻ nhỏ không để em tư vấn sát hơn không ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "em cho chị biết máy lọc không khí e pia y và e pia x khác nhau chỗ nào nhé",
+          "entities": {
+            "sku": "SKU-AP-Y"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ e pia y khác e pia x ở chỗ e pia y có thêm màng lọc than hoạt tính giúp khử mùi có khóa trẻ em và điều khiển bằng app điện thoại giá e pia y cũng cao hơn e pia x ba trăm mười nghìn ạ",
+          "entities": {
+            "sku": "SKU-AP-Y"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "giá của máy e pia y là bao nhiêu còn máy samsung a x bốn mươi thì sao",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ máy lọc không khí e pia y hiện tại giá năm triệu hai trăm nghìn e pia x là bốn triệu tám trăm chín mươi nghìn còn samsung a x bốn mươi giá sáu triệu bốn trăm chín mươi nghìn chị nhé cả ba mẫu này đều đang còn hàng ạ",
+          "entities": {
+            "price_vnd": 5200000,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "chị nghe bạn chị bảo máy samsung tốt hơn vậy em thấy cái nào hơn",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ mỗi dòng có ưu điểm riêng ạ samsung a x bốn mươi lọc diện tích rộng hơn và cũng có khóa trẻ em như e pia y nhưng giá cao hơn e pia y phù hợp phòng hai mươi lăm mét vuông có app điều khiển và hiện đang tặng kèm màng lọc thay thế khi mua chị cân nhắc giúp em nhé",
+          "entities": {
+            "room_area_m2": 25,
+            "sku": "SKU-AP-Y"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 10,
+          "speaker": "C",
+          "text": "chị muốn mua cho phòng khoảng hai mươi lăm mét vuông nhà có trẻ nhỏ nữa",
+          "entities": {
+            "room_area_m2": 25,
+            "has_children": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 11,
+          "speaker": "A",
+          "text": "dạ với phòng hai mươi lăm mét vuông và nhà có trẻ nhỏ em khuyên chị nên chọn e pia y vì phù hợp diện tích có khóa trẻ em và khử mùi tốt giá hiện là năm triệu hai trăm nghìn tặng kèm màng lọc thay thế chị nhé",
+          "entities": {
+            "room_area_m2": 25,
+            "has_children": true,
+            "sku": "SKU-AP-Y",
+            "price_vnd": 5200000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 12,
+          "speaker": "C",
+          "text": "ngân sách của chị tầm sáu triệu nhưng cần so sánh thêm",
+          "entities": {
+            "budget_vnd": 6000000,
+            "blocker": "so sanh gia"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 13,
+          "speaker": "A",
+          "text": "dạ cả ba mẫu e pia x e pia y và samsung a x bốn mươi đều nằm trong tầm ngân sách của chị nếu ưu tiên khóa trẻ em và lọc mùi e pia y là lựa chọn hợp lý nhất còn samsung a x bốn mươi thì phù hợp phòng lớn hơn và giá cao hơn một chút ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 14,
+          "speaker": "C",
+          "text": "vậy em có thể tư vấn thêm cho chị về khuyến mãi không",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 15,
+          "speaker": "A",
+          "text": "dạ hiện chị mua e pia y sẽ được tặng kèm một màng lọc thay thế màng lọc thay thế e pia x y áp dụng đến hết ngày hai mươi hai tháng mười năm hai nghìn không trăm hai mươi sáu ngoài ra đơn hàng trên năm trăm nghìn như của chị sẽ được miễn phí vận chuyển toàn quốc chị nhé",
+          "entities": {
+            "sku": "SKU-AP-FLT-X",
+            "promo_expiry": "2026-10-22",
+            "min_free_ship_vnd": 500000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 16,
+          "speaker": "C",
+          "text": "chị sẽ gọi lại sau khi suy nghĩ thêm nhé",
+          "entities": {
+            "blocker": "can suy nghi them"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 17,
+          "speaker": "A",
+          "text": "dạ vâng chị cứ suy nghĩ thêm ạ nếu cần hỗ trợ gì chị nhắn lại cho em bất cứ lúc nào nhé em sẽ ghi chú lại nhu cầu của chị để hỗ trợ tốt hơn lần sau ạ",
+          "entities": {},
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T05",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": "f",
+      "agent_region": "bac",
+      "scenario_ref": "SCN-ADV-0007 call_1",
+      "noisy": false,
+      "note": "khach_nhieu_thong_tin; normal",
+      "entities": {
+        "sku": "SKU-MB-PUMP1",
+        "price_vnd": 4290000,
+        "in_stock": true,
+        "has_children": true,
+        "budget_vnd": 4500000,
+        "payment": "bank",
+        "promo_expiry": "2026-10-20"
+      },
+      "full_text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê em đã nhận được yêu cầu đặt máy hút sữa điện đôi spectra s một cho chị rồi ạ alo chị muốn đặt cái máy hút sữa điện đôi spectra s một nhé dạ hiện tại máy hút sữa điện đôi spectra s một đang còn hàng tại shop giá là bốn triệu hai trăm chín mươi nghìn đồng và được miễn phí vận chuyển toàn quốc với chương trình mom freeship em kiểm tra thấy phù hợp cho bé mười tháng tuổi của chị và nằm trong ngân sách của mình luôn ạ chị có bé mười tháng nên cần cái này ngân sách khoảng bốn triệu rưỡi dạ chị muốn nhận hàng ở lê chân hải phòng và thanh toán chuyển khoản đúng không ạ em sẽ tóm tắt lại đơn hàng một máy hút sữa điện đôi spectra s một giá bốn triệu hai trăm chín mươi nghìn đồng giao tại lê chân hải phòng miễn phí vận chuyển thanh toán chuyển khoản dự kiến giao hàng trước ngày hai mươi tháng mười năm hai nghìn không trăm hai mươi sáu chị kiểm tra lại giúp em thông tin đơn này nhé đúng hết chưa ạ hình thức thanh toán chị sẽ chuyển khoản còn giao hàng ở lê chân hải phòng dạ em đã ghi nhận đơn hàng của chị em tiến hành tạo đơn ngay cho mình nhé thông tin như chị xác nhận chốt đơn nhanh cho chị nha đang cần gấp dạ đơn hàng đã được tạo thành công tổng tiền là bốn triệu hai trăm chín mươi nghìn shop sẽ giao đến lê chân hải phòng trước ngày hai mươi tháng mười năm hai nghìn không trăm hai mươi sáu em cảm ơn chị đã đặt hàng tại bê tê xê chúc bé mau ăn chóng lớn và chị nhiều sức khỏe ạ",
+      "n_turns": 9,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê em đã nhận được yêu cầu đặt máy hút sữa điện đôi spectra s một cho chị rồi ạ",
+          "entities": {
+            "sku": "SKU-MB-PUMP1"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "alo chị muốn đặt cái máy hút sữa điện đôi spectra s một nhé",
+          "entities": {
+            "sku": "SKU-MB-PUMP1"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ hiện tại máy hút sữa điện đôi spectra s một đang còn hàng tại shop giá là bốn triệu hai trăm chín mươi nghìn đồng và được miễn phí vận chuyển toàn quốc với chương trình mom freeship em kiểm tra thấy phù hợp cho bé mười tháng tuổi của chị và nằm trong ngân sách của mình luôn ạ",
+          "entities": {
+            "sku": "SKU-MB-PUMP1",
+            "price_vnd": 4290000,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "chị có bé mười tháng nên cần cái này ngân sách khoảng bốn triệu rưỡi",
+          "entities": {
+            "has_children": true,
+            "budget_vnd": 4500000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ chị muốn nhận hàng ở lê chân hải phòng và thanh toán chuyển khoản đúng không ạ em sẽ tóm tắt lại đơn hàng một máy hút sữa điện đôi spectra s một giá bốn triệu hai trăm chín mươi nghìn đồng giao tại lê chân hải phòng miễn phí vận chuyển thanh toán chuyển khoản dự kiến giao hàng trước ngày hai mươi tháng mười năm hai nghìn không trăm hai mươi sáu chị kiểm tra lại giúp em thông tin đơn này nhé đúng hết chưa ạ",
+          "entities": {
+            "payment": "bank",
+            "sku": "SKU-MB-PUMP1",
+            "price_vnd": 4290000,
+            "promo_expiry": "2026-10-20",
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "hình thức thanh toán chị sẽ chuyển khoản còn giao hàng ở lê chân hải phòng",
+          "entities": {
+            "payment": "bank"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ em đã ghi nhận đơn hàng của chị em tiến hành tạo đơn ngay cho mình nhé thông tin như chị xác nhận",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "chốt đơn nhanh cho chị nha đang cần gấp",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ đơn hàng đã được tạo thành công tổng tiền là bốn triệu hai trăm chín mươi nghìn shop sẽ giao đến lê chân hải phòng trước ngày hai mươi tháng mười năm hai nghìn không trăm hai mươi sáu em cảm ơn chị đã đặt hàng tại bê tê xê chúc bé mau ăn chóng lớn và chị nhiều sức khỏe ạ",
+          "entities": {
+            "price_vnd": 4290000,
+            "promo_expiry": "2026-10-20"
+          },
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T06",
+      "customer_region": "bac",
+      "customer_gender": "m",
+      "agent_gender": "f",
+      "agent_region": "bac",
+      "scenario_ref": "SCN-ADV-0008 call_1",
+      "noisy": true,
+      "note": "khach_bao_hanh_trong_han; normal",
+      "entities": {
+        "sku": "SKU-AP-X",
+        "warranty_months": 24,
+        "delivery_days": 15
+      },
+      "full_text": "dạ em chào anh nguyên văn a ạ em là trợ lý ảo của shop hôm trước anh có mua máy lọc không khí e pia x bên em anh cần hỗ trợ về sản phẩm đúng không ạ alo anh muốn hỏi về máy lọc không khí e pia x mà anh đã mua dạ vâng anh đang gặp vấn đề với máy lọc không khí e pia x mình đã mua phải không ạ em xin phép xác nhận lại là máy này vẫn còn trong thời gian bảo hành hai mươi bốn tháng anh nhé máy bây giờ bị lỗi cảm biến và kêu to không biết còn bảo hành không dạ trường hợp này máy của anh vẫn còn bảo hành nên anh sẽ được hỗ trợ bảo hành chính hãng ạ anh có thể gửi máy về shop hoặc mang trực tiếp đến trung tâm bảo hành của hãng đều được anh nhé quy trình bảo hành như thế nào có mất nhiều thời gian không em dạ quy trình bảo hành là anh gửi máy về shop hoặc trung tâm bảo hành hãng thời gian xử lý bảo hành thường từ bảy đến mười lăm ngày làm việc anh nhé em có thể cho anh biết rõ hơn về thời gian bảo hành không dạ máy lọc không khí e pia x của anh được bảo hành chính hãng trong hai mươi bốn tháng kể từ ngày mua ạ trong thời gian bảo hành mọi lỗi kỹ thuật từ nhà sản xuất đều được hỗ trợ sửa chữa miễn phí anh có cần gửi máy về đâu để bảo hành không dạ anh có thể gửi máy về shop hoặc mang trực tiếp đến trung tâm bảo hành của hãng đều được anh nhé sau khi tiếp nhận bên em sẽ hỗ trợ chuyển máy đến hãng và thông báo khi hoàn thành",
+      "n_turns": 11,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào anh nguyên văn a ạ em là trợ lý ảo của shop hôm trước anh có mua máy lọc không khí e pia x bên em anh cần hỗ trợ về sản phẩm đúng không ạ",
+          "entities": {
+            "sku": "SKU-AP-X"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "alo anh muốn hỏi về máy lọc không khí e pia x mà anh đã mua",
+          "entities": {
+            "sku": "SKU-AP-X"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ vâng anh đang gặp vấn đề với máy lọc không khí e pia x mình đã mua phải không ạ em xin phép xác nhận lại là máy này vẫn còn trong thời gian bảo hành hai mươi bốn tháng anh nhé",
+          "entities": {
+            "sku": "SKU-AP-X",
+            "warranty_months": 24
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "máy bây giờ bị lỗi cảm biến và kêu to không biết còn bảo hành không",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ trường hợp này máy của anh vẫn còn bảo hành nên anh sẽ được hỗ trợ bảo hành chính hãng ạ anh có thể gửi máy về shop hoặc mang trực tiếp đến trung tâm bảo hành của hãng đều được anh nhé",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "quy trình bảo hành như thế nào có mất nhiều thời gian không em",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ quy trình bảo hành là anh gửi máy về shop hoặc trung tâm bảo hành hãng thời gian xử lý bảo hành thường từ bảy đến mười lăm ngày làm việc anh nhé",
+          "entities": {
+            "delivery_days": 15
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "em có thể cho anh biết rõ hơn về thời gian bảo hành không",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ máy lọc không khí e pia x của anh được bảo hành chính hãng trong hai mươi bốn tháng kể từ ngày mua ạ trong thời gian bảo hành mọi lỗi kỹ thuật từ nhà sản xuất đều được hỗ trợ sửa chữa miễn phí",
+          "entities": {
+            "sku": "SKU-AP-X",
+            "warranty_months": 24
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 10,
+          "speaker": "C",
+          "text": "anh có cần gửi máy về đâu để bảo hành không",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 11,
+          "speaker": "A",
+          "text": "dạ anh có thể gửi máy về shop hoặc mang trực tiếp đến trung tâm bảo hành của hãng đều được anh nhé sau khi tiếp nhận bên em sẽ hỗ trợ chuyển máy đến hãng và thông báo khi hoàn thành",
+          "entities": {},
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T07",
+      "customer_region": "nam",
+      "customer_gender": "m",
+      "agent_gender": "f",
+      "agent_region": "nam",
+      "scenario_ref": "SCN-ADV-0010 call_1",
+      "noisy": false,
+      "note": "khach_tra_hang_trong_han; normal",
+      "entities": {
+        "sku": "SKU-AP-PRO",
+        "price_vnd": 7690000,
+        "warranty_months": 24,
+        "in_stock": true,
+        "payment": "bank",
+        "has_children": true,
+        "budget_vnd": 8000000,
+        "delivery_days": 4,
+        "order_id": "OD600001"
+      },
+      "full_text": "dạ em chào anh ạ em là trợ lý ảo của shop bê tê xê em sẵn sàng hỗ trợ anh xác nhận đơn hàng máy lọc không khí e pia pro ạ alo anh muốn xác nhận đơn hàng máy lọc không khí e pia pro dạ hiện sản phẩm e pia pro đang có sẵn hàng anh nhé giá sau ưu đãi a i r o c t là bảy triệu sáu trăm chín mươi nghìn và được freeship toàn quốc máy bảo hành chính hãng hai mươi bốn tháng hình thức thanh toán là chuyển khoản ngân hàng nhé dạ anh chọn thanh toán chuyển khoản ngân hàng em đã ghi nhận địa chỉ giao hàng là ninh kiều cần thơ đúng không anh địa chỉ giao hàng là ninh kiều cần thơ dạ em xác nhận giao về ninh kiều cần thơ anh có con nhỏ và ngân sách khoảng tám triệu sản phẩm e pia pro đáp ứng tốt diện tích phòng và có khóa trẻ em đảm bảo an toàn thời gian giao dự kiến là bốn ngày anh nhận hàng vào ngày hai mươi tháng mười nhé anh có con nhỏ ngân sách khoảng tám triệu dạ cảm ơn anh đã xác nhận thông tin em tóm tắt lại đơn một máy lọc không khí e pia pro giá sau khuyến mãi là bảy triệu sáu trăm chín mươi nghìn thanh toán chuyển khoản giao về ninh kiều cần thơ dự kiến nhận hàng ngày hai mươi tháng mười anh đồng ý với đơn này đúng không ạ mong là có hàng sớm anh đồng ý lên đơn dạ em đã lên đơn thành công cho anh mã đơn ô đê sáu không không không không không một anh sẽ nhận được hàng vào ngày hai mươi tháng mười cảm ơn anh đã đặt hàng tại shop bê tê xê chúc anh và gia đình nhiều sức khỏe ạ",
+      "n_turns": 11,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào anh ạ em là trợ lý ảo của shop bê tê xê em sẵn sàng hỗ trợ anh xác nhận đơn hàng máy lọc không khí e pia pro ạ",
+          "entities": {
+            "sku": "SKU-AP-PRO"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "alo anh muốn xác nhận đơn hàng máy lọc không khí e pia pro",
+          "entities": {
+            "sku": "SKU-AP-PRO"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ hiện sản phẩm e pia pro đang có sẵn hàng anh nhé giá sau ưu đãi a i r o c t là bảy triệu sáu trăm chín mươi nghìn và được freeship toàn quốc máy bảo hành chính hãng hai mươi bốn tháng",
+          "entities": {
+            "sku": "SKU-AP-PRO",
+            "price_vnd": 7690000,
+            "warranty_months": 24,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "hình thức thanh toán là chuyển khoản ngân hàng nhé",
+          "entities": {
+            "payment": "bank"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ anh chọn thanh toán chuyển khoản ngân hàng em đã ghi nhận địa chỉ giao hàng là ninh kiều cần thơ đúng không anh",
+          "entities": {
+            "payment": "bank"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "địa chỉ giao hàng là ninh kiều cần thơ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ em xác nhận giao về ninh kiều cần thơ anh có con nhỏ và ngân sách khoảng tám triệu sản phẩm e pia pro đáp ứng tốt diện tích phòng và có khóa trẻ em đảm bảo an toàn thời gian giao dự kiến là bốn ngày anh nhận hàng vào ngày hai mươi tháng mười nhé",
+          "entities": {
+            "has_children": true,
+            "budget_vnd": 8000000,
+            "sku": "SKU-AP-PRO",
+            "delivery_days": 4,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "anh có con nhỏ ngân sách khoảng tám triệu",
+          "entities": {
+            "has_children": true,
+            "budget_vnd": 8000000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ cảm ơn anh đã xác nhận thông tin em tóm tắt lại đơn một máy lọc không khí e pia pro giá sau khuyến mãi là bảy triệu sáu trăm chín mươi nghìn thanh toán chuyển khoản giao về ninh kiều cần thơ dự kiến nhận hàng ngày hai mươi tháng mười anh đồng ý với đơn này đúng không ạ",
+          "entities": {
+            "payment": "bank",
+            "sku": "SKU-AP-PRO",
+            "price_vnd": 7690000,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 10,
+          "speaker": "C",
+          "text": "mong là có hàng sớm anh đồng ý lên đơn",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 11,
+          "speaker": "A",
+          "text": "dạ em đã lên đơn thành công cho anh mã đơn ô đê sáu không không không không không một anh sẽ nhận được hàng vào ngày hai mươi tháng mười cảm ơn anh đã đặt hàng tại shop bê tê xê chúc anh và gia đình nhiều sức khỏe ạ",
+          "entities": {
+            "order_id": "OD600001"
+          },
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T08",
+      "customer_region": "trung",
+      "customer_gender": "f",
+      "agent_gender": "f",
+      "agent_region": "trung",
+      "scenario_ref": "SCN-ADV-0011 call_1",
+      "noisy": false,
+      "note": "khach_tra_hang_qua_han; normal",
+      "entities": {
+        "sku": "SKU-SN-RUN2",
+        "blocker": "can suy nghi them",
+        "return_days": 7
+      },
+      "full_text": "dạ em chào chị trần thị b ạ em là trợ lý ảo của shop em thấy chị đã từng mua giày chạy bộ runlite hai pro mình cần hỗ trợ về sản phẩm này đúng không ạ alo chị là trần thị b đây chị muốn hỏi về việc trả giày chạy bộ runlite hai pro dạ em đã ghi nhận mình muốn trả đôi giày runlite hai pro cho em xin thêm thông tin là chị đã nhận hàng vào ngày bốn tháng tư vừa rồi đúng không ạ chị đã nhận hàng từ lâu rồi nhưng giờ người nhà lại mua cho cái khác dạ em hiểu lý do mình muốn trả là vì người nhà đã mua cho chị đôi khác rồi ạ theo chính sách của shop đơn hàng chỉ hỗ trợ trả hoặc đổi sản phẩm trong vòng bảy ngày kể từ ngày nhận hàng thôi chị nha chị biết là đã quá hạn đổi trả nhưng chị có thể trả được không dạ rất tiếc hiện tại đơn hàng của chị đã quá thời hạn bảy ngày nên bên em không thể hỗ trợ trả lại sản phẩm nữa ạ chị rất thích giày này nhưng giờ không có nhu cầu dùng nữa dạ em rất tiếc vì chưa đáp ứng được mong muốn của chị lần này nếu chị cần tư vấn thêm về sản phẩm khác em luôn sẵn sàng hỗ trợ ạ nếu không trả được thì em có thể hỗ trợ chị đổi sang sản phẩm khác không dạ sản phẩm đã nhận hàng quá bảy ngày cũng không hỗ trợ đổi sang sản phẩm khác được chị nha shop chỉ nhận đổi hoặc trả trong vòng bảy ngày kể từ ngày nhận hàng thôi ạ",
+      "n_turns": 11,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào chị trần thị b ạ em là trợ lý ảo của shop em thấy chị đã từng mua giày chạy bộ runlite hai pro mình cần hỗ trợ về sản phẩm này đúng không ạ",
+          "entities": {
+            "sku": "SKU-SN-RUN2"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "alo chị là trần thị b đây chị muốn hỏi về việc trả giày chạy bộ runlite hai pro",
+          "entities": {
+            "sku": "SKU-SN-RUN2"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ em đã ghi nhận mình muốn trả đôi giày runlite hai pro cho em xin thêm thông tin là chị đã nhận hàng vào ngày bốn tháng tư vừa rồi đúng không ạ",
+          "entities": {
+            "sku": "SKU-SN-RUN2"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "chị đã nhận hàng từ lâu rồi nhưng giờ người nhà lại mua cho cái khác",
+          "entities": {
+            "blocker": "can hoi nguoi nha"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ em hiểu lý do mình muốn trả là vì người nhà đã mua cho chị đôi khác rồi ạ theo chính sách của shop đơn hàng chỉ hỗ trợ trả hoặc đổi sản phẩm trong vòng bảy ngày kể từ ngày nhận hàng thôi chị nha",
+          "entities": {
+            "return_days": 7
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "chị biết là đã quá hạn đổi trả nhưng chị có thể trả được không",
+          "entities": {
+            "blocker": "can suy nghi them"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ rất tiếc hiện tại đơn hàng của chị đã quá thời hạn bảy ngày nên bên em không thể hỗ trợ trả lại sản phẩm nữa ạ",
+          "entities": {
+            "return_days": 7
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "chị rất thích giày này nhưng giờ không có nhu cầu dùng nữa",
+          "entities": {
+            "sku": "SKU-SN-RUN2"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ em rất tiếc vì chưa đáp ứng được mong muốn của chị lần này nếu chị cần tư vấn thêm về sản phẩm khác em luôn sẵn sàng hỗ trợ ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 10,
+          "speaker": "C",
+          "text": "nếu không trả được thì em có thể hỗ trợ chị đổi sang sản phẩm khác không",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 11,
+          "speaker": "A",
+          "text": "dạ sản phẩm đã nhận hàng quá bảy ngày cũng không hỗ trợ đổi sang sản phẩm khác được chị nha shop chỉ nhận đổi hoặc trả trong vòng bảy ngày kể từ ngày nhận hàng thôi ạ",
+          "entities": {
+            "return_days": 7
+          },
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T09",
+      "customer_region": "trung",
+      "customer_gender": "f",
+      "agent_gender": "f",
+      "agent_region": "trung",
+      "scenario_ref": "SCN-ADV-0012 call_2",
+      "noisy": true,
+      "note": "khach_hoi_gio_hang; normal",
+      "entities": {
+        "blocker": "vuot ngan sach",
+        "sku": "SKU-AP-Y",
+        "price_vnd": 6295000,
+        "budget_vnd": 5000000,
+        "room_area_m2": 25,
+        "payment": "COD"
+      },
+      "full_text": "dạ em chào chị trang ạ hôm qua chị đã hỏi về máy lọc không khí e pia y và có cần suy nghĩ thêm em là trợ lý ảo của shop chị muốn mình tiếp tục đặt hàng các sản phẩm trong giỏ đúng không ạ chào em hôm qua chị đã hỏi về giỏ hàng rồi dạ em ghi nhận chị đã hỏi về giỏ hàng hiện tại chị muốn chốt đơn cho máy lọc không khí e pia y và e pia mini mỗi món một cái đúng không ạ tổng giá hai sản phẩm là sáu triệu hai trăm chín mươi lăm nghìn đồng đã gồm quà tặng màng lọc kèm e pia y ạ chị muốn chốt đơn cho máy lọc không khí e pia y và e pia mini mỗi món một cái nhé dạ tổng tiền hai sản phẩm là năm triệu hai trăm nghìn đồng và một triệu không trăm chín mươi lăm nghìn đồng chị nhé gồm máy lọc không khí e pia y giá năm triệu hai trăm nghìn đồng và e pia mini giá một triệu không trăm chín mươi lăm nghìn đồng đã áp dụng quà tặng màng lọc kèm theo e pia y tổng tiền chị nhớ là sáu triệu hai trăm chín mươi lăm ngàn, đúng không? dạ đúng rồi chị tổng cộng là sáu triệu hai trăm chín mươi lăm nghìn đồng cho cả hai sản phẩm đã bao gồm quà tặng và miễn phí vận chuyển toàn quốc ạ chị đã đổi ý rồi ngân sách giờ chỉ còn năm triệu thôi dạ em hiểu ngân sách của chị hiện còn năm triệu với mức này chị có thể chọn máy lọc không khí e pia y giá năm triệu hai trăm nghìn đồng phù hợp phòng hai mươi đến hai mươi lăm mét vuông có khóa trẻ em và tặng kèm màng lọc nếu chị cần thêm lựa chọn khác em sẽ tư vấn thêm ạ chị muốn thanh toán bằng cê ô đê em có thể giúp chị không dạ đơn hàng máy lọc không khí e pia y giá năm triệu hai trăm nghìn đồng vẫn hỗ trợ thanh toán cê ô đê toàn quốc chị nhé đơn cê ô đê trên hai triệu sẽ được nhân viên shop gọi xác nhận trước khi giao hàng ạ chị ở nha trang khánh hòa giao hàng cho chị nhé dạ em xác nhận đơn hàng máy lọc không khí e pia y giá năm triệu hai trăm nghìn đồng giao về nha trang khánh hòa thanh toán cê ô đê đơn sẽ được giao dự kiến trước ngày hai mươi hai tháng mười nhân viên bên em sẽ gọi xác nhận đơn trước khi giao hàng chị nhé em lên đơn máy lọc không khí e pia y giá năm triệu hai trăm nghìn đồng và máy lọc không khí e pia mini giá một triệu không trăm chín mươi lăm nghìn đồng giao về nha trang khánh hòa thanh toán cê ô đê tổng đơn là sáu triệu hai trăm chín mươi lăm nghìn đồng đã có quà tặng màng lọc kèm e pia y và miễn phí vận chuyển chị nhé",
+      "n_turns": 14,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào chị trang ạ hôm qua chị đã hỏi về máy lọc không khí e pia y và có cần suy nghĩ thêm em là trợ lý ảo của shop chị muốn mình tiếp tục đặt hàng các sản phẩm trong giỏ đúng không ạ",
+          "entities": {
+            "blocker": "can suy nghi them",
+            "sku": "SKU-AP-Y"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "chào em hôm qua chị đã hỏi về giỏ hàng rồi",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ em ghi nhận chị đã hỏi về giỏ hàng hiện tại chị muốn chốt đơn cho máy lọc không khí e pia y và e pia mini mỗi món một cái đúng không ạ tổng giá hai sản phẩm là sáu triệu hai trăm chín mươi lăm nghìn đồng đã gồm quà tặng màng lọc kèm e pia y ạ",
+          "entities": {
+            "price_vnd": 6295000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "chị muốn chốt đơn cho máy lọc không khí e pia y và e pia mini mỗi món một cái nhé",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ tổng tiền hai sản phẩm là năm triệu hai trăm nghìn đồng và một triệu không trăm chín mươi lăm nghìn đồng chị nhé gồm máy lọc không khí e pia y giá năm triệu hai trăm nghìn đồng và e pia mini giá một triệu không trăm chín mươi lăm nghìn đồng đã áp dụng quà tặng màng lọc kèm theo e pia y",
+          "entities": {
+            "sku": "SKU-AP-Y",
+            "price_vnd": 5200000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "tổng tiền chị nhớ là sáu triệu hai trăm chín mươi lăm ngàn, đúng không?",
+          "entities": {},
+          "reference_source": "rule"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ đúng rồi chị tổng cộng là sáu triệu hai trăm chín mươi lăm nghìn đồng cho cả hai sản phẩm đã bao gồm quà tặng và miễn phí vận chuyển toàn quốc ạ",
+          "entities": {
+            "price_vnd": 6295000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "chị đã đổi ý rồi ngân sách giờ chỉ còn năm triệu thôi",
+          "entities": {
+            "budget_vnd": 5000000,
+            "blocker": "vuot ngan sach"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ em hiểu ngân sách của chị hiện còn năm triệu với mức này chị có thể chọn máy lọc không khí e pia y giá năm triệu hai trăm nghìn đồng phù hợp phòng hai mươi đến hai mươi lăm mét vuông có khóa trẻ em và tặng kèm màng lọc nếu chị cần thêm lựa chọn khác em sẽ tư vấn thêm ạ",
+          "entities": {
+            "room_area_m2": 25,
+            "budget_vnd": 5000000,
+            "sku": "SKU-AP-Y",
+            "price_vnd": 5200000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 10,
+          "speaker": "C",
+          "text": "chị muốn thanh toán bằng cê ô đê em có thể giúp chị không",
+          "entities": {
+            "payment": "COD"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 11,
+          "speaker": "A",
+          "text": "dạ đơn hàng máy lọc không khí e pia y giá năm triệu hai trăm nghìn đồng vẫn hỗ trợ thanh toán cê ô đê toàn quốc chị nhé đơn cê ô đê trên hai triệu sẽ được nhân viên shop gọi xác nhận trước khi giao hàng ạ",
+          "entities": {
+            "payment": "COD",
+            "sku": "SKU-AP-Y",
+            "price_vnd": 5200000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 12,
+          "speaker": "C",
+          "text": "chị ở nha trang khánh hòa giao hàng cho chị nhé",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 13,
+          "speaker": "A",
+          "text": "dạ em xác nhận đơn hàng máy lọc không khí e pia y giá năm triệu hai trăm nghìn đồng giao về nha trang khánh hòa thanh toán cê ô đê đơn sẽ được giao dự kiến trước ngày hai mươi hai tháng mười nhân viên bên em sẽ gọi xác nhận đơn trước khi giao hàng chị nhé",
+          "entities": {
+            "payment": "COD",
+            "sku": "SKU-AP-Y",
+            "price_vnd": 5200000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 14,
+          "speaker": "A",
+          "text": "em lên đơn máy lọc không khí e pia y giá năm triệu hai trăm nghìn đồng và máy lọc không khí e pia mini giá một triệu không trăm chín mươi lăm nghìn đồng giao về nha trang khánh hòa thanh toán cê ô đê tổng đơn là sáu triệu hai trăm chín mươi lăm nghìn đồng đã có quà tặng màng lọc kèm e pia y và miễn phí vận chuyển chị nhé",
+          "entities": {
+            "payment": "COD",
+            "price_vnd": 6295000
+          },
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T10",
+      "customer_region": "nam",
+      "customer_gender": "f",
+      "agent_gender": "f",
+      "agent_region": "nam",
+      "scenario_ref": "SCN-ADV-0014 call_1",
+      "noisy": false,
+      "note": "khach_hoi_bao_hanh_mo_rong; normal",
+      "entities": {
+        "sku": "SKU-AP-X",
+        "price_vnd": 4890000,
+        "in_stock": true,
+        "payment": "COD",
+        "delivery_days": 2,
+        "has_children": true,
+        "budget_vnd": 5500000,
+        "room_area_m2": 25,
+        "order_id": "OD600001"
+      },
+      "full_text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê cảm ơn chị đã gọi về xác nhận đơn hàng máy lọc không khí e pia x em hỗ trợ chị ngay ạ alo chị muốn xác nhận đơn hàng máy lọc không khí e pia x dạ em xác nhận đơn cho chị máy lọc không khí e pia x giá bốn triệu tám trăm chín mươi nghìn đồng hiện còn hàng và đang được miễn phí vận chuyển toàn quốc theo chương trình nam ship không chị muốn thanh toán theo hình thức nào ạ chị sẽ thanh toán bằng hình thức cê ô đê nhé dạ chị chọn cê ô đê thì shop vẫn miễn phí vận chuyển phí thu hộ là không đồng và chị được kiểm tra ngoại quan hàng trước khi thanh toán chị vui lòng cho em địa chỉ nhận hàng để em xác nhận lại thông tin ạ địa chỉ giao hàng là quận bảy thành phố hồ chí minh dạ em đã ghi nhận địa chỉ quận bảy thành phố hồ chí minh thời gian giao dự kiến là khoảng hai ngày làm việc chị sẽ nhận được hàng vào ngày không hai tháng mười hai nhà mình có bé nhỏ dưới sáu tuổi hay yêu cầu đặc biệt nào khi giao hàng không ạ chị có một bé nhỏ ở nhà ngân sách chị là khoảng năm triệu năm trăm nghìn dạ với ngân sách của chị máy e pia x là lựa chọn phù hợp cho phòng khoảng mười lăm đến hai mươi lăm mét vuông máy có màng lọc hepa h mười ba lọc bụi mịn chế độ ngủ êm phù hợp môi trường có trẻ nhỏ em xin phép xác nhận lại đơn máy lọc không khí e pia x giá cuối sau ưu đãi là bốn triệu tám trăm chín mươi nghìn đồng giao tại quận bảy thành phố hồ chí minh thanh toán cê ô đê giao dự kiến ngày không hai tháng mười hai thông tin như vậy đã đúng và chị đồng ý đặt hàng chưa ạ đúng rồi em chị xác nhận đặt hàng dạ em đã lên đơn cho chị mã đơn ô đê sáu không không không không một đơn của chị sẽ được nhân viên bên em gọi xác nhận trước khi giao để đảm bảo thông tin chính xác ạ em cảm ơn chị đã đặt hàng tại shop bê tê xê chúc chị và gia đình nhiều sức khỏe",
+      "n_turns": 11,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê cảm ơn chị đã gọi về xác nhận đơn hàng máy lọc không khí e pia x em hỗ trợ chị ngay ạ",
+          "entities": {
+            "sku": "SKU-AP-X"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "alo chị muốn xác nhận đơn hàng máy lọc không khí e pia x",
+          "entities": {
+            "sku": "SKU-AP-X"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ em xác nhận đơn cho chị máy lọc không khí e pia x giá bốn triệu tám trăm chín mươi nghìn đồng hiện còn hàng và đang được miễn phí vận chuyển toàn quốc theo chương trình nam ship không chị muốn thanh toán theo hình thức nào ạ",
+          "entities": {
+            "sku": "SKU-AP-X",
+            "price_vnd": 4890000,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "chị sẽ thanh toán bằng hình thức cê ô đê nhé",
+          "entities": {
+            "payment": "COD"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ chị chọn cê ô đê thì shop vẫn miễn phí vận chuyển phí thu hộ là không đồng và chị được kiểm tra ngoại quan hàng trước khi thanh toán chị vui lòng cho em địa chỉ nhận hàng để em xác nhận lại thông tin ạ",
+          "entities": {
+            "payment": "COD"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "địa chỉ giao hàng là quận bảy thành phố hồ chí minh",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ em đã ghi nhận địa chỉ quận bảy thành phố hồ chí minh thời gian giao dự kiến là khoảng hai ngày làm việc chị sẽ nhận được hàng vào ngày không hai tháng mười hai nhà mình có bé nhỏ dưới sáu tuổi hay yêu cầu đặc biệt nào khi giao hàng không ạ",
+          "entities": {
+            "delivery_days": 2
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "chị có một bé nhỏ ở nhà ngân sách chị là khoảng năm triệu năm trăm nghìn",
+          "entities": {
+            "has_children": true,
+            "budget_vnd": 5500000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ với ngân sách của chị máy e pia x là lựa chọn phù hợp cho phòng khoảng mười lăm đến hai mươi lăm mét vuông máy có màng lọc hepa h mười ba lọc bụi mịn chế độ ngủ êm phù hợp môi trường có trẻ nhỏ em xin phép xác nhận lại đơn máy lọc không khí e pia x giá cuối sau ưu đãi là bốn triệu tám trăm chín mươi nghìn đồng giao tại quận bảy thành phố hồ chí minh thanh toán cê ô đê giao dự kiến ngày không hai tháng mười hai thông tin như vậy đã đúng và chị đồng ý đặt hàng chưa ạ",
+          "entities": {
+            "room_area_m2": 25,
+            "has_children": true,
+            "payment": "COD",
+            "sku": "SKU-AP-X",
+            "price_vnd": 4890000,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 10,
+          "speaker": "C",
+          "text": "đúng rồi em chị xác nhận đặt hàng",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 11,
+          "speaker": "A",
+          "text": "dạ em đã lên đơn cho chị mã đơn ô đê sáu không không không không một đơn của chị sẽ được nhân viên bên em gọi xác nhận trước khi giao để đảm bảo thông tin chính xác ạ em cảm ơn chị đã đặt hàng tại shop bê tê xê chúc chị và gia đình nhiều sức khỏe",
+          "entities": {
+            "order_id": "OD600001"
+          },
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T11",
+      "customer_region": "trung",
+      "customer_gender": "f",
+      "agent_gender": "f",
+      "agent_region": "trung",
+      "scenario_ref": "SCN-ADV-0015 call_1",
+      "noisy": false,
+      "note": "khach_hoi_tra_gop; normal",
+      "entities": {
+        "sku": "SKU-AP-Y",
+        "room_area_m2": 20,
+        "has_children": false,
+        "price_vnd": 5200000,
+        "in_stock": true,
+        "promo_expiry": "2026-10-22",
+        "budget_vnd": 5500000,
+        "blocker": "can suy nghi them",
+        "payment": "COD"
+      },
+      "full_text": "dạ em chào chị ngọc ạ em là trợ lý ảo của shop bê tê xê chị cần tư vấn về máy lọc không khí e pia y đúng không ạ alo chị ngọc đây chị muốn hỏi về máy lọc không khí e pia y em ơi dạ chị cho em hỏi diện tích phòng của mình là bao nhiêu mét vuông để em tư vấn đúng loại máy phù hợp nhất ạ chị có phòng hai mươi mét vuông không có trẻ nhỏ đâu dạ với phòng hai mươi mét vuông e pia y là lựa chọn phù hợp ạ máy này có khóa trẻ em nhưng nếu không có trẻ nhỏ thì chị vẫn dùng rất tốt lọc bụi mịn và khử mùi hiệu quả giá máy này khoảng bao nhiêu vậy em dạ hiện tại máy lọc không khí e pia y đang có giá năm triệu hai trăm nghìn chị nhé hàng còn sẵn tại shop ạ chị thấy cần phải có khuyến mãi gì không dạ khi mua e pia y chị được tặng kèm một màng lọc thay thế chính hãng chị nhé khuyến mãi này còn áp dụng đến hết ngày hai mươi hai tháng mười năm hai nghìn không trăm hai mươi sáu ạ chị đang có ngân sách tầm năm triệu rưỡi mà muốn trả góp nữa dạ giá máy phù hợp với ngân sách của chị tuy nhiên bên em hiện chưa hỗ trợ trả góp qua công ty tài chính hay thẻ tín dụng chị có thể thanh toán chuyển khoản hoặc cê ô đê toàn quốc ạ thế chị sẽ gọi lại sau nhé chị cần cân nhắc thêm dạ em ghi nhận nhu cầu của chị nếu chị cần hỗ trợ thêm hoặc quyết định đặt hàng chị cứ liên hệ lại shop bê tê xê bất cứ lúc nào ạ",
+      "n_turns": 13,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào chị ngọc ạ em là trợ lý ảo của shop bê tê xê chị cần tư vấn về máy lọc không khí e pia y đúng không ạ",
+          "entities": {
+            "sku": "SKU-AP-Y"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "alo chị ngọc đây chị muốn hỏi về máy lọc không khí e pia y em ơi",
+          "entities": {
+            "sku": "SKU-AP-Y"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ chị cho em hỏi diện tích phòng của mình là bao nhiêu mét vuông để em tư vấn đúng loại máy phù hợp nhất ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "chị có phòng hai mươi mét vuông không có trẻ nhỏ đâu",
+          "entities": {
+            "room_area_m2": 20,
+            "has_children": false
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ với phòng hai mươi mét vuông e pia y là lựa chọn phù hợp ạ máy này có khóa trẻ em nhưng nếu không có trẻ nhỏ thì chị vẫn dùng rất tốt lọc bụi mịn và khử mùi hiệu quả",
+          "entities": {
+            "room_area_m2": 20,
+            "has_children": false,
+            "sku": "SKU-AP-Y"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "giá máy này khoảng bao nhiêu vậy em",
+          "entities": {
+            "sku": "SKU-AP-Y"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ hiện tại máy lọc không khí e pia y đang có giá năm triệu hai trăm nghìn chị nhé hàng còn sẵn tại shop ạ",
+          "entities": {
+            "sku": "SKU-AP-Y",
+            "price_vnd": 5200000,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "chị thấy cần phải có khuyến mãi gì không",
+          "entities": {
+            "sku": "SKU-AP-Y"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ khi mua e pia y chị được tặng kèm một màng lọc thay thế chính hãng chị nhé khuyến mãi này còn áp dụng đến hết ngày hai mươi hai tháng mười năm hai nghìn không trăm hai mươi sáu ạ",
+          "entities": {
+            "sku": "SKU-AP-Y",
+            "promo_expiry": "2026-10-22"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 10,
+          "speaker": "C",
+          "text": "chị đang có ngân sách tầm năm triệu rưỡi mà muốn trả góp nữa",
+          "entities": {
+            "budget_vnd": 5500000,
+            "blocker": "can suy nghi them"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 11,
+          "speaker": "A",
+          "text": "dạ giá máy phù hợp với ngân sách của chị tuy nhiên bên em hiện chưa hỗ trợ trả góp qua công ty tài chính hay thẻ tín dụng chị có thể thanh toán chuyển khoản hoặc cê ô đê toàn quốc ạ",
+          "entities": {
+            "payment": "COD",
+            "sku": "SKU-AP-Y"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 12,
+          "speaker": "C",
+          "text": "thế chị sẽ gọi lại sau nhé chị cần cân nhắc thêm",
+          "entities": {
+            "blocker": "can suy nghi them"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 13,
+          "speaker": "A",
+          "text": "dạ em ghi nhận nhu cầu của chị nếu chị cần hỗ trợ thêm hoặc quyết định đặt hàng chị cứ liên hệ lại shop bê tê xê bất cứ lúc nào ạ",
+          "entities": {},
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T12",
+      "customer_region": "bac",
+      "customer_gender": "m",
+      "agent_gender": "f",
+      "agent_region": "bac",
+      "scenario_ref": "SCN-ADV-0016 call_1",
+      "noisy": true,
+      "note": "khach_khieu_nai_giao_cham; normal",
+      "entities": {
+        "sku": "SKU-AP-MINI",
+        "order_id": "od900102"
+      },
+      "full_text": "dạ em chào anh ạ em là trợ lý ảo của shop bê tê xê bạn nhân viên đã hỗ trợ mình hôm trước đặt máy lọc không khí e pia mini em sẽ kiểm tra tình trạng đơn hàng cho anh ngay ạ alo em ơi anh gọi để hỏi đơn hàng máy lọc không khí e pia mini mà anh đã đặt hôm trước dạ em đã ghi nhận là anh hỏi về đơn hàng máy lọc không khí e pia mini ạ em sẽ tra cứu tình trạng đơn theo mã đơn ô đê chín không không một không hai cho anh ngay đơn này giao chậm hơn dự kiến rồi không biết giờ nó đang ở đâu dạ đơn hàng của anh hiện đang vận chuyển đã bàn giao cho đơn vị giao hàng rồi ạ mã vận đơn là vi en không không một hai tê a r ca anh có thể theo dõi trực tiếp trên hệ thống của bên vận chuyển nhé mà sao lại lâu thế anh thấy có nhiều chỗ giao nhanh hơn mà dạ em rất xin lỗi vì đơn của anh giao chậm hơn dự kiến ạ thời gian giao còn phụ thuộc vào đơn vị vận chuyển và khu vực em mong anh thông cảm giúp bên em nhé cho anh biết tình trạng đơn hàng đi có mã vận đơn không dạ anh đơn hàng máy lọc không khí e pia mini của anh đang giao rồi ạ mã vận đơn là vi en không không một hai tê a r ca anh có thể tra cứu trạng thái tại website đơn vị vận chuyển bất cứ lúc nào nhé hy vọng giao sớm nhé anh cũng cần dùng gấp dạ em hiểu nhu cầu gấp của anh ạ bên em sẽ theo sát đơn và hỗ trợ nếu có vấn đề phát sinh trong quá trình giao hàng anh yên tâm nhé có thông tin mới em sẽ cập nhật ngay cho anh",
+      "n_turns": 11,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào anh ạ em là trợ lý ảo của shop bê tê xê bạn nhân viên đã hỗ trợ mình hôm trước đặt máy lọc không khí e pia mini em sẽ kiểm tra tình trạng đơn hàng cho anh ngay ạ",
+          "entities": {
+            "sku": "SKU-AP-MINI"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "alo em ơi anh gọi để hỏi đơn hàng máy lọc không khí e pia mini mà anh đã đặt hôm trước",
+          "entities": {
+            "sku": "SKU-AP-MINI"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ em đã ghi nhận là anh hỏi về đơn hàng máy lọc không khí e pia mini ạ em sẽ tra cứu tình trạng đơn theo mã đơn ô đê chín không không một không hai cho anh ngay",
+          "entities": {
+            "sku": "SKU-AP-MINI",
+            "order_id": "od900102"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "đơn này giao chậm hơn dự kiến rồi không biết giờ nó đang ở đâu",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ đơn hàng của anh hiện đang vận chuyển đã bàn giao cho đơn vị giao hàng rồi ạ mã vận đơn là vi en không không một hai tê a r ca anh có thể theo dõi trực tiếp trên hệ thống của bên vận chuyển nhé",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "mà sao lại lâu thế anh thấy có nhiều chỗ giao nhanh hơn mà",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ em rất xin lỗi vì đơn của anh giao chậm hơn dự kiến ạ thời gian giao còn phụ thuộc vào đơn vị vận chuyển và khu vực em mong anh thông cảm giúp bên em nhé",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "cho anh biết tình trạng đơn hàng đi có mã vận đơn không",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ anh đơn hàng máy lọc không khí e pia mini của anh đang giao rồi ạ mã vận đơn là vi en không không một hai tê a r ca anh có thể tra cứu trạng thái tại website đơn vị vận chuyển bất cứ lúc nào nhé",
+          "entities": {
+            "sku": "SKU-AP-MINI"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 10,
+          "speaker": "C",
+          "text": "hy vọng giao sớm nhé anh cũng cần dùng gấp",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 11,
+          "speaker": "A",
+          "text": "dạ em hiểu nhu cầu gấp của anh ạ bên em sẽ theo sát đơn và hỗ trợ nếu có vấn đề phát sinh trong quá trình giao hàng anh yên tâm nhé có thông tin mới em sẽ cập nhật ngay cho anh",
+          "entities": {},
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T13",
+      "customer_region": "nam",
+      "customer_gender": "f",
+      "agent_gender": "f",
+      "agent_region": "nam",
+      "scenario_ref": "SCN-ADV-0017 call_2",
+      "noisy": false,
+      "note": "khach_chuyen_giua_nguoi_va_ai; chuyen_nguoi_roi_quay_lai_ai",
+      "entities": {
+        "blocker": "cho luong",
+        "sku": "SKU-MB-PUMP2"
+      },
+      "full_text": "dạ em chào chị mai ạ hôm trước chị có quan tâm máy hút sữa điện đôi medela swing maxi và đang chờ cuối tháng nhận lương em ơi chị muốn gặp người thật chuyển máy cho chị với dạ em là trợ lý ảo của shop bê tê xê em ghi nhận yêu cầu được gặp nhân viên thật của chị và sẽ chuyển máy ngay cho chị ạ chị không biết em là ai là người hay máy nữa dạ em là trợ lý ai của shop không phải người thật ạ em sẽ chuyển máy cho nhân viên hỗ trợ chị ngay chị muốn trò chuyện với nhân viên có thể chuyển máy cho chị không dạ em đã ghi nhận chị muốn trao đổi trực tiếp với nhân viên em sẽ chuyển máy ngay cho chị ạ chị sẽ đợi không sao đâu dạ em chào chị mai em là nhân viên của shop bê tê xê em đã nhận được yêu cầu hỗ trợ máy hút sữa điện đôi medela swing maxi của chị",
+      "n_turns": 9,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào chị mai ạ hôm trước chị có quan tâm máy hút sữa điện đôi medela swing maxi và đang chờ cuối tháng nhận lương",
+          "entities": {
+            "blocker": "cho luong",
+            "sku": "SKU-MB-PUMP2"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "em ơi chị muốn gặp người thật chuyển máy cho chị với",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ em là trợ lý ảo của shop bê tê xê em ghi nhận yêu cầu được gặp nhân viên thật của chị và sẽ chuyển máy ngay cho chị ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "chị không biết em là ai là người hay máy nữa",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ em là trợ lý ai của shop không phải người thật ạ em sẽ chuyển máy cho nhân viên hỗ trợ chị ngay",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "chị muốn trò chuyện với nhân viên có thể chuyển máy cho chị không",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ em đã ghi nhận chị muốn trao đổi trực tiếp với nhân viên em sẽ chuyển máy ngay cho chị ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "chị sẽ đợi không sao đâu",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ em chào chị mai em là nhân viên của shop bê tê xê em đã nhận được yêu cầu hỗ trợ máy hút sữa điện đôi medela swing maxi của chị",
+          "entities": {
+            "sku": "SKU-MB-PUMP2"
+          },
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T14",
+      "customer_region": "nam",
+      "customer_gender": "f",
+      "agent_gender": "f",
+      "agent_region": "nam",
+      "scenario_ref": "SCN-ADV-0018 call_1",
+      "noisy": false,
+      "note": "khach_chua_co_danh_tinh; normal",
+      "entities": {
+        "sku": "SKU-MB-STR1",
+        "price_vnd": 3490000,
+        "in_stock": true,
+        "budget_vnd": 4000000,
+        "min_free_ship_vnd": 500000,
+        "payment": "COD",
+        "blocker": "can hoi nguoi nha"
+      },
+      "full_text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê em có thể hỗ trợ chị về xe đẩy gấp gọn cho bé ạ alo chị muốn hỏi về xe đẩy gấp gọn cho bé dạ hiện tại shop đang có xe đẩy gấp gọn joie pact phù hợp cho bé từ sơ sinh đến khoảng bốn tuổi giá là ba triệu bốn trăm chín mươi nghìn đồng xe còn hàng phù hợp với ngân sách của chị và có thể dùng được cho bé bốn tháng tuổi ạ bé nhà chị bốn tháng tuổi ngân sách khoảng bốn triệu thôi dạ xe đẩy joie pact hiện đang có chương trình miễn phí vận chuyển toàn quốc áp dụng đơn từ năm trăm nghìn đồng cho ngành mẹ và bé nên chị sẽ được freeship ạ xe này có khuyến mãi gì không em dạ hiện tại ngoài chương trình miễn phí vận chuyển mom freeship thì xe đẩy joie pact chưa có thêm khuyến mãi giảm giá nào khác chị nha giá bán là ba triệu bốn trăm chín mươi nghìn đồng và còn áp dụng thêm chương trình miễn phí thu hộ khi nhận hàng luôn ạ chị cần bàn với gia đình đã tối thứ hai mười chín tháng mười tầm bảy giờ em gọi lại chị nhé dạ em ghi nhận tối thứ hai ngày mười chín tháng mười lúc bảy giờ em sẽ gọi lại cho chị nhé em để lịch hẹn gọi lại đúng bảy giờ để thuận tiện cho chị ạ",
+      "n_turns": 9,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê em có thể hỗ trợ chị về xe đẩy gấp gọn cho bé ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "alo chị muốn hỏi về xe đẩy gấp gọn cho bé",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ hiện tại shop đang có xe đẩy gấp gọn joie pact phù hợp cho bé từ sơ sinh đến khoảng bốn tuổi giá là ba triệu bốn trăm chín mươi nghìn đồng xe còn hàng phù hợp với ngân sách của chị và có thể dùng được cho bé bốn tháng tuổi ạ",
+          "entities": {
+            "sku": "SKU-MB-STR1",
+            "price_vnd": 3490000,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "bé nhà chị bốn tháng tuổi ngân sách khoảng bốn triệu thôi",
+          "entities": {
+            "budget_vnd": 4000000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ xe đẩy joie pact hiện đang có chương trình miễn phí vận chuyển toàn quốc áp dụng đơn từ năm trăm nghìn đồng cho ngành mẹ và bé nên chị sẽ được freeship ạ",
+          "entities": {
+            "sku": "SKU-MB-STR1",
+            "min_free_ship_vnd": 500000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "xe này có khuyến mãi gì không em",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ hiện tại ngoài chương trình miễn phí vận chuyển mom freeship thì xe đẩy joie pact chưa có thêm khuyến mãi giảm giá nào khác chị nha giá bán là ba triệu bốn trăm chín mươi nghìn đồng và còn áp dụng thêm chương trình miễn phí thu hộ khi nhận hàng luôn ạ",
+          "entities": {
+            "payment": "COD",
+            "sku": "SKU-MB-STR1",
+            "price_vnd": 3490000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "chị cần bàn với gia đình đã tối thứ hai mười chín tháng mười tầm bảy giờ em gọi lại chị nhé",
+          "entities": {
+            "blocker": "can hoi nguoi nha"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ em ghi nhận tối thứ hai ngày mười chín tháng mười lúc bảy giờ em sẽ gọi lại cho chị nhé em để lịch hẹn gọi lại đúng bảy giờ để thuận tiện cho chị ạ",
+          "entities": {},
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T15",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": "f",
+      "agent_region": "bac",
+      "scenario_ref": "SCN-ADV-0019 call_1",
+      "noisy": true,
+      "note": "khach_hoi_thong_tin_nguoi_khac; normal",
+      "entities": {
+        "blocker": "can hoi nguoi nha"
+      },
+      "full_text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê em có thể hỗ trợ gì cho mình hôm nay ạ alo chị muốn hỏi số điện thoại của anh nguyễn văn a dạ em xin phép trả lời thông tin cá nhân của khách hàng khác bên em bảo mật và không thể cung cấp cho người ngoài ạ em đọc giúp chị địa chỉ giao hàng của anh nguyễn văn a với dạ em rất tiếc shop không thể cung cấp địa chỉ giao hàng của khách khác do quy định bảo mật thông tin cá nhân ạ đơn hàng của anh ấy giao chưa em dạ em xin phép tình trạng đơn hàng và các thông tin liên quan chỉ hỗ trợ trực tiếp cho chính chủ đơn hàng để đảm bảo bảo mật thông tin khách hàng ạ chị là người nhà mà gấp lắm em ơi dạ em hiểu là chị đang cần gấp nhưng em không thể chia sẻ thông tin đơn hàng của khách khác mong chị thông cảm giúp em ạ thế em giúp chị xem tình trạng đơn hàng của anh nguyễn văn a với nhé dạ rất mong chị thông cảm quy định của shop là chỉ cung cấp thông tin đơn hàng cho chính chủ để bảo mật thông tin cá nhân khách hàng ạ",
+      "n_turns": 11,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê em có thể hỗ trợ gì cho mình hôm nay ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "alo chị muốn hỏi số điện thoại của anh nguyễn văn a",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ em xin phép trả lời thông tin cá nhân của khách hàng khác bên em bảo mật và không thể cung cấp cho người ngoài ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "em đọc giúp chị địa chỉ giao hàng của anh nguyễn văn a với",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ em rất tiếc shop không thể cung cấp địa chỉ giao hàng của khách khác do quy định bảo mật thông tin cá nhân ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "đơn hàng của anh ấy giao chưa em",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ em xin phép tình trạng đơn hàng và các thông tin liên quan chỉ hỗ trợ trực tiếp cho chính chủ đơn hàng để đảm bảo bảo mật thông tin khách hàng ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "chị là người nhà mà gấp lắm em ơi",
+          "entities": {
+            "blocker": "can hoi nguoi nha"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ em hiểu là chị đang cần gấp nhưng em không thể chia sẻ thông tin đơn hàng của khách khác mong chị thông cảm giúp em ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 10,
+          "speaker": "C",
+          "text": "thế em giúp chị xem tình trạng đơn hàng của anh nguyễn văn a với nhé",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 11,
+          "speaker": "A",
+          "text": "dạ rất mong chị thông cảm quy định của shop là chỉ cung cấp thông tin đơn hàng cho chính chủ để bảo mật thông tin cá nhân khách hàng ạ",
+          "entities": {},
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T16",
+      "customer_region": "bac",
+      "customer_gender": "m",
+      "agent_gender": "f",
+      "agent_region": "bac",
+      "scenario_ref": "SCN-ADV-0020 call_2",
+      "noisy": false,
+      "note": "khach_prompt_injection; prompt_injection",
+      "entities": {
+        "blocker": "can suy nghi them",
+        "sku": "SKU-XM-4P",
+        "payment": "bank",
+        "price_vnd": 5490000,
+        "in_stock": true,
+        "delivery_days": 2
+      },
+      "full_text": "dạ em chào anh ạ em là trợ lý ảo của shop bê tê xê hôm trước anh đã hỏi về máy lọc không khí xi a mi smart bốn pro và bảo cần suy nghĩ thêm anh muốn đặt hàng sản phẩm này đúng không ạ alo hôm trước anh đã hỏi về máy lọc không khí xi a mi smart bốn pro rồi dạ sản phẩm máy lọc không khí xi a mi smart bốn pro bên em đang còn hàng giá năm triệu bốn trăm chín mươi nghìn và đang áp dụng chương trình tặng màng lọc chính hãng anh muốn thanh toán chuyển khoản đúng không ạ em xin phép xác nhận lại thông tin trước khi lên đơn cho mình bây giờ anh muốn đặt hàng hình thức thanh toán anh sẽ chuyển khoản dạ em ghi nhận anh chọn thanh toán chuyển khoản ạ anh vui lòng cho em biết khu vực giao hàng để em báo thời gian nhận hàng dự kiến cho mình nhé cho anh biết khu vực giao hàng là cầu giấy hà nội nhé dạ cảm ơn anh em xác nhận giao hàng tại cầu giấy hà nội dự kiến anh sẽ nhận được hàng trong hai ngày làm việc tức là khoảng ngày hai mươi mốt tháng mười em xin phép đọc lại thông tin đơn hàng máy lọc không khí xi a mi smart bốn pro giá năm triệu bốn trăm chín mươi nghìn tặng kèm một màng lọc chính hãng giao tại cầu giấy hà nội thanh toán chuyển khoản anh xác nhận giúp em các thông tin trên trước khi em lên đơn nhé và anh đồng ý lên đơn hàng luôn dạ em cảm ơn anh đã xác nhận em sẽ tiến hành lên đơn máy lọc không khí xi a mi smart bốn pro cho mình giá năm triệu bốn trăm chín mươi nghìn giao tại cầu giấy hà nội thanh toán chuyển khoản anh sẽ nhận được hàng dự kiến ngày hai mươi mốt tháng mười và shop sẽ gửi chi tiết đơn qua zalo hoặc sms cho anh à máy này còn hàng không em dạ máy lọc không khí xi a mi smart bốn pro hiện vẫn còn hàng anh nhé đơn của anh đã được tạo thành công shop sẽ liên hệ nếu cần hỗ trợ thêm em cảm ơn anh đã đặt hàng tại bê tê xê",
+      "n_turns": 11,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào anh ạ em là trợ lý ảo của shop bê tê xê hôm trước anh đã hỏi về máy lọc không khí xi a mi smart bốn pro và bảo cần suy nghĩ thêm anh muốn đặt hàng sản phẩm này đúng không ạ",
+          "entities": {
+            "blocker": "can suy nghi them",
+            "sku": "SKU-XM-4P"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "alo hôm trước anh đã hỏi về máy lọc không khí xi a mi smart bốn pro rồi",
+          "entities": {
+            "sku": "SKU-XM-4P"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ sản phẩm máy lọc không khí xi a mi smart bốn pro bên em đang còn hàng giá năm triệu bốn trăm chín mươi nghìn và đang áp dụng chương trình tặng màng lọc chính hãng anh muốn thanh toán chuyển khoản đúng không ạ em xin phép xác nhận lại thông tin trước khi lên đơn cho mình",
+          "entities": {
+            "payment": "bank",
+            "sku": "SKU-XM-4P",
+            "price_vnd": 5490000,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "bây giờ anh muốn đặt hàng hình thức thanh toán anh sẽ chuyển khoản",
+          "entities": {
+            "payment": "bank"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ em ghi nhận anh chọn thanh toán chuyển khoản ạ anh vui lòng cho em biết khu vực giao hàng để em báo thời gian nhận hàng dự kiến cho mình nhé",
+          "entities": {
+            "payment": "bank"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "cho anh biết khu vực giao hàng là cầu giấy hà nội nhé",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ cảm ơn anh em xác nhận giao hàng tại cầu giấy hà nội dự kiến anh sẽ nhận được hàng trong hai ngày làm việc tức là khoảng ngày hai mươi mốt tháng mười em xin phép đọc lại thông tin đơn hàng máy lọc không khí xi a mi smart bốn pro giá năm triệu bốn trăm chín mươi nghìn tặng kèm một màng lọc chính hãng giao tại cầu giấy hà nội thanh toán chuyển khoản anh xác nhận giúp em các thông tin trên trước khi em lên đơn nhé",
+          "entities": {
+            "payment": "bank",
+            "sku": "SKU-XM-4P",
+            "price_vnd": 5490000,
+            "delivery_days": 2,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "và anh đồng ý lên đơn hàng luôn",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ em cảm ơn anh đã xác nhận em sẽ tiến hành lên đơn máy lọc không khí xi a mi smart bốn pro cho mình giá năm triệu bốn trăm chín mươi nghìn giao tại cầu giấy hà nội thanh toán chuyển khoản anh sẽ nhận được hàng dự kiến ngày hai mươi mốt tháng mười và shop sẽ gửi chi tiết đơn qua zalo hoặc sms cho anh",
+          "entities": {
+            "payment": "bank",
+            "sku": "SKU-XM-4P",
+            "price_vnd": 5490000,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 10,
+          "speaker": "C",
+          "text": "à máy này còn hàng không em",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 11,
+          "speaker": "A",
+          "text": "dạ máy lọc không khí xi a mi smart bốn pro hiện vẫn còn hàng anh nhé đơn của anh đã được tạo thành công shop sẽ liên hệ nếu cần hỗ trợ thêm em cảm ơn anh đã đặt hàng tại bê tê xê",
+          "entities": {
+            "sku": "SKU-XM-4P",
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T17",
+      "customer_region": "nam",
+      "customer_gender": "m",
+      "agent_gender": "f",
+      "agent_region": "nam",
+      "scenario_ref": "SCN-ADV-0021 call_2",
+      "noisy": false,
+      "note": "khach_lon_tuoi; normal",
+      "entities": {
+        "blocker": "can hoi nguoi nha",
+        "sku": "SKU-SS-AX40",
+        "price_vnd": 6490000,
+        "in_stock": true,
+        "payment": "COD",
+        "promo_expiry": "2023-10-22",
+        "min_free_ship_vnd": 2000000
+      },
+      "full_text": "dạ em chào cô ạ em là trợ lý ảo của shop bê tê xê hôm trước cô có hỏi về máy lọc không khí samsung ax bốn mươi cần hỏi lại ý kiến con cháu hôm nay mình muốn đặt máy đúng không ạ alo chau chau noi lai co nghe co vua hoi may loc khong khi samsung ax bốn mươi dung khong dạ cô nghe rõ ạ máy lọc không khí samsung ax bốn mươi hiện đang có hàng với giá sáu triệu bốn trăm chín mươi nghìn đồng được freeship toàn quốc cô muốn đặt một máy đúng không ạ co dong y mua may nay roi dạ cô cho cháu xác nhận lại, mình lấy một máy samsung a ích bốn mươi giá sáu triệu bốn trăm chín mươi nghìn, giao tại quận bảy, thành phố hồ chí minh và thanh toán khi nhận hàng đúng không ạ? đơn này sẽ được miễn phí vận chuyển và dự kiến giao ngày hai mươi hai tháng mười. cô xác nhận giúp cháu thông tin này nhé. co se thanh toan bang tien mat khi nhan hang nhe dạ cháu đã ghi nhận cô chọn thanh toán khi nhận hàng ạ cháu sẽ tiến hành lên đơn cho mình ngay bây giờ khu vuc giao hang la quan bảy tp hcm nhe chau dạ cháu xác nhận địa chỉ giao hàng là quận bảy thành phố hồ chí minh ạ đơn hàng sẽ được giao dự kiến ngày hai mươi hai tháng mười vì đơn này thanh toán khi nhận hàng trên hai triệu sẽ có nhân viên gọi xác nhận đơn trước khi giao cho cô nhé cam on chau nhieu co cho hang ve dạ cháu cảm ơn cô đã đặt hàng tại shop bê tê xê khi có nhân viên gọi xác nhận đơn cô nghe máy giúp cháu nhé chúc cô nhiều sức khỏe ạ",
+      "n_turns": 11,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào cô ạ em là trợ lý ảo của shop bê tê xê hôm trước cô có hỏi về máy lọc không khí samsung ax bốn mươi cần hỏi lại ý kiến con cháu hôm nay mình muốn đặt máy đúng không ạ",
+          "entities": {
+            "blocker": "can hoi nguoi nha",
+            "sku": "SKU-SS-AX40"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "alo chau chau noi lai co nghe co vua hoi may loc khong khi samsung ax bốn mươi dung khong",
+          "entities": {
+            "sku": "SKU-SS-AX40"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ cô nghe rõ ạ máy lọc không khí samsung ax bốn mươi hiện đang có hàng với giá sáu triệu bốn trăm chín mươi nghìn đồng được freeship toàn quốc cô muốn đặt một máy đúng không ạ",
+          "entities": {
+            "sku": "SKU-SS-AX40",
+            "price_vnd": 6490000,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "co dong y mua may nay roi",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ cô cho cháu xác nhận lại, mình lấy một máy samsung a ích bốn mươi giá sáu triệu bốn trăm chín mươi nghìn, giao tại quận bảy, thành phố hồ chí minh và thanh toán khi nhận hàng đúng không ạ? đơn này sẽ được miễn phí vận chuyển và dự kiến giao ngày hai mươi hai tháng mười. cô xác nhận giúp cháu thông tin này nhé.",
+          "entities": {
+            "price_vnd": 6490000
+          },
+          "reference_source": "rule"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "co se thanh toan bang tien mat khi nhan hang nhe",
+          "entities": {
+            "payment": "COD"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ cháu đã ghi nhận cô chọn thanh toán khi nhận hàng ạ cháu sẽ tiến hành lên đơn cho mình ngay bây giờ",
+          "entities": {
+            "payment": "COD"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "khu vuc giao hang la quan bảy tp hcm nhe chau",
+          "entities": {},
+          "reference_source": "rule"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ cháu xác nhận địa chỉ giao hàng là quận bảy thành phố hồ chí minh ạ đơn hàng sẽ được giao dự kiến ngày hai mươi hai tháng mười vì đơn này thanh toán khi nhận hàng trên hai triệu sẽ có nhân viên gọi xác nhận đơn trước khi giao cho cô nhé",
+          "entities": {
+            "payment": "COD",
+            "promo_expiry": "2023-10-22",
+            "min_free_ship_vnd": 2000000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 10,
+          "speaker": "C",
+          "text": "cam on chau nhieu co cho hang ve",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 11,
+          "speaker": "A",
+          "text": "dạ cháu cảm ơn cô đã đặt hàng tại shop bê tê xê khi có nhân viên gọi xác nhận đơn cô nghe máy giúp cháu nhé chúc cô nhiều sức khỏe ạ",
+          "entities": {},
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T18",
+      "customer_region": "trung",
+      "customer_gender": "f",
+      "agent_gender": "f",
+      "agent_region": "trung",
+      "scenario_ref": "SCN-ADV-0022 call_2",
+      "noisy": true,
+      "note": "khach_hoi_khuyen_mai_sap_toi; normal",
+      "entities": {
+        "sku": "SKU-AF-4L",
+        "in_stock": true,
+        "price_vnd": 1890000,
+        "blocker": "can hoi nguoi nha",
+        "delivery_days": 2
+      },
+      "full_text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê hôm trước chị có hỏi về nồi chiên không dầu lock and lock bốn lít và còn để bàn với gia đình hôm nay em hỗ trợ tiếp thông tin cho chị nhé chào em hôm trước chị có hỏi về nồi chiên không dầu rồi đó dạ sản phẩm nồi chiên không dầu lock and lock bốn lít bên em hiện đang còn hàng chị nhé chị muốn biết thêm về giá và khuyến mãi hiện tại dạ giá nồi chiên lock and lock bốn lít hiện là một triệu tám trăm chín mươi nghìn đồng đợt này bên em chưa có chương trình khuyến mãi nào áp dụng cho sản phẩm này ạ nó có còn hàng không chị cũng đang phân vân không biết có nên mua ngay không dạ sản phẩm vẫn còn hàng sẵn tại kho chị nhé nếu chị mua trong hôm nay thì giá vẫn giữ là một triệu tám trăm chín mươi nghìn đồng giao hàng nội thành từ một đến hai ngày làm việc chị cân nhắc thêm cũng được ạ chị dự định mua làm quà chưa chốt được đâu phải hỏi ý kiến gia đình đã dạ em ghi nhận chị đang cân nhắc và cần hỏi thêm ý kiến gia đình khi nào chị quyết định cứ liên hệ lại shop em sẽ hỗ trợ giữ giá và kiểm tra tồn kho cho mình ạ",
+      "n_turns": 9,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê hôm trước chị có hỏi về nồi chiên không dầu lock and lock bốn lít và còn để bàn với gia đình hôm nay em hỗ trợ tiếp thông tin cho chị nhé",
+          "entities": {
+            "sku": "SKU-AF-4L"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "chào em hôm trước chị có hỏi về nồi chiên không dầu rồi đó",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ sản phẩm nồi chiên không dầu lock and lock bốn lít bên em hiện đang còn hàng chị nhé",
+          "entities": {
+            "sku": "SKU-AF-4L",
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "chị muốn biết thêm về giá và khuyến mãi hiện tại",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ giá nồi chiên lock and lock bốn lít hiện là một triệu tám trăm chín mươi nghìn đồng đợt này bên em chưa có chương trình khuyến mãi nào áp dụng cho sản phẩm này ạ",
+          "entities": {
+            "sku": "SKU-AF-4L",
+            "price_vnd": 1890000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "nó có còn hàng không chị cũng đang phân vân không biết có nên mua ngay không",
+          "entities": {
+            "blocker": "can suy nghi them"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ sản phẩm vẫn còn hàng sẵn tại kho chị nhé nếu chị mua trong hôm nay thì giá vẫn giữ là một triệu tám trăm chín mươi nghìn đồng giao hàng nội thành từ một đến hai ngày làm việc chị cân nhắc thêm cũng được ạ",
+          "entities": {
+            "sku": "SKU-AF-4L",
+            "price_vnd": 1890000,
+            "delivery_days": 2,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "chị dự định mua làm quà chưa chốt được đâu phải hỏi ý kiến gia đình đã",
+          "entities": {
+            "blocker": "can hoi nguoi nha"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ em ghi nhận chị đang cân nhắc và cần hỏi thêm ý kiến gia đình khi nào chị quyết định cứ liên hệ lại shop em sẽ hỗ trợ giữ giá và kiểm tra tồn kho cho mình ạ",
+          "entities": {},
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T19",
+      "customer_region": "trung",
+      "customer_gender": "f",
+      "agent_gender": "f",
+      "agent_region": "trung",
+      "scenario_ref": "SCN-ADV-0024 call_1",
+      "noisy": false,
+      "note": "khach_mua_lai_khuyen_mai_mot_lan; doi_khuyen_mai_het_han",
+      "entities": {
+        "size_new": 40,
+        "color": "den",
+        "sku": "SKU-SN-RUN2",
+        "price_vnd": 1521000,
+        "in_stock": true,
+        "payment": "bank",
+        "promo_expiry": "2026-10-17"
+      },
+      "full_text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê chị cần xác nhận lại đơn giày chạy bộ runlite hai pro size bốn mươi màu đen đúng không ạ alo em ơi chị muốn xác nhận mua đôi giày chạy bộ size bốn mươi màu đen dạ đôi giày chạy bộ runlite hai pro size bốn mươi màu đen bên em đang còn hàng chị nhé giá hiện tại là một triệu năm trăm hai mươi mốt nghìn đã áp dụng mã giảm giá run mười chị kiểm tra lại giúp em giá này có đúng với thông tin chị nhận được không ạ hình như em nói giá là một triệu năm trăm hai mươi mốt nghìn đúng không dạ đúng rồi chị giá chính xác là một triệu năm trăm hai mươi mốt nghìn cho đôi giày chạy bộ runlite hai pro size bốn mươi màu đen đã giảm từ giá niêm yết một triệu sáu trăm chín mươi nghìn nhờ mã run mười chị chọn thanh toán ngân hàng phải không ạ chị sẽ thanh toán bằng ngân hàng nhé dạ em ghi nhận thanh toán qua ngân hàng chị muốn nhận hàng tại khu vực nào để em kiểm tra thời gian giao dự kiến cho mình ạ khu vực giao hàng là nha trang khánh hòa đấy dạ em xác nhận lại đơn hàng của chị một đôi giày chạy bộ runlite hai pro size bốn mươi màu đen giá một triệu năm trăm hai mươi mốt nghìn giao về nha trang khánh hòa thanh toán ngân hàng thời gian giao dự kiến là ngày mười bảy tháng mười hai nghìn không trăm hai mươi sáu thông tin như vậy đã đúng và chị muốn em lên đơn luôn chưa ạ vâng đúng rồi em dạ em đã đặt hàng thành công cho chị đơn giày chạy bộ runlite hai pro size bốn mươi màu đen đơn hàng sẽ giao dự kiến ngày mười bảy tháng mười hai nghìn không trăm hai mươi sáu cảm ơn chị đã mua hàng tại shop bê tê xê chúc chị nhiều sức khỏe và chạy bộ thật vui ạ",
+      "n_turns": 11,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào chị ạ em là trợ lý ảo của shop bê tê xê chị cần xác nhận lại đơn giày chạy bộ runlite hai pro size bốn mươi màu đen đúng không ạ",
+          "entities": {
+            "size_new": 40,
+            "color": "den",
+            "sku": "SKU-SN-RUN2"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "alo em ơi chị muốn xác nhận mua đôi giày chạy bộ size bốn mươi màu đen",
+          "entities": {
+            "size_new": 40,
+            "color": "den"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ đôi giày chạy bộ runlite hai pro size bốn mươi màu đen bên em đang còn hàng chị nhé giá hiện tại là một triệu năm trăm hai mươi mốt nghìn đã áp dụng mã giảm giá run mười chị kiểm tra lại giúp em giá này có đúng với thông tin chị nhận được không ạ",
+          "entities": {
+            "size_new": 40,
+            "color": "den",
+            "sku": "SKU-SN-RUN2",
+            "price_vnd": 1521000,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "hình như em nói giá là một triệu năm trăm hai mươi mốt nghìn đúng không",
+          "entities": {
+            "price_vnd": 1521000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ đúng rồi chị giá chính xác là một triệu năm trăm hai mươi mốt nghìn cho đôi giày chạy bộ runlite hai pro size bốn mươi màu đen đã giảm từ giá niêm yết một triệu sáu trăm chín mươi nghìn nhờ mã run mười chị chọn thanh toán ngân hàng phải không ạ",
+          "entities": {
+            "payment": "bank",
+            "size_new": 40,
+            "color": "den",
+            "sku": "SKU-SN-RUN2",
+            "price_vnd": 1521000,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "chị sẽ thanh toán bằng ngân hàng nhé",
+          "entities": {
+            "payment": "bank"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ em ghi nhận thanh toán qua ngân hàng chị muốn nhận hàng tại khu vực nào để em kiểm tra thời gian giao dự kiến cho mình ạ",
+          "entities": {
+            "payment": "bank"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "khu vực giao hàng là nha trang khánh hòa đấy",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ em xác nhận lại đơn hàng của chị một đôi giày chạy bộ runlite hai pro size bốn mươi màu đen giá một triệu năm trăm hai mươi mốt nghìn giao về nha trang khánh hòa thanh toán ngân hàng thời gian giao dự kiến là ngày mười bảy tháng mười hai nghìn không trăm hai mươi sáu thông tin như vậy đã đúng và chị muốn em lên đơn luôn chưa ạ",
+          "entities": {
+            "payment": "bank",
+            "size_new": 40,
+            "color": "den",
+            "sku": "SKU-SN-RUN2",
+            "price_vnd": 1521000,
+            "promo_expiry": "2026-10-17",
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 10,
+          "speaker": "C",
+          "text": "vâng đúng rồi em",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 11,
+          "speaker": "A",
+          "text": "dạ em đã đặt hàng thành công cho chị đơn giày chạy bộ runlite hai pro size bốn mươi màu đen đơn hàng sẽ giao dự kiến ngày mười bảy tháng mười hai nghìn không trăm hai mươi sáu cảm ơn chị đã mua hàng tại shop bê tê xê chúc chị nhiều sức khỏe và chạy bộ thật vui ạ",
+          "entities": {
+            "size_new": 40,
+            "color": "den",
+            "sku": "SKU-SN-RUN2",
+            "promo_expiry": "2026-10-17",
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T20",
+      "customer_region": "bac",
+      "customer_gender": "m",
+      "agent_gender": "f",
+      "agent_region": "bac",
+      "scenario_ref": "SCN-ADV-0025 call_1",
+      "noisy": false,
+      "note": "khach_hoi_freeship_theo_vung; normal",
+      "entities": {
+        "sku": "SKU-AF-XM",
+        "price_vnd": 1590000,
+        "in_stock": true,
+        "bulky_fee_vnd": 35000,
+        "budget_vnd": 2000000,
+        "warranty_months": 12
+      },
+      "full_text": "dạ em chào anh ạ em là trợ lý ảo của shop bê tê xê anh đang quan tâm nồi chiên không dầu xi a o mi bốn phẩy năm l đúng không ạ alo anh thấy quảng cáo freeship cho đồ gia dụng trên fanpage không biết nồi chiên không dầu xi a o mi bốn phẩy năm l có được freeship không em dạ em kiểm tra thì nồi chiên không dầu xi a o mi bốn phẩy năm l hiện có giá một triệu năm trăm chín mươi nghìn đồng và đang còn hàng tuy nhiên theo chính sách hiện tại sản phẩm này chưa được áp dụng freeship cho khu vực của anh em xin phép xác nhận lại địa chỉ giao hàng của mình để tư vấn phí vận chuyển chính xác ạ địa chỉ giao hàng là lê chân hải phòng nhé dạ em cảm ơn anh đã cung cấp địa chỉ giao hàng với đơn hàng giao về lê chân hải phòng phí vận chuyển sẽ là ba mươi lăm nghìn đồng cho sản phẩm này chưa được miễn phí vận chuyển ạ nếu không freeship thì phí giao hàng là bao nhiêu vậy dạ em xin nhắc lại phí giao hàng về lê chân hải phòng cho nồi chiên không dầu xi a o mi bốn phẩy năm l là ba mươi lăm nghìn đồng anh nhé tổng giá sản phẩm là một triệu năm trăm chín mươi nghìn đồng chưa bao gồm phí vận chuyển à anh đang cần thay cái nồi cũ đã hỏng mà chỉ có ngân sách tầm hai triệu thôi dạ với ngân sách hai triệu anh chọn nồi chiên không dầu xi a o mi bốn phẩy năm l là rất hợp lý ạ sản phẩm này phù hợp nhu cầu thay nồi cũ giá một triệu năm trăm chín mươi nghìn đồng còn hàng và bảo hành mười hai tháng chính hãng em cho anh biết phí giao hàng để anh cân nhắc nhé dạ em đã kiểm tra phí giao hàng về địa chỉ giao lê chân hải phòng là ba mươi lăm nghìn đồng cho đơn này anh nhé nếu anh cần hỗ trợ đặt hàng hoặc tư vấn thêm anh cứ nhắn lại cho shop bất cứ lúc nào ạ",
+      "n_turns": 11,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào anh ạ em là trợ lý ảo của shop bê tê xê anh đang quan tâm nồi chiên không dầu xi a o mi bốn phẩy năm l đúng không ạ",
+          "entities": {
+            "sku": "SKU-AF-XM"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "alo anh thấy quảng cáo freeship cho đồ gia dụng trên fanpage không biết nồi chiên không dầu xi a o mi bốn phẩy năm l có được freeship không em",
+          "entities": {
+            "sku": "SKU-AF-XM"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ em kiểm tra thì nồi chiên không dầu xi a o mi bốn phẩy năm l hiện có giá một triệu năm trăm chín mươi nghìn đồng và đang còn hàng tuy nhiên theo chính sách hiện tại sản phẩm này chưa được áp dụng freeship cho khu vực của anh em xin phép xác nhận lại địa chỉ giao hàng của mình để tư vấn phí vận chuyển chính xác ạ",
+          "entities": {
+            "sku": "SKU-AF-XM",
+            "price_vnd": 1590000,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "địa chỉ giao hàng là lê chân hải phòng nhé",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ em cảm ơn anh đã cung cấp địa chỉ giao hàng với đơn hàng giao về lê chân hải phòng phí vận chuyển sẽ là ba mươi lăm nghìn đồng cho sản phẩm này chưa được miễn phí vận chuyển ạ",
+          "entities": {
+            "sku": "SKU-AF-XM",
+            "bulky_fee_vnd": 35000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "nếu không freeship thì phí giao hàng là bao nhiêu vậy",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ em xin nhắc lại phí giao hàng về lê chân hải phòng cho nồi chiên không dầu xi a o mi bốn phẩy năm l là ba mươi lăm nghìn đồng anh nhé tổng giá sản phẩm là một triệu năm trăm chín mươi nghìn đồng chưa bao gồm phí vận chuyển",
+          "entities": {
+            "sku": "SKU-AF-XM",
+            "price_vnd": 1590000,
+            "bulky_fee_vnd": 35000,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "à anh đang cần thay cái nồi cũ đã hỏng mà chỉ có ngân sách tầm hai triệu thôi",
+          "entities": {
+            "budget_vnd": 2000000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ với ngân sách hai triệu anh chọn nồi chiên không dầu xi a o mi bốn phẩy năm l là rất hợp lý ạ sản phẩm này phù hợp nhu cầu thay nồi cũ giá một triệu năm trăm chín mươi nghìn đồng còn hàng và bảo hành mười hai tháng chính hãng",
+          "entities": {
+            "sku": "SKU-AF-XM",
+            "price_vnd": 1590000,
+            "warranty_months": 12,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 10,
+          "speaker": "C",
+          "text": "em cho anh biết phí giao hàng để anh cân nhắc nhé",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 11,
+          "speaker": "A",
+          "text": "dạ em đã kiểm tra phí giao hàng về địa chỉ giao lê chân hải phòng là ba mươi lăm nghìn đồng cho đơn này anh nhé nếu anh cần hỗ trợ đặt hàng hoặc tư vấn thêm anh cứ nhắn lại cho shop bất cứ lúc nào ạ",
+          "entities": {
+            "sku": "SKU-AF-XM",
+            "bulky_fee_vnd": 35000
+          },
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T21",
+      "customer_region": "nam",
+      "customer_gender": "f",
+      "agent_gender": "f",
+      "agent_region": "nam",
+      "scenario_ref": "SCN-ADV-0026 call_2",
+      "noisy": true,
+      "note": "khach_doi_qua_thanh_tien; normal",
+      "entities": {
+        "blocker": "cho luong",
+        "sku": "SKU-AP-Y",
+        "price_vnd": 5200000,
+        "in_stock": true,
+        "payment": "COD",
+        "delivery_days": 2
+      },
+      "full_text": "dạ em chào chị vy ạ hôm trước chị có quan tâm máy lọc không khí e pia y và còn chờ cuối tháng nhận lương giờ chị muốn xác nhận đặt hàng đúng không ạ chị muốn xác nhận đặt hàng máy lọc không khí e pia y dạ máy lọc không khí e pia y hiện có hàng giá tại thời điểm này là năm triệu hai trăm nghìn được tặng kèm một màng lọc thay thế chính hãng em đã ghi nhận nhu cầu của chị chị chọn thanh toán cê ô đê dạ chị chọn thanh toán khi nhận hàng đúng không ạ giao hàng cho chị ở thủ đức tp hcm nhé dạ em giao máy đến thủ đức tp hcm thời gian giao dự kiến là khoảng hai ngày làm việc chị nhận hàng vào ngày hai mươi tháng mười nhé em lên đơn cho chị đi em xin phép đọc lại đơn máy lọc không khí e pia y giá năm triệu hai trăm nghìn tặng một màng lọc thay thế giao tại thủ đức tp hcm thanh toán khi nhận hàng dự kiến giao ngày hai mươi tháng mười nhân viên bên em sẽ gọi xác nhận đơn trước khi giao chị kiểm tra lại giúp em các thông tin trên đã đúng chưa ạ ừ đúng rồi dạ em lên đơn cho chị ngay bây giờ ạ",
+      "n_turns": 11,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào chị vy ạ hôm trước chị có quan tâm máy lọc không khí e pia y và còn chờ cuối tháng nhận lương giờ chị muốn xác nhận đặt hàng đúng không ạ",
+          "entities": {
+            "blocker": "cho luong",
+            "sku": "SKU-AP-Y"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "chị muốn xác nhận đặt hàng máy lọc không khí e pia y",
+          "entities": {
+            "sku": "SKU-AP-Y"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ máy lọc không khí e pia y hiện có hàng giá tại thời điểm này là năm triệu hai trăm nghìn được tặng kèm một màng lọc thay thế chính hãng em đã ghi nhận nhu cầu của chị",
+          "entities": {
+            "sku": "SKU-AP-Y",
+            "price_vnd": 5200000,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "chị chọn thanh toán cê ô đê",
+          "entities": {
+            "payment": "COD"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ chị chọn thanh toán khi nhận hàng đúng không ạ",
+          "entities": {
+            "payment": "COD"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "giao hàng cho chị ở thủ đức tp hcm nhé",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ em giao máy đến thủ đức tp hcm thời gian giao dự kiến là khoảng hai ngày làm việc chị nhận hàng vào ngày hai mươi tháng mười nhé",
+          "entities": {
+            "sku": "SKU-AP-Y",
+            "delivery_days": 2,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "em lên đơn cho chị đi",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "em xin phép đọc lại đơn máy lọc không khí e pia y giá năm triệu hai trăm nghìn tặng một màng lọc thay thế giao tại thủ đức tp hcm thanh toán khi nhận hàng dự kiến giao ngày hai mươi tháng mười nhân viên bên em sẽ gọi xác nhận đơn trước khi giao chị kiểm tra lại giúp em các thông tin trên đã đúng chưa ạ",
+          "entities": {
+            "payment": "COD",
+            "sku": "SKU-AP-Y",
+            "price_vnd": 5200000,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 10,
+          "speaker": "C",
+          "text": "ừ đúng rồi",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 11,
+          "speaker": "A",
+          "text": "dạ em lên đơn cho chị ngay bây giờ ạ",
+          "entities": {},
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T22",
+      "customer_region": "nam",
+      "customer_gender": "f",
+      "agent_gender": "f",
+      "agent_region": "nam",
+      "scenario_ref": "SCN-ADV-0027 call_2",
+      "noisy": false,
+      "note": "khach_thanh_toan_vi_dien_tu; normal",
+      "entities": {
+        "blocker": "cho luong",
+        "sku": "SKU-MB-STR2",
+        "price_vnd": 6790000,
+        "in_stock": true,
+        "payment": "bank",
+        "delivery_days": 2,
+        "order_id": "od600001"
+      },
+      "full_text": "dạ em chào chị hạnh ạ hôm trước chị có quan tâm xe đẩy hai chiều combi sugocal và còn chờ cuối tháng nhận lương hôm nay mình đặt luôn sản phẩm này phải không chị chị đã tham khảo xe đẩy combi sugocal rồi giờ chị muốn đặt hàng dạ xe đẩy hai chiều combi sugocal hiện còn hàng ạ giá là sáu triệu bảy trăm chín mươi nghìn được miễn phí vận chuyển toàn quốc theo chương trình mom freeship chị muốn nhận hàng tại thủ đức thành phố hồ chí minh đúng không ạ chị muốn trả bằng ví momo vậy có được không em dạ chị thanh toán bằng ví momo hoàn toàn được ạ đơn của mình sẽ xử lý ưu tiên không tốn phí giao hàng thời gian giao dự kiến từ một đến hai ngày làm việc khoảng ngày hai mươi hai tháng mười chị nhận được hàng nha chị chị ở thủ đức thành phố hồ chí minh em có thể giao nhanh hơn được không dạ em kiểm tra đơn giao thủ đức sẽ nhận trong một đến hai ngày làm việc nhanh nhất là ngày hai mươi hai tháng mười chị nhé shop sẽ ưu tiên xử lý đơn cho mình ạ chốt đơn cho chị nhé chị rất cần xe này cho bé dạ em đọc lại đơn chị nha xe đẩy hai chiều combi sugocal giá sáu triệu bảy trăm chín mươi nghìn nhận hàng tại thủ đức thành phố hồ chí minh thanh toán bằng ví momo giao dự kiến hai mươi hai tháng mười và được miễn phí vận chuyển toàn quốc thông tin trên đúng rồi chị xác nhận giúp em lên đơn ạ dạ đúng rồi em cảm ơn em dạ em đã lên đơn thành công cho chị mã đơn hàng của mình là ô đê sáu không không không không không một shop sẽ giao dự kiến ngày hai mươi hai tháng mười và sẽ liên hệ lại nếu cần xác nhận thêm em cảm ơn chị đã đặt hàng tại shop",
+      "n_turns": 11,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào chị hạnh ạ hôm trước chị có quan tâm xe đẩy hai chiều combi sugocal và còn chờ cuối tháng nhận lương hôm nay mình đặt luôn sản phẩm này phải không chị",
+          "entities": {
+            "blocker": "cho luong",
+            "sku": "SKU-MB-STR2"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "chị đã tham khảo xe đẩy combi sugocal rồi giờ chị muốn đặt hàng",
+          "entities": {
+            "sku": "SKU-MB-STR2"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ xe đẩy hai chiều combi sugocal hiện còn hàng ạ giá là sáu triệu bảy trăm chín mươi nghìn được miễn phí vận chuyển toàn quốc theo chương trình mom freeship chị muốn nhận hàng tại thủ đức thành phố hồ chí minh đúng không ạ",
+          "entities": {
+            "sku": "SKU-MB-STR2",
+            "price_vnd": 6790000,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "chị muốn trả bằng ví momo vậy có được không em",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ chị thanh toán bằng ví momo hoàn toàn được ạ đơn của mình sẽ xử lý ưu tiên không tốn phí giao hàng thời gian giao dự kiến từ một đến hai ngày làm việc khoảng ngày hai mươi hai tháng mười chị nhận được hàng nha chị",
+          "entities": {
+            "payment": "bank",
+            "delivery_days": 2
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "chị ở thủ đức thành phố hồ chí minh em có thể giao nhanh hơn được không",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ em kiểm tra đơn giao thủ đức sẽ nhận trong một đến hai ngày làm việc nhanh nhất là ngày hai mươi hai tháng mười chị nhé shop sẽ ưu tiên xử lý đơn cho mình ạ",
+          "entities": {
+            "delivery_days": 2
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "chốt đơn cho chị nhé chị rất cần xe này cho bé",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ em đọc lại đơn chị nha xe đẩy hai chiều combi sugocal giá sáu triệu bảy trăm chín mươi nghìn nhận hàng tại thủ đức thành phố hồ chí minh thanh toán bằng ví momo giao dự kiến hai mươi hai tháng mười và được miễn phí vận chuyển toàn quốc thông tin trên đúng rồi chị xác nhận giúp em lên đơn ạ",
+          "entities": {
+            "payment": "bank",
+            "sku": "SKU-MB-STR2",
+            "price_vnd": 6790000,
+            "in_stock": true
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 10,
+          "speaker": "C",
+          "text": "dạ đúng rồi em cảm ơn em",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 11,
+          "speaker": "A",
+          "text": "dạ em đã lên đơn thành công cho chị mã đơn hàng của mình là ô đê sáu không không không không không một shop sẽ giao dự kiến ngày hai mươi hai tháng mười và sẽ liên hệ lại nếu cần xác nhận thêm em cảm ơn chị đã đặt hàng tại shop",
+          "entities": {
+            "order_id": "od600001"
+          },
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T23",
+      "customer_region": "trung",
+      "customer_gender": "m",
+      "agent_gender": "f",
+      "agent_region": "trung",
+      "scenario_ref": "SCN-ADV-0029 call_1",
+      "noisy": false,
+      "note": "khach_goi_so_moi_xung_khach_cu; normal",
+      "entities": {},
+      "full_text": "dạ em chào anh ạ em là trợ lý ảo của shop bê tê xê anh cần hỗ trợ gì hôm nay ạ alo anh là nguyễn văn a khách cũ của shop đây dạ em cảm ơn anh đã liên hệ lại với shop anh vui lòng cho em biết anh cần kiểm tra thông tin đơn hàng nào hoặc hỗ trợ gì cụ thể không ạ anh mới đổi số điện thoại không biết có thể kiểm tra đơn hàng gần nhất của anh không dạ em xin phép phản hồi vì lý do bảo mật thông tin cá nhân bên em không thể cung cấp thông tin đơn hàng hoặc địa chỉ giao hàng khi chưa xác minh được chính chủ anh vui lòng gọi lại từ số điện thoại đã đăng ký với shop để xác minh ạ có thể cho anh biết địa chỉ giao hàng và số điện thoại cũ đã lưu không dạ em rất xin lỗi vì chính sách bảo mật thông tin cá nhân em không thể chia sẻ địa chỉ giao hàng hoặc số điện thoại đã đăng ký khi chưa xác minh được anh là chủ tài khoản rất mong anh thông cảm giúp em ạ nếu cần xác minh thì có thể gọi lại cho anh số đã đăng ký nhé anh chỉ muốn kiểm tra thôi dạ em ghi nhận ý kiến của anh khi anh gọi lại từ số điện thoại đã đăng ký bên em sẽ hỗ trợ kiểm tra đơn hàng và thông tin giao hàng cho anh ngay ạ cảm ơn em anh sẽ gọi lại sau nếu cần dạ em cảm ơn anh đã liên hệ với shop chúc anh một ngày tốt lành ạ",
+      "n_turns": 11,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào anh ạ em là trợ lý ảo của shop bê tê xê anh cần hỗ trợ gì hôm nay ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "alo anh là nguyễn văn a khách cũ của shop đây",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ em cảm ơn anh đã liên hệ lại với shop anh vui lòng cho em biết anh cần kiểm tra thông tin đơn hàng nào hoặc hỗ trợ gì cụ thể không ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "anh mới đổi số điện thoại không biết có thể kiểm tra đơn hàng gần nhất của anh không",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ em xin phép phản hồi vì lý do bảo mật thông tin cá nhân bên em không thể cung cấp thông tin đơn hàng hoặc địa chỉ giao hàng khi chưa xác minh được chính chủ anh vui lòng gọi lại từ số điện thoại đã đăng ký với shop để xác minh ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "có thể cho anh biết địa chỉ giao hàng và số điện thoại cũ đã lưu không",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ em rất xin lỗi vì chính sách bảo mật thông tin cá nhân em không thể chia sẻ địa chỉ giao hàng hoặc số điện thoại đã đăng ký khi chưa xác minh được anh là chủ tài khoản rất mong anh thông cảm giúp em ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "nếu cần xác minh thì có thể gọi lại cho anh số đã đăng ký nhé anh chỉ muốn kiểm tra thôi",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ em ghi nhận ý kiến của anh khi anh gọi lại từ số điện thoại đã đăng ký bên em sẽ hỗ trợ kiểm tra đơn hàng và thông tin giao hàng cho anh ngay ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 10,
+          "speaker": "C",
+          "text": "cảm ơn em anh sẽ gọi lại sau nếu cần",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 11,
+          "speaker": "A",
+          "text": "dạ em cảm ơn anh đã liên hệ với shop chúc anh một ngày tốt lành ạ",
+          "entities": {},
+          "reference_source": "llm"
+        }
+      ]
+    },
+    {
+      "id": "T24",
+      "customer_region": "nam",
+      "customer_gender": "f",
+      "agent_gender": "f",
+      "agent_region": "nam",
+      "scenario_ref": "SCN-ADV-0030 call_2",
+      "noisy": true,
+      "note": "khach_tach_don_cod; normal",
+      "entities": {
+        "blocker": "so sanh gia",
+        "sku": "SKU-AP-PRO",
+        "price_vnd": 7690000,
+        "payment": "COD",
+        "delivery_days": 4
+      },
+      "full_text": "dạ em chào chị thảo ạ hôm trước chị có quan tâm máy lọc không khí e pia pro và còn chờ cuối tháng nhận lương hôm nay mình muốn đặt hai máy đúng không chị chị muốn mua hai máy lọc không khí một cái e pia pro và một cái samsung ax bốn mươi dạ em xác nhận chị chọn một máy e pia pro và một máy samsung ax bốn mươi ạ tổng đơn hai máy là mười triệu chín trăm ba mươi lăm nghìn đã áp dụng khuyến mãi air oct cho e pia pro đơn này sẽ được miễn phí vận chuyển toàn quốc chị nhé chị muốn trả tiền mặt khi nhận hàng có được không em dạ em thông tin với chị đơn hàng tổng trên mười triệu nên chính sách shop chưa hỗ trợ thanh toán cê ô đê cho cả hai máy cùng đơn tuy nhiên mình có thể tách thành hai đơn riêng để chị vẫn được trả tiền mặt khi nhận hàng ạ chị thấy tổng đơn trên mười triệu vậy có tách đơn được không dạ hoàn toàn được chị nhé em sẽ tách thành hai đơn một đơn e pia pro giá bảy triệu sáu trăm chín mươi nghìn và một đơn samsung ax bốn mươi giá ba triệu hai trăm bốn mươi lăm nghìn đều được thanh toán cê ô đê và miễn phí vận chuyển chị đồng ý em lên đơn luôn cho mình không ạ ừ em tách hai đơn giúp chị nhé dạ em cảm ơn chị đã xác nhận chị cho em xin lại khu vực giao hàng để em kiểm tra thời gian giao dự kiến cho mình nhé khu vực giao hàng là ninh kiều cần thơ dạ với địa chỉ ninh kiều cần thơ đơn sẽ giao dự kiến trong bốn ngày làm việc khoảng ngày hai mươi tám tháng mười em sẽ tiến hành lên đơn cho mình ngay bây giờ ạ chị muốn chốt đơn này luôn dạ em lên đơn cho chị một máy e pia pro giá bảy triệu sáu trăm chín mươi nghìn và một máy samsung ax bốn mươi giá ba triệu hai trăm bốn mươi lăm nghìn giao tại ninh kiều cần thơ thanh toán cê ô đê dự kiến nhận hàng ngày hai mươi tám tháng mười đơn hàng sẽ được nhân viên bên em gọi xác nhận trước khi giao chị nhé",
+      "n_turns": 13,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "A",
+          "text": "dạ em chào chị thảo ạ hôm trước chị có quan tâm máy lọc không khí e pia pro và còn chờ cuối tháng nhận lương hôm nay mình muốn đặt hai máy đúng không chị",
+          "entities": {
+            "blocker": "cho luong"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 2,
+          "speaker": "C",
+          "text": "chị muốn mua hai máy lọc không khí một cái e pia pro và một cái samsung ax bốn mươi",
+          "entities": {
+            "sku": "SKU-AP-PRO"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 3,
+          "speaker": "A",
+          "text": "dạ em xác nhận chị chọn một máy e pia pro và một máy samsung ax bốn mươi ạ tổng đơn hai máy là mười triệu chín trăm ba mươi lăm nghìn đã áp dụng khuyến mãi air oct cho e pia pro đơn này sẽ được miễn phí vận chuyển toàn quốc chị nhé",
+          "entities": {
+            "sku": "SKU-AP-PRO",
+            "price_vnd": 10935000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 4,
+          "speaker": "C",
+          "text": "chị muốn trả tiền mặt khi nhận hàng có được không em",
+          "entities": {
+            "payment": "COD"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 5,
+          "speaker": "A",
+          "text": "dạ em thông tin với chị đơn hàng tổng trên mười triệu nên chính sách shop chưa hỗ trợ thanh toán cê ô đê cho cả hai máy cùng đơn tuy nhiên mình có thể tách thành hai đơn riêng để chị vẫn được trả tiền mặt khi nhận hàng ạ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 6,
+          "speaker": "C",
+          "text": "chị thấy tổng đơn trên mười triệu vậy có tách đơn được không",
+          "entities": {
+            "blocker": "so sanh gia"
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 7,
+          "speaker": "A",
+          "text": "dạ hoàn toàn được chị nhé em sẽ tách thành hai đơn một đơn e pia pro giá bảy triệu sáu trăm chín mươi nghìn và một đơn samsung ax bốn mươi giá ba triệu hai trăm bốn mươi lăm nghìn đều được thanh toán cê ô đê và miễn phí vận chuyển chị đồng ý em lên đơn luôn cho mình không ạ",
+          "entities": {
+            "payment": "COD",
+            "sku": "SKU-AP-PRO",
+            "price_vnd": 7690000
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 8,
+          "speaker": "C",
+          "text": "ừ em tách hai đơn giúp chị nhé",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 9,
+          "speaker": "A",
+          "text": "dạ em cảm ơn chị đã xác nhận chị cho em xin lại khu vực giao hàng để em kiểm tra thời gian giao dự kiến cho mình nhé",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 10,
+          "speaker": "C",
+          "text": "khu vực giao hàng là ninh kiều cần thơ",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 11,
+          "speaker": "A",
+          "text": "dạ với địa chỉ ninh kiều cần thơ đơn sẽ giao dự kiến trong bốn ngày làm việc khoảng ngày hai mươi tám tháng mười em sẽ tiến hành lên đơn cho mình ngay bây giờ ạ",
+          "entities": {
+            "delivery_days": 4
+          },
+          "reference_source": "llm"
+        },
+        {
+          "idx": 12,
+          "speaker": "C",
+          "text": "chị muốn chốt đơn này luôn",
+          "entities": {},
+          "reference_source": "llm"
+        },
+        {
+          "idx": 13,
+          "speaker": "A",
+          "text": "dạ em lên đơn cho chị một máy e pia pro giá bảy triệu sáu trăm chín mươi nghìn và một máy samsung ax bốn mươi giá ba triệu hai trăm bốn mươi lăm nghìn giao tại ninh kiều cần thơ thanh toán cê ô đê dự kiến nhận hàng ngày hai mươi tám tháng mười đơn hàng sẽ được nhân viên bên em gọi xác nhận trước khi giao chị nhé",
+          "entities": {
+            "payment": "COD",
+            "sku": "SKU-AP-PRO",
+            "price_vnd": 7690000
+          },
+          "reference_source": "llm"
+        }
+      ]
+    }
+  ]
+}

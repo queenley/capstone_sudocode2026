@@ -1,0 +1,219 @@
+{
+  "conversation_id": "SCN-GEN-0065__call_1",
+  "scenario_id": "SCN-GEN-0065",
+  "call": "call_1",
+  "customer_id": "C034",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-27",
+  "region": "trung",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào cô Loan ạ, em là trợ lý ảo của shop BTC. Hôm trước cô có hỏi về máy lọc nước RO Karofi 9 lõi cho gia đình ở Cần Thơ đúng không ạ? Em xác nhận lại, cô muốn tiếp tục tìm hiểu về mẫu máy này phải không cô?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Hôm trước cô có hỏi về máy lọc nước RO Karofi 9 lõi cho gia đình ở Cần Thơ đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area",
+        "decision_maker",
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-WF-RO9"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, cô muốn hỏi thêm về máy lọc nước RO Karofi 9 lõi mà hôm trước cô đã nghe.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy lọc nước RO Karofi 9 lõi này phù hợp cho gia đình có 4 đến 6 người sử dụng, bình chứa 10 lít và lọc RO an toàn cho nước máy, nước giếng. Cô cho em hỏi gia đình mình gồm mấy người để em tư vấn kỹ hơn ạ?",
+      "questions": [
+        {
+          "slot": "usage_need",
+          "type": "open",
+          "text": "Cô cho em hỏi gia đình mình gồm mấy người để em tư vấn kỹ hơn ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-WF-RO9"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhà cô là gia đình 4 người, nên cần máy lọc cho cả nhà sử dụng.",
+      "facts_stated": {
+        "usage_need": "gia đình 4 người"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, với gia đình 4 người thì máy Karofi 9 lõi đáp ứng tốt nhu cầu sử dụng nước sạch mỗi ngày cho cả nhà cô ạ. Cô dự kiến đầu tư khoảng bao nhiêu cho máy này để em báo giá chi tiết ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Cô dự kiến đầu tư khoảng bao nhiêu cho máy này để em báo giá chi tiết ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-WF-RO9"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cô có khoảng 6 triệu để đầu tư cho máy này, không biết máy này có khuyến mãi gì không?",
+      "facts_stated": {
+        "budget_vnd": 6000000
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy lọc nước Karofi 9 lõi hiện có giá 5.990.000đ, đang còn hàng tại shop. Hiện tại chưa có chương trình khuyến mãi giảm giá cho mẫu này cô nhé, nhưng cô được miễn phí vận chuyển và giao lắp tận nơi. Giá này phù hợp với ngân sách cô dự kiến ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cô đang chờ cuối tháng nhận lương mới quyết định mua, nên em lưu lại cho cô nhé.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận thông tin của cô, cuối tháng nhận lương nếu cô cần mua thì chỉ cần liên hệ lại shop hoặc gọi số hotline này giúp em ạ. Giá và sản phẩm em đã lưu lại cho cô, em đợi tin từ cô khi mình sẵn sàng đặt hàng nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "usage_need",
+          "value": "gia đình 4 người",
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 6000000,
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-WF-RO9",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5990000,
+          "op": "set",
+          "source": "call_1#turn7"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chua_san_sang_mua",
+    "objection_handling": "Nhẹ nhàng ghi nhận lý do khách chờ lương, hẹn hỗ trợ lại khi khách sẵn sàng.",
+    "sentiment": "neutral",
+    "decision_maker": "con gái",
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

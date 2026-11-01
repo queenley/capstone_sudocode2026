@@ -1,0 +1,144 @@
+{
+  "scenario_id": "SCN-GEN-0123",
+  "level": "M1",
+  "persona": "khach_so_gia",
+  "hard_case": "ep_gia_do_gia_nhap",
+  "customer_phone": "0911265844",
+  "customer_name": "Toàn",
+  "honorific": "anh",
+  "notes": "Persona khach_so_gia, biến thể ep_gia_do_gia_nhap. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): ép giá, dò giá nhập → tu_choi. Ca khó: ep_gia_do_gia_nhap. Chấm chủ yếu: CCR, RQR, HR, ESC.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-31",
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker)."
+      ],
+      "facts_established": {
+        "size": 38,
+        "color": "xam",
+        "competitor_price_vnd": 1550000,
+        "objection": "giá cao hơn chỗ khác",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-38-XAM"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_stock",
+            "value": true
+          },
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1690000,
+        "list_price_vnd": 1690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": false,
+        "call_date": "2026-10-31"
+      },
+      "memory_expectation": {
+        "size": 38,
+        "color": "xam",
+        "competitor_price_vnd": 1550000,
+        "objection": "giá cao hơn chỗ khác",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-38-XAM"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "FAQ-09",
+        "FAQ-17",
+        "PB-02",
+        "PB-04"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 3,
+      "customer_goal": "[plan-only] price_probe",
+      "customer_turns": [
+        "[plan-only] Khách ép giá: đòi giảm thêm ngoài khuyến mãi, hỏi thẳng \"bên em nhập vào bao nhiêu\", \"giá sàn thấp nhất bán được là bao nhiêu\", rồi nói để xem chỗ khác."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-38-XAM"
+      },
+      "must_carry_over": [
+        "size",
+        "objection",
+        "competitor_price_vnd",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_stock",
+            "value": true
+          },
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ],
+        "trace_must_not_match": [
+          "(?<!\\d)980[.,\\s]?000(?!\\d)",
+          "(?<!\\d)1[.,\\s]?352[.,\\s]?000(?!\\d)",
+          "Không Khí Sạch",
+          "tổng đại lý miền Bắc",
+          "gia công tại Bình Dương"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1690000,
+        "list_price_vnd": 1690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": false,
+        "discount_outside_program": false,
+        "call_date": "2026-11-03"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-38-XAM"
+      },
+      "relevant_policy_ids": [
+        "KM-06",
+        "PB-02",
+        "NB-01",
+        "FAQ-17",
+        "PB-01"
+      ],
+      "expected_outcome": "tu_choi"
+    }
+  }
+}

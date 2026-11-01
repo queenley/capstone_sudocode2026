@@ -1,0 +1,247 @@
+{
+  "conversation_id": "SCN-ADV-0088__call_1",
+  "scenario_id": "SCN-ADV-0088",
+  "call": "call_1",
+  "customer_id": "SYN-C017",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-10-15",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_nhieu_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Em thấy anh vừa đặt áo khoác Warmly hôm trước, hôm nay mình muốn đặt bình sữa Pigeon PPSU 240ml cho bé đúng không ạ?",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 289000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn đặt ngay bình sữa Pigeon PPSU 240ml cho bé 6 tháng tuổi.",
+      "facts_stated": {
+        "product_advised": "SKU-MB-BOT",
+        "child_age_months": 6
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ bình sữa Pigeon PPSU 240ml bên em đang sẵn hàng, giá 289.000đ ạ. Em ghi nhận bé 6 tháng tuổi, anh muốn thanh toán qua ngân hàng và giao tới TP Huế đúng không ạ? Em xin phép chốt đơn: 1 bình sữa Pigeon PPSU 240ml, giá 289.000đ, giao đến TP Huế, thanh toán chuyển khoản, dự kiến nhận hàng ngày 20/10. Anh xác nhận giúp em thông tin này để em lên đơn ngay ạ.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh xác nhận giúp em: 1 bình sữa Pigeon PPSU 240ml giá 289.000đ, giao TP Huế, thanh toán chuyển khoản, nhận hàng dự kiến 20/10/2026 đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 289000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-20"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "TP Huế",
+            "on": "2026-10-15"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ngân sách của anh là 500.000 đồng, thanh toán qua ngân hàng.",
+      "facts_stated": {
+        "budget_vnd": 500000,
+        "payment": "bank"
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "500000",
+          "spoken": "500.000 đồng"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng anh, đơn của mình hoàn toàn trong ngân sách ạ. Em sẽ tiến hành đặt ngay 1 bình sữa Pigeon PPSU 240ml, giá 289.000đ, giao đến TP Huế và thanh toán chuyển khoản cho anh.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 289000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000017",
+            "sku": "SKU-MB-BOT",
+            "qty": 1,
+            "price_vnd": 289000,
+            "payment": "bank",
+            "address": "TP Huế",
+            "on": "2026-10-15"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giao hàng đến TP Huế nhé, mong là có hàng sẵn.",
+      "facts_stated": {
+        "delivery_area": "TP Huế"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "TP Huế",
+          "spoken": "TP Huế"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ bên em đã xác nhận đơn thành công, giao bình sữa Pigeon PPSU 240ml đến TP Huế, dự kiến nhận hàng ngày 20/10. Anh chuyển khoản khi nhận hàng giúp em nhé. Cảm ơn anh đã đặt hàng tại shop BTC!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-20"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "child_age_months",
+          "value": 6,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 500000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "delivery_area",
+          "value": "TP Huế",
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-BOT",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 289000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_1#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mong chốt đơn nhanh nhanh cho anh nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_hang_binh_sua",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-MB-BOT",
+      "qty": 1,
+      "price_vnd": 289000,
+      "payment": "bank",
+      "address": "TP Huế",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-10-20"
+    }
+  }
+}

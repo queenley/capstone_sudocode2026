@@ -1,0 +1,186 @@
+{
+  "conversation_id": "SCN-GEN-0175__call_2",
+  "scenario_id": "SCN-GEN-0175",
+  "call": "call_2",
+  "customer_id": "C006",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-16",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Nam ạ, hôm trước anh có quan tâm Giày chạy bộ RunLite 1, còn muốn so sánh thêm; anh muốn mình tiếp tục thế nào ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh muốn mình tiếp tục thế nào ạ?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh gọi lại vì muốn hỏi thêm một chút về đôi giày.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã gọi lại ạ. Đôi giày chạy bộ RunLite 1 size 38 màu trắng bên em hiện còn hàng, giá là 1.290.000đ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1290000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nó có chống trượt không? Anh thấy nhiều mẫu khác cũng đẹp.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giày RunLite 1 có đế cao su giúp chống trượt tốt khi chạy bộ anh nhé. Nếu anh muốn tham khảo thêm mẫu khác, em cũng có thể giới thiệu các dòng tương tự ạ.",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh muốn em giới thiệu thêm mẫu nào không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá này có thể thương lượng không hay đã cố định rồi?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giá 1.290.000đ là giá niêm yết hiện tại của shop anh ạ, chưa có chương trình giảm thêm cho mẫu này. Tuy nhiên, bên em miễn phí vận chuyển toàn quốc cho đơn từ 500.000đ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1290000
+        },
+        {
+          "field": "promo_RUN-10_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thực ra anh không mua nữa, cảm ơn em đã tư vấn.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã quan tâm sản phẩm bên em. Nếu sau này anh cần hỗ trợ thêm về giày hoặc sản phẩm khác, anh cứ liên hệ shop nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN1",
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1290000,
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN1-38-TRANG",
+          "op": "set",
+          "source": "call_2#turn0"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_them_tu_choi",
+    "outcome": "tu_choi",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

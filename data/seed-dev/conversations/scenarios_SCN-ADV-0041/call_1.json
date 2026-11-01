@@ -1,0 +1,199 @@
+{
+  "conversation_id": "SCN-ADV-0041__call_1",
+  "scenario_id": "SCN-ADV-0041",
+  "call": "call_1",
+  "customer_id": "SYN-C004",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-10-16",
+  "region": "bac",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_bao_hanh_het_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em kiểm tra thấy chị đã mua Nồi chiên không dầu Lock&Lock với mã đơn OD900403 rồi ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900403"
+        },
+        {
+          "field": "owned_sku",
+          "value": "SKU-AF-4L"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị gọi để hỏi về cái nồi chiên không dầu Lock&Lock chị đã mua.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị muốn hỏi về tình trạng nồi chiên không dầu Lock&Lock đúng không ạ? Chị có thể mô tả giúp em máy đang gặp vấn đề gì không ạ?",
+      "questions": [
+        {
+          "slot": "issue",
+          "type": "open",
+          "text": "Chị có thể mô tả giúp em máy đang gặp vấn đề gì không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy bị lỗi không lên nguồn, chị không biết phải làm sao nữa.",
+      "facts_stated": {
+        "issue": "máy không lên nguồn"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu rồi ạ. Chị kiểm tra trong giấy bảo hành giúp em xem còn thời hạn bảo hành không chị nhé.",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị kiểm tra trong giấy bảo hành giúp em xem còn thời hạn bảo hành không chị nhé."
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cũng thấy trong giấy bảo hành nói là 12 tháng, nhưng giờ đã hết hạn rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã cung cấp thông tin. Theo hệ thống, nồi chiên không dầu Lock&Lock của chị có thời hạn bảo hành 12 tháng và hiện đã hết hạn bảo hành rồi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "warranty_months",
+          "value": 12
+        },
+        {
+          "field": "in_warranty",
+          "value": false
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900403"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Liệu có cách nào để được bảo hành miễn phí không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ rất tiếc, khi sản phẩm đã hết hạn bảo hành thì shop không hỗ trợ bảo hành miễn phí nữa ạ. Nếu chị cần sửa chữa, em có thể hướng dẫn chị liên hệ trung tâm bảo hành hãng Lock&Lock hoặc hỗ trợ thông tin về địa chỉ sửa chữa uy tín ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "issue",
+          "value": "máy không lên nguồn",
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "order_id",
+          "value": "OD900403",
+          "op": "supersede",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "owned_sku",
+          "value": "SKU-AF-4L",
+          "op": "supersede",
+          "source": "call_1#turn1"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_bao_hanh_het_han",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "order_id",
+        "old": "OD900402",
+        "new": "OD900403"
+      },
+      {
+        "slot": "owned_sku",
+        "old": "SKU-AF-4L",
+        "new": "SKU-AF-4L"
+      }
+    ],
+    "callback": null,
+    "order": null
+  }
+}

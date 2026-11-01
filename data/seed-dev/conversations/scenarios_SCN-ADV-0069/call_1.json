@@ -1,0 +1,202 @@
+{
+  "conversation_id": "SCN-ADV-0069__call_1",
+  "scenario_id": "SCN-ADV-0069",
+  "call": "call_1",
+  "customer_id": "SYN-C004",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-14",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_bao_hanh_trong_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị D ạ, em là trợ lý ảo của shop BTC. Em thấy chị đã mua Máy lọc không khí AirPure Pro trước đây, chị cần hỗ trợ về bảo hành sản phẩm đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị cần hỗ trợ về bảo hành sản phẩm đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900401"
+        },
+        {
+          "field": "owned_sku",
+          "value": "SKU-AP-PRO"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị D đây. Hôm nay chị gọi để hỏi về Máy lọc không khí AirPure Pro mà chị đã mua.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã kiểm tra thì Máy lọc không khí AirPure Pro của chị vẫn còn trong thời hạn bảo hành 24 tháng chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "warranty_months",
+          "value": 24
+        },
+        {
+          "field": "in_warranty",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900401"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Bây giờ quạt trong máy bị rung mạnh, không biết là còn bảo hành không nhỉ?",
+      "facts_stated": {
+        "issue": "quạt trong máy rung mạnh"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ tình trạng quạt rung mạnh nếu là lỗi kỹ thuật sẽ được bảo hành chị ạ. Chị có thể gửi máy về shop hoặc mang tới trung tâm bảo hành hãng, thời gian xử lý từ 7–15 ngày làm việc.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "warranty_months",
+          "value": 24
+        },
+        {
+          "field": "in_warranty",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn biết quy trình bảo hành thế nào, gửi lại hàng cho shop hay là trung tâm nào đó?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ quy trình bảo hành là chị có thể mang sản phẩm đến trung tâm bảo hành hãng hoặc gửi về shop, bên em hỗ trợ chuyển máy đến hãng giúp chị. Chị chỉ cần giữ lại hóa đơn hoặc mã đơn hàng khi gửi máy đi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu gửi hàng thì mất bao lâu để xử lý vậy em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ thời gian xử lý bảo hành thông thường sẽ từ 7–15 ngày làm việc kể từ khi shop hoặc trung tâm nhận được sản phẩm chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "issue",
+          "value": "quạt trong máy rung mạnh",
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "order_id",
+          "value": "OD900401",
+          "op": "supersede",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "owned_sku",
+          "value": "SKU-AP-PRO",
+          "op": "supersede",
+          "source": "call_1#turn1"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_bao_hanh",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "order_id",
+        "old_value": "OD900402",
+        "new_value": "OD900401"
+      },
+      {
+        "slot": "owned_sku",
+        "old_value": "SKU-AF-4L",
+        "new_value": "SKU-AP-PRO"
+      }
+    ],
+    "callback": null,
+    "order": null
+  }
+}

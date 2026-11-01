@@ -1,0 +1,159 @@
+{
+  "scenario_id": "SCN-GEN-0078",
+  "level": "M2",
+  "persona": "khach_ngoai_pham_vi_chuyen_may",
+  "hard_case": null,
+  "customer_phone": "0998000015",
+  "customer_name": "Đỗ Văn Khải",
+  "honorific": "anh",
+  "notes": "Persona khach_ngoai_pham_vi_chuyen_may, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): câu hỏi y tế, chuyển nhân viên → chuyen_may. Chấm chủ yếu: CCR, RQR, TSR, ESC.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-17",
+      "customer_goal": "Hỏi về máy hâm sữa Fatz 4 chức năng",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về máy hâm sữa Fatz 4 chức năng mà anh đã mua trước đây.",
+        "Giá của máy này hiện tại là bao nhiêu?",
+        "Anh có nghe rằng máy này đang có khuyến mãi gì không?",
+        "Ngân sách của anh chỉ khoảng 1 triệu thôi.",
+        "À, anh cần suy nghĩ thêm trước khi quyết định."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C015",
+          "session_id": "SYN-015-S1",
+          "date": "2026-07-16",
+          "channel": "fb",
+          "summary": "Mua Máy hâm sữa Fatz 4 chức năng giá 490.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C015",
+          "session_id": "SYN-015-S2",
+          "date": "2026-10-05",
+          "channel": "web",
+          "summary": "Đặt Combo Spectra S1 + máy hâm sữa Fatz + 50 túi trữ sữa giá 4.790.000đ, đơn OD901502 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C015",
+          "order_id": "OD901501",
+          "date": "2026-07-16",
+          "sku": "SKU-MB-MON",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-MB-MON"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C015",
+          "order_id": "OD901502",
+          "date": "2026-10-05",
+          "sku": "SKU-BDL-MOM",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901502"
+          }
+        }
+      ],
+      "facts_established": {
+        "child_age_months": 7,
+        "budget_vnd": 1000000,
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 490000,
+        "list_price_vnd": 490000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_MOM-FREESHIP_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "child_age_months": 7,
+        "budget_vnd": 1000000,
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-MB-MON",
+        "price_quoted_vnd": 490000
+      },
+      "relevant_policy_ids": [
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 1,
+      "customer_goal": "Hỏi về vấn đề y tế liên quan đến sản phẩm",
+      "customer_turns": [
+        "Alo, anh có một câu hỏi về sản phẩm này.",
+        "Chị của anh đang dùng thuốc, không biết có dùng máy hâm sữa này được không?",
+        "Nếu có vấn đề gì thì phải làm sao?",
+        "Anh muốn hỏi thêm một chút rồi sẽ quyết định, có thể chuyển máy cho anh không?"
+      ],
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "handoff.transfer",
+        "brief_must_contain": [
+          "customer_phone",
+          "customer_name",
+          "escalation_reason",
+          "conversation_summary",
+          "product_advised",
+          "price_quoted_vnd",
+          "open_questions",
+          "next_action",
+          "generated_at"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "call_date": "2026-10-18"
+      },
+      "relevant_policy_ids": [
+        "PB-06",
+        "PB-01"
+      ],
+      "expected_outcome": "chuyen_may"
+    }
+  }
+}

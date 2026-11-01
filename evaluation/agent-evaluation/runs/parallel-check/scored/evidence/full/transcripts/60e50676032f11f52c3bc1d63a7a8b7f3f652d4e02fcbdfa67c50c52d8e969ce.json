@@ -1,0 +1,70 @@
+{
+  "context": {
+    "run_id": "PRODUCT-70a8f17c2a91c3b1",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0010",
+    "call": "call_3",
+    "turn": 3
+  },
+  "customer_text": "Bây giờ anh muốn mua, nhưng máy có còn không?",
+  "agent_text": "Dạ hiện tại máy AirPure Pro bên em chưa còn hàng ạ, anh Minh có thể đợi đến ngày 21 tháng 10 để bên em có hàng lại ạ. Anh có muốn em tư vấn thêm sản phẩm khác không ạ?",
+  "customer_id": "C004",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-70a8f17c2a91c3b1/full/SCN-GEN-0010/call_3/3/19",
+      "run_id": "PRODUCT-70a8f17c2a91c3b1",
+      "context": {
+        "run_id": "PRODUCT-70a8f17c2a91c3b1",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0010",
+        "call": "call_3",
+        "turn": 3
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "a5ea0d6e9f1060e868586bcc8ad982eef44c590b59573a31a0e25556ded877be",
+          "pointer": "/110"
+        }
+      ],
+      "event_id": "PRODUCT-70a8f17c2a91c3b1/full/SCN-GEN-0010/call_3/3/19",
+      "request": {
+        "name": "inventory.check",
+        "args": {
+          "sku": "SKU-AP-PRO",
+          "on": "2026-10-20"
+        }
+      },
+      "on": "2026-10-20",
+      "started_at": "2026-10-17T04:06:57.297275+00:00",
+      "finished_at": "2026-10-17T04:06:57.297275+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-AP-PRO",
+        "in_stock": false,
+        "qty": 0,
+        "restock_expected": "2026-10-21"
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"on\": \"2026-10-20\", \"sku\": \"SKU-AP-PRO\"}, \"name\": \"inventory.check\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "a5ea0d6e9f1060e868586bcc8ad982eef44c590b59573a31a0e25556ded877be",
+      "pointer": "/106"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "a5ea0d6e9f1060e868586bcc8ad982eef44c590b59573a31a0e25556ded877be",
+      "pointer": "/111"
+    }
+  ]
+}

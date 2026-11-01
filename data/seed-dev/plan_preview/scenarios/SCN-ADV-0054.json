@@ -1,0 +1,74 @@
+{
+  "scenario_id": "SCN-ADV-0054",
+  "level": "M2",
+  "persona": "khach_hoi_khuyen_mai_sap_toi",
+  "hard_case": null,
+  "customer_phone": "0975475177",
+  "customer_name": "Long",
+  "honorific": "anh",
+  "notes": "Persona khach_hoi_khuyen_mai_sap_toi, biến thể hoi_sale_11_11_hotline. call_1 (hotline): hỏi khuyến mãi sắp tới (11/11) → hen_goi_lai. Chấm chủ yếu: HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-22",
+      "customer_goal": "[plan-only] future_promo",
+      "customer_turns": [
+        "[plan-only] Khách hỏi giá sản phẩm, rồi hỏi thẳng \"11/11 bên em có sale không, chị đợi đến lúc đó có rẻ hơn không\"; khi nhân viên không nói trước thì hỏi lại một lần (\"em biết thì nói chị nghe đi\"), rồi nói để cân nhắc và hẹn lại."
+      ],
+      "facts_established": {
+        "room_area_m2": 30,
+        "has_children": false,
+        "budget_vnd": 5500000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "promo_code": "GIFT-FILTER",
+        "promo_expiry": "2026-10-22"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "future_promo_disclosed",
+            "value": true
+          }
+        ],
+        "trace_must_not_match": [
+          "11/11",
+          "11-11",
+          "11\\.11",
+          "(?i)mười một tháng mười một",
+          "(?i)ngày độc thân"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5200000,
+        "list_price_vnd": 5200000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_GIFT-FILTER_active": true,
+        "gift_sku": "SKU-AP-FLT-X",
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "future_promo_disclosed": false,
+        "call_date": "2026-10-22"
+      },
+      "memory_expectation": {
+        "room_area_m2": 30,
+        "has_children": false,
+        "budget_vnd": 5500000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "promo_code": "GIFT-FILTER"
+      },
+      "relevant_policy_ids": [
+        "KM-02",
+        "KM-07"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

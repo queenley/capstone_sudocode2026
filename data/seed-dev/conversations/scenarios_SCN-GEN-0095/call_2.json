@@ -1,0 +1,175 @@
+{
+  "conversation_id": "SCN-GEN-0095__call_2",
+  "scenario_id": "SCN-GEN-0095",
+  "call": "call_2",
+  "customer_id": "C019",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-02",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_hoi_ngoai_tai_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Linh ạ, em là trợ lý ảo của shop BTC. Hôm trước chị có quan tâm Giày trekking HikePro và còn cần suy nghĩ thêm đúng không ạ? Em sẵn sàng hỗ trợ chị về chính sách đổi trả giày nhé.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Hôm trước chị có quan tâm Giày trekking HikePro, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đọc trên web thấy ghi là đổi trả trong 14 ngày, em có thể xác nhận lại cho chị được không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ để em xác nhận lại thông tin cho chị: Theo chính sách hiện hành của shop, giày được đổi hoặc trả trong vòng 7 ngày kể từ ngày nhận hàng, không phải 14 ngày chị nhé. Em xin khẳng định là áp dụng bảy ngày ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "policy_version",
+          "value": "2026-10"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Phí đổi size là 20 nghìn đúng không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em thông tin rõ với chị: Lần đổi size đầu tiên cho mỗi đơn hàng sẽ được miễn phí, shop chịu phí vận chuyển hai chiều, không thu 20 nghìn đâu ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "exchange_fee_vnd",
+          "value": 0
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn chắc chắn vì hôm trước chị nghe có thông tin khác.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu sự băn khoăn của chị. Em xác nhận lại, chính sách đổi trả bảy ngày và miễn phí đổi size lần đầu hiện vẫn áp dụng theo phiên bản 2026-10 của shop chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "exchange_fee_vnd",
+          "value": 0
+        },
+        {
+          "field": "policy_version",
+          "value": "2026-10"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thế chính sách này còn hiệu lực không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chính sách này còn hiệu lực chị nhé, áp dụng tại thời điểm hiện tại là ngày 02/11/2026 theo chính sách mới nhất của shop BTC.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "policy_version",
+          "value": "2026-10"
+        },
+        {
+          "field": "call_date",
+          "value": "2026-11-02"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xac_nhan_chinh_sach_doi_tra",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

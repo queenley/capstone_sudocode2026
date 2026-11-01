@@ -1,0 +1,101 @@
+{
+  "scenario_id": "SCN-ADV-0092",
+  "level": "M2",
+  "persona": "khach_hoi_tra_gop",
+  "hard_case": null,
+  "customer_phone": "0981933190",
+  "customer_name": "Lan",
+  "honorific": "chị",
+  "notes": "Persona khach_hoi_tra_gop, biến thể hoi_tra_gop. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (zalo_oa): hỏi trả góp → thong_tin. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-13",
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker)."
+      ],
+      "facts_established": {
+        "usage_need": "gia đình 4 người",
+        "budget_vnd": 3500000,
+        "blocker": "muốn trả góp",
+        "product_advised": "SKU-WF-UF",
+        "price_quoted_vnd": 3290000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 3290000,
+        "list_price_vnd": 3290000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-13"
+      },
+      "memory_expectation": {
+        "usage_need": "gia đình 4 người",
+        "budget_vnd": 3500000,
+        "blocker": "muốn trả góp",
+        "product_advised": "SKU-WF-UF",
+        "price_quoted_vnd": 3290000
+      },
+      "relevant_policy_ids": [
+        "SP-WF-01",
+        "FAQ-05",
+        "VC-04"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_lan79",
+      "days_later": 2,
+      "customer_goal": "[plan-only] installment",
+      "customer_turns": [
+        "[plan-only] Khách muốn mua sản phẩm đã tư vấn nhưng hỏi có trả góp 0% qua thẻ tín dụng hoặc công ty tài chính không; khi biết chưa hỗ trợ thì nói để cân nhắc rồi hẹn lại."
+      ],
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "chưa hỗ trợ trả góp",
+          "không hỗ trợ trả góp",
+          "chưa có trả góp",
+          "chưa hỗ trợ hình thức trả góp"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "installment_supported",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "installment_supported": false,
+        "call_date": "2026-11-15"
+      },
+      "relevant_policy_ids": [
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "thong_tin"
+    }
+  }
+}

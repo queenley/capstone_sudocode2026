@@ -1,0 +1,89 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0014",
+    "call": "call_2",
+    "turn": 2
+  },
+  "customer_text": "Chị thấy giá bên mình tăng lên 1 triệu 521 ngàn, không hiểu sao lại như vậy?",
+  "agent_text": "Dạ, khuyến mãi RUN2-SALE hôm trước bên em báo đã hết rồi ạ, nên giá hôm nay là 1.521.000 đồng kèm giảm 10% và miễn phí COD ạ. Em thông tin để chị rõ nhé.",
+  "customer_id": "C013",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0014/call_2/2/10",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0014",
+        "call": "call_2",
+        "turn": 2
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/381"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0014/call_2/2/10",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-SN-RUN2-42-DEN",
+          "on": "2026-10-15",
+          "customer_phone": "0964252477"
+        }
+      },
+      "on": "2026-10-15",
+      "started_at": "2026-10-17T04:24:37.083550+00:00",
+      "finished_at": "2026-10-17T04:24:37.084104+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-SN-RUN2-42-DEN",
+        "list_price_vnd": 1690000,
+        "final_price_vnd": 1521000,
+        "applied_promos": [
+          {
+            "promo_code": "COD-0",
+            "type": "freecod",
+            "discount_vnd": 0
+          },
+          {
+            "promo_code": "RUN-10",
+            "type": "percent",
+            "discount_vnd": 169000
+          }
+        ],
+        "expired_promos": [
+          "RUN2-SALE"
+        ],
+        "ineligible_promos": [],
+        "not_applied_exclusive": [],
+        "freeship": false,
+        "_internal_price_floor_vnd": 1352000
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"customer_phone\": \"0964252477\", \"on\": \"2026-10-15\", \"sku\": \"SKU-SN-RUN2-42-DEN\"}, \"name\": \"pricing.get_quote\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/377"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/382"
+    }
+  ]
+}

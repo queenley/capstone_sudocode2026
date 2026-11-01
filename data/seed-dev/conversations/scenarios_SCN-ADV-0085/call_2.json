@@ -1,0 +1,283 @@
+{
+  "conversation_id": "SCN-ADV-0085__call_2",
+  "scenario_id": "SCN-ADV-0085",
+  "call": "call_2",
+  "customer_id": "SYN-C013",
+  "session_index": 2,
+  "channel": "chat_fanpage",
+  "date": "2026-10-16",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_go_khong_dau",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh, em là trợ lý ảo của shop BTC. Hôm trước anh có quan tâm Giày trekking HikePro và bảo để bàn với gia đình, hôm nay anh muốn đặt luôn đúng không ạ?",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "size",
+        "variant_sku",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chao em anh muon dat doi giay trekking hikepro mau xam size 42",
+      "facts_stated": {
+        "size": 42,
+        "color": "xam",
+        "product_advised": "SKU-SN-TRK"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh chọn Giày trekking HikePro màu xám, size 42 đúng không ạ? Giá hiện tại là 1.990.000đ, sản phẩm này bên em còn hàng. Anh muốn thanh toán chuyển khoản và nhận tại Long Biên, Hà Nội ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh xác nhận lại giúp em: Giày trekking HikePro, màu xám, size 42, giá 1.990.000đ, giao Long Biên, Hà Nội, thanh toán chuyển khoản, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Long Biên, Hà Nội",
+            "on": "2026-10-16"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "hinh thuc thanh toan la chuyen khoan ngan hang",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận thanh toán chuyển khoản ngân hàng. Đơn hàng sẽ giao về Long Biên, Hà Nội trong khoảng 2 ngày làm việc, dự kiến nhận hàng ngày 19/10/2026 ạ.",
+      "questions": [],
+      "facts_used": [
+        "payment",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "delivery_days",
+          "value": 2
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-19"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "khu vuc giao hang la long bien ha noi",
+      "facts_stated": {
+        "delivery_area": "Long Biên, Hà Nội"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận giao hàng tại Long Biên, Hà Nội. Anh yên tâm, đơn sẽ được giao nhanh theo lịch dự kiến.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "mong la hang se den nhanh nhe",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh, shop sẽ xử lý đơn ngay để giao sớm nhất cho anh. Em tiến hành tạo đơn hàng Giày trekking HikePro màu xám, size 42, giá 1.990.000đ, giao Long Biên, Hà Nội, thanh toán chuyển khoản ạ.",
+      "questions": [],
+      "facts_used": [
+        "variant_sku",
+        "delivery_area",
+        "payment",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1990000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000013",
+            "sku": "SKU-SN-TRK-42-XAM",
+            "qty": 1,
+            "price_vnd": 1990000,
+            "payment": "bank",
+            "address": "Long Biên, Hà Nội",
+            "on": "2026-10-16"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chot don cho anh nhe",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng của anh đã được tạo thành công. Dự kiến nhận hàng ngày 19/10/2026. Nếu cần hỗ trợ thêm, anh cứ nhắn cho shop nhé, em cảm ơn anh đã đặt hàng ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-19"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn3"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Long Biên, Hà Nội",
+          "op": "set",
+          "source": "call_2#turn5"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-TRK",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1990000,
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-TRK-42-XAM",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_giay_trekking",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001",
+      "sku": "SKU-SN-TRK-42-XAM",
+      "qty": 1,
+      "price_vnd": 1990000,
+      "payment": "bank",
+      "delivery_area": "Long Biên, Hà Nội",
+      "estimated_delivery": "2026-10-19"
+    }
+  }
+}

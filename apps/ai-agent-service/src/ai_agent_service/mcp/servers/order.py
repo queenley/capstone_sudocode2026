@@ -3,8 +3,8 @@
 ``order.status`` and ``order.update`` under the organisers' names, over the
 reference mock (:mod:`.btc`): an exchange checks the new variant's stock,
 the first size change is free and later ones cost 60.000đ both ways, a
-cheaper replacement is refunded in 3 to 5 working days. The lane
-ORDER_SERVICE offers these two (section 4.3). ``order.update`` takes the
+cheaper replacement is refunded in 3 to 5 working days. The business
+lanes offer both (section 4.3). ``order.update`` takes the
 ``idempotency_key`` the harness sets, as every write tool does (section 6.1).
 """
 

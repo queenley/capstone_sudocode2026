@@ -9,7 +9,13 @@ def test_order_is_prepared_then_requires_confirmation_of_the_exact_payload():
 
 
 def test_handoff_without_asking_again():
-    assert "gọi handoff_transfer ngay trong lượt đó" in HARD_RULES
+    assert "gọi handoff_transfer ngay trong lượt" in HARD_RULES
+    assert "không hỏi lại \"anh có muốn chuyển không\"" in HARD_RULES
+
+
+def test_no_information_is_a_reason_to_transfer():
+    # BTC's answer (DIEU-CHINH-DE 4, GIAI-DAP-MENTOR 4): a transfer is a success for an out-of-scope question.
+    assert "ngoai_pham_vi_tai_lieu" in HARD_RULES
 
 
 def test_order_lookup_before_asking_for_the_code():

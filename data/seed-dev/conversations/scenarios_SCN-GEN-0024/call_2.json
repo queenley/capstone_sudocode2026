@@ -1,0 +1,190 @@
+{
+  "conversation_id": "SCN-GEN-0024__call_2",
+  "scenario_id": "SCN-GEN-0024",
+  "call": "call_2",
+  "customer_id": "C015",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-21",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_mua_doi_size",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Vy ạ, em là trợ lý ảo của shop BTC. Hôm trước chị đã đặt Giày chạy bộ RunLite 2 Pro, em hỗ trợ chị đổi sang sản phẩm khác nhé.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "order_id",
+        "size",
+        "payment",
+        "delivery_area",
+        "variant_sku",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị chào, hôm trước chị đã đặt giày chạy bộ nhưng giờ muốn đổi sang sản phẩm khác.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị muốn đổi sang sản phẩm nào ạ? Chị có thể cho em biết tên hoặc mã sản phẩm mới mình muốn đổi không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị có thể cho em biết tên hoặc mã sản phẩm mới mình muốn đổi không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị nghe nói có sản phẩm giày sneaker Urban Classic size 42 màu đen, em có thể cho chị biết không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giày sneaker Urban Classic size 42 màu đen hiện còn hàng chị nhé. Nếu chị đổi sang sản phẩm này thì sẽ được hoàn lại số tiền chênh lệch.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "new_variant_sku",
+          "value": "SKU-SN-CAS-42-DEN"
+        },
+        {
+          "field": "new_size_in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cũng muốn hỏi hoàn chênh lệch là bao nhiêu nếu đổi sang sản phẩm mới.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, khi chị đổi sang giày sneaker Urban Classic, chị sẽ được hoàn lại 631.000 đồng. Việc đổi sản phẩm này không mất phí, shop sẽ chuyển khoản hoàn tiền cho chị trong 3 đến 5 ngày làm việc sau khi nhận lại hàng.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "refund_vnd",
+          "value": 631000
+        },
+        {
+          "field": "exchange_fee_vnd",
+          "value": 0
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "631000",
+          "spoken": "631.000 đồng"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, chị cần đọc số tài khoản ngân hàng để nhận hoàn tiền, số tài khoản của chị là 190023471662.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận yêu cầu đổi sản phẩm sang giày sneaker Urban Classic size 42 màu đen cho chị. Em sẽ tiến hành cập nhật đơn hàng và bộ phận kế toán sẽ chuyển khoản hoàn tiền cho chị theo thông tin chị cung cấp.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "new_variant_sku",
+          "value": "SKU-SN-CAS-42-DEN"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD600001",
+            "action": "exchange_product",
+            "new_variant_sku": "SKU-SN-CAS-42-DEN",
+            "on": "2026-10-21"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "doi_san_pham",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

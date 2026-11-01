@@ -1,0 +1,71 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0014",
+    "call": "call_3",
+    "turn": 2
+  },
+  "customer_text": "Chị sẽ thanh toán COD và giao hàng tại TP Huế.",
+  "agent_text": "Dạ em kiểm tra chưa có mã sản phẩm chính xác cho giày RunLite 2 Pro màu đen size 42, chị vui lòng đợi em kiểm tra lại giúp chị nhé. Chị có muốn em gọi lại sau hay chuyển chị gặp nhân viên hỗ trợ ạ?",
+  "customer_id": "C013",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0014/call_3/2/14",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0014",
+        "call": "call_3",
+        "turn": 2
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/381"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0014/call_3/2/14",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "RunLite-2-Pro-black-42",
+          "on": "2026-10-27",
+          "customer_phone": "0964252477"
+        }
+      },
+      "on": "2026-10-27",
+      "started_at": "2026-10-17T04:41:27.761488+00:00",
+      "finished_at": "2026-10-17T04:41:27.761488+00:00",
+      "outcome": "business_error",
+      "result": {
+        "error": "unknown_sku"
+      },
+      "error": {
+        "code": "unknown_sku",
+        "message": "BTC mock business error"
+      },
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"customer_phone\": \"0964252477\", \"on\": \"2026-10-27\", \"sku\": \"RunLite-2-Pro-black-42\"}, \"name\": \"pricing.get_quote\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/377"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/382"
+    }
+  ]
+}

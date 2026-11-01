@@ -1,0 +1,70 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0010",
+    "call": "call_3",
+    "turn": 3
+  },
+  "customer_text": "Bây giờ anh muốn mua, nhưng máy có còn không?",
+  "agent_text": "Dạ hiện tại máy lọc không khí AirPure Pro bên em chưa còn hàng ạ, anh Minh có thể đợi đến ngày 21 tháng 10 để bên em có hàng lại ạ. Anh có muốn em tư vấn thêm sản phẩm khác không ạ?",
+  "customer_id": "C004",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0010/call_3/3/17",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0010",
+        "call": "call_3",
+        "turn": 3
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/104"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0010/call_3/3/17",
+      "request": {
+        "name": "inventory.check",
+        "args": {
+          "sku": "SKU-AP-PRO",
+          "on": "2026-10-20"
+        }
+      },
+      "on": "2026-10-20",
+      "started_at": "2026-10-17T04:18:19.999264+00:00",
+      "finished_at": "2026-10-17T04:18:19.999264+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-AP-PRO",
+        "in_stock": false,
+        "qty": 0,
+        "restock_expected": "2026-10-21"
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"on\": \"2026-10-20\", \"sku\": \"SKU-AP-PRO\"}, \"name\": \"inventory.check\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/100"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/105"
+    }
+  ]
+}

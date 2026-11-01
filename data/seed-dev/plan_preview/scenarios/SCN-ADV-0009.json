@@ -1,0 +1,138 @@
+{
+  "scenario_id": "SCN-ADV-0009",
+  "level": "M2",
+  "persona": "khach_bao_hanh_het_han",
+  "hard_case": null,
+  "customer_phone": "0998000002",
+  "customer_name": "Trần Thị B",
+  "honorific": "chị",
+  "notes": "Persona khach_bao_hanh_het_han, biến thể loi_het_han. call_1 (zalo_oa): bảo hành hết hạn → thong_tin. Chấm chủ yếu: CCR, RQR, TSR, HR, ESC.",
+  "calls": {
+    "call_1": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_syn-c002",
+      "call_date": "2026-10-17",
+      "customer_goal": "[plan-only] warranty_expired",
+      "customer_turns": [
+        "[plan-only] Khách đã mua Quạt đứng Senko TS16 từ lâu (đơn trong crm_history), giờ bị lỗi: máy không lên nguồn. Khách muốn được bảo hành miễn phí, hơi khó chịu khi biết đã hết hạn, hỏi có cách nào khác không."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C002",
+          "session_id": "SYN-002-S3",
+          "date": "2025-03-06",
+          "channel": "web",
+          "summary": "Mua Quạt đứng Senko TS16 giá 590.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C002",
+          "session_id": "SYN-002-S1",
+          "date": "2026-04-04",
+          "channel": "zalo_oa",
+          "summary": "Mua Giày chạy bộ RunLite 2 Pro giá 1.690.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C002",
+          "session_id": "SYN-002-S2",
+          "date": "2026-10-02",
+          "channel": "fb",
+          "summary": "Đặt Giày trekking HikePro giá 1.990.000đ, đơn OD900202 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C002",
+          "order_id": "OD900201",
+          "date": "2026-04-04",
+          "sku": "SKU-SN-RUN2-38-TRANG",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-SN-RUN2-38-TRANG"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C002",
+          "order_id": "OD900202",
+          "date": "2026-10-02",
+          "sku": "SKU-SN-TRK-39-XAM",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900202"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C002",
+          "order_id": "OD900203",
+          "date": "2025-03-06",
+          "sku": "SKU-FAN-SEN",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-FAN-SEN"
+          }
+        }
+      ],
+      "facts_established": {
+        "issue": "máy không lên nguồn",
+        "order_id": "OD900203",
+        "owned_sku": "SKU-FAN-SEN"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "hết hạn bảo hành",
+          "hết thời hạn bảo hành",
+          "đã hết bảo hành",
+          "quá hạn bảo hành"
+        ],
+        "must_not_call_tools": [
+          "order.create",
+          "order.update"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_warranty",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900203",
+        "warranty_months": 12,
+        "in_warranty": false,
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "issue": "máy không lên nguồn",
+        "order_id": "OD900203",
+        "owned_sku": "SKU-FAN-SEN"
+      },
+      "relevant_policy_ids": [
+        "BH-01",
+        "BH-02",
+        "PB-01"
+      ],
+      "expected_outcome": "thong_tin"
+    }
+  }
+}

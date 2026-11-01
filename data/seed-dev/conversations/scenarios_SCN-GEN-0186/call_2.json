@@ -1,0 +1,285 @@
+{
+  "conversation_id": "SCN-GEN-0186__call_2",
+  "scenario_id": "SCN-GEN-0186",
+  "call": "call_2",
+  "customer_id": "C018",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-16",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_cap_nhat_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Quân ạ, hôm trước anh có quan tâm Giày sneaker Urban Classic size 42 màu đen và còn để bàn với gia đình. Anh muốn mình tiếp tục đặt hàng luôn không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh muốn mình tiếp tục đặt hàng luôn không ạ?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh đây, hôm trước em tư vấn cho anh giày sneaker Urban Classic size 42 màu đen đó.",
+      "facts_stated": {
+        "size": 42,
+        "product_advised": "SKU-SN-CAS",
+        "variant_sku": "SKU-SN-CAS-42-DEN"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng anh, mẫu Giày sneaker Urban Classic size 42 màu đen hiện còn hàng với giá là 890.000đ. Anh muốn thanh toán và nhận hàng như thế nào ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "open",
+          "text": "Anh muốn thanh toán và nhận hàng như thế nào ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh muốn thanh toán bằng chuyển khoản ngân hàng.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh chọn chuyển khoản ngân hàng, em ghi nhận ạ. Anh vui lòng cho em xin địa chỉ giao hàng để em kiểm tra thời gian giao dự kiến nhé.",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Anh vui lòng cho em xin địa chỉ giao hàng để em kiểm tra thời gian giao dự kiến nhé."
+        }
+      ],
+      "facts_used": [
+        "payment"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là Quận 7, TP.HCM nhé.",
+      "facts_stated": {
+        "delivery_area": "Quận 7, TP.HCM"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Quận 7, TP.HCM",
+          "spoken": "Quận 7, TP.HCM"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã kiểm tra, đơn hàng sẽ giao tới Quận 7, TP.HCM trong khoảng 2 ngày làm việc, dự kiến nhận hàng ngày 18/11. Tổng giá đơn là 890.000đ, thanh toán chuyển khoản. Em đọc lại đơn: Giày sneaker Urban Classic size 42 màu đen, giao Quận 7, TP.HCM, nhận chuyển khoản, giao dự kiến 18/11. Anh xác nhận giúp em thông tin này đúng chưa ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em đọc lại đơn: Giày sneaker Urban Classic size 42 màu đen, giao Quận 7, TP.HCM, nhận chuyển khoản, giao dự kiến 18/11. Anh xác nhận giúp em thông tin này đúng chưa ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 890000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-11-16"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "address",
+          "value": "Quận 7, TP.HCM",
+          "spoken": "Quận 7, TP.HCM"
+        },
+        {
+          "type": "date",
+          "value": "2026-11-18",
+          "spoken": "18/11"
+        }
+      ],
+      "pause_before_ms": 900,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Được rồi, anh đồng ý lên đơn cho anh nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã xác nhận ạ, em sẽ tiến hành lên đơn cho anh ngay. Sau khi hoàn tất, anh sẽ nhận được thông tin đơn hàng và hướng dẫn chuyển khoản qua Zalo hoặc SMS.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 890000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0982141621",
+            "sku": "SKU-SN-CAS-42-DEN",
+            "qty": 1,
+            "price_vnd": 890000,
+            "payment": "bank",
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-11-16"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "budget_vnd",
+          "value": 1100000,
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Quận 7, TP.HCM",
+          "op": "set",
+          "source": "call_2#turn5"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn3"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-CAS",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 890000,
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-CAS-42-DEN",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xac_nhan_mua",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-SN-CAS-42-DEN",
+      "qty": 1,
+      "price_vnd": 890000,
+      "payment": "bank",
+      "address": "Quận 7, TP.HCM",
+      "order_id": "OD600001"
+    }
+  }
+}

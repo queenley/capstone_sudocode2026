@@ -21,10 +21,13 @@ from __future__ import annotations
 from datetime import date
 from typing import Any, Literal
 
-from pydantic import Field, field_validator, model_validator
+import hashlib
+from functools import lru_cache
+
+from pydantic import Field, create_model, field_validator, model_validator
 
 from .catalog import StrictModel
-from .slots import CUSTOMER_SLOTS, Channel, InputMode, Outcome, btc_input_mode, btc_outcome, normalize_outcome
+from .slots import CUSTOMER_SLOTS, Channel, InputMode, Outcome, btc_input_mode, normalize_outcome
 
 Region = Literal["bac", "trung", "nam"]
 CallName = Literal["call_1", "call_2", "call_3"]
@@ -37,6 +40,13 @@ MetricName = Literal["CCR", "RQR", "TSR", "HR", "ESC"]
 class ForbiddenClaim(StrictModel):
     field: str
     value: Any  # "*any*" forbids every value of ``field``
+
+
+class TextLimit(StrictModel):
+    """The team's check: at most *max* agent turns of the call match *pattern* (0 = never said)."""
+
+    pattern: str
+    max: int = Field(ge=0)
 
 
 class SuccessIf(StrictModel):
@@ -59,6 +69,8 @@ class SuccessIf(StrictModel):
     forbidden_claims: list[ForbiddenClaim | str] = Field(default_factory=list)
     trace_must_not_match: list[str] = Field(default_factory=list)
     max_agent_questions: int | None = Field(default=None, ge=0)
+    #: The team's key, not BTC's: reference_eval ignores it; the harness reports it apart (report.team_checks).
+    say_at_most: list[TextLimit] = Field(default_factory=list)
 
     def export(self) -> dict[str, Any]:
         """BTC JSON: drop empty checks but always keep ``tool_called``."""
@@ -99,6 +111,8 @@ class CallSpec(StrictModel):
     ground_truth_facts: dict[str, Any] = Field(default_factory=dict)
     # Flat BTC shape: {slot: value, ..., "superseded": {...}, "must_not_write_to": id, "address_ttl_check": bool}
     memory_expectation: dict[str, Any] = Field(default_factory=dict)
+    #: The policy sections ([XX-nn] of policy/) an ideal agent consults: retrieval ground truth (planning/policies.py).
+    relevant_policy_ids: list[str] = Field(default_factory=list)
     # Expected structured outputs of the agent (CallBrief at call start, HandoffBrief for chuyen_may).
     expected_call_brief: dict[str, Any] | None = None
     expected_handoff_brief: dict[str, Any] | None = None
@@ -182,16 +196,22 @@ class Scenario(StrictModel):
             payload.update(customer_goal=call.customer_goal, customer_turns=call.customer_turns)
             optional = {"customer_turns_asr": call.customer_turns_asr, "seed_history": call.seed_history}
             payload.update({key: value for key, value in optional.items() if value})
-            payload["facts_established"] = call.facts_established
-            payload.update({key: value for key, value in (("must_carry_over", call.must_carry_over),
+            # An empty section is left out, as in BTC's samples (contracts/scenario/scenario-keys.yaml rules.values).
+            payload.update({key: value for key, value in (("facts_established", call.facts_established),
+                                                          ("must_carry_over", call.must_carry_over),
                                                           ("must_not_ask", call.must_not_ask)) if value})
             payload["success_if"] = call.success_if.export()
-            payload["ground_truth_facts"] = call.ground_truth_facts
+            if call.ground_truth_facts:
+                payload["ground_truth_facts"] = call.ground_truth_facts
             if call.memory_expectation:
                 payload["memory_expectation"] = call.memory_expectation
+            if call.relevant_policy_ids:
+                payload["relevant_policy_ids"] = call.relevant_policy_ids
             if call.fault_injection:
                 payload["fault_injection"] = call.fault_injection.model_dump(mode="json")
-            payload["expected_outcome"] = btc_outcome(call.expected_outcome)
+            # The outcome itself, BTC's four or the team's (cap_nhat_don, thong_tin, xoa_du_lieu), never "khac":
+            # reference_eval reads only chuyen_may, and contracts/scenario/scenario-keys.yaml registers each.
+            payload["expected_outcome"] = call.expected_outcome
             calls[name] = {key: value for key, value in payload.items() if value is not None}
         return {"scenario_id": self.scenario_id, "level": self.level, "persona": self.persona,
                 "hard_case": self.hard_case, "customer_phone": self.customer_phone,
@@ -201,7 +221,7 @@ class Scenario(StrictModel):
     def metadata(self) -> dict[str, Any]:
         """The pipeline's own fields: everything :meth:`btc_export` leaves out, except briefs and tools.
 
-        ``outcome_detail`` keeps the pipeline's outcome where BTC's file says "khac" (cap_nhat_don, thong_tin, xoa_du_lieu);
+        ``outcome_detail`` repeats the outcome (files written before it was exported whole said "khac");
         ``input_mode_detail`` the typed-chat mode where it says "chat_teencode" (chat_khong_dau, chat_sai_chinh_ta).
         """
         return {"scenario_id": self.scenario_id, "persona_source": self.persona_source,
@@ -255,3 +275,60 @@ class ScenarioDraft(StrictModel):
         description="Đúng một phần tử cho mỗi phần tử của INPUT.calls, cùng thứ tự; crm_history không phải cuộc gọi")
     tags: list[str] = Field(default_factory=list, max_length=6,
                             description="Tối đa 4 tag snake_case ngắn mô tả tình huống")
+
+
+class SpokenTurn(StrictModel):
+    """One customer turn and its ASR / typed-chat form, side by side, so the two lists cannot differ in length."""
+
+    text: str = Field(description="Lời khách, tiếng Việt chuẩn có dấu")
+    asr: str = Field(description="Cùng câu đó theo input_mode của cuộc (lỗi ASR, không dấu, teencode…)")
+
+
+#: One planned call as the writer's schema needs it: its name, the slots the customer must state, and whether its
+#: turns also need an ASR / typed-chat form.
+CallShape = tuple[str, tuple[str, ...], bool]
+
+
+@lru_cache(maxsize=None)
+def draft_schema(calls: tuple[CallShape, ...]) -> type[StrictModel]:
+    """The answer the writer is asked for, shaped by the plan so strict mode cannot leave anything out:
+
+    * one required key per planned call (``call_1``…): a list let the model merge two calls into one;
+    * per call, ``must_state`` with one required key per ``customer_must_state`` slot: a free list of facts lost a
+      different pair of them on each of four attempts;
+    * a call with an ASR / typed-chat form writes ``turns`` of ``{text, asr}`` pairs: two lists differed in length.
+
+    :func:`as_draft` turns the answer into a :class:`ScenarioDraft`."""
+    fields: dict[str, Any] = {}
+    for name, slots, spoken in calls:
+        must = create_model(f"MustState_{name}_{'_'.join(slots) or 'none'}", __base__=StrictModel, **{
+            slot: (str | int | float | bool, Field(description=f"Giá trị của {slot} đúng như customer_must_state"))
+            for slot in slots})
+        turns = (list[SpokenTurn], Field(min_length=2, max_length=12, description="Lời khách theo thứ tự, kèm bản asr"))             if spoken else (list[str], Field(min_length=2, max_length=12, description="Lời khách theo thứ tự thời gian"))
+        call = create_model(f"Call_{name}_{len(slots)}_{int(spoken)}", __base__=StrictModel,
+                            customer_goal=(str, Field(min_length=4, description="Mục tiêu của khách, 1 câu")),
+                            **{("turns" if spoken else "customer_turns"): turns},
+                            must_state=(must, Field(description="Mọi khóa của customer_must_state, đúng giá trị")),
+                            facts_stated=(list[StatedFact], Field(default_factory=list,
+                                                                  description="Thông tin khác khách nêu thêm")))
+        fields[name] = (call, Field(description=f"Phía khách của {name}, đúng INPUT.calls[call={name}]"))
+    digest = hashlib.sha256(repr(calls).encode()).hexdigest()[:8]   # stable across runs: the model cache keys on it
+    return create_model(f"ScenarioDraft{len(calls)}Calls{digest}", __base__=StrictModel,
+                        tags=(list[str], Field(default_factory=list, max_length=6,
+                                               description="Tối đa 4 tag snake_case ngắn mô tả tình huống")),
+                        **fields)
+
+
+def as_draft(answer: StrictModel, calls: tuple[CallShape, ...]) -> ScenarioDraft:
+    """*answer* of :func:`draft_schema` as a ScenarioDraft: each call labelled with its planned name, its turns and
+    ASR lines split, and ``must_state`` written as facts_stated (ahead of any other fact the model listed)."""
+    drafts = []
+    for name, slots, spoken in calls:
+        call = getattr(answer, name)
+        stated = [StatedFact(slot=slot, value=getattr(call.must_state, slot)) for slot in slots]
+        stated += [fact for fact in call.facts_stated if fact.slot not in slots]
+        drafts.append(CallDraft(call=name, customer_goal=call.customer_goal,
+                                customer_turns=[t.text for t in call.turns] if spoken else call.customer_turns,
+                                customer_turns_asr=[t.asr for t in call.turns] if spoken else [],
+                                facts_stated=stated))
+    return ScenarioDraft(calls=drafts, tags=answer.tags)

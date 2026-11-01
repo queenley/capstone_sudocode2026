@@ -1,0 +1,48 @@
+{
+  "scenario_id": "SCN-ADV-0014",
+  "persona_source": "advanced",
+  "customer_id": "C007",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "normal",
+  "tags": [
+    "bao_hanh",
+    "cross_channel",
+    "mua_hang",
+    "thong_tin",
+    "variant:mua_roi_hoi_bh_mo_rong",
+    "warranty"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "order",
+      "outcome_detail": "chot_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Máy lọc không khí AirPure X",
+        "price_vnd": 4890000,
+        "promo": "NAM-SHIP0",
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_hoi_bao_hanh_mo_rong",
+      "patience_start": 3
+    },
+    "call_2": {
+      "kind": "extended_warranty",
+      "outcome_detail": "thong_tin",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "extended_warranty": "thêm 12 tháng, giá bằng 8% giá sản phẩm"
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_hoi_bao_hanh_mo_rong",
+      "patience_start": 3
+    }
+  }
+}

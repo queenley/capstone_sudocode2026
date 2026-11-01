@@ -40,6 +40,8 @@ x-runtime: &runtime
     BANK_NAME: ${BANK_NAME:-}
     BANK_ACCOUNT_NO: ${BANK_ACCOUNT_NO:-}
     BANK_ACCOUNT_NAME: ${BANK_ACCOUNT_NAME:-}
+    # The identity events worker tells the AI agent when a customer deleted their data (policy QT-06).
+    AI_AGENT_SERVICE_URL: ${AI_AGENT_SERVICE_URL:-http://ai-agent-service:8400}
   depends_on:
     postgres:
       condition: service_healthy
@@ -88,6 +90,8 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+      # A busy machine (image builds, other jobs) starts it in minutes; healthy as soon as it answers.
+      start_period: 180s
   identity-service:
     build:
       context: .
@@ -103,6 +107,8 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+      # A busy machine (image builds, other jobs) starts it in minutes; healthy as soon as it answers.
+      start_period: 180s
   sales-service:
     build:
       context: .
@@ -118,6 +124,8 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+      # A busy machine (image builds, other jobs) starts it in minutes; healthy as soon as it answers.
+      start_period: 180s
   # Speech recognition for calls (apps/asr-service). On this machine's CPU by default;
   # to use one hosted elsewhere (a rented GPU, Dockerfile.gpu), set ASR_URL (and
   # ASR_API_KEY) to it and ASR_LOCAL=0 so this container does not start.
@@ -170,6 +178,12 @@ services:
       NVIDIA_API_KEY: ${NVIDIA_API_KEY:-}
       AI_GATEWAY_API_KEY: ${AI_GATEWAY_API_KEY:-}
       AGENT_DB_SCHEMA: ${AGENT_DB_SCHEMA:-agent}
+      # A profile of apps/ai-agent-service/config/models.yaml ("local": every agent on Gemini's free
+      # key). Empty: the file as written.
+      AGENT_PROFILE: ${AGENT_PROFILE:-}
+      # 1 for test runs: a handoff is accepted by the system at once and the agent goes on answering,
+      # so a scripted or UI test runs to its end without a consultant. 0 (the product): a consultant accepts.
+      HANDOFF_AUTO_ACCEPT: ${HANDOFF_AUTO_ACCEPT:-0}
       LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
       LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
       LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL:-}
@@ -207,8 +221,9 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
-      # Startup loads the MCP servers and the embedding model (downloaded on the first start): minutes, not seconds.
-      start_period: 300s
+      # Startup loads the MCP servers and the embedding model (downloaded on the first start): minutes, not seconds,
+      # and over 10 on a busy machine (751s seen while a data-generation run and tests shared it).
+      start_period: 900s
   api-gateway:
     build:
       context: .
@@ -240,6 +255,8 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+      # A busy machine (image builds, other jobs) starts it in minutes; healthy as soon as it answers.
+      start_period: 180s
   commerce-events:
     <<: *runtime
     command: ["python", "-m", "src.messaging.worker", "--service", "commerce"]

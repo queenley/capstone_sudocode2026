@@ -1,0 +1,154 @@
+{
+  "scenario_id": "SCN-ADV-0049",
+  "level": "M2",
+  "persona": "khach_chuyen_giua_nguoi_va_ai",
+  "hard_case": "khieu_nai_chuyen_nguoi_roi_ai_theo_doi",
+  "customer_phone": "0998000003",
+  "customer_name": "Lê Văn C",
+  "honorific": "anh",
+  "notes": "Persona khach_chuyen_giua_nguoi_va_ai, biến thể khieu_nai_nang_roi_ai_theo_doi. call_1 (chat_fanpage): khiếu nại nặng, chuyển nhân viên → chuyen_may; call_2 (hotline): hỏi tình trạng đơn → cap_nhat_don. Ca khó: khieu_nai_chuyen_nguoi_roi_ai_theo_doi. Chấm chủ yếu: CCR, RQR, TSR, ESC.",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.syn-c003",
+      "call_date": "2026-10-29",
+      "customer_goal": "Khiếu nại về đơn hàng giao chậm và gói hàng bị móp méo.",
+      "customer_turns": [
+        "Alo, anh cần gặp người có thẩm quyền ngay.",
+        "Đơn hàng của anh đã giao chậm lần thứ hai rồi, rất không hài lòng.",
+        "Gói hàng bị móp méo, anh không thể chấp nhận điều này được.",
+        "Nếu không giải quyết nhanh chóng, anh sẽ đánh giá 1 sao trên trang.",
+        "Mong rằng có thể được chuyển ngay cho nhân viên phụ trách để giải quyết."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C003",
+          "session_id": "SYN-003-S1",
+          "date": "2026-05-07",
+          "channel": "fb",
+          "summary": "Mua Xe đẩy gấp gọn Joie Pact giá 3.490.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C003",
+          "session_id": "SYN-003-S2",
+          "date": "2026-10-03",
+          "channel": "web",
+          "summary": "Đặt Máy hâm sữa Fatz 4 chức năng giá 490.000đ, đơn OD900302 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C003",
+          "order_id": "OD900301",
+          "date": "2026-05-07",
+          "sku": "SKU-MB-STR1",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-MB-STR1"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C003",
+          "order_id": "OD900302",
+          "date": "2026-10-03",
+          "sku": "SKU-MB-MON",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900302"
+          }
+        }
+      ],
+      "facts_established": {
+        "order_id": "OD900302",
+        "owned_sku": "SKU-MB-MON"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "handoff.transfer",
+        "brief_must_contain": [
+          "customer_phone",
+          "customer_name",
+          "escalation_reason",
+          "conversation_summary",
+          "product_advised",
+          "price_quoted_vnd",
+          "open_questions",
+          "next_action",
+          "generated_at"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900302",
+        "call_date": "2026-10-29"
+      },
+      "memory_expectation": {
+        "order_id": "OD900302",
+        "owned_sku": "SKU-MB-MON"
+      },
+      "relevant_policy_ids": [
+        "PB-10",
+        "VC-06",
+        "PB-01"
+      ],
+      "expected_outcome": "chuyen_may"
+    },
+    "call_2": {
+      "days_later": 1,
+      "customer_goal": "Hỏi về tình trạng đơn hàng đang giao.",
+      "customer_turns": [
+        "Alo em, hôm qua anh đã gặp nhân viên rồi, giờ anh muốn hỏi đơn hàng của mình đến đâu rồi.",
+        "Mà em nhớ nhé, anh không muốn kể lại từ đầu đâu đấy.",
+        "Đơn hàng của anh là VN0032TRK, anh cần biết là đang ở đâu.",
+        "Hy vọng là không có gì trục trặc nữa."
+      ],
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD900302"
+        },
+        "must_say_any": [
+          "đang giao",
+          "đang vận chuyển",
+          "đã bàn giao"
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900302",
+        "order_status": "shipping",
+        "tracking": "VN0032TRK",
+        "call_date": "2026-10-30"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    }
+  }
+}

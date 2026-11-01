@@ -1,0 +1,199 @@
+{
+  "conversation_id": "SCN-GEN-0074__call_2",
+  "scenario_id": "SCN-GEN-0074",
+  "call": "call_2",
+  "customer_id": "SYN-C014",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-19",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_mua_doi_size",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Lê Thị Hoa ạ, hôm trước chị có đặt Giày chạy bộ RunLite 2 Pro size 43 màu đen. Em đã ghi nhận thông tin đơn hàng mã OD600001 của chị rồi ạ.",
+      "questions": [],
+      "facts_used": [
+        "size",
+        "order_id",
+        "product_advised",
+        "variant_sku",
+        "payment",
+        "delivery_area",
+        "price_quoted_vnd",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "variant_sku",
+          "value": "SKU-SN-RUN2-43-DEN"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, chị đổi ý rồi em ơi, giày này size 43 bị chật quá.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ý chị ạ. Chị muốn đổi sang size 42 đúng không ạ? Em sẽ kiểm tra tồn kho và hỗ trợ chị đổi size ngay.",
+      "questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Chị muốn đổi sang size 42 đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "new_size_in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn đổi sang size 42 màu đen nhé.",
+      "facts_stated": {
+        "size": 42
+      },
+      "entities": [],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại giày RunLite 2 Pro size 42 màu đen còn hàng, em sẽ tiến hành đổi size cho chị. Đơn hàng của chị sẽ được cập nhật sang size 42 màu đen, không mất phí đổi và chị sẽ được hoàn lại 219.000đ chênh lệch giá.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "new_variant_sku",
+          "value": "SKU-SN-RUN2-42-DEN"
+        },
+        {
+          "field": "exchange_fee_vnd",
+          "value": 0
+        },
+        {
+          "field": "refund_vnd",
+          "value": 219000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD600001",
+            "action": "exchange_size",
+            "new_variant_sku": "SKU-SN-RUN2-42-DEN",
+            "on": "2026-10-19"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đã nhận hàng rồi, mà không vừa nên muốn đổi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận chị đã nhận hàng và muốn đổi sang size 42 màu đen. Đơn đổi size sẽ được xử lý trong 1–2 ngày, bên vận chuyển sẽ liên hệ lấy lại đôi giày size 43 tại địa chỉ cũ. Sau khi shop nhận lại hàng và kiểm tra đạt điều kiện, chị sẽ được hoàn 219.000đ trong 3–5 ngày làm việc qua chuyển khoản ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "refund_vnd",
+          "value": 219000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mong em nhanh chóng giúp chị cập nhật đơn hàng.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã cập nhật yêu cầu đổi size cho chị rồi ạ. Chị vui lòng giữ sản phẩm nguyên tem hộp để bên vận chuyển đến lấy hàng. Nếu cần hỗ trợ thêm, chị cứ liên hệ shop bất cứ lúc nào nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "size",
+          "value": 42,
+          "op": "supersede",
+          "source": "call_2#turn4"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "size",
+        "old_value": 43,
+        "new_value": 42
+      }
+    ],
+    "callback": null,
+    "order": null
+  }
+}

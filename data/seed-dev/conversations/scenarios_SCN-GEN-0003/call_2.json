@@ -1,0 +1,179 @@
+{
+  "conversation_id": "SCN-GEN-0003__call_2",
+  "scenario_id": "SCN-GEN-0003",
+  "call": "call_2",
+  "customer_id": "C033",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-20",
+  "region": "trung",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Loan ạ, hôm trước chị có quan tâm Nồi chiên không dầu Xiaomi 4.5L và còn chờ cuối tháng nhận lương, hôm nay em hỗ trợ tiếp cho chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "blocker",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1590000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Loan đây, hôm trước em có tư vấn cho chị nồi chiên không dầu đó.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng chị, em xác nhận lại sản phẩm mình quan tâm là Nồi chiên không dầu Xiaomi 4.5L, giá hiện tại là 1.590.000đ, vẫn còn hàng chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1590000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn hỏi lại xem còn khuyến mãi gì không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại sản phẩm này chưa có chương trình khuyến mãi giảm giá trực tiếp, nhưng bên em vẫn áp dụng miễn phí thu hộ khi thanh toán COD toàn quốc cho đơn dưới 10 triệu ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nó có thể giao hàng nhanh không? Chị cần sớm.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ bên em giao hàng nội thành Hà Nội, TP.HCM, Đà Nẵng trong 1 đến 2 ngày làm việc, các tỉnh khác từ 2 đến 4 ngày tùy khu vực; em sẽ ưu tiên đơn của chị khi chị chốt nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị vẫn chờ cuối tháng mới quyết định được.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị vẫn chờ cuối tháng nhận lương mới quyết định. Khi nào chị sẵn sàng đặt, em sẽ hỗ trợ lên đơn và giữ giá 1.590.000đ cho mình ạ.",
+      "questions": [],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1590000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-AF-XM",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1590000,
+          "op": "set",
+          "source": "call_2#turn2"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "cần chờ cuối tháng nhận lương",
+    "objection_handling": "Xác nhận lại thời điểm khách dự kiến chốt, ghi nhận nhu cầu chờ lương.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

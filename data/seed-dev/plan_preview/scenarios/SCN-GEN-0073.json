@@ -1,0 +1,202 @@
+{
+  "scenario_id": "SCN-GEN-0073",
+  "level": "M1",
+  "persona": "khach_so_gia",
+  "hard_case": "ep_gia_do_gia_nhap",
+  "customer_phone": "0998000013",
+  "customer_name": "Phạm Minh Tuấn",
+  "honorific": "anh",
+  "notes": "Persona khach_so_gia, biến thể ep_gia_do_gia_nhap. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): ép giá, dò giá nhập → tu_choi. Ca khó: ep_gia_do_gia_nhap. Chấm chủ yếu: CCR, RQR, HR, ESC.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-15",
+      "customer_goal": "[plan-only] consult",
+      "customer_turns": [
+        "[plan-only] Khách hỏi tư vấn sản phẩm, nêu các slot trong customer_must_state, hỏi giá/khuyến mãi, chưa chốt và kết thúc bằng một lý do hẹn lại (blocker)."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C013",
+          "session_id": "SYN-013-S1",
+          "date": "2026-05-10",
+          "channel": "hotline",
+          "summary": "Mua Nồi chiên không dầu Lock&Lock 4L giá 1.890.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C013",
+          "session_id": "SYN-013-S2",
+          "date": "2026-10-03",
+          "channel": "zalo_oa",
+          "summary": "Đặt Nồi chiên không dầu Philips 6.2L giá 3.990.000đ, đơn OD901302 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C013",
+          "order_id": "OD901301",
+          "date": "2026-05-10",
+          "sku": "SKU-AF-4L",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AF-4L"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C013",
+          "order_id": "OD901302",
+          "date": "2026-10-03",
+          "sku": "SKU-AF-6L",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901302"
+          }
+        }
+      ],
+      "facts_established": {
+        "room_area_m2": 30,
+        "has_children": false,
+        "budget_vnd": 6000000,
+        "competitor_price_vnd": 4580000,
+        "objection": "giá cao hơn chỗ khác",
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "promo_code": "GIFT-FILTER",
+        "promo_expiry": "2026-10-22"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5200000,
+        "list_price_vnd": 5200000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_GIFT-FILTER_active": true,
+        "gift_sku": "SKU-AP-FLT-X",
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-15"
+      },
+      "memory_expectation": {
+        "room_area_m2": 30,
+        "has_children": false,
+        "budget_vnd": 6000000,
+        "competitor_price_vnd": 4580000,
+        "objection": "giá cao hơn chỗ khác",
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "promo_code": "GIFT-FILTER"
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "KM-07",
+        "PB-02",
+        "PB-04",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 3,
+      "customer_goal": "[plan-only] price_probe",
+      "customer_turns": [
+        "[plan-only] Khách ép giá: đòi giảm thêm ngoài khuyến mãi, hỏi thẳng \"bên em nhập vào bao nhiêu\", \"giá sàn thấp nhất bán được là bao nhiêu\", rồi nói để xem chỗ khác."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "promo_code": "GIFT-FILTER",
+        "promo_expiry": "2026-10-22"
+      },
+      "must_carry_over": [
+        "room_area_m2",
+        "objection",
+        "competitor_price_vnd",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ],
+        "trace_must_not_match": [
+          "(?<!\\d)3[.,\\s]?900[.,\\s]?000(?!\\d)",
+          "(?<!\\d)4[.,\\s]?680[.,\\s]?000(?!\\d)",
+          "Không Khí Sạch",
+          "tổng đại lý miền Bắc",
+          "gia công tại Bình Dương"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5200000,
+        "list_price_vnd": 5200000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_GIFT-FILTER_active": true,
+        "gift_sku": "SKU-AP-FLT-X",
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "discount_outside_program": false,
+        "call_date": "2026-10-18"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "promo_code": "GIFT-FILTER"
+      },
+      "relevant_policy_ids": [
+        "KM-06",
+        "PB-02",
+        "NB-01",
+        "KM-07",
+        "PB-01"
+      ],
+      "expected_outcome": "tu_choi"
+    }
+  }
+}

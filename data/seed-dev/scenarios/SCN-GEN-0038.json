@@ -1,0 +1,137 @@
+{
+  "scenario_id": "SCN-GEN-0038",
+  "level": "M1",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "hard_case": "het_hang_luc_khach_quyet",
+  "customer_phone": "0932157116",
+  "customer_name": "Nga",
+  "honorific": "chị",
+  "notes": "Persona khach_do_du_hoi_nguoi_nha, biến thể het_hang_luc_quyet. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): tư vấn, chưa chốt → hen_goi_lai. Ca khó: het_hang_luc_khach_quyet. call_2: hết hàng đúng lúc khách quyết → hẹn lại. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-15",
+      "customer_goal": "Hỏi về xe đẩy gấp gọn cho bé.",
+      "customer_turns": [
+        "Alo, chị là Nga. Chị muốn hỏi về xe đẩy gấp gọn Joie Pact.",
+        "Chị có một bé 4 tháng tuổi, ngân sách của chị khoảng 3 triệu rưỡi thôi.",
+        "Xe này có khuyến mãi gì không em nhỉ?",
+        "Chị cần hỏi chồng đã nhé, tối mai em gọi lại cho chị vào lúc 7 giờ được không?"
+      ],
+      "facts_established": {
+        "child_age_months": 4,
+        "budget_vnd": 3500000,
+        "decision_maker": "chồng",
+        "blocker": "cần hỏi chồng",
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-10-16T19:00"
+        },
+        "must_say_any": [
+          "7 giờ",
+          "19 giờ",
+          "19h",
+          "7h tối"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 3490000,
+        "list_price_vnd": 3490000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "callback_at": "2026-10-16T19:00",
+        "call_date": "2026-10-15"
+      },
+      "memory_expectation": {
+        "child_age_months": 4,
+        "budget_vnd": 3500000,
+        "decision_maker": "chồng",
+        "blocker": "cần hỏi chồng",
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-02",
+        "FAQ-12",
+        "LN-01",
+        "PB-03"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 10,
+      "customer_goal": "Hỏi lại về xe đẩy đã hết hàng.",
+      "customer_turns": [
+        "Alo, chị Nga đây. Em gọi lại chị đúng giờ đấy nhé.",
+        "Hôm trước em có tư vấn cho chị về xe đẩy Joie Pact, nhưng nghe nói hết hàng rồi đúng không?",
+        "Chị muốn biết khi nào có hàng lại để chị đặt.",
+        "Nếu có hàng lại thì em báo chị sớm nhé, chị cần gấp lắm."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "must_carry_over": [
+        "decision_maker",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "decision_maker",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_stock",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 3490000,
+        "list_price_vnd": 3490000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": false,
+        "freeship": true,
+        "call_date": "2026-10-25"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-02",
+        "FAQ-12",
+        "FAQ-17",
+        "PB-01",
+        "PB-03"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

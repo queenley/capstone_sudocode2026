@@ -1,0 +1,222 @@
+{
+  "conversation_id": "SCN-ADV-0103__call_1",
+  "scenario_id": "SCN-ADV-0103",
+  "call": "call_1",
+  "customer_id": "SYN-C006",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-29",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_bao_hanh_trong_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Em thấy anh đã mua Máy tiệt trùng sấy khô Moaz Bebe, mình cần hỗ trợ về bảo hành sản phẩm này đúng không ạ?",
+      "questions": [
+        {
+          "slot": "owned_sku",
+          "type": "confirm",
+          "text": "Em xác nhận lại anh đã mua Máy tiệt trùng sấy khô Moaz Bebe bên em đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "owned_sku",
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "owned_sku",
+          "value": "SKU-MB-STER"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900601"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh gọi để hỏi về quy trình bảo hành cho máy tiệt trùng sấy khô Moaz Bebe mà anh đã mua.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ. Anh gặp vấn đề với máy tiệt trùng Moaz Bebe, anh có thể cho em biết tình trạng lỗi cụ thể của máy không ạ?",
+      "questions": [
+        {
+          "slot": "issue",
+          "type": "open",
+          "text": "Anh có thể mô tả giúp em lỗi của máy không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "owned_sku",
+          "value": "SKU-MB-STER"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này đang bị lỗi, bánh xe bị kẹt, không hoạt động được.",
+      "facts_stated": {
+        "issue": "bánh xe bị kẹt"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận máy bị kẹt bánh xe, không hoạt động. Anh cho em hỏi mình mua máy chưa đầy một năm đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh xác nhận mình mua máy chưa đầy một năm đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "issue",
+          "value": "bánh xe bị kẹt"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mới mua cách đây chưa đầy một năm, không biết còn bảo hành không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm của anh còn trong thời gian bảo hành 12 tháng nên sẽ được hỗ trợ bảo hành anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "warranty_months",
+          "value": 12
+        },
+        {
+          "field": "in_warranty",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Quy trình bảo hành như thế nào, gửi về shop hay trung tâm bảo hành hãng?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh có thể mang máy đến trung tâm bảo hành của hãng hoặc gửi về shop bên em đều được ạ. Shop sẽ hỗ trợ chuyển máy đến hãng và anh chịu phí vận chuyển chiều đi giúp em.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thời gian bảo hành mất bao lâu nhỉ? 7 hay 15 ngày làm việc?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ thời gian xử lý bảo hành thường từ 7–15 ngày làm việc anh nhé. Em sẽ ghi nhận lỗi bánh xe bị kẹt và hỗ trợ anh làm thủ tục bảo hành ngay.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "issue",
+          "value": "bánh xe bị kẹt",
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "order_id",
+          "value": "OD900601",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "owned_sku",
+          "value": "SKU-MB-STER",
+          "op": "set",
+          "source": "call_1#turn1"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_bao_hanh",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "scenario_id": "SCN-ADV-0071",
+  "persona_source": "advanced",
+  "customer_id": "C046",
+  "region": "nam",
+  "category": "me-be",
+  "difficulty": "normal",
+  "tags": [
+    "cross_channel",
+    "dịch_vụ_khách_hàng",
+    "hoàn_tiền",
+    "refund",
+    "return",
+    "trả_hàng",
+    "variant:tra_hang_7_ngay",
+    "xác_nhận_mua_hàng"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "order",
+      "outcome_detail": "chot_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Xe đẩy gấp gọn Joie Pact",
+        "price_vnd": 3490000,
+        "promo": "MOM-FREESHIP",
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_tra_hang_trong_han",
+      "patience_start": 3
+    },
+    "call_2": {
+      "kind": "return_request",
+      "outcome_detail": "cap_nhat_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "refund_vnd": 3490000,
+        "refund_days": "3-5 ngày làm việc"
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_tra_hang_trong_han",
+      "patience_start": 3
+    }
+  }
+}

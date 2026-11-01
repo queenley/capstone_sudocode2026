@@ -1,0 +1,129 @@
+{
+  "scenario_id": "SCN-GEN-0124",
+  "level": "M1",
+  "persona": "khach_da_mua_doi_size",
+  "hard_case": "doi_san_pham_hoan_chenh_lech",
+  "customer_phone": "0922808864",
+  "customer_name": "Tú",
+  "honorific": "anh",
+  "notes": "Persona khach_da_mua_doi_size, biến thể doi_san_pham_hoan_chenh_lech. call_1 (hotline): chốt đơn → chot_don; call_2 (hotline): đổi sản phẩm, hoàn chênh lệch → cap_nhat_don. Ca khó: doi_san_pham_hoan_chenh_lech. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-29",
+      "customer_goal": "[plan-only] order",
+      "customer_turns": [
+        "[plan-only] Khách xác nhận muốn mua, nêu hình thức thanh toán và khu vực giao hàng (chỉ quận/tỉnh), đồng ý lên đơn."
+      ],
+      "facts_established": {
+        "size": 42,
+        "color": "den",
+        "payment": "COD",
+        "delivery_area": "Long Biên, Hà Nội",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-42-DEN",
+        "order_id": "OD600001"
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-RUN2-42-DEN",
+          "price_vnd": 1690000,
+          "payment": "COD"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1690000,
+        "list_price_vnd": 1690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-10-31",
+        "call_date": "2026-10-29"
+      },
+      "memory_expectation": {
+        "size": 42,
+        "color": "den",
+        "payment": "COD",
+        "delivery_area": "Long Biên, Hà Nội",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-42-DEN",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01"
+      ],
+      "expected_outcome": "chot_don"
+    },
+    "call_2": {
+      "days_later": 4,
+      "customer_goal": "[plan-only] exchange_product",
+      "customer_turns": [
+        "[plan-only] Khách muốn đổi sang sản phẩm khác rẻ hơn (agent_will_tell.new_product) và hỏi được hoàn chênh lệch bao nhiêu; khách đọc số tài khoản ngân hàng 190123100429 để nhận hoàn tiền."
+      ],
+      "must_carry_over": [
+        "size",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "order_id"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "variant_sku",
+        "order_id"
+      ],
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "OD600001",
+          "new_variant_sku": "SKU-SN-CAS-42-DEN",
+          "action": "exchange_product"
+        },
+        "must_say_any": [
+          "800.000",
+          "800000"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "exchange_fee_vnd",
+            "value": 30000
+          }
+        ],
+        "trace_must_not_match": [
+          "190123100429"
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD600001",
+        "new_variant_sku": "SKU-SN-CAS-42-DEN",
+        "exchange_fee_vnd": 0,
+        "refund_vnd": 800000,
+        "extra_payment_vnd": 0,
+        "new_size_in_stock": true,
+        "return_days": 7,
+        "call_date": "2026-11-02"
+      },
+      "relevant_policy_ids": [
+        "DT-01",
+        "DT-04",
+        "QT-03",
+        "QT-04",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    }
+  }
+}

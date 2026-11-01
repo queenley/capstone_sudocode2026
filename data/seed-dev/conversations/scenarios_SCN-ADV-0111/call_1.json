@@ -1,0 +1,220 @@
+{
+  "conversation_id": "SCN-ADV-0111__call_1",
+  "scenario_id": "SCN-ADV-0111",
+  "call": "call_1",
+  "customer_id": "SYN-C005",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-11-14",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_khieu_nai_giao_cham",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Em hỗ trợ anh kiểm tra đơn giày chạy bộ anh đặt hôm trước nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh gọi để hỏi đơn hàng giày chạy bộ của anh đang ở đâu rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra cho anh, đơn giày chạy bộ RunLite 1 của anh mã OD900502 hiện đang vận chuyển, bên em đã bàn giao cho đơn vị giao hàng rồi ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900502"
+        },
+        {
+          "field": "order_status",
+          "value": "shipping"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900502"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Lúc đặt thì bảo giao nhanh mà giờ vẫn chưa thấy gì, bực ghê.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": "annoyed",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xin lỗi vì đơn hàng giao chậm khiến anh phải chờ lâu ạ. Đơn hàng của anh đang giao trên đường, em sẽ cung cấp mã vận đơn để anh tiện theo dõi nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "shipping"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có mã vận đơn gì không để anh kiểm tra?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ mã vận đơn của anh là VN0052TRK, anh có thể nhập mã này trên hệ thống của đơn vị vận chuyển để xem hành trình đơn hàng đang ở đâu rồi ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "tracking",
+          "value": "VN0052TRK"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD900502",
+          "spoken": "OD900502"
+        },
+        {
+          "type": "order_id",
+          "value": "VN0052TRK",
+          "spoken": "VN0052TRK"
+        }
+      ],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em kiểm tra cho anh coi, chứ chờ lâu quá rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em vừa kiểm tra lại, đơn hàng của anh vẫn đang vận chuyển và dự kiến sẽ giao trong 1–2 ngày làm việc tới ạ. Nếu có vấn đề phát sinh bên em sẽ chủ động liên hệ với anh.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "shipping"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ừ, anh cần biết rõ nó đang ở đâu và khi nào giao hàng nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": "neutral",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại đơn hàng của anh đã bàn giao cho đơn vị vận chuyển và đang giao, anh chỉ cần theo dõi bằng mã vận đơn em cung cấp là sẽ biết chính xác hành trình. Em sẽ ghi nhận lại trường hợp này và hỗ trợ anh sát sao hơn ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "shipping"
+        },
+        {
+          "field": "tracking",
+          "value": "VN0052TRK"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "issue",
+          "value": "đơn hàng giao chậm",
+          "op": "set",
+          "source": "call_1#turn11"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

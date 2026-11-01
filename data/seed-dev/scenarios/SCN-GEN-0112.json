@@ -1,0 +1,100 @@
+{
+  "scenario_id": "SCN-GEN-0112",
+  "level": "M2",
+  "persona": "khach_ngoai_pham_vi_chuyen_may",
+  "hard_case": null,
+  "customer_phone": "0976158464",
+  "customer_name": "Thu",
+  "honorific": "chị",
+  "notes": "Persona khach_ngoai_pham_vi_chuyen_may, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): câu hỏi y tế, chuyển nhân viên → chuyen_may. Chấm chủ yếu: CCR, RQR, TSR, ESC.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-29",
+      "customer_goal": "Hỏi về bình sữa cho bé và giá cả",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về bình sữa Pigeon PPSU 240ml cho bé 2 tháng tuổi.",
+        "Giá bình sữa này là bao nhiêu vậy em?",
+        "Chị có ngân sách khoảng 500 ngàn thôi.",
+        "À, chị chờ cuối tháng chị nhận lương rồi gọi lại nhé."
+      ],
+      "facts_established": {
+        "child_age_months": 2,
+        "budget_vnd": 500000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-MB-BOT",
+        "price_quoted_vnd": 289000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 289000,
+        "list_price_vnd": 289000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_MOM-FREESHIP_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-29"
+      },
+      "memory_expectation": {
+        "child_age_months": 2,
+        "budget_vnd": 500000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-MB-BOT",
+        "price_quoted_vnd": 289000
+      },
+      "relevant_policy_ids": [
+        "SP-MB-03"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 1,
+      "customer_goal": "Hỏi về an toàn sử dụng sản phẩm",
+      "customer_turns": [
+        "Chị có một câu hỏi về an toàn, nếu bé nhà chị đang dùng thuốc thì có dùng bình sữa này được không nhỉ?",
+        "Em có thể cho chị biết thêm thông tin về điều này không?",
+        "Chị rất lo lắng về sức khỏe của bé.",
+        "Nếu không được thì chị sẽ không mua đâu."
+      ],
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "handoff.transfer",
+        "brief_must_contain": [
+          "customer_phone",
+          "customer_name",
+          "escalation_reason",
+          "conversation_summary",
+          "product_advised",
+          "price_quoted_vnd",
+          "open_questions",
+          "next_action",
+          "generated_at"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "call_date": "2026-10-30"
+      },
+      "relevant_policy_ids": [
+        "PB-06",
+        "PB-01"
+      ],
+      "expected_outcome": "chuyen_may"
+    }
+  }
+}

@@ -1,0 +1,319 @@
+{
+  "conversation_id": "SCN-ADV-0109__call_1",
+  "scenario_id": "SCN-ADV-0109",
+  "call": "call_1",
+  "customer_id": "C013",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-26",
+  "region": "trung",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_hoi_bao_hanh_mo_rong",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị muốn xác nhận đơn hàng nồi chiên không dầu Philips 6.2L phải không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn xác nhận đơn hàng nồi chiên không dầu Philips 6.2L phải không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn xác nhận đơn hàng nồi chiên không dầu Philips 6.2L.",
+      "facts_stated": {
+        "product_advised": "SKU-AF-6L"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận với chị đơn hàng nồi chiên không dầu Philips 6.2L, giá là 3.990.000đ. Sản phẩm hiện còn hàng tại shop, bảo hành 12 tháng chính hãng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "3990000",
+          "spoken": "3.990.000đ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cái này chị sẽ thanh toán qua ngân hàng nhé.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị chọn thanh toán chuyển khoản ngân hàng, em đã ghi nhận ạ. Em xin phép xác nhận lại thông tin đơn hàng trước khi lên đơn cho mình nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần giao hàng ở Hải Châu, Đà Nẵng.",
+      "facts_stated": {
+        "delivery_area": "Hải Châu, Đà Nẵng"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Hải Châu, Đà Nẵng",
+          "spoken": "Hải Châu, Đà Nẵng"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn của chị sẽ giao tại Hải Châu, Đà Nẵng. Thời gian dự kiến nhận hàng là ngày 28/11/2026, miễn phí vận chuyển toàn quốc chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-28"
+        },
+        {
+          "field": "freeship",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Hải Châu, Đà Nẵng",
+            "on": "2026-11-26"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-11-28",
+          "spoken": "ngày 28/11/2026"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ngân sách chị không quá 4 triệu rưỡi đâu.",
+      "facts_stated": {
+        "budget_vnd": 4500000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "4500000",
+          "spoken": "4 triệu rưỡi"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm này giá là 3.990.000đ, nằm trong ngân sách của chị ạ. Em xin phép đọc lại thông tin đơn hàng để chị xác nhận nhé: Nồi chiên không dầu Philips 6.2L, 1 cái, giá 3.990.000đ, giao tại Hải Châu, Đà Nẵng, thanh toán chuyển khoản ngân hàng, dự kiến nhận hàng ngày 28/11/2026. Chị xác nhận giúp em thông tin này đúng chưa ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em xin phép đọc lại thông tin đơn hàng để chị xác nhận nhé: Nồi chiên không dầu Philips 6.2L, 1 cái, giá 3.990.000đ, giao tại Hải Châu, Đà Nẵng, thanh toán chuyển khoản ngân hàng, dự kiến nhận hàng ngày 28/11/2026. Chị xác nhận giúp em thông tin này đúng chưa ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3990000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-28"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "3990000",
+          "spoken": "3.990.000đ"
+        },
+        {
+          "type": "date",
+          "value": "2026-11-28",
+          "spoken": "ngày 28/11/2026"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi em.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã lên đơn hàng cho chị thành công. Đơn sẽ giao tại Hải Châu, Đà Nẵng vào ngày 28/11/2026. Shop sẽ gửi thông tin đơn hàng và hướng dẫn thanh toán qua Zalo hoặc SMS cho chị ạ. Em cảm ơn chị đã đặt hàng tại shop BTC!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-28"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0964252477",
+            "sku": "SKU-AF-6L",
+            "qty": 1,
+            "price_vnd": 3990000,
+            "payment": "bank",
+            "address": "Hải Châu, Đà Nẵng",
+            "on": "2026-11-26"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "budget_vnd",
+          "value": 4500000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Hải Châu, Đà Nẵng",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "usage_need",
+          "value": "thay đồ cũ đã hỏng",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AF-6L",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 3990000,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_1#turn11"
+        }
+      ],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-11-28",
+          "spoken": "ngày 28/11/2026"
+        }
+      ],
+      "pause_before_ms": 1000,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xac_nhan_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-AF-6L",
+      "qty": 1,
+      "price_vnd": 3990000,
+      "payment": "bank",
+      "address": "Hải Châu, Đà Nẵng",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-11-28"
+    }
+  }
+}

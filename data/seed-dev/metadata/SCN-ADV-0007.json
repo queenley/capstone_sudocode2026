@@ -1,0 +1,48 @@
+{
+  "scenario_id": "SCN-ADV-0007",
+  "persona_source": "advanced",
+  "customer_id": "C005",
+  "region": "bac",
+  "category": "me-be",
+  "difficulty": "normal",
+  "tags": [
+    "cross_channel",
+    "giao_hàng",
+    "info_rich",
+    "phí_vận_chuyển",
+    "variant:noi_het_mot_lan",
+    "đặt_hàng"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "order",
+      "outcome_detail": "chot_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Máy hút sữa điện đôi Spectra S1",
+        "price_vnd": 4290000,
+        "promo": "MOM-FREESHIP",
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_nhieu_thong_tin",
+      "patience_start": 2
+    },
+    "call_2": {
+      "kind": "order_status",
+      "outcome_detail": "cap_nhat_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "order_status": "created"
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_nhieu_thong_tin",
+      "patience_start": 2
+    }
+  }
+}

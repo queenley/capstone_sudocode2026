@@ -3,12 +3,12 @@
 1. Export a random sample of ≥ 20 (call, criterion) pairs that have an LLM verdict::
 
        python -m src.pipeline.judge_agreement --export --n 30
-       -> output/review/judge_agreement.csv  (fill `human_verdict` with PASS or FAIL; LLM verdict is hidden)
+       -> <seed>/review/judge_agreement.csv  (fill `human_verdict` with PASS or FAIL; LLM verdict is hidden)
 
 2. Compute agreement::
 
        python -m src.pipeline.judge_agreement --ingest
-       -> output/reports/judge_agreement.json  (% agreement, Cohen's kappa, per-criterion breakdown)
+       -> <seed>/reports/judge_agreement.json  (% agreement, Cohen's kappa, per-criterion breakdown)
 
 BTC: kappa < 0.6 means the rubric/judge is not reliable yet and errors must be analysed.
 """

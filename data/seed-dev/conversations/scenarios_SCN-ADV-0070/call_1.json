@@ -1,0 +1,186 @@
+{
+  "conversation_id": "SCN-ADV-0070__call_1",
+  "scenario_id": "SCN-ADV-0070",
+  "call": "call_1",
+  "customer_id": "SYN-C006",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-10-15",
+  "region": "nam",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_bao_hanh_het_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, rất sẵn lòng hỗ trợ anh với nồi chiên không dầu Xiaomi 4.5L đã mua trước đó. Anh có thể chia sẻ giúp em vấn đề mình đang gặp phải với máy không ạ?",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về nồi chiên không dầu Xiaomi 4.5L mà anh đã mua.",
+      "facts_stated": {
+        "owned_sku": "SKU-AF-XM"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh có thể cho em biết máy đang bị gì để em kiểm tra chính sách bảo hành cho anh nhé.",
+      "questions": [
+        {
+          "slot": "issue",
+          "type": "open",
+          "text": "Anh có thể cho em biết máy đang bị gì để em kiểm tra chính sách bảo hành cho anh nhé."
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy bị lỗi, quạt trong máy rung mạnh, không biết có được bảo hành không?",
+      "facts_stated": {
+        "issue": "quạt trong máy rung mạnh"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra thì nồi chiên không dầu Xiaomi 4.5L của anh mua ngày 10/07/2025, thời hạn bảo hành là 12 tháng nên hiện đã hết hạn bảo hành rồi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "warranty_months",
+          "value": 12
+        },
+        {
+          "field": "in_warranty",
+          "value": false
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900603"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình như bảo hành chỉ có 12 tháng thôi, nhưng anh nghĩ là mình xứng đáng được bảo hành miễn phí.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em rất tiếc vì sản phẩm của anh gặp trục trặc ngoài thời gian bảo hành. Hiện tại shop chưa có chính sách hỗ trợ miễn phí sau khi hết hạn bảo hành. Nếu anh cần, em có thể hướng dẫn anh liên hệ trung tâm bảo hành hãng để được kiểm tra và báo phí sửa chữa ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có cách nào khác để giải quyết vấn đề này không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại shop chưa có chính sách hỗ trợ thêm ngoài thời hạn bảo hành ạ. Anh có thể mang máy tới trung tâm bảo hành chính hãng Xiaomi để được kiểm tra và hỗ trợ theo quy định của hãng anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "issue",
+          "value": "quạt trong máy rung mạnh",
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "order_id",
+          "value": "OD900603",
+          "op": "supersede",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "owned_sku",
+          "value": "SKU-AF-XM",
+          "op": "supersede",
+          "source": "call_1#turn2"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_bao_hanh",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "order_id",
+        "old": "OD900602",
+        "new": "OD900603"
+      },
+      {
+        "slot": "owned_sku",
+        "old": "SKU-AF-XM",
+        "new": "SKU-AF-XM"
+      }
+    ],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "scenario_id": "SCN-ADV-0041",
+  "persona_source": "advanced",
+  "customer_id": "SYN-C004",
+  "region": "bac",
+  "category": "gia-dung/noi-chien",
+  "difficulty": "normal",
+  "tags": [
+    "bao_hanh",
+    "expired",
+    "khach_buc_bo",
+    "khach_hang",
+    "nho_tro_giup",
+    "variant:loi_het_han",
+    "warranty"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR",
+    "ESC"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "warranty_expired",
+      "outcome_detail": "thong_tin",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "warranty_months": 12,
+        "in_warranty": false
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_bao_hanh_het_han",
+      "patience_start": 2
+    }
+  }
+}

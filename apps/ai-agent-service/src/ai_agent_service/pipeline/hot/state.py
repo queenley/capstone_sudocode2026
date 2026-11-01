@@ -113,6 +113,8 @@ class HotState(TurnInput, total=False):
     draft: dict[str, Any] | None
     #: Today's price per sku from every quote this call.
     quotes: dict[str, int]
+    #: Order lines created this call, retained across turn resets (``actions.placed_lines``).
+    placed_lines: list[dict[str, Any]]
     #: Public catalogue codes seen in this call, retained across turn resets.
     trusted_skus: list[str]
     #: The products tools showed this call, latest last: ``{sku, name, price_vnd}``.
@@ -125,12 +127,17 @@ class HotState(TurnInput, total=False):
     pending_purchase: dict[str, Any] | None
     deletion_recorded: bool
     deletion_awaiting_for: str | None
+    #: The changes ``order.update`` made in this call, ``{order_id, action, new_variant_sku}``: the
+    #: same change asked again in a later turn is refused, not made (and charged) a second time.
+    updated_orders: list[dict[str, Any]]
     #: How a customer not yet known calls themselves (anh, chị, cô, chú, bác),
     #: and whether the agent asked already (``components.intake.honorific``).
     honorific_said: str | None
     honorific_asked: bool
     #: Consecutive infrastructure failures of tools; route rule 1.
     tool_failures: int
+    #: Consecutive turns the model could not draft (an error, a timeout); route rule 1.
+    model_failures: int
 
     # guard
     guard: dict[str, Any]

@@ -1,0 +1,137 @@
+{
+  "scenario_id": "SCN-GEN-0177",
+  "level": "M2",
+  "persona": "khach_da_kenh_fb_hotline",
+  "hard_case": "teencode_da_kenh",
+  "customer_phone": "0980737028",
+  "customer_name": "Mai",
+  "honorific": "chị",
+  "notes": "Persona khach_da_kenh_fb_hotline, biến thể chuan. call_1 (chat_fanpage): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Ca khó: teencode_da_kenh. call_1 ngày 08/11: Chủ nhật (LN-01: giờ 09:00–18:00, chỉ nhận đơn). Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.c011",
+      "call_date": "2026-11-08",
+      "input_mode": "chat_teencode",
+      "customer_goal": "Hỏi về giày chạy bộ size 40 màu đen",
+      "customer_turns": [
+        "Chị muốn hỏi về giày chạy bộ RunLite 2 Pro size 40 màu đen.",
+        "Giá của đôi giày này là bao nhiêu em?",
+        "Có khuyến mãi gì không nhỉ?",
+        "À, chị muốn gọi hotline hỏi thêm thông tin."
+      ],
+      "customer_turns_asr": [
+        "chi muon hoi ve giay chay bo runlite 2 pro size 40 mau den",
+        "gia cua doi giay này la bao nhieu em",
+        "co khuyen mai gi khong nhi",
+        "a chi muon goi hotline hoi them thong tin"
+      ],
+      "facts_established": {
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "color": "den",
+        "phone_provided": true,
+        "size": 40,
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-40-DEN"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1690000,
+        "list_price_vnd": 1690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-08"
+      },
+      "memory_expectation": {
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "color": "den",
+        "size": 40,
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-40-DEN"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "FAQ-09"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 3,
+      "customer_goal": "Xác nhận mua giày và cung cấp thông tin thanh toán",
+      "customer_turns": [
+        "Alo, chị gọi lại để mua đôi giày chạy bộ đó.",
+        "Chị sẽ thanh toán qua ngân hàng.",
+        "Khu vực giao hàng là Ninh Kiều, Cần Thơ nhé.",
+        "Chốt đơn cho chị luôn đi em."
+      ],
+      "facts_established": {
+        "delivery_area": "Ninh Kiều, Cần Thơ",
+        "payment": "bank",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-40-DEN",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "phone_provided",
+        "product_advised",
+        "variant_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-RUN2-40-DEN",
+          "price_vnd": 1690000,
+          "payment": "bank"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1690000,
+        "list_price_vnd": 1690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-11-16",
+        "call_date": "2026-11-11"
+      },
+      "memory_expectation": {
+        "delivery_area": "Ninh Kiều, Cần Thơ",
+        "payment": "bank",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-40-DEN",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

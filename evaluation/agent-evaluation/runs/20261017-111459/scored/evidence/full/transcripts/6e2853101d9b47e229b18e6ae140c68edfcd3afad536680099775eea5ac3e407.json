@@ -1,0 +1,71 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0014",
+    "call": "call_1",
+    "turn": 3
+  },
+  "customer_text": "Có khuyến mãi gì không em?",
+  "agent_text": "Dạ em xin lỗi chị, hiện tại em chưa có thông tin khuyến mãi cụ thể cho sản phẩm này. Nếu chị cần, em có thể hỏi thêm người phụ trách để hỗ trợ chị nhé?",
+  "customer_id": "C013",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0014/call_1/3/5",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0014",
+        "call": "call_1",
+        "turn": 3
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/351"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0014/call_1/3/5",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "RUNLITE2PRO-BLACK-42",
+          "on": "2026-10-05",
+          "customer_phone": "0964252477"
+        }
+      },
+      "on": "2026-10-05",
+      "started_at": "2026-10-17T04:24:30.557482+00:00",
+      "finished_at": "2026-10-17T04:24:30.557482+00:00",
+      "outcome": "business_error",
+      "result": {
+        "error": "unknown_sku"
+      },
+      "error": {
+        "code": "unknown_sku",
+        "message": "BTC mock business error"
+      },
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"customer_phone\": \"0964252477\", \"on\": \"2026-10-05\", \"sku\": \"RUNLITE2PRO-BLACK-42\"}, \"name\": \"pricing.get_quote\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/347"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/352"
+    }
+  ]
+}

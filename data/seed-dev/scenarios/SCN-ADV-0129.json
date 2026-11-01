@@ -1,0 +1,112 @@
+{
+  "scenario_id": "SCN-ADV-0129",
+  "level": "M2",
+  "persona": "khach_hoi_ngoai_chu_de",
+  "hard_case": null,
+  "customer_phone": "0964252477",
+  "customer_name": "Trang",
+  "honorific": "chị",
+  "notes": "Persona khach_hoi_ngoai_chu_de, biến thể lac_de_roi_tu_van. call_1 (chat_fanpage): hỏi chuyện ngoài lề → thong_tin; call_2 (hotline): tư vấn, chưa chốt → hen_goi_lai. Chấm chủ yếu: TSR.",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.trang.394",
+      "call_date": "2026-12-12",
+      "customer_goal": "Nhờ viết bài văn tả mẹ cho con.",
+      "customer_turns": [
+        "Alo em ơi, chị đang muốn nhờ em viết giúp chị một bài văn tả mẹ cho con chị ấy.",
+        "Chị không biết viết như thế nào cho hay, em có thể giúp chị không?",
+        "À, mà em có biết sản phẩm này không, máy lọc không khí Xiaomi ấy?",
+        "Thôi, không có thông tin thì cũng không sao, chị chỉ muốn hỏi vậy thôi."
+      ],
+      "success_if": {
+        "tool_called": null,
+        "agent_must_say": [
+          "không có thông tin",
+          "chưa có thông tin",
+          "em chưa rõ",
+          "em không chắc",
+          "em sẽ kiểm tra",
+          "chưa nắm được"
+        ],
+        "must_not_call_tools": [
+          "order.create",
+          "handoff.transfer"
+        ]
+      },
+      "ground_truth_facts": {
+        "off_topic_question": "nhờ viết giúp bài văn tả mẹ cho con",
+        "call_date": "2026-12-12"
+      },
+      "relevant_policy_ids": [
+        "PB-05",
+        "FAQ-15"
+      ],
+      "expected_outcome": "thong_tin"
+    },
+    "call_2": {
+      "days_later": 2,
+      "customer_goal": "Hỏi về máy lọc không khí Xiaomi Smart 4 Pro.",
+      "customer_turns": [
+        "Chị muốn hỏi về máy lọc không khí Xiaomi Smart 4 Pro đấy.",
+        "Máy này có giá bao nhiêu và đang có khuyến mãi gì không em?",
+        "Chị có dự định dùng cho phòng 35 mét vuông, mà nhà chị không có trẻ nhỏ đâu.",
+        "Chị đang tính ngân sách khoảng 5 triệu rưỡi, nhưng cần bàn với gia đình đã.",
+        "Thế tối mai tầm 7 giờ em gọi lại chị nhé?"
+      ],
+      "facts_established": {
+        "blocker": "để bàn với gia đình",
+        "budget_vnd": 5500000,
+        "has_children": false,
+        "room_area_m2": 35,
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000
+      },
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-12-15T19:00"
+        },
+        "must_say_any": [
+          "7 giờ",
+          "19 giờ",
+          "19h",
+          "7h tối"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5490000,
+        "list_price_vnd": 5490000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_XM-COMBO_active": false,
+        "promo_AIR-2ND-50_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "promo_11-11_active": false,
+        "in_stock": true,
+        "callback_at": "2026-12-15T19:00",
+        "call_date": "2026-12-14"
+      },
+      "memory_expectation": {
+        "blocker": "để bàn với gia đình",
+        "budget_vnd": 5500000,
+        "has_children": false,
+        "room_area_m2": 35,
+        "product_advised": "SKU-XM-4P",
+        "price_quoted_vnd": 5490000
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "LN-01",
+        "PB-03",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "conversation_id": "SCN-ADV-0014__call_2",
+  "scenario_id": "SCN-ADV-0014",
+  "call": "call_2",
+  "customer_id": "C007",
+  "session_index": 2,
+  "channel": "zalo_oa",
+  "date": "2026-11-07",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_hoi_bao_hanh_mo_rong",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Thảo ạ, hôm trước chị có mua Máy lọc không khí AirPure X bên em.",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-AP-X"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị vừa mua máy lọc không khí AirPure X hôm trước, giờ muốn hỏi thêm.",
+      "facts_stated": {
+        "product_advised": "SKU-AP-X"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, chị muốn hỏi thêm về vấn đề nào liên quan đến máy lọc không khí AirPure X ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có thể mua thêm gói bảo hành mở rộng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với Máy lọc không khí AirPure X chị vừa mua, bên em có hỗ trợ gói bảo hành mở rộng ạ. Chị đủ điều kiện để mua thêm gói này nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "extended_warranty_eligible",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá cho gói bảo hành mở rộng này là bao nhiêu?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, gói bảo hành mở rộng có giá bằng 8% giá sản phẩm, mình sẽ tính trực tiếp trên giá máy chị đã mua ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "extended_warranty_percent",
+          "value": 8
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Gói bảo hành này thêm bao nhiêu tháng ạ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ gói bảo hành mở rộng này sẽ thêm 12 tháng vào thời hạn bảo hành tiêu chuẩn cho máy của mình ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "extended_warranty_months",
+          "value": 12
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_bao_hanh_mo_rong",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

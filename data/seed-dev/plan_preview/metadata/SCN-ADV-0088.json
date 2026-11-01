@@ -1,0 +1,45 @@
+{
+  "scenario_id": "SCN-ADV-0088",
+  "persona_source": "advanced",
+  "customer_id": "SYN-C017",
+  "region": "trung",
+  "category": "me-be",
+  "difficulty": "normal",
+  "tags": [
+    "cross_channel",
+    "date:sunday",
+    "info_rich",
+    "variant:noi_het_mot_lan"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "order",
+      "outcome_detail": "chot_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Bình sữa Pigeon PPSU 240ml",
+        "price_vnd": 289000,
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_nhieu_thong_tin",
+      "patience_start": 2
+    },
+    "call_2": {
+      "kind": "order_status",
+      "outcome_detail": "cap_nhat_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "order_status": "created"
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_nhieu_thong_tin",
+      "patience_start": 2
+    }
+  }
+}

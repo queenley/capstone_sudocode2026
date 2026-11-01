@@ -1,0 +1,72 @@
+{
+  "scenario_id": "SCN-ADV-0120",
+  "level": "M2",
+  "persona": "khach_hoi_freeship_theo_vung",
+  "hard_case": null,
+  "customer_phone": "0990853801",
+  "customer_name": "Nhung",
+  "honorific": "chị",
+  "notes": "Persona khach_hoi_freeship_theo_vung, biến thể freeship_mien_nam_hoi_tu_mien_bac. call_1 (chat_fanpage): hỏi freeship của vùng khác → hen_goi_lai. Chấm chủ yếu: TSR, HR.",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.nhung.733",
+      "call_date": "2026-10-16",
+      "customer_goal": "Hỏi về chương trình freeship cho nồi chiên không dầu",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về nồi chiên không dầu Xiaomi 4.5L, chị thấy quảng cáo freeship trên fanpage.",
+        "Chị ở Cầu Giấy, Hà Nội, không biết có freeship cho khu vực này không em?",
+        "Nếu không có freeship thì phí giao hàng sẽ là bao nhiêu nhỉ?",
+        "Chị đang tính mua làm quà, ngân sách của chị tầm 2 triệu thôi.",
+        "Chị chờ cuối tháng mới nhận lương nên cần cân nhắc kĩ, em nhé."
+      ],
+      "facts_established": {
+        "blocker": "chờ cuối tháng nhận lương",
+        "budget_vnd": 2000000,
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "usage_need": "mua làm quà",
+        "product_advised": "SKU-AF-XM",
+        "price_quoted_vnd": 1590000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "miền Nam",
+          "địa chỉ giao"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "freeship",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1590000,
+        "list_price_vnd": 1590000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "blocker": "chờ cuối tháng nhận lương",
+        "budget_vnd": 2000000,
+        "delivery_area": "Cầu Giấy, Hà Nội",
+        "usage_need": "mua làm quà",
+        "product_advised": "SKU-AF-XM",
+        "price_quoted_vnd": 1590000
+      },
+      "relevant_policy_ids": [
+        "KM-08",
+        "VC-02"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

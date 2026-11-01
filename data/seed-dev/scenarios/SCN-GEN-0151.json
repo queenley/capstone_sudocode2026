@@ -1,0 +1,140 @@
+{
+  "scenario_id": "SCN-GEN-0151",
+  "level": "M2",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "hard_case": null,
+  "customer_phone": "0998000009",
+  "customer_name": "Phạm Thị I",
+  "honorific": "chị",
+  "notes": "Persona khach_co_don_chua_co_lich_su, biến thể chuan. call_1 (hotline): hỏi tình trạng đơn → cap_nhat_don; call_2 (hotline): đổi địa chỉ giao → cap_nhat_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-12",
+      "customer_goal": "Hỏi tình trạng đơn hàng đang giao",
+      "customer_turns": [
+        "Alo, chị Phạm Thị I đây, chị muốn hỏi tình trạng đơn hàng của mình.",
+        "Đơn hàng của chị là máy hút sữa điện đôi Spectra S1 đó.",
+        "Chị thấy nó vẫn đang trong quá trình giao hàng, không biết bao giờ mới tới ạ?",
+        "Em có thông tin gì về mã số vận chuyển không?"
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C009",
+          "session_id": "SYN-009-S1",
+          "date": "2026-06-25",
+          "channel": "hotline",
+          "summary": "Mua Combo Spectra S1 + máy hâm sữa Fatz + 50 túi trữ sữa giá 4.790.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C009",
+          "session_id": "SYN-009-S2",
+          "date": "2026-10-09",
+          "channel": "zalo_oa",
+          "summary": "Đặt Máy hút sữa điện đôi Spectra S1 giá 4.290.000đ, đơn OD900902 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C009",
+          "order_id": "OD900901",
+          "date": "2026-06-25",
+          "sku": "SKU-BDL-MOM",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-BDL-MOM"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C009",
+          "order_id": "OD900902",
+          "date": "2026-10-09",
+          "sku": "SKU-MB-PUMP1",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900902"
+          }
+        }
+      ],
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD900902"
+        },
+        "must_say_any": [
+          "đang giao",
+          "đang vận chuyển",
+          "đã bàn giao"
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900902",
+        "order_status": "shipping",
+        "tracking": "VN0092TRK",
+        "call_date": "2026-11-12"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    },
+    "call_2": {
+      "days_later": 2,
+      "customer_goal": "Đổi địa chỉ giao hàng cho đơn đang giao",
+      "customer_turns": [
+        "Chị xin chào, chị muốn đổi địa chỉ giao cho đơn hàng đang giao.",
+        "Địa chỉ cũ không còn phù hợp mà chị đã chuyển nhà rồi.",
+        "Chị muốn chuyển sang Quận 7, TP.HCM.",
+        "Mã đơn hàng vẫn là đơn hàng chị đã hỏi hôm trước đúng không em?"
+      ],
+      "facts_established": {
+        "delivery_area": "Quận 7, TP.HCM"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "OD900902",
+          "action": "update_address"
+        }
+      },
+      "ground_truth_facts": {
+        "order_id": "OD900902",
+        "order_status": "shipping",
+        "tracking": "VN0092TRK",
+        "call_date": "2026-11-14"
+      },
+      "memory_expectation": {
+        "delivery_area": "Quận 7, TP.HCM"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    }
+  }
+}

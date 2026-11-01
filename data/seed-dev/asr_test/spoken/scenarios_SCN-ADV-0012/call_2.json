@@ -1,0 +1,168 @@
+{
+  "scenario_id": "SCN-ADV-0012",
+  "call": "call_2",
+  "input_mode": "text",
+  "source_sha256": "5ac3a7d7f0e6561724cdbf619c2025b54756b89cbbf9d0a52defc4be8c98fff2",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "A",
+      "text": "Dạ em chào chị Trang ạ, hôm qua chị đã hỏi về Máy lọc không khí AirPure Y và có cần suy nghĩ thêm. Em là trợ lý ảo của shop, chị muốn mình tiếp tục đặt hàng các sản phẩm trong giỏ đúng không ạ?",
+      "spoken_text": "dạ em chào chị trang ạ hôm qua chị đã hỏi về máy lọc không khí e pia y và có cần suy nghĩ thêm em là trợ lý ảo của shop chị muốn mình tiếp tục đặt hàng các sản phẩm trong giỏ đúng không ạ",
+      "entities": {
+        "blocker": "can suy nghi them",
+        "sku": "SKU-AP-Y"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Chào em, hôm qua chị đã hỏi về giỏ hàng rồi.",
+      "spoken_text": "chào em hôm qua chị đã hỏi về giỏ hàng rồi",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 3,
+      "speaker": "A",
+      "text": "Dạ em ghi nhận chị đã hỏi về giỏ hàng. Hiện tại chị muốn chốt đơn cho Máy lọc không khí AirPure Y và AirPure Mini, mỗi món một cái đúng không ạ? Tổng giá hai sản phẩm là 6.295.000đ, đã gồm quà tặng màng lọc kèm AirPure Y ạ.",
+      "spoken_text": "dạ em ghi nhận chị đã hỏi về giỏ hàng hiện tại chị muốn chốt đơn cho máy lọc không khí e pia y và e pia mini mỗi món một cái đúng không ạ tổng giá hai sản phẩm là sáu triệu hai trăm chín mươi lăm nghìn đồng đã gồm quà tặng màng lọc kèm e pia y ạ",
+      "entities": {
+        "price_vnd": 6295000
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "Chị muốn chốt đơn cho máy lọc không khí AirPure Y và AirPure Mini, mỗi món một cái nhé.",
+      "spoken_text": "chị muốn chốt đơn cho máy lọc không khí e pia y và e pia mini mỗi món một cái nhé",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 5,
+      "speaker": "A",
+      "text": "Dạ, tổng tiền hai sản phẩm là 6.295.000đ chị nhé, gồm Máy lọc không khí AirPure Y giá 5.200.000đ và AirPure Mini giá 1.095.000đ, đã áp dụng quà tặng màng lọc kèm theo AirPure Y.",
+      "spoken_text": "dạ tổng tiền hai sản phẩm là năm triệu hai trăm nghìn đồng và một triệu không trăm chín mươi lăm nghìn đồng chị nhé gồm máy lọc không khí e pia y giá năm triệu hai trăm nghìn đồng và e pia mini giá một triệu không trăm chín mươi lăm nghìn đồng đã áp dụng quà tặng màng lọc kèm theo e pia y",
+      "entities": {
+        "sku": "SKU-AP-Y",
+        "price_vnd": 5200000
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 6,
+      "speaker": "C",
+      "text": "Tổng tiền chị nhớ là 6 triệu 295 ngàn, đúng không?",
+      "spoken_text": "tổng tiền chị nhớ là sáu triệu hai trăm chín mươi lăm ngàn, đúng không?",
+      "entities": {},
+      "reference_source": "rule",
+      "issues": [
+        "words_changed"
+      ]
+    },
+    {
+      "idx": 7,
+      "speaker": "A",
+      "text": "Dạ đúng rồi chị, tổng cộng là 6.295.000đ cho cả hai sản phẩm, đã bao gồm quà tặng và miễn phí vận chuyển toàn quốc ạ.",
+      "spoken_text": "dạ đúng rồi chị tổng cộng là sáu triệu hai trăm chín mươi lăm nghìn đồng cho cả hai sản phẩm đã bao gồm quà tặng và miễn phí vận chuyển toàn quốc ạ",
+      "entities": {
+        "price_vnd": 6295000
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 8,
+      "speaker": "C",
+      "text": "Chị đã đổi ý rồi, ngân sách giờ chỉ còn 5 triệu thôi.",
+      "spoken_text": "chị đã đổi ý rồi ngân sách giờ chỉ còn năm triệu thôi",
+      "entities": {
+        "budget_vnd": 5000000,
+        "blocker": "vuot ngan sach"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 9,
+      "speaker": "A",
+      "text": "Dạ em hiểu ngân sách của chị hiện còn 5 triệu. Với mức này, chị có thể chọn Máy lọc không khí AirPure Y giá 5.200.000đ, phù hợp phòng 20–25m², có khóa trẻ em và tặng kèm màng lọc. Nếu chị cần thêm lựa chọn khác, em sẽ tư vấn thêm ạ.",
+      "spoken_text": "dạ em hiểu ngân sách của chị hiện còn năm triệu với mức này chị có thể chọn máy lọc không khí e pia y giá năm triệu hai trăm nghìn đồng phù hợp phòng hai mươi đến hai mươi lăm mét vuông có khóa trẻ em và tặng kèm màng lọc nếu chị cần thêm lựa chọn khác em sẽ tư vấn thêm ạ",
+      "entities": {
+        "room_area_m2": 25,
+        "budget_vnd": 5000000,
+        "sku": "SKU-AP-Y",
+        "price_vnd": 5200000
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 10,
+      "speaker": "C",
+      "text": "Chị muốn thanh toán bằng COD, em có thể giúp chị không?",
+      "spoken_text": "chị muốn thanh toán bằng cê ô đê em có thể giúp chị không",
+      "entities": {
+        "payment": "COD"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 11,
+      "speaker": "A",
+      "text": "Dạ đơn hàng Máy lọc không khí AirPure Y giá 5.200.000đ vẫn hỗ trợ thanh toán COD toàn quốc chị nhé. Đơn COD trên 2 triệu sẽ được nhân viên shop gọi xác nhận trước khi giao hàng ạ.",
+      "spoken_text": "dạ đơn hàng máy lọc không khí e pia y giá năm triệu hai trăm nghìn đồng vẫn hỗ trợ thanh toán cê ô đê toàn quốc chị nhé đơn cê ô đê trên hai triệu sẽ được nhân viên shop gọi xác nhận trước khi giao hàng ạ",
+      "entities": {
+        "payment": "COD",
+        "sku": "SKU-AP-Y",
+        "price_vnd": 5200000
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 12,
+      "speaker": "C",
+      "text": "Chị ở Nha Trang, Khánh Hòa, giao hàng cho chị nhé.",
+      "spoken_text": "chị ở nha trang khánh hòa giao hàng cho chị nhé",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 13,
+      "speaker": "A",
+      "text": "Dạ em xác nhận đơn hàng Máy lọc không khí AirPure Y giá 5.200.000đ, giao về Nha Trang, Khánh Hòa, thanh toán COD. Đơn sẽ được giao dự kiến trước ngày 22/10. Nhân viên bên em sẽ gọi xác nhận đơn trước khi giao hàng chị nhé.",
+      "spoken_text": "dạ em xác nhận đơn hàng máy lọc không khí e pia y giá năm triệu hai trăm nghìn đồng giao về nha trang khánh hòa thanh toán cê ô đê đơn sẽ được giao dự kiến trước ngày hai mươi hai tháng mười nhân viên bên em sẽ gọi xác nhận đơn trước khi giao hàng chị nhé",
+      "entities": {
+        "payment": "COD",
+        "sku": "SKU-AP-Y",
+        "price_vnd": 5200000
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 14,
+      "speaker": "A",
+      "text": "Em lên đơn Máy lọc không khí AirPure Y giá 5.200.000đ và Máy lọc không khí AirPure Mini giá 1.095.000đ, giao về Nha Trang, Khánh Hòa, thanh toán COD. Tổng đơn là 6.295.000đ, đã có quà tặng màng lọc kèm AirPure Y và miễn phí vận chuyển chị nhé.",
+      "spoken_text": "em lên đơn máy lọc không khí e pia y giá năm triệu hai trăm nghìn đồng và máy lọc không khí e pia mini giá một triệu không trăm chín mươi lăm nghìn đồng giao về nha trang khánh hòa thanh toán cê ô đê tổng đơn là sáu triệu hai trăm chín mươi lăm nghìn đồng đã có quà tặng màng lọc kèm e pia y và miễn phí vận chuyển chị nhé",
+      "entities": {
+        "payment": "COD",
+        "price_vnd": 6295000
+      },
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

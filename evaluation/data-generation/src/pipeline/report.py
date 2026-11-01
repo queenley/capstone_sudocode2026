@@ -1,6 +1,6 @@
 """Stage 11 — data-generation report with visualizations.
 
-Outputs (``output/reports/``)
+Outputs (``<seed>/reports/``)
 * ``validation_report.md``   – tables + Mermaid charts (renders on GitHub / Mermaid-enabled previews)
 * ``validation_report.html`` – self-contained visual report (meters, bars, tooltips, dark mode)
 * ``audio_statistics.json``, ``audio_by_customer.csv`` – audio analysis data
@@ -30,6 +30,7 @@ from src.utils.paths import (
     SIMULATION_REPLAYS, VALIDATION_JSON,
 )
 from src.utils.report_html import render as render_html
+from src.utils.settings import load_settings
 
 # M2 volume requirements (competition brief).
 TARGETS = {"conversations": 250, "audio_conversations": 100, "audio_hours": 3, "multi_session_customers": 60,
@@ -41,6 +42,22 @@ METRICS = (("CCR", "CCR"), ("RQR", "RQR"), ("TSR", "TSR"), ("HR", "HR"), ("Over-
 
 def _json(path: Path, default: Any) -> Any:
     return json.loads(path.read_text(encoding="utf-8")) if path.exists() else default
+
+
+def estimated_usd(calls_log: list[dict[str, Any]], prices: dict[str, dict[str, float]]) -> float | None:
+    """The model requests' cost by settings.yaml pricing_usd_per_mtok, cached prompt tokens at the cached rate.
+    None when a model that was paid for has no price: a partial sum would read as the whole."""
+    total = 0.0
+    for row in calls_log:
+        if row.get("cache_hit") or row.get("prompt_tokens") is None:
+            continue
+        price = prices.get(row.get("model", ""))
+        if price is None:
+            return None
+        cached = row.get("cached_tokens") or 0
+        total += ((row["prompt_tokens"] - cached) * price["input"] + cached * price["cached"]
+                  + (row.get("output_tokens") or 0) * price["output"]) / 1_000_000
+    return round(total, 4)
 
 
 # --------------------------------------------------------------------------- #
@@ -172,6 +189,8 @@ def build_context() -> dict[str, Any]:
                 "cache_hits": sum(bool(x.get("cache_hit")) for x in calls_log),
                 "prompt_tokens": sum(x.get("prompt_tokens") or 0 for x in calls_log),
                 "output_tokens": sum(x.get("output_tokens") or 0 for x in calls_log),
+                "cached_tokens": sum(x.get("cached_tokens") or 0 for x in calls_log),
+                "estimated_usd": estimated_usd(calls_log, load_settings().get("pricing_usd_per_mtok") or {}),
                 "tts_chars": _json(REPORTS_DIR / "elevenlabs_usage.json", {}).get("characters_sent", 0)},
         "crm_profiles": len(load_customers()),
     }
@@ -200,7 +219,7 @@ def official_markdown(ctx: dict[str, Any]) -> list[str]:
             if off[name]:
                 lines.append(f"| {name} | " + " | ".join(str(off[name].get(k)) for k in keys) + " |")
         lines += ["", f"Oracle perfect (every label satisfiable with BTC mock_tools): **{off['oracle_perfect']}**. "
-                      "Score the agent with `data/eval/reference_eval.py --scenarios output/scenarios --trace <agent trace>`."]
+                      "Score the agent with `data/eval/reference_eval.py --scenarios <seed>/scenarios --trace <agent trace>`."]
     else:
         lines.append("Not built yet: `python -m src.pipeline.build_ground_truth`.")
     ts = ctx["test_set"]
@@ -226,7 +245,7 @@ def official_markdown(ctx: dict[str, Any]) -> list[str]:
     if tools:
         lines.append("Tools not in BTC set: " + (", ".join(f"`{t}`" for t in tools["not_in_btc"]) or "none")
                      + " · extra params: " + (", ".join(f"`{t}`: {p}" for t, p in tools["extra_params"].items()) or "none")
-                     + " · details: `output/reports/tools_audit.md`.")
+                     + " · details: `<seed>/reports/tools_audit.md`.")
     else:
         lines.append("Not audited yet: `python -m src.pipeline.build_ground_truth`.")
     agreement = ctx["judge_agreement"]
@@ -281,7 +300,8 @@ def to_markdown(ctx: dict[str, Any]) -> str:
     lines += [" → ".join(f"{stage} **{n}**" for stage, n in ctx["funnel"]), "",
               f"- CRM profiles: {ctx['crm_profiles']} (incl. synthetic when generated)",
               f"- Model API requests: {api['requests']} · cache hits: {api['cache_hits']} · prompt tokens: "
-              f"{api['prompt_tokens']} · output tokens: {api['output_tokens']}",
+              f"{api['prompt_tokens']} (cached {api['cached_tokens']}) · output tokens: {api['output_tokens']}"
+              + (f" · estimated cost: ${api['estimated_usd']:.2f}" if api["estimated_usd"] is not None else ""),
               f"- ElevenLabs characters: {api['tts_chars']}", ""]
     return "\n".join(lines)
 

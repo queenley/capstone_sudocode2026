@@ -1,0 +1,123 @@
+{
+  "scenario_id": "SCN-ADV-0050",
+  "level": "M2",
+  "persona": "khach_chua_co_danh_tinh",
+  "hard_case": null,
+  "customer_phone": "0977000002",
+  "customer_name": null,
+  "honorific": "chị",
+  "notes": "Persona khach_chua_co_danh_tinh, biến thể chat_an_danh_roi_goi. call_1 (chat_fanpage): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.anon-003",
+      "call_date": "2026-10-16",
+      "customer_goal": "Hỏi về áo phao lông vũ cho mùa đông",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về áo phao lông vũ màu be size L.",
+        "Giá áo này là bao nhiêu em nhỉ?",
+        "Áo phao này còn hàng không?",
+        "Chị cần phải chờ đến cuối tháng nhận lương rồi mới quyết định được.",
+        "Thế có khuyến mãi gì không em?"
+      ],
+      "facts_established": {
+        "size": "L",
+        "color": "be",
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-JK-DWN",
+        "price_quoted_vnd": 1490000,
+        "variant_sku": "SKU-JK-DWN-L-BE"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1490000,
+        "list_price_vnd": 1490000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "size": "L",
+        "color": "be",
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-JK-DWN",
+        "price_quoted_vnd": 1490000,
+        "variant_sku": "SKU-JK-DWN-L-BE"
+      },
+      "relevant_policy_ids": [
+        "SP-JK-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 3,
+      "customer_goal": "Xác nhận đơn hàng áo phao lông vũ",
+      "customer_turns": [
+        "Chị muốn đặt áo phao lông vũ màu be size L mà hôm trước em tư vấn.",
+        "Hình thức thanh toán là COD nhé.",
+        "Chị ở TP Huế, cho em biết khu vực giao hàng.",
+        "À, chị đồng ý lên đơn luôn."
+      ],
+      "facts_established": {
+        "payment": "COD",
+        "delivery_area": "TP Huế",
+        "product_advised": "SKU-JK-DWN",
+        "price_quoted_vnd": 1490000,
+        "variant_sku": "SKU-JK-DWN-L-BE",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-JK-DWN-L-BE",
+          "price_vnd": 1490000,
+          "payment": "COD"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1490000,
+        "list_price_vnd": 1490000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-10-23",
+        "call_date": "2026-10-19"
+      },
+      "memory_expectation": {
+        "payment": "COD",
+        "delivery_area": "TP Huế",
+        "product_advised": "SKU-JK-DWN",
+        "price_quoted_vnd": 1490000,
+        "variant_sku": "SKU-JK-DWN-L-BE",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

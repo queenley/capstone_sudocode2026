@@ -1,0 +1,179 @@
+{
+  "conversation_id": "SCN-ADV-0117__call_2",
+  "scenario_id": "SCN-ADV-0117",
+  "call": "call_2",
+  "customer_id": "C010",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-22",
+  "region": "nam",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_hoi_khuyen_mai_sap_toi",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, hôm trước anh có quan tâm Nồi chiên không dầu Lock&Lock 4L và còn để bàn với gia đình đúng không ạ? Em là trợ lý ảo của shop, anh cần mình tư vấn thêm về sản phẩm hay chương trình khuyến mãi ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Hôm trước anh có nói để bàn với gia đình, mình cần em hỗ trợ gì thêm không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, hôm trước anh hỏi nồi chiên không dầu Lock&Lock, giờ anh muốn biết thêm thông tin.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, nồi chiên không dầu Lock&Lock 4L phù hợp cho 2 đến 3 người dùng, công suất 1.400W, dung tích 4 lít, có thể chiên nướng đa dạng món ăn. Hiện giá của sản phẩm là 1.890.000đ, máy còn hàng tại shop và được bảo hành 12 tháng anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá vẫn là 1 triệu 890 ngàn đúng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi anh, giá hiện tại của nồi chiên không dầu Lock&Lock 4L vẫn là 1.890.000đ. Giá này chưa thay đổi kể từ lần trước em báo anh ạ.",
+      "questions": [],
+      "facts_used": [
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "11/11 có khuyến mãi gì đặc biệt không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ theo chính sách bên em, em chỉ được cập nhật các chương trình đang áp dụng tại thời điểm hiện tại thôi ạ. Hiện em chưa có thông tin về khuyến mãi ngày 11/11, nếu có chương trình mới em sẽ báo lại ngay cho anh.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ờ, anh cần hỏi thêm gia đình nữa rồi sẽ quyết định sau nhé.",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận anh cần bàn thêm với gia đình. Khi nào anh quyết định, anh cứ liên hệ lại, bên em luôn sẵn sàng hỗ trợ ạ.",
+      "questions": [],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-AF-4L",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1890000,
+          "op": "set",
+          "source": "call_2#turn1"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_them_san_pham",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_hoi_nguoi_nha",
+    "objection_handling": "Ghi nhận khách cần hỏi thêm gia đình, giữ tư vấn và giá cũ.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

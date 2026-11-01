@@ -1,0 +1,206 @@
+{
+  "scenario_id": "SCN-ADV-0101",
+  "level": "M2",
+  "persona": "khach_can_tu_van_nhieu",
+  "hard_case": "doi_khuyen_mai_het_han",
+  "customer_phone": "0998000019",
+  "customer_name": "Ngô Văn Phúc",
+  "honorific": "anh",
+  "notes": "Persona khach_can_tu_van_nhieu, biến thể so_sanh_may_loc. call_1 (chat_fanpage): so sánh nhiều mẫu → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Ca khó: doi_khuyen_mai_het_han. call_1 ngày 22/10: ngày cuối của khuyến mãi (KM-01: nói hạn, không hứa sau hôm nay). call_2: KM GIFT-FILTER không còn áp dụng. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.phuc.918",
+      "call_date": "2026-10-22",
+      "customer_goal": "So sánh máy lọc không khí cho phòng 25m²",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về máy lọc không khí mà em tư vấn hôm trước.",
+        "Anh đang phân vân giữa máy lọc không khí AirPure Y và AirPure X, em thấy cái nào hơn?",
+        "Máy Samsung AX40 thì sao, có gì khác với hai cái kia không em?",
+        "Ngân sách của anh khoảng 5 triệu rưỡi thôi, vậy có máy nào trong tầm giá không?",
+        "Em có thể nói rõ hơn về ưu nhược điểm của từng loại không?",
+        "Anh thấy trên Fanpage có máy AirPure Y đang khuyến mãi gì nhỉ?",
+        "Thế còn về độ bền của máy, cái nào tốt hơn?",
+        "À, anh muốn so sánh thêm trước khi quyết định, em có thể tư vấn thêm không?"
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C019",
+          "session_id": "SYN-019-S1",
+          "date": "2026-06-01",
+          "channel": "fb",
+          "summary": "Mua Máy lọc không khí AirPure Y giá 5.200.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C019",
+          "session_id": "SYN-019-S2",
+          "date": "2026-10-09",
+          "channel": "web",
+          "summary": "Đặt Máy lọc không khí Samsung AX40 giá 6.490.000đ, đơn OD901902 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C019",
+          "order_id": "OD901901",
+          "date": "2026-06-01",
+          "sku": "SKU-AP-Y",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AP-Y"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C019",
+          "order_id": "OD901902",
+          "date": "2026-10-09",
+          "sku": "SKU-SS-AX40",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901902"
+          }
+        }
+      ],
+      "facts_established": {
+        "blocker": "muốn so sánh thêm",
+        "budget_vnd": 5500000,
+        "has_children": false,
+        "room_area_m2": 25,
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "promo_code": "GIFT-FILTER",
+        "promo_expiry": "2026-10-22"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_GIFT-FILTER_active": true,
+        "gift_sku": "SKU-AP-FLT-X",
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "price_vnd:SKU-AP-X": 4890000,
+        "price_vnd:SKU-SS-AX40": 6490000,
+        "call_date": "2026-10-22",
+        "price_vnd:SKU-AP-Y": 5200000
+      },
+      "memory_expectation": {
+        "blocker": "muốn so sánh thêm",
+        "budget_vnd": 5500000,
+        "has_children": false,
+        "room_area_m2": 25,
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "promo_code": "GIFT-FILTER"
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "FAQ-04",
+        "KM-07",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 5,
+      "customer_goal": "Xác nhận mua máy lọc không khí AirPure Y",
+      "customer_turns": [
+        "Alo, anh đã quyết định mua máy lọc không khí AirPure Y rồi.",
+        "Hình thức thanh toán anh chọn là chuyển khoản ngân hàng.",
+        "Khu vực giao hàng là Long Biên, Hà Nội nhé.",
+        "Em lên đơn cho anh đi, anh muốn nhận hàng sớm nhất có thể."
+      ],
+      "facts_established": {
+        "delivery_area": "Long Biên, Hà Nội",
+        "payment": "bank",
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AP-Y",
+          "price_vnd": 5200000,
+          "payment": "bank"
+        },
+        "forbidden_claims": [
+          {
+            "field": "promo_GIFT-FILTER_active",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 5200000,
+        "list_price_vnd": 5200000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_GIFT-FILTER_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-10-29",
+        "call_date": "2026-10-27"
+      },
+      "memory_expectation": {
+        "delivery_area": "Long Biên, Hà Nội",
+        "payment": "bank",
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04",
+        "KM-01",
+        "CL-02",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

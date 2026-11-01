@@ -1,0 +1,149 @@
+{
+  "scenario_id": "SCN-GEN-0172",
+  "level": "M1",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "hard_case": "hen_goi_lai_ngay_nghi",
+  "customer_phone": "0979298416",
+  "customer_name": "Hương",
+  "honorific": "chị",
+  "notes": "Persona khach_do_du_hoi_nguoi_nha, biến thể hen_ngay_nghi. call_1 (hotline): tư vấn, hẹn gọi lại vào ngày nghỉ → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Ca khó: hen_goi_lai_ngay_nghi. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-20",
+      "customer_goal": "Hỏi về máy lọc không khí Samsung AX40",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về máy lọc không khí Samsung AX40.",
+        "Máy này có phù hợp với phòng 25 mét vuông không em?",
+        "Chị có một bé nhỏ ở nhà, máy này có an toàn không?",
+        "Ngân sách chị tầm 7 triệu rưỡi thôi, có khuyến mãi gì không em?",
+        "Thứ Hai tuần sau tầm 9 giờ sáng em gọi lại chị nhé."
+      ],
+      "facts_established": {
+        "blocker": "cần hỏi chồng",
+        "budget_vnd": 7500000,
+        "decision_maker": "chồng",
+        "has_children": true,
+        "room_area_m2": 25,
+        "product_advised": "SKU-SS-AX40",
+        "price_quoted_vnd": 6490000
+      },
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-10-26T09:00"
+        },
+        "must_say_any": [
+          "27/10",
+          "thứ Ba",
+          "Thứ Ba"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 6490000,
+        "list_price_vnd": 6490000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "callback_at": "2026-10-27T09:00",
+        "call_date": "2026-10-20"
+      },
+      "memory_expectation": {
+        "blocker": "cần hỏi chồng",
+        "budget_vnd": 7500000,
+        "decision_maker": "chồng",
+        "has_children": true,
+        "room_area_m2": 25,
+        "product_advised": "SKU-SS-AX40",
+        "price_quoted_vnd": 6490000
+      },
+      "relevant_policy_ids": [
+        "LN-01",
+        "LN-02",
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "FAQ-02",
+        "PB-03"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 7,
+      "customer_goal": "Chốt đơn mua máy lọc không khí",
+      "customer_turns": [
+        "Alo, chị Hương đây.",
+        "Chị xác nhận mua máy lọc không khí Samsung AX40.",
+        "Hình thức thanh toán là COD nhé.",
+        "Khu vực giao hàng là Lê Chân, Hải Phòng."
+      ],
+      "facts_established": {
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "payment": "COD",
+        "product_advised": "SKU-SS-AX40",
+        "price_quoted_vnd": 6490000,
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "room_area_m2",
+        "decision_maker",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "decision_maker",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SS-AX40",
+          "price_vnd": 6490000,
+          "payment": "COD"
+        },
+        "must_say_any": [
+          "gọi xác nhận",
+          "gọi điện xác nhận",
+          "gọi lại xác nhận",
+          "xác nhận đơn",
+          "xác nhận trước khi giao"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 6490000,
+        "list_price_vnd": 6490000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-10-31",
+        "needs_confirmation_call": true,
+        "call_date": "2026-10-27"
+      },
+      "memory_expectation": {
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "payment": "COD",
+        "product_advised": "SKU-SS-AX40",
+        "price_quoted_vnd": 6490000,
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-05",
+        "QT-01",
+        "PB-01",
+        "PB-03"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

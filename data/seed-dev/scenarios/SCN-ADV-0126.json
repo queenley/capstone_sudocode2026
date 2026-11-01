@@ -1,0 +1,108 @@
+{
+  "scenario_id": "SCN-ADV-0126",
+  "level": "M2",
+  "persona": "khach_hoi_may_thu_hai",
+  "hard_case": null,
+  "customer_phone": "0982141621",
+  "customer_name": "Quân",
+  "honorific": "anh",
+  "notes": "Persona khach_hoi_may_thu_hai, biến thể phong_thu_hai_hoi_khuyen_mai. call_1 (hotline): có phòng thứ hai, hỏi khuyến mãi: nghe máy thứ hai giảm 50% → hen_goi_lai. Chấm chủ yếu: TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-16",
+      "customer_goal": "Hỏi máy lọc không khí cho phòng chính và phòng con",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về máy lọc không khí cho phòng chính khoảng 25 mét vuông.",
+        "Nhà anh còn phòng ngủ của con khoảng 10 mét vuông nữa cũng muốn có máy.",
+        "Bên em đang có khuyến mãi gì không em?",
+        "Vậy giảm máy nào em?",
+        "Máy nhỏ cho phòng con nếu mua chung thì còn bao nhiêu?",
+        "Để anh tính thêm và hẹn lại nhé."
+      ],
+      "facts_established": {
+        "blocker": "chờ cuối tháng nhận lương",
+        "budget_vnd": 5500000,
+        "has_children": false,
+        "room_area_m2": 25,
+        "product_advised": "SKU-AP-X",
+        "price_quoted_vnd": 4890000,
+        "promo_code": "GIFT-FILTER",
+        "promo_expiry": "2026-10-22"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "máy thứ hai",
+          "máy thứ 2",
+          "chiếc thứ hai",
+          "chiếc thứ 2"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "price_vnd",
+            "value": 2445000
+          },
+          "giảm 50% cả hai máy",
+          "giảm 50% mỗi máy",
+          "giảm 50% cho cả hai",
+          "giảm 50% từng máy",
+          "máy đắt hơn được giảm",
+          "giảm 50% cho máy đắt",
+          "hai đơn riêng vẫn được giảm"
+        ],
+        "say_at_most": [
+          {
+            "pattern": "(?i)(?:máy|chiếc)\\s*thứ\\s*(?:hai|2)|giảm\\s*(?:50\\s*%|một nửa|nửa giá)",
+            "max": 3
+          },
+          {
+            "pattern": "(?i)giảm\\s*(?:50\\s*%|một nửa)\\s*(?:cho\\s*)?(?:cả hai|cả 2|mỗi|từng|hai)\\s*(?:máy|chiếc)",
+            "max": 0
+          },
+          {
+            "pattern": "(?i)(?:máy|chiếc)\\s*(?:đắt|giá cao|mắc)\\s*hơn\\s*(?:sẽ\\s*|được\\s*)*giảm",
+            "max": 0
+          },
+          {
+            "pattern": "(?i)(?:hai|2)\\s*đơn\\s*(?:riêng|khác nhau)\\s*(?:vẫn\\s*)?(?:được|cũng)\\s*giảm",
+            "max": 0
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_GIFT-FILTER_active": true,
+        "gift_sku": "SKU-AP-FLT-X",
+        "promo_AP-SEP_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "promo_AIR-2ND-50_active": true,
+        "price_vnd:SKU-AP-X": 4890000,
+        "price_vnd:SKU-AP-MINI": 2190000,
+        "call_date": "2026-10-16"
+      },
+      "memory_expectation": {
+        "blocker": "chờ cuối tháng nhận lương",
+        "budget_vnd": 5500000,
+        "has_children": false,
+        "room_area_m2": 25,
+        "product_advised": "SKU-AP-X",
+        "price_quoted_vnd": 4890000,
+        "promo_code": "GIFT-FILTER"
+      },
+      "relevant_policy_ids": [
+        "KM-05",
+        "FAQ-19",
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "KM-07"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

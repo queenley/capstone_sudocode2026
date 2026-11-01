@@ -1,0 +1,138 @@
+{
+  "scenario_id": "SCN-ADV-0138",
+  "level": "M2",
+  "persona": "khach_tra_hang_qua_han",
+  "hard_case": null,
+  "customer_phone": "0998000014",
+  "customer_name": "Lê Thị Hoa",
+  "honorific": "chị",
+  "notes": "Persona khach_tra_hang_qua_han, biến thể qua_7_ngay. call_1 (hotline): trả hàng quá hạn → thong_tin. Chấm chủ yếu: CCR, RQR, TSR, HR, ESC.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-17",
+      "customer_goal": "Cố gắng trả giày chạy bộ dù đã quá hạn",
+      "customer_turns": [
+        "Alo, chị Lê Thị Hoa đây, em ơi chị muốn hỏi về giày chạy bộ RunLite 2 Pro mà chị đã mua.",
+        "Chị nhận hàng từ lâu rồi, giờ chị thấy màu nó không hợp với nội thất nhà chị.",
+        "Chị biết là đã quá hạn đổi trả nhưng mà chị không thích màu này, có cách nào giúp chị không?",
+        "Chị rất thích kiểu dáng nhưng màu sắc thì không hợp, em xem có cách nào để chị trả hàng không?",
+        "Chị đã thử đi rồi nhưng không thấy thoải mái, ừm, chị thật sự muốn trả lại mà.",
+        "Chị đã đọc chính sách đổi trả nhưng chị mong em giúp chị vì chị đã thích giày này trước đây mà giờ không hợp nữa."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C014",
+          "session_id": "SYN-014-S3",
+          "date": "2025-03-18",
+          "channel": "web",
+          "summary": "Mua Quạt đứng Senko TS16 giá 590.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C014",
+          "session_id": "SYN-014-S1",
+          "date": "2026-06-13",
+          "channel": "zalo_oa",
+          "summary": "Mua Giày chạy bộ RunLite 2 Pro giá 1.740.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C014",
+          "session_id": "SYN-014-S2",
+          "date": "2026-10-04",
+          "channel": "fb",
+          "summary": "Đặt Giày sneaker Urban Classic giá 940.000đ, đơn OD901402 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C014",
+          "order_id": "OD901401",
+          "date": "2026-06-13",
+          "sku": "SKU-SN-RUN2-43-XAM",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-SN-RUN2-43-XAM"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C014",
+          "order_id": "OD901402",
+          "date": "2026-10-04",
+          "sku": "SKU-SN-CAS-43-DEN",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901402"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C014",
+          "order_id": "OD901403",
+          "date": "2025-03-18",
+          "sku": "SKU-FAN-SEN",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-FAN-SEN"
+          }
+        }
+      ],
+      "facts_established": {
+        "return_reason": "không hợp màu nội thất nhà mình",
+        "order_id": "OD901401",
+        "owned_sku": "SKU-SN-RUN2"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "7 ngày",
+          "bảy ngày"
+        ],
+        "must_not_call_tools": [
+          "order.create",
+          "order.update"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "return_allowed",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD901401",
+        "return_days": 7,
+        "return_allowed": false,
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "order_id": "OD901401",
+        "owned_sku": "SKU-SN-RUN2"
+      },
+      "relevant_policy_ids": [
+        "DT-01",
+        "DT-06",
+        "PB-01"
+      ],
+      "expected_outcome": "thong_tin"
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "scenario_id": "SCN-ADV-0109",
+  "persona_source": "advanced",
+  "customer_id": "C013",
+  "region": "trung",
+  "category": "gia-dung/noi-chien",
+  "difficulty": "normal",
+  "tags": [
+    "bao_hanh",
+    "cross_channel",
+    "date:ordinary",
+    "mua_hang",
+    "nồi_chiên_khong_dau",
+    "thanh_toán",
+    "variant:mua_roi_hoi_bh_mo_rong",
+    "warranty"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "order",
+      "outcome_detail": "chot_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Nồi chiên không dầu Philips 6.2L",
+        "price_vnd": 3990000,
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_hoi_bao_hanh_mo_rong",
+      "patience_start": 3
+    },
+    "call_2": {
+      "kind": "extended_warranty",
+      "outcome_detail": "thong_tin",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "extended_warranty": "thêm 12 tháng, giá bằng 8% giá sản phẩm"
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_hoi_bao_hanh_mo_rong",
+      "patience_start": 3
+    }
+  }
+}

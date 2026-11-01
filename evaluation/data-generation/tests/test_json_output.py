@@ -19,3 +19,18 @@ def test_broken_json_is_repaired():
 def test_wrong_values_still_raise_for_the_client_to_ask_again():
     with pytest.raises(ValidationError):
         parse_output('{"verdicts": [{"criterion_id": "J01", "verdict": "MAYBE", "evidence": "x"}]}', JudgeOutput)
+
+
+def test_a_key_the_schema_lacks_is_dropped_not_retried():
+    # gpt-4o-mini wrote the scenario's tags inside each call: nothing reads them, the rest is kept as written.
+    from src.schemas.scenario import ScenarioDraft
+
+    text = ('{"calls": [{"call": "call_1", "customer_goal": "Hỏi giày chạy", "customer_turns": ["Chào em", "Giá sao em"],'
+            ' "tags": ["giay"]}], "tags": ["chay"]}')
+    value, repaired = parse_output(text, ScenarioDraft)
+    assert repaired and value.tags == ["chay"] and value.calls[0].customer_turns == ["Chào em", "Giá sao em"]
+
+
+def test_an_extra_key_beside_a_wrong_value_still_raises():
+    with pytest.raises(ValidationError):
+        parse_output('{"verdicts": [{"criterion_id": "J01", "verdict": "MAYBE", "evidence": "x", "note": "y"}]}', JudgeOutput)

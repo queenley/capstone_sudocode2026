@@ -1,0 +1,77 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0018",
+    "call": "call_2",
+    "turn": 1
+  },
+  "customer_text": "alo anh goi lai de hoi ve xe day gap gon hom truoc",
+  "agent_text": "Dạ em là trợ lý tự động của cửa hàng ạ. Anh cho em hỏi anh cần tư vấn về xe đẩy gấp gọn loại nào hoặc mục đích sử dụng để em hỗ trợ tốt hơn ạ?",
+  "customer_id": "C010",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0018/call_2/1/6",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0018",
+        "call": "call_2",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/566"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0018/call_2/1/6",
+      "request": {
+        "name": "crm.get_customer",
+        "args": {
+          "phone": "0993186032"
+        }
+      },
+      "on": "2026-10-25",
+      "started_at": "2026-10-17T04:44:45.923832+00:00",
+      "finished_at": "2026-10-17T04:44:45.923832+00:00",
+      "outcome": "success",
+      "result": {
+        "found": true,
+        "ambiguous": false,
+        "customer_id": "C010",
+        "name": "Đức",
+        "honorific": "anh",
+        "phone": "0993186032",
+        "identities": {
+          "zalo_id": null,
+          "fb_id": "fb.đức.146"
+        },
+        "orders": [],
+        "sessions": []
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"phone\": \"0993186032\"}, \"name\": \"crm.get_customer\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/569"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/571"
+    }
+  ]
+}

@@ -87,18 +87,33 @@ def has_positive_requirement(success_if: SuccessIf) -> bool:
 # --------------------------------------------------------------------------- #
 # Text helpers used by deterministic consistency checks                        #
 # --------------------------------------------------------------------------- #
-_MILLION = re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:triệu|tr)\b", re.IGNORECASE)
-_THOUSAND = re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:nghìn|ngàn|k)\b", re.IGNORECASE)
+#: "5 triệu", "5,2 triệu", "5tr2", "4 triệu rưỡi", "4 triệu 290 ngàn", "4 triệu 290", "5 triệu 2 trăm": the part after
+#: the millions belongs to the same amount ("tr" is not "trăm": no letter may follow it).
+_MILLION = re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:triệu|tr(?![^\W\d_]))"
+                      r"(?:\s*(rưỡi)|\s*(\d{1,3})(?:\s*(trăm|nghìn|ngàn|k)(?![^\W\d_]))?)?", re.IGNORECASE)
+_THOUSAND = re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:nghìn|ngàn|k)(?![^\W\d_])", re.IGNORECASE)
 _GROUPED = re.compile(r"(?<![\d.,])(\d{1,3}(?:[.,]\d{3})+)(?![\d.,])")
+#: A bare number after the millions, by its digits: "5 triệu 2" is 5.200.000, "5 triệu 25" 5.250.000, "4 triệu 290" 4.290.000.
+_REST_SCALE = {1: 100_000, 2: 10_000, 3: 1_000}
+_REST_UNIT = {"trăm": 100_000, "nghìn": 1_000, "ngàn": 1_000, "k": 1_000}
 
 
 def money_mentions(text: str) -> set[int]:
-    """VND amounts written as ``5.200.000đ``, ``5,2 triệu``, ``500k``."""
+    """VND amounts written as ``5.200.000đ``, ``5,2 triệu``, ``5tr2``, ``4 triệu rưỡi``, ``4 triệu 290 ngàn``, ``500k``."""
     amounts: set[int] = set()
+    taken: list[tuple[int, int]] = []
     for match in _MILLION.finditer(text):
-        amounts.add(round(float(match.group(1).replace(",", ".")) * 1_000_000))
+        value = float(match.group(1).replace(",", ".")) * 1_000_000
+        if match.group(2):
+            value += 500_000
+        elif match.group(3):
+            unit = (match.group(4) or "").lower()
+            value += int(match.group(3)) * (_REST_UNIT[unit] if unit else _REST_SCALE[len(match.group(3))])
+        amounts.add(round(value))
+        taken.append(match.span())
     for match in _THOUSAND.finditer(text):
-        amounts.add(round(float(match.group(1).replace(",", ".")) * 1_000))
+        if not any(start <= match.start() < end for start, end in taken):   # "290 ngàn" of "4 triệu 290 ngàn"
+            amounts.add(round(float(match.group(1).replace(",", ".")) * 1_000))
     for match in _GROUPED.finditer(text):
         amounts.add(int(re.sub(r"\D", "", match.group(1))))
     return amounts

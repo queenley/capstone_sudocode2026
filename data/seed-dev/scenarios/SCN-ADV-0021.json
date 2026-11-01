@@ -1,0 +1,172 @@
+{
+  "scenario_id": "SCN-ADV-0021",
+  "level": "M2",
+  "persona": "khach_lon_tuoi",
+  "hard_case": null,
+  "customer_phone": "0936270107",
+  "customer_name": "Tuấn",
+  "honorific": "anh",
+  "notes": "Persona khach_lon_tuoi, biến thể noi_cham_hoi_lai. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-17",
+      "input_mode": "asr_transcript",
+      "customer_goal": "Hỏi về máy lọc không khí Samsung AX40",
+      "customer_turns": [
+        "Alo, cháu ơi, cô muốn hỏi về máy lọc không khí Samsung AX40.",
+        "Máy này có giá bao nhiêu vậy cháu?",
+        "Cô thấy trên mạng có khuyến mãi gì không?",
+        "À mà cô có một cái phòng 25 mét vuông, nhà có trẻ nhỏ nữa.",
+        "Cô muốn hỏi ý kiến con cháu trước đã.",
+        "Cháu có thể gọi lại cho cô vào tối thứ Hai (19/10) tầm 7 giờ được không?"
+      ],
+      "customer_turns_asr": [
+        "alo chau oi co muon hoi ve may loc khong khi samsung ax40",
+        "may nay co gia bao nhieu vay chau",
+        "a ma co thay tren mang co khuyen mai gi khong",
+        "a ma co mot phong 25 met vuong nha co co tre nho nua",
+        "co muon hoi y kien con chau truoc da",
+        "chau co the goi lai cho co vao toi thu hai 19 10 tam 7 gio duoc khong"
+      ],
+      "facts_established": {
+        "room_area_m2": 25,
+        "has_children": true,
+        "budget_vnd": 7000000,
+        "decision_maker": "con",
+        "blocker": "cần hỏi con cháu",
+        "product_advised": "SKU-SS-AX40",
+        "price_quoted_vnd": 6490000
+      },
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-10-19T19:00"
+        },
+        "must_say_any": [
+          "7 giờ",
+          "19 giờ",
+          "19h",
+          "7h tối"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 6490000,
+        "list_price_vnd": 6490000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "callback_at": "2026-10-19T19:00",
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "room_area_m2": 25,
+        "has_children": true,
+        "budget_vnd": 7000000,
+        "decision_maker": "con",
+        "blocker": "cần hỏi con cháu",
+        "product_advised": "SKU-SS-AX40",
+        "price_quoted_vnd": 6490000
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "FAQ-02",
+        "LN-01",
+        "PB-03",
+        "PB-10"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 3,
+      "input_mode": "asr_transcript",
+      "customer_goal": "Đặt hàng máy lọc không khí Samsung AX40",
+      "customer_turns": [
+        "Alo cháu, cháu nói lại cô nghe, cô vừa hỏi máy lọc không khí Samsung AX40 đúng không?",
+        "Cô đồng ý mua máy này rồi.",
+        "Cô sẽ thanh toán bằng tiền mặt khi nhận hàng nhé.",
+        "Khu vực giao hàng là Quận 7, TP.HCM nhé cháu.",
+        "Cảm ơn cháu nhiều, cô chờ hàng về."
+      ],
+      "customer_turns_asr": [
+        "alo chau chau noi lai co nghe co vua hoi may loc khong khi samsung ax40 dung khong",
+        "co dong y mua may nay roi",
+        "co se thanh toan bang tien mat khi nhan hang nhe",
+        "khu vuc giao hang la quan 7 tp hcm nhe chau",
+        "cam on chau nhieu co cho hang ve"
+      ],
+      "facts_established": {
+        "payment": "COD",
+        "delivery_area": "Quận 7, TP.HCM",
+        "product_advised": "SKU-SS-AX40",
+        "price_quoted_vnd": 6490000,
+        "promo_code": "NAM-SHIP0",
+        "promo_expiry": "2026-11-05",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "room_area_m2",
+        "decision_maker",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "decision_maker",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SS-AX40",
+          "price_vnd": 6490000,
+          "payment": "COD"
+        },
+        "must_say_any": [
+          "gọi xác nhận",
+          "gọi điện xác nhận",
+          "gọi lại xác nhận",
+          "xác nhận đơn",
+          "xác nhận trước khi giao"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 6490000,
+        "list_price_vnd": 6490000,
+        "promo_active": true,
+        "promo_NAM-SHIP0_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "freeship": true,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-10-22",
+        "needs_confirmation_call": true,
+        "call_date": "2026-10-20"
+      },
+      "memory_expectation": {
+        "payment": "COD",
+        "delivery_area": "Quận 7, TP.HCM",
+        "product_advised": "SKU-SS-AX40",
+        "price_quoted_vnd": 6490000,
+        "promo_code": "NAM-SHIP0",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-05",
+        "QT-01",
+        "PB-01",
+        "PB-10"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

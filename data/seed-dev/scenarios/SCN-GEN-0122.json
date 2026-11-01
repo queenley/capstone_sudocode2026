@@ -1,0 +1,142 @@
+{
+  "scenario_id": "SCN-GEN-0122",
+  "level": "M1",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "hard_case": null,
+  "customer_phone": "0994157718",
+  "customer_name": "Tiến",
+  "honorific": "anh",
+  "notes": "Persona khach_do_du_hoi_nguoi_nha, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-30",
+      "customer_goal": "Hỏi về giày chạy bộ mà anh đã thấy hôm trước.",
+      "customer_turns": [
+        "Alo, em ơi, anh muốn hỏi về giày chạy bộ RunLite 2 Pro size 41 màu đen.",
+        "Em có thể cho anh biết giá và khuyến mãi hiện tại không?",
+        "Thế còn tình trạng hàng còn không em?",
+        "À, anh cần hỏi vợ trước đã, hẹn em gọi lại tối mai tầm 7 giờ nhé."
+      ],
+      "facts_established": {
+        "size": 41,
+        "color": "den",
+        "decision_maker": "vợ",
+        "blocker": "cần hỏi vợ",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-41-DEN"
+      },
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-10-31T19:00"
+        },
+        "must_say_any": [
+          "7 giờ",
+          "19 giờ",
+          "19h",
+          "7h tối"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1690000,
+        "list_price_vnd": 1690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": true,
+        "callback_at": "2026-10-31T19:00",
+        "call_date": "2026-10-30"
+      },
+      "memory_expectation": {
+        "size": 41,
+        "color": "den",
+        "decision_maker": "vợ",
+        "blocker": "cần hỏi vợ",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-41-DEN"
+      },
+      "relevant_policy_ids": [
+        "SP-SN-01",
+        "FAQ-09",
+        "LN-01",
+        "PB-03"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 3,
+      "customer_goal": "Xác nhận mua giày và hỏi về hình thức thanh toán.",
+      "customer_turns": [
+        "Alo, anh gọi lại đây, anh muốn mua giày RunLite 2 Pro size 41 màu đen.",
+        "Hình thức thanh toán anh chọn là COD.",
+        "Giao hàng ở Nha Trang, Khánh Hòa nhé.",
+        "Vậy anh đồng ý lên đơn cho anh nhé."
+      ],
+      "facts_established": {
+        "payment": "COD",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-41-DEN",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "size",
+        "decision_maker",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "size",
+        "color",
+        "decision_maker",
+        "product_advised",
+        "variant_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-SN-RUN2-41-DEN",
+          "price_vnd": 1690000,
+          "payment": "COD"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1690000,
+        "list_price_vnd": 1690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_RUN-10_active": false,
+        "promo_RUN2-SALE_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-11-06",
+        "call_date": "2026-11-02"
+      },
+      "memory_expectation": {
+        "payment": "COD",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "product_advised": "SKU-SN-RUN2",
+        "price_quoted_vnd": 1690000,
+        "variant_sku": "SKU-SN-RUN2-41-DEN",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "PB-01",
+        "PB-03"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

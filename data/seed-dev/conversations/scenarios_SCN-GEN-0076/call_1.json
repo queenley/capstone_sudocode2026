@@ -1,0 +1,248 @@
+{
+  "conversation_id": "SCN-GEN-0076__call_1",
+  "scenario_id": "SCN-GEN-0076",
+  "call": "call_1",
+  "customer_id": "SYN-C016",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-15",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em thấy hôm trước mình có đặt Máy lọc không khí AirPure X, hôm nay chị quan tâm đến dòng AirPure Pro cho phòng 20 mét vuông đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Hôm nay chị hỏi về Máy lọc không khí AirPure Pro cho phòng khoảng 20 mét vuông đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về máy lọc không khí AirPure Pro cho phòng khoảng 20 mét vuông.",
+      "facts_stated": {
+        "room_area_m2": 20
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với phòng 20 mét vuông, AirPure Pro là lựa chọn tốt vì công suất mạnh hơn AirPure X. Chị có thể cho em biết mình có trẻ nhỏ hoặc yêu cầu đặc biệt gì thêm không ạ?",
+      "questions": [
+        {
+          "slot": "has_children",
+          "type": "open",
+          "text": "Chị có trẻ nhỏ hoặc nhu cầu đặc biệt nào khác không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị không có trẻ nhỏ, ngân sách tầm 8 triệu rưỡi đổ lại.",
+      "facts_stated": {
+        "has_children": false,
+        "budget_vnd": 8500000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "8500000",
+          "spoken": "8 triệu rưỡi"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm AirPure Pro hiện bên em đang có giá ưu đãi 7.690.000đ, nằm trong ngân sách của chị và đang áp dụng khuyến mãi AIR-OCT giảm 300.000đ so với giá niêm yết 7.990.000đ. Máy còn hàng, bảo hành 12 tháng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "7690000",
+          "spoken": "7.690.000đ"
+        },
+        {
+          "type": "money",
+          "value": "7990000",
+          "spoken": "7.990.000đ"
+        }
+      ],
+      "pause_before_ms": 370,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại AirPure Pro được giảm trực tiếp 300.000đ với mã AIR-OCT, còn 7.690.000đ. Ngoài ra, đơn hàng từ 500.000đ được freeship toàn quốc và miễn phí thu hộ khi nhận hàng chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "7690000",
+          "spoken": "7.690.000đ"
+        }
+      ],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ừ, chị cần suy nghĩ thêm rồi gọi lại nhé.",
+      "facts_stated": {
+        "blocker": "cần suy nghĩ thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng em ghi nhận, khi nào chị quyết định cứ nhắn hoặc gọi lại cho shop nhé. Em giữ giá khuyến mãi này đến hết ngày 30/10 ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 8500000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "has_children",
+          "value": false,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 20,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7690000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "promo_code",
+          "value": "AIR-OCT",
+          "op": "set",
+          "source": "call_1#turn7"
+        }
+      ],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-10-30",
+          "spoken": "30/10"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

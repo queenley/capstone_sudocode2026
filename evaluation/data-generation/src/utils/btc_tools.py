@@ -7,6 +7,11 @@
 
 ``fresh_mock_tools()`` re-executes the module so runtime state (created orders,
 once-per-customer promo usage, callbacks) starts empty for every scenario.
+
+The team's own tools (:data:`TEAM_TOOLS`) run the agent's code over the same mock: ``delivery_estimate``
+is ``apps/ai-agent-service/.../mcp/servers/delivery.py``, loaded by its path, so a label and the agent's
+answer come from one rule. The team's optional arguments (``order.create`` ``order_group``) are dropped
+before the mock runs, as the agent's MCP wrapper drops them.
 """
 from __future__ import annotations
 
@@ -17,16 +22,19 @@ import os
 from functools import lru_cache
 from types import ModuleType
 
-from src.utils.paths import CATALOG_DIR, DATA_DIR
+from src.utils.paths import CATALOG_DIR, DATA_DIR, REPO_ROOT
 
 EVAL_DIR = DATA_DIR / "eval"
 OFFICIAL_TOOLS = ("crm.get_customer", "catalog.search", "inventory.check", "order.create", "order.update",
                   "schedule.callback", "handoff.transfer", "pricing.get_quote", "order.status")
 M2_TOOLS = ("pricing.get_quote", "order.status")
+#: The team's tools the planner labels with (contracts/scenario/scenario-keys.yaml team_tools).
+TEAM_TOOLS = ("delivery_estimate",)
+AGENT_DELIVERY = REPO_ROOT / "apps" / "ai-agent-service" / "src" / "ai_agent_service" / "mcp" / "servers" / "delivery.py"
 
 
-def _load(name: str, filename: str) -> ModuleType:
-    spec = importlib.util.spec_from_file_location(name, EVAL_DIR / filename)
+def _load(name: str, filename: str, folder=EVAL_DIR) -> ModuleType:
+    spec = importlib.util.spec_from_file_location(name, folder / filename)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)  # type: ignore[union-attr]
     return module
@@ -69,8 +77,15 @@ def tool_signatures() -> dict[str, list[str]]:
     return {name: list(inspect.signature(fn).parameters) for name, fn in mock_tools().TOOLS.items()}
 
 
+@lru_cache(maxsize=1)
+def team_delivery() -> ModuleType:
+    return _load("agent_delivery", AGENT_DELIVERY.name, AGENT_DELIVERY.parent)
+
+
 def call_tool(module: ModuleType, name: str, args: dict) -> dict:
-    """Execute an official tool on ``module`` with only the parameters it accepts."""
+    """Execute an official tool on ``module`` with only the parameters it accepts, or a team tool over it."""
+    if name == "delivery_estimate":
+        return team_delivery().estimate(module, args.get("address"), args.get("on") or module.REF)
     fn = module.TOOLS[name]
     accepted = inspect.signature(fn).parameters
     return fn(**{k: v for k, v in args.items() if k in accepted})

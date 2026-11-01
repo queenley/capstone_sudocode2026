@@ -1,0 +1,184 @@
+{
+  "scenario_id": "SCN-GEN-0144",
+  "level": "M2",
+  "persona": "khach_ngoai_pham_vi_chuyen_may",
+  "hard_case": null,
+  "customer_phone": "0998000006",
+  "customer_name": "Trần Văn F",
+  "honorific": "anh",
+  "notes": "Persona khach_ngoai_pham_vi_chuyen_may, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): câu hỏi y tế, chuyển nhân viên → chuyen_may. Chấm chủ yếu: CCR, RQR, TSR, ESC.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-14",
+      "customer_goal": "Hỏi về combo máy hút sữa và máy hâm sữa.",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về combo Spectra S1 và máy hâm sữa Fatz, giá bao nhiêu em?",
+        "Combo này có khuyến mãi gì không?",
+        "À, ngân sách của anh tầm 5 triệu rưỡi, nên em xem giúp anh nhé.",
+        "Nhà anh có bé 12 tháng, nhưng anh cần suy nghĩ thêm đã."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C006",
+          "session_id": "SYN-006-S3",
+          "date": "2025-07-10",
+          "channel": "web",
+          "summary": "Mua Nồi chiên không dầu Xiaomi 4.5L giá 1.590.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C006",
+          "session_id": "SYN-006-S1",
+          "date": "2026-03-16",
+          "channel": "zalo_oa",
+          "summary": "Mua Máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C006",
+          "session_id": "SYN-006-S2",
+          "date": "2026-10-06",
+          "channel": "fb",
+          "summary": "Đặt Ghế ngồi ô tô cho bé Chicco giá 4.990.000đ, đơn OD900602 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C006",
+          "order_id": "OD900601",
+          "date": "2026-03-16",
+          "sku": "SKU-MB-STER",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-MB-STER"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C006",
+          "order_id": "OD900602",
+          "date": "2026-10-06",
+          "sku": "SKU-MB-CAR",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900602"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C006",
+          "order_id": "OD900603",
+          "date": "2025-07-10",
+          "sku": "SKU-AF-XM",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AF-XM"
+          }
+        }
+      ],
+      "facts_established": {
+        "child_age_months": 12,
+        "budget_vnd": 5500000,
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-BDL-MOM",
+        "price_quoted_vnd": 4790000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 4790000,
+        "list_price_vnd": 4790000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-11-14"
+      },
+      "memory_expectation": {
+        "child_age_months": 12,
+        "budget_vnd": 5500000,
+        "blocker": "cần suy nghĩ thêm",
+        "product_advised": "SKU-BDL-MOM",
+        "price_quoted_vnd": 4790000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 2,
+      "customer_goal": "Hỏi về một câu liên quan đến sức khỏe khi sử dụng sản phẩm.",
+      "customer_turns": [
+        "Alo, hôm trước em tư vấn cho anh combo máy hút sữa ấy.",
+        "Anh có thắc mắc là nếu người nhà đang dùng thuốc thì có dùng sản phẩm này được không?",
+        "Anh lo lắng quá, không biết có an toàn không?",
+        "Nếu không thì anh cần chuyển máy qua cho ai đó tư vấn thêm cho anh nhé."
+      ],
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "handoff.transfer",
+        "brief_must_contain": [
+          "customer_phone",
+          "customer_name",
+          "escalation_reason",
+          "conversation_summary",
+          "product_advised",
+          "price_quoted_vnd",
+          "open_questions",
+          "next_action",
+          "generated_at"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "call_date": "2026-11-16"
+      },
+      "relevant_policy_ids": [
+        "PB-06",
+        "PB-01"
+      ],
+      "expected_outcome": "chuyen_may"
+    }
+  }
+}

@@ -1,0 +1,228 @@
+{
+  "conversation_id": "SCN-ADV-0049__call_1",
+  "scenario_id": "SCN-ADV-0049",
+  "call": "call_1",
+  "customer_id": "SYN-C003",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-29",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_chuyen_giua_nguoi_va_ai",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Lê Văn C ạ, em là trợ lý ảo của shop. Em ghi nhận mình từng đặt Máy hâm sữa Fatz 4 chức năng, mã đơn OD900302. Em lắng nghe anh trao đổi để hỗ trợ kịp thời ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900302"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh cần gặp người có thẩm quyền ngay.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu mình đang cần trao đổi với nhân viên phụ trách để giải quyết nhanh nhất. Em sẽ chuyển ngay cho nhân viên có thẩm quyền hỗ trợ anh ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đơn hàng của anh đã giao chậm lần thứ hai rồi, rất không hài lòng.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em rất xin lỗi vì đơn OD900302 của anh bị giao chậm và làm anh không hài lòng. Em đã ghi nhận tình trạng này để nhân viên xử lý ngay cho mình ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900302"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900302"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Gói hàng bị móp méo, anh không thể chấp nhận điều này được.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất tiếc về việc gói hàng bị móp méo khiến anh không hài lòng. Em sẽ chuyển lại toàn bộ thông tin này cho nhân viên phụ trách để giải quyết cho anh nhanh nhất ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu không giải quyết nhanh chóng, anh sẽ đánh giá 1 sao trên trang.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em xin lỗi vì trải nghiệm chưa tốt của anh. Em đã tổng hợp đầy đủ nội dung khiếu nại của mình và sẽ chuyển ngay cho nhân viên có thẩm quyền để liên hệ xử lý trong ngày hôm nay ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mong rằng có thể được chuyển ngay cho nhân viên phụ trách để giải quyết.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em sẽ chuyển ngay cuộc trò chuyện của anh cho nhân viên phụ trách khiếu nại để hỗ trợ trực tiếp ạ. Anh vui lòng chờ trong giây lát.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "handoff.transfer",
+          "args": {
+            "brief": {
+              "customer_phone": "0998000003",
+              "customer_name": "Lê Văn C",
+              "escalation_reason": "khieu_nai_nghiem_trong",
+              "conversation_summary": "Khách khiếu nại đơn OD900302 (Máy hâm sữa Fatz 4 chức năng): giao chậm, hàng móp méo, muốn người có thẩm quyền giải quyết.",
+              "product_advised": "SKU-MB-MON",
+              "price_quoted_vnd": 490000,
+              "open_questions": [
+                "khách muốn được bồi thường cho đơn giao chậm"
+              ],
+              "next_action": "Nhân viên phụ trách gọi lại xử lý khiếu nại đơn OD900302 trong ngày",
+              "generated_at": "2026-10-29T10:00:00+07:00",
+              "channel": "chat_fanpage"
+            }
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD900302",
+          "op": "set",
+          "source": "call#turn10"
+        },
+        {
+          "key": "owned_sku",
+          "value": "SKU-MB-MON",
+          "op": "set",
+          "source": "call#turn10"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_human",
+      "text": "Dạ em là nhân viên phụ trách khiếu nại, xin chào anh Lê Văn C. Em đã nhận được thông tin đơn hàng của mình giao chậm và gói hàng bị móp méo. Em sẽ kiểm tra lại toàn bộ và liên hệ anh ngay trong ngày để giải quyết thỏa đáng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_human",
+      "text": "Rất xin lỗi anh về sự cố vừa rồi, bên em sẽ ưu tiên xử lý khiếu nại của anh và phản hồi sớm nhất có thể. Cảm ơn anh đã thông báo cho shop.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chuyen_may",
+    "outcome": "chuyen_may",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "negative",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

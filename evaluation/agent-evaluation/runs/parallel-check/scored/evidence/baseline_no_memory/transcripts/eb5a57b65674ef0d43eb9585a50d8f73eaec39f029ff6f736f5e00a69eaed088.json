@@ -1,0 +1,70 @@
+{
+  "context": {
+    "run_id": "PRODUCT-70a8f17c2a91c3b1",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0010",
+    "call": "call_2",
+    "turn": 3
+  },
+  "customer_text": "Anh có thể chờ đến khi nào để mua máy?",
+  "agent_text": "Dạ máy AirPure Pro hiện bên em đang hết hàng, dự kiến về kho vào ngày 21 tháng 10 năm 2026 ạ. Anh Minh muốn đặt trước hay để em thông báo khi có hàng lại ạ?",
+  "customer_id": "C004",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-70a8f17c2a91c3b1/baseline_no_memory/SCN-GEN-0010/call_2/3/9",
+      "run_id": "PRODUCT-70a8f17c2a91c3b1",
+      "context": {
+        "run_id": "PRODUCT-70a8f17c2a91c3b1",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0010",
+        "call": "call_2",
+        "turn": 3
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "84dbdbb61f87e56f616d16b2ce1774f6865b34b7f6e180febc24f67788daf1f5",
+          "pointer": "/62"
+        }
+      ],
+      "event_id": "PRODUCT-70a8f17c2a91c3b1/baseline_no_memory/SCN-GEN-0010/call_2/3/9",
+      "request": {
+        "name": "inventory.check",
+        "args": {
+          "sku": "SKU-AP-PRO",
+          "on": "2026-10-18"
+        }
+      },
+      "on": "2026-10-18",
+      "started_at": "2026-10-17T04:08:43.810694+00:00",
+      "finished_at": "2026-10-17T04:08:43.810694+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-AP-PRO",
+        "in_stock": false,
+        "qty": 0,
+        "restock_expected": "2026-10-21"
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"on\": \"2026-10-18\", \"sku\": \"SKU-AP-PRO\"}, \"name\": \"inventory.check\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "84dbdbb61f87e56f616d16b2ce1774f6865b34b7f6e180febc24f67788daf1f5",
+      "pointer": "/58"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "84dbdbb61f87e56f616d16b2ce1774f6865b34b7f6e180febc24f67788daf1f5",
+      "pointer": "/63"
+    }
+  ]
+}

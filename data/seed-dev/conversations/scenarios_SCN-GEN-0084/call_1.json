@@ -1,0 +1,256 @@
+{
+  "conversation_id": "SCN-GEN-0084__call_1",
+  "scenario_id": "SCN-GEN-0084",
+  "call": "call_1",
+  "customer_id": "SYN-C018",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị muốn hỏi về xe đẩy gấp gọn Joie Pact đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn hỏi về xe đẩy gấp gọn Joie Pact đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo chi muon hoi ve xe day gap gon joie pact ma em da tu van hom truoc",
+      "facts_stated": {
+        "product_advised": "SKU-MB-STR1"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ Joie Pact bên em đang còn hàng, giá 3.490.000đ chị nhé. Đơn từ 500.000đ còn được miễn phí vận chuyển toàn quốc với chương trình MOM-FREESHIP.",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Joie Pact bên em đang còn hàng, giá 3.490.000đ chị nhé."
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "3490000",
+          "spoken": "3.490.000"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "em co biet xe nay gia bao nhieu khong",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ ngân sách của chị khoảng 3 triệu rưỡi, Joie Pact đang có giá phù hợp ạ.",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của chị khoảng 3 triệu rưỡi đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "3500000",
+          "spoken": "3 triệu rưỡi"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chi dang co ngan sach khoang 3 trieu rưỡi thoi",
+      "facts_stated": {
+        "budget_vnd": 3500000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "3500000",
+          "spoken": "3 trieu rưỡi"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ bé 8 tháng tuổi dùng Joie Pact thì rất hợp lý, xe gọn nhẹ, chịu tải tới 22kg, phù hợp cho bé đi ra ngoài cùng chị.",
+      "questions": [
+        {
+          "slot": "child_age_months",
+          "type": "confirm",
+          "text": "Bé nhà mình 8 tháng tuổi đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "child_age_months"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chi co be 8 thang tuoi can xe day gon de di ra ngoai",
+      "facts_stated": {
+        "child_age_months": 8
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị đang chờ cuối tháng nhận lương rồi mới quyết định. Nếu chị cần giữ giá hoặc có thêm thắc mắc về xe Joie Pact, chị cứ nhắn shop bất cứ lúc nào ạ. Chương trình miễn phí vận chuyển MOM-FREESHIP còn tới 29/11, chị cân nhắc giúp em nhé.",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "promo_expiry"
+      ],
+      "claims": [
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "child_age_months",
+          "value": 8,
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 3500000,
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-STR1",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 3490000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_1#turn4"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "a ma chi dang cho cuoi thang nhan luong roi moi quyet dinh duoc",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chờ lương",
+    "objection_handling": "Thông báo thời gian khuyến mãi còn hiệu lực, nhắc khách giữ giá nếu cần.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "scenario_id": "SCN-GEN-0236",
+  "persona_source": "btc",
+  "customer_id": "SYN-C017",
+  "region": "trung",
+  "category": "gia-dung/quat",
+  "difficulty": "hard",
+  "tags": [
+    "cập_nhật",
+    "date:sunday",
+    "hard_case",
+    "kênh_liên_hệ",
+    "mua_hàng",
+    "order_status",
+    "quạt",
+    "supersede",
+    "variant:ba_phien_doi_thong_tin"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "consult",
+      "outcome_detail": "hen_goi_lai",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Quạt đứng DC inverter Panasonic F-409",
+        "price_vnd": 2450000,
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 4
+    },
+    "call_2": {
+      "kind": "order",
+      "outcome_detail": "chot_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Quạt đứng DC inverter Panasonic F-409",
+        "price_vnd": 2450000,
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 3
+    },
+    "call_3": {
+      "kind": "order_status",
+      "outcome_detail": "cap_nhat_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "order_status": "created"
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 2
+    }
+  }
+}

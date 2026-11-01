@@ -1,0 +1,223 @@
+{
+  "scenario_id": "SCN-GEN-0084",
+  "level": "M2",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "hard_case": "asr_loi_tool_timeout",
+  "customer_phone": "0998000018",
+  "customer_name": "Trịnh Thị Lan",
+  "honorific": "chị",
+  "notes": "Persona khach_asr_nhiem_tool_timeout, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): tư vấn, chưa chốt → hen_goi_lai. Ca khó: asr_loi_tool_timeout. call_2: hết hàng đúng lúc khách quyết → hẹn lại. Chấm chủ yếu: CCR, RQR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-17",
+      "input_mode": "asr_transcript",
+      "customer_goal": "Hỏi về xe đẩy gấp gọn Joie Pact.",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về xe đẩy gấp gọn Joie Pact mà em đã tư vấn hôm trước.",
+        "Em có biết xe này giá bao nhiêu không?",
+        "Chị đang có ngân sách khoảng 3 triệu rưỡi thôi.",
+        "Chị có bé 8 tháng tuổi, cần xe đẩy gọn để đi ra ngoài.",
+        "À, mà chị đang chờ cuối tháng nhận lương rồi mới quyết định được."
+      ],
+      "customer_turns_asr": [
+        "alo chi muon hoi ve xe day gap gon joie pact ma em da tu van hom truoc",
+        "em co biet xe nay gia bao nhieu khong",
+        "chi dang co ngan sach khoang 3 trieu rưỡi thoi",
+        "chi co be 8 thang tuoi can xe day gon de di ra ngoai",
+        "a ma chi dang cho cuoi thang nhan luong roi moi quyet dinh duoc"
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C018",
+          "session_id": "SYN-018-S3",
+          "date": "2025-07-22",
+          "channel": "web",
+          "summary": "Mua Nồi chiên không dầu Xiaomi 4.5L giá 1.590.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C018",
+          "session_id": "SYN-018-S1",
+          "date": "2026-05-25",
+          "channel": "zalo_oa",
+          "summary": "Mua Ghế ngồi ô tô cho bé Chicco giá 4.990.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C018",
+          "session_id": "SYN-018-S2",
+          "date": "2026-10-08",
+          "channel": "fb",
+          "summary": "Đặt Máy hút sữa điện đôi Medela Swing Maxi giá 5.990.000đ, đơn OD901802 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C018",
+          "order_id": "OD901801",
+          "date": "2026-05-25",
+          "sku": "SKU-MB-CAR",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-MB-CAR"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C018",
+          "order_id": "OD901802",
+          "date": "2026-10-08",
+          "sku": "SKU-MB-PUMP2",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901802"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C018",
+          "order_id": "OD901803",
+          "date": "2025-07-22",
+          "sku": "SKU-AF-XM",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AF-XM"
+          }
+        }
+      ],
+      "facts_established": {
+        "child_age_months": 8,
+        "budget_vnd": 3500000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 3490000,
+        "list_price_vnd": 3490000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "child_age_months": 8,
+        "budget_vnd": 3500000,
+        "blocker": "chờ cuối tháng nhận lương",
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-02",
+        "FAQ-12",
+        "PB-01"
+      ],
+      "fault_injection": {
+        "tool": "inventory.check",
+        "mode": "timeout"
+      },
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 8,
+      "input_mode": "asr_transcript",
+      "customer_goal": "Hỏi lại về xe đẩy Joie Pact.",
+      "customer_turns": [
+        "Alo, chị gọi lại để hỏi về xe đẩy Joie Pact.",
+        "Hôm trước em bảo có hàng, giờ còn không hay là hết hàng rồi?",
+        "Chị thật sự muốn mua cái xe này nhưng nghe nói nó hết hàng thì sao?",
+        "Có dự kiến ngày nào có hàng lại không? Chị cần nhanh nhanh để đi chơi cuối tháng này.",
+        "Nếu có hàng thì chị sẽ chốt đơn ngay."
+      ],
+      "customer_turns_asr": [
+        "alo chi goi lai de hoi ve xe day joie pact",
+        "hom truoc em bao co hang gio con khong hay la het hang roi",
+        "chi that su muon mua cai xe nay nhung nghe noi no het hang thi sao",
+        "co du kien ngay nao co hang lai khong chi can nhanh nhanh de di choi cuoi thang nay",
+        "neu co hang thi chi se chot don ngay"
+      ],
+      "facts_established": {
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_stock",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 3490000,
+        "list_price_vnd": 3490000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": false,
+        "freeship": true,
+        "call_date": "2026-10-25"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-02",
+        "FAQ-12",
+        "FAQ-17",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

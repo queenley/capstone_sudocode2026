@@ -1,0 +1,65 @@
+{
+  "scenario_id": "SCN-ADV-0128",
+  "call": "call_2",
+  "input_mode": "text",
+  "source_sha256": "4eb14fb479502630e6553f387724cb376236add0dbf1f9ff7015a311f114d71d",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Em ơi, chị muốn hỏi về máy lọc không khí Xiaomi Smart 4 Lite, em cho chị biết giá với khuyến mãi có không?",
+      "spoken_text": "em ơi chị muốn hỏi về máy lọc không khí xi a mi smart bốn lai em cho chị biết giá với khuyến mãi có không",
+      "entities": {
+        "sku": "SKU-XM-4L"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Chị định mua cho phòng khoảng 35 mét vuông, nhà có trẻ nhỏ.",
+      "spoken_text": "chị định mua cho phòng khoảng ba mươi lăm mét vuông nhà có trẻ nhỏ",
+      "entities": {
+        "room_area_m2": 35,
+        "has_children": true
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Ngân sách của chị tầm 3 triệu rưỡi thôi.",
+      "spoken_text": "ngân sách của chị tầm ba triệu rưỡi thôi.",
+      "entities": {
+        "budget_vnd": 3500000
+      },
+      "reference_source": "rule",
+      "issues": [
+        "words_changed"
+      ]
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "Chị đang chờ cuối tháng nhận lương mới quyết định được.",
+      "spoken_text": "chị đang chờ cuối tháng nhận lương mới quyết định được",
+      "entities": {
+        "blocker": "cho luong"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 5,
+      "speaker": "C",
+      "text": "Chị sẽ gọi lại sau nhé.",
+      "spoken_text": "chị sẽ gọi lại sau nhé",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

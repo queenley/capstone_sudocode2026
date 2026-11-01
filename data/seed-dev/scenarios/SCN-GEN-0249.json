@@ -1,0 +1,158 @@
+{
+  "scenario_id": "SCN-GEN-0249",
+  "level": "M2",
+  "persona": "khach_mua_nhieu_mon",
+  "hard_case": "16_luot_4_san_pham_vuot_cod",
+  "customer_phone": "0975475177",
+  "customer_name": "Long",
+  "honorific": "anh",
+  "notes": "Persona khach_mua_nhieu_mon, biến thể bon_san_pham_vuot_cod. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt nhiều món → chot_don. Ca khó: 16_luot_4_san_pham_vuot_cod. call_1 ngày 01/11: Chủ nhật (LN-01: giờ 09:00–18:00, chỉ nhận đơn). Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-01",
+      "customer_goal": "Hỏi về máy lọc không khí AirPure Pro",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro cho phòng 15 mét vuông.",
+        "Nhà anh không có trẻ nhỏ nên không cần tính năng gì đặc biệt đâu.",
+        "Giá của máy này là bao nhiêu em nhỉ?",
+        "Có khuyến mãi gì không hay là giá cố định?",
+        "À, anh đang có ngân sách khoảng 9 triệu, nhưng mà...",
+        "Thực ra anh đang chờ cuối tháng nhận lương mới quyết định được.",
+        "Em có thể cho anh biết thêm thông tin không?",
+        "Thế thì anh sẽ gọi lại sau nhé."
+      ],
+      "facts_established": {
+        "blocker": "chờ cuối tháng nhận lương",
+        "budget_vnd": 9000000,
+        "has_children": false,
+        "room_area_m2": 15,
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 7990000,
+        "list_price_vnd": 7990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "call_date": "2026-11-01"
+      },
+      "memory_expectation": {
+        "blocker": "chờ cuối tháng nhận lương",
+        "budget_vnd": 9000000,
+        "has_children": false,
+        "room_area_m2": 15,
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 2,
+      "customer_goal": "Mua nhiều món cho nhà mới",
+      "customer_turns": [
+        "Alo, anh gọi lại để đặt hàng đây.",
+        "Hôm trước em tư vấn cho anh về máy lọc không khí AirPure Pro, anh muốn lấy một cái.",
+        "Ngoài ra, anh cũng muốn mua một nồi chiên không dầu Xiaomi 4.5L nữa.",
+        "Và cho anh thêm một quạt đứng Senko TS16 nhé.",
+        "À, đừng quên thêm màng lọc thay thế AirPure Pro cho anh nữa.",
+        "Tổng tiền cho tất cả những món này là bao nhiêu em?",
+        "Ngân sách của anh giờ chỉ còn 8 triệu rưỡi thôi.",
+        "Anh muốn trả tiền khi nhận hàng, có được không em?"
+      ],
+      "facts_established": {
+        "budget_vnd": 8500000,
+        "delivery_area": "Ninh Kiều, Cần Thơ",
+        "payment": "bank",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000,
+        "promo_code": "NAM-SHIP0",
+        "promo_expiry": "2026-11-05",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AP-PRO",
+          "price_vnd": 7990000
+        },
+        "also_ordered": [
+          "SKU-AF-XM",
+          "SKU-FAN-SEN",
+          "SKU-AP-FLT-P"
+        ],
+        "total_match_vnd": 11160000,
+        "must_say_any": [
+          "10 triệu",
+          "10.000.000",
+          "chuyển khoản"
+        ]
+      },
+      "ground_truth_facts": {
+        "promo_active": true,
+        "promo_NAM-SHIP0_active": true,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "price_vnd:SKU-AP-PRO": 7990000,
+        "price_vnd:SKU-AF-XM": 1590000,
+        "price_vnd:SKU-FAN-SEN": 590000,
+        "price_vnd:SKU-AP-FLT-P": 990000,
+        "delivery_days": 4,
+        "total_vnd": 11160000,
+        "cod_allowed": false,
+        "estimated_delivery": "2026-11-07",
+        "call_date": "2026-11-03"
+      },
+      "memory_expectation": {
+        "budget_vnd": 8500000,
+        "delivery_area": "Ninh Kiều, Cần Thơ",
+        "payment": "bank",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7990000,
+        "promo_code": "NAM-SHIP0",
+        "order_id": "OD600001",
+        "superseded": {
+          "budget_vnd": 9000000
+        }
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-03",
+        "VC-04",
+        "FAQ-19",
+        "KM-05",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

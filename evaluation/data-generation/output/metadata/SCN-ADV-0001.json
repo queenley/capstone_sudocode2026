@@ -1,0 +1,49 @@
+{
+  "scenario_id": "SCN-ADV-0001",
+  "persona_source": "advanced",
+  "customer_id": "C001",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "normal",
+  "tags": [
+    "cross_channel",
+    "hen_goi_lai",
+    "may_loc_khong_khi",
+    "not_sold",
+    "tu_lanh",
+    "tu_van",
+    "variant:khong_ban_roi_tu_van"
+  ],
+  "metric_focus": [
+    "TSR",
+    "HR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "not_sold",
+      "outcome_detail": "thong_tin",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "not_sold": "tủ lạnh Inverter khoảng 300 lít",
+        "alternative": "Máy lọc không khí AirPure X"
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_hoi_san_pham_khong_ban",
+      "patience_start": 3
+    },
+    "call_2": {
+      "kind": "consult",
+      "outcome_detail": "hen_goi_lai",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Máy lọc không khí AirPure X",
+        "price_vnd": 4890000,
+        "promo": "GIFT-FILTER",
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_hoi_san_pham_khong_ban",
+      "patience_start": 3
+    }
+  }
+}

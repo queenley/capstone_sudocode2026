@@ -1,0 +1,196 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_id": "PRODUCT-Manifest",
+  "run_id": "PRODUCT-80658e306ac7ffa1",
+  "level": "M2",
+  "fixture": false,
+  "purpose": "development",
+  "split": "development",
+  "created_at": "2026-10-15T09:00:00+07:00",
+  "round": 0,
+  "reference_date": "2026-10-15",
+  "timezone": "Asia/Ho_Chi_Minh",
+  "sources": [
+    {
+      "path": "fixtures/p1-scope.json",
+      "sha256": "1f28e93563d0805dc1f730da2c18e3e00d7c34cae0c557219e87d320a73cd377",
+      "pointer": ""
+    },
+    {
+      "path": "sources/btc/policy/playbook-telesale.md",
+      "sha256": "ca74b496676a1bf88c7d0caf36cfaada69c9f9003045c98055426f259a0fae0d",
+      "pointer": ""
+    },
+    {
+      "path": "sources/btc/schemas/tools.schema.json",
+      "sha256": "4cc8935e3e7f1a37b43eab0d68d85e8383037e52423e9f7cc022da916c97d4e0",
+      "pointer": ""
+    },
+    {
+      "path": "sources/btc/policy/faq.md",
+      "sha256": "1c9874be840123bf19c30f87d29ab0ededdfd1b1a50c6d7417d1acadea4f1f60",
+      "pointer": ""
+    },
+    {
+      "path": "expected-tools/full/SCN-GEN-0002/call_1.json",
+      "sha256": "5f03d6acde8b85edfd62c590d4e96849708e6dba29535bb7dae69a39b3fd72dc",
+      "pointer": ""
+    },
+    {
+      "path": "expected-tools/baseline_no_memory/SCN-GEN-0002/call_1.json",
+      "sha256": "b7300a60ad12c99d4fafccda9765b46d5406025d6d9ffed0c133b54ee1bbf596",
+      "pointer": ""
+    },
+    {
+      "path": "expected-tools/full/SCN-GEN-0002/call_2.json",
+      "sha256": "570c566a19e1dde19e09e040eb1a375bea771b52bd2d9b8d4cea63d99e02d057",
+      "pointer": ""
+    },
+    {
+      "path": "expected-tools/baseline_no_memory/SCN-GEN-0002/call_2.json",
+      "sha256": "b9cca6bdba2d9306478076481554a470bed063fc10ac818f0ab421471551384d",
+      "pointer": ""
+    },
+    {
+      "path": "adapter.json",
+      "sha256": "34ebdacf2e31e5d570d3a9c8c2ff918c5cf5441f15e6f194b86ffcc365240348",
+      "pointer": ""
+    },
+    {
+      "path": "product_adapter.py",
+      "sha256": "1007f0df6f6935d1a81d708a5b88af412b57543b491e7ecff278e92fa4134be9",
+      "pointer": ""
+    },
+    {
+      "path": "product-bundle.json",
+      "sha256": "22c68837b40b27688c39afc43b24d150abf62593c5eee35673f574d9875b8dfe",
+      "pointer": ""
+    },
+    {
+      "path": "metrics-policy.json",
+      "sha256": "237d8a0436435bfeeb8ae36ea4097c26858ce74c178f47e5866c008089c06e63",
+      "pointer": ""
+    },
+    {
+      "path": "conversion-report.json",
+      "sha256": "455e949381fe4258851743ba7cc0f57138eccf502f6f021840aa541ecd5658a2",
+      "pointer": ""
+    },
+    {
+      "path": "extractor-prompt.txt",
+      "sha256": "8d062d34021b3e506268ef16ff0ec941b0cd8f37779d521f849f6ba00fd66e71",
+      "pointer": ""
+    },
+    {
+      "path": "extract_command.py",
+      "sha256": "4bafd9f7cd0c5a01c4f79aac65c7fb5a584d0cf664b7020cad95dd9d24ea2fdc",
+      "pointer": ""
+    },
+    {
+      "path": "extractor.json",
+      "sha256": "659d6eb6a3e4375a5abdc51eaa2b8b6aa5695e44ca84b43891b5316e33b44871",
+      "pointer": ""
+    }
+  ],
+  "scenarios": [
+    {
+      "path": "scenarios/SCN-GEN-0002.json",
+      "sha256": "55095ab8e8d8f78afed83bea811e73530354d239e9c1735609b0cfbc4852f431",
+      "pointer": ""
+    }
+  ],
+  "grading_contracts": [
+    {
+      "path": "grading/SCN-GEN-0002.json",
+      "sha256": "847ab9bd3855cdc072e15b69345071f80558d5edece6fd5011d3802bc481faca",
+      "pointer": ""
+    }
+  ],
+  "suites": [
+    {
+      "id": "fixed_turn",
+      "applicable": true,
+      "reason": "Fixture conformance, not official run"
+    }
+  ],
+  "planned_calls": [
+    {
+      "config": "full",
+      "scenario_id": "SCN-GEN-0002",
+      "call": "call_1",
+      "expected_turns": 2,
+      "memory_required": false
+    },
+    {
+      "config": "full",
+      "scenario_id": "SCN-GEN-0002",
+      "call": "call_2",
+      "expected_turns": 2,
+      "memory_required": true
+    },
+    {
+      "config": "baseline_no_memory",
+      "scenario_id": "SCN-GEN-0002",
+      "call": "call_1",
+      "expected_turns": 2,
+      "memory_required": false
+    },
+    {
+      "config": "baseline_no_memory",
+      "scenario_id": "SCN-GEN-0002",
+      "call": "call_2",
+      "expected_turns": 2,
+      "memory_required": false
+    }
+  ],
+  "asr_ids": [],
+  "rag_ids": [],
+  "simulator_seeds": [],
+  "configuration": {
+    "model": "gpt-4.1-mini",
+    "parameters": {
+      "provider": "openai",
+      "temperature": 0.0,
+      "max_tokens": 2048,
+      "timeout": 60.0,
+      "max_retries": 0,
+      "retries": 0
+    },
+    "prompt": {
+      "path": "sources/btc/policy/playbook-telesale.md",
+      "sha256": "ca74b496676a1bf88c7d0caf36cfaada69c9f9003045c98055426f259a0fae0d",
+      "pointer": ""
+    },
+    "tools": {
+      "path": "sources/btc/schemas/tools.schema.json",
+      "sha256": "4cc8935e3e7f1a37b43eab0d68d85e8383037e52423e9f7cc022da916c97d4e0",
+      "pointer": ""
+    },
+    "kb": {
+      "path": "sources/btc/policy/faq.md",
+      "sha256": "1c9874be840123bf19c30f87d29ab0ededdfd1b1a50c6d7417d1acadea4f1f60",
+      "pointer": ""
+    },
+    "hardware": "local apps/ai-agent-service, agent_eval schema",
+    "extractor_version": "product-extractor-v2",
+    "judge_version": null
+  },
+  "timeouts_ms": {
+    "agent": 300000,
+    "tool": 30000,
+    "after_call": 300000,
+    "judge": 60000
+  },
+  "retry": {
+    "agent": 0,
+    "tool": 0,
+    "judge_format": 1
+  },
+  "state_namespaces": {
+    "full": "product/80658e306ac7ffa1/full",
+    "baseline_no_memory": "product/80658e306ac7ffa1/baseline_no_memory"
+  },
+  "warmup_count": 3,
+  "candidate_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "dispute_ids": []
+}

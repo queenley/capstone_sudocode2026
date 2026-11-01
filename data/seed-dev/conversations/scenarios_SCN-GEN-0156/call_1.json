@@ -1,0 +1,273 @@
+{
+  "conversation_id": "SCN-GEN-0156__call_1",
+  "scenario_id": "SCN-GEN-0156",
+  "call": "call_1",
+  "customer_id": "SYN-C015",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-31",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có hỏi về Máy hâm sữa Fatz, hôm nay em hỗ trợ anh về máy lọc không khí Xiaomi Smart 4 Lite đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Hôm nay em hỗ trợ anh về máy lọc không khí Xiaomi Smart 4 Lite đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về máy lọc không khí Xiaomi Smart 4 Lite mà em tư vấn hôm trước.",
+      "facts_stated": {
+        "product_advised": "SKU-XM-4L"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng ạ, máy lọc không khí Xiaomi Smart 4 Lite hiện bên em đang có hàng, giá là 2.990.000đ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "2990000",
+          "spoken": "2.990.000đ"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này có đủ cho diện tích phòng 40 mét vuông không em?",
+      "facts_stated": {
+        "room_area_m2": 40
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy Xiaomi Smart 4 Lite phù hợp cho phòng tối đa 43 mét vuông anh nhé, nên dùng cho phòng 40 mét vuông là vừa ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhà anh có trẻ nhỏ, ngân sách khoảng 3 triệu đồng thôi.",
+      "facts_stated": {
+        "has_children": true,
+        "budget_vnd": 3000000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "3000000",
+          "spoken": "3 triệu đồng"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy Xiaomi Smart 4 Lite phù hợp với gia đình có trẻ nhỏ, trong tầm giá 2.990.000đ nên nằm trong ngân sách của anh luôn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "2990000",
+          "spoken": "2.990.000đ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này đang có khuyến mãi gì không nhỉ? À mà anh cần hỏi vợ đã rồi hẹn lại em nhé, tối thứ Hai (2/11) tầm 7 giờ em gọi lại anh nhé.",
+      "facts_stated": {
+        "blocker": "cần hỏi vợ",
+        "decision_maker": "vợ"
+      },
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-11-02",
+          "spoken": "thứ Hai (2/11)"
+        },
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra thì hiện tại máy Xiaomi Smart 4 Lite chưa có chương trình khuyến mãi giảm giá, tuy nhiên giá đã tốt nhất là 2.990.000đ anh nhé. Em sẽ đặt lịch gọi lại cho anh vào 7 giờ tối thứ Hai, ngày 2/11 như anh dặn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2990000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0998000015",
+            "callback_at": "2026-11-02T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần hỏi vợ",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 3000000,
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "decision_maker",
+          "value": "vợ",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 40,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-XM-4L",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 2990000,
+          "op": "set",
+          "source": "call_1#turn8"
+        }
+      ],
+      "entities": [
+        {
+          "type": "money",
+          "value": "2990000",
+          "spoken": "2.990.000đ"
+        },
+        {
+          "type": "date",
+          "value": "2026-11-02",
+          "spoken": "ngày 2/11"
+        },
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ tối"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "cần hỏi người nhà",
+    "objection_handling": "Đặt lịch gọi lại đúng thời gian khách yêu cầu, nhắc lại giá hiện tại và kiểm tra khuyến mãi.",
+    "sentiment": "neutral",
+    "decision_maker": "vợ",
+    "commitments": [
+      {
+        "callback_at": "2026-11-02T19:00"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-11-02T19:00",
+      "note": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

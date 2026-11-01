@@ -5,6 +5,8 @@ agent is the scripted stand-in from ``conftest``.
 """
 
 from decimal import Decimal
+
+import pytest
 from datetime import timedelta
 from sqlalchemy import select
 from src.db.models import Handoff, ProfileFact, Outbox, Promotion, Proposal, SKU, now
@@ -317,6 +319,34 @@ def test_delete_revokes_access_and_memory(client):
     assert client.get(f"/api/conversations/{c}", headers=h).status_code == 404
     with client.app.state.database.sessions() as db:
         assert db.scalars(select(ProfileFact)).all() == []
+        # The AI agent keeps its own memory: the event names the conversations it must forget (QT-06).
+        event = db.scalar(select(Outbox).where(Outbox.event_type == "identity.customer.deleted"))
+        assert event.payload["conversation_ids"] == [str(c)]
+
+
+def test_the_worker_tells_the_agent_to_forget_and_retries_on_failure(monkeypatch):
+    from types import SimpleNamespace
+    from src.identity import deletion
+
+    sent = []
+    def post(url, *, content, headers, **options):
+        sent.append((url, headers, content))
+        return SimpleNamespace(raise_for_status=lambda: None, json=lambda: {"status": "deleted"})
+
+    monkeypatch.setenv("AI_AGENT_SERVICE_URL", "http://agent:8400")
+    monkeypatch.setattr(deletion.httpx, "post", post)
+    event = {"id": "synthetic-request", "payload": {"customer_id": "x", "conversation_ids": ["c-1"]}}
+    settings = SimpleNamespace(secret="synthetic-test-secret")
+    deletion.deliver(event, settings)
+    assert sent[0][0] == "http://agent:8400/internal/customer-deletions"
+    assert sent[0][1]["X-Deletion-Signature"] == deletion.signature(settings.secret, sent[0][2])
+    assert b"c-1" in sent[0][2]
+
+    def down(*args, **kwargs):
+        raise OSError("connection refused")
+    monkeypatch.setattr(deletion.httpx, "post", down)
+    with pytest.raises(OSError):
+        deletion.deliver(event, settings)
 
 
 def lines_body(client, lines, key="basket-0001", **extra):

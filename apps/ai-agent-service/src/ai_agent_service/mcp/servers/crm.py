@@ -55,6 +55,8 @@ async def order_create(
     promo_code: str | None = None,
     payment: Literal["COD", "bank", "momo", "zalopay"] = "COD",
     address: str | None = None,
+    basket_skus: list[str] | None = None,
+    order_group: str | None = None,
     customer_phone: str | None = None,
     on: str | None = None,
     idempotency_key: str | None = None,
@@ -62,11 +64,16 @@ async def order_create(
     turn_id: str | None = None,
     purchase_authorization: str | None = None,
 ) -> dict[str, Any]:
-    """Place an order once the customer has agreed to buy.
+    """Place one line of an order once the customer has agreed to buy.
 
-    price_vnd is the unit price after promotions, exactly the final_price_vnd
-    pricing_get_quote gave for this sku today; any other number is refused.
-    Cash on delivery (COD) is refused above 10.000.000đ in total.
+    Several products: one call per product, each with the others in
+    basket_skus. price_vnd is the unit price after promotions, exactly the
+    final_price_vnd pricing_get_quote gave for this sku today (with the same
+    basket_skus); any other number is refused. Cash on delivery (COD) is
+    refused when the order's total, every COD line of the call together, is
+    above 10.000.000đ: offer a bank transfer, or ask the customer whether to
+    split it into two orders, and only once they agree give each line its
+    order_group ("1" or "2"), each order at most 10.000.000đ.
 
     Args:
         sku: The product sku or variant_sku being bought.
@@ -77,6 +84,8 @@ async def order_create(
             Call Brief records; COD when neither says, read back so the customer
             can change it. Never a reason to wait with the order.
         address: The delivery address the customer gave; leave it out when none was given.
+        basket_skus: The other skus in the same order, as when quoting (the second purifier's AIR-2ND-50).
+        order_group: Only for an order split with the customer's agreement: which of the orders this line is in.
         customer_phone: Set by the system; leave it out.
         on: The day of the call. Set by the system; leave it out.
         idempotency_key: Set by the system; leave it out.
@@ -85,11 +94,13 @@ async def order_create(
         purchase_authorization: Signed consent supplied by the system; leave it out.
     """
     m = btc.mock()
+    # order_group is the team's own: the organisers' mock does not take it (the guard reads it, section 4.4).
     return await btc.call(
         "order.create", m.order_create, idempotency_key=idempotency_key,
-        call_id=call_id, turn_id=turn_id, purchase_authorization=purchase_authorization,
+        call_id=call_id, turn_id=turn_id, purchase_authorization=purchase_authorization, order_group=order_group,
         customer_phone=customer_phone, sku=sku, qty=qty, price_vnd=price_vnd,
         promo_code=promo_code, payment=payment, address=address, on=on or btc.reference_date(),
+        basket_skus=basket_skus or None,
     )
 
 
@@ -118,14 +129,18 @@ async def schedule_callback(
     )
 
 
-@server.tool(roles={"advisor"}, name="handoff_transfer")
+# The harness calls it too: in lane HANDOFF the model may be what is failing (route rule 1).
+@server.tool(roles={"advisor", "harness"}, name="handoff_transfer")
 async def handoff_transfer(brief: dict[str, Any], idempotency_key: str | None = None) -> dict[str, Any]:
     """Hand the call to a person, with a brief they can act on in ten seconds.
 
-    Use when the customer asks for a person, or the question is one that must
-    go to a person (medical questions), after first saying you do not have
-    that information. The system fills in the customer's phone, name, the
-    product and price already advised, and the time; write the rest.
+    Use when the customer asks for a person; asks for medical, medicine,
+    pregnancy, child-safety or legal advice; makes a serious complaint; or
+    asks what the documents and tools do not answer (escalation_reason
+    ngoai_pham_vi_tai_lieu): say you do not have that information first. Not
+    for a product question, even about a product for mothers and babies. The
+    system fills in the customer's phone, name, the product and price already
+    advised, and the time; write the rest.
 
     Args:
         brief: escalation_reason (cau_hoi_y_te, ngoai_pham_vi_tai_lieu,

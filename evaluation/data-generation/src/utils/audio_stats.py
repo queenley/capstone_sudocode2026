@@ -1,6 +1,6 @@
 """Analyse generated customer audio: volume, calls per customer, channel and noise.
 
-Source files: ``output/audio/scenarios_<id>/call_<n>/turn_<k>.wav`` plus the
+Source files: ``<seed>/audio/scenarios_<id>/call_<n>/turn_<k>.wav`` plus the
 adjacent ``turn_<k>.json`` written by ``synthesize_scenario_audio``. Customer and
 channel come from the scenario file (old-schema scenarios are read leniently).
 

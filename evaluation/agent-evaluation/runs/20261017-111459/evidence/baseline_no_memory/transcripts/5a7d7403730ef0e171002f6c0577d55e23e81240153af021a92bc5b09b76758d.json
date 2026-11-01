@@ -1,0 +1,81 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0021",
+    "call": "call_2",
+    "turn": 4
+  },
+  "customer_text": "Chị chờ xác nhận từ em nhé.",
+  "agent_text": "Dạ em đã chuyển yêu cầu của chị Mai đến bộ phận hỗ trợ rồi ạ, bên đó sẽ liên hệ và giúp chị xử lý sớm nhất. Chị cần hỗ trợ gì thêm không ạ? Dạ em kết nối anh/chị với đồng nghiệp phụ trách ngay ạ, anh/chị chờ em một chút.",
+  "customer_id": "C011",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0021/call_2/4/6",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0021",
+        "call": "call_2",
+        "turn": 4
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+          "pointer": "/730"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/baseline_no_memory/SCN-GEN-0021/call_2/4/6",
+      "request": {
+        "name": "handoff.transfer",
+        "args": {
+          "brief": {
+            "customer_phone": "0980737028",
+            "customer_name": "Mai",
+            "customer_id": "C011",
+            "channel": "hotline",
+            "product_advised": null,
+            "price_quoted_vnd": null,
+            "generated_at": "2026-10-20T10:00:00+07:00",
+            "escalation_reason": "khach_yeu_cau_gap_nguoi",
+            "escalation_reason_detail": "Khách yêu cầu xóa dữ liệu cá nhân, đã cung cấp số CCCD",
+            "conversation_summary": "Khách hàng là chị Mai muốn xóa dữ liệu cá nhân, đã cung cấp số CCCD để xác minh.",
+            "open_questions": [],
+            "next_action": "Hỗ trợ khách hàng xóa dữ liệu cá nhân theo quy trình."
+          }
+        }
+      },
+      "on": "2026-10-20",
+      "started_at": "2026-10-17T04:47:48.201430+00:00",
+      "finished_at": "2026-10-17T04:47:48.201430+00:00",
+      "outcome": "success",
+      "result": {
+        "ticket_id": "HT0001",
+        "status": "queued",
+        "brief_ok": true
+      },
+      "error": null,
+      "side_effect": true,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"brief\": {\"channel\": \"hotline\", \"conversation_summary\": \"Khách hàng là chị Mai muốn xóa dữ liệu cá nhân, đã cung cấp số CCCD để xác minh.\", \"customer_id\": \"C011\", \"customer_name\": \"Mai\", \"customer_phone\": \"0980737028\", \"escalation_reason\": \"khach_yeu_cau_gap_nguoi\", \"escalation_reason_detail\": \"Khách yêu cầu xóa dữ liệu cá nhân, đã cung cấp số CCCD\", \"generated_at\": \"2026-10-20T10:00:00+07:00\", \"next_action\": \"Hỗ trợ khách hàng xóa dữ liệu cá nhân theo quy trình.\", \"open_questions\": [], \"price_quoted_vnd\": null, \"product_advised\": null}}, \"name\": \"handoff.transfer\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/725"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "41e6bcb00e8bcb63a57ff6c077adb48924bfe96640ec50d48b2670b8c71a2718",
+      "pointer": "/731"
+    }
+  ]
+}

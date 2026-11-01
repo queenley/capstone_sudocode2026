@@ -1,0 +1,91 @@
+{
+  "context": {
+    "run_id": "PRODUCT-17d9ac458e9d0bdb",
+    "config": "full",
+    "scenario_id": "SCN-GEN-0020",
+    "call": "call_2",
+    "turn": 3
+  },
+  "customer_text": "Giá cả vẫn như hôm trước chứ em?",
+  "agent_text": "Dạ đúng rồi chị Linh, giá hôm nay vẫn giữ nguyên là 2 triệu 990 nghìn đồng như hôm trước ạ, còn được miễn phí ship khi thanh toán COD luôn ạ. Chị muốn em đặt hàng cho mình luôn ạ?",
+  "customer_id": "C019",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0020/call_2/3/12",
+      "run_id": "PRODUCT-17d9ac458e9d0bdb",
+      "context": {
+        "run_id": "PRODUCT-17d9ac458e9d0bdb",
+        "config": "full",
+        "scenario_id": "SCN-GEN-0020",
+        "call": "call_2",
+        "turn": 3
+      },
+      "evidence_refs": [
+        {
+          "path": "full/raw-records.json",
+          "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+          "pointer": "/714"
+        }
+      ],
+      "event_id": "PRODUCT-17d9ac458e9d0bdb/full/SCN-GEN-0020/call_2/3/12",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-XM-4L",
+          "on": "2026-10-20",
+          "customer_phone": "0905218549"
+        }
+      },
+      "on": "2026-10-20",
+      "started_at": "2026-10-17T04:29:39.211138+00:00",
+      "finished_at": "2026-10-17T04:29:39.212154+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-XM-4L",
+        "list_price_vnd": 2990000,
+        "final_price_vnd": 2990000,
+        "applied_promos": [
+          {
+            "promo_code": "COD-0",
+            "type": "freecod",
+            "discount_vnd": 0
+          }
+        ],
+        "expired_promos": [],
+        "ineligible_promos": [
+          {
+            "promo_code": "AIR-2ND-50",
+            "reason": "min_qty"
+          },
+          {
+            "promo_code": "NAM-SHIP0",
+            "reason": "region"
+          }
+        ],
+        "not_applied_exclusive": [],
+        "freeship": true,
+        "_internal_price_floor_vnd": 2691000
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"customer_phone\": \"0905218549\", \"on\": \"2026-10-20\", \"sku\": \"SKU-XM-4L\"}, \"name\": \"pricing.get_quote\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/710"
+    },
+    {
+      "path": "full/raw-records.json",
+      "sha256": "b9e6d25a6b0392df7caeea12df1a3bc88d15253a41788489ec685311b1da1ef3",
+      "pointer": "/715"
+    }
+  ]
+}

@@ -1,0 +1,140 @@
+{
+  "scenario_id": "SCN-GEN-0219",
+  "level": "M2",
+  "persona": "khach_co_don_chua_co_lich_su",
+  "hard_case": null,
+  "customer_phone": "0998000013",
+  "customer_name": "Phạm Minh Tuấn",
+  "honorific": "anh",
+  "notes": "Persona khach_co_don_chua_co_lich_su, biến thể chuan. call_1 (hotline): hỏi tình trạng đơn → cap_nhat_don; call_2 (hotline): đổi địa chỉ giao → cap_nhat_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-11-14",
+      "customer_goal": "Hỏi tình trạng đơn hàng của nồi chiên không dầu Philips",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về tình trạng đơn hàng nồi chiên không dầu Philips mà anh đã đặt.",
+        "Đơn hàng có mã OD901302, anh thấy vẫn đang giao.",
+        "Mấy hôm nay không thấy cập nhật gì cả, không biết có vấn đề gì không nhỉ?",
+        "Nếu có gì trục trặc thì thông báo cho anh sớm nhé."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C013",
+          "session_id": "SYN-013-S1",
+          "date": "2026-05-10",
+          "channel": "hotline",
+          "summary": "Mua Nồi chiên không dầu Lock&Lock 4L giá 1.890.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C013",
+          "session_id": "SYN-013-S2",
+          "date": "2026-10-03",
+          "channel": "zalo_oa",
+          "summary": "Đặt Nồi chiên không dầu Philips 6.2L giá 3.990.000đ, đơn OD901302 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C013",
+          "order_id": "OD901301",
+          "date": "2026-05-10",
+          "sku": "SKU-AF-4L",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AF-4L"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C013",
+          "order_id": "OD901302",
+          "date": "2026-10-03",
+          "sku": "SKU-AF-6L",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901302"
+          }
+        }
+      ],
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.status",
+        "args_match": {
+          "order_id": "OD901302"
+        },
+        "must_say_any": [
+          "đang giao",
+          "đang vận chuyển",
+          "đã bàn giao"
+        ]
+      },
+      "ground_truth_facts": {
+        "order_id": "OD901302",
+        "order_status": "shipping",
+        "tracking": "VN0132TRK",
+        "call_date": "2026-11-14"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    },
+    "call_2": {
+      "days_later": 1,
+      "customer_goal": "Đổi địa chỉ giao hàng cho đơn hàng đang xử lý",
+      "customer_turns": [
+        "Alo, anh muốn đổi địa chỉ giao hàng cho đơn hàng nồi chiên không dầu.",
+        "Địa chỉ mới là Cầu Giấy, Hà Nội, anh mong nhân viên cập nhật giúp.",
+        "Hôm qua anh có gọi hỏi tình trạng đơn hàng rồi, giờ muốn đổi địa chỉ thôi.",
+        "Mong là không có vấn đề gì phát sinh với đơn hàng này nhé."
+      ],
+      "facts_established": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.update",
+        "args_match": {
+          "order_id": "OD901302",
+          "action": "update_address"
+        }
+      },
+      "ground_truth_facts": {
+        "order_id": "OD901302",
+        "order_status": "shipping",
+        "tracking": "VN0132TRK",
+        "call_date": "2026-11-15"
+      },
+      "memory_expectation": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "relevant_policy_ids": [
+        "VC-06",
+        "PB-01"
+      ],
+      "expected_outcome": "cap_nhat_don"
+    }
+  }
+}

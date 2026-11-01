@@ -1,0 +1,209 @@
+{
+  "conversation_id": "SCN-ADV-0107__call_1",
+  "scenario_id": "SCN-ADV-0107",
+  "call": "call_1",
+  "customer_id": "C004",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-23",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_hoi_gio_hang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, em nhận được tin nhắn của anh về giỏ hàng gồm máy lọc không khí AirPure Y và AirPure Mini trên website. Em sẵn sàng hỗ trợ anh tính tổng tiền và thông tin chi tiết ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh nhắn tin hỏi về giỏ hàng trên website, có máy lọc không khí AirPure Y và Mini.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng anh, em kiểm tra giỏ hàng gồm 2 sản phẩm: máy lọc không khí AirPure Y và AirPure Mini. Anh cần hỏi tổng tiền cho cả hai đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh cần hỏi tổng tiền cho cả hai đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cho anh hỏi tổng tiền là bao nhiêu với hai món này?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, tổng tiền cho hai sản phẩm là 6.295.000 đồng ạ. Cụ thể, máy lọc không khí AirPure Y có giá 5.200.000 đồng và AirPure Mini là 1.095.000 đồng. Giá này đã áp dụng khuyến mãi thanh toán khi nhận hàng và chương trình mua kèm giảm giá cho AirPure Mini.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-AP-Y",
+          "value": 5200000
+        },
+        {
+          "field": "price_vnd:SKU-AP-MINI",
+          "value": 1095000
+        },
+        {
+          "field": "total_vnd",
+          "value": 6295000
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "pricing.get_quote",
+          "args": {
+            "sku": "SKU-AP-Y",
+            "on": "2026-10-23",
+            "customer_phone": "0952059972",
+            "basket_skus": [
+              "SKU-AP-MINI"
+            ]
+          }
+        },
+        {
+          "name": "pricing.get_quote",
+          "args": {
+            "sku": "SKU-AP-MINI",
+            "on": "2026-10-23",
+            "customer_phone": "0952059972",
+            "basket_skus": [
+              "SKU-AP-Y"
+            ]
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có khuyến mãi nào khi mua cùng không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện đơn hàng này đã áp dụng đầy đủ các khuyến mãi hiện tại anh nhé. Khi mua cùng lúc hai sản phẩm, AirPure Mini được giảm 50% giá, từ 2.190.000 đồng còn 1.095.000 đồng. Ngoài ra, anh được miễn phí vận chuyển toàn quốc và miễn phí thu hộ khi nhận hàng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Phí giao hàng thì thế nào nhỉ? Anh chưa chắc chắn, cần suy nghĩ thêm.",
+      "facts_stated": {
+        "blocker": "cần suy nghĩ thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, đơn hàng của anh được miễn phí giao hàng toàn quốc anh nhé. Anh cứ suy nghĩ thêm, khi nào cần đặt hàng hoặc cần tư vấn, anh nhắn lại cho shop bất cứ lúc nào ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thôi được, hẹn em gọi lại nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em ghi nhận anh cần suy nghĩ thêm. Khi nào anh quyết định, em sẽ hỗ trợ đặt hàng nhanh chóng và giữ giá ưu đãi cho anh ạ. Em cảm ơn anh đã quan tâm sản phẩm của shop BTC!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm",
+          "op": "set",
+          "source": "call_1#turn10"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "scenario_id": "SCN-GEN-0186",
+  "persona_source": "btc",
+  "customer_id": "C018",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "difficulty": "hard",
+  "tags": [
+    "cập_nhật_thông_tin",
+    "date:ordinary",
+    "hard_case",
+    "kiểm_tra_trạng_thái",
+    "order_status",
+    "supersede",
+    "tư_vấn",
+    "variant:ba_phien_doi_thong_tin",
+    "đặt_hàng"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "consult",
+      "outcome_detail": "hen_goi_lai",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Giày sneaker Urban Classic size 42 den",
+        "price_vnd": 890000,
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 4
+    },
+    "call_2": {
+      "kind": "order",
+      "outcome_detail": "chot_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Giày sneaker Urban Classic size 42 den",
+        "price_vnd": 890000,
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 3
+    },
+    "call_3": {
+      "kind": "order_status",
+      "outcome_detail": "cap_nhat_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "order_status": "created"
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_cap_nhat_thong_tin",
+      "patience_start": 2
+    }
+  }
+}

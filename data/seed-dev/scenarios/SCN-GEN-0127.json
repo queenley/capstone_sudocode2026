@@ -1,0 +1,127 @@
+{
+  "scenario_id": "SCN-GEN-0127",
+  "level": "M2",
+  "persona": "khach_da_kenh_fb_hotline",
+  "hard_case": "teencode_da_kenh",
+  "customer_phone": "0930048764",
+  "customer_name": "Hà",
+  "honorific": "chị",
+  "notes": "Persona khach_da_kenh_fb_hotline, biến thể chuan. call_1 (chat_fanpage): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Ca khó: teencode_da_kenh. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.c029",
+      "call_date": "2026-10-29",
+      "input_mode": "chat_teencode",
+      "customer_goal": "Hỏi về nồi chiên không dầu cho gia đình.",
+      "customer_turns": [
+        "Alo em ơi, chị muốn hỏi về nồi chiên không dầu Philips 6.2L.",
+        "Chị định mua cho gia đình, ngân sách khoảng 4 triệu rưỡi.",
+        "Nồi này có khuyến mãi gì không em?",
+        "Chị muốn gọi hotline hỏi thêm một số thông tin nữa, hẹn em lần sau nhé."
+      ],
+      "customer_turns_asr": [
+        "alo em oi chi muon hoi ve noi chien khong dau philips 62l",
+        "chi dinh mua cho gia dinh ngan sach khoang 4 trieu rưỡi",
+        "noi nay co khuyen mai gi khong em",
+        "chi muon goi hotline hoi them mot so thong tin nua hen em lan sau nhe"
+      ],
+      "facts_established": {
+        "usage_need": "dùng cho gia đình",
+        "budget_vnd": 4500000,
+        "phone_provided": true,
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "product_advised": "SKU-AF-6L",
+        "price_quoted_vnd": 3990000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 3990000,
+        "list_price_vnd": 3990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-29"
+      },
+      "memory_expectation": {
+        "usage_need": "dùng cho gia đình",
+        "budget_vnd": 4500000,
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "product_advised": "SKU-AF-6L",
+        "price_quoted_vnd": 3990000
+      },
+      "relevant_policy_ids": [
+        "SP-AF-01",
+        "FAQ-07"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 2,
+      "customer_goal": "Xác nhận mua nồi chiên không dầu.",
+      "customer_turns": [
+        "Chào em, chị muốn đặt nồi chiên không dầu Philips 6.2L.",
+        "Chị sẽ thanh toán qua ngân hàng.",
+        "Giao hàng cho chị ở quận Long Biên, Hà Nội nhé.",
+        "Chốt đơn cho chị luôn em nhé."
+      ],
+      "facts_established": {
+        "payment": "bank",
+        "delivery_area": "Long Biên, Hà Nội",
+        "product_advised": "SKU-AF-6L",
+        "price_quoted_vnd": 3990000,
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "phone_provided",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AF-6L",
+          "price_vnd": 3990000,
+          "payment": "bank"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 3990000,
+        "list_price_vnd": 3990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-11-03",
+        "call_date": "2026-10-31"
+      },
+      "memory_expectation": {
+        "payment": "bank",
+        "delivery_area": "Long Biên, Hà Nội",
+        "product_advised": "SKU-AF-6L",
+        "price_quoted_vnd": 3990000,
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

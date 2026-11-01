@@ -1,0 +1,291 @@
+{
+  "conversation_id": "SCN-GEN-0120__call_2",
+  "scenario_id": "SCN-GEN-0120",
+  "call": "call_2",
+  "customer_id": "C036",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-03",
+  "region": "nam",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_cap_nhat_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Phương ạ, hôm trước chị có quan tâm nồi chiên không dầu Lock&Lock 4L, còn để bàn với gia đình. Em có thể hỗ trợ chị tiếp tục đặt đơn nhé!",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "promo_NAM-SHIP0_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo em ơi, chị đổi ý rồi, chị muốn mua nồi chiên không dầu Lock&Lock 4L.",
+      "facts_stated": {
+        "product_advised": "SKU-AF-4L"
+      },
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng chị, nồi chiên không dầu Lock&Lock 4L hiện bên em còn hàng, giá 1.890.000đ, đang áp dụng miễn phí vận chuyển toàn quốc cho đơn này. Chị đã chọn đúng sản phẩm, em xin xác nhận lại với chị nhé!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "promo_NAM-SHIP0_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ngân sách giờ chị là 2 triệu 300 nghìn nhé.",
+      "facts_stated": {
+        "budget_vnd": 2300000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "2300000",
+          "spoken": "2 triệu 300 nghìn"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ ngân sách mình như vậy là thoải mái rồi chị ạ, giá sản phẩm chỉ 1.890.000đ và đã bao gồm freeship. Mình muốn thanh toán chuyển khoản và giao tại Thủ Đức, TP.HCM đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Mình muốn thanh toán chuyển khoản và giao tại Thủ Đức, TP.HCM đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "freeship",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán là chuyển khoản, còn khu vực giao hàng là Thủ Đức, TP.HCM.",
+      "facts_stated": {
+        "payment": "bank",
+        "delivery_area": "Thủ Đức, TP.HCM"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã xác nhận. Để em tổng kết lại đơn: 1 nồi chiên không dầu Lock&Lock 4L, giá 1.890.000đ, freeship, giao tại Thủ Đức, TP.HCM, thanh toán chuyển khoản. Dự kiến nhận hàng ngày 05/11. Chị xác nhận giúp em các thông tin trên đúng chưa ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Chị xác nhận giúp em: 1 nồi chiên không dầu Lock&Lock 4L, giá 1.890.000đ, freeship, giao tại Thủ Đức, TP.HCM, thanh toán chuyển khoản, nhận hàng dự kiến ngày 05/11 – đúng chưa ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-05"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Thủ Đức, TP.HCM",
+            "on": "2026-11-03"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chốt đơn cho chị nhé!",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã tạo đơn thành công cho chị. Nồi chiên sẽ được giao đến Thủ Đức, TP.HCM dự kiến ngày 05/11. Chị chuyển khoản theo thông tin shop gửi qua Zalo hoặc SMS, bên em sẽ xác nhận và giao hàng sớm nhất ạ. Em cảm ơn chị đã đặt hàng tại shop!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-05"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0949066882",
+            "sku": "SKU-AF-4L",
+            "qty": 1,
+            "price_vnd": 1890000,
+            "payment": "bank",
+            "address": "Thủ Đức, TP.HCM",
+            "on": "2026-11-03"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Thủ Đức, TP.HCM",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 2300000,
+          "op": "supersede",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AF-4L",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1890000,
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "promo_code",
+          "value": "NAM-SHIP0",
+          "op": "set",
+          "source": "call_2#turn9"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "budget_vnd",
+        "old_value": 2000000,
+        "new_value": 2300000
+      }
+    ],
+    "callback": null,
+    "order": {
+      "sku": "SKU-AF-4L",
+      "qty": 1,
+      "price_vnd": 1890000,
+      "payment": "bank",
+      "address": "Thủ Đức, TP.HCM",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-11-05"
+    }
+  }
+}

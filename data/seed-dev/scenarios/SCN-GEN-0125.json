@@ -1,0 +1,115 @@
+{
+  "scenario_id": "SCN-GEN-0125",
+  "level": "M1",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "hard_case": null,
+  "customer_phone": "0979511174",
+  "customer_name": "Hiền",
+  "honorific": "chị",
+  "notes": "Persona khach_hoi_nhieu_khong_mua, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): hỏi thêm rồi từ chối → tu_choi. Chấm chủ yếu: CCR, RQR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-30",
+      "customer_goal": "Hỏi về máy tiệt trùng sấy khô Moaz Bebe",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về máy tiệt trùng sấy khô Moaz Bebe.",
+        "Giá của máy này là bao nhiêu em nhỉ?",
+        "Máy này có khuyến mãi gì không?",
+        "Chị có ngân sách khoảng 2 triệu rưỡi thôi.",
+        "Chị đang phân vân, muốn so sánh thêm với các sản phẩm khác.",
+        "Ừ, vậy chị sẽ suy nghĩ thêm rồi gọi lại nhé."
+      ],
+      "facts_established": {
+        "child_age_months": 3,
+        "budget_vnd": 2500000,
+        "blocker": "muốn so sánh thêm",
+        "product_advised": "SKU-MB-STER",
+        "price_quoted_vnd": 1890000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1890000,
+        "list_price_vnd": 1890000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-30"
+      },
+      "memory_expectation": {
+        "child_age_months": 3,
+        "budget_vnd": 2500000,
+        "blocker": "muốn so sánh thêm",
+        "product_advised": "SKU-MB-STER",
+        "price_quoted_vnd": 1890000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-03",
+        "PB-11"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 4,
+      "customer_goal": "Từ chối mua máy tiệt trùng sấy khô",
+      "customer_turns": [
+        "Alo, chị gọi lại để hỏi thêm về máy tiệt trùng.",
+        "Máy tiệt trùng sấy khô Moaz Bebe giá 1 triệu 890 nghìn đúng không?",
+        "Chị thấy giá này vẫn hơi cao so với những gì chị tìm hiểu.",
+        "Chị cảm ơn em, nhưng chắc chị không mua nữa đâu."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-MB-STER",
+        "price_quoted_vnd": 1890000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "max_agent_questions": 4
+      },
+      "ground_truth_facts": {
+        "price_vnd": 1890000,
+        "list_price_vnd": 1890000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-11-03"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-MB-STER",
+        "price_quoted_vnd": 1890000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-03",
+        "PB-01",
+        "PB-11"
+      ],
+      "expected_outcome": "tu_choi"
+    }
+  }
+}

@@ -1,0 +1,160 @@
+{
+  "conversation_id": "SCN-GEN-0062__call_2",
+  "scenario_id": "SCN-GEN-0062",
+  "call": "call_2",
+  "customer_id": "SYN-C005",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-18",
+  "region": "trung",
+  "category": "me-be",
+  "persona": "khach_ngoai_pham_vi_chuyen_may",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Nguyễn Văn E, hôm trước anh có quan tâm Xe đẩy 2 chiều Combi Sugocal, còn chờ cuối tháng nhận lương. Em là trợ lý ảo của shop, anh cần hỗ trợ về sản phẩm nào ạ?",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em ơi, anh có một câu hỏi về an toàn của sản phẩm này.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận anh quan tâm đến vấn đề an toàn của xe đẩy Combi Sugocal. Anh muốn hỏi cụ thể về tính năng nào hay có băn khoăn gì về sức khỏe của bé khi sử dụng sản phẩm không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh muốn hỏi cụ thể về tính năng nào hay có băn khoăn gì về sức khỏe của bé khi sử dụng sản phẩm không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị gái anh đang cho bé dùng thuốc, liệu có dùng xe đẩy này được không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với các câu hỏi về y tế hoặc liên quan đến sức khỏe bé khi dùng xe đẩy, em xin phép chuyển máy cho nhân viên phụ trách để hỗ trợ anh chính xác nhất ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "handoff.transfer",
+          "args": {
+            "brief": {
+              "customer_phone": "0998000005",
+              "customer_name": "Nguyễn Văn E",
+              "escalation_reason": "cau_hoi_y_te",
+              "conversation_summary": "Khách hỏi Xe đẩy 2 chiều Combi Sugocal, có câu hỏi y tế/an toàn cần chuyên môn.",
+              "product_advised": "SKU-MB-STR2",
+              "price_quoted_vnd": 6790000,
+              "open_questions": [
+                "câu hỏi y tế của khách"
+              ],
+              "next_action": "Dược sĩ/nhân viên phụ trách gọi lại tư vấn",
+              "generated_at": "2026-10-18T10:00:00+07:00",
+              "channel": "hotline"
+            }
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh rất lo lắng về ảnh hưởng đến sức khỏe của bé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu anh rất quan tâm đến sức khỏe của bé. Nhân viên chuyên môn sẽ liên hệ lại để tư vấn kỹ hơn cho anh trong thời gian sớm nhất ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu không được thì anh không mua đâu.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_human",
+      "text": "Dạ chào anh Nguyễn Văn E, em là nhân viên chăm sóc khách hàng của shop. Em đã nhận được câu hỏi về an toàn xe đẩy cho bé và sẽ hỗ trợ anh cụ thể ngay bây giờ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_y_te",
+    "outcome": "chuyen_may",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

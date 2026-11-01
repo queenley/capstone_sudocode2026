@@ -1,0 +1,173 @@
+{
+  "conversation_id": "SCN-GEN-0141__call_2",
+  "scenario_id": "SCN-GEN-0141",
+  "call": "call_2",
+  "customer_id": "SYN-C003",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-21",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Lê Văn C ạ, hôm trước anh có quan tâm Giày trekking HikePro size 41 màu đen, còn muốn so sánh thêm. Em là trợ lý ảo của shop, anh muốn mình tiếp tục tư vấn về sản phẩm này hay có câu hỏi gì thêm không ạ?",
+      "questions": [],
+      "facts_used": [
+        "size",
+        "blocker",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh gọi lại để hỏi thêm về giày trekking.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm Giày trekking HikePro size 41 màu đen bên em hiện còn hàng, giá 1.990.000đ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh nghĩ kỹ rồi và không muốn mua nữa, cảm ơn em nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em ghi nhận anh chưa có nhu cầu mua Giày trekking HikePro. Nếu thời gian tới mình cần tư vấn lại hoặc có chương trình mới về sản phẩm này, bên em sẽ thông báo cho anh nhé. Cảm ơn anh đã quan tâm ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá có vẻ cao hơn so với những gì anh tìm hiểu.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ. Giá bên em là giá niêm yết chính hãng 1.990.000đ, đảm bảo hàng mới nguyên hộp, đầy đủ bảo hành và đổi trả theo chính sách của shop. Khi nào anh cần hỗ trợ thêm, anh cứ liên hệ lại cho bên em nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh sẽ tìm thêm lựa chọn khác, hẹn gặp lại em sau.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã liên hệ với shop. Chúc anh sớm tìm được đôi giày ưng ý, hẹn gặp lại anh vào dịp khác ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-TRK",
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1990000,
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-TRK-41-DEN",
+          "op": "set",
+          "source": "call_2#turn0"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_choi_mua_giay_trekking",
+    "outcome": "tu_choi",
+    "objection_type": "gia_cao_so_voi_tham_khao",
+    "objection_handling": "Nhấn mạnh giá chính hãng, bảo hành và đổi trả đầy đủ.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

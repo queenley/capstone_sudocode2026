@@ -264,8 +264,7 @@ class ToolGuardMiddleware(AgentMiddleware):
             args["on"] = on
         phone = getattr(context, "customer_phone", None)
         if (name == "crm_get_customer" and phone and "phone" in accepted
-                and getattr(context, "tier", None) == "VERIFIED"
-                and getattr(context, "lane", None) == "ORDER_SERVICE"):
+                and getattr(context, "tier", None) == "VERIFIED"):
             # Order lookup stays on the verified caller, never a model-supplied identity.
             args = {"phone": phone}
         if "customer_phone" in accepted and name != "crm_get_customer":

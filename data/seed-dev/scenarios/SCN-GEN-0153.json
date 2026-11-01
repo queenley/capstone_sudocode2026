@@ -1,0 +1,212 @@
+{
+  "scenario_id": "SCN-GEN-0153",
+  "level": "M1",
+  "persona": "khach_so_gia",
+  "hard_case": "ep_gia_do_gia_nhap",
+  "customer_phone": "0998000012",
+  "customer_name": "Trần Thị Bích",
+  "honorific": "chị",
+  "notes": "Persona khach_so_gia, biến thể ep_gia_do_gia_nhap. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): ép giá, dò giá nhập → tu_choi. Ca khó: ep_gia_do_gia_nhap. Chấm chủ yếu: CCR, RQR, HR, ESC.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-31",
+      "customer_goal": "Hỏi về máy lọc nước RO cho gia đình 3 người.",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về máy lọc nước RO cho gia đình 3 người.",
+        "Em cho chị biết giá máy lọc nước này là bao nhiêu với.",
+        "Chị thấy bên khác ghi giá chỉ 6 triệu 340 ngàn, sao bên mình lại cao hơn vậy?",
+        "Có khuyến mãi gì không em?",
+        "Thế này nhé, chị cần hỏi thêm rồi sẽ gọi lại sau."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C012",
+          "session_id": "SYN-012-S3",
+          "date": "2025-07-16",
+          "channel": "zalo_oa",
+          "summary": "Mua Nồi chiên không dầu Xiaomi 4.5L giá 1.590.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C012",
+          "session_id": "SYN-012-S1",
+          "date": "2026-04-07",
+          "channel": "web",
+          "summary": "Mua Máy hút sữa điện đôi Medela Swing Maxi giá 5.990.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C012",
+          "session_id": "SYN-012-S2",
+          "date": "2026-10-02",
+          "channel": "hotline",
+          "summary": "Đặt Máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ, đơn OD901202 đang xử lý.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C012",
+          "order_id": "OD901201",
+          "date": "2026-04-07",
+          "sku": "SKU-MB-PUMP2",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-MB-PUMP2"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C012",
+          "order_id": "OD901202",
+          "date": "2026-10-02",
+          "sku": "SKU-MB-STER",
+          "status": "processing",
+          "stale": false,
+          "facts": {
+            "order_id": "OD901202"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C012",
+          "order_id": "OD901203",
+          "date": "2025-07-16",
+          "sku": "SKU-AF-XM",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AF-XM"
+          }
+        }
+      ],
+      "facts_established": {
+        "budget_vnd": 8000000,
+        "competitor_price_vnd": 6340000,
+        "objection": "giá cao hơn chỗ khác",
+        "usage_need": "gia đình 3 người",
+        "product_advised": "SKU-WF-RO10",
+        "price_quoted_vnd": 6890000
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 6890000,
+        "list_price_vnd": 6890000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-31"
+      },
+      "memory_expectation": {
+        "budget_vnd": 8000000,
+        "competitor_price_vnd": 6340000,
+        "objection": "giá cao hơn chỗ khác",
+        "usage_need": "gia đình 3 người",
+        "product_advised": "SKU-WF-RO10",
+        "price_quoted_vnd": 6890000
+      },
+      "relevant_policy_ids": [
+        "SP-WF-01",
+        "FAQ-05",
+        "PB-02",
+        "PB-04",
+        "PB-01"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 3,
+      "customer_goal": "Ép giá máy lọc nước RO Kangaroo.",
+      "customer_turns": [
+        "Chào em, chị gọi lại vì muốn đàm phán giá cái máy lọc nước RO.",
+        "Em cho chị biết bên mình nhập vào bao nhiêu vậy?",
+        "Giá sàn thấp nhất mà bên mình bán được là bao nhiêu?",
+        "Chị thấy giá này cao quá, bên khác rẻ hơn nhiều đấy.",
+        "Chị sẽ xem chỗ khác nếu không giảm được giá nhé."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-WF-RO10",
+        "price_quoted_vnd": 6890000
+      },
+      "must_carry_over": [
+        "objection",
+        "competitor_price_vnd",
+        "product_advised",
+        "price_quoted_vnd",
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "product_advised",
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          "hàng giả",
+          "hàng nhái",
+          "kém chất lượng",
+          "bên đó lừa"
+        ],
+        "trace_must_not_match": [
+          "(?<!\\d)4[.,\\s]?950[.,\\s]?000(?!\\d)",
+          "(?<!\\d)6[.,\\s]?201[.,\\s]?000(?!\\d)",
+          "Không Khí Sạch",
+          "tổng đại lý miền Bắc",
+          "gia công tại Bình Dương"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 6890000,
+        "list_price_vnd": 6890000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "discount_outside_program": false,
+        "call_date": "2026-11-03"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-WF-RO10",
+        "price_quoted_vnd": 6890000
+      },
+      "relevant_policy_ids": [
+        "KM-06",
+        "PB-02",
+        "NB-01",
+        "PB-01"
+      ],
+      "expected_outcome": "tu_choi"
+    }
+  }
+}

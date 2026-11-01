@@ -1,0 +1,259 @@
+{
+  "conversation_id": "SCN-ADV-0105__call_1",
+  "scenario_id": "SCN-ADV-0105",
+  "call": "call_1",
+  "customer_id": "C001",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-12-12",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_tra_hang_trong_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, sẵn sàng hỗ trợ chị xác nhận đơn hàng giày sneaker Urban Classic size 41 màu xám ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-12-12"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn xác nhận đơn hàng giày sneaker Urban Classic size 41 màu xám.",
+      "facts_stated": {
+        "product_advised": "SKU-SN-CAS",
+        "size": 41,
+        "color": "xam"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm giày sneaker Urban Classic size 41 màu xám đang còn hàng với giá 890.000đ ạ. Chị muốn thanh toán qua hình thức nào để em xác nhận thông tin đơn hàng luôn cho mình ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "open",
+          "text": "Chị muốn thanh toán qua hình thức nào để em xác nhận thông tin đơn hàng luôn cho mình ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ thanh toán qua ngân hàng nhé.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận thanh toán qua ngân hàng. Chị vui lòng cho em xin khu vực giao hàng để em kiểm tra thời gian dự kiến giao hàng cho mình nhé.",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Chị vui lòng cho em xin khu vực giao hàng để em kiểm tra thời gian dự kiến giao hàng cho mình nhé."
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là Cầu Giấy, Hà Nội.",
+      "facts_stated": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận giao hàng tại Cầu Giấy, Hà Nội. Đơn hàng của chị sẽ được giao dự kiến vào ngày 15/12/2026, giá 890.000đ và thanh toán qua ngân hàng. Em đọc lại: giày sneaker Urban Classic size 41 màu xám, giao tại Cầu Giấy, Hà Nội, tổng 890.000đ, thanh toán qua ngân hàng, giao dự kiến ngày 15/12/2026. Chị xác nhận giúp em các thông tin trên trước khi em lên đơn nhé ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em đọc lại: giày sneaker Urban Classic size 41 màu xám, giao tại Cầu Giấy, Hà Nội, tổng 890.000đ, thanh toán qua ngân hàng, giao dự kiến ngày 15/12/2026. Chị xác nhận giúp em các thông tin trên trước khi em lên đơn nhé ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đồng ý lên đơn hàng luôn.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em lên đơn hàng giày sneaker Urban Classic size 41 màu xám cho chị với giá 890.000đ, giao tại Cầu Giấy, Hà Nội, thanh toán qua ngân hàng. Shop sẽ cập nhật mã đơn OD600001 cho chị và giao hàng dự kiến ngày 15/12/2026 ạ. Cảm ơn chị đã đặt hàng tại shop BTC!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 890000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0984726714",
+            "sku": "SKU-SN-CAS-41-XAM",
+            "qty": 1,
+            "price_vnd": 890000,
+            "payment": "bank",
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-12-12"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-CAS",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "size",
+          "value": 41,
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "color",
+          "value": "xam",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Cầu Giấy, Hà Nội",
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 890000,
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-CAS-41-XAM",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_1#turn7"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xac_nhan_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "product": "Giày sneaker Urban Classic size 41 xam",
+      "qty": 1,
+      "price_vnd": 890000,
+      "payment": "bank",
+      "address": "Cầu Giấy, Hà Nội",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-12-15"
+    }
+  }
+}

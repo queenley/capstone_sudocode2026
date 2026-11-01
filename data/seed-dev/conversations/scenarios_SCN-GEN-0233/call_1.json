@@ -1,0 +1,249 @@
+{
+  "conversation_id": "SCN-GEN-0233__call_1",
+  "scenario_id": "SCN-GEN-0233",
+  "call": "call_1",
+  "customer_id": "SYN-C014",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-13",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_mua_nhieu_mon",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Lê Thị Hoa, hôm trước chị có quan tâm Giày chạy bộ RunLite 2 Pro; hôm nay em là trợ lý ảo của shop, chị cần hỗ trợ về sản phẩm nào ạ?",
+      "questions": [],
+      "facts_used": [
+        "owned_sku",
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về máy lọc không khí AirPure Pro em ơi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị quan tâm đến máy lọc không khí AirPure Pro ạ. Chị cần dùng cho diện tích phòng khoảng bao nhiêu mét vuông để em tư vấn đúng nhu cầu của mình nhé?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "open",
+          "text": "Chị cần dùng cho diện tích phòng khoảng bao nhiêu mét vuông để em tư vấn đúng nhu cầu của mình nhé?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-AP-PRO"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đang cần cho phòng khoảng 30 mét vuông, có bé nhỏ ở nhà.",
+      "facts_stated": {
+        "room_area_m2": 30,
+        "has_children": true
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy lọc không khí AirPure Pro phù hợp cho phòng tới 45 mét vuông, rất tốt cho phòng 30 mét vuông và nhà có bé nhỏ vì có khóa trẻ em và lọc bụi mịn hiệu quả. Chị quan tâm mức ngân sách nào để em báo giá chi tiết ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Chị quan tâm mức ngân sách nào để em báo giá chi tiết ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mình có ngân sách 9 triệu, không biết máy này giá bao nhiêu nhỉ?",
+      "facts_stated": {
+        "budget_vnd": 9000000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "9000000",
+          "spoken": "9 triệu"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy lọc không khí AirPure Pro bên em giá là 7.990.000đ, hiện đang sẵn hàng chị nhé. Giá này đã được cập nhật mới nhất và chưa có chương trình khuyến mãi thêm ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "7990000",
+          "spoken": "7.990.000đ"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần bàn với gia đình đã, nên hẹn tối mai tầm 7 giờ em gọi lại cho chị nhé.",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ, em sẽ hẹn gọi lại cho chị vào 7 giờ tối ngày mai để hỗ trợ thêm thông tin nếu chị cần nhé. Em sẽ lưu lại ghi chú chị muốn bàn với gia đình trước khi quyết định ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-11-14T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0998000014",
+            "callback_at": "2026-11-14T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 9000000,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 30,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7990000,
+          "op": "set",
+          "source": "call_1#turn7"
+        }
+      ],
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_ban_gia_dinh",
+    "objection_handling": "Đã xác nhận lý do cần hỏi ý kiến gia đình, hẹn gọi lại đúng khung giờ khách yêu cầu và lưu chú thích blocker.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "commitment": "hen_goi_lai_19h_2026-11-14"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-11-14T19:00",
+      "note": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "scenario_id": "SCN-ADV-0067",
+  "persona_source": "advanced",
+  "customer_id": "C043",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "hard",
+  "tags": [
+    "compare",
+    "cross_channel",
+    "date:promo_last_day",
+    "hard_case",
+    "long_call",
+    "variant:so_sanh_may_loc"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "compare",
+      "outcome_detail": "hen_goi_lai",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Máy lọc không khí AirPure Y",
+        "price_vnd": 5200000,
+        "promo": "GIFT-FILTER",
+        "in_stock": true,
+        "items": [
+          "Máy lọc không khí AirPure Y: 5.200.000đ",
+          "Máy lọc không khí AirPure X: 4.890.000đ",
+          "Máy lọc không khí Samsung AX40: 6.490.000đ"
+        ]
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_can_tu_van_nhieu",
+      "patience_start": 4
+    },
+    "call_2": {
+      "kind": "order",
+      "outcome_detail": "chot_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Máy lọc không khí AirPure Y",
+        "price_vnd": 5200000,
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_can_tu_van_nhieu",
+      "patience_start": 3
+    }
+  }
+}

@@ -1,0 +1,211 @@
+{
+  "context": {
+    "run_id": "PRODUCT-80658e306ac7ffa1",
+    "config": "baseline_no_memory",
+    "scenario_id": "SCN-GEN-0002",
+    "call": "call_1",
+    "turn": 1
+  },
+  "customer_text": "Chị muốn đặt hàng máy hút sữa điện đôi Spectra S1.",
+  "agent_text": "Máy hút sữa điện đôi Spectra S1 bên em đang có giá 4 triệu 290 nghìn đồng, được miễn phí vận chuyển và miễn phí thu hộ ạ. Chị muốn đặt bao nhiêu máy ạ?",
+  "customer_id": "C032",
+  "consultant_texts": [],
+  "tools": [
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/1/1",
+      "run_id": "PRODUCT-80658e306ac7ffa1",
+      "context": {
+        "run_id": "PRODUCT-80658e306ac7ffa1",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0002",
+        "call": "call_1",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "3fb5790ead96a1540fc4d6b7ff9b23baa5b6504c1c0eec54d92838404bc02e16",
+          "pointer": "/7"
+        }
+      ],
+      "event_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/1/1",
+      "request": {
+        "name": "crm.get_customer",
+        "args": {
+          "phone": "0965384535"
+        }
+      },
+      "on": "2026-10-15",
+      "started_at": "2026-10-17T02:41:47.878655+00:00",
+      "finished_at": "2026-10-17T02:41:47.878655+00:00",
+      "outcome": "success",
+      "result": {
+        "found": true,
+        "ambiguous": false,
+        "customer_id": "C032",
+        "name": "Tâm",
+        "honorific": "chị",
+        "phone": "0965384535",
+        "identities": {
+          "zalo_id": null,
+          "fb_id": null
+        },
+        "orders": [
+          {
+            "order_id": "OD301177",
+            "sku": "SKU-MB-PUMP1",
+            "price_vnd": 4290000,
+            "date": "2026-10-03",
+            "status": "shipping",
+            "tracking": "GHN7781234"
+          }
+        ],
+        "sessions": []
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/1/2",
+      "run_id": "PRODUCT-80658e306ac7ffa1",
+      "context": {
+        "run_id": "PRODUCT-80658e306ac7ffa1",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0002",
+        "call": "call_1",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "3fb5790ead96a1540fc4d6b7ff9b23baa5b6504c1c0eec54d92838404bc02e16",
+          "pointer": "/14"
+        }
+      ],
+      "event_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/1/2",
+      "request": {
+        "name": "catalog.search",
+        "args": {
+          "query": "Spectra S1"
+        }
+      },
+      "on": "2026-10-15",
+      "started_at": "2026-10-17T02:41:53.712266+00:00",
+      "finished_at": "2026-10-17T02:41:53.712266+00:00",
+      "outcome": "success",
+      "result": {
+        "items": [
+          {
+            "sku": "SKU-MB-PUMP1",
+            "name": "Máy hút sữa điện đôi Spectra S1",
+            "category": "me-be",
+            "list_price_vnd": 4290000,
+            "attributes": {
+              "warranty_months": 12
+            },
+            "variants": []
+          },
+          {
+            "sku": "SKU-BDL-MOM",
+            "name": "Combo Spectra S1 + máy hâm sữa Fatz + 50 túi trữ sữa",
+            "category": "me-be",
+            "list_price_vnd": 4790000,
+            "attributes": {
+              "bundle_of": [
+                "SKU-MB-PUMP1",
+                "SKU-MB-MON",
+                "SKU-MB-BAG"
+              ],
+              "saving_vnd": 109000,
+              "warranty_months": 12
+            },
+            "variants": []
+          }
+        ],
+        "total": 2
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    },
+    {
+      "schema_version": "1.0.0",
+      "artifact_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/1/3",
+      "run_id": "PRODUCT-80658e306ac7ffa1",
+      "context": {
+        "run_id": "PRODUCT-80658e306ac7ffa1",
+        "config": "baseline_no_memory",
+        "scenario_id": "SCN-GEN-0002",
+        "call": "call_1",
+        "turn": 1
+      },
+      "evidence_refs": [
+        {
+          "path": "baseline_no_memory/raw-records.json",
+          "sha256": "3fb5790ead96a1540fc4d6b7ff9b23baa5b6504c1c0eec54d92838404bc02e16",
+          "pointer": "/17"
+        }
+      ],
+      "event_id": "PRODUCT-80658e306ac7ffa1/baseline_no_memory/SCN-GEN-0002/call_1/1/3",
+      "request": {
+        "name": "pricing.get_quote",
+        "args": {
+          "sku": "SKU-MB-PUMP1",
+          "on": "2026-10-15",
+          "customer_phone": "0965384535"
+        }
+      },
+      "on": "2026-10-15",
+      "started_at": "2026-10-17T02:41:54.993738+00:00",
+      "finished_at": "2026-10-17T02:41:54.993738+00:00",
+      "outcome": "success",
+      "result": {
+        "sku": "SKU-MB-PUMP1",
+        "list_price_vnd": 4290000,
+        "final_price_vnd": 4290000,
+        "applied_promos": [
+          {
+            "promo_code": "MOM-FREESHIP",
+            "type": "freeship",
+            "discount_vnd": 0
+          },
+          {
+            "promo_code": "COD-0",
+            "type": "freecod",
+            "discount_vnd": 0
+          }
+        ],
+        "expired_promos": [
+          "PUMP-GIFT"
+        ],
+        "ineligible_promos": [],
+        "not_applied_exclusive": [],
+        "freeship": true,
+        "_internal_price_floor_vnd": 3946800
+      },
+      "error": null,
+      "side_effect": false,
+      "attempt": 1
+    }
+  ],
+  "tool_texts": [
+    "{\"args\": {\"phone\": \"0965384535\"}, \"name\": \"crm.get_customer\"}",
+    "{\"args\": {\"query\": \"Spectra S1\"}, \"name\": \"catalog.search\"}",
+    "{\"args\": {\"customer_phone\": \"0965384535\", \"on\": \"2026-10-15\", \"sku\": \"SKU-MB-PUMP1\"}, \"name\": \"pricing.get_quote\"}"
+  ],
+  "evidence_refs": [
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "3fb5790ead96a1540fc4d6b7ff9b23baa5b6504c1c0eec54d92838404bc02e16",
+      "pointer": "/10"
+    },
+    {
+      "path": "baseline_no_memory/raw-records.json",
+      "sha256": "3fb5790ead96a1540fc4d6b7ff9b23baa5b6504c1c0eec54d92838404bc02e16",
+      "pointer": "/18"
+    }
+  ]
+}
