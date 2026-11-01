@@ -86,6 +86,8 @@ def test_http_option_reaches_shared_recognizer_and_default_stays_off(dn, monkeyp
     from fastapi.testclient import TestClient
     monkeypatch.setattr(main, 'API_KEY', '')
     monkeypatch.setattr(dn, 'metadata', lambda name: {'name': name})
+    loaded = []
+    monkeypatch.setattr(engines, 'load', lambda model: loaded.append(model) or 0)
     seen = []
     def recognize(model, samples, words, *, denoiser):
         seen.append((model, denoiser))
@@ -106,6 +108,25 @@ def test_http_option_reaches_shared_recognizer_and_default_stays_off(dn, monkeyp
         frame = ws.receive_json()
         if frame['type'] == 'partial': frame = ws.receive_json()
         assert frame['preprocessing']['name'] == 'rnnoise'
+    assert loaded == ['zipformer-30m']
+
+
+def test_websocket_rejects_missing_weights_before_accepting_audio(dn, monkeypatch):
+    from asr_service import main, engines
+    from fastapi.testclient import TestClient
+    from starlette.websockets import WebSocketDisconnect
+    monkeypatch.setattr(main, 'API_KEY', '')
+    def missing(model):
+        raise FileNotFoundError('private-model-path')
+    monkeypatch.setattr(engines, 'load', missing)
+    monkeypatch.setattr(dn, 'metadata', lambda _: pytest.fail('weights must be ready first'))
+    with TestClient(main.app).websocket_connect('/v1/stream') as ws:
+        ws.send_json({'denoiser': 'rnnoise'})
+        frame = ws.receive_json()
+        assert frame['type'] == 'error' and 'private-model-path' not in frame['text']
+        with pytest.raises(WebSocketDisconnect) as closed:
+            ws.receive_json()
+        assert closed.value.code == 4400
 
 
 @pytest.mark.parametrize('preprocessing,denoise_seconds,decoder_seconds', [
