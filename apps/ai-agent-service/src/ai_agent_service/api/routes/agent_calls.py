@@ -68,7 +68,15 @@ class SuggestionFeedback(BaseModel):
     reason: str | None = Field(default=None, max_length=300)
 
 
-class FaqEntry(BaseModel):
+class ForgetRequest(BaseModel):
+    """The conversations of a customer who deleted their data (``identity.customer.deleted``)."""
+
+    conversation_ids: list[str] = Field(default_factory=list, max_length=5000)
+
+
+class GapEntry(BaseModel):
+    """A Knowledge Gap Loop entry: the question the agent could not answer, and the consultant's answer."""
+
     question: str = Field(min_length=3, max_length=500)
     answer: str = Field(min_length=3, max_length=2000)
 
@@ -175,9 +183,20 @@ async def suggestion_feedback(call_id: int, body: SuggestionFeedback, request: R
         raise _http(error) from error
 
 
-@router.post("/calls/{call_id}/faq")
-async def save_faq(call_id: int, body: FaqEntry, request: Request) -> dict[str, Any]:
+@router.post("/calls/{call_id}/knowledge-gap")
+async def save_gap_entry(call_id: int, body: GapEntry, request: Request) -> dict[str, Any]:
+    """Knowledge Gap Loop: save the consultant's answer; it waits for approval on the developer page."""
     try:
-        return await calls.save_faq(call_id, actor=_actor(request), question=body.question, answer=body.answer)
+        return await calls.save_gap_entry(call_id, actor=_actor(request), question=body.question, answer=body.answer)
+    except CallError as error:
+        raise _http(error) from error
+
+
+@router.post("/customers/forget")
+async def forget_customer(body: ForgetRequest, request: Request) -> dict[str, Any]:
+    """Policy QT-06: the platform deleted a customer's data; the agent forgets them too. Admin only."""
+    staff(request, {"admin"})
+    try:
+        return await calls.forget_conversations(body.conversation_ids)
     except CallError as error:
         raise _http(error) from error

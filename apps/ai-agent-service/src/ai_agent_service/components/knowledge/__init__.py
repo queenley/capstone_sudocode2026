@@ -1,7 +1,7 @@
 """The knowledge base. ``docs/design.md`` section 7.
 
 - :mod:`.corpus`: the chunks: the organisers' policy sections and the team's
-  approved FAQ and playbook entries, each with its validity window, its
+  approved Knowledge Gap Loop and playbook entries, each with its validity window, its
   restriction, its industry and the changelog entries that explain it;
 - :mod:`.lexical`: BM25 over syllables and syllable pairs, with and without
   accents;

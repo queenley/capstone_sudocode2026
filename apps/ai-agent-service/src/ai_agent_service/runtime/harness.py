@@ -367,7 +367,7 @@ class CallStore:
             "guard": state.get("guard") or {}, "blocked_drafts": state.get("blocked_drafts") or [],
             "regenerations": state.get("regen_count") or 0,
             "call_brief_latency_ms": state.get("call_brief_latency_ms"),
-            "handoff": state.get("handoff") if (state.get("handoff") or {}).get("status") == "pending" else None,
+            "handoff": state.get("handoff") if (state.get("handoff") or {}).get("status") in ("pending", "accepted") else None,
             "turn_no": state.get("turn_no"),
         }
 
@@ -394,9 +394,11 @@ class CallStore:
             "brief = %(brief)s, brief_object = %(brief_object)s, warnings = %(warnings)s, "
             "route_reason = %(route_reason)s, mode = %(mode)s, "
             "suggestion = CASE WHEN %(copilot)s THEN %(suggestion)s ELSE suggestion END, "
-            "handoff_status = CASE WHEN %(handoff)s AND handoff_status IS NULL THEN 'pending' ELSE handoff_status END, "
+            "accepted_by = CASE WHEN %(handoff)s AND handoff_status IS NULL THEN %(accepted_by)s ELSE accepted_by END, "
+            "accepted_at = CASE WHEN %(handoff)s AND %(auto)s AND handoff_status IS NULL THEN now() ELSE accepted_at END, "
             "handoff_reason = CASE WHEN %(handoff)s AND handoff_status IS NULL THEN %(reason)s ELSE handoff_reason END, "
             "handoff_requested_at = CASE WHEN %(handoff)s AND handoff_status IS NULL THEN now() ELSE handoff_requested_at END, "
+            "handoff_status = CASE WHEN %(handoff)s AND handoff_status IS NULL THEN %(handoff_status)s ELSE handoff_status END, "
             "handoff_brief = CASE WHEN %(handoff)s THEN %(handoff_brief)s ELSE handoff_brief END "
             "WHERE id = %(id)s",
             {
@@ -413,7 +415,11 @@ class CallStore:
                 "mode": state.get("mode") or "speak",
                 "copilot": state.get("mode") == "copilot",
                 "suggestion": json.dumps(state.get("suggestion"), ensure_ascii=False) if state.get("suggestion") else None,
-                "handoff": handoff.get("status") == "pending",
+                "handoff": handoff.get("status") in ("pending", "accepted"),
+                # "accepted" only with HANDOFF_AUTO_ACCEPT (test runs): no consultant took it.
+                "handoff_status": handoff.get("status"),
+                "accepted_by": handoff.get("accepted_by"),
+                "auto": bool(handoff.get("accepted_by")),
                 "reason": _reason_label(handoff.get("reason")),
                 # Tokenised like the transcript: the brief carries the phone.
                 "handoff_brief": json.dumps(pii.tokenise_data(handoff.get("brief"), self.vault), ensure_ascii=False, default=str)

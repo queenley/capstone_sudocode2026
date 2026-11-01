@@ -191,9 +191,12 @@ def forget(request: Request):
             select(CustomerAccess).where(CustomerAccess.customer_id == customer_id)
         ):
             access.revoked_at = now()
+        # The AI agent keeps its own memory of these conversations; the event names them so it can forget too.
+        conversation_ids = []
         for conv in db.scalars(
             select(Conversation).where(Conversation.customer_id == customer_id)
         ):
+            conversation_ids.append(str(conv.id))
             db.execute(delete(Challenge).where(Challenge.conversation_id == conv.id))
             for msg in db.scalars(
                 select(Message).where(Message.conversation_id == conv.id)
@@ -230,7 +233,7 @@ def forget(request: Request):
             Outbox(
                 event_type="identity.customer.deleted",
                 aggregate_id=customer.id,
-                payload={"customer_id": str(customer.id)},
+                payload={"customer_id": str(customer.id), "conversation_ids": conversation_ids},
             )
         )
         db.commit()

@@ -1,10 +1,14 @@
 # Which tools the advisor may call in each lane. docs/design.md section 4.3.
 #
 # A lane is one configuration of the AdvisorAgent: its instruction lives with
-# the advisor's prompts, its tools here. `route` picks the lane by rules; the
-# advisor is offered exactly these tools and no others. A lane with no tools
-# is a real answer: CLARIFY and CONFIRM_IDENTITY bind nothing, so "the agent
-# called no tool" is mechanically true.
+# the advisor's prompts, its tools here. `route` picks the lane by rules on a
+# state the code knows (failures, recognition, identity, a brief), never on a
+# guess at what the customer is talking about: CONTINUITY and NEW carry every
+# business tool and the advisor picks what the turn needs. A lane with no
+# tools is a real answer: CLARIFY and CONFIRM_IDENTITY bind nothing, so "the
+# agent called no tool" is mechanically true. HANDOFF has no entry: the
+# harness itself transfers the call there, without a model
+# (pipeline/hot/nodes.py, _transfer).
 #
 # The knowledge base is not a tool of any lane: load_context retrieves the
 # turn's passages before the advisor runs (section 4.2), which saves a model
@@ -14,23 +18,9 @@
 # underscore (inventory.check -> inventory_check); src/mcp/client.py turns
 # them back for the trace.
 lanes:
-  HANDOFF:
-    - handoff_transfer
   CLARIFY: []
   CONFIRM_IDENTITY: []
-  ORDER_SERVICE:
-    - account_orders
-    - account_cart
-    - account_profile
-    - order_status
-    - order_update
-    - delivery_estimate
-    - crm_get_customer
-    - handoff_transfer
-    - memory_request_deletion
-  OUT_OF_SCOPE:
-    - handoff_transfer
-  CONTINUITY: &sales
+  CONTINUITY: &business
     - account_cart
     - account_orders
     - account_profile
@@ -39,11 +29,13 @@ lanes:
     - pricing_get_quote
     - delivery_estimate
     - order_create
-    # The order this call just created is corrected in the same lane: the
-    # address or payment the customer adds after it (an order a second time
-    # is refused before it runs, components/guardrails/actions.py).
+    # An order the customer has (order_status, or crm_get_customer when no
+    # code was given) and the change they ask on it (order_update): a change
+    # is never a new order (rule 20 of config/prompts/agent/advisor/rules.md).
+    - order_status
+    - crm_get_customer
     - order_update
     - schedule_callback
     - handoff_transfer
     - memory_request_deletion
-  NEW: *sales
+  NEW: *business

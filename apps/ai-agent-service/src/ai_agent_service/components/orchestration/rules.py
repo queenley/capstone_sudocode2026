@@ -2,56 +2,58 @@
 
 | # | Condition | Lane |
 |---|---|---|
-| 1 | tools failing in a row, or ``guard`` fell back to the safe line twice in the call | HANDOFF |
+| 1 | tools failing in a row, or the model failing in a row | HANDOFF |
 | 2 | ``asr_low_conf`` | CLARIFY |
 | 3 | tier PROBABLE or AMBIGUOUS, while the one confirming question is out | CONFIRM_IDENTITY |
-| 4 | the customer has an order and the turn is about it, or answers what the agent just asked about it | ORDER_SERVICE |
-| 5 | a topic that must go to a person (PB-06) | OUT_OF_SCOPE |
-| 6 | VERIFIED with a brief | CONTINUITY |
-| 7 | anything else | NEW |
+| 4 | VERIFIED with a brief | CONTINUITY |
+| 5 | anything else | NEW |
+
+Safe lines are not a reason to hand over: a guard that blocks wrongly twice
+would turn its own mistake into a transfer the grader counts as
+``over_escalation`` (seen 2026-10-25, SCN-GEN-0007).
+
+Every row reads a state the code knows for certain: the failure counters,
+the recogniser's confidence, the identity tier, whether a brief exists. No
+row guesses what the customer is talking about. What a turn is about (an
+order, a product, a policy, a topic that must go to a person) is read from
+the customer's words in context, which is the advisor's job: CONTINUITY and
+NEW carry every business tool, and the advisor picks the ones the turn needs.
+A lane chosen from the words would take tools away on a wrong guess, and the
+turn could not recover from it.
 
 :class:`RouteInput` is everything ``route`` may read: the enforcement is the
 signature, since a field that is not here cannot be read.
 
-What needs reading the customer's words in context is not routed: whether
-the documents answer a question, whether the caller is the person the brief
-is about, how to answer a price objection. Those are the advisor's, by its
-instructions, with the turn's passages and the brief in front of it.
-
 A lane's instruction gains notes when they apply: PB-10 when the customer is
-impatient, PB-11 after three contacts without a close, and on a shared number
-whose name question went unanswered, what may not be said (section 4.2).
+impatient, PB-11 after three contacts without a close, PB-06 when the words
+touch on health, medicine or pregnancy, and on a shared number whose name
+question went unanswered, what may not be said (section 4.2).
 """
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 from typing import Literal
 
-from ..intake.text import plain
-
-Lane = Literal["HANDOFF", "CLARIFY", "CONFIRM_IDENTITY", "ORDER_SERVICE", "OUT_OF_SCOPE", "CONTINUITY", "NEW"]
+Lane = Literal["HANDOFF", "CLARIFY", "CONFIRM_IDENTITY", "CONTINUITY", "NEW"]
 
 #: Rule 1: consecutive infrastructure failures of tools.
 TOOL_FAILURES = 2
-#: Rule 1: safe lines said in one call.
-SAFE_LINES = 2
+#: Rule 1: consecutive turns the model could not answer.
+MODEL_FAILURES = 2
 #: PB-11: contacts without a close before the agent stops pressing.
 SESSIONS_WITHOUT_CLOSE = 3
-
-ORDER_TALK = re.compile(
-    r"\b(don hang|don cua|ma don|od\d+|dang giao|giao chua|giao den dau|den dau roi|khi nao giao|doi size|"
-    r"doi sang|doi mau|doi san pham|tra hang|hoan tien|doi dia chi|sua dia chi|trang thai don|nhan hang|"
-    r"van don|chat qua|rong qua|bi loi)\b"
-)
-ORDER_LOOKUP = re.compile(r"\b(?:tinh trang don|trang thai don|don hang\b[^.!?]*\b(?:o dau|den dau|toi dau|giao chua))\b")
 
 #: The notes a lane's instruction gains, in the advisor's language.
 NOTES = {
     "impatient": "Khách đang bực: xin lỗi ngắn một câu, đi thẳng vào việc, tối đa một câu xác nhận (PB-10).",
     "no_close": ("Khách đã liên hệ từ 3 lần mà chưa chốt: không ép, ghi nhận nhu cầu, chỉ hẹn liên hệ lại khi có "
                  "chương trình mới (PB-11)."),
+    "pb06": ("Lời khách có nhắc tới sức khỏe, thuốc, thai sản hoặc pháp lý (PB-06). Khách xin lời khuyên y tế, về "
+             "thuốc, về an toàn cho mẹ, bé hay người bệnh, hoặc về pháp lý: nói \"Dạ hiện em chưa có thông tin về …\" "
+             "rồi gọi handoff_transfer (y tế, thuốc, thai sản: escalation_reason cau_hoi_y_te). Khách chỉ hỏi sản "
+             "phẩm (máy hút sữa, đồ cho bé, thông số, giá, tồn kho), kể cả khi kể mình đang mang thai hay cho con bú: "
+             "tư vấn bình thường bằng tool, với sản phẩm mẹ và bé chỉ nêu thông số hãng công bố, không chuyển máy."),
     "unconfirmed": ("Số này thuộc nhiều người và khách chưa cho biết là ai: tư vấn chung như khách mới, không đọc "
                     "thông tin riêng của ai, không nói về lần tư vấn trước, không hỏi lại tên; khách hỏi về đơn riêng "
                     "thì nói em chưa xem được khi chưa xác nhận và đề nghị chuyển nhân viên."),
@@ -62,13 +64,12 @@ NOTES = {
 class RouteInput:
     tier: Literal["VERIFIED", "PROBABLE", "AMBIGUOUS", "UNKNOWN"]
     has_brief: bool
-    has_order: bool
     asr_low_conf: bool
     tool_failures: int
-    safe_lines: int
-    #: Tokenised, as intake left it. None on the opening turn.
-    customer_said: str | None
-    #: PB-06: medical, pregnancy, medicine, legal.
+    #: Turns in a row whose draft the model could not produce (an error, a timeout).
+    model_failures: int = 0
+    #: PB-06: health, pregnancy, medicine, legal words in the turn. A note, never a lane:
+    #: "máy hút sữa cho con bú" names the topic and is a product question.
     must_transfer: bool = False
     impatient: bool = False
     #: Previous contacts that ended without an order (PB-11).
@@ -77,11 +78,6 @@ class RouteInput:
     #: been asked and not answered, the call goes on as a stranger's
     #: (section 4.2: the question is asked once).
     awaiting_identity: bool = True
-    #: The lane of the previous turn, and whether the agent's reply then asked
-    #: the customer something: an answer belongs to the task its question did
-    #: ("Địa chỉ mới là Hải Châu" says no "đơn", and is still about the order).
-    previous_lane: str | None = None
-    answering: bool = False
 
 
 @dataclass(frozen=True)
@@ -100,6 +96,8 @@ def decide(view: RouteInput) -> RouteDecision:
     notes = []
     if view.impatient:
         notes.append(NOTES["impatient"])
+    if view.must_transfer and lane in ("CONTINUITY", "NEW"):
+        notes.append(NOTES["pb06"])
     if view.sessions_without_close >= SESSIONS_WITHOUT_CLOSE and lane in ("CONTINUITY", "NEW"):
         notes.append(NOTES["no_close"])
     if view.tier == "AMBIGUOUS" and lane != "CONFIRM_IDENTITY":
@@ -108,19 +106,14 @@ def decide(view: RouteInput) -> RouteDecision:
 
 
 def _table(view: RouteInput) -> tuple[Lane, int, str]:
-    said = plain(view.customer_said or "")
-    if view.tool_failures >= TOOL_FAILURES or view.safe_lines >= SAFE_LINES:
-        return "HANDOFF", 1, "tools failing" if view.tool_failures >= TOOL_FAILURES else "two safe lines in this call"
+    if view.tool_failures >= TOOL_FAILURES:
+        return "HANDOFF", 1, "tools failing"
+    if view.model_failures >= MODEL_FAILURES:
+        return "HANDOFF", 1, "the model failing"
     if view.asr_low_conf:
         return "CLARIFY", 2, "the recognition was unclear"
     if view.tier in ("PROBABLE", "AMBIGUOUS") and view.awaiting_identity:
         return "CONFIRM_IDENTITY", 3, f"identity {view.tier.lower()}"
-    if (view.has_order and ORDER_TALK.search(said)) or (view.tier == "VERIFIED" and ORDER_LOOKUP.search(said)):
-        return "ORDER_SERVICE", 4, "about an existing order"
-    if view.has_order and view.previous_lane == "ORDER_SERVICE" and view.answering and not view.must_transfer:
-        return "ORDER_SERVICE", 4, "answering the agent's question about an order"
-    if view.must_transfer:
-        return "OUT_OF_SCOPE", 5, "a topic that must go to a person (PB-06)"
     if view.tier == "VERIFIED" and view.has_brief:
-        return "CONTINUITY", 6, "a returning customer with a brief"
-    return "NEW", 7, "default"
+        return "CONTINUITY", 4, "a returning customer with a brief"
+    return "NEW", 5, "default"

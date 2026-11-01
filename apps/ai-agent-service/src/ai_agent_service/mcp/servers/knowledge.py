@@ -3,12 +3,15 @@
 One knowledge base, three sources (``components.knowledge``):
 
 - the organisers' policy corpus, ``policy/*.md``, one chunk per section;
-- the approved FAQ and playbook entries of the version ``config/knowledge.yaml``
+- the approved Knowledge Gap Loop and playbook entries of the version ``config/knowledge.yaml``
   names, ``data/kb/v<N>.jsonl``, copied into ``kb_chunks`` at startup with
   scope ``release`` (section 7.5), so rolling back is pointing at another
   file and restarting;
-- entries a consultant saved during a demo (``kb_upsert``), scope ``demo``:
-  in the database only, never exported, never counted as an improvement.
+- entries of the Knowledge Gap Loop a consultant saved from the console
+  (``kb_upsert``), scope ``demo``: in the database only, never exported, never
+  counted as an improvement, and **not served until a person approves them**
+  (``kb_review``, after the gate of section 10.2, ``components.improvement.gap``).
+  ``kb_pending`` lists what waits.
 
 ``kb_search`` is the harness's (``load_context`` searches every customer
 turn, section 4.2) and the admin's; the advisor never calls it, it reads the
@@ -36,6 +39,7 @@ from psycopg.rows import dict_row
 from ...components import knowledge
 from ...components.knowledge import corpus
 from ...components.knowledge.search import Hit, KnowledgeBase, Result
+from ...components.improvement import gap
 from ...config.config_manager import get_knowledge_config, kb_dir
 from ..server_base import SCHEMA_LOCK, Server, ToolFailure, apply_schema, current_role, database
 
@@ -46,7 +50,7 @@ server = Server("knowledge")
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS kb_chunks (
     chunk_id    TEXT PRIMARY KEY,
-    source      TEXT NOT NULL CHECK (source IN ('faq', 'playbook')),
+    source      TEXT NOT NULL CHECK (source IN ('gap', 'playbook')),
     title       TEXT NOT NULL,
     text        TEXT NOT NULL,
     situation   TEXT,
@@ -59,6 +63,13 @@ CREATE TABLE IF NOT EXISTS kb_chunks (
 ALTER TABLE kb_chunks ADD COLUMN IF NOT EXISTS scope TEXT NOT NULL DEFAULT 'demo';
 ALTER TABLE kb_chunks ADD COLUMN IF NOT EXISTS persona TEXT;
 ALTER TABLE kb_chunks ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
+-- A console entry is served only once a person approved it (section 10.2); a release entry always is.
+ALTER TABLE kb_chunks ADD COLUMN IF NOT EXISTS approved_by TEXT;
+ALTER TABLE kb_chunks ADD COLUMN IF NOT EXISTS approved_at TIMESTAMPTZ;
+-- The Knowledge Gap Loop's entries were called 'faq' until 2026-11-01.
+ALTER TABLE kb_chunks DROP CONSTRAINT IF EXISTS kb_chunks_source_check;
+UPDATE kb_chunks SET source = 'gap' WHERE source = 'faq';
+ALTER TABLE kb_chunks ADD CONSTRAINT kb_chunks_source_check CHECK (source IN ('gap', 'playbook'));
 """
 
 #: How often a search checks whether ``kb_chunks`` changed under another process.
@@ -106,8 +117,9 @@ def sync_release(version: int) -> int:
     return len(entries)
 
 
+#: What is served: a release entry, or a console entry a person approved.
 ROWS = ("SELECT chunk_id, source, title, text, situation, persona, valid_from, valid_to, provenance, scope "
-        "FROM kb_chunks WHERE NOT revoked ORDER BY chunk_id")
+        "FROM kb_chunks WHERE NOT revoked AND (scope = 'release' OR approved_at IS NOT NULL) ORDER BY chunk_id")
 STAMP = "SELECT count(*) AS n, max(updated_at) AS at FROM kb_chunks"
 
 
@@ -213,7 +225,7 @@ async def kb_search(
     order_date: str | None = None,
     situation: str | None = None,
 ) -> dict[str, Any]:
-    """Search the shop's policies, FAQ and playbook for what applies to a question.
+    """Search the shop's policies, Knowledge Gap Loop answers and playbook for what applies to a question.
 
     Returns the best passages with their scores and flags (restricted,
     superseded and since when, an absence), whether the documents do not
@@ -238,7 +250,7 @@ async def kb_search(
 
 @server.tool(roles={"admin"}, name="kb_upsert")
 async def kb_upsert(
-    source: Literal["faq", "playbook"],
+    source: Literal["gap", "playbook"],
     title: str,
     text: str,
     situation: str | None = None,
@@ -247,13 +259,14 @@ async def kb_upsert(
     provenance: dict[str, Any] | None = None,
     revoke: bool = False,
 ) -> dict[str, Any]:
-    """Add, replace or revoke one FAQ or playbook entry saved during a demo, after a person approved it.
+    """Add, replace or revoke one Knowledge Gap Loop or playbook entry, saved from the console.
 
-    A demo entry lives in the database only; what counts as the system's
-    improvement is what a release file holds (section 7.5).
+    A new or changed entry waits for a person (``kb_review``) and is not
+    served until then. A demo entry lives in the database only; what counts
+    as the system's improvement is what a release file holds (section 7.5).
 
     Args:
-        source: faq or playbook.
+        source: gap (an answer of the Knowledge Gap Loop) or playbook.
         title: The question, or the situation it handles.
         text: The answer, or the entry.
         situation: For a playbook entry, its situation from config/situations.yaml.
@@ -274,14 +287,72 @@ async def kb_upsert(
             raise ToolFailure("FORBIDDEN", f"{chunk_id} belongs to a release file; change the file instead")
         await conn.execute(
             "INSERT INTO kb_chunks (chunk_id, source, title, text, situation, persona, provenance, scope, revoked,"
-            " updated_at) VALUES (%s, %s, %s, %s, %s, %s, %s, 'demo', %s, now()) "
+            " updated_at, approved_by, approved_at) VALUES (%s, %s, %s, %s, %s, %s, %s, 'demo', %s, now(), NULL, NULL) "
             "ON CONFLICT (chunk_id) DO UPDATE SET title = EXCLUDED.title, text = EXCLUDED.text,"
             " situation = EXCLUDED.situation, persona = EXCLUDED.persona, provenance = EXCLUDED.provenance,"
-            " revoked = EXCLUDED.revoked, updated_at = now()",
+            " revoked = EXCLUDED.revoked, updated_at = now(), approved_by = NULL, approved_at = NULL",
             (chunk_id, source, title, text, situation, persona, json.dumps(provenance or {}, ensure_ascii=False), revoke),
         )
     _checked = 0.0  # this process rebuilds on its next search
-    return {"chunk_id": chunk_id, "revoked": revoke, "scope": "demo"}
+    return {"chunk_id": chunk_id, "revoked": revoke, "scope": "demo", "status": "revoked" if revoke else "pending"}
+
+
+PENDING = ("SELECT chunk_id, source, title, text, provenance, created_at, updated_at FROM kb_chunks "
+           "WHERE scope = 'demo' AND NOT revoked AND approved_at IS NULL ORDER BY updated_at")
+
+
+@server.tool(roles={"admin"}, name="kb_pending")
+async def kb_pending() -> dict[str, Any]:
+    """The Knowledge Gap Loop entries saved from the console that wait for a person, oldest first.
+
+    Each comes with what the gate of section 10.2 would say if it were
+    approved now (``gate``: empty when the checks find nothing).
+    """
+    pool = await database()
+    async with pool.connection() as conn:
+        rows = await (await conn.execute(PENDING)).fetchall()
+    return {"entries": [
+        {"chunk_id": r["chunk_id"], "source": r["source"], "question": r["title"], "answer": r["text"],
+         "provenance": r["provenance"] or {}, "saved_at": r["updated_at"].isoformat(),
+         "gate": list(gap.gate(r["title"], r["text"]))}
+        for r in rows
+    ]}
+
+
+@server.tool(roles={"admin"}, name="kb_review")
+async def kb_review(chunk_id: str, decision: Literal["approve", "reject"], reviewer: str) -> dict[str, Any]:
+    """A person's decision on one waiting Knowledge Gap Loop entry (section 10.2).
+
+    ``approve`` runs the gate first and refuses an entry that fails it; an
+    approved entry is served from the next search. ``reject`` switches it off.
+
+    Args:
+        chunk_id: The entry, as ``kb_pending`` lists it.
+        decision: approve or reject.
+        reviewer: Who decided, for the record.
+    """
+    global _checked
+    pool = await database()
+    async with pool.connection() as conn:
+        row = await (await conn.execute(
+            "SELECT title, text, scope, revoked, approved_at FROM kb_chunks WHERE chunk_id = %s", (chunk_id,))).fetchone()
+        if row is None or row["scope"] != "demo":
+            raise ToolFailure("NOT_FOUND", f"No console entry {chunk_id}")
+        if row["revoked"] or row["approved_at"] is not None:
+            raise ToolFailure("CONFLICT", f"{chunk_id} was already decided")
+        if decision == "approve":
+            reasons = gap.gate(row["title"], row["text"])
+            if reasons:
+                raise ToolFailure("GATE", " ".join(reasons))
+            await conn.execute(
+                "UPDATE kb_chunks SET approved_by = %s, approved_at = now(), updated_at = now(),"
+                " provenance = provenance || %s WHERE chunk_id = %s",
+                (reviewer, json.dumps({"approved_by": reviewer}, ensure_ascii=False), chunk_id),
+            )
+        else:
+            await conn.execute("UPDATE kb_chunks SET revoked = true, updated_at = now() WHERE chunk_id = %s", (chunk_id,))
+    _checked = 0.0  # this process rebuilds on its next search
+    return {"chunk_id": chunk_id, "status": "approved" if decision == "approve" else "rejected", "reviewer": reviewer}
 
 
 if __name__ == "__main__":

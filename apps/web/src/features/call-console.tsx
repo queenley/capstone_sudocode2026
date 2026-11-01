@@ -20,7 +20,8 @@ const CALL_EVERY_MS = 3000;
 const CHANNEL: Record<string, string> = { web: "Web chat", zalo: "Zalo", hotline: "Hotline", facebook: "Facebook" };
 
 type Warning = { content: string; action: string; reasons: string[] };
-type Faq = { question: string; answer: string; saved: string | null };
+// Knowledge Gap Loop (docs/design.md 10.2): the consultant's answer, saved to wait for approval.
+type GapEntry = { question: string; answer: string; saved: string | null };
 
 /** ``embedded``: inside the sales workspace (/ban-hang), which has already signed the person in:
  * connect at once with that token and leave out this page's own header and token form; the
@@ -37,7 +38,7 @@ export default function CallConsole({ embedded = false, focus = null }: { embedd
   const [draftFrom, setDraftFrom] = useState<"own" | "edited">("own");
   const [sending, setSending] = useState(false);
   const [warning, setWarning] = useState<Warning | null>(null);
-  const [faq, setFaq] = useState<Faq | null>(null);
+  const [gapEntry, setGapEntry] = useState<GapEntry | null>(null);
   // The 👍/👎 the consultant gave the suggestion on screen, keyed by its text so a new suggestion starts unrated.
   const [rated, setRated] = useState<{ text: string; thumb: "up" | "down" } | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
@@ -91,7 +92,7 @@ export default function CallConsole({ embedded = false, focus = null }: { embedd
     setDraft("");
     setDraftFrom("own");
     setWarning(null);
-    setFaq(null);
+    setGapEntry(null);
     if (!connected || selectedId == null) return;
     void refreshCall(selectedId);
     const timer = setInterval(() => refreshCall(selectedId), CALL_EVERY_MS);
@@ -143,7 +144,7 @@ export default function CallConsole({ embedded = false, focus = null }: { embedd
       setWarning(null);
       setDraft("");
       setDraftFrom("own");
-      if (question) setFaq({ question, answer: content.trim(), saved: null });
+      if (question) setGapEntry({ question, answer: content.trim(), saved: null });
       await refreshCall(detail.id);
     });
     setSending(false);
@@ -326,31 +327,38 @@ export default function CallConsole({ embedded = false, focus = null }: { embedd
                       </div>
                     </div>
                   )}
-                  {faq && !awaitingReply && (
+                  {gapEntry && !awaitingReply && (
                     <div className="card">
-                      {faq.saved ? (
-                        <p>Đã lưu thành FAQ {faq.saved}. Lần sau trợ lý tự trả lời được câu này.</p>
+                      {gapEntry.saved ? (
+                        <p>
+                          Đã lưu vào Knowledge Gap Loop ({gapEntry.saved}), đang chờ duyệt. Sau khi được duyệt ở trang Developer, trợ lý
+                          mới dùng câu trả lời này.
+                        </p>
                       ) : (
                         <>
-                          <small>Lưu câu trả lời này để trợ lý dùng lần sau?</small>
-                          <p>Câu hỏi: {faq.question}</p>
-                          <textarea rows={2} value={faq.answer} onChange={(e) => setFaq({ ...faq, answer: e.target.value })} />
-                          <small>Xóa mọi thông tin riêng của khách trước khi lưu.</small>
+                          <small>Knowledge Gap Loop: lưu câu trả lời này để trợ lý dùng lần sau, sau khi được duyệt?</small>
+                          <p>Câu hỏi: {gapEntry.question}</p>
+                          <textarea
+                            rows={2}
+                            value={gapEntry.answer}
+                            onChange={(e) => setGapEntry({ ...gapEntry, answer: e.target.value })}
+                          />
+                          <small>Xóa mọi thông tin riêng của khách. Không ghi giá, mã khuyến mãi hay tồn kho: những thứ đó luôn lấy từ tool.</small>
                           <div className="buttonrow">
                             <button
                               onClick={() =>
                                 run(async () => {
-                                  const saved = await api<{ chunk_id?: string }>(`/api/agent/calls/${detail.id}/faq`, token, {
-                                    question: faq.question,
-                                    answer: faq.answer,
+                                  const saved = await api<{ chunk_id?: string }>(`/api/agent/calls/${detail.id}/knowledge-gap`, token, {
+                                    question: gapEntry.question,
+                                    answer: gapEntry.answer,
                                   });
-                                  setFaq({ ...faq, saved: saved.chunk_id || "mới" });
+                                  setGapEntry({ ...gapEntry, saved: saved.chunk_id || "mới" });
                                 })
                               }
                             >
-                              Lưu FAQ
+                              Lưu để duyệt
                             </button>
-                            <button className="secondary" onClick={() => setFaq(null)}>
+                            <button className="secondary" onClick={() => setGapEntry(null)}>
                               Để sau
                             </button>
                           </div>

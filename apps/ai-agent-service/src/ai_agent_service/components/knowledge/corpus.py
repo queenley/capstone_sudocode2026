@@ -6,8 +6,9 @@ Three sources end up in one knowledge base, each entry a :class:`Chunk`:
   ``## [XX-nn]`` section, 99 in all. The section code is the ``chunk_id`` the
   organisers label Recall@k with (``rag/qa_labeled.json``), so a section is
   never split or merged, not even DT-01 with DT-OLD-01, which share a title.
-- **faq** and **playbook**: entries the improvement loop adds after a person
-  approved them. Approved entries ship in the repository as
+- **gap** and **playbook**: entries the improvement loop adds after a person
+  approved them (gap: an answer the Knowledge Gap Loop added, section 10.2;
+  playbook: how to handle a situation, sections 10.3 and 10.5). Approved entries ship in the repository as
   ``data/kb/v<N>.jsonl`` (section 7.5), because the organisers grade the final
   build from the README; entries saved during a demo stay in the database.
 
@@ -26,7 +27,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Iterable, Literal, Mapping
 
-Source = Literal["policy", "faq", "playbook"]
+Source = Literal["policy", "gap", "playbook"]
 
 #: ``## [DT-03] Đổi size / màu`` -> ("DT-03", "Đổi size / màu"); also DT-OLD-01, SP-AIR-01.
 SECTION = re.compile(r"^## \[([A-Z]+(?:-[A-Z]+)?-\d+)\]\s*(.*)$", re.MULTILINE)
@@ -187,7 +188,7 @@ ENTRY_REQUIRED = ("chunk_id", "source", "title", "text")
 
 
 def entry_chunk(entry: Mapping[str, Any], *, doc: str) -> Chunk:
-    """One FAQ or playbook entry as a chunk, from a version file or a ``kb_chunks`` row.
+    """One Knowledge Gap Loop or playbook entry as a chunk, from a version file or a ``kb_chunks`` row.
 
     Raises ``ValueError`` naming what is wrong: an entry that cannot be read
     is a mistake in an approved file, never something to skip in silence.
@@ -196,14 +197,14 @@ def entry_chunk(entry: Mapping[str, Any], *, doc: str) -> Chunk:
     if missing:
         raise ValueError(f"{doc}: entry {entry.get('chunk_id') or '?'} lacks {', '.join(missing)}")
     source = str(entry["source"])
-    if source not in ("faq", "playbook"):
-        raise ValueError(f"{doc}: entry {entry['chunk_id']} has source {source!r}; only faq and playbook are added")
+    if source not in ("gap", "playbook"):
+        raise ValueError(f"{doc}: entry {entry['chunk_id']} has source {source!r}; only gap and playbook are added")
     title = str(entry["title"])
     known = {"chunk_id", "source", "title", "text", "situation", "persona", "valid_from", "valid_to"}
     return Chunk(
         chunk_id=str(entry["chunk_id"]),
         doc=doc,
-        doc_title="Câu hỏi thường gặp" if source == "faq" else "Kịch bản xử lý tình huống",
+        doc_title="Câu trả lời đã được duyệt" if source == "gap" else "Kịch bản xử lý tình huống",
         title=title,
         text=str(entry["text"]),
         source=source,  # type: ignore[arg-type]

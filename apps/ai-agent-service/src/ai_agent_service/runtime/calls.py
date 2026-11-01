@@ -19,7 +19,7 @@ import json
 import logging
 import uuid
 from dataclasses import dataclass
-from typing import Any, Awaitable, Callable
+from typing import Any, Awaitable, Callable, Sequence
 
 from langchain_core.messages import AIMessage
 
@@ -28,10 +28,12 @@ from ..components.guardrails.hard import GuardInput, check
 from ..components.handoff import copilot
 from ..components.improvement import signals
 from ..components.intake import pii
+from ..config.config_manager import handoff_auto_accept
 from ..mcp import client as mcp_client
 from ..mcp.tools import ToolBox
+from ..pipeline.hot.nodes import AUTO_ACCEPTOR
 from . import harness, options, trace_export, vault as vaults
-from .db import connection
+from .db import checkpointer, connection
 
 logger = logging.getLogger(__name__)
 
@@ -268,11 +270,19 @@ async def request_handoff(call_id: int, *, reason: str) -> dict[str, Any]:
         if await cursor.fetchone() is not None:
             raise CallError(409, "The assistant is still answering. Try again in a moment.")
         turn_id = f"bridge-{call_id}"
-        cursor = await conn.execute(
-            "UPDATE calls SET mode = 'copilot', handoff_status = 'pending', handoff_reason = %s, "
-            "handoff_requested_at = now() WHERE id = %s AND handoff_status IS NULL RETURNING *",
-            (reason, call_id),
-        )
+        if handoff_auto_accept():
+            # Test runs: accepted by the system at once, and the agent goes on answering.
+            cursor = await conn.execute(
+                "UPDATE calls SET handoff_status = 'accepted', accepted_by = %s, accepted_at = now(), "
+                "handoff_reason = %s, handoff_requested_at = now() WHERE id = %s AND handoff_status IS NULL RETURNING *",
+                (AUTO_ACCEPTOR, reason, call_id),
+            )
+        else:
+            cursor = await conn.execute(
+                "UPDATE calls SET mode = 'copilot', handoff_status = 'pending', handoff_reason = %s, "
+                "handoff_requested_at = now() WHERE id = %s AND handoff_status IS NULL RETURNING *",
+                (reason, call_id),
+            )
         updated = await cursor.fetchone()
         row = updated or row
         if updated is not None:
@@ -386,15 +396,77 @@ async def suggestion_feedback(call_id: int, *, actor: Actor, thumb: str, reason:
     return {"recorded": True, "thumb": thumb}
 
 
-async def save_faq(call_id: int, *, actor: Actor, question: str, answer: str) -> dict[str, Any]:
-    """Gap Loop step 6c (section 10.2): the consultant's answer becomes a FAQ entry, live at once."""
+async def save_gap_entry(call_id: int, *, actor: Actor, question: str, answer: str) -> dict[str, Any]:
+    """Knowledge Gap Loop (section 10.2): the consultant's answer is saved, and waits for a person's approval.
+
+    Not served until :func:`review_gap_entry` approves it after the gate.
+    """
     await call_row(call_id)
     admin = ToolBox(await mcp_client.tools_for("admin"))
-    envelope = await admin.call("kb_upsert", source="faq", title=question, text=answer,
+    envelope = await admin.call("kb_upsert", source="gap", title=question, text=answer,
                                 provenance={"call_id": call_id, "saved_by": actor.label or actor.id})
     if not envelope.get("ok"):
         raise CallError(502, (envelope.get("error") or {}).get("message", "Could not save"))
     return envelope["data"]
+
+
+async def pending_gap_entries() -> list[dict[str, Any]]:
+    """The Knowledge Gap Loop entries waiting for approval, each with what the gate would say."""
+    admin = ToolBox(await mcp_client.tools_for("admin"))
+    envelope = await admin.call("kb_pending")
+    if not envelope.get("ok"):
+        raise CallError(502, (envelope.get("error") or {}).get("message", "Could not list the entries"))
+    return list((envelope.get("data") or {}).get("entries") or [])
+
+
+async def review_gap_entry(chunk_id: str, *, actor: Actor, decision: str) -> dict[str, Any]:
+    """A person approves (after the gate) or rejects one waiting entry; a script may call it the same way."""
+    admin = ToolBox(await mcp_client.tools_for("admin"))
+    envelope = await admin.call("kb_review", chunk_id=chunk_id, decision=decision, reviewer=actor.label or actor.id)
+    if not envelope.get("ok"):
+        error = envelope.get("error") or {}
+        status = {"GATE": 422, "NOT_FOUND": 404, "CONFLICT": 409}.get(str(error.get("code")), 502)
+        raise CallError(status, error.get("message", "Could not review the entry"))
+    return envelope["data"]
+
+
+# ── a customer's deletion from the platform, policy QT-06 ──────────────────
+
+
+async def forget_conversations(conversation_ids: Sequence[str]) -> dict[str, Any]:
+    """The customer deleted their data on the website: forget what the agent kept of them.
+
+    The customers the agent identified in those conversations lose their
+    memory entirely (``memory.delete_customer``: facts, episodes, identities,
+    a tombstone; a customer's hotline calls under the same number go with
+    it). The conversations' own calls lose their transcript, their personal
+    data and their working memory (the checkpoint), identified or not.
+    """
+    ids = [str(i) for i in conversation_ids]
+    if not ids:
+        return {"customers": 0, "calls": 0}
+    async with connection() as conn:
+        rows = await (await conn.execute(
+            "SELECT id, customer_id FROM calls WHERE conversation_id = ANY(%s::uuid[])", (ids,))).fetchall()
+    customers = sorted({str(r["customer_id"]) for r in rows if r["customer_id"]})
+    admin = ToolBox(await mcp_client.tools_for("admin"))
+    for customer_id in customers:
+        envelope = await admin.call("memory_delete_customer", customer_id=customer_id)
+        if not envelope.get("ok"):
+            raise CallError(502, (envelope.get("error") or {}).get("message", "Could not delete the memory"))
+    call_ids = [int(r["id"]) for r in rows]
+    async with connection() as conn:
+        await conn.execute("DELETE FROM turns WHERE call_id = ANY(%s)", (call_ids,))
+        await conn.execute("DELETE FROM pii_vault WHERE call_id = ANY(%s)", (call_ids,))
+        await conn.execute(
+            "UPDATE calls SET customer_id = NULL, customer_key = NULL, customer_label = NULL, phone_last4 = NULL, "
+            "caller_token = NULL, brief = '[]'::jsonb, brief_object = NULL, warnings = '[]'::jsonb, suggestion = NULL, "
+            "handoff_brief = NULL, after_call = NULL WHERE id = ANY(%s)", (call_ids,))
+    saver = checkpointer()
+    for call_id in call_ids:
+        await saver.adelete_thread(f"call-{call_id}")
+    logger.info("Forgot %d customers and %d calls on the platform's deletion", len(customers), len(call_ids))
+    return {"customers": len(customers), "calls": len(call_ids)}
 
 
 # ── reads for the console ─────────────────────────────────────────────────

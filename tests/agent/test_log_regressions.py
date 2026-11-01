@@ -10,26 +10,17 @@ from langchain_core.language_models.fake_chat_models import FakeMessagesListChat
 from langchain_core.tools import StructuredTool
 
 from ai_agent_service.agents.advisor import AdvisorAgent, AgentContext
-from ai_agent_service.components.orchestration.rules import RouteInput, decide
+from ai_agent_service.config.config_manager import get_lanes
 from ai_agent_service.pipeline.hot import nodes
 from ai_agent_service.pipeline.hot.state import HotContext
 
 
-@pytest.mark.parametrize("said", ["Alo, anh gọi để hỏi tình trạng đơn hàng của mình.",
-                                  "Đơn hàng của anh đang ở đâu rồi?"])
-def test_verified_order_lookup_does_not_offer_new_purchase_tools(said):
-    route = decide(RouteInput(tier="VERIFIED", has_brief=True, has_order=False, asr_low_conf=False,
-                              tool_failures=0, safe_lines=0, customer_said=said))
-    assert route.lane == "ORDER_SERVICE"
-
-
-@pytest.mark.parametrize("tier,said", [("UNKNOWN", "Đơn hàng đang ở đâu?"),
-                                       ("VERIFIED", "Nếu mua thì khi nào giao?"),
-                                       ("VERIFIED", "Tư vấn đổi size trước khi mua")])
-def test_order_lookup_does_not_bypass_identity_or_capture_presale_questions(tier, said):
-    route = decide(RouteInput(tier=tier, has_brief=tier=="VERIFIED", has_order=False,
-                              asr_low_conf=False, tool_failures=0, safe_lines=0, customer_said=said))
-    assert route.lane != "ORDER_SERVICE"
+@pytest.mark.parametrize("lane", ["CONTINUITY", "NEW"])
+def test_the_business_lanes_offer_order_and_sales_tools_together(lane):
+    # A customer who asks about an order and then about a product (or the reverse) is served in one lane.
+    tools = get_lanes()[lane]
+    assert {"order_status", "crm_get_customer", "order_update"} <= tools
+    assert {"catalog_search", "inventory_check", "pricing_get_quote", "order_create"} <= tools
 
 
 class Model(FakeMessagesListChatModel):
@@ -115,9 +106,9 @@ async def test_stream_error_keeps_sent_sentence_and_only_adds_safe_line():
 
 
 @pytest.mark.parametrize('tier,lane,expected', [
-    ('VERIFIED','ORDER_SERVICE',{'phone':'0900000001'}),
-    ('UNKNOWN','ORDER_SERVICE',{'phone':'0900000002','zalo_id':'other-profile'}),
-    ('VERIFIED','NEW',{'phone':'0900000002','zalo_id':'other-profile'}),
+    ('VERIFIED','CONTINUITY',{'phone':'0900000001'}),
+    ('VERIFIED','NEW',{'phone':'0900000001'}),
+    ('UNKNOWN','NEW',{'phone':'0900000002','zalo_id':'other-profile'}),
 ])
 def test_order_lookup_uses_verified_caller_without_exposing_phone_to_model(tier,lane,expected):
     from ai_agent_service.mcp.tools import ToolGuardMiddleware

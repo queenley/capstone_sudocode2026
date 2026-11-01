@@ -124,12 +124,17 @@ class HotState(TurnInput, total=False):
     #: The orders this call created, ``{order_id, sku}``: what a later turn
     #: corrects with ``order.update`` instead of booking the product again.
     created_orders: list[dict[str, Any]]
+    #: The changes ``order.update`` made in this call, ``{order_id, action, new_variant_sku}``: the
+    #: same change asked again in a later turn is refused, not made (and charged) a second time.
+    updated_orders: list[dict[str, Any]]
     #: How a customer not yet known calls themselves (anh, chị, cô, chú, bác),
     #: and whether the agent asked already (``components.intake.honorific``).
     honorific_said: str | None
     honorific_asked: bool
     #: Consecutive infrastructure failures of tools; route rule 1.
     tool_failures: int
+    #: Consecutive turns the model could not draft (an error, a timeout); route rule 1.
+    model_failures: int
 
     # guard
     guard: dict[str, Any]

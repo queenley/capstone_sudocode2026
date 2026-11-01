@@ -40,6 +40,8 @@ x-runtime: &runtime
     BANK_NAME: ${BANK_NAME:-}
     BANK_ACCOUNT_NO: ${BANK_ACCOUNT_NO:-}
     BANK_ACCOUNT_NAME: ${BANK_ACCOUNT_NAME:-}
+    # The identity events worker tells the AI agent when a customer deleted their data (policy QT-06).
+    AI_AGENT_SERVICE_URL: ${AI_AGENT_SERVICE_URL:-http://ai-agent-service:8400}
   depends_on:
     postgres:
       condition: service_healthy
@@ -175,6 +177,12 @@ services:
       NVIDIA_API_KEY: ${NVIDIA_API_KEY:-}
       AI_GATEWAY_API_KEY: ${AI_GATEWAY_API_KEY:-}
       AGENT_DB_SCHEMA: ${AGENT_DB_SCHEMA:-agent}
+      # A profile of apps/ai-agent-service/config/models.yaml ("local": every agent on Gemini's free
+      # key). Empty: the file as written.
+      AGENT_PROFILE: ${AGENT_PROFILE:-}
+      # 1 for test runs: a handoff is accepted by the system at once and the agent goes on answering,
+      # so a scripted or UI test runs to its end without a consultant. 0 (the product): a consultant accepts.
+      HANDOFF_AUTO_ACCEPT: ${HANDOFF_AUTO_ACCEPT:-0}
       LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
       LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
       LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL:-}

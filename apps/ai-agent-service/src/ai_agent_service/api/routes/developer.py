@@ -259,6 +259,36 @@ async def set_clock(body: BusinessDay, request: Request) -> dict[str, str]:
     return {"day": day, "time": "10:00", "zone": "Asia/Ho_Chi_Minh"}
 
 
+# ── Knowledge Gap Loop, docs/design.md section 10.2 ───────────────────────
+
+
+class GapDecision(BaseModel):
+    decision: Literal["approve", "reject"]
+
+
+@router.get("/knowledge-gap")
+async def pending_gap_entries(request: Request) -> dict[str, Any]:
+    """The entries consultants saved that wait for approval; ``gate`` says what would refuse each."""
+    _guard(request)
+    try:
+        return {"entries": await calls.pending_gap_entries()}
+    except calls.CallError as error:
+        raise HTTPException(error.status, str(error)) from error
+
+
+@router.post("/knowledge-gap/{chunk_id}")
+async def review_gap_entry(chunk_id: str, body: GapDecision, request: Request) -> dict[str, Any]:
+    """Approve (the gate runs first; 422 with its reasons) or reject one entry. Scripts call it the same way."""
+    _guard(request)
+    role = staff(request, ROLES)
+    actor = calls.Actor(id=str(getattr(request.state, "actor_id", None) or role), is_staff=True,
+                        label=f"{role}:{getattr(request.state, 'actor_id', None) or role}")
+    try:
+        return await calls.review_gap_entry(chunk_id, actor=actor, decision=body.decision)
+    except calls.CallError as error:
+        raise HTTPException(error.status, str(error)) from error
+
+
 # ── latency, data/btc/eval/huong-dan-do-latency.md ────────────────────────
 
 THRESHOLDS_MS = {"ttft": 3000, "total": 8000, "ttfa": 2500, "call_brief": 3000}

@@ -122,14 +122,18 @@ async def schedule_callback(
     )
 
 
-@server.tool(roles={"advisor"}, name="handoff_transfer")
+# The harness calls it too: in lane HANDOFF the model may be what is failing (route rule 1).
+@server.tool(roles={"advisor", "harness"}, name="handoff_transfer")
 async def handoff_transfer(brief: dict[str, Any], idempotency_key: str | None = None) -> dict[str, Any]:
     """Hand the call to a person, with a brief they can act on in ten seconds.
 
-    Use when the customer asks for a person, or the question is one that must
-    go to a person (medical questions), after first saying you do not have
-    that information. The system fills in the customer's phone, name, the
-    product and price already advised, and the time; write the rest.
+    Use when the customer asks for a person; asks for medical, medicine,
+    pregnancy, child-safety or legal advice; makes a serious complaint; or
+    asks what the documents and tools do not answer (escalation_reason
+    ngoai_pham_vi_tai_lieu): say you do not have that information first. Not
+    for a product question, even about a product for mothers and babies. The
+    system fills in the customer's phone, name, the product and price already
+    advised, and the time; write the rest.
 
     Args:
         brief: escalation_reason (cau_hoi_y_te, ngoai_pham_vi_tai_lieu,
