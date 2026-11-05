@@ -36,6 +36,10 @@ from ...components.memory import ontology
 #: ``handoff_brief.schema.json``) to the product's. Anything else is refused.
 CHANNELS = {"hotline": "hotline", "zalo_oa": "zalo", "chat_fanpage": "facebook", "web_chat": "web"}
 
+#: How the CRM names the channel of a past session, where it differs from the
+#: scenario format's: ``crm_seed*.json`` writes ``fb`` for the Facebook page.
+CRM_SESSION_CHANNELS = {"fb": "facebook"}
+
 #: The harness's name for the field a call's turns come from, as it passes
 #: it when a call has no ``input_mode``, to the product's input mode.
 INPUT_FIELDS = {"customer_turns_asr": "asr_transcript", "customer_turns": None}
@@ -265,7 +269,7 @@ def seed_sessions(raw: Any, *, day: str, channel: str) -> tuple[SeedSession, ...
         sessions.append(SeedSession(
             session_id=seed_session_id(item, index),
             day=_seed_day(item, day=day, index=index),
-            channel=CHANNELS.get(str(item.get("channel")), str(item.get("channel") or channel)),
+            channel=(CHANNELS | CRM_SESSION_CHANNELS).get(str(item.get("channel")), str(item.get("channel") or channel)),
             summary=str(item.get("summary") or _order_summary(item)),
             outcome=str(item.get("outcome") or "khac"),
             facts=dict(facts or {}),

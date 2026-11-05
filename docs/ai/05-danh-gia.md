@@ -225,7 +225,7 @@ docker compose up -d postgres
 
 # Tầng 3: bắt đầu nhỏ (tốn phí). Không --config: cả hai cấu hình, rồi in bảng BTC
 $env:EVAL_BUDGET_DB = "evaluation/runs/20261024-work/budget.sqlite"
-& $PY run_eval.py --scenarios evaluation/datasets/create-data-diagnostic-v4/scenarios --only SCN-GEN-0051 --out evaluation/runs/thu-1
+& $PY run_eval.py --scenarios data/seed-dev/scenarios --only SCN-GEN-0051 --out evaluation/runs/thu-1
 
 # Chỉ đổi extractor: gắn nhãn lại một run cũ, không chạy lại agent
 & $PY run_eval.py --relabel evaluation/runs/20261024-work/development-r2-v4-M2 --out evaluation/runs/relabel-r2

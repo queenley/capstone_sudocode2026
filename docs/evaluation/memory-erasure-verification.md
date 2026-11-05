@@ -4,7 +4,7 @@
 
 ## Phạm vi kịch bản
 
-Đã đọc đủ sáu scenario thuộc nhóm `hoi_ai_xoa_du_lieu` của `create-data-diagnostic-v4`; giữ nguyên trạng thái diagnostic và mọi nhãn hiện tại.
+Đã đọc đủ sáu scenario thuộc nhóm `hoi_ai_xoa_du_lieu` của bộ kịch bản cũ `create-data-diagnostic-v4` (đã xoá khỏi cây thư mục); giữ nguyên trạng thái diagnostic và mọi nhãn hiện tại.
 
 | Scenario | Kết thúc phần yêu cầu xóa | Giới hạn bằng chứng sẵn có |
 |---|---|---|
@@ -70,7 +70,7 @@ EVAL_BUDGET_DB="$PWD/evaluation/runs/20261024-work/budget.sqlite" \
 EVAL_DATABASE_URL=postgresql://vqd@127.0.0.1:55471/memory_erasure_eval \
 AGENT_DB_SCHEMA=agent IMPROVEMENT_DIR="$PWD/evaluation/runs/20261101-memory-erasure/smoke-after-improvement" \
   apps/ai-agent-service/.venv/bin/python run_eval.py \
-  --scenarios evaluation/datasets/create-data-diagnostic-v4/scenarios \
+  --scenarios data/seed-dev/scenarios \
   --only SCN-GEN-0037 --warmup 0 \
   --out evaluation/runs/20261101-memory-erasure/smoke-0037-after
 ```

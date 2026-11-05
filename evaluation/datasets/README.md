@@ -1,26 +1,27 @@
 # Datasets của evaluation
 
-Một bộ kịch bản đã gán nhãn, định dạng của BTC (`apps/ai-agent-service/data/btc/schemas/scenario_format.md`), đủ để chạy bằng lệnh đánh giá duy nhất của repo.
+Đường chạy duy nhất: kịch bản nằm ở [`data/seed-dev/scenarios`](../../data/seed-dev/README.md) (400 kịch bản: 250 persona BTC `SCN-GEN-*`, 150 persona của nhóm `SCN-ADV-*`), định dạng của BTC (`apps/ai-agent-service/data/btc/schemas/scenario_format.md`), chạy bằng lệnh đánh giá duy nhất của repo. Thư mục này chỉ giữ quy tắc duyệt nhãn.
 
 | Thư mục | Là gì |
 |---|---|
-| `create-data-diagnostic-v4/` | 150 kịch bản đã sinh bằng `evaluation/data-generation`, đã sửa nhãn thanh toán (`chuyen_khoan` → `bank`). `scenarios/` (1 file mỗi kịch bản), `tool-labels.json` (tool kỳ vọng từng cuộc), `conversion-report.json` (nguồn, hash, trường đã đổi), `DISPUTES.md` (nhãn cần người duyệt) |
 | `ground-truth-review/` | Quy tắc duyệt và sửa nhãn (`SKILL.md`): đọc trước khi thêm hoặc sửa kịch bản |
 
-Trạng thái: **diagnostic**. `conversion-report.json` ghi `official_gt_approved: false`, tức nhãn do bộ sinh gán và chưa có người duyệt độc lập. Mọi điểm đo trên bộ này là điểm chẩn đoán, không phải điểm chính thức.
+Trạng thái: **diagnostic**. Chưa có `data/seed-dev/review/golden_manifest.json`, tức nhãn do bộ sinh gán và chưa có người duyệt độc lập. Mọi điểm đo trên bộ này là điểm chẩn đoán, không phải điểm chính thức.
 
 ## Chạy thử
 
 ```bash
 # lập kế hoạch + chạy 1 kịch bản (tốn phí model; extractor tắt)
-apps/ai-agent-service/.venv/bin/python run_eval.py --scenarios evaluation/datasets/create-data-diagnostic-v4/scenarios --only SCN-GEN-0051 --no-extract --out evaluation/runs/<tên-lần-chạy>
+apps/ai-agent-service/.venv/bin/python run_eval.py --scenarios data/seed-dev/scenarios --only SCN-GEN-0051 --no-extract --out evaluation/runs/<tên-lần-chạy>
 ```
 
-Các kịch bản hiếm chuyên biệt (`hard_case`) và khách tổng hợp `SYN-C...` dùng `apps/ai-agent-service/data/btc/catalog/crm_seed_synthetic.json`.
+Chọn tập con: chép kịch bản sang một thư mục trong `evaluation/runs/subsets/` rồi trỏ `--scenarios` vào đó (xem `data/seed-dev/README.md`, mục 3).
+
+Khách tổng hợp `SYN-C...` dùng `apps/ai-agent-service/data/btc/catalog/crm_seed_synthetic.json`.
 
 ## Kịch bản đã dùng (ID có tiền tố `SCN-GEN-`)
 
-Lấy từ các run trong `evaluation/runs/` và sổ chạy đã xóa; ghi lại đây để không chạy trùng hay dùng nhầm holdout. Mọi nhãn vẫn là diagnostic.
+**Đây là ID của bộ v4 cũ (đã xoá); chưa xác nhận ID trùng nội dung với `data/seed-dev`** (SCN-GEN-0051 thì cùng khách và cùng đơn). Lấy từ các run trong `evaluation/runs/` và sổ chạy đã xóa; ghi lại đây để không chạy trùng hay dùng nhầm holdout. Mọi nhãn vẫn là diagnostic.
 
 | Nhóm | ID |
 |---|---|
@@ -34,4 +35,4 @@ Lấy từ các run trong `evaluation/runs/` và sổ chạy đã xóa; ghi lạ
 
 ## Các bản cũ
 
-v1 (101 kịch bản), v2 (122), v3 (150, nhãn `chuyen_khoan`), `output1-btc-diagnostic-v2` và bộ ASR `asr-team-v2` đã bị xóa khỏi cây thư mục; còn trong lịch sử git trước commit dọn dẹp. Không dùng được nữa để tái lập các run cũ trong `evaluation/runs/`, nhưng bằng chứng của các run đó vẫn còn nguyên ở đó.
+v1 (101 kịch bản), v2 (122), v3 (150, nhãn `chuyen_khoan`), v4 (`create-data-diagnostic-v4`, 150, lệch SKU đơn so với CRM synthetic), `output1-btc-diagnostic-v2` và bộ ASR `asr-team-v2` đã bị xóa khỏi cây thư mục; v1 đến v3 còn trong lịch sử git trước commit dọn dẹp. Bằng chứng các run cũ trong `evaluation/runs/` còn nguyên, nhưng không tái lập được từ bộ đã xoá.

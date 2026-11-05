@@ -104,7 +104,7 @@ config/prompts/
 evaluation/               (lệnh chạy là run_eval.py ở GỐC repo; mã chấm nằm trong apps/ai-agent-service)
 ├── README.md             Cửa vào duy nhất: bản đồ, lệnh chạy, quy tắc
 ├── rag_offline.py        Recall@k của kho tri thức, không model, không database (make eval)
-├── datasets/             Kịch bản đã gán nhãn (create-data-diagnostic-v4) và quy tắc duyệt nhãn (ground-truth-review)
+├── datasets/             Quy tắc duyệt nhãn (ground-truth-review); kịch bản chạy ở data/seed-dev/scenarios
 ├── runs/                 Bằng chứng từng lượt chạy, cache extractor, sổ ngân sách (chỉ lưu local, không commit)
 └── data-generation/      Bộ sinh dữ liệu test theo định dạng BTC
     ├── config/

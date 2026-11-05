@@ -156,9 +156,9 @@ Danh sách đủ 15 loại: [evaluation/data-generation/README.md §3](../../eva
 
 ### Dataset để chấm
 
-Lệnh đánh giá (`run_eval.py`) đọc kịch bản ở [`evaluation/datasets/`](../../evaluation/datasets/README.md): hiện chỉ giữ `create-data-diagnostic-v4` (150 kịch bản đã gán nhãn; bản v4 sửa 40 nhãn `chuyen_khoan` thành `bank` cho khớp schema BTC). Các bản v1 đến v3 đã xóa, còn trong lịch sử git.
+Lệnh đánh giá (`run_eval.py`) đọc kịch bản ở [`data/seed-dev/scenarios`](../../data/seed-dev/README.md): đường chạy duy nhất, 400 kịch bản (250 `SCN-GEN-*` và 150 `SCN-ADV-*`). Các bản v1 đến v4 đã xóa khỏi cây thư mục.
 
-> Dataset có trạng thái **diagnostic**: nhãn do bộ sinh gán, **chưa có người duyệt** (`official_gt_approved: false`). Tranh chấp nhãn đã biết: [DISPUTES.md](../../evaluation/datasets/create-data-diagnostic-v4/DISPUTES.md). Quy tắc duyệt và sửa nhãn: [ground-truth-review](../../evaluation/datasets/ground-truth-review/SKILL.md).
+> Dataset có trạng thái **diagnostic**: nhãn do bộ sinh gán, **chưa có người duyệt** (chưa có `review/golden_manifest.json`). Quy tắc duyệt và sửa nhãn: [ground-truth-review](../../evaluation/datasets/ground-truth-review/SKILL.md).
 
 **Lịch sử cuộc cũ** (`seed_history`): trước khi chạy, lệnh đánh giá ghi các phiên cũ và đơn cũ vào bộ nhớ của khách ở cả hai cấu hình; cấu hình baseline chỉ là **không đọc lại** chúng.
 

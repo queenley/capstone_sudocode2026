@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import os
 import sqlite3
+import weakref
 from decimal import Decimal, ROUND_CEILING
 from pathlib import Path
 from typing import Any
@@ -98,6 +99,23 @@ def settle(key: str | None, dollars: float) -> None:
                    (amount, key))
 
 
+_LIVE: "weakref.WeakSet[BudgetCallback]" = weakref.WeakSet()
+
+
+def settle_abandoned() -> None:
+    """Settle, at an upper bound, every request that started but never ended.
+
+    A streamed reply the guard stops reading is closed before the model
+    finishes, and LangChain then fires neither ``on_llm_end`` nor
+    ``on_llm_error``: the request would keep its whole-context reservation
+    for ever. Call this once nothing is in flight (the end of a turn).
+    Requests that ended in ``on_llm_error`` are not touched: their billing is
+    unknown, so they keep the full reservation.
+    """
+    for callback in list(_LIVE):
+        callback.settle_abandoned()
+
+
 class BudgetCallback(BaseCallbackHandler):
     raise_error = True
 
@@ -114,15 +132,29 @@ class BudgetCallback(BaseCallbackHandler):
             raise RuntimeError("Evaluation budget requires explicit max_retries=0")
         self.maximum = (OPENAI_CONTEXT * self.input_price + config["max_tokens"] * self.output_price) / 1_000_000
         self.agent = agent
+        self.max_tokens = config["max_tokens"]
         self.pending: dict[Any, str | None] = {}
+        self.input_bound: dict[Any, int] = {}
+        _LIVE.add(self)
 
     def on_chat_model_start(self, serialized: dict, messages: list, *, run_id: Any, **kwargs: Any) -> None:
         if len(messages) != 1:
             raise RuntimeError("Evaluation budget requires one request per model invocation")
         self.pending[run_id] = reserve(self.agent, self.maximum)
+        # A token is at least one UTF-8 byte, so the bytes sent bound the input tokens from above.
+        self.input_bound[run_id] = len(repr((messages, kwargs.get("invocation_params"))).encode("utf-8"))
+
+    def settle_abandoned(self) -> None:
+        for run_id, key in list(self.pending.items()):
+            self.pending.pop(run_id, None)
+            input_tokens = self.input_bound.pop(run_id, None)
+            if input_tokens is None:
+                continue  # No bound: keep the full reservation.
+            settle(key, (input_tokens * self.input_price + self.max_tokens * self.output_price) / 1_000_000)
 
     def on_llm_end(self, response: Any, *, run_id: Any, **kwargs: Any) -> None:
         key = self.pending.pop(run_id, None)
+        self.input_bound.pop(run_id, None)
         usage = (response.llm_output or {}).get("token_usage") or {}
         input_tokens, output_tokens = usage.get("prompt_tokens"), usage.get("completion_tokens")
         if input_tokens is None or output_tokens is None:
@@ -134,6 +166,7 @@ class BudgetCallback(BaseCallbackHandler):
 
     def on_llm_error(self, error: BaseException, *, run_id: Any, **kwargs: Any) -> None:
         key = self.pending.pop(run_id, None)
+        self.input_bound.pop(run_id, None)
         if (usage := error_usage(error)) is not None:
             settle(key, (usage[0] * self.input_price + usage[1] * self.output_price) / 1_000_000)
         # Unknown billing, including interrupted streams, retains the full reservation.

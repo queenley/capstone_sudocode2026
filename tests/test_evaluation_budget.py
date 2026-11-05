@@ -148,3 +148,20 @@ def test_corrupt_ledger_fails_closed_before_new_reservation(tmp_path, monkeypatc
         budget.reserve("test", 0.01)
     with sqlite3.connect(path) as db:
         assert db.execute("SELECT COUNT(*) FROM requests").fetchone()[0] == before
+
+
+def test_interrupted_stream_settles_at_an_upper_bound_not_the_full_reservation(tmp_path, monkeypatch):
+    path = tmp_path / "budget.sqlite"
+    budget.initialize(path, 1)
+    monkeypatch.setenv("EVAL_BUDGET_DB", str(path))
+    callback = budget.BudgetCallback({"provider": "openai", "model": "gpt-4.1-mini", "max_tokens": 1000,
+        "max_retries": 0, "rate_limits": {"input_token_price_per_million": 0.4, "output_token_price_per_million": 1.6}}, "test")
+    callback.on_chat_model_start({}, [["x" * 1000]], run_id="closed-early")  # never ends, never errors
+    callback.on_chat_model_start({}, [[]], run_id="errored")
+    callback.on_llm_error(RuntimeError("unknown billing"), run_id="errored")
+    budget.settle_abandoned()
+    with sqlite3.connect(path) as db:
+        settled = db.execute("SELECT units FROM requests WHERE settled=1").fetchall()
+        assert len(settled) == 1 and 0 < settled[0][0] < budget.units(0.01)
+        assert db.execute("SELECT COUNT(*) FROM requests WHERE settled=0").fetchone()[0] == 1  # the error keeps its reservation
+    budget.settle_abandoned()  # Nothing left to settle twice.

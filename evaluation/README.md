@@ -9,7 +9,7 @@
 | `apps/ai-agent-service/src/ai_agent_service/components/evaluation/scorers.py` | Extractor (nhãn `questions`, `claims`, `facts_used`) |
 | [`config/prompts/evaluation/extractor.txt`](../config/prompts/evaluation/extractor.txt) | Prompt của extractor, nạp nguyên văn |
 | `apps/ai-agent-service/data/btc/` | Gói dữ liệu của BTC, bản duy nhất trong repo; `tests/agent/test_btc_pack.py` ghim hash từng file |
-| [`datasets/`](datasets/README.md) | Kịch bản đã gán nhãn (v4, 150 kịch bản) và quy tắc duyệt nhãn |
+| [`datasets/`](datasets/README.md) | Quy tắc duyệt nhãn; kịch bản chạy nằm ở `data/seed-dev/scenarios` (400 kịch bản) |
 | [`data-generation/`](data-generation/README.md) | Sinh kịch bản theo định dạng BTC (có venv, test, prompt riêng) |
 | [`rag_offline.py`](rag_offline.py) | Recall@k của kho tri thức, không cần model hay database (`make eval`) |
 | `runs/` | Bằng chứng mỗi lần chạy, cache extractor và sổ ngân sách. **Không lên Git** (có thể chứa dữ liệu khách) |
@@ -24,7 +24,7 @@ Từ gốc repo, với Python của agent (`apps/ai-agent-service/.venv`) và `d
 export EVAL_BUDGET_DB=evaluation/runs/20261024-work/budget.sqlite
 
 # Chạy kịch bản qua agent (tốn phí model). Không --config: cả full và baseline_no_memory, rồi in bảng BTC
-python run_eval.py --scenarios evaluation/datasets/create-data-diagnostic-v4/scenarios --only SCN-GEN-0051 --out evaluation/runs/<tên>
+python run_eval.py --scenarios data/seed-dev/scenarios --only SCN-GEN-0051 --out evaluation/runs/<tên>
 
 # Kiểm đường ống mà không gọi extractor (agent vẫn gọi model; RQR và HR không đo)
 python run_eval.py --scenarios <thư mục> --only <ID> --no-extract

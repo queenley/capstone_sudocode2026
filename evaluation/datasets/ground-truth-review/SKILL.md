@@ -5,6 +5,8 @@ description: Review, approve, or revise evaluation scenarios and ground-truth la
 
 # Ground-truth review for evaluation data
 
+> **Current dataset:** the only run path is `data/seed-dev/scenarios` (see `data/seed-dev/README.md`). The `create-data-diagnostic-v<N>` folders named below are the old revision layout and were removed; a new revision folder is needed only when labels are changed under review.
+
 This is the single instruction file for creating, reviewing, and revising team evaluation data. Team data lives under `evaluation/datasets/<revision>/` (see its `README.md`). Treat the organisers' pack in `apps/ai-agent-service/data/btc/` as an immutable reference: a BTC schema defines the shape, not the truth of an answer. Verify prices, promotions, inventory, order state, and effective dates against that pack's catalog, policy, and `eval/mock_tools.py`. The seven BTC public samples (`test_set/public_sample/`) are development examples; they are not the future organiser golden set. Do not use frozen or hidden cases to teach FAQ, Reflection, or Exemplar Bank.
 
 Before running a new case, check the BTC scenario format (`schemas/scenario_format.md`) and make sure every call has a reviewed grading method, expected tools for both the `full` and the `baseline_no_memory` configuration, a source/provenance and a PII decision. A structurally valid JSON file with a wrong business fact or an unsupported field is not ready. Keep new or corrected labels in a new revision; never overwrite a used revision.

@@ -56,7 +56,7 @@ from ...components.intake import itn, pii
 from ...components.intake import text as intake_text
 from ...components.memory import ontology
 from ...config.config_manager import get_models_config
-from ...llm import token_ledger
+from ...llm import evaluation_budget, token_ledger
 from ...mcp import client as mcp_client
 from ...mcp.server_base import database
 from ...mcp.servers import btc
@@ -475,6 +475,9 @@ async def take_turn(
     except Exception as failure:  # noqa: BLE001 - the caller decides what a failed turn means
         logger.exception("Turn %s of %s failed", turn_no, thread)
         return {}, f"{type(failure).__name__}: {failure}"[:300]
+    finally:
+        # A stream the guard closed early never reports its usage; settle it at an upper bound.
+        evaluation_budget.settle_abandoned()
 
 
 def record(state: Mapping[str, Any], turn_no: int, text: str, now: datetime, vault: pii.Vault,
@@ -631,6 +634,8 @@ def diagnose(state: Mapping[str, Any], error: str | None, *, config: str, scenar
         "policy": (guard.get("soft") or {}).get("decided_by"),
         "regenerations": state.get("regen_count") or 0,
         "blocked_drafts": [d.get("reasons") for d in state.get("blocked_drafts") or []],
+        # What the agent was about to say, beside why it was stopped: diagnostics only, never the BTC trace.
+        "blocked_draft_texts": [d.get("text") for d in state.get("blocked_drafts") or []],
         "fallback": bool(draft.get("fallback")),
         "blocked_tool_calls": [{"name": r["name"], "args": r.get("args") or {}, "result": r.get("result")}
                                for r in state.get("tool_results") or [] if r.get("blocked_by")],
