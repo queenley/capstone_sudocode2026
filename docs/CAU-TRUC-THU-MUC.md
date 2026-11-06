@@ -13,7 +13,7 @@ capstone_sudocode2026/
 ├── config/prompts/       Toàn bộ prompt đưa cho model
 ├── contracts/            Hợp đồng: OpenAPI, sự kiện Kafka, khóa của kịch bản test (scenario/)
 ├── data/seed/catalog/    Dữ liệu sản phẩm demo cho trang mua hàng
-├── data/seed-<tên>/      Bộ dữ liệu test do evaluation/data-generation sinh (run_all --seed <tên>)
+├── data/<tên>/      Bộ dữ liệu test do evaluation/data-generation sinh (run_all --seed <tên>)
 ├── evaluation/           Đánh giá chất lượng AI: harness chấm điểm và bộ sinh dữ liệu test
 ├── scripts/              Script vận hành: seed dữ liệu, tạo admin, migration, deploy, dev
 ├── tests/                Test tự động (pytest) cho backend và agent
@@ -104,7 +104,7 @@ config/prompts/
 evaluation/               (lệnh chạy là run_eval.py ở GỐC repo; mã chấm nằm trong apps/ai-agent-service)
 ├── README.md             Cửa vào duy nhất: bản đồ, lệnh chạy, quy tắc
 ├── rag_offline.py        Recall@k của kho tri thức, không model, không database (make eval)
-├── datasets/             Quy tắc duyệt nhãn (ground-truth-review); kịch bản chạy ở data/seed-dev/scenarios
+├── datasets/             Quy tắc duyệt nhãn (ground-truth-review); kịch bản chạy ở data/dev/scenarios
 ├── runs/                 Bằng chứng từng lượt chạy, cache extractor, sổ ngân sách (chỉ lưu local, không commit)
 └── data-generation/      Bộ sinh dữ liệu test theo định dạng BTC
     ├── config/

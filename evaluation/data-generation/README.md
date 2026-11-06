@@ -123,15 +123,17 @@ File nằm thẳng trong catalog của agent, nên agent và các kịch bản c
 ### Bước 4. Chạy thử nhỏ
 
 ```powershell
-python -m src.pipeline.run_all --fresh --limit 2 --advanced-limit 2 --skip-audio
+python -m src.pipeline.run_all --fresh --limit 2 --advanced-limit 2 --skip-audio --output ../runs/datagen-thu
 ```
+
+Luôn kèm `--output` hoặc `--seed` khi dùng `--fresh`: nếu không, lệnh xóa kịch bản, hội thoại và nhãn trong `data/dev`, bộ dữ liệu đang dùng để chấm. `evaluation/runs/` không lên git nên hợp cho chạy thử.
 
 Xem `<seed>/scenarios/`, `<seed>/conversations/` và `<seed>/reports/validation.json` (mọi dòng `validator_pass: true`) trước khi chạy toàn bộ.
 
 ### Bước 5. Sinh toàn bộ
 
 ```powershell
-python -m src.pipeline.run_all --fresh --asr-dialogues 24
+python -m src.pipeline.run_all --fresh --asr-dialogues 24 --output ../runs/datagen-moi
 ```
 
 Sinh 150 kịch bản theo persona BTC và 93 theo persona nâng cao, một hội thoại mẫu và một phán quyết judge cho mỗi cuộc, chạy simulator, kiểm tra chính thức, audio lượt khách tới khi đủ 3 giờ, bộ ASR 24 hội thoại, RAG, dashboard và báo cáo. Khoảng 243 + 486 + 486 request model (cộng các lần tự sửa ở bước 4), và khoảng 150.000 ký tự ElevenLabs.
@@ -177,7 +179,7 @@ Cho agent chạy trên `<seed>/scenarios/` bằng lệnh đánh giá của repo 
 
 ```powershell
 cd ../..
-apps/ai-agent-service/.venv/Scripts/python run_eval.py --scenarios data/seed-dev/scenarios --only SCN-GEN-0001 --out evaluation/runs/<tên>
+apps/ai-agent-service/.venv/Scripts/python run_eval.py --scenarios data/dev/scenarios --only SCN-GEN-0001 --out evaluation/runs/<tên>
 ```
 
 Muốn giữ một bộ để chấm lại về sau, chép nó vào `evaluation/datasets/<revision>/` theo [quy tắc duyệt nhãn](../datasets/ground-truth-review/SKILL.md). Công cụ chuyển đổi `data-import` của bộ chấm cũ đã gỡ.
@@ -345,11 +347,12 @@ Kịch bản này không có `handoff_brief/` vì không cuộc nào chuyển m�
 
 ## 5. Output: thư mục và file
 
-Mọi thứ sinh ra nằm trong **`data/seed-<tên>/` ở gốc repo** (gọi tắt `<seed>/` trong tài liệu và code), không còn nằm trong thư mục của data-generation. Tên do `--seed` của `run_all` đặt (hoặc biến `DATAGEN_SEED`; mặc định `dev` → `data/seed-dev/`); `DATAGEN_OUTPUT` thay toàn bộ đường dẫn. Mỗi bộ dữ liệu một seed, không ghi đè seed đã dùng để chấm:
+Mọi thứ sinh ra nằm trong **`data/<tên>/` ở gốc repo** (gọi tắt `<seed>/` trong tài liệu và code), không còn nằm trong thư mục của data-generation. Tên do `--seed` của `run_all` đặt (hoặc biến `DATAGEN_SEED`; mặc định `dev` → `data/dev/`); `DATAGEN_OUTPUT` thay toàn bộ đường dẫn. Mỗi bộ dữ liệu một seed, không ghi đè seed đã dùng để chấm:
 
 ```powershell
-.venv/Scripts/python -m src.pipeline.run_all --seed v5 --plan-only     # → data/seed-v5/plan_preview/
-.venv/Scripts/python -m src.pipeline.run_all --seed v5 --resume        # → data/seed-v5/
+.venv/Scripts/python -m src.pipeline.run_all --seed v5 --plan-only     # → data/v5/plan_preview/
+.venv/Scripts/python -m src.pipeline.run_all --seed v5 --resume        # → data/v5/
+.venv/Scripts/python -m src.pipeline.run_all --output ../runs/thu --resume   # → thư mục bất kỳ, tính từ nơi gõ lệnh; thắng --seed
 ```
 
 **Khóa của kịch bản.** Mọi khóa được phép trong `facts_established`, `must_carry_over`, `must_not_ask`, `memory_expectation`, `success_if`, `ground_truth_facts`, `expected_outcome` (và cấp kịch bản, cấp cuộc gọi) nằm trong một file: [`contracts/scenario/scenario-keys.yaml`](../../contracts/scenario/scenario-keys.yaml), mỗi khóa có kiểu, nguồn (`btc_sample` / `btc_format` / `team`) và ý nghĩa. Danh sách slot của [`src/schemas/slots.py`](src/schemas/slots.py) đọc từ file này; tên tool và tham số đọc từ `tools.schema.json` của BTC. `Dataset.write_scenario` từ chối kịch bản có khóa, kiểu hoặc giá trị không có trong file ([`src/schemas/keys.py`](src/schemas/keys.py)), nên một tình huống cần khóa mới thì **thêm khóa vào file trước** theo `rules` ở đầu file (đặt tên theo hậu tố, `origin: team`, `description`, `since`), rồi chạy `pytest tests/test_scenario_keys.py`. Không đổi tên hay kiểu của khóa BTC.
@@ -641,7 +644,7 @@ src/utils/                 dataset.py (vị trí mọi file output), btc_schemas
                            paths.py, crm.py, memory.py, pii.py, audio_*, report_html.py…
 src/pipeline/              các bước (§4) và run_all
 tests/                     test offline
-(không còn output/)        dữ liệu sinh ra nằm ở data/seed-<tên>/ ở gốc repo (§5)
+(không còn output/)        dữ liệu sinh ra nằm ở data/<tên>/ ở gốc repo (§5)
 ```
 
 Prompt nằm ở `../../config/prompts/data-generation/` (prompt của judge lấy từ rubric của BTC).
@@ -725,9 +728,27 @@ Những chỗ bộ sinh từng gán nhãn sai, viết hội thoại mẫu sai, h
 
 | Tình huống | Trước | Bây giờ |
 |---|---|---|
-| Nơi ghi dữ liệu | `evaluation/data-generation/output/` | `data/seed-<tên>/` ở gốc repo (`run_all --seed <tên>`, mặc định `seed-dev`); audio không lên Git |
+| Nơi ghi dữ liệu | `evaluation/data-generation/output/` | `data/<tên>/` ở gốc repo (`run_all --seed <tên>`, mặc định `dev`); audio không lên Git |
 | Chạy với OpenAI | `src.gemini_client` / `src.elevenlabs_client` không còn sau khi dời vào `src/providers/`; ElevenLabs và Gemini tìm `.env` sai chỗ | factory chỉ nạp SDK của nhà cung cấp được dùng; cả ba client đọc một file `ENV_FILE` (`evaluation/data-generation/.env`) |
 | Audio sạch / nhiễu | chỉ có trong báo cáo tổng | `python -m src.pipeline.audio_report` (và trong `run_all`): số clip và hội thoại sạch / nhiễu theo loại, SNR, phút, theo kênh và cách nhập, ở cả bộ theo lượt và bộ hội thoại |
 | Chi phí hội thoại mẫu (gpt-4.1, ~16k token đầu vào mỗi cuộc) | tài liệu chính sách (~10k token, giống nhau mọi cuộc) nằm cuối CALL JSON, sau phần thay đổi: không bao giờ được prompt cache của OpenAI | `fixed_prefix`: hướng dẫn rồi chính sách đứng trước, CALL JSON sau, nên ~80% đầu vào tính giá cache (giảm 75% trên gpt-4.1; ước tính ~$0,042 → ~$0,023 một cuộc, lần thử lại còn rẻ hơn); `prompt_cache_key` mỗi bước; log ghi `cached_tokens` |
 | Ước tính tiền | báo cáo chỉ đếm token | `report` in `cached_tokens` và chi phí ước tính theo `pricing_usd_per_mtok` (`config/settings.yaml`; không có giá của một model đã dùng thì không in số, để không đọc nhầm số thiếu là đủ) |
 | Đọc lại audio đã trả tiền | ElevenLabs chỉ bỏ qua clip khi `--resume`, và theo file WAV đã trộn tiếng ồn | cache âm thanh gốc theo (câu, giọng, model, cài đặt) ở `.cache/tts/`, dùng chung mọi seed và lần chạy; tiếng ồn vẫn trộn mới; `elevenlabs_usage.json` ghi `turns_from_tts_cache` |
+
+## Hai bước kiểm thêm
+
+- `sync_customer_turns` (sau `generate_dialogue`): câu khách mà hội thoại mẫu viết thêm ở cuối, như "đúng rồi em" sau câu đọc lại, được ghi lại vào `customer_turns`. Thiếu bước này, `order.create` không bao giờ được khách đồng ý khi chấm.
+- `check_labels` (sau `build_ground_truth`): oracle dựng từ nhãn nên luôn đạt; bước này so nhãn với lời khách và hội thoại mẫu, ghi `reports/label_check.json` để người duyệt đọc.
+
+## Audio của revision mới: chỉ đọc lượt đã đổi
+
+Mỗi ký tự gửi ElevenLabs đều tốn tiền, nên revision mới dùng lại clip của revision trước:
+
+```bash
+export DATAGEN_SEED=dev-r3
+python -m src.pipeline.carry_audio --from dev-r2   # miễn phí: chép clip có cùng lời, kể cả khi lượt đổi vị trí
+python -m src.pipeline.synthesize_scenario_audio --changed-only --only SCN-ADV-0151 --dry-run   # xem danh sách và số ký tự, không gọi API
+python -m src.pipeline.synthesize_scenario_audio --changed-only --only SCN-ADV-0151             # chỉ đọc các lượt đó
+```
+
+`--only` thêm kịch bản chưa có clip nào; cuộc khác chưa có clip thì giữ nguyên. Lượt mới giữ giọng của cuộc đó. Dạng đọc (`asr_reference`) chỉ gọi model cho các dòng mới.

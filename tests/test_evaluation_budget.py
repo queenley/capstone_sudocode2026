@@ -111,8 +111,7 @@ def test_settlement_does_not_recreate_a_missing_ledger(tmp_path, monkeypatch):
 
 def test_ledger_preflight_requires_existing_valid_ledger_without_mutation(tmp_path, monkeypatch):
     monkeypatch.delenv("EVAL_BUDGET_DB", raising=False)
-    with pytest.raises(RuntimeError, match="EVAL_BUDGET_DB is required"):
-        budget.validate_ledger()
+    assert budget.validate_ledger() is False   # optional: no ledger, no cap
     path = tmp_path / "budget.sqlite"
     monkeypatch.setenv("EVAL_BUDGET_DB", str(path))
     with pytest.raises(RuntimeError, match="must exist"):

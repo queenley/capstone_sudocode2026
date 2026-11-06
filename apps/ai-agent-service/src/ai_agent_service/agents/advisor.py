@@ -56,6 +56,8 @@ from langchain_core.messages import AIMessage, AIMessageChunk, SystemMessage, To
 from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import BaseTool
 
+from ..components import clock
+from ..components.context import focus
 from ..components.context.budget import Section, assemble
 from ..components.guardrails import actions, purchase
 from ..components.memory.brief import BriefLine
@@ -103,6 +105,8 @@ class AgentContext:
     warnings: tuple[str, ...] = ()
     must_not_ask: tuple[str, ...] = ()
     working_summary: str | None = None
+    #: The call's working state, the last thing the model reads (``pipeline.hot.call_state``).
+    call_state: tuple[str, ...] = ()
     #: Why the previous draft of this turn was blocked, for a regeneration.
     block_reasons: tuple[str, ...] = ()
     #: The sentences of this answer the customer already heard when a later one was blocked:
@@ -200,6 +204,10 @@ class AdvisorEvent:
 #: also enforced in code where code can (the guard, the before-write check).
 #: The codes in brackets are the policy sections the rule comes from.
 HARD_RULES = load_prompt("advisor/rules.md")
+#: Rules a turn loads by its situation (``components.context.focus``).
+RULE_PACKS: dict[str, str] = load_prompt_yaml("advisor/rule_packs.yaml")
+#: Every rule, for the run's manifest and for a reader.
+ALL_RULES = "\n\n".join((HARD_RULES, *RULE_PACKS.values()))
 
 #: The lane notes, the identity question, the opening and the channel notes.
 _NOTES = load_prompt_yaml("advisor/notes.yaml")
@@ -242,23 +250,24 @@ def lane_instruction(context: AgentContext) -> str:
     return "\n".join([text, *extra]).strip()
 
 
-def system_prompt(context: AgentContext, *, max_tokens: int = 3000) -> tuple[str, tuple[str, ...]]:
+def system_prompt(context: AgentContext, *, max_tokens: int = 4000, called: Sequence[str] = ()) -> tuple[str, tuple[str, ...]]:
     """The system message in section 4.4's order, and the sections that were cut.
 
-    1 rules, 2 warnings (both never cut), 3 the lane, 4 the brief lines the
-    tier allows, 5 the summary of older turns (the last four travel as
-    messages), 6 the turn's knowledge passages, 7 the playbook entries of the
-    situation, 8 tool results already gathered (a regeneration), 9 why the
-    previous draft was blocked. Required evidence survives the soft budget;
-    optional sections are admitted in priority order.
+    What never changes comes first, so a provider's prompt cache can hold it, and the customer's request last, next
+    to where the model answers. Between them: the situation's rules, warnings, the lane, what the call has shown, the
+    brief lines the tier and the turn allow, the summary of older turns, the knowledge passages, the playbook,
+    tool results already gathered and why the previous draft was blocked. *called* is the tools this turn already ran.
     """
     brief = "\n".join(f"{line.id}. {line.text}" for line in context.brief_lines)
     policy, playbook = shown_passages(context.knowledge)
     sections = [
         Section("rules", HARD_RULES),
+        Section("packs", _packs_block(context, called)),
         Section("warnings", "\n".join(f"CẢNH BÁO: {w}" for w in context.warnings)),
         Section("lane", (
-            f"Lane: {context.lane}. Mức xác minh danh tính: {context.tier}. Kênh: {context.channel}."
+            # Without the day, "tối mai" has no date and the model invents a year.
+            (f"Bây giờ là {clock.moment_label(context.now)}; tính ngày giờ khách nói (mai, thứ Bảy) từ đây.\n" if context.now else "")
+            + f"Lane: {context.lane}. Mức xác minh danh tính: {context.tier}. Kênh: {context.channel}."
             + (f" Hồ sơ đứng tên: {context.address_as}." if context.address_as else _address_note(context))
             + f"\n{lane_instruction(context)}"
         ).strip()),
@@ -272,9 +281,26 @@ def system_prompt(context: AgentContext, *, max_tokens: int = 3000) -> tuple[str
         Section("tool_results", _tool_block(context.tool_results)),
         Section("opening", OPENING[bool(context.brief_lines)] if context.phase == "opening" else ""),
         Section("blocked", _blocked_block(context)),
+        Section("call_state", _state_block(context)),
     ]
     pack = assemble(sections, max_tokens=max_tokens)
     return pack.text, pack.cut
+
+
+def _packs_block(context: AgentContext, called: Sequence[str]) -> str:
+    chosen = focus.packs(context, RULE_PACKS, called)
+    return "Luật cho tình huống này:\n" + "\n".join(RULE_PACKS[name] for name in chosen) if chosen else ""
+
+
+def _state_block(context: AgentContext) -> str:
+    """The call's state, then the request: what the answer has to be about."""
+    parts = []
+    if context.call_state:
+        parts.append("Trạng thái cuộc:\n" + "\n".join(f"- {line}" for line in context.call_state))
+    if context.customer_said and context.lane in ("CONTINUITY", "NEW"):
+        parts.append(f'Yêu cầu hiện tại của khách: "{context.customer_said}". Làm đúng yêu cầu này trước, không trả lời '
+                     "sang việc khác; thông tin ở trên chỉ dùng khi phục vụ yêu cầu này.")
+    return "\n".join(parts)
 
 
 def shown_passages(knowledge: Sequence[Mapping[str, Any]]) -> tuple[list[Mapping[str, Any]], list[Mapping[str, Any]]]:
@@ -373,7 +399,8 @@ class ContextPromptMiddleware(AgentMiddleware):
         context = getattr(getattr(request, "runtime", None), "context", None)
         if not isinstance(context, AgentContext):
             return request
-        prompt, _ = system_prompt(context)
+        called = [m.name for m in request.state.get("messages") or [] if isinstance(m, ToolMessage) and m.name]
+        prompt, _ = system_prompt(context, called=called)
         prompt = pii.tokenise(prompt, context.vault)
         if request.state.get("run_model_call_count", 0) >= self.model_limit - 1:
             prompt += ("\nĐây là lượt model cuối: không gọi thêm tool. Trả lời ngắn từ kết quả đã có; "

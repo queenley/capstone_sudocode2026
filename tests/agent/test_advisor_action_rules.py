@@ -1,5 +1,5 @@
 """The advisor's hard rules keep the three act-now behaviours the evaluation showed it lacking."""
-from ai_agent_service.agents.advisor import HARD_RULES
+from ai_agent_service.agents.advisor import ALL_RULES as HARD_RULES
 
 
 def test_order_is_prepared_then_requires_confirmation_of_the_exact_payload():

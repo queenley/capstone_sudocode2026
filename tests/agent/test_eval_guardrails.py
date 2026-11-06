@@ -24,9 +24,9 @@ def rows(config="full"):
 
 
 @pytest.mark.parametrize("options", [[], ["--no-extract"], ["--relabel", "SOURCE"]])
-def test_model_backed_modes_require_ledger_before_database_or_models(tmp_path, monkeypatch, options):
+def test_a_named_but_missing_ledger_stops_before_database_or_models(tmp_path, monkeypatch, options):
     source = cohort(tmp_path / "source")
-    monkeypatch.delenv("EVAL_BUDGET_DB", raising=False)
+    monkeypatch.setenv("EVAL_BUDGET_DB", str(tmp_path / "missing.sqlite"))
     db, extractor = Mock(), Mock()
     monkeypatch.setattr(runner, "use_evaluation_database", db)
     monkeypatch.setattr(cli, "_extractor", extractor)

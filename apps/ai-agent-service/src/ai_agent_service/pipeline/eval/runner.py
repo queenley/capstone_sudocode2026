@@ -629,6 +629,7 @@ def diagnose(state: Mapping[str, Any], error: str | None, *, config: str, scenar
         "knowledge": {"chunks": [h.get("chunk_id") for h in found.get("hits") or []], "top_score": found.get("top_score"),
                       "abstain": found.get("reason") if found.get("abstain") else None,
                       "order_date": found.get("order_date")} if found else None,
+        "context": state.get("prompt_stats"),
         "streamed": bool(draft.get("streamed")),
         "guard_passed": guard.get("passed"),
         "policy": (guard.get("soft") or {}).get("decided_by"),
@@ -648,6 +649,50 @@ def _add(total: dict[str, dict[str, int]], more: Mapping[str, Mapping[str, int]]
         bucket = total.setdefault(agent, {"calls": 0, "input": 0, "output": 0})
         for key, value in counts.items():
             bucket[key] = bucket.get(key, 0) + int(value)
+
+
+#: Turns of each session in a load test: enough to load the model, few enough to stay cheap.
+LOAD_TURNS = 3
+
+
+async def load_test(rig: Rig, ready: list[Scenario], levels: list[int], progress: Progress) -> list[dict[str, Any]]:
+    """How many sessions at once the demo holds: each level starts that many first calls together, memory off.
+
+    Never traced and never graded. A level holds when no turn failed and both p95 are within the chat limits of
+    ``huong-dan-do-latency.md``. The turns of a level run on one rig, as the demo's do; a level with more sessions
+    than scenarios plays them again under other call ids.
+    """
+    from .performance import LIMITS_MS
+
+    def p95(values: list[int]) -> int:
+        ordered = sorted(values)
+        return ordered[min(len(ordered) - 1, int(0.95 * len(ordered)))]
+
+    results = []
+    for level in levels:
+        await reset()
+        chosen = [ready[index % len(ready)] for index in range(level)]
+        plans = [scenario.calls[0] for scenario in chosen]
+        for scenario, plan in zip(chosen, plans):
+            if plan.seed:
+                await seed(rig, plan.seed, customer_phone=scenario.data.get("customer_phone"),
+                           customer_name=scenario.data.get("customer_name"))
+
+        async def one(index: int, plan: CallPlan) -> list[TurnResult]:
+            session = CallSession.for_plan(rig, plan, thread=f"load|{level}|{index}", memory=False)
+            await session.connect()
+            return [await session.turn(text) for text in plan.turns[:LOAD_TURNS]]
+
+        turns = [turn for session in await asyncio.gather(*(one(i, p) for i, p in enumerate(plans))) for turn in session]
+        first = [t.first_token_ms if t.first_token_ms is not None else t.total_ms for t in turns]
+        total = [t.total_ms for t in turns]
+        errors = sum(bool(t.error) for t in turns)
+        figures = {"sessions": level, "turns": len(turns), "errors": errors, "ttft_p95_ms": p95(first), "total_p95_ms": p95(total)}
+        figures["held"] = not errors and figures["ttft_p95_ms"] <= LIMITS_MS["ttft"] and figures["total_p95_ms"] <= LIMITS_MS["total"]
+        results.append(figures)
+        progress(f"  load {level} sessions: {figures}")
+    await reset()
+    return results
 
 
 async def warm_up(rig: Rig, scenario: Scenario, turns: int, progress: Progress) -> None:

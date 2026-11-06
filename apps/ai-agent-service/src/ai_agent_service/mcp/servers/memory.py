@@ -46,11 +46,17 @@ import uuid
 from datetime import date, datetime
 from typing import Any, Literal
 
+from ...components.intake import pii
+from ...components.intake.text import plain
 from ..server_base import Server, ToolFailure, apply_schema, database
 
 server = Server("memory")
 
 READERS = {"advisor", "harness", "memory_writer", "admin"}
+#: ``memory_search_calls``: lines returned, characters per line, past lines read.
+SEARCH_LIMIT = 5
+SEARCH_CHARS = 240
+SEARCH_ROWS = 400
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS facts (
@@ -110,6 +116,9 @@ CREATE TABLE IF NOT EXISTS episodes (
     created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
     UNIQUE (customer_id, call_id)
 );
+-- What the customer came for and what the call left open: came after the table.
+ALTER TABLE episodes ADD COLUMN IF NOT EXISTS goal TEXT;
+ALTER TABLE episodes ADD COLUMN IF NOT EXISTS open_items JSONB NOT NULL DEFAULT '[]';
 
 CREATE TABLE IF NOT EXISTS identities (
     key_type    TEXT NOT NULL CHECK (key_type IN ('phone', 'zalo_id', 'fb_id')),
@@ -199,11 +208,57 @@ async def memory_get_episodes(customer_id: str, n: int = 3) -> dict[str, Any]:
                 "episode_id": r["episode_id"], "call_id": r["call_id"], "channel": r["channel"],
                 "date": r["started_at"].isoformat(), "summary": r["summary"], "outcome": r["outcome"],
                 "objection_type": r["objection_type"], "sentiment": r["sentiment"],
-                "commitments": r["commitments"],
+                "commitments": r["commitments"], "goal": r["goal"], "open_items": r["open_items"],
             }
             for r in rows
         ]
     }
+
+
+def matching_lines(rows: list[dict[str, Any]], query: str, limit: int = SEARCH_LIMIT) -> list[dict[str, Any]]:
+    """The past lines that say most of the query's words, best first, with personal tokens masked.
+
+    A token belongs to the vault of the call it was said in, so it means nothing in this one.
+    """
+    words = {word for word in plain(query).split() if len(word) > 1}
+    scored = []
+    for row in rows:
+        said = set(plain(str(row["content"])).split())
+        score = len(words & said)
+        if score:
+            scored.append((score, row))
+    scored.sort(key=lambda pair: pair[0], reverse=True)
+    return [{"date": str(row["started_at"])[:10], "speaker": row["speaker"],
+             "text": pii.TOKEN.sub("[đã che]", str(row["content"]))[:SEARCH_CHARS]} for _, row in scored[:limit]]
+
+
+@server.tool(roles={"advisor", "admin"}, name="memory_search_calls")
+async def memory_search_calls(customer_id: str, query: str, call_id: str | None = None) -> dict[str, Any]:
+    """Search what this customer and the shop said in their earlier calls, by keywords.
+
+    Use it when the customer refers to something said before that the Call Brief does not hold.
+
+    Args:
+        customer_id: The customer. Filled in by the harness.
+        query: The keywords, for example "bao hanh may loc".
+        call_id: The current call, left out of the search. Filled in by the harness.
+    """
+    if not customer_id:
+        return {"lines": [], "episodes": []}
+    pool = await database()
+    async with pool.connection() as conn:
+        rows = []
+        # The conversation log is the API's: an evaluation database has none, and searches the episodes alone.
+        if (await (await conn.execute("SELECT to_regclass('turns') AS t")).fetchone())["t"]:
+            rows = await (await conn.execute(
+                "SELECT t.content, t.speaker, c.started_at FROM turns t JOIN calls c ON c.id = t.call_id "
+                "WHERE c.customer_id = %s AND c.id::text <> %s AND t.speaker IN ('customer', 'agent', 'human_agent') "
+                "ORDER BY c.started_at DESC, t.id LIMIT %s", (customer_id, str(call_id or ""), SEARCH_ROWS))).fetchall()
+        episodes = await (await conn.execute(
+            "SELECT started_at, 'episode' AS speaker, concat_ws(' ', goal, summary) AS content FROM episodes "
+            "WHERE customer_id = %s AND call_id <> %s ORDER BY started_at DESC LIMIT 10",
+            (customer_id, str(call_id or "")))).fetchall()
+    return {"lines": matching_lines(rows, query), "episodes": matching_lines(episodes, query)}
 
 
 @server.tool(roles=READERS, name="memory_get_open_items")
@@ -453,7 +508,7 @@ async def memory_commit_episode(customer_id: str, episode: dict[str, Any]) -> di
     Args:
         customer_id: The customer.
         episode: {call_id, channel, date, summary, outcome, objection_type,
-            sentiment, commitments, source_turn_span}.
+            sentiment, commitments, source_turn_span, goal, open_items}.
     """
     episode_id = f"E-{uuid.uuid4().hex[:12]}"
     pool = await database()
@@ -462,15 +517,17 @@ async def memory_commit_episode(customer_id: str, episode: dict[str, Any]) -> di
         await _not_deleted(conn, customer_id)
         await conn.execute(
             "INSERT INTO episodes (episode_id, customer_id, call_id, channel, started_at, summary, outcome, "
-            "objection_type, sentiment, commitments, source_turn_span) "
-            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) "
-            "ON CONFLICT (customer_id, call_id) DO UPDATE SET summary = EXCLUDED.summary, outcome = EXCLUDED.outcome",
+            "objection_type, sentiment, commitments, source_turn_span, goal, open_items) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) "
+            "ON CONFLICT (customer_id, call_id) DO UPDATE SET summary = EXCLUDED.summary, outcome = EXCLUDED.outcome, "
+            "goal = EXCLUDED.goal, open_items = EXCLUDED.open_items",
             (
                 episode_id, customer_id, str(episode["call_id"]), episode.get("channel", "web"),
                 _day(episode.get("date")), episode["summary"], episode.get("outcome"),
                 episode.get("objection_type"), episode.get("sentiment"),
                 json.dumps(episode.get("commitments") or [], ensure_ascii=False),
                 json.dumps(episode.get("source_turn_span") or [], ensure_ascii=False),
+                episode.get("goal"), json.dumps(episode.get("open_items") or [], ensure_ascii=False),
             ),
         )
     return {"episode_id": episode_id}

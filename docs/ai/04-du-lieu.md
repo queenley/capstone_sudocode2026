@@ -109,7 +109,7 @@ flowchart LR
 |---|---|---|---|
 | 1 | `build_catalog` | không | kiểm catalog nhất quán (giá, biến thể, tồn kho, khuyến mãi) và khớp bản của agent |
 | 2 | `generate_synthetic_customers` | LLM (tên) | 10 khách giả lập thêm vào 50 khách BTC, `crm_seed_synthetic.json` |
-| 3 | `generate_scenarios` | LLM, 1/kịch bản | `data/seed-<tên>/scenarios/` (định dạng mẫu BTC), `metadata/`, `call_brief/`, `handoff_brief/`, `tools/` |
+| 3 | `generate_scenarios` | LLM, 1/kịch bản | `data/<tên>/scenarios/` (định dạng mẫu BTC), `metadata/`, `call_brief/`, `handoff_brief/`, `tools/` |
 | 4 | `generate_dialogue` | LLM, 1/cuộc | transcript tham chiếu |
 | 5 | `simulate_replays` | không (tùy chọn LLM) | replay theo simulator BTC × 3 seed |
 | 6 | `validate_rules` | không | chấm chính thức, phải hoàn hảo |
@@ -122,7 +122,7 @@ flowchart LR
 | 13 | `summarize_dataset` | không | dashboard HTML |
 | 14 | `report` | không | báo cáo `.md` + `.html` |
 
-`--plan-only` chạy bước lập kế hoạch + nhãn + kiểm oracle mà **không tốn API**. Mọi thứ sinh ra nằm ở `data/seed-<tên>/` ở gốc repo (`run_all --seed <tên>`, mặc định `seed-dev`); audio của seed không lên Git.
+`--plan-only` chạy bước lập kế hoạch + nhãn + kiểm oracle mà **không tốn API**. Mọi thứ sinh ra nằm ở `data/<tên>/` ở gốc repo (`run_all --seed <tên>`, mặc định `dev`); audio của seed không lên Git.
 
 ### Sinh kịch bản test
 
@@ -156,9 +156,9 @@ Danh sách đủ 15 loại: [evaluation/data-generation/README.md §3](../../eva
 
 ### Dataset để chấm
 
-Lệnh đánh giá (`run_eval.py`) đọc kịch bản ở [`data/seed-dev/scenarios`](../../data/seed-dev/README.md): đường chạy duy nhất, 400 kịch bản (250 `SCN-GEN-*` và 150 `SCN-ADV-*`). Các bản v1 đến v4 đã xóa khỏi cây thư mục.
+Lệnh đánh giá (`run_eval.py`) chấm trên [`data/dev/scenarios`](../../data/dev/README.md): bộ dữ liệu duy nhất, 404 kịch bản (250 `SCN-GEN-*` và 154 `SCN-ADV-*`), 801 cuộc, sinh sau lần đổi CRM tổng hợp ngày 28/10 nên đơn trong `seed_history` khớp đơn mà `crm`/`order.status` trả về. Các bản v1 đến v4 đã xóa khỏi cây thư mục; v4 lệch CRM ở 28 kịch bản (ví dụ SCN-GEN-0051: lời khách nói xe đẩy Combi Sugocal, CRM ghi OD900302 là máy hâm sữa).
 
-> Dataset có trạng thái **diagnostic**: nhãn do bộ sinh gán, **chưa có người duyệt** (chưa có `review/golden_manifest.json`). Quy tắc duyệt và sửa nhãn: [ground-truth-review](../../evaluation/datasets/ground-truth-review/SKILL.md).
+> Dataset có trạng thái **diagnostic**: nhãn do bộ sinh gán, **chưa có người duyệt** (chưa có `review/golden_manifest.json`). Đổi nhãn theo quy tắc [ground-truth-review](../../evaluation/datasets/ground-truth-review/SKILL.md): tạo revision mới, không ghi đè.
 
 **Lịch sử cuộc cũ** (`seed_history`): trước khi chạy, lệnh đánh giá ghi các phiên cũ và đơn cũ vào bộ nhớ của khách ở cả hai cấu hình; cấu hình baseline chỉ là **không đọc lại** chúng.
 
@@ -184,7 +184,7 @@ Schema `agent` trong PostgreSQL (tạo khi khởi động; `AGENT_DB_SCHEMA`):
 | `pii_vault` | token → giá trị, **mã hóa AES-GCM** | đổi `APP_SECRET` thì vault cũ không đọc được |
 | checkpoint LangGraph | state của đồ thị theo `thread_id = call-<id>` | |
 | `facts` (MCP memory) | fact ledger: slot, giá trị, nguồn, `op` (`set`/`supersede`/`delete`), id fact, cuộc và lượt gốc | tên slot trùng BTC |
-| episodes | một dòng tóm tắt mỗi phiên | phần tính trước của brief |
+| episodes | một dòng tóm tắt mỗi phiên, kèm `goal` và `open_items` | phần tính trước của brief |
 | identities | khóa băm HMAC → khách, trạng thái `confirmed`/`provisional` | |
 | `deletion_requests` | yêu cầu xóa dữ liệu (QT-06), thực hiện ở after_call | |
 | `zalo_threads`, `zalo_messages`, `zalo_tokens` | kênh Zalo OA | |

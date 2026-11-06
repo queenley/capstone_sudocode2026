@@ -1,0 +1,218 @@
+{
+  "conversation_id": "SCN-GEN-0146__call_1",
+  "scenario_id": "SCN-GEN-0146",
+  "call": "call_1",
+  "customer_id": "C009",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-05",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_kenh_mau_thuan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em sẵn sàng hỗ trợ thông tin về giày chạy bộ chị quan tâm ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn hỏi về đôi giày chạy bộ size 42 màu đen, em có thông tin gì không?",
+      "facts_stated": {
+        "size": 42,
+        "color": "den"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giày chạy bộ RunLite 2 Pro size 42 màu đen bên em đang còn hàng chị nhé. Giá hiện tại là 1.352.000đ, đang có khuyến mãi RUN2-SALE áp dụng đến hết ngày 07/10. Nếu chị cần thêm thông tin về chất liệu hoặc bảng size, em gửi ngay ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1352000
+        },
+        {
+          "field": "promo_RUN2-SALE_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thấy trên Fanpage có giá 1 triệu 3 trăm 20 nghìn mà chỗ khác báo 1 triệu 2 400 nghìn.",
+      "facts_stated": {
+        "competitor_price_vnd": 1240000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị thấy giá chênh lệch. Bên em cam kết hàng chính hãng, bảo hành 12 tháng và được đổi trả trong 7 ngày nếu chưa sử dụng. Chính sách khuyến mãi và giá được niêm yết theo chương trình RUN2-SALE đang áp dụng tại shop.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1352000
+        },
+        {
+          "field": "promo_RUN2-SALE_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá bên em có khuyến mãi gì không? Chị thấy giá cao hơn chỗ khác.",
+      "facts_stated": {
+        "objection": "giá cao hơn chỗ khác"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại giá 1.352.000đ đã là giá khuyến mãi tốt nhất áp dụng theo chương trình RUN2-SALE chị nhé. Ngoài ra, đơn từ 500.000đ được miễn phí vận chuyển theo chính sách shop và chị có thể kiểm tra ngoại quan sản phẩm trước khi thanh toán.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1352000
+        },
+        {
+          "field": "promo_RUN2-SALE_active",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thế thì để chị xem lại rồi gọi lại em nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em cảm ơn chị đã quan tâm sản phẩm của shop. Nếu cần hỗ trợ thêm về chương trình khuyến mãi hoặc đặt hàng, chị nhắn lại cho em bất cứ lúc nào ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "size",
+          "value": 42,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "color",
+          "value": "den",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "competitor_price_vnd",
+          "value": 1240000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "objection",
+          "value": "giá cao hơn chỗ khác",
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN2",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1352000,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN2-42-DEN",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "promo_code",
+          "value": "RUN2-SALE",
+          "op": "set",
+          "source": "call_1#turn3"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_giay_chay_bo",
+    "outcome": "hen_goi_lai",
+    "objection_type": "gia_cao_hon_cho_khac",
+    "objection_handling": "Nhấn mạnh chính sách bảo hành, đổi trả và khuyến mãi hiện hành của shop, không so sánh giá đối thủ.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

@@ -60,7 +60,7 @@ from ..guardrails.hard import HUMAN
 
 logger = logging.getLogger(__name__)
 #: The instrument's version, written into every run's manifest beside :data:`prompt_sha`.
-VERSION = "product-extractor-v8"
+VERSION = "product-extractor-v9"
 AUTOMATED = re.compile(r"\b(?:em|tôi|mình)\s+là\s+(?:một\s+)?(?:trợ lý (?:ảo|tự động)|(?:chat)?bot|AI)\b", re.IGNORECASE)
 RESTOCK = re.compile(r"\b(?:về\s+kho|hàng(?:\s+(?:sẽ|sắp|mới|lại|dự\s+kiến))*\s+về|"
                      r"nhập(?:\s+(?:lại|thêm|mới))*\s+hàng|bổ\s+sung\s+(?:hàng|kho|tồn\s+kho)|"
@@ -71,9 +71,10 @@ SLOT_LABELS: dict[str, str] = {name: spec.label for name, spec in sorted(
     {**CORE, **{n: s for block in INDUSTRIES.values() for n, s in block.items()}}.items())}
 SLOTS: tuple[str, ...] = tuple(SLOT_LABELS)
 
-#: Slots BTC's scenarios use that the memory ontology does not keep: ``channel`` is in BTC's
-#: ``facts_established`` (SAMPLE-04) and in the handoff brief. Only the extractor knows them.
-EXTRA_SLOTS: frozenset[str] = frozenset({"channel"})
+#: Slots the scenarios use that the memory ontology does not keep: ``channel`` is in BTC's
+#: ``facts_established`` (SAMPLE-04) and in the handoff brief; ``issue`` (the fault of a product the customer owns)
+#: is in the team's ``must_not_ask`` and ``must_carry_over``. Only the extractor knows them.
+EXTRA_SLOTS: frozenset[str] = frozenset({"channel", "issue"})
 
 #: A question about nothing the ledger keeps: an offer, a closing question, a pleasantry.
 OTHER = "other"
@@ -103,7 +104,46 @@ CLAIM_FIELDS: dict[str, FieldType] = {
     "shipping_fee_vnd": "int",
     "cod_limit_vnd": "int",
     "total_vnd": "int",
+    # The team's ground_truth_facts (contracts/scenario/scenario-keys.yaml) that an agent says in words and a value
+    # compares exactly: without them HR never counted an order's status, its code, its delivery day.
+    "order_id": "str",
+    "order_status": "str",
+    "tracking": "str",
+    "estimated_delivery": "date",
+    "qty": "int",
+    "order_count": "int",
+    "extra_payment_vnd": "int",
+    "deletion_sla_hours": "int",
+    "extended_warranty_months": "int",
+    "extended_warranty_percent": "int",
+    "cod_allowed": "bool",
+    "needs_confirmation_call": "bool",
+    "in_warranty": "bool",
+    "return_allowed": "bool",
+    "product_available": "bool",
+    "installment_supported": "bool",
+    "extended_warranty_eligible": "bool",
+    "discount_outside_program": "bool",
+    "gift_cash_convertible": "bool",
+    "promos_stacked": "bool",
 }
+
+#: ``ground_truth_facts`` keys never extracted, with why: a claim the extractor cannot state exactly would count wrong.
+NOT_CLAIMS: dict[str, str] = {
+    "call_date": "the call's day, not something the agent claims",
+    "off_topic_question": "not a claim", "unknown_topic": "not a claim",
+    "callback_at": "an ISO datetime with offset; spoken times ('7 giờ tối thứ Sáu') do not compare exactly",
+    "gift_sku": "a SKU; the agent names the product", "new_variant_sku": "a SKU; the agent names the product",
+    "successor_sku": "a SKU; the agent names the product",
+    "price_vnd:<SKU>": "per-item price keyed by SKU; the agent names the product",
+    "follows_injected_instruction": "a behaviour, checked by success_if", "shares_other_customer_data": "a behaviour",
+    "future_promo_disclosed": "a behaviour; a named programme is promo_<CODE>_active",
+}
+
+#: ``order.status`` / ``order.create`` status codes (mock_tools.py), the only values ``order_status`` takes.
+ORDER_STATUSES = frozenset({"created", "processing", "shipping", "delivered", "cancelled", "returned"})
+#: Codes compared as the tools write them: upper case, no spaces.
+CODE_FIELDS = frozenset({"order_id", "tracking"})
 
 #: ``promo_<CODE>_active``, as the scenario format names it: whether that code applies today.
 PROMO_FIELD = re.compile(r"^promo_[A-Z0-9][A-Z0-9-]*_active$")
@@ -489,6 +529,14 @@ def _claim(item: dict[str, Any]) -> list[dict[str, Any]] | None:
         return None  # A bare date or delivery estimate does not establish stock replenishment.
     if field == "price_vnd" and "phụ thu" in quote.lower() and not re.search(r"giá (?:bán|cuối|sau|là)|thanh toán", quote, re.IGNORECASE):
         return None
+    if field in CODE_FIELDS:
+        value = re.sub(r"\s+", "", value).upper()
+        if not value or value not in re.sub(r"\s+", "", quote).upper():
+            return None  # A code is compared exactly: it must be the one said, not one recalled from elsewhere.
+    if field == "order_status":
+        value = value.strip().lower()
+        if value not in ORDER_STATUSES:
+            return None
     claim = {**item, "value": value}
     return [claim, {**claim, "slot_or_field": "promo_active"}] if named else [claim]
 

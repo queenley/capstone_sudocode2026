@@ -45,6 +45,7 @@ from typing import Any, Iterable, Mapping
 
 from langchain.agents.middleware import AgentMiddleware
 from langchain_core.messages import ToolMessage
+from ..components import clock
 from ..components.intake import pii
 from ..components.guardrails import purchase
 from ..components.intake.text import plain
@@ -297,6 +298,8 @@ class ToolGuardMiddleware(AgentMiddleware):
             if "purchase_authorization" in accepted:
                 args["purchase_authorization"] = purchase.receipt(
                     getattr(context, "pending_purchase", None), business_args, context)
+        if name == "schedule_callback" and (moment := clock.parse_local(args.get("callback_at"))) is not None:
+            args["callback_at"] = clock.tool_time(moment)
         if name in WRITE_TOOLS and IDEMPOTENCY_ARG in accepted:
             key = idempotency_key(context, name, args)
             if key:

@@ -8,7 +8,7 @@ a tool error with the reason, and nothing happens in the business.
 |---|---|
 | ``order.create`` | a phone to order for; the tier allows it; the product code is trusted (it came from a tool this call or from the brief, never made up from a name); the unit price equals today's ``pricing.get_quote`` for that code; COD total at most 10.000.000đ; not the same product as an order this call already created, unless the customer wants one more (*intents* ``one_more``, read by Jev; the word list :data:`ONE_MORE` only when Jev gave no answer) |
 | ``order.update`` | the order is one this customer has, or one a tool showed this call; the new variant is trusted; not the same change as one this call already made, in any turn (a second exchange is charged, DT-03); the customer asked for this change or agreed to it (*intents* ``change``, read by Jev: a complaint alone, "size M hơi chật", is not a choice yet). An order this call created may be corrected by its caller whatever the tier |
-| ``schedule.callback`` | an ISO 8601 time with +07:00, inside working hours (LN-01, LN-02) and not in the past; otherwise the nearest working slot, for the model to propose |
+| ``schedule.callback`` | a date and time in Vietnam time, not in the past, inside working hours (LN-01) or on a holiday, which the tool itself moves (LN-02, ``moved_from``, and the customer is told); otherwise the nearest working slot, for the model to propose |
 | ``handoff.transfer`` | the advisor decides; outside lane HANDOFF Jev checks the transfer is warranted (*intents* ``handoff``: a request for a person, medical or legal advice, a serious complaint, a question the documents and tools do not answer); no answer from Jev leaves the advisor's decision standing. The brief validates against ``schemas/handoff_brief.schema.json`` itself (required fields, enums, phone pattern, summary length), after the harness filled in what it knows |
 | ``memory.request_deletion`` | VERIFIED, and the customer agreed when asked to confirm (QT-06): *intents* ``delete``, read by Jev; the word lists only when Jev gave no answer |
 | any write tool in copilot mode | refused: the consultant acts, the advisor only suggests (section 4.6) |
@@ -236,13 +236,13 @@ def _order_update(args: Mapping[str, Any], *, orders: frozenset[str], trusted: f
 def _schedule_callback(args: Mapping[str, Any], *, now: datetime | None) -> list[str]:
     moment = clock.parse_local(args.get("callback_at"))
     if moment is None:
-        return ["callback_at phải là ngày giờ ISO 8601, ví dụ 2026-10-17T19:00+07:00."]
-    if clock.is_working_time(moment) and (now is None or moment >= now):
+        return ["callback_at phải là ngày giờ theo giờ Việt Nam, ví dụ 2026-10-17T19:00."]
+    if (clock.is_working_time(moment) or clock.is_holiday(moment.date())) and (now is None or moment >= now):
         return []
     slot = clock.nearest_working_time(moment, not_before=now)
     why = "đã qua" if now is not None and moment < now else "ngoài giờ làm việc (thứ Hai đến thứ Bảy 08:00–21:00, Chủ nhật 09:00–18:00, nghỉ 26/10 và 01/01)"
     return [f"Giờ hẹn {clock.moment_label(moment)} {why}; đề xuất với khách {clock.moment_label(slot)} "
-            f"({clock.iso_local(slot)}) rồi mới đặt lịch."]
+            f"({clock.tool_time(slot)}) rồi mới đặt lịch."]
 
 
 def _handoff(args: Mapping[str, Any], *, lane: str | None, warranted: bool | None) -> list[str]:

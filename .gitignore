@@ -25,7 +25,7 @@ infra/terraform/**/.terraform/
 evaluation/data-generation/.venv/
 evaluation/data-generation/.cache/
 # evaluation/data-generation/output/
-# Generated seeds (data/seed-<name>/, evaluation/data-generation src/utils/paths.py): audio stays out of git
+# Generated seeds (data/<name>/, evaluation/data-generation src/utils/paths.py): audio stays out of git
 # data/seed-*/audio/
 # data/seed-*/audio_previous/
 # data/seed-*/asr_test/audio/
@@ -61,5 +61,5 @@ evaluation/agent-evaluation/runs/
 # User-supplied private ASR hard-test audio and references
 data/seed/catalog/asr_hard_vi/
 
-# Imported seed-dev ASR transcripts and local audio; keep raw data out of Git.
-/data/seed-dev/
+# A label revision being built (ground-truth-review/SKILL.md) stays local until it replaces data/dev.
+/data/dev-r*/

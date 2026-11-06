@@ -34,6 +34,9 @@ HOLIDAYS = frozenset({"2026-10-26", "2027-01-01"})
 #: as in the mock: Monday to Saturday 08:00–21:00, Sunday 09:00–18:00.
 HOURS: dict[int, tuple[time, time]] = {**{day: (time(8), time(21)) for day in range(6)}, 6: (time(9), time(18))}
 
+#: LN-02: the big sale day opens longer than its weekday.
+SPECIAL_HOURS: dict[str, tuple[time, time]] = {"2026-11-11": (time(7), time(23))}
+
 #: The latest callback worth proposing is this long before closing.
 LAST_SLOT = timedelta(minutes=30)
 
@@ -85,13 +88,18 @@ def parse_local(value: object) -> datetime | None:
     return moment.astimezone(VIETNAM)
 
 
-def iso_local(moment: datetime) -> str:
-    """``2026-10-16T20:00+07:00``: minutes, Vietnam offset, as tools take a time."""
-    return moment.astimezone(VIETNAM).isoformat(timespec="minutes")
+def tool_time(moment: datetime) -> str:
+    """``2026-10-16T20:00``: minutes in Vietnam time, no offset, as tools take a time and the organisers' labels write it."""
+    return moment.astimezone(VIETNAM).strftime("%Y-%m-%dT%H:%M")
 
 
 def is_holiday(day: date) -> bool:
     return day.isoformat() in HOLIDAYS
+
+
+def hours_on(day: date) -> tuple[time, time]:
+    """The switchboard's opening and closing on *day*."""
+    return SPECIAL_HOURS.get(day.isoformat()) or HOURS[day.weekday()]
 
 
 def is_working_time(moment: datetime) -> bool:
@@ -99,7 +107,7 @@ def is_working_time(moment: datetime) -> bool:
     local = moment.astimezone(VIETNAM)
     if is_holiday(local.date()):
         return False
-    opening, closing = HOURS[local.weekday()]
+    opening, closing = hours_on(local.date())
     return opening <= local.time() < closing
 
 
@@ -119,7 +127,7 @@ def nearest_working_time(moment: datetime, *, not_before: datetime | None = None
         day = local.date() + timedelta(days=1)
         while is_holiday(day):
             day += timedelta(days=1)
-        opening, closing = HOURS[day.weekday()]
+        opening, closing = hours_on(day)
         wanted = min(max(local.time(), opening), (datetime.combine(day, closing) - LAST_SLOT).time())
         return _not_before(datetime.combine(day, wanted, tzinfo=VIETNAM), floor)
     candidates = [c for c in (_previous_slot(local), _next_opening(local)) if c is not None]
@@ -131,7 +139,7 @@ def _previous_slot(local: datetime) -> datetime | None:
     """The last proposable slot at or before *local* on its own day, if that day works."""
     if is_holiday(local.date()):
         return None
-    opening, closing = HOURS[local.weekday()]
+    opening, closing = hours_on(local.date())
     last = datetime.combine(local.date(), closing, tzinfo=VIETNAM) - LAST_SLOT
     first = datetime.combine(local.date(), opening, tzinfo=VIETNAM)
     return last if local >= last and last >= first else None
@@ -140,13 +148,13 @@ def _previous_slot(local: datetime) -> datetime | None:
 def _next_opening(local: datetime) -> datetime:
     """The next opening time after *local*, skipping holidays."""
     day = local.date()
-    opening = datetime.combine(day, HOURS[day.weekday()][0], tzinfo=VIETNAM)
+    opening = datetime.combine(day, hours_on(day)[0], tzinfo=VIETNAM)
     if local < opening and not is_holiday(day):
         return opening
     day += timedelta(days=1)
     while is_holiday(day):
         day += timedelta(days=1)
-    return datetime.combine(day, HOURS[day.weekday()][0], tzinfo=VIETNAM)
+    return datetime.combine(day, hours_on(day)[0], tzinfo=VIETNAM)
 
 
 def _not_before(candidate: datetime, floor: datetime | None) -> datetime:

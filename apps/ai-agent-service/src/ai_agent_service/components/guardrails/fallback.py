@@ -29,6 +29,8 @@ LINES = {
     # A turn whose order was placed and whose read-back was still blocked: the customer must not
     # hear "chưa có thông tin" about an order that exists.
     "order_placed": "Dạ em đã tạo đơn cho {who} rồi ạ, {who} cần đổi gì trong đơn thì báo em nhé.",
+    # A call back on a day the shop is closed: the tool moved it (LN-02) and the answer did not say so.
+    "callback_moved": "Dạ hôm {who} hẹn bên em nghỉ nên lịch gọi lại được dời sang {moment} ạ.",
 }
 
 #: Per lane; a lane not listed gets SAFE_LINE. None is the bridging line: it is said only

@@ -35,7 +35,6 @@ from ...components.memory import ontology
 #: The organisers' channel names (``scenario_format.md``, and ``web_chat`` from
 #: ``handoff_brief.schema.json``) to the product's. Anything else is refused.
 CHANNELS = {"hotline": "hotline", "zalo_oa": "zalo", "chat_fanpage": "facebook", "web_chat": "web"}
-
 #: How the CRM names the channel of a past session, where it differs from the
 #: scenario format's: ``crm_seed*.json`` writes ``fb`` for the Facebook page.
 CRM_SESSION_CHANNELS = {"fb": "facebook"}

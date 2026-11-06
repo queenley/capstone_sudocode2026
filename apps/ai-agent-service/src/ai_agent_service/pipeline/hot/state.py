@@ -100,6 +100,10 @@ class HotState(TurnInput, total=False):
 
     # advisor (compaction)
     working_summary: str | None
+    #: What the customer stated in this call, by slot, tokenised (``call_state``). Written by ``perceive``.
+    call_facts: dict[str, Any]
+    #: This turn's prompt: ``{tokens, cut, packs, brief_shown, brief_held}``, for the run's diagnostics.
+    prompt_stats: dict[str, Any]
 
     # route
     lane: Lane
@@ -126,6 +130,8 @@ class HotState(TurnInput, total=False):
     created_orders: list[dict[str, Any]]
     pending_purchase: dict[str, Any] | None
     deletion_recorded: bool
+    #: ``schedule.callback`` ran in this call: a later turn may speak of the call back as booked.
+    callback_booked: bool
     deletion_awaiting_for: str | None
     #: The changes ``order.update`` made in this call, ``{order_id, action, new_variant_sku}``: the
     #: same change asked again in a later turn is refused, not made (and charged) a second time.

@@ -37,6 +37,18 @@ def nfc(text: str) -> str:
     return unicodedata.normalize("NFC", text)
 
 
+def fold(text: str) -> str:
+    """*text* without Vietnamese marks: "đỏ" -> "do"."""
+    plain = unicodedata.normalize("NFD", text.replace("đ", "d").replace("Đ", "D"))
+    return nfc("".join(char for char in plain if not unicodedata.combining(char)))
+
+
+def unmarked(text: str) -> bool:
+    """Whether *text* came without diacritics: speech-to-text or typing that keeps a stray mark at most."""
+    letters = [char for char in text if char.isalpha()]
+    return sum(char != fold(char) for char in letters) < 0.1 * len(letters)
+
+
 def clean(text: str) -> tuple[str, bool]:
     """Chat text into plain Vietnamese; and whether anything was teencode."""
     changed = False

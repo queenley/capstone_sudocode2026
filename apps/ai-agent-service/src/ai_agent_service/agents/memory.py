@@ -44,6 +44,8 @@ from pydantic import BaseModel, Field
 
 from ..components.clock import day_label
 from ..components.intake.itn import format_vnd, money_spans
+from ..components.intake.pii import TOKEN
+from ..components.intake.text import fold, unmarked
 from ..components.memory import gate
 from ..components.memory.gate import Candidate
 from ..components.memory.ontology import FROM_WORDS, NOTE_SLOT, SENTIMENTS, coerce, slot
@@ -55,6 +57,9 @@ from .base import BaseAgent
 logger = logging.getLogger(__name__)
 
 RULES_VERSION = "rules-0.3"
+#: A first line shorter than this is a greeting, not a goal.
+GOAL_MIN_WORDS = 4
+GOAL_MAX_CHARS = 160
 
 
 # ── the model's part ──────────────────────────────────────────────────────
@@ -102,26 +107,39 @@ PROMPT_SHA = hashlib.sha256(
 
 # ── the rules: the fallback ───────────────────────────────────────────────
 
-ROOM = re.compile(r"(\d{1,3})\s*(m2|m²|mét vuông|met vuong|mét)", re.IGNORECASE)
+class Words:
+    """A rule over Vietnamese words that also reads them without diacritics, as speech-to-text writes them.
+
+    A line that does have its marks is held to them: "bà" stays apart from "ba".
+    """
+
+    def __init__(self, pattern: str) -> None:
+        self.marked = re.compile(pattern, re.IGNORECASE)
+        self.plain = re.compile(fold(pattern), re.IGNORECASE)
+
+    def search(self, said: str) -> re.Match[str] | None:
+        return self.plain.search(fold(said)) if unmarked(said) else self.marked.search(said)
+
+
+ROOM = Words(r"(\d{1,3})\s*(m2|m²|mét vuông|met vuong|mét)")
 ROOM_SIDES = re.compile(r"(\d{1,2})\s*[x×]\s*(\d{1,2})")
-CHILDREN_YES = re.compile(r"(có (bé|con|em bé|trẻ)|bé nhỏ|con nhỏ|trẻ nhỏ|em bé|nhà có bé)", re.IGNORECASE)
-CHILDREN_NO = re.compile(r"(không có (bé|con|trẻ)|chưa có (bé|con))", re.IGNORECASE)
-BUDGET_CUE = re.compile(r"(ngân sách|tầm|khoảng|dưới|tối đa|không quá|budget|trong vòng)", re.IGNORECASE)
-ASK_FAMILY = re.compile(r"(hỏi|bàn với|bàn) (ý kiến )?(ông xã|chồng|vợ|bà xã|người nhà|gia đình|bố mẹ|anh nhà)", re.IGNORECASE)
-THINK = re.compile(r"(suy nghĩ thêm|cân nhắc thêm|để (chị|anh|em|mình) (xem|nghĩ|tính))", re.IGNORECASE)
-COMPARE = re.compile(r"(so sánh|bên khác|chỗ khác|shop khác|bên kia)", re.IGNORECASE)
-TOO_DEAR = re.compile(r"(đắt quá|mắc quá|hơi đắt|giá cao|đắt hơn)", re.IGNORECASE)
+CHILDREN_YES = Words(r"(có (bé|con|em bé|trẻ)|bé nhỏ|con nhỏ|trẻ nhỏ|em bé|nhà có bé)")
+CHILDREN_NO = Words(r"(không có (bé|con|trẻ)|chưa có (bé|con))")
+BUDGET_CUE = Words(r"(ngân sách|tầm|khoảng|dưới|tối đa|không quá|budget|trong vòng)")
+ASK_FAMILY = Words(r"(hỏi|bàn với|bàn) (ý kiến )?(ông xã|chồng|vợ|bà xã|người nhà|gia đình|bố mẹ|anh nhà)")
+THINK = Words(r"(suy nghĩ thêm|cân nhắc thêm|để (chị|anh|em|mình) (xem|nghĩ|tính))")
+COMPARE = Words(r"(so sánh|bên khác|chỗ khác|shop khác|bên kia)")
+TOO_DEAR = Words(r"(đắt quá|mắc quá|hơi đắt|giá cao|đắt hơn)")
 SIZE = re.compile(r"\bsize\s*([0-9]{2}|[smlx]{1,3})\b", re.IGNORECASE)
-COLOUR = re.compile(r"\bmàu\s+(trắng|đen|xanh|đỏ|hồng|xám|be|nâu|vàng|kem)\b", re.IGNORECASE)
-TRANSFER = re.compile(r"(chuyển khoản|ck qua|banking)", re.IGNORECASE)
-COD = re.compile(r"(\bcod\b|nhận hàng (rồi )?trả tiền|thanh toán khi nhận)", re.IGNORECASE)
+COLOUR = Words(r"\bmàu\s+(trắng|đen|xanh|đỏ|hồng|xám|be|nâu|vàng|kem)\b")
+TRANSFER = Words(r"(chuyển khoản|ck qua|banking)")
+COD = Words(r"(\bcod\b|nhận hàng (rồi )?trả tiền|thanh toán khi nhận)")
 UNHAPPY = re.compile(r"(bực|chán|mất thời gian|lâu quá|hỏi rồi mà|nói rồi mà)", re.IGNORECASE)
-CALL_BACK = re.compile(r"(gọi lại|liên hệ lại|báo lại)", re.IGNORECASE)
+CALL_BACK = Words(r"(gọi lại|liên hệ lại|báo lại)")
 #: The customer ends without buying; "thôi để chị xem lại" is the organisers' own (simulator spec, rule 2).
-DECLINE = re.compile(
+DECLINE = Words(
     r"(thôi khỏi|khỏi đi|thôi,? (không (mua|lấy|đặt|cần)|bỏ đi)|thôi,? để (chị|anh|em|mình|tôi) xem lại"
-    r"|không (mua|lấy|đặt|cần) (nữa|đâu)|để (dịp|khi) khác|không quan tâm)",
-    re.IGNORECASE,
+    r"|không (mua|lấy|đặt|cần) (nữa|đâu)|để (dịp|khi) khác|không quan tâm)"
 )
 #: Where to deliver, district and province only (never the house number).
 AREA = re.compile(
@@ -129,15 +147,19 @@ AREA = re.compile(
     r"(?:\s*,\s*(?:tỉnh\s+|tp\.?\s*)?[\wÀ-ỹ]+(?:\s+[\wÀ-ỹ]+)?)?)",
     re.IGNORECASE,
 )
-QUANTITY = re.compile(r"\b(\d{1,2}|hai|ba|bốn|năm)\s+(cái|chiếc|đôi|bộ|hộp|bình|máy)\b", re.IGNORECASE)
-CHILD_AGE = re.compile(r"\b(?:bé|con|em bé)\s+(?:nhà (?:chị|anh|em) )?(?:được |mới )?(\d{1,2})\s*tháng", re.IGNORECASE)
-CHILD_YEARS = re.compile(r"\b(?:bé|con|em bé)\s+(?:được |mới )?(\d)\s*tuổi", re.IGNORECASE)
-PREFER_ZALO = re.compile(r"(nhắn|liên hệ|gửi)\s+(qua\s+)?zalo", re.IGNORECASE)
-PREFER_CALL = re.compile(r"(gọi điện|gọi cho (chị|anh|em)|gọi vào số)", re.IGNORECASE)
+QUANTITY = Words(r"\b(\d{1,2}|hai|ba|bốn|năm)\s+(cái|chiếc|đôi|bộ|hộp|bình|máy)\b")
+CHILD_AGE = Words(r"\b(?:bé|con|em bé)\s+(?:nhà (?:chị|anh|em) )?(?:được |mới )?(\d{1,2})\s*tháng")
+CHILD_YEARS = Words(r"\b(?:bé|con|em bé)\s+(?:được |mới )?(\d)\s*tuổi")
+PREFER_ZALO = Words(r"(nhắn|liên hệ|gửi)\s+(qua\s+)?zalo")
+PREFER_CALL = Words(r"(gọi điện|gọi cho (chị|anh|em)|gọi vào số)")
 PHONE_TOKEN = re.compile(r"<PHONE_\d+>")
-WORD_NUMBERS = {"hai": 2, "ba": 3, "bốn": 4, "năm": 5}
+WORD_NUMBERS = {"hai": 2, "ba": 3, "bốn": 4, "bon": 4, "năm": 5, "nam": 5}
 
 FAMILY = {"ông xã": "chồng", "anh nhà": "chồng", "bà xã": "vợ", "gia đình": "người nhà", "bố mẹ": "bố mẹ"}
+#: The family words as written, from their spelling without marks.
+RELATIVES = {fold(word): word for word in (*FAMILY, "chồng", "vợ", "người nhà")}
+#: What the next call cannot do without and a model reading the whole call can pass over.
+BACKSTOP = ("blocker", "decision_maker")
 
 
 def rules_from_words(transcript: Sequence[dict[str, Any]]) -> list[Candidate]:
@@ -165,7 +187,8 @@ def rules_from_words(transcript: Sequence[dict[str, Any]]) -> list[Candidate]:
         if BUDGET_CUE.search(text) and (amounts := money_spans(text)):
             add("budget_vnd", amounts[-1].value, turn)
         if match := ASK_FAMILY.search(text):
-            who = FAMILY.get(match.group(3).lower(), match.group(3).lower())
+            word = RELATIVES.get(fold(match.group(3).lower()), match.group(3).lower())
+            who = FAMILY.get(word, word)
             add("blocker", f"cần hỏi {who}", turn)
             add("decision_maker", who, turn)
         elif THINK.search(text):
@@ -232,6 +255,9 @@ class MemoryAgent(BaseAgent):
         found = from_tools(tool_log, on=on)
         words = await self._from_words(transcript)
         found += words
+        if not any(c.slot == "order_id" for c in found):   # an order settled whatever held the customer back
+            held = {c.slot for c in words}
+            found += [c for c in rules_from_words(transcript) if c.slot in BACKSTOP and c.slot not in held]
         if not any(c.slot == "outcome" for c in found):
             outcome = _outcome_from_words(transcript)
             if outcome:
@@ -265,8 +291,9 @@ class MemoryAgent(BaseAgent):
             found.append(Candidate("sentiment", read.sentiment, "customer", last, extractor=self.version))
         return found
 
-    async def summarize(self, candidates: Sequence[Candidate], *, call_number: int, day: str, channel: str) -> dict[str, Any]:
-        """The episode: one line, and the outcome."""
+    async def summarize(self, candidates: Sequence[Candidate], *, call_number: int, day: str, channel: str,
+                        transcript: Sequence[dict[str, Any]] = ()) -> dict[str, Any]:
+        """The episode: one line, the outcome, what the customer came for and what was left open."""
         last = {c.slot: c.value for c in gate.settle(candidates) if c.slot and not _customer_record(c)}
         parts = []
         if "product_advised" in last:
@@ -284,14 +311,32 @@ class MemoryAgent(BaseAgent):
         if last.get("outcome") == "chuyen_may":
             parts.append("đã chuyển tư vấn viên")
         summary = f"Cuộc {call_number} ({day_label(day)[:5]}, {channel}): " + (", ".join(parts) or "chưa có gì đáng ghi")
+        commitments = [str(last["commitments"])] if "commitments" in last else (
+            [f"gọi lại {last['callback_at']}"] if "callback_at" in last else [])
+        closed = last.get("outcome") in ("chot_don", "tu_choi")
         return {
             "summary": summary,
+            "goal": goal_of(transcript),
+            "open_items": [*([f"khách {last['blocker']}"] if "blocker" in last and not closed else []), *commitments],
             "outcome": last.get("outcome") or "khac",
             "objection_type": last.get("objection"),
             "sentiment": last.get("sentiment") if last.get("sentiment") in SENTIMENTS else "binh_thuong",
-            "commitments": [str(last["commitments"])] if "commitments" in last else (
-                [f"gọi lại {last['callback_at']}"] if "callback_at" in last else []),
+            "commitments": commitments,
         }
+
+
+def goal_of(transcript: Sequence[dict[str, Any]]) -> str | None:
+    """What the customer came for: their first line that says something, in their words, with no personal token.
+
+    By code, so the goal costs no model call and cannot be a model's guess at what they meant.
+    """
+    for line in transcript:
+        if line.get("speaker") != "customer":
+            continue
+        said = " ".join(TOKEN.sub("", str(line.get("text") or "")).split())
+        if len(said.split()) >= GOAL_MIN_WORDS:
+            return said[:GOAL_MAX_CHARS]
+    return None
 
 
 def from_tools(tool_log: Sequence[dict[str, Any]], *, on: str) -> list[Candidate]:

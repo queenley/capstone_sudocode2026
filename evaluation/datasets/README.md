@@ -1,27 +1,27 @@
 # Datasets của evaluation
 
-Đường chạy duy nhất: kịch bản nằm ở [`data/seed-dev/scenarios`](../../data/seed-dev/README.md) (400 kịch bản: 250 persona BTC `SCN-GEN-*`, 150 persona của nhóm `SCN-ADV-*`), định dạng của BTC (`apps/ai-agent-service/data/btc/schemas/scenario_format.md`), chạy bằng lệnh đánh giá duy nhất của repo. Thư mục này chỉ giữ quy tắc duyệt nhãn.
+Kịch bản nằm ở [`data/dev/scenarios`](../../data/dev/README.md) (404 kịch bản: 250 persona BTC `SCN-GEN-*`, 154 persona của nhóm `SCN-ADV-*`). Định dạng của BTC (`apps/ai-agent-service/data/btc/schemas/scenario_format.md`), chạy bằng lệnh đánh giá duy nhất của repo. Thư mục này giữ quy tắc duyệt nhãn và danh sách ID đã dùng.
 
 | Thư mục | Là gì |
 |---|---|
 | `ground-truth-review/` | Quy tắc duyệt và sửa nhãn (`SKILL.md`): đọc trước khi thêm hoặc sửa kịch bản |
 
-Trạng thái: **diagnostic**. Chưa có `data/seed-dev/review/golden_manifest.json`, tức nhãn do bộ sinh gán và chưa có người duyệt độc lập. Mọi điểm đo trên bộ này là điểm chẩn đoán, không phải điểm chính thức.
+Trạng thái: **diagnostic**. Chưa có `review/golden_manifest.json`, tức nhãn do bộ sinh gán và chưa có người duyệt độc lập. Mọi điểm đo trên bộ này là điểm chẩn đoán, không phải điểm chính thức.
 
 ## Chạy thử
 
 ```bash
 # lập kế hoạch + chạy 1 kịch bản (tốn phí model; extractor tắt)
-apps/ai-agent-service/.venv/bin/python run_eval.py --scenarios data/seed-dev/scenarios --only SCN-GEN-0051 --no-extract --out evaluation/runs/<tên-lần-chạy>
+apps/ai-agent-service/.venv/bin/python run_eval.py --scenarios data/dev/scenarios --only SCN-GEN-0051 --no-extract --out evaluation/runs/<tên-lần-chạy>
 ```
 
-Chọn tập con: chép kịch bản sang một thư mục trong `evaluation/runs/subsets/` rồi trỏ `--scenarios` vào đó (xem `data/seed-dev/README.md`, mục 3).
+Chọn tập con: chép kịch bản sang một thư mục trong `evaluation/runs/subsets/` rồi trỏ `--scenarios` vào đó (xem `data/dev/README.md`, mục 3).
 
 Khách tổng hợp `SYN-C...` dùng `apps/ai-agent-service/data/btc/catalog/crm_seed_synthetic.json`.
 
 ## Kịch bản đã dùng (ID có tiền tố `SCN-GEN-`)
 
-**Đây là ID của bộ v4 cũ (đã xoá); chưa xác nhận ID trùng nội dung với `data/seed-dev`** (SCN-GEN-0051 thì cùng khách và cùng đơn). Lấy từ các run trong `evaluation/runs/` và sổ chạy đã xóa; ghi lại đây để không chạy trùng hay dùng nhầm holdout. Mọi nhãn vẫn là diagnostic.
+**Đây là ID của bộ v4 cũ (đã xoá); chưa xác nhận ID trùng nội dung với `data/dev`** (SCN-GEN-0051 thì cùng khách và cùng đơn). Lấy từ các run trong `evaluation/runs/` và sổ chạy đã xóa; ghi lại đây để không chạy trùng hay dùng nhầm holdout. Mọi nhãn vẫn là diagnostic.
 
 | Nhóm | ID |
 |---|---|

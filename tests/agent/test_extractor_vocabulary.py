@@ -135,3 +135,39 @@ def test_a_quote_found_once_gets_its_true_offsets():
     data = scorers.turn_input("Dạ chị thanh toán COD hay chuyển khoản ạ?")
     kept, dropped = scorers.spanned([item("question", "payment", "open", quote="COD hay chuyển khoản", start=99, end=0)], data)
     assert dropped == 0 and data["agent_text"][kept[0]["start"]:kept[0]["end"]] == "COD hay chuyển khoản"
+
+
+TEAM_SCENARIOS = Path(__file__).resolve().parents[2] / "data" / "dev" / "scenarios"
+
+
+def team_calls():
+    for path in sorted(TEAM_SCENARIOS.glob("*.json")):
+        yield from json.loads(path.read_text(encoding="utf-8"))["calls"].values()
+
+
+@pytest.mark.skipif(not TEAM_SCENARIOS.is_dir(), reason="data/dev is not checked out")
+def test_every_slot_the_team_scores_on_is_in_the_vocabulary():
+    names = {s for call in team_calls() for key in ("must_not_ask", "must_carry_over") for s in call.get(key) or ()}
+    assert names and names <= scorers.vocabulary(), names - scorers.vocabulary()
+
+
+@pytest.mark.skipif(not TEAM_SCENARIOS.is_dir(), reason="data/dev is not checked out")
+def test_every_truth_the_team_labels_is_extracted_or_said_why_not():
+    """HR counts a claim only when its field is in the call's ground_truth_facts: a labelled truth the extractor never
+    produces is never checked, so each one is either a claim field or written down in NOT_CLAIMS with the reason."""
+    for call in team_calls():
+        for field in call.get("ground_truth_facts") or ():
+            known = (field in scorers.CLAIM_FIELDS or scorers.PROMO_FIELD.match(field) or field in scorers.NOT_CLAIMS
+                     or (field.startswith("price_vnd:") and "price_vnd:<SKU>" in scorers.NOT_CLAIMS))
+            assert known, field
+
+
+def test_order_codes_and_statuses_compare_as_the_tools_write_them():
+    claim = {"kind": "claim", "speaker": "agent", "source_field": "agent_text", "start": 0, "end": 1, "purpose": ""}
+    status = scorers._claim({**claim, "slot_or_field": "order_status", "value": "Shipping", "quote": "đơn đang giao"})
+    assert status and status[0]["value"] == "shipping"
+    assert scorers._claim({**claim, "slot_or_field": "order_status", "value": "đang giao", "quote": "đang giao"}) is None
+    code = scorers._claim({**claim, "slot_or_field": "tracking", "value": "vn0032trk", "quote": "mã vận đơn VN0032TRK"})
+    assert code and code[0]["value"] == "VN0032TRK"
+    # A code the reply does not say is not the agent's claim.
+    assert scorers._claim({**claim, "slot_or_field": "order_id", "value": "OD900302", "quote": "đơn của anh"}) is None

@@ -19,6 +19,12 @@ with the same words.
     python -m src.pipeline.synthesize_scenario_audio --hours 1 --clean   # one hour, no background noise
     python -m src.pipeline.synthesize_scenario_audio --reference-only --limit 5   # spoken forms only, no TTS
     python -m src.pipeline.synthesize_scenario_audio --ground-truth-only          # rewrite ground_truth.json
+
+Only what changed, after ``carry_audio`` brought a previous revision's clips over. A call with no clip stays silent
+unless ``--only`` names its scenario, and the target hours do not apply:
+
+    python -m src.pipeline.synthesize_scenario_audio --changed-only --only SCN-ADV-0151 --dry-run  # the list, no API
+    python -m src.pipeline.synthesize_scenario_audio --changed-only --only SCN-ADV-0151
 """
 from __future__ import annotations
 
@@ -27,6 +33,7 @@ import hashlib
 import json
 import wave
 from pathlib import Path
+from typing import Collection
 
 import numpy as np
 import yaml
@@ -34,6 +41,7 @@ import yaml
 from src.asr.reference import load_or_build, write_ground_truth
 from src.utils.audio_noise import NOISE_TYPES, add_noise
 from src.utils.crm import SourceData, load_customers
+from src.schemas.scenario import Scenario
 from src.utils.dataset import Dataset, call_folder
 from src.utils.paths import AUDIO_DIR, REPORTS_DIR, ROOT
 from src.utils.quota import stop_on_daily_limit
@@ -62,6 +70,29 @@ def _spoken_text(wav: Path) -> tuple[str | None, str | None]:
     return meta.get("text"), meta.get("spoken_text") or meta.get("text")
 
 
+def turns_to_speak(scenario: Scenario, only: Collection[str] = (), root: Path = AUDIO_DIR) -> list[tuple[str, int, str]]:
+    """``(call, turn, text)`` of each turn with no clip of its words, in the calls that have clips or are named."""
+    found = []
+    for call_name, call in scenario.ordered_calls():
+        folder = root / call_folder(scenario.scenario_id) / call_name
+        if scenario.scenario_id in only or any(folder.glob("turn_*.wav")):
+            for turn, text in enumerate(call.customer_turns, start=1):
+                clip = folder / f"turn_{turn}.wav"
+                if not clip.exists() or _spoken_text(clip)[0] != text:
+                    found.append((call_name, turn, text))
+    return found
+
+
+def voice_of(folder: Path) -> str | None:
+    """The voice already speaking a call, so a new turn does not change the caller."""
+    for meta in folder.glob("turn_*.json"):
+        try:
+            return json.loads(meta.read_text(encoding="utf-8")).get("voice_id")
+        except (OSError, ValueError):
+            continue
+    return None
+
+
 def spoken_seconds(root: Path = AUDIO_DIR) -> float:
     """Seconds of customer audio already on disk (from the .json beside each WAV)."""
     total = 0.0
@@ -88,7 +119,19 @@ def main() -> None:
                              "one of its Vietnamese voices of the same gender, region accent and age band")
     parser.add_argument("--reference-only", action="store_true", help="Write the spoken forms only (model, no TTS)")
     parser.add_argument("--ground-truth-only", action="store_true", help="Rewrite ground_truth.json from the clips on disk")
+    parser.add_argument("--changed-only", action="store_true",
+                        help="Speak only turns with no clip of their words, whatever the target hours")
+    parser.add_argument("--only", default="", help="Comma-separated scenario ids, spoken from nothing with --changed-only")
+    parser.add_argument("--dry-run", action="store_true", help="With --changed-only: list the turns and characters, no API call")
     args = parser.parse_args()
+    only = {sid.strip() for sid in args.only.split(",") if sid.strip()}
+    if args.changed_only and args.dry_run:
+        todo = [(scenario.scenario_id, *turn) for scenario in Dataset().iter_scenarios(args.limit)
+                for turn in turns_to_speak(scenario, only)]
+        for sid, call_name, turn, text in todo:
+            print(f"  {sid}/{call_name}/turn_{turn}: {text}")
+        print(f"{len(todo)} turns to speak, about {sum(len(item[3]) for item in todo)} characters; nothing sent.")
+        return
     if args.ground_truth_only:
         print(f"ASR ground truth: {write_ground_truth()}")
         return
@@ -138,20 +181,27 @@ def main() -> None:
     seconds = spoken_seconds()
     generated = 0
     for scenario in Dataset().iter_scenarios(args.limit):
-        if seconds >= target_seconds:
+        if seconds >= target_seconds and not args.changed_only:
             break
+        wanted = turns_to_speak(scenario, only) if args.changed_only else None
         # A caller the CRM does not know (khach_chua_co_danh_tinh) is voiced from the scenario's own honorific.
         customer = by_id.get(scenario.customer_id or "")
         honorific = (customer.honorific if customer else scenario.honorific or "chị").lower()
         gender = "male" if honorific in MALE else "female"
         age_band = "senior" if honorific in SENIOR or scenario.persona == "khach_lon_tuoi" else "adult"
         for call_name, call in scenario.ordered_calls():
-            voice = tts.pick_voice("customer", gender, scenario.region, age_band, scenario.customer_id or scenario.customer_phone)
+            if wanted is not None and not any(item[0] == call_name for item in wanted):
+                continue   # nothing to say: no spoken form to write, no model call
+            folder = AUDIO_DIR / call_folder(scenario.scenario_id) / call_name
+            voice = (voice_of(folder) if args.changed_only else None) or tts.pick_voice(
+                "customer", gender, scenario.region, age_band, scenario.customer_id or scenario.customer_phone)
             reference = load_or_build(reference_client, scenario, call_name, call, names)
             for turn_index, text in enumerate(call.customer_turns, start=1):
                 spoken = reference["turns"][turn_index - 1] if reference else None
                 said = spoken["spoken_text"] if spoken else text
-                output = AUDIO_DIR / call_folder(scenario.scenario_id) / call_name / f"turn_{turn_index}.wav"
+                output = folder / f"turn_{turn_index}.wav"
+                if wanted is not None and (call_name, turn_index, text) not in wanted:
+                    continue
                 if args.resume and output.exists() and _spoken_text(output) == (text, said):
                     continue   # a turn whose words changed (a regenerated scenario) is spoken again
                 pcm = tts.synthesize_turn(said, voice, model_id=model_id, language_code=language_code,

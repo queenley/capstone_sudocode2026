@@ -28,6 +28,7 @@ from importlib import metadata
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
+from ...components.context import focus
 from ...agents import advisor as advisor_prompts
 from ...agents import policy as policy_rules
 from ...components import clock
@@ -99,8 +100,9 @@ def manifest(
             "policy": {k: policy.get(k) for k in ("provider", "model", "timeout")},
             "extractor": dict(extractor) if extractor else None,
         },
+        "advisor_context": "full" if focus.full() else "focused",
         "prompts_sha256": {
-            "advisor": _sha([advisor_prompts.HARD_RULES, advisor_prompts.LANE_NOTES, advisor_prompts.CONFIRM_NOTES,
+            "advisor": _sha([advisor_prompts.HARD_RULES, advisor_prompts.RULE_PACKS, advisor_prompts.LANE_NOTES, advisor_prompts.CONFIRM_NOTES,
                              advisor_prompts.OPENING, advisor_prompts.COPILOT_NOTE, advisor_prompts.SPOKEN_NOTE]),
             "lanes_yaml": hashlib.sha256(LANES_YAML.read_bytes()).hexdigest(),
             "policy": _sha([{name: question.model_dump() for name, question in policy_rules.QUESTIONS.items()},

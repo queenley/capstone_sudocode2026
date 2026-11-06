@@ -25,6 +25,12 @@ YES = re.compile(
     r"(?:dong y |xac nhan )?(?:dat(?: hang| may| don)?|chot(?: don)?|len don|mua)"
     r"(?: cho (?:anh|chi|toi))?(?: di| a| nhe| nha)?)[.!]*")
 NO = re.compile(r"\b(?:khong (?:mua|dat|dong y)|huy|thoi|de sau)\b")
+#: A yes as people give it after the read-back ("Đúng rồi em, lên đơn giúp chị nhé"): a consent phrase, and beside it
+#: only address words and courtesy. Anything else left over ("đúng rồi nhưng đổi địa chỉ") keeps it from being a yes.
+CONSENT = re.compile(r"\b(?:dong y|xac nhan|dung(?: roi)?|chinh xac|vang|u|uh|um|ok|oke|"
+                     r"(?:len|lam|ghi) don|(?:dat|chot)(?: don| hang| may)?|mua)\b")
+COURTESY = re.compile(r"\b(?:da|a|nhe|nha|nhen|em|anh|chi|co|chu|cau|bac|toi|minh|chau|con|oi|giup|gium|cho|luon|di|"
+                      r"voi|nhu vay|thong tin|la|du|roi|cam on|nay)\b")
 
 
 def now() -> float:
@@ -93,9 +99,17 @@ def answer(pending: Mapping[str, Any] | None, *, call_id: str, channel: str, tur
     if (pending.get("call_id") != call_id or pending.get("channel") != channel
             or pending.get("issued_turn_id") == turn_id or pending.get("expires_at", 0) <= now()
             or not last_reply or not last_reply.endswith(pending.get("question") or "\0")
-            or not YES.fullmatch(plain(said).strip())):
+            or not agrees(said)):
         return None
     return {**pending, "status": "authorized", "confirmed_turn_id": turn_id}
+
+
+def agrees(said: str) -> bool:
+    """Whether *said*, the whole of it, is a yes to the question just read out."""
+    if YES.fullmatch(plain(said).strip()):
+        return True
+    rest, found = CONSENT.subn(" ", " ".join(re.findall(r"[a-z0-9]+", plain(said))))
+    return bool(found) and not COURTESY.sub(" ", rest).strip()
 
 
 def matches(pending: Mapping[str, Any] | None, args: Mapping[str, Any], context: Any) -> bool:

@@ -201,7 +201,7 @@ async def run_turn(
 
     async def say(kind: str, text: str) -> None:
         if emit is not None:
-            await emit(kind, pii.detokenize(text, vault))
+            await emit(kind, pii.for_customer(text, vault))
     now = clock.at(row.get("business_day") or options.business_day())
     turn_no = await _customer_turns(call_id) + (0 if content is None else 1)
     context = HotContext(
@@ -272,7 +272,7 @@ async def run_turn(
     reply = state.get("reply") or {}
     text = reply.get("text") or ""
     await _patch_meta(call_id, turn_id, "agent", {"latency": latency})
-    shown = pii.detokenize(text, vault)
+    shown = pii.for_customer(text, vault)
     meta = {"lane": state.get("lane"), "tier": state.get("tier"), "used_brief_lines": reply.get("used_lines") or [],
             "facts_used": used_slots(reply.get("used_lines") or [], state.get("brief_lines") or [],
                                      (state.get("brief") or {}).get("profile_facts") or {}),

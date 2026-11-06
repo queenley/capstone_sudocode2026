@@ -1,0 +1,68 @@
+{
+  "scenario_id": "SCN-ADV-0152",
+  "level": "M1",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "hard_case": "hen_goi_lai_chu_nhat_ngoai_gio",
+  "customer_phone": "0929486628",
+  "customer_name": "Nam",
+  "honorific": "anh",
+  "notes": "Ca hẹn gọi lại chu_nhat_ngoai_gio, thêm ở revision r3 (LN-01, LN-02). Nhãn chưa có người duyệt.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-22",
+      "customer_goal": "Hỏi về giày sneaker Urban Classic size 38 màu trắng.",
+      "customer_turns": [
+        "Alo, em chào anh. Anh muốn hỏi về giày sneaker Urban Classic size 38 màu trắng.",
+        "Giày này còn hàng không em? Anh thấy trên website ghi là có.",
+        "À, giá cả như thế nào nhỉ? Anh muốn biết thêm về khuyến mãi nếu có.",
+        "Chủ nhật này tầm 7 giờ tối em gọi lại anh nhé.",
+        "Ừ, 5 giờ rưỡi cũng được em."
+      ],
+      "facts_established": {
+        "size": 38,
+        "color": "trang",
+        "decision_maker": "vợ",
+        "blocker": "cần hỏi vợ",
+        "product_advised": "SKU-SN-CAS",
+        "price_quoted_vnd": 890000,
+        "variant_sku": "SKU-SN-CAS-38-TRANG"
+      },
+      "success_if": {
+        "tool_called": "schedule.callback",
+        "args_match": {
+          "callback_at": "2026-10-25T17:30"
+        },
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "must_say_any": [
+          "17:30",
+          "17h30",
+          "5 giờ rưỡi",
+          "5 giờ 30",
+          "17 giờ 30"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 890000,
+        "list_price_vnd": 890000,
+        "callback_at": "2026-10-25T17:30",
+        "call_date": "2026-10-22"
+      },
+      "memory_expectation": {
+        "size": 38,
+        "color": "trang",
+        "decision_maker": "vợ",
+        "blocker": "cần hỏi vợ",
+        "product_advised": "SKU-SN-CAS",
+        "price_quoted_vnd": 890000,
+        "variant_sku": "SKU-SN-CAS-38-TRANG"
+      },
+      "relevant_policy_ids": [
+        "LN-01",
+        "PB-03"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

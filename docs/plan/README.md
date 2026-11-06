@@ -24,6 +24,7 @@ flowchart LR
 3. **Duyệt** trước khi code nếu thay đổi chạm prompt, guard hoặc bộ nhớ: những chỗ này ảnh hưởng mọi cuộc gọi.
 4. **Đo** trên cùng cohort trước và sau (retest có chủ đích, theo [AGENTS.md](../../AGENTS.md)). Không chỉnh sản phẩm dựa trên holdout.
 5. **Cập nhật trạng thái** trong file và backlog, kể cả khi cải tiến thất bại: biết cái gì không hiệu quả cũng là kết quả.
+6. **Ghi nhật ký** vào [IMPROVEMENT-LOG.md](IMPROVEMENT-LOG.md) sau mỗi lần sửa case sai hoặc thêm tính năng.
 
 Trạng thái dùng chung: `ý tưởng` · `đề xuất` · `đã duyệt` · `đang làm` · `đang đo` · `xong` · `bỏ`.
 

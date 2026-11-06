@@ -20,11 +20,12 @@ from typing import Any, Mapping, Sequence
 from langchain_core.messages import AIMessage, HumanMessage, RemoveMessage
 from langgraph.runtime import Runtime
 
-from ...agents.advisor import AdvisorFailure, AgentContext, Draft, shown_passages, _seen_in
+from ...agents.advisor import RULE_PACKS, AdvisorFailure, AgentContext, Draft, shown_passages, system_prompt, _seen_in
 from ...agents.policy import PolicyInput, needs_review
-from ...components.context import compact
+from ...components.context import compact, focus
+from ...components.context.budget import tokens as count_tokens
 from ...components.guardrails import actions, fallback, purchase
-from ...components.guardrails.hard import MAX_SENTENCES, ORDER_SUMMARY, GuardInput, check
+from ...components.guardrails.hard import MAX_SENTENCES, ORDER_SUMMARY, GuardInput, check, moved_callback
 from ...components.guardrails.stream import SentenceSplitter
 from ...components.identity import resolver
 from ...components.intake import honorific, itn, lexicon, pii, signals, text as intake_text
@@ -35,6 +36,7 @@ from ...components.orchestration.rules import MODEL_FAILURES, RouteInput, decide
 from ...config.config_manager import handoff_auto_accept
 from ...mcp.servers import btc
 from ...mcp.tools import INFRASTRUCTURE_CODES
+from . import call_state
 from .state import TURN_KEYS, HotContext, HotState
 
 logger = logging.getLogger(__name__)
@@ -110,6 +112,7 @@ async def perceive(state: HotState, runtime: Runtime[HotContext]) -> dict[str, A
     low = context.asr_confidence is not None and context.asr_confidence < ASR_LOW_CONFIDENCE
     update.update(
         input_mode=mode,
+        call_facts=call_state.heard(tokenised, state.get("call_facts")),
         messages=[HumanMessage(content=tokenised, id=f"customer-{state['turn_id']}")],
         flags={"asr_low_conf": low, "new_key": bool(new_phones), "new_phone_tokens": new_phones,
                **signals.read(written).as_flags()},
@@ -447,6 +450,11 @@ async def advisor(state: HotState, runtime: Runtime[HotContext]) -> dict[str, An
         return update
 
     agent_context = _agent_context(state, context, summary)
+    prompt, cut = system_prompt(agent_context)
+    if cut:
+        logger.warning("Call %s lost %s from its prompt", state.get("call_id"), ", ".join(cut))
+    update["prompt_stats"] = focus.stats(count_tokens(prompt), cut, focus.packs(agent_context, RULE_PACKS),
+                                         len(agent_context.brief_lines), len(state.get("brief_lines") or []))
     if state.get("lane") == "HANDOFF":
         # Rule 1: tools or the model keep failing. The model is what may be failing, so the
         # harness puts the call through itself, and the bridging line is said only when it did.
@@ -538,11 +546,14 @@ _HANDOFF_DETAIL = {
 def _agent_context(state: HotState, context: HotContext, summary: str | None) -> AgentContext:
     """The slice of the state the advisor may read (section 3.2), with what the tier withholds left out."""
     tier = state.get("tier") or "UNKNOWN"
-    lines = [BriefLine(l["id"], l["text"], l["sensitive"], tuple(l.get("fact_ids") or ())) for l in state.get("brief_lines") or []]
+    lines = [BriefLine(l["id"], l["text"], l["sensitive"], tuple(l.get("fact_ids") or ()), l.get("kind", "other"))
+             for l in state.get("brief_lines") or []]
     if tier == "PROBABLE":
         lines = [line for line in lines if not line.sensitive]
     elif tier != "VERIFIED":
         lines = []
+    lines = focus.lines(lines, _last_customer_text(state), first_turn=int(state.get("turn_no") or 1) <= 1
+                        or state.get("phase") == "opening", blocked=bool(state.get("block_reasons")))
     brief = state.get("brief") or {}
     phone = context.vault.get(state.get("phone_token") or "")
     products = brief.get("products_advised") or []
@@ -569,6 +580,7 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
         warnings=tuple(state.get("freshness") or []) if tier == "VERIFIED" else (),
         must_not_ask=tuple(brief.get("must_not_ask") or []) if tier == "VERIFIED" else (),
         working_summary=summary,
+        call_state=call_state.lines(state.get("call_facts"), state.get("quotes"), _last_agent_text(state)),
         block_reasons=tuple(state.get("block_reasons") or []),
         tool_results=tuple(state.get("tool_results") or []),
         quotes=dict(state.get("quotes") or {}),
@@ -667,6 +679,7 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
     orders = list(state.get("known_orders") or [])
     created = list(state.get("created_orders") or [])
     deletion_recorded = bool(state.get("deletion_recorded"))
+    callback_booked = bool(state.get("callback_booked"))
     pending_purchase = state.get("pending_purchase")
     updated = list(state.get("updated_orders") or [])
     failures = int(state.get("tool_failures") or 0)
@@ -677,6 +690,7 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
             failures = 0
             if actions.deletion_succeeded(result["name"], envelope) and result["name"] == "memory.request_deletion":
                 deletion_recorded = True
+            callback_booked = callback_booked or result["name"] == "schedule.callback"
             if result["name"] == "pricing.get_quote" and data.get("sku"):
                 quotes[data["sku"]] = int(data["final_price_vnd"])
             if result["name"] == "order.create" and data.get("order_id"):
@@ -694,7 +708,8 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
             failures += 1
     return {"tool_results": list(state.get("tool_results") or []) + new_results, "quotes": quotes,
             "known_orders": orders, "created_orders": created, "updated_orders": updated, "tool_failures": failures,
-            "deletion_recorded": deletion_recorded, "pending_purchase": pending_purchase,
+            "deletion_recorded": deletion_recorded, "callback_booked": callback_booked,
+            "pending_purchase": pending_purchase,
             "placed_lines": _placed(state.get("placed_lines") or [], new_results),
             "trusted_skus": sorted(set(state.get("trusted_skus") or []) | codes),
             "seen_products": _products_in(new_results, state.get("seen_products") or [])}
@@ -809,6 +824,11 @@ async def _streamed(state: HotState, context: HotContext, messages: list[Any], a
         update["safe_lines"] = int(state.get("safe_lines") or 0) + 1
         logger.warning("Call %s: a streamed sentence was blocked after %d said; safe line said",
                        state.get("call_id"), len(attempt.said))
+    moved = moved_callback(text, produced)
+    if moved:  # Said rather than regenerated: nothing else of the answer was wrong, and LN-02 is the shop's own rule.
+        line = fallback.LINES["callback_moved"].format(who=_who(state), moment=moved)
+        await _say(context, line, timing)
+        text = f"{text} {line}".strip()
     update.update(
         draft={"text": text, **stats, "fallback": bool(attempt.reasons)},
         guard=verdict,
@@ -969,6 +989,9 @@ async def guard(state: HotState, runtime: Runtime[HotContext]) -> dict[str, Any]
     tier = state.get("tier") or "UNKNOWN"
     view = guard_input(state, context, text, results)
     hard = check(view)
+    moved = moved_callback(text, results)
+    if moved:
+        hard = hard._replace(passed=False, reasons=(*hard.reasons, f"Lịch gọi lại đã dời sang {moved} (LN-02); phải báo khách giờ mới."))
     verdict: dict[str, Any] = {"hard": {"passed": hard.passed, "reasons": list(hard.reasons)}}
     reasons = list(hard.reasons)
     if hard.passed and context.policy is not None and needs_review(text):
@@ -1018,6 +1041,7 @@ def guard_input(state: HotState, context: HotContext, text: str, results: tuple[
         on=state.get("on"),
         created_orders=tuple(str(o["order_id"]) for o in state.get("created_orders") or [] if o.get("order_id")),
         deletion_recorded=bool(state.get("deletion_recorded")),
+        callback_booked=bool(state.get("callback_booked")),
     )
 
 

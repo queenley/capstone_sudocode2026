@@ -38,6 +38,16 @@ def test_vault_reveals_phones_to_the_customer_and_last_four_to_staff():
     assert pii.unknown_tokens("<PHONE_1> <PHONE_7>", vault) == ["<PHONE_7>"]
 
 
+def test_the_customer_hears_a_whole_phone_number_only_where_a_sentence_confirms_the_delivery():
+    vault = pii.Vault()
+    reply = pii.tokenise("Dạ có phải anh dùng số 0901234876 không ạ? Em giao về số 0901234876 nhé. CCCD 012345678901.", vault)
+    assert pii.for_customer(reply, vault) == ("Dạ có phải anh dùng số *******876 không ạ? "
+                                              "Em giao về số 0901234876 nhé. CCCD ****8901.")
+    assert pii.for_customer(pii.tokenise("Người nhận: 0901234876", vault), vault) == "Người nhận: 0901234876"
+    # Staff screens keep their own rule.
+    assert pii.detokenize(reply, vault, reveal_phone=False).startswith("Dạ có phải anh dùng số ****4876")
+
+
 def test_mask_keeps_the_last_four_digits_for_logs():
     assert pii.mask("gọi 0901234567") == "gọi ******4567"
 

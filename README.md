@@ -166,7 +166,13 @@ Set-Location apps/web; npm run typecheck; npm run build
 Có một lệnh đánh giá duy nhất, `run_eval.py` ở gốc repo, cũng là lệnh giám khảo BTC sẽ gọi: chạy agent trên kịch bản, hai cấu hình (có nhớ khách và không nhớ khách), gắn nhãn bằng extractor rồi chấm bằng `reference_eval.py` của BTC. Cửa vào: [evaluation/README.md](evaluation/README.md).
 
 ```powershell
-apps/ai-agent-service/.venv/Scripts/python run_eval.py --scenarios data/seed-dev/scenarios --only SCN-GEN-0051 --out evaluation/runs/thu-1
+apps/ai-agent-service/.venv/Scripts/python run_eval.py --scenarios data/dev/scenarios --only SCN-GEN-0051 --out evaluation/runs/thu-1
+```
+
+Ghép bảng ASR, Agent và hiệu năng cho báo cáo từ các run đã xong, không tốn phí model:
+
+```powershell
+apps/ai-agent-service/.venv/Scripts/python run_eval.py --report all --run router=evaluation/runs/thu-1
 ```
 
 Cách một con số được tạo ra: [docs/evaluation/scoring-flow.md](docs/evaluation/scoring-flow.md). Chi tiết lệnh của agent: [README của AI agent](apps/ai-agent-service/README.md#test-và-đánh-giá).

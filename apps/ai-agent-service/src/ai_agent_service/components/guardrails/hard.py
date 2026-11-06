@@ -31,6 +31,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Iterable, Literal, Mapping
 
+from .. import clock
 from ..intake.itn import amounts, format_vnd
 from ..intake.pii import PATTERNS, TOKEN
 from ..intake.text import plain
@@ -57,12 +58,17 @@ TRANSFER_PROMISE = re.compile(
     r"\bem\b[^.?!]*?\b(chuyển|kết nối|nối máy)\b[^.?!]*?\b(máy|cuộc gọi|nhân viên|đồng nghiệp|bộ phận|tư vấn viên)\b", re.IGNORECASE)
 #: Words that make it an offer or a question rather than a promise.
 TRANSFER_OFFER = re.compile(r"(nếu|muốn|có thể|được không|có cần|\?|hay là|để em hỏi)", re.IGNORECASE)
+#: A call back promised for a moment ("em gọi lại anh lúc 7 giờ tối mai"): the same claim about the system as a transfer.
+CALLBACK_PROMISE = re.compile(r"\b(gọi lại|liên hệ lại)\b.*(\d\s*(giờ|h\b)|\b(sáng|trưa|chiều|tối|mai|thứ|ngày)\b)", re.IGNORECASE)
 ORDER_CODE = re.compile(r"\bOD\d+\b")
 ORDER_SUMMARY = re.compile(r"(tổng (cộng|đơn|tiền)|xác nhận đơn|lên đơn|mã đơn|đặt hàng)", re.IGNORECASE)
 VIETNAMESE = re.compile(r"[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]", re.IGNORECASE)
 SENTENCE = re.compile(r"(?<=[.!?…])\s+")
 DIGIT_RUN = re.compile(r"(?<!\d)\d{10,14}(?!\d)")
 MARKUP = re.compile(r"(\*\*|__|^\s*[-*•]\s|^\s*#{1,6}\s|```)", re.MULTILINE)
+#: "7 giờ tối", "lúc 7 giờ": a time of day, not a duration.
+TIME_OF_DAY_AFTER = re.compile(r"\s*(sáng|trưa|chiều|tối)\b", re.IGNORECASE)
+TIME_OF_DAY_BEFORE = re.compile(r"\b(lúc|vào)\s+$", re.IGNORECASE)
 DURATION = re.compile(r"(\d+)\s*(?:-|–|đến)?\s*(\d+)?\s*(ngày|tháng|tuần|giờ)\b", re.IGNORECASE)
 STOCK = re.compile(r"\b(còn hàng|hết hàng|có sẵn hàng|sẵn hàng|tạm hết|sắp hết hàng|chỉ còn \d+)\b", re.IGNORECASE)
 OUT_OF_STOCK = re.compile(r"\b(hết hàng|tạm hết)\b", re.IGNORECASE)
@@ -117,6 +123,8 @@ class GuardInput:
     #: False for a consultant's text: they are the person, so there is no tool to wait for.
     check_handoff: bool = True
     deletion_recorded: bool = False
+    #: ``schedule.callback`` ran in an earlier turn of this call.
+    callback_booked: bool = False
 
 
 def numbers_in(value: Any) -> set[int]:
@@ -211,6 +219,7 @@ def check(view: GuardInput) -> Verdict:
     reasons += _order_state(text, view)
     reasons += _promotions(text, view)
     reasons += _transfer(text, view)
+    reasons += _callback(text, view)
     reasons += _completed_order(text, view)
     reasons += _completed_deletion(text, view)
     if INTERNAL.search(text):
@@ -261,6 +270,9 @@ def _durations(text: str, view: GuardInput) -> list[str]:
     allowed = allowed_counts(view)
     reasons = []
     for match in DURATION.finditer(text):
+        if match.group(3).lower() == "giờ" and (TIME_OF_DAY_AFTER.match(text[match.end():])
+                                                or TIME_OF_DAY_BEFORE.search(text[:match.start()])):
+            continue
         stated = [int(match.group(1))] + ([int(match.group(2))] if match.group(2) else [])
         if not all(n in allowed for n in stated):
             reasons.append(
@@ -471,6 +483,39 @@ def _transfer(text: str, view: GuardInput) -> list[str]:
         if str(result.get("name", "")).replace("_", ".") == "handoff.transfer" and (result.get("result") or {}).get("ok"):
             return []
     return ["Nói sẽ chuyển máy cho nhân viên mà chưa gọi handoff_transfer; gọi handoff_transfer trước rồi mới báo khách."]
+
+
+def _callback(text: str, view: GuardInput) -> list[str]:
+    """Saying the shop will call at a given moment is a claim about what the system did: ``schedule.callback`` must have run."""
+    if not view.check_handoff or view.callback_booked:
+        return []
+    promised = [s for s in SENTENCE.split(text) if CALLBACK_PROMISE.search(s) and not TRANSFER_OFFER.search(s)]
+    if not promised or any(_booked(result) for result in view.tool_results):
+        return []
+    return ["Hứa gọi lại vào một thời điểm mà chưa gọi schedule_callback; gọi schedule_callback trước rồi mới báo khách."]
+
+
+def _booked(result: Mapping[str, Any]) -> bool:
+    return str(result.get("name", "")).replace("_", ".") == "schedule.callback" and bool((result.get("result") or {}).get("ok"))
+
+
+def moved_callback(text: str, results: Iterable[Mapping[str, Any]]) -> str | None:
+    """The new time of a call back the tool moved (LN-02), when *text*, the whole answer, does not tell it.
+
+    Not part of :func:`check`: a streamed answer is checked a sentence at a
+    time, and a sentence need not say everything the answer must.
+    """
+    for result in results:
+        data = (result.get("result") or {}).get("data") or {}
+        moment = clock.parse_local(data.get("callback_at")) if _booked(result) and data.get("moved_from") else None
+        if moment is None:
+            continue
+        said = text.lower()
+        day = {f"{moment.day}/{moment.month}", f"{moment.day:02d}/{moment.month:02d}", f"{moment.day} tháng {moment.month}",
+               clock.WEEKDAYS[moment.weekday()].lower()}
+        if not any(phrase in said for phrase in day):
+            return clock.moment_label(moment)
+    return None
 
 
 def _availability(results: Iterable[Mapping[str, Any]]) -> list[bool]:

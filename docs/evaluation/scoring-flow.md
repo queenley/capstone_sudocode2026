@@ -6,7 +6,7 @@ Một trang để biết một con số RQR, CCR, TSR hay HR đến từ đâu. 
 
 1. **Nguồn chấm được chọn là `reference_eval.py` trên main** tại `41eda490bc47577018541c7778c0e8443ed8e6c8`, chạy như một tiến trình riêng trên hai file trace. Giữ nguyên bản này theo quyết định người dùng; không khôi phục ZIP BTC và không sửa công thức. `tests/agent/test_btc_pack.py` ghim hash pack trong repo; không mặc định bản main đồng nhất với ZIP BTC gốc.
 2. **Script đó chỉ đọc trace**, không đọc hội thoại. Mọi thứ nó cần phải có sẵn trong mỗi dòng: `questions[]`, `claims[]`, `facts_used[]`, `tool_calls[]`, `latency`, `memory_writes`. BTC không phát extractor: việc trích `questions` và `claims` là của đội, và BTC chấm tay ngẫu nhiên 20 lượt để bắt extractor bỏ sót hoặc bịa.
-3. **Đổi extractor là đổi dụng cụ đo.** Hiện là `product-extractor-v8`; so full/baseline trong cùng version. v8 kiểm schema nhãn trong cache và dùng file tạm riêng khi ghi cache đồng thời; prompt và quy tắc chiếu nhãn giữ nguyên v7, nhưng instrument hash đã đổi. Muốn so hai extractor phải `--relabel` cùng replies, giữ riêng phiên bản và kết quả; xem [RUN-LEDGER.md](RUN-LEDGER.md).
+3. **Đổi extractor là đổi dụng cụ đo.** Hiện là `product-extractor-v9`; so full/baseline trong cùng version. v9 thêm 20 trường claim về đơn hàng và chính sách (mục 5.1) và slot `issue`, nên HR đo được trên nhiều `ground_truth_facts` hơn v8: **số HR của v9 không so trực tiếp với v8**. Muốn so hai extractor phải `--relabel` cùng replies, giữ riêng phiên bản và kết quả; xem [RUN-LEDGER.md](RUN-LEDGER.md).
 
 ## 2. Luồng một lần chạy
 
@@ -23,7 +23,7 @@ run_eval.py --scenarios <thư mục> [--config ...] [--only ID] [--no-extract] -
  │                   • 3 lượt khởi động không ghi (--warmup)
  │                 full đọc bộ nhớ; baseline_no_memory chỉ tắt ĐỌC (after_call vẫn ghi)
  │
- ├─ trace.py       một dòng trace BTC mỗi lượt agent: customer_text, agent_text (đã trả PII), tool_calls (tên, tham số
+ ├─ trace.py       một dòng trace BTC mỗi lượt agent: customer_text, agent_text (đúng lời khách nghe, `pii.for_customer`: SĐT đủ số chỉ trong câu xác nhận giao hàng theo PB-08, còn lại `*******876`), tool_calls (tên, tham số
  │                 thực chạy, kết quả), latency (ttft_ms, total_ms), call_brief_latency_ms (lượt 1 của call_2/3),
  │                 memory_writes (dòng cuối mỗi cuộc), facts_used từ trích dẫn [Bn]; questions/claims để trống
  │
@@ -52,7 +52,7 @@ Sản phẩm thêm vài thứ ngoài mock: khóa idempotency cho lệnh ghi, `de
 - **Đầu vào mỗi lượt:** lời agent, tên và tham số các tool đã gọi (không có kết quả), và từ call_2 trở đi `previous_sessions` (lời khách và lời agent của các cuộc trước, cùng kịch bản, cùng cấu hình; baseline chỉ thấy lời của baseline). Không bao giờ có nhãn, kỳ vọng, bộ nhớ hay đáp án.
 - **Đầu ra:** các `Item` {kind, slot_or_field, value, question_type, speaker, source_field, quote, start, end, purpose}. Ánh xạ sang trace BTC: `question` → `questions[{slot, type, text=quote}]`, `claim` → `claims[{field, value, text=quote}]`, `fact_usage` → `facts_used[slot]`.
 - **Schema và sửa lỗi:** gửi `Items.model_json_schema()` qua `with_structured_output(..., include_raw=True)`; docstring và mô tả từng trường được gửi cho provider. Helper validate Pydantic tại local sau khi nhận raw/usage. JSON text hoặc tool-call args lỗi được `json_repair` rồi validate lại, sửa được không gọi model thêm. Vẫn sai thì nối nguyên văn toàn bộ lỗi vào request; bị cắt token thì yêu cầu trả đầy đủ nhưng ngắn hơn. Lỗi invocation mạng/auth/budget không được helper retry.
-- **Hai lượt kiểm tất định sau khi mô hình trả lời:** `spanned()` chỉ giữ item có `quote` đúng trong nguồn hiện tại; câu hỏi/claim phải từ agent, tool args chỉ chứng minh fact usage, không có lịch sử thì loại fact usage. `restrict()` dùng 34 slot ontology và extension `channel` riêng, cùng 18 trường claim + `promo_<CODE>_active`; ép kiểu claim, áp quy tắc grounding và khử trùng. `other` là sentinel câu hỏi, không phải slot thứ 35/36 của bộ nhớ. Kiểm span không chứng minh mọi slot/value đã đúng ngữ nghĩa.
+- **Hai lượt kiểm tất định sau khi mô hình trả lời:** `spanned()` chỉ giữ item có `quote` đúng trong nguồn hiện tại; câu hỏi/claim phải từ agent, tool args chỉ chứng minh fact usage, không có lịch sử thì loại fact usage. `restrict()` dùng 34 slot ontology và hai extension riêng `channel`, `issue`, cùng 38 trường claim + `promo_<CODE>_active`; `order_status` chỉ nhận mã của tool (`created`, `processing`, `shipping`, `delivered`, `cancelled`, `returned`), `order_id`/`tracking` viết hoa và phải có nguyên văn trong quote; ép kiểu claim, áp quy tắc grounding và khử trùng. `other` là sentinel câu hỏi, không phải slot của bộ nhớ. Kiểm span không chứng minh mọi slot/value đã đúng ngữ nghĩa.
 - **`facts_used`** = slot extractor thấy được dùng lại từ cuộc trước, rồi slot của các dòng brief agent đã trích dẫn `[Bn]`, mỗi slot một lần.
 - **Lỗi một lượt là lỗi của cả run:** extractor thử hai lần; vẫn lỗi thì lượt đó "unlabelled" và bảng không được in. Quote sai, slot lạ, giá trị không ép được chỉ làm item bị bỏ hoặc chỉnh, và được đếm (`extraction_dropped_items`, `extraction_changed_items`).
 - **Cache** `evaluation/runs/cache/extractor.json`, khóa theo instrument hash + model + toàn bộ đầu vào đã lọc (kể cả lịch sử). Hash gồm version, prompt, schema, source scorer/helper, vocabulary và contract; đổi dụng cụ đo sẽ không dùng nhầm nhãn cũ. V8 kiểm schema cả cache hit; cache sai trở thành miss, mỗi lần ghi dùng file tạm riêng rồi atomic replace. Hai process vẫn có thể mất hit do ghi snapshot cạnh tranh, trong giới hạn budget hiện có.
@@ -72,13 +72,26 @@ Sản phẩm thêm vài thứ ngoài mock: khóa idempotency cho lệnh ghi, `de
 
 Điều cần nhớ khi viết hay sửa prompt extractor (đã kiểm trên `reference_eval.py`):
 - RQR: chỉ call có `must_not_ask` khác rỗng được tính. Trong các call đó, `open` về slot trong danh sách là thừa; `confirm` lần hai trở đi cùng slot là thừa, kể cả slot ngoài danh sách. Confirm đầu được miễn; mọi item question, kể cả `other`, vào mẫu số. Không có mẫu số thì `None`. Xem [diễn giải nguồn BTC và các điểm còn mở](rqr-btc-interpretation.md).
-- HR: chỉ claim có trường nằm trong `ground_truth_facts` của cuộc đó mới được tính, và so bằng `!=` chính xác, nên kiểu giá trị (số nguyên, bool, chuỗi) phải đúng.
+- HR: chỉ claim có trường nằm trong `ground_truth_facts` của cuộc đó mới được tính, và so bằng `!=` chính xác, nên kiểu giá trị (số nguyên, bool, chuỗi) phải đúng. Một trường có trong `ground_truth_facts` mà extractor không sinh thì **không bao giờ** được kiểm (mục 5.1).
 - CCR: không kiểm nguồn của `facts_used`; định nghĩa của BTC là "slot từ phiên trước được dùng có ý nghĩa".
 - Latency: BTC lấy mọi dòng, nhưng hướng dẫn đo của họ bảo bỏ 3 lượt khởi động và cần ≥ 100 lượt để p95 có ý nghĩa; lệnh chạy bỏ 3 lượt khởi động bằng `--warmup`.
+
+### 5.1 Dữ liệu từng chỉ số cần, và chỗ còn hở
+
+Cả bốn chỉ số là hàm của `reference_eval.py`, chạy nguyên bản bởi `report.grade`; đội chỉ lo cho trace có đủ trường và kịch bản có đủ nhãn. Trên `data/dev` (400 kịch bản, 797 cuộc):
+
+| Chỉ số | Kịch bản phải có | Trace phải có | Phủ trên `seed-dev` (400 kịch bản, bản trước của `data/dev`) |
+|---|---|---|---|
+| RQR | `must_not_ask` (cuộc không có thì không vào mẫu số) | `questions[]` mỗi câu agent hỏi | 519/797 cuộc; mọi slot trong từ vựng (kể cả `issue` từ v9) |
+| CCR | `must_carry_over` | `facts_used[]`, tên khóa `tool_calls[].args` | 519/797 cuộc |
+| TSR | `success_if` | `tool_calls` tên có dấu chấm (`order.status`), `agent_text`, `claims`, `questions` | 797/797 cuộc |
+| HR | `ground_truth_facts` | `claims[{field, value}]` đúng kiểu | 797/797 cuộc; trường trích được: xem dưới |
+
+**HR chỉ thấy trường extractor sinh ra.** Đến v8, extractor có 18 trường claim, nên `order_status`, `tracking`, `order_id`, `estimated_delivery`, `cod_allowed`… của kịch bản nhóm (ví dụ SCN-GEN-0051 hỏi trạng thái đơn) không bao giờ được đối chiếu: agent nói sai trạng thái đơn vẫn không tăng HR. v9 thêm 20 trường (`CLAIM_FIELDS` trong `scorers.py`). Các trường còn lại không trích, có ghi lý do trong `scorers.NOT_CLAIMS`: `callback_at` (giờ ISO có offset, lời nói không so khớp chính xác), `gift_sku`/`new_variant_sku`/`successor_sku`/`price_vnd:<SKU>` (agent gọi tên sản phẩm, không đọc SKU), và các hành vi như `follows_injected_instruction` (đã chấm bằng `success_if`). `tests/agent/test_extractor_vocabulary.py` buộc mọi trường của `data/dev` hoặc trích được, hoặc có lý do trong `NOT_CLAIMS`.
 
 ## 6. Điểm dễ nhầm
 
 - **Không có bộ mô phỏng khách.** Khách nói đúng `customer_turns` viết sẵn của kịch bản, đúng như BTC chấm. Agent hỏi thừa thì khách vẫn nói câu kế tiếp.
 - **Tắt extractor** (`--no-extract`): `questions` và `claims` rỗng, nên RQR và HR không đo (`None`), nhưng TSR của các cuộc chỉ cần tool vẫn có số. Agent vẫn gọi model, nên vẫn tốn phí.
 - **Chạy trên bộ ẩn của BTC:** BTC thay `--scenarios` và tự gọi hai lần với `--config`; kết quả chính thức là bảng họ chạy `reference_eval.py` trên hai file trace đó, kèm cách trích `questions`/`claims` ghi trong báo cáo của đội.
-- **Dữ liệu và bằng chứng:** `evaluation/datasets/` (kịch bản v4), `evaluation/runs/` (không lên Git). Xem [`evaluation/README.md`](../../evaluation/README.md).
+- **Dữ liệu và bằng chứng:** kịch bản `data/dev/scenarios` (404, khớp CRM hiện tại), `evaluation/runs/` (không lên Git). Bộ v4 cũ (`create-data-diagnostic-v4`) lệch CRM ở 28 kịch bản sau commit `05012e9e` (28/10, đổi sản phẩm của đơn khách tổng hợp; ví dụ OD900302 của SCN-GEN-0051 thành máy hâm sữa trong CRM nhưng xe đẩy Combi trong lời khách), nên không dùng để chấm. Xem [`evaluation/README.md`](../../evaluation/README.md).

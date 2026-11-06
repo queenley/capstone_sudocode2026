@@ -65,3 +65,11 @@ def test_documented_order_history_without_explicit_summary_can_be_seeded():
         "days_before": 1, "order_id": "SYNTHETIC-ORDER", "sku": "SYNTHETIC-SKU", "status": "done"}]))
     assert plan.seed[0].day == "2026-10-14"
     assert plan.seed[0].summary == "Đơn SYNTHETIC-ORDER: SYNTHETIC-SKU (done)."
+
+
+def test_a_crm_session_channel_is_seeded_under_the_products_name():
+    """The synthetic CRM writes ``fb`` for Facebook; a seed that carries it is that channel, not an unknown one."""
+    plan, = scenarios.plan(scenario(seed_history=[
+        {"days_before": 1, "channel": "fb", "summary": "Synthetic session"},
+        {"days_before": 1, "channel": "web", "summary": "Synthetic session"}]))
+    assert [s.channel for s in plan.seed] == ["facebook", "web"]

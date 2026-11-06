@@ -5,13 +5,13 @@ description: Review, approve, or revise evaluation scenarios and ground-truth la
 
 # Ground-truth review for evaluation data
 
-> **Current dataset:** the only run path is `data/seed-dev/scenarios` (see `data/seed-dev/README.md`). The `create-data-diagnostic-v<N>` folders named below are the old revision layout and were removed; a new revision folder is needed only when labels are changed under review.
+> **Current dataset:** the run path is named in `evaluation/README.md` (`data/dev/scenarios`, formerly `seed-dev-r3`). A new revision folder is needed only when labels are changed under review.
 
-This is the single instruction file for creating, reviewing, and revising team evaluation data. Team data lives under `evaluation/datasets/<revision>/` (see its `README.md`). Treat the organisers' pack in `apps/ai-agent-service/data/btc/` as an immutable reference: a BTC schema defines the shape, not the truth of an answer. Verify prices, promotions, inventory, order state, and effective dates against that pack's catalog, policy, and `eval/mock_tools.py`. The seven BTC public samples (`test_set/public_sample/`) are development examples; they are not the future organiser golden set. Do not use frozen or hidden cases to teach FAQ, Reflection, or Exemplar Bank.
+This is the single instruction file for creating, reviewing, and revising team evaluation data. Team data lives under `data/dev-r<N>/` (the current revision is named in `evaluation/README.md`); the old `create-data-diagnostic-v<N>/` folders are in git history only. Treat the organisers' pack in `apps/ai-agent-service/data/btc/` as an immutable reference: a BTC schema defines the shape, not the truth of an answer. Verify prices, promotions, inventory, order state, and effective dates against that pack's catalog, policy, and `eval/mock_tools.py`. The seven BTC public samples (`test_set/public_sample/`) are development examples; they are not the future organiser golden set. Do not use frozen or hidden cases to teach FAQ, Reflection, or Exemplar Bank.
 
 Before running a new case, check the BTC scenario format (`schemas/scenario_format.md`) and make sure every call has a reviewed grading method, expected tools for both the `full` and the `baseline_no_memory` configuration, a source/provenance and a PII decision. A structurally valid JSON file with a wrong business fact or an unsupported field is not ready. Keep new or corrected labels in a new revision; never overwrite a used revision.
 
-Each `create-data-diagnostic-v<N>/` is a derived, BTC-compatible diagnostic revision of `evaluation/data-generation` output, not approved official GT. Its `conversion-report.json` records every changed field; `official_gt_approved: false` must remain truthful. `QaAgent` and model judgments can propose or flag labels, but cannot approve their own labels. A human reviewer makes the final decision.
+Each `data/dev-r<N>/` is a derived, BTC-compatible diagnostic revision of `evaluation/data-generation` output, not approved official GT. Its `conversion-report.json` records every changed field; `official_gt_approved: false` must remain truthful. `QaAgent` and model judgments can propose or flag labels, but cannot approve their own labels. A human reviewer makes the final decision.
 
 ## Before changing data
 
@@ -21,8 +21,8 @@ Each `create-data-diagnostic-v<N>/` is a derived, BTC-compatible diagnostic revi
 
 ## Publish a revision
 
-- Write a new versioned folder (`create-data-diagnostic-v<N+1>/`) with its scenarios, `tool-labels.json`, an updated conversion report and source hashes. Do not overwrite a revision a run has used.
-- The converter that built v1 to v4 (`normalize_create_data.py`) was removed with the old harness; it is in the git history before commit `358a070`. A new revision needs a converter again, or labels edited by hand under review.
+- Write a new versioned folder (`data/dev-r<N+1>/`) with its scenarios, an updated conversion report and source hashes. Do not overwrite a revision a run has used.
+- Build a revision with a script that can be rerun, not by hand.
 - Keep reviewer evidence with the new revision. Mark approval only for the scope actually reviewed; one approved field or call does not approve the whole dataset.
 - Run a model-backed evaluation only when requested or authorized, on the same pinned cohort, and report label changes separately from agent changes.
 

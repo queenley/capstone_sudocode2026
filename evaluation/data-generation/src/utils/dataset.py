@@ -1,6 +1,6 @@
 """The generated dataset on disk. This module is the only one that knows where a file goes.
 
-Each fact is stored once, under the seed folder (``data/seed-<name>/`` at the repository root,
+Each fact is stored once, under the seed folder (``data/<name>/`` at the repository root,
 ``src/utils/paths.py``)::
 
     <seed>/

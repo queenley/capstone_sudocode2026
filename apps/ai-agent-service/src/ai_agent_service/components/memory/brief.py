@@ -52,9 +52,12 @@ class BriefLine(NamedTuple):
     text: str
     sensitive: bool = False
     fact_ids: tuple[str, ...] = ()
+    #: What a turn reads it for (``components.context.focus``): history, product, quote, need, open, order, other.
+    kind: str = "other"
 
     def as_dict(self) -> dict[str, Any]:
-        return {"id": self.id, "text": self.text, "sensitive": self.sensitive, "fact_ids": list(self.fact_ids)}
+        return {"id": self.id, "text": self.text, "sensitive": self.sensitive, "fact_ids": list(self.fact_ids),
+                "kind": self.kind}
 
 
 def used_slots(cited: Sequence[str], lines: Sequence[Mapping[str, Any]],
@@ -101,6 +104,24 @@ def _line(name: str, fact: Mapping[str, Any]) -> str:
     }.get(name, f"{_label(name).capitalize()}: {value}.")
 
 
+def spoken(name: str, value: Any) -> str:
+    """One slot as the advisor reads it: "ngân sách: 3.500.000đ"."""
+    return f"{_label(name)}: {_value(value, name)}"
+
+
+#: Slots of a brief line about something unfinished.
+OPEN_SLOTS = ("blocker", "callback_at", "objection", "decision_maker", "competitor_price_vnd")
+#: Outcomes after which what held the customer back is over.
+SETTLING = ("chot_don", "tu_choi")
+
+
+def _settled(fact: Mapping[str, Any], episodes: Sequence[Mapping[str, Any]]) -> bool:
+    """A blocker a later close or refusal answered; the same day counts, as on the welcome line. It is past, not
+    forgotten: the line stays for the organisers' ``must_carry_over``, it only stops being called open."""
+    said = str(fact.get("valid_from") or "")[:10]
+    return bool(said) and any(e.get("outcome") in SETTLING and str(e.get("date") or "")[:10] >= said for e in episodes)
+
+
 def _label(name: str) -> str:
     spec = slot(name)
     return spec.label if spec else name
@@ -135,30 +156,40 @@ def render(
     ``channel`` the channel of this call, for the last session's line.
     """
     held = _current(facts)
+    settled = "blocker" in held and _settled(held["blocker"], episodes)
     honorific = customer.get("honorific") or "anh/chị"
     name = customer.get("name")
     who = f"{honorific} {name}" if name else honorific
-    lines: list[tuple[str, bool, tuple[str, ...]]] = []
+    lines: list[tuple[str, bool, tuple[str, ...], str]] = []
 
     if episodes:
         last = episodes[0]
-        lines.append((f"Khách quen: {who}, đã liên hệ {len(episodes)} lần trước.", False, ()))
+        lines.append((f"Khách quen: {who}, đã liên hệ {len(episodes)} lần trước.", False, (), "history"))
         summary = str(last.get("summary") or "").strip()
         lines.append((
             f"Lần gần nhất {day_label(last['date'])} qua {_channel(last.get('channel'))}: {summary}",
             bool(money_spans(summary)) or "địa chỉ" in summary.lower(),
             (),
+            "history",
         ))
         others = {str(e.get("channel")) for e in episodes} - {str(last.get("channel")), str(channel)}
         if others:
             names = ", ".join(sorted({_channel(c) for c in others}))
-            lines.append((f"Khách cũng từng liên hệ qua {names}.", False, ()))
+            lines.append((f"Khách cũng từng liên hệ qua {names}.", False, (), "history"))
+
+    if episodes:
+        # What the last call left open that no fact holds: a promise, say. Facts have their own lines.
+        said = [str(held[name]["value"]) for name in ("blocker", "callback_at") if name in held]
+        left = [str(item) for item in episodes[0].get("open_items") or [] if not any(value in str(item) for value in said)]
+        if left and not settled:
+            text = f"Việc còn dở lần trước: {'; '.join(left)}."
+            lines.append((text, bool(money_spans(text)), (), "open"))
 
     for product in products:
         # Each line rests on the facts it states, and only those (section 5.5).
         ids = product.get("fact_ids") or {}
         label = product.get("name") or product["sku"]
-        lines.append((f"Đã tư vấn {label} ({product['sku']}).", False, _ids(ids, "product_advised")))
+        lines.append((f"Đã tư vấn {label} ({product['sku']}).", False, _ids(ids, "product_advised"), "product"))
         if product.get("price_quoted_vnd"):
             promo = f", kèm khuyến mãi {product['promo_code']}" if product.get("promo_code") else ""
             quoted = f" ngày {day_label(product['quoted_on'])}" if product.get("quoted_on") else ""
@@ -167,15 +198,21 @@ def render(
                 "Đây là lịch sử; giá hôm nay phải lấy lại bằng pricing_get_quote.",
                 True,
                 _ids(ids, "price_quoted_vnd", "quoted_on", "promo_code", "promo_expiry"),
+                "quote",
             ))
     if "alt_suggested" in held:
         fact = held["alt_suggested"]
-        lines.append((f"Đã gợi ý thêm sản phẩm {fact['value']}.", False, (fact["fact_id"],)))
+        lines.append((f"Đã gợi ý thêm sản phẩm {fact['value']}.", False, (fact["fact_id"],), "product"))
 
     for slot_name in LINE_ORDER:
         if slot_name in held:
             fact = held[slot_name]
-            lines.append((_line(slot_name, fact), is_sensitive(slot_name), (fact["fact_id"],)))
+            kind = "open" if slot_name in OPEN_SLOTS else "order" if slot_name == "order_id" else "need"
+            if settled and slot_name == "blocker":
+                lines.append((f"Băn khoăn trước đây, đã giải quyết: {fact['value']}; không hỏi lại như việc còn dở.",
+                              is_sensitive(slot_name), (fact["fact_id"],), "history"))
+                continue
+            lines.append((_line(slot_name, fact), is_sensitive(slot_name), (fact["fact_id"],), kind))
 
     for order in orders:
         lines.append((
@@ -183,10 +220,11 @@ def render(
             f"trạng thái {order.get('status')}.",
             True,
             (),
+            "order",
         ))
 
     if not episodes and (held or orders):
-        lines.insert(0, (f"Khách quen: {who}; đã có thông tin được lưu, chưa có cuộc trước kết thúc.", False, ()))
+        lines.insert(0, (f"Khách quen: {who}; đã có thông tin được lưu, chưa có cuộc trước kết thúc.", False, (), "history"))
 
     for fact in facts:
         if fact.get("status") == "disputed":
@@ -196,10 +234,11 @@ def render(
                 "khác với hệ thống. Hỏi xác nhận, không tự chọn bên.",
                 True,
                 (fact["fact_id"],),
+                "other",
             ))
     for fact in facts:
         if fact.get("status") == "active" and fact["slot"] == NOTE_SLOT:
-            lines.append((f"Ghi chú về khách: {fact['value']}.", False, (fact["fact_id"],)))
+            lines.append((f"Ghi chú về khách: {fact['value']}.", False, (fact["fact_id"],), "other"))
     unconfirmed = [f for f in facts if f.get("status") == "unconfirmed" and f["slot"] not in held]
     if unconfirmed:
         # Said by someone who gave this customer's number and left before confirming (after_call, PROBABLE).
@@ -212,10 +251,11 @@ def render(
             "xác nhận, dùng bình thường.",
             True,
             tuple(f["fact_id"] for f in unconfirmed),
+            "other",
         ))
 
-    numbered = tuple(BriefLine(f"B{i}", text, sensitive, ids) for i, (text, sensitive, ids) in enumerate(lines, 1))
-    blockers = [f for n, f in held.items() if n == "blocker"]
+    numbered = tuple(BriefLine(f"B{i}", text, sensitive, ids, kind) for i, (text, sensitive, ids, kind) in enumerate(lines, 1))
+    blockers = [f for n, f in held.items() if n == "blocker" and not settled]
     last_session = None
     if episodes:
         last = episodes[0]

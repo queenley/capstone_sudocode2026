@@ -79,7 +79,7 @@ async def after_call(
         if settled.get("tier") == "PROBABLE" and claimed:
             remembered = await _hold(claimed, settled, candidates, writer=writer)
         else:
-            remembered = await _remember(settled, candidates, writer=writer, memory=memory)
+            remembered = await _remember(settled, candidates, writer=writer, memory=memory, transcript=transcript)
             if remembered.get("status") == "done" and settled.get("tier") == "VERIFIED":
                 denied = any(NOT_ME.search(str(line.get("text") or "")) for line in transcript
                              if line.get("speaker") == "customer")
@@ -143,7 +143,8 @@ def _settle_identity(call: dict[str, Any]) -> dict[str, Any]:
     return call
 
 
-async def _remember(call: dict[str, Any], candidates: list[gate.Candidate], *, writer: Any, memory: MemoryAgent, episode: bool = True) -> dict[str, Any]:
+async def _remember(call: dict[str, Any], candidates: list[gate.Candidate], *, writer: Any, memory: MemoryAgent,
+                    transcript: Sequence[dict[str, Any]] = (), episode: bool = True) -> dict[str, Any]:
     tier = call.get("tier") or "UNKNOWN"
     if tier in ("PROBABLE", "AMBIGUOUS"):
         return {"status": "skipped", "reason": f"identity still {tier.lower()} at hang-up", "memory_writes": []}
@@ -185,7 +186,8 @@ async def _remember(call: dict[str, Any], candidates: list[gate.Candidate], *, w
         return {"status": "done", "customer_id": customer_id, "memory_writes": committed.get("memory_writes") or []}
     writes = committed.get("memory_writes") or []
     try:
-        episode = await memory.summarize(candidates, call_number=number, day=call["on"], channel=call.get("channel") or "web")
+        episode = await memory.summarize(candidates, call_number=number, day=call["on"], channel=call.get("channel") or "web",
+                                         transcript=transcript)
     except Exception as error:
         return {"status": "failed", "reason": "could not summarize the call", "error": type(error).__name__,
                 "customer_id": customer_id, "memory_writes": writes}
