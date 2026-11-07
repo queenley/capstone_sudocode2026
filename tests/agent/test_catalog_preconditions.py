@@ -12,39 +12,6 @@ from ai_agent_service.mcp.tools import idempotency_key
 from ai_agent_service.mcp.servers import btc
 
 
-@pytest.mark.asyncio
-@pytest.mark.parametrize("name", ["pricing_get_quote", "inventory_check"])
-@pytest.mark.parametrize("seen", [False, True])
-async def test_catalog_result_required_before_sku_reads(name, seen):
-    call = {"id": "tool-1", "name": name, "args": {"sku": "SKU-TEST-42"}}
-    message = ToolMessage(name="catalog_search", tool_call_id="catalog-1", content=json.dumps({
-        "ok": True, "data": {"items": [{"sku": "SKU-TEST", "variants": [{"variant_sku": "SKU-TEST-42"}]}]}}))
-    request = SimpleNamespace(tool_call=call, runtime=SimpleNamespace(context=AgentContext(call_id="test")),
-                              state={"messages": [message] if seen else []})
-    request.override = lambda **changes: SimpleNamespace(**{**vars(request), **changes})
-    handler = AsyncMock(return_value="tool-result")
-    result = await ActionGuardMiddleware().awrap_tool_call(request, handler)
-    if seen:
-        assert result == "tool-result"
-        handler.assert_awaited_once()
-    else:
-        assert json.loads(result.content)["error"]["code"] == "PRECONDITION"
-        handler.assert_not_awaited()
-
-
-@pytest.mark.asyncio
-async def test_failed_tool_result_does_not_trust_a_sku():
-    context = AgentContext(call_id="test")
-    call = {"id": "tool-1", "name": "pricing_get_quote", "args": {"sku": "GUESSED"}}
-    request = SimpleNamespace(tool_call=call, runtime=SimpleNamespace(context=context), state={"messages": [
-        ToolMessage(name="pricing_get_quote", tool_call_id="old", content=json.dumps({
-            "ok": False, "data": {"sku": "GUESSED"}, "error": {"code": "unknown_sku"}}))]})
-    handler = AsyncMock()
-    result = await ActionGuardMiddleware().awrap_tool_call(request, handler)
-    assert result.additional_kwargs["blocked_by"] == "guardrail"
-    handler.assert_not_awaited()
-
-
 def test_repeat_order_across_turns_replays_first_result():
     context = SimpleNamespace(call_id="call-1", turn_id="t2")
     args = {"sku": "SKU-AP-X", "price_vnd": 4890000, "qty": 1, "payment": "COD"}

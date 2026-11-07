@@ -21,6 +21,7 @@ lanes:
   CLARIFY: []
   CONFIRM_IDENTITY: []
   CONTINUITY: &business
+    - load_skill
     - account_cart
     - account_orders
     - account_profile
@@ -31,7 +32,7 @@ lanes:
     - order_create
     # An order the customer has (order_status, or crm_get_customer when no
     # code was given) and the change they ask on it (order_update): a change
-    # is never a new order (rule 20 of config/prompts/agent/advisor/rules.md).
+    # is never a new order (change-order in config/prompts/agent/advisor/skills.yaml).
     - order_status
     - crm_get_customer
     - order_update

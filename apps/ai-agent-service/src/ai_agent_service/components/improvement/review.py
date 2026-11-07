@@ -70,6 +70,16 @@ def write(round_name: str, proposals: Sequence[Mapping[str, Any]]) -> Path:
     return path
 
 
+def approve_scripted(path: Path, reviewer: str) -> None:
+    """An evaluation has no person: approve what passed the gates, under a name that says so."""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    for item in data.get("proposals") or []:
+        if item.get("decision") is None and not item.get("flags"):
+            item.update(decision="approved", reviewer=reviewer, note="scripted, no person")
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    log("approve_scripted", review=path.name, reviewer=reviewer)
+
+
 def approved(path: Path) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
     """The proposals a person approved, and the ones refused with the reason."""
     data = json.loads(path.read_text(encoding="utf-8"))

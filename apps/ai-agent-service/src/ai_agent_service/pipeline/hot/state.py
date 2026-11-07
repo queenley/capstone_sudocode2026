@@ -125,6 +125,10 @@ class HotState(TurnInput, total=False):
     #: corrects with ``order.update`` instead of booking the product again.
     created_orders: list[dict[str, Any]]
     pending_purchase: dict[str, Any] | None
+    #: The skills loaded for the task on: names only, the text is the repository's.
+    loaded_skills: list[str]
+    #: The call's earlier tool results, short, for the PolicyAgent.
+    call_log: list[dict[str, Any]]
     deletion_recorded: bool
     deletion_awaiting_for: str | None
     #: The changes ``order.update`` made in this call, ``{order_id, action, new_variant_sku}``: the

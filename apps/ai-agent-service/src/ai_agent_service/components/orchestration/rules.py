@@ -25,8 +25,7 @@ turn could not recover from it.
 signature, since a field that is not here cannot be read.
 
 A lane's instruction gains notes when they apply: PB-10 when the customer is
-impatient, PB-11 after three contacts without a close, PB-06 when the words
-touch on health, medicine or pregnancy, and on a shared number whose name
+impatient, PB-11 after three contacts without a close, and on a shared number whose name
 question went unanswered, what may not be said (section 4.2).
 """
 
@@ -49,11 +48,6 @@ NOTES = {
     "impatient": "Khách đang bực: xin lỗi ngắn một câu, đi thẳng vào việc, tối đa một câu xác nhận (PB-10).",
     "no_close": ("Khách đã liên hệ từ 3 lần mà chưa chốt: không ép, ghi nhận nhu cầu, chỉ hẹn liên hệ lại khi có "
                  "chương trình mới (PB-11)."),
-    "pb06": ("Lời khách có nhắc tới sức khỏe, thuốc, thai sản hoặc pháp lý (PB-06). Khách xin lời khuyên y tế, về "
-             "thuốc, về an toàn cho mẹ, bé hay người bệnh, hoặc về pháp lý: nói \"Dạ hiện em chưa có thông tin về …\" "
-             "rồi gọi handoff_transfer (y tế, thuốc, thai sản: escalation_reason cau_hoi_y_te). Khách chỉ hỏi sản "
-             "phẩm (máy hút sữa, đồ cho bé, thông số, giá, tồn kho), kể cả khi kể mình đang mang thai hay cho con bú: "
-             "tư vấn bình thường bằng tool, với sản phẩm mẹ và bé chỉ nêu thông số hãng công bố, không chuyển máy."),
     "unconfirmed": ("Số này thuộc nhiều người và khách chưa cho biết là ai: tư vấn chung như khách mới, không đọc "
                     "thông tin riêng của ai, không nói về lần tư vấn trước, không hỏi lại tên; khách hỏi về đơn riêng "
                     "thì nói em chưa xem được khi chưa xác nhận và đề nghị chuyển nhân viên."),
@@ -70,7 +64,6 @@ class RouteInput:
     model_failures: int = 0
     #: PB-06: health, pregnancy, medicine, legal words in the turn. A note, never a lane:
     #: "máy hút sữa cho con bú" names the topic and is a product question.
-    must_transfer: bool = False
     impatient: bool = False
     #: Previous contacts that ended without an order (PB-11).
     sessions_without_close: int = 0
@@ -96,8 +89,6 @@ def decide(view: RouteInput) -> RouteDecision:
     notes = []
     if view.impatient:
         notes.append(NOTES["impatient"])
-    if view.must_transfer and lane in ("CONTINUITY", "NEW"):
-        notes.append(NOTES["pb06"])
     if view.sessions_without_close >= SESSIONS_WITHOUT_CLOSE and lane in ("CONTINUITY", "NEW"):
         notes.append(NOTES["no_close"])
     if view.tier == "AMBIGUOUS" and lane != "CONFIRM_IDENTITY":

@@ -13,11 +13,10 @@ customer. One call is one vote of evidence, never a rule; an entry needs the
 same failure fixed with several customers.
 
 - :mod:`.signals`: the sources of the brief, and the grader's failures routed by code.
-- :mod:`.lessons`: hints, cards, the deterministic screen, support.
-- :mod:`.playbook`: from cards to one entry.
+- :mod:`.lessons`: what counts as evidence and what a change may never say.
+- :mod:`.skill_versions`: skills, one sentence at a time, version by version.
 - :mod:`.review`: who approves what, and the improvement log.
 - :mod:`.versions`: what is live, publishing, rollback, revocation.
 
-The exploration that turns a failure into a verified hint plays calls, so it
-is a pipeline, not a component: ``pipeline/improve``.
+The commands are in ``pipeline/improve``.
 """

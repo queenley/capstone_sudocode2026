@@ -164,6 +164,7 @@ async def evaluate(
     questions: Mapping[str, Question],
     *,
     timeout: float | None = None,
+    wait: bool = False,
 ) -> Decision:
     """Ask the evaluation model routed to *caller* in ``config/models.yaml``.
 
@@ -183,7 +184,8 @@ async def evaluate(
     typesafe = config.get("api") == "typesafe"
 
     limiter = limiter_for(provider, config["rate_limits"], config["model"])
-    if not await limiter.aacquire(blocking=False):
+    # A check that holds a reply is refused a slot rather than wait; one running beside the reply may wait for it.
+    if not await limiter.aacquire(blocking=wait):
         raise JevUnavailable("THROTTLED", "no slot in the local rate limit")
 
     body: dict[str, Any] = {

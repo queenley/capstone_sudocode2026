@@ -296,7 +296,8 @@ class ToolGuardMiddleware(AgentMiddleware):
                 args["turn_id"] = context.turn_id
             if "purchase_authorization" in accepted:
                 args["purchase_authorization"] = purchase.receipt(
-                    getattr(context, "pending_purchase", None), business_args, context)
+                    (getattr(context, "consent", None) or {}).get("draft") or getattr(context, "pending_purchase", None),
+                    business_args, context)
         if name in WRITE_TOOLS and IDEMPOTENCY_ARG in accepted:
             key = idempotency_key(context, name, args)
             if key:

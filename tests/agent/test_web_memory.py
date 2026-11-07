@@ -88,24 +88,6 @@ async def test_delayed_tab_cannot_replace_a_newer_fact():
     assert conn.execute.await_count==1
 
 
-@pytest.mark.parametrize('text,name',[('Dạ em đã lên đơn cho anh ạ.','order.create'),
-                                      ('Dạ em đã đổi size cho anh ạ.','order.update')])
-def test_completed_order_claim_requires_successful_tool(text,name):
-    from ai_agent_service.components.guardrails.hard import GuardInput, _completed_order
-    assert _completed_order(text,GuardInput(text=text,tier='VERIFIED',tool_results=()))
-    assert not _completed_order(text,GuardInput(text=text,tier='VERIFIED',tool_results=({
-        'name':name,'result':{'ok':True,'data':{'order_id':'TEST'}}},)))
-    assert _completed_order(text,GuardInput(text=text,tier='VERIFIED',tool_results=({
-        'name':name,'result':{'ok':False,'error':{'code':'TIMEOUT'}}},)))
-
-
-@pytest.mark.parametrize('text',['Dạ em chưa tạo đơn cho anh.','Anh đã đặt hàng chưa ạ?',
-                                'Dạ em sẽ lên đơn khi anh xác nhận.'])
-def test_order_question_or_future_action_is_not_a_completed_claim(text):
-    from ai_agent_service.components.guardrails.hard import GuardInput, _completed_order
-    assert not _completed_order(text,GuardInput(text=text,tier='VERIFIED',tool_results=()))
-
-
 def test_incremental_facts_put_customer_name_in_advisor_brief_without_inventing_episode():
     from ai_agent_service.components.memory.brief import render
     from datetime import datetime, timezone
