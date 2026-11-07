@@ -44,8 +44,9 @@ MAX_LOADED = 3
 
 
 def on_demand() -> bool:
-    """``ADVISOR_SKILLS=0`` keeps every body in the prompt, to measure what loading on demand changes."""
-    return os.environ.get("ADVISOR_SKILLS", "1").strip().lower() not in ("0", "false", "no", "off")
+    """Every body stays in the prompt unless ``ADVISOR_SKILLS=1``: a load costs a model round and a prompt longer by
+    these bodies costs next to nothing once cached (2026-11-07, four scenarios: 28% more model calls when loading)."""
+    return os.environ.get("ADVISOR_SKILLS", "0").strip().lower() not in ("0", "false", "no", "off", "")
 
 
 def catalogue(loaded: Iterable[str] = ()) -> str:

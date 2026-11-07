@@ -60,7 +60,7 @@ from ..guardrails.hard import HUMAN
 
 logger = logging.getLogger(__name__)
 #: The instrument's version, written into every run's manifest beside :data:`prompt_sha`.
-VERSION = "product-extractor-v8"
+VERSION = "product-extractor-v9"
 AUTOMATED = re.compile(r"\b(?:em|tôi|mình)\s+là\s+(?:một\s+)?(?:trợ lý (?:ảo|tự động)|(?:chat)?bot|AI)\b", re.IGNORECASE)
 RESTOCK = re.compile(r"\b(?:về\s+kho|hàng(?:\s+(?:sẽ|sắp|mới|lại|dự\s+kiến))*\s+về|"
                      r"nhập(?:\s+(?:lại|thêm|mới))*\s+hàng|bổ\s+sung\s+(?:hàng|kho|tồn\s+kho)|"
@@ -125,6 +125,9 @@ def vocabulary() -> frozenset[str]:
     return frozenset(SLOTS) | EXTRA_SLOTS
 
 
+SOURCE_FIELD = re.compile(r"agent_text|tool_texts/\d+")
+
+
 class Item(BaseModel):
     """Một quan sát nguyên tử có bằng chứng nguyên văn trong lượt đang gắn nhãn."""
 
@@ -133,7 +136,7 @@ class Item(BaseModel):
     kind: Literal["question", "claim", "fact_usage"] = Field(
         description="question: agent hỏi khách; claim: agent khẳng định sự thật có thể kiểm chứng; "
                     "fact_usage: dùng lại dữ kiện của cuộc trước trong lời agent hoặc tham số công cụ.")
-    slot_or_field: str = Field(min_length=1, description="Tên slot của câu hỏi/dữ kiện dùng lại, hoặc trường của claim; "
+    slot_or_field: str = Field(description="Tên slot của câu hỏi/dữ kiện dùng lại, hoặc trường của claim; "
                               "dùng other cho câu hỏi ngoài danh mục, không tự đặt alias.")
     value: str | int | float | bool | None = Field(
         description="Giá trị theo kiểu slot: tiền là số nguyên VND, phone_provided chỉ là bool, địa chỉ chỉ là token; "
@@ -143,12 +146,9 @@ class Item(BaseModel):
                     "open khi hỏi giá trị còn thiếu, lựa chọn hoặc xin phép; null nếu không phải question.")
     speaker: Literal["agent", "tool", "consultant"] = Field(
         description="Người tạo nguồn: agent cho agent_text; tool cho tool_texts/INDEX; không gán lời consultant cho agent.")
-    source_field: str = Field(pattern=r"^(agent_text|tool_texts/\d+)$",
-                             description="agent_text hoặc tool_texts/INDEX (INDEX bắt đầu từ 0); không trích lịch sử.")
-    quote: str = Field(min_length=1, description="Trích nguyên văn bằng chứng; câu hỏi phải chứa cả nội dung cần hỏi "
+    source_field: str = Field(description="agent_text hoặc tool_texts/INDEX (INDEX bắt đầu từ 0); không trích lịch sử.")
+    quote: str = Field(description="Trích nguyên văn bằng chứng; câu hỏi phải chứa cả nội dung cần hỏi "
                        "và phạm vi phủ định/lựa chọn/xác nhận, không chỉ cắt cụm đúng không.")
-    start: int = Field(ge=0, description="Vị trí bắt đầu quote theo code point Unicode trong source_field.")
-    end: int = Field(ge=0, description="Vị trí ngay sau ký tự cuối quote; source_field[start:end] phải bằng quote.")
     purpose: str = Field(description="Lý do ngắn theo ngôn ngữ: dữ kiện dùng để làm gì; câu hỏi xin giá trị, lựa chọn "
                          "hay xác nhận mệnh đề nào. Không suy luận từ điểm số hoặc nhãn kịch bản.")
 
@@ -156,8 +156,11 @@ class Item(BaseModel):
     def consistent(self) -> Item:
         if (self.kind == "question") != (self.question_type is not None):
             raise ValueError("question phải có question_type open/confirm; claim và fact_usage phải dùng null.")
-        if self.end <= self.start:
-            raise ValueError("end phải lớn hơn start cho quote không rỗng.")
+        # Held here, not in the schema: strict mode takes neither a minimum length nor these checks on every model.
+        if not self.slot_or_field or not self.quote:
+            raise ValueError("slot_or_field và quote không được rỗng.")
+        if not SOURCE_FIELD.fullmatch(self.source_field):
+            raise ValueError("source_field chỉ là agent_text hoặc tool_texts/INDEX.")
         if self.kind == "question" and self.question_type == "open" and self.value is not None:
             raise ValueError("Câu hỏi open phải dùng value=null; không coi lựa chọn/ví dụ là candidate đã chốt.")
         return self
@@ -252,7 +255,7 @@ class Extractor:
 
     def __init__(self, llm: BaseChatModel, *, model_name: str, cache_path: Path | None = None) -> None:
         # Two attempts: a truncated or invalid answer is asked again once, then the turn is left unlabelled.
-        self._labeller = StructuredOutput(llm, Items, attempts=2, length_hint=LENGTH_HINT)
+        self._labeller = StructuredOutput(llm, Items, attempts=2, length_hint=LENGTH_HINT, strict=True)
         self.model_name = model_name
         self.prompt_sha = prompt_sha()
         self._cache_path = cache_path
@@ -394,10 +397,12 @@ def field_text(data: dict[str, Any], name: Any) -> str | None:
 def spanned(items: list[dict[str, Any]], data: dict[str, Any]) -> tuple[list[dict[str, Any]], int]:
     """Items whose quote is located in its source, with exact offsets; and how many were not.
 
-    A model counts characters badly, so each quote is searched for: kept when it occurs once or when the model's
-    offset names one of its occurrences, dropped otherwise. The source decides who spoke.
+    The model writes the quote and code finds it, since a model counts characters badly. Items come in the order
+    they appear, so a quote that occurs several times takes its occurrences in turn, and stays on the last one: one
+    question about two slots repeats a quote at one place. The source decides who spoke.
     """
     kept, dropped = [], 0
+    seen: dict[tuple[str, str], int] = {}
     for item in items:
         text = field_text(data, item.get("source_field"))
         quote = item.get("quote")
@@ -405,13 +410,12 @@ def spanned(items: list[dict[str, Any]], data: dict[str, Any]) -> tuple[list[dic
             dropped += 1
             continue
         starts = [m.start() for m in re.finditer(re.escape(quote), text)]
-        if len(starts) == 1:
-            start = starts[0]
-        elif item.get("start") in starts:
-            start = item["start"]
-        else:
+        if not starts:
             dropped += 1
             continue
+        key = (str(item["source_field"]), quote)
+        start = starts[min(seen.get(key, 0), len(starts) - 1)]
+        seen[key] = seen.get(key, 0) + 1
         speaker = {"agent_text": "agent", "tool_texts": "tool", "consultant_texts": "consultant"}[
             str(item["source_field"]).split("/")[0]]
         kept.append({**item, "speaker": speaker, "start": start, "end": start + len(quote)})

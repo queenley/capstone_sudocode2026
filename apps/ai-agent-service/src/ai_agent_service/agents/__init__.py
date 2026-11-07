@@ -3,7 +3,7 @@
 | Agent | When | Reads | Returns |
 |---|---|---|---|
 | ``AdvisorAgent`` | every turn | the slice of section 3.2 | a draft, tool results |
-| ``PolicyAgent`` (Jev) | every turn | draft, tool results, policy | violations |
+| ``PolicyAgent`` (Decisions API) | every turn | draft, tool results, policy | violations |
 | ``MemoryAgent`` | after the call | transcript, current facts | what to write |
 | ``QaAgent`` | after the call | candidates, a failure | tags, hints |
 | ``SimulatorAgent`` | evaluation only | persona, outline | the customer's turns |

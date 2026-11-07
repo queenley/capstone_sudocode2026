@@ -378,11 +378,11 @@ def amounts(text: str) -> list[int]:
 
 # ── written money, read back ──────────────────────────────────────────────
 
-_MILLION = re.compile(r"(?<![\w.,])(\d+(?:[.,]\d+)?)\s*(triệu|tr|củ)(?![a-zà-ỹ])(?:\s*(\d{1,3})(?![\d.,]\d)|\s*(rưỡi))?", re.IGNORECASE)
-_BILLION = re.compile(r"(?<![\w.,])(\d+(?:[.,]\d+)?)\s*(tỷ|tỉ)(?![a-zà-ỹ])", re.IGNORECASE)
-_THOUSAND = re.compile(r"(?<![\w.,])(\d+(?:[.,]\d+)?)\s*(k|nghìn|ngàn)(?![a-zà-ỹ])", re.IGNORECASE)
-_GROUPED = re.compile(r"(?<![\w.,])(\d{1,3}(?:[.,]\d{3})+)(?:\s*(đồng|đ|vnđ|vnd|d)(?![a-zà-ỹ]))?", re.IGNORECASE)
-_PLAIN = re.compile(r"(?<![\w.,])(\d{4,9})\s*(đồng|đ|vnđ|vnd)(?![a-zà-ỹ])", re.IGNORECASE)
+_MILLION = re.compile(r"(?<![\w.,])(\d+(?:[.,]\d+)?)\s*(triệu|trieu|tr|củ)(?![a-zà-ỹ])(?:\s*(\d{1,3})(?![\d.,]\d)|\s*(rưỡi|ruoi))?", re.IGNORECASE)
+_BILLION = re.compile(r"(?<![\w.,])(\d+(?:[.,]\d+)?)\s*(tỷ|tỉ|ty)(?![a-zà-ỹ])", re.IGNORECASE)
+_THOUSAND = re.compile(r"(?<![\w.,])(\d+(?:[.,]\d+)?)\s*(k|nghìn|ngàn|nghin|ngan)(?![a-zà-ỹ])", re.IGNORECASE)
+_GROUPED = re.compile(r"(?<![\w.,])(\d{1,3}(?:[.,]\d{3})+)(?:\s*(đồng|dong|đ|vnđ|vnd|d)(?![a-zà-ỹ]))?", re.IGNORECASE)
+_PLAIN = re.compile(r"(?<![\w.,])(\d{4,9})\s*(đồng|dong|đ|vnđ|vnd)(?![a-zà-ỹ])", re.IGNORECASE)
 #: "1m2", "2m5": millions typed with m between the digits. "5m" alone stays a length.
 _M_MILLION = re.compile(r"(?<![\w.,])(\d{1,3})m(\d{1,3})(?![\w.,]\w|\d)", re.IGNORECASE)
 

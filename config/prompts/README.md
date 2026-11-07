@@ -6,6 +6,7 @@ Mọi prompt đưa cho model đều nằm ở đây, mỗi thư mục con ứng 
 |---|---|---|
 | `agent/advisor/rules.md` | `agents/advisor.py` (`HARD_RULES`) | Luật cứng, mục đầu của system prompt |
 | `agent/advisor/notes.yaml` | `agents/advisor.py` | Ghi chú theo lane, câu xác minh danh tính, lời mở đầu, copilot, kênh chat/thoại. `{must_not_ask}` được điền lúc chạy |
+| `agent/policy_rules.md` | `agents/policy.py` (`RULES`) | Developer message của mọi request Decisions: định nghĩa vi phạm và ý khách |
 | `agent/memory_extractor.md` | `agents/memory.py` | Rút thông tin khách sau cuộc gọi. `{slots}` được điền lúc chạy |
 | `agent/context_compactor.md` | `components/context/compact.py` | Tóm tắt lượt cũ. `{previous}`, `{turns}` |
 | `agent/tts_openai.md` | `components/voice/tts.py` | Chỉ dẫn giọng đọc cho model gpt-4o TTS |

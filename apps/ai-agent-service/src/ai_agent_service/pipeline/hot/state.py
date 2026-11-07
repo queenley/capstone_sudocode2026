@@ -127,8 +127,12 @@ class HotState(TurnInput, total=False):
     pending_purchase: dict[str, Any] | None
     #: The skills loaded for the task on: names only, the text is the repository's.
     loaded_skills: list[str]
-    #: The call's earlier tool results, short, for the PolicyAgent.
+    #: The call's earlier tool results, short: the advisor reads them again and the PolicyAgent checks against them.
     call_log: list[dict[str, Any]]
+    #: The documents' passages read earlier in this call, by chunk id: what was said from them stays sourced.
+    passages_read: dict[str, str]
+    #: The basket the customer is choosing, sku -> ``{qty}``, from the quotes that named one (``basket_skus``).
+    basket: dict[str, dict[str, Any]]
     deletion_recorded: bool
     deletion_awaiting_for: str | None
     #: The changes ``order.update`` made in this call, ``{order_id, action, new_variant_sku}``: the

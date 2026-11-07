@@ -48,7 +48,7 @@ def test_blocking_counts_include_both_configurations():
 
 @pytest.mark.asyncio
 async def test_seed_timeout_is_saved_without_labelling_baseline_retrieval_or_grading(monkeypatch, tmp_path):
-    from ai_agent_service.llm import jev
+    from ai_agent_service.llm import decisions
     from ai_agent_service.mcp import client
 
     failure = "seed S-SYNTHETIC: memory_commit_facts TIMEOUT before the first turn"
@@ -69,7 +69,7 @@ async def test_seed_timeout_is_saved_without_labelling_baseline_retrieval_or_gra
     monkeypatch.setattr(report, "manifest", lambda **kwargs: {"problems": kwargs["found"]})
     monkeypatch.setattr(report, "freeze", lambda *args: tmp_path)
     monkeypatch.setattr(client, "close_all", AsyncMock())
-    monkeypatch.setattr(jev, "close", AsyncMock())
+    monkeypatch.setattr(decisions, "close", AsyncMock())
     layout = cli.Layout(tmp_path, {"full": tmp_path / "full.jsonl", "baseline_no_memory": tmp_path / "baseline.jsonl"})
 
     assert await cli._evaluate(args, run_id="synthetic", layout=layout, database="synthetic_eval") == 1

@@ -86,7 +86,7 @@ def test_setup_exception_leaves_incomplete_evidence_and_no_table(tmp_path, monke
 
 @pytest.mark.asyncio
 async def test_failed_scorer_cannot_leave_a_complete_manifest_or_table(tmp_path, monkeypatch):
-    from ai_agent_service.llm import jev
+    from ai_agent_service.llm import decisions
     from ai_agent_service.mcp import client
 
     (tmp_path / "synthetic.json").write_text(json.dumps({"scenario_id": "SYNTHETIC-1",
@@ -105,7 +105,7 @@ async def test_failed_scorer_cannot_leave_a_complete_manifest_or_table(tmp_path,
     monkeypatch.setattr(report, "trace_errors", lambda *args: [])
     monkeypatch.setattr(report, "grade", lambda *args, **kwargs: (1, "synthetic scorer failure"))
     monkeypatch.setattr(client, "close_all", AsyncMock())
-    monkeypatch.setattr(jev, "close", AsyncMock())
+    monkeypatch.setattr(decisions, "close", AsyncMock())
     layout = cli.Layout(tmp_path, {"full": tmp_path / "full.jsonl", "baseline_no_memory": tmp_path / "baseline.jsonl"})
     args = cli.parser().parse_args(["--scenarios", str(tmp_path), "--warmup", "0"])
     assert await cli._evaluate(args, run_id="synthetic", layout=layout, database="synthetic_eval") == 1
