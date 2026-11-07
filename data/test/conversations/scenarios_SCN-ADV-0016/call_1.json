@@ -1,0 +1,196 @@
+{
+  "conversation_id": "SCN-ADV-0016__call_1",
+  "scenario_id": "SCN-ADV-0016",
+  "call": "call_1",
+  "customer_id": "SYN-C001",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-11-12",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_khieu_nai_giao_cham",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, anh là Nguyễn Văn A đúng không ạ? Em là trợ lý ảo của shop, hôm trước anh có đặt Máy lọc không khí AirPure Mini, đơn hàng OD900102. Anh cần hỗ trợ về đơn này đúng không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Anh cần hỗ trợ về đơn OD900102 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900102"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi đơn hàng máy lọc không khí của anh đang ở đâu rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra thì đơn Máy lọc không khí AirPure Mini của anh hiện đang giao, bên vận chuyển đã nhận hàng và đang trên đường chuyển tới anh ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "shipping"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900102"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nghe nói hôm nay giao mà giờ vẫn chưa thấy, chậm quá.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất xin lỗi vì đơn đang giao đến anh bị chậm hơn dự kiến. Thường đơn nội thành sẽ giao trong 1–2 ngày làm việc, nhưng có thể đơn vị vận chuyển gặp trục trặc nhỏ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "shipping"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": "apologetic",
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Theo dự kiến thì bao giờ mới đến tay anh vậy em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ theo cập nhật mới nhất, đơn của anh đã được bàn giao cho vận chuyển và đang trên đường, dự kiến sẽ giao trong hôm nay hoặc muộn nhất là ngày mai anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "shipping"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em có thể cho anh biết mã vận đơn để anh theo dõi không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ mã vận đơn của anh là VN0012TRK, anh có thể tra cứu trạng thái đơn hàng này trên website của đơn vị vận chuyển hoặc nhắn lại shop nếu cần hỗ trợ thêm ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "tracking",
+          "value": "VN0012TRK"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "order_id",
+          "value": "OD900102",
+          "spoken": "đơn OD900102"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cảm ơn em, giờ anh thấy rõ rồi, hy vọng sớm nhận được hàng.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã thông cảm, khi nhận được hàng có gì cần hỗ trợ thêm anh cứ nhắn cho shop nhé. Chúc anh một ngày tốt lành ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tra_cuu_don_hang",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

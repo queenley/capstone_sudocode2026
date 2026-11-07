@@ -1,0 +1,236 @@
+{
+  "conversation_id": "SCN-ADV-0011__call_1",
+  "scenario_id": "SCN-ADV-0011",
+  "call": "call_1",
+  "customer_id": "SYN-C002",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-30",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_tra_hang_qua_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em đã ghi nhận chị đang quan tâm trả Giày chạy bộ RunLite 2 Pro đã mua trước đây, đúng không ạ?",
+      "questions": [
+        {
+          "slot": "order_id",
+          "type": "confirm",
+          "text": "Em xác nhận lại chị muốn hỏi về đơn giày chạy bộ RunLite 2 Pro đã nhận trước đó, đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900201"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900201"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về việc trả Giày chạy bộ RunLite 2 Pro mà chị đã nhận lâu rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã kiểm tra đơn hàng mã OD900201 của chị, sản phẩm Giày chạy bộ RunLite 2 Pro đã giao thành công từ tháng 4. Theo chính sách của shop, thời hạn đổi trả là 7 ngày kể từ ngày nhận hàng chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900201"
+        },
+        {
+          "field": "return_days",
+          "value": 7
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giày này là size 38 màu trắng, chị mua cho người nhà nhưng giờ họ đã mua cái khác rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất tiếc, theo quy định hiện tại, đơn hàng của chị đã quá thời hạn 7 ngày nên shop không thể hỗ trợ trả lại sản phẩm này được ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "return_allowed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em ơi, chị biết là đã quá hạn nhưng mà chị có thể trả lại không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ mong chị thông cảm giúp em, chính sách đổi trả của shop chỉ áp dụng trong vòng 7 ngày, nên hiện tại chị không còn nằm trong thời gian hỗ trợ trả hàng nữa ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "return_allowed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị mua cái này giá 1 triệu 690 nghìn, mà giờ không sử dụng được.",
+      "facts_stated": {},
+      "entities": [
+        {
+          "type": "money",
+          "value": "1690000",
+          "spoken": "1 triệu 690 nghìn"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu hoàn cảnh của chị, tuy nhiên shop chỉ nhận đổi trả trong vòng 7 ngày kể từ khi nhận hàng thôi ạ. Sau thời gian này, mình không thể trả lại theo chính sách được chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "return_allowed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cũng cần tiền để mua cái khác, em xem giúp chị với nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất tiếc không thể hỗ trợ trả hàng cho chị lúc này, mong chị thông cảm và có thể tham khảo các sản phẩm mới tại shop nếu cần chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "return_allowed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD900201",
+          "op": "set",
+          "source": "call#turn1"
+        },
+        {
+          "key": "owned_sku",
+          "value": "SKU-SN-RUN2",
+          "op": "set",
+          "source": "call#turn1"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_tra_hang",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

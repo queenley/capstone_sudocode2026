@@ -1,0 +1,270 @@
+{
+  "conversation_id": "SCN-ADV-0042__call_1",
+  "scenario_id": "SCN-ADV-0042",
+  "call": "call_1",
+  "customer_id": "C028",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-17",
+  "region": "bac",
+  "category": "thoi-trang/ao-khoac",
+  "persona": "khach_tra_hang_trong_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, em hỗ trợ xác nhận đơn hàng áo khoác Windbreak size S màu navy cho anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn xác nhận đặt hàng áo khoác gió Windbreak size S màu navy.",
+      "facts_stated": {
+        "product_advised": "SKU-JK-WND",
+        "size": "S",
+        "color": "navy"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, áo khoác gió Windbreak size S màu navy hiện còn hàng anh nhé. Giá là 690.000đ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán của anh sẽ là chuyển khoản ngân hàng.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận anh chọn thanh toán qua chuyển khoản ngân hàng ạ. Anh cho em xin khu vực giao hàng để em kiểm tra thời gian giao nhé.",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Anh cho em xin khu vực giao hàng để em kiểm tra thời gian giao nhé."
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là quận Cầu Giấy, Hà Nội nhé.",
+      "facts_stated": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng sẽ giao tại quận Cầu Giấy, Hà Nội. Anh vui lòng chờ em kiểm tra thông tin giao hàng và xác nhận đặt đơn.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-17"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em kiểm tra giúp anh xem có hàng không, anh đồng ý lên đơn.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, áo khoác gió Windbreak size S màu navy còn hàng. Đơn hàng giao tại quận Cầu Giấy, Hà Nội, giá 690.000đ, thanh toán chuyển khoản. Dự kiến giao ngày 20/10/2026. Em xác nhận thông tin này và tiến hành đặt đơn cho anh nhé.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh xác nhận lại: áo khoác gió Windbreak size S màu navy, 1 chiếc, giá 690.000đ, giao quận Cầu Giấy, Hà Nội, thanh toán chuyển khoản, nhận hàng dự kiến ngày 20/10/2026 đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi em, lên đơn giúp anh nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em lên đơn cho anh ngay ạ. Mã đơn của anh là OD600001, tổng tiền 690.000đ, giao dự kiến ngày 20/10. Cảm ơn anh đã đặt hàng tại shop BTC!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 690000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0922808864",
+            "sku": "SKU-JK-WND-S-NAVY",
+            "qty": 1,
+            "price_vnd": 690000,
+            "payment": "bank",
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-17"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "color",
+          "value": "navy",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Cầu Giấy, Hà Nội",
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "size",
+          "value": "S",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-JK-WND",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 690000,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-JK-WND-S-NAVY",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_1#turn11"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xac_nhan_dat_hang",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-JK-WND-S-NAVY",
+      "qty": 1,
+      "price_vnd": 690000,
+      "payment": "bank",
+      "address": "Cầu Giấy, Hà Nội",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-10-20"
+    }
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "conversation_id": "SCN-ADV-0014__call_2",
+  "scenario_id": "SCN-ADV-0014",
+  "call": "call_2",
+  "customer_id": "C007",
+  "session_index": 2,
+  "channel": "zalo_oa",
+  "date": "2026-11-07",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_hoi_bao_hanh_mo_rong",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Thảo ạ, em là trợ lý ảo của shop BTC. Hôm trước chị có mua Máy lọc không khí AirPure X, em rất vui được tiếp tục hỗ trợ chị.",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-AP-X"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Thảo đây, hôm trước chị đã mua máy lọc không khí AirPure X.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã tin tưởng sản phẩm bên em ạ. Chị muốn hỏi về gói bảo hành mở rộng cho máy AirPure X đúng không chị?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị muốn hỏi về gói bảo hành mở rộng cho máy AirPure X đúng không chị?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn hỏi xem có gói bảo hành mở rộng nào không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy lọc không khí AirPure X bên em có hỗ trợ mua thêm gói bảo hành mở rộng chị nhé. Gói này sẽ cộng thêm 12 tháng bảo hành cho máy, với giá là 8% giá sản phẩm.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "extended_warranty_eligible",
+          "value": true
+        },
+        {
+          "field": "extended_warranty_months",
+          "value": 12
+        },
+        {
+          "field": "extended_warranty_percent",
+          "value": 8
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu có thì giá là bao nhiêu và thêm bao nhiêu tháng bảo hành?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị mua gói này sẽ được thêm 12 tháng bảo hành, mức phí là 8% giá máy lọc không khí AirPure X của mình chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "extended_warranty_months",
+          "value": 12
+        },
+        {
+          "field": "extended_warranty_percent",
+          "value": 8
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần thêm bảo hành để yên tâm hơn về chất lượng sản phẩm nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận nhu cầu của chị ạ. Nếu chị quyết định mua thêm bảo hành mở rộng, em sẽ hướng dẫn cụ thể cách đăng ký cho mình bất cứ lúc nào chị cần.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_bao_hanh_mo_rong",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

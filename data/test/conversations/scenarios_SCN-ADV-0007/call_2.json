@@ -1,0 +1,181 @@
+{
+  "conversation_id": "SCN-ADV-0007__call_2",
+  "scenario_id": "SCN-ADV-0007",
+  "call": "call_2",
+  "customer_id": "C005",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_nhieu_thong_tin",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Hương ạ, em là trợ lý ảo của shop BTC. Hôm trước chị đã đặt Máy hút sữa điện đôi Spectra S1, thanh toán qua chuyển khoản và nhận tại Lê Chân, Hải Phòng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Hôm trước chị đã đặt Máy hút sữa điện đôi Spectra S1, thanh toán qua chuyển khoản và nhận tại Lê Chân, Hải Phòng đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "payment",
+        "delivery_area",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn hỏi tình trạng đơn hàng chị đã đặt hôm trước.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em kiểm tra giúp chị ngay ạ. Đơn hàng của chị đã được tạo trên hệ thống và đang trong trạng thái xử lý, shop đã ghi nhận đơn rồi ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "created"
+        },
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD600001"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đơn hàng của chị có được xác nhận chưa?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng mã OD600001 của chị đã tạo trên hệ thống, shop sẽ gọi xác nhận với chị trước khi giao hàng ạ. Hiện tại đơn đang chuẩn bị và sẽ được xử lý sớm cho mình.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "order_status",
+          "value": "created"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị không nhớ mã đơn, em xem giúp chị với.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã kiểm tra, đơn hàng của chị có mã OD600001, sản phẩm Máy hút sữa điện đôi Spectra S1, thanh toán chuyển khoản và nhận tại Lê Chân, Hải Phòng. Nếu cần tra cứu lại chị báo em nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "product_advised",
+        "payment",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần biết đơn hàng này khi nào sẽ giao.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng của chị đang chuẩn bị, dự kiến shop sẽ giao trong 2–3 ngày làm việc tới tại Lê Chân, Hải Phòng. Khi đơn được bàn giao cho đơn vị vận chuyển, shop sẽ gửi mã vận đơn cho chị qua Zalo hoặc SMS ạ.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

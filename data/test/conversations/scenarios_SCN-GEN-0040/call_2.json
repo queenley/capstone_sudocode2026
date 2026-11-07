@@ -1,0 +1,200 @@
+{
+  "conversation_id": "SCN-GEN-0040__call_2",
+  "scenario_id": "SCN-GEN-0040",
+  "call": "call_2",
+  "customer_id": "C025",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-20",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_mua_doi_size",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Nhung ạ, em là trợ lý ảo của shop. Hôm trước chị đặt Giày chạy bộ RunLite 2 Pro size 43 màu đen và chọn nhận hàng tại Long Biên, Hà Nội, thanh toán chuyển khoản phải không ạ?",
+      "questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Hôm trước chị đặt Giày chạy bộ RunLite 2 Pro size 43 màu đen phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "delivery_area",
+        "payment",
+        "product_advised",
+        "variant_sku",
+        "order_id",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đổi ý rồi em, giày size 43 mặc chật quá.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng chị, mình muốn đổi sang size khác đúng không ạ? Size 43 hơi rộng hoặc chật, mình muốn chọn size nào để em hỗ trợ cập nhật ngay cho chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn đổi sang size 42 màu đen nhé.",
+      "facts_stated": {
+        "size": 42
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị muốn đổi sang size 42 màu đen ạ. Size này hiện còn hàng, shop sẽ cập nhật đơn cho chị ngay. Em xin phép xác nhận lại, chị không cần cung cấp mã đơn nữa nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "new_size_in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị không cần phải hỏi lại mã đơn đâu, em đã biết rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã kiểm tra đơn OD600001 của chị. Khi đổi sang size 42, chị sẽ được hoàn lại 219.000 đồng, shop không thu thêm phí đổi size ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        },
+        {
+          "field": "refund_vnd",
+          "value": 219000
+        },
+        {
+          "field": "exchange_fee_vnd",
+          "value": 0
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em có thể cập nhật đơn cho chị được không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em sẽ cập nhật đơn cho chị ngay và lên lịch cho bên vận chuyển qua lấy lại đôi size 43. Số tiền hoàn 219.000 đồng sẽ được chuyển khoản về tài khoản của chị trong 3-5 ngày làm việc sau khi shop nhận lại hàng và kiểm tra đủ điều kiện đổi trả nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "refund_vnd",
+          "value": 219000
+        },
+        {
+          "field": "exchange_fee_vnd",
+          "value": 0
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD600001",
+            "action": "exchange_size",
+            "new_variant_sku": "SKU-SN-RUN2-42-DEN",
+            "on": "2026-10-20"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "size",
+          "value": 42,
+          "op": "supersede",
+          "source": "call_2#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "doi_size",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "size",
+        "old_value": 43,
+        "new_value": 42
+      }
+    ],
+    "callback": null,
+    "order": null
+  }
+}

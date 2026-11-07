@@ -1,0 +1,285 @@
+{
+  "conversation_id": "SCN-ADV-0017__call_3",
+  "scenario_id": "SCN-ADV-0017",
+  "call": "call_3",
+  "customer_id": "C011",
+  "session_index": 3,
+  "channel": "hotline",
+  "date": "2026-10-21",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_chuyen_giua_nguoi_va_ai",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Mai ạ, hôm trước bạn nhân viên đã hỗ trợ mình tư vấn Máy hút sữa điện đôi Medela Swing Maxi và mình còn chờ cuối tháng nhận lương. Hôm nay chị muốn tiếp tục đặt hàng luôn đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Hôm nay chị muốn tiếp tục đặt hàng luôn đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hôm trước bạn nhân viên tư vấn cho chị rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng chị, Máy hút sữa điện đôi Medela Swing Maxi hiện bên em còn hàng, giá 5.990.000đ, đang áp dụng miễn phí vận chuyển toàn quốc cho đơn mẹ & bé từ 500.000đ. Chị cần em hỗ trợ đặt hàng ngay bây giờ không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị cần em hỗ trợ đặt hàng ngay bây giờ không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn đặt máy hút sữa điện đôi Medela Swing Maxi.",
+      "facts_stated": {
+        "product_advised": "SKU-MB-PUMP2"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị chọn thanh toán qua ngân hàng và giao hàng đến Ninh Kiều, Cần Thơ đúng không ạ? Đơn hàng của chị sẽ được miễn phí vận chuyển và dự kiến giao trước ngày 27/10.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em xác nhận lại: Máy hút sữa điện đôi Medela Swing Maxi, 1 máy, giá 5.990.000đ, giao về Ninh Kiều, Cần Thơ và chị thanh toán chuyển khoản ngân hàng, dự kiến nhận hàng trước ngày 27/10 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "freeship",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-10-21"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ thanh toán qua ngân hàng nhé, gửi đến Ninh Kiều, Cần Thơ.",
+      "facts_stated": {
+        "delivery_area": "Ninh Kiều, Cần Thơ",
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em đã ghi nhận thông tin đặt hàng của chị là Máy hút sữa điện đôi Medela Swing Maxi, giá 5.990.000đ, giao về Ninh Kiều, Cần Thơ và thanh toán chuyển khoản. Đơn hàng của chị sẽ được miễn phí vận chuyển và dự kiến giao trước ngày 27/10.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "payment",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "freeship",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0980737028",
+            "sku": "SKU-MB-PUMP2",
+            "qty": 1,
+            "price_vnd": 5990000,
+            "payment": "bank",
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-10-21"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Được rồi, chị xác nhận đặt hàng nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã tạo xong đơn hàng cho chị. Shop sẽ gửi thông tin chuyển khoản qua Zalo hoặc SMS, và giao hàng tận nơi trước ngày 27/10. Em cảm ơn chị đã đặt hàng tại shop ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Ninh Kiều, Cần Thơ",
+          "op": "set",
+          "source": "call_3#turn7"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_3#turn7"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-PUMP2",
+          "op": "set",
+          "source": "call_3#turn7"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5990000,
+          "op": "set",
+          "source": "call_3#turn7"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_3#turn7"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_3#turn7"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "text": "Shop sẽ gửi thông tin chuyển khoản qua Zalo hoặc SMS"
+      },
+      {
+        "text": "Dự kiến giao hàng trước ngày 27/10"
+      }
+    ],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-MB-PUMP2",
+      "qty": 1,
+      "price_vnd": 5990000,
+      "payment": "bank",
+      "address": "Ninh Kiều, Cần Thơ",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-10-27"
+    }
+  }
+}

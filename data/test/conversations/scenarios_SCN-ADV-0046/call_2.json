@@ -1,0 +1,182 @@
+{
+  "conversation_id": "SCN-ADV-0046__call_2",
+  "scenario_id": "SCN-ADV-0046",
+  "call": "call_2",
+  "customer_id": "C037",
+  "session_index": 2,
+  "channel": "zalo_oa",
+  "date": "2026-10-23",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_hoi_bao_hanh_mo_rong",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Toàn ạ, hôm trước anh đã mua Máy lọc không khí AirPure Pro bên em.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "order_id",
+        "room_area_m2",
+        "payment",
+        "delivery_area",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-AP-PRO"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, hôm trước anh đã mua máy lọc không khí AirPure Pro.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận anh đã mua AirPure Pro rồi ạ. Anh đang quan tâm tới gói bảo hành mở rộng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh đang quan tâm tới gói bảo hành mở rộng đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-AP-PRO"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh có thể mua thêm gói bảo hành mở rộng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với máy AirPure Pro, anh đủ điều kiện mua gói bảo hành mở rộng. Gói này sẽ thêm 12 tháng bảo hành cho máy, giá bằng 8% giá sản phẩm anh đã mua ạ.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "extended_warranty_eligible",
+          "value": true
+        },
+        {
+          "field": "extended_warranty_months",
+          "value": 12
+        },
+        {
+          "field": "extended_warranty_percent",
+          "value": 8
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá cho gói bảo hành này là bao nhiêu, có thêm bao nhiêu tháng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ gói này sẽ kéo dài bảo hành thêm 12 tháng cho anh, và giá là 8% giá máy, anh có thể mua trong vòng 15 ngày kể từ ngày nhận hàng ạ.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "extended_warranty_months",
+          "value": 12
+        },
+        {
+          "field": "extended_warranty_percent",
+          "value": 8
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh muốn biết thêm thông tin để yên tâm hơn về sản phẩm.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ bảo hành mở rộng áp dụng cho các lỗi kỹ thuật do nhà sản xuất, anh mang máy đến trung tâm bảo hành hoặc gửi về shop đều được. Trong thời gian bảo hành, shop sẽ hỗ trợ chuyển máy giúp anh, thời gian xử lý 7–15 ngày làm việc ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_thong_tin_bao_hanh_mo_rong",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

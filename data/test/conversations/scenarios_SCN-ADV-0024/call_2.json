@@ -1,0 +1,319 @@
+{
+  "conversation_id": "SCN-ADV-0024__call_2",
+  "scenario_id": "SCN-ADV-0024",
+  "call": "call_2",
+  "customer_id": "C013",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-18",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_mua_lai_khuyen_mai_mot_lan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Trang ạ, em là trợ lý ảo của shop BTC. Hôm trước chị đã mua giày chạy bộ RunLite 2 Pro size 40 màu đen và được giảm 10% với mã RUN-10, hôm nay chị muốn đặt thêm một đôi đúng không ạ?",
+      "questions": [],
+      "facts_used": [
+        "size",
+        "product_advised",
+        "variant_sku",
+        "promo_code",
+        "price_quoted_vnd",
+        "payment",
+        "delivery_area",
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "promo_RUN-10_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, lần trước chị đã mua đôi giày chạy bộ đó và được giảm 10%, lần này cũng được như vậy đúng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra lại thì chương trình giảm 10% RUN-10 đã hết hiệu lực từ sau ngày 13/10 chị nhé. Hiện tại giá của đôi Giày chạy bộ RunLite 2 Pro size 40 màu đen là 1.690.000đ, không còn giảm giá thêm nhưng hàng vẫn còn sẵn kho ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "promo_RUN-10_active",
+          "value": false
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn mua thêm một đôi nữa làm quà cho người nhà.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị chọn đúng size và màu như lần trước là 40 màu đen, em giữ nguyên sản phẩm này cho đơn mới nhé. Đơn mới sẽ có giá 1.690.000đ và không còn áp dụng mã giảm giá cũ, shop vẫn hỗ trợ miễn phí thu hộ khi chị nhận hàng ạ.",
+      "questions": [],
+      "facts_used": [
+        "size",
+        "color"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "promo_RUN-10_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Lần trước chị thanh toán qua ngân hàng, mà giờ chị đổi ý rồi em, giờ chị muốn thanh toán COD.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận, đơn này chị thanh toán COD khi nhận hàng giúp em nhé. Tổng đơn là 1.690.000đ, không có phí thu hộ và chị kiểm tra sản phẩm trước khi thanh toán ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng vẫn như lần trước nhé, Nha Trang, Khánh Hòa.",
+      "facts_stated": {
+        "delivery_area": "Nha Trang, Khánh Hòa"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Nha Trang, Khánh Hòa",
+          "spoken": "Nha Trang, Khánh Hòa"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận giao Giày chạy bộ RunLite 2 Pro size 40 màu đen đến địa chỉ Nha Trang, Khánh Hòa, chị nhận hàng và thanh toán COD 1.690.000đ. Dự kiến giao hàng vào ngày 22/10/2026. Thông tin vậy là đúng rồi, em tiến hành tạo đơn mới cho chị nhé.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em đọc lại: Giày chạy bộ RunLite 2 Pro size 40 màu đen, giao tại Nha Trang, Khánh Hòa, thanh toán COD 1.690.000đ, giao dự kiến ngày 22/10/2026. Chị xác nhận giúp em thông tin này đúng chưa ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area",
+        "variant_sku"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-10-18"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "address",
+          "value": "Nha Trang, Khánh Hòa",
+          "spoken": "Nha Trang, Khánh Hòa"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-22",
+          "spoken": "22/10/2026"
+        }
+      ],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ừ đúng rồi em, làm đơn giúp chị nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em lên đơn mới cho chị, tổng đơn là 1.690.000đ, nhận hàng tại Nha Trang, Khánh Hòa, thanh toán COD. Đơn sẽ được giao dự kiến vào ngày 22/10/2026 ạ. Cảm ơn chị đã tin tưởng shop BTC!",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "payment",
+        "variant_sku"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1690000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0964252477",
+            "sku": "SKU-SN-RUN2-40-DEN",
+            "qty": 1,
+            "price_vnd": 1690000,
+            "payment": "COD",
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-10-18"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "supersede",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1690000,
+          "op": "supersede",
+          "source": "call_2#turn7"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600002",
+          "op": "set",
+          "source": "call_2#turn10"
+        }
+      ],
+      "entities": [
+        {
+          "type": "address",
+          "value": "Nha Trang, Khánh Hòa",
+          "spoken": "Nha Trang, Khánh Hòa"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-22",
+          "spoken": "22/10/2026"
+        }
+      ],
+      "pause_before_ms": 900,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "mua_them_giay",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "payment",
+        "old_value": "bank",
+        "new_value": "COD"
+      },
+      {
+        "slot": "price_quoted_vnd",
+        "old_value": 1521000,
+        "new_value": 1690000
+      }
+    ],
+    "callback": null,
+    "order": {
+      "sku": "SKU-SN-RUN2-40-DEN",
+      "qty": 1,
+      "price_vnd": 1690000,
+      "payment": "COD",
+      "address": "Nha Trang, Khánh Hòa",
+      "estimated_delivery": "2026-10-22",
+      "order_id": "OD600002"
+    }
+  }
+}

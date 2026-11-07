@@ -1,0 +1,146 @@
+{
+  "scenario_id": "SCN-GEN-0027",
+  "level": "M2",
+  "persona": "khach_da_kenh_fb_hotline",
+  "hard_case": "teencode_da_kenh",
+  "customer_phone": "0994893949",
+  "customer_name": "Hạnh",
+  "honorific": "chị",
+  "notes": "Persona khach_da_kenh_fb_hotline, biến thể chuan. call_1 (chat_fanpage): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Ca khó: teencode_da_kenh. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.c017",
+      "call_date": "2026-10-17",
+      "input_mode": "chat_teencode",
+      "customer_goal": "Hỏi về xe đẩy gấp gọn cho bé",
+      "customer_turns": [
+        "Alo em ơi, chị muốn hỏi về xe đẩy gấp gọn Joie Pact cho bé của chị.",
+        "Bé nhà chị giờ được 1 tháng, ngân sách của chị cũng tầm 3 triệu rưỡi thôi.",
+        "Xe này có khuyến mãi gì không em nhỉ?",
+        "Chị thấy trên mạng bảo có mẹo hay cho xe đẩy này đấy.",
+        "Thế chị muốn gọi hotline hỏi thêm một số thông tin nữa."
+      ],
+      "customer_turns_asr": [
+        "alo em oi chi muon hoi ve xe day gap gon joie pact cho be cua chi",
+        "be nha chi gio duoc 1 thang ngan sach cua chi cung tam 3 trieu rữi thoi",
+        "xe nay co khuyen mai gi khong em nhi",
+        "chi thay tren mang bao co meo hay cho xe day nay day",
+        "the chi muon goi hotline hoi them mot so thong tin nua"
+      ],
+      "facts_established": {
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "budget_vnd": 3500000,
+        "child_age_months": 1,
+        "phone_provided": true,
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 3490000,
+        "list_price_vnd": 3490000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "call_date": "2026-10-17"
+      },
+      "memory_expectation": {
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "budget_vnd": 3500000,
+        "child_age_months": 1,
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-02",
+        "FAQ-12"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 3,
+      "customer_goal": "Xác nhận mua xe đẩy gấp gọn Joie Pact",
+      "customer_turns": [
+        "Chào em, hôm trước chị đã hỏi về xe đẩy Joie Pact rồi, giờ chị muốn mua luôn.",
+        "Hình thức thanh toán chị chọn là COD nhé.",
+        "Chị ở Quận 7, TP.HCM, giao hàng cho chị ở đó nhé.",
+        "Có gì cần thêm thông tin gì nữa không em?"
+      ],
+      "facts_established": {
+        "delivery_area": "Quận 7, TP.HCM",
+        "payment": "COD",
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "phone_provided",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-MB-STR1",
+          "price_vnd": 3490000,
+          "payment": "COD"
+        },
+        "must_say_any": [
+          "gọi xác nhận",
+          "gọi điện xác nhận",
+          "gọi lại xác nhận",
+          "xác nhận đơn",
+          "xác nhận trước khi giao"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 3490000,
+        "list_price_vnd": 3490000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "freeship": true,
+        "delivery_days": 2,
+        "estimated_delivery": "2026-10-22",
+        "needs_confirmation_call": true,
+        "call_date": "2026-10-20"
+      },
+      "memory_expectation": {
+        "delivery_area": "Quận 7, TP.HCM",
+        "payment": "COD",
+        "product_advised": "SKU-MB-STR1",
+        "price_quoted_vnd": 3490000,
+        "promo_code": "MOM-FREESHIP",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-05",
+        "QT-01",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

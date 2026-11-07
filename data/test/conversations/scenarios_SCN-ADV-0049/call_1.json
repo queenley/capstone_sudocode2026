@@ -1,0 +1,165 @@
+{
+  "conversation_id": "SCN-ADV-0049__call_1",
+  "scenario_id": "SCN-ADV-0049",
+  "call": "call_1",
+  "customer_id": "SYN-C003",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-29",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_chuyen_giua_nguoi_va_ai",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Lê Văn C, em là trợ lý ảo của shop BTC. Em đã thấy mình có đơn Máy hâm sữa Fatz 4 chức năng mã OD900302, anh cần hỗ trợ về đơn này đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh cần hỗ trợ về đơn Máy hâm sữa Fatz 4 chức năng mã OD900302 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900302"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn khiếu nại về đơn hàng của mình, gói hàng bị móp méo.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất xin lỗi vì anh nhận hàng bị móp méo. Em kiểm tra thì đơn hàng mã OD900302 của mình đang trong quá trình giao, bên em sẽ báo nhân viên xử lý ngay ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900302"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900302"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đơn này đã giao chậm lần thứ hai rồi, rất bực bội.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em thành thật xin lỗi anh về việc đơn hàng giao chậm và gây phiền lòng cho mình. Để giải quyết nhanh nhất, em sẽ chuyển thông tin khiếu nại của anh cho nhân viên phụ trách có thẩm quyền xử lý ngay trong ngày hôm nay.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900302"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "handoff.transfer",
+          "args": {
+            "brief": {
+              "customer_phone": "0998000003",
+              "customer_name": "Lê Văn C",
+              "escalation_reason": "khieu_nai_nghiem_trong",
+              "conversation_summary": "Khách khiếu nại đơn OD900302 (Máy hâm sữa Fatz 4 chức năng): giao chậm, hàng móp méo, muốn người có thẩm quyền giải quyết.",
+              "product_advised": "SKU-MB-MON",
+              "price_quoted_vnd": 490000,
+              "open_questions": [
+                "khách muốn được bồi thường cho đơn giao chậm"
+              ],
+              "next_action": "Nhân viên phụ trách gọi lại xử lý khiếu nại đơn OD900302 trong ngày",
+              "generated_at": "2026-10-29T10:00:00+07:00",
+              "channel": "chat_fanpage"
+            }
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có ai có thẩm quyền để giải quyết không? Anh không muốn nói lại từ đầu đâu.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_human",
+      "text": "Dạ anh Lê Văn C, em là nhân viên phụ trách khiếu nại đơn OD900302 của mình. Em đã nhận đủ thông tin về trường hợp của anh và sẽ trực tiếp hỗ trợ giải quyết ngay ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh sẽ đánh giá 1 sao nếu không được giải quyết sớm.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "khieu_nai_handoff",
+    "outcome": "chuyen_may",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "negative",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

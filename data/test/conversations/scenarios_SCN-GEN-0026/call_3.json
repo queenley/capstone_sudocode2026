@@ -1,0 +1,215 @@
+{
+  "conversation_id": "SCN-GEN-0026__call_3",
+  "scenario_id": "SCN-GEN-0026",
+  "call": "call_3",
+  "customer_id": "C024",
+  "session_index": 3,
+  "channel": "hotline",
+  "date": "2026-10-20",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Kiên ạ, hôm trước anh có quan tâm Giày chạy bộ RunLite 2 Pro, còn cần suy nghĩ thêm. Em là trợ lý ảo của shop, anh cần em hỗ trợ thông tin gì về sản phẩm này đúng không ạ?",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "size",
+        "variant_sku",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh Kiên đây, anh muốn hỏi giày chạy bộ size 41 màu đen.",
+      "facts_stated": {
+        "size": 41,
+        "color": "den"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh hỏi Giày chạy bộ RunLite 2 Pro size 41 màu đen đúng không ạ? Hiện mẫu này đang hết hàng, dự kiến sẽ về lại vào ngày 24/10 anh nhé.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Dạ anh hỏi Giày chạy bộ RunLite 2 Pro size 41 màu đen đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku"
+      ],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        },
+        {
+          "field": "restock_date",
+          "value": "2026-10-24"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hôm trước em bảo giày này hết hàng đúng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi anh, hôm trước em kiểm tra thì mẫu này cũng đang hết hàng. Em sẽ báo lại ngay khi hàng về vào ngày 24/10 anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        },
+        {
+          "field": "restock_date",
+          "value": "2026-10-24"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em có thông tin gì về ngày có hàng lại không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh, theo thông tin mới nhất thì Giày chạy bộ RunLite 2 Pro size 41 màu đen sẽ về lại vào ngày 24/10. Anh có muốn em giữ thông tin và gọi lại cho anh khi hàng về không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh có muốn em giữ thông tin và gọi lại cho anh khi hàng về không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "restock_date",
+          "value": "2026-10-24"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh quyết mua rồi, nhưng phải hẹn lại thôi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận anh sẽ chờ hàng về. Đến ngày 24/10 em sẽ chủ động gọi lại để anh đặt hàng nhanh nhất nhé. Em cảm ơn anh Kiên đã quan tâm sản phẩm của shop ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "restock_date",
+          "value": "2026-10-24"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN2",
+          "op": "set",
+          "source": "call_3#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1521000,
+          "op": "set",
+          "source": "call_3#turn9"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN2-41-DEN",
+          "op": "set",
+          "source": "call_3#turn9"
+        },
+        {
+          "key": "promo_code",
+          "value": "RUN-10",
+          "op": "set",
+          "source": "call_3#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "type": "callback_on_restock",
+        "date": "2026-10-24"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "date": "2026-10-24",
+      "reason": "Gọi lại khi hàng về để đặt hàng"
+    },
+    "order": null
+  }
+}

@@ -1,0 +1,196 @@
+{
+  "conversation_id": "SCN-GEN-0037__call_1",
+  "scenario_id": "SCN-GEN-0037",
+  "call": "call_1",
+  "customer_id": "C023",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-25",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_yeu_cau_xoa_du_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, em hỗ trợ mình về máy lọc không khí cho phòng 20 mét vuông phải không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Chị cần tư vấn máy lọc không khí cho phòng khoảng 20 mét vuông đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo em ơi, chị muốn hỏi về máy lọc không khí cho phòng khoảng 20 mét vuông.",
+      "facts_stated": {
+        "room_area_m2": 20
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với diện tích phòng 20 mét vuông, em tư vấn chị máy lọc không khí Xiaomi Smart 4 Lite ạ. Máy này phù hợp diện tích phòng của mình, thiết kế nhỏ gọn, lọc hiệu quả và hiện đang có hàng sẵn chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhà chị có trẻ nhỏ nên khá quan tâm đến cái này.",
+      "facts_stated": {
+        "has_children": true
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu chị quan tâm vì nhà có trẻ nhỏ ạ. Máy Xiaomi Smart 4 Lite có bộ lọc HEPA giúp lọc bụi mịn, phấn hoa và vi khuẩn trong không khí, phù hợp cho gia đình có bé nhỏ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có ngân sách tầm 3 triệu rưỡi thôi, không biết máy này giá bao nhiêu?",
+      "facts_stated": {
+        "budget_vnd": 3500000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy lọc không khí Xiaomi Smart 4 Lite bên em giá 2.990.000đ chị nhé. Sản phẩm đang không có khuyến mãi, mình được miễn phí vận chuyển và thanh toán khi nhận hàng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2990000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, chị còn phải chờ cuối tháng này mới nhận lương nên không thể quyết ngay được, em nhé.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị cần chờ tới cuối tháng mới quyết định ạ. Khi nào chị sẵn sàng đặt, chỉ cần liên hệ lại shop em sẽ hỗ trợ nhanh nhất cho mình chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 3500000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 20,
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-XM-4L",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 2990000,
+          "op": "set",
+          "source": "call_1#turn5"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chua_quyet",
+    "objection_handling": "Ghi nhận lý do khách chưa quyết định và hướng dẫn liên hệ lại khi sẵn sàng.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

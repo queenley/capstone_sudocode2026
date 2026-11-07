@@ -1,0 +1,262 @@
+{
+  "conversation_id": "SCN-GEN-0015__call_2",
+  "scenario_id": "SCN-GEN-0015",
+  "call": "call_2",
+  "customer_id": "C035",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-07",
+  "region": "trung",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em xin phép xác nhận, chị là chị Dung đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị là chị Dung đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "is_human",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo em, chị Dung đây. Hôm qua có cô Loan gọi cho em về máy lọc nước RO.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã xác nhận. Em hỗ trợ chị về sản phẩm máy lọc nước RO Karofi 9 lõi ạ.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "open",
+          "text": "Chị muốn mua loại nào và cần tư vấn thêm gì không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị quyết định mua máy lọc nước RO Karofi 9 lõi mà cô Loan đã hỏi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị chọn máy lọc nước RO Karofi 9 lõi, em ghi nhận ạ. Chị muốn giao hàng ở đâu và thanh toán theo hình thức nào để em lên đơn cho mình ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Chị muốn giao hàng ở đâu và thanh toán theo hình thức nào để em lên đơn cho mình ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn thanh toán bằng COD và giao hàng ở Ninh Kiều, Cần Thơ.",
+      "facts_stated": {
+        "payment": "COD",
+        "delivery_area": "Ninh Kiều, Cần Thơ"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận đơn của chị: giao máy lọc nước RO Karofi 9 lõi đến Ninh Kiều, Cần Thơ, thanh toán COD. Giá sản phẩm là 2.190.000đ, đã bao gồm miễn phí vận chuyển. Dự kiến giao hàng vào ngày 12/11/2026. Trước khi giao, nhân viên bên em sẽ gọi xác nhận đơn với chị ạ. Chị vui lòng xác nhận lại giúp em thông tin đơn hàng này đúng chưa để em tiến hành đặt hàng cho mình nhé?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Chị vui lòng xác nhận lại giúp em thông tin đơn hàng này đúng chưa để em tiến hành đặt hàng cho mình nhé?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        },
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-12"
+        },
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-11-07"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Phòng chị rộng 12 mét vuông và không có trẻ nhỏ, ngân sách của chị là 2 triệu rưỡi.",
+      "facts_stated": {
+        "room_area_m2": 12,
+        "has_children": false,
+        "budget_vnd": 2500000
+      },
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã xác nhận thông tin. Em sẽ tiến hành đặt đơn hàng cho mình ngay bây giờ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0958421083",
+            "sku": "SKU-AP-MINI",
+            "qty": 1,
+            "price_vnd": 2190000,
+            "payment": "COD",
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-11-07"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "budget_vnd",
+          "value": 2500000,
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Ninh Kiều, Cần Thơ",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "has_children",
+          "value": false,
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 12,
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-MINI",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 2190000,
+          "op": "set",
+          "source": "call_2#turn7"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_mua_may_loc_nuoc",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-AP-MINI",
+      "qty": 1,
+      "price_vnd": 2190000,
+      "payment": "COD",
+      "address": "Ninh Kiều, Cần Thơ",
+      "estimated_delivery": "2026-11-12",
+      "order_id": "OD600001"
+    }
+  }
+}

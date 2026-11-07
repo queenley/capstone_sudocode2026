@@ -1,0 +1,53 @@
+{
+  "scenario_id": "SCN-ADV-0007",
+  "call": "call_1",
+  "input_mode": "text",
+  "source_sha256": "b2aeba2c4d7b59fec7770478e3a34367fe60b03b1af02dc6df9773178f5f4a4e",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Alo, chị muốn đặt máy hút sữa điện đôi Spectra S1, giá khoảng 4 triệu rưỡi nhé.",
+      "spoken_text": "alo, chị muốn đặt máy hút sữa điện đôi spectra ét một, giá khoảng bốn triệu rưỡi nhé.",
+      "entities": {
+        "price_vnd": 4500000
+      },
+      "reference_source": "rule",
+      "issues": [
+        "digit_left"
+      ]
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Chị có bé 10 tháng tuổi, ngân sách cũng tầm đó, thanh toán qua ngân hàng.",
+      "spoken_text": "chị có bé mười tháng tuổi, ngân sách cũng tầm đó, thanh toán qua ngân hàng.",
+      "entities": {
+        "has_children": true
+      },
+      "reference_source": "rule",
+      "issues": [
+        "entity_not_stated:budget_vnd"
+      ]
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Nhà chị ở Lê Chân, Hải Phòng, giao hàng nhanh giúp chị nhé.",
+      "spoken_text": "nhà chị ở lê chân hải phòng giao hàng nhanh giúp chị nhé",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "Chốt đơn luôn đi em! Chị không muốn mất thời gian đâu.",
+      "spoken_text": "chốt đơn luôn đi em chị không muốn mất thời gian đâu",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

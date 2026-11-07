@@ -1,0 +1,245 @@
+{
+  "conversation_id": "SCN-ADV-0025__call_1",
+  "scenario_id": "SCN-ADV-0025",
+  "call": "call_1",
+  "customer_id": "C004",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-16",
+  "region": "bac",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_hoi_freeship_theo_vung",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, anh cần tư vấn về nồi chiên không dầu Xiaomi 4.5L đúng không anh?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh cần tư vấn về nồi chiên không dầu Xiaomi 4.5L đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1590000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh thấy trên fanpage có quảng cáo freeship cho đồ gia dụng, không biết nồi chiên không dầu Xiaomi 4.5L có được freeship không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã quan tâm. Với nồi chiên không dầu Xiaomi 4.5L, hiện tại chưa áp dụng chương trình freeship cho khu vực của anh. Chính sách freeship áp dụng theo địa chỉ giao hàng, chủ yếu cho miền Nam thôi anh nhé.",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Anh cho em xin địa chỉ giao hàng cụ thể để em kiểm tra phí vận chuyển cho mình nhé?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "freeship",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Địa chỉ giao hàng của anh là ở Lê Chân, Hải Phòng.",
+      "facts_stated": {
+        "delivery_area": "Lê Chân, Hải Phòng"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã nhận được địa chỉ giao hàng ở Lê Chân, Hải Phòng của anh. Đơn hàng dưới 2 triệu đồng như nồi chiên Xiaomi 4.5L sẽ có phí vận chuyển 35.000đ đến Hải Phòng anh nhé.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1590000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh muốn mua cái nồi này để thay đồ cũ đã hỏng.",
+      "facts_stated": {
+        "usage_need": "thay đồ cũ đã hỏng"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh chọn nồi chiên Xiaomi 4.5L để thay đồ cũ đã hỏng, bên em còn hàng sẵn.",
+      "questions": [],
+      "facts_used": [
+        "usage_need"
+      ],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu không freeship thì phí giao hàng là bao nhiêu em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận lại, phí giao hàng cho nồi chiên Xiaomi 4.5L giao đến Lê Chân, Hải Phòng là 35.000đ anh nhé. Nếu đơn đạt từ 2 triệu đồng thì sẽ được miễn phí vận chuyển toàn quốc, còn đơn dưới 2 triệu sẽ tính phí theo khu vực giao hàng.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1590000
+        },
+        {
+          "field": "freeship",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, anh sẽ chờ cuối tháng nhận lương rồi quyết định nhé.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em ghi nhận anh sẽ quyết định mua khi nhận lương cuối tháng. Nếu anh cần tư vấn thêm về sản phẩm hoặc chương trình ưu đãi mới, anh cứ nhắn lại cho em bất cứ lúc nào ạ. Em cảm ơn anh đã quan tâm shop!",
+      "questions": [],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 2000000,
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Lê Chân, Hải Phòng",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "usage_need",
+          "value": "thay đồ cũ đã hỏng",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AF-XM",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1590000,
+          "op": "set",
+          "source": "call_1#turn10"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_feeship_khu_vuc",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

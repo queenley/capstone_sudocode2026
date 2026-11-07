@@ -1,0 +1,250 @@
+{
+  "conversation_id": "SCN-GEN-0006__call_1",
+  "scenario_id": "SCN-GEN-0006",
+  "call": "call_1",
+  "customer_id": "C002",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "nam",
+  "category": "thoi-trang/giay",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần tư vấn về sản phẩm nào ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về đôi giày chạy bộ size 38 màu đen mà em có.",
+      "facts_stated": {
+        "size": 38,
+        "color": "den",
+        "product_advised": "SKU-SN-RUN1"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh đang quan tâm đến giày chạy bộ RunLite 1 size 38 màu đen đúng không ạ? Em kiểm tra thì hiện sản phẩm này còn hàng tại shop mình.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Dạ anh đang quan tâm đến giày chạy bộ RunLite 1 size 38 màu đen đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá của nó là bao nhiêu vậy em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đôi này hiện đang có giá ưu đãi 1.161.000đ, đã áp dụng khuyến mãi RUN-10 giảm 10% so với giá niêm yết 1.290.000đ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1161000
+        },
+        {
+          "field": "list_price_vnd",
+          "value": 1290000
+        },
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có khuyến mãi gì không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chương trình RUN-10 giảm ngay 10% đang được áp dụng cho đôi giày này, anh chỉ cần thanh toán 1.161.000đ thôi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        },
+        {
+          "field": "price_vnd",
+          "value": 1161000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, để anh hỏi vợ đã rồi gọi lại cho em tối thứ Hai (19/10) tầm 7 giờ nhé.",
+      "facts_stated": {
+        "blocker": "cần hỏi vợ",
+        "decision_maker": "vợ"
+      },
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-10-19",
+          "spoken": "tối thứ Hai (19/10)"
+        },
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng anh, em đã ghi nhận anh sẽ gọi lại vào 7 giờ tối thứ Hai, ngày 19/10 để báo lại cho shop mình ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-10-19T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0936270107",
+            "callback_at": "2026-10-19T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần hỏi vợ",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "decision_maker",
+          "value": "vợ",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "color",
+          "value": "den",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "size",
+          "value": 38,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN1",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1161000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN1-38-DEN",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "promo_code",
+          "value": "RUN-10",
+          "op": "set",
+          "source": "call_1#turn5"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "cần hỏi người nhà",
+    "objection_handling": "Đã xác nhận thời điểm gọi lại cụ thể và ghi nhận lịch hẹn.",
+    "sentiment": "neutral",
+    "decision_maker": "vợ",
+    "commitments": [
+      {
+        "hứa_gọi_lại": {
+          "date": "2026-10-19T19:00"
+        }
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-10-19T19:00",
+      "reason": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

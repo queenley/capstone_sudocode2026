@@ -1,0 +1,128 @@
+{
+  "scenario_id": "SCN-ADV-0013",
+  "level": "M2",
+  "persona": "khach_mua_phu_kien_thay_the",
+  "hard_case": null,
+  "customer_phone": "0998000001",
+  "customer_name": "Nguyễn Văn A",
+  "honorific": "anh",
+  "notes": "Persona khach_mua_phu_kien_thay_the, biến thể thay_mang_loc. call_1 (hotline): chốt đơn → chot_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-29",
+      "customer_goal": "Hỏi về thời gian thay màng lọc và đặt hàng.",
+      "customer_turns": [
+        "Alo, anh muốn hỏi là khi nào thì phải thay màng lọc cho Máy lọc không khí AirPure X ạ?",
+        "Máy này anh đã dùng cũng lâu rồi, màng lọc có thay gì không em?",
+        "Anh muốn đặt mua Màng lọc thay thế AirPure X/Y luôn, em cho anh biết giá với.",
+        "Hình thức thanh toán là chuyển khoản ngân hàng, và khu vực giao hàng là Lê Chân, Hải Phòng nhé."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C001",
+          "session_id": "SYN-001-S1",
+          "date": "2026-03-01",
+          "channel": "hotline",
+          "summary": "Mua Máy lọc không khí AirPure X giá 4.890.000đ, đã nhận hàng.",
+          "outcome": "chot_don",
+          "stale": true
+        },
+        {
+          "source": "crm_session",
+          "customer_id": "SYN-C001",
+          "session_id": "SYN-001-S2",
+          "date": "2026-10-01",
+          "channel": "zalo_oa",
+          "summary": "Đặt Máy lọc không khí AirPure Mini giá 2.190.000đ, đơn OD900102 đang giao.",
+          "outcome": "chot_don",
+          "stale": false
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C001",
+          "order_id": "OD900101",
+          "date": "2026-03-01",
+          "sku": "SKU-AP-X",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AP-X"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "SYN-C001",
+          "order_id": "OD900102",
+          "date": "2026-10-01",
+          "sku": "SKU-AP-MINI",
+          "status": "shipping",
+          "stale": false,
+          "facts": {
+            "order_id": "OD900102"
+          }
+        }
+      ],
+      "facts_established": {
+        "budget_vnd": 1000000,
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "payment": "bank",
+        "usage_need": "thay đồ cũ đã hỏng",
+        "issue": "Máy lọc không khí AirPure X đã sử dụng lâu, cần thay màng lọc.",
+        "product_advised": "SKU-AP-FLT-X",
+        "price_quoted_vnd": 690000,
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "order_id",
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "order_id",
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AP-FLT-X",
+          "price_vnd": 690000,
+          "payment": "bank"
+        },
+        "must_say_any": [
+          "6–12 tháng",
+          "6-12 tháng",
+          "6 đến 12 tháng"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 690000,
+        "list_price_vnd": 690000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "freeship": false,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-11-03",
+        "call_date": "2026-10-29"
+      },
+      "memory_expectation": {
+        "budget_vnd": 1000000,
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "payment": "bank",
+        "usage_need": "thay đồ cũ đã hỏng",
+        "issue": "Máy lọc không khí AirPure X đã sử dụng lâu, cần thay màng lọc.",
+        "product_advised": "SKU-AP-FLT-X",
+        "price_quoted_vnd": 690000,
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

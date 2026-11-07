@@ -1,0 +1,233 @@
+{
+  "conversation_id": "SCN-GEN-0014__call_2",
+  "scenario_id": "SCN-GEN-0014",
+  "call": "call_2",
+  "customer_id": "C013",
+  "session_index": 2,
+  "channel": "zalo_oa",
+  "date": "2026-10-15",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_da_kenh_mau_thuan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Trang ạ, em là trợ lý ảo của shop BTC. Hôm trước chị có quan tâm đến Giày chạy bộ RunLite 2 Pro size 42 màu đen, em rất vui được hỗ trợ tiếp chị hôm nay.",
+      "questions": [],
+      "facts_used": [
+        "size",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "promo_code",
+        "objection",
+        "competitor_price_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi lại về đôi giày chạy bộ RunLite 2 Pro size 42 đó.",
+      "facts_stated": {
+        "product_advised": "SKU-SN-RUN2",
+        "size": 42
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị hỏi lại về đôi RunLite 2 Pro size 42 phải không ạ? Em xác nhận sản phẩm này bên em còn hàng, hiện giá là 1.521.000đ áp dụng khuyến mãi RUN-10 đến ngày 25/10 ạ.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Dạ chị hỏi lại về đôi RunLite 2 Pro size 42 phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "size"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1521000
+        },
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hôm trước em có nói giá 1 triệu 5 trăm hai mươi mấy ngàn phải không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi chị, nhưng chương trình RUN2-SALE hôm trước em báo đã hết hiệu lực nên giá hiện tại của đôi RunLite 2 Pro là 1.521.000đ, đã áp dụng khuyến mãi hiện hành rồi ạ.",
+      "questions": [],
+      "facts_used": [
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_quoted_vnd",
+          "value": 1352000
+        },
+        {
+          "field": "promo_RUN2-SALE_active",
+          "value": false
+        },
+        {
+          "field": "price_vnd",
+          "value": 1521000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị vẫn thấy bên khác rẻ hơn, chắc em có khuyến mãi gì không?",
+      "facts_stated": {
+        "competitor_price_vnd": 1240000,
+        "objection": "giá cao hơn chỗ khác"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã chia sẻ. Hiện giá 1.521.000đ bên em đã là giá ưu đãi nhất theo chương trình RUN-10. Ngoài ra shop miễn phí vận chuyển toàn quốc và nhận COD không mất phí thu hộ, mình được kiểm tra sản phẩm khi nhận chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "competitor_price_vnd"
+      ],
+      "claims": [
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn tìm hiểu thêm trước khi quyết định mua.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng chị cứ cân nhắc thêm, khuyến mãi RUN-10 còn đến ngày 25/10 ạ. Nếu chị cần tư vấn tiếp hoặc đặt hàng, chị nhắn lại cho shop bất cứ lúc nào nhé. Em cảm ơn chị đã quan tâm sản phẩm của shop ạ.",
+      "questions": [],
+      "facts_used": [
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-RUN2",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1521000,
+          "op": "supersede",
+          "source": "call_2#turn5"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-RUN2-42-DEN",
+          "op": "set",
+          "source": "call_2#turn1"
+        },
+        {
+          "key": "promo_code",
+          "value": "RUN-10",
+          "op": "supersede",
+          "source": "call_2#turn5"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_lai_gia_km_giay",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "price_quoted_vnd",
+        "old_value": 1352000,
+        "new_value": 1521000
+      },
+      {
+        "slot": "promo_code",
+        "old_value": "RUN2-SALE",
+        "new_value": "RUN-10"
+      }
+    ],
+    "callback": null,
+    "order": null
+  }
+}

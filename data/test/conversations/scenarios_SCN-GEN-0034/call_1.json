@@ -1,0 +1,254 @@
+{
+  "conversation_id": "SCN-GEN-0034__call_1",
+  "scenario_id": "SCN-GEN-0034",
+  "call": "call_1",
+  "customer_id": "C020",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-15",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_asr_nhiem_tool_timeout",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần hỗ trợ về máy lọc không khí Xiaomi Smart 4 Pro đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh cần tư vấn máy lọc không khí Xiaomi Smart 4 Pro đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo anh muon hoi ve may loc khong khi xiaomi smart 4 pro cho phong khoang 30 met vuong",
+      "facts_stated": {
+        "room_area_m2": 30
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy Xiaomi Smart 4 Pro phù hợp phòng khoảng 30 mét vuông, công suất mạnh, lọc bụi mịn và có app điều khiển ạ. Nhà mình có trẻ nhỏ nên em ưu tiên tư vấn dòng này vì lọc tốt và dễ dùng.",
+      "questions": [
+        {
+          "slot": "has_children",
+          "type": "confirm",
+          "text": "Anh nhà có bé nhỏ đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "nha anh co be nho nen can cai nao tot tot chut",
+      "facts_stated": {
+        "has_children": true
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy Xiaomi 4 Pro có khoá trẻ em và bộ lọc HEPA H13, phù hợp gia đình có bé nhỏ ạ. Anh dự kiến ngân sách cho máy này khoảng bao nhiêu để em tư vấn giá tốt nhất nhé?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Anh dự kiến ngân sách cho máy này khoảng bao nhiêu ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "ngan sach cua anh tam 6 trieu ruoi thoi",
+      "facts_stated": {
+        "budget_vnd": 6500000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "6500000",
+          "spoken": "6 trieu ruoi"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giá máy Xiaomi Smart 4 Pro hiện tại là 5.490.000đ, đang trong ngân sách của anh. Tuy nhiên máy này hiện hết hàng, dự kiến sẽ về lại vào ngày 19/10 anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "in_stock",
+          "value": false
+        },
+        {
+          "field": "restock_date",
+          "value": "2026-10-19"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-10-19",
+          "spoken": "ngày 19/10"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "may nay co khuyen mai gi khong em",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện máy đang áp dụng chương trình tặng màng lọc chính hãng khi mua mới, anh mua sẽ được tặng kèm 1 màng lọc HEPA cho máy Xiaomi 4 Pro ạ. Ngoài ra, shop đang miễn phí vận chuyển và miễn phí thu hộ khi nhận hàng.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_XM-COMBO_active",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        },
+        {
+          "field": "gift_sku",
+          "value": "SKU-XM-FLT"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "a ma anh cho cuoi thang moi nhan luong nen se goi lai",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận anh sẽ gọi lại sau khi nhận lương cuối tháng ạ. Máy Xiaomi 4 Pro dự kiến về hàng ngày 19/10, anh gọi lại giúp em sau ngày này để được giữ giá tốt và nhận ưu đãi tặng màng lọc anh nhé. Em cảm ơn anh đã liên hệ shop BTC ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "restock_date",
+          "value": "2026-10-19"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn11"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 6500000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 30,
+          "op": "set",
+          "source": "call_1#turn1"
+        }
+      ],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-10-19",
+          "spoken": "ngày 19/10"
+        }
+      ],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chờ lương cuối tháng",
+    "objection_handling": "Đã xác nhận thời gian khách gọi lại, thông báo ngày về hàng và ưu đãi.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

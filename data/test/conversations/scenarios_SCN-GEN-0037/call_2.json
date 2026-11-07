@@ -1,0 +1,177 @@
+{
+  "conversation_id": "SCN-GEN-0037__call_2",
+  "scenario_id": "SCN-GEN-0037",
+  "call": "call_2",
+  "customer_id": "C023",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-29",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_yeu_cau_xoa_du_lieu",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Thu ạ, em là trợ lý ảo của shop BTC. Hôm trước chị có quan tâm Máy lọc không khí Xiaomi Smart 4 Lite và đang chờ cuối tháng nhận lương, hôm nay em có thể hỗ trợ chị về vấn đề nào ạ?",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "is_human",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, cho chị hỏi em là người thật hay máy vậy?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em là trợ lý ảo của shop, không phải người thật ạ. Em sẽ hỗ trợ chị các yêu cầu về sản phẩm và thông tin cá nhân theo quy định của shop.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "is_human",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn yêu cầu xóa dữ liệu cá nhân của mình.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận yêu cầu xóa dữ liệu cá nhân của chị. Để xác minh, chị vui lòng cho em thông tin CCCD hoặc số điện thoại đã đăng ký với shop ạ.",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị vui lòng cung cấp số CCCD hoặc số điện thoại đã đăng ký để em xác minh ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Số CCCD của chị là 079188285084, em xác minh giúp chị với nhé.",
+      "facts_stated": {},
+      "entities": [
+        {
+          "type": "cccd",
+          "value": "079188285084",
+          "spoken": "079188285084"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận đã nhận thông tin CCCD chị cung cấp. Em xin thông báo, theo quy trình, shop sẽ xóa toàn bộ dữ liệu cá nhân của chị trong vòng 72 giờ kể từ thời điểm xác nhận. Sau khi xóa, chị sẽ được coi là khách mới nếu liên hệ lại.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Chị đồng ý xóa toàn bộ thông tin cá nhân của mình và hiểu sau khi xóa chị sẽ không còn thông tin lưu tại shop nữa đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "deletion_sla_hours",
+          "value": 72
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đồng ý xóa dữ liệu khi em xác nhận cho chị.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã xác nhận yêu cầu xóa dữ liệu của chị. Shop sẽ tiến hành xóa toàn bộ thông tin cá nhân của chị trong vòng 72 giờ theo đúng quy định. Em cảm ơn chị đã liên hệ shop BTC ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "deletion_sla_hours",
+          "value": 72
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "profile_state",
+          "value": "pending_deletion",
+          "op": "set",
+          "source": "call_2#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "xoa_du_lieu",
+    "outcome": "xoa_du_lieu",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

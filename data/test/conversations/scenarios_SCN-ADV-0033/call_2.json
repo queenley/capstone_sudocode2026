@@ -1,0 +1,237 @@
+{
+  "conversation_id": "SCN-ADV-0033__call_2",
+  "scenario_id": "SCN-ADV-0033",
+  "call": "call_2",
+  "customer_id": "C021",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-19",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_hoi_san_pham_khong_ban",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Yến ạ, em là trợ lý ảo của shop BTC. Chị muốn hỏi về mẫu giày trekking HikePro size 39 màu xám đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn hỏi về mẫu giày trekking HikePro size 39 màu xám đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn hỏi về giày trekking HikePro size 39 màu xam.",
+      "facts_stated": {
+        "product_advised": "SKU-SN-TRK",
+        "size": 39,
+        "color": "xam"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại shop có sẵn giày trekking HikePro size 39 màu xám chị hỏi ạ. Em kiểm tra và giá hiện tại là 1.990.000đ chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1990000",
+          "spoken": "1.990.000đ"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá của đôi giày này là bao nhiêu em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giá đôi giày trekking HikePro size 39 màu xám đang là 1.990.000đ ạ. Hiện tại sản phẩm này chưa có chương trình khuyến mãi, tuy nhiên khi chị đặt hàng sẽ được miễn phí thu hộ COD.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1990000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1990000",
+          "spoken": "1.990.000đ"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có khuyến mãi gì không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị cứ bàn với gia đình trước nhé. Em sẽ gọi lại cho chị vào lúc 7 giờ tối ngày mai để trao đổi tiếp ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-10-20T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0901304118",
+            "callback_at": "2026-10-20T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_2#turn7"
+        },
+        {
+          "key": "color",
+          "value": "xam",
+          "op": "set",
+          "source": "call_2#turn7"
+        },
+        {
+          "key": "size",
+          "value": 39,
+          "op": "set",
+          "source": "call_2#turn7"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-TRK",
+          "op": "set",
+          "source": "call_2#turn7"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1990000,
+          "op": "set",
+          "source": "call_2#turn7"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-TRK-39-XAM",
+          "op": "set",
+          "source": "call_2#turn7"
+        }
+      ],
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần bàn với gia đình đã, hẹn em gọi lại tối mai tầm 7 giờ nhé.",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_hoi_nguoi_nha",
+    "objection_handling": "Đã xác nhận thời điểm gọi lại cụ thể và ghi chú lịch hẹn.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "time": "2026-10-20T19:00",
+        "action": "gọi lại",
+        "note": "khách hỏi người nhà rồi báo lại"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-10-20T19:00",
+      "note": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

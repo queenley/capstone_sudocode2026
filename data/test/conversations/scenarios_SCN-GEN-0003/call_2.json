@@ -1,0 +1,198 @@
+{
+  "conversation_id": "SCN-GEN-0003__call_2",
+  "scenario_id": "SCN-GEN-0003",
+  "call": "call_2",
+  "customer_id": "C033",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-20",
+  "region": "trung",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Loan ạ, hôm trước chị có quan tâm Nồi chiên không dầu Xiaomi 4.5L và mình còn chờ cuối tháng nhận lương phải không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Chị vẫn còn chờ cuối tháng nhận lương đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd",
+        "blocker"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1590000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em ơi, chị lại gọi để hỏi về nồi chiên không dầu đó.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, nồi chiên không dầu Xiaomi 4.5L hiện bên em vẫn còn hàng chị nhé. Máy công suất 1.500W, dung tích 4.5 lít, có thể điều khiển qua app điện thoại, phù hợp cho gia đình 3–5 người ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá vẫn là 1 triệu 590 ngàn phải không?",
+      "facts_stated": {},
+      "entities": [
+        {
+          "type": "money",
+          "value": "1590000",
+          "spoken": "1 triệu 590 ngàn"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giá của nồi chiên không dầu Xiaomi 4.5L hiện tại là 1.590.000đ chị nhé. Giá này đã áp dụng chương trình miễn phí thu hộ khi nhận hàng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1590000
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có thể hỏi thêm về khuyến mãi không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại sản phẩm này chưa có chương trình khuyến mãi giảm giá thêm, nhưng mình sẽ được miễn phí thu hộ COD khi nhận hàng, tổng giá vẫn là 1.590.000đ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị vẫn đang chờ cuối tháng mới mua, em ơi.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị dự định cuối tháng mới mua ạ. Khi nào chị sẵn sàng đặt hàng chị cứ liên hệ lại, em sẽ kiểm tra giá và tồn kho mới nhất cho mình nhé.",
+      "questions": [],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AF-XM",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1590000,
+          "op": "set",
+          "source": "call_2#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chờ_lương",
+    "objection_handling": "Ghi nhận khách chờ lương cuối tháng, hướng dẫn liên hệ lại khi sẵn sàng.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

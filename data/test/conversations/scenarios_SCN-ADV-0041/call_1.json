@@ -1,0 +1,189 @@
+{
+  "conversation_id": "SCN-ADV-0041__call_1",
+  "scenario_id": "SCN-ADV-0041",
+  "call": "call_1",
+  "customer_id": "SYN-C004",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-10-16",
+  "region": "bac",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_bao_hanh_het_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Phạm Thị D ạ, em là trợ lý ảo của shop BTC. Em đã ghi nhận chị từng mua Nồi chiên không dầu Lock&Lock 4L bên em. Chị cần hỗ trợ về sản phẩm này đúng không ạ?",
+      "questions": [
+        {
+          "slot": "issue",
+          "type": "open",
+          "text": "Chị cần hỗ trợ về vấn đề gì với nồi chiên không dầu ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Phạm Thị D đây, chị mua nồi chiên không dầu Lock&Lock 4L từ lâu rồi, giờ nó không lên nguồn nữa.",
+      "facts_stated": {
+        "issue": "máy không lên nguồn"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã kiểm tra thông tin đơn hàng của chị rồi ạ. Nồi chiên không dầu Lock&Lock 4L được bảo hành 12 tháng theo chính sách của hãng và shop. Tuy nhiên, sản phẩm của chị đã hết hạn bảo hành nên mình không còn được hỗ trợ miễn phí nữa ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "warranty_months",
+          "value": 12
+        },
+        {
+          "field": "in_warranty",
+          "value": false
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900403"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn hỏi xem nồi này có được bảo hành miễn phí không, chị rất khó chịu khi biết đã hết hạn bảo hành.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất xin lỗi vì bất tiện này ạ. Do đã quá hạn bảo hành nên mình sẽ không được bảo hành miễn phí nữa chị nhé. Nếu chị muốn sửa chữa, mình có thể mang sản phẩm đến trung tâm bảo hành của hãng để được kiểm tra và báo phí cụ thể ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_warranty",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có cách nào khác để sửa hay bảo trì không em? Chị không muốn mất tiền mua cái khác đâu.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại sản phẩm đã hết bảo hành nên shop không hỗ trợ sửa chữa miễn phí được ạ. Chị có thể liên hệ trung tâm bảo hành Lock&Lock chính hãng để được hỗ trợ sửa chữa với chi phí hợp lý hơn so với mua mới chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị nghĩ shop nên có chính sách bảo hành tốt hơn cho sản phẩm, máy mới dùng có vài tháng thôi mà đã hỏng rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất tiếc về trải nghiệm của chị và sẽ ghi nhận ý kiến đóng góp của mình để shop cải thiện dịch vụ. Nếu chị cần thêm thông tin về bảo hành hoặc hỗ trợ khác, chị cứ nhắn em bất cứ lúc nào ạ. Em cảm ơn chị đã phản hồi.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "issue",
+          "value": "máy không lên nguồn",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "order_id",
+          "value": "OD900403",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "owned_sku",
+          "value": "SKU-AF-4L",
+          "op": "set",
+          "source": "call_1#turn2"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_bao_hanh",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "negative",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "order_id",
+        "old_value": "OD900402",
+        "new_value": "OD900403"
+      },
+      {
+        "slot": "owned_sku",
+        "old_value": "SKU-AF-4L",
+        "new_value": "SKU-AF-4L"
+      }
+    ],
+    "callback": null,
+    "order": null
+  }
+}

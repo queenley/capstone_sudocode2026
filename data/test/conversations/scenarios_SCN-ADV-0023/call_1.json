@@ -1,0 +1,350 @@
+{
+  "conversation_id": "SCN-ADV-0023__call_1",
+  "scenario_id": "SCN-ADV-0023",
+  "call": "call_1",
+  "customer_id": "C031",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-16",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_doi_cong_don_khuyen_mai",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Oanh ạ, hôm trước chị đã mua AirPure X bản 2024 ở Đống Đa. Em là trợ lý ảo của shop, chị muốn tư vấn thêm về máy lọc không khí đúng không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Phòng của mình hiện diện tích bao nhiêu mét vuông rồi ạ? Em có lưu trước đó là 20m², mình xác nhận giúp em nhé."
+        },
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Địa chỉ nhận hàng của mình còn là Đống Đa, Hà Nội không ạ?"
+        }
+      ],
+      "facts_used": [
+        "owned_sku",
+        "room_area_m2",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "is_human",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo em ơi, chị muốn mua Máy lọc không khí AirPure Pro.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị muốn đổi sang AirPure Pro đúng không ạ? Máy này đang phù hợp phòng lớn hơn, mình định đặt cho phòng diện tích bao nhiêu mét vuông để em tư vấn kỹ hơn nhé.",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "open",
+          "text": "Chị định dùng cho phòng diện tích bao nhiêu mét vuông ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_TRADE-IN-AP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đã thấy chương trình giảm giá tháng 10 và cả chương trình thu cũ đổi mới, chị muốn cộng cả hai cho chị nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em thông tin với chị: hiện tại máy AirPure Pro chỉ áp dụng được 1 chương trình ưu đãi có lợi nhất ở thời điểm đặt đơn, không cộng dồn cả hai được ạ. Với chương trình thu cũ đổi mới, chị từng mua AirPure X nên sẽ được giảm 400.000đ trực tiếp vào giá máy, giá sau ưu đãi là 7.590.000đ chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "promo_TRADE-IN-AP_active",
+          "value": true
+        },
+        {
+          "field": "price_vnd",
+          "value": 7590000
+        },
+        {
+          "field": "promos_stacked",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có một bé nhỏ nữa nên cần máy tốt một chút.",
+      "facts_stated": {
+        "has_children": true
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ AirPure Pro có khóa trẻ em và lọc được bụi mịn, phấn hoa, lông thú, rất phù hợp nhà có em bé ạ. Máy có app điều khiển, bảo hành chính hãng 24 tháng cho chị luôn.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À mà chị đã chuyển về Cầu Giấy, Hà Nội rồi em.",
+      "facts_stated": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận địa chỉ mới là Cầu Giấy, Hà Nội. Giao hàng tại đây dự kiến 2 ngày làm việc, khoảng 19/10 chị sẽ nhận được máy ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "delivery_days",
+          "value": 2
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-19"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-16"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có ngân sách tầm 8 triệu rưỡi và thanh toán qua ngân hàng.",
+      "facts_stated": {
+        "budget_vnd": 8500000,
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ giá cuối cùng của AirPure Pro sau ưu đãi là 7.590.000đ, thanh toán qua ngân hàng bên em đều nhận ạ, nằm trong ngân sách của chị luôn.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7590000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đang chờ cuối tháng nhận lương thì mới chốt được đơn, nhưng nếu được cộng cả hai thì chị sẽ đồng ý mức giá đó.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu chị muốn cân nhắc thêm, bên em giữ ưu đãi thu cũ đổi mới còn hạn đến 14/12. Khi mình sẵn sàng, chỉ cần liên hệ lại là em hỗ trợ đặt đơn AirPure Pro giá 7.590.000đ và giao tận nơi cho chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_TRADE-IN-AP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0985003703",
+            "sku": "SKU-AP-PRO",
+            "qty": 1,
+            "price_vnd": 7590000,
+            "payment": "bank",
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-16"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn13"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 8500000,
+          "op": "set",
+          "source": "call_1#turn11"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Cầu Giấy, Hà Nội",
+          "op": "supersede",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_1#turn11"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 15,
+          "op": "supersede",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7590000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "promo_code",
+          "value": "TRADE-IN-AP",
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_1#turn13"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_chot_gia_dieu_kien",
+    "outcome": "chot_don",
+    "objection_type": "muon_cong_km",
+    "objection_handling": "Giải thích đúng chính sách chỉ áp dụng 1 khuyến mãi, chọn chương trình có lợi nhất cho khách.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "commitment": "giữ ưu đãi TRADE-IN-AP đến hết 14/12"
+      }
+    ],
+    "supersedes": [
+      {
+        "slot": "delivery_area",
+        "old": "Đống Đa, Hà Nội",
+        "new": "Cầu Giấy, Hà Nội"
+      },
+      {
+        "slot": "room_area_m2",
+        "old": 20,
+        "new": 15
+      }
+    ],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001",
+      "sku": "SKU-AP-PRO",
+      "qty": 1,
+      "price_vnd": 7590000,
+      "payment": "bank",
+      "delivery_area": "Cầu Giấy, Hà Nội",
+      "estimated_delivery": "2026-10-19"
+    }
+  }
+}

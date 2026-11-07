@@ -1,0 +1,118 @@
+{
+  "scenario_id": "SCN-GEN-0009",
+  "level": "M1",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "hard_case": null,
+  "customer_phone": "0960161055",
+  "customer_name": "Thảo",
+  "honorific": "chị",
+  "notes": "Persona khach_hoi_nhieu_khong_mua, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): hỏi thêm rồi từ chối → tu_choi. call_1 ngày 18/10: Chủ nhật (LN-01: giờ 09:00–18:00, chỉ nhận đơn). Chấm chủ yếu: CCR, RQR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-18",
+      "customer_goal": "Hỏi chi tiết về máy hút sữa điện đôi Spectra S1.",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về máy hút sữa điện đôi Spectra S1 mà em có.",
+        "Máy này giá bao nhiêu vậy em?",
+        "Chị thấy trên mạng có nhiều loại, không biết có khuyến mãi gì không?",
+        "Chị có ngân sách khoảng 5 triệu thôi, nhưng vẫn muốn so sánh thêm với máy khác.",
+        "Em cho chị biết thêm thông tin để chị quyết định nhé."
+      ],
+      "facts_established": {
+        "blocker": "muốn so sánh thêm",
+        "budget_vnd": 5000000,
+        "child_age_months": 18,
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 4290000,
+        "list_price_vnd": 4290000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "promo_PUMP-GIFT_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-18"
+      },
+      "memory_expectation": {
+        "blocker": "muốn so sánh thêm",
+        "budget_vnd": 5000000,
+        "child_age_months": 18,
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-01",
+        "FAQ-11",
+        "PB-11"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 7,
+      "customer_goal": "Hỏi thêm chi tiết rồi từ chối mua.",
+      "customer_turns": [
+        "Chị đã suy nghĩ thêm về máy hút sữa em tư vấn hôm trước.",
+        "Nhưng mà sau khi xem xét kỹ thì chị chưa muốn mua ngay.",
+        "Chị thấy giá vẫn hơi cao so với những gì chị tìm hiểu.",
+        "Có lẽ chị sẽ tìm thêm thông tin rồi quay lại sau nhé."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000,
+        "promo_code": "MOM-FREESHIP",
+        "promo_expiry": "2026-11-29"
+      },
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "child_age_months",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "max_agent_questions": 4
+      },
+      "ground_truth_facts": {
+        "price_vnd": 4290000,
+        "list_price_vnd": 4290000,
+        "promo_active": true,
+        "promo_MOM-FREESHIP_active": true,
+        "promo_COD-0_active": true,
+        "promo_PUMP-GIFT_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-25"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-MB-PUMP1",
+        "price_quoted_vnd": 4290000,
+        "promo_code": "MOM-FREESHIP"
+      },
+      "relevant_policy_ids": [
+        "SP-MB-01",
+        "FAQ-11",
+        "PB-01",
+        "PB-11"
+      ],
+      "expected_outcome": "tu_choi"
+    }
+  }
+}

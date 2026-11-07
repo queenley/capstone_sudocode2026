@@ -1,0 +1,216 @@
+{
+  "conversation_id": "SCN-ADV-0043__call_1",
+  "scenario_id": "SCN-ADV-0043",
+  "call": "call_1",
+  "customer_id": "SYN-C005",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-15",
+  "region": "trung",
+  "category": "thoi-trang/ao-khoac",
+  "persona": "khach_tra_hang_qua_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Nguyễn Văn E ạ, em là trợ lý ảo của shop. Em thấy anh đã mua Áo khoác gió Windbreak và đã nhận hàng rồi. Em có thể hỗ trợ anh về vấn đề trả hàng ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về việc trả áo khoác gió mà anh đã nhận.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận anh muốn trả lại Áo khoác gió Windbreak đã nhận ạ. Anh vui lòng cho em biết lý do mình muốn trả sản phẩm không ạ?",
+      "questions": [
+        {
+          "slot": "return_reason",
+          "type": "open",
+          "text": "Anh vui lòng cho em biết lý do mình muốn trả sản phẩm không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Áo này anh thấy to hơn mình nghĩ, không vừa lắm.",
+      "facts_stated": {
+        "return_reason": "thấy to hơn mình nghĩ"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã chia sẻ lý do ạ. Theo chính sách của shop, áo khoác gió được đổi hoặc trả trong vòng 7 ngày kể từ ngày nhận hàng, và sản phẩm của anh đã quá thời gian này nên em rất tiếc chưa thể hỗ trợ trả hàng cho mình được ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "return_allowed",
+          "value": false
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900501"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em có thể giúp anh thông tin về việc trả hàng không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh thông cảm giúp em, sản phẩm của mình đã nhận quá 7 ngày nên theo quy định hiện tại shop chưa hỗ trợ trả hàng trong trường hợp này anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "return_allowed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh biết là đã quá thời gian đổi trả nhưng anh có lý do riêng.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất hiểu mong muốn của anh, tuy nhiên chính sách đổi trả của shop chỉ áp dụng trong 7 ngày kể từ lúc nhận hàng. Nếu cần thêm thông tin về chính sách, em sẽ gửi chi tiết cho anh qua Zalo hoặc email ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "return_allowed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thực sự là áo này không như anh mong đợi, anh nài nỉ em giúp anh với nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất tiếc và mong anh thông cảm, hiện tại shop chưa hỗ trợ trả lại sản phẩm ngoài thời hạn 7 ngày. Nếu có chương trình hỗ trợ thêm trong tương lai, em sẽ chủ động thông báo cho anh ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "return_days",
+          "value": 7
+        },
+        {
+          "field": "return_allowed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD900501",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "owned_sku",
+          "value": "SKU-JK-WND-M-NAVY",
+          "op": "set",
+          "source": "call_1#turn1"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_chinh_sach_tra_hang",
+    "outcome": "thong_tin",
+    "objection_type": "qua_han_doi_tra_nai_nhiu",
+    "objection_handling": "Nêu đúng chính sách trả hàng 7 ngày, xin lỗi, giải thích nhẹ nhàng, không hứa ngoại lệ.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

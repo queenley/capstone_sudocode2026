@@ -1,0 +1,249 @@
+{
+  "conversation_id": "SCN-GEN-0004__call_1",
+  "scenario_id": "SCN-GEN-0004",
+  "call": "call_1",
+  "customer_id": "C034",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-15",
+  "region": "trung",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào cô ạ, em là trợ lý ảo của shop BTC. Cô Loan hôm trước có hỏi về Máy lọc nước RO Karofi 9 lõi, mình muốn tiếp tục trao đổi về sản phẩm này đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Cô Loan hôm trước có hỏi về Máy lọc nước RO Karofi 9 lõi, mình muốn tiếp tục trao đổi về sản phẩm này đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "delivery_area",
+        "decision_maker"
+      ],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-WF-RO9"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, cô muốn hỏi về máy lọc nước RO Karofi 9 lõi mà hôm trước mình đã nói.",
+      "facts_stated": {
+        "product_advised": "SKU-WF-RO9"
+      },
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, sản phẩm Máy lọc nước RO Karofi 9 lõi đang sẵn hàng tại shop ạ. Cô cần em tư vấn thêm về tính năng hay lắp đặt cho gia đình mình không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cô thấy máy này cho gia đình 4 người thì có ổn không nhỉ?",
+      "facts_stated": {
+        "usage_need": "gia đình 4 người"
+      },
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy lọc nước RO Karofi 9 lõi đáp ứng tốt cho gia đình 4 người cô nhé, công suất lọc 10 lít/giờ, dùng nước máy là phù hợp ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-WF-RO9"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ngân sách của cô tầm 7 triệu, máy này có khuyến mãi gì không em?",
+      "facts_stated": {
+        "budget_vnd": 7000000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "7000000",
+          "spoken": "7 triệu"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại máy này giá 5.990.000đ, đang không có khuyến mãi giảm giá nhưng được miễn phí vận chuyển toàn quốc cho đơn từ 2 triệu cô nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5990000",
+          "spoken": "5.990.000đ"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cô cần bàn với gia đình rồi sẽ gọi lại em nhé, khoảng 7 giờ tối mai được không?",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ tối mai"
+        }
+      ],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận, cô hẹn gọi lại vào 7 giờ tối mai để trao đổi thêm về sản phẩm. Em sẽ gọi cho cô đúng thời gian đó ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-10-16T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0958421083",
+            "callback_at": "2026-10-16T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 7000000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "usage_need",
+          "value": "gia đình 4 người",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-WF-RO9",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5990000,
+          "op": "set",
+          "source": "call_1#turn9"
+        }
+      ],
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "cần hỏi người nhà",
+    "objection_handling": "Hẹn lịch gọi lại đúng khung giờ khách yêu cầu, nhắc lại thời gian cụ thể.",
+    "sentiment": "neutral",
+    "decision_maker": "con gái",
+    "commitments": [
+      {
+        "hứa_gọi_lại": "2026-10-16T19:00"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-10-16T19:00",
+      "reason": "khách cần hỏi ý kiến gia đình"
+    },
+    "order": null
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "scenario_id": "SCN-ADV-0033",
+  "call": "call_2",
+  "input_mode": "text",
+  "source_sha256": "8c3583bd9bdbf30c22256ea617e19ec6bb55f8c3bb35410fde61f84424fba98c",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Chị muốn hỏi về giày trekking HikePro size 39 màu xam.",
+      "spoken_text": "chị muốn hỏi về giày trekking hikepro size ba mươi chín màu xam.",
+      "entities": {},
+      "reference_source": "rule",
+      "issues": [
+        "words_changed"
+      ]
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Giá của đôi giày này là bao nhiêu em nhỉ?",
+      "spoken_text": "giá của đôi giày này là bao nhiêu em nhỉ?",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Có khuyến mãi gì không?",
+      "spoken_text": "có khuyến mãi gì không?",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "Chị cần bàn với gia đình đã, hẹn em gọi lại tối mai tầm 7 giờ nhé.",
+      "spoken_text": "chị cần bàn với gia đình đã, hẹn em gọi lại tối mai tầm bảy giờ nhé.",
+      "entities": {
+        "blocker": "can hoi nguoi nha"
+      },
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

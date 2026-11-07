@@ -1,0 +1,185 @@
+{
+  "conversation_id": "SCN-GEN-0023__call_2",
+  "scenario_id": "SCN-GEN-0023",
+  "call": "call_2",
+  "customer_id": "C021",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_so_gia",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Yến ạ, hôm trước chị có quan tâm Máy lọc không khí AirPure Pro; chị muốn mình tiếp tục thế nào ạ?",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2",
+        "objection",
+        "competitor_price_vnd",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị gọi lại để hỏi về giá máy lọc không khí á.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận mình đang quan tâm Máy lọc không khí AirPure Pro cho phòng 25m² đúng không ạ? Hiện tại bên em báo giá sản phẩm này là 7.690.000đ, đã áp dụng khuyến mãi AIR-OCT đang còn hiệu lực ạ.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Dạ em xác nhận mình đang quan tâm Máy lọc không khí AirPure Pro cho phòng 25m² đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "room_area_m2",
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá bên mình là 7 triệu 690 nhưng chị thấy bên khác có giá 7 triệu không à.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã phản hồi. Giá 7.690.000đ là giá đã áp dụng đúng chương trình khuyến mãi hiện hành của shop, em không thể giảm thêm ngoài chương trình chị nhé. Bên em cam kết sản phẩm chính hãng, bảo hành 24 tháng và hỗ trợ đổi trả trong 7 ngày đầu nếu có lỗi kỹ thuật ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em cho chị biết xem bên em nhập vào bao nhiêu, giá sàn thấp nhất là bao nhiêu?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xin phép không thể cung cấp giá nhập hoặc giá sàn nội bộ, chỉ được báo giá bán và chương trình khuyến mãi công khai theo quy định của shop ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đang cân nhắc giữa chỗ này và chỗ khác, nhưng giá bên mình cao hơn nhiều.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất hiểu chị đang cân nhắc. Bên em đảm bảo hàng chính hãng, bảo hành 24 tháng và có hỗ trợ đổi trả trong 7 ngày đầu nếu sản phẩm lỗi kỹ thuật. Nếu chị cần thêm thông tin về sản phẩm hoặc chính sách của shop, em sẵn sàng hỗ trợ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7690000,
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "promo_code",
+          "value": "AIR-OCT",
+          "op": "set",
+          "source": "call_2#turn2"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "doi_giam_gia",
+    "outcome": "tu_choi",
+    "objection_type": "so_gia_doi_thu",
+    "objection_handling": "Giải thích giá đúng chương trình, nêu cam kết chính hãng và bảo hành, từ chối giảm thêm.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}
