@@ -136,7 +136,7 @@ def test_who_takes_a_reasoning_effort(provider, model, reasons):
 
 
 def test_a_model_that_takes_no_effort_is_not_sent_one_and_usage_is_on(monkeypatch):
-    monkeypatch.setenv("OPENAI_API_KEY", "x")
+    monkeypatch.setattr(factory, "require_api_key", lambda provider: "x")
     built = {}
     monkeypatch.setattr(factory.LLMFactory, "create_llm", ORIGINAL_CREATE_LLM)
     monkeypatch.setattr(factory, "init_chat_model", lambda model, **kwargs: built.update({model: kwargs}))
@@ -317,8 +317,8 @@ def test_the_tier_reaches_openai_only(monkeypatch):
     seen = {}
     monkeypatch.setattr(factory.LLMFactory, "create_llm", ORIGINAL_CREATE_LLM)
     monkeypatch.setattr(factory, "init_chat_model", lambda model, **kwargs: seen.update({model: kwargs}))
-    monkeypatch.setenv("GROQ_API_KEY", "x")
-    monkeypatch.setenv("OPENAI_API_KEY", "x")
+    # The keys are read once and cached, so setting them here would depend on the order the tests run in.
+    monkeypatch.setattr(factory, "require_api_key", lambda provider: "x")
     factory.LLMFactory.create_llm({"provider": "openai", "model": "gpt-5.6-luna", "service_tier": "fast"}, rate_limited=False)
     assert seen["gpt-5.6-luna"]["service_tier"] == "fast"
     factory.LLMFactory.create_llm({"provider": "groq", "model": "m", "service_tier": "fast"}, rate_limited=False)
