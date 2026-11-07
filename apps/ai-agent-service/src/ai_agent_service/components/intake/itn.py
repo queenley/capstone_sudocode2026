@@ -55,7 +55,9 @@ DIGITS = {
     "một": 1, "mốt": 1, "hai": 2, "ba": 3, "bốn": 4, "tư": 4, "năm": 5, "lăm": 5, "nhăm": 5,
     "sáu": 6, "bảy": 7, "bẩy": 7, "tám": 8, "chín": 9,
 }
-SCALES = {"nghìn": 1_000, "ngàn": 1_000, "k": 1_000, "triệu": 1_000_000, "củ": 1_000_000, "tỷ": 1_000_000_000, "tỉ": 1_000_000_000}
+#: "tr" is how a customer types triệu ("năm tr ba" is 5.300.000), "k" how they type nghìn.
+SCALES = {"nghìn": 1_000, "ngàn": 1_000, "k": 1_000, "triệu": 1_000_000, "tr": 1_000_000, "củ": 1_000_000,
+          "tỷ": 1_000_000_000, "tỉ": 1_000_000_000}
 NUMBER_WORDS = set(DIGITS) | set(SCALES) | {"mười", "mươi", "trăm", "rưỡi"}
 
 #: Words that are digits only inside a number: "tư" and "năm" are also "fourth"
@@ -182,7 +184,71 @@ def _digit_string(words: list[str]) -> bool:
     return all(w in DIGITS for w in words) and not COUNTED & set(words)
 
 
+#: Number words typed without diacritics, read only inside an amount of money (a run holding a scale):
+#: "nam" alone is a year or the south, "nam trieu ba" is 5.300.000.
+TONELESS = {"khong": "không", "mot": "một", "hai": "hai", "ba": "ba", "bon": "bốn", "tu": "tư", "nam": "năm",
+            "lam": "lăm", "sau": "sáu", "bay": "bảy", "tam": "tám", "chin": "chín", "tram": "trăm",
+            "linh": "linh", "le": "lẻ", "ruoi": "rưỡi", "nghin": "nghìn", "ngan": "ngàn", "trieu": "triệu",
+            "tr": "tr", "k": "k", "cu": "củ", "ty": "tỷ", "ti": "tỉ", "cham": "chấm", "phay": "phẩy"}
+TONELESS_SCALES = {"nghin", "ngan", "trieu", "tr", "k", "cu", "ty", "ti"}
+
+
+def _toneless(text: str) -> str:
+    """Restore the diacritics of number words typed without them, only in a run that names a scale of money."""
+    tokens = text.split(" ")
+    i = 0
+    while i < len(tokens):
+        if _bare(tokens[i]) not in TONELESS and _bare(tokens[i]) != "muoi":
+            i += 1
+            continue
+        j = i
+        while j < len(tokens) and (_bare(tokens[j]) in TONELESS or _bare(tokens[j]) == "muoi"):
+            j += 1
+            if tokens[j - 1][-1:] in ".,!?;:":
+                break
+        run = [_bare(t) for t in tokens[i:j]]
+        if TONELESS_SCALES & set(run) and set(run) - set(DIGITS) - set(SCALES) - {"mười", "mươi", "trăm", "rưỡi", "chấm", "phẩy"}:
+            canonical: list[str] = []
+            for k, word in enumerate(run):
+                if word == "muoi":
+                    value = "mươi" if canonical and canonical[-1] in DIGITS else "mười"
+                elif word == "tu" and not (canonical and (canonical[-1] in SCALES or canonical[-1] in ("mươi", "mười", "trăm"))):
+                    value = None  # "tu" opening a run is "từ" (from), not four.
+                else:
+                    value = TONELESS[word]
+                if value is None:
+                    canonical.append(word)
+                    continue
+                canonical.append(value)
+                token = tokens[i + k]
+                tokens[i + k] = value + token[len(token.rstrip(".,!?;:")):]
+        i = max(j, i + 1)
+    return " ".join(tokens)
+
+
+_DECIMAL_WORDS = "chấm|phẩy"
+_DIGIT_WORDS = "|".join(sorted(set(DIGITS) - {"linh", "lẻ"}, key=len, reverse=True))
+_HEAD_WORDS = "|".join(sorted(set(DIGITS) | {"mười", "mươi", "trăm"}, key=len, reverse=True))
+#: "một chấm năm triệu", "hai phẩy năm củ": a spoken decimal before a scale of money.
+SPOKEN_DECIMAL = re.compile(
+    rf"(?<!\w)((?:(?:{_HEAD_WORDS})\s+)*(?:{_HEAD_WORDS}))\s+({_DECIMAL_WORDS})\s+"
+    rf"((?:(?:{_DIGIT_WORDS})\s+){{0,2}}(?:{_DIGIT_WORDS}))\s+(triệu|tr|củ|nghìn|ngàn|k|tỷ|tỉ)(?!\w)",
+    re.IGNORECASE)
+
+
+def _spoken_decimals(text: str) -> str:
+    """Write a spoken decimal amount as digits, "1,5 triệu", which :func:`money_spans` reads; else leave it."""
+    def replace(match: re.Match[str]) -> str:
+        head = parse_number(match[1].lower().split())
+        if head is None or head >= 1000:
+            return match.group()
+        tail = "".join(str(DIGITS[w]) for w in match[3].lower().split())
+        return f"{head},{tail} {match[4]}"
+    return SPOKEN_DECIMAL.sub(replace, text)
+
+
 def _spoken_numbers(text: str) -> str:
+    text = _spoken_decimals(_toneless(text))
     tokens = text.split(" ")
     out: list[str] = []
     cursor = 0
@@ -317,6 +383,8 @@ _BILLION = re.compile(r"(?<![\w.,])(\d+(?:[.,]\d+)?)\s*(tỷ|tỉ)(?![a-zà-ỹ]
 _THOUSAND = re.compile(r"(?<![\w.,])(\d+(?:[.,]\d+)?)\s*(k|nghìn|ngàn)(?![a-zà-ỹ])", re.IGNORECASE)
 _GROUPED = re.compile(r"(?<![\w.,])(\d{1,3}(?:[.,]\d{3})+)(?:\s*(đồng|đ|vnđ|vnd|d)(?![a-zà-ỹ]))?", re.IGNORECASE)
 _PLAIN = re.compile(r"(?<![\w.,])(\d{4,9})\s*(đồng|đ|vnđ|vnd)(?![a-zà-ỹ])", re.IGNORECASE)
+#: "1m2", "2m5": millions typed with m between the digits. "5m" alone stays a length.
+_M_MILLION = re.compile(r"(?<![\w.,])(\d{1,3})m(\d{1,3})(?![\w.,]\w|\d)", re.IGNORECASE)
 
 
 def _decimal(raw: str) -> float:
@@ -342,6 +410,11 @@ def money_spans(text: str) -> list[Span]:
         if match.group(4):
             value += 500_000
         found.append(Span(match.start(), match.end(), match.group(0), int(round(value))))
+    for match in _M_MILLION.finditer(text):
+        if free(match.start(), match.end()):
+            tail = match.group(2)
+            found.append(Span(match.start(), match.end(), match.group(0),
+                              int(match.group(1)) * 1_000_000 + int(tail) * 10 ** (6 - len(tail))))
     for match in _THOUSAND.finditer(text):
         if free(match.start(), match.end()):
             found.append(Span(match.start(), match.end(), match.group(0), int(round(_decimal(match.group(1)) * 1_000))))
