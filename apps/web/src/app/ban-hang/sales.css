@@ -10,7 +10,7 @@
 
 /* ---------- sidebar ---------- */
 .sl-side {
-  background: linear-gradient(180deg, var(--chrome) 0%, var(--chrome-2) 100%);
+  background: var(--chrome);
   color: var(--on-chrome-muted);
   padding: 18px 14px;
   display: flex;
@@ -37,19 +37,17 @@
 .sl-logo strong {
   display: block;
   font-size: 17px;
-  font-weight: 800;
+  font-weight: 500;
   letter-spacing: -0.02em;
 }
 .sl-logo small {
   display: block;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--on-chrome-muted);
 }
 .sl-side-label {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  font-size: 13px;
+  font-weight: 500;
   padding: 12px 10px 4px;
   color: var(--chrome-label);
 }
@@ -66,7 +64,7 @@
   background: transparent;
   color: var(--on-chrome-muted);
   text-align: left;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 14px;
   padding: 10px 12px;
   border-radius: var(--radius-sm);
@@ -98,8 +96,8 @@
   min-width: 22px;
   height: 22px;
   border-radius: 11px;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 500;
   display: inline-grid;
   place-items: center;
   padding: 0 7px;
@@ -132,14 +130,14 @@
   padding: 10px 12px;
   border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.06);
-  font-size: 12px;
+  font-size: 13px;
 }
 .sl-side-status b {
   display: flex;
   align-items: center;
   gap: 6px;
   color: var(--on-chrome);
-  font-weight: 600;
+  font-weight: 500;
 }
 .sl-side-status b::before {
   content: "";
@@ -165,8 +163,7 @@
   gap: 16px;
   margin: 0 -30px 22px;
   padding: 14px 30px;
-  background: color-mix(in srgb, var(--bg) 85%, transparent);
-  backdrop-filter: blur(10px);
+  background: var(--bg);
   border-bottom: 1px solid var(--line);
 }
 .sl-topbar-title {
@@ -193,7 +190,7 @@
   background: var(--brand-soft);
   color: var(--brand-ink);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
 }
 .sl-live::before {
   content: "";
@@ -244,7 +241,7 @@
 }
 .sl-warn {
   color: var(--warn-ink);
-  font-weight: 600;
+  font-weight: 500;
   font-size: 13px;
 }
 .sl-center {
@@ -280,17 +277,15 @@
   opacity: 1;
 }
 .sl-kpi span {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-weight: 500;
   padding-right: 48px;
 }
 .sl-kpi b {
   font-family: var(--font-mono);
   font-size: 30px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--brand-ink);
   letter-spacing: -0.03em;
 }
@@ -389,8 +384,8 @@
   font-size: 14px;
 }
 .sl-badge {
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 500;
   padding: 3px 10px;
   border-radius: 999px;
   background: var(--brand-soft-2);
@@ -445,15 +440,14 @@
   overflow: hidden;
   border: 1px solid var(--line);
   font-size: 14px;
+  font-variant-numeric: tabular-nums;
 }
 .sl-table th {
   text-align: left;
   background: var(--surface-2);
   padding: 11px 12px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--muted);
   border-bottom: 1px solid var(--line);
 }
@@ -503,11 +497,15 @@
   color: var(--on-brand);
   border-radius: var(--radius);
   padding: 11px 20px;
-  font-weight: 700;
+  font-weight: 500;
   min-height: 44px;
 }
 .sl-order-toggle { background: transparent; color: var(--brand-ink); padding: 4px; white-space: nowrap; }
 .sl-main { scroll-margin-top: 200px; }
+.sl-btn:active,
+.sl-btn-small:active {
+  transform: translateY(1px) scale(0.985);
+}
 .sl-btn-small {
   padding: 6px 12px;
   font-size: 13px;
@@ -530,9 +528,7 @@
   display: grid;
   place-items: center;
   padding: 24px 16px;
-  background:
-    radial-gradient(80% 60% at 50% 0%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%),
-    var(--bg);
+  background: var(--bg);
 }
 .sl-gate-card {
   width: 100%;

@@ -3,9 +3,10 @@ import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
 import ProductArt from "@/components/product/ProductArt";
 import ProductCard from "@/components/product/ProductCard";
-import { categoryName, DEPARTMENTS, discountPercent, fetchProducts, ShopProduct } from "@/lib/catalog";
+import { categoryName, DEPARTMENTS, discountPercent, fetchProducts, money, ShopProduct } from "@/lib/catalog";
 import { shopContext } from "@/lib/shop-context";
 import { HOTLINE, ZALO_URL } from "@/lib/contact";
+import Icon from "@/components/ui/Icon";
 
 const icon = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true };
 
@@ -66,6 +67,10 @@ export default function HomePage() {
         .slice(0, 8),
     [products],
   );
+  const hero = useMemo(
+    () => deals.find((p) => p.image) || (products || []).find((p) => p.image && p.available > 0) || null,
+    [deals, products],
+  );
   const featured = useMemo(
     () =>
       DEPARTMENTS.map((dept) => ({
@@ -77,53 +82,42 @@ export default function HomePage() {
 
   return (
     <>
+      {/* The hero says what is sold and how it is sold (taste-skill copy rules, docs/plan/UI-REDESIGN-TASTE.md):
+          the category in the h1, one fact, two actions, and a real product from the catalogue as its picture. */}
       <section className="s-hero">
         <div className="s-wrap s-hero-inner">
           <div className="s-hero-copy">
-            <span className="s-eyebrow">Tư vấn bởi AI · Nhân viên hỗ trợ khi cần</span>
-            <h1>
-              Mua đúng thứ nhà bạn cần, <em>hỏi gì cũng có người trả lời.</em>
-            </h1>
+            <p className="s-hero-kicker">Tư vấn bởi trợ lý AI · nhân viên hỗ trợ khi cần</p>
+            <h1>Gia dụng, giày và đồ mẹ bé, có trợ lý AI tư vấn</h1>
             <p>
-              Máy lọc không khí, máy lọc nước, giày chạy bộ, đồ cho bé… Trợ lý Quivo báo giá, tồn kho và khuyến mãi
-              theo đúng dữ liệu cửa hàng, nhớ nhu cầu của bạn cho lần sau.
+              Hỏi máy lọc nào hợp phòng của bạn, cỡ giày nào vừa, đồ nào hợp tuổi bé. Trợ lý báo giá, tồn kho và khuyến mãi
+              theo đúng dữ liệu cửa hàng, và nhớ nhu cầu của bạn cho lần sau.
             </p>
-            <div className="s-hero-stats">
-              <div>
-                <strong>24/7</strong>
-                <span>Trợ lý AI tư vấn</span>
-              </div>
-              <div>
-                <strong>3 kênh</strong>
-                <span>Web · Zalo · Hotline</span>
-              </div>
-              <div>
-                <strong>{products ? products.length : "…"}</strong>
-                <span>Sản phẩm đang bán</span>
-              </div>
-            </div>
             <div className="s-hero-cta">
               <button className="s-btn s-btn-lg" onClick={() => shopContext.openChat()}>
                 Chat với trợ lý AI
               </button>
-              <Link className="s-btn s-btn-lg s-btn-outline" href="/danh-muc/gia-dung">
-                Xem sản phẩm
+              <Link className="s-btn s-btn-lg s-btn-outline" href="/khuyen-mai">
+                Xem sản phẩm giảm giá
               </Link>
             </div>
-            <ul className="s-hero-points">
-              <li>Giá và khuyến mãi lấy trực tiếp từ hệ thống</li>
-              <li>Hotline {HOTLINE}, gọi được ngay trên web</li>
-              <li>{ZALO_URL ? "Nhắn tin qua Zalo OA" : "Chat 24/7 trên website"}</li>
-            </ul>
+            <p className="s-hero-fact">Miễn phí giao hàng cho đơn từ 2.000.000₫, nội thành 1–2 ngày làm việc.</p>
           </div>
           <div className="s-hero-art">
-            <ProductArt category="gia-dung/may-loc-khong-khi" brand="AirPure" size="hero" />
-            <span className="s-hero-live">Trợ lý đang trực tuyến</span>
-            <div className="s-hero-bubble">
-              <b>Khách:</b> Phòng 25m², có bé nhỏ thì chọn máy nào?
-              <br />
-              <b>Trợ lý:</b> Dạ AirPure Pro có khóa trẻ em, lọc HEPA H13, phù hợp phòng đến 45m² ạ…
-            </div>
+            {hero ? (
+              <Link href={`/san-pham/${encodeURIComponent(hero.ref)}`} className="s-hero-product">
+                <ProductArt category={hero.category} brand={hero.brand} size="hero" image={hero.image} alt={hero.name} />
+                <span className="s-hero-product-name">{hero.name}</span>
+                <span className="s-price">
+                  <strong>{money(hero.price)}</strong>
+                  {hero.listPrice > hero.price && <s>{money(hero.listPrice)}</s>}
+                </span>
+              </Link>
+            ) : products === null && !error ? (
+              <div className="s-hero-product s-skeleton-block" aria-hidden="true" />
+            ) : (
+              <ProductArt category="gia-dung/may-loc-khong-khi" brand="AirPure" size="hero" />
+            )}
           </div>
         </div>
       </section>
@@ -188,14 +182,14 @@ export default function HomePage() {
           </div>
           <div className="s-assist-cards">
             <button className="s-assist-card" onClick={() => shopContext.openChat()}>
-              <span>💬</span>
+              <span><Icon name="chat" /></span>
               <b>Chat trên website</b>
               <small>Trả lời ngay, 24/7</small>
             </button>
             <a className="s-assist-card" href={`tel:${HOTLINE.replace(/\s/g, "")}`}>
-              <span>☏</span>
+              <span><Icon name="phone" /></span>
               <b>Hotline {HOTLINE}</b>
-              <small>Hoặc bấm ☏ trong khung chat để gọi qua web</small>
+              <small>Hoặc bấm nút gọi trong khung chat để gọi qua web</small>
             </a>
             {ZALO_URL ? (
               <a className="s-assist-card" href={ZALO_URL} target="_blank" rel="noreferrer">
@@ -205,7 +199,7 @@ export default function HomePage() {
               </a>
             ) : (
               <Link className="s-assist-card" href="/don-hang">
-                <span>📦</span>
+                <span><Icon name="package" /></span>
                 <b>Tra cứu đơn hàng</b>
                 <small>Xác minh số điện thoại để xem đơn</small>
               </Link>

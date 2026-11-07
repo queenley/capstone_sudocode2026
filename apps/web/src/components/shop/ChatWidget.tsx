@@ -22,6 +22,7 @@ import { catalogOnce } from "@/lib/mentions";
 import { account as accountStore, useAccount } from "@/lib/account";
 import { newKey } from "@/lib/cart-items";
 import ReturningWelcome from "@/components/shop/ReturningWelcome";
+import Icon from "@/components/ui/Icon";
 
 /** The cart in this browser with the names the shop shows, for the assistant ("giỏ hàng tôi có gì").
  *  Signed in, the assistant reads the account's cart itself (its account_cart tool): nothing is sent. */
@@ -302,7 +303,7 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
           event.preventDefault();
           shopContext.closeChat();
         }}>
-          <header className="s-chat-head">
+          <header className={`s-chat-head${status === "handed_off" ? " s-chat-head-human" : ""}`}>
             <div>
               <strong>Trợ lý Quivo</strong>
               <span>
@@ -331,14 +332,14 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
                     });
                 }}
               >
-                ☏
+                <Icon name="phone" />
               </button>
               <button
                 className="s-icon-btn"
                 aria-label="Đóng"
                 onClick={() => shopContext.closeChat()}
               >
-                ✕
+                <Icon name="close" />
               </button>
             </div>
           </header>
@@ -404,6 +405,12 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
                   )}
               </div>
             ))}
+            {/* Who answers now: a person has the conversation and has read it, so nothing needs repeating. */}
+            {status === "handed_off" && (
+              <p className="s-chat-handoff">
+                Đã chuyển cho nhân viên. Nhân viên đã xem cuộc trò chuyện này, bạn không cần nhắc lại.
+              </p>
+            )}
             <div ref={bottom} />
           </div>
           {error && (
@@ -462,7 +469,7 @@ function ConversationWidget({ customerId }: { customerId?: string }) {
             </form>
           )}
           <footer className="s-chat-foot">
-            <a href={`tel:${HOTLINE.replace(/\s/g, "")}`}>☏ {HOTLINE}</a>
+            <a href={`tel:${HOTLINE.replace(/\s/g, "")}`}><Icon name="phone" size={16} /> {HOTLINE}</a>
             {ZALO_URL && (
               <a href={ZALO_URL} target="_blank" rel="noreferrer">
                 Chat qua Zalo

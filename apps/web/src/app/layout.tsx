@@ -28,7 +28,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#065f46" },
+    { media: "(prefers-color-scheme: light)", color: "#18211d" },
     { media: "(prefers-color-scheme: dark)", color: "#0a1a15" },
   ],
 };
@@ -53,7 +53,7 @@ export default function RootLayout({
         {/* Without the network the page falls back to the system fonts in theme.css. */}
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap"
         />
       </head>
       <body>{children}</body>

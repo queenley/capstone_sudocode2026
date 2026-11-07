@@ -8,6 +8,7 @@ import { categoryName, DEPARTMENTS } from "@/lib/catalog";
 import { firstName, useAccount } from "@/lib/account";
 import { useCart } from "@/lib/cart";
 import { HOTLINE, ZALO_URL } from "@/lib/contact";
+import Icon from "@/components/ui/Icon";
 
 const icon = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true };
 
@@ -42,7 +43,7 @@ export default function Header() {
             <span>Miễn phí giao hàng cho đơn từ 2.000.000₫ · Đổi trả theo chính sách cửa hàng</span>
           </span>
           <span className="s-topline-links">
-            <a href={`tel:${HOTLINE.replace(/\s/g, "")}`}>☏ Hotline {HOTLINE}</a>
+            <a href={`tel:${HOTLINE.replace(/\s/g, "")}`}><Icon name="phone" size={14} /> Hotline {HOTLINE}</a>
             {ZALO_URL && (
               <a href={ZALO_URL} target="_blank" rel="noreferrer">
                 Zalo
@@ -54,7 +55,7 @@ export default function Header() {
       </div>
       <div className="s-wrap s-mainbar">
         <button ref={menuButton} className="s-menu-btn" aria-label="Danh mục" aria-controls="shop-navigation" aria-expanded={menu} onClick={() => setMenu(!menu)}>
-          ☰
+          <Icon name="menu" size={20} />
         </button>
         <Link href="/" className="s-logo" aria-label="Quivo, trang chủ">
           {/* The wordmark's "Q" is the mark: one image, no separate icon beside it. */}

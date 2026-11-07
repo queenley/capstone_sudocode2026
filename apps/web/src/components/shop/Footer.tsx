@@ -46,7 +46,7 @@ export default function Footer() {
           <Link href="/ban-hang">Trang bán hàng</Link>
         </div>
       </div>
-      <div className="s-wrap mt-7 flex flex-col gap-2 border-t border-white/12 pt-4 pb-6 text-xs sm:flex-row sm:justify-between sm:gap-4">
+      <div className="s-wrap mt-7 flex flex-col gap-2 border-t border-white/12 pt-4 pb-6 text-[13px] sm:flex-row sm:justify-between sm:gap-4">
         <span>
           © {new Date().getFullYear()} Quivo. Dữ liệu sản phẩm minh họa cho
           dự án capstone.

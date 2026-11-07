@@ -9,13 +9,44 @@
 
 :root {
   color-scheme: light;
-  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  /* One text family (Vietnamese diacritics), weights 400 and 500 only; the mono
+     face is for codes and IDs on the staff pages (docs/plan/UI-REDESIGN-TASTE.md). */
+  --font-sans: "Be Vietnam Pro", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
 
+  /* Spacing: every margin, gap and padding written from now on is one of these. */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 96px;
+  --s-10: 128px;
+
+  /* Type: each level at least 1.2x the next; nothing under 13px. */
+  --t-h1: clamp(36px, 2.5vw + 20px, 56px);
+  --t-h2: clamp(24px, 1vw + 18px, 32px);
+  --t-h3: 20px;
+  --t-card: 18px;
+  --t-body: 16px;
+  --t-small: 14px;
+  --t-label: 13px;
+
+  /* Motion: hover in 140ms, out 200ms, press 90ms, one ease, no overshoot. */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --m-in: 140ms;
+  --m-out: 200ms;
+  --m-press: 90ms;
+  --m-image: 600ms;
+
+  /* Three radii (the 16 and 24 of before fold into 20). */
   --radius-sm: 8px;
   --radius: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  --radius-lg: 20px;
+  --radius-xl: 20px;
 
   /* Surfaces, from the page to the most raised. */
   --bg: #f4f8f6;
@@ -54,12 +85,14 @@
   --info-soft: #eff6ff;
   --info-ink: #1d4ed8;
 
-  /* Dark chrome: the staff sidebar, the shop's top line and footer. */
-  --chrome: #065f46;
-  --chrome-2: #054d39;
+  /* Dark chrome: the staff sidebar, the shop's top line and footer. A warm
+     near-black, not the brand: the interface stays neutral and emerald marks
+     only the main action, links, focus and state. */
+  --chrome: #18211d;
+  --chrome-2: #1f2a25;
   --on-chrome: #ffffff;
-  --on-chrome-muted: rgb(255 255 255 / 0.72);
-  --chrome-label: #6ee7b7;
+  --on-chrome-muted: rgb(255 255 255 / 0.74);
+  --chrome-label: #a7b5ae;
   --chrome-active: #ffffff;
   --on-chrome-active: #065f46;
 
@@ -110,9 +143,9 @@
   --info: #3b82f6;
   --info-soft: #111d33;
   --info-ink: #93c5fd;
-  --chrome: #0a1a15;
-  --chrome-2: #0e221b;
-  --chrome-label: #34d399;
+  --chrome: #101513;
+  --chrome-2: #151b18;
+  --chrome-label: #9fb0a8;
   --chrome-active: #133528;
   --on-chrome-active: #6ee7b7;
   --overlay: rgb(0 0 0 / 0.6);
@@ -155,9 +188,9 @@
     --info: #3b82f6;
     --info-soft: #111d33;
     --info-ink: #93c5fd;
-    --chrome: #0a1a15;
-    --chrome-2: #0e221b;
-    --chrome-label: #34d399;
+    --chrome: #101513;
+    --chrome-2: #151b18;
+    --chrome-label: #9fb0a8;
     --chrome-active: #133528;
     --on-chrome-active: #6ee7b7;
     --overlay: rgb(0 0 0 / 0.6);
@@ -167,6 +200,14 @@
     --shadow-lg: 0 24px 64px rgb(0 0 0 / 0.6);
     --focus: 0 0 0 3px rgb(52 211 153 / 0.35);
   }
+}
+
+/* Two weights only: emphasis is 500, never the browser's bold. */
+b,
+strong,
+th,
+dt {
+  font-weight: 500;
 }
 
 /* Numbers that line up: prices, timers, counts, codes. */
@@ -211,8 +252,7 @@ kbd {
 
 :focus-visible {
   outline: 2px solid var(--brand-ink);
-  outline-offset: 3px;
-  box-shadow: var(--focus);
+  outline-offset: 2px;
 }
 
 .skip-link {
@@ -224,7 +264,7 @@ kbd {
   border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--brand-ink);
-  font-weight: 700;
+  font-weight: 500;
   box-shadow: var(--shadow);
   transform: translateY(-150%);
 }

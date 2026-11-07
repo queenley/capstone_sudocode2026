@@ -5,8 +5,9 @@
 import { shopContext } from "@/lib/shop-context";
 import { HOTLINE, ZALO_URL } from "@/lib/contact";
 
-const SECTIONS: { title: string; items: string[] }[] = [
+const SECTIONS: { id: string; title: string; items: string[] }[] = [
   {
+    id: "doi-tra",
     title: "Đổi trả",
     items: [
       "Đổi hoặc trả trong 7 ngày kể từ ngày nhận hàng; gia dụng và mẹ & bé lỗi kỹ thuật từ nhà sản xuất được đổi mới trong 30 ngày.",
@@ -17,6 +18,7 @@ const SECTIONS: { title: string; items: string[] }[] = [
     ],
   },
   {
+    id: "giao-hang",
     title: "Giao hàng",
     items: [
       "Nội thành Hà Nội, TP.HCM, Đà Nẵng: 1–2 ngày làm việc; tỉnh thành khác: 2–4 ngày; vùng sâu, hải đảo: 5–7 ngày.",
@@ -26,6 +28,7 @@ const SECTIONS: { title: string; items: string[] }[] = [
     ],
   },
   {
+    id: "thanh-toan",
     title: "Thanh toán",
     items: [
       "Thanh toán khi nhận hàng (COD) toàn quốc cho đơn dưới 10.000.000₫, phí thu hộ 0₫.",
@@ -34,6 +37,7 @@ const SECTIONS: { title: string; items: string[] }[] = [
     ],
   },
   {
+    id: "bao-hanh",
     title: "Bảo hành",
     items: [
       "Máy lọc không khí AirPure, Samsung: 24 tháng; Xiaomi: 12 tháng. Máy lọc nước RO: 36 tháng thân máy (lõi lọc không bảo hành).",
@@ -53,7 +57,7 @@ export default function PolicyPage() {
         theo đúng điều khoản.
       </p>
       {SECTIONS.map((section) => (
-        <section key={section.title} className="s-policy">
+        <section key={section.id} id={section.id} className="s-policy">
           <h2>{section.title}</h2>
           <ul>
             {section.items.map((item) => (

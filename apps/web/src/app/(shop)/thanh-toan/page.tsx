@@ -13,6 +13,7 @@ import { cart, useCart } from "@/lib/cart";
 import { newKey, useCartItems } from "@/lib/cart-items";
 import { customerToken, openSession, ShopSession } from "@/lib/session";
 import { useAccount } from "@/lib/account";
+import Icon from "@/components/ui/Icon";
 
 type Quote = {
   sku_code: string;
@@ -326,7 +327,7 @@ export default function CheckoutPage() {
   if (placed) {
     return (
       <div className="s-wrap s-page s-done">
-        <div className="s-done-icon">✓</div>
+        <div className="s-done-icon"><Icon name="check" size={28} /></div>
         <h1 ref={resultHeading} tabIndex={-1}>Đặt hàng thành công</h1>
         <p>
           Mã đơn <b>#{placed.id.slice(0, 8).toUpperCase()}</b> ·{" "}
@@ -397,9 +398,10 @@ export default function CheckoutPage() {
               <p className="s-muted" role="status">Đang kiểm tra…</p>
             ) : verified ? (
               <p className="s-good">
+                <Icon name="check" />{" "}
                 {me?.registered
-                  ? `✓ Đặt hàng với tài khoản ${me.full_name || ""} (${me.phone || ""}).`
-                  : "✓ Số điện thoại đã được xác minh trên thiết bị này."}
+                  ? `Đặt hàng với tài khoản ${me.full_name || ""} (${me.phone || ""}).`
+                  : "Số điện thoại đã được xác minh trên thiết bị này."}
               </p>
             ) : (
               <>

@@ -1,8 +1,9 @@
 "use client";
-// A filterable, sortable grid of products: brand, price band, in-stock only.
+// A filterable, sortable grid of products: brand, price band, room size, in-stock only.
 import { useId, useMemo, useState } from "react";
 import ProductCard from "./ProductCard";
 import { discountPercent, ShopProduct } from "@/lib/catalog";
+import { roomArea } from "./specs";
 
 const PRICE_BANDS: { label: string; min: number; max: number }[] = [
   { label: "Dưới 1 triệu", min: 0, max: 1_000_000 },
@@ -11,16 +12,31 @@ const PRICE_BANDS: { label: string; min: number; max: number }[] = [
   { label: "Trên 7 triệu", min: 7_000_000, max: Infinity },
 ];
 
+// The shopper's room: a product fits when the room it suits is at least this big.
+const ROOMS: { label: string; min: number; above?: boolean }[] = [
+  { label: "Đến 20 m²", min: 20 },
+  { label: "20 – 30 m²", min: 30 },
+  { label: "30 – 45 m²", min: 45 },
+  { label: "Trên 45 m²", min: 45, above: true },
+];
+
 type Sort = "popular" | "price-asc" | "price-desc" | "discount";
 
 export default function ProductListing({ products, empty, error, onRetry }: { products: ShopProduct[] | null; empty?: string; error?: string; onRetry?: () => void }) {
   const filterId = useId();
   const [brands, setBrands] = useState<string[]>([]);
   const [band, setBand] = useState(-1);
+  const [room, setRoom] = useState(-1);
   const [inStock, setInStock] = useState(false);
   const [sort, setSort] = useState<Sort>("popular");
   const [filtersOpen, setFiltersOpen] = useState(false);
 
+  const hasRooms = useMemo(() => (products || []).some((p) => roomArea(p.description) !== null), [products]);
+  const fits = (p: ShopProduct) => {
+    if (room < 0) return true;
+    const area = roomArea(p.description);
+    return area !== null && (ROOMS[room].above ? area > ROOMS[room].min : area >= ROOMS[room].min);
+  };
   const allBrands = useMemo(() => [...new Set((products || []).map((p) => p.brand).filter(Boolean))].sort(), [products]);
 
   const shown = useMemo(() => {
@@ -28,6 +44,7 @@ export default function ProductListing({ products, empty, error, onRetry }: { pr
       (p) =>
         (!brands.length || brands.includes(p.brand)) &&
         (band < 0 || (p.price >= PRICE_BANDS[band].min && p.price < PRICE_BANDS[band].max)) &&
+        fits(p) &&
         (!inStock || p.available > 0),
     );
     if (sort === "price-asc") list = [...list].sort((a, b) => a.price - b.price);
@@ -36,7 +53,8 @@ export default function ProductListing({ products, empty, error, onRetry }: { pr
       list = [...list].sort((a, b) => discountPercent(b.price, b.listPrice) - discountPercent(a.price, a.listPrice));
     if (sort === "popular") list = [...list].sort((a, b) => Number(b.available > 0) - Number(a.available > 0));
     return list;
-  }, [products, brands, band, inStock, sort]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fits reads room
+  }, [products, brands, band, room, inStock, sort]);
 
   return (
     <div className="s-listing">
@@ -71,6 +89,22 @@ export default function ProductListing({ products, empty, error, onRetry }: { pr
             </button>
           )}
         </fieldset>
+        {hasRooms && (
+          <fieldset>
+            <legend>Diện tích phòng</legend>
+            {ROOMS.map((r, i) => (
+              <label key={r.label} className="s-check">
+                <input type="radio" name="room" checked={room === i} onChange={() => setRoom(i)} />
+                {r.label}
+              </label>
+            ))}
+            {room >= 0 && (
+              <button className="s-link-btn" onClick={() => setRoom(-1)}>
+                Bỏ lọc diện tích
+              </button>
+            )}
+          </fieldset>
+        )}
         <fieldset>
           <legend>Tình trạng</legend>
           <label className="s-check">
@@ -106,7 +140,7 @@ export default function ProductListing({ products, empty, error, onRetry }: { pr
         </div>}
         {!error && products !== null && shown.length === 0 && (
           <div className="s-empty"><p>{empty || "Không có sản phẩm phù hợp với bộ lọc."}</p>
-            {(brands.length > 0 || band >= 0 || inStock) && <button className="s-btn s-btn-outline" onClick={() => { setBrands([]); setBand(-1); setInStock(false); }}>Xóa bộ lọc</button>}
+            {(brands.length > 0 || band >= 0 || room >= 0 || inStock) && <button className="s-btn s-btn-outline" onClick={() => { setBrands([]); setBand(-1); setRoom(-1); setInStock(false); }}>Xóa bộ lọc</button>}
           </div>
         )}
       </div>

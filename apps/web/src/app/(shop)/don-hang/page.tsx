@@ -270,7 +270,7 @@ export default function OrdersPage() {
         >
           Đăng xuất khỏi thiết bị này
         </button>
-        <button className="s-link-btn s-danger" onClick={forget}>
+        <button id="xoa-du-lieu" className="s-link-btn s-danger" onClick={forget}>
           Xóa dữ liệu cá nhân của tôi
         </button>
       </div>

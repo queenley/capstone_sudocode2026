@@ -4,12 +4,14 @@ import { useState } from "react";
 import ProductArt from "./ProductArt";
 import { categoryName, discountPercent, money, ShopProduct } from "@/lib/catalog";
 import { cart } from "@/lib/cart";
+import { keySpecs } from "./specs";
 
 export default function ProductCard({ product }: { product: ShopProduct }) {
   const [added, setAdded] = useState(0);
   const off = discountPercent(product.price, product.listPrice);
   const single = product.variants.length === 1 ? product.variants[0] : null;
   const soldOut = product.available <= 0;
+  const specs = keySpecs(product.description);
   return (
     <article className="s-card">
       <Link href={`/san-pham/${encodeURIComponent(product.ref)}`} className="s-card-link">
@@ -21,6 +23,13 @@ export default function ProductCard({ product }: { product: ShopProduct }) {
         <div className="s-card-body">
           <span className="s-card-cat">{categoryName(product.category)}</span>
           <h3 className="s-card-title">{product.name}</h3>
+          {specs.length > 0 && (
+            <ul className="s-card-specs" aria-label="Thông số chính">
+              {specs.map((spec) => (
+                <li key={spec}>{spec}</li>
+              ))}
+            </ul>
+          )}
           <div className="s-price">
             <strong>
               {product.variants.length > 1 && <small>Từ </small>}
