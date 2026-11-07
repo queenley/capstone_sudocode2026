@@ -526,7 +526,7 @@ def usage_between(before: Mapping[str, Mapping[str, int]], after: Mapping[str, M
     spent = {}
     for agent, now in after.items():
         then = before.get(agent) or {}
-        delta = {key: int(now.get(key, 0)) - int(then.get(key, 0)) for key in ("calls", "input", "output")}
+        delta = {key: int(now.get(key, 0)) - int(then.get(key, 0)) for key in ("calls", "input", "output", "cached")}
         if any(delta.values()):
             spent[agent] = delta
     return spent

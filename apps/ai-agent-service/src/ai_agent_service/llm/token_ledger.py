@@ -18,14 +18,15 @@ _LOCK = threading.Lock()
 _LEDGER: Dict[str, Dict[str, int]] = {}
 
 
-def record(agent: str, input_tokens: int, output_tokens: int) -> None:
-    """Add one completed LLM call's token usage under ``agent``."""
+def record(agent: str, input_tokens: int, output_tokens: int, cached_tokens: int = 0) -> None:
+    """Add one completed LLM call's token usage under ``agent``; *cached_tokens* are part of *input_tokens*."""
     key = (agent or "unknown").strip() or "unknown"
     with _LOCK:
-        entry = _LEDGER.setdefault(key, {"calls": 0, "input": 0, "output": 0})
+        entry = _LEDGER.setdefault(key, {"calls": 0, "input": 0, "output": 0, "cached": 0})
         entry["calls"] += 1
         entry["input"] += int(input_tokens or 0)
         entry["output"] += int(output_tokens or 0)
+        entry["cached"] += int(cached_tokens or 0)
 
 
 def snapshot() -> Dict[str, Dict[str, int]]:

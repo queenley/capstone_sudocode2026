@@ -33,10 +33,10 @@ import re
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
-from typing import Literal, Sequence
+from typing import Literal, Mapping, Sequence
 
 from ..intake.text import plain
-from .corpus import THROUGH_TOOLS, Chunk, by_id
+from .corpus import THROUGH_TOOLS, Chunk, by_id, covers
 from .lexical import Lexical, fuse
 from .semantic import Embedder, Vectors
 
@@ -96,6 +96,8 @@ class Hit:
     instruction: str | None
     #: For a restricted passage whose one usable fact a tool gives instead: that tool.
     redirect: str | None = None
+    #: An entry written for a product of this call.
+    for_product: bool = False
 
 
 @dataclass(frozen=True)
@@ -128,6 +130,7 @@ class KnowledgeBase:
         settings: Settings = Settings(),
         embedder: Embedder | None = None,
         cache: Path | None = None,
+        categories: Mapping[str, str] | None = None,
     ) -> None:
         ids = [c.chunk_id for c in chunks]
         if len(ids) != len(set(ids)):
@@ -139,6 +142,8 @@ class KnowledgeBase:
         documents = [(c.chunk_id, c.indexed) for c in chunks]
         self._lexical = Lexical(documents, k1=settings.k1, b=settings.b, accents=settings.accents)
         self._embedder, self._cache = embedder, cache
+        #: The catalogue's category of each SKU, for an entry written for a category.
+        self._categories = dict(categories or {})
         self._vectors = Vectors(embedder, documents, cache=cache) if embedder is not None else None
 
     @property
@@ -147,7 +152,8 @@ class KnowledgeBase:
 
     def extended(self, extra: Sequence[Chunk]) -> "KnowledgeBase":
         """This base with *extra* chunks added (entries saved at runtime), same model and cache."""
-        return KnowledgeBase([*self.chunks, *extra], settings=self.settings, embedder=self._embedder, cache=self._cache)
+        return KnowledgeBase([*self.chunks, *extra], settings=self.settings, embedder=self._embedder, cache=self._cache,
+                             categories=self._categories)
 
     def search(
         self,
@@ -158,6 +164,7 @@ class KnowledgeBase:
         order_date: str | None = None,
         situation: str | None = None,
         other_order_dates: Sequence[str] = (),
+        about: Sequence[str] = (),
     ) -> Result:
         """The top *k* passages for *query* and whether to abstain.
 
@@ -167,7 +174,10 @@ class KnowledgeBase:
         either day nothing is filtered. A playbook entry for *situation* is
         preferred over others (section 7.3). *other_order_dates* are this
         customer's other orders when the question names none: the answer may
-        differ between them, and the result says so.
+        differ between them, and the result says so. *about* is the SKUs this
+        call is on: an entry written for one of them is preferred, an entry
+        written for other products is left out. Without any, entries are
+        found by their words alone.
         """
         k = k or self.settings.top_k
         lexical = self._lexical.ranking(query)
@@ -181,14 +191,17 @@ class KnowledgeBase:
                          if self._by_id[doc_id].source == "playbook" and self._by_id[doc_id].situation == situation]
             if preferred:
                 rankings.append(preferred)
+        for_product = [(doc_id, s) for doc_id, s in lexical if self._for_product(self._by_id[doc_id], about)]
+        if for_product:
+            rankings.append(for_product)
         fused = fuse(rankings, k=self.settings.fusion_k) if self._vectors is not None or len(rankings) > 1 else lexical
         day = order_date or on
         ranked = [doc_id for doc_id, _ in fused]
-        top = [doc_id for doc_id in ranked if self._by_id[doc_id].in_force(day)][:k]
+        top = [doc_id for doc_id in ranked if self._by_id[doc_id].in_force(day) and self._fits(self._by_id[doc_id], about)][:k]
         reached = ranked[:ranked.index(top[-1])] if top else ranked
         withheld = tuple(doc_id for doc_id in reached if not self._by_id[doc_id].in_force(day))
         scores = dict(fused)
-        hits = tuple(self._hit(query, doc_id, scores.get(doc_id, 0.0), rank, cosines.get(doc_id))
+        hits = tuple(self._hit(query, doc_id, scores.get(doc_id, 0.0), rank, cosines.get(doc_id), about)
                      for rank, doc_id in enumerate(top, 1))
         top_score = (hits[0].cosine if self._vectors is not None else hits[0].coverage) if hits else None
         reason = self._abstain(hits, top_score)
@@ -200,7 +213,15 @@ class KnowledgeBase:
         return Result(query, hits, top_score, reason is not None, reason, changelog, self.mode, withheld, explains,
                       differs)
 
-    def _hit(self, query: str, doc_id: str, score: float, rank: int, cosine: float | None) -> Hit:
+    def _for_product(self, chunk: Chunk, about: Sequence[str]) -> bool:
+        return bool(chunk.applies_to) and any(covers(chunk.applies_to, sku, self._categories.get(sku)) for sku in about)
+
+    def _fits(self, chunk: Chunk, about: Sequence[str]) -> bool:
+        """Whether *chunk* may be read on this call: it is for no product in particular, or for one of *about*."""
+        return not about or not chunk.applies_to or self._for_product(chunk, about)
+
+    def _hit(self, query: str, doc_id: str, score: float, rank: int, cosine: float | None,
+             about: Sequence[str] = ()) -> Hit:
         chunk = self._by_id[doc_id]
         instruction = None
         if chunk.restricted:
@@ -216,6 +237,7 @@ class KnowledgeBase:
             absence=self.about_absence(query, chunk),
             instruction=instruction,
             redirect=THROUGH_TOOLS.get(doc_id) if chunk.restricted else None,
+            for_product=self._for_product(chunk, about),
         )
 
     def about_absence(self, query: str, chunk: Chunk) -> bool:

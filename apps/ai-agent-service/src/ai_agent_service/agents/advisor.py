@@ -304,14 +304,18 @@ def _state_block(context: AgentContext) -> str:
 
 
 def shown_passages(knowledge: Sequence[Mapping[str, Any]]) -> tuple[list[Mapping[str, Any]], list[Mapping[str, Any]]]:
-    """What the model reads of a turn's passages: the first three from the documents, what explains a withheld
-    passage (it takes no place of those three), and the playbook entries.
+    """What the model reads of a turn's passages: the first three from the documents, one campaign entry for this
+    call's product if none of the three is one, what explains a withheld passage, and the playbook entries. The last
+    three take no place of the first three.
 
     The guard checks a reply against these and no others: a number from a
     passage the model never saw cannot be a number it read (section 4.5).
     """
     documents = [p for p in knowledge if p.get("source") != "playbook" and not p.get("explains")]
-    policy = [*documents[:KNOWLEDGE_SHOWN], *(p for p in knowledge if p.get("explains"))]
+    first = documents[:KNOWLEDGE_SHOWN]
+    campaign = [] if any(p.get("campaign") for p in first) else [
+        p for p in documents[KNOWLEDGE_SHOWN:] if p.get("campaign") and p.get("for_product")][:1]
+    policy = [*first, *campaign, *(p for p in knowledge if p.get("explains"))]
     playbook = [p for p in knowledge if p.get("source") == "playbook"]
     return policy, playbook
 

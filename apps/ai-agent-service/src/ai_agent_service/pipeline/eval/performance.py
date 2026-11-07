@@ -6,7 +6,8 @@ as ``huong-dan-do-latency.md`` says (warm-up turns are never traced). What a run
 ``run_eval.py`` plays text, so TTFA, which runs from the end of speech to the first audio byte, has no value here.
 
 Cost is tokens times the list price of each model below, as if the same tokens had gone to it: only the model the run
-used is a measurement, the other is an estimate. Prompt caching is not counted, so it is a ceiling.
+used is a measurement, the other is an estimate. The cost does not discount the prompt cache, whose price this repo
+does not hold, so it is a ceiling; ``cached_share`` says how much of the input came from it.
 """
 
 from __future__ import annotations
@@ -44,6 +45,9 @@ def _tokens(entries: Iterable[Mapping[str, Any]], part: str) -> dict[str, dict[s
             bucket = total.setdefault(agent, {"calls": 0, "input": 0, "output": 0})
             for key in bucket:
                 bucket[key] += int(counts.get(key, 0))
+            # Runs older than the cached count have none: unknown, not zero.
+            if "cached" in counts:
+                bucket["cached"] = bucket.get("cached", 0) + int(counts["cached"])
     return total
 
 
@@ -54,7 +58,10 @@ def _per_turn(tokens: Mapping[str, Mapping[str, int]], turns: int) -> dict[str, 
     used_in, used_out = sum(c["input"] for c in model), sum(c["output"] for c in model)
     policy_in, policy_out = sum(c["input"] for c in policy), sum(c["output"] for c in policy)
     shared = policy_in * POLICY_PRICE / 1_000_000
+    known = [c for c in tokens.values() if "cached" in c]
+    measured_in = sum(c["input"] for c in known)
     return {
+        "cached_share": round(100 * sum(c["cached"] for c in known) / measured_in, 1) if measured_in else None,
         "input": round((used_in + policy_in) / turns, 1), "output": round((used_out + policy_out) / turns, 1),
         "total": round((used_in + used_out + policy_in + policy_out) / turns, 1),
         "cost_usd": {name: round(((used_in * rate_in + used_out * rate_out) / 1_000_000 + shared) / turns, 6)

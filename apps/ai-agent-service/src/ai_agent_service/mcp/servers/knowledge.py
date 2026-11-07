@@ -96,8 +96,10 @@ def sync_release(version: int) -> int:
                         " text = EXCLUDED.text, situation = EXCLUDED.situation, persona = EXCLUDED.persona,"
                         " valid_from = EXCLUDED.valid_from, valid_to = EXCLUDED.valid_to,"
                         " provenance = EXCLUDED.provenance, scope = 'release', revoked = false, updated_at = now() "
-                        "WHERE (kb_chunks.title, kb_chunks.text, kb_chunks.scope, kb_chunks.revoked)"
-                        " IS DISTINCT FROM (EXCLUDED.title, EXCLUDED.text, 'release', false)",
+                        "WHERE (kb_chunks.title, kb_chunks.text, kb_chunks.scope, kb_chunks.revoked,"
+                        " kb_chunks.valid_from, kb_chunks.valid_to, kb_chunks.provenance)"
+                        " IS DISTINCT FROM (EXCLUDED.title, EXCLUDED.text, 'release', false,"
+                        " EXCLUDED.valid_from, EXCLUDED.valid_to, EXCLUDED.provenance)",
                         (chunk.chunk_id, chunk.source, chunk.title, chunk.text, chunk.situation, chunk.persona,
                          chunk.valid_from, chunk.valid_to, json.dumps(dict(chunk.provenance), ensure_ascii=False)),
                     )
@@ -181,6 +183,8 @@ def hit_view(hit: Hit, *, reveal: bool) -> dict[str, Any]:
         "redirect": hit.redirect,
         "changelog": list(chunk.changelog),
         "situation": chunk.situation,
+        "campaign": chunk.campaign,
+        "for_product": hit.for_product,
         "rank": hit.rank,
         "score": hit.score,
         "cosine": hit.cosine,
@@ -214,6 +218,7 @@ async def kb_search(
     order_date: str | None = None,
     situation: str | None = None,
     other_order_dates: list[str] | None = None,
+    about: list[str] | None = None,
 ) -> dict[str, Any]:
     """Search the shop's policies, FAQ and playbook for what applies to a question.
 
@@ -229,12 +234,13 @@ async def kb_search(
         order_date: When the question is about an order already placed, the day it was placed; it decides the version instead (CL-01).
         situation: The call's situation, to prefer the playbook entry written for it.
         other_order_dates: The customer's other order days, when the question names no order.
+        about: The SKUs this call is on: entries for them are preferred, entries for other products left out.
     """
     if not query.strip():
         raise ToolFailure("BAD_REQUEST", "An empty query has no passages")
     kb = await base()
     result = kb.search(query, k=max(1, min(k, MAX_K)), on=on, order_date=order_date, situation=situation,
-                       other_order_dates=other_order_dates or ())
+                       other_order_dates=other_order_dates or (), about=about or ())
     settings = kb.settings
     threshold = settings.abstain_cosine if kb.mode == "hybrid" else settings.abstain_coverage
     return result_view(result, reveal=current_role() == "admin", threshold=threshold)
@@ -250,6 +256,10 @@ async def kb_upsert(
     chunk_id: str | None = None,
     provenance: dict[str, Any] | None = None,
     revoke: bool = False,
+    valid_from: str | None = None,
+    valid_to: str | None = None,
+    campaign: str | None = None,
+    applies_to: list[str] | None = None,
 ) -> dict[str, Any]:
     """Add, replace or revoke one FAQ or playbook entry saved during a demo, after a person approved it.
 
@@ -265,11 +275,23 @@ async def kb_upsert(
         chunk_id: Omit to add; give it to replace or revoke.
         provenance: call_id and turn of the answer, the passages it cites, who approved it.
         revoke: True to switch the entry off.
+        valid_from: First day the entry holds, YYYY-MM-DD; a campaign's promotion gives it when omitted.
+        valid_to: Last day the entry holds; a campaign that is not a promotion must give it.
+        campaign: A promotion's code, or the campaign's own name.
+        applies_to: What it is about, as promotions.json writes it: SKU-AP-X, category:gia-dung, *.
     """
     global _checked
     if not text.strip() or not title.strip():
         raise ToolFailure("BAD_REQUEST", "An entry needs a title and text")
     chunk_id = chunk_id or f"{source.upper()}-{uuid.uuid4().hex[:8]}"
+    provenance = {**(provenance or {}), **({"campaign": campaign} if campaign else {}),
+                  **({"applies_to": applies_to} if applies_to else {})}
+    try:
+        corpus.with_campaigns([corpus.entry_chunk({**provenance, "chunk_id": chunk_id, "source": source, "title": title,
+                                                   "text": text, "valid_from": valid_from, "valid_to": valid_to},
+                                                  doc="kb_upsert")], knowledge.promotions())
+    except ValueError as error:
+        raise ToolFailure("BAD_REQUEST", str(error)) from error
     pool = await database()
     async with pool.connection() as conn:
         cursor = await conn.execute("SELECT scope FROM kb_chunks WHERE chunk_id = %s", (chunk_id,))
@@ -277,12 +299,14 @@ async def kb_upsert(
         if existing and existing["scope"] == "release":
             raise ToolFailure("FORBIDDEN", f"{chunk_id} belongs to a release file; change the file instead")
         await conn.execute(
-            "INSERT INTO kb_chunks (chunk_id, source, title, text, situation, persona, provenance, scope, revoked,"
-            " updated_at) VALUES (%s, %s, %s, %s, %s, %s, %s, 'demo', %s, now()) "
+            "INSERT INTO kb_chunks (chunk_id, source, title, text, situation, persona, valid_from, valid_to, provenance,"
+            " scope, revoked, updated_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, 'demo', %s, now()) "
             "ON CONFLICT (chunk_id) DO UPDATE SET title = EXCLUDED.title, text = EXCLUDED.text,"
-            " situation = EXCLUDED.situation, persona = EXCLUDED.persona, provenance = EXCLUDED.provenance,"
+            " situation = EXCLUDED.situation, persona = EXCLUDED.persona, valid_from = EXCLUDED.valid_from,"
+            " valid_to = EXCLUDED.valid_to, provenance = EXCLUDED.provenance,"
             " revoked = EXCLUDED.revoked, updated_at = now()",
-            (chunk_id, source, title, text, situation, persona, json.dumps(provenance or {}, ensure_ascii=False), revoke),
+            (chunk_id, source, title, text, situation, persona, valid_from, valid_to,
+             json.dumps(provenance, ensure_ascii=False), revoke),
         )
     _checked = 0.0  # this process rebuilds on its next search
     return {"chunk_id": chunk_id, "revoked": revoke, "scope": "demo"}

@@ -21,10 +21,10 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import date, timedelta
 from pathlib import Path
-from typing import Any, Iterable, Literal, Mapping
+from typing import Any, Iterable, Literal, Mapping, Sequence
 
 Source = Literal["policy", "faq", "gap", "playbook"]
 
@@ -114,6 +114,10 @@ class Chunk:
     #: For a playbook entry: the situation of ``config/situations.yaml`` it handles.
     situation: str | None = None
     persona: str | None = None
+    #: For a campaign's entry: a promotion's code, whose days and products it takes, or the campaign's own name.
+    campaign: str | None = None
+    #: What an entry is about, as ``promotions.json`` writes it: ``SKU-AP-X``, ``category:gia-dung``, ``*``.
+    applies_to: tuple[str, ...] = ()
     #: For a team entry: where it came from, who approved it, what it cites (section 5.5).
     provenance: Mapping[str, Any] = field(default_factory=dict)
 
@@ -211,7 +215,11 @@ def entry_chunk(entry: Mapping[str, Any], *, doc: str) -> Chunk:
     if source not in ("faq", "gap", "playbook"):
         raise ValueError(f"{doc}: entry {entry['chunk_id']} has source {source!r}; only faq, gap and playbook are added")
     title = str(entry["title"])
+    # campaign and applies_to stay in provenance too: that is the column that carries them through ``kb_chunks``.
     known = {"chunk_id", "source", "title", "text", "situation", "persona", "valid_from", "valid_to"}
+    applies_to = entry.get("applies_to") or ()
+    if isinstance(applies_to, str) or not all(isinstance(target, str) for target in applies_to):
+        raise ValueError(f"{doc}: entry {entry['chunk_id']} needs applies_to as a list of codes")
     return Chunk(
         chunk_id=str(entry["chunk_id"]),
         doc=doc,
@@ -223,8 +231,41 @@ def entry_chunk(entry: Mapping[str, Any], *, doc: str) -> Chunk:
         valid_to=_day(entry.get("valid_to")),
         situation=entry.get("situation") or None,
         persona=entry.get("persona") or None,
+        campaign=entry.get("campaign") or None,
+        applies_to=tuple(applies_to),
         provenance={k: v for k, v in entry.items() if k not in known},
     )
+
+
+def with_campaigns(chunks: Sequence[Chunk], promotions: Sequence[Mapping[str, Any]]) -> list[Chunk]:
+    """*chunks* with each campaign entry's days and products, from its promotion unless the entry says its own.
+
+    A campaign with no promotion and no end would never expire, so it is refused, as any mistake in an approved file is.
+    """
+    known = {str(promotion.get("promo_code")): promotion for promotion in promotions}
+    done: list[Chunk] = []
+    for chunk in chunks:
+        promotion = known.get(chunk.campaign or "")
+        if chunk.campaign and promotion is None and not chunk.valid_to:
+            raise ValueError(f"{chunk.doc}: entry {chunk.chunk_id} is for campaign {chunk.campaign!r}, which is not a "
+                             "promotion and has no valid_to")
+        if promotion is not None:
+            chunk = replace(chunk, valid_from=chunk.valid_from or _day(promotion.get("start")),
+                            valid_to=chunk.valid_to or _day(promotion.get("end")),
+                            applies_to=chunk.applies_to or tuple(promotion.get("applies_to") or ()))
+        done.append(chunk)
+    return done
+
+
+def covers(targets: Iterable[str], sku: str, category: str | None) -> bool:
+    """Whether *targets*, written as ``promotions.json`` writes them, include a product."""
+    for target in targets:
+        if target == "*" or sku == target or sku.startswith(f"{target}-"):
+            return True
+        wanted = target.removeprefix("category:")
+        if target != wanted and category and (category == wanted or category.startswith(f"{wanted}/")):
+            return True
+    return False
 
 
 def version_file(directory: Path, version: int) -> Path:

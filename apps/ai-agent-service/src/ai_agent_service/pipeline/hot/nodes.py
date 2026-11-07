@@ -152,7 +152,8 @@ async def _knowledge(state: dict[str, Any], context: HotContext, said: str) -> d
         return None
     order_date, other_orders = _order_days(state, said)
     found = await context.harness.data("kb_search", query=said, k=5, on=state["on"], order_date=order_date,
-                                       other_order_dates=list(other_orders))
+                                       other_order_dates=list(other_orders),
+                                       about=[p["sku"] for p in state.get("seen_products") or [] if p.get("sku")])
     if not found:
         return None
     return {key: found.get(key) for key in ("hits", "top_score", "threshold", "abstain", "reason", "mode",

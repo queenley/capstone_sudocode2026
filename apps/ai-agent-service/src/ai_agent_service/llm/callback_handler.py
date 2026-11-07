@@ -56,6 +56,17 @@ def extract_usage(message: BaseMessage) -> tuple[int, int]:
     return _from_response_metadata(message.response_metadata or {})
 
 
+def cached_tokens(response: LLMResult) -> int:
+    """The input tokens the provider read from its prompt cache, when it reports them."""
+    for generations in response.generations:
+        for generation in generations:
+            meta = getattr(getattr(generation, "message", None), "usage_metadata", None) or {}
+            cached = (meta.get("input_token_details") or {}).get("cache_read")
+            if cached:
+                return int(cached)
+    return 0
+
+
 def error_usage(error: BaseException) -> tuple[int, int] | None:
     """OpenAI truncation includes billed usage even though structured parsing failed."""
     usage = getattr(getattr(error, "completion", None), "usage", None)
@@ -115,7 +126,7 @@ class TokenTrackingCallback(BaseCallbackHandler):
         input_tokens, output_tokens = self._tokens_from(response)
         if input_tokens or output_tokens:
             self.rate_limiter.record_request(input_tokens, output_tokens)
-            token_ledger.record(self.agent_name, input_tokens, output_tokens)
+            token_ledger.record(self.agent_name, input_tokens, output_tokens, cached_tokens(response))
 
     @staticmethod
     def _tokens_from(response: LLMResult) -> tuple[int, int]:

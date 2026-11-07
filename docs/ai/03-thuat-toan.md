@@ -123,6 +123,24 @@ flowchart TD
 - **Khi khách nhắc mức cũ:** mục changelog của đoạn bị lọc đi cùng kết quả, nên agent nói được mức đã đổi từ ngày nào.
 - **Khi không có ngày:** không lọc gì; đường gọi của agent luôn có ngày cuộc gọi.
 
+### FAQ theo sản phẩm và theo đợt
+Mục FAQ của nhóm nằm ở `data/kb/v<N>.jsonl` (sau khi người duyệt) hoặc bảng `kb_chunks` (mục demo qua `kb_upsert`). Ngoài các trường thường có, một mục có thể ghi:
+
+| Trường | Nghĩa |
+|---|---|
+| `applies_to` | Mục nói về gì, viết như `promotions.json`: `SKU-AP-X`, `category:gia-dung`, `*` |
+| `campaign` | Mã trong `promotions.json`, hoặc tên đợt tự đặt |
+| `valid_from`, `valid_to` | Ngày hiệu lực. Bỏ trống thì lấy từ khuyến mãi của `campaign`; đợt tự đặt bắt buộc có `valid_to` |
+
+```json
+{"chunk_id": "FAQ-T-001", "source": "faq", "title": "Đợt 11/11 có áp dụng cùng ưu đãi khác không?", "text": "...", "campaign": "<mã trong promotions.json>"}
+```
+
+- **Tự hết hạn:** qua `valid_to`, mục bị bộ lọc hiệu lực loại, không cần xóa.
+- **Theo sản phẩm:** khi cuộc gọi đã tra sản phẩm, mục khớp sản phẩm được ưu tiên và mục cho sản phẩm khác bị bỏ. Chưa tra sản phẩm nào thì mục được tìm theo lời khách như thường.
+- **Chỗ đọc riêng:** model đọc 3 đoạn tài liệu mỗi lượt; một mục theo đợt khớp sản phẩm được đọc thêm nếu chưa nằm trong 3 đoạn đó, tối đa 1 mục.
+- **Không chứa con số:** cổng duyệt cấm số tiền, mã khuyến mãi và tồn kho trong câu trả lời. Mục giải thích điều kiện, còn giá và ưu đãi lấy từ tool.
+
 ### Quyết định từ chối
 
 | Lý do | Điều kiện |

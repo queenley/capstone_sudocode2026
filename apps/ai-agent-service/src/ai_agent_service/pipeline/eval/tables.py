@@ -147,6 +147,10 @@ def performance_table(runs: Mapping[str, Path]) -> str:
             return f"${spent['cost_usd'][model]:.5f}" if model else f"{spent[field]:g}"
         return read
 
+    def cached(one: Mapping[str, Any]) -> str:
+        share = (one["tokens_per_turn"] or {}).get("cached_share")
+        return "chưa đo" if share is None else f"{share:g}%"
+
     rows = [
         row("Chế độ vận hành", _mode),
         row("Thời gian nạp Call Brief (p95)", lambda one: _stat(one, "call_brief")),
@@ -155,6 +159,7 @@ def performance_table(runs: Mapping[str, Path]) -> str:
         row("Total Latency (p95)", lambda one: _stat(one, "total")),
         row("Số phiên đồng thời (demo)", _held),
         row("Số token mỗi lượt hỏi (TB)", tokens("total")),
+        row("Token đầu vào lấy từ prompt cache", cached),
         *[row(f"Số tiền mỗi lượt hỏi (TB), {model}", tokens("cost_usd", model)) for model in performance.PRICES],
     ]
     return "Chế độ hoạt động & hiệu năng\n\n" + _markdown(("Metrics", *COLUMNS.values()), rows)

@@ -76,6 +76,11 @@ def limiter_stats() -> dict[str, dict[str, Any]]:
         return {name: rl.stats() for name, rl in _LIMITERS.items()}
 
 
+def cache_options(provider: str, agent_name: str) -> dict[str, Any]:
+    """OpenAI sends requests with one key to one cache: one key per agent, as each has its own prompt."""
+    return {"model_kwargs": {"prompt_cache_key": agent_name}} if provider == "openai" and agent_name else {}
+
+
 class LLMFactory:
     """Builds chat models from config blocks."""
 
@@ -137,6 +142,8 @@ class LLMFactory:
 
         if callbacks:
             kwargs["callbacks"] = callbacks
+
+        kwargs.update(cache_options(provider, agent_name))
 
         for name in GENERATION_PARAMS:
             value = config.get(name)

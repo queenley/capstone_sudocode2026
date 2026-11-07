@@ -1,0 +1,55 @@
+{
+  "scenario_id": "SCN-GEN-0014",
+  "call": "call_1",
+  "input_mode": "text",
+  "source_sha256": "80d19326b1f502788cee80fb756ef610b70d2e662238ff7a10f1a6ff2e33570b",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Chị muốn hỏi về đôi giày chạy bộ RunLite 2 Pro size 42 màu đen.",
+      "spoken_text": "chị muốn hỏi về đôi giày chạy bộ runlite hai pro size bốn mươi hai màu đen.",
+      "entities": {
+        "size_new": 42,
+        "color": "den",
+        "sku": "SKU-SN-RUN2"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Chị thấy trên Fanpage ghi giá khoảng 1 triệu 3 trăm hai mươi ngàn.",
+      "spoken_text": "chị thấy trên fanpage ghi giá khoảng một triệu ba trăm hai mươi nghìn.",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Nhưng chị thấy bên chỗ khác bán có 1 triệu 2 bốn ngàn, sao bên mình lại cao hơn vậy?",
+      "spoken_text": "nhưng chị thấy bên chỗ khác bán có một triệu hai bốn ngàn, sao bên mình lại cao hơn vậy?",
+      "entities": {
+        "competitor_price_vnd": 1024000
+      },
+      "reference_source": "rule",
+      "issues": [
+        "entity_not_stated:competitor_price_vnd"
+      ]
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "Có khuyến mãi gì không em? Hay chị phải chờ thêm?",
+      "spoken_text": "có khuyến mãi gì không em? hay chị phải chờ thêm?",
+      "entities": {
+        "blocker": "can suy nghi them"
+      },
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}
