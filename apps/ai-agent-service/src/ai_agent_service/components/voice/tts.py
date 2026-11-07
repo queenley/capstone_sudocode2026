@@ -14,8 +14,9 @@ Engines:
 - ``openai``: OpenAI's speech API (``openai:<voice>``, model ``OPENAI_TTS_MODEL``,
   ``gpt-4o-mini-tts`` unless set) with ``OPENAI_API_KEY``. In the cloud: no
   weights to download, no CPU taken from the recogniser, about a second per
-  sentence, and every sentence requested at once. Paid per character. One
-  chunk per sentence (mp3), as the browser decodes each message whole.
+  sentence, and every sentence requested at once. Paid per character. Asked
+  for pcm, OpenAI's advice for the fastest response, and sent as small wav chunks
+  as it arrives, since the browser decodes each message whole.
 - ``elevenlabs``: ElevenLabs (``ELEVENLABS_API_KEY``, model
   ``ELEVENLABS_TTS_MODEL``, ``eleven_flash_v2_5`` unless set). ``elevenlabs:``
   picks the agent's voice by the caller's region from ``voices.yaml`` (the
@@ -50,6 +51,7 @@ import wave
 from dataclasses import dataclass
 from typing import AsyncIterator
 
+import httpx
 import numpy as np
 
 
@@ -101,6 +103,14 @@ def _openai_instructions() -> str:
     return load_prompt("tts_openai.md")
 
 
+#: OpenAI's pcm: 24 kHz, 16-bit, little-endian (their text-to-speech guide).
+OPENAI_PCM_RATE = 24_000
+#: How long a connection stays open between turns.
+KEEP_ALIVE_SECONDS = 120
+#: A quarter of a second: small enough to start at once and to pass the gateway's frame limit.
+PCM_CHUNK_BYTES = OPENAI_PCM_RATE // 2
+
+
 class OpenAIVoice:
     """OpenAI's speech API: one request per sentence, all sentences at once."""
 
@@ -119,27 +129,34 @@ class OpenAIVoice:
 
             from ...config.config_manager import require_api_key
 
-            cls._client = AsyncOpenAI(api_key=require_api_key("openai"), timeout=20.0, max_retries=1)
+            # A call's turns are further apart than the client's default 5 s of keep-alive.
+            http = httpx.AsyncClient(limits=httpx.Limits(keepalive_expiry=KEEP_ALIVE_SECONDS), timeout=20.0)
+            cls._client = AsyncOpenAI(api_key=require_api_key("openai"), timeout=20.0, max_retries=1, http_client=http)
         return cls._client
 
     async def warm(self) -> None:
-        """Nothing to load: only check that the key is there, so a call does not find out."""
-        self._api()
+        """Open the connection before the first sentence needs it; listing models costs nothing."""
+        await self._api().models.list()
 
     async def stream(self, text: str) -> AsyncIterator[Speech]:
         started = time.perf_counter()
         first: float | None = None
-        chunks: list[bytes] = []
+        held = bytearray()
         # Only the gpt-4o voices follow instructions; tts-1 ignores them.
         extra = {"instructions": _openai_instructions()} if self.model.startswith("gpt-4o") else {}
         async with self._api().audio.speech.with_streaming_response.create(
-            model=self.model, voice=self.voice, input=text, response_format="mp3", **extra,
+            model=self.model, voice=self.voice, input=text, response_format="pcm", **extra,
         ) as response:
             async for chunk in response.iter_bytes():
                 if first is None:
                     first = time.perf_counter() - started
-                chunks.append(chunk)
-        yield Speech(b"".join(chunks), "audio/mpeg", time.perf_counter() - started, first)
+                held += chunk
+                if len(held) >= PCM_CHUNK_BYTES:
+                    size = len(held) - len(held) % 2  # a sample is never cut in two
+                    yield _pcm_speech(bytes(held[:size]), started, first)
+                    del held[:size]
+        if len(held) >= 2:
+            yield _pcm_speech(bytes(held[:len(held) - len(held) % 2]), started, first)
 
 
 REGIONS = ("bac", "trung", "nam")
@@ -301,6 +318,12 @@ class VieNeuVoice:
             # its current chunk and quit instead of voicing the whole sentence.
             stop.set()
             await worker
+
+
+def _pcm_speech(pcm: bytes, started: float, first: float | None) -> Speech:
+    audio = np.frombuffer(pcm, dtype="<i2").astype(np.float32) / 32768
+    return Speech(_wav(audio, OPENAI_PCM_RATE), "audio/wav", time.perf_counter() - started, first,
+                  len(audio) / OPENAI_PCM_RATE)
 
 
 def _wav(audio: np.ndarray, rate: int) -> bytes:

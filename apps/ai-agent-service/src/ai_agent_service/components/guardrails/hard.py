@@ -10,13 +10,13 @@ sentence means:
 | human | no claim to be a person |
 | tier | below VERIFIED, no order code and no price the brief holds that a tool of the turn did not give |
 | promotion | a promotion not yet started is never named (KM-02), read from the catalogue of promotions |
-| money | every amount, in digits or in words (read by the ITN the customer's words go through), must come from a valid source: this turn's tool results, today's quotes earlier in the call, the organisers' policy passages read this turn, a quantity times a unit price, the difference of two amounts of one object, the customer's own words, or a price the brief holds |
+| money | every amount, in digits or in words (read by the ITN the customer's words go through), must come from a valid source: this call's tool results, today's quotes earlier in the call, the system's basket total, the organisers' policy passages read this turn, a quantity times a unit price, the difference of two amounts of one object, the customer's own words, or a price the brief holds |
 | days, weeks, months | a number of them must come from a tool result, a passage of the turn, the customer's words or the brief's warnings |
 
 These two compare a number with data; they do not read what a sentence means.
 
 What a sentence means (a price stated as the shop's, a stock, an order's
-state, a promise) is not read here: it is the PolicyAgent's, on Jev. Every
+state, a promise) is not read here: it is the PolicyAgent's. Every
 reason is returned, not just the first, so one regeneration can fix them all.
 The same check runs on one sentence of a streamed reply.
 """
@@ -71,6 +71,12 @@ class GuardInput:
     tokens: frozenset[str] = field(default_factory=frozenset)
     #: Today's price per product from every quote earlier in this call.
     quotes: Mapping[str, int] = field(default_factory=dict)
+    #: Numbers in what quotes and orders returned in earlier turns: a refund told again is still sourced.
+    earlier_numbers: frozenset[int] = field(default_factory=frozenset)
+    #: Numbers in every result of earlier turns, a search's warranty months included: what a duration may repeat.
+    earlier_counts: frozenset[int] = field(default_factory=frozenset)
+    #: The total the system added up for the basket the customer is choosing.
+    basket_total: int | None = None
     #: The brief's freshness warnings: what has ended or run out, stated by ``refresh``.
     warnings: tuple[str, ...] = ()
     #: Every promotion the shop runs, code to ``(start, end)``, and the day of the call (KM-02).
@@ -114,7 +120,9 @@ def allowed_amounts(view: GuardInput) -> set[int]:
     The customer's amounts are not here: :func:`_money` lets them through, and
     the PolicyAgent judges whether a sentence passes one off as the shop's.
     """
-    tools: set[int] = set(view.quotes.values())
+    tools: set[int] = set(view.quotes.values()) | {n for n in view.earlier_numbers if n >= 1_000}
+    if view.basket_total:
+        tools.add(view.basket_total)
     groups: list[set[int]] = []
     for result in view.tool_results:
         tools |= numbers_in(result.get("result"))
@@ -152,7 +160,7 @@ def amount_groups(value: Any) -> list[set[int]]:
 
 def allowed_counts(view: GuardInput) -> set[int]:
     """Numbers a duration may state: from the tools, the passages, the customer."""
-    found: set[int] = set()
+    found: set[int] = set(view.earlier_counts)
     for result in view.tool_results:
         found |= numbers_in(result.get("result"))
     for text in (*view.customer_said, *view.policy_texts, *view.warnings):
@@ -188,11 +196,11 @@ def check(view: GuardInput) -> Verdict:
 
 
 def _money(text: str, view: GuardInput) -> list[str]:
-    """An amount with no source. Whether a sourced amount is stated rightly is a reading of meaning, Jev's."""
+    """An amount with no source. Whether a sourced amount is stated rightly is a reading of meaning, the PolicyAgent's."""
     allowed = allowed_amounts(view) | set(view.brief_prices) | {COD_LIMIT_VND}
     allowed |= {value for said in view.customer_said for value in amounts(said)}
-    return [f"Số tiền {format_vnd(value)} không có trong kết quả tool của lượt này hay tài liệu chính sách; "
-            "gọi tool để lấy số đúng hoặc bỏ con số."
+    return [f"Số tiền {format_vnd(value)} không có trong kết quả tool của cuộc gọi hay tài liệu chính sách; "
+            "không tự tính, dùng đúng số đã có hoặc bỏ con số."
             for value in amounts(text) if value not in allowed]
 
 
@@ -203,7 +211,7 @@ def _durations(text: str, view: GuardInput) -> list[str]:
         stated = [int(match.group(1))] + ([int(match.group(2))] if match.group(2) else [])
         if not all(n in allowed for n in stated):
             reasons.append(
-                f"Thời hạn \"{match.group(0).strip()}\" không có trong kết quả tool hay tài liệu của lượt này; "
+                f"Thời hạn \"{match.group(0).strip()}\" không có trong kết quả tool của cuộc gọi hay tài liệu; "
                 "lấy từ delivery_estimate, catalog_search hoặc tài liệu, hoặc bỏ con số."
             )
     return reasons

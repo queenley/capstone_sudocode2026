@@ -22,7 +22,7 @@ from ..intake.text import plain
 TTL_SECONDS = 300
 #: What a customer agreed to and the model need not write again: filled in by code when it left them out.
 FILLED = ("promo_code", "address", "payment", "qty", "basket_skus", "order_group")
-#: Only when Jev gave no answer (*intents* ``purchase``): a short yes right after the exact read-back.
+#: Only when the PolicyAgent gave no answer (*intents* ``purchase``): a short yes right after the exact read-back.
 YES = re.compile(
     r"(?:da )?(?:(?:vang|da|u|uh|co|dong y|xac nhan|ok|oke|dung roi)(?: a| nhe| nha)?|"
     r"(?:dong y |xac nhan )?(?:dat(?: hang| may| don)?|chot(?: don)?|len don|mua)"
@@ -73,21 +73,30 @@ def _owner(context: Any) -> str:
     return hashlib.sha256(_json([context.customer_id, context.customer_phone]).encode()).hexdigest()
 
 
-def draft(args: Mapping[str, Any], context: Any) -> dict[str, Any]:
+def draft(args: Mapping[str, Any], context: Any, *, names: Mapping[str, str] | None = None,
+          quotes: Mapping[str, int] | None = None) -> dict[str, Any]:
+    """The order to read back, as it is said aloud: names and amounts, never a product code."""
     order = payload(args)
+    known = {**{p.get("sku"): p.get("name") for p in context.seen_products if p.get("name")}, **(names or {})}
     address = context.vault.put("ADDR", order["address"]) if order["address"] else "chưa cung cấp địa chỉ"
-    product = next((p.get("name") for p in context.seen_products if p.get("sku") == order["sku"] and p.get("name")), None)
-    label = f"{product} ({order['sku']})" if product else order["sku"]
+    label = known.get(order["sku"]) or "đã chọn"
+    promo = f", mã khuyến mãi: {order['promo_code']}" if order["promo_code"] else ""
     payment = {"COD": "trả tiền khi nhận hàng", "bank": "chuyển khoản"}.get(order["payment"], order["payment"])
     question = (f"Anh/chị xác nhận đặt {order['qty']} sản phẩm {label}, đơn giá {format_vnd(order['price_vnd'])}, "
-                f"tổng {format_vnd(order['price_vnd'] * order['qty'])}, thanh toán {payment}, "
-                f"mã khuyến mãi: {order['promo_code'] or 'không dùng mã riêng'}, địa chỉ giao hàng: {address}, đồng ý không ạ?")
+                f"tổng {format_vnd(order['price_vnd'] * order['qty'])}, thanh toán {payment}{promo}, "
+                f"địa chỉ giao hàng: {address}, đồng ý không ạ?")
     read_back = (f"Dạ em đọc lại đơn: {order['qty']} sản phẩm {label}, đơn giá {format_vnd(order['price_vnd'])}, "
-                 f"tổng {format_vnd(order['price_vnd'] * order['qty'])}, thanh toán {payment}, "
-                 f"mã khuyến mãi: {order['promo_code'] or 'không dùng mã riêng'}, địa chỉ giao hàng: {address}.")
-    if order.get('basket_skus') or order.get('order_group'):
-        details = ', '.join(str(x) for x in order.get('basket_skus', [])) or 'không có'
-        question = f"Sản phẩm cùng giỏ: {details}; nhóm đơn: {order.get('order_group') or 'chung'}. " + question
+                 f"tổng {format_vnd(order['price_vnd'] * order['qty'])}, thanh toán {payment}{promo}, "
+                 f"địa chỉ giao hàng: {address}.")
+    basket = [sku for sku in order.get("basket_skus") or [] if sku != order["sku"]]
+    others = [known[sku] for sku in basket if known.get(sku)]
+    if others:
+        prices = [(quotes or {}).get(sku) for sku in basket]
+        whole = "" if None in prices else f", tổng cả giỏ {format_vnd(order['price_vnd'] * order['qty'] + sum(prices))}"
+        question = f"Đơn này đi cùng {', '.join(others)}{whole}. " + question
+        read_back = f"Đơn này đi cùng {', '.join(others)}{whole}. " + read_back
+    if order.get("order_group"):
+        question = f"Đây là đơn {order['order_group']} của phần tách đơn. " + question
     return {"draft_id": uuid4().hex, "call_id": context.call_id, "channel": context.channel,
             "owner": _owner(context), "issued_turn_id": context.turn_id, "action_type": "order_create",
             "target_id": order["sku"], "payload_hash": fingerprint(order), "expires_at": now() + TTL_SECONDS,
@@ -107,7 +116,7 @@ def still_open(pending: Mapping[str, Any] | None, *, call_id: str, channel: str,
 
 def answer(pending: Mapping[str, Any] | None, *, call_id: str, channel: str, turn_id: str,
            said: str, last_reply: str | None) -> dict[str, Any] | None:
-    """The fallback when Jev gave no answer: a short yes to a read-back the customer just heard, nothing else."""
+    """The fallback when the PolicyAgent gave no answer: a short yes to a read-back the customer just heard, nothing else."""
     opened = still_open(pending, call_id=call_id, channel=channel, turn_id=turn_id)
     if (opened is None or not last_reply or not last_reply.endswith(opened.get("question") or "\0")
             or not YES.fullmatch(plain(said).strip())):

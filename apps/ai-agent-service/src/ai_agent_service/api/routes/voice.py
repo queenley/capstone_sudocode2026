@@ -49,6 +49,7 @@ import logging
 import os
 import time
 import uuid
+from types import SimpleNamespace
 from typing import Any
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
@@ -139,11 +140,17 @@ async def voice_call(ws: WebSocket, conversation_id: str) -> None:
         await session.close()
 
 
+#: Measuring only: a turn may arrive as text, with the speech and its recognition taken as done.
+BENCH = os.environ.get("VOICE_BENCH") == "1"
+
+
 def valid_control(message: Any) -> bool:
     if not isinstance(message, dict):
         return False
     if message.get("type") == "hangup":
         return True
+    if message.get("type") == "bench_text":
+        return BENCH and isinstance(message.get("text"), str) and bool(message["text"].strip())
     if message.get("type") == "capture_settings":
         return message.get("profile") in {"standard", "barge-in"}
     if (message.get("type") not in {"playback_started", "playback_chunk", "playback_ended", "playback_stopped"}
@@ -187,6 +194,8 @@ class Session:
         self.timings: dict[str, dict[str, Any]] = {}
         self.spoken: dict[str, list[str]] = {}
         self.chunks: dict[str, list[dict[str, Any]]] = {}
+        #: The sentences of a turn being spoken while the harness is still working.
+        self.streams: dict[str, asyncio.Queue[Any]] = {}
         self.cancelled: set[str] = set()
         self.thinking: set[str] = set()
         #: Turns whose answer is being synthesised or played.
@@ -335,6 +344,13 @@ class Session:
 
     async def control(self, message: dict[str, Any]) -> str | None:
         kind = message.get("type")
+        if kind == "bench_text":
+            now = time.perf_counter()
+            self.recognition_generation += 1
+            event = SimpleNamespace(audio=b"", speech_end=now, decided=now, reason="bench")
+            self.spawn(self.turn(event, busy=self.busy(), generation=self.recognition_generation,
+                                 pause_generation=self.pause_generation, typed=message["text"]))
+            return None
         if kind == "capture_settings":
             self.capture_profile = message["profile"]
             self.capture_settings = {key: message[key] for key in ("echoCancellation", "noiseSuppression", "autoGainControl")
@@ -399,14 +415,15 @@ class Session:
         outcome = await self._take(turn_id, None, self.timings[turn_id]["origin"])
         await self._answer(turn_id, outcome)
 
-    async def turn(self, event: Any, *, busy: bool, generation: int, pause_generation: int) -> None:
+    async def turn(self, event: Any, *, busy: bool, generation: int, pause_generation: int,
+                   typed: str | None = None) -> None:
         from ...components.voice import asr
 
         echo_text = self.echo_window(event.speech_end - len(event.audio) / 16000, event.speech_end)
         capture = {"profile": self.capture_profile, **self.capture_settings}
         self.asr_pending += 1
         try:
-            heard = await asyncio.wait_for(
+            heard = asr.Transcript("bench", typed, 0.0, 0.0) if typed else await asyncio.wait_for(
                 asyncio.to_thread(asr.transcribe, self.settings.asr, event.audio, self.lexicon.hotwords),
                 timeout=asr.TIMEOUT,
             )
@@ -454,19 +471,24 @@ class Session:
                          "corrections": applied, "asr_ms": int(heard.seconds * 1000),
                          "audio_seconds": round(heard.audio_seconds, 2), "endpointing": event.reason,
                          "removed_words": decision.removed_words, "policy_version": POLICY_VERSION})
-        outcome = await self._take(turn_id, text, timing["asr_done"])
+        outcome = await self._take(turn_id, text, timing["asr_done"], emit=self._sink(turn_id))
         self.thinking.discard(turn_id)
         if outcome.kind == "message" and self.row.get("conversation_id"):
             await platform.append_messages(self.ws.app, str(self.row["conversation_id"]), customer=text,
                                            assistant=outcome.content)
         if turn_id in self.cancelled:
             timing["superseded"] = True
+            stream = self.streams.pop(turn_id, None)
+            if stream is not None:
+                stream.put_nowait(None)
+                self.speaking.discard(turn_id)
+                await self.send({"type": "stop", "turn": turn_id})
             await harness.keep_heard(self.call_id, turn_id, "")
             await self.send({"type": "reply", "turn": turn_id, "text": outcome.content, "superseded": True})
             return
         await self._answer(turn_id, outcome)
 
-    async def _take(self, turn_id: str, text: str | None, arrived: float) -> harness.Outcome:
+    async def _take(self, turn_id: str, text: str | None, arrived: float, *, emit: Any = None) -> harness.Outcome:
         """One turn through the harness, one at a time, under the call's lease."""
         async with self.turn_lock:
             for _ in range(20):
@@ -476,14 +498,14 @@ class Session:
             else:
                 return harness.Outcome("error", turn_id, error="another turn holds the call")
             try:
-                return await harness.run_turn(self.row, content=text, turn_id=turn_id, arrived=arrived,
+                return await harness.run_turn(self.row, content=text, turn_id=turn_id, arrived=arrived, emit=emit,
                                               user_id=self.user_id, input_mode="asr_transcript" if text else None)
             finally:
                 await calls.release_lease(self.call_id)
 
     async def _answer(self, turn_id: str, outcome: harness.Outcome) -> None:
         timing = self.timings[turn_id]
-        timing["agent_done"] = time.perf_counter()
+        timing.setdefault("agent_done", time.perf_counter())
         timing["latency"] = outcome.latency
         if outcome.kind == "waiting":
             await self.send({"type": "reply", "turn": turn_id, "text": None, "waiting": True})
@@ -493,6 +515,10 @@ class Session:
         await self.send({"type": "reply", "turn": turn_id, "text": text, "meta": outcome.meta,
                          "error": outcome.error})
         await self._choose_voice(outcome)
+        stream = self.streams.pop(turn_id, None)
+        if stream is not None:
+            stream.put_nowait(None)  # it spoke as it was written: what is left is to end it
+            return
         self.speaking.add(turn_id)
         await self.speak(turn_id, text or FALLBACK)
 
@@ -517,47 +543,94 @@ class Session:
             logger.info("Call %s: voice %s for region %s", self.call_id, voice_id, region or "default")
 
     async def speak(self, turn_id: str, text: str) -> None:
+        """A whole answer, for a turn that was not spoken as it was written."""
         from ...components.voice import tts
 
-        parts = tts.sentences(text)
-        self.spoken[turn_id] = parts
-        self.chunks[turn_id] = []
+        queue: asyncio.Queue[Any] = asyncio.Queue()
+        for part in tts.sentences(text):
+            queue.put_nowait(("sentence", part))
+        queue.put_nowait(None)
+        await self._speak_stream(turn_id, queue)
+
+    def _sink(self, turn_id: str) -> Any:
+        """What the harness says goes to the voice at once: the caller hears the first sentence before the turn ends."""
+        from ...components.voice import tts
+
+        async def sink(kind: str, text: str) -> None:
+            if turn_id in self.cancelled or not text.strip() or kind not in ("sentence", "filler"):
+                return
+            queue = self.streams.get(turn_id)
+            if queue is None:
+                queue = self.streams[turn_id] = asyncio.Queue()
+                self.speaking.add(turn_id)
+                self.spawn(self._speak_stream(turn_id, queue))
+            if kind == "filler":
+                if os.environ.get("VOICE_FILLER", "0") == "1":
+                    queue.put_nowait(("filler", text))
+                return
+            self.timings[turn_id].setdefault("agent_done", time.perf_counter())
+            for part in tts.sentences(text):
+                queue.put_nowait(("sentence", part))
+        return sink
+
+    async def _speak_stream(self, turn_id: str, queue: "asyncio.Queue[Any]") -> None:
+        """Sentences off *queue* in order, each chunk as it exists; None ends it.
+
+        A network voice starts on a sentence the moment it arrives, a CPU voice when its turn comes. A filler is
+        heard but is not the answer: it is not in what the caller heard of it, and TTFA does not stop on it.
+        """
+        spoken = self.spoken.setdefault(turn_id, [])
+        chunks = self.chunks.setdefault(turn_id, [])
         timing = self.timings[turn_id]
-        offsets = [0.0] * len(parts)
+        order: asyncio.Queue[Any] = asyncio.Queue()
+        pumps: list[asyncio.Task[None]] = []
+
+        async def pump(text: str, out: "asyncio.Queue[Any]") -> None:
+            try:
+                async for speech in self.voice.stream(text):
+                    out.put_nowait(speech)
+            finally:
+                out.put_nowait(None)
+
+        async def feed() -> None:
+            while (item := await queue.get()) is not None:
+                out: asyncio.Queue[Any] = asyncio.Queue()
+                if self.voice.parallel:
+                    pumps.append(asyncio.create_task(pump(item[1], out)))
+                order.put_nowait((*item, out))
+            order.put_nowait(None)
+
+        feeder = asyncio.create_task(feed())
         seq = 0
-        async for index, speech in self._synthesise(parts):
-            if turn_id in self.cancelled:
-                break
-            self.chunks[turn_id].append({"sentence": index, "offset": offsets[index], "duration": speech.duration})
-            offsets[index] += speech.duration or 0.0
-            await self.send({"type": "audio", "turn": turn_id, "seq": seq, "sentence": index, "mime": speech.mime,
-                             "data": base64.b64encode(speech.audio).decode("ascii")})
-            if seq == 0:
-                timing["first_audio"] = time.perf_counter()
-                await self._record(turn_id)
-            seq += 1
-        if turn_id not in self.cancelled:
-            await self.send({"type": "audio_end", "turn": turn_id, "last_seq": seq - 1})
-
-    async def _synthesise(self, parts: list[str]):
-        """(sentence index, chunk) in playback order: a network voice asks for
-        every sentence at once, a CPU voice streams one after another."""
-        if not self.voice.parallel:
-            for index, part in enumerate(parts):
-                async for speech in self.voice.stream(part):
-                    yield index, speech
-            return
-
-        async def collect(part: str) -> list[Any]:
-            return [speech async for speech in self.voice.stream(part)]
-
-        jobs = [asyncio.create_task(collect(part)) for part in parts]
         try:
-            for index, job in enumerate(jobs):
-                for speech in await job:
-                    yield index, speech
+            while (entry := await order.get()) is not None:
+                kind, text, out = entry
+                index = -1
+                if kind == "sentence":
+                    spoken.append(text)
+                    index = len(spoken) - 1
+                if not self.voice.parallel:
+                    pumps.append(asyncio.create_task(pump(text, out)))
+                offset = 0.0
+                while (speech := await out.get()) is not None:
+                    if turn_id in self.cancelled:
+                        return
+                    chunks.append({"sentence": index, "offset": offset, "duration": speech.duration})
+                    offset += speech.duration or 0.0
+                    await self.send({"type": "audio", "turn": turn_id, "seq": seq, "sentence": index, "mime": speech.mime,
+                                     "data": base64.b64encode(speech.audio).decode("ascii")})
+                    if kind == "filler":
+                        timing.setdefault("filler_audio", time.perf_counter())
+                    elif "first_audio" not in timing:
+                        timing["first_audio"] = time.perf_counter()
+                        await self._record(turn_id)
+                        await self.metrics(turn_id)
+                    seq += 1
+            if turn_id not in self.cancelled:
+                await self.send({"type": "audio_end", "turn": turn_id, "last_seq": seq - 1})
         finally:
-            for job in jobs:
+            feeder.cancel()
+            for job in pumps:
                 job.cancel()
 
     async def _record(self, turn_id: str) -> None:
@@ -566,7 +639,7 @@ class Session:
         figures = _figures(timing)
         if timing.get("kind") == "turn" and figures.get("ttfa_ms") is not None:
             await harness.record_ttfa(self.call_id, turn_id, figures["ttfa_ms"], {
-                k: figures[k] for k in ("endpoint_ms", "asr_ms", "agent_ms", "tts_first_ms") if figures.get(k) is not None
+                k: figures[k] for k in ("endpoint_ms", "asr_ms", "agent_ms", "tts_first_ms", "ttfa_without_asr_ms", "filler_ms") if figures.get(k) is not None
             } | {"asr_model": self.settings.asr, "endpointing": self.settings.endpointing, "tts": self.settings.tts,
                  "capture": timing.get("capture"), "voice_policy_version": POLICY_VERSION})
 
@@ -680,6 +753,10 @@ def _figures(t: dict[str, Any]) -> dict[str, Any]:
         "agent_ms": ms("asr_done", "agent_done"),
         "tts_first_ms": ms("agent_done", "first_audio"),
         "ttfa_ms": ms("speech_end", "first_audio"),
+        # The same, without recognition: the organisers' guide excludes ASR only for offline files, so both are kept.
+        "ttfa_without_asr_ms": (lambda a, b: a - b if a is not None and b is not None else None)(
+            ms("speech_end", "first_audio"), ms("turn_end", "asr_done")),
+        "filler_ms": ms("speech_end", "filler_audio"),
         "ttfa_client_ms": ms("speech_end", "play_start"),
         "ttft_ms": latency.get("ttft_ms"),
         "reason": t.get("reason"),

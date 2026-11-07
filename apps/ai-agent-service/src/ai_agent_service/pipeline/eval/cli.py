@@ -288,7 +288,7 @@ async def _evaluate_locked(args, **kwargs) -> int:
 
 
 async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, database: str) -> int:
-    from ...llm import jev
+    from ...llm import decisions
     from ...mcp import client as mcp_client
     from . import report, runner, scenarios, trace
 
@@ -363,7 +363,7 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
         try:
             await mcp_client.close_all()
         finally:
-            await jev.close()
+            await decisions.close()
 
     trace.write_jsonl(layout.side("diagnostics.jsonl"), [d for run in runs.values() for d in run.diagnostics])
     trace.write_jsonl(layout.side("scenario-errors.jsonl"),

@@ -9,7 +9,7 @@ a tool error with the reason, and nothing happens in the business.
 | ``order.create`` | a phone to order for; the tier allows it; the product code is trusted (it came from a tool this call or from the brief, never made up from a name); the unit price equals today's ``pricing.get_quote`` for that code; COD total at most 10.000.000đ; not the same product as an order this call already created, unless the customer wants one more (*intents* ``one_more``, read by Jev; the word list :data:`ONE_MORE` only when Jev gave no answer) |
 | ``order.update`` | the order is one this customer has, or one a tool showed this call; the new variant is trusted; not the same change as one this call already made, in any turn (a second exchange is charged, DT-03); the customer asked for this change or agreed to it (*intents* ``change``, read by Jev: a complaint alone, "size M hơi chật", is not a choice yet). An order this call created may be corrected by its caller whatever the tier |
 | ``schedule.callback`` | an ISO 8601 time with +07:00, inside working hours (LN-01, LN-02) and not in the past; otherwise the nearest working slot, for the model to propose |
-| ``handoff.transfer`` | the advisor decides; outside lane HANDOFF Jev checks the transfer is warranted (*intents* ``handoff``: a request for a person, medical or legal advice, a serious complaint, a question the documents and tools do not answer); no answer from Jev leaves the advisor's decision standing. The brief validates against ``schemas/handoff_brief.schema.json`` itself (required fields, enums, phone pattern, summary length), after the harness filled in what it knows |
+| ``handoff.transfer`` | the advisor decides; outside lane HANDOFF the PolicyAgent checks the transfer is warranted (*intents* ``handoff``: a request for a person, medical or legal advice, a serious complaint, a question the documents and tools do not answer); no answer from Jev leaves the advisor's decision standing. The brief validates against ``schemas/handoff_brief.schema.json`` itself (required fields, enums, phone pattern, summary length), after the harness filled in what it knows |
 | ``memory.request_deletion`` | VERIFIED, and the customer agreed when asked to confirm (QT-06): *intents* ``delete``, read by Jev; the word lists only when Jev gave no answer |
 | any write tool in copilot mode | refused: the consultant acts, the advisor only suggests (section 4.6) |
 
@@ -38,14 +38,14 @@ COD_LIMIT_VND = 10_000_000
 
 UPDATE_ACTIONS = frozenset({"exchange_size", "exchange_product", "return", "update_address"})
 
-#: The fallback when Jev gives no answer (*intents* ``one_more``). The customer asks for one more of
+#: The fallback when the PolicyAgent gives no answer (*intents* ``one_more``). The customer asks for one more of
 #: what was ordered, on the plain (unaccented) text: a second
 #: order of the same product is theirs to ask for, never the agent's way of adding an address.
 ONE_MORE = re.compile(
     r"\b(mua them|dat them|lay them|them (?:mot|1|hai|2|ba|3) (?:cai|chiec|bo|don)|them (?:cai|chiec|don)|"
     r"(?:mot|1|hai|2) (?:cai|chiec|don) nua|cai nua|chiec nua|don (?:khac|moi|thu hai|nua))\b")
 
-#: The fallback when Jev gives no answer (*intents* ``delete``): the agent asked to confirm a deletion;
+#: The fallback when the PolicyAgent gives no answer (*intents* ``delete``): the agent asked to confirm a deletion;
 #: the customer agreed (QT-06).
 ASKED_TO_DELETE = re.compile(r"\bxoa\b.*\?|\bxac nhan\b.*\bxoa\b")
 AGREED = re.compile(r"\b(dong y|dung roi|dung vay|xoa di|xoa giup|xoa het|ok|oke|vang|da|u|uh|co)\b")
@@ -80,7 +80,7 @@ def check(
     *trusted* is every product code this call has seen from a tool or the
     brief; None skips that check (a caller without the call's history).
     *intents* is what the customer means, where an action depends on it,
-    read by the PolicyAgent on Jev (``handoff``, ``delete``, ``one_more``):
+    read by the PolicyAgent (``handoff``, ``delete``, ``one_more``):
     True, False, or None when it gave no answer (a word list decides then,
     or, for a transfer, the advisor's decision stands).
     *created* is the orders this call created, ``{order_id, sku}``: the
@@ -142,7 +142,8 @@ def placed_lines(results: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
     return list(lines.values())
 
 
-def _cod_order(args: Mapping[str, Any], line: int, placed: Sequence[Mapping[str, Any]], said: str) -> list[str]:
+def _cod_order(args: Mapping[str, Any], line: int, placed: Sequence[Mapping[str, Any]], said: str,
+               quotes: Mapping[str, int] | None = None) -> list[str]:
     """VC-03 on the whole order: the COD lines of this call in the same ``order_group`` with this one.
 
     QT-01: an order above the limit may be split, if the customer agrees; the
@@ -156,6 +157,9 @@ def _cod_order(args: Mapping[str, Any], line: int, placed: Sequence[Mapping[str,
         return []
     same = [p for p in placed if p.get("order_group") == group and p.get("payment") == "COD"]
     total = line + sum(int(p["price_vnd"]) * int(p["qty"]) for p in same)
+    if group is None:  # the rest of the basket this order goes with, not yet placed
+        done = {p.get("sku") for p in same} | {args.get("sku")}
+        total += sum(int((quotes or {}).get(sku) or 0) for sku in args.get("basket_skus") or [] if sku not in done)
     if total <= COD_LIMIT_VND:
         return []
     with_placed = f" (gồm {len(same)} món đã đặt trong cuộc gọi)" if same else ""
@@ -199,7 +203,7 @@ def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes
     if not isinstance(quantity, int) or isinstance(quantity, bool) or quantity < 1:
         return reasons + ["Số lượng phải là số nguyên dương."]
     qty = quantity
-    return reasons + _cod_order(args, int(price) * qty, placed, said)
+    return reasons + _cod_order(args, int(price) * qty, placed, said, quotes)
 
 
 def _order_update(args: Mapping[str, Any], *, orders: frozenset[str], trusted: frozenset[str] | None,

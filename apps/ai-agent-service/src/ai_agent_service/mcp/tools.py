@@ -41,10 +41,13 @@ import json
 import logging
 import re
 import time
-from typing import Any, Iterable, Mapping
+import uuid
+from typing import Any, Iterable, Mapping, Sequence
 
 from langchain.agents.middleware import AgentMiddleware
-from langchain_core.messages import ToolMessage
+from langchain.agents.middleware.types import ToolCallRequest
+from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+from langchain_core.utils.function_calling import convert_to_openai_tool
 from ..components.intake import pii
 from ..components.guardrails import purchase
 from ..components.intake.text import plain
@@ -81,6 +84,124 @@ def _tool_name(tool: Any) -> str | None:
     if isinstance(tool, dict):
         return tool.get("name") or (tool.get("function") or {}).get("name")
     return None
+
+
+#: Arguments the harness fills in (:meth:`ToolGuardMiddleware._with_context`): the model is never asked for them.
+SYSTEM_ARGS = frozenset({"on", "customer_phone", "customer_id", "account_id", "call_id", "turn_id",
+                         "purchase_authorization", IDEMPOTENCY_ARG})
+
+#: ``handoff_transfer`` takes the brief as an open object, since the harness adds to it; the model writes these.
+MODEL_ARGS = {
+    "handoff_transfer": {
+        "brief": {
+            "type": "object",
+            "description": "What the person taking the call needs. The system fills in the customer and the product.",
+            "properties": {
+                "escalation_reason": {"type": "string", "enum": [
+                    "cau_hoi_y_te", "ngoai_pham_vi_tai_lieu", "khach_yeu_cau_gap_nguoi", "khieu_nai_nghiem_trong",
+                    "loi_he_thong", "khach_mat_kien_nhan", "khac"]},
+                "escalation_reason_detail": {"type": "string"},
+                "conversation_summary": {"type": "string", "description": "Two to five sentences."},
+                "open_questions": {"type": "array", "items": {"type": "string"},
+                                   "description": "The questions not yet answered."},
+                "next_action": {"type": "string", "description": "What the person should do first."},
+            },
+            "required": ["escalation_reason", "escalation_reason_detail", "conversation_summary", "open_questions",
+                         "next_action"],
+        },
+    },
+}
+
+
+def _strict_value(schema: Mapping[str, Any]) -> dict[str, Any]:
+    """A value's schema as strict mode takes it: no defaults, and every object closed with all fields required."""
+    value = {k: v for k, v in schema.items() if k not in ("default", "title")}
+    if value.get("type") == "object":
+        return _strict_object(value)
+    if isinstance(value.get("items"), Mapping):
+        value["items"] = _strict_value(value["items"])
+    if isinstance(value.get("anyOf"), list):
+        value["anyOf"] = [_strict_value(option) for option in value["anyOf"]]
+    return value
+
+
+def _nullable(schema: dict[str, Any]) -> dict[str, Any]:
+    """An optional field as strict mode says it: required, and null when there is nothing to say."""
+    if any(option.get("type") == "null" for option in schema.get("anyOf") or []):
+        return schema
+    description = {k: schema[k] for k in ("description",) if k in schema}
+    return {"anyOf": [{k: v for k, v in schema.items() if k != "description"}, {"type": "null"}], **description}
+
+
+def _strict_object(schema: Mapping[str, Any]) -> dict[str, Any]:
+    required = set(schema.get("required") or [])
+    properties = {name: (_strict_value(spec) if name in required else _nullable(_strict_value(spec)))
+                  for name, spec in (schema.get("properties") or {}).items()}
+    return {**{k: v for k, v in schema.items() if k not in ("default", "title")}, "type": "object",
+            "properties": properties, "required": list(properties), "additionalProperties": False}
+
+
+def strict_tool(tool: Any) -> dict[str, Any]:
+    """*tool* as the model is offered it: only what it should write, under strict mode (OpenAI's recommendation)."""
+    formatted = convert_to_openai_tool(tool)
+    function = formatted["function"]
+    name = function["name"]
+    parameters = dict(function.get("parameters") or {"type": "object", "properties": {}})
+    shown = {key: spec for key, spec in (parameters.get("properties") or {}).items() if key not in SYSTEM_ARGS}
+    shown.update(MODEL_ARGS.get(name) or {})
+    required = [key for key in parameters.get("required") or [] if key in shown]
+    function = {**function, "parameters": _strict_object({**parameters, "properties": shown, "required": required}),
+                "strict": True}
+    return {"type": "function", "function": function}
+
+
+class StrictToolsMiddleware(AgentMiddleware):
+    """Offers tools under strict mode. Execution is unchanged: the harness still sees and fills every argument."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._shown: dict[str, dict[str, Any]] = {}
+
+    def _strict(self, request: Any) -> Any:
+        tools = []
+        for tool in request.tools:
+            name = _tool_name(tool)
+            if isinstance(tool, dict) or name is None:
+                tools.append(tool)
+                continue
+            if name not in self._shown:
+                self._shown[name] = strict_tool(tool)
+            tools.append(self._shown[name])
+        return request.override(tools=tools)
+
+    def wrap_model_call(self, request: Any, handler: Any) -> Any:
+        return handler(self._strict(request))
+
+    async def awrap_model_call(self, request: Any, handler: Any) -> Any:
+        return await handler(self._strict(request))
+
+
+def other_products_only(args: Mapping[str, Any]) -> dict[str, Any]:
+    """A basket holds the *other* products: naming the one quoted, at one unit, would read as a second unit of it
+    and bring a promotion on a second item the customer is not buying."""
+    fixed = dict(args)
+    basket = fixed.get("basket_skus")
+    if basket and int(fixed.get("qty") or 1) == 1:
+        others = [sku for sku in basket if sku != fixed.get("sku")]
+        if others:
+            fixed["basket_skus"] = others
+        else:
+            fixed.pop("basket_skus")
+    return fixed
+
+
+def without_nulls(request: Any) -> Any:
+    """Strict mode writes null for an optional field: to a tool that is the same as leaving it out."""
+    call = request.tool_call
+    args = call.get("args")
+    if not isinstance(args, Mapping) or all(value is not None for value in args.values()):
+        return request
+    return request.override(tool_call={**call, "args": {k: v for k, v in args.items() if v is not None}})
 
 
 class LaneToolsMiddleware(AgentMiddleware):
@@ -257,6 +378,7 @@ class ToolGuardMiddleware(AgentMiddleware):
         name = request.tool_call["name"]
         args = dict(request.tool_call.get("args") or {})
         args.pop(IDEMPOTENCY_ARG, None)  # the harness's to set, never the model's
+        args = other_products_only(args)
         if name in WRITE_TOOLS:
             args = {**declared_defaults(accepted, exclude=(IDEMPOTENCY_ARG,)), **args}
         on = getattr(context, "on", None)
@@ -316,6 +438,69 @@ class ToolGuardMiddleware(AgentMiddleware):
             tool_call_id=call["id"],
             name=call["name"],
         )
+
+
+#: Marks the tool calls the harness made itself, so they do not count as a model call.
+CHAINED = "chained"
+SEARCH, QUOTE, STOCK = "catalog_search", "pricing_get_quote", "inventory_check"
+
+
+def chained_lookups(messages: Sequence[Any]) -> list[dict[str, Any]]:
+    """The price and stock calls a search that found one product leads to, unless this run already made them.
+
+    A quote needs the code a search returns, so it takes a model round of its own; these are one call each and
+    take milliseconds. Run only once a round of tools has finished, so calls and their results stay in order.
+    """
+    results: list[ToolMessage] = []
+    for message in reversed(messages):
+        if not isinstance(message, ToolMessage):
+            break
+        results.append(message)
+    skus = []
+    for result in reversed(results):
+        data = ((parse_envelope(result.content) or {}).get("data") or {}) if result.name == SEARCH else {}
+        items = data.get("items") or []
+        if len(items) == 1 and isinstance(items[0].get("sku"), str) and not items[0].get("successor_sku"):
+            skus.append(items[0]["sku"])
+    if not skus:
+        return []
+    done: set[tuple[str, str]] = set()
+    for message in reversed(messages):
+        if isinstance(message, HumanMessage):
+            break
+        for call in getattr(message, "tool_calls", None) or []:
+            done.add((call["name"], str((call.get("args") or {}).get("sku"))))
+    calls = []
+    for sku in dict.fromkeys(skus):
+        for name, args in ((QUOTE, {"sku": sku, "qty": 1}), (STOCK, {"sku": sku})):
+            if (name, sku) not in done:
+                calls.append({"name": name, "args": args, "id": f"chain-{uuid.uuid4().hex[:12]}", "type": "tool_call"})
+    return calls
+
+
+class ChainLookupMiddleware(AgentMiddleware):
+    """Saves the model round between a search and its price: the model then reads real results of real tools."""
+
+    def __init__(self, tools: Iterable[Any], guard: ToolGuardMiddleware) -> None:
+        super().__init__()
+        self._tools = {tool.name: tool for tool in tools}
+        self._guard = guard
+
+    async def abefore_model(self, state: Any, runtime: Any) -> dict[str, Any] | None:
+        if QUOTE not in self._tools or STOCK not in self._tools:
+            return None
+        calls = chained_lookups(state.get("messages") or [])
+        if not calls:
+            return None
+
+        async def run(request: Any) -> Any:
+            return await request.tool.ainvoke(request.tool_call)
+
+        results = await asyncio.gather(*(
+            self._guard.awrap_tool_call(ToolCallRequest(tool_call=call, tool=self._tools[call["name"]], state=state,
+                                                        runtime=runtime), run)
+            for call in calls))
+        return {"messages": [AIMessage(content="", tool_calls=calls, additional_kwargs={CHAINED: True}), *results]}
 
 
 ADDRESS_TOKEN = re.compile(r"<ADDR_\d+>")

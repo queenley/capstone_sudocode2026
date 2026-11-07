@@ -10,7 +10,7 @@ and without diacritics, so "khong", "ko" and "không" are one word.
 A word list only adds a note the advisor reads. Nothing here allows or
 refuses an action: whether the customer wants a person, agreed to a
 deletion or wants one more order is read in context by the PolicyAgent on
-Jev (``agents/policy.py``, ``INTENTS``). Word lists made those decisions
+the PolicyAgent (``agents/policy.py``, ``INTENTS``). Word lists made those decisions
 until 2026-11-01 and got them wrong both ways (a request for a person not
 heard, a product question taken for a medical one).
 """

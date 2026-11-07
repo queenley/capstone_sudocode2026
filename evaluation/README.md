@@ -56,7 +56,7 @@ Dùng `--out` mới hoặc thư mục rỗng; CLI không ghi đè bằng chứng
 
 Scenario được kiểm trước khi gọi model và snapshot từ nội dung đã nạp, cả `--config`. Database có advisory lock cho toàn bộ run, chặn hai runner reset lẫn nhau; output được giữ chỗ độc quyền. Trước extractor/scorer phải đủ đúng từng scenario/call/turn, đúng config và lời khách, không trùng hoặc trộn run. Trace được lưu sau mỗi scenario để giữ replies nếu bước sau lỗi. Relabel chỉ sửa lỗi extractor trên replies đầy đủ; lỗi seed, graph hoặc after-call vẫn chặn chấm.
 
-Extractor hiện là `product-extractor-v8`: thêm kiểm tra schema cache và ghi file tạm riêng khi chạy đồng thời. Prompt/phép chiếu nhãn giữ nguyên từ v7 nhưng instrument hash đổi; muốn so với v7 phải relabel cùng replies. Cache JSON có thể mất hit khi nhiều process ghi snapshot, làm tăng số cache miss trong cap; không làm file cache bị ghi dở.
+Extractor hiện là `product-extractor-v9`: thêm kiểm tra schema cache và ghi file tạm riêng khi chạy đồng thời. Prompt/phép chiếu nhãn giữ nguyên từ v7 nhưng instrument hash đổi; muốn so với v7 phải relabel cùng replies. Cache JSON có thể mất hit khi nhiều process ghi snapshot, làm tăng số cache miss trong cap; không làm file cache bị ghi dở.
 
 ## Quy tắc
 

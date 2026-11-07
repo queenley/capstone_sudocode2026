@@ -103,12 +103,15 @@ def _parse(value: Any, schema: type[T]) -> tuple[T, bool]:
 class StructuredOutput(Generic[T]):
     """*llm* answering in *schema*: parsed, repaired when it can be, asked again when it cannot."""
 
-    def __init__(self, llm: Any, schema: type[T], *, attempts: int = 3, length_hint: str = LENGTH_HINT) -> None:
+    def __init__(self, llm: Any, schema: type[T], *, attempts: int = 3, length_hint: str = LENGTH_HINT,
+                 strict: bool = False) -> None:
         self.schema = schema
         self.attempts = max(1, attempts)
         self.length_hint = length_hint
+        # Strict mode makes the provider hold the answer to the schema; only OpenAI's client takes it.
+        options = {"strict": True} if strict and getattr(llm, "_llm_type", "") == "openai-chat" else {}
         # SDK-side Pydantic validators can raise before raw output/usage reaches us.
-        self._runnable = llm.with_structured_output(schema.model_json_schema(), include_raw=True)
+        self._runnable = llm.with_structured_output(schema.model_json_schema(), include_raw=True, **options)
 
     async def ainvoke(self, request: Request) -> T:
         return (await self.arun(request))[0]

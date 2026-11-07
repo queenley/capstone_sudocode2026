@@ -51,6 +51,11 @@ class SentenceSplitter:
             break
         return [s.strip() for s in sentences if s.strip()]
 
+    @property
+    def holding(self) -> bool:
+        """Whether part of a sentence is waiting for the rest."""
+        return bool(self._buffer.strip())
+
     def flush(self) -> str | None:
         """What is left when the stream ends: the last sentence, if any."""
         rest, self._buffer = self._buffer.strip(), ""

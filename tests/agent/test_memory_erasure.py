@@ -59,7 +59,7 @@ async def test_eval_stops_before_another_turn_or_after_call_after_invocation_err
 async def test_eval_cli_saves_failed_trace_without_labelling_or_starting_baseline(monkeypatch, tmp_path):
     from ai_agent_service.pipeline.eval import cli, runner, scenarios, report
     from ai_agent_service.mcp import client
-    from ai_agent_service.llm import jev
+    from ai_agent_service.llm import decisions
     args = cli.parser().parse_args(['--scenarios', str(tmp_path), '--warmup', '0'])
     import json
     for sid in ('SYNTHETIC-1', 'SYNTHETIC-2'):
@@ -73,7 +73,7 @@ async def test_eval_cli_saves_failed_trace_without_labelling_or_starting_baselin
     monkeypatch.setattr(cli, '_label', AsyncMock())
     monkeypatch.setattr(report, 'manifest', lambda **kwargs: {})
     monkeypatch.setattr(client, 'close_all', AsyncMock())
-    monkeypatch.setattr(jev, 'close', AsyncMock())
+    monkeypatch.setattr(decisions, 'close', AsyncMock())
     layout = cli.Layout(tmp_path, {'full': tmp_path/'full.jsonl', 'baseline_no_memory': tmp_path/'baseline.jsonl'})
     assert await cli._evaluate(args, run_id='synthetic', layout=layout, database='synthetic_eval') == 1
     runner.run_scenario.assert_awaited_once()
