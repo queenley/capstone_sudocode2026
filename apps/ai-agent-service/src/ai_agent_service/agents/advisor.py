@@ -132,7 +132,7 @@ class AgentContext:
     #: This turn, for the idempotency key of a write tool (section 6.1).
     turn_id: str | None = None
     #: The turn's passages from the knowledge base, already filtered by the
-    #: harness: a restricted one carries no text, a superseded one its dates.
+    #: harness: a restricted one carries no text, one not in force never arrives.
     knowledge: tuple[Mapping[str, Any], ...] = ()
     #: What the search found when no passage is shown: that none was relevant.
     knowledge_note: str | None = None
@@ -304,18 +304,20 @@ def _state_block(context: AgentContext) -> str:
 
 
 def shown_passages(knowledge: Sequence[Mapping[str, Any]]) -> tuple[list[Mapping[str, Any]], list[Mapping[str, Any]]]:
-    """What the model reads of a turn's passages: the first three from the documents, and the playbook entries.
+    """What the model reads of a turn's passages: the first three from the documents, what explains a withheld
+    passage (it takes no place of those three), and the playbook entries.
 
     The guard checks a reply against these and no others: a number from a
     passage the model never saw cannot be a number it read (section 4.5).
     """
-    policy = [p for p in knowledge if p.get("source") != "playbook"][:KNOWLEDGE_SHOWN]
+    documents = [p for p in knowledge if p.get("source") != "playbook" and not p.get("explains")]
+    policy = [*documents[:KNOWLEDGE_SHOWN], *(p for p in knowledge if p.get("explains"))]
     playbook = [p for p in knowledge if p.get("source") == "playbook"]
     return policy, playbook
 
 
 def _knowledge_block(heading: str, passages: Sequence[Mapping[str, Any]]) -> str:
-    """Passages as the model reads them: a restricted one as a refusal, a superseded one with its dates."""
+    """Passages as the model reads them: a restricted one as a refusal."""
     if not passages:
         return ""
     lines = []
@@ -325,8 +327,7 @@ def _knowledge_block(heading: str, passages: Sequence[Mapping[str, Any]]) -> str
         if passage.get("restricted"):
             lines.append(passage.get("instruction") or f"Đoạn [{code}] là thông tin nội bộ: không đọc, không trích.")
             continue
-        validity = f" (đoạn này {passage['validity']})" if passage.get("superseded") and passage.get("validity") else ""
-        lines.append(f"[{code}] {title}{validity}: {str(passage.get('text') or '').strip()}")
+        lines.append(f"[{code}] {title}: {str(passage.get('text') or '').strip()}")
     return f"{heading}:\n" + "\n".join(lines)
 
 

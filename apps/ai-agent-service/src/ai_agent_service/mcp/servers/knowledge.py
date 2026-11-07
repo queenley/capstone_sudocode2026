@@ -177,8 +177,6 @@ def hit_view(hit: Hit, *, reveal: bool) -> dict[str, Any]:
         "title": chunk.title,
         "text": None if chunk.restricted and not reveal else chunk.text,
         "restricted": chunk.restricted,
-        "superseded": hit.superseded,
-        "validity": hit.validity,
         "instruction": hit.instruction,
         "redirect": hit.redirect,
         "changelog": list(chunk.changelog),
@@ -202,6 +200,9 @@ def result_view(result: Result, *, reveal: bool, threshold: float) -> dict[str, 
         "abstain": result.abstain,
         "reason": result.reason,
         "changelog": [{"chunk_id": c.chunk_id, "title": c.title, "text": c.text} for c in result.changelog.values()],
+        "withheld": list(result.withheld),
+        "explains": list(result.explains),
+        "version_differs": list(result.version_differs),
     }
 
 
@@ -212,13 +213,14 @@ async def kb_search(
     on: str | None = None,
     order_date: str | None = None,
     situation: str | None = None,
+    other_order_dates: list[str] | None = None,
 ) -> dict[str, Any]:
     """Search the shop's policies, FAQ and playbook for what applies to a question.
 
-    Returns the best passages with their scores and flags (restricted,
-    superseded and since when, an absence), whether the documents do not
-    cover the question (``abstain`` and why), and the changelog entries the
-    passages cite.
+    Returns the best passages in force with their scores and flags (restricted,
+    an absence), whether the documents do not cover the question (``abstain``
+    and why), the changelog entries the passages cite, the ids withheld as not
+    in force, and any other order on which a passage would not hold.
 
     Args:
         query: The customer's question in their own words.
@@ -226,11 +228,13 @@ async def kb_search(
         on: The day of the call, YYYY-MM-DD: which version of a policy is in force.
         order_date: When the question is about an order already placed, the day it was placed; it decides the version instead (CL-01).
         situation: The call's situation, to prefer the playbook entry written for it.
+        other_order_dates: The customer's other order days, when the question names no order.
     """
     if not query.strip():
         raise ToolFailure("BAD_REQUEST", "An empty query has no passages")
     kb = await base()
-    result = kb.search(query, k=max(1, min(k, MAX_K)), on=on, order_date=order_date, situation=situation)
+    result = kb.search(query, k=max(1, min(k, MAX_K)), on=on, order_date=order_date, situation=situation,
+                       other_order_dates=other_order_dates or ())
     settings = kb.settings
     threshold = settings.abstain_cosine if kb.mode == "hybrid" else settings.abstain_coverage
     return result_view(result, reveal=current_role() == "admin", threshold=threshold)

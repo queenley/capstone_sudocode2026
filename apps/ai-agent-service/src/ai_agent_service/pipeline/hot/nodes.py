@@ -29,6 +29,7 @@ from ...components.guardrails.hard import MAX_SENTENCES, ORDER_SUMMARY, GuardInp
 from ...components.guardrails.stream import SentenceSplitter
 from ...components.identity import resolver
 from ...components.intake import honorific, itn, lexicon, pii, signals, text as intake_text
+from ...components.knowledge.search import stated_order_day
 from ...components.memory import brief as briefs
 from ...components.memory import recall
 from ...components.memory.brief import BriefLine
@@ -149,23 +150,33 @@ async def _knowledge(state: dict[str, Any], context: HotContext, said: str) -> d
     """``kb.search`` on the customer's words: the passages, and whether the documents cover them."""
     if context.harness is None or not said.strip():
         return None
-    order_date = _order_date(state, said)
-    found = await context.harness.data("kb_search", query=said, k=5, on=state["on"], order_date=order_date)
+    order_date, other_orders = _order_days(state, said)
+    found = await context.harness.data("kb_search", query=said, k=5, on=state["on"], order_date=order_date,
+                                       other_order_dates=list(other_orders))
     if not found:
         return None
     return {key: found.get(key) for key in ("hits", "top_score", "threshold", "abstain", "reason", "mode",
-                                            "changelog", "version")} | {"order_date": order_date}
+                                            "changelog", "version", "withheld", "explains", "version_differs")} | {
+                                                "order_date": order_date}
 
 
-def _order_date(state: dict[str, Any], said: str) -> str | None:
-    """The day the order a question is about was placed, when it is about one this customer has."""
+def _order_days(state: dict[str, Any], said: str) -> tuple[str | None, tuple[str, ...]]:
+    """The day of the order a question is about, and when it names none, this customer's other order days."""
     orders = [o for o in (state.get("brief") or {}).get("orders") or [] if o.get("order_id")]
-    if not orders or not (signals.ORDER_TALK.search(intake_text.plain(said)) or "OD" in said):
-        return None
     named = next((o for o in orders if o["order_id"] in said), None)
-    chosen = named or max(orders, key=lambda o: str(o.get("date") or o.get("created_at") or ""))
-    day = str(chosen.get("date") or chosen.get("created_at") or "")[:10]
-    return day or None
+    if named is not None:
+        return _order_day(named) or None, ()
+    stated = stated_order_day(said, state.get("on"))
+    if stated:
+        return stated, ()
+    if not orders or not (signals.ORDER_TALK.search(intake_text.plain(said)) or "OD" in said):
+        return None, ()
+    days = sorted({_order_day(order) for order in orders} - {""})
+    return (days[-1], tuple(days[:-1])) if days else (None, ())
+
+
+def _order_day(order: Mapping[str, Any]) -> str:
+    return str(order.get("date") or order.get("created_at") or "")[:10]
 
 
 async def _identify(state: HotState, context: HotContext) -> dict[str, Any]:
@@ -1161,12 +1172,16 @@ NOTHING_RELEVANT = "Tài liệu: không có đoạn nào đủ liên quan tới 
 def _passages(state: HotState) -> tuple[dict[str, Any], ...]:
     """The passages the advisor reads this turn: none when the best one is under θ, as nothing is relevant then.
 
-    An internal passage reaches it as the instruction it stands for, never its text.
+    An internal passage reaches it as the instruction it stands for, never its text. A passage not in force
+    never does, but the changelog entry that replaced it comes along, or a customer quoting the old rule
+    would hear a different number with no reason for it.
     """
     found = state.get("knowledge") or {}
     if not found.get("hits") or found.get("reason") == "no_match":
         return ()
-    return tuple(found["hits"])
+    explains = set(found.get("explains") or ())
+    return (*(hit for hit in found["hits"] if hit.get("chunk_id") not in explains),
+            *({**entry, "explains": True} for entry in found.get("changelog") or () if entry.get("chunk_id") in explains))
 
 
 #: The knowledge search found the documents do not answer the turn (nothing relevant, or a passage
@@ -1179,6 +1194,11 @@ NO_ANSWER = ("Tài liệu không trả lời câu khách vừa hỏi. Nếu tool
              "này để nhân viên trả lời khách.")
 
 
+#: When the customer's orders fall under different versions of a policy and the question names none.
+ORDER_VERSION = ("Đoạn trên đúng cho đơn mới nhất của khách; đơn đặt ngày {days} theo bản chính sách khác. Khách "
+                 "chưa nói đơn nào thì hỏi đơn nào trước khi nêu thời hạn hay mức phí.")
+
+
 def _knowledge_note(state: HotState) -> str | None:
     """What the search says when the documents have no answer: a fact of the retrieval, not of the words."""
     found = state.get("knowledge") or {}
@@ -1188,6 +1208,8 @@ def _knowledge_note(state: HotState) -> str | None:
         return f"{NOTHING_RELEVANT} {NO_ANSWER}"
     if found.get("abstain") and found.get("reason") == "absence":
         return NO_ANSWER
+    if found.get("version_differs"):
+        return ORDER_VERSION.format(days=", ".join(found["version_differs"]))
     return None
 
 

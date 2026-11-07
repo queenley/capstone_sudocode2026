@@ -23,6 +23,17 @@ Loại: ... · Trạng thái: ... · Chỉ số: TSR / CCR / RQR / HR / latency 
 
 Sáu mục đầu được ghi lại sau khi làm, từ đợt sửa ngày 05-06/11/2026. Chưa mục nào có số đo trên agent thật.
 
+### 2026-11-07 · Lọc chính sách không còn hiệu lực trước khi lấy top k
+
+Loại: knowledge, prompt · Trạng thái: đang đo · Chỉ số: RAG, version accuracy, TSR
+
+- **Vấn đề:** đoạn hết hiệu lực vẫn vào top 5 và text của nó vẫn tới model, chỉ kèm câu dặn đừng nhắc lại. Ngày đặt khách tự nói không được dùng. Khách có đơn ở hai bản chính sách bị lấy đơn mới nhất mà không hỏi. `NQ-*` ghi không dùng để tư vấn khách vẫn đọc được. Mục changelog được tính nhưng chưa tới model.
+- **Bằng chứng:** `rag/qa_labeled.json`, 9 trên 60 câu trả về đoạn không áp dụng; Q43 không dùng ngày đơn. 20 trên 22 khách có đơn nằm ở cả hai phía 01/10/2026.
+- **Sửa:** `KnowledgeBase.search` lọc theo `in_force` trước khi lấy top k, bỏ `superseded`, `validity`, `counterpart`; `stated_order_day` đọc ngày đặt từ lời khách, dùng cho cả hot path và `rag.py`; `version_differs` thêm ghi chú để agent hỏi đơn nào; `_passages` gửi kèm mục changelog của đoạn bị lọc, ngoài hạn mức 3 đoạn model đọc (`shown_passages`); tiêu đề tài liệu quyết định `restricted` và ngày hết hiệu lực; sửa luật 3 trong `rules.md`.
+- **Đã kiểm:** `tests/agent/test_knowledge_in_force.py`; bộ `tests/agent` không có lỗi mới so với trước.
+- **Số đo:** RAG 60 câu, hybrid, trước và sau như nhau: Recall@3 91,5, Recall@5 93,2, abstain không trả lời được 75, abstain restricted 60, false abstain 0. Keyword cũng không đổi. Câu có đoạn không áp dụng: 9 xuống 0, Q43 là câu duy nhất lấy bản cũ và đúng. Tác động lên TSR, RQR chưa đo vì chưa chạy agent.
+- **Còn lại:** chạy nhóm kịch bản đổi trả để xem câu hỏi "đơn nào" có làm tăng RQR không. Với đơn cũ, DT-06 và DT-07 không có bản cũ tương ứng nên không còn được đọc. Khách hỏi về ghi âm cuộc gọi giờ nhận câu thông tin nội bộ vì NQ-03 bị chặn. Mục FAQ do nhóm thêm chưa được đối chiếu tự động với chính sách.
+
 ### 2026-11-07 · `run_all --output`
 
 Loại: tính năng · Trạng thái: xong · Chỉ số: không áp dụng

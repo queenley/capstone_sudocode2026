@@ -79,7 +79,7 @@ Ba việc, chạy ở lượt đầu, khi có khóa mới, hoặc khi khách tr�
    - `retrieve`: đọc fact, 3 phiên gần nhất, đơn hàng. Đây là **công tắc bộ nhớ**: tắt thì không đọc gì (cấu hình baseline).
    - `refresh`: hỏi lại tool xem những gì brief nhắc còn đúng không: giá hôm nay, khuyến mãi, tồn kho, trạng thái đơn. Cái gì đổi thì thành **cảnh báo**, ví dụ "giá đã tăng từ 4.890.000đ lên 5.200.000đ vì KM hết hạn".
    - `render`: dựng brief theo template (không để model viết tự do), đánh số dòng `B1..Bn`, mỗi dòng gắn với fact gốc. Thời gian dựng được đo làm `call_brief_latency_ms`.
-3. **Tra tri thức** bằng lời khách (`kb_search`): 5 đoạn chính sách liên quan nhất, kèm cờ "nội bộ", "hết hiệu lực" và quyết định có nên **từ chối** không. Nếu câu hỏi về một đơn đã đặt, chính sách được chọn theo **ngày đặt đơn**, không theo hôm nay. Chi tiết thuật toán: [Thuật toán §3.3](03-thuat-toan.md#33-truy-hồi-tri-thức-bm25--embedding--rrf).
+3. **Tra tri thức** bằng lời khách (`kb_search`): 5 đoạn chính sách **còn hiệu lực** liên quan nhất, kèm cờ "nội bộ" và quyết định có nên **từ chối** không. Nếu câu hỏi về một đơn đã đặt, chính sách được chọn theo **ngày đặt đơn**, không theo hôm nay. Chi tiết thuật toán: [Thuật toán §3.3](03-thuat-toan.md#33-truy-hồi-tri-thức-bm25--embedding--rrf).
 
 > Tri thức không phải là tool của model. Harness tra trước rồi đưa đoạn văn vào prompt, nhờ vậy tiết kiệm một vòng gọi model cho mỗi câu hỏi chính sách.
 

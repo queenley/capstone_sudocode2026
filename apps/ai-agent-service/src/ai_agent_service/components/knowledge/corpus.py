@@ -22,7 +22,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any, Iterable, Literal, Mapping
 
@@ -33,9 +33,11 @@ SECTION = re.compile(r"^## \[([A-Z]+(?:-[A-Z]+)?-\d+)\]\s*(.*)$", re.MULTILINE)
 TITLE = re.compile(r"^# (.+)$", re.MULTILINE)
 
 #: Section 7.2: restricted chunk by chunk, not only document by document. A
-#: document marked internal is restricted whole; KM-06 sits in a public
-#: document but holds the price floor percentages.
-INTERNAL_MARK = "NỘI BỘ"
+#: document whose title marks it internal or for staff only is restricted
+#: whole; KM-06 sits in a public document but holds the price floor percentages.
+INTERNAL_MARKS = ("NỘI BỘ", "không dùng để tư vấn khách")
+#: A retired document says so in its title, so a new one needs no row in :data:`CHANGELOG` to stop being read.
+RETIRED = re.compile(r"HẾT HIỆU LỰC từ (\d{2})/(\d{2})/(\d{4})")
 RESTRICTED_SECTIONS = frozenset({"KM-06"})
 
 #: Restricted chunks whose one usable fact reaches the customer through a tool
@@ -144,7 +146,8 @@ def policy_chunks(folder: Path) -> list[Chunk]:
         body = path.read_text(encoding="utf-8")
         heading = TITLE.search(body)
         doc_title = heading.group(1).strip() if heading else path.stem
-        internal = INTERNAL_MARK in doc_title
+        internal = any(mark in doc_title for mark in INTERNAL_MARKS)
+        retired = _retired(doc_title)
         sections = list(SECTION.finditer(body))
         for index, match in enumerate(sections):
             end = sections[index + 1].start() if index + 1 < len(sections) else len(body)
@@ -158,11 +161,20 @@ def policy_chunks(folder: Path) -> list[Chunk]:
                 text=body[match.end():end].strip(),
                 restricted=internal or chunk_id in RESTRICTED_SECTIONS,
                 valid_from=window.valid_from,
-                valid_to=window.valid_to,
+                valid_to=window.valid_to or retired,
                 changelog=tuple(dict.fromkeys(g.entry for g in CHANGELOG if g.covers(chunk_id))),
                 industry=_industry(chunk_id),
             ))
     return chunks
+
+
+def _retired(doc_title: str) -> str | None:
+    """The last day a document's title leaves it in force, if it says it was retired."""
+    match = RETIRED.search(doc_title)
+    if match is None:
+        return None
+    day, month, year = (int(part) for part in match.groups())
+    return (date(year, month, day) - timedelta(days=1)).isoformat()
 
 
 def _window(chunk_id: str) -> Governs:

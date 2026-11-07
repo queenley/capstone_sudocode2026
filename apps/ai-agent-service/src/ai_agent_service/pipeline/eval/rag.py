@@ -35,7 +35,7 @@ from types import ModuleType
 from typing import Any, Sequence
 
 from ...components import knowledge
-from ...components.knowledge.search import KnowledgeBase, Result
+from ...components.knowledge.search import KnowledgeBase, Result, stated_order_day
 from ...config.config_manager import btc_data_dir
 from ...mcp.servers import btc
 
@@ -63,7 +63,7 @@ def held_out(index: int) -> bool:
 def answer_of(kb: KnowledgeBase, query: str, result: Result) -> str:
     if result.abstain:
         return RESTRICTED_LINE if result.reason == "restricted" else ABSTAIN_LINE
-    allowed = [hit for hit in result.hits if not hit.chunk.restricted and not hit.superseded]
+    allowed = [hit for hit in result.hits if not hit.chunk.restricted]
     return kb.sentence_for(query, allowed[0].chunk) if allowed else ABSTAIN_LINE
 
 
@@ -73,7 +73,7 @@ def run(kb: KnowledgeBase, qa: Sequence[dict[str, Any]], *, on: str) -> tuple[di
     rows: list[dict[str, Any]] = []
     for index, question in enumerate(sorted(qa, key=lambda q: q["qid"])):
         text = question["question"]
-        result = kb.search(text, on=on)
+        result = kb.search(text, on=on, order_date=stated_order_day(text, on))
         retrieved = [hit.chunk.chunk_id for hit in result.hits]
         results[question["qid"]] = {"retrieved_chunk_ids": retrieved, "abstained": result.abstain,
                                     "answer": answer_of(kb, text, result)}
