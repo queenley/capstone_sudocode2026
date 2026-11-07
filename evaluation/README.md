@@ -32,6 +32,13 @@ python run_eval.py --scenarios <thư mục> --only <ID> --no-extract
 # Gắn nhãn lại một run cũ bằng extractor hiện tại, KHÔNG chạy lại agent (chỉ tốn lượt gọi extractor)
 python run_eval.py --relabel evaluation/runs/<ngày>-work/<run> --out evaluation/runs/<tên>-relabel
 
+# Rubric judge BTC trên một run đã có (tốn phí judge, không chạy lại agent); hoặc thêm --judge khi chạy
+python run_eval.py --judge-run evaluation/runs/<run> --out evaluation/runs/<run>-judge
+# Bốc ≥20 cặp (cuộc gọi, tiêu chí) thành phiếu chấm tay, không gọi model; người chấm điền sheet.csv
+python run_eval.py --judge-sample evaluation/runs/<run>-judge
+# Độ đồng thuận người–judge: % và Cohen's kappa; kappa < 0,6 thì phân tích lỗi
+python run_eval.py --judge-agreement evaluation/runs/<run>-judge/human-review
+
 # Recall@k của kho tri thức, miễn phí
 python evaluation/rag_offline.py
 

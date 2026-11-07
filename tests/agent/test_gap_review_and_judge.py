@@ -64,16 +64,17 @@ def test_rollback_refuses_corrupt_versions_without_moving_the_live_pointer(knowl
 
 @pytest.mark.asyncio
 async def test_rubric_missing_duplicate_or_invented_evidence_is_incomplete():
-    ids = applicable({}, "call_1")
+    scenario = {"calls": {"call_1": {}}}
+    rows = [{"customer_text": "Số của chị 0900000001", "agent_text": "Dạ em chưa có thông tin.", "tool_calls": []}]
+    ids = applicable(scenario, "call_1", rows)
     good = [Criterion(criterion_id=key, verdict="PASS", evidence="Dạ em chưa có thông tin.") for key in ids]
     writer = SimpleNamespace(ainvoke=AsyncMock(return_value=Judgment(verdicts=good)))
     judge = BtcJudge(SimpleNamespace(with_structured_output=lambda _: writer))
-    rows = [{"customer_text": "Số của chị 0900000001", "agent_text": "Dạ em chưa có thông tin.", "tool_calls": []}]
-    assert (await judge.grade({}, "call_1", rows))["status"] == "COMPLETE"
+    assert (await judge.grade(scenario, "call_1", rows))["status"] == "COMPLETE"
     assert "0900000001" not in writer.ainvoke.await_args.args[0]
     for verdicts in (good[:-1], good + [good[0]], [item.model_copy(update={"evidence": "Invented quote"}) for item in good],
                      [item.model_copy(update={"evidence": "   "}) for item in good]):
         writer.ainvoke.return_value = Judgment(verdicts=verdicts)
-        assert (await judge.grade({}, "call_1", rows))["status"] == "INCOMPLETE"
+        assert (await judge.grade(scenario, "call_1", rows))["status"] == "INCOMPLETE"
     writer.ainvoke.side_effect = RuntimeError("provider failed")
-    assert (await judge.grade({}, "call_1", rows))["status"] == "INCOMPLETE"
+    assert (await judge.grade(scenario, "call_1", rows))["status"] == "INCOMPLETE"

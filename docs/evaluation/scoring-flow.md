@@ -76,6 +76,17 @@ Sản phẩm thêm vài thứ ngoài mock: khóa idempotency cho lệnh ghi, `de
 - CCR: không kiểm nguồn của `facts_used`; định nghĩa của BTC là "slot từ phiên trước được dùng có ý nghĩa".
 - Latency: BTC lấy mọi dòng, nhưng hướng dẫn đo của họ bảo bỏ 3 lượt khởi động và cần ≥ 100 lượt để p95 có ý nghĩa; lệnh chạy bỏ 3 lượt khởi động bằng `--warmup`.
 
+## 5b. Rubric judge và đối chiếu với người
+
+Theo Phụ lục A.3, **mọi số TSR chấm bằng assertion** (`success_if` trong `reference_eval.py`). Rubric judge (`components/evaluation/judge.py`) chỉ để chẩn đoán các tiêu chí không assert được bằng code, không bao giờ đổi số của BTC.
+
+- **Rubric:** dùng nguyên `data/btc/eval/llm_judge_rubric.json`: `judge_prompt_template`, 12 tiêu chí J01–J12, PASS/FAIL kèm một câu trích. Câu trích phải có nguyên văn trong transcript; thiếu, trùng tiêu chí hoặc trích bịa thì cuộc gọi là INCOMPLETE và không được tính.
+- **Judge đọc gì:** đầu kịch bản (persona, `hard_case`, tên, xưng hô, ghi chú), mục tiêu, kênh, fact đã có và kết quả của **các cuộc trước**, spec của cuộc đang chấm, và transcript (lời khách, lời agent, tool). Số điện thoại, địa chỉ được che trước khi gửi model.
+- **Tiêu chí nào áp dụng** (`applicable`): theo `applies_to` của rubric, đọc từ kịch bản (hard case, ground truth, kết quả kỳ vọng) và từ trace (đã gọi `order.create`, `handoff.transfer`, kết quả hết hàng, khách hỏi người hay máy, tổng đơn vượt ngân sách đã nêu). J02, J06, J08 luôn áp dụng.
+- **Kết quả:** `{config}.judge.jsonl` từng cuộc; bảng tỉ lệ PASS theo tiêu chí in ra cuối run (`--judge`) hoặc ghi `judge-table.txt`, `judge-summary.json` (`--judge-run`).
+- **Đối chiếu với người** (`agreement_protocol` của rubric, `pipeline/eval/judge_agreement.py`): `--judge-sample` bốc ngẫu nhiên (hạt giống cố định) ≥20 cặp (cuộc gọi, tiêu chí) của cấu hình `full` thành `sheet.csv` + `calls.md`; phiếu không chứa verdict của judge (nằm riêng trong `judge-key.json`, người chấm không mở). Sau khi chấm, `--judge-agreement` tính % đồng thuận và Cohen's kappa, ghi `agreement.json` kèm danh sách ca lệch. Dưới 20 cặp là `TOO_FEW`; kappa < 0,6 là `UNRELIABLE` và phải phân tích các ca lệch trước khi dùng số của judge.
+- **Thiên lệch cần ghi trong báo cáo:** judge dùng cùng `gpt-4.1-mini` (cấu hình `agents.extractor`) với agent, nên có thể chấm dễ cho chính lời của mô hình đó. Đây là lý do phải có đối chiếu với người.
+
 ## 6. Điểm dễ nhầm
 
 - **Không có bộ mô phỏng khách.** Khách nói đúng `customer_turns` viết sẵn của kịch bản, đúng như BTC chấm. Agent hỏi thừa thì khách vẫn nói câu kế tiếp.
