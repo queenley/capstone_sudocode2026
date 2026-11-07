@@ -39,6 +39,7 @@ from __future__ import annotations
 import json
 import logging
 import time
+from datetime import timedelta
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, AsyncIterator, Awaitable, Callable, Literal, Mapping, Sequence
@@ -54,6 +55,7 @@ from langchain.agents.middleware import (
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, AIMessageChunk, SystemMessage, ToolMessage
 from langchain_core.runnables import RunnableConfig
+from langchain.tools import ToolRuntime, tool
 from langchain_core.tools import BaseTool
 
 from ..components.context.budget import Section, assemble
@@ -66,6 +68,7 @@ from ..config.config_manager import get_lanes, load_prompt, load_prompt_yaml
 from ..llm import tracing
 from ..llm.callback_handler import text_of
 from ..mcp.client import dotted
+from ..components.context import skills as skill_book
 from ..mcp.tools import LaneToolsMiddleware, ToolGuardMiddleware, envelope_of, parse_envelope, order_arguments
 from .base import BaseAgent
 
@@ -160,6 +163,12 @@ class AgentContext:
     #: depends on what the customer means (a transfer, a deletion, one more order).
     recent: tuple[tuple[str, str], ...] = ()
     #: ``PolicyAgent.judge``: what the customer means for one action, None without an answer.
+    #: Why a tool with an effect must wait: the flags of what was just said (``pipeline/hot/review.py``).
+    review_flags: Callable[[], Awaitable[list[str]]] | None = field(default=None, repr=False, compare=False)
+    #: This turn's agreement to an order: the authorized draft, and the read-back still to be said.
+    consent: dict[str, Any] = field(default_factory=dict, repr=False, compare=False)
+    #: The skills loaded for the task on: ``load_skill`` adds to it, the next model call reads it.
+    skills: list[str] = field(default_factory=list, repr=False, compare=False)
     judge: Callable[[str, Mapping[str, Any]], Awaitable[bool | None]] | None = field(default=None, repr=False,
                                                                                        compare=False)
 
@@ -256,6 +265,8 @@ def system_prompt(context: AgentContext, *, max_tokens: int = 3000) -> tuple[str
     policy, playbook = shown_passages(context.knowledge)
     sections = [
         Section("rules", HARD_RULES),
+        Section("today", _today(context)),
+        Section("skills", skill_book.section(context.skills, offered=context.lane in ("CONTINUITY", "NEW"))),
         Section("warnings", "\n".join(f"CẢNH BÁO: {w}" for w in context.warnings)),
         Section("lane", (
             f"Lane: {context.lane}. Mức xác minh danh tính: {context.tier}. Kênh: {context.channel}."
@@ -314,13 +325,25 @@ def _address_note(context: AgentContext) -> str:
             "gộp vào câu hỏi đang cần hỏi: \"Dạ cho em hỏi mình xưng hô là anh hay chị ạ?\"")
 
 
+WEEKDAYS = ("thứ Hai", "thứ Ba", "thứ Tư", "thứ Năm", "thứ Sáu", "thứ Bảy", "Chủ nhật")
+
+
+def _today(context: AgentContext) -> str:
+    """The day of the call, so "mai" or "thứ Ba tuần sau" need no guess."""
+    if context.now is None:
+        return ""
+    now, tomorrow = context.now, context.now + timedelta(days=1)
+    return (f"Hôm nay: {WEEKDAYS[now.weekday()]}, {now:%d/%m/%Y}, {now:%H:%M}. "
+            f"Ngày mai: {WEEKDAYS[tomorrow.weekday()]}, {tomorrow:%d/%m/%Y}.")
+
+
 def _blocked_block(context: AgentContext) -> str:
     """Why the last draft was blocked, and when part of the answer was already said, what to go on from."""
     if not context.block_reasons:
         return ""
     reasons = "; ".join(context.block_reasons)
     if context.already_said:
-        return (f"Khách đã nghe em nói: «{' '.join(context.already_said)}». Câu tiếp theo của em bị chặn vì: {reasons} "
+        return (f"Khách đã nghe em nói: «{' '.join(context.already_said)}». Em dừng lại vì: {reasons} "
                 "Nói tiếp phần còn lại của câu trả lời, không lặp lại phần khách đã nghe; cần tool thì gọi trước khi nói.")
     return f"Câu trả lời trước của em đã bị chặn vì: {reasons} Hãy soạn lại, tránh đúng những điểm đó."
 
@@ -373,7 +396,9 @@ class ContextPromptMiddleware(AgentMiddleware):
         context = getattr(getattr(request, "runtime", None), "context", None)
         if not isinstance(context, AgentContext):
             return request
-        prompt, _ = system_prompt(context)
+        prompt, cut = system_prompt(context)
+        if cut:
+            logger.info("Prompt of call %s turn %s cut: %s", context.call_id, context.turn_id, cut)
         prompt = pii.tokenise(prompt, context.vault)
         if request.state.get("run_model_call_count", 0) >= self.model_limit - 1:
             prompt += ("\nĐây là lượt model cuối: không gọi thêm tool. Trả lời ngắn từ kết quả đã có; "
@@ -382,11 +407,24 @@ class ContextPromptMiddleware(AgentMiddleware):
             return request.override(system_message=SystemMessage(content=prompt), tools=[])
         return request.override(system_message=SystemMessage(content=prompt))
 
+    def _is_last(self, request: ModelRequest) -> bool:
+        return request.state.get("run_model_call_count", 0) >= self.model_limit - 1
+
+    @staticmethod
+    def _answer_only(response: Any) -> Any:
+        """The last call offers no tool; a model that calls one anyway ends the run with what it wrote."""
+        for message in getattr(response, "result", None) or []:
+            if isinstance(message, AIMessage) and message.tool_calls:
+                message.tool_calls = []
+        return response
+
     def wrap_model_call(self, request: ModelRequest, handler: Any) -> Any:
-        return handler(self._with_prompt(request))
+        response = handler(self._with_prompt(request))
+        return self._answer_only(response) if self._is_last(request) else response
 
     async def awrap_model_call(self, request: ModelRequest, handler: Any) -> Any:
-        return await handler(self._with_prompt(request))
+        response = await handler(self._with_prompt(request))
+        return self._answer_only(response) if self._is_last(request) else response
 
 
 class ActionGuardMiddleware(AgentMiddleware):
@@ -395,7 +433,7 @@ class ActionGuardMiddleware(AgentMiddleware):
     async def awrap_tool_call(self, request: Any, handler: Any) -> Any:
         call = request.tool_call
         name = call["name"]
-        if name not in actions.WRITE_TOOLS | actions.SKU_READ_TOOLS | actions.CUSTOMER_READ_TOOLS:
+        if name not in actions.WRITE_TOOLS | actions.CUSTOMER_READ_TOOLS:
             return await handler(request)
         context = getattr(getattr(request, "runtime", None), "context", None)
         if not isinstance(context, AgentContext):
@@ -403,13 +441,22 @@ class ActionGuardMiddleware(AgentMiddleware):
                 "retryable": False, "message": "Missing trusted runtime context."}}),
                 tool_call_id=call["id"], name=name, additional_kwargs={"blocked_by": "guardrail"})
         args = dict(call.get("args") or {})
+        if name in actions.WRITE_TOOLS and context.review_flags is not None:
+            flagged = await context.review_flags()
+            if flagged:
+                envelope = {"ok": False, "error": {"code": "PRECONDITION", "retryable": False, "message":
+                            "Câu vừa nói với khách có lỗi, đính chính trước khi làm: " + " ".join(flagged)}}
+                return ToolMessage(content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=name,
+                                   additional_kwargs={"args": args, "blocked_by": "guardrail"})
         if name == "handoff_transfer":
             args["brief"] = actions.fill_handoff(args.get("brief") or {}, context.handoff_defaults)
         state = getattr(request, "state", None) or {}
         quotes = {**context.quotes, **_quotes_in(state)}
+        if name == "order_create":
+            args = _filled_order(args, context, quotes)
         codes, orders = _seen_in(state, context.tool_results)
         created = (*context.created_orders, *_created_in(state))
-        intents = await _intents(name, args, context, created)
+        intents = await _intents(name, args, context, created, state)
         verdict = actions.check(
             name, args, tier=context.tier, mode=context.mode, has_phone=bool(context.customer_phone),
             quotes=quotes, orders=context.known_orders | orders, trusted=context.trusted_skus | codes | set(quotes),
@@ -422,20 +469,54 @@ class ActionGuardMiddleware(AgentMiddleware):
         )
         if verdict.passed and name == "order_create":
             business_args = order_arguments(args, context)
-            if not purchase.matches(context.pending_purchase, business_args, context):
-                details = {} if purchase.NO.search(plain(context.customer_said or "")) else {
-                    "purchase_draft": purchase.draft(business_args, context)}
-                envelope = {"ok": False, "error": {"code": "CONFIRMATION_REQUIRED", "retryable": False,
-                    "message": "Đọc lại đúng đơn và đợi khách xác nhận trong phiên này trước khi tạo đơn.", "details": details}}
+            record = purchase.draft(business_args, context)
+            pending = context.pending_purchase
+            heard = bool(pending and pending.get("payload_hash") == record["payload_hash"]
+                         and pending.get("owner") == record["owner"])
+            agreed = None
+            if context.judge is not None:
+                agreed = await context.judge("purchase", {
+                    "recent_messages": [{"speaker": who, "text": text[:600]} for who, text in context.recent],
+                    "order": record["read_back"]})
+            if agreed is None:  # no answer from Jev: an order is placed only on a plain yes to what was just read back
+                agreed = heard and purchase.answer(
+                    pending, call_id=context.call_id, channel=context.channel, turn_id=str(context.turn_id),
+                    said=context.customer_said or "", last_reply=context.last_agent_said) is not None
+            if not agreed:
+                # The customer heard this very order and did not agree: answer them, it is not read a second time.
+                message = ("Khách đã nghe đơn này và chưa đồng ý: trả lời điều khách đang nói, không gọi lại order_create."
+                           if heard else "Đọc lại đúng đơn và đợi khách xác nhận trong phiên này trước khi tạo đơn.")
+                envelope = {"ok": False, "error": {"code": "CONFIRMATION_REQUIRED", "retryable": False, "message": message,
+                    "details": {} if heard else {"purchase_draft": record}}}
                 return ToolMessage(content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=name,
                                    additional_kwargs={"args": args, "blocked_by": "guardrail"})
+            context.consent["draft"] = purchase.authorize(record, context.turn_id)
+            if not heard:
+                context.consent["read_back"] = record["read_back"]
         if not verdict.passed:
             envelope = {"ok": False, "error": {"code": "PRECONDITION", "retryable": False, "message": " ".join(verdict.reasons)}}
             return ToolMessage(
                 content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=name,
                 additional_kwargs={"args": args, "blocked_by": "guardrail"},
             )
+        if name == "schedule_callback" and str(args.get("callback_at") or "").endswith("+07:00"):
+            # The shop's clock is Vietnam's; the tool's own answer carries no offset.
+            args["callback_at"] = str(args["callback_at"])[:-6]
         return await handler(request.override(tool_call={**call, "args": args}))
+
+
+def _filled_order(args: Mapping[str, Any], context: AgentContext, quotes: Mapping[str, int]) -> dict[str, Any]:
+    """What code knows of an order, so the model does not have to write it: the price is today's quote,
+    and what it left out of an order the customer already heard read back comes from that read-back."""
+    order = dict(args)
+    pending = context.pending_purchase
+    if pending and pending.get("target_id") == order.get("sku"):
+        for key, value in (pending.get("args") or {}).items():
+            if order.get(key) in (None, "", []):
+                order[key] = value
+    if order.get("sku") in quotes:
+        order["price_vnd"] = quotes[order["sku"]]
+    return order
 
 
 def placed_this_call(context: AgentContext, state: Mapping[str, Any]) -> list[dict[str, Any]]:
@@ -446,8 +527,8 @@ def placed_this_call(context: AgentContext, state: Mapping[str, Any]) -> list[di
     return list(lines.values())
 
 
-async def _intents(name: str, args: Mapping[str, Any], context: AgentContext,
-                   created: Sequence[Mapping[str, Any]]) -> dict[str, bool | None]:
+async def _intents(name: str, args: Mapping[str, Any], context: AgentContext, created: Sequence[Mapping[str, Any]],
+                   state: Mapping[str, Any] | None = None) -> dict[str, bool | None]:
     """What the customer means, for the one action about to run, read by Jev (section 4.4).
 
     Asked only when the action depends on it: a transfer outside lane
@@ -465,7 +546,8 @@ async def _intents(name: str, args: Mapping[str, Any], context: AgentContext,
             "recent_messages": said,
             "reason_given": {"escalation_reason": brief.get("escalation_reason"),
                              "detail": brief.get("escalation_reason_detail")},
-            "shop_documents_found": documents or [context.knowledge_note or "no passage was relevant"],
+            "shop_documents_found": documents or ["no passage matched the question"],
+            "tools_called": [r["name"] for r in (*context.tool_results, *tool_results_of((state or {}).get("messages") or []))],
         })}
     if name == "memory_request_deletion" and context.tier == "VERIFIED":
         return {"delete": await context.judge("delete", {"recent_messages": said})}
@@ -544,6 +626,18 @@ def _quotes_in(state: Mapping[str, Any]) -> dict[str, int]:
     return quotes
 
 
+LOAD_SKILL = "load_skill"
+
+
+@tool(LOAD_SKILL)
+def load_skill(name: str, runtime: ToolRuntime[AgentContext]) -> str:
+    """Load how the shop does a task, named in the list of skills in the instructions."""
+    result = skill_book.load(runtime.context.skills, name)
+    logger.info("Skill %s for call %s turn %s: %s", name, runtime.context.call_id, runtime.context.turn_id,
+                "loaded" if result["ok"] else "unknown")
+    return json.dumps(result, ensure_ascii=False)
+
+
 class AdvisorAgent(BaseAgent):
     """Drafts the reply for one turn, from the slice of state it is given."""
 
@@ -566,7 +660,7 @@ class AdvisorAgent(BaseAgent):
         that must see every attempt sets it to 0. ``llm`` replaces the model
         from config, for offline tests."""
         super().__init__("advisor", provider=provider, model=model, generation=generation, llm=llm)
-        self._tools = list(tools or ())
+        self._tools = [*(tools or ()), *([load_skill] if tools else [])]
         names = [tool.name for tool in self._tools]
         retry = [ModelRetryMiddleware(max_retries=retries, initial_delay=1.0, on_failure="error")] if retries else []
         self._graph = create_agent(
@@ -686,6 +780,8 @@ def tool_results_of(produced: Sequence[Any]) -> list[dict[str, Any]]:
         if not isinstance(message, AIMessage):
             continue
         for call in message.tool_calls:
+            if call["name"] == LOAD_SKILL:
+                continue  # how the model reads a procedure, not a business tool: no trace, no evidence
             answer = answers.get(call["id"])
             envelope = parse_envelope(answer.content) if answer is not None else None
             blocked_by = answer.additional_kwargs.get("blocked_by") if answer is not None else None

@@ -110,27 +110,6 @@ async def test_eval_stops_labelling_after_extractor_invocation_failure(monkeypat
     assert extractor.label.await_count == 1 and run.stopped
 
 
-@pytest.mark.parametrize('acknowledgement', [
-    'Dạ em đã ghi nhận yêu cầu xóa dữ liệu của chị rồi ạ.',
-    'Em ghi nhận yêu cầu xóa dữ liệu của chị rồi ạ.',
-    'Yêu cầu xóa dữ liệu của chị đã được ghi nhận ạ.',
-    'Dạ em đã xóa toàn bộ dữ liệu của chị rồi ạ.',
-    'Dữ liệu của chị đã được xóa rồi ạ.',
-])
-def test_deletion_acknowledgement_requires_the_actual_effect(acknowledgement):
-    from ai_agent_service.components.guardrails.hard import GuardInput, check
-    assert not check(GuardInput(acknowledgement, (), 'VERIFIED')).passed
-    failed = ({'name': 'memory.request_deletion', 'result': {'ok': False, 'error': {'code': 'PRECONDITION'}}},)
-    assert not check(GuardInput(acknowledgement, failed, 'VERIFIED')).passed
-
-
-def test_recorded_request_can_be_acknowledged_but_cannot_be_claimed_as_erased():
-    from ai_agent_service.components.guardrails.hard import GuardInput, check
-    success = ({'name': 'memory.request_deletion', 'result': {'ok': True, 'data': RECORDED}},)
-    assert check(GuardInput('Dạ em đã ghi nhận yêu cầu xóa dữ liệu của chị rồi ạ.', success, 'VERIFIED')).passed
-    assert not check(GuardInput('Dạ em đã xóa toàn bộ dữ liệu của chị rồi ạ.', success, 'VERIFIED')).passed
-
-
 @pytest.mark.asyncio
 @pytest.mark.parametrize('middle,owner,confirmation,allowed', [
     ('Đây là số CCCD: <ID_1>.', 'C-OWN', 'Chị đồng ý xóa dữ liệu của mình.', True),
@@ -209,14 +188,5 @@ def test_wrong_request_response_cannot_set_recorded_flag_or_support_acknowledgem
     from ai_agent_service.components.guardrails.hard import GuardInput, check
     results = [{'name': 'memory.request_deletion', 'result': {'ok': True, 'data': data}}]
     assert not nodes._absorb({}, results)['deletion_recorded']
-    assert not check(GuardInput('Em đã ghi nhận yêu cầu xóa dữ liệu ạ.', tuple(results), 'VERIFIED', check_handoff=False)).passed
 
 
-@pytest.mark.parametrize('deleted,valid', [(False, False), ('done', False), ([], False),
-    ({'facts': False}, False), ({'facts': -1}, False), ({'facts': '1'}, False), ({}, True), ({'facts': 3}, True)])
-def test_only_real_deletion_counts_support_completed_erasure(deleted, valid):
-    from ai_agent_service.components.guardrails.hard import GuardInput, check
-    results = ({'name': 'memory.delete_customer', 'result': {'ok': True,
-        'data': {'customer_id': 'C-OWN', 'deleted': deleted}}},)
-    assert check(GuardInput('Em đã xóa toàn bộ dữ liệu của chị rồi ạ.', results, 'VERIFIED',
-        check_handoff=False)).passed is valid

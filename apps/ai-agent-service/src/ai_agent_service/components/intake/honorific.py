@@ -19,11 +19,6 @@ from .text import plain
 FORMS = {"anh": "anh", "chi": "chị", "co": "cô", "chu": "chú", "bac": "bác"}
 _FORM = r"(anh|chi|co|chu|bac)"
 
-#: "chị muốn ...", "anh cần ...": the pronoun opening a clause, then what they do.
-_SELF = re.compile(
-    rf"(?:^|[,.;!?]\s*|\b(?:thi|vay|ma|nen|con)\s+){_FORM}\s+"
-    r"(muon|can|hoi|dang|dinh|mua|dat|lay|chon|thay|co|o|ten|la|chua|da|se|xin|nho|vua|cung|thi|tinh|dung|nghi|thich|o)\b"
-)
 #: "tôi là chị Lan", "mình là anh Nam".
 _IS = re.compile(rf"\b(?:toi|minh)\s+la\s+{_FORM}\b")
 #: The agent asked how to address the customer.
@@ -45,5 +40,5 @@ def self_reference(said: str | None, *, agent_asked: str | None = None) -> str |
         answer = _ANSWER.match(text)
         if answer:
             return FORMS[answer.group(1)]
-    found = _IS.search(text) or _SELF.search(text)
+    found = _IS.search(text)
     return FORMS[found.group(1)] if found else None

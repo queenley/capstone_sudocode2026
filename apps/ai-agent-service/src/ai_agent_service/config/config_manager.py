@@ -74,6 +74,12 @@ def handoff_auto_accept() -> bool:
     """
     return os.environ.get("HANDOFF_AUTO_ACCEPT", "").strip().lower() in ("1", "true", "yes", "on")
 
+def jev_head_start() -> float:
+    """``JEV_HEAD_START_MS``: how long a review may run before its sentence is said; 0 says it at once."""
+    raw = os.environ.get("JEV_HEAD_START_MS", "").strip()
+    return max(0.0, float(raw) / 1000) if raw else 0.0
+
+
 def kb_dir() -> Path:
     """The approved knowledge versions, ``data/kb/v<N>.jsonl`` (``docs/design.md`` section 7.5)."""
     return ROOT / "data" / "kb"

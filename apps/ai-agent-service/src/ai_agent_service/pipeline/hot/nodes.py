@@ -9,6 +9,8 @@ module each docstring names. Collaborators arrive through
 
 from __future__ import annotations
 
+import json
+
 import asyncio
 import logging
 import re
@@ -21,10 +23,13 @@ from langchain_core.messages import AIMessage, HumanMessage, RemoveMessage
 from langgraph.runtime import Runtime
 
 from ...agents.advisor import AdvisorFailure, AgentContext, Draft, shown_passages, _seen_in
-from ...agents.policy import PolicyInput, needs_review
+from ...agents.policy import PolicyInput
 from ...components.context import compact
 from ...components.guardrails import actions, fallback, purchase
-from ...components.guardrails.hard import MAX_SENTENCES, ORDER_SUMMARY, GuardInput, check
+from ...components.guardrails.hard import MAX_SENTENCES, ORDER_SUMMARY, GuardInput, check, clean
+from ...config.config_manager import jev_head_start
+from .review import Reviews
+from ...components.context import skills as skill_book
 from ...components.guardrails.stream import SentenceSplitter
 from ...components.identity import resolver
 from ...components.intake import honorific, itn, lexicon, pii, signals, text as intake_text
@@ -39,6 +44,9 @@ from .state import TURN_KEYS, HotContext, HotState
 
 logger = logging.getLogger(__name__)
 
+#: What the PolicyAgent reads of the call's earlier tool results: the last few, short.
+CALL_LOG_SIZE = 12
+CALL_LOG_CHARS = 500
 #: Section 4.5: two regenerations, then the safe line.
 MAX_REGENERATIONS = 2
 
@@ -82,9 +90,9 @@ async def perceive(state: HotState, runtime: Runtime[HotContext]) -> dict[str, A
         context.arrived = time.perf_counter()
     update: dict[str, Any] = {**TURN_KEYS, "flags": {"asr_low_conf": False, "new_key": False}}
     raw = (context.text or "").strip()
-    update["pending_purchase"] = purchase.answer(
+    update["pending_purchase"] = purchase.still_open(
         state.get("pending_purchase"), call_id=str(state["call_id"]), channel=state.get("channel") or "web",
-        turn_id=state["turn_id"], said=raw, last_reply=_last_reply(state))
+        turn_id=state["turn_id"])
     if state.get("phase") == "opening" or not raw:
         return update
 
@@ -157,10 +165,12 @@ async def _knowledge(state: dict[str, Any], context: HotContext, said: str) -> d
 def _order_date(state: dict[str, Any], said: str) -> str | None:
     """The day the order a question is about was placed, when it is about one this customer has."""
     orders = [o for o in (state.get("brief") or {}).get("orders") or [] if o.get("order_id")]
-    if not orders or not (signals.ORDER_TALK.search(intake_text.plain(said)) or "OD" in said):
+    words = intake_text.plain(said)
+    chosen = next((o for o in orders if o["order_id"] in said), None) or next(
+        (o for o in orders if any(str(o.get(key) or "") and intake_text.plain(str(o[key])) in words
+                                  for key in ("product_name", "name", "sku", "variant_sku"))), None)
+    if chosen is None:
         return None
-    named = next((o for o in orders if o["order_id"] in said), None)
-    chosen = named or max(orders, key=lambda o: str(o.get("date") or o.get("created_at") or ""))
     day = str(chosen.get("date") or chosen.get("created_at") or "")[:10]
     return day or None
 
@@ -405,7 +415,6 @@ async def route(state: HotState) -> dict[str, Any]:
         asr_low_conf=bool(flags.get("asr_low_conf")),
         tool_failures=int(state.get("tool_failures") or 0),
         model_failures=int(state.get("model_failures") or 0),
-        must_transfer=bool(flags.get("must_transfer")),
         impatient=bool(flags.get("impatient")),
         sessions_without_close=int((state.get("brief") or {}).get("sessions_without_close") or 0),
         awaiting_identity=bool(state.get("awaiting")),
@@ -555,6 +564,7 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
     return AgentContext(
         call_id=str(state["call_id"]),
         pending_purchase=state.get("pending_purchase"),
+        skills=list(state.get("loaded_skills") or []),
         customer_id=state.get("customer_id") if tier == "VERIFIED" else None,
         account_id=context.account_id,
         address_as=_address_as(state),
@@ -689,10 +699,13 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
                 if order.get("order_id") and order["order_id"] not in orders:
                     orders.append(order["order_id"])
         elif result.get("blocked_by") == "guardrail" and (envelope.get("error") or {}).get("code") == "CONFIRMATION_REQUIRED":
-            pending_purchase = ((envelope["error"].get("details") or {}).get("purchase_draft"))
+            pending_purchase = (envelope["error"].get("details") or {}).get("purchase_draft") or pending_purchase
         elif (envelope.get("error") or {}).get("code") in INFRASTRUCTURE_CODES:
             failures += 1
+    log = [{"tool": r.get("name"), "result": json.dumps((r.get("result") or {}).get("data"), ensure_ascii=False, default=str)[:CALL_LOG_CHARS]}
+           for r in new_results if (r.get("result") or {}).get("ok")]
     return {"tool_results": list(state.get("tool_results") or []) + new_results, "quotes": quotes,
+            "call_log": [*(state.get("call_log") or []), *log][-CALL_LOG_SIZE:],
             "known_orders": orders, "created_orders": created, "updated_orders": updated, "tool_failures": failures,
             "deletion_recorded": deletion_recorded, "pending_purchase": pending_purchase,
             "placed_lines": _placed(state.get("placed_lines") or [], new_results),
@@ -713,8 +726,10 @@ class _Attempt:
     reasons: list[str] = field(default_factory=list)
     blocked: str = ""
     draft: Any = None
-    #: The PolicyAgent's verdict on each sentence it reviewed, for the trace.
-    soft: list[Any] = field(default_factory=list)
+    #: The reviews running beside this turn's stream.
+    reviews: Reviews = field(default_factory=lambda: Reviews(None))
+    #: The sentence stopped had already been said: the next run corrects it.
+    correction: bool = False
 
 
 def _soft_summary(reviews: Sequence[Any]) -> dict[str, Any] | None:
@@ -755,19 +770,28 @@ async def _streamed(state: HotState, context: HotContext, messages: list[Any], a
     view = agent_context
     #: Sentences said by runs whose next sentence was blocked: the next run goes on after them.
     carried: list[str] = []
-    #: Every PolicyAgent verdict of the turn, abandoned runs' included: why a run was regenerated.
-    soft_reviews: list[Any] = []
+    reviews = Reviews(_reviewer(state, context), head_start=jev_head_start())
+    view = replace(view, review_flags=reviews.flags)
+    corrected = False
     try:
         while True:
             # A retry is checked against every tool result of the turn, the abandoned runs' included.
-            attempt = _Attempt(said=list(carried), last_spoken=bool(carried))
+            attempt = _Attempt(said=list(carried), last_spoken=bool(carried), reviews=reviews)
             await _stream_once(state, context, messages, view, earlier + tuple(produced), timing, attempt)
             produced += [r for r in attempt.results if r not in produced]
-            soft_reviews += attempt.soft
+            if not attempt.reasons:
+                # The answer is out: what the reviews still running say comes before the turn ends.
+                await reviews.recheck(earlier + tuple(produced))
+                _flagged(attempt)
             if not attempt.reasons:
                 break
             reasons = attempt.reasons
             blocked_drafts.append({"text": attempt.blocked, "reasons": attempt.reasons})
+            if attempt.correction:
+                if corrected:
+                    attempt.reasons = []  # one correction a turn: a second is logged, not said
+                    break
+                corrected = True
             if regenerations >= MAX_REGENERATIONS:
                 break
             regenerations += 1
@@ -790,16 +814,22 @@ async def _streamed(state: HotState, context: HotContext, messages: list[Any], a
         failed = await _model_failed(state, context, agent_context, produced, error,
                                      summary=state.get("working_summary"))
         return {**failed, "latency": timing}
+    finally:
+        reviews.close()
 
     update = _absorb(state, produced)
+    update["loaded_skills"] = skill_book.after_turn(agent_context.skills, produced)
     draft = attempt.draft
     stats = {"model": getattr(draft, "model", None), "model_calls": getattr(draft, "model_calls", None),
              "seconds": round(getattr(draft, "seconds", 0.0), 3), "streamed": True}
     verdict: dict[str, Any] = {"passed": not attempt.reasons, "streamed": True, "sentences": len(attempt.said),
                                "hard": {"passed": not reasons, "reasons": reasons}}
-    soft = _soft_summary(soft_reviews)
+    soft = _soft_summary(reviews.verdicts)
     if soft is not None:
         verdict["soft"] = soft
+    if reviews.flagged:
+        verdict["flagged_after_said"] = reviews.flagged
+        logger.warning("Call %s: %d said sentence(s) flagged by the PolicyAgent", state.get("call_id"), len(reviews.flagged))
     text = " ".join(attempt.said)
     if attempt.reasons:
         line = _safe_line(state, produced)
@@ -834,6 +864,8 @@ async def _stream_once(
     stream = context.advisor.stream(messages, view, user_id=context.user_id)
     try:
         async for event in stream:
+            if _flagged(attempt):
+                return attempt
             if event.kind == "tool_started":
                 if timing["filler_ms"] is None and not attempt.said and context.emit is not None:
                     await context.emit("filler", fallback.LINES["filler"].format(who=_who(state)))
@@ -849,6 +881,11 @@ async def _stream_once(
                     recorded = event.draft or Draft(text="", tool_results=[], model=None, model_calls=0, seconds=0)
                     attempt.draft = replace(recorded, text=question, tool_results=attempt.results)
                     return attempt
+                line = view.consent.pop("read_back", None)
+                if line and any(r.get("name") == "order.create" and (r.get("result") or {}).get("ok") for r in attempt.results):
+                    # The customer agreed in this turn and has not heard the order: PB-09, read back once.
+                    await _say(context, line, timing)
+                    attempt.said.append(line)
                 new_message = True
             elif event.kind == "done":
                 attempt.draft = event.draft
@@ -871,6 +908,44 @@ async def _stream_once(
         return attempt
     finally:
         await stream.aclose()
+
+
+def _flagged(attempt: _Attempt) -> bool:
+    """A review flagged what was said: stop the stream, and the next run corrects it (section 4.8)."""
+    flag = attempt.reviews.take()
+    if flag is None:
+        return False
+    text, reasons = flag
+    attempt.correction = True
+    attempt.blocked = text
+    attempt.reasons = [f"Câu em vừa nói có lỗi: «{text}». {' '.join(reasons)} Khách nghe sai thì đính chính ngắn một câu; chỉ thiếu tool thì gọi tool, không nói lại câu đó. Không chuyển máy chỉ để sửa lỗi này, không thêm thông tin chưa có nguồn."]
+    return True
+
+
+def _established(state: HotState) -> dict[str, Any]:
+    """What this call and the customer's record already show: an earlier turn's stock or order is not unsupported."""
+    return {"quotes": dict(state.get("quotes") or {}), "orders_created": list(state.get("created_orders") or []),
+            "orders_known": list(state.get("known_orders") or []),
+            "orders_of_this_customer": list((state.get("brief") or {}).get("orders") or []),
+            "earlier_tool_results": list(state.get("call_log") or [])}
+
+
+def _reviewer(state: HotState, context: HotContext) -> Any:
+    """How this turn's sentences reach the PolicyAgent, with what it needs to read them fairly."""
+    if context.policy is None:
+        return None
+    tier = state.get("tier") or "UNKNOWN"
+    policy, playbook = shown_passages(_passages(state))
+    snippets = tuple(str(p["text"]) for p in (*policy, *playbook) if p.get("text") and not p.get("restricted"))
+    earlier = _established(state)
+    said = _last_customer_text(state)
+    logger.info("Passages shown for call %s turn %s: %s", state.get("call_id"), state.get("turn_id"),
+                [p.get("chunk_id") for p in (*policy, *playbook)])
+
+    async def review(text: str, results: tuple[dict[str, Any], ...]) -> Any:
+        return await context.policy.review(PolicyInput(text=text, tool_results=results, tier=tier, policy_snippets=snippets,
+                                                       earlier=earlier, customer_said=said))
+    return review
 
 
 def _confirmation_draft(results: Sequence[Mapping[str, Any]]) -> dict[str, Any] | None:
@@ -911,15 +986,18 @@ async def _offer(state: HotState, context: HotContext, sentence: str, results: t
     if len(attempt.said) >= MAX_SENTENCES and not ORDER_SUMMARY.search(" ".join([*attempt.said, sentence])):
         attempt.last_spoken = False
         return True  # past the length the rules allow: not said, the stream goes on to its end
-    view = guard_input(state, context, spoken, results)
-    reasons = list(check(view).reasons)
-    if not reasons and context.policy is not None and needs_review(spoken):
-        soft = await context.policy.review(PolicyInput(text=spoken, tool_results=results, tier=view.tier,
-                                                       policy_snippets=view.policy_texts))
-        attempt.soft.append(soft)
-        reasons += list(soft.reasons)
+    reasons = list(check(guard_input(state, context, spoken, results)).reasons)
     if reasons:
         attempt.reasons, attempt.blocked = reasons, " ".join([*attempt.said, sentence])
+        return False
+    spoken = clean(spoken)
+    attempt.reviews.add(spoken, results)
+    await attempt.reviews.head()
+    if _flagged(attempt):
+        # This sentence stays unsaid. If the flag is on it alone, nothing needs correcting either.
+        if attempt.blocked == spoken:
+            attempt.correction = False
+            attempt.reasons = [reason.split("». ", 1)[-1] for reason in attempt.reasons]
         return False
     await _say(context, spoken, timing)
     attempt.said.append(sentence)
@@ -971,9 +1049,11 @@ async def guard(state: HotState, runtime: Runtime[HotContext]) -> dict[str, Any]
     hard = check(view)
     verdict: dict[str, Any] = {"hard": {"passed": hard.passed, "reasons": list(hard.reasons)}}
     reasons = list(hard.reasons)
-    if hard.passed and context.policy is not None and needs_review(text):
-        soft = await context.policy.review(PolicyInput(text=text, tool_results=results, tier=tier,
-                                                       policy_snippets=view.policy_texts))
+    if hard.passed and context.policy is not None:
+        soft = await context.policy.review(PolicyInput(
+            text=text, tool_results=results, tier=tier, policy_snippets=view.policy_texts,
+            earlier=_established(state),
+            customer_said=_last_customer_text(state)))
         verdict["soft"] = {"passed": soft.passed, "reasons": list(soft.reasons), "decided_by": soft.decided_by,
                            "probabilities": soft.probabilities, "seconds": soft.seconds}
         reasons += list(soft.reasons)
@@ -1012,13 +1092,21 @@ def guard_input(state: HotState, context: HotContext, text: str, results: tuple[
         priced_texts=tuple(str(p["text"]) for p in shown if (p.get("source") or "policy") == "policy"),
         brief_prices=tuple(int(p["price_quoted_vnd"]) for p in brief.get("products_advised") or [] if p.get("price_quoted_vnd")),
         tokens=frozenset(context.vault.entries),
-        quotes=dict(state.get("quotes") or {}),
+        quotes={**(state.get("quotes") or {}), **_quoted_in(results)},
         warnings=tuple(state.get("freshness") or []) if tier == "VERIFIED" else (),
         promotions=promotions(),
         on=state.get("on"),
-        created_orders=tuple(str(o["order_id"]) for o in state.get("created_orders") or [] if o.get("order_id")),
-        deletion_recorded=bool(state.get("deletion_recorded")),
     )
+
+
+def _quoted_in(results: Sequence[Mapping[str, Any]]) -> dict[str, int]:
+    """This turn's quotes, not yet in the state: a basket's total may add them."""
+    found = {}
+    for result in results:
+        data = (result.get("result") or {}).get("data") or {}
+        if result.get("name") == "pricing.get_quote" and data.get("sku") and data.get("final_price_vnd") is not None:
+            found[str(data["sku"])] = int(data["final_price_vnd"])
+    return found
 
 
 @lru_cache(maxsize=1)
@@ -1150,9 +1238,8 @@ def _passages(state: HotState) -> tuple[dict[str, Any], ...]:
 #: (DIEU-CHINH-DE 4: a transfer is a success for an out-of-scope question). Said next to the
 #: passages, where the model reads them, because a passage that says "phải nói không có thông tin"
 #: otherwise outweighs rule 4 (FIX-07, 2026-11-01).
-NO_ANSWER = ("Tài liệu không trả lời câu khách vừa hỏi. Nếu tool cũng không trả lời được: nói \"Dạ hiện em chưa có "
-             "thông tin về …\" rồi gọi handoff_transfer (escalation_reason ngoai_pham_vi_tai_lieu) ngay trong lượt "
-             "này để nhân viên trả lời khách.")
+NO_ANSWER = ("Tìm trong tài liệu không thấy đoạn khớp câu khách vừa hỏi; điều này chưa có nghĩa là shop không có. Câu về "
+             "sản phẩm, giá, đơn thì tra tool phù hợp trước. Tool cũng không trả lời được thì làm theo luật 4.")
 
 
 def _knowledge_note(state: HotState) -> str | None:

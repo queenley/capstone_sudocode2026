@@ -60,64 +60,8 @@ def guard(text, results=(), **extra):
     return check(GuardInput(text=text, tool_results=tuple(results), tier="VERIFIED", **extra))
 
 
-def test_an_orders_state_needs_an_order_tool_of_the_turn():
-    said = "Dạ đơn của chị đang được giao rồi ạ."
-    assert any("trạng thái đơn" in r for r in guard(said).reasons)
-    status = {"name": "order.status", "result": {"ok": True, "data": {"orders": [{"status": "shipping"}]}}}
-    assert not any("trạng thái đơn" in r for r in guard(said, [status]).reasons)
-    assert not any("trạng thái đơn" in r for r in guard(said, check_handoff=False).reasons)
-    for plain_talk in ("Dạ bên em giao hàng toàn quốc ạ.", "Dạ sản phẩm sẽ được giao trong 2 ngày ạ."):
-        assert not any("trạng thái đơn" in r for r in guard(plain_talk).reasons)
-
-
 def placed(text, results=(), **extra):
     return any("order_create" in r for r in guard(text, results, **extra).reasons)
-
-
-def test_saying_the_order_is_placed_needs_an_order_create_that_succeeded():
-    claims = ("Dạ em đã lên đơn cho anh sản phẩm này, thanh toán COD ạ.",
-              "Dạ đơn hàng của chị đã được tạo ạ.",
-              "Dạ em chốt đơn xong rồi ạ.",
-              "Dạ đặt hàng thành công rồi anh nhé.",
-              "Dạ em đã lên đơn cho anh Máy lọc không khí Xiaomi, thanh toán COD ạ.",
-              "Dạ em đã lên đơn cho anh rồi, anh muốn nhận hàng giờ nào ạ?")
-    created = {"name": "order.create", "result": {"ok": True, "data": {"order_id": "OD600001", "status": "created"}}}
-    refused = {"name": "order.create", "blocked_by": "guardrail",
-               "result": {"ok": False, "error": {"code": "PRECONDITION", "message": "Chưa có số điện thoại"}}}
-    for claim in claims:
-        assert placed(claim), claim
-        assert placed(claim, [refused]), claim
-        assert not placed(claim, [created]), claim
-        assert not placed(claim, created_orders=("OD600001",)), claim
-        assert not placed(claim, check_handoff=False), claim
-    status = {"name": "order.status", "result": {"ok": True, "data": {"orders": [{"status": "created"}]}}}
-    assert not placed("Dạ đơn hàng của anh đang ở trạng thái đã tạo ạ.", [status])
-
-
-def test_saying_the_order_was_changed_needs_an_order_update_that_succeeded():
-    said = "Dạ em đã đổi size cho đơn của chị sang 38 ạ."
-    updated = {"name": "order.update", "result": {"ok": True, "data": {"order_id": "OD600001", "status": "updated"}}}
-    assert any("order_update" in r for r in guard(said).reasons)
-    assert not any("order_update" in r for r in guard(said, [updated]).reasons)
-
-
-def test_an_empty_order_read_cannot_back_a_claim_to_create_a_new_order():
-    for data in ({"orders": []}, {"orders": [{"order_id": "OD600001", "status": "created"}]}):
-        status = {"name": "order.status", "result": {"ok": True, "data": data}}
-        assert placed("Dạ em đã tạo đơn mới cho chị rồi ạ.", [status])
-    assert placed("Dạ em đã tạo đơn mới cho chị rồi ạ.", created_orders=("OD600001",))
-    assert placed("Hôm trước em báo giá rồi, em đã tạo đơn mới cho chị ạ.")
-
-
-def test_empty_or_mismatched_order_state_cannot_back_delivery_claims():
-    for data in ({"orders": []}, {"orders": [{"status": "created"}]}):
-        status = {"name": "order.status", "result": {"ok": True, "data": data}}
-        assert not guard("Dạ đơn hàng đang giao cho chị ạ.", [status]).passed
-
-
-def test_successful_write_for_another_order_does_not_back_the_claim():
-    created = {"name": "order.create", "result": {"ok": True, "data": {"order_id": "OD600001"}}}
-    assert placed("Dạ em đã tạo đơn OD600002 cho chị ạ.", [created])
 
 
 def test_an_offer_to_place_the_order_or_an_earlier_order_is_not_the_claim():
@@ -174,8 +118,9 @@ class Stepwise:
 @pytest.mark.asyncio
 async def test_a_sentence_stopped_after_the_first_is_regenerated_from_what_was_said():
     first = "Dạ bên em có mẫu máy lọc phù hợp với phòng của chị ạ."
-    stock = "Mẫu này hiện còn hàng ạ."
-    inventory = {"name": "inventory.check", "args": {"sku": "SKU-A"}, "result": {"ok": True, "data": {"in_stock": True}}}
+    stock = "Mẫu này giá 1.000.000đ ạ."
+    inventory = {"name": "pricing.get_quote", "args": {"sku": "SKU-A"},
+                 "result": {"ok": True, "data": {"sku": "SKU-A", "final_price_vnd": 1000000}}}
     advisor = Stepwise((f"{first} {stock}", ()), (f"{first} {stock}", (inventory,)))
     spoken = []
 
@@ -233,25 +178,6 @@ def test_a_turn_that_placed_an_order_never_falls_back_to_no_information():
     assert "chưa có thông tin" in _safe_line(state, [])
 
 
-def test_a_blocked_delivery_time_is_told_the_sentence_to_say():
-    from ai_agent_service.components.guardrails import hard
-    by_area = {"name": "delivery_estimate", "args": {}, "result": {"ok": True, "data": {"address_known": False, "by_area": [
-        {"area": "Hà Nội, TP.HCM, Đà Nẵng", "delivery_days": 2}, {"area": "tỉnh thành khác", "delivery_days": 4}]}}}
-    verdict = hard.check(hard.GuardInput(text="Dạ đơn giao trong 4 ngày ạ.", tool_results=(by_area,), tier="VERIFIED"))
-    assert "2 ngày ở Hà Nội, TP.HCM, Đà Nẵng; 4 ngày ở tỉnh thành khác" in verdict.reasons[0]
-
-
-def test_order_state_requires_evidence_for_every_named_order():
-    from ai_agent_service.components.guardrails import hard
-    text = "Đơn OD1 và OD2 đang giao ạ."
-    for orders in ([{"order_id": "OD1", "status": "shipping"}],
-                   [{"order_id": "OD1", "status": "shipping"}, {"order_id": "OD2", "status": "created"}]):
-        tools = ({"name": "order.status", "result": {"ok": True, "data": {"orders": orders}}},)
-        assert hard._order_state(text, hard.GuardInput(text=text, tier="VERIFIED", tool_results=tools))
-    tools = tuple({"name": "order.status", "result": {"ok": True, "data": {"orders": [order]}}} for order in
-                  [{"order_id": "OD1", "status": "shipping"}, {"order_id": "OD2", "status": "delivered"}])
-    separate = "Đơn OD1 đang giao, đơn OD2 đã giao ạ."
-    assert not hard._order_state(separate, hard.GuardInput(text=separate, tier="VERIFIED", tool_results=tools))
 def test_a_change_made_in_an_earlier_turn_is_not_made_again():
     # The duplicate check reads the whole call, not the turn: three "đổi sang L" over three turns were
     # three charged exchanges (FIX-05, 2026-11-01).

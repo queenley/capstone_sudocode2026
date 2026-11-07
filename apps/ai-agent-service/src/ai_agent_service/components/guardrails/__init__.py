@@ -6,10 +6,11 @@ because hard is cheap, deterministic and stops most of what goes wrong.
 - :mod:`.actions`: before a tool with an effect runs (GUARDRAIL before ACT):
   the price of an order equals today's quote, COD stays under its limit, a
   Handoff Brief is complete.
-- :mod:`.hard`: the reply, in code, under 50 ms: every amount of money has a
-  source, nothing internal, no raw personal data, nothing the tier forbids,
-  no claim to be human, the right shape.
-- The soft check is the PolicyAgent, ``src/agents/policy.py``.
+- :mod:`.hard`: the reply, in code, under 50 ms: what is compared with data
+  (an amount or a period has a source) or has a fixed shape (raw personal data,
+  internal terms, a claim to be human, what the tier forbids).
+- What a sentence means is the PolicyAgent's, ``agents/policy.py``, beside the
+  stream (``pipeline/hot/review.py``).
 - :mod:`.fallback`: what is said when a draft is still blocked after two
   regenerations, and the other lines of the fallback table.
 

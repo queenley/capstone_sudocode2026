@@ -19,7 +19,7 @@ from __future__ import annotations
 from typing import NamedTuple, Sequence
 
 #: Sections that are never cut, whatever the allowance.
-PROTECTED = frozenset({"rules", "warnings", "lane", "brief", "tool_results", "opening", "blocked"})
+PROTECTED = frozenset({"rules", "skills", "today", "warnings", "lane", "brief", "tool_results", "opening", "blocked"})
 
 
 class Section(NamedTuple):

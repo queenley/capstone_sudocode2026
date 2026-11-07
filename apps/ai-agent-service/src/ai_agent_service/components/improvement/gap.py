@@ -20,9 +20,15 @@ from __future__ import annotations
 
 import re
 
-from ..intake.signals import MUST_TRANSFER
 from ..intake.text import plain
 from .lessons import MONEY, promo_codes
+
+#: PB-06: a topic that goes to a person is never answered by a Knowledge Gap entry. Whole phrases: without
+#: diacritics "thuốc" and "thuộc" look alike. Off the customer's path: a reviewed entry, not a live decision.
+MUST_TRANSFER = re.compile(
+    r"\b(cho con bu|dang bau|ba bau|me bau|mang thai|co thai|benh nhan|bi benh|benh ly|uong thuoc|thuoc men|di ung|"
+    r"hen suyen|bac si|y te|phap ly|kien tung|luat su)\b")
+
 
 #: Stock is the tools' to say, on the plain (unaccented) text.
 STOCK = re.compile(r"\b(con hang|het hang|ton kho|sap ve hang|con \d+ (?:cai|chiec|san pham|bo))\b")

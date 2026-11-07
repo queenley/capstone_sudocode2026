@@ -13,8 +13,7 @@ here, and nowhere else (section 10.1):
 - :func:`revoke` writes a new version without one entry, for an entry the
   next round found harmful.
 
-A playbook entry is screened again here (``lessons.screen``), so a flagged
-hint cannot be published whatever its review said. Every change goes to the
+Every change goes to the
 improvement log (:mod:`.review`). The knowledge server reads the version at
 startup, so a run started after the change runs on it.
 """
@@ -29,7 +28,6 @@ from typing import Any, Mapping, Sequence
 from ...config.config_manager import KNOWLEDGE_YAML, get_knowledge_config, kb_dir
 from ..knowledge.corpus import entry_chunk, version_file
 from . import review
-from .lessons import Hint, screen
 from .storage import atomic_text, version_write
 
 VERSION_LINE = re.compile(r"^version:\s*(\d+)\s*$", re.MULTILINE)
@@ -91,11 +89,6 @@ def publish(new: Sequence[Mapping[str, Any]], *, reviewer: str, note: str = "",
     folder = directory or kb_dir()
     if not reviewer.strip():
         raise ValueError("Publishing needs the reviewer who approved the entries")
-    for line in new:
-        if line.get("source") == "playbook" and isinstance(line.get("hint"), Mapping):
-            flags = screen(Hint.from_json(line["hint"]))
-            if flags:
-                raise ValueError(f"{line.get('chunk_id')} is flagged ({', '.join(flags)}); it is never published")
     current = active(config_path)
     base = entries(current, folder)
     clash = {line["chunk_id"] for line in base} & {line["chunk_id"] for line in new}

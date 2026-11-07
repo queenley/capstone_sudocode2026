@@ -118,7 +118,7 @@ def test_the_word_lists_that_decided_for_the_customer_are_gone():
     from ai_agent_service.components.intake import signals
     for name in ("WANTS_PERSON", "COMPLAINT", "ASKS_IF_HUMAN", "WANTS_DELETION"):
         assert not hasattr(signals, name)
-    assert set(signals.read("chuyển máy cho tôi").as_flags()) == {"impatient", "must_transfer"}
+    assert set(signals.read("chuyển máy cho tôi").as_flags()) == {"impatient"}
     assert policy_module.INTENTS["handoff"].criteria
 
 

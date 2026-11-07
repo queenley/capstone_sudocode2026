@@ -29,8 +29,9 @@ from ..intake.itn import format_vnd
 from ..intake.text import plain
 from . import Verdict
 
+#: Tools with an effect wait for the reviews of what was just said (section 4.8).
+#: They are the write tools, so the two sets are one.
 WRITE_TOOLS = frozenset({"order_create", "order_update", "schedule_callback", "handoff_transfer", "memory_request_deletion"})
-SKU_READ_TOOLS = frozenset({"pricing_get_quote", "inventory_check"})
 CUSTOMER_READ_TOOLS = frozenset({"order_status", "crm_get_customer"})
 
 COD_LIMIT_VND = 10_000_000
@@ -103,11 +104,6 @@ def check(
                 return Verdict(True)
         if not has_phone:
             return Verdict(False, ("Chưa có số đã xác minh để tra hồ sơ hoặc danh sách đơn.",))
-        return Verdict(True)
-    if name in SKU_READ_TOOLS:
-        sku = args.get("sku")
-        if trusted is not None and (not sku or sku not in trusted):
-            return Verdict(False, ("Mã sản phẩm chưa được xác nhận; tra catalog_search và dùng đúng sku hoặc variant_sku trả về.",))
         return Verdict(True)
     if name not in WRITE_TOOLS:
         return Verdict(True)
@@ -279,6 +275,8 @@ def _deletion(*, tier: str, last_agent_said: str | None, customer_said: str | No
         return ["Chưa xác minh danh tính nên chưa ghi nhận được yêu cầu xóa dữ liệu."]
     if agreed is False:
         return ["Khách chưa đồng ý xóa dữ liệu."]
+    if agreed is True:
+        return []
     immediate = bool(last_agent_said and ASKED_TO_DELETE.search(plain(last_agent_said)))
     asked = immediate if deletion_asked is None else deletion_asked
     said = plain(customer_said or "")
@@ -314,7 +312,8 @@ def fill_handoff(brief: Mapping[str, Any], known: Mapping[str, Any]) -> dict[str
     """
     filled = {k: v for k, v in known.items() if v is not None or k in ("product_advised", "price_quoted_vnd", "customer_name")}
     filled.update({k: v for k, v in brief.items() if k not in ("customer_phone", "generated_at", "customer_id")})
-    filled.setdefault("open_questions", [])
+    questions = filled.get("open_questions")
+    filled["open_questions"] = [questions] if isinstance(questions, str) else list(questions or [])
     filled.setdefault("next_action", "Gọi lại khách và trả lời câu hỏi còn mở.")
     filled.setdefault("escalation_reason", "khac")
     return filled

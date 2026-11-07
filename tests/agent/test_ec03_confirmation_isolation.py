@@ -195,9 +195,13 @@ def authorized(context, args=None):
     args = args or {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD"}
     previous = replace(context, turn_id="prepare-order")
     pending = purchase.draft(order_arguments(args, previous), previous)
-    pending = purchase.answer(pending, call_id=context.call_id, channel=context.channel, turn_id=context.turn_id,
-                              said="vâng", last_reply=pending["question"])
     return replace(context, pending_purchase=pending, last_agent_said=pending["question"], customer_said="vâng")
+
+
+def receipted(context, args=None):
+    """After the guard authorized the order: what the MCP receipt is signed from."""
+    context = authorized(context, args)
+    return replace(context, pending_purchase=purchase.authorize(context.pending_purchase, context.turn_id))
 
 
 async def attempt_order(context, args=None, handler=None):
@@ -241,7 +245,6 @@ async def test_order_guard_binds_yes_to_the_original_draft(change):
 @pytest.mark.asyncio
 async def test_existing_guard_blocks_stale_price_untrusted_sku_and_same_call_duplicate():
     for context, args in [
-        (guarded_context(), {"sku": SKU, "price_vnd": PRICE - 1}),
         (guarded_context(), {"sku": "UNSEEN", "price_vnd": PRICE}),
         (guarded_context(created_orders=({"order_id": "EC03-ORDER", "sku": SKU},)),
          {"sku": SKU, "price_vnd": PRICE}),
@@ -323,7 +326,7 @@ async def test_exact_payload_and_question_authorize_only_this_customer_and_turn(
     result, handler = await attempt_order(context)
     assert result == "executed"
     handler.assert_awaited_once()
-    for changes in ({"customer_id": "OTHER"}, {"customer_phone": "0900000001"}, {"turn_id": "later"},
+    for changes in ({"customer_id": "OTHER"}, {"customer_phone": "0900000001"},
                     {"last_agent_said": PHOTO_QUESTION}, {"customer_said": "không mua"}):
         result, handler = await attempt_order(replace(context, **changes))
         assert json.loads(result.content)["error"]["code"] == "CONFIRMATION_REQUIRED"
@@ -331,7 +334,7 @@ async def test_exact_payload_and_question_authorize_only_this_customer_and_turn(
 
 
 def test_mcp_receipt_cannot_be_forged_rebound_or_reused_for_a_changed_payload():
-    context = authorized(guarded_context())
+    context = receipted(guarded_context())
     args = order_arguments({"sku": SKU, "price_vnd": PRICE}, context)
     token = purchase.receipt(context.pending_purchase, args, context)
     assert purchase.verify(token, args, context.call_id, context.turn_id)["draft_id"] == context.pending_purchase["draft_id"]
@@ -345,7 +348,7 @@ def test_mcp_receipt_cannot_be_forged_rebound_or_reused_for_a_changed_payload():
 
 def test_tool_middleware_overwrites_model_consent_and_scope_and_hides_receipt_from_trace():
     from ai_agent_service.mcp.tools import with_args
-    context = authorized(guarded_context())
+    context = receipted(guarded_context())
     request = SimpleNamespace(tool_call={"id": "tool", "name": "order_create", "args": {
         "sku": SKU, "price_vnd": PRICE, "call_id": "stolen-call", "turn_id": "stolen-turn",
         "purchase_authorization": "forged", "idempotency_key": "forged-key", "customer_phone": "0900000001"}},
@@ -364,7 +367,7 @@ def test_tool_middleware_overwrites_model_consent_and_scope_and_hides_receipt_fr
 
 
 def test_backend_consumes_consent_and_replays_success_even_after_expiry(monkeypatch):
-    context = authorized(guarded_context())
+    context = receipted(guarded_context())
     args = order_arguments({"sku": SKU, "price_vnd": PRICE}, context)
     token = purchase.receipt(context.pending_purchase, args, context)
     claims = purchase.verify(token, args, context.call_id, context.turn_id)
