@@ -123,6 +123,15 @@ flowchart TD
 - **Khi khách nhắc mức cũ:** mục changelog của đoạn bị lọc đi cùng kết quả, nên agent nói được mức đã đổi từ ngày nào.
 - **Khi không có ngày:** không lọc gì; đường gọi của agent luôn có ngày cuộc gọi.
 
+### Duyệt câu hỏi còn thiếu kiến thức
+Câu agent không trả lời được được ghi vào `knowledge-gaps.json`, đã che dữ liệu cá nhân. Admin xử lý ở `/admin`, phần "Câu hỏi còn thiếu kiến thức":
+
+- **Duyệt:** nhập câu trả lời và nguồn công khai còn hiệu lực, qua `gap.gate`, rồi hệ thống viết phiên bản kiến thức mới `data/kb/v<N>.jsonl`. Cần nạp lại dịch vụ trợ lý, và số đo sau đó thuộc phiên bản mới.
+- **Chuyển thành FAQ nháp** (chỉ admin): tạo mục nháp từ câu hỏi và câu trả lời, rồi duyệt ở phần FAQ theo đợt. Có tác dụng sau tối đa 10 giây, không đổi phiên bản, và gắn được đợt, sản phẩm. Đây là cách nên dùng khi chưa cần phát hành phiên bản mới.
+- **Bỏ qua:** đóng câu không cần trả lời, kèm lý do. Câu đã xuất bản không bỏ qua được; muốn gỡ thì thu hồi mục đó.
+
+Khác với FAQ theo đợt: FAQ theo đợt có tác dụng ngay và không đổi phiên bản kiến thức.
+
 ### FAQ theo sản phẩm và theo đợt
 Mục FAQ của nhóm nằm ở `data/kb/v<N>.jsonl` (sau khi người duyệt) hoặc bảng `kb_chunks` (mục demo qua `kb_upsert`). Ngoài các trường thường có, một mục có thể ghi:
 
@@ -140,6 +149,23 @@ Mục FAQ của nhóm nằm ở `data/kb/v<N>.jsonl` (sau khi người duyệt) 
 - **Theo sản phẩm:** khi cuộc gọi đã tra sản phẩm, mục khớp sản phẩm được ưu tiên và mục cho sản phẩm khác bị bỏ. Chưa tra sản phẩm nào thì mục được tìm theo lời khách như thường.
 - **Chỗ đọc riêng:** model đọc 3 đoạn tài liệu mỗi lượt; một mục theo đợt khớp sản phẩm được đọc thêm nếu chưa nằm trong 3 đoạn đó, tối đa 1 mục.
 - **Không chứa con số:** cổng duyệt cấm số tiền, mã khuyến mãi và tồn kho trong câu trả lời. Mục giải thích điều kiện, còn giá và ưu đãi lấy từ tool.
+- **Không lộ khuyến mãi sớm:** mục gắn đợt chưa bắt đầu bị lọc theo ngày, nên agent không đọc được trước ngày bắt đầu (KM-02).
+
+Trang `/admin` có phần **FAQ theo đợt** để thêm, sửa, bật, tắt và xóa mục, qua `/api/developer/faq` (chỉ vai trò admin):
+
+```mermaid
+stateDiagram-v2
+    [*] --> Nhap: Soạn mới hoặc từ drafts.jsonl
+    Nhap --> DangBat: Người duyệt xác nhận và qua cổng kiểm tra
+    DangBat --> Nhap: Tắt
+    Nhap --> DaXoa: Xóa
+    DangBat --> DaXoa: Xóa
+```
+
+- **Nháp:** agent không đọc. `data/kb/drafts.jsonl` được nạp thành nháp khi knowledge server khởi động; mục đã sửa hoặc đã xóa không bị nạp lại.
+- **Bật:** cần ít nhất một nguồn công khai còn hiệu lực và qua `gap.gate`. Có tác dụng sau tối đa 10 giây, không cần khởi động lại, và không đổi `knowledge version`.
+- **Xóa:** xóa mềm, dòng vẫn còn trong `kb_chunks` với trạng thái `deleted`. Mỗi lần lưu hoặc xóa được ghi vào nhật ký cải tiến của hệ thống.
+- **Mục trong bản phát hành** (`data/kb/v<N>.jsonl`) chỉ xem được ở đây; muốn đổi thì sửa qua phiên bản mới.
 
 ### Quyết định từ chối
 

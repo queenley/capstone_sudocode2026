@@ -1,6 +1,6 @@
 # Data generation report
 
-_Generated 2026-11-07 12:24. Visual version: [validation_report.html](validation_report.html)._
+_Generated 2026-11-07 13:01. Visual version: [validation_report.html](validation_report.html)._
 
 Generated records are not golden until they pass rules and the judge (or a human approves them).
 
@@ -226,5 +226,5 @@ xychart-beta horizontal
 Generated **192** → Rule pass **191** → Judge pass **178** → Human approved **0** → Golden **0**
 
 - CRM profiles: 70 (incl. synthetic when generated)
-- Model API requests: 698 · cache hits: 2 · prompt tokens: 5218464 (cached 3809408) · output tokens: 456804 · estimated cost: $5.01
-- ElevenLabs characters: 47869
+- Model API requests: 698 · cache hits: 6 · prompt tokens: 5218464 (cached 3809408) · output tokens: 456804 · estimated cost: $5.01
+- ElevenLabs characters: 0

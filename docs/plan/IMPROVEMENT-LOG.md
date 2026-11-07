@@ -23,6 +23,62 @@ Loại: ... · Trạng thái: ... · Chỉ số: TSR / CCR / RQR / HR / latency 
 
 Sáu mục đầu được ghi lại sau khi làm, từ đợt sửa ngày 05-06/11/2026. Chưa mục nào có số đo trên agent thật.
 
+### 2026-11-07 · Tham số thừa làm hỏng báo giá và chuyển máy
+
+Loại: hard guard, tool · Trạng thái: đang đo · Chỉ số: TSR, HR
+
+- **Vấn đề:** model truyền tham số tool không khai báo, server từ chối cả lần gọi và model chỉ nhận `BAD_ENVELOPE`. PolicyAgent chặn cả số có trong tài liệu đã đọc. Guard coi câu "em chưa chuyển được máy" là lời hứa chuyển máy.
+- **Bằng chứng:** `evaluation/runs/eval2` (150 kịch bản, đang chạy): 141 trên 660 `pricing.get_quote` lỗi, cả 141 có `payment`, không lần thành công nào có; 3 `handoff.transfer` lỗi đều có `escalation_reason` thừa; 118 trên 1.290 lượt dính lỗi. SCN-ADV-0104 call_1 turn 4: chuyển máy lỗi, cả 3 bản nháp bị chặn, khách nhận câu an toàn. Lỗi tham số chỉ nằm ở 3 trên 36 lần fallback.
+- **Sửa:** `advisor.declared_arguments` bỏ tham số không khai báo trước mọi tool; câu hỏi `unquoted_price` tính cả tài liệu đã đọc; `hard.TRANSFER_REFUSED` cho câu từ chối đi qua.
+- **Đã kiểm:** `tests/agent/test_tool_arguments.py`. Chưa chạy lại `eval2`.
+- **Số đo:** chưa đo.
+- **Còn lại:** `schedule.callback` lỗi `INTERNAL` khi thiếu `customer_phone`. Còn 33 trên 36 lần fallback chưa rõ nguyên nhân.
+
+### 2026-11-07 · Admin duyệt Knowledge Gap Loop
+
+Loại: tính năng, hard guard · Trạng thái: đang đo · Chỉ số: HR
+
+- **Vấn đề:** màn hình duyệt gap chỉ có ở trang developer; `gaps.resolve` không gọi `gap.gate` nên câu trả lời có số tiền, mã khuyến mãi hoặc tồn kho vẫn được xuất bản; không có cách loại câu không cần trả lời; nguồn trích có thể là chính sách hết hiệu lực.
+- **Bằng chứng:** `gate` không có nơi gọi nào trong `gaps.py`; `KnowledgeGaps` chỉ được gắn trong `agent-console.tsx`.
+- **Sửa:** gắn `KnowledgeGaps` vào `/admin`; `gaps.resolve` gọi `gate` và từ chối nguồn hết hiệu lực; thêm `gaps.dismiss` và `POST /api/developer/knowledge-gaps/{id}/dismiss`; câu đang mở hiện trước.
+- **Đã kiểm:** `tests/agent/test_gap_review_and_judge.py`, `tests/agent/test_faq_admin.py`, `apps/web/e2e/gap-admin.spec.ts` với backend giả.
+- **Số đo:** chưa đo; chưa có câu hỏi thật.
+- **Sửa thêm:** `POST /api/developer/knowledge-gaps/{id}/faq` và nút "Chuyển thành FAQ nháp": tạo mục nháp `FAQ-GAP-<id>`, việc duyệt bật vẫn ở phần FAQ, không đổi phiên bản kiến thức.
+- **Còn lại:** gom câu trùng nghĩa, chuyển kho gap sang DB, gợi ý câu trả lời, xóa bản sao trong FAQ khi khách yêu cầu xóa dữ liệu.
+
+### 2026-11-07 · Trang quản lý FAQ và bộ FAQ nháp
+
+Loại: tính năng · Trạng thái: đang đo · Chỉ số: token mỗi lượt, TSR
+
+- **Vấn đề:** chưa có FAQ thật cho các đợt, và admin không có giao diện để thêm, sửa, xóa FAQ.
+- **Bằng chứng:** `data/kb/v0.jsonl` trống; `kb_upsert` chỉ gọi được qua MCP.
+- **Sửa:** thêm `data/kb/drafts.jsonl` (10 mục nháp lấy từ KM, LN, DT, VC), `components/knowledge/faq.py`, API `/api/developer/faq` chỉ cho admin, cột `status` trong `kb_chunks`, màn hình `faq-admin.tsx` ở `/admin`. Mục nháp không được agent đọc; bật cần người xác nhận và qua `gap.gate`.
+- **Đã kiểm:** `tests/agent/test_faq_admin.py`; cả vòng đời trên database tạm của Postgres (nạp nháp, duyệt, tìm theo sản phẩm, hết hạn, tắt, xóa, khởi động lại không nạp lại mục đã xóa); `apps/web/e2e/faq-admin.spec.ts` trên Chromium với backend giả; `tsc --noEmit`. Chưa chạy trên service thật.
+- **Số đo:** chưa đo; chưa có mục nào được bật.
+- **Còn lại:** người duyệt đọc từng mục, gồm cả ngày mở đợt Giáng sinh và Tết do tôi tự chọn. Chưa phát hiện xu hướng từ cuộc gọi thật.
+
+### 2026-11-07 · FAQ theo sản phẩm và theo đợt
+
+Loại: knowledge, tính năng · Trạng thái: đang đo · Chỉ số: RAG, TSR, token mỗi lượt
+
+- **Vấn đề:** mục FAQ của nhóm không gắn được với sản phẩm hay đợt khuyến mãi; `kb_upsert` không nhận ngày hiệu lực; đổi ngày trong bản phát hành không được ghi xuống `kb_chunks`.
+- **Bằng chứng:** `sync_release` chỉ cập nhật khi title hoặc text đổi; `data/kb/v0.jsonl` trống; model chỉ đọc 3 đoạn mỗi lượt.
+- **Sửa:** thêm `campaign`, `applies_to` trong `corpus.py`, lưu qua `provenance` nên không cần migration; `with_campaigns` lấy ngày và sản phẩm từ `promotions.json`, từ chối đợt không có ngày kết thúc; `search(about=...)` ưu tiên mục khớp sản phẩm và bỏ mục của sản phẩm khác; `shown_passages` đọc thêm tối đa 1 mục theo đợt khớp sản phẩm; `kb_upsert` nhận ngày, đợt, sản phẩm; `sync_release` so cả ngày và `provenance`.
+- **Đã kiểm:** `tests/agent/test_knowledge_campaigns.py`; câu lệnh `sync_release` chạy trên database tạm của Postgres 16: dữ liệu giống thì không ghi, đổi `valid_to` thì cập nhật. `kb_upsert` chưa được gọi thật qua MCP.
+- **Số đo:** RAG 60 câu không đổi (Recall@3 91,5, Recall@5 93,2), vì `v0` chưa có mục nào. Tác dụng thật chưa đo.
+- **Còn lại:** thêm mục FAQ thật cho một đợt rồi đo. Bước phát hiện xu hướng từ cuộc gọi thật chưa làm. Mục do nhóm thêm vẫn cần người đối chiếu với chính sách.
+
+### 2026-11-07 · Đo prompt cache và đặt `prompt_cache_key`
+
+Loại: tính năng, evaluation · Trạng thái: đang đo · Chỉ số: token mỗi lượt, chi phí
+
+- **Vấn đề:** agent dựa vào cache tự động của nhà cung cấp nhưng không ghi số token đọc từ cache, nên không biết tiết kiệm bao nhiêu.
+- **Bằng chứng:** `token_ledger` chỉ có `calls`, `input`, `output`; `performance.py` ghi rõ chưa tính cache.
+- **Sửa:** `token_ledger` thêm `cached`, đọc từ `input_token_details.cache_read`; `usage.json`, `performance.py` và `--report performance` có tỷ lệ cache, run cũ hiện "chưa đo"; `factory.cache_options` đặt `prompt_cache_key` theo từng agent cho OpenAI. Chi phí vẫn chưa trừ phần cache vì repo chưa có giá token cache.
+- **Đã kiểm:** `tests/agent/test_knowledge_campaigns.py`, gồm kiểm khóa nằm trong payload của `ChatOpenAI`. Chưa gọi API thật.
+- **Số đo:** chưa đo. Lần chạy `cache-thu-1` dừng vì `eval2` đang giữ database.
+- **Còn lại:** chạy SCN-GEN-0050 khi `eval2` xong, đọc dòng cache trong `--report performance`, rồi quyết định có ổn định thêm phần prompt phía sau không.
+
 ### 2026-11-07 · Lọc chính sách không còn hiệu lực trước khi lấy top k
 
 Loại: knowledge, prompt · Trạng thái: đang đo · Chỉ số: RAG, version accuracy, TSR

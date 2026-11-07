@@ -93,12 +93,13 @@ QUESTIONS = {
     "unquoted_price": Boolean(
         instructions=(
             "Does the reply state, as this shop's own current price, discount, fee or refund, an amount of "
-            "money that is not in the tool results?"
+            "money that is in neither the tool results nor the policy passages?"
         ),
         criteria={
-            "true": "An amount given as what this shop charges, discounts or refunds now, and the tool results "
-                    "do not contain it.",
-            "false": "Every such amount is in the tool results, or the amount is clearly someone else's: the "
+            "true": "An amount given as what this shop charges, discounts or refunds now, and neither the tool "
+                    "results nor the policy passages contain it.",
+            "false": "Every such amount is in the tool results or the policy passages, or the amount is clearly "
+                     "someone else's: the "
                      "customer's budget, another shop's price, a price the customer remembers, an offer said "
                      "to have ended.",
         },

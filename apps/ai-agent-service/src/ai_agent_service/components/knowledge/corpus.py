@@ -268,6 +268,17 @@ def covers(targets: Iterable[str], sku: str, category: str | None) -> bool:
     return False
 
 
+def load_drafts(directory: Path) -> list[dict[str, Any]]:
+    """``data/kb/drafts.jsonl``: entries written for a person to review, each checked as an entry would be."""
+    path = directory / "drafts.jsonl"
+    if not path.exists():
+        return []
+    drafts = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    for entry in drafts:
+        entry_chunk(entry, doc=path.name)
+    return drafts
+
+
 def version_file(directory: Path, version: int) -> Path:
     """``data/kb/v<N>.jsonl``: the approved entries of knowledge version *version*."""
     return directory / f"v{version}.jsonl"

@@ -59,6 +59,8 @@ CREATE TABLE IF NOT EXISTS kb_chunks (
 ALTER TABLE kb_chunks ADD COLUMN IF NOT EXISTS scope TEXT NOT NULL DEFAULT 'demo';
 ALTER TABLE kb_chunks ADD COLUMN IF NOT EXISTS persona TEXT;
 ALTER TABLE kb_chunks ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
+ALTER TABLE kb_chunks ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'live';
+UPDATE kb_chunks SET status = 'draft' WHERE revoked AND status = 'live';
 """
 
 #: How often a search checks whether ``kb_chunks`` changed under another process.
@@ -106,6 +108,27 @@ def sync_release(version: int) -> int:
         finally:
             conn.execute("SELECT pg_advisory_unlock(%s)", (SCHEMA_LOCK,))
     return len(entries)
+
+
+def seed_drafts() -> int:
+    """Put ``data/kb/drafts.jsonl`` into ``kb_chunks`` as drafts, unserved until a person approves them.
+
+    An entry already there is left as it is: what an admin edited or deleted is not brought back at the next start.
+    """
+    from ...config.database import get_settings
+
+    url, _ = get_settings().require_database_url()
+    drafts = corpus.load_drafts(kb_dir())
+    with psycopg.connect(url, autocommit=True) as conn:
+        for entry in drafts:
+            conn.execute(
+                "INSERT INTO kb_chunks (chunk_id, source, title, text, valid_from, valid_to, provenance, scope, status,"
+                " revoked) VALUES (%s, 'faq', %s, %s, %s, %s, %s, 'demo', 'draft', true) ON CONFLICT (chunk_id) DO NOTHING",
+                (entry["chunk_id"], entry["title"], entry["text"], entry.get("valid_from"), entry.get("valid_to"),
+                 json.dumps({key: entry[key] for key in ("campaign", "applies_to", "cites") if key in entry},
+                            ensure_ascii=False)),
+            )
+    return len(drafts)
 
 
 ROWS = ("SELECT chunk_id, source, title, text, situation, persona, valid_from, valid_to, provenance, scope "
@@ -300,13 +323,13 @@ async def kb_upsert(
             raise ToolFailure("FORBIDDEN", f"{chunk_id} belongs to a release file; change the file instead")
         await conn.execute(
             "INSERT INTO kb_chunks (chunk_id, source, title, text, situation, persona, valid_from, valid_to, provenance,"
-            " scope, revoked, updated_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, 'demo', %s, now()) "
+            " scope, status, revoked, updated_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, 'demo', %s, %s, now()) "
             "ON CONFLICT (chunk_id) DO UPDATE SET title = EXCLUDED.title, text = EXCLUDED.text,"
             " situation = EXCLUDED.situation, persona = EXCLUDED.persona, valid_from = EXCLUDED.valid_from,"
             " valid_to = EXCLUDED.valid_to, provenance = EXCLUDED.provenance,"
-            " revoked = EXCLUDED.revoked, updated_at = now()",
+            " status = EXCLUDED.status, revoked = EXCLUDED.revoked, updated_at = now()",
             (chunk_id, source, title, text, situation, persona, valid_from, valid_to,
-             json.dumps(provenance, ensure_ascii=False), revoke),
+             json.dumps(provenance, ensure_ascii=False), "draft" if revoke else "live", revoke),
         )
     _checked = 0.0  # this process rebuilds on its next search
     return {"chunk_id": chunk_id, "revoked": revoke, "scope": "demo"}
@@ -315,6 +338,7 @@ async def kb_upsert(
 if __name__ == "__main__":
     apply_schema(SCHEMA)
     synced = sync_release(get_knowledge_config().version)
+    seed_drafts()
     built = prepare()
     logger.info("Knowledge version %d: %d approved entries; %d chunks, %s retrieval",
                 get_knowledge_config().version, synced, len(built.chunks), built.mode)

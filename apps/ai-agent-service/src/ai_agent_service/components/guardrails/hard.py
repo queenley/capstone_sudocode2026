@@ -58,6 +58,8 @@ TRANSFER_PROMISE = re.compile(
     r"\bem\b[^.?!]*?\b(chuyển|kết nối|nối máy)\b[^.?!]*?\b(máy|cuộc gọi|nhân viên|đồng nghiệp|bộ phận|tư vấn viên)\b", re.IGNORECASE)
 #: Words that make it an offer or a question rather than a promise.
 TRANSFER_OFFER = re.compile(r"(nếu|muốn|có thể|được không|có cần|\?|hay là|để em hỏi)", re.IGNORECASE)
+#: Words that say the call is not being put through: the honest answer when the transfer failed.
+TRANSFER_REFUSED = re.compile(r"\b(chưa|không)\b[^.?!]*?\b(chuyển|kết nối|nối máy)\b", re.IGNORECASE)
 #: A call back promised for a moment ("em gọi lại anh lúc 7 giờ tối mai"): the same claim about the system as a transfer.
 CALLBACK_PROMISE = re.compile(r"\b(gọi lại|liên hệ lại)\b.*(\d\s*(giờ|h\b)|\b(sáng|trưa|chiều|tối|mai|thứ|ngày)\b)", re.IGNORECASE)
 ORDER_CODE = re.compile(r"\bOD\d+\b")
@@ -476,7 +478,8 @@ def _transfer(text: str, view: GuardInput) -> list[str]:
     """Saying the call is being put through is a claim about what the system did: ``handoff.transfer`` must have run."""
     if not view.check_handoff:
         return []
-    promised = [s for s in SENTENCE.split(text) if TRANSFER_PROMISE.search(s) and not TRANSFER_OFFER.search(s)]
+    promised = [s for s in SENTENCE.split(text) if TRANSFER_PROMISE.search(s) and not TRANSFER_OFFER.search(s)
+                and not TRANSFER_REFUSED.search(s)]
     if not promised:
         return []
     for result in view.tool_results:

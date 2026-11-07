@@ -421,12 +421,30 @@ class ContextPromptMiddleware(AgentMiddleware):
         return await handler(self._with_prompt(request))
 
 
+def declared_arguments(tool: Any, args: Mapping[str, Any]) -> dict[str, Any]:
+    """*args* without those *tool* does not declare.
+
+    A model carries one tool's arguments over to another (``payment`` from ``order_create`` to ``pricing_get_quote``,
+    a brief's ``escalation_reason`` beside the brief). The server refuses the whole call for it, in a shape the model
+    cannot read, so one stray word costs the customer the quote.
+    """
+    declared = getattr(tool, "args", None)
+    if not declared:
+        return dict(args)
+    return {key: value for key, value in args.items() if key in declared}
+
+
 class ActionGuardMiddleware(AgentMiddleware):
     """The guardrail before act (section 4.4): a write tool runs only if its arguments pass."""
 
     async def awrap_tool_call(self, request: Any, handler: Any) -> Any:
         call = request.tool_call
         name = call["name"]
+        kept = declared_arguments(getattr(request, "tool", None), call.get("args") or {})
+        if len(kept) != len(call.get("args") or {}):
+            logger.info("Dropped undeclared arguments of %s: %s", name, sorted(set(call["args"]) - set(kept)))
+            call = {**call, "args": kept}
+            request = request.override(tool_call=call)
         if name not in actions.WRITE_TOOLS | actions.SKU_READ_TOOLS | actions.CUSTOMER_READ_TOOLS:
             return await handler(request)
         context = getattr(getattr(request, "runtime", None), "context", None)

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { api, ChatMessage, CreateCatalogSkuInput } from "@/services/api";
 import AdminTools from "./admin-tools";
 import AgentConsole from "./agent-console";
+import FaqAdmin from "./faq-admin";
+import KnowledgeGaps from "./knowledge-gaps";
 
 type Row = Record<string, unknown>;
 type Detail = { brief: Row; messages: ChatMessage[]; memory_timeline: Row[] };
@@ -23,6 +25,7 @@ export default function Workspace({ role }: { role: string }) {
   const [detail, setDetail] = useState<Detail | null>(null);
   const [reply, setReply] = useState("");
   const [reviewText, setReviewText] = useState("");
+  const [faqAdded, setFaqAdded] = useState(0);
   const [product, setProduct] = useState<CatalogProductForm>({
     name: "",
     brand: "",
@@ -322,6 +325,11 @@ export default function Workspace({ role }: { role: string }) {
                 value={reviewText}
                 onChange={(e) => setReviewText(e.target.value)}
               />
+              <KnowledgeGaps
+                token={token}
+                onFaqCreated={() => setFaqAdded((count) => count + 1)}
+              />
+              <FaqAdmin token={token} refresh={faqAdded} />
               <h2>Add catalog product</h2>
               <AdminTools token={token} onError={setError} />
               <form
