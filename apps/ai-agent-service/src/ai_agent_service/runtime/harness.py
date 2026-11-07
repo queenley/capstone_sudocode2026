@@ -38,6 +38,7 @@ from ..agents.memory import MemoryAgent
 from ..agents.policy import PolicyAgent
 from ..agents.qa import QaAgent
 from ..components import clock
+from ..observability import stopwatch
 from ..components.handoff.render import REASONS
 from ..components.intake import itn, pii
 from ..components.intake import text as intake_text
@@ -238,6 +239,7 @@ async def run_turn(
         # does not stay in the checkpoint and label the turns after it.
         "input_mode": input_mode,
     }
+    watch, token = stopwatch.started()
     try:
         state = await built.graph.ainvoke(turn_input, config=thread(call_id), context=context)
     except Exception as error:  # noqa: BLE001 - the page and the call both need to hear about it
@@ -246,6 +248,8 @@ async def run_turn(
             await _store_customer_fallback(call_id, turn_id, content, vault, now)
         await vaults.save(call_id, vault)
         return Outcome("error", turn_id, error=f"{type(error).__name__}: {error}"[:300])
+    finally:
+        stopwatch.stopped(token)
     await vaults.save(call_id, vault, customer_id=state.get("customer_id"))
 
     if content is not None and row["channel"] == "web" and memory and state.get("tier") == "VERIFIED":
@@ -264,6 +268,8 @@ async def run_turn(
         "call_brief_latency_ms": state.get("call_brief_latency_ms"),
         "warmup": _turns_timed <= WARMUP_TURNS,
         "streaming": bool((state.get("draft") or {}).get("streamed")),
+        # Where the time went (observability/stopwatch); "other" includes loading and saving the call around the graph.
+        **watch.report(total_ms),
     }
     suggestion = state.get("suggestion")
     if (row.get("mode") or "speak") == "copilot":

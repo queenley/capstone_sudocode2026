@@ -201,7 +201,7 @@ export default function AgentConsole({
       </header>
       <div className="section-heading console-heading">
         <div>
-          <p className="eyebrow">AI AGENT · OBSERVABILITY</p>
+          <p className="eyebrow">AI agent · observability</p>
           <h1>Agent Console</h1>
           <p className="console-subtitle">
             Model, độ trễ, lane và tool của từng lượt; cấu hình voice và ngày
@@ -286,7 +286,7 @@ export default function AgentConsole({
       <section className="panel model-panel">
         <div className="panel-title">
           <div>
-            <p className="eyebrow">ADVISOR MODEL</p>
+            <p className="eyebrow">Advisor model</p>
             <h2>Model đang chạy</h2>
           </div>
           <span>
@@ -344,7 +344,7 @@ export default function AgentConsole({
       <section className="panel latency-panel">
         <div className="panel-title">
           <div>
-            <p className="eyebrow">LATENCY · HUONG-DAN-DO-LATENCY</p>
+            <p className="eyebrow">Latency · huong-dan-do-latency</p>
             <h2>p50 / p95 so với ngưỡng BTC</h2>
           </div>
           <select
@@ -408,7 +408,7 @@ export default function AgentConsole({
       <section className="panel flow-panel">
         <div className="panel-title">
           <div>
-            <p className="eyebrow">HOT GRAPH · PIPELINE/HOT</p>
+            <p className="eyebrow">Hot graph · pipeline/hot</p>
             <h2>Một lượt đi qua 7 bước</h2>
           </div>
         </div>
@@ -437,7 +437,7 @@ export default function AgentConsole({
         <section className="panel trace-panel">
           <div className="panel-title">
             <div>
-              <p className="eyebrow">AGENT TURNS</p>
+              <p className="eyebrow">Agent turns</p>
               <h2>Lượt gần đây</h2>
             </div>
             <button
@@ -473,7 +473,7 @@ export default function AgentConsole({
           )}
         </section>
         <aside className="panel trace-detail">
-          <p className="eyebrow">CHI TIẾT LƯỢT</p>
+          <p className="eyebrow">Chi tiết lượt</p>
           <h2>{selected?.route || "Chọn một lượt"}</h2>
           {selected ? (
             <>
@@ -527,7 +527,7 @@ export default function AgentConsole({
         <section className="panel">
           <div className="panel-title">
             <div>
-              <p className="eyebrow">VOICE CHANNEL</p>
+              <p className="eyebrow">Voice channel</p>
               <h2>Kênh gọi thoại</h2>
             </div>
             <span>
@@ -634,7 +634,7 @@ export default function AgentConsole({
           )}
         </section>
         <aside className="panel">
-          <p className="eyebrow">BUSINESS DAY</p>
+          <p className="eyebrow">Business day</p>
           <h2>Ngày nghiệp vụ</h2>
           <p className="empty">
             Dữ liệu BTC viết cho 2026-10-15. Đổi ngày để thử cuộc gọi thứ hai

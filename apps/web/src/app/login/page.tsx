@@ -65,7 +65,7 @@ export default function LoginPage() {
             }
           }}
         >
-          <p className="eyebrow">DÀNH CHO NHÂN VIÊN</p>
+          <p className="eyebrow">Dành cho nhân viên</p>
           <h1>Đăng nhập</h1>
           <p className="auth-lead">Tư vấn viên, bán hàng và quản trị dùng tài khoản do quản trị viên cấp.</p>
           {error && (

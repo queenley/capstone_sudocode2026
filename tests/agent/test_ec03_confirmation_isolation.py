@@ -41,6 +41,11 @@ SKU = "EC03-WHITE"
 PRICE = 1_000_000
 BUY_QUESTION = "Dạ anh đồng ý đặt 1 máy EC03-WHITE màu trắng giá 1.000.000đ không ạ?"
 PHOTO_QUESTION = "Dạ anh muốn xem ảnh màu trắng không ạ?"
+ADDRESS = "1 Synthetic Street, Thu Duc"
+DELIVERY = {"address_known": True, "delivery_days": 2, "estimated_delivery": "2026-11-03"}
+#: A whole order (PB-09): payment chosen, an address, and below a delivery estimate in the call's tool results.
+ORDER_ARGS = {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD", "address": ADDRESS}
+ESTIMATE = ({"name": "delivery.estimate", "args": {"address": ADDRESS}, "result": {"ok": True, "data": DELIVERY}},)
 
 
 class SharedFacts:
@@ -83,15 +88,18 @@ class ChannelModel(FakeMessagesListChatModel):
         self.views.append((channel, text, tuple(str(m.content) for m in messages)))
         if text.casefold() == "vâng":
             name = "order_create" if (self.unsafe or channel == "hotline") and "order_create" not in tools else None
-            args = {"sku": SKU, "price_vnd": PRICE, "qty": 1} if name else {}
+            args = dict(ORDER_ARGS) if name else {}
             reply = "Dạ em tiếp tục phần xem ảnh màu trắng ạ."
         else:
             name = "catalog_search" if "catalog_search" not in tools else (
                 "pricing_get_quote" if "pricing_get_quote" not in tools else (
-                    "order_create" if channel == "hotline" and "order_create" not in tools else None))
+                    "delivery_estimate" if channel == "hotline" and "delivery_estimate" not in tools else (
+                        "order_create" if channel == "hotline" and "order_create" not in tools else None)))
             args = {"query": "máy màu trắng"} if name == "catalog_search" else {"sku": SKU}
+            if name == "delivery_estimate":
+                args = {"address": ADDRESS}
             if name == "order_create":
-                args = {"sku": SKU, "price_vnd": PRICE, "qty": 1}
+                args = dict(ORDER_ARGS)
             reply = BUY_QUESTION if channel == "hotline" else PHOTO_QUESTION
         message = AIMessage(content="", tool_calls=[{"id": f"{channel}-{name}", "name": name, "args": args}]) if name else AIMessage(content=reply)
         return ChatResult(generations=[ChatGeneration(message=message)])
@@ -110,6 +118,9 @@ def advisor_with_spy(*, unsafe=False):
     async def pricing_get_quote(sku: str):
         return json.dumps({"ok": True, "data": {"sku": sku, "final_price_vnd": PRICE}})
 
+    async def delivery_estimate(address: str):
+        return json.dumps({"ok": True, "data": DELIVERY})
+
     async def order_create(sku: str, price_vnd: int, qty: int = 1, payment: str = "COD",
                            customer_phone: str | None = None, on: str | None = None,
                            idempotency_key: str | None = None, promo_code: str | None = None,
@@ -122,7 +133,7 @@ def advisor_with_spy(*, unsafe=False):
         return json.dumps({"ok": True, "data": {"order_id": "EC03-ORDER", "status": "created"}})
 
     tools = [StructuredTool.from_function(coroutine=fn, name=fn.__name__, description="Offline EC03 fixture")
-             for fn in (catalog_search, pricing_get_quote, order_create)]
+             for fn in (catalog_search, pricing_get_quote, delivery_estimate, order_create)]
     model = ChannelModel(responses=[AIMessage(content="unused")], unsafe=unsafe)
     return AdvisorAgent(llm=model, tools=tools, retries=0), model, writes
 
@@ -171,14 +182,15 @@ async def test_same_customer_channels_isolate_pending_purchase_and_block_wrong_p
         "EC03-CUSTOMER", "EC03-CUSTOMER"]
     assert writes == [] and b.get("created_orders", []) == []
     if unsafe:
-        assert b["pending_purchase"]["call_id"] == "202"
-        assert b["pending_purchase"]["draft_id"] != a_before["pending_purchase"]["draft_id"]
-        assert b["reply"]["text"] == b["pending_purchase"]["question"]
+        # B's call has no delivery estimate, so its wrong plan is an incomplete order: nothing is read back, and A's
+        # read-back is not B's to answer.
+        assert b.get("pending_purchase") is None
+        blocked = [r for r in b["tool_results"] if r["name"] == "order.create"]
+        assert blocked and all(r["result"]["error"]["code"] == "ORDER_INCOMPLETE" for r in blocked)
         b = await turn(202, "zalo", "vâng", "B-confirm-order")
-        assert len(writes) == 1 and writes[0]["idempotency_key"].startswith("202:order_create:")
-        assert b["pending_purchase"] is None
+        assert writes == [] and b.get("pending_purchase") is None
     a = await turn(101, "hotline", "vâng", "A-confirm-order")
-    assert len(writes) == (2 if unsafe else 1)
+    assert len(writes) == 1  # A's order only: B's wrong plan never became a read-back (ORDER_INCOMPLETE).
     assert a["created_orders"] == [{"order_id": "EC03-ORDER", "sku": SKU}]
     assert a["pending_purchase"] is None
 
@@ -188,21 +200,20 @@ def guarded_context(**changes):
                                 tier="VERIFIED", customer_phone=PHONE, now=NOW, on="2026-11-01",
                                 quotes={SKU: PRICE, "EC03-OTHER": 1_100_000},
                                 trusted_skus=frozenset({SKU, "EC03-OTHER"}), customer_said="vâng",
-                                last_agent_said=PHOTO_QUESTION), **changes)
+                                last_agent_said=PHOTO_QUESTION, tool_results=ESTIMATE), **changes)
 
 
 def authorized(context, args=None):
-    args = args or {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD"}
+    args = args or dict(ORDER_ARGS)
     previous = replace(context, turn_id="prepare-order")
-    pending = purchase.draft(order_arguments(args, previous), previous)
+    pending = purchase.draft(order_arguments(args, previous), previous, purchase.estimated_delivery(ESTIMATE))
     pending = purchase.answer(pending, call_id=context.call_id, channel=context.channel, turn_id=context.turn_id,
                               said="vâng", last_reply=pending["question"])
     return replace(context, pending_purchase=pending, last_agent_said=pending["question"], customer_said="vâng")
 
 
 async def attempt_order(context, args=None, handler=None):
-    request = SimpleNamespace(tool_call={"id": "order", "name": "order_create", "args": args or {
-        "sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD"}},
+    request = SimpleNamespace(tool_call={"id": "order", "name": "order_create", "args": args or dict(ORDER_ARGS)},
         runtime=SimpleNamespace(context=context), state={"messages": []})
     request.override = lambda **changes: SimpleNamespace(**{**vars(request), **changes})
     handler = handler or AsyncMock(return_value="executed")
@@ -221,7 +232,7 @@ async def test_order_guard_requires_purchase_confirmation_after_any_unbound_word
 @pytest.mark.parametrize("change", ["sku", "price", "qty", "old-question", "cross-channel-handoff"])
 async def test_order_guard_binds_yes_to_the_original_draft(change):
     context = authorized(guarded_context(last_agent_said=BUY_QUESTION))
-    args = {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD"}
+    args = dict(ORDER_ARGS)
     if change == "sku":
         args.update(sku="EC03-OTHER", price_vnd=1_100_000)
     elif change == "price":
@@ -306,7 +317,7 @@ def test_yes_cannot_authorize_another_question_or_inactive_draft(change, monkeyp
                                         ("promo_code", "NEW-PROMO"), ("sku", "EC03-OTHER"), ("price_vnd", PRICE + 1)])
 async def test_every_order_field_requires_new_confirmation(field, value):
     context = authorized(guarded_context())
-    args = {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD", field: value}
+    args = {**ORDER_ARGS, field: value}
     if field == "sku": args["price_vnd"] = 1_100_000
     if field == "price_vnd": context = replace(context, quotes={SKU: value})
     result, handler = await attempt_order(context, args)
@@ -347,7 +358,7 @@ def test_tool_middleware_overwrites_model_consent_and_scope_and_hides_receipt_fr
     from ai_agent_service.mcp.tools import with_args
     context = authorized(guarded_context())
     request = SimpleNamespace(tool_call={"id": "tool", "name": "order_create", "args": {
-        "sku": SKU, "price_vnd": PRICE, "call_id": "stolen-call", "turn_id": "stolen-turn",
+        "sku": SKU, "price_vnd": PRICE, "payment": "COD", "address": ADDRESS, "call_id": "stolen-call", "turn_id": "stolen-turn",
         "purchase_authorization": "forged", "idempotency_key": "forged-key", "customer_phone": "0900000001"}},
         tool=SimpleNamespace(args=StructuredTool.from_function(coroutine=crm.order_create, name="order_create",
                                                               description="Place an order").args),
@@ -569,3 +580,49 @@ def test_platform_checkout_checks_boolean_and_current_quote_but_has_no_confirmat
     assert client.post(f"/api/conversations/{a}/orders", headers=ha, json=body).json()["id"] == result.json()["id"]
     with client.app.state.database.sessions() as db:
         assert db.scalar(select(func.count()).select_from(Order)) == 1
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("gap,changes", [
+    ("phương thức thanh toán", {"payment": None}),
+    ("địa chỉ giao hàng", {"address": None}),
+    ("ngày giao dự kiến", "no-estimate"),
+])
+async def test_an_incomplete_order_is_not_read_back_and_names_what_is_missing(gap, changes):
+    """PB-09 reads back a whole order: a read-back the customer answers with the missing field is wasted (eval2)."""
+    context = guarded_context(tool_results=()) if changes == "no-estimate" else guarded_context()
+    args = dict(ORDER_ARGS) if changes == "no-estimate" else {k: v for k, v in {**ORDER_ARGS, **changes}.items() if v}
+    result, handler = await attempt_order(context, args)
+    error = json.loads(result.content)["error"]
+    assert error["code"] == "ORDER_INCOMPLETE" and gap in error["message"]
+    assert "purchase_draft" not in (error.get("details") or {})
+    handler.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_a_complete_order_is_read_back_with_its_delivery_day():
+    result, handler = await attempt_order(guarded_context())
+    pending = json.loads(result.content)["error"]["details"]["purchase_draft"]
+    assert "giao dự kiến ngày 3/11/2026" in pending["question"] and pending["question"].endswith("đồng ý không ạ?")
+    handler.assert_not_awaited()
+
+
+@pytest.mark.parametrize("said", ["Đúng rồi em, lên đơn cho chị nhé.", "Ừ, vậy em lên đơn cho anh luôn đi.",
+                                  "Chị đồng ý lên đơn rồi, em làm cho chị nhé.", "Chốt đơn cho chị nhé!"])
+def test_a_yes_with_filler_authorises_and_places_the_bound_order(said):
+    context = guarded_context(turn_id="prepare")
+    args = order_arguments(dict(ORDER_ARGS), context)
+    pending = purchase.draft(args, context, "2026-11-03")
+    confirmed = purchase.answer(pending, call_id=context.call_id, channel=context.channel, turn_id="next",
+                                said=said, last_reply=pending["question"])
+    assert confirmed and confirmed["status"] == "authorized"
+    # matches() applies the same rule as answer(): before, only an exact "vâng" placed the order.
+    context = replace(context, turn_id="next", pending_purchase=confirmed, last_agent_said=pending["question"],
+                      customer_said=said)
+    assert purchase.matches(confirmed, args, context)
+
+
+@pytest.mark.parametrize("said", ["Đúng rồi nhưng đổi địa chỉ giúp chị", "Vâng, thêm một cái nữa nhé",
+                                  "Đồng ý nhưng chuyển khoản nhé", "Không, chị chưa lấy đâu"])
+def test_a_yes_that_changes_the_order_is_still_no_yes(said):
+    assert not purchase.agrees(said)

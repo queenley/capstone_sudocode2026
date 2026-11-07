@@ -25,7 +25,8 @@ from ...agents.policy import PolicyInput, needs_review
 from ...components.context import compact, focus
 from ...components.context.budget import tokens as count_tokens
 from ...components.guardrails import actions, fallback, purchase
-from ...components.guardrails.hard import MAX_SENTENCES, ORDER_SUMMARY, GuardInput, check, moved_callback
+from ...components.guardrails.hard import (MAX_SENTENCES, ORDER_SUMMARY, GuardInput, check, moved_callback, numbers_in,
+                                           open_amounts)
 from ...components.guardrails.stream import SentenceSplitter
 from ...components.identity import resolver
 from ...components.intake import honorific, itn, lexicon, pii, signals, text as intake_text
@@ -33,6 +34,7 @@ from ...components.knowledge.search import stated_order_day
 from ...components.memory import brief as briefs
 from ...components.memory import recall
 from ...components.memory.brief import BriefLine
+from ...observability import stopwatch
 from ...components.orchestration.rules import MODEL_FAILURES, RouteInput, decide
 from ...config.config_manager import handoff_auto_accept
 from ...mcp.servers import btc
@@ -138,9 +140,11 @@ async def load_context(state: HotState, runtime: Runtime[HotContext]) -> dict[st
     placed is answered by the policy of the day it was placed (CL-01).
     """
     context = runtime.context
-    update = await _identify(state, context)
+    with stopwatch.span("context"):
+        update = await _identify(state, context)
     if state.get("phase") != "opening" and (context.text or "").strip():
-        found = await _knowledge({**state, **update}, context, _last_customer_text(state) or "")
+        with stopwatch.span("knowledge"):
+            found = await _knowledge({**state, **update}, context, _last_customer_text(state) or "")
         if found is not None:
             update["knowledge"] = found
     return update
@@ -450,7 +454,8 @@ async def advisor(state: HotState, runtime: Runtime[HotContext]) -> dict[str, An
     summary = state.get("working_summary")
     folded, kept = compact.split(messages)
     if folded:
-        summary = await compact.fold_with(context.compactor, folded, summary)
+        with stopwatch.span("compact"):
+            summary = await compact.fold_with(context.compactor, folded, summary)
         update["working_summary"] = summary
         update["messages"] = [RemoveMessage(id=m.id) for m in folded if m.id]
         messages = kept
@@ -477,7 +482,8 @@ async def advisor(state: HotState, runtime: Runtime[HotContext]) -> dict[str, An
         update.update(await _streamed(state, context, turn_messages, agent_context))
         return update
     try:
-        draft = await context.advisor.draft(turn_messages, agent_context, user_id=context.user_id)
+        with stopwatch.span("advisor"):
+            draft = await context.advisor.draft(turn_messages, agent_context, user_id=context.user_id)
     except Exception as error:  # noqa: BLE001 - section 4.9: a failure is never silence
         logger.exception("Advisor failed on call %s", state.get("call_id"))
         produced = list(error.partial.tool_results) if isinstance(error, AdvisorFailure) else []
@@ -683,6 +689,10 @@ def _placed(earlier: Sequence[Mapping[str, Any]], results: Sequence[Mapping[str,
     return list(lines.values())
 
 
+#: Tools whose numbers a later turn of the call may repeat: prices, discounts, fees and delivery days.
+PRICED_TOOLS = frozenset({"pricing.get_quote", "catalog.search", "delivery.estimate"})
+
+
 def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     """A run's tool results added to the turn's, with today's quotes, the orders seen and the failure count."""
     new_results = [{**r, "turn": state.get("turn_no") or 0} for r in produced]
@@ -718,7 +728,12 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
             pending_purchase = ((envelope["error"].get("details") or {}).get("purchase_draft"))
         elif (envelope.get("error") or {}).get("code") in INFRASTRUCTURE_CODES:
             failures += 1
+    numbers = set(state.get("call_numbers") or ())
+    for result in new_results:
+        if str(result.get("name", "")).replace("_", ".", 1) in PRICED_TOOLS:
+            numbers |= numbers_in(result.get("result"))
     return {"tool_results": list(state.get("tool_results") or []) + new_results, "quotes": quotes,
+            "call_numbers": sorted(numbers),
             "known_orders": orders, "created_orders": created, "updated_orders": updated, "tool_failures": failures,
             "deletion_recorded": deletion_recorded, "callback_booked": callback_booked,
             "pending_purchase": pending_purchase,
@@ -864,8 +879,9 @@ async def _stream_once(
     # into the last sentence before the tools ("…chờ chút nhé.Dạ đơn hàng…").
     new_message = False
     stream = context.advisor.stream(messages, view, user_id=context.user_id)
+    waited = _waited(stream)
     try:
-        async for event in stream:
+        async for event in waited:
             if event.kind == "tool_started":
                 if timing["filler_ms"] is None and not attempt.said and context.emit is not None:
                     await context.emit("filler", fallback.LINES["filler"].format(who=_who(state)))
@@ -902,7 +918,20 @@ async def _stream_once(
             await _offer(state, context, rest, earlier + tuple(attempt.results), attempt, timing)
         return attempt
     finally:
+        await waited.aclose()
         await stream.aclose()
+
+
+async def _waited(stream: Any) -> Any:
+    """*stream*'s events, the wait for each timed as ``advisor``: what the customer waits on, not what runs ahead."""
+    events = stream.__aiter__()
+    while True:
+        with stopwatch.span("advisor"):
+            try:
+                event = await events.__anext__()
+            except StopAsyncIteration:
+                return
+        yield event
 
 
 def _confirmation_draft(results: Sequence[Mapping[str, Any]]) -> dict[str, Any] | None:
@@ -943,11 +972,14 @@ async def _offer(state: HotState, context: HotContext, sentence: str, results: t
     if len(attempt.said) >= MAX_SENTENCES and not ORDER_SUMMARY.search(" ".join([*attempt.said, sentence])):
         attempt.last_spoken = False
         return True  # past the length the rules allow: not said, the stream goes on to its end
-    view = guard_input(state, context, spoken, results)
-    reasons = list(check(view).reasons)
+    with stopwatch.span("guard"):
+        view = guard_input(state, context, spoken, results)
+        reasons = list(check(view).reasons)
     if not reasons and context.policy is not None and needs_review(spoken):
-        soft = await context.policy.review(PolicyInput(text=spoken, tool_results=results, tier=view.tier,
-                                                       policy_snippets=view.policy_texts))
+        with stopwatch.span("policy"):
+            soft = await context.policy.review(PolicyInput(text=spoken, tool_results=results, tier=view.tier,
+                                                           policy_snippets=view.policy_texts,
+                                                           open_amounts=open_amounts(view)))
         attempt.soft.append(soft)
         reasons += list(soft.reasons)
     if reasons:
@@ -999,16 +1031,19 @@ async def guard(state: HotState, runtime: Runtime[HotContext]) -> dict[str, Any]
     text = unmarked(draft.get("text") or "")
     results = tuple(state.get("tool_results") or [])
     tier = state.get("tier") or "UNKNOWN"
-    view = guard_input(state, context, text, results)
-    hard = check(view)
+    with stopwatch.span("guard"):
+        view = guard_input(state, context, text, results)
+        hard = check(view)
     moved = moved_callback(text, results)
     if moved:
         hard = hard._replace(passed=False, reasons=(*hard.reasons, f"Lịch gọi lại đã dời sang {moved} (LN-02); phải báo khách giờ mới."))
     verdict: dict[str, Any] = {"hard": {"passed": hard.passed, "reasons": list(hard.reasons)}}
     reasons = list(hard.reasons)
     if hard.passed and context.policy is not None and needs_review(text):
-        soft = await context.policy.review(PolicyInput(text=text, tool_results=results, tier=tier,
-                                                       policy_snippets=view.policy_texts))
+        with stopwatch.span("policy"):
+            soft = await context.policy.review(PolicyInput(text=text, tool_results=results, tier=tier,
+                                                           policy_snippets=view.policy_texts,
+                                                           open_amounts=open_amounts(view)))
         verdict["soft"] = {"passed": soft.passed, "reasons": list(soft.reasons), "decided_by": soft.decided_by,
                            "probabilities": soft.probabilities, "seconds": soft.seconds}
         reasons += list(soft.reasons)
@@ -1048,6 +1083,7 @@ def guard_input(state: HotState, context: HotContext, text: str, results: tuple[
         brief_prices=tuple(int(p["price_quoted_vnd"]) for p in brief.get("products_advised") or [] if p.get("price_quoted_vnd")),
         tokens=frozenset(context.vault.entries),
         quotes=dict(state.get("quotes") or {}),
+        call_numbers=tuple(state.get("call_numbers") or ()),
         warnings=tuple(state.get("freshness") or []) if tier == "VERIFIED" else (),
         promotions=promotions(),
         on=state.get("on"),

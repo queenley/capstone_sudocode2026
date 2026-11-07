@@ -23,6 +23,72 @@ Loại: ... · Trạng thái: ... · Chỉ số: TSR / CCR / RQR / HR / latency 
 
 Sáu mục đầu được ghi lại sau khi làm, từ đợt sửa ngày 05-06/11/2026. Chưa mục nào có số đo trên agent thật.
 
+### 2026-11-08 · Chỉ đọc lại đơn khi đủ thông tin, và "đồng ý" kèm từ đệm vẫn tạo được đơn
+
+Loại: hard guard, prompt · Trạng thái: đang đo · Chỉ số: TSR
+
+- **Vấn đề:** 23 cuộc trong `eval2` trượt TSR vì không có `order.create` nào (`success_if` chờ `order.create` khớp `args_match`). Khi trả lời câu agent đọc lại đơn, khách thường đưa thông tin còn thiếu chứ không nói "đồng ý", nên câu đọc lại bị phí. Còn khi khách đã đồng ý thì đơn vẫn không được tạo.
+- **Bằng chứng:** `evaluation/runs/eval2-full-relabel-3`. Trong 23 cuộc, 19 có `pricing.get_quote` lỗi `BAD_ENVELOPE` vì tham số `payment` (đã sửa ở mục "Tham số thừa…", sau khi chạy run này); 13 cuộc đọc lại đơn ở lượt cuối nên không còn lượt để khách xác nhận. Trên toàn run có 153 câu trả lời ngay sau câu đọc lại đơn: 116 không phải lời đồng ý (phần lớn là địa chỉ hoặc cách thanh toán, ví dụ SCN-ADV-0018 call_2 lượt 3 "Giao hàng cho chị ở Thủ Đức"); 35 được `purchase.answer()` (qua `agrees()`) nhận là đồng ý nhưng không có đơn, trong khi `purchase.matches()` đòi `YES.fullmatch`; chỉ 2 tạo được đơn. `agrees()` còn từ chối "Ừ, vậy em lên đơn cho anh luôn đi." (SCN-GEN-0232) và "Chị đồng ý lên đơn rồi, em làm cho chị nhé." (SCN-GEN-0240). Mẫu BTC: cả 5 cuộc chấm `order.create` đều để khách nói "lên đơn" ở lượt cuối.
+- **Sửa:** (1) `ActionGuardMiddleware` trả `ORDER_INCOMPLETE`, kèm phần còn thiếu và không phát hành bản nháp, khi đơn thiếu thanh toán do model truyền, thiếu địa chỉ (lấy từ lời khách hoặc bộ nhớ qua `order_arguments`) hoặc thiếu ngày giao từ `delivery.estimate` (`purchase.missing`, `purchase.estimated_delivery`). Câu đọc lại có thêm "giao dự kiến ngày …" (PB-09). Rule 12 trong `rule_packs.yaml` bỏ "thiếu địa chỉ hay thanh toán không phải lý do chờ / tự đặt COD": giờ chỉ hỏi phần còn thiếu, và gọi `order_create` ngay khi khách vừa đưa thông tin cuối cùng, để câu "chốt đơn" kế tiếp là lời xác nhận. (2) `purchase.matches()` dùng `agrees()`, cùng quy tắc với `answer()`; các điều kiện khác giữ nguyên: đúng câu đọc lại ở lượt trước, cùng nội dung đơn, còn trong 300 giây, có biên nhận HMAC. (3) `COURTESY` thêm "vậy", "làm"; câu có "nhưng", "đổi", "thêm", "chuyển khoản" vẫn không được tính là đồng ý.
+- **Đã kiểm:** thêm 12 test trong `tests/agent/test_ec03_confirmation_isolation.py` (đơn thiếu từng trường; câu đọc lại có ngày giao; 4 câu đồng ý kèm từ đệm tạo được đơn; 4 câu có ý đổi đơn bị từ chối). Fixture được cập nhật cho đơn đủ thông tin. Kế hoạch mua sai trên kênh khác giờ dừng ở `ORDER_INCOMPLETE`, không còn tạo bản nháp. `tests/agent`: 1.285 passed; 11 failed và 14 errors đều nằm ở ASR và voice (`test_asr_*`, `test_voice_transport`), các file không bị đổi trong mục này.
+- **Số đo:** chưa đo.
+- **Còn lại:** khi lần đầu khách nói muốn mua lại rơi vào lượt cuối (như SAMPLE-02, SAMPLE-04, SAMPLE-05 của BTC), vẫn không còn lượt để xác nhận: đây là đánh đổi đã chọn (xác nhận trước khi tạo đơn). Số lượng mặc định là 1 khi khách không nói, và được đọc lại để khách sửa. Cần chạy lại các cuộc `order.create` của `eval2`, trước hết một kịch bản (SCN-ADV-0018).
+
+### 2026-11-07 · Extractor v11: entity nạp từ contract, thêm today và crm_history
+
+Loại: evaluation · Trạng thái: đang đo · Chỉ số: RQR, HR, CCR (đổi dụng cụ đo)
+
+- **Vấn đề:** từ vựng của extractor được viết tay, lệch khỏi `contracts/scenario/scenario-keys.yaml`. Slot `return_reason` và `tracking` có trong contract nhưng extractor không có, nên câu hỏi về hai slot này bị gán `other` và RQR không thấy. `callback_at`, `gift_sku`, `new_variant_sku`, `successor_sku`, `price_vnd:<SKU>` và `future_promo_disclosed` có trong `ground_truth_facts` nhưng không bao giờ được trích, nên HR không kiểm các trường này. Fact lấy từ hồ sơ CRM (`seed_history`) không được tính là `facts_used`. Relabel `eval2` 3.592 lượt chạy nhiều giờ.
+- **Bằng chứng:** so `scorers.vocabulary()`/`CLAIM_FIELDS` với contract: thiếu `return_reason`, `tracking`. Các trường claim mới xuất hiện trong kịch bản của `evaluation/runs/eval2-full-relabel-3/scenarios` (ví dụ `gift_sku` 51 lần, `callback_at` dạng `2026-10-19T19:00`). Về tốc độ: giới hạn OpenAI trong `models.yaml` là 200k token đầu vào/phút (giữ lại 10%). Mỗi lượt khoảng 6,6k token prompt cộng lịch sử, nên chỉ chạy được khoảng 20 lượt/phút. Ngoài ra cache 5,9 MB được ghi lại toàn bộ sau mỗi lượt, ngay trên event loop.
+- **Sửa:** `scorers.contract()` đọc contract. `EXTRA_SLOTS` là các slot contract có mà ontology không có. `CLAIM_FIELDS` là khóa `ground_truth_facts` trừ `NOT_CLAIMS`, cộng `shipping_fee_vnd` và `cod_limit_vnd`. Thêm kiểu `datetime` (chuẩn hóa về `YYYY-MM-DDTHH:MM`) và `sku` (phải có đúng mã trong quote); `price_vnd:<SKU>` cũng phải có mã trong quote. `turn_input` nhận `today` và `crm_history`, do `cli.call_context` lấy từ plan của kịch bản, ở cả run thường lẫn relabel. Fact usage được giữ khi có `previous_sessions` hoặc `crm_history`. Prompt cập nhật theo bản người dùng đưa; vẫn giữ slot `issue` và quy tắc `estimated_delivery` của v10. Cache ghi theo lô (50 nhãn hoặc 30 giây, và một lần khi gắn nhãn xong) trong thread riêng, JSON không thụt lề. `VERSION` lên `product-extractor-v11`.
+- **Đã kiểm:** chạy 11 file test extractor/relabel/eval trong `apps/ai-agent-service/.venv`: 126 passed. Ba test mới nằm trong `test_extractor_vocabulary.py` (entity theo contract; `callback_at`/SKU/`price_vnd:<SKU>`; `crm_history` làm bằng chứng). Python hệ thống thiếu `pytest-asyncio`, nên test async phải chạy bằng venv này.
+- **Số đo:** chưa đo.
+- **Còn lại:** hash và version đổi nên cache cũ không dùng được; relabel lại sẽ gọi model cho mọi lượt. Muốn nhanh hơn rõ rệt phải nâng `input_tokens_per_minute` của OpenAI theo tier thật của key, hoặc gắn nhãn cả một cuộc trong một lần gọi; cách sau lại đổi dụng cụ đo, cần duyệt trước. Các lỗi TSR "không có tool call order.create khớp args_match" là lỗi của agent, không phải của extractor, nên extractor không sửa được.
+
+### 2026-11-07 · Extractor v10: một lượt không gán được nhãn không làm hỏng cả run
+
+Loại: evaluation · Trạng thái: đang đo · Chỉ số: RQR, HR, CCR (đổi dụng cụ đo)
+
+- **Vấn đề:** relabel `full` của `eval2` dừng ở lượt 521/3.747. Một lượt hỏng cả hai lần thử, và `_label` dừng mọi lượt còn lại.
+- **Bằng chứng:** `evaluation/runs/eval2-full-relabel-2`, SCN-ADV-0061 call_2 lượt 4, câu "em chưa tra được giá chính xác lúc này": cả hai lần model trả `kind: "other"`, schema chỉ nhận `question`, `claim`, `fact_usage`. Prompt dùng `other` làm nhãn dự phòng của slot; ở nhiệt độ 0 chạy lại vẫn ra như vậy.
+- **Sửa:** `scorers.Item` nhận `kind: other`, `label_items` bỏ mục đó và tính vào `changed`; `VERSION` lên `product-extractor-v10`. `cli._label` gán nhãn tiếp các lượt khác khi một lượt hỏng, trừ khi có `EVAL_BUDGET_DB`; bảng vẫn bị giữ khi còn lượt chưa gán nhãn.
+- **Đã kiểm:** hai test mới trong `tests/agent/test_relabel_one_config.py`; `test_eval_guardrails` cập nhật theo hành vi mới; toàn bộ `tests/agent` chỉ còn lỗi ASR của môi trường.
+- **Số đo:** chưa đo.
+- **Còn lại:** đổi `scorers.py` đổi `prompt_sha256`, nên cache cũ không dùng được. Lần sửa trước (thử lại khi ghi cache) cũng đã đổi hash mà không nâng version: run `thu-1` có hash `bc5653…`, relabel lần 2 có `29c4d1…`. Không so số giữa các hash khác nhau.
+
+### 2026-11-07 · Chấm riêng một cấu hình và extractor không còn treo
+
+Loại: evaluation · Trạng thái: đang đo · Chỉ số: TSR, CCR, RQR, HR của `full`
+
+- **Vấn đề:** `eval2` chạy xong `full` (404 kịch bản, 3.747 lượt) thì extractor đứng yên hơn 20 phút ở lượt 143 rồi tiến trình dừng. Manifest còn `INCOMPLETE`, không có baseline, nên relabel từ chối và không chấm được gì. Lúc gán nhãn cũng không in tiến độ, nên không phân biệt được treo hay đang chạy.
+- **Bằng chứng:** `evaluation/runs/eval2`: cache extractor ghi lần cuối 16:43 với 143 mục; CPU của tiến trình không đổi; 5 kết nối HTTPS ở trạng thái `CLOSE_WAIT`.
+- **Sửa:** `relabel` nhận `--config`: chỉ chấm cấu hình đó, không cần cấu hình kia. Một run dừng mà không ghi lý do chỉ được nhận khi chọn `--config` và trace của cấu hình đó đủ mọi lượt (`report.trace_errors`), không lượt hay `after_call` nào lỗi; lỗi đã ghi trong manifest vẫn chặn. `cli._label` giới hạn 300 s mỗi lượt: quá thì dừng với lỗi, phần đã gán nhãn giữ trong cache. In tiến độ sau mỗi 200 lượt. Lần relabel đầu dừng ở lượt 256 vì Windows từ chối ghi đè `extractor.json` (`PermissionError`, repo nằm trong OneDrive); `scorers._replace` thử lại 5 lần, vẫn bị giữ thì cảnh báo và gán nhãn tiếp.
+- **Đã kiểm:** `tests/agent/test_relabel_one_config.py`, hai test mới trong `test_extractor_cache_integrity.py`. Kiểm `eval2` qua đúng các bước kiểm của relabel, không gọi model: đủ 3.747 lượt, không lỗi.
+- **Số đo:** chưa đo.
+- **Còn lại:** số của `eval2` là của code trước các bản sửa guard, chỉ dùng làm mốc. Relabel xoá `facts_used` cũ, nên CCR là cận dưới. Chưa tìm được vì sao lời gọi extractor treo dù đã đặt timeout 60 s; giới hạn 300 s chỉ chặn hậu quả.
+
+### 2026-11-07 · Đo thời gian từng bước của một lượt
+
+Loại: evaluation · Trạng thái: đang đo · Chỉ số: TTFT, Total Latency
+
+- **Vấn đề:** trace chỉ có `ttft_ms` và `total_ms`, nên không biết giây nào đi vào model, tool, guard hay PolicyAgent, và không quyết được có nên thêm Redis. Langfuse chỉ thấy model và tool của advisor; PolicyAgent, hard guard, tra knowledge và nạp brief không có span, `stage_timings` gửi lên luôn rỗng.
+- **Bằng chứng:** `evaluation/runs/eval2`, 3.419 lượt: TTFT p50 3,2 s, p95 9,3 s; Call Brief p50 84 ms, p95 267 ms; lượt có tool p50 3,9 s so với 1,6 s; lượt viết lại p50 6,3 s. Trung bình 2,03 lần gọi advisor và 0,91 lần gọi PolicyAgent mỗi lượt.
+- **Sửa:** `observability/stopwatch.py` mở một đồng hồ mỗi lượt qua contextvar, đo thời gian thực của từng bước: `context`, `knowledge`, `compact`, `advisor` (thời gian chờ chữ tiếp theo, kể cả tool), `guard`, `policy`, `respond`, `persist`, `other`; thêm `model` và `tools` đo bên trong advisor. Hai tool chạy song song chỉ tính một lần. Ghi vào `diagnostics.jsonl` (`timings`), không vào trace BTC; `--performance` in bảng theo bước; API đưa vào `latency.stages_ms`, nên màn Developer và Langfuse (`stage_timings`) có số.
+- **Đã kiểm:** `tests/agent/test_turn_stopwatch.py`, gồm một lượt qua graph thật với model giả. Toàn bộ `tests/agent` không thêm lỗi mới.
+- **Số đo:** chưa đo; `eval2` chạy trước khi có đồng hồ.
+- **Còn lại:** chạy lại một kịch bản để có bảng đầu tiên. PolicyAgent vẫn chưa có span riêng trên Langfuse. Khi stream, model chạy trước trong lúc câu đang được kiểm, nên `model` có thể dài hơn `chờ advisor`.
+
+### 2026-11-07 · Guard nhận đúng nguồn của số tiền
+
+Loại: hard guard, soft guard, tool · Trạng thái: đang đo · Chỉ số: TSR, HR, số lần fallback
+
+- **Vấn đề:** phần lớn lần chặn số tiền là chặn oan, nên khách nhận câu an toàn thay cho câu trả lời đúng. `schedule.callback` lỗi `INTERNAL` khi chưa có số của khách.
+- **Bằng chứng:** `evaluation/runs/eval2`, phân loại toàn bộ, không lấy mẫu: giá của lượt trước trong cùng cuộc; `1.400 W` bị đọc là tiền; ngân sách gõ không dấu hoặc kiểu "5 triệu rưỡi"; tổng các báo giá; phí bằng 8% giá theo BH-05; giá của Call Brief ở lượt mở đầu; `order.status` trả rỗng; PolicyAgent chặn số viết bằng chữ và số đã có trong tool. SCN-ADV-0093, SCN-ADV-0145: `schedule.callback` thiếu `customer_phone`.
+- **Sửa:** `call_numbers` giữ số của giá, catalog và giao hàng trong cả cuộc; `allowed_amounts` nhận tổng các báo giá và tỷ lệ trong tài liệu nhân với giá; `itn` đọc "rưỡi" và bỏ số có đơn vị đo; `customer_amounts` đọc tiền không dấu; `PRICE_HISTORY` nhận cách nhắc giá cũ ở lượt mở đầu; `_order_state` chấp nhận tra rỗng và câu hỏi xác nhận; `open_amounts` để PolicyAgent chỉ xét số không có nguồn; thiếu số khách thì `actions` yêu cầu hỏi số, `crm` báo lỗi rõ thay vì `INTERNAL`.
+- **Đã kiểm:** `tests/agent/test_money_sources.py`. Phát lại 140 bản nháp bị chặn qua guard mới, không gọi model: 92 qua, 48 còn bị chặn. Trong 48 ca có tổng tính sai thật (11.380.000 so với 10.935.000), và khoảng 15 ca lượt mở đầu mà bản phát lại không có giá của Call Brief.
+- **Số đo:** chưa đo trên agent thật.
+- **Còn lại:** chạy lại `eval2` sau khi sửa. Theo dõi HR vì guard nới ra ở một số nguồn. Model viết lại nguyên câu ở 14 lần fallback, nên chưa dùng được lý do bị chặn để sửa câu.
+
 ### 2026-11-07 · Tham số thừa làm hỏng báo giá và chuyển máy
 
 Loại: hard guard, tool · Trạng thái: đang đo · Chỉ số: TSR, HR
@@ -32,7 +98,7 @@ Loại: hard guard, tool · Trạng thái: đang đo · Chỉ số: TSR, HR
 - **Sửa:** `advisor.declared_arguments` bỏ tham số không khai báo trước mọi tool; câu hỏi `unquoted_price` tính cả tài liệu đã đọc; `hard.TRANSFER_REFUSED` cho câu từ chối đi qua.
 - **Đã kiểm:** `tests/agent/test_tool_arguments.py`. Chưa chạy lại `eval2`.
 - **Số đo:** chưa đo.
-- **Còn lại:** `schedule.callback` lỗi `INTERNAL` khi thiếu `customer_phone`. Còn 33 trên 36 lần fallback chưa rõ nguyên nhân.
+- **Còn lại:** xem mục "Guard nhận đúng nguồn của số tiền".
 
 ### 2026-11-07 · Admin duyệt Knowledge Gap Loop
 

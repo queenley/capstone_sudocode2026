@@ -76,7 +76,7 @@ export default function Workspace({ role }: { role: string }) {
       </header>
       <div className="section-heading">
         <div>
-          <p className="eyebrow">INTERNAL WORKSPACE</p>
+          <p className="eyebrow">Internal workspace</p>
           <h1>
             {role === "agent"
               ? "Every handoff, in context."

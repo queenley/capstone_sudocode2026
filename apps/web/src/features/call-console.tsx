@@ -284,7 +284,7 @@ export default function CallConsole({
       )}
       <div className="section-heading console-heading">
         <div>
-          <p className="eyebrow">QUIVO · HỖ TRỢ KHÁCH HÀNG</p>
+          <p className="eyebrow">Quivo · hỗ trợ khách hàng</p>
           <Heading>Cuộc gọi của trợ lý</Heading>
           <p className="console-subtitle">
             Theo dõi trợ lý đang tư vấn, nhận cuộc gọi khi trợ lý chuyển máy, và

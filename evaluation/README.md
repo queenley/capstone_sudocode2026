@@ -43,6 +43,10 @@ python run_eval.py --scenarios <thư mục> --only <ID> --no-extract
 # Gắn nhãn lại một run cũ bằng extractor hiện tại, KHÔNG chạy lại agent (chỉ tốn lượt gọi extractor)
 python run_eval.py --relabel evaluation/runs/<ngày>-work/<run> --out evaluation/runs/<tên>-relabel
 
+# Chỉ chấm một cấu hình (không có cột baseline). Cũng là cách duy nhất chấm một run bị dừng mà không ghi lý do,
+# và chỉ khi trace của cấu hình đó đủ mọi lượt, không lượt hay after_call nào lỗi
+python run_eval.py --relabel evaluation/runs/<run> --config full --out evaluation/runs/<tên>-full-relabel
+
 # Bảng hiệu năng của run đã xong, miễn phí (không model, không database)
 python run_eval.py --performance evaluation/runs/<tên>
 
@@ -101,6 +105,7 @@ Ghi chú dưới bảng báo khi hai cột khác bộ kịch bản, khác model,
 | Call Brief, TTFT, Total | `reference_eval.latency` của BTC, p95 | Ngưỡng theo `huong-dan-do-latency.md`; cần ≥ 100 lượt mới có ý nghĩa |
 | TTFA (voice) | `latency.ttfa_ms` | `run_eval.py` chạy chữ nên luôn "chưa đo"; số thật nằm ở màn Developer khi gọi voice |
 | Số phiên đồng thời | `--sessions` | Mức cao nhất không lỗi và p95 trong ngưỡng chat, không ghi trace, không chấm |
+| Thời gian theo bước | `timings` trong `diagnostics.jsonl` | Trung bình, p50, p95 của từng bước (`observability/stopwatch.py`); run cũ ghi "chưa đo" |
 | Token mỗi lượt | `usage.json` | Trung bình theo lượt khách, tách và cộng `after_call` |
 | Chi phí mỗi lượt | token nhân giá niêm yết (`performance.PRICES`) | Chỉ model đã chạy là số đo; model kia là ước tính cùng số token, chưa tính cache. Giá Gemini 3 Flash lấy từ trang theo dõi bên thứ ba, cần đối chiếu trang giá Google trước khi báo cáo |
 
@@ -112,7 +117,7 @@ Dùng `--out` mới hoặc thư mục rỗng; CLI không ghi đè bằng chứng
 
 Scenario được kiểm trước khi gọi model và snapshot từ nội dung đã nạp, cả `--config`. Database có advisory lock cho toàn bộ run, chặn hai runner reset lẫn nhau; output được giữ chỗ độc quyền. Trước extractor/scorer phải đủ đúng từng scenario/call/turn, đúng config và lời khách, không trùng hoặc trộn run. Trace được lưu sau mỗi scenario để giữ replies nếu bước sau lỗi. Relabel chỉ sửa lỗi extractor trên replies đầy đủ; lỗi seed, graph hoặc after-call vẫn chặn chấm.
 
-Extractor hiện là `product-extractor-v9`: thêm 20 trường claim (trạng thái/mã đơn, mã vận đơn, ngày giao dự kiến, COD, bảo hành, đổi trả…) và slot `issue`, để HR kiểm được các `ground_truth_facts` của kịch bản nhóm mà v8 bỏ qua. Số HR của v9 không so trực tiếp với v8; muốn so phải relabel cùng replies. Cache JSON có thể mất hit khi nhiều process ghi snapshot, làm tăng số cache miss trong cap; không làm file cache bị ghi dở.
+Extractor hiện là `product-extractor-v11`: entity nạp từ `contracts/scenario/scenario-keys.yaml` (thêm slot `return_reason`, `tracking`; claim `callback_at`, `gift_sku`, `new_variant_sku`, `successor_sku`, `price_vnd:<SKU>`, `future_promo_disclosed`), mỗi lượt có thêm `today` và `crm_history`; số v11 so với v10 phải relabel cùng replies. v10 như v9, nhưng một mục model gắn `kind: other` (không phải câu hỏi, claim hay dữ kiện dùng lại) bị bỏ thay vì làm hỏng cả lượt; số của v10 so với v9 phải relabel cùng replies. v9 thêm 20 trường claim (trạng thái/mã đơn, mã vận đơn, ngày giao dự kiến, COD, bảo hành, đổi trả…) và slot `issue`, để HR kiểm được các `ground_truth_facts` của kịch bản nhóm mà v8 bỏ qua. Số HR của v9 không so trực tiếp với v8; muốn so phải relabel cùng replies. Cache JSON có thể mất hit khi nhiều process ghi snapshot, làm tăng số cache miss trong cap; không làm file cache bị ghi dở.
 
 ## Quy tắc
 

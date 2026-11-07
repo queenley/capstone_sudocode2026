@@ -39,6 +39,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Literal, Mapping
 
+from ..components.intake.itn import format_vnd
 from ..components.intake.text import plain
 from ..llm.jev import Boolean, JevUnavailable
 from .base import BaseAgent
@@ -93,7 +94,8 @@ QUESTIONS = {
     "unquoted_price": Boolean(
         instructions=(
             "Does the reply state, as this shop's own current price, discount, fee or refund, an amount of "
-            "money that is in neither the tool results nor the policy passages?"
+            "money that is in neither the tool results nor the policy passages? When amounts_without_source "
+            "is given, only those amounts can count."
         ),
         criteria={
             "true": "An amount given as what this shop charges, discounts or refunds now, and neither the tool "
@@ -209,6 +211,8 @@ class PolicyInput:
     tier: Literal["VERIFIED", "PROBABLE", "AMBIGUOUS", "UNKNOWN"]
     #: Policy passages the advisor read this turn.
     policy_snippets: tuple[str, ...] = ()
+    #: The reply's amounts with no source, when the hard check already traced the others; None when it did not run.
+    open_amounts: tuple[int, ...] | None = None
 
 
 @dataclass(frozen=True)
@@ -235,6 +239,7 @@ class PolicyAgent(BaseAgent):
                 {"tool": r.get("name"), "result": (r.get("result") or {}).get("data")} for r in view.tool_results
             ],
             "policy": list(view.policy_snippets) or ["(no policy passage was read this turn)"],
+            **({} if view.open_amounts is None else {"amounts_without_source": [format_vnd(a) for a in view.open_amounts]}),
         }
         try:
             decision = await self.evaluate(json.loads(json.dumps(state, ensure_ascii=False, default=str)), QUESTIONS)
@@ -245,6 +250,8 @@ class PolicyAgent(BaseAgent):
             return PolicyVerdict(True, decided_by=f"skipped:{unavailable.code}")
         probabilities = {name: float(answer.probability or 0.0) for name, answer in decision.answers.items()}
         failed = [name for name, p in probabilities.items() if p >= THRESHOLDS[name]]
+        if view.open_amounts == () and "unquoted_price" in failed:  # every amount has a source: nothing to judge
+            failed.remove("unquoted_price")
         return PolicyVerdict(
             passed=not failed,
             reasons=tuple(REASONS[name] for name in failed),

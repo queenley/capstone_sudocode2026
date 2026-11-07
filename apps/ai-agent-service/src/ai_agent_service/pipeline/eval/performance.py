@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping
 
 from ...config.config_manager import btc_data_dir
+from ...observability.stopwatch import INSIDE, PATH
 
 #: USD per million tokens. GPT: ``config/models.yaml``. Gemini 3 Flash: third-party trackers of Google's price list
 #: (benchlm.ai, evolink.ai, read 2026-11-05), not Google's page: check it before quoting a figure.
@@ -103,7 +104,60 @@ def measure(directory: Path) -> dict[str, Any]:
         "tokens_per_turn": _per_turn(turn_tokens, len(rows)) if usage else None,
         "with_after_call": _per_turn({**turn_tokens, **{f"{k}#after": v for k, v in after_tokens.items()}}, len(rows)) if usage else None,
         "tokens_by_agent": turn_tokens,
+        "stages": stages(directory / "diagnostics.jsonl"),
     }
+
+
+#: How the table names each stage of ``observability/stopwatch``.
+STAGE_NAMES = {"context": "nạp brief, định danh", "knowledge": "tra knowledge", "compact": "gộp lượt cũ",
+               "advisor": "chờ advisor", "guard": "hard guard", "policy": "PolicyAgent", "respond": "respond",
+               "persist": "persist", "other": "còn lại", "model": "model", "tools": "tool"}
+
+
+def _percentile(values: list[int], share: float) -> int:
+    ordered = sorted(values)
+    return ordered[min(len(ordered) - 1, max(0, round(share * len(ordered) + 0.5) - 1))]
+
+
+def stages(path: Path) -> dict[str, Any] | None:
+    """Where the ``full`` turns' time went, by stage; None for a run older than the stopwatch.
+
+    A turn a stage did not run in counts as 0 ms for it, so the means add up to the mean turn.
+    """
+    if not path.is_file():
+        return None
+    timed = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        row = json.loads(line) if line.strip() else {}
+        if row.get("config") == "full" and (row.get("timings") or {}).get("stages_ms"):
+            timed.append(row["timings"])
+    if not timed:
+        return None
+    figures: dict[str, Any] = {"n": len(timed), "stages": {}}
+    total = sum(sum(t["stages_ms"].get(name, 0) for name in (*PATH, "other")) for t in timed) / len(timed)
+    for name in (*PATH, "other", *INSIDE):
+        values = [int(t["stages_ms"].get(name, 0)) for t in timed]
+        if not any(values):
+            continue
+        mean = sum(values) / len(values)
+        figures["stages"][name] = {"mean_ms": round(mean), "p50_ms": _percentile(values, 0.5),
+                                   "p95_ms": _percentile(values, 0.95),
+                                   "share": round(mean / total, 3) if total and name not in INSIDE else None,
+                                   "per_turn": round(sum(t.get("stage_counts", {}).get(name, 0) for t in timed) / len(timed), 2)}
+    return figures
+
+
+def stage_lines(figures: Mapping[str, Any] | None) -> list[str]:
+    if not figures:
+        return ["  Thời gian theo bước        chưa đo (run trước khi có stopwatch)"]
+    lines = [f"  Thời gian theo bước        TB mỗi lượt, n={figures['n']}; 'model' và 'tool' nằm trong 'chờ advisor'"]
+    for name, stats in figures["stages"].items():
+        share = f" ({stats['share']:.0%})" if stats["share"] is not None else ""
+        times = f", {stats['per_turn']:g} lần/lượt" if stats["per_turn"] and name not in ("other", "respond", "persist") else ""
+        indent = "      " if name in INSIDE else "    "
+        lines.append(f"{indent}{STAGE_NAMES.get(name, name):<20} TB {stats['mean_ms'] / 1000:.2f} s{share}, "
+                     f"p50 {stats['p50_ms'] / 1000:.2f} s, p95 {stats['p95_ms'] / 1000:.2f} s{times}")
+    return lines
 
 
 def _ms(stats: Mapping[str, Any] | None, limit: int | None = None) -> str:
@@ -139,6 +193,7 @@ def table(figures: Mapping[str, Any], sessions: Iterable[Mapping[str, Any]] = ()
         f"  Total Latency              {_ms(latency.get('total'), LIMITS_MS['total'])}",
         f"  Số phiên đồng thời (demo)  {sessions_line(sessions)}",
     ]
+    lines += stage_lines(figures.get("stages"))
     if tokens:
         lines += [f"  Token mỗi lượt (TB)        {tokens['total']:g} (vào {tokens['input']:g}, ra {tokens['output']:g}); "
                   f"kể cả after_call {whole['total']:g}"]

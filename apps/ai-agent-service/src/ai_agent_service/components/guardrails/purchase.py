@@ -29,8 +29,11 @@ NO = re.compile(r"\b(?:khong (?:mua|dat|dong y)|huy|thoi|de sau)\b")
 #: only address words and courtesy. Anything else left over ("đúng rồi nhưng đổi địa chỉ") keeps it from being a yes.
 CONSENT = re.compile(r"\b(?:dong y|xac nhan|dung(?: roi)?|chinh xac|vang|u|uh|um|ok|oke|"
                      r"(?:len|lam|ghi) don|(?:dat|chot)(?: don| hang| may)?|mua)\b")
+#: "vậy", "làm (cho)", "luôn" are filler around a yes ("Ừ, vậy em lên đơn cho anh luôn đi", "Chị đồng ý lên đơn rồi, em
+#: làm cho chị nhé": eval2 SCN-GEN-0232, SCN-GEN-0240). A word that changes the order ("đổi", "nhưng", "thêm", a
+#: number) is not here, so "đúng rồi nhưng đổi địa chỉ" still is no yes.
 COURTESY = re.compile(r"\b(?:da|a|nhe|nha|nhen|em|anh|chi|co|chu|cau|bac|toi|minh|chau|con|oi|giup|gium|cho|luon|di|"
-                      r"voi|nhu vay|thong tin|la|du|roi|cam on|nay)\b")
+                      r"voi|nhu vay|vay|lam|thong tin|la|du|roi|cam on|nay)\b")
 
 
 def now() -> float:
@@ -74,15 +77,53 @@ def _owner(context: Any) -> str:
     return hashlib.sha256(_json([context.customer_id, context.customer_phone]).encode()).hexdigest()
 
 
-def draft(args: Mapping[str, Any], context: Any) -> dict[str, Any]:
+def missing(args: Mapping[str, Any], order: Mapping[str, Any], delivery: str | None) -> list[str]:
+    """What the order still lacks before it may be read back (PB-09), in the words the model is told.
+
+    Product and today's price are the action guard's (a trusted code, the current quote); the quantity reads back as
+    1 unless said. The payment must be one the model passed, from the customer or the brief: :func:`payload` would
+    write COD for a missing one, and a read-back the customer answers by naming the payment is a read-back wasted
+    (eval2: 116 of 153 read-backs were answered with a missing field, not a yes).
+    """
+    gaps = []
+    if not args.get("payment"):
+        gaps.append("phương thức thanh toán khách chọn (COD hay chuyển khoản)")
+    if not order.get("address"):
+        gaps.append("địa chỉ giao hàng (lời khách hoặc Call Brief)")
+    if not delivery:
+        gaps.append("ngày giao dự kiến (gọi delivery_estimate với địa chỉ giao)")
+    return gaps
+
+
+def estimated_delivery(results: Any) -> str | None:
+    """The day the latest successful ``delivery.estimate`` of the call gave, ``YYYY-MM-DD``."""
+    for result in reversed(list(results or ())):
+        envelope = result.get("result") if isinstance(result, Mapping) else None
+        if str(result.get("name", "")).replace("_", ".", 1) != "delivery.estimate" or not isinstance(envelope, Mapping):
+            continue
+        data = envelope.get("data") if "data" in envelope else envelope
+        if (envelope.get("ok", True) and isinstance(data, Mapping) and data.get("estimated_delivery")
+                and data.get("address_known", True)):
+            return str(data["estimated_delivery"])[:10]
+    return None
+
+
+def _day(value: str) -> str:
+    year, month, day = (int(part) for part in value.split("-"))
+    return f"{day}/{month}/{year}"
+
+
+def draft(args: Mapping[str, Any], context: Any, delivery: str | None = None) -> dict[str, Any]:
     order = payload(args)
     address = context.vault.put("ADDR", order["address"]) if order["address"] else "chưa cung cấp địa chỉ"
     product = next((p.get("name") for p in context.seen_products if p.get("sku") == order["sku"] and p.get("name")), None)
     label = f"{product} ({order['sku']})" if product else order["sku"]
     payment = {"COD": "trả tiền khi nhận hàng", "bank": "chuyển khoản"}.get(order["payment"], order["payment"])
+    arrives = f", giao dự kiến ngày {_day(delivery)}" if delivery else ""
     question = (f"Anh/chị xác nhận đặt {order['qty']} sản phẩm {label}, đơn giá {format_vnd(order['price_vnd'])}, "
                 f"tổng {format_vnd(order['price_vnd'] * order['qty'])}, thanh toán {payment}, "
-                f"mã khuyến mãi: {order['promo_code'] or 'không dùng mã riêng'}, địa chỉ giao hàng: {address}, đồng ý không ạ?")
+                f"mã khuyến mãi: {order['promo_code'] or 'không dùng mã riêng'}, địa chỉ giao hàng: {address}"
+                f"{arrives}, đồng ý không ạ?")
     if order.get('basket_skus') or order.get('order_group'):
         details = ', '.join(str(x) for x in order.get('basket_skus', [])) or 'không có'
         question = f"Sản phẩm cùng giỏ: {details}; nhóm đơn: {order.get('order_group') or 'chung'}. " + question
@@ -117,7 +158,8 @@ def matches(pending: Mapping[str, Any] | None, args: Mapping[str, Any], context:
                 and pending.get("call_id") == context.call_id and pending.get("channel") == context.channel
                 and pending.get("owner") == _owner(context) and pending.get("action_type") == "order_create"
                 and pending.get("confirmed_turn_id") == context.turn_id
-                and YES.fullmatch(plain(context.customer_said or "").strip())
+                # The same rule as answer(): eval2 had 35 yeses answer() authorised and this refused.
+                and agrees(context.customer_said or "")
                 and (context.last_agent_said or "").endswith(pending.get("question") or "\0")
                 and pending.get("expires_at", 0) > now() and pending.get("payload_hash") == fingerprint(args))
 

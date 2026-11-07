@@ -28,6 +28,9 @@ py -3.12 scripts/seed/product_images.py --sheet sheet.jpg                       
 docker compose build seed web; docker compose run --rm seed; docker compose up -d web
 ```
 
-Without a reviewed picture (no fitting one on Openverse on 2026-10-25): SKU-AF-6L, SKU-FAN-SEN,
+Every product has a picture since 2026-11-07. The thirteen picked last (SKU-AF-6L, SKU-FAN-SEN,
 SKU-FAN-TWR, SKU-JK-DWN, SKU-JK-WND, SKU-MB-BAG, SKU-MB-MON, SKU-MB-STER, SKU-SN-SOCK,
-SKU-WF-RO9, SKU-WF-RO10, SKU-WF-UF, SKU-XM-4P.
+SKU-WF-RO9, SKU-WF-RO10, SKU-WF-UF, SKU-XM-4P) show the kind of product only loosely: the
+water purifiers are countertop and public water dispensers, the bottle warmer and sterilizer
+are baby bottles, and the milk bags are milk bottles in a fridge. Replace them when a closer
+picture turns up (`--candidates`, then `--use`).

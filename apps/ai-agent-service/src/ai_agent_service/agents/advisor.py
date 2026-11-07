@@ -66,6 +66,7 @@ from ..components.intake.itn import format_vnd
 from ..components.intake.text import plain
 from ..config.config_manager import get_lanes, load_prompt, load_prompt_yaml
 from ..llm import tracing
+from ..observability import stopwatch
 from ..llm.callback_handler import text_of
 from ..mcp.client import dotted
 from ..mcp.tools import LaneToolsMiddleware, ToolGuardMiddleware, envelope_of, parse_envelope, order_arguments
@@ -418,7 +419,8 @@ class ContextPromptMiddleware(AgentMiddleware):
         return handler(self._with_prompt(request))
 
     async def awrap_model_call(self, request: ModelRequest, handler: Any) -> Any:
-        return await handler(self._with_prompt(request))
+        with stopwatch.span("model"):
+            return await handler(self._with_prompt(request))
 
 
 def declared_arguments(tool: Any, args: Mapping[str, Any]) -> dict[str, Any]:
@@ -438,6 +440,10 @@ class ActionGuardMiddleware(AgentMiddleware):
     """The guardrail before act (section 4.4): a write tool runs only if its arguments pass."""
 
     async def awrap_tool_call(self, request: Any, handler: Any) -> Any:
+        with stopwatch.span("tools"):
+            return await self._guarded(request, handler)
+
+    async def _guarded(self, request: Any, handler: Any) -> Any:
         call = request.tool_call
         name = call["name"]
         kept = declared_arguments(getattr(request, "tool", None), call.get("args") or {})
@@ -455,6 +461,8 @@ class ActionGuardMiddleware(AgentMiddleware):
         args = dict(call.get("args") or {})
         if name == "handoff_transfer":
             args["brief"] = actions.fill_handoff(args.get("brief") or {}, context.handoff_defaults)
+        if name == "schedule_callback" and not args.get("customer_phone") and context.customer_phone:
+            args["customer_phone"] = context.customer_phone
         state = getattr(request, "state", None) or {}
         quotes = {**context.quotes, **_quotes_in(state)}
         codes, orders = _seen_in(state, context.tool_results)
@@ -473,8 +481,19 @@ class ActionGuardMiddleware(AgentMiddleware):
         if verdict.passed and name == "order_create":
             business_args = order_arguments(args, context)
             if not purchase.matches(context.pending_purchase, business_args, context):
+                delivery = purchase.estimated_delivery(
+                    [*context.tool_results, *tool_results_of(state.get("messages") or [])])
+                gaps = purchase.missing(args, business_args, delivery)
+                if gaps:
+                    # PB-09 reads back a whole order once: a read-back with a gap is answered with the gap, not a yes.
+                    envelope = {"ok": False, "error": {"code": "ORDER_INCOMPLETE", "retryable": False,
+                        "message": "Chưa đọc lại đơn. Còn thiếu: " + "; ".join(gaps)
+                                   + ". Có công cụ thì gọi ngay; thiếu thông tin của khách thì chỉ hỏi đúng phần đó.",
+                        "details": {"missing": gaps}}}
+                    return ToolMessage(content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"],
+                                       name=name, additional_kwargs={"args": args, "blocked_by": "guardrail"})
                 details = {} if purchase.NO.search(plain(context.customer_said or "")) else {
-                    "purchase_draft": purchase.draft(business_args, context)}
+                    "purchase_draft": purchase.draft(business_args, context, delivery)}
                 envelope = {"ok": False, "error": {"code": "CONFIRMATION_REQUIRED", "retryable": False,
                     "message": "Đọc lại đúng đơn và đợi khách xác nhận trong phiên này trước khi tạo đơn.", "details": details}}
                 return ToolMessage(content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=name,

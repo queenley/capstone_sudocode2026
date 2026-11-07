@@ -219,7 +219,7 @@ export default function VoiceCallPanel({
         <header className="call-top">
           <div className={"call-avatar " + (live ? "live" : "")}>☏</div>
           <div>
-            <p className="eyebrow">HOTLINE CỬA HÀNG</p>
+            <p className="eyebrow">Hotline cửa hàng</p>
             <h2>Tư vấn qua cuộc gọi</h2>
             <span className="call-clock">
               {!live

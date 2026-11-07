@@ -312,8 +312,10 @@ def amounts(text: str) -> list[int]:
 
 # ── written money, read back ──────────────────────────────────────────────
 
-_MILLION = re.compile(r"(?<![\w.,])(\d+(?:[.,]\d+)?)\s*(triệu|tr|củ)(?![a-zà-ỹ])(?:\s*(\d{1,3})(?![\d.,]\d))?", re.IGNORECASE)
+_MILLION = re.compile(r"(?<![\w.,])(\d+(?:[.,]\d+)?)\s*(triệu|tr|củ)(?![a-zà-ỹ])(?:\s*(\d{1,3})(?![\d.,]\d))?(\s*rưỡi(?![a-zà-ỹ]))?", re.IGNORECASE)
 _BILLION = re.compile(r"(?<![\w.,])(\d+(?:[.,]\d+)?)\s*(tỷ|tỉ)(?![a-zà-ỹ])", re.IGNORECASE)
+#: What makes a grouped number a measure and not money: "công suất 1.400 W", "bình 1.500 ml".
+_UNIT = re.compile(r"\s*(?:k?w|watt|ml|lít|lit|mah|kg|mm|cm|m[23²³]?|btu|vòng|rpm)(?![a-zà-ỹ0-9])", re.IGNORECASE)
 _THOUSAND = re.compile(r"(?<![\w.,])(\d+(?:[.,]\d+)?)\s*(k|nghìn|ngàn)(?![a-zà-ỹ])", re.IGNORECASE)
 _GROUPED = re.compile(r"(?<![\w.,])(\d{1,3}(?:[.,]\d{3})+)(?:\s*(đồng|đ|vnđ|vnd|d)(?![a-zà-ỹ]))?", re.IGNORECASE)
 _PLAIN = re.compile(r"(?<![\w.,])(\d{4,9})\s*(đồng|đ|vnđ|vnd)(?![a-zà-ỹ])", re.IGNORECASE)
@@ -339,12 +341,14 @@ def money_spans(text: str) -> list[Span]:
         tail = match.group(3)
         if tail and "." not in match.group(1) and "," not in match.group(1):
             value += int(tail) * 10 ** (6 - len(tail))
+        elif match.group(4):
+            value += 500_000
         found.append(Span(match.start(), match.end(), match.group(0), int(round(value))))
     for match in _THOUSAND.finditer(text):
         if free(match.start(), match.end()):
             found.append(Span(match.start(), match.end(), match.group(0), int(round(_decimal(match.group(1)) * 1_000))))
     for match in _GROUPED.finditer(text):
-        if free(match.start(), match.end()):
+        if free(match.start(), match.end()) and not (match.group(2) is None and _UNIT.match(text, match.end())):
             digits = re.sub(r"[.,]", "", match.group(1))
             value = int(digits)
             # 1.000 on its own is a thousand; a grouped number under 1.000 dong

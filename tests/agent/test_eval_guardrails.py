@@ -214,7 +214,8 @@ async def test_real_extractor_only_stop_can_be_relabelled(evaluation, monkeypatc
     monkeypatch.setattr(cli, "_extractor", lambda: broken)
     assert await cli._evaluate(args, run_id="synthetic", layout=layout, database="synthetic_eval") == 1
     manifest = json.loads(layout.side("manifest.json").read_text())
-    assert manifest["problems"]["full"]["unlabelled_turns"] == 1
+    # Without a spending cap every turn is tried, so both failed (cli._label); the table is withheld all the same.
+    assert manifest["problems"]["full"]["unlabelled_turns"] == 2
     assert manifest["problems"]["full"]["scenarios_stopped"] == 0
     fixed = SimpleNamespace(model_name="synthetic", stats=lambda: {}, label=AsyncMock(return_value=empty))
     out = layout.directory.parent / "relabelled"

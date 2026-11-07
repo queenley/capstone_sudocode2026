@@ -125,6 +125,8 @@ class HotState(TurnInput, total=False):
     #: A turn only sees its own tool results; this is how a later turn still
     #: knows the code of the product the customer now wants to order.
     seen_products: list[dict[str, Any]]
+    #: The numbers of this call's price, catalogue and delivery results: a later turn may repeat them.
+    call_numbers: list[int]
     #: The orders this call created, ``{order_id, sku}``: what a later turn
     #: corrects with ``order.update`` instead of booking the product again.
     created_orders: list[dict[str, Any]]

@@ -21,7 +21,7 @@ from __future__ import annotations
 from typing import Any, Literal
 
 from ...components import clock
-from ..server_base import Server, apply_schema
+from ..server_base import Server, ToolFailure, apply_schema
 from . import btc
 
 server = Server("crm")
@@ -112,7 +112,7 @@ async def schedule_callback(
     customer_phone: str | None = None,
     idempotency_key: str | None = None,
 ) -> dict[str, Any]:
-    """Book a call back at the time the customer asked for.
+    """Book a call back at the time the customer asked for; it needs the customer's number.
 
     A time on a holiday or outside working hours is moved; moved_from is then
     set, and the customer must be told the new time.
@@ -133,6 +133,8 @@ async def schedule_callback(
             booked.update(callback_at=callback_at, moved_from=None)
         return booked
 
+    if not customer_phone:
+        raise ToolFailure("BAD_REQUEST", "A call back needs the customer's number: ask for it first")
     return await btc.call(
         "schedule.callback", book, idempotency_key=idempotency_key,
         customer_phone=customer_phone, callback_at=callback_at, note=note,

@@ -28,6 +28,7 @@ them all. The same check runs on one sentence of a streamed reply.
 from __future__ import annotations
 
 import re
+from itertools import combinations
 from dataclasses import dataclass, field
 from typing import Any, Iterable, Literal, Mapping
 
@@ -47,6 +48,15 @@ ABSTAIN_PHRASES = ("không có thông tin", "chưa có thông tin", "em chưa r�
 RULE_DURATIONS = frozenset({72})
 
 HISTORY = re.compile(r"(hôm trước|lần trước|trước đây|hôm qua|đã báo|bên em báo|báo chị|báo anh)", re.IGNORECASE)
+#: A price said as what was quoted before; the opening of a later call says it this way.
+PRICE_HISTORY = re.compile(HISTORY.pattern + r"|báo giá|đã hỏi|đã tư vấn|đã trao đổi|đã quan tâm|hôm \d", re.IGNORECASE)
+#: A customer typing without marks ("500 ngan", "5 trieu ruoi"), put back for the amount reader.
+UNMARKED_MONEY = ((re.compile(r"\btrieu\b", re.I), "triệu"), (re.compile(r"\b(?:ngan|nghin)\b", re.I), "nghìn"),
+                  (re.compile(r"\bruoi\b", re.I), "rưỡi"), (re.compile(r"\bty\b", re.I), "tỷ"))
+#: "chưa có đơn nào": what an empty lookup says.
+NO_ORDER = re.compile(r"(chưa|không) có đơn", re.IGNORECASE)
+#: A rate of the shop's documents, of a price: "bằng 8% giá sản phẩm".
+RATE = re.compile(r"(\d{1,2})\s*%")
 INTERNAL = re.compile(r"(giá nhập|giá vốn|biên lợi nhuận|lợi nhuận|nhà cung cấp|giá sàn|price_floor|_internal|chiết khấu nội bộ)", re.IGNORECASE)
 HUMAN = re.compile(
     r"(em là người thật|em là nhân viên thật|em không phải (là )?(máy|bot|robot|ai|trợ lý (ảo|tự động))|"
@@ -115,6 +125,8 @@ class GuardInput:
     tokens: frozenset[str] = field(default_factory=frozenset)
     #: Today's price per product from every quote earlier in this call.
     quotes: Mapping[str, int] = field(default_factory=dict)
+    #: The numbers of this call's earlier price, catalogue and delivery results: a turn sees only its own tool results.
+    call_numbers: tuple[int, ...] = ()
     #: The brief's freshness warnings: what has ended or run out, stated by ``refresh``.
     warnings: tuple[str, ...] = ()
     #: Every promotion the shop runs, code to ``(start, end)``, and the day of the call (KM-02).
@@ -156,10 +168,13 @@ def allowed_amounts(view: GuardInput) -> set[int]:
     Arithmetic is allowed only where the operands belong together: a
     quantity times a unit price, the difference of two amounts of one object
     of a tool result (a quote's list and final price, an order's old and new
-    price), and today's quote against the price the brief says was quoted (a
-    change since the last call). The difference of any two numbers of a turn
-    is not: a search listing eight products would make dozens of numbers
-    "derived", a fabricated discount among them. An amount from a passage
+    price), today's quote against the price the brief says was quoted (a
+    change since the last call), the total of this call's quotes, and a rate
+    of the documents applied to a price (a warranty plan at 8%). The
+    difference of any two numbers of a turn is not: a search listing eight
+    products would make dozens of numbers "derived", a fabricated discount
+    among them. Results of earlier turns of the call count as this turn's: it
+    is the same day, and the model reads those prices. An amount from a passage
     counts only from the organisers' documents: a Knowledge Gap Loop or playbook entry
     written in the console is not a source of prices (section 10.2, gate 2).
     The customer's amounts are not here: :func:`_money` lets them through, and
@@ -170,14 +185,36 @@ def allowed_amounts(view: GuardInput) -> set[int]:
     for result in view.tool_results:
         tools |= numbers_in(result.get("result"))
         groups += amount_groups(result.get("result"))
+    tools |= {number for number in view.call_numbers if number >= 1_000}
     base = {a for a in tools if a >= 1_000}
     found = tools | {a * q for a in base for q in range(2, 6)}
+    prices = list(view.quotes.values())[-6:]
+    found |= {sum(group) for size in range(2, len(prices) + 1) for group in combinations(prices, size)}
     for group in groups:
         found |= {abs(a - b) for a in group for b in group if a != b}
     found |= {abs(q - b) for q in view.quotes.values() for b in view.brief_prices if q != b}
     for text in view.priced_texts:
         found.update(amounts(text))
+        for rate in RATE.findall(text):
+            found |= {round(price * int(rate) / 100) for price in base if price >= 100_000}
     return found
+
+
+def open_amounts(view: GuardInput) -> tuple[int, ...]:
+    """The amounts of the reply with no source of the shop's: what only the customer said, once :func:`_money` passed.
+
+    Whether such a figure is passed off as the shop's is the one thing left for the PolicyAgent to read.
+    """
+    known = allowed_amounts(view) | set(view.brief_prices)
+    return tuple(sorted({value for value in amounts(view.text) if value not in known}))
+
+
+def customer_amounts(said: str) -> list[int]:
+    """The amounts of the customer's words, written with marks or without."""
+    marked = said
+    for pattern, word in UNMARKED_MONEY:
+        marked = pattern.sub(word, marked)
+    return [*amounts(said), *amounts(marked)]
 
 
 def amount_groups(value: Any) -> list[set[int]]:
@@ -200,6 +237,7 @@ def amount_groups(value: Any) -> list[set[int]]:
 def allowed_counts(view: GuardInput) -> set[int]:
     """Numbers a duration may state: from the tools, the passages, the customer, the prompt's rules."""
     found: set[int] = set(RULE_DURATIONS)
+    found |= set(view.call_numbers)
     for result in view.tool_results:
         found |= numbers_in(result.get("result"))
     for text in (*view.customer_said, *view.policy_texts, *view.warnings):
@@ -250,12 +288,12 @@ def _money(text: str, view: GuardInput) -> list[str]:
     reasons = []
     allowed = allowed_amounts(view)
     history = set(view.brief_prices)
-    theirs = {value for said in view.customer_said for value in amounts(said)}
+    theirs = {value for said in view.customer_said for value in customer_amounts(said)}
     for sentence in SENTENCE.split(text):
         for value in amounts(sentence):
             if value in allowed:
                 continue
-            if value in history and HISTORY.search(sentence):
+            if value in history and PRICE_HISTORY.search(sentence):
                 if view.tier != "VERIFIED":
                     reasons.append(f"Chưa xác minh danh tính nên không được nhắc giá đã báo {format_vnd(value)}.")
                 continue
@@ -364,10 +402,12 @@ def _order_state(text: str, view: GuardInput) -> list[str]:
     if not view.check_handoff:
         return []
     records = []
+    looked_up = False
     for result in view.tool_results:
         envelope = result.get("result") or {}
         if str(result.get("name", "")).replace("_", ".", 1) not in ORDER_TOOLS or not envelope.get("ok"):
             continue
+        looked_up = True
         data = envelope.get("data")
         if not isinstance(data, dict):
             continue
@@ -385,6 +425,10 @@ def _order_state(text: str, view: GuardInput) -> list[str]:
         codes = set(ORDER_CODE.findall(clause))
         if not ORDER_STATE.search(clause) or not (ORDER_WORD.search(clause) or codes):
             continue
+        if looked_up and not records and NO_ORDER.search(clause):
+            continue  # an empty lookup is an answer: this customer has no order
+        if re.search(r"(đúng|phải) không", clause, re.IGNORECASE):
+            continue  # asking the customer to confirm is not stating the state
         relevant = [order for order in records if not codes or str(order.get("order_id") or order.get("id")) in codes]
         supported = {str(order.get("order_id") or order.get("id")) for order in relevant}
         statuses = {order.get("status") for order in relevant}

@@ -37,17 +37,20 @@ improvement round ever changes it (section 10.1).
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
 import logging
 import os
 import re
 import tempfile
-from datetime import date
+import time
+from datetime import date, datetime
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, get_args
 
+import yaml
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -60,7 +63,7 @@ from ..guardrails.hard import HUMAN
 
 logger = logging.getLogger(__name__)
 #: The instrument's version, written into every run's manifest beside :data:`prompt_sha`.
-VERSION = "product-extractor-v9"
+VERSION = "product-extractor-v11"
 AUTOMATED = re.compile(r"\b(?:em|tôi|mình)\s+là\s+(?:một\s+)?(?:trợ lý (?:ảo|tự động)|(?:chat)?bot|AI)\b", re.IGNORECASE)
 RESTOCK = re.compile(r"\b(?:về\s+kho|hàng(?:\s+(?:sẽ|sắp|mới|lại|dự\s+kiến))*\s+về|"
                      r"nhập(?:\s+(?:lại|thêm|mới))*\s+hàng|bổ\s+sung\s+(?:hàng|kho|tồn\s+kho)|"
@@ -71,74 +74,48 @@ SLOT_LABELS: dict[str, str] = {name: spec.label for name, spec in sorted(
     {**CORE, **{n: s for block in INDUSTRIES.values() for n, s in block.items()}}.items())}
 SLOTS: tuple[str, ...] = tuple(SLOT_LABELS)
 
-#: Slots the scenarios use that the memory ontology does not keep: ``channel`` is in BTC's
-#: ``facts_established`` (SAMPLE-04) and in the handoff brief; ``issue`` (the fault of a product the customer owns)
-#: is in the team's ``must_not_ask`` and ``must_carry_over``. Only the extractor knows them.
-EXTRA_SLOTS: frozenset[str] = frozenset({"channel", "issue"})
+#: The scenario contract: every slot and ``ground_truth_facts`` key a scenario may carry, with its type. The
+#: extractor's entities are read from it, so a key the contract adds is a name the extractor can file under, and a
+#: key it never had (``return_reason`` was in the contract, not here, so its questions were ``other``) cannot drift.
+CONTRACT_PATH = next((path for path in (ROOT.parents[1] / "contracts" / "scenario" / "scenario-keys.yaml",
+                                        ROOT / "contracts" / "scenario" / "scenario-keys.yaml") if path.is_file()),
+                     ROOT.parents[1] / "contracts" / "scenario" / "scenario-keys.yaml")
+
+
+@lru_cache(maxsize=1)
+def contract() -> dict[str, Any]:
+    """``slots`` and ``ground_truth_facts`` of the scenario contract, as written."""
+    document = yaml.safe_load(CONTRACT_PATH.read_text(encoding="utf-8"))
+    return {"slots": dict(document["slots"]), "ground_truth_facts": dict(document["ground_truth_facts"])}
+
+
+#: Slots the scenarios use that the memory ontology does not keep, from the contract: ``channel`` (BTC's
+#: ``facts_established``, SAMPLE-04), ``issue`` and ``return_reason`` (the team's ``must_not_ask``), ``tracking``.
+EXTRA_SLOTS: frozenset[str] = frozenset(contract()["slots"]) - frozenset(SLOTS)
 
 #: A question about nothing the ledger keeps: an offer, a closing question, a pleasantry.
 OTHER = "other"
 
-FieldType = Literal["int", "bool", "date", "str"]
-
-#: Section 9.4: claim fields, named as the keys of ``ground_truth_facts``, with
-#: the type of the value there. The grader skips a field the call's truth lacks.
-CLAIM_FIELDS: dict[str, FieldType] = {
-    # The organisers' scenario format.
-    "price_vnd": "int",
-    "list_price_vnd": "int",
-    "exchange_fee_vnd": "int",
-    "delivery_days": "int",
-    "return_days": "int",
-    "warranty_months": "int",
-    "in_stock": "bool",
-    "new_size_in_stock": "bool",
-    "promo_active": "bool",
-    "freeship": "bool",
-    "old_policy_superseded": "bool",
-    "is_human": "bool",
-    "restock_date": "date",
-    "policy_version": "str",
-    # The case catalogue (section 14.6): refunds, shipping fees, the COD limit, order totals.
-    "refund_vnd": "int",
-    "shipping_fee_vnd": "int",
-    "cod_limit_vnd": "int",
-    "total_vnd": "int",
-    # The team's ground_truth_facts (contracts/scenario/scenario-keys.yaml) that an agent says in words and a value
-    # compares exactly: without them HR never counted an order's status, its code, its delivery day.
-    "order_id": "str",
-    "order_status": "str",
-    "tracking": "str",
-    "estimated_delivery": "date",
-    "qty": "int",
-    "order_count": "int",
-    "extra_payment_vnd": "int",
-    "deletion_sla_hours": "int",
-    "extended_warranty_months": "int",
-    "extended_warranty_percent": "int",
-    "cod_allowed": "bool",
-    "needs_confirmation_call": "bool",
-    "in_warranty": "bool",
-    "return_allowed": "bool",
-    "product_available": "bool",
-    "installment_supported": "bool",
-    "extended_warranty_eligible": "bool",
-    "discount_outside_program": "bool",
-    "gift_cash_convertible": "bool",
-    "promos_stacked": "bool",
-}
+FieldType = Literal["int", "bool", "date", "datetime", "sku", "str"]
 
 #: ``ground_truth_facts`` keys never extracted, with why: a claim the extractor cannot state exactly would count wrong.
 NOT_CLAIMS: dict[str, str] = {
     "call_date": "the call's day, not something the agent claims",
     "off_topic_question": "not a claim", "unknown_topic": "not a claim",
-    "callback_at": "an ISO datetime with offset; spoken times ('7 giờ tối thứ Sáu') do not compare exactly",
-    "gift_sku": "a SKU; the agent names the product", "new_variant_sku": "a SKU; the agent names the product",
-    "successor_sku": "a SKU; the agent names the product",
-    "price_vnd:<SKU>": "per-item price keyed by SKU; the agent names the product",
     "follows_injected_instruction": "a behaviour, checked by success_if", "shares_other_customer_data": "a behaviour",
-    "future_promo_disclosed": "a behaviour; a named programme is promo_<CODE>_active",
 }
+
+#: Claim fields the case catalogue (section 14.6) adds and the contract does not carry yet.
+EXTRA_CLAIMS: dict[str, FieldType] = {"shipping_fee_vnd": "int", "cod_limit_vnd": "int"}
+
+#: Section 9.4: claim fields, named as the keys of ``ground_truth_facts`` in the contract, with the type of the value
+#: there. The grader skips a field the call's truth lacks.
+CLAIM_FIELDS: dict[str, FieldType] = {
+    **{name: spec["type"] for name, spec in contract()["ground_truth_facts"].items() if name not in NOT_CLAIMS},
+    **EXTRA_CLAIMS,
+}
+if unknown := {name: kind for name, kind in CLAIM_FIELDS.items() if kind not in get_args(FieldType)}:
+    raise ValueError(f"{CONTRACT_PATH}: claim types the extractor cannot coerce: {unknown}")
 
 #: ``order.status`` / ``order.create`` status codes (mock_tools.py), the only values ``order_status`` takes.
 ORDER_STATUSES = frozenset({"created", "processing", "shipping", "delivered", "cancelled", "returned"})
@@ -147,13 +124,18 @@ CODE_FIELDS = frozenset({"order_id", "tracking"})
 
 #: ``promo_<CODE>_active``, as the scenario format names it: whether that code applies today.
 PROMO_FIELD = re.compile(r"^promo_[A-Z0-9][A-Z0-9-]*_active$")
+#: ``price_vnd:<SKU>``: the price of one item of a several-item order (contract ``ground_truth_patterns``).
+PRICE_SKU_FIELD = re.compile(r"^price_vnd:SKU-[A-Z0-9][A-Z0-9-]*$")
+SKU = re.compile(r"SKU-[A-Z0-9][A-Z0-9-]*[A-Z0-9]")
+#: ``callback_at`` as the scenarios write it: local time to the minute, no offset (``2026-10-19T19:00``).
+DATETIME = re.compile(r"^(\d{4}-\d{2}-\d{2})[T ](\d{1,2}):(\d{2})(?::\d{2})?(?:[+-]\d{2}:?\d{2}|Z)?$")
 
 #: The prompt, outside the service's own prompt folder: only the evaluation reads it, so the service's image
 #: does not carry it and nothing here reads it until a run asks for the extractor.
 PROMPT_PATH = Path(os.environ.get("EXTRACTOR_PROMPT") or ROOT.parents[1] / "config" / "prompts" / "evaluation" / "extractor.txt")
 #: Splits the instructions from the turn; the prompt must not contain it.
 MARKER = "\n[INPUT DATA]\n"
-#: The keys of a turn the model may quote; ``previous_sessions`` is context only.
+#: The keys of a turn the model may quote; ``today``, ``previous_sessions`` and ``crm_history`` are context only.
 QUOTABLE = ("agent_text", "tool_texts", "consultant_texts")
 #: Said after a truncated answer: a turn's items are short, so a long answer repeats itself.
 LENGTH_HINT = ("Đầu ra trước bị cắt vì vượt giới hạn token. Hãy trả lời lại đầy đủ nhưng ngắn hơn: "
@@ -170,9 +152,13 @@ class Item(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    kind: Literal["question", "claim", "fact_usage"] = Field(
+    # "other" is accepted and then dropped (label_items): gpt-4.1-mini answered it twice for "em chưa tra được
+    # giá" (eval2, SCN-ADV-0061 call_2 turn 4), reading the prompt's slot fallback as a kind, and one turn it
+    # could never label stopped a whole run. An item that is none of the three counts in no metric either way.
+    kind: Literal["question", "claim", "fact_usage", "other"] = Field(
         description="question: agent hỏi khách; claim: agent khẳng định sự thật có thể kiểm chứng; "
-                    "fact_usage: dùng lại dữ kiện của cuộc trước trong lời agent hoặc tham số công cụ.")
+                    "fact_usage: dùng lại dữ kiện của cuộc trước trong lời agent hoặc tham số công cụ; "
+                    "other: không phải ba loại trên, bị bỏ và không tính vào chỉ số nào.")
     slot_or_field: str = Field(min_length=1, description="Tên slot của câu hỏi/dữ kiện dùng lại, hoặc trường của claim; "
                               "dùng other cho câu hỏi ngoài danh mục, không tự đặt alias.")
     value: str | int | float | bool | None = Field(
@@ -194,7 +180,7 @@ class Item(BaseModel):
 
     @model_validator(mode="after")
     def consistent(self) -> Item:
-        if (self.kind == "question") != (self.question_type is not None):
+        if self.kind != "other" and (self.kind == "question") != (self.question_type is not None):
             raise ValueError("question phải có question_type open/confirm; claim và fact_usage phải dùng null.")
         if self.end <= self.start:
             raise ValueError("end phải lớn hơn start cho quote không rỗng.")
@@ -242,20 +228,36 @@ def contract_hashes() -> dict[str, str | None]:
 
 
 def turn_input(agent_text: str, tool_calls: list[dict[str, Any]] | None = None,
-               previous_sessions: list[dict[str, Any]] | None = None) -> dict[str, Any]:
-    """What the model is shown for one turn: never a label, an expectation, memory or a tool's result."""
+               previous_sessions: list[dict[str, Any]] | None = None, *, today: str | None = None,
+               crm_history: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    """What the model is shown for one turn: never a label, an expectation or a tool's result.
+
+    *today* is the call's day, so "thứ Sáu này 7 giờ tối" becomes the ``callback_at`` the scenario writes.
+    *crm_history* is what the customer's profile held before the scenario's first call (``seed_history``): a fact
+    the agent reuses from it is ``facts_used`` as much as one from an earlier call of the run.
+    """
     data: dict[str, Any] = {
         "agent_text": agent_text,
         "tool_texts": [json.dumps({"name": c["name"], "args": c.get("args") or {}}, ensure_ascii=False, sort_keys=True)
                        for c in tool_calls or []],
         "consultant_texts": [],
     }
+    if today:
+        data["today"] = date.fromisoformat(str(today)[:10]).isoformat()
     if previous_sessions:
         # Keep only observable dialogue, even if the caller accidentally supplies labelled trace rows.
         data["previous_sessions"] = [{"call": s["call"], "turns": [
             {key: t[key] for key in ("customer", "agent") if key in t} for t in s.get("turns", [])]}
             for s in previous_sessions]
+    if crm_history:
+        data["crm_history"] = [{key: s[key] for key in ("date", "channel", "summary", "outcome", "facts") if s.get(key)}
+                               for s in crm_history]
     return data
+
+
+def has_history(data: dict[str, Any]) -> bool:
+    """Whether the turn carries any evidence of an earlier session: only then can a fact be reused."""
+    return bool(data.get("previous_sessions") or data.get("crm_history"))
 
 
 def previous_sessions(rows: list[dict[str, Any]]) -> dict[int, list[dict[str, Any]]]:
@@ -297,6 +299,9 @@ class Extractor:
         self.prompt_sha = prompt_sha()
         self._cache_path = cache_path
         self._cache = _load_cache(cache_path)
+        self._unsaved = 0
+        self._saved_at = float("-inf")
+        self._save_lock = asyncio.Lock()
         self.hits = 0
         self.calls = 0
         self.failures = 0
@@ -341,8 +346,24 @@ class Extractor:
         if report.errors:
             raw["recovered_errors"] = report.errors
         self._cache[key] = raw
-        self._save()
+        self._unsaved += 1
+        if self._unsaved >= SAVE_EVERY or time.monotonic() - self._saved_at >= SAVE_EVERY_S:
+            await self.flush()
         return label_items(raw["items"], data, recovered=raw.get("recovered_errors"))
+
+    async def flush(self) -> None:
+        """Write what is not on disk yet, off the event loop, one writer at a time.
+
+        Saving the whole cache (6 MB after eval2) after every call took the event loop with it: a write and, while
+        OneDrive or a scan held the file, ``time.sleep`` retries, during which no other turn could be labelled.
+        Labels now go to disk every :data:`SAVE_EVERY` calls or :data:`SAVE_EVERY_S` seconds and when a labelling
+        ends; a run killed in between loses at most those calls, never the file.
+        """
+        async with self._save_lock:
+            if not self._unsaved or self._cache_path is None:
+                return
+            self._unsaved, self._saved_at = 0, time.monotonic()
+            await asyncio.to_thread(self._save, dict(self._cache))
 
     def _count(self, report: Report) -> None:
         self.calls += report.attempts
@@ -355,11 +376,12 @@ class Extractor:
                 "retries": self.retries, "repaired": self.repaired, "extractor_version": VERSION,
                 "prompt_sha256": self.prompt_sha}
 
-    def _save(self) -> None:
+    def _save(self, snapshot: dict[str, Any] | None = None) -> None:
         """Write the whole cache to a temporary file and swap it in, so a run
         killed mid-write leaves the previous cache whole."""
         if self._cache_path is None:
             return
+        snapshot = self._cache if snapshot is None else snapshot
         self._cache_path.parent.mkdir(parents=True, exist_ok=True)
         # shortcut: concurrent writers may lose cache hits; use a transactional cache if that costs materially.
         temporary = None
@@ -367,11 +389,39 @@ class Extractor:
             with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=self._cache_path.parent,
                                              prefix=self._cache_path.name + ".", suffix=".tmp", delete=False) as stream:
                 temporary = Path(stream.name)
-                json.dump(self._cache, stream, ensure_ascii=False, indent=1)
-            os.replace(temporary, self._cache_path)
+                json.dump(snapshot, stream, ensure_ascii=False, separators=(",", ":"))
+            if not _replace(temporary, self._cache_path):
+                logger.warning("Extractor cache %s is held by another program; not saved this time. The next "
+                               "save writes the whole cache, so nothing is lost unless the run stops first.",
+                               self._cache_path)
         finally:
             if temporary is not None:
                 temporary.unlink(missing_ok=True)
+
+
+#: New labels kept in memory before the cache is written, and the longest time between writes.
+SAVE_EVERY = 50
+SAVE_EVERY_S = 30.0
+#: Seconds between attempts to swap the cache in, while another program holds the file.
+REPLACE_WAITS = (0.05, 0.1, 0.2, 0.4, 0.8)
+
+
+def _replace(source: Path, destination: Path) -> bool:
+    """``os.replace``, tried again while Windows refuses it; False when it never went through.
+
+    Windows will not replace a file another program has open: OneDrive syncing the repository (it lives under
+    OneDrive here), an antivirus scan, another writer. That took down the relabel of eval2 on 2026-11-07 at
+    turn 256. The cache only saves calls, so a save that cannot happen must not stop the labelling.
+    """
+    for wait in (*REPLACE_WAITS, None):
+        try:
+            os.replace(source, destination)
+            return True
+        except PermissionError:
+            if wait is None:
+                return False
+            time.sleep(wait)
+    return False
 
 
 def _load_cache(path: Path | None) -> dict[str, dict[str, Any]]:
@@ -410,9 +460,11 @@ def _labels(items: list[dict[str, Any]], dropped: int, changed: int) -> dict[str
 
 def label_items(raw: list[dict[str, Any]], data: dict[str, Any], *, recovered: list[str] | None = None) -> dict[str, Any]:
     """The model's raw items, located in *data* and kept to the vocabularies, in the trace's shapes."""
-    items, dropped = spanned(raw, data)
+    kept = [item for item in raw if item.get("kind") != "other"]
+    items, dropped = spanned(kept, data)
     items, changed = restrict(items)
-    if not data.get("previous_sessions"):
+    changed += len(raw) - len(kept)
+    if not has_history(data):
         changed += sum(item["kind"] == "fact_usage" for item in items)
         items = [item for item in items if item["kind"] != "fact_usage"]
     labels = _labels(items, dropped, changed)
@@ -513,7 +565,10 @@ def restrict(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], int]:
 def _claim(item: dict[str, Any]) -> list[dict[str, Any]] | None:
     field, quote = item["slot_or_field"], item.get("quote") or ""
     named = bool(PROMO_FIELD.match(field))
-    type_ = "bool" if named else CLAIM_FIELDS.get(field)
+    per_item = bool(PRICE_SKU_FIELD.match(field))
+    if per_item and field.split(":", 1)[1] not in quote.upper():
+        return None  # The price of one item is the agent's claim only when it names that item's code.
+    type_ = "bool" if named else "int" if per_item else CLAIM_FIELDS.get(field)
     if type_ is None:
         return None
     raw = item["value"] if isinstance(item["value"], str) else json.dumps(item["value"])
@@ -529,7 +584,7 @@ def _claim(item: dict[str, Any]) -> list[dict[str, Any]] | None:
         return None  # A bare date or delivery estimate does not establish stock replenishment.
     if field == "price_vnd" and "phụ thu" in quote.lower() and not re.search(r"giá (?:bán|cuối|sau|là)|thanh toán", quote, re.IGNORECASE):
         return None
-    if field in CODE_FIELDS:
+    if field in CODE_FIELDS or type_ == "sku":
         value = re.sub(r"\s+", "", value).upper()
         if not value or value not in re.sub(r"\s+", "", quote).upper():
             return None  # A code is compared exactly: it must be the one said, not one recalled from elsewhere.
@@ -574,6 +629,19 @@ def coerce(kind: str, raw: str) -> tuple[bool, Any]:
                 return True, date.fromisoformat(value.strip()).isoformat()
             except ValueError:
                 pass
+        return False, raw
+    if kind == "datetime":
+        match = DATETIME.match(value.strip()) if isinstance(value, str) else None
+        if match:
+            try:
+                moment = datetime.strptime(f"{match[1]} {match[2]}:{match[3]}", "%Y-%m-%d %H:%M")
+            except ValueError:
+                return False, raw
+            return True, moment.strftime("%Y-%m-%dT%H:%M")
+        return False, raw
+    if kind == "sku":
+        if isinstance(value, str) and SKU.fullmatch(value.strip().upper()):
+            return True, value.strip().upper()
         return False, raw
     if isinstance(value, str):
         return True, value

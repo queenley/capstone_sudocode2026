@@ -1,6 +1,12 @@
-/* Design tokens: one emerald palette for the shop, the staff pages and the
-   sales workspace, in light and dark. Every colour in globals.css, shop.css
-   and sales.css is one of these; nothing else names a colour.
+/* Design tokens for the shop, the staff pages and the sales workspace, in light
+   and dark. Every colour in globals.css, shop.css and sales.css is one of these;
+   nothing else names a colour.
+
+   The light palette is the one taste-skill dealt for the shop (white-navy-tab:
+   navy ink on white, an orange action with a navy label) with Work Sans, the
+   first of the product pairings that sets Vietnamese; the storefront loads the
+   kit itself from public/assets and these names follow it. Orange is too pale
+   for text on white, so --brand-ink is a darker orange (6.9:1).
 
    The theme follows the system unless the person picked one: <html
    data-theme="light|dark"> (components/theme/ThemeToggle.tsx, remembered in
@@ -9,44 +15,44 @@
 
 :root {
   color-scheme: light;
-  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  --font-sans: "Work Sans", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
 
   --radius-sm: 8px;
   --radius: 12px;
-  --radius-lg: 16px;
+  --radius-lg: 20px;
   --radius-xl: 24px;
 
   /* Surfaces, from the page to the most raised. */
-  --bg: #f4f8f6;
+  --bg: #ffffff;
   --surface: #ffffff;
-  --surface-2: #f7faf9;
-  --surface-3: #edf3f0;
-  --line: #e1eae6;
-  --line-strong: #82978c;
+  --surface-2: #f8f8f6;
+  --surface-3: #f4f4f2;
+  --line: #e3e4e9;
+  --line-strong: #8a90a3;
 
   /* Text. */
-  --ink: #0f1f19;
-  --ink-2: #33433d;
-  --muted: #64746d;
+  --ink: #1f2b4d;
+  --ink-2: #3c4766;
+  --muted: #646b81;
 
-  /* Brand: emerald. --brand-ink is brand-coloured text on a surface. */
-  --brand: #047857;
-  --brand-strong: #065f46;
-  --brand-deep: #065f46;
-  --on-brand: #ffffff;
-  --brand-ink: #047857;
-  --brand-soft: #ecfdf5;
-  --brand-soft-2: #d1fae5;
-  --brand-line: #a7f3d0;
-  --accent: #34d399;
+  /* Brand: the orange action with a navy label. --brand-ink is brand-coloured text on a surface. */
+  --brand: #f7941d;
+  --brand-strong: #e07f0a;
+  --brand-deep: #1f2b4d;
+  --on-brand: #1f2b4d;
+  --brand-ink: #a85a00;
+  --brand-soft: #fff4e6;
+  --brand-soft-2: #ffe6c7;
+  --brand-line: #fbc98a;
+  --accent: #f7941d;
 
   /* States. Solid colours carry white text in both themes. */
   --danger: #dc2626;
   --danger-soft: #fef2f2;
   --danger-line: #fecaca;
   --danger-ink: #b91c1c;
-  --warn: #d97706;
+  --warn: #b45309;
   --warn-soft: #fffbeb;
   --warn-line: #fde68a;
   --warn-ink: #92400e;
@@ -54,21 +60,21 @@
   --info-soft: #eff6ff;
   --info-ink: #1d4ed8;
 
-  /* Dark chrome: the staff sidebar, the shop's top line and footer. */
-  --chrome: #065f46;
-  --chrome-2: #054d39;
+  /* Dark chrome: the staff sidebar. */
+  --chrome: #1f2b4d;
+  --chrome-2: #18223d;
   --on-chrome: #ffffff;
   --on-chrome-muted: rgb(255 255 255 / 0.72);
-  --chrome-label: #6ee7b7;
+  --chrome-label: #fbc98a;
   --chrome-active: #ffffff;
-  --on-chrome-active: #065f46;
+  --on-chrome-active: #1f2b4d;
 
-  --overlay: rgb(6 28 21 / 0.45);
-  --shadow-rgb: 16 48 36;
+  --overlay: rgb(15 22 40 / 0.45);
+  --shadow-rgb: 31 43 77;
   --shadow-sm: 0 1px 2px rgb(var(--shadow-rgb) / 0.06);
   --shadow: 0 1px 2px rgb(var(--shadow-rgb) / 0.05), 0 8px 24px rgb(var(--shadow-rgb) / 0.07);
   --shadow-lg: 0 24px 64px rgb(var(--shadow-rgb) / 0.18);
-  --focus: 0 0 0 3px rgb(5 150 105 / 0.28);
+  --focus: 0 0 0 3px rgb(247 148 29 / 0.35);
   --skeleton: linear-gradient(90deg, var(--surface-3) 25%, var(--surface-2) 50%, var(--surface-3) 75%);
 
   /* Names the pages used before the tokens: kept as aliases. */
@@ -81,24 +87,24 @@
    (CSS has no way to share a block between a selector and a media query). */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #0b1310;
-  --surface: #111b17;
-  --surface-2: #15211c;
-  --surface-3: #1b2a24;
-  --line: #22332c;
-  --line-strong: #667e72;
-  --ink: #e6f1ec;
-  --ink-2: #c3d2cb;
-  --muted: #8fa29a;
-  --brand: #10b981;
-  --brand-strong: #34d399;
-  --brand-deep: #0d3b2e;
-  --on-brand: #032219;
-  --brand-ink: #34d399;
-  --brand-soft: #10271f;
-  --brand-soft-2: #133528;
-  --brand-line: #1f5a46;
-  --accent: #34d399;
+  --bg: #0e1424;
+  --surface: #151c30;
+  --surface-2: #1a2238;
+  --surface-3: #212a42;
+  --line: #2a3450;
+  --line-strong: #6b7591;
+  --ink: #eef0f6;
+  --ink-2: #c9cedc;
+  --muted: #9aa1b5;
+  --brand: #f7941d;
+  --brand-strong: #ffa940;
+  --brand-deep: #2a2010;
+  --on-brand: #1f2b4d;
+  --brand-ink: #ffb057;
+  --brand-soft: #2a1f10;
+  --brand-soft-2: #3a2a12;
+  --brand-line: #6a4a1c;
+  --accent: #f7941d;
   --danger: #dc2626;
   --danger-soft: #2a1414;
   --danger-line: #5a2424;
@@ -110,40 +116,40 @@
   --info: #3b82f6;
   --info-soft: #111d33;
   --info-ink: #93c5fd;
-  --chrome: #0a1a15;
-  --chrome-2: #0e221b;
-  --chrome-label: #34d399;
-  --chrome-active: #133528;
-  --on-chrome-active: #6ee7b7;
+  --chrome: #0a0f1c;
+  --chrome-2: #0f1526;
+  --chrome-label: #ffb057;
+  --chrome-active: #212a42;
+  --on-chrome-active: #ffb057;
   --overlay: rgb(0 0 0 / 0.6);
   --shadow-rgb: 0 0 0;
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
   --shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 24px rgb(0 0 0 / 0.35);
   --shadow-lg: 0 24px 64px rgb(0 0 0 / 0.6);
-  --focus: 0 0 0 3px rgb(52 211 153 / 0.35);
+  --focus: 0 0 0 3px rgb(247 148 29 / 0.4);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #0b1310;
-    --surface: #111b17;
-    --surface-2: #15211c;
-    --surface-3: #1b2a24;
-    --line: #22332c;
-    --line-strong: #667e72;
-    --ink: #e6f1ec;
-    --ink-2: #c3d2cb;
-    --muted: #8fa29a;
-    --brand: #10b981;
-    --brand-strong: #34d399;
-    --brand-deep: #0d3b2e;
-    --on-brand: #032219;
-    --brand-ink: #34d399;
-    --brand-soft: #10271f;
-    --brand-soft-2: #133528;
-    --brand-line: #1f5a46;
-    --accent: #34d399;
+    --bg: #0e1424;
+    --surface: #151c30;
+    --surface-2: #1a2238;
+    --surface-3: #212a42;
+    --line: #2a3450;
+    --line-strong: #6b7591;
+    --ink: #eef0f6;
+    --ink-2: #c9cedc;
+    --muted: #9aa1b5;
+    --brand: #f7941d;
+    --brand-strong: #ffa940;
+    --brand-deep: #2a2010;
+    --on-brand: #1f2b4d;
+    --brand-ink: #ffb057;
+    --brand-soft: #2a1f10;
+    --brand-soft-2: #3a2a12;
+    --brand-line: #6a4a1c;
+    --accent: #f7941d;
     --danger: #dc2626;
     --danger-soft: #2a1414;
     --danger-line: #5a2424;
@@ -155,17 +161,17 @@
     --info: #3b82f6;
     --info-soft: #111d33;
     --info-ink: #93c5fd;
-    --chrome: #0a1a15;
-    --chrome-2: #0e221b;
-    --chrome-label: #34d399;
-    --chrome-active: #133528;
-    --on-chrome-active: #6ee7b7;
+    --chrome: #0a0f1c;
+    --chrome-2: #0f1526;
+    --chrome-label: #ffb057;
+    --chrome-active: #212a42;
+    --on-chrome-active: #ffb057;
     --overlay: rgb(0 0 0 / 0.6);
     --shadow-rgb: 0 0 0;
     --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
     --shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 24px rgb(0 0 0 / 0.35);
     --shadow-lg: 0 24px 64px rgb(0 0 0 / 0.6);
-    --focus: 0 0 0 3px rgb(52 211 153 / 0.35);
+    --focus: 0 0 0 3px rgb(247 148 29 / 0.4);
   }
 }
 

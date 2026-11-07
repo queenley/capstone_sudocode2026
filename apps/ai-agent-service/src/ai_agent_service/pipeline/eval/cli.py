@@ -70,6 +70,12 @@ EXTRACTOR_CACHE = RUNS / "cache" / "extractor.json"
 
 #: Extractor calls in flight at once; the provider's rate limiter paces them.
 EXTRACTOR_CONCURRENCY = 4
+#: Seconds one turn's labelling may take, its retry included (two attempts of 60 s, and the limiter's wait).
+#: Past it the labelling stops with an error instead of waiting: eval2 (2026-11-07) waited over twenty minutes
+#: on four calls whose connections the provider had closed. What was labelled stays in the cache for the rerun.
+LABEL_TIMEOUT_S = 300
+#: A line every this many labelled turns, so a long labelling shows it is moving.
+LABEL_PROGRESS_EVERY = 200
 
 
 @dataclass
@@ -254,8 +260,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         print("--provider and --model go together")
         return 2
     if args.relabel:
-        if args.no_extract or args.config or args.judge or args.provider or args.model or args.only:
-            print("--relabel runs only the extractor; agent/config/selection options are not supported")
+        if args.no_extract or args.judge or args.provider or args.model or args.only:
+            print("--relabel runs only the extractor; agent/selection options are not supported (--config is)")
             return 2
         from . import relabel
 
@@ -272,7 +278,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         except (RuntimeError, ValueError) as error:
             print(f"Extractor setup error: {error}")
             return 2
-        return asyncio.run(relabel.relabel(args.relabel.resolve(), out, extractor))
+        return asyncio.run(relabel.relabel(args.relabel.resolve(), out, extractor,
+                                           (args.config,) if args.config else None))
     if not args.scenarios.is_dir():
         print(f"{args.scenarios} is not a directory")
         return 2
@@ -419,7 +426,7 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
                 if integrity:
                     run.stopped.append({"scenario_id": ready[0].scenario_id, "error": "; ".join(integrity)})
             if extractor is not None and not run.stopped:
-                await _label(run, extractor)
+                await _label(run, extractor, ready)
             if args.judge and not run.stopped:
                 from ...components.evaluation.judge import BtcJudge
                 from ...llm.factory import LLMFactory
@@ -537,7 +544,24 @@ def _extractor() -> Any:
                      cache_path=EXTRACTOR_CACHE)
 
 
-async def _label(run: ConfigRun, extractor: Any) -> None:
+def call_context(cohort: Any) -> dict[tuple[str, str], dict[str, Any]]:
+    """``today`` and ``crm_history`` of every call of *cohort* (planned scenarios), for the extractor.
+
+    The day is the call's own (``call_date`` or the days after the one before), so a time said in words can be
+    written as the scenario writes ``callback_at``; the CRM history is the ``seed_history`` the profile held.
+    """
+    context = {}
+    for scenario in cohort or ():
+        for plan in scenario.calls:
+            context[(scenario.scenario_id, plan.name)] = {
+                "today": plan.on,
+                "crm_history": [{"date": s.day, "channel": s.channel, "summary": s.summary, "outcome": s.outcome,
+                                 "facts": dict(s.facts)} for s in plan.seed],
+            }
+    return context
+
+
+async def _label(run: ConfigRun, extractor: Any, cohort: Any = None) -> None:
     """Fill ``questions``, ``claims`` and ``facts_used`` of every row, after the turns ran, so no extractor call
     ever queues in front of a timed turn.
 
@@ -554,17 +578,30 @@ async def _label(run: ConfigRun, extractor: Any) -> None:
     # A burst can reserve the remaining cap before any in-flight usage settles.
     gate = asyncio.Semaphore(1 if os.environ.get("EVAL_BUDGET_DB") else EXTRACTOR_CONCURRENCY)
     history = scorers.previous_sessions(run.rows)
+    context = call_context(cohort)
     halted = False
+    finished = 0
 
     async def one(index: int, row: dict[str, Any], diagnosis: dict[str, Any]) -> None:
-        nonlocal halted
-        data = scorers.turn_input(row["agent_text"], row["tool_calls"], history.get(index))
+        nonlocal halted, finished
+        call = context.get((row["scenario_id"], row["call"]), {})
+        data = scorers.turn_input(row["agent_text"], row["tool_calls"], history.get(index),
+                                  today=call.get("today"), crm_history=call.get("crm_history"))
         async with gate:
             if halted:
                 return
-            labels = await extractor.label(data)
+            try:
+                labels = await asyncio.wait_for(extractor.label(data), LABEL_TIMEOUT_S)
+            except asyncio.TimeoutError:
+                labels = {**scorers._labels([], 0, 0), "error": f"extractor gave no answer in {LABEL_TIMEOUT_S} s"}
+            finished += 1
+            if finished % LABEL_PROGRESS_EVERY == 0:
+                print(f"  labelled {finished}/{len(run.rows)} turns", flush=True)
             if labels.get("error"):
-                halted = True
+                # Under a spending cap the rest is not paid for; without one, the other turns are labelled, so a
+                # rerun repeats only those that failed (the rest are in the cache) and one bad turn of 3.747 does
+                # not cost the other 3.746. The table is withheld either way while a turn is unlabelled.
+                halted = bool(os.environ.get("EVAL_BUDGET_DB"))
                 run.stopped.append({"scenario_id": row["scenario_id"], "stage": "extraction", "error": labels["error"]})
         row["questions"], row["claims"] = labels["questions"], labels["claims"]
         row["facts_used"] = trace.merged_facts_used(labels["facts_used"], row["facts_used"])
@@ -580,8 +617,12 @@ async def _label(run: ConfigRun, extractor: Any) -> None:
         if labels.get("recovered_errors"):
             diagnosis["extraction_recovered_errors"] = labels["recovered_errors"]
 
-    await asyncio.gather(*(one(index, row, diagnosis)
-                           for index, (row, diagnosis) in enumerate(zip(run.rows, run.diagnostics))))
+    try:
+        await asyncio.gather(*(one(index, row, diagnosis)
+                               for index, (row, diagnosis) in enumerate(zip(run.rows, run.diagnostics))))
+    finally:
+        if hasattr(extractor, "flush"):
+            await extractor.flush()
     print(f"  labelled {sum('extraction_items' in d for d in run.diagnostics)} turns ({extractor.stats()})")
 
 

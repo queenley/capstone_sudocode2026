@@ -158,8 +158,45 @@ def test_every_truth_the_team_labels_is_extracted_or_said_why_not():
     for call in team_calls():
         for field in call.get("ground_truth_facts") or ():
             known = (field in scorers.CLAIM_FIELDS or scorers.PROMO_FIELD.match(field) or field in scorers.NOT_CLAIMS
-                     or (field.startswith("price_vnd:") and "price_vnd:<SKU>" in scorers.NOT_CLAIMS))
+                     or scorers.PRICE_SKU_FIELD.match(field))
             assert known, field
+
+
+def test_the_entities_are_the_scenario_contract():
+    """Slots and claim fields come from contracts/scenario/scenario-keys.yaml, with the contract's types."""
+    contract = scorers.contract()
+    assert set(contract["slots"]) <= scorers.vocabulary()
+    for name, spec in contract["ground_truth_facts"].items():
+        assert name in scorers.NOT_CLAIMS or scorers.CLAIM_FIELDS[name] == spec["type"], name
+    assert {"return_reason", "tracking"} <= scorers.vocabulary()
+
+
+def test_callback_times_and_codes_are_written_as_the_scenarios_write_them():
+    claim = {"kind": "claim", "speaker": "agent", "source_field": "agent_text", "start": 0, "end": 1, "purpose": ""}
+    callback = scorers._claim({**claim, "slot_or_field": "callback_at", "value": "2026-10-19T19:00:00+07:00",
+                               "quote": "em gọi lại chị 7 giờ tối thứ Hai"})
+    assert callback and callback[0]["value"] == "2026-10-19T19:00"
+    assert scorers._claim({**claim, "slot_or_field": "callback_at", "value": "tối thứ Hai", "quote": "tối thứ Hai"}) is None
+    gift = scorers._claim({**claim, "slot_or_field": "gift_sku", "value": "sku-ap-flt-x", "quote": "tặng kèm SKU-AP-FLT-X"})
+    assert gift and gift[0]["value"] == "SKU-AP-FLT-X"
+    # A product named in words is not its code.
+    assert scorers._claim({**claim, "slot_or_field": "gift_sku", "value": "SKU-AP-FLT-X", "quote": "tặng kèm lõi lọc"}) is None
+    item = scorers._claim({**claim, "slot_or_field": "price_vnd:SKU-AF-6L", "value": "2.490.000đ",
+                           "quote": "SKU-AF-6L giá 2.490.000đ"})
+    assert item and item[0]["value"] == 2490000
+    assert scorers._claim({**claim, "slot_or_field": "price_vnd:SKU-AF-6L", "value": 2490000,
+                           "quote": "nồi chiên 6 lít giá 2.490.000đ"}) is None
+
+
+def test_crm_history_is_evidence_for_reused_facts_and_today_is_context():
+    data = scorers.turn_input("Dạ chị vẫn ở Thủ Đức đúng không ạ?", today="2026-10-19",
+                              crm_history=[{"date": "2026-10-01", "channel": "hotline", "summary": "Hỏi xe đẩy",
+                                            "outcome": "khac", "facts": {"delivery_area": "Thủ Đức, TP.HCM"}}])
+    assert data["today"] == "2026-10-19" and data["crm_history"][0]["facts"] == {"delivery_area": "Thủ Đức, TP.HCM"}
+    fact = {"kind": "fact_usage", "slot_or_field": "delivery_area", "value": "Thủ Đức", "question_type": None,
+            "speaker": "agent", "source_field": "agent_text", "quote": "Thủ Đức", "start": 12, "end": 19, "purpose": "p"}
+    assert scorers.label_items([fact], data)["facts_used"] == ["delivery_area"]
+    assert scorers.label_items([fact], scorers.turn_input(data["agent_text"]))["facts_used"] == []
 
 
 def test_order_codes_and_statuses_compare_as_the_tools_write_them():

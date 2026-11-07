@@ -122,7 +122,7 @@ def check(
                                  if tier != "VERIFIED" and args.get("order_id") not in created_ids
                                  else _order_update(args, orders=orders | created_ids, trusted=trusted,
                                                     updated=updated, agreed=(intents or {}).get("change"))),
-        "schedule_callback": lambda: _schedule_callback(args, now=now),
+        "schedule_callback": lambda: _schedule_callback(args, now=now, has_phone=has_phone),
         "handoff_transfer": lambda: _handoff(args, lane=lane, warranted=(intents or {}).get("handoff")),
         "memory_request_deletion": lambda: _deletion(tier=tier, last_agent_said=last_agent_said,
                                                      customer_said=customer_said, deletion_asked=deletion_asked, agreed=(intents or {}).get("delete")),
@@ -233,7 +233,9 @@ def _order_update(args: Mapping[str, Any], *, orders: frozenset[str], trusted: f
     return reasons
 
 
-def _schedule_callback(args: Mapping[str, Any], *, now: datetime | None) -> list[str]:
+def _schedule_callback(args: Mapping[str, Any], *, now: datetime | None, has_phone: bool = True) -> list[str]:
+    if not has_phone and not args.get("customer_phone"):
+        return ["Chưa có số điện thoại để gọi lại; hỏi số của khách trước, rồi mới đặt lịch."]
     moment = clock.parse_local(args.get("callback_at"))
     if moment is None:
         return ["callback_at phải là ngày giờ theo giờ Việt Nam, ví dụ 2026-10-17T19:00."]
