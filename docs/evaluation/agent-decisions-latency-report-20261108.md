@@ -137,7 +137,7 @@ Each round costs about 1.3 s and each tool about 20 ms, so the number of rounds 
 |---|---|---|---|
 | Strict tools | Strict schemas, system-filled arguments hidden from the model, typed handoff brief | `mcp/tools.py` | No malformed tool calls in these runs |
 | Nulls removed | Nulls that strict mode requires are dropped before a tool runs | `without_nulls` | Tool errors 0 |
-| Chained lookup | A search that finds one product brings its price and stock with no model round | `ChainLookupMiddleware` | Fewer rounds |
+| Chained lookup | A search that finds one product brings its price and stock with no model round | `ChainLookupMiddleware` | Saves a round on 6 to 10 of 36 turns, see below |
 | Results reused in the call | A prompt section holds the latest result per tool and subject | `reusable_results`, `_earlier_block` | Exact repeats from 34 to 3 |
 | Basket total by code | The system adds the basket; the model never does | `_basket_after`, `_basket_block` | Told totals correct |
 | Own product out of the basket | A quote no longer treats its own SKU as a second item | `other_products_only` | Fixes a wrong second-item discount |
@@ -149,6 +149,47 @@ Each round costs about 1.3 s and each tool about 20 ms, so the number of rounds 
 | No codes aloud | Rule 2: codes are for tools only | `advisor/rules.md` | Leaks 0 in these runs |
 | Earlier results for transfers | The transfer check also sees what the call already knows; the "no passage" note points to earlier results first | `_intents`, `NO_ANSWER` | The needless refund transfer stopped |
 | Unaccented money | `5 trieu ruoi` is read as money | `intake/itn.py` | Stops blocking a customer's own budget |
+
+### Grouping tool calls and chaining them
+
+A turn with tools needs at least two model rounds: one to ask for the tools and one to write the answer. In `eight-standard`, TTFT p50 is 2.24 s on turns with tools (24 turns) and 0.92 s on turns without (12 turns). Each round saved is worth about 1.3 s, so lookups are arranged by what depends on what.
+
+```
+catalog_search --(exactly one product, no successor)--> pricing_get_quote + inventory_check   by the harness, no model round
+pricing_get_quote, inventory_check, delivery_estimate    independent once the code is known: one model round, together
+order_create, order_update, handoff_transfer             never chained: guarded writes, the model asks for them
+```
+
+| Case | How it runs | Where |
+|---|---|---|
+| Independent lookups | The model asks for them in one round, and they run at the same time. `parallel_tool_calls` is not set, so OpenAI's default (on) applies | `advisor/rules.md`, `ToolNode` |
+| Dependent lookups | A quote needs the code a search returns, which would take a round of its own | |
+| Search finds one product | The harness calls price and stock itself, at the same time, then gives the model real tool messages to read | `chained_lookups`, `ChainLookupMiddleware` |
+| Several searches in one round | Each one that found a single product is chained, so a two-product question stays in one extra step | `chained_lookups` |
+| Search finds several products, or one with a successor | No chain: the model has to choose | `chained_lookups` |
+| Already asked this run | Not called again, and earlier turns' results are reused (above) | `chained_lookups`, `reusable_results` |
+
+Chained calls pass through `ToolGuardMiddleware` like any other, so system arguments are filled and internal fields removed. They carry a `chained` mark and do not count as model calls. The chain does not depend on the customer's words, only on what the search returned.
+
+**Measured.** From Langfuse, one run each. Rounds include warm-up and opening turns, so there are more than the measured model calls above. "Turns chained" counts measured turns that start with search, quote and stock, which also matches the rare turn where the model asked for all three itself.
+
+| | `six` | `eight-standard` | `eight-fast` | `eight-low` |
+|---|---|---|---|---|
+| Model rounds | 74 | 71 | 74 | 72 |
+| Rounds with no tool | 38 | 39 | 37 | 38 |
+| Rounds with one tool | 31 | 26 | 30 | 28 |
+| Rounds with two or more tools | 5 | 6 | 7 | 6 |
+| Turns chained, of 36 | 10 | 6 | 7 | 9 |
+
+- **Chaining works and saves a round on 6 to 10 of 36 turns.** The saving was never measured with the chain switched off, so about 1.3 s per chained turn is an estimate from the round time.
+- **The model rarely groups calls on its own.** In `eight-standard`, only 6 of 32 rounds with tools asked for more than one. Many turns need only one lookup, so this does not show how many rounds were lost. That was not analysed.
+- **The cost of the chain:** stock is fetched even when the customer asked only for the price. That adds about 20 ms and some prompt tokens on the next round, against one round saved.
+
+**Not done.**
+
+- The answer round after tools remains. Skipping it means template replies, which are hard when the customer also asks something else.
+- `delivery_estimate` is not chained, since it needs an address and not every turn wants it.
+- Planning a whole graph of tools ahead (LLMCompiler) was rejected as heavier than this problem: the common dependency is one step, and the chain already covers it.
 
 **The address is not mandatory before an order.** A rough keyword count finds that in 63 of 235 `order.create` calls in `seed-dev`, and 3 of 5 in `public_sample`, the customer never gives an address. Fixed customer turns could then never produce the order. An order may be created first and completed when the address arrives.
 
@@ -201,7 +242,7 @@ Prewarming is documented for the Responses API only, and we use Chat Completions
 | Speak the first sentence at once | Applied | Clearest voice effect ([voice trials](voice-latency-trials-20261107.md)) |
 | PCM in small chunks, keep-alive | Applied | Moderate |
 | Reviews beside the stream | Applied | Decisions does not delay the first token |
-| Parallel and chained tools, reuse within a call | Applied | Section 3 |
+| Grouped and chained tools, reuse within a call | Applied | Section 3, "Grouping tool calls and chaining them" |
 | Skills in the prompt, effort `none` | Applied | Section 4 |
 | Filler or short line before a tool | Rejected | Team decision: it is penalised and is not the answer's first audio |
 | LLMCompiler, Responses or WebSocket, Realtime, routing model | Rejected | Heavier than the problem, or slower when measured |
