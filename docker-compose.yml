@@ -20,8 +20,6 @@ x-runtime: &runtime
     AGENT_TOKEN: ${AGENT_TOKEN:-local-agent-change-me}
     SELLER_TOKEN: ${SELLER_TOKEN:-local-seller-change-me}
     DEVELOPER_TOKEN: ${DEVELOPER_TOKEN:-local-developer-change-me}
-    TYPESAFE_API_KEY: ${TYPESAFE_API_KEY:-}
-    JEV_URL: ${JEV_URL:-https://api.typesafe.ai/v1/systemone}
     LLM_API_KEY: ${LLM_API_KEY:-}
     LLM_URL: ${LLM_URL:-}
     LLM_MODEL: ${LLM_MODEL:-}
@@ -179,8 +177,9 @@ services:
       ZALO_OAUTH_URL: ${ZALO_OAUTH_URL:-}
       GROQ_API_KEY: ${GROQ_API_KEY:-}
       NVIDIA_API_KEY: ${NVIDIA_API_KEY:-}
-      AI_GATEWAY_API_KEY: ${AI_GATEWAY_API_KEY:-}
       AGENT_DB_SCHEMA: ${AGENT_DB_SCHEMA:-agent}
+      # 1 loads skills on demand instead of keeping them all in the advisor's prompt.
+      ADVISOR_SKILLS: ${ADVISOR_SKILLS:-0}
       # A profile of apps/ai-agent-service/config/models.yaml ("local": every agent on Gemini's free
       # key). Empty: the file as written.
       AGENT_PROFILE: ${AGENT_PROFILE:-}

@@ -34,7 +34,7 @@ async def test_last_model_call_has_no_tools_and_preserves_previous_results():
 
     class InspectModel(Model):
         def bind_tools(self, tools, **kwargs):
-            observed.append([t.name for t in tools])
+            observed.append(kwargs.get("tool_choice"))
             return self
 
     async def lookup(query: str) -> str:
@@ -47,8 +47,8 @@ async def test_last_model_call_has_no_tools_and_preserves_previous_results():
     agent = AdvisorAgent(llm=model, tools=[tool], retries=0)
     draft = await agent.draft([HumanMessage(content="Tìm sản phẩm")], AgentContext(call_id="fixture", lane="NEW"))
     assert len(draft.tool_results) == 7
-    # create_agent skips bind_tools entirely when tools is empty.
-    assert len(observed) == 7
+    # The tools stay bound, so the prompt cache holds; the last call may not use them.
+    assert observed[-1] == "none" and "none" not in observed[:-1]
     assert draft.model_calls == 8
 
 

@@ -19,7 +19,7 @@ from ai_agent_service.pipeline.hot.review import Reviews
 
 def verdict(passed=True, reasons=(), failed=None):
     return SimpleNamespace(passed=passed, reasons=reasons, failed=failed if failed is not None else ("over_promise",) * len(reasons),
-                           probabilities={}, decided_by="jev", seconds=0)
+                           probabilities={}, decided_by="decisions", seconds=0)
 
 
 @pytest.mark.asyncio
@@ -204,3 +204,20 @@ def test_a_baskets_total_is_the_sum_of_todays_quotes():
 
 def test_the_cod_limit_is_the_shops_own_amount():
     assert hard.check(hard.GuardInput(text="Dạ đơn COD tối đa 10.000.000đ ạ", tool_results=(), tier="VERIFIED")).passed
+
+
+def test_openai_voice_sends_small_wav_chunks_and_never_cuts_a_sample():
+    from ai_agent_service.components.voice import tts
+
+    speech = tts._pcm_speech(b"\x00\x10" * tts.OPENAI_PCM_RATE, 0.0, 0.1)
+    assert speech.mime == "audio/wav" and speech.audio[:4] == b"RIFF" and speech.duration == 1.0
+
+
+def test_the_ledger_takes_the_advisors_model_and_no_other():
+    from ai_agent_service.llm.evaluation_budget import BudgetCallback
+
+    rates = {"input_token_price_per_million": 0.40, "output_token_price_per_million": 1.60}
+    config = {"provider": "openai", "rate_limits": rates, "max_retries": 0, "max_tokens": 10}
+    assert BudgetCallback({**config, "model": "gpt-6-luna"}, "advisor")
+    with pytest.raises(RuntimeError):
+        BudgetCallback({**config, "model": "gpt-6.1-terra"}, "advisor")

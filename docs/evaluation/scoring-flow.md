@@ -6,7 +6,7 @@ Một trang để biết một con số RQR, CCR, TSR hay HR đến từ đâu. 
 
 1. **Nguồn chấm được chọn là `reference_eval.py` trên main** tại `41eda490bc47577018541c7778c0e8443ed8e6c8`, chạy như một tiến trình riêng trên hai file trace. Giữ nguyên bản này theo quyết định người dùng; không khôi phục ZIP BTC và không sửa công thức. `tests/agent/test_btc_pack.py` ghim hash pack trong repo; không mặc định bản main đồng nhất với ZIP BTC gốc.
 2. **Script đó chỉ đọc trace**, không đọc hội thoại. Mọi thứ nó cần phải có sẵn trong mỗi dòng: `questions[]`, `claims[]`, `facts_used[]`, `tool_calls[]`, `latency`, `memory_writes`. BTC không phát extractor: việc trích `questions` và `claims` là của đội, và BTC chấm tay ngẫu nhiên 20 lượt để bắt extractor bỏ sót hoặc bịa.
-3. **Đổi extractor là đổi dụng cụ đo.** Hiện là `product-extractor-v8`; so full/baseline trong cùng version. v8 kiểm schema nhãn trong cache và dùng file tạm riêng khi ghi cache đồng thời; prompt và quy tắc chiếu nhãn giữ nguyên v7, nhưng instrument hash đã đổi. Muốn so hai extractor phải `--relabel` cùng replies, giữ riêng phiên bản và kết quả; xem [RUN-LEDGER.md](RUN-LEDGER.md).
+3. **Đổi extractor là đổi dụng cụ đo.** Hiện là `product-extractor-v9`; so full/baseline trong cùng version. v8 kiểm schema nhãn trong cache và dùng file tạm riêng khi ghi cache đồng thời; prompt và quy tắc chiếu nhãn giữ nguyên v7, nhưng instrument hash đã đổi. Muốn so hai extractor phải `--relabel` cùng replies, giữ riêng phiên bản và kết quả; xem [RUN-LEDGER.md](RUN-LEDGER.md).
 
 ## 2. Luồng một lần chạy
 

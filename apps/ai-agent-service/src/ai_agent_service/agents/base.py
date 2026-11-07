@@ -3,13 +3,13 @@
 An agent's name is its key in ``config/models.yaml``. Under ``agents`` it
 names a chat model, which :class:`~src.llm.factory.LLMFactory` builds with the
 shared rate limiter and the token ledger already on it. Under ``evaluators``
-it names an evaluation model such as Jev, reached through
-:func:`~src.llm.jev.evaluate`. Either way, changing the model an agent uses
+it names an evaluation model, reached through
+:func:`~src.llm.decisions.evaluate`. Either way, changing the model an agent uses
 is one line of config, the same for every agent, and nothing below an agent
 picks a model by itself.
 
 That is all the base does. The agents differ too much for more: the Advisor
-is a tool loop, the Policy one request to Jev, the Memory and QA agents run
+is a tool loop, the Policy one request to the Decisions API, the Memory and QA agents run
 after the call. None holds state between calls (``docs/design.md``,
 principle 2). Each builds the rest from ``src/components`` and the framework.
 """
@@ -17,12 +17,12 @@ principle 2). Each builds the rest from ``src/components`` and the framework.
 from __future__ import annotations
 
 import logging
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 from langchain_core.language_models import BaseChatModel
 
 from ..config.config_manager import get_models_config
-from ..llm import jev
+from ..llm import decisions
 from ..llm.factory import LLMFactory
 
 logger = logging.getLogger(__name__)
@@ -72,7 +72,7 @@ class BaseAgent:
         an offline test, never a way around the file in the product.
 
         An agent with no entry under ``agents`` and no override has no chat
-        model (``llm`` is None): the Policy asks Jev and nothing else.
+        model (``llm`` is None): the Policy asks the Decisions API and nothing else.
         """
         self.name = name
         self.llm: BaseChatModel | None = llm
@@ -99,11 +99,11 @@ class BaseAgent:
         self.llm = LLMFactory.create_llm(config, agent_name=name)
 
     async def evaluate(
-        self, state: jev.State, questions: Mapping[str, jev.Question]
-    ) -> jev.Decision:
+        self, messages: Sequence[Mapping[str, Any]], questions: Mapping[str, decisions.Predicate]
+    ) -> decisions.Decision:
         """Ask the evaluation model routed to this agent under ``evaluators``.
 
-        Raises :class:`~src.llm.jev.JevUnavailable` rather than waiting; the
+        Raises :class:`~src.llm.decisions.DecisionUnavailable` rather than waiting; the
         agent decides what to do without an answer.
         """
-        return await jev.evaluate(self.name, state, questions)
+        return await decisions.evaluate(self.name, messages, questions)

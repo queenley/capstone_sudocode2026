@@ -90,6 +90,67 @@ Skill-discipline probe, 6 prompts, first decision only, real system prompt:
 
 Groq models hit 429 after 2 or 3 prompts because the prompt is large. On real calls `gemini-3.5-flash` had TTFT of 11 to 78 s and hit its rate limit after 6 turns, so it passes the probe but is too slow and too limited as it stands. The probe is too small to rank the two lite models.
 
+### Measurement against the organisers' rules
+
+Checked against `eval/huong-dan-do-latency.md` and `GIAI-DAP-MENTOR.md` item 7. **Treat the latency numbers above as raw: TTFT and total are over-measured, and small runs have no meaningful p95.** Nothing here is corrected yet.
+
+| The organisers ask | We do | Effect |
+|---|---|---|
+| TTFT ends at the first token generated | Stamped in `_say`, after the whole first sentence is generated and passes the hard check (`pipeline/hot/nodes.py`) | Over-measured, inferred at 0.2 to 0.7 s a turn, not measured |
+| Total ends at the last token | `total_ms` spans the whole graph turn (`pipeline/eval/runner.py:436`), including the wait for Jev and saving state | Over-measured, up to 6 to 8 s on some turns before the wait was shortened |
+| Drop 3 warm-up turns | The 15-scenario runs do; the small runs used `--warmup 0`, Luna and `gpt-4o-mini` included | Mistake in those runs: connection time counted in the first turn |
+| At least 100 turns | Luna 33, `gpt-4o-mini` 41 | p95 not meaningful; the grader warns too |
+| Same hardware, API and model when comparing | Models compared across runs, some under free-tier limits | Absolute numbers do not compare between free Gemini and OpenAI |
+
+Correct already: the start of the clock (`runner.py:430`), the filler not counting toward TTFT, `after_call` outside the timer.
+
+Over-measuring does not mean the target is met: each tool round before the answer is real time, about 1 s.
+
+Proposed: stamp the first token of the sentence actually said (a blocked sentence does not count), stamp the last token for total, log separately when the customer really sees the first sentence, and stop using `--warmup 0`. The total needs a change in `pipeline/eval/runner.py` and `trace.py`, which belong to the evaluation owner, so it waits for that decision.
+
+### Voice bench from text, 2026-11-07
+
+Text sent straight into the voice WebSocket (`VOICE_BENCH=1`), so end of speech and ASR are excluded: TTFA runs from the text arriving to the first audio byte. Three warm-up turns, then five measured turns in one call per configuration. One run each, so this shows direction and is not a p95. The real stack, reasoning effort `none`, TTS `gpt-4o-mini-tts`.
+
+| Configuration | Easy | One lookup | Policy | Two lookups | Many lookups | Median TTFA |
+|---|---|---|---|---|---|---|
+| `gpt-5.6-luna`, Chat Completions, skills in prompt | **2.1 s** | 4.9 s | 5.5 s | 6.1 s | 5.5 s | **5.5 s** |
+| `gpt-6-luna`, Chat Completions, skills loaded | 5.4 s | 5.2 s | 5.2 s | 13.5 s | 5.0 s | 5.2 s |
+| `gpt-6-luna`, Chat Completions, skills in prompt | 5.6 s | 8.0 s | 7.9 s | 18.4 s | 6.5 s | 7.9 s |
+| `gpt-6-luna`, Responses, skills in prompt | 3.6 s | 10.5 s | 8.4 s | 9.4 s | 8.8 s | 8.8 s |
+
+Turns with no tool on `gpt-5.6-luna` reached 2.1 to 2.5 s, the only turns under the target. First audio from TTS was 0.9 to 1.8 s in most turns, which leaves about 1.4 s for the agent. Regenerations explain the worst turns (13.5 s and 18.4 s).
+
+## Setup rework, late 2026-11-07
+
+Measured on 2026-11-08: see the [report](agent-decisions-latency-report-20261108.md). The text below is what stood before those runs.
+
+Checked by offline tests only, one of them a whole run against a fake OpenAI endpoint. No model has run on this code. Analysis behind it: five runs in `evaluation/runs/toolheavy/` on `GEN-0017`, `ADV-0137`, `ADV-0089`, `GEN-0011`.
+
+| Area | Change | Why |
+|---|---|---|
+| Prompt cache | The system message holds only rules and skills; the turn's context comes right after the customer's last message (`agents/advisor.py`, OpenAI only) | From GPT-5.6 a lookup stops only at boundaries, such as the end of the first run of developer messages. The old layout hit 45 to 61% and paid 1.25 times to write the rest |
+| Limiter | OpenAI limits set to this key's headers | Waits of up to 10 s fell into TTFT and made up the p95 tail |
+| Tools | Strict mode, system-filled arguments hidden, a typed handoff brief, nulls removed before a tool runs (`mcp/tools.py`) | OpenAI recommends strict mode, and it is off by default on Chat Completions. `BAD_ENVELOPE` came from a flat brief |
+| Usage | `stream_usage` on | A client of our own turned it off, so streamed calls reported no tokens |
+| Per model | Effort and API settings sent only to `gpt-5*` and `gpt-6*`, temperature 0 otherwise | An agent's settings follow it when it moves to another model |
+| Earlier results | A prompt section with the latest result per tool and subject; the money check accepts what quotes and orders returned earlier | Results were dropped between turns, so 15 to 26% of calls repeated and a true refund was withdrawn |
+| Basket | The system adds up the total | Models added it wrong (11.86M for 10.86M) |
+| Chained lookup | A search that finds one product brings its price and stock without a model round (`ChainLookupMiddleware`) | A round costs about 1.5 s and a tool 20 ms |
+| Rules and skills | Reuse within the call, transfer only after the tool, narrower rules 4 and 6, no arithmetic by the model, one tool per need | Contradictions in the prompt caused regenerations and over-escalations |
+| ITN | Money without diacritics is read (`5 trieu ruoi`) | A customer's own budget was blocked and answered with the safe line |
+| Skills | In the prompt by default | Loading took 28% more model calls |
+| Advisor | `gpt-5.6-luna` | Same TSR as `gpt-6-luna` on those scenarios, with fewer over-escalations and rounds |
+| Soft guard | OpenAI Decisions API on `gpt-6-luna` replaces Jev (`llm/decisions.py`) | The user's decision |
+
+To check on the first run:
+
+- **Thresholds in `agents/policy.py` were set on Jev.** Probabilities from another model need not mean the same, so they are provisional until labelled examples set them.
+- Whether the context after the customer's message changes behaviour; one replay of a similar layout did.
+- `waited_s` near zero, and cached share of input.
+- `pipeline/eval/cli.py` changed by one import (`jev` to `decisions`): it belongs to the evaluation owner, so it needs their review.
+- `docs/design.md` still describes Jev.
+
 ## Improvement loop: reduced, not yet run
 
 Only the Knowledge Gap Loop and Reflection remain, per the decision of 2026-11-07. Removed: the LATS exploration, the playbook, and the simulator measurement commands. A/B was never implemented and is dropped. `agents/simulator.py` stays for the organisers' M2 simulator.

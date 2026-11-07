@@ -27,7 +27,7 @@ from ...agents.policy import PolicyInput
 from ...components.context import compact
 from ...components.guardrails import actions, fallback, purchase
 from ...components.guardrails.hard import MAX_SENTENCES, ORDER_SUMMARY, GuardInput, check, clean
-from ...config.config_manager import jev_head_start
+from ...config.config_manager import review_head_start
 from .review import Reviews
 from ...components.context import skills as skill_book
 from ...components.guardrails.stream import SentenceSplitter
@@ -47,6 +47,10 @@ logger = logging.getLogger(__name__)
 #: What the PolicyAgent reads of the call's earlier tool results: the last few, short.
 CALL_LOG_SIZE = 12
 CALL_LOG_CHARS = 500
+#: How far back the PolicyAgent reads the customer's words, in messages of the call.
+CUSTOMER_WORDS = 12
+#: How many of the documents' passages the guards remember for the rest of a call.
+PASSAGES_READ = 9
 #: Section 4.5: two regenerations, then the safe line.
 MAX_REGENERATIONS = 2
 
@@ -57,7 +61,7 @@ ASR_LOW_CONFIDENCE = 0.45
 #: and, by imitation of the passages it was shown, document codes ("[DT-03]",
 #: "[SP-AIR-01]"). The customer hears neither; the brief lines are kept as the
 #: ones the reply used (``facts_used`` in the trace).
-_CODE = r"(?:B\d+|[A-Z]{2,4}(?:-[A-Z]{2,4})?-\d{2})"
+_CODE = r"(?:B(?:\d+|n)|[A-Z]{2,4}(?:-[A-Z]{2,4})?-\d{2})"
 _MARK = rf"\[{_CODE}(?:\s*[,;]\s*{_CODE})*\]"
 #: One run of marks, with the commas between them ("[DT-01], [CL-01]").
 MARKS = re.compile(rf"\s*{_MARK}(?:\s*[,;]?\s*{_MARK})*")
@@ -147,6 +151,7 @@ async def load_context(state: HotState, runtime: Runtime[HotContext]) -> dict[st
         found = await _knowledge({**state, **update}, context, _last_customer_text(state) or "")
         if found is not None:
             update["knowledge"] = found
+            update["passages_read"] = _passages_after(state.get("passages_read") or {}, _passages({"knowledge": found}))
     return update
 
 
@@ -279,8 +284,8 @@ async def _settle(state: HotState, context: HotContext, answer: str) -> dict[str
 async def _confirms(state: HotState, context: HotContext, answer: str) -> bool:
     """Whether the answer to the confirming question confirms who the caller is (section 4.2).
 
-    Read by Jev with the question asked; the word list (``resolver.confirms``)
-    only when Jev gives no answer in time. A wrong "yes" would open someone
+    Read by the PolicyAgent with the question asked; the word list (``resolver.confirms``)
+    only when it gives no answer in time. A wrong "yes" would open someone
     else's data, so its threshold is the higher one (``INTENT_THRESHOLDS``).
     """
     if context.policy is not None:
@@ -606,6 +611,8 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
         notes=tuple(state.get("route_notes") or ()),
         trusted_skus=trusted | frozenset(p["sku"] for p in state.get("seen_products") or []),
         seen_products=tuple(state.get("seen_products") or ()),
+        earlier_results=reusable_results(state.get("call_log") or []),
+        basket_lines=_basket_lines(state.get("basket") or {}, state.get("quotes") or {}),
         created_orders=tuple(state.get("created_orders") or ()),
         updated_orders=tuple(state.get("updated_orders") or ()),
         self_called=None if tier == "VERIFIED" else state.get("honorific_said"),
@@ -630,6 +637,57 @@ def _last_reply(state: HotState) -> str | None:
 
 #: The products kept for later turns: enough for a conversation, small in the prompt.
 SEEN_PRODUCTS = 15
+
+
+def _passages_after(read: Mapping[str, str], shown: Sequence[Mapping[str, Any]]) -> dict[str, str]:
+    """*read* with the organisers' passages the advisor was just shown, the latest last, at most PASSAGES_READ."""
+    now = dict(read)
+    policy, _ = shown_passages(shown)
+    for passage in policy:
+        if passage.get("text") and not passage.get("restricted") and not passage.get("superseded") and passage.get("chunk_id"):
+            now.pop(str(passage["chunk_id"]), None)
+            now[str(passage["chunk_id"])] = str(passage["text"])
+    return dict(list(now.items())[-PASSAGES_READ:])
+
+
+def _result_key(result: Mapping[str, Any]) -> str | None:
+    """What a tool result is about: a later result about the same thing replaces it."""
+    data = (result.get("result") or {}).get("data") or {}
+    items = data.get("items") or [{}]
+    return data.get("sku") or data.get("order_id") or items[0].get("sku")
+
+
+def reusable_results(log: Sequence[Mapping[str, Any]]) -> tuple[Mapping[str, Any], ...]:
+    """The latest result per tool and subject, in the order they came: what the advisor need not ask again."""
+    latest = {(entry.get("tool"), entry.get("key")): entry for entry in log}
+    return tuple(entry for entry in log if latest.get((entry.get("tool"), entry.get("key"))) is entry)
+
+
+def _basket_after(basket: Mapping[str, Mapping[str, Any]], results: Sequence[Mapping[str, Any]]) -> dict[str, dict[str, Any]]:
+    """The basket after *results*: a quote that names other products sets it, an order placed empties it."""
+    current = {sku: dict(line) for sku, line in basket.items()}
+    for result in results:
+        envelope = result.get("result") or {}
+        if not envelope.get("ok"):
+            continue
+        asked = result.get("args") or {}
+        if result.get("name") == "order.create":
+            current = {}
+        elif result.get("name") == "pricing.get_quote" and (envelope.get("data") or {}).get("sku"):
+            sku = envelope["data"]["sku"]
+            others = [s for s in asked.get("basket_skus") or [] if s != sku]
+            if others:
+                current = {s: current.get(s, {"qty": 1}) for s in [*others, sku]}
+            if sku in current:
+                current[sku] = {"qty": int(asked.get("qty") or 1)}
+    return current
+
+
+def _basket_lines(basket: Mapping[str, Mapping[str, Any]], quotes: Mapping[str, int]) -> tuple[tuple[str, int, int], ...]:
+    """``(sku, unit price, qty)`` per product when two or more are in the basket and all are quoted, else nothing."""
+    if len(basket) < 2 or any(sku not in quotes for sku in basket):
+        return ()
+    return tuple((sku, int(quotes[sku]), int(line.get("qty") or 1)) for sku, line in basket.items())
 
 
 def _products_in(results: Sequence[Mapping[str, Any]], seen: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
@@ -690,7 +748,8 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
             if result["name"] == "pricing.get_quote" and data.get("sku"):
                 quotes[data["sku"]] = int(data["final_price_vnd"])
             if result["name"] == "order.create" and data.get("order_id"):
-                created.append({"order_id": data["order_id"], "sku": (result.get("args") or {}).get("sku")})
+                created.append({"order_id": data["order_id"], "sku": (result.get("args") or {}).get("sku"),
+                                "no_address": not (result.get("args") or {}).get("address")})
                 pending_purchase = None
             if result["name"] == "order.update":
                 asked = result.get("args") or {}
@@ -702,10 +761,12 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
             pending_purchase = (envelope["error"].get("details") or {}).get("purchase_draft") or pending_purchase
         elif (envelope.get("error") or {}).get("code") in INFRASTRUCTURE_CODES:
             failures += 1
-    log = [{"tool": r.get("name"), "result": json.dumps((r.get("result") or {}).get("data"), ensure_ascii=False, default=str)[:CALL_LOG_CHARS]}
+    log = [{"tool": r.get("name"), "key": _result_key(r),
+            "result": json.dumps((r.get("result") or {}).get("data"), ensure_ascii=False, default=str)[:CALL_LOG_CHARS]}
            for r in new_results if (r.get("result") or {}).get("ok")]
     return {"tool_results": list(state.get("tool_results") or []) + new_results, "quotes": quotes,
             "call_log": [*(state.get("call_log") or []), *log][-CALL_LOG_SIZE:],
+            "basket": _basket_after(state.get("basket") or {}, new_results),
             "known_orders": orders, "created_orders": created, "updated_orders": updated, "tool_failures": failures,
             "deletion_recorded": deletion_recorded, "pending_purchase": pending_purchase,
             "placed_lines": _placed(state.get("placed_lines") or [], new_results),
@@ -730,6 +791,8 @@ class _Attempt:
     reviews: Reviews = field(default_factory=lambda: Reviews(None))
     #: The sentence stopped had already been said: the next run corrects it.
     correction: bool = False
+    #: When the first token of the sentence being put together was generated, in ms of the turn.
+    token_at: int | None = None
 
 
 def _soft_summary(reviews: Sequence[Any]) -> dict[str, Any] | None:
@@ -741,7 +804,7 @@ def _soft_summary(reviews: Sequence[Any]) -> dict[str, Any] | None:
     return {
         "passed": all(review.passed for review in reviews),
         "reasons": sorted({reason for review in reviews for reason in review.reasons}),
-        "decided_by": "jev" if "jev" in decided else decided[-1],
+        "decided_by": "decisions" if "decisions" in decided else decided[-1],
         "probabilities": {name: max(review.probabilities.get(name, 0.0) for review in reviews) for name in sorted(questions)},
         "seconds": round(sum(review.seconds for review in reviews), 3),
         "sentences": len(reviews),
@@ -770,7 +833,7 @@ async def _streamed(state: HotState, context: HotContext, messages: list[Any], a
     view = agent_context
     #: Sentences said by runs whose next sentence was blocked: the next run goes on after them.
     carried: list[str] = []
-    reviews = Reviews(_reviewer(state, context), head_start=jev_head_start())
+    reviews = Reviews(_reviewer(state, context), head_start=review_head_start())
     view = replace(view, review_flags=reviews.flags)
     corrected = False
     try:
@@ -899,9 +962,16 @@ async def _stream_once(
                 streamed_text = True
                 text = (" " + event.text) if new_message else event.text
                 new_message = False
+                at = _since(context)
+                timing["last_token_ms"] = at
+                if attempt.token_at is None:
+                    attempt.token_at = at
                 for sentence in splitter.feed(text):
                     if not await _offer(state, context, sentence, earlier + tuple(attempt.results), attempt, timing):
                         return attempt
+                    attempt.token_at = at  # what follows this sentence in the same chunk began here
+                if not splitter.holding:
+                    attempt.token_at = None
         rest = splitter.flush()
         if rest:
             await _offer(state, context, rest, earlier + tuple(attempt.results), attempt, timing)
@@ -927,7 +997,9 @@ def _established(state: HotState) -> dict[str, Any]:
     return {"quotes": dict(state.get("quotes") or {}), "orders_created": list(state.get("created_orders") or []),
             "orders_known": list(state.get("known_orders") or []),
             "orders_of_this_customer": list((state.get("brief") or {}).get("orders") or []),
-            "earlier_tool_results": list(state.get("call_log") or [])}
+            "earlier_tool_results": list(state.get("call_log") or []),
+            "prices_quoted_before": [p.get("price_quoted_vnd") for p in (state.get("brief") or {}).get("products_advised") or []
+                                     if p.get("price_quoted_vnd")]}
 
 
 def _reviewer(state: HotState, context: HotContext) -> Any:
@@ -936,9 +1008,10 @@ def _reviewer(state: HotState, context: HotContext) -> Any:
         return None
     tier = state.get("tier") or "UNKNOWN"
     policy, playbook = shown_passages(_passages(state))
-    snippets = tuple(str(p["text"]) for p in (*policy, *playbook) if p.get("text") and not p.get("restricted"))
+    snippets = tuple(dict.fromkeys((*(state.get("passages_read") or {}).values(),
+                                    *(str(p["text"]) for p in (*policy, *playbook) if p.get("text") and not p.get("restricted")))))
     earlier = _established(state)
-    said = _last_customer_text(state)
+    said = tuple(str(m.content) for m in (state.get("messages") or [])[-CUSTOMER_WORDS:] if isinstance(m, HumanMessage))
     logger.info("Passages shown for call %s turn %s: %s", state.get("call_id"), state.get("turn_id"),
                 [p.get("chunk_id") for p in (*policy, *playbook)])
 
@@ -999,16 +1072,25 @@ async def _offer(state: HotState, context: HotContext, sentence: str, results: t
             attempt.correction = False
             attempt.reasons = [reason.split("». ", 1)[-1] for reason in attempt.reasons]
         return False
-    await _say(context, spoken, timing)
+    await _say(context, spoken, timing, token_at=attempt.token_at)
     attempt.said.append(sentence)
     attempt.last_spoken = True
     return True
 
 
-async def _say(context: HotContext, text: str, timing: dict[str, int | None]) -> None:
-    """Hand a checked sentence to the channel; the first one is the turn's first token (section 4.8)."""
+async def _say(context: HotContext, text: str, timing: dict[str, int | None], *, token_at: int | None = None) -> None:
+    """Hand a checked sentence to the channel.
+
+    ``eval/huong-dan-do-latency.md``: TTFT ends at the first token generated and Total at the last. A sentence that
+    was blocked was never said, so its tokens do not count. ``said_first_ms`` is when the customer can see it, after
+    the sentence is whole and checked. A line of the harness has no tokens: it counts when it is said.
+    """
+    now = _since(context)
     if timing["first_token_ms"] is None:
-        timing["first_token_ms"] = _since(context)
+        timing["first_token_ms"] = token_at if token_at is not None else now
+        timing["said_first_ms"] = now
+    if token_at is None:
+        timing["last_token_ms"] = now
     if context.emit is not None:
         await context.emit("sentence", text)
 
@@ -1029,7 +1111,7 @@ def _who(state: HotState) -> str:
 
 
 async def guard(state: HotState, runtime: Runtime[HotContext]) -> dict[str, Any]:
-    """Section 4.5: the hard check, then ``PolicyAgent`` on Jev.
+    """Section 4.5: the hard check, then ``PolicyAgent``.
 
     Blocked with regenerations left: back to the advisor with the reasons.
     Blocked with none left: the lane's safe line, counted (two in a call send
@@ -1088,15 +1170,34 @@ def guard_input(state: HotState, context: HotContext, text: str, results: tuple[
         tool_results=results,
         tier=tier,
         customer_said=tuple(str(m.content) for m in state.get("messages") or [] if isinstance(m, HumanMessage)),
-        policy_texts=passages,
-        priced_texts=tuple(str(p["text"]) for p in shown if (p.get("source") or "policy") == "policy"),
+        policy_texts=(*(state.get("passages_read") or {}).values(), *passages),
+        priced_texts=(*(state.get("passages_read") or {}).values(),
+                      *(str(p["text"]) for p in shown if (p.get("source") or "policy") == "policy")),
         brief_prices=tuple(int(p["price_quoted_vnd"]) for p in brief.get("products_advised") or [] if p.get("price_quoted_vnd")),
         tokens=frozenset(context.vault.entries),
         quotes={**(state.get("quotes") or {}), **_quoted_in(results)},
+        earlier_numbers=_earlier_numbers(state.get("call_log") or []),
+        earlier_counts=frozenset(int(n) for entry in state.get("call_log") or [] for n in re.findall(r"\d+", str(entry.get("result") or ""))),
+        basket_total=_basket_total(state, results),
         warnings=tuple(state.get("freshness") or []) if tier == "VERIFIED" else (),
         promotions=promotions(),
         on=state.get("on"),
     )
+
+
+#: The earlier results whose numbers the customer may hear again: what the shop stated, not a search's list prices.
+STATED_TOOLS = frozenset({"pricing.get_quote", "delivery.estimate", "order.status", "order.create", "order.update"})
+
+
+def _earlier_numbers(log: Sequence[Mapping[str, Any]]) -> frozenset[int]:
+    return frozenset(int(n) for entry in log if entry.get("tool") in STATED_TOOLS
+                     for n in re.findall(r"\d+", str(entry.get("result") or "")))
+
+
+def _basket_total(state: HotState, results: Sequence[Mapping[str, Any]]) -> int | None:
+    quotes = {**(state.get("quotes") or {}), **_quoted_in(results)}
+    lines = _basket_lines(_basket_after(state.get("basket") or {}, results), quotes)
+    return sum(price * qty for _, price, qty in lines) or None
 
 
 def _quoted_in(results: Sequence[Mapping[str, Any]]) -> dict[str, int]:
@@ -1239,7 +1340,8 @@ def _passages(state: HotState) -> tuple[dict[str, Any], ...]:
 #: passages, where the model reads them, because a passage that says "phải nói không có thông tin"
 #: otherwise outweighs rule 4 (FIX-07, 2026-11-01).
 NO_ANSWER = ("Tìm trong tài liệu không thấy đoạn khớp câu khách vừa hỏi; điều này chưa có nghĩa là shop không có. Câu về "
-             "sản phẩm, giá, đơn thì tra tool phù hợp trước. Tool cũng không trả lời được thì làm theo luật 4.")
+             "sản phẩm, giá, đơn thì xem mục \"Đã tra trong cuộc này\" rồi tra tool phù hợp. Cả hai đều không trả lời được "
+             "thì làm theo luật 4.")
 
 
 def _knowledge_note(state: HotState) -> str | None:

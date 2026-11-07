@@ -159,7 +159,7 @@ async def test_database_lock_wraps_the_entire_evaluation(monkeypatch):
 @pytest.fixture
 def evaluation(tmp_path, monkeypatch):
     from types import SimpleNamespace
-    from ai_agent_service.llm import jev
+    from ai_agent_service.llm import decisions
     from ai_agent_service.mcp import client
 
     source = cohort(tmp_path / "source")
@@ -176,7 +176,7 @@ def evaluation(tmp_path, monkeypatch):
     monkeypatch.setattr(cli, "_extractor", lambda: SimpleNamespace(model_name="synthetic", stats=lambda: {}))
     monkeypatch.setattr(report, "manifest", lambda **kwargs: {"problems": kwargs["found"]})
     monkeypatch.setattr(client, "close_all", AsyncMock())
-    monkeypatch.setattr(jev, "close", AsyncMock())
+    monkeypatch.setattr(decisions, "close", AsyncMock())
     return args, layout, run
 
 

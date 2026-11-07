@@ -13,7 +13,8 @@ def context(**changes):
     return AgentContext(**{"call_id": "c", "lane": "NEW", "tier": "VERIFIED", "now": now, **changes})
 
 
-def test_catalogue_is_always_there_and_a_body_only_once_loaded():
+def test_catalogue_is_always_there_and_a_body_only_once_loaded(monkeypatch):
+    monkeypatch.setenv("ADVISOR_SKILLS", "1")
     prompt, _ = system_prompt(context())
     assert "place-order" in prompt and skills.SKILLS["place-order"]["description"] in prompt
     assert skills.SKILLS["place-order"]["body"] not in prompt
@@ -21,7 +22,8 @@ def test_catalogue_is_always_there_and_a_body_only_once_loaded():
     assert prompt.count(skills.SKILLS["place-order"]["body"]) == 1
 
 
-def test_a_lane_with_no_tools_offers_no_skill():
+def test_a_lane_with_no_tools_offers_no_skill(monkeypatch):
+    monkeypatch.setenv("ADVISOR_SKILLS", "1")
     assert "load_skill" not in system_prompt(context(lane="CLARIFY"))[0]
 
 
@@ -81,3 +83,10 @@ def test_skills_are_general_not_keyed_to_a_persona_or_a_scenario():
 
 def test_every_skill_says_when_to_use_it():
     assert all(skill["description"].startswith("Dùng khi") and skill["body"] for skill in skills.SKILLS.values())
+
+
+def test_every_skill_in_the_prompt_never_pushes_the_documents_out(monkeypatch):
+    monkeypatch.setenv("ADVISOR_SKILLS", "0")
+    passage = {"chunk_id": "BH-05", "source": "policy", "title": "Bảo hành mở rộng", "text": "Gói bảo hành mở rộng thêm 12 tháng."}
+    prompt, cut = system_prompt(context(knowledge=(passage,), seen_products=({"sku": "SKU-A", "name": "Máy", "price_vnd": 1000},)))
+    assert "Gói bảo hành mở rộng thêm 12 tháng." in prompt and "SKU-A" in prompt and cut == ()

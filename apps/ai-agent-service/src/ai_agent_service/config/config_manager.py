@@ -74,9 +74,9 @@ def handoff_auto_accept() -> bool:
     """
     return os.environ.get("HANDOFF_AUTO_ACCEPT", "").strip().lower() in ("1", "true", "yes", "on")
 
-def jev_head_start() -> float:
-    """``JEV_HEAD_START_MS``: how long a review may run before its sentence is said; 0 says it at once."""
-    raw = os.environ.get("JEV_HEAD_START_MS", "").strip()
+def review_head_start() -> float:
+    """``REVIEW_HEAD_START_MS``: how long a review may run before its sentence is said; 0 says it at once."""
+    raw = os.environ.get("REVIEW_HEAD_START_MS", "").strip()
     return max(0.0, float(raw) / 1000) if raw else 0.0
 
 
@@ -94,14 +94,12 @@ def embedding_dir() -> Path:
 
 # Provider id -> the environment variable holding its key. For the chat
 # providers it is the one each LangChain integration reads by itself; the
-# gateway has no integration, so src/llm/jev.py reads it through here.
+# Decisions API is outside LangChain, so src/llm/decisions.py reads it through here.
 PROVIDER_ENV_VAR = {
     "google_genai": "GOOGLE_API_KEY",
     "groq": "GROQ_API_KEY",
     "nvidia": "NVIDIA_API_KEY",
     "openai": "OPENAI_API_KEY",
-    "vercel_gateway": "AI_GATEWAY_API_KEY",
-    "typesafe": "TYPESAFE_API_KEY",
 }
 
 
@@ -119,7 +117,6 @@ class Secrets(BaseSettings):
     nvidia_api_key: str | None = None
     openai_api_key: str | None = None
     ai_gateway_api_key: str | None = None
-    typesafe_api_key: str | None = None
 
 
 class RateLimits(BaseModel):
@@ -181,6 +178,9 @@ class Generation(BaseModel):
     max_tokens: int | None = None
     timeout: float | None = None
     max_retries: int | None = None
+    reasoning_effort: str | None = None
+    use_responses_api: bool | None = None
+    service_tier: str | None = None
 
     def merge(self, other: "Generation") -> "Generation":
         """This block, with everything *other* actually states laid over it.
@@ -262,16 +262,7 @@ class EvaluationProvider(BaseModel):
     model_config = {"extra": "forbid"}
 
     label: str
-    #: The request and answer format: Vercel AI Gateway's ``POST <base_url>/evaluate``,
-    #: or TypeSafe's own ``POST <base_url>/systemone`` (``src/llm/jev.py`` translates).
-    api: Literal["gateway", "typesafe"] = "gateway"
-    base_url: str
-    #: An environment variable whose value, when set, is the whole endpoint
-    #: instead of ``base_url`` plus the API's path (``JEV_URL``).
-    url_env: str | None = None
-    models_url: str
     models: list[str] = Field(default_factory=list)
-    zero_data_retention: bool = True
     rate_limits: RateLimits = Field(default_factory=RateLimits)
 
 
@@ -362,7 +353,7 @@ class ModelsConfig(BaseModel):
         return self.profiles[name]
 
     def evaluator_config(self, name: str) -> dict[str, Any]:
-        """The resolved block for evaluator *name*, ready for ``src.llm.jev``.
+        """The resolved block for evaluator *name*, ready for ``src.llm.decisions``.
 
         Refuses a model its provider does not list, for the same reason the
         Admin page does: a model nobody put in the file is one nobody checked.
@@ -388,16 +379,10 @@ class ModelsConfig(BaseModel):
                 f"{MODELS_YAML}: {routing.model!r} is not listed under "
                 f"evaluation_providers.{routing.provider}.models"
             )
-        path = "/systemone" if block.api == "typesafe" else "/evaluate"
-        override = os.environ.get(block.url_env, "").strip() if block.url_env else ""
         return {
             "provider": routing.provider,
             "model": routing.model,
-            "api": block.api,
-            "base_url": block.base_url.rstrip("/"),
-            "url": override.rstrip("/") or block.base_url.rstrip("/") + path,
             "timeout": routing.timeout,
-            "zero_data_retention": block.zero_data_retention,
             "rate_limits": {
                 **block.rate_limits.model_dump(),
                 "buffer_percentage": self.rate_limiter.buffer_percentage,
