@@ -206,7 +206,9 @@ def audio_windows(samples):
         start = end
 
 
-def decode(path: Path, model: str, denoiser: str = "none") -> dict:
+def decode(path: Path, model: str, denoiser: str = "none", *, turns: bool = False) -> dict:
+    """Decode *path*. With *turns*, split it by speaker first and add ``turns[]`` (idx, speaker, start, end, text)
+    when the split looks like a call; otherwise the reason is in ``turns_rejected`` and no turns are given."""
     from ...components.voice import asr
     if asr.remote() and urlparse(asr.url()).hostname not in {"localhost", "127.0.0.1", "::1"}:
         raise ValueError("This mode allows local ASR only; no paid/external provider")
@@ -214,18 +216,52 @@ def decode(path: Path, model: str, denoiser: str = "none") -> dict:
     load_seconds = asr.load(model)
     started = time.perf_counter()
     chunks = []
-    for start, end, chunk in audio_windows(samples):
-        result = asr.transcribe(model, chunk, lexicon().hotwords, denoiser=denoiser)
-        chunks.append({"start": start / 16000, "end": end / 16000, "text": result.text, "seconds": result.seconds,
-                       "denoise_seconds": getattr(result, "denoise_seconds", 0.0),
-                       "decoder_seconds": getattr(result, "decoder_seconds", None),
-                       "preprocessing": getattr(result, "preprocessing", None) or {"name": "none"}})
-    return {"text": " ".join(c["text"].strip() for c in chunks).strip(), "seconds": sum(c["seconds"] for c in chunks), "model": model,
+
+    def recognise(offset: int, piece) -> str:
+        texts = []
+        for start, end, chunk in audio_windows(piece):
+            result = asr.transcribe(model, chunk, lexicon().hotwords, denoiser=denoiser)
+            chunks.append({"start": (offset + start) / 16000, "end": (offset + end) / 16000, "text": result.text,
+                           "seconds": result.seconds, "denoise_seconds": getattr(result, "denoise_seconds", 0.0),
+                           "decoder_seconds": getattr(result, "decoder_seconds", None),
+                           "preprocessing": getattr(result, "preprocessing", None) or {"name": "none"}})
+            texts.append(result.text.strip())
+        return " ".join(text for text in texts if text)
+
+    found, extra = None, {}
+    if turns:
+        from . import diarize
+        if not diarize.available():
+            extra["turns_rejected"] = "speaker diarization models are not fetched"
+        else:
+            split_started = time.perf_counter()
+            found = diarize.turns(diarize.speaker_spans(samples))
+            extra["diarization_seconds"] = time.perf_counter() - split_started
+            extra["turning_version"] = diarize.VERSION
+            pad = int(0.15 * 16000)
+            for turn in found:
+                left = max(0, int(turn["start"] * 16000) - pad)
+                right = min(len(samples), int(turn["end"] * 16000) + pad)
+                turn["text"] = recognise(left, samples[left:right])
+            found = [turn for turn in found if turn["text"]]
+            for idx, turn in enumerate(found, start=1):
+                turn["idx"] = idx
+            reason = diarize.plausible(found, len(samples) / 16000)
+            if reason:
+                extra["turns_rejected"], found, chunks = reason, None, []
+    if found:
+        speakers = diarize.label_speakers(found)
+        extra["turns"] = [{"idx": turn["idx"], "speaker": speakers[turn["cluster"]], "start": turn["start"],
+                           "end": turn["end"], "text": turn["text"]} for turn in found]
+        text = " ".join(turn["text"] for turn in found)
+    else:
+        text = recognise(0, samples)
+    return {"text": text.strip(), "seconds": sum(c["seconds"] for c in chunks), "model": model,
             "denoiser": denoiser, "denoise_seconds": sum(c["denoise_seconds"] for c in chunks),
             "decoder_seconds": sum(c["decoder_seconds"] if c["decoder_seconds"] is not None else c["seconds"] for c in chunks),
             "chunks": chunks, "chunking_version": "energy-min-20s-v1", "load_seconds": load_seconds,
             "model_metadata": asr.metadata(model),
-            "wall_seconds": time.perf_counter() - started, **info}
+            "wall_seconds": time.perf_counter() - started, **extra, **info}
 
 
 def audio_smoke(path: Path, out: Path, model: str, denoiser: str = "none") -> dict:
@@ -247,8 +283,14 @@ def audio_smoke(path: Path, out: Path, model: str, denoiser: str = "none") -> di
 
 
 def evaluate(source: Path, hypotheses: Path | None, out: Path, *, model: str = "zipformer-30m",
-             transcribe: bool = False, only: set[str] | None = None, entity_review: Path | None = None, denoiser: str = "none") -> dict:
-    """Replay provided predictions or explicitly decode existing local audio. Never fetch weights."""
+             transcribe: bool = False, only: set[str] | None = None, entity_review: Path | None = None, denoiser: str = "none",
+             turns: bool = False) -> dict:
+    """Replay provided predictions or explicitly decode existing local audio. Never fetch weights.
+
+    *turns* splits each decoded call by speaker into ``turns[]`` (``diarize``); it needs local transcription."""
+    if turns and not transcribe:
+        raise ValueError("--asr-turns splits decoded audio; it needs --asr-transcribe")
+    split_turns = turns  # ``turns`` is reused below for each prediction's turn list.
     if denoiser not in ("none", "rnnoise") or (denoiser != "none" and not transcribe):
         raise ValueError("Denoiser requires local transcription and a valid option")
     ground_truth = source / "ground_truth.json" if source.is_dir() else source
@@ -315,7 +357,7 @@ def evaluate(source: Path, hypotheses: Path | None, out: Path, *, model: str = "
             if transcribe:
                 filename = record.get("audio") or f"audio/{key}.wav"
                 path = (ground_truth.parent / filename).resolve()
-                prediction = decode(path, model, denoiser)
+                prediction = decode(path, model, denoiser, turns=split_turns)
                 with (out / "decoded.jsonl").open("a", encoding="utf-8") as stream:
                     stream.write(json.dumps({"id": key, "prediction": prediction}, ensure_ascii=False, allow_nan=False) + "\n")
                 print(f"ASR {model}: {len(rows) + len(failures) + 1}/{len(selected)} {key}", file=sys.stderr, flush=True)
