@@ -18,6 +18,8 @@ import {
 } from "@/lib/catalog";
 import { cart } from "@/lib/cart";
 import { shopContext } from "@/lib/shop-context";
+import { HOTLINE } from "@/lib/contact";
+import Icon from "@/components/ui/Icon";
 
 type Quote = CatalogRow & { total: string; discount: string; promotions: { name: string; description: string; type: string }[] };
 
@@ -120,7 +122,6 @@ export default function ProductPage() {
         <div className="s-detail-media">
           <ProductArt category={product.category} brand={product.brand} size="hero" image={product.image} alt={product.name} />
           {off > 0 && <span className="s-badge s-badge-sale s-badge-lg">-{off}%</span>}
-          {product.image && product.imageCredit && <PhotoCredit credit={product.imageCredit} />}
         </div>
         <div className="s-detail-info">
           <span className="s-card-cat">{product.brand}</span>
@@ -146,6 +147,10 @@ export default function ProductPage() {
               </ul>
             </div>
           )}
+          {/* The terms the price is quoted under (dieu-khoan-khuyen-mai.md, KM-01 and KM-03/04). */}
+          <p className="s-price-note">
+            Giá và ưu đãi tính theo ngày đặt hàng. Các ưu đãi không cộng dồn được thì áp dụng ưu đãi có lợi nhất cho bạn.
+          </p>
 
           {sizes.length > 0 && (
             <div className="s-options">
@@ -203,21 +208,29 @@ export default function ProductPage() {
               </button>
             </div>
             <button className="s-btn s-btn-lg s-btn-outline" disabled={available <= 0} onClick={() => addToCart(false)}>
-              {added ? "Đã thêm ✓" : "Thêm vào giỏ"}
+              {added ? <><Icon name="check" /> Đã thêm</> : "Thêm vào giỏ"}
             </button>
             <button className="s-btn s-btn-lg" disabled={available <= 0} onClick={() => addToCart(true)}>
               Mua ngay
             </button>
           </div>
           <button className="s-ask" onClick={() => shopContext.openChat(`Tư vấn giúp tôi về ${product.name}`)}>
-            💬 Hỏi trợ lý về sản phẩm này
+            <span><Icon name="chat" /> Hỏi trợ lý về sản phẩm này</span>
             <small>Giá theo khu vực, đổi máy cũ, so sánh với mẫu khác…</small>
           </button>
           <ul className="s-perks">
-            <li>Giao nhanh, miễn phí cho đơn từ 2.000.000₫</li>
-            <li>Thanh toán khi nhận hàng (COD)</li>
-            <li>Đổi trả theo chính sách cửa hàng</li>
+            <li><Link href="/chinh-sach#giao-hang">Giao nhanh, miễn phí cho đơn từ 2.000.000₫</Link></li>
+            <li><Link href="/chinh-sach#thanh-toan">Thanh toán khi nhận hàng (COD) cho đơn dưới 10.000.000₫</Link></li>
+            <li><Link href="/chinh-sach#doi-tra">Đổi trả trong 7 ngày</Link></li>
+            <li><Link href="/chinh-sach#bao-hanh">Chính sách bảo hành</Link></li>
           </ul>
+          {/* Opening hours of the switchboard (thong-bao-lich-nghi.md, LN-01). */}
+          <p className="s-support">
+            <Icon name="phone" size={16} />
+            <span>
+              Gọi mua <a href={`tel:${HOTLINE.replace(/\s/g, "")}`}>{HOTLINE}</a> · Thứ Hai – Thứ Bảy 8:00–21:00, Chủ nhật 9:00–18:00
+            </span>
+          </p>
         </div>
       </div>
 
@@ -248,6 +261,13 @@ export default function ProductPage() {
             ))}
           </div>
         </section>
+      )}
+
+      {product.image && product.imageCredit && (
+        <details className="s-credits">
+          <summary>Nguồn ảnh</summary>
+          <PhotoCredit credit={product.imageCredit} />
+        </details>
       )}
     </div>
   );

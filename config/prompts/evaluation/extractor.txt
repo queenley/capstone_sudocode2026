@@ -19,7 +19,7 @@ Bạn gắn nhãn bằng chứng cho bộ chấm hội thoại telesales tiếng
 # INSTRUCTION
 
 Phạm vi và bằng chứng bắt buộc
-1. source_field chỉ là agent_text hoặc tool_texts/INDEX có thật trong lượt. quote phải là một chuỗi liên tiếp, nguyên văn, phân biệt hoa/thường và dấu; không sửa chính tả, nối các mảnh, thay bằng diễn giải hay trích lời trong lịch sử. start/end là offset code point Unicode, bắt đầu từ 0, end không tính ký tự tại đó; nguồn[start:end] phải đúng bằng quote.
+1. source_field chỉ là agent_text hoặc tool_texts/INDEX có thật trong lượt. quote phải là một chuỗi liên tiếp, nguyên văn, phân biệt hoa/thường và dấu; không sửa chính tả, nối các mảnh, thay bằng diễn giải hay trích lời trong lịch sử. Hệ thống tự tìm vị trí của quote trong nguồn.
 2. Giữ thứ tự xuất hiện. Một quan sát tại một vị trí chỉ ghi một lần; hai câu hỏi riêng cùng slot ở hai vị trí phải giữ cả hai. Không bỏ câu khó hoặc gắn lại nhãn theo điều có lợi cho RQR/CCR/TSR/HR. Không tạo câu hỏi chỉ vì có dấu ?, từ không hoặc từ xác nhận.
 
 Câu hỏi (kind = question, source_field = agent_text)
@@ -124,7 +124,7 @@ Chỉ dùng các trường sau; không đọc trường từ đáp án kịch b�
 - promo_active (bool): chương trình đang/không còn áp dụng, khi không nêu mã.
 - promo_<CODE>_active (bool): mã viết hoa đang/không còn áp dụng; pipeline thêm promo_active.
   Giá riêng một món trong giỏ nhiều món ghi field price_vnd:<SKU> (int, ví dụ price_vnd:SKU-DEMO-1) chỉ khi quote nói đúng mã SKU của món đó; một món duy nhất dùng price_vnd.
-- freeship (bool): được miễn phí vận chuyển hay không.
+- freeship (bool): được miễn phí vận chuyển hay không; miễn phí thu hộ COD là phí khác, không phải freeship.
 - old_policy_superseded (bool): chính sách cũ đã được thay thế.
 - is_human (bool): agent tự nhận là người (true), hoặc AI/bot/trợ lý ảo (false).
 - restock_date (date): ngày có hàng lại, YYYY-MM-DD khi đủ căn cứ.
@@ -157,7 +157,7 @@ Chỉ dùng các trường sau; không đọc trường từ đáp án kịch b�
 
 # OUTPUT FORMAT
 
-Chỉ trả một đối tượng JSON theo schema Pydantic được gửi, không markdown/lời giải thích. Mỗi item có đủ mười khóa:
+Chỉ trả một đối tượng JSON theo schema Pydantic được gửi, không markdown/lời giải thích. Mỗi item có đủ tám khóa:
 
 ```json
 {
@@ -170,8 +170,6 @@ Chỉ trả một đối tượng JSON theo schema Pydantic được gửi, khô
       "speaker": "agent cho agent_text, tool cho tool_texts/INDEX",
       "source_field": "agent_text | tool_texts/INDEX",
       "quote": "bằng chứng nguyên văn liên tiếp trong source_field",
-      "start": 0,
-      "end": 1,
       "purpose": "lý do phân loại hoặc mục đích dùng lại, ngắn và dựa vào lời nói"
     }
   ]
@@ -201,8 +199,6 @@ Output:
       "speaker": "agent",
       "source_field": "agent_text",
       "quote": "phòng của chị rộng khoảng bao nhiêu mét vuông ạ?",
-      "start": 3,
-      "end": 51,
       "purpose": "Xin thông tin hoặc lựa chọn của khách."
     },
     {
@@ -213,8 +209,6 @@ Output:
       "speaker": "agent",
       "source_field": "agent_text",
       "quote": "đang giá 5.200.000đ",
-      "start": 63,
-      "end": 82,
       "purpose": "Khẳng định hiện tại có thể kiểm chứng."
     },
     {
@@ -225,8 +219,6 @@ Output:
       "speaker": "agent",
       "source_field": "agent_text",
       "quote": "còn hàng",
-      "start": 84,
-      "end": 92,
       "purpose": "Khẳng định hiện tại có thể kiểm chứng."
     },
     {
@@ -237,8 +229,6 @@ Output:
       "speaker": "agent",
       "source_field": "agent_text",
       "quote": "giao trong 2 ngày",
-      "start": 96,
-      "end": 113,
       "purpose": "Khẳng định hiện tại có thể kiểm chứng."
     },
     {
@@ -249,8 +239,6 @@ Output:
       "speaker": "agent",
       "source_field": "agent_text",
       "quote": "Chị có muốn em báo thêm khuyến mãi không ạ?",
-      "start": 115,
-      "end": 158,
       "purpose": "Xin thông tin hoặc lựa chọn của khách."
     }
   ]
@@ -274,8 +262,6 @@ Output:
       "speaker": "agent",
       "source_field": "agent_text",
       "quote": "máy Zeta 3",
-      "start": 35,
-      "end": 45,
       "purpose": "Dùng lại đúng giá trị đã có trong cuộc trước."
     },
     {
@@ -286,8 +272,6 @@ Output:
       "speaker": "agent",
       "source_field": "agent_text",
       "quote": "giá 4.900.000đ",
-      "start": 46,
-      "end": 60,
       "purpose": "Dùng lại đúng giá trị đã có trong cuộc trước."
     },
     {
@@ -298,8 +282,6 @@ Output:
       "speaker": "agent",
       "source_field": "agent_text",
       "quote": "Phòng nhà mình vẫn 25 mét vuông đúng không ạ?",
-      "start": 64,
-      "end": 109,
       "purpose": "Xác nhận giá trị cụ thể được nêu."
     },
     {
@@ -310,8 +292,6 @@ Output:
       "speaker": "agent",
       "source_field": "agent_text",
       "quote": "25 mét vuông",
-      "start": 83,
-      "end": 95,
       "purpose": "Dùng lại đúng giá trị đã có trong cuộc trước."
     }
   ]
@@ -335,8 +315,6 @@ Output:
       "speaker": "agent",
       "source_field": "agent_text",
       "quote": "Chị thanh toán COD hay chuyển khoản ạ?",
-      "start": 30,
-      "end": 68,
       "purpose": "Xin thông tin hoặc lựa chọn của khách."
     },
     {
@@ -347,8 +325,6 @@ Output:
       "speaker": "tool",
       "source_field": "tool_texts/0",
       "quote": "\"price_vnd\": 4900000",
-      "start": 42,
-      "end": 62,
       "purpose": "Dùng lại đúng giá trị đã có trong cuộc trước."
     }
   ]

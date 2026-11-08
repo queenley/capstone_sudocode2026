@@ -61,25 +61,3 @@ def test_the_middleware_drops_a_stray_argument_before_the_call():
 def test_arguments_all_declared_pass_untouched():
     assert call({"sku": "SKU-AP-X", "qty": 2}) == ("ran", {"sku": "SKU-AP-X", "qty": 2})
 
-
-view = SimpleNamespace(check_handoff=True, tool_results=())
-
-
-@pytest.mark.parametrize("text", [
-    "Dạ em rất xin lỗi anh, hiện tại em chưa chuyển được máy cho nhân viên phụ trách ngay lúc này.",
-    "Dạ em không kết nối được với nhân viên lúc này ạ.",
-])
-def test_saying_the_transfer_did_not_happen_is_not_a_promise(text):
-    assert hard._transfer(text, view) == []
-
-
-@pytest.mark.parametrize("text", [
-    "Dạ em sẽ chuyển anh sang nhân viên phụ trách ạ.",
-    "Dạ em chuyển máy cho nhân viên ngay, không để anh chờ lâu ạ.",
-])
-def test_a_real_promise_is_still_refused(text):
-    assert hard._transfer(text, view)
-
-
-def test_the_price_check_counts_what_the_documents_say():
-    assert "policy passages" in QUESTIONS["unquoted_price"].instructions

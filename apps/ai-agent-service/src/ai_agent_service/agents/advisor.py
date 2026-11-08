@@ -37,8 +37,10 @@ same reply can later be streamed sentence by sentence (Appendix E).
 from __future__ import annotations
 
 import json
+import re
 import logging
 import time
+from datetime import timedelta
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, AsyncIterator, Awaitable, Callable, Literal, Mapping, Sequence
@@ -52,8 +54,9 @@ from langchain.agents.middleware import (
     ToolCallLimitMiddleware,
 )
 from langchain_core.language_models import BaseChatModel
-from langchain_core.messages import AIMessage, AIMessageChunk, SystemMessage, ToolMessage
+from langchain_core.messages import AIMessage, AIMessageChunk, HumanMessage, SystemMessage, ToolMessage
 from langchain_core.runnables import RunnableConfig
+from langchain.tools import ToolRuntime, tool
 from langchain_core.tools import BaseTool
 
 from ..components import clock
@@ -69,7 +72,9 @@ from ..llm import tracing
 from ..observability import stopwatch
 from ..llm.callback_handler import text_of
 from ..mcp.client import dotted
-from ..mcp.tools import LaneToolsMiddleware, ToolGuardMiddleware, envelope_of, parse_envelope, order_arguments
+from ..components.context import skills as skill_book
+from ..mcp.tools import (ChainLookupMiddleware, LaneToolsMiddleware, StrictToolsMiddleware, ToolGuardMiddleware, CHAINED,
+                         envelope_of, parse_envelope, order_arguments, without_nulls)
 from .base import BaseAgent
 
 logger = logging.getLogger(__name__)
@@ -148,6 +153,10 @@ class AgentContext:
     flags: Mapping[str, Any] = field(default_factory=dict)
     #: The products tools showed earlier in this call: ``{sku, name, price_vnd}``.
     seen_products: tuple[Mapping[str, Any], ...] = ()
+    #: The latest result per tool and subject from earlier turns: what need not be asked again.
+    earlier_results: tuple[Mapping[str, Any], ...] = ()
+    #: ``(sku, unit price, qty)`` of the basket being chosen, when all of it is quoted.
+    basket_lines: tuple[tuple[str, int, int], ...] = ()
     #: The orders earlier turns of this call created: ``{order_id, sku}``.
     created_orders: tuple[Mapping[str, Any], ...] = ()
     #: The changes ``order_update`` made in earlier turns of this call: ``{order_id, action, new_variant_sku}``.
@@ -161,10 +170,16 @@ class AgentContext:
     last_agent_said: str | None = None
     deletion_asked: bool | None = None
     pending_purchase: Mapping[str, Any] | None = None
-    #: The last few messages, ``(speaker, text)`` tokenised: what Jev reads when an action
+    #: The last few messages, ``(speaker, text)`` tokenised: what the PolicyAgent reads when an action
     #: depends on what the customer means (a transfer, a deletion, one more order).
     recent: tuple[tuple[str, str], ...] = ()
     #: ``PolicyAgent.judge``: what the customer means for one action, None without an answer.
+    #: Why a tool with an effect must wait: the flags of what was just said (``pipeline/hot/review.py``).
+    review_flags: Callable[[], Awaitable[list[str]]] | None = field(default=None, repr=False, compare=False)
+    #: This turn's agreement to an order: the authorized draft, and the read-back still to be said.
+    consent: dict[str, Any] = field(default_factory=dict, repr=False, compare=False)
+    #: The skills loaded for the task on: ``load_skill`` adds to it, the next model call reads it.
+    skills: list[str] = field(default_factory=list, repr=False, compare=False)
     judge: Callable[[str, Mapping[str, Any]], Awaitable[bool | None]] | None = field(default=None, repr=False,
                                                                                        compare=False)
 
@@ -251,19 +266,29 @@ def lane_instruction(context: AgentContext) -> str:
     return "\n".join([text, *extra]).strip()
 
 
-def system_prompt(context: AgentContext, *, max_tokens: int = 4000, called: Sequence[str] = ()) -> tuple[str, tuple[str, ...]]:
-    """The system message in section 4.4's order, and the sections that were cut.
+def system_prompt(context: AgentContext, *, max_tokens: int = 3000) -> tuple[str, tuple[str, ...]]:
+    """The whole system prompt as one text, and the sections that were cut: for a provider that takes one message."""
+    static, turn, cut = prompt_parts(context, max_tokens=max_tokens)
+    return "\n\n".join(part for part in (static, turn) if part), cut
 
-    What never changes comes first, so a provider's prompt cache can hold it, and the customer's request last, next
-    to where the model answers. Between them: the situation's rules, warnings, the lane, what the call has shown, the
-    brief lines the tier and the turn allow, the summary of older turns, the knowledge passages, the playbook,
-    tool results already gathered and why the previous draft was blocked. *called* is the tools this turn already ran.
+
+def prompt_parts(context: AgentContext, *, max_tokens: int = 3000) -> tuple[str, str, tuple[str, ...]]:
+    """What never changes, what this turn adds, and the sections that were cut.
+
+    The first part is the rules and the skills. The second, in section 4.4's order: the day, warnings, the lane, the
+    products and orders of the call, the brief lines the tier allows, the summary of older turns (the last four
+    travel as messages), the turn's knowledge passages, the playbook entries of the situation, results of earlier
+    turns, tool results already gathered (a regeneration), why the previous draft was blocked. Required evidence
+    survives the soft budget, which applies to the second part; optional sections are admitted in priority order.
     """
+    inline = not skill_book.on_demand()
+    offered = context.lane in ("CONTINUITY", "NEW")
+    static = "\n\n".join(part for part in (HARD_RULES, skill_book.section(context.skills, offered=offered) if inline else "") if part)
     brief = "\n".join(f"{line.id}. {line.text}" for line in context.brief_lines)
     policy, playbook = shown_passages(context.knowledge)
     sections = [
-        Section("rules", HARD_RULES),
-        Section("packs", _packs_block(context, called)),
+        Section("skills", "" if inline else skill_book.section(context.skills, offered=offered)),
+        Section("today", _today(context)),
         Section("warnings", "\n".join(f"CẢNH BÁO: {w}" for w in context.warnings)),
         Section("lane", (
             # Without the day, "tối mai" has no date and the model invents a year.
@@ -273,6 +298,8 @@ def system_prompt(context: AgentContext, *, max_tokens: int = 4000, called: Sequ
             + f"\n{lane_instruction(context)}"
         ).strip()),
         Section("products", _products_block(context.seen_products)),
+        Section("earlier", _earlier_block(context.earlier_results)),
+        Section("basket", _basket_block(context.basket_lines)),
         Section("orders", _orders_block(context.created_orders, context.updated_orders)),
         Section("brief", f"Call Brief:\n{brief}" if brief else ""),
         Section("summary", f"Tóm tắt các lượt trước:\n{context.working_summary}" if context.working_summary else ""),
@@ -285,7 +312,7 @@ def system_prompt(context: AgentContext, *, max_tokens: int = 4000, called: Sequ
         Section("call_state", _state_block(context)),
     ]
     pack = assemble(sections, max_tokens=max_tokens)
-    return pack.text, pack.cut
+    return static, pack.text, pack.cut
 
 
 def _packs_block(context: AgentContext, called: Sequence[str]) -> str:
@@ -346,13 +373,25 @@ def _address_note(context: AgentContext) -> str:
             "gộp vào câu hỏi đang cần hỏi: \"Dạ cho em hỏi mình xưng hô là anh hay chị ạ?\"")
 
 
+WEEKDAYS = ("thứ Hai", "thứ Ba", "thứ Tư", "thứ Năm", "thứ Sáu", "thứ Bảy", "Chủ nhật")
+
+
+def _today(context: AgentContext) -> str:
+    """The day of the call, so "mai" or "thứ Ba tuần sau" need no guess."""
+    if context.now is None:
+        return ""
+    now, tomorrow = context.now, context.now + timedelta(days=1)
+    return (f"Hôm nay: {WEEKDAYS[now.weekday()]}, {now:%d/%m/%Y}, {now:%H:%M}. "
+            f"Ngày mai: {WEEKDAYS[tomorrow.weekday()]}, {tomorrow:%d/%m/%Y}.")
+
+
 def _blocked_block(context: AgentContext) -> str:
     """Why the last draft was blocked, and when part of the answer was already said, what to go on from."""
     if not context.block_reasons:
         return ""
     reasons = "; ".join(context.block_reasons)
     if context.already_said:
-        return (f"Khách đã nghe em nói: «{' '.join(context.already_said)}». Câu tiếp theo của em bị chặn vì: {reasons} "
+        return (f"Khách đã nghe em nói: «{' '.join(context.already_said)}». Em dừng lại vì: {reasons} "
                 "Nói tiếp phần còn lại của câu trả lời, không lặp lại phần khách đã nghe; cần tool thì gọi trước khi nói.")
     return f"Câu trả lời trước của em đã bị chặn vì: {reasons} Hãy soạn lại, tránh đúng những điểm đó."
 
@@ -376,10 +415,25 @@ def _products_block(products: Sequence[Mapping[str, Any]]) -> str:
     """The products tools showed earlier in this call, with their codes: what a later turn quotes and orders."""
     if not products:
         return ""
-    lines = [f"- {p['sku']}: {p.get('name') or '?'}" + (f", {format_vnd(int(p['price_vnd']))}" if p.get("price_vnd") else "")
-             for p in products]
-    return ("Sản phẩm đã tra trong cuộc này (mã chính xác: báo giá, kiểm kho, đặt đơn dùng đúng mã này; "
-            "giá ở đây có thể đã cũ, đặt đơn vẫn gọi pricing_get_quote):\n" + "\n".join(lines))
+    lines = [f"- {p['sku']}: {p.get('name') or '?'}" for p in products]
+    return "Sản phẩm đã tra trong cuộc này (mã chính xác: báo giá, kiểm kho, đặt đơn dùng đúng mã này):\n" + "\n".join(lines)
+
+
+def _earlier_block(results: Sequence[Mapping[str, Any]]) -> str:
+    """Results of earlier turns: the messages keep what was said, not what the tools answered."""
+    if not results:
+        return ""
+    lines = [f"- {r.get('tool')}: {r.get('result')}" for r in results]
+    return ("Đã tra trong cuộc này (kết quả tool của các lượt trước; trả lời từ đây, chỉ gọi lại khi đổi sản phẩm, biến "
+            "thể, số lượng, địa chỉ, giỏ hàng hoặc khi sắp đặt đơn):\n" + "\n".join(lines))
+
+
+def _basket_block(lines: Sequence[tuple[str, int, int]]) -> str:
+    """The basket's total, added up here: a model that adds gets it wrong often enough to matter."""
+    if not lines:
+        return ""
+    items = ", ".join(f"{sku} {format_vnd(price)} x {qty}" for sku, price, qty in lines)
+    return f"Tổng giỏ (hệ thống đã cộng): {format_vnd(sum(p * q for _, p, q in lines))}, gồm {items}. Khách hỏi tổng thì đọc đúng số này."
 
 
 def _tool_block(results: Sequence[Mapping[str, Any]]) -> str:
@@ -387,7 +441,27 @@ def _tool_block(results: Sequence[Mapping[str, Any]]) -> str:
         return ""
     lines = [f"- {r['name']}({json.dumps(r.get('args') or {}, ensure_ascii=False)}) -> "
              f"{json.dumps(r.get('result'), ensure_ascii=False)}" for r in results]
-    return "Kết quả tool đã có trong lượt này (dùng lại, không cần gọi lại):\n" + "\n".join(lines)
+    return "Kết quả tool đã có trong lượt này (dùng lại, không gọi lại tool):\n" + "\n".join(lines)
+
+
+#: Opens what the harness adds after the customer's words, so the model does not take it for them.
+TURN_CONTEXT = "Ngữ cảnh của lượt này, do hệ thống cung cấp, không phải lời khách:\n"
+
+
+def with_turn_context(messages: Sequence[Any], turn: str) -> list[Any]:
+    """*messages* with the turn's context right after the customer's last message.
+
+    From GPT-5.6 a cache lookup stops only at boundaries: the end of the first run of developer messages, and the end
+    of a user message or of a group of tool results (developers.openai.com/api/docs/guides/prompt-caching). So the
+    first message holds only what never changes. Context placed before the customer's message would join that first
+    run on a call's first turn and move the boundary; after it, every turn keeps it, and the customer's earlier
+    messages stay boundaries too.
+    """
+    if not turn:
+        return list(messages)
+    context = SystemMessage(content=TURN_CONTEXT + turn)
+    last = max((i for i, message in enumerate(messages) if isinstance(message, HumanMessage)), default=len(messages) - 1)
+    return [*messages[:last + 1], context, *messages[last + 1:]]
 
 
 class ContextPromptMiddleware(AgentMiddleware):
@@ -397,30 +471,55 @@ class ContextPromptMiddleware(AgentMiddleware):
     from the other, and the service is async.
     """
 
-    def __init__(self, model_limit: int = 8) -> None:
+    def __init__(self, model_limit: int = 8, *, split: bool = False) -> None:
         super().__init__()
         self.model_limit = model_limit
+        self.split = split
 
     def _with_prompt(self, request: ModelRequest) -> ModelRequest:
         context = getattr(getattr(request, "runtime", None), "context", None)
         if not isinstance(context, AgentContext):
             return request
-        called = [m.name for m in request.state.get("messages") or [] if isinstance(m, ToolMessage) and m.name]
-        prompt, _ = system_prompt(context, called=called)
-        prompt = pii.tokenise(prompt, context.vault)
-        if request.state.get("run_model_call_count", 0) >= self.model_limit - 1:
-            prompt += ("\nĐây là lượt model cuối: không gọi thêm tool. Trả lời ngắn từ kết quả đã có; "
-                       "thiếu dữ liệu thì nói chưa kiểm tra được và xin đúng thông tin còn thiếu. "
-                       "Không khẳng định thao tác thành công nếu chưa có kết quả tool thành công.")
-            return request.override(system_message=SystemMessage(content=prompt), tools=[])
-        return request.override(system_message=SystemMessage(content=prompt))
+        static, turn, cut = prompt_parts(context)
+        if cut:
+            logger.info("Prompt of call %s turn %s cut: %s", context.call_id, context.turn_id, cut)
+        turn = pii.tokenise(turn, context.vault)
+        if not skill_book.on_demand():
+            # Every skill is in the prompt: nothing to load, and no model round spent on it.
+            request = request.override(tools=[t for t in request.tools if getattr(t, "name", None) != LOAD_SKILL])
+        last = request.state.get("run_model_call_count", 0) >= self.model_limit - 1
+        if last:
+            turn += ("\nĐây là lượt model cuối: không gọi thêm tool. Trả lời ngắn từ kết quả đã có; "
+                     "thiếu dữ liệu thì nói chưa kiểm tra được và xin đúng thông tin còn thiếu. "
+                     "Không khẳng định thao tác thành công nếu chưa có kết quả tool thành công.")
+        if self.split:
+            request = request.override(system_message=SystemMessage(content=static),
+                                       messages=with_turn_context(request.messages, turn))
+        else:
+            prompt = "\n\n".join(part for part in (static, turn) if part)
+            request = request.override(system_message=SystemMessage(content=prompt))
+        # No tool, without taking them away: a changed tool list would miss the prompt cache.
+        return request.override(tool_choice="none") if last else request
+
+    def _is_last(self, request: ModelRequest) -> bool:
+        return request.state.get("run_model_call_count", 0) >= self.model_limit - 1
+
+    @staticmethod
+    def _answer_only(response: Any) -> Any:
+        """The last call offers no tool; a model that calls one anyway ends the run with what it wrote."""
+        for message in getattr(response, "result", None) or []:
+            if isinstance(message, AIMessage) and message.tool_calls:
+                message.tool_calls = []
+        return response
 
     def wrap_model_call(self, request: ModelRequest, handler: Any) -> Any:
-        return handler(self._with_prompt(request))
+        response = handler(self._with_prompt(request))
+        return self._answer_only(response) if self._is_last(request) else response
 
     async def awrap_model_call(self, request: ModelRequest, handler: Any) -> Any:
         with stopwatch.span("model"):
-            return await handler(self._with_prompt(request))
+            response = await handler(self._with_prompt(request))
+        return self._answer_only(response) if self._is_last(request) else response
 
 
 def declared_arguments(tool: Any, args: Mapping[str, Any]) -> dict[str, Any]:
@@ -444,6 +543,7 @@ class ActionGuardMiddleware(AgentMiddleware):
             return await self._guarded(request, handler)
 
     async def _guarded(self, request: Any, handler: Any) -> Any:
+        request = without_nulls(request)
         call = request.tool_call
         name = call["name"]
         kept = declared_arguments(getattr(request, "tool", None), call.get("args") or {})
@@ -451,7 +551,7 @@ class ActionGuardMiddleware(AgentMiddleware):
             logger.info("Dropped undeclared arguments of %s: %s", name, sorted(set(call["args"]) - set(kept)))
             call = {**call, "args": kept}
             request = request.override(tool_call=call)
-        if name not in actions.WRITE_TOOLS | actions.SKU_READ_TOOLS | actions.CUSTOMER_READ_TOOLS:
+        if name not in actions.WRITE_TOOLS | actions.CUSTOMER_READ_TOOLS:
             return await handler(request)
         context = getattr(getattr(request, "runtime", None), "context", None)
         if not isinstance(context, AgentContext):
@@ -459,15 +559,24 @@ class ActionGuardMiddleware(AgentMiddleware):
                 "retryable": False, "message": "Missing trusted runtime context."}}),
                 tool_call_id=call["id"], name=name, additional_kwargs={"blocked_by": "guardrail"})
         args = dict(call.get("args") or {})
+        if name in actions.WRITE_TOOLS and context.review_flags is not None:
+            flagged = await context.review_flags()
+            if flagged:
+                envelope = {"ok": False, "error": {"code": "PRECONDITION", "retryable": False, "message":
+                            "Câu vừa nói với khách có lỗi, đính chính trước khi làm: " + " ".join(flagged)}}
+                return ToolMessage(content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=name,
+                                   additional_kwargs={"args": args, "blocked_by": "guardrail"})
         if name == "handoff_transfer":
             args["brief"] = actions.fill_handoff(args.get("brief") or {}, context.handoff_defaults)
         if name == "schedule_callback" and not args.get("customer_phone") and context.customer_phone:
             args["customer_phone"] = context.customer_phone
         state = getattr(request, "state", None) or {}
         quotes = {**context.quotes, **_quotes_in(state)}
+        if name == "order_create":
+            args = _filled_order(args, context, quotes)
         codes, orders = _seen_in(state, context.tool_results)
         created = (*context.created_orders, *_created_in(state))
-        intents = await _intents(name, args, context, created)
+        intents = await _intents(name, args, context, created, state)
         verdict = actions.check(
             name, args, tier=context.tier, mode=context.mode, has_phone=bool(context.customer_phone),
             quotes=quotes, orders=context.known_orders | orders, trusted=context.trusted_skus | codes | set(quotes),
@@ -480,31 +589,59 @@ class ActionGuardMiddleware(AgentMiddleware):
         )
         if verdict.passed and name == "order_create":
             business_args = order_arguments(args, context)
-            if not purchase.matches(context.pending_purchase, business_args, context):
-                delivery = purchase.estimated_delivery(
-                    [*context.tool_results, *tool_results_of(state.get("messages") or [])])
-                gaps = purchase.missing(args, business_args, delivery)
-                if gaps:
-                    # PB-09 reads back a whole order once: a read-back with a gap is answered with the gap, not a yes.
-                    envelope = {"ok": False, "error": {"code": "ORDER_INCOMPLETE", "retryable": False,
-                        "message": "Chưa đọc lại đơn. Còn thiếu: " + "; ".join(gaps)
-                                   + ". Có công cụ thì gọi ngay; thiếu thông tin của khách thì chỉ hỏi đúng phần đó.",
-                        "details": {"missing": gaps}}}
-                    return ToolMessage(content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"],
-                                       name=name, additional_kwargs={"args": args, "blocked_by": "guardrail"})
-                details = {} if purchase.NO.search(plain(context.customer_said or "")) else {
-                    "purchase_draft": purchase.draft(business_args, context, delivery)}
-                envelope = {"ok": False, "error": {"code": "CONFIRMATION_REQUIRED", "retryable": False,
-                    "message": "Đọc lại đúng đơn và đợi khách xác nhận trong phiên này trước khi tạo đơn.", "details": details}}
+            delivery = purchase.estimated_delivery([*context.tool_results, *tool_results_of(state.get("messages") or [])])
+            record = purchase.draft(business_args, context, delivery, names=_names_in(state), quotes=quotes)
+            pending = context.pending_purchase
+            heard = bool(pending and pending.get("payload_hash") == record["payload_hash"]
+                         and pending.get("owner") == record["owner"])
+            agreed = None
+            # PB-09: the customer hears the price before an order exists. A quote only this run has seen is not heard yet.
+            told_price = heard or business_args.get("sku") in context.quotes
+            if not told_price:
+                agreed = False
+            elif context.judge is not None:
+                agreed = await context.judge("purchase", {
+                    "recent_messages": [{"speaker": who, "text": text[:600]} for who, text in context.recent],
+                    "order": record["read_back"]})
+            if agreed is None and told_price:  # no answer from the PolicyAgent: an order is placed only on a plain yes to what was just read back
+                agreed = heard and purchase.answer(
+                    pending, call_id=context.call_id, channel=context.channel, turn_id=str(context.turn_id),
+                    said=context.customer_said or "", last_reply=context.last_agent_said) is not None
+            if not agreed:
+                # The customer heard this very order and did not agree: answer them, it is not read a second time.
+                message = ("Khách đã nghe đơn này và chưa đồng ý: trả lời điều khách đang nói, không gọi lại order_create."
+                           if heard else "Đọc lại đúng đơn và đợi khách xác nhận trong phiên này trước khi tạo đơn.")
+                envelope = {"ok": False, "error": {"code": "CONFIRMATION_REQUIRED", "retryable": False, "message": message,
+                    "details": {} if heard else {"purchase_draft": record}}}
                 return ToolMessage(content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=name,
                                    additional_kwargs={"args": args, "blocked_by": "guardrail"})
+            context.consent["draft"] = purchase.authorize(record, context.turn_id)
+            if not heard:
+                context.consent["read_back"] = record["read_back"]
         if not verdict.passed:
             envelope = {"ok": False, "error": {"code": "PRECONDITION", "retryable": False, "message": " ".join(verdict.reasons)}}
             return ToolMessage(
                 content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=name,
                 additional_kwargs={"args": args, "blocked_by": "guardrail"},
             )
+        if name == "schedule_callback" and args.get("callback_at"):
+            # The shop's clock is Vietnam's, to the minute; the tool's own answer carries no offset.
+            args["callback_at"] = re.sub(r"^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})(?::\d{2})?(?:\.\d+)?(?:\+07:00|Z)?$", r"\1", str(args["callback_at"]))
         return await handler(request.override(tool_call={**call, "args": args}))
+
+
+def _filled_order(args: Mapping[str, Any], context: AgentContext, quotes: Mapping[str, int]) -> dict[str, Any]:
+    """What code knows of an order, so the model does not have to write it: the price is today's quote,
+    and what it left out of an order the customer already heard read back comes from that read-back."""
+    order = dict(args)
+    pending = context.pending_purchase
+    if pending and pending.get("target_id") == order.get("sku"):
+        for key, value in (pending.get("args") or {}).items():
+            if order.get(key) in (None, "", []):
+                order[key] = value
+    if order.get("sku") in quotes:
+        order["price_vnd"] = quotes[order["sku"]]
+    return order
 
 
 def placed_this_call(context: AgentContext, state: Mapping[str, Any]) -> list[dict[str, Any]]:
@@ -515,9 +652,9 @@ def placed_this_call(context: AgentContext, state: Mapping[str, Any]) -> list[di
     return list(lines.values())
 
 
-async def _intents(name: str, args: Mapping[str, Any], context: AgentContext,
-                   created: Sequence[Mapping[str, Any]]) -> dict[str, bool | None]:
-    """What the customer means, for the one action about to run, read by Jev (section 4.4).
+async def _intents(name: str, args: Mapping[str, Any], context: AgentContext, created: Sequence[Mapping[str, Any]],
+                   state: Mapping[str, Any] | None = None) -> dict[str, bool | None]:
+    """What the customer means, for the one action about to run, read by the PolicyAgent (section 4.4).
 
     Asked only when the action depends on it: a transfer outside lane
     HANDOFF, a deletion, a change to an order, an order for a product this
@@ -534,11 +671,16 @@ async def _intents(name: str, args: Mapping[str, Any], context: AgentContext,
             "recent_messages": said,
             "reason_given": {"escalation_reason": brief.get("escalation_reason"),
                              "detail": brief.get("escalation_reason_detail")},
-            "shop_documents_found": documents or [context.knowledge_note or "no passage was relevant"],
+            "shop_documents_found": documents or ["no passage matched the question"],
+            "tools_called": [r["name"] for r in (*context.tool_results, *tool_results_of((state or {}).get("messages") or []))],
+            "known_this_call": [f"{r.get('tool')}: {r.get('result')}"[:500] for r in context.earlier_results[-6:]],
         })}
     if name == "memory_request_deletion" and context.tier == "VERIFIED":
         return {"delete": await context.judge("delete", {"recent_messages": said})}
     if name == "order_update":
+        if args.get("action") == "update_address" and any(
+                o.get("order_id") == args.get("order_id") and o.get("no_address") for o in created):
+            return {}  # the address this order still lacks: the customer already agreed to the order
         change = {k: args.get(k) for k in ("order_id", "action", "new_variant_sku", "new_address") if args.get(k)}
         return {"change": await context.judge("change", {"recent_messages": said, "change": change})}
     if name == "order_create" and any(o.get("sku") and o.get("sku") == args.get("sku") for o in created):
@@ -583,7 +725,8 @@ def _created_in(state: Mapping[str, Any]) -> list[dict[str, Any]]:
             envelope = envelope_of(message)
             data = envelope.get("data") if isinstance(envelope, dict) and envelope.get("ok") else None
             if isinstance(data, dict) and data.get("order_id"):
-                created.append({"order_id": data["order_id"], "sku": asked.get(message.tool_call_id, {}).get("sku")})
+                order = asked.get(message.tool_call_id, {})
+                created.append({"order_id": data["order_id"], "sku": order.get("sku"), "no_address": not order.get("address")})
     return created
 
 
@@ -601,6 +744,16 @@ def _updated_in(state: Mapping[str, Any], earlier: Sequence[Mapping[str, Any]]) 
     return done
 
 
+def _names_in(state: Mapping[str, Any]) -> dict[str, str]:
+    """Product names from the searches already in this run: what a read-back says instead of a code."""
+    names: dict[str, str] = {}
+    for message in state.get("messages") or []:
+        if isinstance(message, ToolMessage) and message.name == "catalog_search":
+            data = (envelope_of(message) or {}).get("data") or {}
+            names.update({item["sku"]: item["name"] for item in data.get("items") or [] if item.get("sku") and item.get("name")})
+    return names
+
+
 def _quotes_in(state: Mapping[str, Any]) -> dict[str, int]:
     """Today's price per sku from the pricing results already in this run."""
     quotes: dict[str, int] = {}
@@ -611,6 +764,18 @@ def _quotes_in(state: Mapping[str, Any]) -> dict[str, int]:
             if envelope.get("ok") and data.get("sku") and data.get("final_price_vnd") is not None:
                 quotes[data["sku"]] = int(data["final_price_vnd"])
     return quotes
+
+
+LOAD_SKILL = "load_skill"
+
+
+@tool(LOAD_SKILL)
+def load_skill(name: str, runtime: ToolRuntime[AgentContext]) -> str:
+    """Load how the shop does a task, named in the list of skills in the instructions."""
+    result = skill_book.load(runtime.context.skills, name)
+    logger.info("Skill %s for call %s turn %s: %s", name, runtime.context.call_id, runtime.context.turn_id,
+                "loaded" if result["ok"] else "unknown")
+    return json.dumps(result, ensure_ascii=False)
 
 
 class AdvisorAgent(BaseAgent):
@@ -635,20 +800,24 @@ class AdvisorAgent(BaseAgent):
         that must see every attempt sets it to 0. ``llm`` replaces the model
         from config, for offline tests."""
         super().__init__("advisor", provider=provider, model=model, generation=generation, llm=llm)
-        self._tools = list(tools or ())
+        self._tools = [*(tools or ()), *([load_skill] if tools else [])]
         names = [tool.name for tool in self._tools]
         retry = [ModelRetryMiddleware(max_retries=retries, initial_delay=1.0, on_failure="error")] if retries else []
+        openai = getattr(self.llm, "_llm_type", "") == "openai-chat"
+        guard = ToolGuardMiddleware(names, retries=retries)
         self._graph = create_agent(
             model=self.llm,
             tools=self._tools,
             middleware=[
-                ContextPromptMiddleware(self.MODEL_CALLS_PER_RUN),
+                ChainLookupMiddleware(self._tools, guard),
+                ContextPromptMiddleware(self.MODEL_CALLS_PER_RUN, split=openai),
                 *retry,
                 ModelCallLimitMiddleware(run_limit=self.MODEL_CALLS_PER_RUN, exit_behavior="error"),
                 ToolCallLimitMiddleware(run_limit=self.TOOL_CALLS_PER_RUN, exit_behavior="continue"),
                 LaneToolsMiddleware(get_lanes(), names),
+                *([StrictToolsMiddleware()] if openai else []),
                 ActionGuardMiddleware(),
-                ToolGuardMiddleware(names, retries=retries),
+                guard,
             ],
             context_schema=AgentContext,
             name=self.name,
@@ -735,7 +904,7 @@ class AdvisorAgent(BaseAgent):
             text=_final_text(produced),
             tool_results=tool_results_of(produced),
             model=self.model_name,
-            model_calls=sum(1 for m in produced if isinstance(m, AIMessage)),
+            model_calls=sum(1 for m in produced if isinstance(m, AIMessage) and not m.additional_kwargs.get(CHAINED)),
             seconds=time.perf_counter() - started,
         )
 
@@ -755,6 +924,8 @@ def tool_results_of(produced: Sequence[Any]) -> list[dict[str, Any]]:
         if not isinstance(message, AIMessage):
             continue
         for call in message.tool_calls:
+            if call["name"] == LOAD_SKILL:
+                continue  # how the model reads a procedure, not a business tool: no trace, no evidence
             answer = answers.get(call["id"])
             envelope = parse_envelope(answer.content) if answer is not None else None
             blocked_by = answer.additional_kwargs.get("blocked_by") if answer is not None else None

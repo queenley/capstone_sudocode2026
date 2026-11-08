@@ -362,7 +362,8 @@ class CallStore:
             from ..components.improvement import gaps
             question = next((text for speaker, text, _ in rows if speaker == "customer"), "")
             try:
-                await asyncio.to_thread(gaps.record, question, call_id=str(self.call_id), turn_id=turn_id)
+                recent = [str(m.content) for m in (state.get("messages") or [])[-4:]]
+                await asyncio.to_thread(gaps.record, question, call_id=str(self.call_id), turn_id=turn_id, recent=recent)
             except (OSError, ValueError):
                 logger.warning("Could not record a knowledge gap for call %s", self.call_id)
 

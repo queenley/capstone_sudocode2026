@@ -447,6 +447,8 @@ class CallSession:
             self.last = state
         record(state, self.turn_no, text, self.now, self.vault, self.transcript, self.tool_log)
         first = (state.get("latency") or {}).get("first_token_ms")
+        # The organisers' Total ends at the last token, not when the graph has finished saving (latency guide).
+        total_ms = int((state.get("latency") or {}).get("last_token_ms") or total_ms)
         return TurnResult(state, total_ms, int(first) if first is not None else None, error, request_at,
                           completed_at, usage_between(before, token_ledger.snapshot()), watch.report(total_ms))
 

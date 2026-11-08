@@ -90,7 +90,7 @@ def test_an_item_that_is_none_of_the_three_kinds_is_dropped_not_fatal():
 
     text = "Dạ hiện em chưa tra được giá chính xác lúc này."
     other = {"kind": "other", "slot_or_field": "other", "value": None, "question_type": "open", "speaker": "agent",
-             "source_field": "agent_text", "quote": text, "start": 0, "end": len(text), "purpose": "báo chưa tra được"}
+             "source_field": "agent_text", "quote": text, "purpose": "báo chưa tra được"}
     scorers.Items.model_validate({"items": [other]})  # v9 refused this, and the turn could never be labelled
     labels = scorers.label_items([other], scorers.turn_input(text))
     assert labels["items"] == [] and labels["questions"] == [] and labels["claims"] == [] and labels["changed"] == 1

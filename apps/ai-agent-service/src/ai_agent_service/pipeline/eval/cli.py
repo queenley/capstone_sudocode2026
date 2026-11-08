@@ -121,6 +121,13 @@ def parser() -> argparse.ArgumentParser:
     parser.add_argument("--no-extract", action="store_true",
                         help="Skip the question and claim extractor: no model call for it, and RQR and HR come out empty.")
     parser.add_argument("--judge", action="store_true", help="Also run the BTC rubric judge; diagnostic, extra model cost, never changes the BTC score.")
+    parser.add_argument("--judge-run", type=Path, metavar="RUN_DIR",
+                        help="Run the rubric judge over a finished run's replies; the agent and the extractor do not run.")
+    parser.add_argument("--judge-sample", type=Path, metavar="JUDGE_DIR",
+                        help="Draw calls and criteria from a judged run into a blind sheet for people to grade; no model call.")
+    parser.add_argument("--sample-size", type=int, default=20, help="With --judge-sample: (call, criterion) pairs to draw (default 20).")
+    parser.add_argument("--judge-agreement", type=Path, metavar="SHEET_DIR",
+                        help="Compare the people's verdicts in a --judge-sample sheet with the judge's: agreement and Cohen's kappa.")
     parser.add_argument("--relabel", type=Path, metavar="RUN_DIR",
                         help="Label a finished run's turns again with today's extractor and grade them; the agent does not run.")
     parser.add_argument("--asr", type=Path, help="ASR ground_truth.json or its directory; scores with main's unchanged scorer.")
@@ -259,6 +266,26 @@ def main(argv: Sequence[str] | None = None) -> int:
     if bool(args.provider) != bool(args.model):
         print("--provider and --model go together")
         return 2
+    if args.judge_sample or args.judge_agreement:
+        from . import judge_agreement
+
+        if args.judge_agreement:
+            return judge_agreement.report(args.judge_agreement.resolve())
+        out = (args.out or args.judge_sample / "human-review").resolve()
+        return judge_agreement.draw(args.judge_sample.resolve(), out, size=args.sample_size)
+    if args.judge_run:
+        if args.relabel or args.no_extract or args.config or args.judge or args.provider or args.model or args.only:
+            print("--judge-run judges a finished run's replies; agent, extractor and selection options are not supported")
+            return 2
+        from . import judge_agreement
+
+        out = (args.out or RUNS / (datetime.now().strftime("%Y%m%d-%H%M%S") + "-judge")).resolve()
+        try:
+            validate_ledger()
+        except RuntimeError as error:
+            print(error)
+            return 2
+        return asyncio.run(judge_agreement.judge_run(args.judge_run.resolve(), out, _judge()))
     if args.relabel:
         if args.no_extract or args.judge or args.provider or args.model or args.only:
             print("--relabel runs only the extractor; agent/selection options are not supported (--config is)")
@@ -374,7 +401,7 @@ async def _evaluate_locked(args, **kwargs) -> int:
 
 
 async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, database: str) -> int:
-    from ...llm import jev
+    from ...llm import decisions
     from ...mcp import client as mcp_client
     from . import report, runner, scenarios, trace
 
@@ -428,18 +455,11 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
             if extractor is not None and not run.stopped:
                 await _label(run, extractor, ready)
             if args.judge and not run.stopped:
-                from ...components.evaluation.judge import BtcJudge
-                from ...llm.factory import LLMFactory
-                from ...config.config_manager import get_models_config
-                judge = BtcJudge(LLMFactory.create_llm(get_models_config().agent_llm_config("extractor"), agent_name="rubric_judge"))
-                judgments = []
-                for scenario in ready:
-                    for call, spec in scenario.data["calls"].items():
-                        rows = [row for row in run.rows if row["scenario_id"] == scenario.scenario_id and row["call"] == call]
-                        if rows:
-                            judgments.append({"config": config, "scenario_id": scenario.scenario_id, "call": call,
-                                              **await judge.grade(dict(spec), call, rows)})
+                from ...components.evaluation.judge import judge_calls, summarise, table
+
+                judgments = await judge_calls(_judge(), ready, run.rows, config)
                 trace.write_jsonl(layout.side(f"{config}.judge.jsonl"), judgments)
+                print(table(summarise(judgments)))
             invalid = 0
             for row, diagnosis in zip(run.rows, run.diagnostics):
                 errors = trace.schema_errors(row)
@@ -461,7 +481,7 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
         try:
             await mcp_client.close_all()
         finally:
-            await jev.close()
+            await decisions.close()
 
     trace.write_jsonl(layout.side("diagnostics.jsonl"), [d for run in runs.values() for d in run.diagnostics])
     trace.write_jsonl(layout.side("scenario-errors.jsonl"),
@@ -532,6 +552,15 @@ def _retrieval(into: Path) -> str:
     kb = knowledge.build()
     results, rows = rag.run(kb, rag.questions(), on=btc.reference_date())
     return rag.table(rag.measure(results, rows, into), mode=kb.mode)
+
+
+def _judge() -> Any:
+    """The rubric judge on the extractor's model (``agents.extractor`` in models.yaml), costed as ``rubric_judge``."""
+    from ...components.evaluation.judge import BtcJudge
+    from ...config.config_manager import get_models_config
+    from ...llm.factory import LLMFactory
+
+    return BtcJudge(LLMFactory.create_llm(get_models_config().agent_llm_config("extractor"), agent_name="rubric_judge"))
 
 
 def _extractor() -> Any:

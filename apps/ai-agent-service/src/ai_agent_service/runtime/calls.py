@@ -340,7 +340,7 @@ async def consultant_reply(call_id: int, *, actor: Actor, content: str, action: 
         cursor = await conn.execute("SELECT content FROM turns WHERE call_id = %s AND speaker = 'customer'", (call_id,))
         said = tuple(r["content"] for r in await cursor.fetchall())
     verdict = check(GuardInput(text=tokenised, tool_results=(), tier=row["tier"], tokens=frozenset(vault.entries),
-                               customer_said=said, check_handoff=False))
+                               customer_said=said))
     # A consultant may quote a price the tools did not give this turn: they are accountable for it.
     warnings = [r for r in verdict.reasons if not r.startswith("Số tiền")]
     protected = ("Nhắc tới thông tin nội bộ", "Có dữ liệu cá nhân", "Có một dãy", "Có mã dữ liệu cá nhân", "Chưa xác minh danh tính")

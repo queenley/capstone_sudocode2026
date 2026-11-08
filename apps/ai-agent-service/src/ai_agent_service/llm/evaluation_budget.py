@@ -122,8 +122,9 @@ class BudgetCallback(BaseCallbackHandler):
     raise_error = True
 
     def __init__(self, config: dict[str, Any], agent: str) -> None:
-        if config["provider"] != "openai" or config["model"] != "gpt-4.1-mini":
-            raise RuntimeError("Evaluation budget currently supports only openai:gpt-4.1-mini")
+        # The Luna models are counted at gpt-4.1-mini's rates, above their price: the safe side of a cap.
+        if config["provider"] != "openai" or config["model"] not in ("gpt-4.1-mini", "gpt-5.6-luna", "gpt-6-luna"):
+            raise RuntimeError("Evaluation budget currently supports only openai:gpt-4.1-mini, gpt-5.6-luna and gpt-6-luna")
         rates = config["rate_limits"]
         self.input_price = rates["input_token_price_per_million"]
         self.output_price = rates["output_token_price_per_million"]

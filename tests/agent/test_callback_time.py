@@ -35,14 +35,6 @@ def test_a_moved_call_back_must_be_told():
     assert hard.moved_callback("Dạ em gọi lại vào thứ Ba nhé.", [BOOKED]) is None
 
 
-def test_a_call_back_at_a_moment_is_promised_only_after_it_is_booked():
-    said = "Dạ em sẽ ghi chú và gọi lại anh vào lúc 7 giờ tối mai."
-    assert hard.check(replace(VIEW, text=said)).passed is False
-    assert hard.check(replace(VIEW, text=said, tool_results=(BOOKED,))).passed is True
-    assert hard.check(replace(VIEW, text=said, callback_booked=True)).passed is True
-    assert hard.check(replace(VIEW, text="Dạ anh muốn em gọi lại lúc mấy giờ ạ?")).passed is True
-
-
 @pytest.mark.parametrize("said", [
     "Đúng rồi em.", "Ừ, đúng rồi.", "Vâng, chị xác nhận nhé.", "Chị đồng ý.", "Anh xác nhận đúng rồi em nhé.",
     "Đúng rồi em, lên đơn giúp anh nhé.", "Ừ, em đặt luôn giúp chị nhé.", "Đúng rồi, thông tin như vậy là chính xác.",

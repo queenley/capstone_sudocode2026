@@ -11,7 +11,7 @@ from ai_agent_service.agents import policy as policy_module
 from ai_agent_service.agents.advisor import AgentContext, _intents
 from ai_agent_service.agents.policy import INTENT_THRESHOLDS, INTENTS, PolicyAgent
 from ai_agent_service.components.guardrails import actions
-from ai_agent_service.llm.jev import Answer, Decision, JevUnavailable
+from ai_agent_service.llm.decisions import Answer, Decision, DecisionUnavailable
 from ai_agent_service.pipeline.hot import nodes
 
 
@@ -87,7 +87,7 @@ class FakePolicy(PolicyAgent):
 
     async def evaluate(self, state, questions):
         if self.probability is None:
-            raise JevUnavailable("TIMEOUT", "fixture")
+            raise DecisionUnavailable("TIMEOUT", "fixture")
         name = next(iter(questions))
         return Decision(model="jev", seconds=0.1,
                         answers={name: Answer(type="boolean", probability=self.probability)})
@@ -118,8 +118,8 @@ def test_the_word_lists_that_decided_for_the_customer_are_gone():
     from ai_agent_service.components.intake import signals
     for name in ("WANTS_PERSON", "COMPLAINT", "ASKS_IF_HUMAN", "WANTS_DELETION"):
         assert not hasattr(signals, name)
-    assert set(signals.read("chuyển máy cho tôi").as_flags()) == {"impatient", "must_transfer"}
-    assert policy_module.INTENTS["handoff"].criteria
+    assert set(signals.read("chuyển máy cho tôi").as_flags()) == {"impatient"}
+    assert "## handoff\n" in policy_module.RULES
 
 
 def test_an_order_is_changed_only_once_the_customer_chose_the_change():

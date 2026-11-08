@@ -12,6 +12,7 @@ import {
   VoiceCall,
   VoiceMessage,
 } from "@/services/voice";
+import Icon from "@/components/ui/Icon";
 
 type Line = {
   id: string;
@@ -217,7 +218,7 @@ export default function VoiceCallPanel({
     }}>
       <section className="modal call-panel">
         <header className="call-top">
-          <div className={"call-avatar " + (live ? "live" : "")}>☏</div>
+          <div className={"call-avatar " + (live ? "live" : "")}><Icon name="phone" size={22} /></div>
           <div>
             <p className="eyebrow">Hotline cửa hàng</p>
             <h2>Tư vấn qua cuộc gọi</h2>
@@ -337,7 +338,7 @@ export default function VoiceCallPanel({
                   "message " + (line.who === "caller" ? "outgoing" : "incoming")
                 }
               >
-                <small>{line.who === "caller" ? "BẠN" : "TRỢ LÝ AI"}</small>
+                <small>{line.who === "caller" ? "Bạn" : "Trợ lý AI"}</small>
                 <p className={line.superseded ? "faded" : ""}>
                   {line.heard != null ? line.heard : line.text}
                   {line.heard != null && line.text.startsWith(line.heard) && (

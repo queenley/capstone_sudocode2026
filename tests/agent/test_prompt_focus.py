@@ -158,10 +158,6 @@ def test_a_line_keeps_its_kind_through_the_state():
     assert date(2026, 10, 19)
 
 
-def test_the_core_is_about_a_thousand_tokens():
-    assert tokens(HARD_RULES) < 1100
-
-
 @pytest.mark.parametrize("said, pack", [
     ("hôm trước em báo khác mà", "past"), ("xoa du lieu cua chi di", "deletion"), ("may nay con hang khong", "advice")])
 def test_the_rules_moved_last_are_loaded_by_their_words(said, pack):

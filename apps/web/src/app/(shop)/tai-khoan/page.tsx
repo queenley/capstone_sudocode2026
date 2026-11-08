@@ -76,6 +76,14 @@ export default function AccountPage() {
       )}
 
       <section className="s-account-section">
+        <h2>Trợ lý ghi nhớ gì về bạn</h2>
+        <p className="s-lead">
+          Trợ lý AI ghi nhớ nhu cầu và các lần tư vấn trước, như sản phẩm bạn đã hỏi, giá đã báo và điều bạn còn băn khoăn,
+          để lần sau không phải hỏi lại. Bạn có thể xóa toàn bộ dữ liệu này ở trang <Link href="/don-hang#xoa-du-lieu">Đơn hàng</Link>.
+        </p>
+      </section>
+
+      <section className="s-account-section">
         <h2>Thông tin cá nhân</h2>
         <form
           className="s-form"

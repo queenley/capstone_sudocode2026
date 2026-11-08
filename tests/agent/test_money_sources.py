@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from types import SimpleNamespace
 
 import pytest
@@ -38,15 +39,15 @@ def test_a_bare_grouped_number_is_still_money():
 
 
 def test_a_price_of_an_earlier_turn_may_be_repeated():
-    assert money("Máy này giá 4.890.000đ ạ.", call_numbers=(4_890_000,)) == []
+    assert money("Máy này giá 4.890.000đ ạ.", earlier_numbers=frozenset({4_890_000})) == []
 
 
 def test_a_price_nothing_gave_is_still_refused():
-    assert money("Máy này giá 4.000.000đ ạ.", call_numbers=(4_890_000,))
+    assert money("Máy này giá 4.000.000đ ạ.", earlier_numbers=frozenset({4_890_000}))
 
 
 def test_small_numbers_of_the_call_do_not_become_money():
-    assert 500 not in hard.allowed_amounts(view("x", call_numbers=(500,)))
+    assert 500 not in hard.allowed_amounts(view("x", earlier_numbers=frozenset({500})))
 
 
 @pytest.mark.parametrize("said, reply", [
@@ -67,8 +68,8 @@ def test_the_total_of_this_calls_quotes_is_derived_and_a_wrong_total_is_not():
 
 def test_a_rate_of_the_documents_applied_to_a_price():
     passage = ("Gói bảo hành mở rộng với giá bằng 8% giá sản phẩm.",)
-    assert money("Gói này là 551.200đ ạ.", priced_texts=passage, call_numbers=(6_890_000,)) == []
-    assert money("Gói này là 600.000đ ạ.", priced_texts=passage, call_numbers=(6_890_000,))
+    assert money("Gói này là 551.200đ ạ.", priced_texts=passage, earlier_numbers=frozenset({6_890_000})) == []
+    assert money("Gói này là 600.000đ ạ.", priced_texts=passage, earlier_numbers=frozenset({6_890_000}))
 
 
 @pytest.mark.parametrize("sentence", [
@@ -79,68 +80,43 @@ def test_a_later_call_may_recall_the_briefs_price(sentence):
     assert money(sentence, brief_prices=(4_290_000,)) == []
 
 
-def test_the_briefs_price_is_not_a_current_one():
-    assert money("Máy này giá 4.290.000đ ạ.", brief_prices=(4_290_000,))
-
-
 def test_only_the_customers_figure_is_left_for_the_policy_agent():
     text = "Với ngân sách 7 triệu, máy này giá 5.990.000đ ạ."
-    assert open_amounts(view(text, customer_said=("ngân sách 7 triệu",), call_numbers=(5_990_000,))) == (7_000_000,)
-    assert open_amounts(view("Máy này giá 5.990.000đ ạ.", call_numbers=(5_990_000,))) == ()
+    assert open_amounts(view(text, customer_said=("ngân sách 7 triệu",), earlier_numbers=frozenset({5_990_000}))) == (7_000_000,)
+    assert open_amounts(view("Máy này giá 5.990.000đ ạ.", earlier_numbers=frozenset({5_990_000}))) == ()
 
 
-def review(open_amount, probability=0.99):
-    agent = PolicyAgent.__new__(PolicyAgent)
-    seen = {}
-
-    async def evaluate(state, questions):
-        seen.update(state)
-        answers = {name: SimpleNamespace(probability=0.0) for name in questions}
+def review(monkeypatch, open_amount, probability=0.99):
+    """The PolicyAgent on a stand-in for the Decisions API; what it was shown, as text."""
+    async def evaluate(name, messages, questions, **_):
+        answers = {q: SimpleNamespace(probability=0.0) for q in questions}
         answers["unquoted_price"] = SimpleNamespace(probability=probability)
-        return SimpleNamespace(answers=answers, seconds=0.1)
+        return SimpleNamespace(answers=answers, seconds=0.1, cached_tokens=0, input_tokens=0)
 
-    agent.evaluate = evaluate
-    verdict = asyncio.run(agent.review(PolicyInput(text="x", tool_results=(), tier="VERIFIED", open_amounts=open_amount)))
-    return verdict, seen
-
-
-def test_with_every_amount_traced_the_price_question_cannot_block():
-    verdict, seen = review(())
-    assert verdict.passed and seen["amounts_without_source"] == []
+    monkeypatch.setattr(policy_agent.decisions, "evaluate", evaluate)
+    agent = PolicyAgent.__new__(PolicyAgent)
+    agent.name = "policy"
+    shown = PolicyInput(text="x", tool_results=(), tier="VERIFIED", open_amounts=open_amount)
+    verdict = asyncio.run(agent.review(shown))
+    return verdict, json.dumps(policy_agent.review_input(shown), ensure_ascii=False)
 
 
-def test_a_figure_with_no_source_can_still_be_judged():
-    verdict, seen = review((7_000_000,))
+def test_with_every_amount_traced_the_price_question_cannot_block(monkeypatch):
+    verdict, seen = review(monkeypatch, ())
+    assert verdict.passed and "amounts_without_source" in seen
+
+
+def test_a_figure_with_no_source_can_still_be_judged(monkeypatch):
+    verdict, seen = review(monkeypatch, (7_000_000,))
     assert not verdict.passed and verdict.reasons == (policy_agent.REASONS["unquoted_price"],)
-    assert seen["amounts_without_source"] == ["7.000.000đ"]
+    assert "7.000.000đ" in seen
 
 
-def test_a_review_without_the_hard_check_keeps_the_question():
-    verdict, seen = review(None)
+def test_a_review_without_the_hard_check_keeps_the_question(monkeypatch):
+    verdict, seen = review(monkeypatch, None)
     assert not verdict.passed and "amounts_without_source" not in seen
 
 
-lookup = {"name": "order.status", "result": {"ok": True, "data": {"orders": []}}}
-
-
-def test_an_empty_lookup_may_be_said():
-    text = "Dạ hiện tại anh chưa có đơn hàng nào đang xử lý ạ."
-    assert hard._order_state(text, GuardInput(text=text, tool_results=(lookup,), tier="VERIFIED")) == []
-
-
-def test_saying_there_is_no_order_without_a_lookup_is_still_refused():
-    text = "Dạ hiện tại anh chưa có đơn hàng nào đang xử lý ạ."
-    assert hard._order_state(text, GuardInput(text=text, tool_results=(), tier="VERIFIED"))
-
-
-def test_asking_the_customer_to_confirm_is_not_stating_the_state():
-    text = "Anh đang nói về đơn OD901002 đang xử lý đúng không ạ?"
-    assert hard._order_state(text, GuardInput(text=text, tool_results=(), tier="VERIFIED")) == []
-
-
-def test_stating_an_order_is_on_its_way_still_needs_a_lookup():
-    text = "Dạ đơn OD901002 đang giao ạ."
-    assert hard._order_state(text, GuardInput(text=text, tool_results=(), tier="VERIFIED"))
 
 
 NOON = "2026-10-20T10:00"

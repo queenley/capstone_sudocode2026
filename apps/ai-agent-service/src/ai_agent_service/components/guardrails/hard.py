@@ -1,28 +1,24 @@
 """The hard check on a reply: code only, a few milliseconds a sentence. ``docs/design.md`` section 4.5.
 
-It turns the price hallucination threshold (at most 5%) from a hope into a
-guarantee, and it can be shown live.
+Only what has a fixed shape and must never reach a customer, whatever the
+sentence means:
 
 | Check | How |
 |---|---|
-| money | every amount, in digits or in words (read by the ITN the customer's words go through), must come from a valid source: this turn's tool results, today's quotes earlier in the call, the organisers' policy passages read this turn (never a Knowledge Gap Loop or playbook entry), a quantity times a unit price, the difference of two amounts of one object (a quote's list and final price, an order's fees) or of today's quote and the price the brief says was quoted. An amount the customer said passes here: whether a sentence states it as the shop's own price is a reading of meaning, the PolicyAgent's (``unquoted_price``). A price from the brief only as history ("hôm trước bên em báo"), and only when VERIFIED |
-| days, months | "giao trong 2 ngày", "đổi trả 7 ngày", "bảo hành 24 tháng" must match a tool result, a passage of the turn, the customer's words or a rule the prompt states |
-| discontinued | "ngừng bán" needs a tool of the turn reporting the product discontinued: a passage names its own model only |
-| delivery by area | without an address ``delivery.estimate`` answers per area; a sentence stating one area's days names that area or gives them all |
-| stock | "còn hàng", "hết hàng", "chỉ còn N" need a tool of the turn saying the same (``inventory.check``, or the stock a search returned), or a warning of the brief saying it |
-| order state | an order said to be in transit, delivered, processing or cancelled ("đơn … đang giao", "đã giao") needs an order tool of the turn (``order.status``, ``order.update``, ``order.create``, ``account.orders``): the brief's state is history, and today's may differ |
-| order done | saying an order was placed ("em đã lên đơn", "đơn … đã được tạo") needs ``order.create`` to have succeeded in this turn, an order read reporting it, or an order this call created earlier; saying it was changed ("đã đổi size") needs ``order.update``: a refused or missing call is not an order |
-| promotion | a code named must be applied in this turn's quote, said as history, or said to have ended; a promotion not yet started is never named (KM-02) |
-| internal | no purchase price, margin, supplier, price floor |
 | personal data | no raw phone, ID or account number; no run of 10 to 14 digits; no token that is not this call's |
-| tier | below VERIFIED, no price the brief holds, no order code |
+| internal | no purchase price, margin, supplier, price floor |
 | human | no claim to be a person |
-| handoff | a sentence promising to put the caller through to a person needs ``handoff.transfer`` to have run in this turn |
-| abstaining | a sentence saying the information is missing uses one of the six phrases the organisers' grader reads |
-| shape | not empty, at most three sentences unless reading an order back, Vietnamese, no markup |
+| tier | below VERIFIED, no order code and no price the brief holds that a tool of the turn did not give |
+| promotion | a promotion not yet started is never named (KM-02), read from the catalogue of promotions |
+| money | every amount, in digits or in words (read by the ITN the customer's words go through), must come from a valid source: this call's tool results, today's quotes earlier in the call, the system's basket total, the organisers' policy passages read this turn, a quantity times a unit price, the difference of two amounts of one object, the customer's own words, or a price the brief holds |
+| days, weeks, months | a number of them must come from a tool result, a passage of the turn, the customer's words or the brief's warnings |
 
-Every reason is returned, not just the first, so one regeneration can fix
-them all. The same check runs on one sentence of a streamed reply.
+These two compare a number with data; they do not read what a sentence means.
+
+What a sentence means (a price stated as the shop's, a stock, an order's
+state, a promise) is not read here: it is the PolicyAgent's. Every
+reason is returned, not just the first, so one regeneration can fix them all.
+The same check runs on one sentence of a streamed reply.
 """
 
 from __future__ import annotations
@@ -35,75 +31,36 @@ from typing import Any, Iterable, Literal, Mapping
 from .. import clock
 from ..intake.itn import amounts, format_vnd
 from ..intake.pii import PATTERNS, TOKEN
-from ..intake.text import plain
 from . import Verdict
-from .actions import deletion_succeeded
+from .actions import COD_LIMIT_VND
 
 MAX_SENTENCES = 3
+MAX_BASKET = 8
 
-#: The phrases ``eval/reference_eval.py`` accepts as "not known" (``ABSTAIN_KW``).
-ABSTAIN_PHRASES = ("không có thông tin", "chưa có thông tin", "em chưa rõ", "em không chắc", "em sẽ kiểm tra",
-                   "chưa nắm được")
-#: Durations a rule of the prompt states, not a tool: the 72 hours of a deletion (QT-06).
-RULE_DURATIONS = frozenset({72})
 
-HISTORY = re.compile(r"(hôm trước|lần trước|trước đây|hôm qua|đã báo|bên em báo|báo chị|báo anh)", re.IGNORECASE)
-#: A price said as what was quoted before; the opening of a later call says it this way.
-PRICE_HISTORY = re.compile(HISTORY.pattern + r"|báo giá|đã hỏi|đã tư vấn|đã trao đổi|đã quan tâm|hôm \d", re.IGNORECASE)
-#: A customer typing without marks ("500 ngan", "5 trieu ruoi"), put back for the amount reader.
-UNMARKED_MONEY = ((re.compile(r"\btrieu\b", re.I), "triệu"), (re.compile(r"\b(?:ngan|nghin)\b", re.I), "nghìn"),
-                  (re.compile(r"\bruoi\b", re.I), "rưỡi"), (re.compile(r"\bty\b", re.I), "tỷ"))
-#: "chưa có đơn nào": what an empty lookup says.
-NO_ORDER = re.compile(r"(chưa|không) có đơn", re.IGNORECASE)
-#: A rate of the shop's documents, of a price: "bằng 8% giá sản phẩm".
-RATE = re.compile(r"(\d{1,2})\s*%")
 INTERNAL = re.compile(r"(giá nhập|giá vốn|biên lợi nhuận|lợi nhuận|nhà cung cấp|giá sàn|price_floor|_internal|chiết khấu nội bộ)", re.IGNORECASE)
 HUMAN = re.compile(
     r"(em là người thật|em là nhân viên thật|em không phải (là )?(máy|bot|robot|ai|trợ lý (ảo|tự động))|"
     r"em là con người|không phải trợ lý ảo đâu)",
     re.IGNORECASE,
 )
-#: "em sẽ chuyển máy cho nhân viên", "em kết nối anh với đồng nghiệp": a promise, not an offer.
-TRANSFER_PROMISE = re.compile(
-    r"\bem\b[^.?!]*?\b(chuyển|kết nối|nối máy)\b[^.?!]*?\b(máy|cuộc gọi|nhân viên|đồng nghiệp|bộ phận|tư vấn viên)\b", re.IGNORECASE)
-#: Words that make it an offer or a question rather than a promise.
-TRANSFER_OFFER = re.compile(r"(nếu|muốn|có thể|được không|có cần|\?|hay là|để em hỏi)", re.IGNORECASE)
-#: Words that say the call is not being put through: the honest answer when the transfer failed.
-TRANSFER_REFUSED = re.compile(r"\b(chưa|không)\b[^.?!]*?\b(chuyển|kết nối|nối máy)\b", re.IGNORECASE)
-#: A call back promised for a moment ("em gọi lại anh lúc 7 giờ tối mai"): the same claim about the system as a transfer.
-CALLBACK_PROMISE = re.compile(r"\b(gọi lại|liên hệ lại)\b.*(\d\s*(giờ|h\b)|\b(sáng|trưa|chiều|tối|mai|thứ|ngày)\b)", re.IGNORECASE)
 ORDER_CODE = re.compile(r"\bOD\d+\b")
+#: Allows a reply past :data:`MAX_SENTENCES`: reading an order back takes more.
 ORDER_SUMMARY = re.compile(r"(tổng (cộng|đơn|tiền)|xác nhận đơn|lên đơn|mã đơn|đặt hàng)", re.IGNORECASE)
-VIETNAMESE = re.compile(r"[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]", re.IGNORECASE)
-SENTENCE = re.compile(r"(?<=[.!?…])\s+")
-DIGIT_RUN = re.compile(r"(?<!\d)\d{10,14}(?!\d)")
-MARKUP = re.compile(r"(\*\*|__|^\s*[-*•]\s|^\s*#{1,6}\s|```)", re.MULTILINE)
+DURATION = re.compile(r"(\d+)\s*(?:-|–|đến)?\s*(\d+)?\s*(ngày|tháng|tuần|giờ)\b", re.IGNORECASE)
 #: "7 giờ tối", "lúc 7 giờ": a time of day, not a duration.
 TIME_OF_DAY_AFTER = re.compile(r"\s*(sáng|trưa|chiều|tối)\b", re.IGNORECASE)
 TIME_OF_DAY_BEFORE = re.compile(r"\b(lúc|vào)\s+$", re.IGNORECASE)
-DURATION = re.compile(r"(\d+)\s*(?:-|–|đến)?\s*(\d+)?\s*(ngày|tháng|tuần|giờ)\b", re.IGNORECASE)
-STOCK = re.compile(r"\b(còn hàng|hết hàng|có sẵn hàng|sẵn hàng|tạm hết|sắp hết hàng|chỉ còn \d+)\b", re.IGNORECASE)
-OUT_OF_STOCK = re.compile(r"\b(hết hàng|tạm hết)\b", re.IGNORECASE)
-#: A product said to be no longer sold: it existed, so a tool must say so ("chưa kinh doanh" is a product the shop never had).
-DISCONTINUED = re.compile(r"\b(ngừng bán|ngưng bán|ngừng kinh doanh|ngưng kinh doanh|ngừng sản xuất)\b", re.IGNORECASE)
-#: An order's state said as a fact, in a sentence about an order.
-ORDER_STATE = re.compile(
-    r"\b(đang (?:được )?(?:giao|vận chuyển|xử lý|chuẩn bị)|đang trên đường|đã (?:được )?(?:giao|bàn giao|hủy|huỷ|gửi đi)"
-    r"|chưa (?:được )?giao)\b", re.IGNORECASE)
-ORDER_WORD = re.compile(r"\b(đơn|kiện hàng|gói hàng)\b", re.IGNORECASE)
-ORDER_TOOLS = frozenset({"order.status", "order.update", "order.create", "account.orders"})
-#: The agent saying the order is placed, not offering to place it ("em lên đơn cho anh nhé?").
-ORDER_PLACED = re.compile(
-    r"\b(?:đã|vừa)\s+(?:được\s+)?(?:lên|tạo|chốt)\s+(?:xong\s+)?đơn\b"
-    r"|\b(?:lên|tạo|chốt|đặt)\s+đơn(?:\s+hàng)?\s+(?:thành công|xong|rồi)\b"
-    r"|\bđặt hàng thành công\b"
-    r"|\bđơn(?:\s+hàng)?\b[^.?!]{0,40}?\bđã\s+(?:được\s+)?(?:tạo|lên|ghi nhận)\b", re.IGNORECASE)
-ENDED = re.compile(r"(đã hết|hết hạn|kết thúc|không còn|ngừng)", re.IGNORECASE)
-#: The agent saying it does not know: about itself ("em chưa rõ", "bên em không có thông tin"), not
-#: about the customer ("nếu chị chưa biết chọn mẫu nào").
-ABSTAINING = re.compile(
-    r"\b(em|ben em|shop|minh) (hien |hien tai )?(van )?(chua|khong) (co |duoc )?(thong tin|nam|ro|biet|chac)\b"
-    r"|\b(chua|khong) co thong tin\b")
+#: Durations the prompt's own rules state: data is erased within 72 hours of a request (QT-06).
+RULE_DURATIONS = frozenset({72})
+#: A rate of the shop's documents, of a price: "bằng 8% giá sản phẩm".
+RATE = re.compile(r"(\d{1,2})\s*%")
+#: A customer typing without marks ("500 ngan", "5 trieu ruoi"), put back for the amount reader.
+UNMARKED_MONEY = ((re.compile(r"\btrieu\b", re.I), "triệu"), (re.compile(r"\b(?:ngan|nghin)\b", re.I), "nghìn"),
+                  (re.compile(r"\bruoi\b", re.I), "rưỡi"), (re.compile(r"\bty\b", re.I), "tỷ"))
+DIGIT_RUN = re.compile(r"(?<!\d)\d{10,14}(?!\d)")
+#: Markup a voice would read aloud: removed from what is said, never a reason to regenerate.
+MARKUP = re.compile(r"(\*\*|__|```|^\s*[-*•]\s+|^\s*#{1,6}\s+)", re.MULTILINE)
 
 
 @dataclass(frozen=True)
@@ -119,26 +76,23 @@ class GuardInput:
     policy_texts: tuple[str, ...] = ()
     #: The passages of the organisers' documents among them: the only passages an amount may come from.
     priced_texts: tuple[str, ...] = ()
-    #: Prices the brief holds: history, never a current price.
+    #: Prices the brief holds: private below VERIFIED.
     brief_prices: tuple[int, ...] = ()
     #: This call's vault tokens, the only ones the text may carry.
     tokens: frozenset[str] = field(default_factory=frozenset)
     #: Today's price per product from every quote earlier in this call.
     quotes: Mapping[str, int] = field(default_factory=dict)
-    #: The numbers of this call's earlier price, catalogue and delivery results: a turn sees only its own tool results.
-    call_numbers: tuple[int, ...] = ()
+    #: Numbers in what quotes and orders returned in earlier turns: a refund told again is still sourced.
+    earlier_numbers: frozenset[int] = field(default_factory=frozenset)
+    #: Numbers in every result of earlier turns, a search's warranty months included: what a duration may repeat.
+    earlier_counts: frozenset[int] = field(default_factory=frozenset)
+    #: The total the system added up for the basket the customer is choosing.
+    basket_total: int | None = None
     #: The brief's freshness warnings: what has ended or run out, stated by ``refresh``.
     warnings: tuple[str, ...] = ()
     #: Every promotion the shop runs, code to ``(start, end)``, and the day of the call (KM-02).
     promotions: Mapping[str, tuple[str, str]] = field(default_factory=dict)
     on: str | None = None
-    #: Orders this call created in earlier turns: a later turn may speak of them as placed.
-    created_orders: tuple[str, ...] = ()
-    #: False for a consultant's text: they are the person, so there is no tool to wait for.
-    check_handoff: bool = True
-    deletion_recorded: bool = False
-    #: ``schedule.callback`` ran in an earlier turn of this call.
-    callback_booked: bool = False
 
 
 def numbers_in(value: Any) -> set[int]:
@@ -168,35 +122,36 @@ def allowed_amounts(view: GuardInput) -> set[int]:
     Arithmetic is allowed only where the operands belong together: a
     quantity times a unit price, the difference of two amounts of one object
     of a tool result (a quote's list and final price, an order's old and new
-    price), today's quote against the price the brief says was quoted (a
-    change since the last call), the total of this call's quotes, and a rate
-    of the documents applied to a price (a warranty plan at 8%). The
-    difference of any two numbers of a turn is not: a search listing eight
-    products would make dozens of numbers "derived", a fabricated discount
-    among them. Results of earlier turns of the call count as this turn's: it
-    is the same day, and the model reads those prices. An amount from a passage
+    price), and today's quote against the price the brief says was quoted (a
+    change since the last call). The difference of any two numbers of a turn
+    is not: a search listing eight products would make dozens of numbers
+    "derived", a fabricated discount among them. An amount from a passage
     counts only from the organisers' documents: a Knowledge Gap Loop or playbook entry
     written in the console is not a source of prices (section 10.2, gate 2).
     The customer's amounts are not here: :func:`_money` lets them through, and
     the PolicyAgent judges whether a sentence passes one off as the shop's.
     """
-    tools: set[int] = set(view.quotes.values())
+    tools: set[int] = set(view.quotes.values()) | {n for n in view.earlier_numbers if n >= 1_000}
+    if view.basket_total:
+        tools.add(view.basket_total)
     groups: list[set[int]] = []
     for result in view.tool_results:
         tools |= numbers_in(result.get("result"))
         groups += amount_groups(result.get("result"))
-    tools |= {number for number in view.call_numbers if number >= 1_000}
     base = {a for a in tools if a >= 1_000}
     found = tools | {a * q for a in base for q in range(2, 6)}
-    prices = list(view.quotes.values())[-6:]
-    found |= {sum(group) for size in range(2, len(prices) + 1) for group in combinations(prices, size)}
     for group in groups:
         found |= {abs(a - b) for a in group for b in group if a != b}
     found |= {abs(q - b) for q in view.quotes.values() for b in view.brief_prices if q != b}
     for text in view.priced_texts:
         found.update(amounts(text))
+        # A rate of the documents applied to a price (a warranty plan at 8% of the product).
         for rate in RATE.findall(text):
             found |= {round(price * int(rate) / 100) for price in base if price >= 100_000}
+    # A basket's total: the sum of some of today's quotes (at most a call's few products).
+    quoted = list(view.quotes.values())[:MAX_BASKET]
+    for size in range(2, len(quoted) + 1):
+        found |= {sum(group) for group in combinations(quoted, size)}
     return found
 
 
@@ -235,9 +190,8 @@ def amount_groups(value: Any) -> list[set[int]]:
 
 
 def allowed_counts(view: GuardInput) -> set[int]:
-    """Numbers a duration may state: from the tools, the passages, the customer, the prompt's rules."""
-    found: set[int] = set(RULE_DURATIONS)
-    found |= set(view.call_numbers)
+    """Numbers a duration may state: from the tools, the passages, the customer."""
+    found: set[int] = set(view.earlier_counts) | set(RULE_DURATIONS)
     for result in view.tool_results:
         found |= numbers_in(result.get("result"))
     for text in (*view.customer_said, *view.policy_texts, *view.warnings):
@@ -253,15 +207,6 @@ def check(view: GuardInput) -> Verdict:
     reasons: list[str] = []
     reasons += _money(text, view)
     reasons += _durations(text, view)
-    reasons += _area_days(text, view)
-    reasons += _stock(text, view)
-    reasons += _discontinued(text, view)
-    reasons += _order_state(text, view)
-    reasons += _promotions(text, view)
-    reasons += _transfer(text, view)
-    reasons += _callback(text, view)
-    reasons += _completed_order(text, view)
-    reasons += _completed_deletion(text, view)
     if INTERNAL.search(text):
         reasons.append("Nhắc tới thông tin nội bộ (giá nhập, biên lợi nhuận, nhà cung cấp, giá sàn).")
     for kind, pattern in PATTERNS:
@@ -274,36 +219,20 @@ def check(view: GuardInput) -> Verdict:
     strangers = [m.group(0) for m in TOKEN.finditer(text) if m.group(0) not in view.tokens]
     if strangers:
         reasons.append(f"Có mã dữ liệu cá nhân không thuộc cuộc gọi này: {', '.join(strangers)}.")
-    if view.tier != "VERIFIED" and ORDER_CODE.search(text):
-        reasons.append("Chưa xác minh danh tính nên không được đọc mã đơn.")
     if HUMAN.search(text):
         reasons.append("Không được nhận là người thật.")
-    if ABSTAINING.search(plain(text)) and not any(phrase in text.lower() for phrase in ABSTAIN_PHRASES):
-        reasons.append("Câu thừa nhận thiếu thông tin phải dùng đúng cụm \"chưa có thông tin\".")
-    reasons += _shape(text)
+    reasons += _tier(text, view)
+    reasons += _not_started(text, view)
     return Verdict(not reasons, tuple(dict.fromkeys(reasons)))
 
 
 def _money(text: str, view: GuardInput) -> list[str]:
-    reasons = []
-    allowed = allowed_amounts(view)
-    history = set(view.brief_prices)
-    theirs = {value for said in view.customer_said for value in customer_amounts(said)}
-    for sentence in SENTENCE.split(text):
-        for value in amounts(sentence):
-            if value in allowed:
-                continue
-            if value in history and PRICE_HISTORY.search(sentence):
-                if view.tier != "VERIFIED":
-                    reasons.append(f"Chưa xác minh danh tính nên không được nhắc giá đã báo {format_vnd(value)}.")
-                continue
-            if value in theirs:
-                continue  # the customer's own figure; the PolicyAgent checks it is not stated as the shop's
-            reasons.append(
-                f"Số tiền {format_vnd(value)} không có trong kết quả tool của lượt này hay tài liệu chính sách; "
-                "gọi tool để lấy số đúng hoặc bỏ con số."
-            )
-    return reasons
+    """An amount with no source. Whether a sourced amount is stated rightly is a reading of meaning, the PolicyAgent's."""
+    allowed = allowed_amounts(view) | set(view.brief_prices) | {COD_LIMIT_VND}
+    allowed |= {value for said in view.customer_said for value in customer_amounts(said)}
+    return [f"Số tiền {format_vnd(value)} không có trong kết quả tool của cuộc gọi hay tài liệu chính sách; "
+            "không tự tính, dùng đúng số đã có hoặc bỏ con số."
+            for value in amounts(text) if value not in allowed]
 
 
 def _durations(text: str, view: GuardInput) -> list[str]:
@@ -316,230 +245,36 @@ def _durations(text: str, view: GuardInput) -> list[str]:
         stated = [int(match.group(1))] + ([int(match.group(2))] if match.group(2) else [])
         if not all(n in allowed for n in stated):
             reasons.append(
-                f"Thời hạn \"{match.group(0).strip()}\" không có trong kết quả tool hay tài liệu của lượt này; "
+                f"Thời hạn \"{match.group(0).strip()}\" không có trong kết quả tool của cuộc gọi hay tài liệu; "
                 "lấy từ delivery_estimate, catalog_search hoặc tài liệu, hoặc bỏ con số."
             )
     return reasons
 
 
-def _area_days(text: str, view: GuardInput) -> list[str]:
-    """A delivery time read off ``delivery.estimate`` without an address is one area's, not the customer's.
-
-    With no address the tool answers each area (``by_area``); a sentence that states one of those
-    figures must say which area it is, or give them all, or the customer hears a promise for an area
-    nobody named. A turn whose estimate or order had the address is not checked.
-    """
-    areas: list[Mapping[str, Any]] = []
-    for result in view.tool_results:
-        data = ((result.get("result") or {}).get("data") or {}) if (result.get("result") or {}).get("ok") else {}
-        name = str(result.get("name", "")).replace("_", ".", 1)
-        if name == "delivery.estimate" and data.get("address_known"):
-            return []
-        if name == "order.create" and data.get("estimated_delivery") and (result.get("args") or {}).get("address"):
-            return []
-        if name == "delivery.estimate" and data.get("by_area"):
-            areas += [a for a in data["by_area"] if isinstance(a, Mapping)]
-    figures = {a.get("delivery_days") for a in areas if isinstance(a.get("delivery_days"), int)}
-    if len(figures) < 2:
+def _tier(text: str, view: GuardInput) -> list[str]:
+    """Below VERIFIED the brief is someone's private record: its prices and any order code stay unsaid."""
+    if view.tier == "VERIFIED":
         return []
-    named = re.compile(r"\b(" + "|".join(re.escape(p) for p in _area_phrases(areas)) + r")\b")
-    for sentence in SENTENCE.split(text):
-        said = {int(m.group(1)) for m in DURATION.finditer(sentence) if m.group(3).lower() == "ngày"}
-        if not said & figures or figures <= said:
-            continue
-        if not named.search(plain(sentence)):
-            each = "; ".join(f"{a.get('delivery_days')} ngày ở {a.get('area')}" for a in areas
-                             if isinstance(a.get("delivery_days"), int))
-            return [f"Chưa có địa chỉ nên thời gian giao tùy khu vực: nói đủ \"giao {each}\", hoặc bỏ thời gian giao "
-                    "và xin địa chỉ; không nói một con số riêng."]
-    return []
+    reasons = []
+    if ORDER_CODE.search(text):
+        reasons.append("Chưa xác minh danh tính nên không được đọc mã đơn.")
+    given = set().union(*(numbers_in(r.get("result")) for r in view.tool_results)) if view.tool_results else set()
+    for value in amounts(text):
+        if value in view.brief_prices and value not in given:
+            reasons.append(f"Chưa xác minh danh tính nên không được nhắc giá đã báo {format_vnd(value)}.")
+    return reasons
 
 
-def _discontinued(text: str, view: GuardInput) -> list[str]:
-    """Saying a product is no longer sold needs a tool of the turn reporting one discontinued.
-
-    Like stock, a product's status is the tools': a passage that names a discontinued model is about
-    that model, and read alone it can be taken for a current one with a similar name.
-    """
-    if not DISCONTINUED.search(text):
-        return []
-    for result in view.tool_results:
-        envelope = result.get("result") or {}
-        data = envelope.get("data") or {} if envelope.get("ok") else {}
-        items = [data, *(data.get("items") or [])]
-        if any(item.get("discontinued") or (item.get("attributes") or {}).get("discontinued") for item in items):
-            return []
-    return ["Nói sản phẩm ngừng bán mà chưa có tool của lượt này báo vậy; gọi catalog_search hoặc inventory_check "
-            "với đúng mã, tài liệu chỉ nói về mẫu nó nêu."]
+def _not_started(text: str, view: GuardInput) -> list[str]:
+    """KM-02: a code in the catalogue of promotions whose first day is after the day of the call."""
+    return [f"Không được nhắc chương trình {code} khi chưa bắt đầu (KM-02)."
+            for code, (start, _end) in view.promotions.items()
+            if view.on and start > view.on and re.search(rf"(?<![\w-]){re.escape(code)}(?![\w-])", text, re.IGNORECASE)]
 
 
-def _area_phrases(areas: Iterable[Mapping[str, Any]]) -> set[str]:
-    """How a sentence names an area of ``by_area``: "Hà Nội, TP.HCM, Đà Nẵng" is three names, "tỉnh thành khác"
-    is said "tỉnh"; whole names, since a single word ("nội", "thành") is also in "nói", "thanh toán"."""
-    phrases = set()
-    for area in areas:
-        for part in str(area.get("area") or "").split(","):
-            words = re.sub(r"^tp\.?\s*", "", plain(part).strip()).split()
-            if words:
-                phrases.add(words[0] if len(words) >= 3 else " ".join(words))
-    return phrases or {"khu vuc"}
-
-
-def _stock(text: str, view: GuardInput) -> list[str]:
-    """A stock claim needs a tool of the turn that says the same: ``inventory.check``, or the stock a search returned."""
-    if not STOCK.search(text):
-        return []
-    said_out = bool(OUT_OF_STOCK.search(text))
-    if any(available != said_out for available in _availability(view.tool_results)):
-        return []
-    if said_out and any("hết hàng" in w for w in view.warnings):
-        return []
-    return ["Nói về tồn kho mà kết quả tool của lượt này không nói vậy; gọi inventory_check trước."]
-
-
-def _order_state(text: str, view: GuardInput) -> list[str]:
-    """Each claimed state must match the named orders returned by this turn's tools."""
-    if not view.check_handoff:
-        return []
-    records = []
-    looked_up = False
-    for result in view.tool_results:
-        envelope = result.get("result") or {}
-        if str(result.get("name", "")).replace("_", ".", 1) not in ORDER_TOOLS or not envelope.get("ok"):
-            continue
-        looked_up = True
-        data = envelope.get("data")
-        if not isinstance(data, dict):
-            continue
-        orders = data.get("orders", [data])
-        if isinstance(orders, list):
-            records.extend(order for order in orders if isinstance(order, dict))
-    claims = (
-        (r"đang (?:được )?(?:giao|vận chuyển)|đang trên đường|đã (?:được )?(?:bàn giao|gửi đi)", {"shipping"}),
-        (r"đã (?:được )?giao", {"delivered"}),
-        (r"đã (?:được )?(?:hủy|huỷ)", {"cancelled"}),
-        (r"đang (?:được )?(?:xử lý|chuẩn bị)", {"created", "confirmed"}),
-        (r"chưa (?:được )?giao", {"created", "confirmed", "shipping"}),
-    )
-    for clause in re.split(r"(?<=[.!?…])\s+|[,;:]\s*", text):
-        codes = set(ORDER_CODE.findall(clause))
-        if not ORDER_STATE.search(clause) or not (ORDER_WORD.search(clause) or codes):
-            continue
-        if looked_up and not records and NO_ORDER.search(clause):
-            continue  # an empty lookup is an answer: this customer has no order
-        if re.search(r"(đúng|phải) không", clause, re.IGNORECASE):
-            continue  # asking the customer to confirm is not stating the state
-        relevant = [order for order in records if not codes or str(order.get("order_id") or order.get("id")) in codes]
-        supported = {str(order.get("order_id") or order.get("id")) for order in relevant}
-        statuses = {order.get("status") for order in relevant}
-        expected = [allowed for pattern, allowed in claims if re.search(pattern, clause, re.IGNORECASE)]
-        if (not statuses or not expected or (codes and not codes.issubset(supported))
-                or not all(statuses.issubset(allowed) for allowed in expected)):
-            return ["Nói về trạng thái đơn mà chưa tra trong lượt này; gọi order_status trước, rồi nói đúng trạng thái tool trả về."]
-    return []
-
-
-def _completed_order(text: str, view: GuardInput) -> list[str]:
-    """Saying an order was placed or changed is a claim about what the system did, like a transfer: the write must have run.
-
-    A placed order is also backed by an order this call created in an earlier turn, or by an order
-    read of the turn ("đơn … đang ở trạng thái đã tạo" reports what ``order.status`` returned). A
-    sentence about an earlier contact ("hôm trước em đã lên đơn") is history, not this claim. Not for
-    a consultant's text: they act on their own screen.
-    """
-    if not view.check_handoff:
-        return []
-    for sentence in re.split(r"(?<=[.!?…])\s+|[,;:]\s*", text):
-        if HISTORY.search(sentence) and not re.search(r"hôm nay|bây giờ|đơn mới|vừa", sentence, re.IGNORECASE):
-            continue
-        words = plain(sentence)
-        creating = (_asserted(words, re.search(r"\b(da|vua) (len|tao|dat|xac nhan) (don|hang)\b", words))
-                    or _asserted(sentence, ORDER_PLACED.search(sentence)))
-        updating = _asserted(words, re.search(r"\b(da|vua) (doi|cap nhat|sua) (don|size|kich co|dia chi)\b", words))
-        if not creating and not updating:
-            continue
-        tool = "order.create" if creating else "order.update"
-        codes = set(ORDER_CODE.findall(sentence))
-        backed = set(view.created_orders) if creating and "đơn mới" not in sentence.lower() else set()
-        reported_state = False
-        for result in view.tool_results:
-            name = str(result.get("name", "")).replace("_", ".", 1)
-            envelope = result.get("result") or {}
-            data = envelope.get("data")
-            if not envelope.get("ok") or not isinstance(data, dict):
-                continue
-            if name == tool and data.get("order_id"):
-                backed.add(str(data["order_id"]))
-            # A read can support a reported state, never a claim that a new write happened.
-            if creating and name in {"order.status", "account.orders"} and "trạng thái" in sentence.lower():
-                matching = [order for order in data.get("orders") or [] if isinstance(order, dict)
-                            and order.get("status") == "created"]
-                backed.update(str(order["order_id"]) for order in matching if order.get("order_id"))
-                reported_state = bool(matching) and not codes
-        if not reported_state and (not backed or (codes and not codes.issubset(backed))):
-            wire = tool.replace(".", "_")
-            return [f"Nói đã thực hiện đơn hàng mà chưa có {wire} thành công; chỉ báo thành công sau kết quả tool. "
-                    "Tool từ chối thì làm theo đúng lý do nó trả về (ví dụ xin số điện thoại)."]
-    return []
-
-
-def _completed_deletion(text: str, view: GuardInput) -> list[str]:
-    for sentence in SENTENCE.split(text):
-        words = plain(sentence)
-        recorded = re.search(r'\b(?:ghi nhan|tiep nhan) yeu cau xoa\b'
-                             r'|\byeu cau xoa\b[^.?!]{0,60}\b(?:da|vua) (?:duoc )?(?:ghi nhan|tiep nhan)\b', words)
-        erased = re.search(r'\b(?:da|vua) (?:duoc )?xoa (?:het |toan bo )?du lieu\b'
-                           r'|\bdu lieu\b[^.?!]{0,40}\bda (?:duoc )?xoa\b'
-                           r'|\bxoa (?:het |toan bo )?du lieu\b[^.?!]{0,40}\b(?:thanh cong|xong|roi)\b', words)
-        if erased and re.search(r'yeu cau\s*$', words[:erased.start()]):
-            erased = None
-        if recorded and re.search(r'\b(se|can|de|khi)\b', words[:recorded.start()]):
-            recorded = None
-        if not _asserted(words, recorded) and not _asserted(words, erased):
-            continue
-        expected = 'memory.delete_customer' if _asserted(words, erased) else 'memory.request_deletion'
-        if expected == 'memory.request_deletion' and view.deletion_recorded:
-            continue
-        if not any(result.get('name') == expected and deletion_succeeded(expected, result.get('result') or {})
-                   for result in view.tool_results):
-            return [f'Chỉ báo đã ghi nhận hoặc xóa dữ liệu sau khi {expected} thành công; chưa có kết quả thì không báo thành công.']
-    return []
-
-
-def _asserted(text: str, match: re.Match[str] | None) -> bool:
-    """Whether *match* is said as done: no negation or condition before it in its clause, no question after it.
-
-    Only its own clause counts: "máy lọc không khí" later in the sentence is a product's name, not a negation.
-    """
-    if match is None:
-        return False
-    before = re.split(r"[,;:]", plain(text[:match.start()]))[-1]
-    after = re.split(r"[,;:]", text[match.end():])[0]
-    return not re.search(r"\b(chua|khong|neu)\b", before) and "?" not in after
-
-
-def _transfer(text: str, view: GuardInput) -> list[str]:
-    """Saying the call is being put through is a claim about what the system did: ``handoff.transfer`` must have run."""
-    if not view.check_handoff:
-        return []
-    promised = [s for s in SENTENCE.split(text) if TRANSFER_PROMISE.search(s) and not TRANSFER_OFFER.search(s)
-                and not TRANSFER_REFUSED.search(s)]
-    if not promised:
-        return []
-    for result in view.tool_results:
-        if str(result.get("name", "")).replace("_", ".") == "handoff.transfer" and (result.get("result") or {}).get("ok"):
-            return []
-    return ["Nói sẽ chuyển máy cho nhân viên mà chưa gọi handoff_transfer; gọi handoff_transfer trước rồi mới báo khách."]
-
-
-def _callback(text: str, view: GuardInput) -> list[str]:
-    """Saying the shop will call at a given moment is a claim about what the system did: ``schedule.callback`` must have run."""
-    if not view.check_handoff or view.callback_booked:
-        return []
-    promised = [s for s in SENTENCE.split(text) if CALLBACK_PROMISE.search(s) and not TRANSFER_OFFER.search(s)]
-    if not promised or any(_booked(result) for result in view.tool_results):
-        return []
-    return ["Hứa gọi lại vào một thời điểm mà chưa gọi schedule_callback; gọi schedule_callback trước rồi mới báo khách."]
+def clean(text: str) -> str:
+    """The sentence without markup, for a channel that may read it aloud."""
+    return MARKUP.sub("", text).strip()
 
 
 def _booked(result: Mapping[str, Any]) -> bool:
@@ -563,55 +298,3 @@ def moved_callback(text: str, results: Iterable[Mapping[str, Any]]) -> str | Non
         if not any(phrase in said for phrase in day):
             return clock.moment_label(moment)
     return None
-
-
-def _availability(results: Iterable[Mapping[str, Any]]) -> list[bool]:
-    """Whether each product a tool of the turn reported on is in stock."""
-    found: list[bool] = []
-    for result in results:
-        envelope = result.get("result") or {}
-        if not envelope.get("ok"):
-            continue
-        data = envelope.get("data") or {}
-        if "in_stock" in data:
-            found.append(bool(data["in_stock"]))
-        for item in data.get("items") or []:
-            if "in_stock" in item:
-                found.append(bool(item["in_stock"]))
-            elif "stock" in item:
-                found.append(int(item.get("stock") or 0) > 0)
-    return found
-
-
-def _promotions(text: str, view: GuardInput) -> list[str]:
-    if not view.promotions:
-        return []
-    applied = {p.get("promo_code") for r in view.tool_results if r.get("name") == "pricing.get_quote"
-               for p in (((r.get("result") or {}).get("data") or {}).get("applied_promos") or [])}
-    reasons = []
-    for sentence in SENTENCE.split(text):
-        for code, (start, _end) in view.promotions.items():
-            if not re.search(rf"(?<![\w-]){re.escape(code)}(?![\w-])", sentence, re.IGNORECASE):
-                continue
-            if view.on and start > view.on:
-                reasons.append(f"Không được nhắc chương trình {code} khi chưa bắt đầu (KM-02).")
-            elif code not in applied and not HISTORY.search(sentence) and not ENDED.search(sentence):
-                reasons.append(f"Khuyến mãi {code} không có trong báo giá của lượt này; gọi pricing_get_quote trước.")
-    return reasons
-
-
-def _shape(text: str) -> list[str]:
-    reasons = []
-    sentences = [s for s in SENTENCE.split(text) if len(s.strip()) > 12]
-    if len(sentences) > MAX_SENTENCES and not ORDER_SUMMARY.search(text):
-        reasons.append(f"Quá dài: {len(sentences)} câu, tối đa {MAX_SENTENCES}.")
-    if len(text) > 40 and not VIETNAMESE.search(text):
-        reasons.append("Câu trả lời không phải tiếng Việt.")
-    if MARKUP.search(text):
-        reasons.append("Không dùng markdown, gạch đầu dòng hay in đậm: câu trả lời có thể được đọc thành tiếng.")
-    return reasons
-
-
-def warnings_for(texts: Iterable[str], view: GuardInput) -> list[str]:
-    """The same checks on a consultant's text, as warnings rather than a block."""
-    return [reason for text in texts for reason in check(GuardInput(**{**view.__dict__, "text": text, "check_handoff": False})).reasons]

@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import re
 from datetime import datetime, timezone
+from typing import Any, Awaitable, Callable, Mapping, Sequence
 
 from ..intake import pii
 from . import signals, versions, review
@@ -14,6 +15,13 @@ from .gap import gate
 from .storage import atomic_text, locked
 from ...config.config_manager import btc_data_dir
 from ..knowledge.corpus import policy_chunks
+
+
+#: Who approved an entry in an evaluation run, where no person does.
+SCRIPTED = "scripted-eval"
+#: Cosine of two questions that ask the same; of a scripted question and the gap it answers.
+SAME_QUESTION = 0.88
+SCRIPT_MATCH = 0.80
 
 
 def _path() -> Path:
@@ -25,7 +33,8 @@ def _read() -> dict:
     return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
 
 
-def record(question: str, *, call_id: str, turn_id: str) -> str | None:
+def record(question: str, *, call_id: str, turn_id: str, recent: Sequence[str] = ()) -> str | None:
+    """A question the agent could not answer, as it was said; :func:`restate_open` makes it findable later."""
     question = pii.tokenise(question.strip(), pii.Vault())
     if len(question) < 3:
         return None
@@ -37,11 +46,83 @@ def record(question: str, *, call_id: str, turn_id: str) -> str | None:
         rows = _read()
         gap = rows.setdefault(key, {"id": key, "question": question, "status": "open", "occurrences": [],
                                     "created_at": datetime.now(timezone.utc).isoformat()})
+        if recent and not gap.get("recent"):
+            gap["recent"] = [pii.tokenise(line, pii.Vault()) for line in recent]
         occurrence = {"call_id": str(call_id), "turn_id": str(turn_id)}
         if occurrence not in gap["occurrences"]:
             gap["occurrences"].append(occurrence)
         atomic_text(_path(), json.dumps(rows, ensure_ascii=False, indent=2))
     return key
+
+
+async def restate_open(restate: Callable[[str, Sequence[str]], Awaitable[Any]]) -> int:
+    """Write each open question as a standalone one, with other ways to ask it. The answer is never touched."""
+    done = 0
+    pending = [dict(gap) for gap in _read().values() if gap["status"] == "open" and not gap.get("restated")]
+    for gap in pending:
+        answer = await restate(gap["question"], gap.get("recent") or ())
+        if answer is None or not answer.question.strip():
+            continue
+        with locked(signals.home()):
+            rows = _read()
+            if gap["id"] in rows:
+                rows[gap["id"]].update(restated=pii.tokenise(answer.question.strip(), pii.Vault()),
+                                       variants=[pii.tokenise(v.strip(), pii.Vault()) for v in answer.variants if v.strip()])
+                atomic_text(_path(), json.dumps(rows, ensure_ascii=False, indent=2))
+                done += 1
+    return done
+
+
+def merge_same(embed: Callable[[Sequence[str]], Any], *, threshold: float = SAME_QUESTION) -> int:
+    """Questions that mean the same become one gap, its occurrences together: the count is what a reviewer reads."""
+    with locked(signals.home()):
+        rows = _read()
+        open_gaps = [gap for gap in rows.values() if gap["status"] == "open" and gap.get("restated")]
+        if len(open_gaps) < 2:
+            return 0
+        vectors = embed([gap["restated"] for gap in open_gaps])
+        merged = 0
+        kept: list[int] = []
+        for index, gap in enumerate(open_gaps):
+            same = next((k for k in kept if float(vectors[index] @ vectors[k]) >= threshold), None)
+            if same is None:
+                kept.append(index)
+                continue
+            target = open_gaps[same]
+            target["occurrences"] += [o for o in gap["occurrences"] if o not in target["occurrences"]]
+            del rows[gap["id"]]
+            merged += 1
+        if merged:
+            atomic_text(_path(), json.dumps(rows, ensure_ascii=False, indent=2))
+    return merged
+
+
+def answer_from_script(script: Sequence[Mapping[str, Any]], embed: Callable[[Sequence[str]], Any], *,
+                       threshold: float = SCRIPT_MATCH) -> list[dict]:
+    """In an evaluation there is no consultant: each scripted answer goes to the open gap it best matches.
+
+    Each still passes the entry's gate and carries its sources. ``SCRIPTED`` as reviewer says in the record and the
+    log that no person approved it, and a report must say so too.
+    """
+    open_gaps = [gap for gap in list_gaps() if gap["status"] == "open" and gap.get("restated")]
+    results: list[dict] = []
+    if not open_gaps or not script:
+        return results
+    vectors = embed([gap["restated"] for gap in open_gaps])
+    for item in script:
+        scores = vectors @ embed([str(item["question"])])[0]
+        best = int(scores.argmax())
+        gap_row = open_gaps[best]
+        if float(scores[best]) < threshold:
+            results.append({"question": item["question"], "status": "no_gap"})
+            continue
+        flags = gate(gap_row["restated"], str(item["answer"]))
+        if flags:
+            results.append({"question": item["question"], "status": "refused", "flags": list(flags)})
+            continue
+        version = resolve(gap_row["id"], answer=str(item["answer"]), cites=list(item.get("cites") or []), reviewer=SCRIPTED)
+        results.append({"question": item["question"], "status": "published", "gap": gap_row["id"], "version": version})
+    return results
 
 
 def list_gaps() -> list[dict]:
@@ -69,7 +150,8 @@ def resolve(key: str, *, answer: str, cites: list[str], reviewer: str,
         refused = gate(gap["question"], answer)
         if refused:
             raise ValueError(" ".join(refused))
-        entry = {"chunk_id": "FAQ-GAP-" + key.upper(), "source": "faq", "title": gap["question"],
+        title = " | ".join(x for x in (gap.get("restated"), *(gap.get("variants") or [])) if x) or gap["question"]
+        entry = {"chunk_id": "FAQ-GAP-" + key.upper(), "source": "faq", "title": title,
                  "text": answer.strip(), "approved_by": reviewer,
                  "provenance": {"gap_id": key, "cites": cites}}
         options = {"directory": directory} if directory else {}

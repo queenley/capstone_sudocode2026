@@ -312,13 +312,13 @@ def amounts(text: str) -> list[int]:
 
 # ── written money, read back ──────────────────────────────────────────────
 
-_MILLION = re.compile(r"(?<![\w.,])(\d+(?:[.,]\d+)?)\s*(triệu|tr|củ)(?![a-zà-ỹ])(?:\s*(\d{1,3})(?![\d.,]\d))?(\s*rưỡi(?![a-zà-ỹ]))?", re.IGNORECASE)
-_BILLION = re.compile(r"(?<![\w.,])(\d+(?:[.,]\d+)?)\s*(tỷ|tỉ)(?![a-zà-ỹ])", re.IGNORECASE)
+_MILLION = re.compile(r"(?<![\w.,])(\d+(?:[.,]\d+)?)\s*(triệu|trieu|tr|củ)(?![a-zà-ỹ])(?:\s*(\d{1,3})(?![\d.,]\d))?(\s*(?:rưỡi|ruoi)(?![a-zà-ỹ]))?", re.IGNORECASE)
+_BILLION = re.compile(r"(?<![\w.,])(\d+(?:[.,]\d+)?)\s*(tỷ|tỉ|ty)(?![a-zà-ỹ])", re.IGNORECASE)
 #: What makes a grouped number a measure and not money: "công suất 1.400 W", "bình 1.500 ml".
 _UNIT = re.compile(r"\s*(?:k?w|watt|ml|lít|lit|mah|kg|mm|cm|m[23²³]?|btu|vòng|rpm)(?![a-zà-ỹ0-9])", re.IGNORECASE)
-_THOUSAND = re.compile(r"(?<![\w.,])(\d+(?:[.,]\d+)?)\s*(k|nghìn|ngàn)(?![a-zà-ỹ])", re.IGNORECASE)
-_GROUPED = re.compile(r"(?<![\w.,])(\d{1,3}(?:[.,]\d{3})+)(?:\s*(đồng|đ|vnđ|vnd|d)(?![a-zà-ỹ]))?", re.IGNORECASE)
-_PLAIN = re.compile(r"(?<![\w.,])(\d{4,9})\s*(đồng|đ|vnđ|vnd)(?![a-zà-ỹ])", re.IGNORECASE)
+_THOUSAND = re.compile(r"(?<![\w.,])(\d+(?:[.,]\d+)?)\s*(k|nghìn|ngàn|nghin|ngan)(?![a-zà-ỹ])", re.IGNORECASE)
+_GROUPED = re.compile(r"(?<![\w.,])(\d{1,3}(?:[.,]\d{3})+)(?:\s*(đồng|dong|đ|vnđ|vnd|d)(?![a-zà-ỹ]))?", re.IGNORECASE)
+_PLAIN = re.compile(r"(?<![\w.,])(\d{4,9})\s*(đồng|dong|đ|vnđ|vnd)(?![a-zà-ỹ])", re.IGNORECASE)
 
 
 def _decimal(raw: str) -> float:

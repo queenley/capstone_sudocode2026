@@ -14,6 +14,7 @@ import CallConsole from "@/features/call-console";
 import { api, AgentCall } from "@/services/api";
 import { colorName, money } from "@/lib/catalog";
 import "./sales.css";
+import { reasonLabel } from "@/features/handoff-reasons";
 
 type Order = {
   id: string;
@@ -304,7 +305,7 @@ function Overview({
                   <div>
                     <b>{c.customer_label || (c.phone_last4 ? `Khách ···${c.phone_last4}` : "Khách chưa xác định")}</b>
                     <small>
-                      {CHANNEL[c.channel] || c.channel} · {c.handoff_reason || "Cần hỗ trợ"}
+                      {CHANNEL[c.channel] || c.channel} · {c.handoff_reason ? reasonLabel(c.handoff_reason) : "Cần hỗ trợ"}
                     </small>
                   </div>
                   <span className="sl-badge sl-badge-hot">Chờ nhận</span>

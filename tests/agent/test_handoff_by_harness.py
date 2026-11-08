@@ -119,10 +119,11 @@ async def test_with_the_switch_the_system_accepts_and_the_agent_goes_on(monkeypa
     assert update["handoff"]["ticket_id"] == "HT0001"
 
 
-def test_the_advisor_is_told_to_transfer_when_the_documents_have_no_answer():
-    # A fact of the retrieval, not a reading of the words: the search abstained (BTC: transfer is a success).
-    assert "handoff_transfer" in nodes._knowledge_note({"knowledge": {"reason": "no_match", "abstain": True}})
-    assert "ngoai_pham_vi_tai_lieu" in nodes._knowledge_note({"knowledge": {"reason": "absence", "abstain": True}})
+def test_the_advisor_is_told_what_the_search_found_not_ordered_to_transfer():
+    # No match may be a question with no diacritics: the tools come first, and rule 4 (BTC: transfer is a success) after.
+    for reason in ("no_match", "absence"):
+        note = nodes._knowledge_note({"knowledge": {"reason": reason, "abstain": True}})
+        assert "tra tool" in note and "luật 4" in note and "handoff_transfer" not in note
     assert nodes._knowledge_note({"knowledge": {"reason": "restricted", "abstain": True}}) is None
     assert nodes._knowledge_note({"knowledge": {"reason": None, "abstain": False}}) is None
     assert nodes._knowledge_note({}) is None

@@ -192,3 +192,13 @@ SCN-ADV-0046/call_1, SCN-ADV-0060/call_1, SCN-ADV-0065/call_1, SCN-ADV-0107/call
 ### D. 3 cuộc dùng `say_at_most`
 
 SCN-ADV-0031/call_1, SCN-ADV-0060/call_1, SCN-ADV-0126/call_1
+
+## 3. Bổ sung 07/11/2026, kiểm trên trace
+
+| Mức | Lỗi | Bằng chứng | Cần sửa |
+|---|---|---|---|
+| Cao | `ground_truth_facts.price_vnd` chỉ có một giá cho cả cuộc, trong khi `reference_eval.py` không xét claim thuộc sản phẩm nào | `SCN-GEN-0017/call_1`: khách hỏi phòng 20 m², chưa nêu mẫu; agent báo đúng giá AirPure X 4.890.000đ vẫn bị tính sai vì nhãn là 7.690.000đ | Với cuộc khách chưa nêu mẫu: bỏ `price_vnd` khỏi nhãn, hoặc để khách nêu mẫu trong lời thoại |
+| Cao | Nhãn cấm chuyển máy với câu ngoài tài liệu, trái `DIEU-CHINH-DE` §4 và `GIAI-DAP-MENTOR` | `SCN-ADV-0129/call_1` có `must_not_call_tools` chứa `handoff.transfer` | Rà lại các ca ngoài tài liệu |
+| Trung bình | Kịch bản đòi nói "hết hạn bảo hành" nhưng khách không xác minh được và không có ngày mua | `SCN-ADV-0070/call_1`: `zalo_syn-c006` không có trong CRM, tier UNKNOWN | Thêm `zalo_id` vào CRM hoặc để khách nói ngày mua |
+| Trung bình | Kịch bản đòi tra đơn theo mã nhưng khách không đưa số hay mã, và kênh không nhận diện được | `SCN-ADV-0048/call_1` | Thêm thông tin vào lời khách hoặc CRM |
+

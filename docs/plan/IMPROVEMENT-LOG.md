@@ -23,6 +23,28 @@ Loại: ... · Trạng thái: ... · Chỉ số: TSR / CCR / RQR / HR / latency 
 
 Sáu mục đầu được ghi lại sau khi làm, từ đợt sửa ngày 05-06/11/2026. Chưa mục nào có số đo trên agent thật.
 
+### 2026-11-08 · Redesign frontend theo taste-skill
+
+Loại: tính năng · Trạng thái: xong · Chỉ số: bố cục (`check.mjs`), copy-lint, e2e
+
+- **Vấn đề:** cửa hàng và trang nhân viên dùng font Inter và chữ 700/800, nhãn viết hoa giãn chữ, gradient, chữ 8–11px. Trang chủ là một chuỗi khối không theo hệ lưới.
+- **Bằng chứng:** chạy kit của skill `Leonxlnx/taste-skill` (plugin không cài được trong môi trường này, nên clone repo và theo `SKILL.md`). Lần đo bố cục đầu tiên: khung chat lệch 28px, trang cuộn ngang ở 390px, hero ở 390px cao hơn một màn hình. `consistency.mjs` lần đầu: 78 FAIL ở 5 cỡ màn hình.
+- **Sửa:** bốc thăm theo skill, không chọn tay: palette white-navy-tab, hero product, nav-split, footer-columns, close-type, brand-band, nút pill, moment photo-chapters. Font Work Sans, vì ba cặp font bốc được (Besley, Outfit, Red Hat) không có dấu tiếng Việt. Kit chép vào `apps/web/public/assets`; bảng màu và CSS riêng của trang ở `public/assets/site.css`. `theme.css` lấy token mới cho toàn frontend; độ đậm chữ tối đa 500; trang nhân viên bỏ nhãn viết hoa, gradient và chữ dưới 13px. Header, Footer và trang chủ viết lại theo markup của kit. Các trang ứng dụng được bọc `.s-app`, nên luật "mỗi section một màn hình" chỉ áp cho trang chủ. Cửa hàng luôn nền sáng; trang nhân viên vẫn đổi được sáng/tối. Thêm trang credit ảnh `/anh` và thẻ og. `KitMotion` gọi lại `motion.js` và mount moment sau mỗi lần chuyển route.
+- **Đã kiểm:** `check.mjs` ở 1440/1024/820/768/390: không còn lỗi nào ngoài `hero-lines`, đã ghi waiver. copy-lint: 0 FAIL, 0 WARN. Gate round 2: 1 FAIL (`section-gaps` ở 390px), kèm 5 waiver ghi trong `.taste-skill/waivers.json`. Round 3: `GATE: ERROR`, vì `consistency.mjs` chạy quá 9,5 phút trên Edge chạy bằng CPU. e2e trên bản production: xem "Số đo".
+- **Số đo:** e2e trên bản production (`next build` + `next start`, build trước khi có merge): 55 pass, 4 fail, 7 skip. Cả 4 fail nằm trong `e2e/redesign-snapshots.spec.ts`, file đến từ một nhánh khác đang merge dở (bộ lọc theo diện tích phòng, thông số trên card, call console). Đó là tính năng của nhánh kia, bản này chưa có. Trước redesign, trên dev server, 5 test fail do route biên dịch chậm và Fast Refresh; bản production không bị. Test `expired responses...` đã chập chờn từ trước: bản cũ trong docker fail 3/3, bản mới pass 2/3.
+- **Còn lại:** chưa redesign bố cục các trang ứng dụng (danh mục, sản phẩm, giỏ hàng, thanh toán) và trang nhân viên; mới đổi token. 5 waiver: nút chat nổi (skill cấm, nhưng đó là sản phẩm), hotline thật, bảng chính sách và FAQ không ảnh, lưới tile đồng dạng, `hero-lines`. Ảnh trang chủ là stand-in (Wikimedia, Flickr), cần thay bằng ảnh thật của shop. Bài học về công cụ: profile Chrome của kit nằm trong `apps/web` làm Tailwind quét treo dev server; Tailwind sinh `.grid` và `.start-7` trùng tên với class kit; Next dev chặn hydrate khi mở bằng `127.0.0.1`.
+
+### 2026-11-07 · Ảnh cho 13 sản phẩm còn thiếu
+
+Loại: dữ liệu · Trạng thái: xong · Chỉ số: không có (giao diện)
+
+- **Vấn đề:** 13 sản phẩm hiện hình vẽ thay cho ảnh.
+- **Bằng chứng:** `data/seed/catalog/README.md` liệt kê 13 mã không có ảnh phù hợp trên Openverse ngày 2026-10-25.
+- **Sửa:** `scripts/seed/product_images.py --candidates` với từ khóa rộng hơn, xem từng bảng ứng viên, chọn bằng `--use`. Ảnh lưu ở `apps/web/public/products`, credit ở `product_images.json`.
+- **Đã kiểm:** xem bảng tổng hợp 13 ảnh mới; thay ảnh `XM-4P` vì ảnh đầu tiên không thấy máy.
+- **Số đo:** 40/40 sản phẩm có ảnh.
+- **Còn lại:** vài ảnh chỉ gần đúng loại hàng (máy lọc nước nóng lạnh cho RO, bình sữa cho máy hâm và máy tiệt trùng). Cần chạy lại seed để ảnh vào database: `docker compose run --rm seed`.
+
 ### 2026-11-08 · Chỉ đọc lại đơn khi đủ thông tin, và "đồng ý" kèm từ đệm vẫn tạo được đơn
 
 Loại: hard guard, prompt · Trạng thái: đang đo · Chỉ số: TSR

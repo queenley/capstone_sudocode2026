@@ -9,6 +9,8 @@ module each docstring names. Collaborators arrive through
 
 from __future__ import annotations
 
+import json
+
 import asyncio
 import logging
 import re
@@ -21,12 +23,15 @@ from langchain_core.messages import AIMessage, HumanMessage, RemoveMessage
 from langgraph.runtime import Runtime
 
 from ...agents.advisor import RULE_PACKS, AdvisorFailure, AgentContext, Draft, shown_passages, system_prompt, _seen_in
-from ...agents.policy import PolicyInput, needs_review
+from ...agents.policy import PolicyInput
 from ...components.context import compact, focus
 from ...components.context.budget import tokens as count_tokens
 from ...components.guardrails import actions, fallback, purchase
-from ...components.guardrails.hard import (MAX_SENTENCES, ORDER_SUMMARY, GuardInput, check, moved_callback, numbers_in,
+from ...components.guardrails.hard import (MAX_SENTENCES, ORDER_SUMMARY, GuardInput, check, clean, moved_callback,
                                            open_amounts)
+from ...config.config_manager import review_head_start
+from .review import Reviews
+from ...components.context import skills as skill_book
 from ...components.guardrails.stream import SentenceSplitter
 from ...components.identity import resolver
 from ...components.intake import honorific, itn, lexicon, pii, signals, text as intake_text
@@ -44,6 +49,13 @@ from .state import TURN_KEYS, HotContext, HotState
 
 logger = logging.getLogger(__name__)
 
+#: What the PolicyAgent reads of the call's earlier tool results: the last few, short.
+CALL_LOG_SIZE = 12
+CALL_LOG_CHARS = 500
+#: How far back the PolicyAgent reads the customer's words, in messages of the call.
+CUSTOMER_WORDS = 12
+#: How many of the documents' passages the guards remember for the rest of a call.
+PASSAGES_READ = 9
 #: Section 4.5: two regenerations, then the safe line.
 MAX_REGENERATIONS = 2
 
@@ -54,7 +66,7 @@ ASR_LOW_CONFIDENCE = 0.45
 #: and, by imitation of the passages it was shown, document codes ("[DT-03]",
 #: "[SP-AIR-01]"). The customer hears neither; the brief lines are kept as the
 #: ones the reply used (``facts_used`` in the trace).
-_CODE = r"(?:B\d+|[A-Z]{2,4}(?:-[A-Z]{2,4})?-\d{2})"
+_CODE = r"(?:B(?:\d+|n)|[A-Z]{2,4}(?:-[A-Z]{2,4})?-\d{2})"
 _MARK = rf"\[{_CODE}(?:\s*[,;]\s*{_CODE})*\]"
 #: One run of marks, with the commas between them ("[DT-01], [CL-01]").
 MARKS = re.compile(rf"\s*{_MARK}(?:\s*[,;]?\s*{_MARK})*")
@@ -87,9 +99,9 @@ async def perceive(state: HotState, runtime: Runtime[HotContext]) -> dict[str, A
         context.arrived = time.perf_counter()
     update: dict[str, Any] = {**TURN_KEYS, "flags": {"asr_low_conf": False, "new_key": False}}
     raw = (context.text or "").strip()
-    update["pending_purchase"] = purchase.answer(
+    update["pending_purchase"] = purchase.still_open(
         state.get("pending_purchase"), call_id=str(state["call_id"]), channel=state.get("channel") or "web",
-        turn_id=state["turn_id"], said=raw, last_reply=_last_reply(state))
+        turn_id=state["turn_id"])
     if state.get("phase") == "opening" or not raw:
         return update
 
@@ -147,6 +159,7 @@ async def load_context(state: HotState, runtime: Runtime[HotContext]) -> dict[st
             found = await _knowledge({**state, **update}, context, _last_customer_text(state) or "")
         if found is not None:
             update["knowledge"] = found
+            update["passages_read"] = _passages_after(state.get("passages_read") or {}, _passages({"knowledge": found}))
     return update
 
 
@@ -165,16 +178,29 @@ async def _knowledge(state: dict[str, Any], context: HotContext, said: str) -> d
                                                 "order_date": order_date}
 
 
+#: The turn mentions an order: the knowledge search then picks the policy version in force on that order's day.
+#: Not routing (the advisor reads what the turn is about); a hint to retrieval only.
+ORDER_TALK = re.compile(
+    r"\b(don hang|don cua|ma don|od\d+|dang giao|giao chua|giao den dau|den dau roi|khi nao giao|doi size|"
+    r"doi sang|doi mau|doi san pham|tra hang|hoan tien|doi dia chi|sua dia chi|trang thai don|nhan hang|"
+    r"van don|chat qua|rong qua|bi loi)\b")
+
+
 def _order_days(state: dict[str, Any], said: str) -> tuple[str | None, tuple[str, ...]]:
     """The day of the order a question is about, and when it names none, this customer's other order days."""
     orders = [o for o in (state.get("brief") or {}).get("orders") or [] if o.get("order_id")]
     named = next((o for o in orders if o["order_id"] in said), None)
+    if named is None:
+        # The order named by its product ("cái máy lọc hôm trước"), as origin/main reads it.
+        words = intake_text.plain(said)
+        named = next((o for o in orders if any(str(o.get(key) or "") and intake_text.plain(str(o[key])) in words
+                                               for key in ("product_name", "name", "sku", "variant_sku"))), None)
     if named is not None:
         return _order_day(named) or None, ()
     stated = stated_order_day(said, state.get("on"))
     if stated:
         return stated, ()
-    if not orders or not (signals.ORDER_TALK.search(intake_text.plain(said)) or "OD" in said):
+    if not orders or not (ORDER_TALK.search(intake_text.plain(said)) or "OD" in said):
         return None, ()
     days = sorted({_order_day(order) for order in orders} - {""})
     return (days[-1], tuple(days[:-1])) if days else (None, ())
@@ -288,8 +314,8 @@ async def _settle(state: HotState, context: HotContext, answer: str) -> dict[str
 async def _confirms(state: HotState, context: HotContext, answer: str) -> bool:
     """Whether the answer to the confirming question confirms who the caller is (section 4.2).
 
-    Read by Jev with the question asked; the word list (``resolver.confirms``)
-    only when Jev gives no answer in time. A wrong "yes" would open someone
+    Read by the PolicyAgent with the question asked; the word list (``resolver.confirms``)
+    only when it gives no answer in time. A wrong "yes" would open someone
     else's data, so its threshold is the higher one (``INTENT_THRESHOLDS``).
     """
     if context.policy is not None:
@@ -424,7 +450,6 @@ async def route(state: HotState) -> dict[str, Any]:
         asr_low_conf=bool(flags.get("asr_low_conf")),
         tool_failures=int(state.get("tool_failures") or 0),
         model_failures=int(state.get("model_failures") or 0),
-        must_transfer=bool(flags.get("must_transfer")),
         impatient=bool(flags.get("impatient")),
         sessions_without_close=int((state.get("brief") or {}).get("sessions_without_close") or 0),
         awaiting_identity=bool(state.get("awaiting")),
@@ -584,6 +609,7 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
     return AgentContext(
         call_id=str(state["call_id"]),
         pending_purchase=state.get("pending_purchase"),
+        skills=list(state.get("loaded_skills") or []),
         customer_id=state.get("customer_id") if tier == "VERIFIED" else None,
         account_id=context.account_id,
         address_as=_address_as(state),
@@ -626,6 +652,8 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
         notes=tuple(state.get("route_notes") or ()),
         trusted_skus=trusted | frozenset(p["sku"] for p in state.get("seen_products") or []),
         seen_products=tuple(state.get("seen_products") or ()),
+        earlier_results=reusable_results(state.get("call_log") or []),
+        basket_lines=_basket_lines(state.get("basket") or {}, state.get("quotes") or {}),
         created_orders=tuple(state.get("created_orders") or ()),
         updated_orders=tuple(state.get("updated_orders") or ()),
         self_called=None if tier == "VERIFIED" else state.get("honorific_said"),
@@ -650,6 +678,57 @@ def _last_reply(state: HotState) -> str | None:
 
 #: The products kept for later turns: enough for a conversation, small in the prompt.
 SEEN_PRODUCTS = 15
+
+
+def _passages_after(read: Mapping[str, str], shown: Sequence[Mapping[str, Any]]) -> dict[str, str]:
+    """*read* with the organisers' passages the advisor was just shown, the latest last, at most PASSAGES_READ."""
+    now = dict(read)
+    policy, _ = shown_passages(shown)
+    for passage in policy:
+        if passage.get("text") and not passage.get("restricted") and not passage.get("superseded") and passage.get("chunk_id"):
+            now.pop(str(passage["chunk_id"]), None)
+            now[str(passage["chunk_id"])] = str(passage["text"])
+    return dict(list(now.items())[-PASSAGES_READ:])
+
+
+def _result_key(result: Mapping[str, Any]) -> str | None:
+    """What a tool result is about: a later result about the same thing replaces it."""
+    data = (result.get("result") or {}).get("data") or {}
+    items = data.get("items") or [{}]
+    return data.get("sku") or data.get("order_id") or items[0].get("sku")
+
+
+def reusable_results(log: Sequence[Mapping[str, Any]]) -> tuple[Mapping[str, Any], ...]:
+    """The latest result per tool and subject, in the order they came: what the advisor need not ask again."""
+    latest = {(entry.get("tool"), entry.get("key")): entry for entry in log}
+    return tuple(entry for entry in log if latest.get((entry.get("tool"), entry.get("key"))) is entry)
+
+
+def _basket_after(basket: Mapping[str, Mapping[str, Any]], results: Sequence[Mapping[str, Any]]) -> dict[str, dict[str, Any]]:
+    """The basket after *results*: a quote that names other products sets it, an order placed empties it."""
+    current = {sku: dict(line) for sku, line in basket.items()}
+    for result in results:
+        envelope = result.get("result") or {}
+        if not envelope.get("ok"):
+            continue
+        asked = result.get("args") or {}
+        if result.get("name") == "order.create":
+            current = {}
+        elif result.get("name") == "pricing.get_quote" and (envelope.get("data") or {}).get("sku"):
+            sku = envelope["data"]["sku"]
+            others = [s for s in asked.get("basket_skus") or [] if s != sku]
+            if others:
+                current = {s: current.get(s, {"qty": 1}) for s in [*others, sku]}
+            if sku in current:
+                current[sku] = {"qty": int(asked.get("qty") or 1)}
+    return current
+
+
+def _basket_lines(basket: Mapping[str, Mapping[str, Any]], quotes: Mapping[str, int]) -> tuple[tuple[str, int, int], ...]:
+    """``(sku, unit price, qty)`` per product when two or more are in the basket and all are quoted, else nothing."""
+    if len(basket) < 2 or any(sku not in quotes for sku in basket):
+        return ()
+    return tuple((sku, int(quotes[sku]), int(line.get("qty") or 1)) for sku, line in basket.items())
 
 
 def _products_in(results: Sequence[Mapping[str, Any]], seen: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
@@ -716,7 +795,8 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
             if result["name"] == "pricing.get_quote" and data.get("sku"):
                 quotes[data["sku"]] = int(data["final_price_vnd"])
             if result["name"] == "order.create" and data.get("order_id"):
-                created.append({"order_id": data["order_id"], "sku": (result.get("args") or {}).get("sku")})
+                created.append({"order_id": data["order_id"], "sku": (result.get("args") or {}).get("sku"),
+                                "no_address": not (result.get("args") or {}).get("address")})
                 pending_purchase = None
             if result["name"] == "order.update":
                 asked = result.get("args") or {}
@@ -725,15 +805,15 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
                 if order.get("order_id") and order["order_id"] not in orders:
                     orders.append(order["order_id"])
         elif result.get("blocked_by") == "guardrail" and (envelope.get("error") or {}).get("code") == "CONFIRMATION_REQUIRED":
-            pending_purchase = ((envelope["error"].get("details") or {}).get("purchase_draft"))
+            pending_purchase = (envelope["error"].get("details") or {}).get("purchase_draft") or pending_purchase
         elif (envelope.get("error") or {}).get("code") in INFRASTRUCTURE_CODES:
             failures += 1
-    numbers = set(state.get("call_numbers") or ())
-    for result in new_results:
-        if str(result.get("name", "")).replace("_", ".", 1) in PRICED_TOOLS:
-            numbers |= numbers_in(result.get("result"))
+    log = [{"tool": r.get("name"), "key": _result_key(r),
+            "result": json.dumps((r.get("result") or {}).get("data"), ensure_ascii=False, default=str)[:CALL_LOG_CHARS]}
+           for r in new_results if (r.get("result") or {}).get("ok")]
     return {"tool_results": list(state.get("tool_results") or []) + new_results, "quotes": quotes,
-            "call_numbers": sorted(numbers),
+            "call_log": [*(state.get("call_log") or []), *log][-CALL_LOG_SIZE:],
+            "basket": _basket_after(state.get("basket") or {}, new_results),
             "known_orders": orders, "created_orders": created, "updated_orders": updated, "tool_failures": failures,
             "deletion_recorded": deletion_recorded, "callback_booked": callback_booked,
             "pending_purchase": pending_purchase,
@@ -755,8 +835,12 @@ class _Attempt:
     reasons: list[str] = field(default_factory=list)
     blocked: str = ""
     draft: Any = None
-    #: The PolicyAgent's verdict on each sentence it reviewed, for the trace.
-    soft: list[Any] = field(default_factory=list)
+    #: The reviews running beside this turn's stream.
+    reviews: Reviews = field(default_factory=lambda: Reviews(None))
+    #: The sentence stopped had already been said: the next run corrects it.
+    correction: bool = False
+    #: When the first token of the sentence being put together was generated, in ms of the turn.
+    token_at: int | None = None
 
 
 def _soft_summary(reviews: Sequence[Any]) -> dict[str, Any] | None:
@@ -768,7 +852,7 @@ def _soft_summary(reviews: Sequence[Any]) -> dict[str, Any] | None:
     return {
         "passed": all(review.passed for review in reviews),
         "reasons": sorted({reason for review in reviews for reason in review.reasons}),
-        "decided_by": "jev" if "jev" in decided else decided[-1],
+        "decided_by": "decisions" if "decisions" in decided else decided[-1],
         "probabilities": {name: max(review.probabilities.get(name, 0.0) for review in reviews) for name in sorted(questions)},
         "seconds": round(sum(review.seconds for review in reviews), 3),
         "sentences": len(reviews),
@@ -797,19 +881,28 @@ async def _streamed(state: HotState, context: HotContext, messages: list[Any], a
     view = agent_context
     #: Sentences said by runs whose next sentence was blocked: the next run goes on after them.
     carried: list[str] = []
-    #: Every PolicyAgent verdict of the turn, abandoned runs' included: why a run was regenerated.
-    soft_reviews: list[Any] = []
+    reviews = Reviews(_reviewer(state, context), head_start=review_head_start())
+    view = replace(view, review_flags=reviews.flags)
+    corrected = False
     try:
         while True:
             # A retry is checked against every tool result of the turn, the abandoned runs' included.
-            attempt = _Attempt(said=list(carried), last_spoken=bool(carried))
+            attempt = _Attempt(said=list(carried), last_spoken=bool(carried), reviews=reviews)
             await _stream_once(state, context, messages, view, earlier + tuple(produced), timing, attempt)
             produced += [r for r in attempt.results if r not in produced]
-            soft_reviews += attempt.soft
+            if not attempt.reasons:
+                # The answer is out: what the reviews still running say comes before the turn ends.
+                await reviews.recheck(earlier + tuple(produced))
+                _flagged(attempt)
             if not attempt.reasons:
                 break
             reasons = attempt.reasons
             blocked_drafts.append({"text": attempt.blocked, "reasons": attempt.reasons})
+            if attempt.correction:
+                if corrected:
+                    attempt.reasons = []  # one correction a turn: a second is logged, not said
+                    break
+                corrected = True
             if regenerations >= MAX_REGENERATIONS:
                 break
             regenerations += 1
@@ -832,16 +925,22 @@ async def _streamed(state: HotState, context: HotContext, messages: list[Any], a
         failed = await _model_failed(state, context, agent_context, produced, error,
                                      summary=state.get("working_summary"))
         return {**failed, "latency": timing}
+    finally:
+        reviews.close()
 
     update = _absorb(state, produced)
+    update["loaded_skills"] = skill_book.after_turn(agent_context.skills, produced)
     draft = attempt.draft
     stats = {"model": getattr(draft, "model", None), "model_calls": getattr(draft, "model_calls", None),
              "seconds": round(getattr(draft, "seconds", 0.0), 3), "streamed": True}
     verdict: dict[str, Any] = {"passed": not attempt.reasons, "streamed": True, "sentences": len(attempt.said),
                                "hard": {"passed": not reasons, "reasons": reasons}}
-    soft = _soft_summary(soft_reviews)
+    soft = _soft_summary(reviews.verdicts)
     if soft is not None:
         verdict["soft"] = soft
+    if reviews.flagged:
+        verdict["flagged_after_said"] = reviews.flagged
+        logger.warning("Call %s: %d said sentence(s) flagged by the PolicyAgent", state.get("call_id"), len(reviews.flagged))
     text = " ".join(attempt.said)
     if attempt.reasons:
         line = _safe_line(state, produced)
@@ -882,6 +981,8 @@ async def _stream_once(
     waited = _waited(stream)
     try:
         async for event in waited:
+            if _flagged(attempt):
+                return attempt
             if event.kind == "tool_started":
                 if timing["filler_ms"] is None and not attempt.said and context.emit is not None:
                     await context.emit("filler", fallback.LINES["filler"].format(who=_who(state)))
@@ -897,6 +998,11 @@ async def _stream_once(
                     recorded = event.draft or Draft(text="", tool_results=[], model=None, model_calls=0, seconds=0)
                     attempt.draft = replace(recorded, text=question, tool_results=attempt.results)
                     return attempt
+                line = view.consent.pop("read_back", None)
+                if line and any(r.get("name") == "order.create" and (r.get("result") or {}).get("ok") for r in attempt.results):
+                    # The customer agreed in this turn and has not heard the order: PB-09, read back once.
+                    await _say(context, line, timing)
+                    attempt.said.append(line)
                 new_message = True
             elif event.kind == "done":
                 attempt.draft = event.draft
@@ -910,9 +1016,16 @@ async def _stream_once(
                 streamed_text = True
                 text = (" " + event.text) if new_message else event.text
                 new_message = False
+                at = _since(context)
+                timing["last_token_ms"] = at
+                if attempt.token_at is None:
+                    attempt.token_at = at
                 for sentence in splitter.feed(text):
                     if not await _offer(state, context, sentence, earlier + tuple(attempt.results), attempt, timing):
                         return attempt
+                    attempt.token_at = at  # what follows this sentence in the same chunk began here
+                if not splitter.holding:
+                    attempt.token_at = None
         rest = splitter.flush()
         if rest:
             await _offer(state, context, rest, earlier + tuple(attempt.results), attempt, timing)
@@ -932,6 +1045,51 @@ async def _waited(stream: Any) -> Any:
             except StopAsyncIteration:
                 return
         yield event
+
+
+def _flagged(attempt: _Attempt) -> bool:
+    """A review flagged what was said: stop the stream, and the next run corrects it (section 4.8)."""
+    flag = attempt.reviews.take()
+    if flag is None:
+        return False
+    text, reasons = flag
+    attempt.correction = True
+    attempt.blocked = text
+    attempt.reasons = [f"Câu em vừa nói có lỗi: «{text}». {' '.join(reasons)} Khách nghe sai thì đính chính ngắn một câu; chỉ thiếu tool thì gọi tool, không nói lại câu đó. Không chuyển máy chỉ để sửa lỗi này, không thêm thông tin chưa có nguồn."]
+    return True
+
+
+def _established(state: HotState) -> dict[str, Any]:
+    """What this call and the customer's record already show: an earlier turn's stock or order is not unsupported."""
+    return {"quotes": dict(state.get("quotes") or {}), "orders_created": list(state.get("created_orders") or []),
+            "orders_known": list(state.get("known_orders") or []),
+            "orders_of_this_customer": list((state.get("brief") or {}).get("orders") or []),
+            "earlier_tool_results": list(state.get("call_log") or []),
+            "prices_quoted_before": [p.get("price_quoted_vnd") for p in (state.get("brief") or {}).get("products_advised") or []
+                                     if p.get("price_quoted_vnd")]}
+
+
+def _reviewer(state: HotState, context: HotContext) -> Any:
+    """How this turn's sentences reach the PolicyAgent, with what it needs to read them fairly."""
+    if context.policy is None:
+        return None
+    tier = state.get("tier") or "UNKNOWN"
+    policy, playbook = shown_passages(_passages(state))
+    snippets = tuple(dict.fromkeys((*(state.get("passages_read") or {}).values(),
+                                    *(str(p["text"]) for p in (*policy, *playbook) if p.get("text") and not p.get("restricted")))))
+    earlier = _established(state)
+    said = tuple(str(m.content) for m in (state.get("messages") or [])[-CUSTOMER_WORDS:] if isinstance(m, HumanMessage))
+    logger.info("Passages shown for call %s turn %s: %s", state.get("call_id"), state.get("turn_id"),
+                [p.get("chunk_id") for p in (*policy, *playbook)])
+
+    async def review(text: str, results: tuple[dict[str, Any], ...]) -> Any:
+        # Runs beside the stream (Reviews): its wall time is the stopwatch's "policy", counted once however many overlap.
+        with stopwatch.span("policy"):
+            view = guard_input(state, context, text, results)
+            return await context.policy.review(PolicyInput(text=text, tool_results=results, tier=tier,
+                                                           policy_snippets=snippets, earlier=earlier, customer_said=said,
+                                                           open_amounts=open_amounts(view)))
+    return review
 
 
 def _confirmation_draft(results: Sequence[Mapping[str, Any]]) -> dict[str, Any] | None:
@@ -973,28 +1131,38 @@ async def _offer(state: HotState, context: HotContext, sentence: str, results: t
         attempt.last_spoken = False
         return True  # past the length the rules allow: not said, the stream goes on to its end
     with stopwatch.span("guard"):
-        view = guard_input(state, context, spoken, results)
-        reasons = list(check(view).reasons)
-    if not reasons and context.policy is not None and needs_review(spoken):
-        with stopwatch.span("policy"):
-            soft = await context.policy.review(PolicyInput(text=spoken, tool_results=results, tier=view.tier,
-                                                           policy_snippets=view.policy_texts,
-                                                           open_amounts=open_amounts(view)))
-        attempt.soft.append(soft)
-        reasons += list(soft.reasons)
+        reasons = list(check(guard_input(state, context, spoken, results)).reasons)
     if reasons:
         attempt.reasons, attempt.blocked = reasons, " ".join([*attempt.said, sentence])
         return False
-    await _say(context, spoken, timing)
+    spoken = clean(spoken)
+    attempt.reviews.add(spoken, results)
+    await attempt.reviews.head()
+    if _flagged(attempt):
+        # This sentence stays unsaid. If the flag is on it alone, nothing needs correcting either.
+        if attempt.blocked == spoken:
+            attempt.correction = False
+            attempt.reasons = [reason.split("». ", 1)[-1] for reason in attempt.reasons]
+        return False
+    await _say(context, spoken, timing, token_at=attempt.token_at)
     attempt.said.append(sentence)
     attempt.last_spoken = True
     return True
 
 
-async def _say(context: HotContext, text: str, timing: dict[str, int | None]) -> None:
-    """Hand a checked sentence to the channel; the first one is the turn's first token (section 4.8)."""
+async def _say(context: HotContext, text: str, timing: dict[str, int | None], *, token_at: int | None = None) -> None:
+    """Hand a checked sentence to the channel.
+
+    ``eval/huong-dan-do-latency.md``: TTFT ends at the first token generated and Total at the last. A sentence that
+    was blocked was never said, so its tokens do not count. ``said_first_ms`` is when the customer can see it, after
+    the sentence is whole and checked. A line of the harness has no tokens: it counts when it is said.
+    """
+    now = _since(context)
     if timing["first_token_ms"] is None:
-        timing["first_token_ms"] = _since(context)
+        timing["first_token_ms"] = token_at if token_at is not None else now
+        timing["said_first_ms"] = now
+    if token_at is None:
+        timing["last_token_ms"] = now
     if context.emit is not None:
         await context.emit("sentence", text)
 
@@ -1015,7 +1183,7 @@ def _who(state: HotState) -> str:
 
 
 async def guard(state: HotState, runtime: Runtime[HotContext]) -> dict[str, Any]:
-    """Section 4.5: the hard check, then ``PolicyAgent`` on Jev.
+    """Section 4.5: the hard check, then ``PolicyAgent``.
 
     Blocked with regenerations left: back to the advisor with the reasons.
     Blocked with none left: the lane's safe line, counted (two in a call send
@@ -1039,11 +1207,13 @@ async def guard(state: HotState, runtime: Runtime[HotContext]) -> dict[str, Any]
         hard = hard._replace(passed=False, reasons=(*hard.reasons, f"Lịch gọi lại đã dời sang {moved} (LN-02); phải báo khách giờ mới."))
     verdict: dict[str, Any] = {"hard": {"passed": hard.passed, "reasons": list(hard.reasons)}}
     reasons = list(hard.reasons)
-    if hard.passed and context.policy is not None and needs_review(text):
+    if hard.passed and context.policy is not None:
         with stopwatch.span("policy"):
-            soft = await context.policy.review(PolicyInput(text=text, tool_results=results, tier=tier,
-                                                           policy_snippets=view.policy_texts,
-                                                           open_amounts=open_amounts(view)))
+            soft = await context.policy.review(PolicyInput(
+                text=text, tool_results=results, tier=tier, policy_snippets=view.policy_texts,
+                earlier=_established(state),
+                customer_said=_last_customer_text(state),
+                open_amounts=open_amounts(view)))
         verdict["soft"] = {"passed": soft.passed, "reasons": list(soft.reasons), "decided_by": soft.decided_by,
                            "probabilities": soft.probabilities, "seconds": soft.seconds}
         reasons += list(soft.reasons)
@@ -1078,19 +1248,44 @@ def guard_input(state: HotState, context: HotContext, text: str, results: tuple[
         tool_results=results,
         tier=tier,
         customer_said=tuple(str(m.content) for m in state.get("messages") or [] if isinstance(m, HumanMessage)),
-        policy_texts=passages,
-        priced_texts=tuple(str(p["text"]) for p in shown if (p.get("source") or "policy") == "policy"),
+        policy_texts=(*(state.get("passages_read") or {}).values(), *passages),
+        priced_texts=(*(state.get("passages_read") or {}).values(),
+                      *(str(p["text"]) for p in shown if (p.get("source") or "policy") == "policy")),
         brief_prices=tuple(int(p["price_quoted_vnd"]) for p in brief.get("products_advised") or [] if p.get("price_quoted_vnd")),
         tokens=frozenset(context.vault.entries),
-        quotes=dict(state.get("quotes") or {}),
-        call_numbers=tuple(state.get("call_numbers") or ()),
+        quotes={**(state.get("quotes") or {}), **_quoted_in(results)},
+        earlier_numbers=_earlier_numbers(state.get("call_log") or []),
+        earlier_counts=frozenset(int(n) for entry in state.get("call_log") or [] for n in re.findall(r"\d+", str(entry.get("result") or ""))),
+        basket_total=_basket_total(state, results),
         warnings=tuple(state.get("freshness") or []) if tier == "VERIFIED" else (),
         promotions=promotions(),
         on=state.get("on"),
-        created_orders=tuple(str(o["order_id"]) for o in state.get("created_orders") or [] if o.get("order_id")),
-        deletion_recorded=bool(state.get("deletion_recorded")),
-        callback_booked=bool(state.get("callback_booked")),
     )
+
+
+#: The earlier results whose numbers the customer may hear again: what the shop stated, not a search's list prices.
+STATED_TOOLS = frozenset({"pricing.get_quote", "delivery.estimate", "order.status", "order.create", "order.update"})
+
+
+def _earlier_numbers(log: Sequence[Mapping[str, Any]]) -> frozenset[int]:
+    return frozenset(int(n) for entry in log if entry.get("tool") in STATED_TOOLS
+                     for n in re.findall(r"\d+", str(entry.get("result") or "")))
+
+
+def _basket_total(state: HotState, results: Sequence[Mapping[str, Any]]) -> int | None:
+    quotes = {**(state.get("quotes") or {}), **_quoted_in(results)}
+    lines = _basket_lines(_basket_after(state.get("basket") or {}, results), quotes)
+    return sum(price * qty for _, price, qty in lines) or None
+
+
+def _quoted_in(results: Sequence[Mapping[str, Any]]) -> dict[str, int]:
+    """This turn's quotes, not yet in the state: a basket's total may add them."""
+    found = {}
+    for result in results:
+        data = (result.get("result") or {}).get("data") or {}
+        if result.get("name") == "pricing.get_quote" and data.get("sku") and data.get("final_price_vnd") is not None:
+            found[str(data["sku"])] = int(data["final_price_vnd"])
+    return found
 
 
 @lru_cache(maxsize=1)
@@ -1226,9 +1421,9 @@ def _passages(state: HotState) -> tuple[dict[str, Any], ...]:
 #: (DIEU-CHINH-DE 4: a transfer is a success for an out-of-scope question). Said next to the
 #: passages, where the model reads them, because a passage that says "phải nói không có thông tin"
 #: otherwise outweighs rule 4 (FIX-07, 2026-11-01).
-NO_ANSWER = ("Tài liệu không trả lời câu khách vừa hỏi. Nếu tool cũng không trả lời được: nói \"Dạ hiện em chưa có "
-             "thông tin về …\" rồi gọi handoff_transfer (escalation_reason ngoai_pham_vi_tai_lieu) ngay trong lượt "
-             "này để nhân viên trả lời khách.")
+NO_ANSWER = ("Tìm trong tài liệu không thấy đoạn khớp câu khách vừa hỏi; điều này chưa có nghĩa là shop không có. Câu về "
+             "sản phẩm, giá, đơn thì xem mục \"Đã tra trong cuộc này\" rồi tra tool phù hợp. Cả hai đều không trả lời được "
+             "thì làm theo luật 4.")
 
 
 #: When the customer's orders fall under different versions of a policy and the question names none.

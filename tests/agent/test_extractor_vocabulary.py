@@ -78,12 +78,15 @@ def test_the_prompt_examples_are_valid_items_kept_whole():
         data, items = json.loads(raw_input), json.loads(raw_output)["items"]
         for i in items:
             assert set(i) == set(scorers.Item.model_fields)
-            assert scorers.field_text(data, i["source_field"])[i["start"]:i["end"]] == i["quote"]
+            assert i["quote"] in scorers.field_text(data, i["source_field"])
             assert (i["kind"] == "question") == (i["question_type"] is not None)
             if i["kind"] == "fact_usage":
                 assert i["purpose"] and "previous_sessions" in data
         labels = scorers.label_items(items, data)
-        assert (labels["items"], labels["dropped"], labels["changed"]) == (items, 0, 0)
+        located = [{k: v for k, v in i.items() if k not in ("start", "end")} for i in labels["items"]]
+        assert (located, labels["dropped"], labels["changed"]) == (items, 0, 0)
+        for i in labels["items"]:
+            assert scorers.field_text(data, i["source_field"])[i["start"]:i["end"]] == i["quote"]
 
 
 def test_the_prompt_never_contains_the_marker_that_splits_the_turn():

@@ -1090,3 +1090,41 @@ footer.call-controls button.hangup { background: var(--danger); color: var(--on-
 .faq-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .faq-approve { display: flex; align-items: center; gap: 8px; }
 .faq-approve input { width: auto; flex: none; }
+
+/* Ported from origin/main's redesign (merge of 2026-11-08): the rules its new components need — card
+   specs, the chat's add-to-cart and handoff notes, the handoff reason badge and brief, the tools a turn
+   used, the Icon component. Colours and type are this design's tokens. */
+.badge-warn {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--warn-line);
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+  font-weight: 500;
+}
+.message .turn-tools {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  color: inherit;
+  opacity: 1;
+}
+.handoff-brief {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--warn-line);
+  border-radius: var(--radius-sm);
+  background: var(--warn-soft);
+}
+.handoff-brief h3 {
+  margin-top: 0;
+}
+.handoff-brief dd ul {
+  margin: 0;
+  padding-left: 18px;
+}
+.handoff-brief details {
+  margin-top: 8px;
+  font-size: 13px;
+}

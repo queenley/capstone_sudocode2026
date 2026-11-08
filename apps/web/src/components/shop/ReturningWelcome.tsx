@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { account as accountStore } from "@/lib/account";
 import { customerToken } from "@/lib/session";
 import { api, ReturningCustomerWelcome } from "@/services/api";
+import Icon from "@/components/ui/Icon";
 
 /** No personal data is persisted. A dismissed welcome stays dismissed for this tab/account. */
 export default function ReturningWelcome({ customerId, chatOpen, onContinue, onDismiss }: {
@@ -111,8 +112,8 @@ export default function ReturningWelcome({ customerId, chatOpen, onContinue, onD
     <aside ref={panel} className="s-returning" aria-labelledby="returning-title" aria-busy={loading}
       onKeyDown={(event) => { if (event.key === "Escape") { event.preventDefault(); dismiss(true); } }}>
       <header className="s-returning-head">
-        <span className="s-returning-kicker">QUIVO · TIẾP NỐI TƯ VẤN</span>
-        <button className="s-icon-btn s-returning-close" aria-label="Đóng lời chào" onClick={() => dismiss(true)}>✕</button>
+        <span className="s-returning-kicker">Quivo · Tiếp nối tư vấn</span>
+        <button className="s-icon-btn s-returning-close" aria-label="Đóng lời chào" onClick={() => dismiss(true)}><Icon name="close" /></button>
       </header>
       <div className="s-returning-content">
         <h2 id="returning-title">{welcome ? <>Chào mừng {welcome.name || "bạn"} quay lại!</> : "Trợ lý luôn sẵn sàng"}</h2>

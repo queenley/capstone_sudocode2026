@@ -2279,3 +2279,87 @@
   .s-wrap { padding-left: 16px; padding-right: 16px; }
   .s-search input { min-width: 0; }
 }
+
+/* Ported from origin/main's redesign (merge of 2026-11-08): the rules its new components need — card
+   specs, the chat's add-to-cart and handoff notes, the handoff reason badge and brief, the tools a turn
+   used, the Icon component. Colours and type are this design's tokens. */
+.s-msg-product-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+.s-msg-product .s-msg-product-add {
+  min-height: 44px;
+  padding: 6px 8px;
+  font-size: 13px;
+}
+.icon {
+  flex: 0 0 auto;
+  vertical-align: -0.15em;
+}
+.s-card-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  color: var(--muted);
+}
+.s-card-specs li + li::before {
+  content: "·";
+  margin-right: 8px;
+}
+.s-price-note {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.s-support {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 16px 0 0;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.s-support .icon {
+  margin-top: 3px;
+  color: var(--muted);
+}
+.s-support a {
+  color: var(--brand-ink);
+  font-weight: 500;
+}
+.s-credits {
+  margin-top: 48px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.s-credits summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.s-credits .s-photo-credit {
+  margin: 0;
+}
+.s-chat-handoff {
+  margin: 8px 0;
+  padding: 10px 12px;
+  border: 1px solid var(--warn-line);
+  border-radius: var(--radius-sm);
+  background: var(--warn-soft);
+  color: var(--warn-ink);
+  font-size: 14px;
+}
+.s-msg-product-done {
+  margin: 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}

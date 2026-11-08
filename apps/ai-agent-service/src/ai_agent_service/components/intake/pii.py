@@ -2,7 +2,7 @@
 
 ``docs/design.md`` sections 4.1 and 4.5. A phone number becomes
 ``<PHONE_1>``, an ID card number ``<CCCD_1>``, a bank account ``<BANK_1>``,
-and the value goes into the call's :class:`Vault`. The model, Jev, Langfuse
+and the value goes into the call's :class:`Vault`. The models, Langfuse
 and the checkpoint only ever see the token. :func:`detokenize` runs after
 every guard has passed, and restores only this call's own tokens: a phone
 number the customer gave may be read back to them; an ID card or account

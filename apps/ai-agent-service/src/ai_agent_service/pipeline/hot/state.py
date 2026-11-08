@@ -131,6 +131,14 @@ class HotState(TurnInput, total=False):
     #: corrects with ``order.update`` instead of booking the product again.
     created_orders: list[dict[str, Any]]
     pending_purchase: dict[str, Any] | None
+    #: The skills loaded for the task on: names only, the text is the repository's.
+    loaded_skills: list[str]
+    #: The call's earlier tool results, short: the advisor reads them again and the PolicyAgent checks against them.
+    call_log: list[dict[str, Any]]
+    #: The documents' passages read earlier in this call, by chunk id: what was said from them stays sourced.
+    passages_read: dict[str, str]
+    #: The basket the customer is choosing, sku -> ``{qty}``, from the quotes that named one (``basket_skus``).
+    basket: dict[str, dict[str, Any]]
     deletion_recorded: bool
     #: ``schedule.callback`` ran in this call: a later turn may speak of the call back as booked.
     callback_booked: bool

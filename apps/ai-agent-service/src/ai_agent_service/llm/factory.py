@@ -25,6 +25,7 @@ import os
 from threading import Lock
 from typing import Any
 
+import httpx
 from langchain.chat_models import init_chat_model
 from langchain_core.language_models import BaseChatModel
 
@@ -47,7 +48,8 @@ SUPPORTED_PROVIDERS = {
 # block is sent as nothing at all, which is how a provider that rejects one
 # outright is expressed — ChatNVIDIA forwards unrecognised keyword arguments
 # into the request body, so `max_retries: null` is the only way to call it.
-GENERATION_PARAMS = ("temperature", "max_tokens", "timeout", "max_retries")
+GENERATION_PARAMS = ("temperature", "max_tokens", "timeout", "max_retries", "reasoning_effort", "use_responses_api",
+                     "service_tier")
 
 # One limiter per model of a provider, shared by every agent that calls it.
 #
@@ -79,6 +81,9 @@ def limiter_stats() -> dict[str, dict[str, Any]]:
 def cache_options(provider: str, agent_name: str) -> dict[str, Any]:
     """OpenAI sends requests with one key to one cache: one key per agent, as each has its own prompt."""
     return {"model_kwargs": {"prompt_cache_key": agent_name}} if provider == "openai" and agent_name else {}
+def takes_reasoning(provider: str, model: str) -> bool:
+    """Whether a model takes a reasoning effort, in which case it refuses a temperature."""
+    return provider == "openai" and model.startswith(("gpt-5", "gpt-6"))
 
 
 class LLMFactory:
@@ -129,6 +134,11 @@ class LLMFactory:
 
             callbacks.append(BudgetCallback(config, agent_name))
 
+        if provider == "openai":
+            # A call's turns are further apart than the client's default 5 s of keep-alive.
+            kwargs["http_async_client"] = httpx.AsyncClient(
+                limits=httpx.Limits(keepalive_expiry=120), timeout=config.get("timeout") or 60)
+
         if rate_limited:
             limiter = limiter_for(provider, config.get("rate_limits") or {}, model)
             kwargs["rate_limiter"] = limiter
@@ -149,6 +159,16 @@ class LLMFactory:
             value = config.get(name)
             if value is not None:
                 kwargs[name] = value
+        if provider == "openai":
+            # A client of our own turns this off by default, and without it a streamed call reports no tokens.
+            kwargs["stream_usage"] = True
+        else:
+            kwargs.pop("service_tier", None)
+        if not takes_reasoning(provider, str(model)):
+            # An agent's settings follow it when the Admin page or a run moves it to another model.
+            kwargs.pop("reasoning_effort", None)
+            kwargs.pop("use_responses_api", None)
+            kwargs.setdefault("temperature", 0.0)
 
         try:
             return init_chat_model(model, model_provider=provider, **kwargs)

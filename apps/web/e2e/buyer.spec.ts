@@ -13,7 +13,7 @@ test("shopper buys a product and asks the assistant", async ({ page }) => {
 
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: /Mua đúng thứ nhà bạn cần/ }),
+    page.getByRole("heading", { name: /Gia dụng, giày và đồ mẹ bé/ }),
   ).toBeVisible();
   await expect(page.locator(".s-card").first()).toBeVisible();
 

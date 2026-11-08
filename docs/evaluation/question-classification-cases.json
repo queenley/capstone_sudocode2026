@@ -4427,8 +4427,14 @@
         "tool_texts": [],
         "consultant_texts": []
       },
-      "expected_questions": [],
-      "reason": "Quote lặp nhiều nơi và offset không chỉ đúng lần nào thì thiếu bằng chứng để chọn một span.",
+      "expected_questions": [
+        {
+          "slot": "size",
+          "type": "confirm",
+          "text": "Size L phải không ạ?"
+        }
+      ],
+      "reason": "Quote lặp nhiều nơi: code nhận lần xuất hiện theo thứ tự, model không còn viết offset (product-extractor-v9).",
       "sources": [
         "TEAM-BOUNDARY",
         "BTC-TRACE"
@@ -4445,8 +4451,6 @@
           "speaker": "agent",
           "source_field": "agent_text",
           "quote": "Size L phải không ạ?",
-          "start": 999,
-          "end": 1019,
           "purpose": "Synthetic boundary fixture"
         }
       ]

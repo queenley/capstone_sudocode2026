@@ -20,6 +20,9 @@ from ..intake.itn import format_vnd
 from ..intake.text import plain
 
 TTL_SECONDS = 300
+#: What a customer agreed to and the model need not write again: filled in by code when it left them out.
+FILLED = ("promo_code", "address", "payment", "qty", "basket_skus", "order_group")
+#: Only when the PolicyAgent gave no answer (*intents* ``purchase``): a short yes right after the exact read-back.
 YES = re.compile(
     r"(?:da )?(?:(?:vang|da|u|uh|co|dong y|xac nhan|ok|oke|dung roi)(?: a| nhe| nha)?|"
     r"(?:dong y |xac nhan )?(?:dat(?: hang| may| don)?|chot(?: don)?|len don|mua)"
@@ -55,7 +58,10 @@ def payload(args: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def fingerprint(args: Mapping[str, Any]) -> str:
-    return hashlib.sha256(_json(payload(args)).encode()).hexdigest()
+    order = payload(args)
+    if order["address"]:  # the same address, typed differently, is the same order
+        order["address"] = " ".join(str(order["address"]).casefold().split())
+    return hashlib.sha256(_json(order).encode()).hexdigest()
 
 
 def order_key(call_id: str, args: Mapping[str, Any]) -> str:
@@ -113,36 +119,62 @@ def _day(value: str) -> str:
     return f"{day}/{month}/{year}"
 
 
-def draft(args: Mapping[str, Any], context: Any, delivery: str | None = None) -> dict[str, Any]:
+def draft(args: Mapping[str, Any], context: Any, delivery: str | None = None, *,
+          names: Mapping[str, str] | None = None, quotes: Mapping[str, int] | None = None) -> dict[str, Any]:
+    """The order to read back, as it is said aloud: names and amounts, never a product code; with *delivery*,
+    the day :func:`estimated_delivery` found."""
     order = payload(args)
+    known = {**{p.get("sku"): p.get("name") for p in context.seen_products if p.get("name")}, **(names or {})}
     address = context.vault.put("ADDR", order["address"]) if order["address"] else "chưa cung cấp địa chỉ"
-    product = next((p.get("name") for p in context.seen_products if p.get("sku") == order["sku"] and p.get("name")), None)
-    label = f"{product} ({order['sku']})" if product else order["sku"]
+    label = known.get(order["sku"]) or "đã chọn"
+    promo = f", mã khuyến mãi: {order['promo_code']}" if order["promo_code"] else ""
     payment = {"COD": "trả tiền khi nhận hàng", "bank": "chuyển khoản"}.get(order["payment"], order["payment"])
     arrives = f", giao dự kiến ngày {_day(delivery)}" if delivery else ""
     question = (f"Anh/chị xác nhận đặt {order['qty']} sản phẩm {label}, đơn giá {format_vnd(order['price_vnd'])}, "
-                f"tổng {format_vnd(order['price_vnd'] * order['qty'])}, thanh toán {payment}, "
-                f"mã khuyến mãi: {order['promo_code'] or 'không dùng mã riêng'}, địa chỉ giao hàng: {address}"
-                f"{arrives}, đồng ý không ạ?")
-    if order.get('basket_skus') or order.get('order_group'):
-        details = ', '.join(str(x) for x in order.get('basket_skus', [])) or 'không có'
-        question = f"Sản phẩm cùng giỏ: {details}; nhóm đơn: {order.get('order_group') or 'chung'}. " + question
+                f"tổng {format_vnd(order['price_vnd'] * order['qty'])}, thanh toán {payment}{promo}, "
+                f"địa chỉ giao hàng: {address}{arrives}, đồng ý không ạ?")
+    read_back = (f"Dạ em đọc lại đơn: {order['qty']} sản phẩm {label}, đơn giá {format_vnd(order['price_vnd'])}, "
+                 f"tổng {format_vnd(order['price_vnd'] * order['qty'])}, thanh toán {payment}{promo}, "
+                 f"địa chỉ giao hàng: {address}{arrives}.")
+    basket = [sku for sku in order.get("basket_skus") or [] if sku != order["sku"]]
+    others = [known[sku] for sku in basket if known.get(sku)]
+    if others:
+        prices = [(quotes or {}).get(sku) for sku in basket]
+        whole = "" if None in prices else f", tổng cả giỏ {format_vnd(order['price_vnd'] * order['qty'] + sum(prices))}"
+        question = f"Đơn này đi cùng {', '.join(others)}{whole}. " + question
+        read_back = f"Đơn này đi cùng {', '.join(others)}{whole}. " + read_back
+    if order.get("order_group"):
+        question = f"Đây là đơn {order['order_group']} của phần tách đơn. " + question
     return {"draft_id": uuid4().hex, "call_id": context.call_id, "channel": context.channel,
             "owner": _owner(context), "issued_turn_id": context.turn_id, "action_type": "order_create",
             "target_id": order["sku"], "payload_hash": fingerprint(order), "expires_at": now() + TTL_SECONDS,
-            "status": "pending", "question": question}
+            "status": "pending", "question": question, "read_back": read_back,
+            "args": {k: (address if k == "address" else v) for k, v in order.items() if k in FILLED and v}}
+
+
+def still_open(pending: Mapping[str, Any] | None, *, call_id: str, channel: str, turn_id: str) -> dict[str, Any] | None:
+    """The read-back of this call still in force: until it expires or the order changes, whatever was said between."""
+    if not pending or pending.get("status") != "pending":
+        return None
+    if (pending.get("call_id") != call_id or pending.get("channel") != channel
+            or pending.get("issued_turn_id") == turn_id or pending.get("expires_at", 0) <= now()):
+        return None
+    return dict(pending)
 
 
 def answer(pending: Mapping[str, Any] | None, *, call_id: str, channel: str, turn_id: str,
            said: str, last_reply: str | None) -> dict[str, Any] | None:
-    if not pending or pending.get("status") != "pending":
-        return None
-    if (pending.get("call_id") != call_id or pending.get("channel") != channel
-            or pending.get("issued_turn_id") == turn_id or pending.get("expires_at", 0) <= now()
-            or not last_reply or not last_reply.endswith(pending.get("question") or "\0")
+    """The fallback when the PolicyAgent gave no answer: a short yes to a read-back the customer just heard, nothing else."""
+    opened = still_open(pending, call_id=call_id, channel=channel, turn_id=turn_id)
+    if (opened is None or not last_reply or not last_reply.endswith(opened.get("question") or "\0")
             or not agrees(said)):
         return None
-    return {**pending, "status": "authorized", "confirmed_turn_id": turn_id}
+    return authorize(opened, turn_id)
+
+
+def authorize(draft_record: Mapping[str, Any], turn_id: str | None) -> dict[str, Any]:
+    """A draft the customer agreed to, in this turn."""
+    return {**draft_record, "status": "authorized", "confirmed_turn_id": turn_id}
 
 
 def agrees(said: str) -> bool:
@@ -158,9 +190,6 @@ def matches(pending: Mapping[str, Any] | None, args: Mapping[str, Any], context:
                 and pending.get("call_id") == context.call_id and pending.get("channel") == context.channel
                 and pending.get("owner") == _owner(context) and pending.get("action_type") == "order_create"
                 and pending.get("confirmed_turn_id") == context.turn_id
-                # The same rule as answer(): eval2 had 35 yeses answer() authorised and this refused.
-                and agrees(context.customer_said or "")
-                and (context.last_agent_said or "").endswith(pending.get("question") or "\0")
                 and pending.get("expires_at", 0) > now() and pending.get("payload_hash") == fingerprint(args))
 
 

@@ -10,12 +10,14 @@
 // send passes the same hard guard as a draft; a warning can be fixed or
 // overridden. The reply reaches the customer's chat. Polling: queue 5 s,
 // open call 3 s.
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/brand/Logo";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 import { api, AgentCall, AgentCallDetail, AgentTurn } from "@/services/api";
 import CallContext from "@/features/call-context";
+import { reasonLabel } from "@/features/handoff-reasons";
+import Icon from "@/components/ui/Icon";
 
 const QUEUE_EVERY_MS = 5000;
 const CALL_EVERY_MS = 3000;
@@ -50,7 +52,7 @@ export default function CallConsole({
   const [sending, setSending] = useState(false);
   const [warning, setWarning] = useState<Warning | null>(null);
   const [faq, setFaq] = useState<Faq | null>(null);
-  // The 👍/👎 the consultant gave the suggestion on screen, keyed by its text so a new suggestion starts unrated.
+  // The thumbs up/down the consultant gave the suggestion on screen, keyed by its text so a new suggestion starts unrated.
   const [rated, setRated] = useState<{
     text: string;
     thumb: "up" | "down";
@@ -284,7 +286,7 @@ export default function CallConsole({
       )}
       <div className="section-heading console-heading">
         <div>
-          <p className="eyebrow">Quivo · hỗ trợ khách hàng</p>
+          <p className="eyebrow">Quivo · Hỗ trợ khách hàng</p>
           <Heading>Cuộc gọi của trợ lý</Heading>
           <p className="console-subtitle">
             Theo dõi trợ lý đang tư vấn, nhận cuộc gọi khi trợ lý chuyển máy, và
@@ -355,7 +357,7 @@ export default function CallConsole({
                   <strong>{caller(c)}</strong>
                   <small>
                     {c.handoff_status === "pending"
-                      ? "Khách cần gặp nhân viên"
+                      ? <span className="badge-warn">{c.handoff_reason ? reasonLabel(c.handoff_reason) : "Khách cần gặp nhân viên"}</span>
                       : c.handoff_status === "accepted"
                         ? "Nhân viên đang phụ trách"
                         : `${c.lane} · ${c.tier.toLowerCase()} · ${c.turn_count} lượt`}
@@ -405,7 +407,7 @@ export default function CallConsole({
 
               {live && detail.handoff_status === "pending" && (
                 <div className="call-action-bar">
-                  <span>{detail.handoff_reason || "Trợ lý đã chuyển máy"}</span>
+                  <span>{detail.handoff_reason ? reasonLabel(detail.handoff_reason) : "Trợ lý đã chuyển máy"}</span>
                   <button onClick={() => accept(detail.id)}>
                     Nhận cuộc gọi này
                   </button>
@@ -416,7 +418,7 @@ export default function CallConsole({
                 <div className="copilot">
                   {warning && (
                     <div className="alert column" role="alert">
-                      <span>Guard cảnh báo: {warning.reasons.join(" ")}</span>
+                      <span><b>Câu trả lời có thể cam kết sai:</b> {warning.reasons.join(" ")}</span>
                       <div className="buttonrow">
                         <button
                           className="secondary"
@@ -510,7 +512,7 @@ export default function CallConsole({
                       )}
                       {!!suggestion.warnings?.length && (
                         <div className="alert">
-                          {suggestion.warnings.join(" ")}
+                          <b>Kiểm tra trước khi gửi:</b> {suggestion.warnings.join(" ")}
                         </div>
                       )}
                       <div className="buttonrow">
@@ -543,7 +545,7 @@ export default function CallConsole({
                             }
                             onClick={() => rate("up")}
                           >
-                            👍
+                            <Icon name="thumb-up" />
                           </button>
                           <button
                             className="secondary"
@@ -554,7 +556,7 @@ export default function CallConsole({
                             }
                             onClick={() => rate("down")}
                           >
-                            👎
+                            <Icon name="thumb-down" />
                           </button>
                         </span>
                       </div>
@@ -677,10 +679,15 @@ function TurnBubble({ turn }: { turn: AgentTurn }) {
     );
   const label =
     turn.speaker === "customer"
-      ? "KHÁCH"
+      ? "Khách"
       : turn.speaker === "human_agent"
-        ? "NHÂN VIÊN"
-        : "TRỢ LÝ AI";
+        ? "Nhân viên"
+        : "Trợ lý AI";
+  // What the assistant looked up before answering, so staff can see the reply rests on a tool.
+  const tools =
+    turn.speaker === "agent"
+      ? ((turn.meta?.tool_calls as { name: string }[] | undefined) || []).map((tool) => tool.name)
+      : [];
   const lane =
     turn.speaker === "agent"
       ? (turn.meta?.lane as string | undefined)
@@ -705,6 +712,7 @@ function TurnBubble({ turn }: { turn: AgentTurn }) {
         })}
       </small>
       <p>{turn.content}</p>
+      {tools.length > 0 && <small className="turn-tools">Đã tra: {[...new Set(tools)].join(", ")}</small>}
     </div>
   );
 }
@@ -713,6 +721,7 @@ function Evidence({ detail }: { detail: AgentCallDetail }) {
   const agentTurns = detail.turns.filter((t) => t.speaker === "agent");
   return (
     <>
+      {detail.handoff_brief && <HandoffBriefView brief={detail.handoff_brief} />}
       <h3>Call brief</h3>
       {detail.warnings.map((w, i) => (
         <div className="notice" key={i}>
@@ -772,17 +781,11 @@ function Evidence({ detail }: { detail: AgentCallDetail }) {
             <dt>Handoff</dt>
             <dd>
               {detail.handoff_status}
-              {detail.handoff_reason ? ` — ${detail.handoff_reason}` : ""}
+              {detail.handoff_reason ? ` — ${reasonLabel(detail.handoff_reason)}` : ""}
             </dd>
           </>
         )}
       </dl>
-      {detail.handoff_brief && (
-        <>
-          <h3>Handoff brief</h3>
-          <pre>{JSON.stringify(detail.handoff_brief, null, 2)}</pre>
-        </>
-      )}
       <h3>Các lượt của trợ lý</h3>
       {agentTurns.length === 0 && <p className="empty">Chưa có lượt nào.</p>}
       {agentTurns.map((t, i) => {
@@ -840,6 +843,64 @@ function Evidence({ detail }: { detail: AgentCallDetail }) {
         </>
       )}
     </>
+  );
+}
+
+// The brief the assistant hands over, field by field, so the person who takes the call
+// does not ask the customer again. Fields it does not know stay readable as JSON.
+const BRIEF_FIELDS: [string, string][] = [
+  ["escalation_reason", "Lý do chuyển"],
+  ["escalation_reason_detail", "Chi tiết"],
+  ["conversation_summary", "Tóm tắt"],
+  ["next_action", "Việc cần làm ngay"],
+  ["open_questions", "Câu khách chưa được trả lời"],
+  ["product_advised", "Sản phẩm đã tư vấn"],
+  ["price_quoted_vnd", "Giá đã báo"],
+  ["promo_code", "Mã khuyến mãi"],
+  ["facts_confirmed", "Đã xác nhận với khách"],
+  ["sentiment", "Thái độ"],
+  ["customer_name", "Tên khách"],
+  ["customer_phone", "Số điện thoại"],
+  ["channel", "Kênh"],
+];
+
+function briefValue(key: string, value: unknown): React.ReactNode {
+  if (key === "escalation_reason" && typeof value === "string") return reasonLabel(value);
+  if (key === "price_quoted_vnd" && typeof value === "number") return `${value.toLocaleString("vi-VN")}₫`;
+  if (Array.isArray(value)) return value.length ? <ul>{value.map((item, i) => <li key={i}>{String(item)}</li>)}</ul> : "—";
+  if (value && typeof value === "object")
+    return (
+      <ul>
+        {Object.entries(value as Record<string, unknown>).map(([k, v]) => (
+          <li key={k}>{k}: {String(v)}</li>
+        ))}
+      </ul>
+    );
+  return String(value);
+}
+
+function HandoffBriefView({ brief }: { brief: Record<string, unknown> }) {
+  const shown = BRIEF_FIELDS.filter(([key]) => brief[key] !== undefined && brief[key] !== null && brief[key] !== "");
+  const known = new Set(BRIEF_FIELDS.map(([key]) => key));
+  const rest = Object.fromEntries(Object.entries(brief).filter(([key]) => !known.has(key)));
+  return (
+    <section className="handoff-brief" aria-label="Handoff brief">
+      <h3>Bàn giao từ trợ lý</h3>
+      <dl className="facts">
+        {shown.map(([key, label]) => (
+          <React.Fragment key={key}>
+            <dt>{label}</dt>
+            <dd>{briefValue(key, brief[key])}</dd>
+          </React.Fragment>
+        ))}
+      </dl>
+      {Object.keys(rest).length > 0 && (
+        <details>
+          <summary>Các trường khác</summary>
+          <pre>{JSON.stringify(rest, null, 2)}</pre>
+        </details>
+      )}
+    </section>
   );
 }
 

@@ -68,6 +68,12 @@ python evaluation/rag_offline.py
 
 # ASR local: thử một clip của gói đã có, không provider/extractor
 python run_eval.py --asr-package /absolute/path/package --asr-unit segments --only CLIP_ID --asr-transcribe --asr-model zipformer-30m --out evaluation/runs/asr-smoke-new
+# Rubric judge BTC trên một run đã có (tốn phí judge, không chạy lại agent); hoặc thêm --judge khi chạy
+python run_eval.py --judge-run evaluation/runs/<run> --out evaluation/runs/<run>-judge
+# Bốc ≥20 cặp (cuộc gọi, tiêu chí) thành phiếu chấm tay, không gọi model; người chấm điền sheet.csv
+python run_eval.py --judge-sample evaluation/runs/<run>-judge
+# Độ đồng thuận người–judge: % và Cohen's kappa; kappa < 0,6 thì phân tích lỗi
+python run_eval.py --judge-agreement evaluation/runs/<run>-judge/human-review
 ```
 
 Giới hạn chi tiêu (tùy chọn): không đặt `EVAL_BUDGET_DB` thì lệnh chạy **không có trần chi tiêu** và in một dòng nhắc. Muốn đặt trần, tạo sổ một lần bằng `evaluation_budget.initialize(path, usd)` rồi đặt `EVAL_BUDGET_DB` trỏ tới nó; khi đã đặt, CLI chặn sổ thiếu/hỏng/hết cap trước DB/model. Không tạo lại sổ để chạy tiếp một ngân sách đã hết. SDK retry phải bằng 0 để không bỏ sót usage của request tính phí. Budget hiện hỗ trợ `openai:gpt-4.1-mini` (xem `llm/evaluation_budget.py`). ASR local/hypothesis replay không cần ledger. `EVAL_RUNS_DIR` đổi chỗ ghi `runs/`.
