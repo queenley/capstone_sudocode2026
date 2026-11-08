@@ -230,7 +230,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 source = prepare(args.asr_package, out / "input", unit=args.asr_unit, only=set(args.only) or None)
                 result = asr.evaluate(source, args.asr_hypotheses, out / "result", model=args.asr_model,
                                       transcribe=args.asr_transcribe, entity_review=args.asr_entity_review, denoiser=args.asr_denoiser)
-                print(json.dumps({"status": result["status"], "main_scorer": result["main_scorer"], "out": str(out)}, ensure_ascii=False, indent=2))
+                print(json.dumps({"status": result["status"], "main_scorer": result["main_scorer"],
+                                  "entity_accuracy_a5": result.get("entity_accuracy_a5"), "out": str(out)}, ensure_ascii=False, indent=2))
                 return 0 if result["status"] == "COMPLETE" else 1
             if args.asr_audio:
                 if args.asr or args.asr_hypotheses or args.asr_entity_review or not args.asr_transcribe:
@@ -245,6 +246,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"ASR setup error: {error}")
             return 2
         print(json.dumps({"status": result["status"], "main_scorer": result["main_scorer"],
+                          "entity_accuracy_a5": result.get("entity_accuracy_a5"),
                           "diagnostics": result["diagnostics"], "out": str(out)}, ensure_ascii=False, indent=2))
         return 0 if result["status"] == "COMPLETE" else 1
     if args.asr_hypotheses or args.asr_transcribe or args.asr_entity_review:

@@ -14,13 +14,14 @@ import time
 from urllib.parse import urlparse
 import re
 import unicodedata
+from typing import Any
 
 from ...config.config_manager import btc_data_dir
 from ...components.voice.recognition import process
 from ...components.voice.policy import POLICY_VERSION
 from ...components.intake.lexicon import lexicon
 
-METRICS_VERSION = "asr-diagnostics-v3-dialogue-entities"
+METRICS_VERSION = "asr-diagnostics-v4-entity-groups"
 
 
 def normalize(text: str) -> str:
@@ -354,6 +355,13 @@ def evaluate(source: Path, hypotheses: Path | None, out: Path, *, model: str = "
                         sample["scenario_entities"] = observed["scenario_entities"]
                 if "turns" in prediction:
                     sample["turns"] = []
+                    # Turns in spoken order, so a model said alone reads against the product named before it.
+                    # Supplied turn entities are kept as they are and never re-extracted.
+                    ordered = [] if entity_review else sorted(
+                        (item for item in turn_values if "entities" not in item[0]), key=lambda item: item[0]["idx"])
+                    observed_turns = commerce_extractor.observe_turns(
+                        [(transformed[variant], turn_now, turn.get("speaker")) for turn, transformed, turn_now in ordered]) if ordered else []
+                    seen = {turn["idx"]: observed for (turn, _, _), observed in zip(ordered, observed_turns)}
                     for turn, transformed, turn_now in turn_values:
                         predicted_turn = {**turn, "text": transformed[variant]}
                         if "entities" not in turn:
@@ -361,7 +369,7 @@ def evaluate(source: Path, hypotheses: Path | None, out: Path, *, model: str = "
                                 from .asr_entities import predict
                                 predicted_turn["entities"] = predict(transformed[variant], vocabulary, version=entity_info["extractor_version"])
                             else:
-                                observed = commerce_extractor.observe(transformed[variant], now=turn_now, speaker=turn.get("speaker"))
+                                observed = seen[turn["idx"]]
                                 predicted_turn["entities"] = observed["asr_entities"]
                                 predicted_turn["scenario_entities"] = observed["scenario_entities"]
                         sample["turns"].append(predicted_turn)
@@ -424,6 +432,10 @@ def evaluate(source: Path, hypotheses: Path | None, out: Path, *, model: str = "
         except Exception as error:
             official[variant] = {"status": "unavailable", "error": type(error).__name__}
     diagnostics = summarize(rows, attempted=len(selected), failures=failures)
+    # Phụ lục A.5 of the brief names entity accuracy for phone numbers and amounts of money; the main scorer pools
+    # every entity type. The split by group stays a diagnostic beside it and never changes the official number.
+    diagnostics["entity_breakdown"] = {variant: entity_breakdown(selected, predictions) for variant, predictions in variants.items()}
+    diagnostics["entity_accuracy_a5"] = {variant: a5_accuracy(breakdown) for variant, breakdown in diagnostics["entity_breakdown"].items()}
     diagnostics["main_scores_available"] = all(isinstance(score, dict) and score.get("status") != "unavailable" for score in official.values())
     from .asr_errors import analyze
     error_analysis = analyze(rows)
@@ -454,7 +466,7 @@ def evaluate(source: Path, hypotheses: Path | None, out: Path, *, model: str = "
                 "lexicon_sha256": hashlib.sha256(json.dumps([(p.pattern, r) for p, r in dictionary._rules],
                     ensure_ascii=False).encode()).hexdigest()}
     report = {"status": "INCOMPLETE" if failures or not diagnostics["main_scores_available"] else "COMPLETE", "main_scorer": official,
-              "diagnostics": diagnostics, "manifest": manifest}
+              "entity_accuracy_a5": diagnostics["entity_accuracy_a5"], "diagnostics": diagnostics, "manifest": manifest}
     if entity_review:
         from .asr_entities import diagnostics as entity_diagnostics
         report["entity_review"] = entity_info
@@ -463,6 +475,72 @@ def evaluate(source: Path, hypotheses: Path | None, out: Path, *, model: str = "
                           ("error-analysis.json", error_analysis)):
         (out / name).write_text(json.dumps(content, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
     return report
+
+
+def _entity_group(field: str) -> str:
+    """``phone`` and ``money`` are the entities Phụ lục A.5 is about; everything else is ``other``."""
+    if field == "phone":
+        return "phone"
+    if field.endswith("_vnd"):
+        return "money"
+    return "other"
+
+
+def _plain(text: str) -> str:
+    """The main scorer's normalization: lowercase, NFC, punctuation as space, single spaces."""
+    text = unicodedata.normalize("NFC", (text or "").lower())
+    return re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", text)).strip()
+
+
+def entity_breakdown(dialogues: list[dict], predictions: dict) -> dict:
+    """Entity accuracy by group and by field, matched as the main scorer matches (exact string, any of a list).
+
+    Each miss is split by whether the hypothesis text equals the reference after normalization: a miss on an exact
+    transcript is the entity extractor's or the label's, not the recogniser's.
+    """
+    fields: dict[str, dict[str, int]] = {}
+    for dialogue in dialogues:
+        predicted = predictions.get(dialogue["id"])
+        if predicted is None:
+            continue
+        exact = _plain(predicted.get("text", "")) == _plain(dialogue.get("full_text", ""))
+        for field, truth in (dialogue.get("entities") or {}).items():
+            counts = fields.setdefault(field, {"total": 0, "correct": 0, "missing": 0, "wrong": 0,
+                                               "errors_on_exact_transcript": 0})
+            counts["total"] += 1
+            value = (predicted.get("entities") or {}).get(field)
+            truths = truth if isinstance(truth, list) else [truth]
+            if any(str(value) == str(item) for item in truths):
+                counts["correct"] += 1
+                continue
+            counts["missing" if value is None else "wrong"] += 1
+            counts["errors_on_exact_transcript"] += int(exact)
+    groups: dict[str, dict[str, Any]] = {}
+    for field, counts in fields.items():
+        group = groups.setdefault(_entity_group(field), {"total": 0, "correct": 0, "missing": 0, "wrong": 0,
+                                                         "errors_on_exact_transcript": 0, "fields": []})
+        for key in ("total", "correct", "missing", "wrong", "errors_on_exact_transcript"):
+            group[key] += counts[key]
+        group["fields"].append(field)
+    for item in [*fields.values(), *groups.values()]:
+        item["accuracy"] = round(100 * item["correct"] / item["total"], 1) if item["total"] else None
+    for group in groups.values():
+        group["fields"].sort()
+    return {"groups": dict(sorted(groups.items())), "fields": dict(sorted(fields.items()))}
+
+
+def a5_accuracy(breakdown: dict) -> dict:
+    """Entity accuracy as Phụ lục A.5 defines it: phone numbers and amounts of money, exact match.
+
+    ``None`` for a group with no label: no number is reported where nothing was measured.
+    """
+    groups = breakdown.get("groups", {})
+    phone, money = groups.get("phone", {}), groups.get("money", {})
+    total = phone.get("total", 0) + money.get("total", 0)
+    correct = phone.get("correct", 0) + money.get("correct", 0)
+    return {"phone": phone.get("accuracy"), "n_phone": phone.get("total", 0),
+            "money": money.get("accuracy"), "n_money": money.get("total", 0),
+            "phone_and_money": round(100 * correct / total, 1) if total else None, "n": total}
 
 
 def summarize(rows: list[dict], *, attempted: int, failures: list) -> dict:

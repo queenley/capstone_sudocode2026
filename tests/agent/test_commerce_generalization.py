@@ -86,9 +86,10 @@ def test_speaker_provenance_controls_quote_mapping(catalogue):
     ('Ưu đãi hết hạn 4/2/abc.', {}),
     ('Ưu đãi hết hạn 7/9/2040.5.', {}),
     ('Ưu đãi hết hạn 2040-09-07.5.', {}),
-    ('Số tài khoản 0789864123.', {}),
+    # An account or ID number is never a phone (v7 files an account under bank_account; 10 digits is no CCCD).
+    ('Số tài khoản 0789864123.', {'bank_account': '0789864123'}),
     ('CCCD 0789864123.', {}),
-    ('Số tài khoản 0789864123, điện thoại 0912345678.', {'phone': '0912345678'}),
+    ('Số tài khoản 0789864123, điện thoại 0912345678.', {'bank_account': '0789864123', 'phone': '0912345678'}),
 ])
 def test_negation_resolution_and_numeric_boundaries(catalogue, text, expected):
     assert module.commerce(text) == expected
@@ -98,8 +99,10 @@ def test_dialogue_uses_actual_boundaries_without_cross_product_roles(catalogue):
     observed = module.observe_dialogue('Tôi đang dùng Zephyr K.\nEm tư vấn Zephyr X.')
     assert observed['asr_entities'] == {'sku': 'SKU-SENTINEL-X'}
     assert observed['scenario_entities'] == {'owned_sku': 'SKU-SENTINEL-K', 'product_advised': 'SKU-SENTINEL-X'}
-    # Single ambiguous utterances remain ambiguous, even in dialogue mode.
-    assert module.observe_dialogue('Zephyr K hay Zephyr X?')['asr_entities'] == {}
+    # v10: a dialogue-level label lists every product named and any one is correct, so a dialogue that names
+    # two answers with one of them; a single utterance still abstains.
+    assert module.observe_dialogue('Zephyr K hay Zephyr X?')['asr_entities']['sku'] in {'SKU-SENTINEL-K', 'SKU-SENTINEL-X'}
+    assert 'sku' not in module.commerce('Zephyr K hay Zephyr X?')
 
 
 def test_dialogue_identifiers_do_not_need_reference_entity_lists(catalogue):

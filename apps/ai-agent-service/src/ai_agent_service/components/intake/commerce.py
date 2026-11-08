@@ -23,14 +23,14 @@ from .pii import normalise_phone
 from .text import plain
 from . import spoken
 
-VERSION = 'scenario-commerce-v5'
+VERSION = 'scenario-commerce-v11'
 CATALOG_PATH = 'catalog/products.json'
 CONTRACT_PATH = (ROOT.parents[1] / 'contracts/scenario/scenario-keys.yaml'
                  if (ROOT.parents[1] / 'contracts/scenario/scenario-keys.yaml').is_file()
                  else ROOT / 'contracts/scenario/scenario-keys.yaml')
 # Only the ASR scoring boundary uses these aliases. Canonical output uses the contract.
 ASR_ALIASES = {'sku': 'product_advised', 'size_new': 'size', 'phone': 'phone_provided'}
-ASR_ONLY = {'size_old', 'min_free_ship_vnd', 'bulky_fee_vnd'}
+ASR_ONLY = {'size_old', 'min_free_ship_vnd', 'bulky_fee_vnd', 'paid_price_vnd', 'id_number', 'bank_account'}
 
 
 @lru_cache(maxsize=1)
@@ -84,7 +84,7 @@ def metadata() -> dict:
             'asset_lifetime': 'immutable per resolved path for this process; restart to reload replaced files',
             'lexicon_sha256': hashlib.sha256(json.dumps(rules, ensure_ascii=False).encode()).hexdigest(),
             'default_date': _catalogue()['reference_date'],
-            'sku_policy': 'catalogue-derived names and complete alphanumeric model codes; existing brand lexicon; spacing tolerant; fuzzy brand only with intact full model; ambiguous matches omitted',
+            'sku_policy': 'catalogue-derived names and complete alphanumeric model codes; existing brand lexicon; spacing tolerant; fuzzy brand only with intact full model; v8: a name misheard after its kind of product matched by sound, a part not taken for the product its name begins, a model alone resolved against the brand and kind just named (dialogue), the last product named wins (dialogue); ambiguous matches omitted',
             'policy': 'surface mentions only; no memory writes or verified business truth; ambiguous values omitted; no catalogue prices/stock inferred'}
 
 
@@ -184,6 +184,126 @@ def _fuzzy_brand_product(surface: str) -> str | None:
     return next(iter(codes)) if len(codes) == 1 else None
 
 
+def _sound(text: str) -> str:
+    """A rough sound key of toneless text, so ASR spellings of a foreign name compare close ("compi" ~ "combi")."""
+    key = text.replace(' ', '')
+    for written, heard in (('ph', 'f'), ('th', 't'), ('ch', 'c'), ('tr', 'c'), ('kh', 'k'), ('gi', 'z'), ('qu', 'k'),
+                           ('ng', 'n'), ('nh', 'n')):
+        key = key.replace(written, heard)
+    key = key.translate(str.maketrans('cqbdrjwyx', 'kkpzzzuis')).replace('h', '')
+    return re.sub(r'(.)\1+', r'\1', key)
+
+
+def _kind_and_name(product: dict) -> tuple[str, str]:
+    """"Máy lọc không khí AirPure X" -> ("may loc khong khi", "AirPure X"): the kind of product and what names it."""
+    words, brand = product['name'].split(), plain(product.get('brand', '')).lower()
+    kind = []
+    for i, word in enumerate(words):
+        if (i and (not word[:1].islower() or not word.isalpha())) or (brand and plain(word).lower() == brand):
+            break
+        kind.append(word)
+    return _surface(' '.join(kind)), re.split(r'\s*[+(]', ' '.join(words[len(kind):]))[0].strip()
+
+
+@lru_cache(maxsize=8)
+def _kinds(catalogue_json: str | None = None, corrections_json: str | None = None) -> dict[str, list[tuple[str, frozenset[str]]]]:
+    """Per kind of product, each product's sound keys: its name, spoken, with the brand's known spoken forms."""
+    catalogue = json.loads(catalogue_json) if catalogue_json is not None else _catalogue()
+    corrections = json.loads(corrections_json) if corrections_json is not None else None
+    groups: dict[str, list[tuple[str, str, str]]] = {}
+    for product in catalogue['products']:
+        if 'NGỪNG BÁN' in product['name'].upper():
+            continue  # A discontinued product is named only by its exact name ("bản 2024").
+        kind, name = _kind_and_name(product)
+        if kind and name:
+            groups.setdefault(kind, []).append((product['sku'], product.get('brand', ''), name))
+    def keys(names: set[str]) -> frozenset[str]:
+        return frozenset({_sound(_surface(form)) for each in names for form in _forms(each) if not re.search(r'\d', form)} - {''})
+
+    out = {}
+    for kind, items in groups.items():
+        entries = []
+        for sku, brand, name in items:
+            names = {name}
+            if brand and brand.lower() in name.lower():
+                names |= {re.sub(re.escape(brand), alias, name, flags=re.IGNORECASE) for alias in _brand_aliases(brand, corrections)}
+            if brand and sum(other == brand for _, other, _ in items) == 1:
+                names |= {brand} | _brand_aliases(brand, corrections)  # The brand's only one of its kind: the brand names it.
+            entries.append((sku, keys(names)))
+        # A brand with several products of this kind, said without a model, names none of them ("máy lọc không khí e pia").
+        for brand in sorted({brand for _, brand, _ in items if brand and sum(other == brand for _, other, _ in items) > 1}):
+            entries.append(('', keys({brand} | _brand_aliases(brand, corrections))))
+        out[kind] = entries
+    return out
+
+
+#: Words that end the name after a kind of product ("máy lọc không khí AirPure Pro và ...").
+NAME_ENDS = frozenset({'va', 'voi', 'hay', 'hoac', 'con', 'cong', 'nhung', 'thay'})
+#: Words that start no product name: "máy lọc không khí cho phòng ...", "xe đẩy của anh".
+NOT_A_NAME = frozenset({'cho', 'cua', 'nay', 'do', 'ay', 'kia', 'nao', 'ma', 'em', 'anh', 'chi', 'co', 'chu', 'bac', 'o',
+                        'thi', 'la', 'khong', 'nhe', 'nha', 'day', 'a', 'ha', 'nua', 'roi', 'gi', 'tren', 'duoi', 'loai',
+                        'nhu', 'de', 'tai', 'ben', 'trong', 'ngoai', 'dang', 'da', 'se', 'van', 'cung', 'moi', 'tot',
+                        'nhat', 'gia', 'hang', 'mot', 'hai', 'ba'})
+#: Similarity a heard name needs: alone of its kind, among several, and ahead of the next candidate.
+SOUND_ALONE, SOUND_AMONG, SOUND_MARGIN = .6, .5, .1
+
+
+def _heard_product(surface: str) -> str | None:
+    """A product named after its kind ("máy lọc không khí epi pro") whose name the ASR misspelled.
+
+    The kind is ordinary Vietnamese, which the recogniser hears well; the name after it is compared by sound
+    with each product of that kind. Ambiguous or weak matches are omitted.
+    """
+    found: dict[str, float] = {}
+    surface = _surface(spoken.catalogue_numbers(surface))
+    for kind, entries in _kinds(*_index_keys()).items():
+        for match in re.finditer(r'(?<!\w)' + re.escape(kind) + r'(?!\w)', surface):
+            window = surface[match.end():].split()[:6]
+            window = window[:next((i for i, word in enumerate(window) if word in NAME_ENDS), len(window))]
+            if not window or window[0] in NOT_A_NAME:
+                continue
+            heard = [_sound(' '.join(window[:n])) for n in range(1, len(window) + 1)]
+            scores = sorted(((max((1 - _distance(said, key) / max(len(said), len(key)) for said in heard for key in keys),
+                                  default=0), sku) for sku, keys in entries), reverse=True)
+            best, sku = scores[0]
+            runner_up = scores[1][0] if len(scores) > 1 else 0
+            if sku and best >= (SOUND_ALONE if len(entries) == 1 else SOUND_AMONG) and best - runner_up >= SOUND_MARGIN:
+                found[sku] = max(found.get(sku, 0), best)
+    return next(iter(found)) if len(found) == 1 else None
+
+
+def _part_without_its_kind(sku: str, surface: str) -> bool:
+    """A part whose name begins another product's ("Màng lọc Xiaomi Smart 4" in "Xiaomi Smart 4 Lite"), its kind unsaid."""
+    products = [p for p in _catalogue()['products'] if 'NGỪNG BÁN' not in p['name'].upper()]
+    product = next((p for p in products if p['sku'] == sku), None)
+    if product is None:
+        return False
+    kind, name = _kind_and_name(product)
+    longer = any(other['sku'] != sku and _kind_and_name(other)[1].lower().startswith(name.lower() + ' ') for other in products)
+    return longer and bool(kind) and not re.search(r'(?<!\w)' + re.escape(kind.split()[0]) + r'(?!\w)', surface)
+
+
+def _model_in_context(text: str, previous: str) -> str | None:
+    """"Mẫu X" after AirPure Y was named: the product of the same brand and kind whose model is X."""
+    products = [p for p in _catalogue()['products'] if 'NGỪNG BÁN' not in p['name'].upper()]
+    before = next((p for p in products if p['sku'] == previous), None)
+    if before is None or not before.get('brand'):
+        return None
+    kind = _kind_and_name(before)[0]
+    surface = _surface(text)
+    found = set()
+    for product in products:
+        if product.get('brand') != before['brand'] or _kind_and_name(product)[0] != kind:
+            continue
+        model = re.sub(re.escape(product['brand']), '', _kind_and_name(product)[1], flags=re.IGNORECASE).strip()
+        for form in (_forms(model) if model else ()):
+            key = _surface(form)
+            if key and re.search(r'\b(?:mau|con|loai|dong|ban|may|cai|doi|chiec)\s+' + r'\s*'.join(map(re.escape, key.replace(' ', '')))
+                                 + r'(?!\w)', surface):
+                found.add(product['sku'])
+    return next(iter(found)) if len(found) == 1 else None
+
+
 def _product(text: str) -> str | None:
     explicit = {re.sub(r'\s+', '', match.group()) for match in
                 re.finditer(r'\bSKU\s*-\s*[A-Z0-9]+(?:\s*-\s*[A-Z0-9]+)*\b', text.upper())}
@@ -193,6 +313,14 @@ def _product(text: str) -> str | None:
         if not explicit <= known:
             return None
         return next(iter(explicit)) if len(explicit) == 1 else _selected_product(text)
+    codes = _named_products(text)
+    if codes:
+        return next(iter(codes)) if len(codes) == 1 else _selected_product(text)
+    return _fuzzy_brand_product(_surface(text)) or _heard_product(text)
+
+
+def _named_products(text: str) -> set[str]:
+    """Every catalogue product *text* names by its exact (spoken) name, parts named without their kind left out."""
     hits = []
     surface = _surface(text)
     for pattern, codes in _product_patterns(*_index_keys()):
@@ -206,9 +334,7 @@ def _product(text: str) -> str | None:
             else:
                 hits.append((*match.span(), codes))
     codes = set().union(*(codes for _, _, codes in hits)) if hits else set()
-    if codes:
-        return next(iter(codes)) if len(codes) == 1 else _selected_product(text)
-    return _fuzzy_brand_product(surface)
+    return {code for code in codes if not _part_without_its_kind(code, surface)}
 
 
 def _clauses(text: str) -> list[str]:
@@ -220,27 +346,43 @@ def _clauses(text: str) -> list[str]:
 
 
 MONEY_CUES = {
-    'budget_vnd': r'ngân sách|tài chính|(?:chi|trả) tối đa|(?:có|dành|chi) (?:tầm|khoảng)',
-    'competitor_price_vnd': r'bên kia|bên khác|chỗ khác|nơi khác|đối thủ|shop khác|cửa hàng khác',
-    'price_vnd': r'giá(?: bán)?|báo giá',
+    'budget_vnd': r'ngân sách|tài chính|(?:chi|trả) tối đa|(?:có|dành|chi) (?:tầm|khoảng)|lên (?:đến|tới)',
+    # v6: where a shopper saw another price ("trên mạng có chỗ bán", "bên ngoài ghi giá").
+    'competitor_price_vnd': r'bên kia|bên khác|chỗ khác|nơi khác|đối thủ|shop khác|cửa hàng khác|trên mạng|'
+                            r'(?:có )?chỗ bán|bên ngoài|ngoài (?:chợ|siêu thị|cửa hàng)|shopee|lazada|tiki',
+    # v6: the shop's own price in a comparison ("sao bên mình lại", "bên em lại") or as quoted ("em báo là").
+    'price_vnd': r'giá(?: bán)?|báo giá|(?:em|bên em|shop|cửa hàng) báo(?: là)?|bên (?:mình|em)(?: sao)?(?: lại)?(?: là| bán| giá)?',
     'min_free_ship_vnd': r'(?:đơn|đơn hàng|mua)(?: tối thiểu)? từ|tối thiểu.*?(?:miễn phí|freeship)',
-    'bulky_fee_vnd': r'(?:phụ )?phí (?:hàng )?cồng kềnh',
+    # v11: "hàng cồng kềnh ngoài nội thành phụ thu 30.000đ": the bulky item named, then what it costs extra.
+    'bulky_fee_vnd': r'(?:phụ )?phí (?:hàng )?cồng kềnh|cồng kềnh[^.!?;]{0,40}?(?:phụ thu|phụ phí|thu thêm|tính thêm|cộng thêm)',
     'exchange_fee_vnd': r'phí (?:đổi|đổi trả)(?: hàng)?',
     'refund_vnd': r'(?:hoàn|hoàn lại|hoàn trả)(?: tiền)?',
+    # v7: the order's total, and what the customer paid before (neither is a selling or competitor price).
+    'total_vnd': r'tổng(?: tiền| cộng| đơn| cả| hóa đơn)?|tất cả là|cả thảy',
+    'paid_price_vnd': r'(?:đã|đợt trước|lần trước|hồi trước|trước đây)(?:\s+\w+){0,2}\s+mua(?: (?:là|với giá|giá|hết))?',
 }
 DURATION_CUES = {
     'warranty_months': r'bảo hành', 'return_days': r'đổi trả|trả hàng',
-    'delivery_days': r'giao hàng|giao trong|vận chuyển|nhận hàng|giao dự kiến',
+    # v11: any delivery verb ("giao nội thành", "ship", "nhận được hàng"), not only "giao hàng".
+    'delivery_days': r'\bgiao\b|vận chuyển|nhận(?: được)? hàng|\bship\b',
 }
 BLOCKERS = {
     'can hoi chong': r'(?:hỏi|bàn|trao đổi|tham khảo|xin ý kiến)(?:\s+\w+){0,3}\s+(?:chồng|ông xã)',
     'can hoi vo': r'(?:hỏi|bàn|trao đổi|tham khảo|xin ý kiến)(?:\s+\w+){0,3}\s+(?:vợ|bà xã)',
-    'can hoi nguoi nha': r'(?:hỏi|bàn|trao đổi|tham khảo|xin ý kiến)(?:\s+\w+){0,3}\s+(?:người nhà|gia đình)',
-    'so sanh gia': r'so sánh (?:giá|thêm)|(?:xem|tham khảo|khảo) giá (?:thêm|chỗ khác|bên khác)',
-    'vuot ngan sach': r'vượt (?:quá )?ngân sách|quá ngân sách|(?:không|chưa) đủ (?:tiền|ngân sách)',
-    'cho luong': r'(?:chờ|đợi|đến khi|tới khi|khi nào)(?:\s+\w+){0,3}\s+(?:lương|lĩnh lương|nhận lương)',
-    # The same everyday intents documented by MemoryAgent's independent rule fallback.
-    'can suy nghi them': r'suy nghĩ (?:thêm|đã|lại)|cân nhắc (?:thêm|đã|lại)|(?:cần|muốn|để (?:chị|anh|em|mình|tôi)) suy nghĩ|để (?:chị|anh|em|mình|tôi) (?:xem|nghĩ|tính)\b',
+    # v9: family named by its members ("hỏi ý kiến con cháu", "bàn với bố mẹ").
+    'can hoi nguoi nha': r'(?:hỏi|bàn|trao đổi|tham khảo|xin ý kiến|hỏi ý kiến)(?:\s+\w+){0,3}\s+'
+                         r'(?:người nhà|gia đình|con cháu|con cái|bố mẹ|ba mẹ|cả nhà)',
+    # v9: the shop's price said to be above another's ("giá bên em vẫn cao hơn chỗ khác", "cân nhắc chỗ khác").
+    'so sanh gia': r'so sánh (?:giá|thêm)|(?:xem|tham khảo|khảo) giá (?:thêm|chỗ khác|bên khác)|'
+                   r'(?:cao|đắt|mắc) hơn (?:chỗ|bên|nơi|shop) khác|cân nhắc (?:thêm )?(?:chỗ|bên|nơi|shop) khác',
+    # v9: a price over what was planned ("hơi cao so với dự kiến").
+    'vuot ngan sach': r'vượt (?:quá )?ngân sách|quá ngân sách|(?:không|chưa) đủ (?:tiền|ngân sách)|'
+                      r'(?:cao|đắt|mắc|vượt) (?:hơn |quá )?(?:so với )?(?:dự kiến|dự tính|khả năng)',
+    # v9: up to six words between the wait and the pay ("chờ đến cuối tháng mới nhận lương").
+    'cho luong': r'(?:chờ|đợi|đến khi|tới khi|khi nào)(?:\s+\w+){0,6}\s+(?:lương|lĩnh lương|nhận lương)',
+    # The same everyday intents documented by MemoryAgent's independent rule fallback; v9: "nghĩ thêm".
+    'can suy nghi them': r'suy nghĩ (?:thêm|đã|lại)|cân nhắc (?:thêm|đã|lại)|(?:cần|muốn|để (?:chị|anh|em|mình|tôi)) suy nghĩ|'
+                         r'để (?:chị|anh|em|mình|tôi) (?:xem|nghĩ|tính)\b|(?<!suy )nghĩ thêm',
 }
 SIZE = r'(?:\d{1,3}|xxxl|xxl|xxs|xl|xs|s|m|l)'
 
@@ -272,6 +414,15 @@ def _uncertain(prefix: str) -> bool:
     return bool(re.search(r'\b(?:nếu|giả sử|có thể|có lẽ|chưa chắc|không chắc|không biết)\b', prefix))
 
 
+def _conditional(prefix: str) -> bool:
+    """Inside an unfinished "nếu ..." (no "thì" yet): "nếu chị cần suy nghĩ thêm" states nothing.
+
+    v9: a blocker is itself hesitation, so "chưa chắc, cần suy nghĩ thêm" and "nếu không có thì chị sẽ cân
+    nhắc thêm" still state it; a payment asked as "có thể thanh toán qua chuyển khoản không" still names it.
+    """
+    return bool(re.search(r'\b(?:nếu|giả sử)\b(?:(?!\bthì\b)[^.!?;])*$', prefix))
+
+
 def _resolved(clause: str, start: int, end: int) -> bool:
     """A completed consultation is no longer a pending purchase blocker."""
     before, after = clause[:start], clause[end:]
@@ -298,8 +449,9 @@ def _size_cues(text: str) -> str:
         return text
     def replace(match):
         word = match[1]
-        sound = re.sub(r'c(?=[ie])', 's', word).replace('z', 's')
-        if sound == 'sise' or re.fullmatch(r'sai[sz]?', word):
+        sound = re.sub(r'c(?=[iey])', 's', word).replace('z', 's').replace('y', 'i')
+        # v9: "side", "sies", "site", "cit", "cy" are how the recogniser writes "size" before a size.
+        if sound == 'sise' or re.fullmatch(r'sai[sz]?', word) or re.fullmatch(r'si(?:[ds]e?|te?|es)?', sound):
             return 'size ' + match[2]
         return match.group()
     return re.sub(r'\b([a-z]{3,5})\s+(' + SIZE + r')\b(?!\s*(?:ngày|giờ|lần|đồng|triệu|tháng)\b)', replace, text)
@@ -307,17 +459,23 @@ def _size_cues(text: str) -> str:
 
 def _payment(clause: str) -> str | None:
     choices = {kind for kind, pattern in [
-        ('COD', r'\bc+o+d+\b|thu hộ|nhận hàng[^.!?;]{0,35}trả tiền|(?:tiền mặt|trả tiền|thanh toán)[^.!?;]{0,35}(?:khi )?nhận hàng'),
-        ('bank', r'chuyển khoản|\bbanking\b|\bbank\b|(?:thanh toán|trả tiền)\s+(?:qua|bằng)\s+ngân hàng'),
+        # v9: "c o d" / "ceo d" as the recogniser splits it; cash on delivery ("tiền mặt khi giao hàng").
+        # "thanh toán qua ngân hàng và giao hàng ở ..." names a delivery place, not cash on delivery: "giao" needs "khi/lúc".
+        ('COD', r'\bc+o+d+\b|\b(?:c|ce|xe)\s*[oô]\s+(?:d|đê|dê)\b|\bceo\s+d\b|thu hộ|nhận hàng[^.!?;]{0,35}trả tiền|'
+                r'(?:tiền mặt|trả tiền|thanh toán)[^.!?;]{0,35}(?:khi )?nhận hàng|(?:khi|lúc) giao hàng[^.!?;]{0,20}trả tiền|'
+                r'(?:trả tiền|thanh toán)[^.!?;]{0,20}(?:khi|lúc) giao hàng|tiền mặt'),
+        # v9: "hình thức thanh toán là qua ngân hàng".
+        ('bank', r'chuyển khoản|\bbanking\b|\bbank\b|(?:thanh toán|trả tiền)[^.!?;]{0,20}(?:qua|bằng)\s+ngân hàng'),
         ('momo', r'\bmomo\b'), ('zalopay', r'\bzalopay\b')]
         for m in re.finditer(pattern, clause)
-        if not _negated(clause[:m.start()]) and not _uncertain(clause[:m.start()])}
+        if not _negated(clause[:m.start()]) and not _conditional(clause[:m.start()])
+        and not re.search(r'\b(?:có lẽ|chưa chắc|không chắc|không biết)\b', clause[:m.start()])}
     return next(iter(choices)) if len(choices) == 1 else None
 
 
 def _money(clause: str, found: dict, active_field: str | None = None) -> str | None:
     clause = clause.lower()
-    correction = r'\s*(?:à\s+không|ờ\s+không|mà\s+là|chứ\s+là|xin lỗi|đính chính|sửa lại|đổi thành|giảm (?:còn|xuống)|tăng lên|nâng lên|hạ xuống)\b'
+    correction = r'\s*(?:à\s+không|ờ\s+không|mà\s+là|chứ\s+là|xin lỗi|đính chính|sửa lại|đổi thành|giảm (?:còn|xuống)|tăng lên|nâng lên|hạ xuống|mà\s+(?:hôm nay|bây giờ|giờ|nay)(?:\s+lại)?(?:\s+là)?)\b'
     negation = r'\b(?:không|chẳng|chưa)(?:\s+(?:phải|là|có|đủ|được|cần|muốn|chi|trả|dành|giá|ngân sách|tài chính|báo|bán|mất|thu|tính|phí|cho))*\s*$'
     connector = r'(?:đến|tới|[-–—]|hoặc|hay)'
     amounts = itn.money_spans(clause)
@@ -341,11 +499,16 @@ def _money(clause: str, found: dict, active_field: str | None = None) -> str | N
         range_start = bool(re.match(r'\s*' + connector + r'\s*\d', after))
         if index and re.fullmatch(r'\s*' + connector + r'\s*', segment):
             range_end = True
+        if re.match(r'\s*(?:đồng\s+)?(?:ngân sách|tài chính)\b', after) or (
+                not candidates and re.search(r'(?:tầm|khoảng|có|chi|dành)\s*$', segment)
+                and re.match(r'\s*(?:thôi|là đủ|là được|trở xuống|đổ lại)\b', after)):
+            # The cue after the amount names it; "chỉ có X thôi" after a competitor or price cue stays theirs.
+            candidates.append((len(segment) + 1, 'budget_vnd'))
         if candidates:
             _, key = max(candidates)
             # Ownership qualifies a price; a later explicit budget/fee starts a new purpose.
             owners = [end for end, name in candidates if name == 'competitor_price_vnd']
-            purposes = [end for end, name in candidates if name not in {'price_vnd', 'competitor_price_vnd'}]
+            purposes = [end for end, name in candidates if name not in {'price_vnd', 'competitor_price_vnd', 'paid_price_vnd'}]
             if key == 'price_vnd' and owners and max(owners) > max(purposes, default=-1):
                 key = 'competitor_price_vnd'
             active_field = key
@@ -357,8 +520,9 @@ def _money(clause: str, found: dict, active_field: str | None = None) -> str | N
         if range_start or range_end:
             found.pop(key, None)  # An interval/alternative cannot become an exact scalar.
             continue
-        if re.search(r'\b(?:nếu|giả sử|có thể|có lẽ|chưa chắc|không chắc|không biết)\b', segment):
-            continue
+        if re.search(r'\b(?:nếu|giả sử|có thể|có lẽ|chưa chắc|không chắc|không biết)\b', segment) and not (
+                key == 'budget_vnd' and re.search(r'có thể (?:chi |trả )?lên (?:đến|tới)\s*$', segment)):
+            continue  # "có thể lên đến X" states a ceiling, not a guess.
         if not correcting and re.search(negation, segment):
             if found.get(key) == amount.value:
                 found.pop(key)
@@ -401,7 +565,7 @@ def _dates(clause: str, year: int, found: dict) -> None:
                 pass
 
 
-def _mentions(text: str, *, now: datetime | None = None) -> dict:
+def _mentions(text: str, *, now: datetime | None = None, previous_size: int | str | None = None) -> dict:
     """Return only explicit scalar ASR-schema values; never fill from catalogue facts."""
     now = now or datetime.fromisoformat(_catalogue()['reference_date'])
     corrected, _ = lexicon().correct(text)
@@ -422,11 +586,15 @@ def _mentions(text: str, *, now: datetime | None = None) -> dict:
     written = spoken.size_letters(_size_cues(itn.normalise(corrected, now)))
     found = {}
     money_role = None
+    earlier_size = previous_size
     for clause in _clauses(written):
         money_role = _money(clause, found, money_role)
         _dates(clause, now.year, found)
-        for m in re.finditer(r'(?<![\w.,])([0-9]+(?:[.,][0-9]+)?)\s*(?:mét vuông|m2|m²)\b', clause):
-            value = Decimal(m[1].replace(',', '.'))
+        # v11: a room's size without "vuông" ("phòng hai mươi lăm mét", "diện tích 20 m").
+        for m in re.finditer(r'(?<![\w.,])([0-9]+(?:[.,][0-9]+)?)\s*(?:mét vuông|m2|m²)\b|'
+                             r'(?:phòng|diện tích|rộng)(?:\s+(?:khoảng|tầm|chừng|cỡ|chị|anh|em|mình|tôi|nhà|ngủ|khách|của))*\s+'
+                             r'([0-9]+(?:[.,][0-9]+)?)\s*(?:mét|m)\b(?!\s*(?:vuông|khối|dài|cao)\b)', clause):
+            value = Decimal((m[1] or m[2]).replace(',', '.'))
             if value == value.to_integral_value() and not _negated(clause[:m.start()]):
                 found['room_area_m2'] = int(value)
         children = _children(clause)
@@ -441,22 +609,34 @@ def _mentions(text: str, *, now: datetime | None = None) -> dict:
             if _negated(clause[:start]) or consultation_done:
                 if found.get('blocker') == value:
                     found.pop('blocker')
-            elif not _uncertain(clause[:start]):
+            elif not _conditional(clause[:start]):
                 found['blocker'] = value
         sizes = [m for m in re.finditer(r'\b(?:size|cỡ)\s+(?:(cũ|đang mặc|hiện tại|đang dùng|từ)\s+)?(' + SIZE + r')\b', clause)
                  if not _negated(clause[:m.start()])]
         target = re.search(r'\b(?:sang|thành|lên|xuống)\s+(?:(?:size|cỡ)\s+)?(' + SIZE + r')\b', clause)
+        # v11: a change said without the word size ("đổi lên bốn mươi mốt") is still a size when the verb is a change.
+        changed = target if target and (re.search(r'\b(?:size|cỡ)\b', target.group())
+                                        or re.search(r'\b(?:đổi|chuyển|thay)\b(?:\s+\w+){0,2}\s*$', clause[:target.start()])) else None
+        if changed and re.search(r'\b(?:không|chưa|chẳng)\b[^.!?;]*$', clause[:changed.start()]):
+            changed = None  # "Không đổi size 46 sang 47" changes nothing.
         if sizes and re.search(r'\b(?:hay|hoặc|đến)\b', clause[sizes[0].end():]) and not target:
             sizes = []
-        if sizes:
-            value = lambda raw: int(raw) if raw.isdigit() else raw.upper()
-            if target:
-                if sizes[0].start() < target.start():
+        value = lambda raw: int(raw) if raw.isdigit() else raw.upper()
+        if sizes or changed:
+            if target and (sizes or changed):
+                if sizes and sizes[0].start() < target.start():
                     found['size_old'] = value(sizes[0][2])
+                elif earlier_size is not None and earlier_size != value(target[1]):
+                    # v11: the size said in an earlier clause or turn is the one being changed from.
+                    found['size_old'] = earlier_size
                 found['size_new'] = value(target[1])
             else:
-                old = sizes[-1][1] or re.search(r'(?:đang mặc|đang mang|đang dùng|hiện tại)\s*$', clause[:sizes[-1].start()])
+                old = (sizes[-1][1] or re.search(r'(?:đang mặc|đang mang|đang dùng|hiện tại)\s*$', clause[:sizes[-1].start()])
+                       # v11: a size that does not fit is the one the customer has ("size 40 hơi chật").
+                       or re.match(r'\s*(?:\w+\s+){0,2}(?:hơi |quá |bị |khá |rất )?(?:chật|rộng|nhỏ|to|bó|lỏng|không vừa|chưa vừa)\b',
+                                   clause[sizes[-1].end():]))
                 found['size_old' if old else 'size_new'] = value(sizes[-1][2])
+            earlier_size = found.get('size_new', found.get('size_old'))
         colors = list(re.finditer(r'\bmàu\s+(xanh navy|xanh than|xanh dương|xanh lá|đen|trắng|xám|ghi|navy|be|đỏ|hồng|nâu|vàng|black|white|gray)\b', clause))
         if colors and re.search(r'\b(?:hay|hoặc)\b', clause[colors[0].end():]):
             colors = []
@@ -469,7 +649,8 @@ def _mentions(text: str, *, now: datetime | None = None) -> dict:
             else:
                 found['color'] = color
         for key, cue in DURATION_CUES.items():
-            for m in re.finditer('(?:' + cue + r')[^.!?;\d]{0,45}(\d+)\s*(ngày|tháng|năm)\b', clause):
+            # v11: a range ("một đến 2 ngày", "2-3 ngày") counts by its upper bound.
+            for m in re.finditer('(?:' + cue + r')[^.!?;\d]{0,45}?(?:\d+\s*(?:đến|tới|-|–|hoặc|hay)\s*)?(\d+)\s*(ngày|tháng|năm)\b', clause):
                 if key == 'warranty_months' and m[2] in {'tháng', 'năm'}:
                     found[key] = int(m[1]) * (12 if m[2] == 'năm' else 1)
                 elif key != 'warranty_months' and m[2] == 'ngày':
@@ -488,6 +669,9 @@ def _mentions(text: str, *, now: datetime | None = None) -> dict:
         if number := normalise_phone(m.group()):
             phones.add(number)
     phones |= spoken_phones
+    for kind, number in spoken.identifiers(corrected).items():
+        found[kind] = number  # Never a phone: ID card and bank account numbers are their own fields.
+        phones.discard(number)
     if len(phones) == 1:
         found['phone'] = next(iter(phones))
     orders = set(re.findall(r'\bOD\d{3,12}\b', re.sub(r'\bod\s+(\d+)', r'OD\1', written, flags=re.IGNORECASE), re.IGNORECASE))
@@ -496,7 +680,24 @@ def _mentions(text: str, *, now: datetime | None = None) -> dict:
     sku = _product(corrected)
     if sku:
         found['sku'] = sku
+        if 'price_vnd' in found:
+            paired = _priced_products(written)
+            if len(set(paired.values())) > 1 and sku in paired:
+                found['price_vnd'] = paired[sku]  # "Y thì 5.200.000, còn X là 4.800.000": Y's price, not the last one.
     return found
+
+
+def _priced_products(written: str) -> dict[str, int]:
+    """Each product named in a clause with the first amount that follows it, when a clause names several."""
+    out: dict[str, int] = {}
+    for clause in _clauses(written):
+        start = 0
+        for span in itn.money_spans(clause):
+            product = _product(clause[start:span.start])
+            if product and product not in out:
+                out[product] = span.value
+            start = span.end
+    return out
 
 
 def scenario_entities(text: str, *, now: datetime | None = None) -> dict:
@@ -547,8 +748,10 @@ def commerce(text: str, *, now: datetime | None = None) -> dict:
     return observe(text, now=now)['asr_entities']
 
 
-def observe(text: str, *, now: datetime | None = None, speaker: str | None = None) -> dict:
-    mentions = _mentions(text, now=now)
+def observe(text: str, *, now: datetime | None = None, speaker: str | None = None,
+            previous_size: int | str | None = None) -> dict:
+    """*previous_size*: a size an earlier turn stated, so "đổi lên 41" here makes it the size changed from."""
+    mentions = _mentions(text, now=now, previous_size=previous_size)
     values = _scenario(mentions, text, speaker=speaker)
     clock = now or datetime.fromisoformat(_catalogue()['reference_date'])
     written = itn.normalise(text.lower(), clock)
@@ -568,22 +771,83 @@ def observe(text: str, *, now: datetime | None = None, speaker: str | None = Non
     return {'scenario_entities': _validate(values), 'asr_entities': mentions}
 
 
-def observe_dialogue(text: str, *, now: datetime | None = None) -> dict:
-    """Aggregate actual predicted speech, keeping the last unambiguous identifier.
+#: v11: "để anh cân nhắc thêm" after the customer compared prices is the comparison, as the organisers label it.
+COMPARED_THEN_HESITATED = 'so sanh gia'
 
-    Scalar utterance extraction still abstains for multiple candidates. A dialogue
-    may name different products/identifiers over time; only its actual boundaries
-    and explicit selection cues supply ordering, never reference turns or labels.
+
+def observe_turns(turns: list[tuple[str, datetime | None, str | None]]) -> list[dict]:
+    """One observation per turn (text, clock, speaker), for the organisers' strict per-turn entity accuracy.
+
+    v10: each turn is read alone, except that a model said alone ("dạ mẫu x là ...") is read against the
+    brand and kind of the product a previous turn named, as a listener would.
+    """
+    previous, size, compared, out = None, None, False, []
+    for text, now, speaker in turns:
+        observed = (observe(text, now=now, speaker=speaker) if size is None
+                    else observe(text, now=now, speaker=speaker, previous_size=size))
+        found = observed['asr_entities']
+        size = found.get('size_new', found.get('size_old', size))
+        if found.get('blocker') == 'can suy nghi them' and compared:
+            found['blocker'] = COMPARED_THEN_HESITATED
+        compared = compared or 'competitor_price_vnd' in found or found.get('blocker') == 'so sanh gia'
+        named = _named_products(text)
+        if 'sku' not in observed['asr_entities'] and not named and previous:
+            found = _model_in_context(text, previous)
+            if found:
+                observed['asr_entities']['sku'] = found
+        if 'sku' in observed['asr_entities']:
+            named = {observed['asr_entities']['sku']}
+        if named:
+            previous = sorted(named)[0]  # Context is the brand and kind; any product named carries them.
+        out.append(observed)
+    return out
+
+
+def observe_dialogue(text: str, *, now: datetime | None = None) -> dict:
+    """One value per field for a whole dialogue: the value its clauses state most often, the latest on a tie.
+
+    v10: the organisers' dialogue-level labels keep every value a field took, in order (``entities_multi``),
+    and any one of them is correct. So a dialogue that names several products or prices answers with one
+    it named rather than abstaining; a clause naming two products votes for both. Only actual clause
+    boundaries and explicit selection cues are used, never reference turns or labels.
     """
     result = observe(text, now=now)
-    for clause in _clauses(text):
+    whole = dict(result['asr_entities'])
+    votes: dict[str, dict] = {}   # field -> value -> [count, latest position]
+
+    def vote(field: str, value, position: int) -> None:
+        seen = votes.setdefault(field, {}).setdefault(json.dumps(value, ensure_ascii=False, sort_keys=True), [0, position, value])
+        seen[0] += 1
+        seen[1] = max(seen[1], position)
+
+    for field, value in result['asr_entities'].items():
+        if field != 'sku':  # Products are counted per clause below.
+            vote(field, value, -1)  # The whole text sees values that span clauses; a clause's own value wins a tie.
+    previous = None
+    for position, clause in enumerate(_clauses(text)):
         current = observe(clause, now=now)
-        for key in ('sku', 'phone', 'order_id'):
-            if key in current['asr_entities']:
-                result['asr_entities'][key] = current['asr_entities'][key]
+        for field, value in current['asr_entities'].items():
+            if field != 'sku':
+                vote(field, value, position)
+        # v8: "dạ mẫu x là ..." after AirPure Y names AirPure X.
+        named = ({current['asr_entities']['sku']} if 'sku' in current['asr_entities']
+                 else _named_products(clause) or ({found} if previous and (found := _model_in_context(clause, previous)) else set()))
+        for sku in sorted(named):
+            vote('sku', sku, position)
+        if len(named) == 1:
+            previous = next(iter(named))
         for key in ('owned_sku', 'alt_suggested', 'product_advised', 'variant_sku'):
             if key in current['scenario_entities']:
                 result['scenario_entities'][key] = current['scenario_entities'][key]
+    for field, values in votes.items():
+        result['asr_entities'][field] = max(values.values(), key=lambda item: (item[0], item[1]))[2]
+    if 'size_old' in whole:
+        # v11: a change of size spans clauses ("size 40 hơi chật ... đổi lên 41"); only the whole text sees both.
+        result['asr_entities'].update({key: whole[key] for key in ('size_old', 'size_new') if key in whole})
+    found = result['asr_entities']
+    if found.get('blocker') == 'can suy nghi them' and ('competitor_price_vnd' in found
+                                                        or json.dumps('so sanh gia') in votes.get('blocker', {})):
+        found['blocker'] = COMPARED_THEN_HESITATED
     selected = _selected_product(text)
     if selected:
         result['asr_entities']['sku'] = selected

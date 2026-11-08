@@ -73,7 +73,7 @@ def test_commerce_replay_records_contract_names_and_instrument_without_gold_acce
     before = (folder / 'ground_truth.json').read_bytes()
     report = asr.evaluate(folder, None, tmp_path / 'out')
     assert report['main_scorer']['raw']['entity_accuracy'] == 0
-    assert report['manifest']['commerce_extractor']['version'] == 'scenario-commerce-v5'
+    assert report['manifest']['commerce_extractor']['version'] == 'scenario-commerce-v11'
     assert report['manifest']['generated_entity_samples'] == 1
     hypotheses = json.loads((tmp_path / 'out/raw/hypotheses.json').read_text())
     assert hypotheses['one']['entities'] == {'color': 'den'}

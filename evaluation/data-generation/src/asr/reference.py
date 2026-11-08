@@ -101,6 +101,77 @@ def problems(text: str, turn: SpokenTurn, products: dict[str, str]) -> list[str]
     return found
 
 
+def _strip_marks(text: str) -> str:
+    text = unicodedata.normalize("NFD", _norm(text).replace("đ", "d"))
+    return "".join(c for c in text if unicodedata.category(c) != "Mn")
+
+
+#: Capitalised words of a product name that name its kind, not the product.
+GENERIC_NAME_WORDS = {"RO", "UF", "DC", "PPSU", "NGỪNG", "BÁN"}
+
+
+def _product_named(name: str, bare: str, said_numbers: set[int] = frozenset()) -> bool:
+    """Whether the clip names this product: every brand and model word of its name ("AirPure" and "Y", "Spectra"
+    and "S1", "Combo" too for a combo), so naming AirPure X is not naming AirPure Y."""
+    name = re.split(r"\s*[(—]", name)[0]
+    words = name.split()
+    marks = [w for i, w in enumerate(words) if any(c.isupper() for c in w) and (i > 0 or w.lower() == "combo")
+             and w not in GENERIC_NAME_WORDS]
+    if not marks:
+        return _strip_marks(name) in bare
+    def said(word: str) -> bool:
+        forms = {_strip_marks(word), _strip_marks(word.replace("&", " and ")), _strip_marks(word.replace("&", " "))}
+        if any(re.search(r"(?<!\w)" + re.escape(f) + r"(?!\w)", bare) for f in forms if f):
+            return True
+        # A model code with a number ("4L", "S1") may be said as the number: "bốn lít", "ét một".
+        number = re.search(r"\d+", word)
+        return bool(number) and int(number.group()) in said_numbers
+    return all(said(w) for w in marks)
+
+
+#: Words that state a value of these entities; without one, the clip does not say it.
+STATED_CUES = {
+    "payment": r"cod|ce o de|thanh toan|chuyen khoan|ngan hang|tra truoc|tra tien|khi nhan hang|tien mat|bank|the tin dung|vi dien tu|momo|zalopay",
+    "has_children": r"\b(?:con|be|tre|chau|em be|tre em|tre nho|em nho|so sinh)\b",
+    "in_stock": r"con hang|het hang|co hang|co san|ve hang|tam het",
+}
+
+
+def stated_in_clip(stated: dict[str, Any], written: str, spoken: str, products: dict[str, str]) -> tuple[dict, dict]:
+    """The entities a clip actually says, and the ones it does not.
+
+    An ASR entity is what a listener can take from the audio. A label carried over from the scenario ("máy này"
+    labelled with the product the call is about) cannot be recognised from speech, so it is not ground truth for
+    ``entity_accuracy``. Each check reads the clip's own words: the product's name or code, the number for numbers
+    and identifiers, the colour or size, a cue word for payment, children and stock. Entities with no surface check
+    (blocker, objections) are kept.
+    """
+    text = f"{written}\n{spoken}"
+    plain, bare = _norm(text), _strip_marks(text)
+    said_numbers = numbers(written) | numbers(spoken)
+    digits = re.sub(r"\D", "", rule_entities._itn().normalise(text.lower(), datetime(2026, 1, 1)))
+    kept, dropped = {}, {}
+    for key, value in stated.items():
+        if key in ("sku", "owned_sku", "alt_suggested", "variant_sku"):
+            name = products.get(str(value), "")
+            ok = str(value).lower() in plain or bool(name) and _product_named(name, bare, said_numbers)
+        elif key in NUMERIC and str(value).lstrip("-").isdigit():
+            ok = int(value) == 0 or int(value) in said_numbers
+        elif key in ("phone", "order_id", "id_number", "bank_account"):
+            ok = bool(re.sub(r"\D", "", str(value))) and re.sub(r"\D", "", str(value)) in digits
+        elif key == "color":
+            ok = _strip_marks(str(value).replace("_", " ")) in bare
+        elif key in ("size_new", "size_old"):
+            ok = re.search(r"(?<!\w)" + re.escape(str(value).lower()) + r"(?!\w)", plain) is not None or \
+                (str(value).isdigit() and int(value) in said_numbers)
+        elif key in STATED_CUES:
+            ok = re.search(STATED_CUES[key], bare) is not None
+        else:
+            ok = True
+        (kept if ok else dropped)[key] = value
+    return kept, dropped
+
+
 def rule_turn(line: dict[str, Any], issues: list[str]) -> dict[str, Any]:
     """The rule-made reference of one line, when the model's could not be used."""
     spoken = to_spoken(line["text"])
@@ -204,6 +275,8 @@ def write_ground_truth(audio_root: Path = AUDIO_DIR, out: Path = ASR_REFERENCE_D
     """
     dataset = dataset or Dataset()
     btc = json.loads((DATA_DIR / "asr" / "ground_truth.json").read_text(encoding="utf-8"))
+    from src.utils.crm import SourceData
+    products = {product.sku: product.name for product in SourceData.load().catalog.products}
     dialogues, left_out = [], {}
     for meta_path in sorted(audio_root.glob("scenarios_*/call_*/turn_*.json")):
         meta = json.loads(meta_path.read_text(encoding="utf-8"))
@@ -222,7 +295,8 @@ def write_ground_truth(audio_root: Path = AUDIO_DIR, out: Path = ASR_REFERENCE_D
         if reason:
             left_out[reason] = left_out.get(reason, 0) + 1
             continue
-        spoken, stated = meta["spoken_text"], meta.get("entities") or {}
+        spoken = meta["spoken_text"]
+        stated, unstated = stated_in_clip(meta.get("entities") or {}, meta.get("text") or "", spoken, products)
         noise = (meta.get("noise") or {}).get("type")
         dialogues.append({
             "id": f"{meta['scenario_id']}-{meta['call']}-t{turn}",
@@ -236,6 +310,7 @@ def write_ground_truth(audio_root: Path = AUDIO_DIR, out: Path = ASR_REFERENCE_D
             "audio": meta_path.with_suffix(".wav").relative_to(audio_root.parent).as_posix(),
             "source_text": meta["text"], "reference_source": meta.get("reference_source"), "noise": noise or "clean",
             "input_mode": meta.get("input_mode"), "duration_seconds": meta.get("duration_seconds"),
+            **({"entities_not_stated": unstated} if unstated else {}),
         })
     seconds = sum(float(d["duration_seconds"] or 0) for d in dialogues)
     ground_truth = {

@@ -88,3 +88,32 @@ def test_products_of_a_call_come_from_its_labels_or_its_words(all_scenarios):
     call = next(c for s in all_scenarios for c in s.calls.values() if "SKU-" in json.dumps(c.model_dump(mode="json")))
     sku = next(word for word in json.dumps(call.model_dump(mode="json")).replace('"', " ").split() if word.startswith("SKU-"))
     assert sku.strip(",") in products_of(call, {sku.strip(","): "x", "SKU-ZZZ": "y"})
+
+
+# What a clip says, not what the scenario is about (ASR entity labels, 6a of the entity plan).
+from src.asr.reference import stated_in_clip as _stated
+
+_PRODUCTS = {"SKU-AP-X": "Máy lọc không khí AirPure X", "SKU-AP-Y": "Máy lọc không khí AirPure Y",
+             "SKU-BDL-AIR": "Combo AirPure Y + 2 màng lọc", "SKU-AF-4L": "Nồi chiên không dầu Lock&Lock 4L"}
+
+
+def test_a_product_the_clip_does_not_name_is_not_an_asr_entity():
+    kept, dropped = _stated({"sku": "SKU-AP-Y", "budget_vnd": 5000000}, "Máy này giá bao nhiêu, ngân sách 5 triệu",
+                            "máy này giá bao nhiêu ngân sách năm triệu", _PRODUCTS)
+    assert kept == {"budget_vnd": 5000000} and dropped == {"sku": "SKU-AP-Y"}
+
+
+def test_naming_one_model_does_not_name_another():
+    assert _stated({"sku": "SKU-AP-Y"}, "Chị hỏi AirPure X", "chị hỏi e pia ích", _PRODUCTS)[1] == {"sku": "SKU-AP-Y"}
+    assert _stated({"sku": "SKU-AP-Y"}, "Chị hỏi AirPure Y", "chị hỏi e pia y", _PRODUCTS)[0] == {"sku": "SKU-AP-Y"}
+    assert _stated({"sku": "SKU-BDL-AIR"}, "Cái Combo AirPure Y có hai màng lọc", "", _PRODUCTS)[0] == {"sku": "SKU-BDL-AIR"}
+    assert _stated({"sku": "SKU-AF-4L"}, "nồi lock and lock bốn lít", "", _PRODUCTS)[0] == {"sku": "SKU-AF-4L"}
+
+
+def test_numbers_cues_and_unchecked_entities():
+    kept, dropped = _stated({"price_vnd": 1690000, "payment": "COD", "has_children": True, "blocker": "so sanh gia"},
+                            "Giá 1 triệu 690 nghìn, trả tiền khi nhận hàng",
+                            "giá một triệu sáu trăm chín mươi nghìn trả tiền khi nhận hàng", _PRODUCTS)
+    assert kept == {"price_vnd": 1690000, "payment": "COD", "blocker": "so sanh gia"}
+    assert dropped == {"has_children": True}
+    assert _stated({"price_vnd": 1690000}, "Giá 1 triệu 6", "giá một triệu sáu", _PRODUCTS)[1] == {"price_vnd": 1690000}

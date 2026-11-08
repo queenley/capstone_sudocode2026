@@ -106,7 +106,7 @@ def test_catalogue_identity_does_not_supply_unspoken_price_stock_or_policy(monke
 def test_main_metric_extractor_declares_contract_and_catalogue_versions():
     from ai_agent_service.components.intake.commerce import metadata
     instrument = metadata()
-    assert instrument['version'] == 'scenario-commerce-v5'
+    assert instrument['version'] == 'scenario-commerce-v11'
     assert len(instrument['contract_sha256']) == len(instrument['catalogue_sha256']) == 64
 
 
@@ -118,7 +118,9 @@ def test_canonical_contract_supports_fields_outside_legacy_asr_schema():
 
 
 def test_uncertainty_and_catalogue_code_boundaries_do_not_become_facts():
-    assert entities.commerce('Bảo hành bao nhiêu tháng? Giao hàng 3 đến 5 ngày.') == {}
+    # scenario-commerce-v11: a range counts by its upper bound, as the organisers' ASR sample labels
+    # "giao nội thành một đến hai ngày" (delivery_days 2). The question still states no warranty.
+    assert entities.commerce('Bảo hành bao nhiêu tháng? Giao hàng 3 đến 5 ngày.') == {'delivery_days': 5}
     assert entities.commerce('SKU-AP-X-UNKNOWN') == {}
     assert entities.commerce('Size cũ 36.') == {'size_old': 36}
 
@@ -192,7 +194,7 @@ def test_five_inside_money_is_not_the_year_unit(amount):
     ('Thanh toán qua ngân hàng.', {'payment': 'bank'}),
     ('Tôi trả tiền mặt khi nhận hàng.', {'payment': 'COD'}),
     ('Chọn COOOD nhé.', {'payment': 'COD'}),
-    ('Số tài khoản ngân hàng của tôi 123456789012.', {}),
+    ('Số tài khoản ngân hàng của tôi 123456789012.', {'bank_account': '123456789012'}),
     ('Giá bên em 9 triệu bên khác có giá 8 triệu.', {'price_vnd': 9_000_000, 'competitor_price_vnd': 8_000_000}),
     ('Tôi đang mặc size 37.', {'size_old': 37}),
     ('Đổi size từ 37 sang 45 được không?', {'size_old': 37, 'size_new': 45}),
@@ -271,3 +273,21 @@ def test_spacing_tolerance_does_not_choose_between_colliding_catalogue_names(mon
     finally:
         module._product_patterns.cache_clear()
         module._model_patterns.cache_clear()
+
+
+def test_entity_breakdown_groups_phone_and_money_and_splits_exact_transcripts():
+    from ai_agent_service.pipeline.eval.asr import entity_breakdown
+    dialogues = [
+        {"id": "a", "full_text": "Ngân sách năm triệu.", "entities": {"budget_vnd": 5000000, "sku": "SKU-X"}},
+        {"id": "b", "full_text": "số của chị không chín không", "entities": {"phone": "090"}},
+        {"id": "c", "full_text": "giá hai triệu", "entities": {"price_vnd": [2000000, 2100000]}},
+    ]
+    predictions = {"a": {"text": "ngân sách năm triệu", "entities": {"budget_vnd": 5000000}},
+                   "b": {"text": "số của chị không chín", "entities": {}},
+                   "c": {"text": "giá hai triệu", "entities": {"price_vnd": 2100000}}}
+    result = entity_breakdown(dialogues, predictions)
+    assert result["groups"]["money"] == {"total": 2, "correct": 2, "missing": 0, "wrong": 0, "errors_on_exact_transcript": 0,
+                                         "fields": ["budget_vnd", "price_vnd"], "accuracy": 100.0}
+    assert result["groups"]["phone"]["missing"] == 1 and result["groups"]["phone"]["errors_on_exact_transcript"] == 0
+    # The SKU was missed on a transcript that matches the reference: an extraction or label error, not ASR.
+    assert result["fields"]["sku"]["errors_on_exact_transcript"] == 1 and result["groups"]["other"]["accuracy"] == 0.0

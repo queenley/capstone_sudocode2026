@@ -141,6 +141,40 @@ def phones(text: str) -> set[str]:
     return found
 
 
+#: What a customer says before an ID card or a bank account number: never a phone number to call back.
+IDENTIFIER_CUES = {
+    "id_number": r"c\s*c\s*c\s*d|căn cước(?: công dân)?|chứng minh(?: nhân dân| thư)?|cmnd",
+    "bank_account": r"số tài khoản(?: ngân hàng)?|tài khoản ngân hàng|stk|số tk",
+}
+#: Their lengths: a CCCD is 12 digits, an old CMND 9, nothing between; a bank account 6 to 19.
+IDENTIFIER_LENGTHS = {"id_number": {9, 12}, "bank_account": set(range(6, 20))}
+
+
+def identifiers(text: str) -> dict[str, str]:
+    """ID card and bank account numbers read out after their cue ("số c c c d của chị là không bảy chín …").
+
+    Kept apart from :func:`phones` so a 12-digit ID or an account number is never filed as a phone number.
+    """
+    text = unicodedata.normalize('NFC', text).lower()
+    digit_values = {word: value for word, value in itn.DIGITS.items() if word not in {'linh', 'lẻ', 'mốt', 'lăm', 'nhăm'}}
+    digit = r'(?:\d+|' + '|'.join(sorted(digit_values, key=len, reverse=True)) + r')(?!\w)'
+    number = re.compile(digit + r'(?:[\s,.-]+' + digit + r')*')
+    found: dict[str, set[str]] = {}
+    for kind, cue in IDENTIFIER_CUES.items():
+        lengths = IDENTIFIER_LENGTHS[kind]
+        for marker in re.finditer(cue, text):
+            # The number follows within a short stretch ("số tài khoản ngân hàng để nhận hoàn tiền nhé là …").
+            for match in number.finditer(text, marker.end(), min(len(text), marker.end() + 60 + 120)):
+                if match.start() > marker.end() + 60:
+                    break
+                parts = re.findall(digit, match.group())
+                digits = ''.join(part if part.isdecimal() else str(digit_values[part]) for part in parts)
+                if len(digits) in lengths:
+                    found.setdefault(kind, set()).add(digits)
+                    break
+    return {kind: next(iter(values)) for kind, values in found.items() if len(values) == 1}
+
+
 def size_letters(text: str) -> str:
     forms = {'ích ích ích e lờ': 'XXXL', 'ích ích e lờ': 'XXL', 'ích ích ét': 'XXS',
              'ích e lờ': 'XL', 'ích ét': 'XS', 'em mờ': 'M', 'e lờ': 'L', 'ét': 'S'}
