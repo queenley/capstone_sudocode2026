@@ -1128,3 +1128,75 @@ footer.call-controls button.hangup { background: var(--danger); color: var(--on-
   margin-top: 8px;
   font-size: 13px;
 }
+
+/* The handoff bell (features/handoff-alerts): red with the count while a customer waits for staff. */
+.handoff-bell { position: relative; display: inline-flex; }
+.handoff-bell-button {
+  position: relative; display: inline-grid; place-items: center; width: 44px; height: 44px; padding: 0;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink);
+}
+.handoff-bell-button.ringing { border-color: var(--danger); background: var(--danger); color: var(--on-chrome); }
+.handoff-bell-button.ringing .icon { animation: bell-ring 1.6s ease-in-out infinite; transform-origin: 50% 10%; }
+.handoff-bell-count {
+  position: absolute; top: -4px; right: -4px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px;
+  background: var(--surface); color: var(--danger-ink); border: 2px solid var(--danger);
+  font-size: 12px; font-weight: 500; line-height: 16px; text-align: center;
+}
+.handoff-bell-source { position: absolute; bottom: 2px; right: 2px; width: 8px; height: 8px; border-radius: 999px; border: 2px solid var(--surface); }
+.handoff-bell-source.kafka, .handoff-bell-source.polling { background: var(--green); }
+.handoff-bell-source.fallback { background: var(--warn-ink); }
+.handoff-bell-source.off { background: var(--line-strong); }
+.handoff-bell-panel {
+  position: absolute; top: calc(100% + 8px); right: 0; z-index: 60; width: min(360px, calc(100vw - 32px));
+  padding: 8px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface);
+  box-shadow: 0 12px 32px rgb(var(--shadow-rgb) / 0.16); color: var(--ink);
+}
+.handoff-bell-head { display: grid; gap: 2px; padding: 8px 10px 10px; border-bottom: 1px solid var(--line); }
+.handoff-bell-head small, .handoff-bell-empty { color: var(--muted); font-size: 13px; }
+.handoff-bell-empty { margin: 0; padding: 12px 10px; }
+.handoff-bell-panel ul { list-style: none; margin: 0; padding: 4px 0; max-height: 360px; overflow-y: auto; }
+.handoff-bell-panel li button {
+  display: grid; gap: 2px; width: 100%; padding: 10px; text-align: left; border-radius: var(--radius-sm);
+  background: transparent; color: var(--ink); font-weight: 400; border-left: 3px solid var(--danger);
+}
+.handoff-bell-panel li button:hover, .handoff-bell-panel li button:focus-visible { background: var(--surface-3); }
+.handoff-bell-panel li span { font-size: 13px; color: var(--muted); }
+.handoff-bell-panel li small { font-size: 13px; color: var(--danger-ink); }
+.handoff-bell-panel .handoff-enable { width: 100%; margin-top: 4px; }
+@keyframes bell-ring { 0%, 60%, 100% { transform: rotate(0); } 10%, 30% { transform: rotate(14deg); } 20%, 40% { transform: rotate(-14deg); } }
+@media (prefers-reduced-motion: reduce) { .handoff-bell-button.ringing .icon { animation: none; } }
+
+.handoff-toasts { position: fixed; right: 16px; bottom: 16px; z-index: 70; display: grid; gap: 8px; width: min(340px, calc(100vw - 32px)); }
+.handoff-toast {
+  display: grid; gap: 4px; padding: 12px 14px; border-radius: var(--radius); color: var(--ink);
+  background: var(--surface); border: 1px solid var(--danger-line); border-left: 4px solid var(--danger);
+  box-shadow: 0 12px 32px rgb(var(--shadow-rgb) / 0.18);
+}
+.handoff-toast strong { color: var(--danger-ink); }
+.handoff-toast small { color: var(--muted); font-size: 13px; }
+.handoff-toast-actions { display: flex; gap: 8px; margin-top: 6px; }
+
+/* One row per customer; the sessions switch above the brief. */
+.queue-item.waiting { box-shadow: inset 3px 0 0 var(--danger); }
+.call-sessions { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 12px; }
+.call-session {
+  display: inline-flex; gap: 8px; align-items: flex-start; flex: none; padding: 8px 12px; text-align: left;
+  border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); color: var(--ink); font-weight: 400;
+}
+.call-session span:last-child { display: grid; gap: 2px; }
+.call-session small { font-size: 12px; color: var(--muted); }
+.call-session[aria-current="true"] { border-color: var(--ink); background: var(--surface-3); }
+.call-session.waiting { border-color: var(--danger); }
+
+/* The Call Brief leads the conversation: what the consultant reads before answering. */
+.call-brief-main { margin: 0 0 16px; border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--surface-2); }
+.call-brief-main.waiting { border-color: var(--danger); }
+.call-brief-main > summary {
+  display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; padding: 12px 16px; cursor: pointer; list-style-position: inside;
+}
+.call-brief-main > summary strong { font-size: 16px; }
+.call-brief-main > summary small { color: var(--muted); font-size: 13px; }
+.call-brief-body { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); padding: 0 16px 16px; }
+.call-brief-body .handoff-brief { margin-bottom: 0; }
+.call-brief-body .brief { margin: 0; }
+.call-brief-known > * + * { margin-top: 8px; }

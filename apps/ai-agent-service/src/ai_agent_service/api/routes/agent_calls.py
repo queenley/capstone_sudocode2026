@@ -7,14 +7,17 @@ these endpoints are for consultants (platform roles ``admin`` and ``agent``).
 
 from __future__ import annotations
 
-from typing import Any, Literal
+import json
+import time
+from typing import Any, AsyncIterator, Literal
 
 from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from src.api.routes.shared import staff
 
 from ...mcp.servers import btc
-from ...runtime import calls, platform, zalo
+from ...runtime import alerts, calls, platform, zalo
 from ...runtime.db import connection
 from ...runtime.calls import Actor, CallError
 
@@ -41,6 +44,7 @@ def _call(row: dict[str, Any], turn_count: int | None = None) -> dict[str, Any]:
         "turn_count": int(turn_count if turn_count is not None else row.get("turn_count") or 0),
         "handoff_status": row.get("handoff_status"), "handoff_reason": row.get("handoff_reason"),
         "handoff_brief": row.get("handoff_brief"), "accepted_by": row.get("accepted_by"),
+        "handoff_requested_at": row["handoff_requested_at"].isoformat() if row.get("handoff_requested_at") else None,
         "suggestion": row.get("suggestion"), "memory_status": row.get("memory_status"), "after_call": row.get("after_call"),
     }
 
@@ -78,6 +82,43 @@ async def list_calls(request: Request, open_only: bool = Query(default=False),
                      limit: int = Query(default=30, ge=1, le=100)) -> list[dict[str, Any]]:
     _actor(request)
     return [_call(row) for row in await calls.list_calls(open_only=open_only, limit=limit)]
+
+
+#: The proxies in front close a stream after two minutes; the stream ends first and the console reconnects.
+STREAM_SECONDS = 100.0
+#: A comment line this often keeps the proxies from timing the stream out between alerts.
+KEEPALIVE_SECONDS = 15.0
+
+
+def _waiting_signature(rows: list[dict[str, Any]]) -> tuple:
+    return tuple((row["id"], row.get("handoff_reason"), row.get("customer_label")) for row in rows)
+
+
+async def _handoff_events(request: Request, *, seconds: float = STREAM_SECONDS) -> AsyncIterator[str]:
+    """Server-sent events: ``handoffs`` with who waits now, each time that changes."""
+    deadline = time.monotonic() + seconds
+    seen, last, quiet_since = alerts.hub.version, None, time.monotonic()
+    yield "retry: 3000\n\n"
+    while time.monotonic() < deadline and not await request.is_disconnected():
+        rows = await alerts.waiting()
+        signature = _waiting_signature(rows)
+        if signature != last:
+            last = signature
+            data = {"source": alerts.hub.source, "waiting": [_call(row) for row in rows]}
+            yield f"event: handoffs\ndata: {json.dumps(data, ensure_ascii=False, default=str)}\n\n"
+            quiet_since = time.monotonic()
+        elif time.monotonic() - quiet_since >= KEEPALIVE_SECONDS:
+            yield ": keepalive\n\n"
+            quiet_since = time.monotonic()
+        seen = await alerts.hub.wait(seen, timeout=min(alerts.POLL_SECONDS, max(0.0, deadline - time.monotonic())))
+
+
+@router.get("/handoffs/stream")
+async def handoff_stream(request: Request) -> StreamingResponse:
+    """Who waits for a consultant, pushed as it changes (Kafka, or this process), read again every few seconds."""
+    _actor(request)
+    return StreamingResponse(_handoff_events(request), media_type="text/event-stream",
+                             headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"})
 
 
 @router.get("/callbacks")

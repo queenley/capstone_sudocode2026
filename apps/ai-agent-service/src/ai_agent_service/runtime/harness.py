@@ -357,6 +357,9 @@ class CallStore:
                     (self.call_id, turn_id, speaker, text, json.dumps(meta, ensure_ascii=False, default=str)),
                 )
             await self._project(conn, state)
+        if (state.get("handoff") or {}).get("status") == "pending" and before is None:
+            from . import alerts
+            alerts.wake()  # the console rings now, not at its next poll
         found = state.get("knowledge") or {}
         if found.get("abstain") and found.get("reason") in ("no_match", "absence") and reply:
             from ..components.improvement import gaps

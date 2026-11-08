@@ -23,6 +23,28 @@ Loại: ... · Trạng thái: ... · Chỉ số: TSR / CCR / RQR / HR / latency 
 
 Sáu mục đầu được ghi lại sau khi làm, từ đợt sửa ngày 05-06/11/2026. Chưa mục nào có số đo trên agent thật.
 
+### 2026-11-08 · Màn hình giám sát: gộp phiên theo khách, Call Brief lên đầu, chuông báo đỏ qua Kafka
+
+Loại: tính năng · Trạng thái: xong · Chỉ số: không có (giao diện nhân viên); e2e
+
+- **Vấn đề:** hàng chờ của `/calls` và `/ban-hang` có một dòng cho mỗi phiên, nên một khách nhắn web, rồi Zalo, rồi gọi hotline chiếm ba dòng rời nhau. Call Brief nằm cuối cột "Bằng chứng" bên phải, dưới phần ngữ cảnh. Khi trợ lý chuyển máy, nhân viên chỉ thấy ở lần tải lại kế tiếp (5 giây ở `/calls`, 10 giây ở `/ban-hang`). Hook báo động `useHandoffAlerts` có sẵn nhưng không trang nào gắn vào.
+- **Bằng chứng:** đọc code. `handoff.requested` đã được ghi vào outbox (`runtime/platform.py`) và worker đẩy lên topic `telesales.sales.events`, nhưng không ai nghe topic đó để báo cho nhân viên. Chỉ cuộc web chat (có `conversation_id`) ghi outbox; hotline và Zalo đặt `handoff_status = 'pending'` thẳng vào bảng `calls`.
+- **Sửa:**
+  - **Backend.** Thêm `runtime/alerts.py`: một hub đánh thức các luồng đọc khi có handoff. Hub được gọi từ `calls.request_handoff`, `accept_handoff`, `hang_up` và từ harness khi trợ lý chuyển máy. Một consumer Kafka chạy trong thread riêng, mỗi process một consumer group (`auto.offset.reset=latest`), nên mọi instance đều nghe được và không lấy mất message của worker outbox. Danh sách khách chờ luôn đọc từ bảng `calls`: Kafka chỉ báo lúc cần đọc lại, nhờ vậy hotline và Zalo vẫn hiện dù không đi qua outbox.
+  - **Endpoint.** `GET /api/agent/handoffs/stream` (SSE) gửi `handoffs` mỗi khi danh sách đổi, gửi keepalive mỗi 15 giây, và tự đóng sau 100 giây để vừa giới hạn 120 giây của proxy. Không có `KAFKA_BROKERS` thì vẫn đọc lại mỗi 5 giây. `_call` trả thêm `handoff_requested_at`.
+  - **Chuông.** `HandoffBell` đọc stream bằng fetch, vì EventSource không gửi được token nhân viên. Stream không mở được hai lần thì chuyển sang polling 5 giây và thử lại. Chuông đỏ, có số đếm và rung khi có người chờ; kêu chuông và thông báo trình duyệt như hook cũ. Danh sách mở ra ghi thời gian chờ, lý do và nguồn tín hiệu (Kafka, máy chủ đọc lại, hay trang tự tải). Toast được render qua portal, vì `.sl-topbar` giữ phần tử `fixed` ở đầu trang. Chuông được gắn vào header `/calls` và topbar `/ban-hang`; bấm vào thì mở cuộc gọi đó trong tab hội thoại.
+  - **Hàng chờ.** `features/call-groups.ts` gộp các phiên theo `customer_id`. Phiên không có `customer_id` (khách lạ, số dùng chung) vẫn đứng riêng, vì không có căn cứ để gộp. Thứ tự: nhóm có người chờ trước, rồi nhóm đang mở, rồi mới nhất. Phía trên brief có dải "Các phiên của khách này" để chuyển giữa các phiên.
+  - **Call Brief.** Component riêng ở đầu khung hội thoại, gập được: bàn giao từ trợ lý cạnh brief và cảnh báo, khung đỏ khi khách đang chờ. Cột phải chỉ còn ngữ cảnh, các lượt của trợ lý và after-call.
+- **Đã kiểm:**
+  - `tests/agent/test_handoff_alerts.py` (7 test): hub đánh thức mọi luồng đọc, kể cả khi bị gọi từ thread Kafka; chỉ sự kiện làm đổi danh sách chờ mới kêu; không có Kafka thì đọc lại theo nhịp; stream gửi lại khi danh sách đổi; một lần đánh thức đến trước nhịp đọc lại.
+  - `e2e/call-console.spec.ts`: thêm 4 test (gộp 3 phiên của một khách thành một dòng và chuyển phiên; chuông đỏ từ stream rồi mở cuộc gọi; polling khi stream trả 502; chuông ở `/ban-hang` mở tab hội thoại). Cả 6 test pass trên dev server.
+  - Test demo trong `redesign-snapshots` đọc brief ở vị trí mới; 3 test console và sales pass. `tsc` sạch. Toàn bộ `tests/` trên venv của `ai-agent-service` (Python 3.12): 1.391 passed, 35 failed, 14 errors. Tất cả fail và error nằm ở ASR và voice (`test_asr_*`, `test_voice_transport`), cộng thêm `test_settlement_does_not_recreate_a_missing_ledger` (Windows khóa file SQLite). Test này cũng fail trên HEAD khi chưa có thay đổi.
+- **Số đo:** không có chỉ số agent. e2e console: 6/6.
+- **Còn lại:**
+  - Handoff của hotline và Zalo chưa ghi outbox, nên instance khác chỉ thấy sau tối đa 5 giây. Muốn tức thì thì cần ghi `handoff.requested` cho cả cuộc không có `conversation_id`; `aggregate_id` của outbox phải là UUID.
+  - Hàng chờ chỉ gộp các phiên trong 50 cuộc gần nhất.
+  - Chưa thử với Kafka thật (profile `async` của docker-compose).
+
 ### 2026-11-08 · Redesign frontend theo taste-skill
 
 Loại: tính năng · Trạng thái: xong · Chỉ số: bố cục (`check.mjs`), copy-lint, e2e
@@ -54,6 +76,7 @@ Loại: hard guard, prompt · Trạng thái: đang đo · Chỉ số: TSR
 - **Sửa:** (1) `ActionGuardMiddleware` trả `ORDER_INCOMPLETE`, kèm phần còn thiếu và không phát hành bản nháp, khi đơn thiếu thanh toán do model truyền, thiếu địa chỉ (lấy từ lời khách hoặc bộ nhớ qua `order_arguments`) hoặc thiếu ngày giao từ `delivery.estimate` (`purchase.missing`, `purchase.estimated_delivery`). Câu đọc lại có thêm "giao dự kiến ngày …" (PB-09). Rule 12 trong `rule_packs.yaml` bỏ "thiếu địa chỉ hay thanh toán không phải lý do chờ / tự đặt COD": giờ chỉ hỏi phần còn thiếu, và gọi `order_create` ngay khi khách vừa đưa thông tin cuối cùng, để câu "chốt đơn" kế tiếp là lời xác nhận. (2) `purchase.matches()` dùng `agrees()`, cùng quy tắc với `answer()`; các điều kiện khác giữ nguyên: đúng câu đọc lại ở lượt trước, cùng nội dung đơn, còn trong 300 giây, có biên nhận HMAC. (3) `COURTESY` thêm "vậy", "làm"; câu có "nhưng", "đổi", "thêm", "chuyển khoản" vẫn không được tính là đồng ý.
 - **Đã kiểm:** thêm 12 test trong `tests/agent/test_ec03_confirmation_isolation.py` (đơn thiếu từng trường; câu đọc lại có ngày giao; 4 câu đồng ý kèm từ đệm tạo được đơn; 4 câu có ý đổi đơn bị từ chối). Fixture được cập nhật cho đơn đủ thông tin. Kế hoạch mua sai trên kênh khác giờ dừng ở `ORDER_INCOMPLETE`, không còn tạo bản nháp. `tests/agent`: 1.285 passed; 11 failed và 14 errors đều nằm ở ASR và voice (`test_asr_*`, `test_voice_transport`), các file không bị đổi trong mục này.
 - **Số đo:** chưa đo.
+- **Quay lui một phần (merge `origin/main`, commit `1fac83c9`):** bỏ phần (1) `ORDER_INCOMPLETE`, vì skill đặt hàng của `main` cố ý cho tạo đơn khi chưa có địa chỉ (hỏi sau) và mặc định COD. Giữ lại ngày giao dự kiến trong câu đọc lại, phần (2) và phần (3). Đã bỏ các test đơn thiếu từng trường; giữ 3 test về ngày giao và câu đồng ý.
 - **Còn lại:** khi lần đầu khách nói muốn mua lại rơi vào lượt cuối (như SAMPLE-02, SAMPLE-04, SAMPLE-05 của BTC), vẫn không còn lượt để xác nhận: đây là đánh đổi đã chọn (xác nhận trước khi tạo đơn). Số lượng mặc định là 1 khi khách không nói, và được đọc lại để khách sửa. Cần chạy lại các cuộc `order.create` của `eval2`, trước hết một kịch bản (SCN-ADV-0018).
 
 ### 2026-11-07 · Extractor v11: entity nạp từ contract, thêm today và crm_history

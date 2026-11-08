@@ -11,6 +11,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Logo } from "@/components/brand/Logo";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 import CallConsole from "@/features/call-console";
+import { HandoffBell } from "@/features/handoff-alerts";
 import { api, AgentCall } from "@/services/api";
 import { colorName, money } from "@/lib/catalog";
 import "./sales.css";
@@ -76,6 +77,8 @@ export default function SalesPage() {
   const [access, setAccess] = useState({ calls: false, orders: false });
   const [checked, setChecked] = useState(false);
   const [error, setError] = useState("");
+  // The call the bell opened, for the console (``at``: the same call can be opened again).
+  const [focus, setFocus] = useState<{ id: number; at: number } | null>(null);
 
   useEffect(() => {
     setToken(sessionStorage.getItem("staff-token") || "");
@@ -188,6 +191,15 @@ export default function SalesPage() {
             <span className="sl-live" title="Trang tự tải lại dữ liệu mỗi 10 giây">
               Cập nhật mỗi 10 giây
             </span>
+            {access.calls && (
+              <HandoffBell
+                token={token}
+                onOpen={(id) => {
+                  go("conversations");
+                  setFocus({ id, at: Date.now() });
+                }}
+              />
+            )}
             <ThemeToggle />
           </div>
         </div>
@@ -198,7 +210,7 @@ export default function SalesPage() {
           <Overview calls={calls} orders={orders} callbacks={callbacks} waiting={waiting} go={go} />
         ) : tab === "conversations" ? (
           <div className="sl-console">
-            <CallConsole embedded />
+            <CallConsole embedded focus={focus} />
           </div>
         ) : tab === "orders" ? (
           <Orders orders={orders || []} token={token} onChange={refresh} />

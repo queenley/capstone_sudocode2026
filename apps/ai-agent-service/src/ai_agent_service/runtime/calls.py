@@ -30,7 +30,7 @@ from ..components.improvement import signals
 from ..components.intake import pii
 from ..mcp import client as mcp_client
 from ..mcp.tools import ToolBox
-from . import harness, options, trace_export, vault as vaults
+from . import alerts, harness, options, trace_export, vault as vaults
 from .db import connection, require_writable_call
 
 logger = logging.getLogger(__name__)
@@ -216,6 +216,7 @@ async def hang_up(call_id: int) -> dict[str, Any]:
             raise CallError(409, "The assistant is still answering. Try ending the call again in a moment.")
     if newly:
         harness.spawn(harness.remember(call_id))
+        alerts.wake()
     return await call_row(call_id)
 
 
@@ -291,6 +292,7 @@ async def request_handoff(call_id: int, *, reason: str) -> dict[str, Any]:
         )
     await harness.add_spoken(call_id, AIMessage(content=LINES["bridging"], id=f"agent-{turn_id}"))
     logger.info("Handoff requested on call %s: %s", call_id, reason)
+    alerts.wake()
     return row
 
 
@@ -320,6 +322,7 @@ async def accept_handoff(call_id: int, *, actor: Actor) -> dict[str, Any]:
             "ON CONFLICT (call_id, turn_id, speaker) DO NOTHING",
             (call_id, f"joined-{call_id}", JOINED_MARK, json.dumps({"joined": actor.label or actor.id})),
         )
+    alerts.wake()
     return row
 
 

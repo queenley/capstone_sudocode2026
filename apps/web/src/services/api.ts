@@ -172,6 +172,8 @@ export type AgentCall = {
   handoff_status: "pending" | "accepted" | null;
   handoff_reason: string | null;
   handoff_brief: Record<string, unknown> | null;
+  /** When the handoff was asked for; absent on older rows. */
+  handoff_requested_at?: string | null;
   accepted_by: string | null;
   suggestion: {
     text: string;
