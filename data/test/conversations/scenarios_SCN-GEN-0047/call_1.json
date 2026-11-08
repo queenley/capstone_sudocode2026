@@ -1,0 +1,207 @@
+{
+  "conversation_id": "SCN-GEN-0047__call_1",
+  "scenario_id": "SCN-GEN-0047",
+  "call": "call_1",
+  "customer_id": "C034",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-01",
+  "region": "trung",
+  "category": "gia-dung/may-loc-nuoc",
+  "persona": "hai_nguoi_chung_sdt",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào cô Loan ạ, hôm trước cô có quan tâm Máy lọc nước RO Karofi 9 lõi và mình ở Cần Thơ; em là trợ lý ảo của shop, cô muốn mình tiếp tục tư vấn về sản phẩm này đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Cô muốn mình tiếp tục tư vấn Máy lọc nước RO Karofi 9 lõi đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "delivery_area",
+        "decision_maker"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, cô muốn hỏi về máy lọc nước RO Karofi 9 lõi mà hôm trước đã nói.",
+      "facts_stated": {
+        "product_advised": "SKU-WF-RO9"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy lọc nước RO Karofi 9 lõi hiện bên em còn hàng, giá là 5.990.000đ ạ. Máy phù hợp cho gia đình 4–6 người, sử dụng RO 9 lõi lọc sạch và an toàn cho sinh hoạt gia đình mình.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Dùng cho gia đình 6 người, ngân sách khoảng 7 triệu thôi.",
+      "facts_stated": {
+        "usage_need": "gia đình 6 người",
+        "budget_vnd": 7000000
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với nhu cầu gia đình 6 người và ngân sách khoảng 7 triệu thì máy Karofi 9 lõi rất phù hợp cô nhé. Giá hiện tại là 5.990.000đ, nằm trong mức ngân sách của mình ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại sản phẩm này chưa có chương trình khuyến mãi giảm giá, tuy nhiên cô sẽ được miễn phí vận chuyển với đơn từ 2 triệu và miễn phí thu hộ nếu chọn COD ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cô cần suy nghĩ thêm rồi gọi lại nhé.",
+      "facts_stated": {
+        "blocker": "cần suy nghĩ thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, cô cứ suy nghĩ thêm ạ. Khi nào cần tư vấn hoặc quyết định đặt hàng, cô gọi lại cho shop bất cứ lúc nào nhé. Em sẽ lưu lại thông tin để hỗ trợ cô nhanh hơn lần sau ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 7000000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "usage_need",
+          "value": "gia đình 6 người",
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-WF-RO9",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5990000,
+          "op": "set",
+          "source": "call_1#turn3"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chưa_quyết_định",
+    "objection_handling": "Nhẹ nhàng xác nhận và hẹn khách quay lại khi cần.",
+    "sentiment": "neutral",
+    "decision_maker": "con gái",
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

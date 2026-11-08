@@ -2,7 +2,8 @@
    (globals.css) are unaffected. Colours are the tokens of theme.css; the
    --s-* names are the shop's own words for them. */
 
-.s-root {
+/* The shop's names for the tokens, page-wide: the chat widget and the app pages read them. */
+:root {
   --s-bg: var(--bg);
   --s-card: var(--surface);
   --s-ink: var(--ink);
@@ -16,11 +17,12 @@
   --s-warn: var(--warn-ink);
   --s-radius: var(--radius-lg);
   --s-shadow: var(--shadow);
+}
+/* .s-root: an app page of the storefront (ShopMain wraps every page but the home page) and the chat
+   widget; the home page is the kit's own (public/assets). */
+.s-root {
   background: var(--s-bg);
   color: var(--s-ink);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
   font-family: var(--font-sans);
 }
 .s-root h1,
@@ -82,48 +84,47 @@
   font-size: 15px;
   cursor: pointer;
   text-align: center;
-  transition: background-color var(--m-out) var(--ease), border-color var(--m-out) var(--ease), color var(--m-out) var(--ease), transform var(--m-out) var(--ease);
+  box-shadow: 0 1px 2px rgb(var(--shadow-rgb) / 0.08), 0 4px 12px rgb(247 148 29 / 0.18);
+  transition: background 0.15s, box-shadow 0.15s, transform 0.05s;
 }
-/* One step up on hover, one down and a little smaller on press (docs/plan/UI-REDESIGN-TASTE.md). */
-@media (hover: hover) and (pointer: fine) {
-  .s-btn:hover:not(:disabled) {
-    background: var(--brand-strong);
-    border-color: var(--brand-strong);
-    opacity: 1;
-    transform: translateY(-1px);
-    transition-duration: var(--m-in);
-  }
+.s-btn:hover:not(:disabled) {
+  background: var(--brand-strong);
+  border-color: var(--brand-strong);
+  opacity: 1;
 }
 .s-btn:active:not(:disabled) {
-  transform: translateY(1px) scale(0.985);
-  transition-duration: var(--m-press);
+  transform: translateY(1px);
 }
 .s-btn-lg {
-  min-height: 48px;
-  padding: 12px 24px;
+  padding: 13px 24px;
   font-size: 16px;
 }
 .s-btn-block {
   width: 100%;
 }
-/* The one secondary look. .s-btn-ghost is the same button, full width in a card. */
-.s-btn-outline,
-.s-btn-ghost {
+.s-btn-outline {
   background: var(--surface);
-  color: var(--ink);
-  border-color: var(--line-strong);
+  color: var(--brand-ink);
+  border-color: var(--brand-line);
+  box-shadow: none;
+}
+.s-btn-outline:hover:not(:disabled) {
+  background: var(--brand-soft);
+  border-color: var(--brand);
 }
 .s-btn-ghost {
+  background: var(--brand-soft);
+  color: var(--brand-ink);
+  border-color: var(--brand-line);
+  box-shadow: none;
   width: 100%;
+  font-size: 14px;
   padding: 9px 12px;
 }
-@media (hover: hover) and (pointer: fine) {
-  .s-btn-outline:hover:not(:disabled),
-  .s-btn-ghost:hover:not(:disabled) {
-    background: var(--surface-3);
-    border-color: var(--ink-2);
-    color: var(--ink);
-  }
+.s-btn-ghost:hover:not(:disabled) {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--on-brand);
 }
 .s-btn.disabled {
   opacity: 0.45;
@@ -141,7 +142,7 @@
   font-size: 14px;
 }
 .s-link-btn:hover:not(:disabled) {
-  color: var(--ink);
+  opacity: 0.8;
 }
 .s-danger {
   color: var(--danger-ink);
@@ -161,7 +162,8 @@
 
 /* ---------- header ---------- */
 .s-header {
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px);
   border-bottom: 1px solid var(--line);
   position: sticky;
   top: 0;
@@ -188,9 +190,9 @@
 }
 .s-topline-tag {
   background: var(--accent);
-  color: #053527;
+  color: var(--on-brand);
   font-weight: 500;
-  font-size: 13px;
+  font-size: 12px;
   padding: 2px 10px;
   border-radius: 999px;
   white-space: nowrap;
@@ -230,7 +232,7 @@
   letter-spacing: -0.03em;
 }
 .s-logo-text small {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--muted);
   font-weight: 500;
 }
@@ -327,7 +329,7 @@
   right: -6px;
   background: var(--danger);
   color: #fff;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 500;
   min-width: 20px;
   height: 20px;
@@ -416,21 +418,41 @@
   align-items: center;
   padding: 44px;
   border-radius: var(--radius-xl);
-  border: 1px solid var(--line);
-  background: var(--surface);
+  border: 1px solid var(--brand-line);
+  background:
+    radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--accent) 22%, transparent) 0%, transparent 55%),
+    linear-gradient(135deg, var(--brand-soft) 0%, var(--surface) 70%);
+  box-shadow: var(--shadow-sm);
 }
-.s-hero-kicker {
-  margin: 0;
-  font-size: 14px;
+.s-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--brand-soft-2);
+  color: var(--brand-ink);
   font-weight: 500;
-  color: var(--muted);
+  font-size: 13px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--brand-line);
+}
+.s-eyebrow::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 25%, transparent);
 }
 .s-hero h1 {
-  font-size: var(--t-h1);
+  font-size: 46px;
   line-height: 1.1;
-  margin: 12px 0 16px;
+  margin: 18px 0 14px;
   letter-spacing: -0.035em;
-  text-wrap: balance;
+}
+.s-hero h1 em {
+  font-style: normal;
+  color: var(--brand-ink);
 }
 .s-hero p {
   font-size: 17px;
@@ -438,42 +460,97 @@
   max-width: 560px;
   line-height: 1.6;
 }
+.s-hero-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 22px 0 6px;
+  max-width: 520px;
+}
+.s-hero-stats div {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px 10px;
+  text-align: center;
+}
+.s-hero-stats strong {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 20px;
+  color: var(--brand-ink);
+}
+.s-hero-stats span {
+  font-size: 12px;
+  color: var(--muted);
+}
 .s-hero-cta {
   display: flex;
   gap: 12px;
-  margin: 24px 0 16px;
+  margin: 22px 0 16px;
   flex-wrap: wrap;
 }
-.s-hero p.s-hero-fact {
+.s-hero-points {
+  list-style: none;
+  padding: 0;
   margin: 0;
-  font-size: 14px;
+  display: flex;
+  gap: 8px 18px;
+  flex-wrap: wrap;
   color: var(--muted);
+  font-size: 14px;
 }
-/* The picture is a product from the catalogue, big, on a flat ground; it leads to its page. */
-.s-hero-product {
-  display: grid;
-  gap: 8px;
-  color: var(--ink);
-}
-.s-hero-product .s-art-hero {
-  aspect-ratio: 4 / 3;
-  width: 100%;
-}
-.s-hero-product-name {
-  font-size: var(--t-card);
+.s-hero-points li::before {
+  content: "✓ ";
+  color: var(--brand-ink);
   font-weight: 500;
 }
-.s-hero-product .s-art img {
-  transition: transform var(--m-image) var(--ease);
+.s-hero-art {
+  position: relative;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow);
 }
-@media (hover: hover) and (pointer: fine) {
-  .s-hero-product:hover .s-art img {
-    transform: scale(1.03);
-  }
+.s-hero-bubble {
+  position: absolute;
+  left: -28px;
+  bottom: 28px;
+  max-width: 330px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 1.55;
+  box-shadow: var(--shadow);
 }
-.s-hero-product.s-skeleton-block {
-  aspect-ratio: 4 / 3;
-  border-radius: var(--radius);
+.s-hero-bubble b {
+  color: var(--brand-ink);
+}
+.s-hero-live {
+  position: absolute;
+  left: 28px;
+  top: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+}
+.s-hero-live::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
 /* ---------- product art ---------- */
@@ -482,18 +559,26 @@
   display: grid;
   place-items: center;
   border-radius: var(--radius);
-  /* Without a photo: a quiet line drawing of the category on a neutral ground. */
-  color: var(--line-strong);
+  color: var(--brand-deep);
   overflow: hidden;
-  /* A flat neutral ground: colour comes from the photographs, not the frame. */
-  background: var(--surface-2);
+  background: linear-gradient(145deg, var(--art-from, var(--surface-3)), var(--art-to, var(--surface-3)));
 }
 :root[data-theme="dark"] .s-art {
   color: var(--ink-2);
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--art-from, var(--surface-3)) 12%, var(--surface-2)),
+    color-mix(in srgb, var(--art-to, var(--surface-3)) 22%, var(--surface-2))
+  );
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .s-art {
     color: var(--ink-2);
+    background: linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--art-from, var(--surface-3)) 12%, var(--surface-2)),
+      color-mix(in srgb, var(--art-to, var(--surface-3)) 22%, var(--surface-2))
+    );
   }
 }
 .s-art-card {
@@ -528,7 +613,7 @@
 }
 .s-photo-credit {
   margin: 8px 2px 0;
-  font-size: 13px;
+  font-size: 11.5px;
   line-height: 1.45;
   color: var(--s-muted);
 }
@@ -543,7 +628,7 @@
   bottom: 10px;
   font-weight: 500;
   font-size: 13px;
-  color: var(--muted);
+  opacity: 0.55;
 }
 
 /* ---------- sections, tiles, grid, cards ---------- */
@@ -556,7 +641,7 @@
 }
 .s-section-kicker {
   display: block;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--brand-ink);
   margin-bottom: 4px;
@@ -568,20 +653,18 @@
   gap: 12px;
   margin-bottom: 16px;
 }
-/* The one link look: brand text, an underline that draws from the left on hover. */
 .s-section-head > a {
   color: var(--brand-ink);
   font-weight: 500;
   font-size: 14px;
-  padding: 12px 0;
-  background: linear-gradient(currentColor, currentColor) 0 calc(100% - 10px) / 0 1px no-repeat;
-  transition: background-size var(--m-out) var(--ease);
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
 }
-@media (hover: hover) and (pointer: fine) {
-  .s-section-head > a:hover {
-    background-size: 100% 1px;
-    transition-duration: var(--m-in);
-  }
+.s-section-head > a:hover {
+  border-color: var(--brand-line);
+  background: var(--brand-soft);
 }
 .s-tiles {
   display: grid;
@@ -600,11 +683,11 @@
   text-align: center;
   font-weight: 500;
   font-size: 14px;
-  transition: box-shadow var(--m-out) var(--ease), transform var(--m-out) var(--ease), border-color var(--m-out) var(--ease);
+  transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
 }
 .s-tile:hover {
-  box-shadow: 0 8px 24px rgb(var(--shadow-rgb) / 0.08);
-  border-color: var(--line-strong);
+  box-shadow: var(--shadow);
+  border-color: var(--brand-line);
   transform: translateY(-2px);
 }
 .s-grid {
@@ -619,11 +702,11 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: box-shadow var(--m-out) var(--ease), transform var(--m-out) var(--ease), border-color var(--m-out) var(--ease);
+  transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
 }
 .s-card:hover {
-  box-shadow: 0 8px 24px rgb(var(--shadow-rgb) / 0.08);
-  border-color: var(--line-strong);
+  box-shadow: var(--shadow);
+  border-color: var(--brand-line);
   transform: translateY(-2px);
 }
 .s-card-link {
@@ -643,7 +726,7 @@
   flex: 1;
 }
 .s-card-cat {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--brand-ink);
   font-weight: 500;
 }
@@ -660,7 +743,7 @@
   min-height: 42px;
 }
 .s-card-note {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--muted);
 }
 .s-card-actions {
@@ -669,7 +752,7 @@
 .s-card-confirmation {
   min-height: 20px;
   margin: 6px 0 0;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--brand-ink);
   text-align: center;
 }
@@ -680,7 +763,7 @@
   position: absolute;
   top: 18px;
   left: 18px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   padding: 3px 10px;
   border-radius: 999px;
@@ -716,7 +799,7 @@
 }
 .s-price strong small {
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--muted);
 }
@@ -798,7 +881,9 @@
 
 /* ---------- assist band ---------- */
 .s-assist {
-  background: var(--chrome);
+  background:
+    radial-gradient(120% 160% at 100% 0%, rgb(247 148 29 / 0.25) 0%, transparent 50%),
+    var(--brand-deep);
   color: var(--on-chrome);
   border-radius: var(--radius-xl);
   padding: 32px;
@@ -842,7 +927,7 @@
   width: 38px;
   height: 38px;
   border-radius: var(--radius);
-  background: rgb(52 211 153 / 0.2);
+  background: rgb(247 148 29 / 0.2);
   color: var(--accent);
   font-size: 18px;
   font-weight: 500;
@@ -1178,16 +1263,10 @@
   font-size: 14px;
   color: var(--ink-2);
 }
-.s-perks a {
-  color: var(--ink-2);
-  text-decoration: underline;
-  text-decoration-color: var(--line-strong);
-  text-underline-offset: 3px;
-  transition: color var(--m-out) var(--ease), text-decoration-color var(--m-out) var(--ease);
-}
-.s-perks a:hover {
-  color: var(--ink);
-  text-decoration-color: currentColor;
+.s-perks li::before {
+  content: "✓ ";
+  color: var(--s-good);
+  font-weight: 500;
 }
 .s-specs {
   width: 100%;
@@ -1387,7 +1466,7 @@
   padding: 4px 0;
 }
 .s-status {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   padding: 4px 10px;
   border-radius: 999px;
@@ -1466,7 +1545,7 @@
   height: 10px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 0 4px rgb(52 211 153 / 0.3);
+  box-shadow: 0 0 0 4px rgb(247 148 29 / 0.3);
 }
 .s-returning {
   position: fixed;
@@ -1489,12 +1568,12 @@
 .s-returning-head { display: flex; flex-shrink: 0; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 8px 0 24px; }
 .s-returning-close { flex-shrink: 0; color: var(--ink-2); background: var(--surface-3); }
 .s-returning-content { min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 0 24px 24px; }
-.s-returning-kicker { color: var(--s-brand); font-size: 13px; font-weight: 500; letter-spacing: .1em; }
+.s-returning-kicker { color: var(--s-brand); font-size: 10px; font-weight: 500; letter-spacing: .1em; }
 .s-returning h2 { margin: 4px 0 12px; font-size: 21px; line-height: 1.3; }
 .s-returning p { margin: 0 0 18px; font-size: 14px; line-height: 1.6; }
 .s-returning-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .s-returning-actions .s-btn { flex: 1; justify-content: space-between; }
-.s-returning small { display: block; margin-top: 12px; color: var(--muted); font-size: 13px; }
+.s-returning small { display: block; margin-top: 12px; color: var(--muted); font-size: 11px; }
 @media (max-width: 600px) {
   .s-returning { right: 16px; bottom: 86px; }
   .s-returning-head { padding-left: 20px; }
@@ -1543,7 +1622,7 @@
   font-size: 16px;
 }
 .s-chat-head span {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--on-chrome-muted);
 }
 .s-chat-head-actions {
@@ -1615,7 +1694,7 @@
   border: 1px solid var(--s-line);
 }
 .s-msg-who {
-  font-size: 13px;
+  font-size: 11px;
   color: var(--s-muted);
   font-weight: 500;
   padding-left: 4px;
@@ -1640,7 +1719,7 @@
   max-width: 100%;
 }
 .s-msg-product {
-  flex: 0 0 148px;
+  flex: 0 0 132px;
   scroll-snap-align: start;
   display: flex;
   flex-direction: column;
@@ -1652,18 +1731,8 @@
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .s-msg-product:hover {
-  border-color: var(--line-strong);
-}
-.s-msg-product-main {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-}
-.s-msg-product .s-msg-product-add {
-  min-height: 44px;
-  padding: 6px 8px;
-  font-size: 13px;
+  border-color: var(--brand-line);
+  box-shadow: var(--shadow-sm);
 }
 .s-msg-product .s-art-thumb {
   width: 100%;
@@ -1671,7 +1740,7 @@
   flex: 0 0 auto;
 }
 .s-msg-product-name {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 1.35;
   color: var(--ink);
@@ -1697,12 +1766,12 @@
   color: var(--muted);
 }
 .s-msg-product-price s {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 500;
   color: var(--muted);
 }
 .s-msg-product-link {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--brand-ink);
 }
@@ -1753,7 +1822,7 @@
   display: flex;
   justify-content: space-between;
   padding: 8px 14px 10px;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--s-muted);
   background: var(--surface-2);
 }
@@ -1837,8 +1906,19 @@
     padding: 24px 20px;
     gap: 24px;
   }
+  .s-hero-stats strong {
+    font-size: 17px;
+  }
   .s-header-actions {
     gap: 4px;
+  }
+  .s-hero h1 {
+    font-size: 32px;
+  }
+  .s-hero-bubble {
+    position: static;
+    margin-top: 12px;
+    max-width: none;
   }
   .s-grid,
   .s-listing .s-grid {
@@ -2029,7 +2109,7 @@
   text-align: left;
 }
 .s-account-link small {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 500;
   color: var(--s-muted);
 }
@@ -2200,23 +2280,24 @@
   .s-search input { min-width: 0; }
 }
 
-/* A linked product photo zooms inside its frame; the frame never grows. */
-.s-card-link .s-art img,
-.s-tile .s-art img {
-  transition: transform var(--m-image) var(--ease);
+/* Ported from origin/main's redesign (merge of 2026-11-08): the rules its new components need — card
+   specs, the chat's add-to-cart and handoff notes, the handoff reason badge and brief, the tools a turn
+   used, the Icon component. Colours and type are this design's tokens. */
+.s-msg-product-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
 }
-@media (hover: hover) and (pointer: fine) {
-  .s-card-link:hover .s-art img,
-  .s-tile:hover .s-art img {
-    transform: scale(1.03);
-  }
+.s-msg-product .s-msg-product-add {
+  min-height: 44px;
+  padding: 6px 8px;
+  font-size: 13px;
 }
 .icon {
   flex: 0 0 auto;
   vertical-align: -0.15em;
 }
-
-/* The specs a shopper chooses by (components/product/specs.ts), under the name. */
 .s-card-specs {
   display: flex;
   flex-wrap: wrap;
@@ -2231,8 +2312,6 @@
   content: "·";
   margin-right: 8px;
 }
-
-/* Product page: the terms under the price, the switchboard line, the photo credits. */
 .s-price-note {
   margin: 8px 0 0;
   font-size: 13px;
@@ -2269,12 +2348,6 @@
 .s-credits .s-photo-credit {
   margin: 0;
 }
-
-
-/* Chat: when a person has the conversation, the header says so and one line confirms it. */
-.s-chat-head-human {
-  box-shadow: inset 0 -3px 0 var(--warn);
-}
 .s-chat-handoff {
   margin: 8px 0;
   padding: 10px 12px;
@@ -2284,7 +2357,6 @@
   color: var(--warn-ink);
   font-size: 14px;
 }
-
 .s-msg-product-done {
   margin: 0;
   min-height: 44px;

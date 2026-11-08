@@ -1,159 +1,122 @@
 "use client";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { Logo } from "@/components/brand/Logo";
-import ThemeToggle from "@/components/theme/ThemeToggle";
 import { categoryName, DEPARTMENTS } from "@/lib/catalog";
 import { firstName, useAccount } from "@/lib/account";
 import { useCart } from "@/lib/cart";
-import { HOTLINE, ZALO_URL } from "@/lib/contact";
-import Icon from "@/components/ui/Icon";
+import { shopContext } from "@/lib/shop-context";
 
-const icon = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true };
+// The storefront's bar: taste-skill's nav-split (public/assets/system.css, .nav--split). The departments
+// on the left, each opening a full-width panel of its categories on hover; Quivo's logo in the middle;
+// search, the account and the cart as plain words and the one main action, the assistant, on the right.
+// Under 1024px the words move into a full-screen sheet behind the "Danh mục" button.
+
+/** A photograph for each category's card in the panel: one of its products (data/seed/catalog). */
+const PICTURE: Record<string, string> = {
+  "gia-dung/may-loc-khong-khi": "/products/SKU-AP-PRO.jpg",
+  "gia-dung/may-loc-nuoc": "/products/SKU-WF-RO10.jpg",
+  "gia-dung/quat": "/products/SKU-FAN-DC1.jpg",
+  "gia-dung/noi-chien": "/products/SKU-AF-4L.jpg",
+  "thoi-trang/giay": "/products/SKU-SN-RUN1.jpg",
+  "thoi-trang/ao-khoac": "/products/SKU-JK-DWN.jpg",
+  "thoi-trang/phu-kien": "/products/SKU-SN-SOCK.jpg",
+};
+
+export const MAIN_ACTION = "Chat với trợ lý AI";
 
 export default function Header() {
   const lines = useCart();
   const { status, account } = useAccount();
   const count = lines.reduce((sum, line) => sum + line.qty, 0);
-  const router = useRouter();
   const pathname = usePathname();
-  const [query, setQuery] = useState("");
   const [menu, setMenu] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
 
+  useEffect(() => setMenu(false), [pathname]);
   useEffect(() => {
-    setMenu(false);
-  }, [pathname]);
+    document.body.classList.toggle("nav-locked", menu);
+    return () => document.body.classList.remove("nav-locked");
+  }, [menu]);
 
-  function search(event: FormEvent) {
-    event.preventDefault();
-    const q = query.trim();
-    if (q) router.push(`/tim-kiem?q=${encodeURIComponent(q)}`);
-  }
-
-  const active = (href: string) => (pathname === href || pathname.startsWith(href + "/") ? "active" : undefined);
+  const current = (href: string) => (pathname === href ? "page" : undefined);
 
   return (
-    <header className="s-header">
-      <div className="s-topline">
-        <div className="s-wrap s-topline-inner">
-          <span className="s-topline-promo">
-            <span className="s-topline-tag">Ưu đãi</span>
-            <span>Miễn phí giao hàng cho đơn từ 2.000.000₫ · Đổi trả theo chính sách cửa hàng</span>
-          </span>
-          <span className="s-topline-links">
-            <a href={`tel:${HOTLINE.replace(/\s/g, "")}`}><Icon name="phone" size={14} /> Hotline {HOTLINE}</a>
-            {ZALO_URL && (
-              <a href={ZALO_URL} target="_blank" rel="noreferrer">
-                Zalo
-              </a>
-            )}
-            <Link href="/login">Nhân viên</Link>
-          </span>
-        </div>
-      </div>
-      <div className="s-wrap s-mainbar">
-        <button ref={menuButton} className="s-menu-btn" aria-label="Danh mục" aria-controls="shop-navigation" aria-expanded={menu} onClick={() => setMenu(!menu)}>
-          <Icon name="menu" size={20} />
-        </button>
-        <Link href="/" className="s-logo" aria-label="Quivo, trang chủ">
-          {/* The wordmark's "Q" is the mark: one image, no separate icon beside it. */}
-          <span className="s-logo-text">
-            <Logo height={30} title="" className="text-brand" />
-            <small className="hidden xs:block">Trợ lý mua sắm AI</small>
-          </span>
+    <header className={`nav nav--split${menu ? " is-open" : ""}`}>
+      <div className="wrap nav__bar">
+        <a className="skip-link" href="#shop-content">Đến nội dung chính</a>
+        <Link className="nav__logo" href="/" aria-label="Quivo, trang chủ">
+          <Logo height={26} title="" />
         </Link>
-        <form className="s-search" role="search" onSubmit={search}>
-          <svg {...icon}>
-            <circle cx="11" cy="11" r="7" />
-            <path d="m20 20-3.5-3.5" />
-          </svg>
-          <input
-            aria-label="Tìm sản phẩm"
-            placeholder="Tìm máy lọc không khí, giày chạy bộ, đồ cho bé…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <button type="submit">Tìm</button>
-        </form>
-        <div className="s-header-actions">
-          <Link
-            href={status === "signed-in" ? "/tai-khoan" : "/dang-nhap"}
-            className="s-header-link s-account-link"
-            aria-label={status === "signed-in" ? "Tài khoản của tôi" : "Đăng nhập hoặc đăng ký"}
-          >
-            <svg {...icon}>
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" />
-            </svg>
-            <span>
-              {status === "signed-in" ? (
-                <>
-                  <small>Xin chào</small>
-                  {firstName(account)}
-                </>
-              ) : (
-                <>
-                  <small>Đăng nhập</small>
-                  Tài khoản
-                </>
-              )}
-            </span>
+        <nav
+          id="shop-navigation"
+          className="nav__links"
+          aria-label="Danh mục sản phẩm"
+          onKeyDown={(event) => {
+            if (event.key === "Escape" && menu) {
+              setMenu(false);
+              menuButton.current?.focus();
+            }
+          }}
+        >
+          {DEPARTMENTS.map((dept) => {
+            const cards = dept.children.filter((child) => PICTURE[child]).slice(0, 4);
+            const rest = dept.children.filter((child) => !cards.includes(child));
+            return (
+              <div className="nav__item" key={dept.slug}>
+                <Link className="nav__link" href={`/danh-muc/${dept.slug}`} aria-current={current(`/danh-muc/${dept.slug}`)}>
+                  {categoryName(dept.slug)}
+                  {cards.length > 0 && (
+                    <svg className="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                  )}
+                </Link>
+                {cards.length > 0 && (
+                  <div className="nav__menu">
+                    <div className="wrap grid">
+                      {rest.length > 0 && (
+                        <div className="menu-col span-3">
+                          <p className="t-label">Thêm trong {categoryName(dept.slug).toLowerCase()}</p>
+                          {rest.map((child) => <Link key={child} href={`/danh-muc/${child}`}>{categoryName(child)}</Link>)}
+                        </div>
+                      )}
+                      {cards.map((child) => (
+                        <Link key={child} className={`menu-card ${rest.length ? "span-3" : "span-4"}`} href={`/danh-muc/${child}`}>
+                          <div className="panel"><img className="frame__img" src={PICTURE[child]} alt="" /></div>
+                          <span className="t-card">{categoryName(child)}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+          <div className="nav__item"><Link className="nav__link" href="/khuyen-mai" aria-current={current("/khuyen-mai")}>Khuyến mãi</Link></div>
+        </nav>
+        <div className="nav__actions">
+          <Link className="nav__link" href="/tim-kiem" aria-current={current("/tim-kiem")}>Tìm</Link>
+          <Link className="nav__link" href={status === "signed-in" ? "/tai-khoan" : "/dang-nhap"}
+            aria-label={status === "signed-in" ? "Tài khoản của tôi" : "Đăng nhập hoặc đăng ký"}>
+            {status === "signed-in" ? firstName(account) : "Đăng nhập"}
           </Link>
-          <Link href="/don-hang" className="s-header-link" aria-label="Đơn hàng của tôi">
-            <svg {...icon}>
-              <path d="M6 2h12l2 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6z" />
-              <path d="M4 6h16M9 11h6M9 15h4" />
-            </svg>
-            <span>Đơn hàng</span>
+          <Link className="nav__link" href="/gio-hang" aria-label={`Giỏ hàng, ${count} sản phẩm`}>
+            Giỏ hàng{count > 0 ? ` (${count})` : ""}
           </Link>
-          <ThemeToggle />
-          <Link href="/gio-hang" className="s-cart-link" aria-label={`Giỏ hàng, ${count} sản phẩm`}>
-            <svg {...icon}>
-              <circle cx="9" cy="20" r="1.5" />
-              <circle cx="18" cy="20" r="1.5" />
-              <path d="M2 3h3l2.6 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.5L21 8H6" />
-            </svg>
-            <span className="s-cart-text">Giỏ hàng</span>
-            {count > 0 && <span className="s-cart-count">{count}</span>}
-          </Link>
+          <button className="btn btn--primary" type="button" onClick={() => shopContext.openChat()}>{MAIN_ACTION}</button>
         </div>
+        <button
+          ref={menuButton}
+          className="nav__toggle"
+          type="button"
+          aria-label="Danh mục"
+          aria-controls="shop-navigation"
+          aria-expanded={menu}
+          onClick={() => setMenu(!menu)}
+        >
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
+        </button>
       </div>
-      <nav id="shop-navigation" className={`s-nav ${menu ? "open" : ""}`} aria-label="Danh mục sản phẩm" onKeyDown={(event) => {
-        if (event.key === "Escape" && menu) {
-          setMenu(false);
-          menuButton.current?.focus();
-        }
-      }}>
-        <div className="s-wrap s-nav-inner">
-          <Link href="/" className={pathname === "/" ? "active" : undefined} aria-current={pathname === "/" ? "page" : undefined}>
-            Trang chủ
-          </Link>
-          {DEPARTMENTS.map((dept) => (
-            <div className="s-nav-item" key={dept.slug}>
-              <Link href={`/danh-muc/${dept.slug}`} className={active(`/danh-muc/${dept.slug}`)} aria-current={pathname === `/danh-muc/${dept.slug}` ? "page" : undefined}>
-                {categoryName(dept.slug)}
-              </Link>
-              {dept.children.length > 0 && (
-                <div className="s-nav-drop">
-                  {dept.children.map((child) => (
-                    <Link key={child} href={`/danh-muc/${child}`}>
-                      {categoryName(child)}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-          <Link href="/khuyen-mai" className={"s-nav-hot " + (active("/khuyen-mai") || "")}>
-            Khuyến mãi
-          </Link>
-          <Link href="/chinh-sach" className={active("/chinh-sach")}>
-            Chính sách
-          </Link>
-        </div>
-      </nav>
     </header>
   );
 }

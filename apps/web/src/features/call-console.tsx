@@ -9,8 +9,13 @@
 // consultant sends it as written, edited, or in their own words. What they
 // send passes the same hard guard as a draft; a warning can be fixed or
 // overridden. The reply reaches the customer's chat. Polling: queue 5 s,
-// open call 3 s.
-import React, { useCallback, useEffect, useRef, useState } from "react";
+// open call 3 s; the header's bell hears handoffs at once (handoff-alerts).
+//
+// The queue has one row per customer (call-groups): the sessions of one CRM
+// customer, on any channel, open from that row and switch above the brief.
+// The Call Brief, and the handoff brief when the assistant handed over, sit at
+// the top of the conversation: what the consultant reads before answering.
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/brand/Logo";
 import ThemeToggle from "@/components/theme/ThemeToggle";
@@ -18,6 +23,8 @@ import { api, AgentCall, AgentCallDetail, AgentTurn } from "@/services/api";
 import CallContext from "@/features/call-context";
 import { reasonLabel } from "@/features/handoff-reasons";
 import Icon from "@/components/ui/Icon";
+import { HandoffBell } from "@/features/handoff-alerts";
+import { groupCalls, groupOf } from "@/features/call-groups";
 
 const QUEUE_EVERY_MS = 5000;
 const CALL_EVERY_MS = 3000;
@@ -32,11 +39,14 @@ type Warning = { content: string; action: string; reasons: string[] };
 type Faq = { question: string; answer: string; saved: string | null };
 
 /** ``embedded``: inside the sales workspace (/ban-hang), which has already signed the person in:
- * connect at once with that token and leave out this page's own header and token form. */
+ * connect at once with that token and leave out this page's own header and token form.
+ * ``focus``: a call to open, as the workspace's bell asks (``at`` makes the same call open again). */
 export default function CallConsole({
   embedded = false,
+  focus = null,
 }: {
   embedded?: boolean;
+  focus?: { id: number; at: number } | null;
 }) {
   const [token, setToken] = useState("");
   const [tokenReady, setTokenReady] = useState(false);
@@ -145,6 +155,19 @@ export default function CallConsole({
   useEffect(() => {
     if (embedded && token && !connected) void refreshQueue();
   }, [embedded, token, connected, refreshQueue]);
+
+  // The bell opened a call: show it, and read the queue now rather than at its next poll.
+  const open = useCallback(
+    (id: number) => {
+      setSelectedId(id);
+      void refreshQueue();
+    },
+    [refreshQueue],
+  );
+  useEffect(() => {
+    // Only a new request from the bell opens a call, not every refresh of the queue.
+    if (focus && connected) open(focus.id);
+  }, [focus, connected]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!connected) return;
@@ -257,6 +280,8 @@ export default function CallConsole({
   const waiting = calls.filter(
     (c) => c.handoff_status === "pending" && !c.ended_at,
   ).length;
+  const groups = useMemo(() => groupCalls(calls), [calls]);
+  const sessions = groupOf(groups, selectedId)?.calls ?? [];
 
   const Container = embedded ? "section" : "main";
   const Heading = embedded ? "h2" : "h1";
@@ -280,6 +305,7 @@ export default function CallConsole({
             <Link href="/admin">Quản trị</Link>
             <Link href="/developer">Kỹ thuật</Link>
           </nav>
+          <HandoffBell token={connected ? token : ""} onOpen={open} />
           <ThemeToggle />
         </header>
         </>
@@ -344,36 +370,40 @@ export default function CallConsole({
               {queueLoading ? "Đang tải hàng chờ…" : connected ? "Chưa có cuộc gọi. Cuộc mới sẽ tự xuất hiện tại đây." : "Kết nối bằng token để tải."}
             </p>
           )}
-          {calls.map((c) => (
-            <div
-              key={c.id}
-              className={
-                "queue-item" + (c.id === selectedId ? " selected" : "")
-              }
-            >
-              <button className="queue-row" aria-pressed={c.id === selectedId} onClick={() => setSelectedId(c.id)}>
-                <span className={"live-dot" + (c.ended_at ? " ended" : "")} />
-                <span className="queue-text">
-                  <strong>{caller(c)}</strong>
-                  <small>
-                    {c.handoff_status === "pending"
-                      ? <span className="badge-warn">{c.handoff_reason ? reasonLabel(c.handoff_reason) : "Khách cần gặp nhân viên"}</span>
-                      : c.handoff_status === "accepted"
-                        ? "Nhân viên đang phụ trách"
-                        : `${c.lane} · ${c.tier.toLowerCase()} · ${c.turn_count} lượt`}
-                  </small>
-                  <small>
-                    {CHANNEL[c.channel] || c.channel} · {when(c.started_at)}
-                  </small>
-                </span>
-              </button>
-              {c.handoff_status === "pending" && !c.ended_at && (
-                <button className="small" onClick={() => accept(c.id)}>
-                  Nhận
+          {groups.map(({ key, calls: list, lead: c, waiting: waits }) => {
+            const selected = list.some((s) => s.id === selectedId);
+            const channels = [...new Set(list.map((s) => CHANNEL[s.channel] || s.channel))];
+            return (
+              <div
+                key={key}
+                className={"queue-item" + (selected ? " selected" : "") + (waits ? " waiting" : "")}
+              >
+                <button className="queue-row" aria-pressed={selected} onClick={() => setSelectedId(c.id)}>
+                  <span className={"live-dot" + (c.ended_at ? " ended" : "")} />
+                  <span className="queue-text">
+                    <strong>{caller(c)}</strong>
+                    <small>
+                      {c.handoff_status === "pending"
+                        ? <span className="badge-warn">{c.handoff_reason ? reasonLabel(c.handoff_reason) : "Khách cần gặp nhân viên"}</span>
+                        : c.handoff_status === "accepted"
+                          ? "Nhân viên đang phụ trách"
+                          : `${c.lane} · ${c.tier.toLowerCase()} · ${c.turn_count} lượt`}
+                    </small>
+                    <small>
+                      {list.length > 1
+                        ? `${list.length} phiên · ${channels.join(", ")} · ${when(list[0].started_at)}`
+                        : `${CHANNEL[c.channel] || c.channel} · ${when(c.started_at)}`}
+                    </small>
+                  </span>
                 </button>
-              )}
-            </div>
-          ))}
+                {c.handoff_status === "pending" && !c.ended_at && (
+                  <button className="small" onClick={() => accept(c.id)}>
+                    Nhận
+                  </button>
+                )}
+              </div>
+            );
+          })}
         </aside>
 
         <section className="panel call-transcript-pane">
@@ -395,6 +425,29 @@ export default function CallConsole({
                       : "Trợ lý AI"}
                 </span>
               </div>
+              {sessions.length > 1 && (
+                <nav className="call-sessions" aria-label="Các phiên của khách này">
+                  {sessions.map((s) => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      className={"call-session" + (s.handoff_status === "pending" && !s.ended_at ? " waiting" : "")}
+                      aria-current={s.id === detail.id ? "true" : undefined}
+                      onClick={() => setSelectedId(s.id)}
+                    >
+                      <span className={"live-dot" + (s.ended_at ? " ended" : "")} />
+                      <span>
+                        <strong>{CHANNEL[s.channel] || s.channel}</strong>
+                        <small>
+                          {when(s.started_at)} · {s.ended_at ? "đã xong" : s.handoff_status === "pending" ? "chờ nhân viên" : "đang mở"} ·{" "}
+                          {s.turn_count} lượt
+                        </small>
+                      </span>
+                    </button>
+                  ))}
+                </nav>
+              )}
+              <CallBrief detail={detail} />
               <div className="messages staff-messages call-turns">
                 {spoken.length === 0 && (
                   <p className="empty">Chưa có lời nào.</p>
@@ -658,7 +711,7 @@ export default function CallConsole({
             <Evidence detail={detail} />
           ) : (
             <p className="empty">
-              Chọn cuộc gọi để xem brief và các lượt của trợ lý.
+              Chọn cuộc gọi để xem ngữ cảnh và các lượt của trợ lý.
             </p>
           )}
           {detail && <CallContext callId={detail.id} token={token} />}
@@ -717,48 +770,69 @@ function TurnBubble({ turn }: { turn: AgentTurn }) {
   );
 }
 
+/** What the consultant reads first: the assistant's handover when it handed over, then what it knew
+ * of the customer before the call (the Call Brief). Folds away to give the conversation the room. */
+function CallBrief({ detail }: { detail: AgentCallDetail }) {
+  const pendingHandoff = detail.handoff_status === "pending" && !detail.ended_at;
+  return (
+    <details className={"call-brief-main" + (pendingHandoff ? " waiting" : "")} open>
+      <summary>
+        <strong>Call Brief</strong>
+        <small>
+          {detail.handoff_brief ? "Bàn giao từ trợ lý · " : ""}
+          {detail.brief.length ? `${detail.brief.length} điều đã biết` : "chưa có gì mang sang"}
+          {detail.warnings.length ? ` · ${detail.warnings.length} lưu ý` : ""}
+        </small>
+      </summary>
+      <div className="call-brief-body">
+        {detail.handoff_brief && <HandoffBriefView brief={detail.handoff_brief} />}
+        <div className="call-brief-known">
+          {detail.warnings.map((w, i) => (
+            <div className="notice" key={i}>
+              {w}
+            </div>
+          ))}
+          {detail.brief.length === 0 ? (
+            <p className="empty">
+              {detail.tier === "UNKNOWN"
+                ? "Chưa xác định khách nên không có gì để mang sang."
+                : detail.tier === "AMBIGUOUS"
+                  ? "Số dùng chung: chưa tải brief cho đến khi khách nói mình là ai."
+                  : "Đã biết khách, chưa có gì để mang sang."}
+            </p>
+          ) : (
+            <ol className="brief">
+              {detail.brief.map((line) => {
+                const withheld = line.sensitive && detail.tier !== "VERIFIED";
+                return (
+                  <li key={line.id} className={withheld ? "faded" : ""}>
+                    <code>{line.id}</code> {line.text}
+                    {withheld && <small> (ẩn cho đến khi xác minh)</small>}
+                  </li>
+                );
+              })}
+            </ol>
+          )}
+          {detail.brief_object?.is_returning && (
+            <dl className="facts">
+              <dt>Không hỏi lại</dt>
+              <dd>{detail.brief_object.must_not_ask?.join(", ") || "—"}</dd>
+              <dt>Mở đầu gợi ý</dt>
+              <dd>{detail.brief_object.suggested_opening}</dd>
+              <dt>Dựng trong</dt>
+              <dd>{detail.brief_object.latency_ms} ms</dd>
+            </dl>
+          )}
+        </div>
+      </div>
+    </details>
+  );
+}
+
 function Evidence({ detail }: { detail: AgentCallDetail }) {
   const agentTurns = detail.turns.filter((t) => t.speaker === "agent");
   return (
     <>
-      {detail.handoff_brief && <HandoffBriefView brief={detail.handoff_brief} />}
-      <h3>Call brief</h3>
-      {detail.warnings.map((w, i) => (
-        <div className="notice" key={i}>
-          {w}
-        </div>
-      ))}
-      {detail.brief.length === 0 ? (
-        <p className="empty">
-          {detail.tier === "UNKNOWN"
-            ? "Chưa xác định khách nên không có gì để mang sang."
-            : detail.tier === "AMBIGUOUS"
-              ? "Số dùng chung: chưa tải brief cho đến khi khách nói mình là ai."
-              : "Đã biết khách, chưa có gì để mang sang."}
-        </p>
-      ) : (
-        <ol className="brief">
-          {detail.brief.map((line) => {
-            const withheld = line.sensitive && detail.tier !== "VERIFIED";
-            return (
-              <li key={line.id} className={withheld ? "faded" : ""}>
-                <code>{line.id}</code> {line.text}
-                {withheld && <small> (ẩn cho đến khi xác minh)</small>}
-              </li>
-            );
-          })}
-        </ol>
-      )}
-      {detail.brief_object?.is_returning && (
-        <dl className="facts">
-          <dt>Không hỏi lại</dt>
-          <dd>{detail.brief_object.must_not_ask?.join(", ") || "—"}</dd>
-          <dt>Mở đầu gợi ý</dt>
-          <dd>{detail.brief_object.suggested_opening}</dd>
-          <dt>Dựng trong</dt>
-          <dd>{detail.brief_object.latency_ms} ms</dd>
-        </dl>
-      )}
       <h3>Ngữ cảnh</h3>
       <dl className="facts">
         <dt>Khách</dt>

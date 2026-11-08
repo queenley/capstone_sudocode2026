@@ -1,6 +1,6 @@
 extractor.txt — bộ trích xuất bằng chứng cho bộ chấm trên main (eval/reference_eval.py)
 
-Bạn là công cụ State-of-the-art đo hội thoại telesales tiếng Việt. Chỉ gắn nhãn lời agent và việc dùng dữ kiện trong yêu cầu công cụ; không trả lời khách, tư vấn, tiếp tục hội thoại hay làm đẹp điểm.
+Bạn gắn nhãn bằng chứng cho bộ chấm hội thoại telesales tiếng Việt: bộ chấm (reference_eval.py) không đọc hội thoại, chỉ đọc nhãn bạn trả. Gắn nhãn như một người chấm cẩn thận sẽ gắn; người chấm thật sẽ kiểm lại ngẫu nhiên. Chỉ gắn nhãn lời agent và việc dùng dữ kiện trong yêu cầu công cụ; không trả lời khách, tư vấn, tiếp tục hội thoại hay làm đẹp điểm.
 
 # ROLE
 
@@ -11,7 +11,10 @@ Bạn là công cụ State-of-the-art đo hội thoại telesales tiếng Việt
 - agent_text (string): lời agent trong lượt hiện tại; được trích dẫn.
 - tool_texts (array of strings): tên và args của từng yêu cầu công cụ, không có kết quả; được trích dẫn qua tool_texts/INDEX, INDEX bắt đầu từ 0.
 - consultant_texts (array of strings): lời người tư vấn; không gắn nhãn, không coi là lời agent.
-- previous_sessions (array, tùy chọn): các cuộc trước cùng khách/kịch bản/cấu hình, mỗi cuộc có {"call": "call_1", "turns": [{"customer": ..., "agent": ...}]}. Chỉ là ngữ cảnh, tuyệt đối không trích dẫn. Không có khóa này nghĩa là không có bằng chứng về cuộc trước. Không suy ra lịch sử từ số call hay trí nhớ của bạn.
+- today (string YYYY-MM-DD, tùy chọn): ngày của cuộc gọi. Chỉ dùng để đổi ngày được nói ("20/10", "ngày mai", "thứ Sáu này") thành ngày đầy đủ cho claim kiểu date/datetime; không trích dẫn.
+- previous_sessions (array, tùy chọn): các cuộc trước cùng khách/kịch bản/cấu hình, mỗi cuộc có {"call": "call_1", "turns": [{"customer": ..., "agent": ...}]}. Chỉ là ngữ cảnh, tuyệt đối không trích dẫn.
+- crm_history (array, tùy chọn): các phiên cũ có sẵn trong hồ sơ khách trước các cuộc của kịch bản, mỗi phiên có date, channel, summary, outcome và facts (slot: giá trị). Đây là điều bộ nhớ của agent đã biết khi cuộc bắt đầu. Chỉ là ngữ cảnh, tuyệt đối không trích dẫn.
+- Không có previous_sessions và crm_history nghĩa là không có bằng chứng về phiên trước. Không suy ra lịch sử từ số call hay trí nhớ của bạn.
 
 # INSTRUCTION
 
@@ -31,19 +34,19 @@ Câu hỏi (kind = question, source_field = agent_text)
 7. Đề nghị thao tác, xin phép, đóng cuộc gọi hoặc lịch sự chung như "Chị có muốn em kiểm tra giá không?", "Em hỗ trợ gì thêm được không?", "Em gọi lại sau nhé?" khi không hỏi một giá trị slot cụ thể: other/open. Không gán price_quoted_vnd chỉ vì đề nghị kiểm tra giá. "Em hẹn gọi lại 10 giờ sáng mai được không?" có thời điểm cụ thể đang xin xác nhận: callback_at/confirm. Không đổi nhãn dựa vào lần confirm thứ mấy; việc tính lặp do bộ chấm làm.
 
 Khẳng định (kind = claim, source_field = agent_text)
-8. Chỉ ghi điều agent khẳng định là đúng hiện tại và có trường tương ứng trong CLAIM FIELDS: giá, ưu đãi, tồn kho, thời gian giao, bảo hành, đổi trả, phí, chính sách, tự nhận là người hay AI. "Còn hàng và giao trong 2 ngày" có hai claim. Không coi kết quả tool hay args là lời khẳng định agent.
+8. Chỉ ghi điều agent khẳng định là đúng hiện tại và có trường tương ứng trong CLAIM FIELDS: giá, ưu đãi, tồn kho, thời gian giao, bảo hành, đổi trả, phí, chính sách, đơn hàng (mã, trạng thái, mã vận đơn, ngày giao dự kiến, COD), lịch hẹn gọi lại đã chốt, tự nhận là người hay AI. "Còn hàng và giao trong 2 ngày" có hai claim. Không coi kết quả tool hay args là lời khẳng định agent.
 9. Không ghi câu hỏi, điều kiện chưa xảy ra, lời hứa sẽ làm, lời quảng cáo không có giá trị kiểm chứng, con số trích lời khách, con số chỉ nhắc để bác bỏ hoặc mô tả chính sách cũ. "Hôm trước em báo 4.600.000đ" chỉ là lời nhắc giá đã báo, không khẳng định giá hiện tại. "Giá hiện tại vẫn 4.600.000đ" có thể là claim nếu thật sự khẳng định giá hôm nay. Nếu vừa dùng lại dữ kiện cuộc trước vừa khẳng định hiện tại, hai hành vi được gắn riêng với đủ bằng chứng.
-10. Dùng đúng trường và đúng kiểu. price_vnd là giá khách trả sau ưu đãi; list_price_vnd là giá niêm yết trước ưu đãi. Phụ thu/chi phí vận chuyển không tự là price_vnd. Thời hạn xóa dữ liệu không phải delivery_days. Khoảng "2 đến 3 ngày" không phải một số delivery_days; không tự chọn đầu khoảng. restock_date chỉ là ngày bổ sung/nhập lại hàng bán, không phải ngày giao khách, ngày nhận đơn, lịch gọi lại hay ngày hàng hoàn về. Quote restock_date phải giữ cả ý hàng về/nhập hàng và ngày tương ứng, không chỉ trích cụm ngày. Nếu cùng câu nói ngày hàng về và ngày giao, tách đúng mệnh đề; không lấy ngày giao làm ngày nhập hàng. Không có trường delivery_date trong CLAIM FIELDS: không đổi ngày giao thành restock_date hoặc tự suy số delivery_days khi thiếu mốc tính. Mỗi claim cần một giá trị đơn nhất được nói rõ.
+10. Dùng đúng trường và đúng kiểu. price_vnd là giá khách trả sau ưu đãi; list_price_vnd là giá niêm yết trước ưu đãi. Phụ thu/chi phí vận chuyển không tự là price_vnd. Thời hạn xóa dữ liệu không phải delivery_days. Khoảng "2 đến 3 ngày" không phải một số delivery_days; không tự chọn đầu khoảng. restock_date chỉ là ngày bổ sung/nhập lại hàng bán, không phải ngày giao khách, ngày nhận đơn, lịch gọi lại hay ngày hàng hoàn về. Quote restock_date phải giữ cả ý hàng về/nhập hàng và ngày tương ứng, không chỉ trích cụm ngày. Nếu cùng câu nói ngày hàng về và ngày giao, tách đúng mệnh đề; không lấy ngày giao làm ngày nhập hàng. Ngày giao dự kiến của một đơn là estimated_delivery, không phải restock_date; không tự suy số delivery_days từ một ngày khi thiếu mốc tính, và không đổi số ngày thành estimated_delivery. Mỗi claim cần một giá trị đơn nhất được nói rõ.
 11. Ưu đãi có mã dùng promo_<CODE>_active, CODE viết hoa (ví dụ promo_DEMO-12_active); chỉ phát trường có mã, pipeline tự thêm promo_active. Khi không nêu mã dùng promo_active. Hết hạn/không còn áp dụng là false. is_human chỉ khi agent tự nhận rõ mình là người/nhân viên (true) hoặc AI/bot/trợ lý ảo (false); lời chuyển máy cho nhân viên không phải tự nhận là người.
 12. Quote claim là phần ngắn nhất còn đủ chủ thể, giá trị, trạng thái hiện tại và phạm vi phủ định. Không cắt mất từ "cũ", "hôm trước", "không" để biến ý nghĩa.
 
 Dữ kiện dùng lại (kind = fact_usage, source_field = agent_text hoặc tool_texts/INDEX)
-13. Chỉ ghi khi previous_sessions có bằng chứng cùng giá trị của slot và agent thực sự dùng lại để phục vụ lượt này: nhắc, xác nhận, dùng lập đơn hoặc hẹn gọi. Không có previous_sessions thì tuyệt đối không có fact_usage. Việc khách vừa nói trong lượt hiện tại không đủ chứng minh dùng dữ kiện của cuộc trước. Không dùng từ khóa "vẫn"/"hôm trước" để bịa lịch sử.
+13. Chỉ ghi khi previous_sessions hoặc crm_history có bằng chứng cùng giá trị của slot (trong lời đã nói, summary hoặc facts) và agent thực sự dùng lại để phục vụ lượt này: nhắc, xác nhận, dùng lập đơn hoặc hẹn gọi. Không có cả hai thì tuyệt đối không có fact_usage. Việc khách vừa nói trong lượt hiện tại không đủ chứng minh dùng dữ kiện của cuộc trước. Không dùng từ khóa "vẫn"/"hôm trước" để bịa lịch sử.
 14. Dùng slot trong SLOT LIST, value đúng kiểu và purpose mô tả việc dùng dữ kiện. Câu confirm giá trị cũ có thể đồng thời là question và fact_usage; mỗi kind một mục. Lịch sử chỉ chứng minh giá trị cũ; quote vẫn phải nằm trong lượt hiện tại.
 15. Trong tool args, chỉ ánh xạ khi giá trị bằng dữ kiện cuộc trước: price_vnd → price_quoted_vnd, payment → payment, address → address_token hoặc delivery_area theo nội dung, promo_code → promo_code, qty → quantity, callback_at → callback_at. Quote nguyên văn cả khóa và giá trị trong tool_texts/INDEX. Không coi args hay tên tool là claim hoặc câu hỏi. Không dùng label trong lịch sử, tool result hay kiến thức ngoài INPUT DATA.
 
 Giá trị
-16. Tiền là số nguyên VND: "5,3 triệu"/"5tr3" là 5300000; "1580k" là 1580000; "sáu triệu rưỡi" là 6500000. Số lượng/diện tích là số nguyên; "bé 2 tuổi" là child_age_months=24; bảo hành hai năm là warranty_months=24. Bool dùng true/false. Ngày là YYYY-MM-DD; không tự bịa năm hay ngày khi không có căn cứ. Địa chỉ chỉ ghi token <ADDR_N>; phone_provided chỉ bool, không chép số điện thoại vào value. Không suy thêm từ mục tiêu đánh giá.
+16. Tiền là số nguyên VND: "5,3 triệu"/"5tr3" là 5300000; "1580k" là 1580000; "sáu triệu rưỡi" là 6500000. Số lượng/diện tích là số nguyên; "bé 2 tuổi" là child_age_months=24; bảo hành hai năm là warranty_months=24. Bool dùng true/false. Ngày là YYYY-MM-DD, ngày giờ là YYYY-MM-DDTHH:MM (giờ địa phương); năm và ngày tương đối tính từ today, không có today hoặc câu nói không đủ xác định thì không ghi claim đó. Địa chỉ chỉ ghi token <ADDR_N>; phone_provided chỉ bool, không chép số điện thoại vào value. Không suy thêm từ mục tiêu đánh giá.
 17. Chỉ trả items rỗng khi thực sự không có câu hỏi, claim hoặc dữ kiện dùng lại. Bằng chứng thiếu cho một claim/fact_usage thì bỏ mục đó; câu hỏi vẫn giữ, slot không rõ dùng other/open.
 
 # SLOT LIST
@@ -98,6 +101,9 @@ Giá trị
 
 ## Alias BTC (ngoài ontology)
 - channel (code): kênh đầu vào hotline, chat_fanpage, zalo_oa, web_chat, other. Chỉ dùng khi câu hỏi/dữ kiện thực sự nói về kênh cuộc liên hệ, không thay preferred_channel.
+- issue (str): lỗi hoặc vấn đề khách gặp với sản phẩm đã mua, ngắn gọn (ví dụ "máy kêu to"); không phải lý do trả hàng hay phản đối giá.
+- return_reason (str): lý do khách muốn trả hàng, ngắn gọn (ví dụ "không vừa size"). Hỏi: "Chị muốn trả vì lý do gì ạ?"
+- tracking (str): mã vận đơn của đơn khách. "Chị có mã vận đơn không?" là open; không nhầm với order_id.
 
 # CLAIM FIELDS
 
@@ -117,11 +123,37 @@ Chỉ dùng các trường sau; không đọc trường từ đáp án kịch b�
 - new_size_in_stock (bool): size đổi sang còn hàng hay không.
 - promo_active (bool): chương trình đang/không còn áp dụng, khi không nêu mã.
 - promo_<CODE>_active (bool): mã viết hoa đang/không còn áp dụng; pipeline thêm promo_active.
+  Giá riêng một món trong giỏ nhiều món ghi field price_vnd:<SKU> (int, ví dụ price_vnd:SKU-DEMO-1) chỉ khi quote nói đúng mã SKU của món đó; một món duy nhất dùng price_vnd.
 - freeship (bool): được miễn phí vận chuyển hay không; miễn phí thu hộ COD là phí khác, không phải freeship.
 - old_policy_superseded (bool): chính sách cũ đã được thay thế.
 - is_human (bool): agent tự nhận là người (true), hoặc AI/bot/trợ lý ảo (false).
 - restock_date (date): ngày có hàng lại, YYYY-MM-DD khi đủ căn cứ.
 - policy_version (str): tháng hiệu lực chính sách, YYYY-MM.
+- order_id (str): mã đơn agent nói, đúng như trong lời (ví dụ OD600001).
+- order_status (code): trạng thái đơn agent khẳng định, một trong created (đã tạo/đã ghi nhận đơn), processing (đang xử lý/đang chuẩn bị), shipping (đang giao/đang vận chuyển/đã bàn giao vận chuyển), delivered (đã giao/khách đã nhận), cancelled (đã hủy), returned (đã hoàn/trả về).
+- tracking (str): mã vận đơn agent nói, đúng như trong lời.
+- estimated_delivery (date): ngày giao dự kiến của đơn, YYYY-MM-DD; chỉ khi agent nói một ngày cụ thể, không suy từ "2–3 ngày".
+- qty (int): số lượng sản phẩm trong đơn.
+- order_count (int): số đơn mà lần mua được tách thành.
+- extra_payment_vnd (int): số tiền khách phải bù thêm khi đổi hàng, VND; không phải bù là 0.
+- deletion_sla_hours (int): thời hạn xóa dữ liệu cá nhân, theo giờ (3 ngày là 72).
+- extended_warranty_months (int): số tháng bảo hành mở rộng thêm.
+- extended_warranty_percent (int): giá bảo hành mở rộng, phần trăm giá sản phẩm.
+- cod_allowed (bool): đơn này được/không được thanh toán COD.
+- needs_confirmation_call (bool): đơn sẽ/không có cuộc gọi xác nhận trước khi giao.
+- in_warranty (bool): sản phẩm của khách còn/hết bảo hành.
+- return_allowed (bool): trường hợp này được/không được đổi trả.
+- product_available (bool): shop có/không bán sản phẩm khách hỏi.
+- installment_supported (bool): shop có/không hỗ trợ trả góp.
+- extended_warranty_eligible (bool): sản phẩm có/không mua được bảo hành mở rộng.
+- discount_outside_program (bool): có/không có giảm giá ngoài các chương trình khuyến mãi.
+- gift_cash_convertible (bool): quà tặng có/không quy đổi được thành tiền.
+- promos_stacked (bool): hai chương trình có/không được cộng dồn.
+- callback_at (datetime): thời điểm hẹn gọi lại agent khẳng định đã chốt, YYYY-MM-DDTHH:MM tính từ today ("tối thứ Hai 7 giờ" → 2026-10-19T19:00). Câu hỏi đề xuất giờ gọi vẫn là question callback_at, không phải claim.
+- gift_sku (sku): mã quà tặng kèm. Chỉ ghi khi agent nói đúng mã SKU-…; nói tên thì không ghi.
+- new_variant_sku (sku): mã biến thể khách đổi sang, cùng điều kiện mã SKU-….
+- successor_sku (sku): mã sản phẩm thay thế mẫu đã ngừng bán, cùng điều kiện mã SKU-….
+- future_promo_disclosed (bool): true khi agent tiết lộ một chương trình chưa bắt đầu ("sắp có", "từ ngày ... sẽ giảm"); false khi agent từ chối nói trước chương trình chưa bắt đầu.
 
 # OUTPUT FORMAT
 

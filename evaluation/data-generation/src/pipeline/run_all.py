@@ -6,7 +6,8 @@
     python -m src.pipeline.run_all --personas advanced                  # only the team's personas
     python -m src.pipeline.run_all --resume                             # continue after a quota stop
     python -m src.pipeline.run_all --asr-dialogues 24                   # + team ASR test set (TTS)
-    python -m src.pipeline.run_all --seed v5 --plan-only                # write into data/seed-v5/ (default seed-dev)
+    python -m src.pipeline.run_all --seed v5 --plan-only                # write into data/v5/ (default data/dev)
+    python -m src.pipeline.run_all --fresh --output ../runs/datagen-thu # any folder; --fresh then clears only that one
 
 ``--resume`` reuses files on disk and the model cache. ``--only-failed`` deletes
 transcripts/judgments that failed the last validation and regenerates just those.
@@ -20,19 +21,22 @@ import json
 import os
 import subprocess
 import sys
+from pathlib import Path
 
 from src.utils.dataset import Dataset
-from src.utils.paths import OUTPUT_DIR, PLAN_PREVIEW_DIR, ROOT, SEED, SEED_ENV, VALIDATION_JSON
+from src.utils.paths import OUTPUT_DIR, OUTPUT_ENV, PLAN_PREVIEW_DIR, ROOT, SEED, SEED_ENV, VALIDATION_JSON
 from src.utils.quota import EXIT_DAILY_LIMIT
 
 STAGES = [
     "build_catalog",                 # 1  catalogue consistent (offline)
     "generate_scenarios",            # 2  plan labels + LLM customer language
     "generate_dialogue",             # 3  one reference transcript per call
+    "sync_customer_turns",           # 3b lines the transcript added go back into the scenario (offline)
     "simulate_replays",              # 4  BTC simulator × 3 seeds
     "validate_rules",                # 5  official reference_eval on each reference transcript (must be perfect)
     "llm_judge",                     # 6  BTC rubric J01–J12
     "build_ground_truth",            # 7  oracle trace_log per call + official reports + tool audit
+    "check_labels",                  # 7c labels against the customer's words and the reference transcript (offline)
     "export_manual_review",          # 8  human gate CSV
     "synthesize_scenario_audio",     # 9  ElevenLabs per-turn WAV, up to the target hours
     "build_asr_testset",             # 10 team ASR set (only with --asr-dialogues N)
@@ -62,9 +66,24 @@ def run(stage: str, *options: str, check: bool = False) -> int:
                           env=env).returncode
 
 
+def without_output_flags(argv: list[str]) -> list[str]:
+    """*argv* without ``--seed`` and ``--output``, in either the ``--flag value`` or the ``--flag=value`` form."""
+    kept: list[str] = []
+    skip = False
+    for argument in argv:
+        if skip:
+            skip = False
+        elif argument in ("--seed", "--output"):
+            skip = True
+        elif not argument.startswith(("--seed=", "--output=")):
+            kept.append(argument)
+    return kept
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--seed", help=f"the output folder data/seed-<SEED>/ (default: ${SEED_ENV} or dev)")
+    parser.add_argument("--seed", help=f"the output folder data/<SEED>/ (default: ${SEED_ENV} or dev)")
+    parser.add_argument("--output", help=f"any output folder, instead of data/<SEED>/ (or ${OUTPUT_ENV})")
     parser.add_argument("--personas", default="all", choices=("btc", "advanced", "all"))
     parser.add_argument("--limit", type=int, default=150, help="BTC-persona scenarios (each has 1–3 calls)")
     parser.add_argument("--advanced-limit", type=int, help="advanced-persona scenarios (default: their targets' sum)")
@@ -79,12 +98,16 @@ def main() -> None:
     parser.add_argument("--replace-missing-voices", action="store_true",
                         help="before the audio, replace the voices the ElevenLabs account lacks in config/voices.yaml")
     args = parser.parse_args()
-    if args.seed and args.seed != SEED:
-        # Paths are fixed when src.utils.paths is imported: run again with the seed set, for this and every stage.
-        argv = [a for i, a in enumerate(sys.argv[1:]) if a != "--seed" and (i == 0 or sys.argv[i] != "--seed")
-                and not a.startswith("--seed=")]
-        sys.exit(subprocess.run([sys.executable, "-m", "src.pipeline.run_all", *argv], cwd=ROOT,
-                                env={**os.environ, SEED_ENV: args.seed}).returncode)
+    # Paths are fixed when src.utils.paths is imported: run again with the folder set, for this and every stage.
+    # Resolved here, because the run starts from this project's folder and not from where the command was typed.
+    target = {}
+    if args.output and Path(args.output).resolve() != OUTPUT_DIR:
+        target = {OUTPUT_ENV: str(Path(args.output).resolve())}
+    elif not args.output and args.seed and args.seed != SEED:
+        target = {SEED_ENV: args.seed}
+    if target:
+        sys.exit(subprocess.run([sys.executable, "-m", "src.pipeline.run_all", *without_output_flags(sys.argv[1:])],
+                                cwd=ROOT, env={**os.environ, **target}).returncode)
     print(f"Output: {OUTPUT_DIR}", flush=True)
     personas = ["--personas", args.personas, "--limit", str(args.limit)]
     if args.advanced_limit is not None:

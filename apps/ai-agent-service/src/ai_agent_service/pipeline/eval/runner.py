@@ -61,6 +61,7 @@ from ...mcp import client as mcp_client
 from ...mcp.server_base import database
 from ...mcp.servers import btc
 from ...mcp.tools import ToolBox
+from ...observability import stopwatch
 from ..cold.after_call import after_call
 from ..hot import nodes
 from ..hot.graph import build_graph
@@ -365,6 +366,8 @@ class TurnResult:
     completed_at: str
     #: Tokens by agent in this turn: ``{agent: {calls, input, output}}``.
     usage: dict[str, dict[str, int]]
+    #: Where the turn's time went: ``observability.stopwatch.Stopwatch.report``.
+    timings: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -428,11 +431,15 @@ class CallSession:
         before = token_ledger.snapshot()
         request_at = utc_now()
         started = time.perf_counter()
-        state, error = await take_turn(
-            self.rig, thread=self.thread, channel=self.channel, keys=self.keys, vault=self.vault, now=self.now,
-            memory=self.memory, mode=self.mode, text=text, turn_no=self.turn_no, input_mode=self.input_mode,
-            arrived=started,
-        )
+        watch, token = stopwatch.started()
+        try:
+            state, error = await take_turn(
+                self.rig, thread=self.thread, channel=self.channel, keys=self.keys, vault=self.vault, now=self.now,
+                memory=self.memory, mode=self.mode, text=text, turn_no=self.turn_no, input_mode=self.input_mode,
+                arrived=started,
+            )
+        finally:
+            stopwatch.stopped(token)
         total_ms = int((time.perf_counter() - started) * 1000)
         completed_at = utc_now()
         if state:
@@ -443,7 +450,7 @@ class CallSession:
         # The organisers' Total ends at the last token, not when the graph has finished saving (latency guide).
         total_ms = int((state.get("latency") or {}).get("last_token_ms") or total_ms)
         return TurnResult(state, total_ms, int(first) if first is not None else None, error, request_at,
-                          completed_at, usage_between(before, token_ledger.snapshot()))
+                          completed_at, usage_between(before, token_ledger.snapshot()), watch.report(total_ms))
 
     async def hang_up(self) -> dict[str, Any]:
         """``after_call`` for this call; what it wrote and how it ended."""
@@ -528,7 +535,7 @@ def usage_between(before: Mapping[str, Mapping[str, int]], after: Mapping[str, M
     spent = {}
     for agent, now in after.items():
         then = before.get(agent) or {}
-        delta = {key: int(now.get(key, 0)) - int(then.get(key, 0)) for key in ("calls", "input", "output")}
+        delta = {key: int(now.get(key, 0)) - int(then.get(key, 0)) for key in ("calls", "input", "output", "cached")}
         if any(delta.values()):
             spent[agent] = delta
     return spent
@@ -591,7 +598,7 @@ async def _run_call(rig: Rig, scenario: Scenario, plan: CallPlan, config: str, *
         )
         run.rows.append(row)
         diagnosis = diagnose(state, result.error, config=config, scenario_id=scenario.scenario_id, call=plan.name,
-                             turn=session.turn_no)
+                             turn=session.turn_no, timings=getattr(result, "timings", None))
         run.diagnostics.append(diagnosis)
         tools = ",".join(t["name"] for t in row["tool_calls"]) or "-"
         progress(f"  {config:<18} {scenario.scenario_id} {plan.name} t{session.turn_no}  {result.total_ms:>6} ms  "
@@ -619,7 +626,7 @@ async def _run_call(rig: Rig, scenario: Scenario, plan: CallPlan, config: str, *
 
 
 def diagnose(state: Mapping[str, Any], error: str | None, *, config: str, scenario_id: str, call: str,
-             turn: int) -> dict[str, Any]:
+             turn: int, timings: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """What a reader of the run needs about one turn, beside its trace line."""
     guard = state.get("guard") or {}
     draft = state.get("draft") or {}
@@ -631,6 +638,7 @@ def diagnose(state: Mapping[str, Any], error: str | None, *, config: str, scenar
         "knowledge": {"chunks": [h.get("chunk_id") for h in found.get("hits") or []], "top_score": found.get("top_score"),
                       "abstain": found.get("reason") if found.get("abstain") else None,
                       "order_date": found.get("order_date")} if found else None,
+        "context": state.get("prompt_stats"),
         "streamed": bool(draft.get("streamed")),
         "guard_passed": guard.get("passed"),
         "policy": (guard.get("soft") or {}).get("decided_by"),
@@ -642,6 +650,8 @@ def diagnose(state: Mapping[str, Any], error: str | None, *, config: str, scenar
         "blocked_tool_calls": [{"name": r["name"], "args": r.get("args") or {}, "result": r.get("result")}
                                for r in state.get("tool_results") or [] if r.get("blocked_by")],
         "error": error or draft.get("error"),
+        # Milliseconds by stage (observability/stopwatch): diagnostics only, the BTC trace keeps its two numbers.
+        "timings": dict(timings or {}),
     }
 
 
@@ -650,6 +660,50 @@ def _add(total: dict[str, dict[str, int]], more: Mapping[str, Mapping[str, int]]
         bucket = total.setdefault(agent, {"calls": 0, "input": 0, "output": 0})
         for key, value in counts.items():
             bucket[key] = bucket.get(key, 0) + int(value)
+
+
+#: Turns of each session in a load test: enough to load the model, few enough to stay cheap.
+LOAD_TURNS = 3
+
+
+async def load_test(rig: Rig, ready: list[Scenario], levels: list[int], progress: Progress) -> list[dict[str, Any]]:
+    """How many sessions at once the demo holds: each level starts that many first calls together, memory off.
+
+    Never traced and never graded. A level holds when no turn failed and both p95 are within the chat limits of
+    ``huong-dan-do-latency.md``. The turns of a level run on one rig, as the demo's do; a level with more sessions
+    than scenarios plays them again under other call ids.
+    """
+    from .performance import LIMITS_MS
+
+    def p95(values: list[int]) -> int:
+        ordered = sorted(values)
+        return ordered[min(len(ordered) - 1, int(0.95 * len(ordered)))]
+
+    results = []
+    for level in levels:
+        await reset()
+        chosen = [ready[index % len(ready)] for index in range(level)]
+        plans = [scenario.calls[0] for scenario in chosen]
+        for scenario, plan in zip(chosen, plans):
+            if plan.seed:
+                await seed(rig, plan.seed, customer_phone=scenario.data.get("customer_phone"),
+                           customer_name=scenario.data.get("customer_name"))
+
+        async def one(index: int, plan: CallPlan) -> list[TurnResult]:
+            session = CallSession.for_plan(rig, plan, thread=f"load|{level}|{index}", memory=False)
+            await session.connect()
+            return [await session.turn(text) for text in plan.turns[:LOAD_TURNS]]
+
+        turns = [turn for session in await asyncio.gather(*(one(i, p) for i, p in enumerate(plans))) for turn in session]
+        first = [t.first_token_ms if t.first_token_ms is not None else t.total_ms for t in turns]
+        total = [t.total_ms for t in turns]
+        errors = sum(bool(t.error) for t in turns)
+        figures = {"sessions": level, "turns": len(turns), "errors": errors, "ttft_p95_ms": p95(first), "total_p95_ms": p95(total)}
+        figures["held"] = not errors and figures["ttft_p95_ms"] <= LIMITS_MS["ttft"] and figures["total_p95_ms"] <= LIMITS_MS["total"]
+        results.append(figures)
+        progress(f"  load {level} sessions: {figures}")
+    await reset()
+    return results
 
 
 async def warm_up(rig: Rig, scenario: Scenario, turns: int, progress: Progress) -> None:

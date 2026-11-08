@@ -1,0 +1,243 @@
+{
+  "conversation_id": "SCN-ADV-0001__call_2",
+  "scenario_id": "SCN-ADV-0001",
+  "call": "call_2",
+  "customer_id": "C001",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-16",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_hoi_san_pham_khong_ban",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Hoa ạ, hôm trước chị có quan tâm đến máy lọc không khí; chị muốn mình tiếp tục tư vấn sản phẩm không khí phù hợp cho phòng chị nhé?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị gọi lại để hỏi về máy lọc không khí mà hôm trước em có nói.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, chị muốn tìm máy lọc không khí cho diện tích phòng khoảng bao nhiêu mét vuông và nhà mình có trẻ nhỏ không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "open",
+          "text": "chị muốn tìm máy cho phòng diện tích khoảng bao nhiêu mét vuông ạ?"
+        },
+        {
+          "slot": "has_children",
+          "type": "open",
+          "text": "nhà mình có trẻ nhỏ không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần máy lọc cho phòng khoảng 25m2, nhà có trẻ nhỏ.",
+      "facts_stated": {
+        "room_area_m2": 25,
+        "has_children": true
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với phòng 25m2 và có trẻ nhỏ, bên em tư vấn chị mẫu AirPure X đáp ứng tốt diện tích này. Sản phẩm hiện giá 4.890.000đ, đang có tặng kèm màng lọc thay thế. Máy có chế độ ngủ êm, tuy không có khóa trẻ em nhưng vận hành an toàn ạ.",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2",
+        "has_children"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4890000
+        },
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ngân sách của chị tầm 5 triệu thôi, không biết có khuyến mãi gì không?",
+      "facts_stated": {
+        "budget_vnd": 5000000
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng tầm ngân sách của chị luôn ạ. Hiện giá máy là 4.890.000đ đã tặng thêm một màng lọc chính hãng. Chương trình quà tặng này còn đến ngày 22/10, chị cân nhắc giúp em nhé.",
+      "questions": [],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4890000
+        },
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần bàn với gia đình đã, tối mai tầm 7 giờ em gọi lại chị nhé.",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em sẽ gọi lại cho chị vào lúc 7 giờ tối ngày mai, 17/10 để chị trao đổi cùng gia đình xong mình chốt nhé.",
+      "questions": [],
+      "facts_used": [
+        "blocker"
+      ],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-10-17T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0984726714",
+            "callback_at": "2026-10-17T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 5000000,
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 25,
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-X",
+          "op": "set",
+          "source": "call_2#turn5"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 4890000,
+          "op": "set",
+          "source": "call_2#turn7"
+        },
+        {
+          "key": "promo_code",
+          "value": "GIFT-FILTER",
+          "op": "set",
+          "source": "call_2#turn7"
+        }
+      ],
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": {
+      "customer_phone": "0984726714",
+      "callback_at": "2026-10-17T19:00",
+      "note": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

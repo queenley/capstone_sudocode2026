@@ -94,7 +94,7 @@ flowchart LR
 - **`facts_used`** = slot extractor thấy được dùng lại từ cuộc trước, rồi slot của các dòng brief agent đã trích dẫn `[Bn]`.
 - **`questions` và `claims`** do **extractor** trích. BTC không cung cấp extractor (đây là trách nhiệm của đội); BTC chấm tay ngẫu nhiên 20 lượt để kiểm extractor có bỏ sót không. Extractor dùng **từ vựng cố định**: 34 slot ontology, extension `channel` riêng và 18 trường claim cộng `promo_<CODE>_active`, kèm kiểu giá trị; slot ngoài bộ thành sentinel `other`, claim sai kiểu bị bỏ. Mỗi item kèm câu trích dẫn đúng nguyên văn để người chấm kiểm tay (`diagnostics.jsonl`). Schema/prompt tiếng Việt và repair/retry ở [scoring-flow](../evaluation/scoring-flow.md).
 - **Thiếu bằng chứng không được điền 0 hay PASS.** Một lượt lỗi hoặc chưa gắn nhãn thì không in bảng.
-- **Ngân sách API:** sổ SQLite (`EVAL_BUDGET_DB`) giữ dự phòng trước mỗi request có phí, chỉ hoàn khi có usage. Hết ngân sách thì dừng, không tạo lại sổ để lách.
+- **Ngân sách API (tùy chọn):** đặt `EVAL_BUDGET_DB` trỏ tới một sổ SQLite thì mỗi request có phí được giữ dự phòng trước, chỉ hoàn khi có usage, và hết ngân sách thì dừng (không tạo lại sổ để lách). Không đặt thì chạy không có trần chi tiêu.
 
 ---
 
@@ -225,7 +225,7 @@ docker compose up -d postgres
 
 # Tầng 3: bắt đầu nhỏ (tốn phí). Không --config: cả hai cấu hình, rồi in bảng BTC
 $env:EVAL_BUDGET_DB = "evaluation/runs/20261024-work/budget.sqlite"
-& $PY run_eval.py --scenarios data/seed-dev/scenarios --only SCN-GEN-0051 --out evaluation/runs/thu-1
+& $PY run_eval.py --scenarios data/dev/scenarios --only SCN-GEN-0051 --out evaluation/runs/thu-1
 
 # Chỉ đổi extractor: gắn nhãn lại một run cũ, không chạy lại agent
 & $PY run_eval.py --relabel evaluation/runs/20261024-work/development-r2-v4-M2 --out evaluation/runs/relabel-r2

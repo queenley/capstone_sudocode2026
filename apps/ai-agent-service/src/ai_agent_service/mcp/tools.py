@@ -48,6 +48,7 @@ from langchain.agents.middleware import AgentMiddleware
 from langchain.agents.middleware.types import ToolCallRequest
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langchain_core.utils.function_calling import convert_to_openai_tool
+from ..components import clock
 from ..components.intake import pii
 from ..components.guardrails import purchase
 from ..components.intake.text import plain
@@ -420,6 +421,8 @@ class ToolGuardMiddleware(AgentMiddleware):
                 args["purchase_authorization"] = purchase.receipt(
                     (getattr(context, "consent", None) or {}).get("draft") or getattr(context, "pending_purchase", None),
                     business_args, context)
+        if name == "schedule_callback" and (moment := clock.parse_local(args.get("callback_at"))) is not None:
+            args["callback_at"] = clock.tool_time(moment)
         if name in WRITE_TOOLS and IDEMPOTENCY_ARG in accepted:
             key = idempotency_key(context, name, args)
             if key:

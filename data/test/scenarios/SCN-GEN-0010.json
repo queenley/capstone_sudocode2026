@@ -1,0 +1,206 @@
+{
+  "scenario_id": "SCN-GEN-0010",
+  "level": "M2",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "hard_case": "het_hang_luc_khach_quyet",
+  "customer_phone": "0952059972",
+  "customer_name": "Minh",
+  "honorific": "anh",
+  "notes": "Persona khach_goi_lan_3_het_kien_nhan, biến thể chuan. call_1 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_2 (hotline): tư vấn, chưa chốt → hen_goi_lai; call_3 (hotline): tư vấn, chưa chốt → hen_goi_lai. Ca khó: het_hang_luc_khach_quyet. call_3: hết hàng đúng lúc khách quyết → hẹn lại. Chấm chủ yếu: CCR, RQR, TSR, HR, ESC.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-15",
+      "customer_goal": "Hỏi về máy lọc không khí cho phòng 25m².",
+      "customer_turns": [
+        "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro cho phòng khoảng 25 mét vuông.",
+        "Ngân sách của anh tầm 8 triệu, có khuyến mãi gì không?",
+        "Máy này hiện có hàng không em?",
+        "À, anh cần chờ đến cuối tháng mới nhận lương, em ạ, nên để anh hẹn gọi lại nhé."
+      ],
+      "facts_established": {
+        "blocker": "chờ cuối tháng nhận lương",
+        "budget_vnd": 8500000,
+        "has_children": false,
+        "room_area_m2": 25,
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT",
+        "promo_expiry": "2026-10-30"
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 7690000,
+        "list_price_vnd": 7990000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": true,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "call_date": "2026-10-15"
+      },
+      "memory_expectation": {
+        "blocker": "chờ cuối tháng nhận lương",
+        "budget_vnd": 8500000,
+        "has_children": false,
+        "room_area_m2": 25,
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT"
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-01",
+        "PB-10"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 3,
+      "customer_goal": "Hỏi lại về máy lọc không khí.",
+      "customer_turns": [
+        "Alo, anh Minh đây, hôm trước có hỏi về máy lọc không khí đó.",
+        "Máy lọc không khí AirPure Pro còn hàng không em?",
+        "Nghe nói có khuyến mãi gì đó, anh muốn biết thêm.",
+        "Thế còn hàng hôm nào có lại, em nhỉ?",
+        "Anh cần chờ thêm một chút trước khi quyết định, hẹn em gọi lại sau nhé."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT",
+        "promo_expiry": "2026-10-30"
+      },
+      "must_carry_over": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "21/10",
+          "ngày 21"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_stock",
+            "value": true
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "price_vnd": 7690000,
+        "list_price_vnd": 7990000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": true,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": false,
+        "restock_date": "2026-10-21",
+        "call_date": "2026-10-18"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT"
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-17",
+        "PB-01",
+        "PB-10"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_3": {
+      "days_later": 2,
+      "customer_goal": "Hỏi lại về máy lọc không khí.",
+      "customer_turns": [
+        "Alo, anh Minh đây, hôm trước em bảo máy lọc không khí AirPure Pro hết hàng.",
+        "Bây giờ có thông tin gì về ngày có hàng không em?",
+        "Anh đã sẵn sàng để mua rồi, nhưng không đặt được đơn.",
+        "Nếu có hàng vào ngày 21 tháng này thì anh sẽ gọi lại nhé."
+      ],
+      "facts_established": {
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT",
+        "promo_expiry": "2026-10-30"
+      },
+      "must_carry_over": [
+        "room_area_m2",
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "must_not_ask": [
+        "room_area_m2",
+        "has_children",
+        "budget_vnd",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": null,
+        "must_say_any": [
+          "21/10",
+          "ngày 21"
+        ],
+        "must_not_call_tools": [
+          "order.create"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "in_stock",
+            "value": true
+          }
+        ],
+        "max_agent_questions": 2
+      },
+      "ground_truth_facts": {
+        "price_vnd": 7690000,
+        "list_price_vnd": 7990000,
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": false,
+        "restock_date": "2026-10-21",
+        "freeship": true,
+        "call_date": "2026-10-20"
+      },
+      "memory_expectation": {
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT"
+      },
+      "relevant_policy_ids": [
+        "SP-AIR-01",
+        "SP-AIR-02",
+        "FAQ-17",
+        "PB-01",
+        "PB-10"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    }
+  }
+}

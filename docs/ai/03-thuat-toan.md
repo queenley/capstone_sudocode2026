@@ -70,7 +70,7 @@ Mười chữ số điện thoại có thể dò ngược từ hash thường tr
 ## 3.3 Truy hồi tri thức (BM25 + embedding + RRF)
 
 ### Kho
-99 đoạn từ 14 file chính sách của BTC, **mỗi mục `## [XX-nn]` là một đoạn** (đúng cách BTC gắn nhãn Recall@k, nên không cắt hay gộp mục nào). Mỗi đoạn mang thêm: `restricted` (nội bộ), ngày hiệu lực (đọc từ `changelog.md`), các mục changelog giải thích nó. Thêm các mục FAQ/playbook đã người duyệt ở `data/kb/v<N>.jsonl` (v0 chưa có mục nào).
+99 đoạn từ 14 file chính sách của BTC, **mỗi mục `## [XX-nn]` là một đoạn** (đúng cách BTC gắn nhãn Recall@k, nên không cắt hay gộp mục nào). Mỗi đoạn mang thêm: `restricted` (tiêu đề tài liệu ghi `NỘI BỘ` hoặc "không dùng để tư vấn khách", cùng KM-06), ngày hiệu lực (từ `changelog.md`, hoặc từ tiêu đề có `HẾT HIỆU LỰC từ dd/mm/yyyy`), các mục changelog giải thích nó. Thêm các mục FAQ/playbook đã người duyệt ở `data/kb/v<N>.jsonl` (v0 chưa có mục nào).
 
 ### Hai bảng xếp hạng
 
@@ -102,7 +102,70 @@ $$\text{RRF}(d)=\sum_{r\in\text{rankings}}\frac{1}{k+\text{rank}_r(d)}$$
 Gộp theo **hạng** chứ không theo điểm, vì điểm BM25 và cosine ở hai thang không liên quan. Cũng vì vậy điểm RRF không dùng làm ngưỡng.
 
 ### Phiên bản chính sách
-Khi câu hỏi về một đơn khách đã có, ngày dùng để lọc là **ngày đặt đơn** (CL-01: đơn trước 01/10 giữ chính sách đổi trả cũ). Đoạn không còn hiệu lực vẫn có thể hiện ra nhưng được gắn chú thích "hết hiệu lực từ ngày X; chỉ áp dụng cho đơn tạo trước ngày đó".
+Một đoạn không có hiệu lực vào ngày cần xét bị **lọc trước khi lấy top k**: model không đọc được nó, và đoạn còn hiệu lực được nhận chỗ trống. Id đoạn bị lọc nằm ở `withheld` trong kết quả để xem lại trong trace.
+
+```mermaid
+flowchart TD
+    Q["Câu khách"] --> N{"Khách nêu mã đơn<br/>hoặc nói ngày đặt?"}
+    N -- "có" --> D1["Ngày xét = ngày đặt đơn đó"]
+    N -- "không" --> O{"Câu hỏi về đơn<br/>và khách có đơn trong CRM?"}
+    O -- "không" --> D2["Ngày xét = hôm nay"]
+    O -- "có" --> D3["Ngày xét = đơn mới nhất<br/>các đơn khác vào other_order_dates"]
+    D1 --> F["Lọc đoạn không hiệu lực vào ngày xét<br/>rồi lấy top 5"]
+    D2 --> F
+    D3 --> F
+    F --> C["Thêm mục changelog của đoạn bị lọc"]
+    F --> V{"Đoạn trong top sai với<br/>đơn khác của khách?"}
+    V -- "có" --> A["Dặn agent hỏi khách đơn nào<br/>trước khi nêu con số"]
+```
+
+- **Ngày xét:** mã đơn khách nêu, rồi ngày đặt khách tự nói ("đơn tạo ngày 28/09", "mua tháng 9/2026"), rồi đơn mới nhất trong CRM khi câu hỏi nói về đơn. Ngày giao hàng và ngày sau hôm nay không được tính là ngày đặt.
+- **Khi khách nhắc mức cũ:** mục changelog của đoạn bị lọc đi cùng kết quả, nên agent nói được mức đã đổi từ ngày nào.
+- **Khi không có ngày:** không lọc gì; đường gọi của agent luôn có ngày cuộc gọi.
+
+### Duyệt câu hỏi còn thiếu kiến thức
+Câu agent không trả lời được được ghi vào `knowledge-gaps.json`, đã che dữ liệu cá nhân. Admin xử lý ở `/admin`, phần "Câu hỏi còn thiếu kiến thức":
+
+- **Duyệt:** nhập câu trả lời và nguồn công khai còn hiệu lực, qua `gap.gate`, rồi hệ thống viết phiên bản kiến thức mới `data/kb/v<N>.jsonl`. Cần nạp lại dịch vụ trợ lý, và số đo sau đó thuộc phiên bản mới.
+- **Chuyển thành FAQ nháp** (chỉ admin): tạo mục nháp từ câu hỏi và câu trả lời, rồi duyệt ở phần FAQ theo đợt. Có tác dụng sau tối đa 10 giây, không đổi phiên bản, và gắn được đợt, sản phẩm. Đây là cách nên dùng khi chưa cần phát hành phiên bản mới.
+- **Bỏ qua:** đóng câu không cần trả lời, kèm lý do. Câu đã xuất bản không bỏ qua được; muốn gỡ thì thu hồi mục đó.
+
+Khác với FAQ theo đợt: FAQ theo đợt có tác dụng ngay và không đổi phiên bản kiến thức.
+
+### FAQ theo sản phẩm và theo đợt
+Mục FAQ của nhóm nằm ở `data/kb/v<N>.jsonl` (sau khi người duyệt) hoặc bảng `kb_chunks` (mục demo qua `kb_upsert`). Ngoài các trường thường có, một mục có thể ghi:
+
+| Trường | Nghĩa |
+|---|---|
+| `applies_to` | Mục nói về gì, viết như `promotions.json`: `SKU-AP-X`, `category:gia-dung`, `*` |
+| `campaign` | Mã trong `promotions.json`, hoặc tên đợt tự đặt |
+| `valid_from`, `valid_to` | Ngày hiệu lực. Bỏ trống thì lấy từ khuyến mãi của `campaign`; đợt tự đặt bắt buộc có `valid_to` |
+
+```json
+{"chunk_id": "FAQ-T-001", "source": "faq", "title": "Đợt 11/11 có áp dụng cùng ưu đãi khác không?", "text": "...", "campaign": "<mã trong promotions.json>"}
+```
+
+- **Tự hết hạn:** qua `valid_to`, mục bị bộ lọc hiệu lực loại, không cần xóa.
+- **Theo sản phẩm:** khi cuộc gọi đã tra sản phẩm, mục khớp sản phẩm được ưu tiên và mục cho sản phẩm khác bị bỏ. Chưa tra sản phẩm nào thì mục được tìm theo lời khách như thường.
+- **Chỗ đọc riêng:** model đọc 3 đoạn tài liệu mỗi lượt; một mục theo đợt khớp sản phẩm được đọc thêm nếu chưa nằm trong 3 đoạn đó, tối đa 1 mục.
+- **Không chứa con số:** cổng duyệt cấm số tiền, mã khuyến mãi và tồn kho trong câu trả lời. Mục giải thích điều kiện, còn giá và ưu đãi lấy từ tool.
+- **Không lộ khuyến mãi sớm:** mục gắn đợt chưa bắt đầu bị lọc theo ngày, nên agent không đọc được trước ngày bắt đầu (KM-02).
+
+Trang `/admin` có phần **FAQ theo đợt** để thêm, sửa, bật, tắt và xóa mục, qua `/api/developer/faq` (chỉ vai trò admin):
+
+```mermaid
+stateDiagram-v2
+    [*] --> Nhap: Soạn mới hoặc từ drafts.jsonl
+    Nhap --> DangBat: Người duyệt xác nhận và qua cổng kiểm tra
+    DangBat --> Nhap: Tắt
+    Nhap --> DaXoa: Xóa
+    DangBat --> DaXoa: Xóa
+```
+
+- **Nháp:** agent không đọc. `data/kb/drafts.jsonl` được nạp thành nháp khi knowledge server khởi động; mục đã sửa hoặc đã xóa không bị nạp lại.
+- **Bật:** cần ít nhất một nguồn công khai còn hiệu lực và qua `gap.gate`. Có tác dụng sau tối đa 10 giây, không cần khởi động lại, và không đổi `knowledge version`.
+- **Xóa:** xóa mềm, dòng vẫn còn trong `kb_chunks` với trạng thái `deleted`. Mỗi lần lưu hoặc xóa được ghi vào nhật ký cải tiến của hệ thống.
+- **Mục trong bản phát hành** (`data/kb/v<N>.jsonl`) chỉ xem được ở đây; muốn đổi thì sửa qua phiên bản mới.
 
 ### Quyết định từ chối
 

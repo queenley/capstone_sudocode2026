@@ -78,6 +78,9 @@ def limiter_stats() -> dict[str, dict[str, Any]]:
         return {name: rl.stats() for name, rl in _LIMITERS.items()}
 
 
+def cache_options(provider: str, agent_name: str) -> dict[str, Any]:
+    """OpenAI sends requests with one key to one cache: one key per agent, as each has its own prompt."""
+    return {"model_kwargs": {"prompt_cache_key": agent_name}} if provider == "openai" and agent_name else {}
 def takes_reasoning(provider: str, model: str) -> bool:
     """Whether a model takes a reasoning effort, in which case it refuses a temperature."""
     return provider == "openai" and model.startswith(("gpt-5", "gpt-6"))
@@ -149,6 +152,8 @@ class LLMFactory:
 
         if callbacks:
             kwargs["callbacks"] = callbacks
+
+        kwargs.update(cache_options(provider, agent_name))
 
         for name in GENERATION_PARAMS:
             value = config.get(name)

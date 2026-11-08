@@ -1,0 +1,56 @@
+{
+  "scenario_id": "SCN-GEN-0014",
+  "call": "call_2",
+  "input_mode": "text",
+  "source_sha256": "354379df028a6641dde8e0ab218ebf123ad6eeecceacdb37b29d039aaa6bded3",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Alo, chị muốn hỏi lại về đôi giày chạy bộ RunLite 2 Pro size 42 đó.",
+      "spoken_text": "alo chị muốn hỏi lại về đôi giày chạy bộ runlite hai pro size bốn mươi hai đó",
+      "entities": {
+        "size_new": 42,
+        "sku": "SKU-SN-RUN2"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Hôm trước em có nói giá 1 triệu 5 trăm hai mươi mấy ngàn phải không?",
+      "spoken_text": "hôm trước em có nói giá một triệu năm trăm hai mươi mấy ngàn phải không?",
+      "entities": {
+        "price_vnd": 1520000
+      },
+      "reference_source": "rule",
+      "issues": [
+        "entity_not_stated:price_vnd"
+      ]
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Chị vẫn thấy bên khác rẻ hơn, chắc em có khuyến mãi gì không?",
+      "spoken_text": "chị vẫn thấy bên khác rẻ hơn chắc em có khuyến mãi gì không",
+      "entities": {
+        "blocker": "so sanh gia"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "Chị muốn tìm hiểu thêm trước khi quyết định mua.",
+      "spoken_text": "chị muốn tìm hiểu thêm trước khi quyết định mua",
+      "entities": {
+        "blocker": "can suy nghi them"
+      },
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

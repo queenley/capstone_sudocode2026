@@ -159,3 +159,12 @@ def test_an_account_number_the_writer_filed_as_a_fact_never_reaches_the_labels()
     facts = [StatedFact(slot="payment", value="190157371104"), StatedFact(slot="payment", value="bank"),
              StatedFact(slot="budget_vnd", value=5_000_000), StatedFact(slot="color", value="079201000123")]
     assert _usable_stated(facts) == {"payment": "bank", "budget_vnd": 5_000_000}
+
+
+def test_no_call_is_seeded_with_crm_history_from_after_its_day():
+    """A fixed first-call day (ba_kenh_lech_gia, 05/10) must not take a customer whose CRM history comes later: the
+    evaluation refuses such a seed (SCN-GEN-0080 and SCN-GEN-0146 were planned so before the planner checked it)."""
+    for sp in plan("btc", 150):
+        for pc in sp.calls:
+            later = [item for item in pc.seed_history if item["date"] > pc.call_date.isoformat()]
+            assert not later, (sp.scenario_id, pc.name, later)

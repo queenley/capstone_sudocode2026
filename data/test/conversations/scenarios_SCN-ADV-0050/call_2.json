@@ -1,0 +1,289 @@
+{
+  "conversation_id": "SCN-ADV-0050__call_2",
+  "scenario_id": "SCN-ADV-0050",
+  "call": "call_2",
+  "customer_id": "ANON-003",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-28",
+  "region": "trung",
+  "category": "thoi-trang/ao-khoac",
+  "persona": "khach_chua_co_danh_tinh",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop. Hôm trước chị có quan tâm Áo phao lông vũ Warmly, còn chờ cuối tháng nhận lương; hôm nay mình muốn đặt luôn đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Hôm nay mình muốn đặt luôn đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "blocker",
+        "size",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, hôm trước chị có hỏi về áo phao lông vũ size L màu be.",
+      "facts_stated": {
+        "size": "L",
+        "color": "be",
+        "product_advised": "SKU-JK-DWN"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận chị chọn Áo phao lông vũ Warmly size L màu be, giá 1.490.000đ. Sản phẩm đang còn hàng ạ.",
+      "questions": [],
+      "facts_used": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn đặt áo này, hình thức thanh toán là COD nha.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận chị chọn thanh toán COD. Đơn hàng sẽ giao về TP Huế, phí vận chuyển 35.000đ, đơn mình chưa đủ điều kiện miễn phí ship ạ.",
+      "questions": [],
+      "facts_used": [
+        "payment",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị ở TP Huế, giao hàng cho chị ở đó được không?",
+      "facts_stated": {
+        "delivery_area": "TP Huế"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "TP Huế",
+          "spoken": "TP Huế"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ shop giao hàng toàn quốc, TP Huế nhận hàng trong 4 ngày làm việc, dự kiến giao ngày 02/11/2026 chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "delivery_days",
+          "value": 4
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-02"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "TP Huế",
+            "on": "2026-10-28"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-11-02",
+          "spoken": "02/11/2026"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thế thì chị đồng ý đặt hàng, giúp chị lên đơn nhé!",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em lên đơn cho chị: Áo phao lông vũ Warmly size L màu be, giá 1.490.000đ, giao về TP Huế, thanh toán COD. Đơn dự kiến giao ngày 02/11/2026. Em tiến hành tạo đơn ngay cho mình ạ.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1490000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-02"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0977000002",
+            "sku": "SKU-JK-DWN-L-BE",
+            "qty": 1,
+            "price_vnd": 1490000,
+            "payment": "COD",
+            "address": "TP Huế",
+            "on": "2026-10-28"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "TP Huế",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-JK-DWN",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1490000,
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-JK-DWN-L-BE",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn8"
+        }
+      ],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-11-02",
+          "spoken": "02/11/2026"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_hang_ao_long_vu",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-JK-DWN-L-BE",
+      "qty": 1,
+      "price_vnd": 1490000,
+      "payment": "COD",
+      "address": "TP Huế",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-11-02"
+    }
+  }
+}

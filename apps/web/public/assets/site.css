@@ -1,0 +1,86 @@
+/* Quivo's storefront on taste-skill's kit (system.css, ui/cards.css, motion/motion.css, layout/layout.css),
+   linked after them by app/(shop)/layout.tsx.
+
+   1. The palette and type the skill dealt, exactly as printed by
+        start.mjs css --page product --palette white-navy-tab --type work-sans --radius soft
+      (Work Sans in place of the dealt Besley / Albert Sans, which set no Vietnamese: the first product
+      pairing that does and that the kit lists for shops). */
+:root {
+  --p-bg: #ffffff; --p-surface: #f4f4f2; --p-ink: #1f2b4d; --p-muted: #646b81;
+  --p-accent: #f7941d; --p-accent-ink: #1f2b4d; --p-action: #f7941d; --p-action-ink: #1f2b4d;
+  --p-inv-bg: #05070a; --p-inv-surface: #111417; --p-inv-ink: #ffffff; --p-inv-muted: #939597;
+  --p-inv-accent: #f7941d; --p-inv-accent-ink: #1f2b4d; --p-inv-action: #f7941d; --p-inv-action-ink: #1f2b4d;
+  --font-display: "Work Sans", system-ui, sans-serif;
+  --font-text: "Work Sans", system-ui, sans-serif;
+  --display-weight: 400;
+  --display-tracking: -0.025em;
+  --display-tracking-xl: -0.035em;
+}
+
+/* 2. The rest of the storefront (a category, a product, the cart, checkout, an account) is an app page:
+      a list or a form, as tall as it is. components/shop/ShopMain.tsx wraps those pages in .s-app, so
+      the kit's one-section-per-screen box (main > section) applies to the home page alone; the fixed
+      header is --nav tall over every page. */
+.s-app { padding-top: var(--nav); }
+
+.footer--app { padding-block: var(--s-8) var(--s-6); }
+.footer__col .footer__link { display: inline; background: none; border: 0; padding: 0; font: inherit; line-height: inherit; color: inherit; cursor: pointer; text-align: left; }
+.footer__col .footer__link:hover { color: var(--action); }
+
+/* 3. The page's own CSS inside its visuals and per card group (system.md). */
+#hang .tile { --tile-ratio: 3 / 2; }
+#hang .grid { row-gap: var(--s-6); }
+#me-be .tile { --tile-ratio: 3 / 2; }
+
+/* The product hero's photograph at a phone: the screen width at its own ratio (deal.mjs: "a photograph: the
+   screen width at its own ratio (390x293)"), so the hero ends on the first screen. */
+@media (max-width: 639px) { .hero--product .hero__stage:has(> picture, > img:not(.is-cutout)) { aspect-ratio: 4 / 3; } }
+/* The range: four a row down to the tablet, so the eight stay on one screen there; a phone shows the
+   first six two-up (layout-v4.md: cut the phone's content rather than shrink it). */
+@media (min-width: 640px) and (max-width: 1023px) { #hang .grid > .tile.span-3 { grid-column: auto / span 3; --tile-ratio: 4 / 5; } }
+@media (max-width: 639px) { #hang .grid > .tile:nth-child(n + 7) { display: none; } }
+/* The assistant's chat: the fragment on the frame's ground at its own width, never wider than the frame. */
+#tro-ly .frame > .ui-chat { width: min(100%, 440px); }
+/* The kit's .start-7, under another name: Tailwind (app/tailwind.css) also generates .start-7, an inset
+   utility (28px, !important in its layer), which would push the block off the grid's lines. */
+@media (min-width: 1024px) { .grid > .q-col-7 { grid-column: 7 / span 6; } }
+/* Tailwind also generates .grid (display: grid, !important in its layer), so the kit's stacked split below
+   1024px (.grid.fill:has(> .frame--fill) as a flex column with a 32px gap) stays a grid and its 32px gap
+   lands between twelve columns, wider than the page. Keep it a grid there, with the grid's own gaps. */
+@media (max-width: 1023px) {
+  #tro-ly .grid.fill { column-gap: var(--gutter); row-gap: var(--s-6); align-content: start; }
+  #tro-ly .grid.fill > .frame--fill { height: auto; min-height: 200px; }
+}
+/* The brand band's two pictures on a phone: a wider crop, so the band holds one screen. */
+@media (max-width: 639px) { #me-be .tile { --tile-ratio: 16 / 9; } }
+
+/* globals.css styles a bare <footer> for the staff pages (a 55px margin, flex, 10px text): not the kit's. */
+footer.footer { margin-top: 0; display: block; font-size: inherit; color: inherit; }
+footer.footer:not(.footer--app) { border-top: 0; }
+/* The kit's focus ring is the action colour; the orange stands 2.3:1 on white, so the ring takes the ink. */
+:focus-visible { outline-color: var(--p-ink); }
+/* The chat mock's placeholder at 4.5:1 on its panel. */
+#tro-ly .ui-chat__ph { color: var(--muted); }
+#tro-ly .frame { align-items: center; }
+@media (max-width: 1023px) { #tro-ly .frame { align-items: flex-start; } }
+/* A phone: the brand band's lines go (its pictures and titles stay), so it holds one screen; a head row's
+   link takes the whole row, on the page's lines. */
+@media (max-width: 639px) {
+  #me-be .tile > p { display: none; }
+  .section-head--split > a.link { flex-basis: 100%; }
+}
+/* A phone number is one unbroken line. */
+.footer a[href^="tel:"] { white-space: nowrap; }
+
+/* A phone: the shop's chat button stays fixed at the foot, so the footer's last links end above it. */
+@media (max-width: 639px) { footer.footer.closing, footer.footer.footer--app { padding-bottom: calc(var(--padb) + 88px); } }
+/* 320px: the logo, the main button and the menu button no longer fit one line; the button waits in the sheet. */
+@media (max-width: 359px) { .nav:not(.is-open) .nav__actions { display: none; } .nav:not(.is-open) .nav__toggle { margin-left: auto; } }
+
+/* The terms beside the questions: one screen from 1280; stacked they need two (layout-v4.md, the tablet table). */
+@media (min-width: 1024px) and (max-width: 1279px) { #mua-hang { --h: 2; } #mua-hang .grid > .span-6 { grid-column: 1 / -1; } }
+@media (min-width: 640px) and (max-width: 1023px) { #mua-hang .grid > .span-6 { grid-column: auto / span 6; } }
+/* A phone: the stacked terms and questions hold 1,305px, two screens by layout-v4.md's table (1,268 to 1,544). */
+@media (max-width: 639px) { #mua-hang { --hm: 2; } }
+/* A phone: the assistant's split grows its section rather than run past it (the kit's .fill takes no room there). */
+@media (max-width: 639px) { #tro-ly .grid.fill { flex: none; } }

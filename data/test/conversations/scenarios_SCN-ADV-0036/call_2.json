@@ -1,0 +1,258 @@
+{
+  "conversation_id": "SCN-ADV-0036__call_2",
+  "scenario_id": "SCN-ADV-0036",
+  "call": "call_2",
+  "customer_id": "C025",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-12-01",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_go_sai_chinh_ta",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Nhung ạ, hôm trước chị có hỏi về bình sữa Pigeon và còn đang để bàn với gia đình. Chị muốn đặt luôn sản phẩm Bình sữa Pigeon PPSU 240ml phải không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn đặt luôn sản phẩm Bình sữa Pigeon PPSU 240ml phải không ạ?"
+        }
+      ],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 289000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, hôm qua chị đã hỏi về bình sữa Pigeon rồi, giờ chị muốn đặt một cái.",
+      "facts_stated": {
+        "product_advised": "SKU-MB-BOT"
+      },
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, sản phẩm Bình sữa Pigeon PPSU 240ml giá 289.000đ đang còn hàng chị nhé. Chị chọn thanh toán qua ngân hàng phải không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Chị chọn thanh toán qua ngân hàng phải không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 289000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ thanh toán qua ngân hàng.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận thanh toán chuyển khoản ạ. Shop sẽ giao hàng về địa chỉ Lê Chân, Hải Phòng như thông tin chị cung cấp phải không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Shop sẽ giao hàng về địa chỉ Lê Chân, Hải Phòng như thông tin chị cung cấp phải không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giao hàng cho chị ở Lê Chân, Hải Phòng nhé.",
+      "facts_stated": {
+        "delivery_area": "Lê Chân, Hải Phòng"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Lê Chân, Hải Phòng",
+          "spoken": "Lê Chân, Hải Phòng"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em xác nhận đơn hàng Bình sữa Pigeon PPSU 240ml, giá 289.000đ, giao tại Lê Chân, Hải Phòng, thanh toán chuyển khoản. Dự kiến giao hàng tới chị ngày 05/12/2026. Thông tin trên đã đúng và chị chốt đơn giúp em nhé?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Thông tin trên đã đúng và chị chốt đơn giúp em nhé?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 289000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Lê Chân, Hải Phòng",
+            "on": "2026-12-01"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chốt đơn giúp chị với nhé!",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã tạo đơn hàng cho chị thành công, mã đơn OD600001, tổng 289.000đ. Shop sẽ giao hàng dự kiến ngày 05/12/2026 về Lê Chân, Hải Phòng. Cảm ơn chị Nhung đã đặt hàng tại shop ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 289000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0990853801",
+            "sku": "SKU-MB-BOT",
+            "qty": 1,
+            "price_vnd": 289000,
+            "payment": "bank",
+            "address": "Lê Chân, Hải Phòng",
+            "on": "2026-12-01"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Lê Chân, Hải Phòng",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-BOT",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 289000,
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_hang",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-MB-BOT",
+      "qty": 1,
+      "price_vnd": 289000,
+      "payment": "bank",
+      "address": "Lê Chân, Hải Phòng",
+      "order_id": "OD600001"
+    }
+  }
+}

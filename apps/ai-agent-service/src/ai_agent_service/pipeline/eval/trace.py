@@ -120,9 +120,9 @@ def turn_row(
         "call": call,
         "turn": turn,
         "customer_text": customer_text,
-        # What the customer heard: their own phone number restored, an ID or
-        # account number never more than its last four digits.
-        "agent_text": pii.detokenize(reply, vault),
+        # What the customer heard (pii.for_customer, PB-08): their phone number whole only where a sentence
+        # confirms the delivery, else its last three digits; an ID or account number never more than its last four.
+        "agent_text": pii.for_customer(reply, vault),
         "questions": [],
         "claims": [],
         "facts_used": facts_used(state),

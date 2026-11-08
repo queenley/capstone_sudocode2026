@@ -100,6 +100,12 @@ class ChannelModel(FakeMessagesListChatModel):
         await asyncio.sleep(0)  # Let both channels overlap without sharing a response cursor.
         return self._generate(messages, stop=stop, run_manager=run_manager, **kwargs)
 
+ADDRESS = "1 Synthetic Street, Thu Duc"
+DELIVERY = {"address_known": True, "delivery_days": 2, "estimated_delivery": "2026-11-03"}
+#: A whole order (PB-09): payment chosen, an address, and below a delivery estimate in the call's tool results.
+ORDER_ARGS = {"sku": SKU, "price_vnd": PRICE, "qty": 1, "payment": "COD", "address": ADDRESS}
+ESTIMATE = ({"name": "delivery.estimate", "args": {"address": ADDRESS}, "result": {"ok": True, "data": DELIVERY}},)
+
 
 def advisor_with_spy(*, unsafe=False):
     writes = []
@@ -572,3 +578,32 @@ def test_platform_checkout_checks_boolean_and_current_quote_but_has_no_confirmat
     assert client.post(f"/api/conversations/{a}/orders", headers=ha, json=body).json()["id"] == result.json()["id"]
     with client.app.state.database.sessions() as db:
         assert db.scalar(select(func.count()).select_from(Order)) == 1
+
+
+@pytest.mark.asyncio
+async def test_a_complete_order_is_read_back_with_its_delivery_day():
+    result, handler = await attempt_order(guarded_context(tool_results=ESTIMATE), dict(ORDER_ARGS))
+    pending = json.loads(result.content)["error"]["details"]["purchase_draft"]
+    assert "giao dự kiến ngày 3/11/2026" in pending["question"] and pending["question"].endswith("đồng ý không ạ?")
+    handler.assert_not_awaited()
+
+
+@pytest.mark.parametrize("said", ["Đúng rồi em, lên đơn cho chị nhé.", "Ừ, vậy em lên đơn cho anh luôn đi.",
+                                  "Chị đồng ý lên đơn rồi, em làm cho chị nhé.", "Chốt đơn cho chị nhé!"])
+def test_a_yes_with_filler_authorises_and_places_the_bound_order(said):
+    context = guarded_context(turn_id="prepare")
+    args = order_arguments(dict(ORDER_ARGS), context)
+    pending = purchase.draft(args, context, "2026-11-03")
+    confirmed = purchase.answer(pending, call_id=context.call_id, channel=context.channel, turn_id="next",
+                                said=said, last_reply=pending["question"])
+    assert confirmed and confirmed["status"] == "authorized"
+    # matches() applies the same rule as answer(): before, only an exact "vâng" placed the order.
+    context = replace(context, turn_id="next", pending_purchase=confirmed, last_agent_said=pending["question"],
+                      customer_said=said)
+    assert purchase.matches(confirmed, args, context)
+
+
+@pytest.mark.parametrize("said", ["Đúng rồi nhưng đổi địa chỉ giúp chị", "Vâng, thêm một cái nữa nhé",
+                                  "Đồng ý nhưng chuyển khoản nhé", "Không, chị chưa lấy đâu"])
+def test_a_yes_that_changes_the_order_is_still_no_yes(said):
+    assert not purchase.agrees(said)

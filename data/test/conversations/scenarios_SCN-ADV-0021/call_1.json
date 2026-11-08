@@ -1,0 +1,278 @@
+{
+  "conversation_id": "SCN-ADV-0021__call_1",
+  "scenario_id": "SCN-ADV-0021",
+  "call": "call_1",
+  "customer_id": "C002",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-11-01",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_lon_tuoi",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào cô ạ, em là trợ lý ảo của shop BTC. Cô cần tư vấn về máy lọc không khí Samsung AX40 đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Cô cần tư vấn về máy lọc không khí Samsung AX40 đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo co muon hoi ve cai may loc khong khi samsung ax40 ma chau da tu van",
+      "facts_stated": {
+        "product_advised": "SKU-SS-AX40"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm máy lọc không khí Samsung AX40 hiện đang có sẵn hàng cô nhé. Máy phù hợp cho phòng khoảng 25 mét vuông, rất thích hợp nếu nhà mình có trẻ nhỏ vì có khoá trẻ em và chức năng lọc bụi mịn, khử mùi hiệu quả ạ.",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Phòng nhà mình khoảng 25 mét vuông đúng không cô?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 550,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "co nghe noi may nay tot lam nhung khong biet gia bao nhieu",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy Samsung AX40 bên cháu giá 6.490.000đ cô nhé, giá đã được cập nhật mới nhất hôm nay ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "co khuyen mai gi khong chau",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại sản phẩm này chưa có chương trình khuyến mãi giảm giá, nhưng cô được miễn phí thu hộ khi nhận hàng (COD) và miễn phí kiểm tra hàng trước khi thanh toán ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 420,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "co co ngan sach khoang 7 trieu nhung can hoi con chau xem sao",
+      "facts_stated": {
+        "budget_vnd": 7000000,
+        "blocker": "cần hỏi con cháu",
+        "decision_maker": "con"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ cô có ngân sách khoảng 7 triệu và muốn hỏi ý kiến con cháu trước đúng không ạ? Nếu cần, cháu có thể hẹn gọi lại vào lúc nào thuận tiện cho cô để tư vấn thêm.",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Cô có ngân sách khoảng 7 triệu đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 6490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "co muon hen chau goi lai toi mai tam 7 gio nhe",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vậy cháu xin hẹn gọi lại cho cô vào lúc 7 giờ tối ngày mai để cô trao đổi thêm với con cháu nhé. Cháu sẽ lưu lại lời nhắn này ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "callback_at",
+          "value": "2026-11-02T19:00"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0936270107",
+            "callback_at": "2026-11-02T19:00",
+            "note": "khách hỏi người nhà rồi báo lại"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần hỏi con cháu",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 7000000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "decision_maker",
+          "value": "con",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 25,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SS-AX40",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 6490000,
+          "op": "set",
+          "source": "call_1#turn9"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "co co mot phong khoang 25 met vuong va co chau nho o nha",
+      "facts_stated": {
+        "room_area_m2": 25,
+        "has_children": true
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "cần hỏi người nhà",
+    "objection_handling": "Lịch hẹn gọi lại đúng khung giờ khách yêu cầu, nhắc lại rõ ràng.",
+    "sentiment": "neutral",
+    "decision_maker": "con",
+    "commitments": [
+      {
+        "callback_at": "2026-11-02T19:00"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-11-02T19:00",
+      "reason": "khách hỏi người nhà rồi báo lại"
+    },
+    "order": null
+  }
+}

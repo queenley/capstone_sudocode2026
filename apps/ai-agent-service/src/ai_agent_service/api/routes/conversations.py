@@ -147,7 +147,8 @@ async def answer_turn(app: Any, conversation: platform.ConversationView, data: T
             latency_ms=int(outcome.latency.get("total_ms") or 0), tool_calls=result["tool_calls"],
             usage={"model_calls": (state.get("draft") or {}).get("model_calls") or 0},
             environment=app.state.settings.environment, router="rules",
-            model=str((state.get("draft") or {}).get("model") or "unknown"), stage_timings={},
+            model=str((state.get("draft") or {}).get("model") or "unknown"),
+            stage_timings=dict(outcome.latency.get("stages_ms") or {}),
             guard_blocked=not bool((state.get("guard") or {}).get("passed", True)),
             error_count=1 if (state.get("draft") or {}).get("error") else 0,
         )
@@ -169,7 +170,7 @@ def _result(row: dict[str, Any], turn_id: str, outcome: harness.Outcome | None, 
         "trace_id": f"{row['id']}:{turn_id}",
         "products": _products(results, state.get("quotes") or {}),
         "stages": list(NODES),
-        "stage_timings_ms": {},
+        "stage_timings_ms": dict(((outcome.latency or {}) if outcome else {}).get("stages_ms") or {}),
         "tool_calls": [dotted(str(r.get("name") or "")) if "." not in str(r.get("name")) else r.get("name")
                        for r in results],
         "signals": {

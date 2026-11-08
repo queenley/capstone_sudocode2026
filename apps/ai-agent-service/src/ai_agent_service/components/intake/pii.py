@@ -207,6 +207,34 @@ def detokenize(text: str, vault: Vault, *, reveal_phone: bool = True) -> str:
     return TOKEN.sub(swap, text)
 
 
+#: PB-08: a phone number is read out in full only to confirm a delivery. A sentence about the delivery says so.
+DELIVERY_CUE = re.compile(r"\b(giao|nhan hang|nguoi nhan|dia chi|ship|shipper|van chuyen|buu ta)\b")
+#: How much of the number a customer hears outside a delivery confirmation: ``*******876``.
+PHONE_TAIL = 3
+SENTENCE = re.compile(r"(?<=[.!?…\n])\s+")
+
+
+def for_customer(text: str, vault: Vault) -> str:
+    """What the customer hears (PB-08): each sentence is restored on its own; a phone number stays whole only in a
+    sentence that confirms the delivery and is otherwise its last three digits; an address is the customer's own and
+    is restored, an ID card or account number is its last four digits as everywhere."""
+    def sentence(part: str) -> str:
+        if DELIVERY_CUE.search(_plain(part)):
+            return detokenize(part, vault)
+
+        def swap(match: re.Match[str]) -> str:
+            value = vault.get(match.group(0))
+            if match.group(1) != "PHONE" or value is None:
+                return detokenize(match.group(0), vault)
+            return "*" * (len(value) - PHONE_TAIL) + value[-PHONE_TAIL:]
+
+        return TOKEN.sub(swap, part)
+
+    pieces = SENTENCE.split(text)
+    gaps = SENTENCE.findall(text)
+    return "".join(sentence(p) + (gaps[i] if i < len(gaps) else "") for i, p in enumerate(pieces))
+
+
 def unknown_tokens(text: str, vault: Vault) -> list[str]:
     """Tokens in *text* that are not this call's: a leak from somewhere else."""
     return [m.group(0) for m in TOKEN.finditer(text) if vault.get(m.group(0)) is None]

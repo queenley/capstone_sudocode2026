@@ -20,6 +20,63 @@ def knowledge(tmp_path, monkeypatch):
     return folder, config
 
 
+@pytest.mark.parametrize("answer, reason", [
+    ("Phí lắp đặt 200.000đ ạ.", "số tiền"),
+    ("Dạ áp mã AIR-OCT nhé.", "mã khuyến mãi"),
+    ("Dạ hiện còn hàng ạ.", "tồn kho"),
+])
+def test_approving_a_gap_goes_through_the_gate(knowledge, answer, reason):
+    folder, config = knowledge
+    gap = gaps.record("Phí lắp đặt bao nhiêu?", call_id="1", turn_id="t1")
+    with pytest.raises(ValueError, match=reason):
+        gaps.resolve(gap, answer=answer, cites=["PB-05"], reviewer="reviewer", directory=folder, config_path=config)
+    assert gaps.list_gaps()[0]["status"] == "open" and versions.versions(folder) == [0]
+
+
+def test_a_retired_policy_cannot_support_an_answer(knowledge):
+    folder, config = knowledge
+    gap = gaps.record("Đổi trả bao lâu?", call_id="1", turn_id="t1")
+    with pytest.raises(ValueError, match="public"):
+        gaps.resolve(gap, answer="Trong thời hạn đổi trả.", cites=["DT-OLD-01"], reviewer="reviewer",
+                     directory=folder, config_path=config)
+
+
+def test_a_question_can_be_dismissed_with_a_reason_and_open_ones_come_first(knowledge):
+    closed = gaps.record("Thời tiết hôm nay?", call_id="1", turn_id="t1")
+    gaps.record("Câu khác?", call_id="1", turn_id="t2")
+    gaps.record("Thời tiết hôm nay?", call_id="2", turn_id="t1")
+    with pytest.raises(ValueError, match="human"):
+        gaps.dismiss(closed, reason="Ngoài phạm vi", reviewer="qa")
+    with pytest.raises(KeyError):
+        gaps.dismiss("0" * 16, reason="Ngoài phạm vi", reviewer="reviewer")
+    gaps.dismiss(closed, reason="Ngoài phạm vi", reviewer="reviewer")
+    assert [row["status"] for row in gaps.list_gaps()] == ["open", "dismissed"]
+    assert gaps.list_gaps()[1]["reason"] == "Ngoài phạm vi"
+
+
+def test_a_gap_that_became_an_faq_is_closed_for_both_other_paths(knowledge):
+    folder, config = knowledge
+    gap = gaps.record("Câu hỏi?", call_id="1", turn_id="t1")
+    assert gaps.open_question(gap) == "Câu hỏi?"
+    gaps.became_faq(gap, faq_id="FAQ-GAP-X", reviewer="reviewer")
+    assert gaps.list_gaps()[0]["faq_id"] == "FAQ-GAP-X"
+    with pytest.raises(ValueError):
+        gaps.open_question(gap)
+    with pytest.raises(ValueError, match="FAQ"):
+        gaps.resolve(gap, answer="Em chưa có thông tin.", cites=["PB-05"], reviewer="reviewer", directory=folder,
+                     config_path=config)
+    with pytest.raises(ValueError):
+        gaps.dismiss(gap, reason="Đổi ý", reviewer="reviewer")
+
+
+def test_a_published_answer_cannot_be_dismissed(knowledge):
+    folder, config = knowledge
+    gap = gaps.record("Câu hỏi?", call_id="1", turn_id="t1")
+    gaps.resolve(gap, answer="Em chưa có thông tin.", cites=["PB-05"], reviewer="reviewer", directory=folder, config_path=config)
+    with pytest.raises(ValueError, match="published"):
+        gaps.dismiss(gap, reason="Đổi ý", reviewer="reviewer")
+
+
 def test_gap_capture_is_private_idempotent_and_cannot_learn_without_review(knowledge):
     folder, config = knowledge
     gap = gaps.record("Số 0900000001 có hỗ trợ không?", call_id="1", turn_id="t1")

@@ -203,9 +203,10 @@ test("demo call 2: returning welcome, chat to cart, and the staff brief", async 
   await page.getByLabel("Staff access token").fill("synthetic-staff-token");
   await page.getByRole("button", { name: "Kết nối", exact: true }).click();
   await page.locator(".queue-row", { hasText: "Khách Thử Nghiệm" }).click();
-  const evidence = page.locator(".call-evidence");
-  await expect(evidence).toContainText("Lần trước (05/11)");
-  await expect(evidence).toContainText("room_area_m2, has_children");
+  // The Call Brief leads the conversation, above the transcript.
+  const brief = page.locator(".call-transcript-pane .call-brief-main");
+  await expect(brief).toContainText("Lần trước (05/11)");
+  await expect(brief).toContainText("room_area_m2, has_children");
   await page.screenshot({ path: path.join(OUT, "demo-3-console.png"), fullPage: true });
 });
 

@@ -22,24 +22,29 @@ from typing import Any, Mapping, Sequence
 from langchain_core.messages import AIMessage, HumanMessage, RemoveMessage
 from langgraph.runtime import Runtime
 
-from ...agents.advisor import AdvisorFailure, AgentContext, Draft, shown_passages, _seen_in
+from ...agents.advisor import RULE_PACKS, AdvisorFailure, AgentContext, Draft, shown_passages, system_prompt, _seen_in
 from ...agents.policy import PolicyInput
-from ...components.context import compact
+from ...components.context import compact, focus
+from ...components.context.budget import tokens as count_tokens
 from ...components.guardrails import actions, fallback, purchase
-from ...components.guardrails.hard import MAX_SENTENCES, ORDER_SUMMARY, GuardInput, check, clean
+from ...components.guardrails.hard import (MAX_SENTENCES, ORDER_SUMMARY, GuardInput, check, clean, moved_callback,
+                                           open_amounts)
 from ...config.config_manager import review_head_start
 from .review import Reviews
 from ...components.context import skills as skill_book
 from ...components.guardrails.stream import SentenceSplitter
 from ...components.identity import resolver
 from ...components.intake import honorific, itn, lexicon, pii, signals, text as intake_text
+from ...components.knowledge.search import stated_order_day
 from ...components.memory import brief as briefs
 from ...components.memory import recall
 from ...components.memory.brief import BriefLine
+from ...observability import stopwatch
 from ...components.orchestration.rules import MODEL_FAILURES, RouteInput, decide
 from ...config.config_manager import handoff_auto_accept
 from ...mcp.servers import btc
 from ...mcp.tools import INFRASTRUCTURE_CODES
+from . import call_state
 from .state import TURN_KEYS, HotContext, HotState
 
 logger = logging.getLogger(__name__)
@@ -122,6 +127,7 @@ async def perceive(state: HotState, runtime: Runtime[HotContext]) -> dict[str, A
     low = context.asr_confidence is not None and context.asr_confidence < ASR_LOW_CONFIDENCE
     update.update(
         input_mode=mode,
+        call_facts=call_state.heard(tokenised, state.get("call_facts")),
         messages=[HumanMessage(content=tokenised, id=f"customer-{state['turn_id']}")],
         flags={"asr_low_conf": low, "new_key": bool(new_phones), "new_phone_tokens": new_phones,
                **signals.read(written).as_flags()},
@@ -146,9 +152,11 @@ async def load_context(state: HotState, runtime: Runtime[HotContext]) -> dict[st
     placed is answered by the policy of the day it was placed (CL-01).
     """
     context = runtime.context
-    update = await _identify(state, context)
+    with stopwatch.span("context"):
+        update = await _identify(state, context)
     if state.get("phase") != "opening" and (context.text or "").strip():
-        found = await _knowledge({**state, **update}, context, _last_customer_text(state) or "")
+        with stopwatch.span("knowledge"):
+            found = await _knowledge({**state, **update}, context, _last_customer_text(state) or "")
         if found is not None:
             update["knowledge"] = found
             update["passages_read"] = _passages_after(state.get("passages_read") or {}, _passages({"knowledge": found}))
@@ -159,25 +167,47 @@ async def _knowledge(state: dict[str, Any], context: HotContext, said: str) -> d
     """``kb.search`` on the customer's words: the passages, and whether the documents cover them."""
     if context.harness is None or not said.strip():
         return None
-    order_date = _order_date(state, said)
-    found = await context.harness.data("kb_search", query=said, k=5, on=state["on"], order_date=order_date)
+    order_date, other_orders = _order_days(state, said)
+    found = await context.harness.data("kb_search", query=said, k=5, on=state["on"], order_date=order_date,
+                                       other_order_dates=list(other_orders),
+                                       about=[p["sku"] for p in state.get("seen_products") or [] if p.get("sku")])
     if not found:
         return None
     return {key: found.get(key) for key in ("hits", "top_score", "threshold", "abstain", "reason", "mode",
-                                            "changelog", "version")} | {"order_date": order_date}
+                                            "changelog", "version", "withheld", "explains", "version_differs")} | {
+                                                "order_date": order_date}
 
 
-def _order_date(state: dict[str, Any], said: str) -> str | None:
-    """The day the order a question is about was placed, when it is about one this customer has."""
+#: The turn mentions an order: the knowledge search then picks the policy version in force on that order's day.
+#: Not routing (the advisor reads what the turn is about); a hint to retrieval only.
+ORDER_TALK = re.compile(
+    r"\b(don hang|don cua|ma don|od\d+|dang giao|giao chua|giao den dau|den dau roi|khi nao giao|doi size|"
+    r"doi sang|doi mau|doi san pham|tra hang|hoan tien|doi dia chi|sua dia chi|trang thai don|nhan hang|"
+    r"van don|chat qua|rong qua|bi loi)\b")
+
+
+def _order_days(state: dict[str, Any], said: str) -> tuple[str | None, tuple[str, ...]]:
+    """The day of the order a question is about, and when it names none, this customer's other order days."""
     orders = [o for o in (state.get("brief") or {}).get("orders") or [] if o.get("order_id")]
-    words = intake_text.plain(said)
-    chosen = next((o for o in orders if o["order_id"] in said), None) or next(
-        (o for o in orders if any(str(o.get(key) or "") and intake_text.plain(str(o[key])) in words
-                                  for key in ("product_name", "name", "sku", "variant_sku"))), None)
-    if chosen is None:
-        return None
-    day = str(chosen.get("date") or chosen.get("created_at") or "")[:10]
-    return day or None
+    named = next((o for o in orders if o["order_id"] in said), None)
+    if named is None:
+        # The order named by its product ("cái máy lọc hôm trước"), as origin/main reads it.
+        words = intake_text.plain(said)
+        named = next((o for o in orders if any(str(o.get(key) or "") and intake_text.plain(str(o[key])) in words
+                                               for key in ("product_name", "name", "sku", "variant_sku"))), None)
+    if named is not None:
+        return _order_day(named) or None, ()
+    stated = stated_order_day(said, state.get("on"))
+    if stated:
+        return stated, ()
+    if not orders or not (ORDER_TALK.search(intake_text.plain(said)) or "OD" in said):
+        return None, ()
+    days = sorted({_order_day(order) for order in orders} - {""})
+    return (days[-1], tuple(days[:-1])) if days else (None, ())
+
+
+def _order_day(order: Mapping[str, Any]) -> str:
+    return str(order.get("date") or order.get("created_at") or "")[:10]
 
 
 async def _identify(state: HotState, context: HotContext) -> dict[str, Any]:
@@ -449,7 +479,8 @@ async def advisor(state: HotState, runtime: Runtime[HotContext]) -> dict[str, An
     summary = state.get("working_summary")
     folded, kept = compact.split(messages)
     if folded:
-        summary = await compact.fold_with(context.compactor, folded, summary)
+        with stopwatch.span("compact"):
+            summary = await compact.fold_with(context.compactor, folded, summary)
         update["working_summary"] = summary
         update["messages"] = [RemoveMessage(id=m.id) for m in folded if m.id]
         messages = kept
@@ -461,6 +492,11 @@ async def advisor(state: HotState, runtime: Runtime[HotContext]) -> dict[str, An
         return update
 
     agent_context = _agent_context(state, context, summary)
+    prompt, cut = system_prompt(agent_context)
+    if cut:
+        logger.warning("Call %s lost %s from its prompt", state.get("call_id"), ", ".join(cut))
+    update["prompt_stats"] = focus.stats(count_tokens(prompt), cut, focus.packs(agent_context, RULE_PACKS),
+                                         len(agent_context.brief_lines), len(state.get("brief_lines") or []))
     if state.get("lane") == "HANDOFF":
         # Rule 1: tools or the model keep failing. The model is what may be failing, so the
         # harness puts the call through itself, and the bridging line is said only when it did.
@@ -471,7 +507,8 @@ async def advisor(state: HotState, runtime: Runtime[HotContext]) -> dict[str, An
         update.update(await _streamed(state, context, turn_messages, agent_context))
         return update
     try:
-        draft = await context.advisor.draft(turn_messages, agent_context, user_id=context.user_id)
+        with stopwatch.span("advisor"):
+            draft = await context.advisor.draft(turn_messages, agent_context, user_id=context.user_id)
     except Exception as error:  # noqa: BLE001 - section 4.9: a failure is never silence
         logger.exception("Advisor failed on call %s", state.get("call_id"))
         produced = list(error.partial.tool_results) if isinstance(error, AdvisorFailure) else []
@@ -552,11 +589,14 @@ _HANDOFF_DETAIL = {
 def _agent_context(state: HotState, context: HotContext, summary: str | None) -> AgentContext:
     """The slice of the state the advisor may read (section 3.2), with what the tier withholds left out."""
     tier = state.get("tier") or "UNKNOWN"
-    lines = [BriefLine(l["id"], l["text"], l["sensitive"], tuple(l.get("fact_ids") or ())) for l in state.get("brief_lines") or []]
+    lines = [BriefLine(l["id"], l["text"], l["sensitive"], tuple(l.get("fact_ids") or ()), l.get("kind", "other"))
+             for l in state.get("brief_lines") or []]
     if tier == "PROBABLE":
         lines = [line for line in lines if not line.sensitive]
     elif tier != "VERIFIED":
         lines = []
+    lines = focus.lines(lines, _last_customer_text(state), first_turn=int(state.get("turn_no") or 1) <= 1
+                        or state.get("phase") == "opening", blocked=bool(state.get("block_reasons")))
     brief = state.get("brief") or {}
     phone = context.vault.get(state.get("phone_token") or "")
     products = brief.get("products_advised") or []
@@ -584,6 +624,7 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
         warnings=tuple(state.get("freshness") or []) if tier == "VERIFIED" else (),
         must_not_ask=tuple(brief.get("must_not_ask") or []) if tier == "VERIFIED" else (),
         working_summary=summary,
+        call_state=call_state.lines(state.get("call_facts"), state.get("quotes"), _last_agent_text(state)),
         block_reasons=tuple(state.get("block_reasons") or []),
         tool_results=tuple(state.get("tool_results") or []),
         quotes=dict(state.get("quotes") or {}),
@@ -727,6 +768,10 @@ def _placed(earlier: Sequence[Mapping[str, Any]], results: Sequence[Mapping[str,
     return list(lines.values())
 
 
+#: Tools whose numbers a later turn of the call may repeat: prices, discounts, fees and delivery days.
+PRICED_TOOLS = frozenset({"pricing.get_quote", "catalog.search", "delivery.estimate"})
+
+
 def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     """A run's tool results added to the turn's, with today's quotes, the orders seen and the failure count."""
     new_results = [{**r, "turn": state.get("turn_no") or 0} for r in produced]
@@ -735,6 +780,7 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
     orders = list(state.get("known_orders") or [])
     created = list(state.get("created_orders") or [])
     deletion_recorded = bool(state.get("deletion_recorded"))
+    callback_booked = bool(state.get("callback_booked"))
     pending_purchase = state.get("pending_purchase")
     updated = list(state.get("updated_orders") or [])
     failures = int(state.get("tool_failures") or 0)
@@ -745,6 +791,7 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
             failures = 0
             if actions.deletion_succeeded(result["name"], envelope) and result["name"] == "memory.request_deletion":
                 deletion_recorded = True
+            callback_booked = callback_booked or result["name"] == "schedule.callback"
             if result["name"] == "pricing.get_quote" and data.get("sku"):
                 quotes[data["sku"]] = int(data["final_price_vnd"])
             if result["name"] == "order.create" and data.get("order_id"):
@@ -768,7 +815,8 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
             "call_log": [*(state.get("call_log") or []), *log][-CALL_LOG_SIZE:],
             "basket": _basket_after(state.get("basket") or {}, new_results),
             "known_orders": orders, "created_orders": created, "updated_orders": updated, "tool_failures": failures,
-            "deletion_recorded": deletion_recorded, "pending_purchase": pending_purchase,
+            "deletion_recorded": deletion_recorded, "callback_booked": callback_booked,
+            "pending_purchase": pending_purchase,
             "placed_lines": _placed(state.get("placed_lines") or [], new_results),
             "trusted_skus": sorted(set(state.get("trusted_skus") or []) | codes),
             "seen_products": _products_in(new_results, state.get("seen_products") or [])}
@@ -902,6 +950,11 @@ async def _streamed(state: HotState, context: HotContext, messages: list[Any], a
         update["safe_lines"] = int(state.get("safe_lines") or 0) + 1
         logger.warning("Call %s: a streamed sentence was blocked after %d said; safe line said",
                        state.get("call_id"), len(attempt.said))
+    moved = moved_callback(text, produced)
+    if moved:  # Said rather than regenerated: nothing else of the answer was wrong, and LN-02 is the shop's own rule.
+        line = fallback.LINES["callback_moved"].format(who=_who(state), moment=moved)
+        await _say(context, line, timing)
+        text = f"{text} {line}".strip()
     update.update(
         draft={"text": text, **stats, "fallback": bool(attempt.reasons)},
         guard=verdict,
@@ -925,8 +978,9 @@ async def _stream_once(
     # into the last sentence before the tools ("…chờ chút nhé.Dạ đơn hàng…").
     new_message = False
     stream = context.advisor.stream(messages, view, user_id=context.user_id)
+    waited = _waited(stream)
     try:
-        async for event in stream:
+        async for event in waited:
             if _flagged(attempt):
                 return attempt
             if event.kind == "tool_started":
@@ -977,7 +1031,20 @@ async def _stream_once(
             await _offer(state, context, rest, earlier + tuple(attempt.results), attempt, timing)
         return attempt
     finally:
+        await waited.aclose()
         await stream.aclose()
+
+
+async def _waited(stream: Any) -> Any:
+    """*stream*'s events, the wait for each timed as ``advisor``: what the customer waits on, not what runs ahead."""
+    events = stream.__aiter__()
+    while True:
+        with stopwatch.span("advisor"):
+            try:
+                event = await events.__anext__()
+            except StopAsyncIteration:
+                return
+        yield event
 
 
 def _flagged(attempt: _Attempt) -> bool:
@@ -1016,8 +1083,12 @@ def _reviewer(state: HotState, context: HotContext) -> Any:
                 [p.get("chunk_id") for p in (*policy, *playbook)])
 
     async def review(text: str, results: tuple[dict[str, Any], ...]) -> Any:
-        return await context.policy.review(PolicyInput(text=text, tool_results=results, tier=tier, policy_snippets=snippets,
-                                                       earlier=earlier, customer_said=said))
+        # Runs beside the stream (Reviews): its wall time is the stopwatch's "policy", counted once however many overlap.
+        with stopwatch.span("policy"):
+            view = guard_input(state, context, text, results)
+            return await context.policy.review(PolicyInput(text=text, tool_results=results, tier=tier,
+                                                           policy_snippets=snippets, earlier=earlier, customer_said=said,
+                                                           open_amounts=open_amounts(view)))
     return review
 
 
@@ -1059,7 +1130,8 @@ async def _offer(state: HotState, context: HotContext, sentence: str, results: t
     if len(attempt.said) >= MAX_SENTENCES and not ORDER_SUMMARY.search(" ".join([*attempt.said, sentence])):
         attempt.last_spoken = False
         return True  # past the length the rules allow: not said, the stream goes on to its end
-    reasons = list(check(guard_input(state, context, spoken, results)).reasons)
+    with stopwatch.span("guard"):
+        reasons = list(check(guard_input(state, context, spoken, results)).reasons)
     if reasons:
         attempt.reasons, attempt.blocked = reasons, " ".join([*attempt.said, sentence])
         return False
@@ -1127,15 +1199,21 @@ async def guard(state: HotState, runtime: Runtime[HotContext]) -> dict[str, Any]
     text = unmarked(draft.get("text") or "")
     results = tuple(state.get("tool_results") or [])
     tier = state.get("tier") or "UNKNOWN"
-    view = guard_input(state, context, text, results)
-    hard = check(view)
+    with stopwatch.span("guard"):
+        view = guard_input(state, context, text, results)
+        hard = check(view)
+    moved = moved_callback(text, results)
+    if moved:
+        hard = hard._replace(passed=False, reasons=(*hard.reasons, f"Lịch gọi lại đã dời sang {moved} (LN-02); phải báo khách giờ mới."))
     verdict: dict[str, Any] = {"hard": {"passed": hard.passed, "reasons": list(hard.reasons)}}
     reasons = list(hard.reasons)
     if hard.passed and context.policy is not None:
-        soft = await context.policy.review(PolicyInput(
-            text=text, tool_results=results, tier=tier, policy_snippets=view.policy_texts,
-            earlier=_established(state),
-            customer_said=_last_customer_text(state)))
+        with stopwatch.span("policy"):
+            soft = await context.policy.review(PolicyInput(
+                text=text, tool_results=results, tier=tier, policy_snippets=view.policy_texts,
+                earlier=_established(state),
+                customer_said=_last_customer_text(state),
+                open_amounts=open_amounts(view)))
         verdict["soft"] = {"passed": soft.passed, "reasons": list(soft.reasons), "decided_by": soft.decided_by,
                            "probabilities": soft.probabilities, "seconds": soft.seconds}
         reasons += list(soft.reasons)
@@ -1326,12 +1404,16 @@ NOTHING_RELEVANT = "Tài liệu: không có đoạn nào đủ liên quan tới 
 def _passages(state: HotState) -> tuple[dict[str, Any], ...]:
     """The passages the advisor reads this turn: none when the best one is under θ, as nothing is relevant then.
 
-    An internal passage reaches it as the instruction it stands for, never its text.
+    An internal passage reaches it as the instruction it stands for, never its text. A passage not in force
+    never does, but the changelog entry that replaced it comes along, or a customer quoting the old rule
+    would hear a different number with no reason for it.
     """
     found = state.get("knowledge") or {}
     if not found.get("hits") or found.get("reason") == "no_match":
         return ()
-    return tuple(found["hits"])
+    explains = set(found.get("explains") or ())
+    return (*(hit for hit in found["hits"] if hit.get("chunk_id") not in explains),
+            *({**entry, "explains": True} for entry in found.get("changelog") or () if entry.get("chunk_id") in explains))
 
 
 #: The knowledge search found the documents do not answer the turn (nothing relevant, or a passage
@@ -1344,6 +1426,11 @@ NO_ANSWER = ("Tìm trong tài liệu không thấy đoạn khớp câu khách v�
              "thì làm theo luật 4.")
 
 
+#: When the customer's orders fall under different versions of a policy and the question names none.
+ORDER_VERSION = ("Đoạn trên đúng cho đơn mới nhất của khách; đơn đặt ngày {days} theo bản chính sách khác. Khách "
+                 "chưa nói đơn nào thì hỏi đơn nào trước khi nêu thời hạn hay mức phí.")
+
+
 def _knowledge_note(state: HotState) -> str | None:
     """What the search says when the documents have no answer: a fact of the retrieval, not of the words."""
     found = state.get("knowledge") or {}
@@ -1353,6 +1440,8 @@ def _knowledge_note(state: HotState) -> str | None:
         return f"{NOTHING_RELEVANT} {NO_ANSWER}"
     if found.get("abstain") and found.get("reason") == "absence":
         return NO_ANSWER
+    if found.get("version_differs"):
+        return ORDER_VERSION.format(days=", ".join(found["version_differs"]))
     return None
 
 

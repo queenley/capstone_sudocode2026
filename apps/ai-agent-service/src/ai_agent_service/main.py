@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
@@ -32,7 +33,7 @@ from .components import voice as voice_component
 from .llm import tracing
 from .mcp import client as mcp_client
 from .observability.turns import TurnTracker
-from .runtime import calls, db, harness, platform
+from .runtime import alerts, calls, db, harness, platform
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -103,9 +104,12 @@ async def lifespan(app: FastAPI):
         except Exception as error:  # noqa: BLE001 - retried on the first turn
             logger.error("Agent warm-up failed, will retry on first request: %s", error)
         harness.spawn(_reconcile_forever(app))
+        app.state.alerts_stop = alerts.start(os.getenv("KAFKA_BROKERS"))
     if not voice_component.status()["missing_packages"]:
         harness.spawn(_prepare_voice())
     yield
+    if getattr(app.state, "alerts_stop", None):
+        app.state.alerts_stop.set()
     app.state.turn_tracker.close()
     tracing.flush()
     await mcp_client.close_all()

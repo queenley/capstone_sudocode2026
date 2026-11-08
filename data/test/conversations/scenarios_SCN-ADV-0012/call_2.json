@@ -1,0 +1,364 @@
+{
+  "conversation_id": "SCN-ADV-0012__call_2",
+  "scenario_id": "SCN-ADV-0012",
+  "call": "call_2",
+  "customer_id": "C013",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-18",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_hoi_gio_hang",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Trang ạ, em là trợ lý ảo của shop BTC. Hôm qua chị có để lại giỏ hàng với Máy lọc không khí AirPure Y, còn cần suy nghĩ thêm; hôm nay chị muốn mình tiếp tục đặt đơn đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Hôm nay chị muốn mình tiếp tục đặt đơn đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "blocker",
+        "room_area_m2",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        },
+        {
+          "field": "price_vnd:SKU-AP-Y",
+          "value": 5200000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị gọi để chốt đơn cho giỏ hàng hôm qua đó.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em ghi nhận chị muốn lấy Máy lọc không khí AirPure Y như hôm qua ạ. Chị muốn lấy thêm sản phẩm nào khác trong giỏ hàng không, hay chỉ lấy mỗi món một cái như cũ ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Chị muốn lấy thêm sản phẩm nào khác trong giỏ hàng không, hay chỉ lấy mỗi món một cái như cũ ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn lấy mỗi món một cái, tổng tiền là bao nhiêu em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị lấy Máy lọc không khí AirPure Y giá 5.200.000đ và Máy lọc không khí AirPure Mini giá 1.095.000đ, tổng cộng là 6.295.000đ. Đơn này được tặng kèm 1 màng lọc thay thế và miễn phí vận chuyển toàn quốc ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-AP-Y",
+          "value": 5200000
+        },
+        {
+          "field": "price_vnd:SKU-AP-MINI",
+          "value": 1095000
+        },
+        {
+          "field": "total_vnd",
+          "value": 6295000
+        },
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        },
+        {
+          "field": "freeship",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đã đổi ý rồi, ngân sách giờ chỉ còn 5 triệu thôi.",
+      "facts_stated": {
+        "budget_vnd": 5000000
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ, với ngân sách 5 triệu thì Máy lọc không khí AirPure Y giá 5.200.000đ sẽ vượt ngân sách một chút. Chị có muốn cân nhắc chọn mẫu khác phù hợp hơn không, hay mình vẫn giữ Máy AirPure Y như đã chọn ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị có muốn cân nhắc chọn mẫu khác phù hợp hơn không, hay mình vẫn giữ Máy AirPure Y như đã chọn ạ?"
+        }
+      ],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-AP-Y",
+          "value": 5200000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn thanh toán COD, giao hàng đến Nha Trang, Khánh Hòa nhé.",
+      "facts_stated": {
+        "payment": "COD",
+        "delivery_area": "Nha Trang, Khánh Hòa"
+      },
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng của chị sẽ được giao đến Nha Trang, Khánh Hòa và thanh toán khi nhận hàng. Đơn này được miễn phí vận chuyển và dự kiến giao trước ngày 22/10 ạ.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-22"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-10-18"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Vậy mình chốt đơn luôn em nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em lên đơn cho chị: Máy lọc không khí AirPure Y giá 5.200.000đ và Máy lọc không khí AirPure Mini giá 1.095.000đ, tổng cộng 6.295.000đ, giao đến Nha Trang, Khánh Hòa, thanh toán COD. Đơn này sẽ được nhân viên bên em gọi xác nhận trước khi giao hàng ạ.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-AP-Y",
+          "value": 5200000
+        },
+        {
+          "field": "price_vnd:SKU-AP-MINI",
+          "value": 1095000
+        },
+        {
+          "field": "total_vnd",
+          "value": 6295000
+        },
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0964252477",
+            "sku": "SKU-AP-Y",
+            "qty": 1,
+            "price_vnd": 5200000,
+            "payment": "COD",
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-10-18",
+            "basket_skus": [
+              "SKU-AP-MINI"
+            ]
+          }
+        },
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0964252477",
+            "sku": "SKU-AP-MINI",
+            "qty": 1,
+            "price_vnd": 1095000,
+            "payment": "COD",
+            "address": "Nha Trang, Khánh Hòa",
+            "on": "2026-10-18",
+            "basket_skus": [
+              "SKU-AP-Y"
+            ]
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "budget_vnd",
+          "value": 5000000,
+          "op": "supersede",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Nha Trang, Khánh Hòa",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-Y",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5200000,
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "promo_code",
+          "value": "GIFT-FILTER",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn10"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cảm ơn em nhiều, em gửi thông tin cho chị nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "budget_vnd",
+        "old_value": 6000000,
+        "new_value": 5000000
+      }
+    ],
+    "callback": null,
+    "order": {
+      "items": [
+        {
+          "sku": "SKU-AP-Y",
+          "qty": 1,
+          "price_vnd": 5200000
+        },
+        {
+          "sku": "SKU-AP-MINI",
+          "qty": 1,
+          "price_vnd": 1095000
+        }
+      ],
+      "total_vnd": 6295000,
+      "payment": "COD",
+      "delivery_area": "Nha Trang, Khánh Hòa",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-10-22"
+    }
+  }
+}

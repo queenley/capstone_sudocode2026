@@ -24,11 +24,13 @@ because nobody waits for it (section 2).
 
 from __future__ import annotations
 
+import functools
 from typing import Any
 
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.graph import END, START, StateGraph
 
+from ...observability import stopwatch
 from .nodes import advisor, after_guard, guard, load_context, perceive, persist, respond, route
 from .state import HotContext, HotState, TurnInput
 
@@ -45,8 +47,8 @@ def build_graph(*, checkpointer: BaseCheckpointSaver | None = None) -> Any:
     graph.add_node("route", route)
     graph.add_node("advisor", advisor)
     graph.add_node("guard", guard)
-    graph.add_node("respond", respond)
-    graph.add_node("persist", persist)
+    graph.add_node("respond", _timed("respond", respond))
+    graph.add_node("persist", _timed("persist", persist))
 
     graph.add_edge(START, "perceive")
     graph.add_edge("perceive", "load_context")
@@ -57,3 +59,12 @@ def build_graph(*, checkpointer: BaseCheckpointSaver | None = None) -> Any:
     graph.add_edge("respond", "persist")
     graph.add_edge("persist", END)
     return graph.compile(checkpointer=checkpointer, name="hot")
+
+
+def _timed(stage: str, node: Any) -> Any:
+    """*node*, timed as *stage* of the turn (``observability/stopwatch``); its signature kept, which LangGraph reads."""
+    @functools.wraps(node)
+    async def timed(state: Any, runtime: Any) -> Any:
+        with stopwatch.span(stage):
+            return await node(state, runtime)
+    return timed

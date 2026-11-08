@@ -1,0 +1,159 @@
+{
+  "conversation_id": "SCN-ADV-0042__call_2",
+  "scenario_id": "SCN-ADV-0042",
+  "call": "call_2",
+  "customer_id": "C028",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-22",
+  "region": "bac",
+  "category": "thoi-trang/ao-khoac",
+  "persona": "khach_tra_hang_trong_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Tú ạ, em là trợ lý ảo của shop BTC. Anh vừa nhận áo khoác gió Windbreak đúng không ạ? Em có thể hỗ trợ anh về đơn hàng OD600001.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "order_id",
+        "size",
+        "payment",
+        "delivery_area",
+        "variant_sku",
+        "price_quoted_vnd"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh vừa nhận hàng áo khoác hôm trước nhưng thấy to hơn mình nghĩ.",
+      "facts_stated": {
+        "return_reason": "thấy to hơn mình nghĩ"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận anh muốn trả lại áo khoác vì mặc thấy to hơn mình nghĩ ạ. Em kiểm tra đơn hàng và sẽ hỗ trợ anh làm thủ tục trả hàng ngay.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh muốn trả hàng, không biết mình được hoàn bao nhiêu tiền?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với đơn áo khoác gió Windbreak, khi trả hàng anh sẽ được hoàn lại 690.000 đồng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "refund_vnd",
+          "value": 690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thời gian hoàn tiền là bao lâu vậy em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, thời gian hoàn tiền sẽ là 3-5 ngày làm việc sau khi shop nhận lại áo khoác và kiểm tra đạt điều kiện đổi trả giúp anh ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh muốn biết khi nào thì nhận được tiền hoàn lại nữa.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã tạo yêu cầu trả hàng cho đơn OD600001. Đơn vị vận chuyển sẽ liên hệ đến lấy áo trong 1-2 ngày làm việc. Khi shop nhận lại hàng và kiểm tra đạt điều kiện, anh sẽ được hoàn 690.000 đồng trong 3-5 ngày làm việc, chuyển khoản về tài khoản anh đã dùng thanh toán ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "refund_vnd",
+          "value": 690000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD600001",
+            "action": "return",
+            "reason": "thấy to hơn mình nghĩ",
+            "on": "2026-10-22"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 450,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "yeu_cau_tra_hang",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

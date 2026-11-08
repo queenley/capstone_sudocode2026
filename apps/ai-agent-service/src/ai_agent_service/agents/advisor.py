@@ -59,6 +59,8 @@ from langchain_core.runnables import RunnableConfig
 from langchain.tools import ToolRuntime, tool
 from langchain_core.tools import BaseTool
 
+from ..components import clock
+from ..components.context import focus
 from ..components.context.budget import Section, assemble
 from ..components.guardrails import actions, purchase
 from ..components.memory.brief import BriefLine
@@ -67,6 +69,7 @@ from ..components.intake.itn import format_vnd
 from ..components.intake.text import plain
 from ..config.config_manager import get_lanes, load_prompt, load_prompt_yaml
 from ..llm import tracing
+from ..observability import stopwatch
 from ..llm.callback_handler import text_of
 from ..mcp.client import dotted
 from ..components.context import skills as skill_book
@@ -108,6 +111,8 @@ class AgentContext:
     warnings: tuple[str, ...] = ()
     must_not_ask: tuple[str, ...] = ()
     working_summary: str | None = None
+    #: The call's working state, the last thing the model reads (``pipeline.hot.call_state``).
+    call_state: tuple[str, ...] = ()
     #: Why the previous draft of this turn was blocked, for a regeneration.
     block_reasons: tuple[str, ...] = ()
     #: The sentences of this answer the customer already heard when a later one was blocked:
@@ -133,7 +138,7 @@ class AgentContext:
     #: This turn, for the idempotency key of a write tool (section 6.1).
     turn_id: str | None = None
     #: The turn's passages from the knowledge base, already filtered by the
-    #: harness: a restricted one carries no text, a superseded one its dates.
+    #: harness: a restricted one carries no text, one not in force never arrives.
     knowledge: tuple[Mapping[str, Any], ...] = ()
     #: What the search found when no passage is shown: that none was relevant.
     knowledge_note: str | None = None
@@ -215,6 +220,10 @@ class AdvisorEvent:
 #: also enforced in code where code can (the guard, the before-write check).
 #: The codes in brackets are the policy sections the rule comes from.
 HARD_RULES = load_prompt("advisor/rules.md")
+#: Rules a turn loads by its situation (``components.context.focus``).
+RULE_PACKS: dict[str, str] = load_prompt_yaml("advisor/rule_packs.yaml")
+#: Every rule, for the run's manifest and for a reader.
+ALL_RULES = "\n\n".join((HARD_RULES, *RULE_PACKS.values()))
 
 #: The lane notes, the identity question, the opening and the channel notes.
 _NOTES = load_prompt_yaml("advisor/notes.yaml")
@@ -282,7 +291,9 @@ def prompt_parts(context: AgentContext, *, max_tokens: int = 3000) -> tuple[str,
         Section("today", _today(context)),
         Section("warnings", "\n".join(f"CẢNH BÁO: {w}" for w in context.warnings)),
         Section("lane", (
-            f"Lane: {context.lane}. Mức xác minh danh tính: {context.tier}. Kênh: {context.channel}."
+            # Without the day, "tối mai" has no date and the model invents a year.
+            (f"Bây giờ là {clock.moment_label(context.now)}; tính ngày giờ khách nói (mai, thứ Bảy) từ đây.\n" if context.now else "")
+            + f"Lane: {context.lane}. Mức xác minh danh tính: {context.tier}. Kênh: {context.channel}."
             + (f" Hồ sơ đứng tên: {context.address_as}." if context.address_as else _address_note(context))
             + f"\n{lane_instruction(context)}"
         ).strip()),
@@ -298,24 +309,47 @@ def prompt_parts(context: AgentContext, *, max_tokens: int = 3000) -> tuple[str,
         Section("tool_results", _tool_block(context.tool_results)),
         Section("opening", OPENING[bool(context.brief_lines)] if context.phase == "opening" else ""),
         Section("blocked", _blocked_block(context)),
+        Section("call_state", _state_block(context)),
     ]
     pack = assemble(sections, max_tokens=max_tokens)
     return static, pack.text, pack.cut
 
 
+def _packs_block(context: AgentContext, called: Sequence[str]) -> str:
+    chosen = focus.packs(context, RULE_PACKS, called)
+    return "Luật cho tình huống này:\n" + "\n".join(RULE_PACKS[name] for name in chosen) if chosen else ""
+
+
+def _state_block(context: AgentContext) -> str:
+    """The call's state, then the request: what the answer has to be about."""
+    parts = []
+    if context.call_state:
+        parts.append("Trạng thái cuộc:\n" + "\n".join(f"- {line}" for line in context.call_state))
+    if context.customer_said and context.lane in ("CONTINUITY", "NEW"):
+        parts.append(f'Yêu cầu hiện tại của khách: "{context.customer_said}". Làm đúng yêu cầu này trước, không trả lời '
+                     "sang việc khác; thông tin ở trên chỉ dùng khi phục vụ yêu cầu này.")
+    return "\n".join(parts)
+
+
 def shown_passages(knowledge: Sequence[Mapping[str, Any]]) -> tuple[list[Mapping[str, Any]], list[Mapping[str, Any]]]:
-    """What the model reads of a turn's passages: the first three from the documents, and the playbook entries.
+    """What the model reads of a turn's passages: the first three from the documents, one campaign entry for this
+    call's product if none of the three is one, what explains a withheld passage, and the playbook entries. The last
+    three take no place of the first three.
 
     The guard checks a reply against these and no others: a number from a
     passage the model never saw cannot be a number it read (section 4.5).
     """
-    policy = [p for p in knowledge if p.get("source") != "playbook"][:KNOWLEDGE_SHOWN]
+    documents = [p for p in knowledge if p.get("source") != "playbook" and not p.get("explains")]
+    first = documents[:KNOWLEDGE_SHOWN]
+    campaign = [] if any(p.get("campaign") for p in first) else [
+        p for p in documents[KNOWLEDGE_SHOWN:] if p.get("campaign") and p.get("for_product")][:1]
+    policy = [*first, *campaign, *(p for p in knowledge if p.get("explains"))]
     playbook = [p for p in knowledge if p.get("source") == "playbook"]
     return policy, playbook
 
 
 def _knowledge_block(heading: str, passages: Sequence[Mapping[str, Any]]) -> str:
-    """Passages as the model reads them: a restricted one as a refusal, a superseded one with its dates."""
+    """Passages as the model reads them: a restricted one as a refusal."""
     if not passages:
         return ""
     lines = []
@@ -325,8 +359,7 @@ def _knowledge_block(heading: str, passages: Sequence[Mapping[str, Any]]) -> str
         if passage.get("restricted"):
             lines.append(passage.get("instruction") or f"Đoạn [{code}] là thông tin nội bộ: không đọc, không trích.")
             continue
-        validity = f" (đoạn này {passage['validity']})" if passage.get("superseded") and passage.get("validity") else ""
-        lines.append(f"[{code}] {title}{validity}: {str(passage.get('text') or '').strip()}")
+        lines.append(f"[{code}] {title}: {str(passage.get('text') or '').strip()}")
     return f"{heading}:\n" + "\n".join(lines)
 
 
@@ -484,17 +517,40 @@ class ContextPromptMiddleware(AgentMiddleware):
         return self._answer_only(response) if self._is_last(request) else response
 
     async def awrap_model_call(self, request: ModelRequest, handler: Any) -> Any:
-        response = await handler(self._with_prompt(request))
+        with stopwatch.span("model"):
+            response = await handler(self._with_prompt(request))
         return self._answer_only(response) if self._is_last(request) else response
+
+
+def declared_arguments(tool: Any, args: Mapping[str, Any]) -> dict[str, Any]:
+    """*args* without those *tool* does not declare.
+
+    A model carries one tool's arguments over to another (``payment`` from ``order_create`` to ``pricing_get_quote``,
+    a brief's ``escalation_reason`` beside the brief). The server refuses the whole call for it, in a shape the model
+    cannot read, so one stray word costs the customer the quote.
+    """
+    declared = getattr(tool, "args", None)
+    if not declared:
+        return dict(args)
+    return {key: value for key, value in args.items() if key in declared}
 
 
 class ActionGuardMiddleware(AgentMiddleware):
     """The guardrail before act (section 4.4): a write tool runs only if its arguments pass."""
 
     async def awrap_tool_call(self, request: Any, handler: Any) -> Any:
+        with stopwatch.span("tools"):
+            return await self._guarded(request, handler)
+
+    async def _guarded(self, request: Any, handler: Any) -> Any:
         request = without_nulls(request)
         call = request.tool_call
         name = call["name"]
+        kept = declared_arguments(getattr(request, "tool", None), call.get("args") or {})
+        if len(kept) != len(call.get("args") or {}):
+            logger.info("Dropped undeclared arguments of %s: %s", name, sorted(set(call["args"]) - set(kept)))
+            call = {**call, "args": kept}
+            request = request.override(tool_call=call)
         if name not in actions.WRITE_TOOLS | actions.CUSTOMER_READ_TOOLS:
             return await handler(request)
         context = getattr(getattr(request, "runtime", None), "context", None)
@@ -512,6 +568,8 @@ class ActionGuardMiddleware(AgentMiddleware):
                                    additional_kwargs={"args": args, "blocked_by": "guardrail"})
         if name == "handoff_transfer":
             args["brief"] = actions.fill_handoff(args.get("brief") or {}, context.handoff_defaults)
+        if name == "schedule_callback" and not args.get("customer_phone") and context.customer_phone:
+            args["customer_phone"] = context.customer_phone
         state = getattr(request, "state", None) or {}
         quotes = {**context.quotes, **_quotes_in(state)}
         if name == "order_create":
@@ -531,7 +589,8 @@ class ActionGuardMiddleware(AgentMiddleware):
         )
         if verdict.passed and name == "order_create":
             business_args = order_arguments(args, context)
-            record = purchase.draft(business_args, context, names=_names_in(state), quotes=quotes)
+            delivery = purchase.estimated_delivery([*context.tool_results, *tool_results_of(state.get("messages") or [])])
+            record = purchase.draft(business_args, context, delivery, names=_names_in(state), quotes=quotes)
             pending = context.pending_purchase
             heard = bool(pending and pending.get("payload_hash") == record["payload_hash"]
                          and pending.get("owner") == record["owner"])

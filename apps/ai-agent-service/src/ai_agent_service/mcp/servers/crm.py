@@ -20,7 +20,8 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from ..server_base import Server, apply_schema
+from ...components import clock
+from ..server_base import Server, ToolFailure, apply_schema
 from . import btc
 
 server = Server("crm")
@@ -111,20 +112,31 @@ async def schedule_callback(
     customer_phone: str | None = None,
     idempotency_key: str | None = None,
 ) -> dict[str, Any]:
-    """Book a call back at the time the customer asked for.
+    """Book a call back at the time the customer asked for; it needs the customer's number.
 
     A time on a holiday or outside working hours is moved; moved_from is then
     set, and the customer must be told the new time.
 
     Args:
-        callback_at: ISO 8601 date and time with +07:00, e.g. 2026-10-17T19:00+07:00.
+        callback_at: Date and time in Vietnam time, no offset, e.g. 2026-10-17T19:00.
         note: What the call back is about.
         customer_phone: Set by the system; leave it out.
         idempotency_key: Set by the system; leave it out.
     """
     m = btc.mock()
+
+    def book(**args: Any) -> dict[str, Any]:
+        booked = m.schedule_callback(**args)
+        moment = clock.parse_local(callback_at)
+        if booked.get("moved_from") and moment is not None and clock.is_working_time(moment):
+            # The mock knows the usual hours, not 11/11's longer ones (LN-02): the time stands.
+            booked.update(callback_at=callback_at, moved_from=None)
+        return booked
+
+    if not customer_phone:
+        raise ToolFailure("BAD_REQUEST", "A call back needs the customer's number: ask for it first")
     return await btc.call(
-        "schedule.callback", m.schedule_callback, idempotency_key=idempotency_key,
+        "schedule.callback", book, idempotency_key=idempotency_key,
         customer_phone=customer_phone, callback_at=callback_at, note=note,
     )
 

@@ -26,8 +26,9 @@ from __future__ import annotations
 import re
 from itertools import combinations
 from dataclasses import dataclass, field
-from typing import Any, Literal, Mapping
+from typing import Any, Iterable, Literal, Mapping
 
+from .. import clock
 from ..intake.itn import amounts, format_vnd
 from ..intake.pii import PATTERNS, TOKEN
 from . import Verdict
@@ -46,7 +47,17 @@ HUMAN = re.compile(
 ORDER_CODE = re.compile(r"\bOD\d+\b")
 #: Allows a reply past :data:`MAX_SENTENCES`: reading an order back takes more.
 ORDER_SUMMARY = re.compile(r"(tổng (cộng|đơn|tiền)|xác nhận đơn|lên đơn|mã đơn|đặt hàng)", re.IGNORECASE)
-DURATION = re.compile(r"(\d+)\s*(?:-|–|đến)?\s*(\d+)?\s*(ngày|tháng|tuần)\b", re.IGNORECASE)
+DURATION = re.compile(r"(\d+)\s*(?:-|–|đến)?\s*(\d+)?\s*(ngày|tháng|tuần|giờ)\b", re.IGNORECASE)
+#: "7 giờ tối", "lúc 7 giờ": a time of day, not a duration.
+TIME_OF_DAY_AFTER = re.compile(r"\s*(sáng|trưa|chiều|tối)\b", re.IGNORECASE)
+TIME_OF_DAY_BEFORE = re.compile(r"\b(lúc|vào)\s+$", re.IGNORECASE)
+#: Durations the prompt's own rules state: data is erased within 72 hours of a request (QT-06).
+RULE_DURATIONS = frozenset({72})
+#: A rate of the shop's documents, of a price: "bằng 8% giá sản phẩm".
+RATE = re.compile(r"(\d{1,2})\s*%")
+#: A customer typing without marks ("500 ngan", "5 trieu ruoi"), put back for the amount reader.
+UNMARKED_MONEY = ((re.compile(r"\btrieu\b", re.I), "triệu"), (re.compile(r"\b(?:ngan|nghin)\b", re.I), "nghìn"),
+                  (re.compile(r"\bruoi\b", re.I), "rưỡi"), (re.compile(r"\bty\b", re.I), "tỷ"))
 DIGIT_RUN = re.compile(r"(?<!\d)\d{10,14}(?!\d)")
 #: Markup a voice would read aloud: removed from what is said, never a reason to regenerate.
 MARKUP = re.compile(r"(\*\*|__|```|^\s*[-*•]\s+|^\s*#{1,6}\s+)", re.MULTILINE)
@@ -134,11 +145,31 @@ def allowed_amounts(view: GuardInput) -> set[int]:
     found |= {abs(q - b) for q in view.quotes.values() for b in view.brief_prices if q != b}
     for text in view.priced_texts:
         found.update(amounts(text))
+        # A rate of the documents applied to a price (a warranty plan at 8% of the product).
+        for rate in RATE.findall(text):
+            found |= {round(price * int(rate) / 100) for price in base if price >= 100_000}
     # A basket's total: the sum of some of today's quotes (at most a call's few products).
     quoted = list(view.quotes.values())[:MAX_BASKET]
     for size in range(2, len(quoted) + 1):
         found |= {sum(group) for group in combinations(quoted, size)}
     return found
+
+
+def open_amounts(view: GuardInput) -> tuple[int, ...]:
+    """The amounts of the reply with no source of the shop's: what only the customer said, once :func:`_money` passed.
+
+    Whether such a figure is passed off as the shop's is the one thing left for the PolicyAgent to read.
+    """
+    known = allowed_amounts(view) | set(view.brief_prices)
+    return tuple(sorted({value for value in amounts(view.text) if value not in known}))
+
+
+def customer_amounts(said: str) -> list[int]:
+    """The amounts of the customer's words, written with marks or without."""
+    marked = said
+    for pattern, word in UNMARKED_MONEY:
+        marked = pattern.sub(word, marked)
+    return [*amounts(said), *amounts(marked)]
 
 
 def amount_groups(value: Any) -> list[set[int]]:
@@ -160,7 +191,7 @@ def amount_groups(value: Any) -> list[set[int]]:
 
 def allowed_counts(view: GuardInput) -> set[int]:
     """Numbers a duration may state: from the tools, the passages, the customer."""
-    found: set[int] = set(view.earlier_counts)
+    found: set[int] = set(view.earlier_counts) | set(RULE_DURATIONS)
     for result in view.tool_results:
         found |= numbers_in(result.get("result"))
     for text in (*view.customer_said, *view.policy_texts, *view.warnings):
@@ -198,7 +229,7 @@ def check(view: GuardInput) -> Verdict:
 def _money(text: str, view: GuardInput) -> list[str]:
     """An amount with no source. Whether a sourced amount is stated rightly is a reading of meaning, the PolicyAgent's."""
     allowed = allowed_amounts(view) | set(view.brief_prices) | {COD_LIMIT_VND}
-    allowed |= {value for said in view.customer_said for value in amounts(said)}
+    allowed |= {value for said in view.customer_said for value in customer_amounts(said)}
     return [f"Số tiền {format_vnd(value)} không có trong kết quả tool của cuộc gọi hay tài liệu chính sách; "
             "không tự tính, dùng đúng số đã có hoặc bỏ con số."
             for value in amounts(text) if value not in allowed]
@@ -208,6 +239,9 @@ def _durations(text: str, view: GuardInput) -> list[str]:
     allowed = allowed_counts(view)
     reasons = []
     for match in DURATION.finditer(text):
+        if match.group(3).lower() == "giờ" and (TIME_OF_DAY_AFTER.match(text[match.end():])
+                                                or TIME_OF_DAY_BEFORE.search(text[:match.start()])):
+            continue
         stated = [int(match.group(1))] + ([int(match.group(2))] if match.group(2) else [])
         if not all(n in allowed for n in stated):
             reasons.append(
@@ -241,3 +275,26 @@ def _not_started(text: str, view: GuardInput) -> list[str]:
 def clean(text: str) -> str:
     """The sentence without markup, for a channel that may read it aloud."""
     return MARKUP.sub("", text).strip()
+
+
+def _booked(result: Mapping[str, Any]) -> bool:
+    return str(result.get("name", "")).replace("_", ".") == "schedule.callback" and bool((result.get("result") or {}).get("ok"))
+
+
+def moved_callback(text: str, results: Iterable[Mapping[str, Any]]) -> str | None:
+    """The new time of a call back the tool moved (LN-02), when *text*, the whole answer, does not tell it.
+
+    Not part of :func:`check`: a streamed answer is checked a sentence at a
+    time, and a sentence need not say everything the answer must.
+    """
+    for result in results:
+        data = (result.get("result") or {}).get("data") or {}
+        moment = clock.parse_local(data.get("callback_at")) if _booked(result) and data.get("moved_from") else None
+        if moment is None:
+            continue
+        said = text.lower()
+        day = {f"{moment.day}/{moment.month}", f"{moment.day:02d}/{moment.month:02d}", f"{moment.day} tháng {moment.month}",
+               clock.WEEKDAYS[moment.weekday()].lower()}
+        if not any(phrase in said for phrase in day):
+            return clock.moment_label(moment)
+    return None

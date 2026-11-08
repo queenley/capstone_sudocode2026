@@ -1,0 +1,214 @@
+{
+  "conversation_id": "SCN-GEN-0042__call_1",
+  "scenario_id": "SCN-GEN-0042",
+  "call": "call_1",
+  "customer_id": "C037",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-17",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_goi_lan_3_het_kien_nhan",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần tư vấn về máy lọc không khí AirPure Pro cho phòng khoảng 35m² đúng không ạ? Dạ máy này phù hợp phòng của mình anh nhé.",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Anh cần tư vấn về máy lọc không khí AirPure Pro cho phòng khoảng 35m² đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro cho phòng khoảng 35 mét vuông.",
+      "facts_stated": {
+        "room_area_m2": 35
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ nhà mình có trẻ nhỏ và ngân sách tầm 9 triệu phải không anh? Máy AirPure Pro có khóa trẻ em, phù hợp gia đình có bé nhỏ, và đang còn hàng với giá ưu đãi 7.690.000đ, giảm 300.000đ so với giá niêm yết nhờ khuyến mãi AIR-OCT tháng này ạ.",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Nhà mình có trẻ nhỏ và ngân sách tầm 9 triệu phải không anh?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhà anh có trẻ nhỏ, ngân sách tầm 9 triệu thôi.",
+      "facts_stated": {
+        "has_children": true,
+        "budget_vnd": 9000000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện giá khuyến mãi AIR-OCT đang giảm 300.000đ còn 7.690.000đ cho AirPure Pro, tặng kèm miễn phí thu hộ COD toàn quốc. Khuyến mãi có hiệu lực đến hết ngày 30/10/2026 anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này có khuyến mãi gì không em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh chờ cuối tháng nhận lương rồi chốt đúng không ạ? Em sẽ ghi chú lại, trước ngày 30/10/2026 anh có thể đặt mua để giữ giá khuyến mãi này. Khi nào anh sẵn sàng, anh liên hệ lại hoặc em sẽ chủ động nhắc anh trước khi chương trình kết thúc ạ.",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Anh chờ cuối tháng nhận lương rồi chốt đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 9000000,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 35,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7690000,
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "promo_code",
+          "value": "AIR-OCT",
+          "op": "set",
+          "source": "call_1#turn7"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, anh đang chờ cuối tháng nhận lương nên chưa chốt được.",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

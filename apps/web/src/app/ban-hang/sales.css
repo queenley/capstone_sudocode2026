@@ -10,7 +10,7 @@
 
 /* ---------- sidebar ---------- */
 .sl-side {
-  background: var(--chrome);
+  background: linear-gradient(180deg, var(--chrome) 0%, var(--chrome-2) 100%);
   color: var(--on-chrome-muted);
   padding: 18px 14px;
   display: flex;
@@ -42,7 +42,7 @@
 }
 .sl-logo small {
   display: block;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--on-chrome-muted);
 }
 .sl-side-label {
@@ -96,7 +96,7 @@
   min-width: 22px;
   height: 22px;
   border-radius: 11px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   display: inline-grid;
   place-items: center;
@@ -109,7 +109,7 @@
 }
 .sl-count {
   background: var(--accent);
-  color: #053527;
+  color: var(--on-brand);
 }
 /* The "Hệ thống" label sits with its links at the bottom of the sidebar. */
 .sl-side nav + .sl-side-label {
@@ -130,7 +130,7 @@
   padding: 10px 12px;
   border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.06);
-  font-size: 13px;
+  font-size: 12px;
 }
 .sl-side-status b {
   display: flex;
@@ -145,7 +145,7 @@
   height: 8px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 0 3px rgb(52 211 153 / 0.25);
+  box-shadow: 0 0 0 3px rgb(247 148 29 / 0.25);
 }
 
 /* ---------- main ---------- */
@@ -163,7 +163,8 @@
   gap: 16px;
   margin: 0 -30px 22px;
   padding: 14px 30px;
-  background: var(--bg);
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
 }
 .sl-topbar-title {
@@ -277,16 +278,17 @@
   opacity: 1;
 }
 .sl-kpi span {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--muted);
   font-weight: 500;
   padding-right: 48px;
 }
 .sl-kpi b {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
   font-size: 30px;
-  font-weight: 500;
-  color: var(--brand-ink);
+  font-weight: 400;
+  color: var(--ink);
   letter-spacing: -0.03em;
 }
 .sl-kpi small {
@@ -384,7 +386,7 @@
   font-size: 14px;
 }
 .sl-badge {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   padding: 3px 10px;
   border-radius: 999px;
@@ -440,7 +442,6 @@
   overflow: hidden;
   border: 1px solid var(--line);
   font-size: 14px;
-  font-variant-numeric: tabular-nums;
 }
 .sl-table th {
   text-align: left;
@@ -502,10 +503,6 @@
 }
 .sl-order-toggle { background: transparent; color: var(--brand-ink); padding: 4px; white-space: nowrap; }
 .sl-main { scroll-margin-top: 200px; }
-.sl-btn:active,
-.sl-btn-small:active {
-  transform: translateY(1px) scale(0.985);
-}
 .sl-btn-small {
   padding: 6px 12px;
   font-size: 13px;
@@ -528,7 +525,8 @@
   display: grid;
   place-items: center;
   padding: 24px 16px;
-  background: var(--bg);
+  background:
+    var(--bg);
 }
 .sl-gate-card {
   width: 100%;

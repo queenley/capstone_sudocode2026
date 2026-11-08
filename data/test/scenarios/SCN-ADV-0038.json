@@ -1,0 +1,123 @@
+{
+  "scenario_id": "SCN-ADV-0038",
+  "level": "M2",
+  "persona": "khach_can_tu_van_nhieu",
+  "hard_case": null,
+  "customer_phone": "0990853801",
+  "customer_name": "Nhung",
+  "honorific": "chị",
+  "notes": "Persona khach_can_tu_van_nhieu, biến thể so_sanh_noi_chien. call_1 (zalo_oa): so sánh nhiều mẫu → hen_goi_lai; call_2 (hotline): chốt đơn → chot_don. Chấm chủ yếu: CCR, RQR, TSR.",
+  "calls": {
+    "call_1": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_nhung30",
+      "call_date": "2026-10-30",
+      "customer_goal": "So sánh nồi chiên không dầu nào tốt hơn cho nhu cầu của chị.",
+      "customer_turns": [
+        "Alo, chị muốn hỏi về nồi chiên không dầu mà hôm trước em tư vấn cho chị á.",
+        "Chị đang phân vân giữa nồi chiên không dầu Philips 6.2L và Lock&Lock 4L, cái nào tốt hơn em?",
+        "Em nói nồi Philips giá 3 triệu 9, còn Lock&Lock chỉ 1 triệu 8 thôi, nhưng chị muốn biết điểm khác nhau giữa chúng á.",
+        "Vậy nồi Xiaomi 4.5L thì sao, em có thông tin gì về cái đó không?",
+        "Chị cần cái nào dùng lâu bền mà dễ sử dụng, vì đồ cũ của chị đã hỏng rồi.",
+        "Ngân sách của chị khoảng 4 triệu thôi, nhưng mà giá nào cũng phải so sánh kỹ á.",
+        "Chị thấy nồi Philips có vẻ đắt nhưng mà em có chắc là nó tốt hơn không?",
+        "Thế chị sẽ nghĩ thêm và gọi lại sau nhé."
+      ],
+      "facts_established": {
+        "blocker": "muốn so sánh thêm",
+        "budget_vnd": 4000000,
+        "usage_need": "thay đồ cũ đã hỏng",
+        "product_advised": "SKU-AF-6L",
+        "price_quoted_vnd": 3990000
+      },
+      "success_if": {
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
+      },
+      "ground_truth_facts": {
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "in_stock": true,
+        "price_vnd:SKU-AF-4L": 1890000,
+        "price_vnd:SKU-AF-XM": 1590000,
+        "call_date": "2026-10-30",
+        "price_vnd:SKU-AF-6L": 3990000
+      },
+      "memory_expectation": {
+        "blocker": "muốn so sánh thêm",
+        "budget_vnd": 4000000,
+        "usage_need": "thay đồ cũ đã hỏng",
+        "product_advised": "SKU-AF-6L",
+        "price_quoted_vnd": 3990000
+      },
+      "relevant_policy_ids": [
+        "SP-AF-01",
+        "FAQ-07"
+      ],
+      "expected_outcome": "hen_goi_lai"
+    },
+    "call_2": {
+      "days_later": 2,
+      "customer_goal": "Xác nhận mua nồi chiên không dầu Philips 6.2L.",
+      "customer_turns": [
+        "Chị đã quyết định mua nồi chiên không dầu Philips 6.2L rồi.",
+        "Hình thức thanh toán là qua ngân hàng nhé.",
+        "Giao hàng cho chị ở Lê Chân, Hải Phòng.",
+        "Cho chị biết thời gian giao hàng khoảng bao lâu nhé."
+      ],
+      "facts_established": {
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "payment": "bank",
+        "product_advised": "SKU-AF-6L",
+        "price_quoted_vnd": 3990000,
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd"
+      ],
+      "must_not_ask": [
+        "budget_vnd",
+        "usage_need",
+        "product_advised"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AF-6L",
+          "price_vnd": 3990000,
+          "payment": "bank"
+        }
+      },
+      "ground_truth_facts": {
+        "price_vnd": 3990000,
+        "list_price_vnd": 3990000,
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "delivery_days": 4,
+        "estimated_delivery": "2026-11-05",
+        "call_date": "2026-11-01"
+      },
+      "memory_expectation": {
+        "delivery_area": "Lê Chân, Hải Phòng",
+        "payment": "bank",
+        "product_advised": "SKU-AF-6L",
+        "price_quoted_vnd": 3990000,
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

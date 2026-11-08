@@ -4,7 +4,7 @@ Every stage imports paths from here instead of re-deriving them, so moving a
 folder only requires one edit. Where each generated file goes inside the
 output folder is ``src/utils/dataset.py``'s job.
 
-The output folder is a seed of the repository's data, ``data/seed-<name>/`` at the
+The output folder is a seed of the repository's data, ``data/<name>/`` at the
 repository root: ``DATAGEN_SEED`` names it (default ``dev``), ``run_all --seed``
 sets it for every stage, and ``DATAGEN_OUTPUT`` replaces the whole path.
 """
@@ -36,8 +36,9 @@ KEYS_FILE = REPO_ROOT / "contracts" / "scenario" / "scenario-keys.yaml"
 
 # Outputs (layout: src/utils/dataset.py)
 SEED_ENV = "DATAGEN_SEED"
+OUTPUT_ENV = "DATAGEN_OUTPUT"
 SEED = os.environ.get(SEED_ENV) or "dev"
-OUTPUT_DIR = Path(os.environ.get("DATAGEN_OUTPUT") or REPO_ROOT / "data" / f"seed-{SEED}").resolve()
+OUTPUT_DIR = Path(os.environ.get(OUTPUT_ENV) or REPO_ROOT / "data" / SEED).resolve()
 PLAN_PREVIEW_DIR = OUTPUT_DIR / "plan_preview"        # --plan-only: the same layout, placeholder customer turns
 AUDIO_DIR = OUTPUT_DIR / "audio"
 ASR_REFERENCE_DIR = OUTPUT_DIR / "asr_reference"   # spoken form of each customer turn + ground_truth.json of the audio

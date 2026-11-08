@@ -201,7 +201,7 @@ export default function AgentConsole({
       </header>
       <div className="section-heading console-heading">
         <div>
-          <p className="eyebrow">AI AGENT · OBSERVABILITY</p>
+          <p className="eyebrow">AI agent · observability</p>
           <h1>Agent Console</h1>
           <p className="console-subtitle">
             Model, độ trễ, lane và tool của từng lượt; cấu hình voice và ngày
@@ -344,7 +344,7 @@ export default function AgentConsole({
       <section className="panel latency-panel">
         <div className="panel-title">
           <div>
-            <p className="eyebrow">LATENCY · HUONG-DAN-DO-LATENCY</p>
+            <p className="eyebrow">Latency · huong-dan-do-latency</p>
             <h2>p50 / p95 so với ngưỡng BTC</h2>
           </div>
           <select
@@ -408,7 +408,7 @@ export default function AgentConsole({
       <section className="panel flow-panel">
         <div className="panel-title">
           <div>
-            <p className="eyebrow">HOT GRAPH · PIPELINE/HOT</p>
+            <p className="eyebrow">Hot graph · pipeline/hot</p>
             <h2>Một lượt đi qua 7 bước</h2>
           </div>
         </div>

@@ -186,13 +186,18 @@ def client(agent):
             bind=connection, expire_on_commit=False, join_transaction_mode="create_savepoint",
         )
     app = create_test_app(Settings(database_url="sqlite://"), database)
-    with TestClient(app) as client:
-        with database.sessions() as db:
-            seed(db)
-        yield client
-    if transaction:
-        transaction.rollback()
-        connection.close()
+    try:
+        with TestClient(app) as client:
+            with database.sessions() as db:
+                seed(db)
+            yield client
+    finally:
+        if transaction:
+            transaction.rollback()
+            connection.close()
+        # Each test has its own engine: close its pool, or the idle connections of every earlier test
+        # add up to Postgres' max_connections (100 on CI) and the last tests get "too many clients".
+        database.engine.dispose()
 
 
 def conversation(client, customer_token=""):

@@ -3,7 +3,8 @@
 ``synthesize_scenario_audio`` uses this module in three steps:
 
 1. :func:`load_or_build` writes ``<seed>/asr_reference/scenarios_<id>/call_<n>.json``.
-   It makes one model call per call and is cached while the lines keep the same words. A line is
+   It makes one model call per call, for the lines not yet on file: a line whose words are unchanged keeps
+   its spoken form, so editing one turn does not rewrite the others. A line is
    ``{idx, speaker: A|C, text}``: the per-turn clips use the customer's lines, ``build_asr_testset``'s whole
    dialogues both speakers' (under ``<seed>/asr_test/spoken/``).
 2. TTS reads ``turns[k].spoken_text``. The ``.json`` written beside each WAV keeps that text and its ``entities``.
@@ -232,6 +233,13 @@ def build(client, scenario: Scenario, call_name: str, call: CallSpec, products: 
             "source_sha256": _sha(line_list), "model": getattr(client, "model", None), "turns": turns}
 
 
+def unchanged_lines(record: dict[str, Any], lines: list[dict[str, Any]]) -> dict[int, dict[str, Any]]:
+    """The spoken form of each line a saved reference already holds, wherever the line now stands."""
+    saved = {(turn["speaker"], turn["text"]): turn for turn in record.get("turns", [])}
+    return {line["idx"]: {**saved[(line["speaker"], line["text"])], "idx": line["idx"]}
+            for line in lines if (line["speaker"], line["text"]) in saved}
+
+
 def load_or_build(client_factory, scenario: Scenario, call_name: str, call: CallSpec, names: dict[str, str],
                   root: Path = ASR_REFERENCE_DIR, lines: list[dict[str, Any]] | None = None) -> dict[str, Any] | None:
     """The call's reference from disk while its lines are unchanged, otherwise built and saved; None for typed chat.
@@ -243,11 +251,16 @@ def load_or_build(client_factory, scenario: Scenario, call_name: str, call: Call
     if call.input_mode in NOT_SPEECH or not lines:
         return None
     path = reference_path(scenario.scenario_id, call_name, root)
+    saved: dict[str, Any] = {}
     if path.exists():
-        record = json.loads(path.read_text(encoding="utf-8"))
-        if record.get("source_sha256") == _sha(lines):
-            return record
-    record = build(client_factory(), scenario, call_name, call, products_of(call, names, lines), lines)
+        saved = json.loads(path.read_text(encoding="utf-8"))
+        if saved.get("source_sha256") == _sha(lines):
+            return saved
+    kept = unchanged_lines(saved, lines)
+    fresh = [line for line in lines if line["idx"] not in kept]   # only these go to the model
+    record = build(client_factory(), scenario, call_name, call, products_of(call, names, fresh), fresh) if fresh else saved
+    made = {turn["idx"]: turn for turn in record["turns"]} if fresh else {}
+    record = {**record, "source_sha256": _sha(lines), "turns": [kept.get(line["idx"]) or made[line["idx"]] for line in lines]}
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return record

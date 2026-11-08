@@ -1,0 +1,305 @@
+{
+  "conversation_id": "SCN-ADV-0013__call_1",
+  "scenario_id": "SCN-ADV-0013",
+  "call": "call_1",
+  "customer_id": "SYN-C001",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-29",
+  "region": "bac",
+  "category": "gia-dung/phu-kien",
+  "persona": "khach_mua_phu_kien_thay_the",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có mua Máy lọc không khí AirPure X, em hỗ trợ anh về thay màng lọc nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi là khi nào thì phải thay màng lọc cho Máy lọc không khí AirPure X ạ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với Máy lọc không khí AirPure X, màng lọc HEPA khuyến nghị thay sau 6–12 tháng tuỳ môi trường sử dụng anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "owned_sku",
+          "value": "SKU-AP-X"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này anh đã dùng cũng lâu rồi, màng lọc có thay gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ nếu máy đã dùng lâu thì anh nên thay màng lọc để đảm bảo hiệu quả lọc bụi tốt nhất ạ. Shop mình có sẵn màng lọc thay thế AirPure X/Y chính hãng, anh cần em báo giá không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh muốn đặt Màng lọc thay thế AirPure X/Y đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh muốn đặt mua Màng lọc thay thế AirPure X/Y luôn, em cho anh biết giá với.",
+      "facts_stated": {
+        "product_advised": "SKU-AP-FLT-X"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giá màng lọc thay thế AirPure X/Y là 690.000đ một chiếc ạ. Hàng có sẵn, thời gian giao về Lê Chân, Hải Phòng dự kiến ngày 3/11. Anh chọn thanh toán chuyển khoản rồi, em xin phép xác nhận lại thông tin và đặt đơn cho anh nhé: 1 màng lọc AirPure X/Y, giao tại Lê Chân, Hải Phòng, thanh toán chuyển khoản, giá 690.000đ. Anh kiểm tra lại giúp em thông tin trên đúng chưa ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh kiểm tra lại giúp em thông tin trên đúng chưa ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-03"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Lê Chân, Hải Phòng",
+            "on": "2026-10-29"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "690000",
+          "spoken": "690.000đ"
+        },
+        {
+          "type": "address",
+          "value": "Lê Chân, Hải Phòng",
+          "spoken": "Lê Chân, Hải Phòng"
+        },
+        {
+          "type": "date",
+          "value": "2026-11-03",
+          "spoken": "ngày 3/11"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán là chuyển khoản ngân hàng, và khu vực giao hàng là Lê Chân, Hải Phòng nhé.",
+      "facts_stated": {
+        "payment": "bank",
+        "delivery_area": "Lê Chân, Hải Phòng"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Lê Chân, Hải Phòng",
+          "spoken": "Lê Chân, Hải Phòng"
+        }
+      ],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận đơn hàng: 1 màng lọc thay thế AirPure X/Y, giá 690.000đ, giao về Lê Chân, Hải Phòng, thanh toán chuyển khoản. Đơn dự kiến giao ngày 3/11. Em cảm ơn anh đã đặt hàng ạ!",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-03"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0998000001",
+            "sku": "SKU-AP-FLT-X",
+            "qty": 1,
+            "price_vnd": 690000,
+            "payment": "bank",
+            "address": "Lê Chân, Hải Phòng",
+            "on": "2026-10-29"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "budget_vnd",
+          "value": 1000000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Lê Chân, Hải Phòng",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "usage_need",
+          "value": "thay đồ cũ đã hỏng",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "issue",
+          "value": "Máy lọc không khí AirPure X đã sử dụng lâu, cần thay màng lọc.",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-FLT-X",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 690000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_1#turn9"
+        }
+      ],
+      "entities": [
+        {
+          "type": "money",
+          "value": "690000",
+          "spoken": "690.000đ"
+        },
+        {
+          "type": "address",
+          "value": "Lê Chân, Hải Phòng",
+          "spoken": "Lê Chân, Hải Phòng"
+        },
+        {
+          "type": "date",
+          "value": "2026-11-03",
+          "spoken": "ngày 3/11"
+        }
+      ],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_mang_loc",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-AP-FLT-X",
+      "qty": 1,
+      "price_vnd": 690000,
+      "payment": "bank",
+      "address": "Lê Chân, Hải Phòng",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-11-03"
+    }
+  }
+}

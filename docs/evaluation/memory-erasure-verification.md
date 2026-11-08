@@ -70,7 +70,7 @@ EVAL_BUDGET_DB="$PWD/evaluation/runs/20261024-work/budget.sqlite" \
 EVAL_DATABASE_URL=postgresql://vqd@127.0.0.1:55471/memory_erasure_eval \
 AGENT_DB_SCHEMA=agent IMPROVEMENT_DIR="$PWD/evaluation/runs/20261101-memory-erasure/smoke-after-improvement" \
   apps/ai-agent-service/.venv/bin/python run_eval.py \
-  --scenarios data/seed-dev/scenarios \
+  --scenarios data/dev/scenarios \
   --only SCN-GEN-0037 --warmup 0 \
   --out evaluation/runs/20261101-memory-erasure/smoke-0037-after
 ```

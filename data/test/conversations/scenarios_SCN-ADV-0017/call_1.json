@@ -1,0 +1,192 @@
+{
+  "conversation_id": "SCN-ADV-0017__call_1",
+  "scenario_id": "SCN-ADV-0017",
+  "call": "call_1",
+  "customer_id": "C011",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-10-16",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_chuyen_giua_nguoi_va_ai",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, em sẵn sàng hỗ trợ chị tư vấn máy hút sữa điện đôi Medela Swing Maxi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo em ơi, chị muốn hỏi về máy hút sữa điện đôi Medela Swing Maxi á.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy hút sữa điện đôi Medela Swing Maxi hiện bên em còn hàng và giá là 5.990.000đ chị nhé. Máy có đầy đủ bảo hành 12 tháng chính hãng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có bé 15 tháng, ngân sách tầm 6 triệu thôi.",
+      "facts_stated": {
+        "child_age_months": 15,
+        "budget_vnd": 6000000
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với ngân sách khoảng 6 triệu, chị chọn Medela Swing Maxi là hợp lý đó ạ. Máy này hút đôi, động cơ êm và nhỏ gọn, phù hợp cho bé nhà mình 15 tháng tuổi.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này có khuyến mãi gì không em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại máy hút sữa Medela Swing Maxi đang áp dụng chương trình miễn phí vận chuyển toàn quốc cho đơn từ 500.000đ chị nhé, đó là khuyến mãi MOM-FREESHIP đang còn hiệu lực ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ừ, nghe có vẻ ổn, nhưng chị cần chờ đến cuối tháng mới có lương, em cho chị hẹn lại được không?",
+      "facts_stated": {
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em ghi nhận, chị cần chờ đến cuối tháng nhận lương rồi sẽ quyết định đúng không ạ. Em hẹn cuối tháng sẽ liên hệ lại để hỗ trợ chị đặt máy nếu chị vẫn có nhu cầu ạ.",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Cuối tháng em gọi lại để hỗ trợ chị đặt hàng nhé ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "chờ cuối tháng nhận lương",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 6000000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "child_age_months",
+          "value": 15,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-PUMP2",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5990000,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_1#turn6"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "chờ lương",
+    "objection_handling": "Ghi nhận thời điểm khách muốn mua, xác nhận sẽ gọi lại tư vấn cuối tháng",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "hứa gọi lại": "cuối tháng hỗ trợ đặt hàng"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "time": "cuối tháng",
+      "reason": "khách chờ nhận lương mới quyết định mua"
+    },
+    "order": null
+  }
+}

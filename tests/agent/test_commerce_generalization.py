@@ -184,6 +184,6 @@ def test_changing_reference_answers_cannot_change_predictions(catalogue, tmp_pat
         out = tmp_path / f'out-{index}'
         report = asr.evaluate(source, None, out)
         assert report['status'] == 'COMPLETE'
-        snapshots.append(json.loads((out / 'raw/hypotheses.json').read_text())['sentinel'])
+        snapshots.append(json.loads((out / 'raw/hypotheses.json').read_text(encoding='utf-8'))['sentinel'])
     assert snapshots[0] == snapshots[1]
     assert snapshots[0]['entities'] == {'sku': 'SKU-SENTINEL-SHOE', 'size_new': 46, 'color': 'den'}

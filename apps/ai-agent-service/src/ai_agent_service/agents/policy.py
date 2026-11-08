@@ -40,6 +40,8 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any, Literal, Mapping
 
+from ..components.intake.itn import format_vnd
+from ..components.intake.text import plain
 from ..config.config_manager import load_prompt
 from ..llm import decisions
 from ..llm.decisions import DecisionUnavailable, Predicate
@@ -136,6 +138,8 @@ class PolicyInput:
     #: What the customer said in this call, the latest last: their own figure is not the shop's, and repeating
     #: their words is not a claim. Only their words: the advisor's would bring back what makes it soften (section 12).
     customer_said: tuple[str, ...] = ()
+    #: The reply's amounts with no source, when the hard check already traced the others; None when it did not run.
+    open_amounts: tuple[int, ...] | None = None
 
 
 @dataclass(frozen=True)
@@ -165,6 +169,8 @@ def review_input(view: PolicyInput) -> list[dict[str, Any]]:
         "policy": list(view.policy_snippets) or ["(no policy passage was read this turn)"],
         "earlier_this_call": dict(view.earlier),
         "customer_said": view.customer_said,
+        # The hard check traced the reply's other amounts to a source: only these are left to judge (unquoted_price).
+        **({} if view.open_amounts is None else {"amounts_without_source": [format_vnd(a) for a in view.open_amounts]}),
     }
     # A refusal is evidence too: "chưa tạo đơn" is true when the tool said so.
     results = {"tool_results": [{"tool": r.get("name"), "ok": bool((r.get("result") or {}).get("ok")),
@@ -205,6 +211,8 @@ class PolicyAgent(BaseAgent):
             return PolicyVerdict(True, decided_by=f"skipped:{unavailable.code}")
         probabilities = {name: float(answer.probability or 0.0) for name, answer in decision.answers.items()}
         failed = [name for name, p in probabilities.items() if p >= THRESHOLDS[name]]
+        if view.open_amounts == () and "unquoted_price" in failed:  # every amount has a source: nothing to judge
+            failed.remove("unquoted_price")
         logger.info("Review %s: %s (cached %d of %d tokens)", failed or "passed",
                     {k: round(v, 2) for k, v in probabilities.items() if v >= 0.3}, decision.cached_tokens, decision.input_tokens)
         return PolicyVerdict(

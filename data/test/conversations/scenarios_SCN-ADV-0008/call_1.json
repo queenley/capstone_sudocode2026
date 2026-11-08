@@ -1,0 +1,181 @@
+{
+  "conversation_id": "SCN-ADV-0008__call_1",
+  "scenario_id": "SCN-ADV-0008",
+  "call": "call_1",
+  "customer_id": "SYN-C001",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-16",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_bao_hanh_trong_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có mua Máy lọc không khí AirPure X, em sẽ hỗ trợ anh về vấn đề máy báo lỗi cảm biến và kêu to nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900101"
+        },
+        {
+          "field": "owned_sku",
+          "value": "SKU-AP-X"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900101"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về máy lọc không khí AirPure X, hiện tại máy đang báo lỗi cảm biến và kêu to.",
+      "facts_stated": {
+        "issue": "máy báo lỗi cảm biến và kêu to"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em ghi nhận máy của anh đang gặp lỗi cảm biến và phát ra tiếng kêu to. Sản phẩm AirPure X của anh còn trong thời gian bảo hành 24 tháng kể từ ngày mua ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "warranty_months",
+          "value": 24
+        },
+        {
+          "field": "in_warranty",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này còn bảo hành không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy của anh vẫn còn thời gian bảo hành chính hãng. Anh có thể gửi về shop hoặc mang trực tiếp đến trung tâm bảo hành của hãng đều được ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_warranty",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Quy trình bảo hành thế nào, gửi về shop hay trung tâm bảo hành vậy?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Quy trình bảo hành là anh có thể gửi máy về shop hoặc trực tiếp đến trung tâm bảo hành hãng. Thời gian xử lý sẽ từ 7–15 ngày làm việc, bên em sẽ hỗ trợ chuyển máy đến hãng nếu anh gửi về shop ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thời gian bảo hành mất bao lâu? Có phải chờ lâu không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, thời gian bảo hành máy AirPure X sẽ từ 7–15 ngày làm việc, tùy theo tình trạng cụ thể. Anh yên tâm bên em sẽ hỗ trợ anh trong suốt quá trình ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "issue",
+          "value": "máy báo lỗi cảm biến và kêu to",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "order_id",
+          "value": "OD900101",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "owned_sku",
+          "value": "SKU-AP-X",
+          "op": "set",
+          "source": "call_1#turn2"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "thong_tin",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

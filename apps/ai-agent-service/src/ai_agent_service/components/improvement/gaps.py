@@ -10,7 +10,8 @@ from datetime import datetime, timezone
 from typing import Any, Awaitable, Callable, Mapping, Sequence
 
 from ..intake import pii
-from . import gap as gate, signals, versions, review
+from . import signals, versions, review
+from .gap import gate
 from .storage import atomic_text, locked
 from ...config.config_manager import btc_data_dir
 from ..knowledge.corpus import policy_chunks
@@ -115,7 +116,7 @@ def answer_from_script(script: Sequence[Mapping[str, Any]], embed: Callable[[Seq
         if float(scores[best]) < threshold:
             results.append({"question": item["question"], "status": "no_gap"})
             continue
-        flags = gate.gate(gap_row["restated"], str(item["answer"]))
+        flags = gate(gap_row["restated"], str(item["answer"]))
         if flags:
             results.append({"question": item["question"], "status": "refused", "flags": list(flags)})
             continue
@@ -125,7 +126,8 @@ def answer_from_script(script: Sequence[Mapping[str, Any]], embed: Callable[[Seq
 
 
 def list_gaps() -> list[dict]:
-    return sorted(_read().values(), key=lambda row: (-len(row["occurrences"]), row["id"]))
+    """Open questions first, the most asked at the top."""
+    return sorted(_read().values(), key=lambda row: (row["status"] != "open", -len(row["occurrences"]), row["id"]))
 
 
 def resolve(key: str, *, answer: str, cites: list[str], reviewer: str,
@@ -143,6 +145,11 @@ def resolve(key: str, *, answer: str, cites: list[str], reviewer: str,
         gap = rows[key]
         if gap["status"] == "resolved":
             return gap["knowledge_version"]
+        if gap["status"] == "faq":
+            raise ValueError("This gap already became an FAQ")
+        refused = gate(gap["question"], answer)
+        if refused:
+            raise ValueError(" ".join(refused))
         title = " | ".join(x for x in (gap.get("restated"), *(gap.get("variants") or [])) if x) or gap["question"]
         entry = {"chunk_id": "FAQ-GAP-" + key.upper(), "source": "faq", "title": title,
                  "text": answer.strip(), "approved_by": reviewer,
@@ -152,7 +159,7 @@ def resolve(key: str, *, answer: str, cites: list[str], reviewer: str,
             options["config_path"] = config_path
         # A retry after a crash between publishing and updating this record must not duplicate the entry.
         current = versions.active(config_path) if config_path is not None else versions.active()
-        allowed = {chunk.chunk_id for chunk in policy_chunks(btc_data_dir() / "policy") if not chunk.restricted}
+        allowed = {chunk.chunk_id for chunk in policy_chunks(btc_data_dir() / "policy") if not chunk.restricted and not chunk.valid_to}
         allowed.update(row["chunk_id"] for row in versions.entries(current, directory))
         if not set(cites).issubset(allowed):
             raise ValueError("Citations must refer to published, public knowledge")
@@ -167,6 +174,45 @@ def resolve(key: str, *, answer: str, cites: list[str], reviewer: str,
             "cites": cites, "knowledge_version": version, "status": "pending_human_review",
         }, ensure_ascii=False, indent=2))
     return version
+
+
+def open_question(key: str) -> str:
+    """The words of a gap still open; raises ``KeyError``, or ``ValueError`` when it was already dealt with."""
+    gap = _read().get(key)
+    if gap is None:
+        raise KeyError(key)
+    if gap["status"] != "open":
+        raise ValueError("This gap was already dealt with")
+    return gap["question"]
+
+
+def became_faq(key: str, *, faq_id: str, reviewer: str) -> None:
+    """Record that an admin's FAQ entry now answers this gap; approving it is the FAQ's own step."""
+    with locked(signals.home()):
+        rows = _read()
+        if key not in rows:
+            raise KeyError(key)
+        rows[key].update(status="faq", faq_id=faq_id, reviewed_by=reviewer)
+        atomic_text(_path(), json.dumps(rows, ensure_ascii=False, indent=2))
+    review.log("gap_to_faq", gap_id=key, chunk_id=faq_id, reviewer=reviewer)
+
+
+def dismiss(key: str, *, reason: str, reviewer: str) -> None:
+    """Close a question that needs no answer, with why; a published one stays published."""
+    if not reviewer.strip() or reviewer.casefold() in review.AGENTS:
+        raise ValueError("A human reviewer is required")
+    if not reason.strip():
+        raise ValueError("A reason is required")
+    with locked(signals.home()):
+        rows = _read()
+        if key not in rows:
+            raise KeyError(key)
+        gap = rows[key]
+        if gap["status"] in ("resolved", "faq"):
+            raise ValueError("This gap was already published; revoke its entry instead")
+        gap.update(status="dismissed", reviewed_by=reviewer, reason=pii.tokenise(reason.strip(), pii.Vault()))
+        atomic_text(_path(), json.dumps(rows, ensure_ascii=False, indent=2))
+    review.log("gap_dismiss", gap_id=key, reviewer=reviewer)
 
 
 def forget_calls(call_ids: list[int]) -> None:

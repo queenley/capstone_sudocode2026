@@ -1,0 +1,197 @@
+{
+  "conversation_id": "SCN-ADV-0040__call_1",
+  "scenario_id": "SCN-ADV-0040",
+  "call": "call_1",
+  "customer_id": "SYN-C003",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-15",
+  "region": "nam",
+  "category": "me-be",
+  "persona": "khach_bao_hanh_trong_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh, em là trợ lý ảo của shop BTC. Em thấy trước đó anh có mua Xe đẩy gấp gọn Joie Pact bên em, anh cần hỗ trợ về sản phẩm này đúng không ạ?",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị C ạ, xe đẩy Joie Pact mà anh mua hôm trước giờ không hút được nữa.",
+      "facts_stated": {
+        "issue": "máy không hút được nữa"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận xe đẩy Joie Pact của anh đang gặp vấn đề không hút được nữa. Em kiểm tra đơn hàng OD900301 của anh vẫn còn trong thời gian bảo hành 12 tháng ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900301"
+        },
+        {
+          "field": "warranty_months",
+          "value": 12
+        },
+        {
+          "field": "in_warranty",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900301"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em không biết xe đẩy này còn bảo hành không nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ xe đẩy Joie Pact của anh còn bảo hành đến tháng 5 năm 2027 ạ. Anh hoàn toàn có thể gửi bảo hành nếu sản phẩm bị lỗi kỹ thuật do nhà sản xuất.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [
+        {
+          "field": "warranty_months",
+          "value": 12
+        },
+        {
+          "field": "in_warranty",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu còn bảo hành thì quy trình bảo hành như thế nào?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, anh có thể mang xe đẩy đến trung tâm bảo hành hãng hoặc gửi về shop BTC, bên em sẽ hỗ trợ chuyển đến hãng giúp mình ạ. Thời gian xử lý bảo hành từ 7–15 ngày làm việc, anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Làm ơn cho anh biết mất bao lâu để xử lý bảo hành nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ thời gian xử lý bảo hành cho xe đẩy Joie Pact là từ 7–15 ngày làm việc, tùy vào tình trạng máy và quy trình của hãng anh nha.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "issue",
+          "value": "máy không hút được nữa",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "order_id",
+          "value": "OD900301",
+          "op": "supersede",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "owned_sku",
+          "value": "SKU-MB-STR1",
+          "op": "supersede",
+          "source": "call_1#turn1"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_bao_hanh",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "order_id",
+        "old": "OD900302",
+        "new": "OD900301"
+      },
+      {
+        "slot": "owned_sku",
+        "old": "SKU-MB-STR1",
+        "new": "SKU-MB-STR1"
+      }
+    ],
+    "callback": null,
+    "order": null
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "scenario_id": "SCN-ADV-0017",
+  "call": "call_1",
+  "input_mode": "text",
+  "source_sha256": "6ae13680b8ff62d10d4c018a6dc109f9fb826c4a4375b2d810a6fbd4994943d0",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Alo em ơi, chị muốn hỏi về máy hút sữa điện đôi Medela Swing Maxi á.",
+      "spoken_text": "alo em ơi chị muốn hỏi về máy hút sữa điện đôi medela swing maxi á",
+      "entities": {
+        "sku": "SKU-MB-PUMP2"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Chị có bé 15 tháng, ngân sách tầm 6 triệu thôi.",
+      "spoken_text": "chị có bé mười lăm tháng ngân sách tầm sáu triệu thôi",
+      "entities": {
+        "has_children": true,
+        "budget_vnd": 6000000
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Máy này có khuyến mãi gì không em nhỉ?",
+      "spoken_text": "máy này có khuyến mãi gì không em nhỉ",
+      "entities": {
+        "sku": "SKU-MB-PUMP2"
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "Ừ, nghe có vẻ ổn, nhưng chị cần chờ đến cuối tháng mới có lương, em cho chị hẹn lại được không?",
+      "spoken_text": "ừ nghe có vẻ ổn nhưng chị cần chờ đến cuối tháng mới có lương em cho chị hẹn lại được không",
+      "entities": {
+        "blocker": "cho luong"
+      },
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

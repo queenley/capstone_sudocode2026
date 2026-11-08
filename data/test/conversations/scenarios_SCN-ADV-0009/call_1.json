@@ -1,0 +1,198 @@
+{
+  "conversation_id": "SCN-ADV-0009__call_1",
+  "scenario_id": "SCN-ADV-0009",
+  "call": "call_1",
+  "customer_id": "SYN-C002",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-10-17",
+  "region": "trung",
+  "category": "gia-dung/quat",
+  "persona": "khach_bao_hanh_het_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Trần Thị B ạ, em là trợ lý ảo của shop. Chị vừa nhắn về quạt đứng Senko TS16 đã mua trước đây, em hỗ trợ chị ngay ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Trần Thị B đây, chị muốn hỏi về quạt đứng Senko TS16 mà chị đã mua.",
+      "facts_stated": {
+        "owned_sku": "SKU-FAN-SEN"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị đã mua quạt Senko TS16 bên em, mình gặp vấn đề gì với sản phẩm này đúng không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy của chị không lên nguồn rồi, có cách gì để được bảo hành không?",
+      "facts_stated": {
+        "issue": "máy không lên nguồn"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra đơn hàng của chị thì quạt Senko TS16 mình mua từ ngày 6/3/2025, bảo hành của sản phẩm là 12 tháng nên hiện đã hết hạn bảo hành rồi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "warranty_months",
+          "value": 12
+        },
+        {
+          "field": "in_warranty",
+          "value": false
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900203"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thấy bảo hành có 12 tháng, nhưng chị mua cũng lâu rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi chị, sản phẩm đã quá hạn bảo hành nên bên em không thể nhận bảo hành miễn phí nữa ạ. Nếu chị cần, em có thể hướng dẫn địa chỉ trung tâm bảo hành hãng hoặc các điểm sửa chữa uy tín cho mình tham khảo nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "warranty_months",
+          "value": 12
+        },
+        {
+          "field": "in_warranty",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị không vui lắm vì không biết có thể sửa chữa hay hỗ trợ gì khác không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": "negative",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất xin lỗi vì bất tiện này ạ. Tuy sản phẩm đã hết hạn bảo hành, chị vẫn có thể mang quạt tới trung tâm bảo hành Senko hoặc tiệm sửa chữa gần nhà để kỹ thuật viên kiểm tra và báo giá sửa giúp chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "warranty_months",
+          "value": 12
+        },
+        {
+          "field": "in_warranty",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "issue",
+          "value": "máy không lên nguồn",
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "order_id",
+          "value": "OD900203",
+          "op": "supersede",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "owned_sku",
+          "value": "SKU-FAN-SEN",
+          "op": "supersede",
+          "source": "call_1#turn5"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_van_bao_hanh",
+    "outcome": "thong_tin",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "negative",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [
+      {
+        "slot": "order_id",
+        "old": "OD900202",
+        "new": "OD900203"
+      },
+      {
+        "slot": "owned_sku",
+        "old": "SKU-FAN-SEN",
+        "new": "SKU-FAN-SEN"
+      }
+    ],
+    "callback": null,
+    "order": null
+  }
+}

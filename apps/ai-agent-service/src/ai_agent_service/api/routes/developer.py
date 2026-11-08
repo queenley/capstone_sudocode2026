@@ -14,6 +14,7 @@ from __future__ import annotations
 import asyncio
 import json
 import statistics
+from datetime import date
 from typing import Any, Literal
 
 from fastapi import APIRouter, HTTPException, Query, Request
@@ -22,18 +23,30 @@ from pydantic import BaseModel, Field
 from src.api.routes.shared import staff
 
 from ...components import btc_schemas, voice as voice_component
+from ...components.improvement import review
+from ...components.knowledge import faq
 from ...config.config_manager import get_models_config, has_api_key
 from ...runtime import calls, harness, options
 from ...runtime.db import connection
 
 router = APIRouter(prefix="/api/developer", tags=["developer"])
 ROLES = {"admin", "developer"}
+ADMIN = {"admin"}
 
 
 class GapResolution(BaseModel):
     answer: str = Field(min_length=3, max_length=4000)
     cites: list[str] = Field(min_length=1, max_length=20)
     approved: Literal[True]
+
+
+class GapDismissal(BaseModel):
+    reason: str = Field(min_length=3, max_length=500)
+
+
+class GapAnswer(BaseModel):
+    answer: str = Field(min_length=3, max_length=2000)
+    cites: list[str] = Field(default_factory=list, max_length=20)
 
 
 @router.get("/knowledge-gaps")
@@ -55,6 +68,105 @@ async def resolve_gap(gap_id: str, body: GapResolution, request: Request):
     except ValueError as error:
         raise HTTPException(422, str(error)) from error
     return {"status": "resolved", "knowledge_version": version, "reload_required": True}
+
+
+@router.post("/knowledge-gaps/{gap_id}/faq")
+async def gap_to_faq(gap_id: str, body: GapAnswer, request: Request) -> dict[str, Any]:
+    """A draft FAQ from a gap, live within seconds once approved, with no new knowledge version."""
+    staff(request, ADMIN)
+    from ...components.improvement import gaps
+    actor = str(request.state.actor_id)
+    try:
+        question = await asyncio.to_thread(gaps.open_question, gap_id)
+        entry = {"title": question[:300], "text": body.answer.strip(), "cites": body.cites}
+        async with connection() as conn:
+            saved = await faq.save(conn, None, entry, status="draft", actor=actor, on=options.business_day(),
+                                   new_id=f"FAQ-GAP-{gap_id.upper()}")
+        await asyncio.to_thread(gaps.became_faq, gap_id, faq_id=saved["chunk_id"], reviewer=actor)
+    except KeyError as error:
+        raise HTTPException(404, "Knowledge gap not found") from error
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
+    return saved
+
+
+@router.post("/knowledge-gaps/{gap_id}/dismiss")
+async def dismiss_gap(gap_id: str, body: GapDismissal, request: Request) -> dict[str, str]:
+    _guard(request)
+    from ...components.improvement import gaps
+    try:
+        await asyncio.to_thread(gaps.dismiss, gap_id, reason=body.reason, reviewer=str(request.state.actor_id))
+    except KeyError as error:
+        raise HTTPException(404, "Knowledge gap not found") from error
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
+    return {"status": "dismissed"}
+
+
+class FaqEntry(BaseModel):
+    title: str = Field(min_length=3, max_length=300)
+    text: str = Field(min_length=3, max_length=2000)
+    valid_from: date | None = None
+    valid_to: date | None = None
+    campaign: str | None = Field(default=None, max_length=80)
+    applies_to: list[str] = Field(default_factory=list, max_length=20)
+    cites: list[str] = Field(default_factory=list, max_length=20)
+    status: Literal["draft", "live"] = "draft"
+    #: A person read the entry against its sources: required to go live.
+    approved: bool = False
+
+
+@router.get("/faq")
+async def list_faq(request: Request) -> dict[str, Any]:
+    staff(request, ADMIN)
+    day = options.business_day()
+    async with connection() as conn:
+        rows = await faq.entries(conn, day)
+    return {"day": day, "entries": rows, "promotions": faq.promotion_choices()}
+
+
+async def _save_faq(request: Request, chunk_id: str | None, body: FaqEntry) -> dict[str, Any]:
+    if body.status == "live" and not body.approved:
+        raise HTTPException(422, "Cần xác nhận đã đối chiếu nguồn trước khi bật.")
+    actor = str(request.state.actor_id)
+    entry = body.model_dump(exclude={"status", "approved"}, exclude_none=True)
+    try:
+        async with connection() as conn:
+            saved = await faq.save(conn, chunk_id, entry, status=body.status, actor=actor, on=options.business_day())
+    except KeyError as error:
+        raise HTTPException(404, "FAQ not found") from error
+    except faq.ReadOnly as error:
+        raise HTTPException(409, "Mục này thuộc bản phát hành, chỉ sửa được trong file phiên bản.") from error
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
+    await asyncio.to_thread(review.log, "faq_save", chunk_id=saved["chunk_id"], status=body.status, reviewer=actor)
+    return saved
+
+
+@router.post("/faq")
+async def create_faq(body: FaqEntry, request: Request) -> dict[str, Any]:
+    staff(request, ADMIN)
+    return await _save_faq(request, None, body)
+
+
+@router.put("/faq/{chunk_id}")
+async def update_faq(chunk_id: str, body: FaqEntry, request: Request) -> dict[str, Any]:
+    staff(request, ADMIN)
+    return await _save_faq(request, chunk_id, body)
+
+
+@router.delete("/faq/{chunk_id}")
+async def delete_faq(chunk_id: str, request: Request) -> dict[str, str]:
+    staff(request, ADMIN)
+    try:
+        async with connection() as conn:
+            await faq.delete(conn, chunk_id)
+    except KeyError as error:
+        raise HTTPException(404, "FAQ not found") from error
+    except faq.ReadOnly as error:
+        raise HTTPException(409, "Mục này thuộc bản phát hành, chỉ sửa được trong file phiên bản.") from error
+    await asyncio.to_thread(review.log, "faq_delete", chunk_id=chunk_id, reviewer=str(request.state.actor_id))
+    return {"status": "deleted"}
 
 
 def _guard(request: Request) -> None:

@@ -100,6 +100,10 @@ class HotState(TurnInput, total=False):
 
     # advisor (compaction)
     working_summary: str | None
+    #: What the customer stated in this call, by slot, tokenised (``call_state``). Written by ``perceive``.
+    call_facts: dict[str, Any]
+    #: This turn's prompt: ``{tokens, cut, packs, brief_shown, brief_held}``, for the run's diagnostics.
+    prompt_stats: dict[str, Any]
 
     # route
     lane: Lane
@@ -121,6 +125,8 @@ class HotState(TurnInput, total=False):
     #: A turn only sees its own tool results; this is how a later turn still
     #: knows the code of the product the customer now wants to order.
     seen_products: list[dict[str, Any]]
+    #: The numbers of this call's price, catalogue and delivery results: a later turn may repeat them.
+    call_numbers: list[int]
     #: The orders this call created, ``{order_id, sku}``: what a later turn
     #: corrects with ``order.update`` instead of booking the product again.
     created_orders: list[dict[str, Any]]
@@ -134,6 +140,8 @@ class HotState(TurnInput, total=False):
     #: The basket the customer is choosing, sku -> ``{qty}``, from the quotes that named one (``basket_skus``).
     basket: dict[str, dict[str, Any]]
     deletion_recorded: bool
+    #: ``schedule.callback`` ran in this call: a later turn may speak of the call back as booked.
+    callback_booked: bool
     deletion_awaiting_for: str | None
     #: The changes ``order.update`` made in this call, ``{order_id, action, new_variant_sku}``: the
     #: same change asked again in a later turn is refused, not made (and charged) a second time.

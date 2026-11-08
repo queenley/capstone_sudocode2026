@@ -1,0 +1,256 @@
+{
+  "conversation_id": "SCN-ADV-0035__call_2",
+  "scenario_id": "SCN-ADV-0035",
+  "call": "call_2",
+  "customer_id": "C023",
+  "session_index": 2,
+  "channel": "chat_fanpage",
+  "date": "2026-11-30",
+  "region": "bac",
+  "category": "me-be",
+  "persona": "khach_go_khong_dau",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Thu ạ, hôm trước chị có quan tâm Máy tiệt trùng sấy khô Moaz Bebe, còn chờ cuối tháng nhận lương. Em hỗ trợ mình luôn nhé.",
+      "questions": [],
+      "facts_used": [
+        "blocker",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chi muon mua may tiet trung say kho",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ, hiện còn hàng chị nhé. Mình muốn nhận hàng ở Cầu Giấy, Hà Nội đúng không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Mình muốn nhận hàng ở Cầu Giấy, Hà Nội đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-11-30"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "hinh thuc thanh toan la chuyen khoan ngan hang",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, chị chọn thanh toán chuyển khoản ngân hàng, đơn giá 1.890.000đ, giao về Cầu Giấy, Hà Nội. Hàng dự kiến giao tới ngày 02/12 nhé. Em đọc lại đơn: 1 máy tiệt trùng Moaz Bebe, giá 1.890.000đ, giao Cầu Giấy, thanh toán chuyển khoản, giao khoảng 2 ngày. Chị xác nhận giúp em thông tin trên đúng chưa ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em đọc lại đơn: 1 máy tiệt trùng Moaz Bebe, giá 1.890.000đ, giao Cầu Giấy, thanh toán chuyển khoản, giao khoảng 2 ngày. Chị xác nhận giúp em thông tin trên đúng chưa ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd",
+        "payment",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "khu vuc giao hang la cau giay ha noi",
+      "facts_stated": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "entities": [],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận đơn hàng cho chị: 1 máy tiệt trùng sấy khô Moaz Bebe, giá 1.890.000đ, giao về Cầu Giấy, thanh toán chuyển khoản. Đơn sẽ giao dự kiến ngày 02/12. Em tiến hành lên đơn cho mình ngay nhé.",
+      "questions": [],
+      "facts_used": [
+        "product_advised",
+        "price_quoted_vnd",
+        "payment",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0976158464",
+            "sku": "SKU-MB-STER",
+            "qty": 1,
+            "price_vnd": 1890000,
+            "payment": "bank",
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-11-30"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chot don nhe em",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn đã tạo thành công. Cảm ơn chị đã đặt hàng Moaz Bebe tại shop, có mã đơn OD600001. Nếu cần hỗ trợ gì thêm, chị nhắn em nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Cầu Giấy, Hà Nội",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-STER",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 1890000,
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn8"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-MB-STER",
+      "qty": 1,
+      "price_vnd": 1890000,
+      "payment": "bank",
+      "address": "Cầu Giấy, Hà Nội",
+      "order_id": "OD600001"
+    }
+  }
+}

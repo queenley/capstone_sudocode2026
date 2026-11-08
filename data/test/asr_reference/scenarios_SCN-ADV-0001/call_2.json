@@ -1,0 +1,52 @@
+{
+  "scenario_id": "SCN-ADV-0001",
+  "call": "call_2",
+  "input_mode": "text",
+  "source_sha256": "30fc31fd3fc45bc13c480c753ba99397c4bfcad1d2e476a52cf69a2fc39ab927",
+  "model": "gpt-4.1-mini",
+  "turns": [
+    {
+      "idx": 1,
+      "speaker": "C",
+      "text": "Alo, chị gọi lại để hỏi về máy lọc không khí mà hôm trước em có nói.",
+      "spoken_text": "alo chị gọi lại để hỏi về máy lọc không khí mà hôm trước em có nói.",
+      "entities": {},
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 2,
+      "speaker": "C",
+      "text": "Chị cần máy lọc cho phòng khoảng 25m2, nhà có trẻ nhỏ.",
+      "spoken_text": "chị cần máy lọc cho phòng khoảng hai mươi lăm mét vuông nhà có trẻ nhỏ.",
+      "entities": {
+        "room_area_m2": 25,
+        "has_children": true
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 3,
+      "speaker": "C",
+      "text": "Ngân sách của chị tầm 5 triệu thôi, không biết có khuyến mãi gì không?",
+      "spoken_text": "ngân sách của chị tầm năm triệu thôi không biết có khuyến mãi gì không?",
+      "entities": {
+        "budget_vnd": 5000000
+      },
+      "reference_source": "llm",
+      "issues": []
+    },
+    {
+      "idx": 4,
+      "speaker": "C",
+      "text": "Chị cần bàn với gia đình đã, tối mai tầm 7 giờ em gọi lại chị nhé.",
+      "spoken_text": "chị cần bàn với gia đình đã tối mai tầm bảy giờ em gọi lại chị nhé.",
+      "entities": {
+        "blocker": "can hoi nguoi nha"
+      },
+      "reference_source": "llm",
+      "issues": []
+    }
+  ]
+}

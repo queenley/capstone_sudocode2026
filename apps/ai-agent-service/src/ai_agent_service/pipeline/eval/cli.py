@@ -22,6 +22,12 @@ unlabelled turn, a failed ``after_call`` or a line outside the schema voids
 the numbers (the traces are kept, no table is printed); 2 when the input or
 the setup is wrong.
 
+The speed and cost table of a finished run, free; with a new run it is printed after the metrics, and ``--sessions``
+adds a load test, which spends model calls (:mod:`.performance`)::
+
+    python run_eval.py --performance evaluation/runs/<day>-work/<run>
+    python run_eval.py --scenarios <dir> --performance --sessions 1,3,5
+
 The run uses a database of its own, the app's name plus ``_eval`` (or
 ``EVAL_DATABASE_URL``, whose name must end in ``_eval``), created on first use
 and emptied per scenario. The advisor's model is ``agents.advisor`` in
@@ -42,6 +48,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Sequence
 
+from ...components.context import focus
 from ...config.config_manager import ROOT, btc_data_dir
 from ...llm.evaluation_budget import validate_ledger
 
@@ -63,6 +70,12 @@ EXTRACTOR_CACHE = RUNS / "cache" / "extractor.json"
 
 #: Extractor calls in flight at once; the provider's rate limiter paces them.
 EXTRACTOR_CONCURRENCY = 4
+#: Seconds one turn's labelling may take, its retry included (two attempts of 60 s, and the limiter's wait).
+#: Past it the labelling stops with an error instead of waiting: eval2 (2026-11-07) waited over twenty minutes
+#: on four calls whose connections the provider had closed. What was labelled stays in the cache for the rerun.
+LABEL_TIMEOUT_S = 300
+#: A line every this many labelled turns, so a long labelling shows it is moving.
+LABEL_PROGRESS_EVERY = 200
 
 
 @dataclass
@@ -84,6 +97,13 @@ class ConfigRun:
     diagnostics: list[dict[str, Any]] = field(default_factory=list)
     usage: list[dict[str, Any]] = field(default_factory=list)
     stopped: list[dict[str, str]] = field(default_factory=list)
+
+
+def _levels(value: str) -> list[int]:
+    levels = [int(part) for part in value.split(",")]
+    if any(level < 1 for level in levels):
+        raise argparse.ArgumentTypeError("a level is at least one session")
+    return levels
 
 
 def parser() -> argparse.ArgumentParser:
@@ -122,13 +142,79 @@ def parser() -> argparse.ArgumentParser:
                         help="With --asr-transcribe: split each call by speaker into turns[] (idx, speaker A/C, start, end) "
                              "for the organisers' per-turn entity accuracy and diarization; implausible splits give no turns")
     parser.add_argument("--asr-entity-review", type=Path, help="Versioned canonical entity labels; pending review stays diagnostic, never self-approved.")
+    parser.add_argument("--performance", nargs="?", const=True, type=Path, metavar="RUN_DIR",
+                        help="Print the speed and cost table: of this run, or, given RUN_DIR, of a finished one (no model call).")
+    parser.add_argument("--sessions", type=_levels, default=[], metavar="N,N,...",
+                        help="With --performance: after the run, this many sessions at once, each level in turn; spends model calls.")
+    parser.add_argument("--report", nargs="?", const="all", type=_sections, metavar="all|asr,agent,performance",
+                        help="Print the report's tables (default all). With --run or --asr-run, from finished runs: no "
+                             "model call. With --scenarios, of the run this command makes, as the Router column.")
+    parser.add_argument("--run", action="append", default=[], type=_named_run, metavar="COLUMN=RUN_DIR",
+                        help="With --report: a finished run as a column: router, subagent, gaploop, reflection or ab; repeat.")
+    parser.add_argument("--asr-run", type=Path, metavar="RUN_DIR", help="With --report: a finished --asr run.")
+    parser.add_argument("--kb-version", type=int, metavar="N",
+                        help="Run on data/kb/v<N>.jsonl instead of config/knowledge.yaml's version: the GapLoop or Reflection column.")
     parser.add_argument("--provider", help="The advisor's provider, overriding config/models.yaml.")
     parser.add_argument("--model", help="The advisor's model, overriding config/models.yaml.")
     return parser
 
 
+def _sections(value: str) -> tuple[str, ...]:
+    from . import tables
+
+    try:
+        return tables.sections(value)
+    except ValueError as error:
+        raise argparse.ArgumentTypeError(str(error)) from error
+
+
+def _named_run(value: str) -> tuple[str, Path]:
+    from . import tables
+
+    try:
+        return tables.named_run(value)
+    except ValueError as error:
+        raise argparse.ArgumentTypeError(str(error)) from error
+
+
+def _tables(args: argparse.Namespace) -> int:
+    """``--report`` over finished runs: reads their files, spends nothing."""
+    from . import tables
+
+    runs = {name: directory.resolve() for name, directory in args.run}
+    try:
+        text = tables.render(args.report, runs, args.asr_run.resolve() if args.asr_run else None)
+    except (OSError, ValueError) as error:
+        print(error)
+        return 2
+    print(text)
+    if args.out:
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        args.out.write_text(text + "\n", encoding="utf-8")
+    return 0
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = parser().parse_args(argv)
+    if (args.run or args.asr_run) and args.report is None:
+        print("--run and --asr-run go with --report")
+        return 2
+    if args.report is not None:
+        if args.run or args.asr_run:
+            return _tables(args)
+        if args.scenarios == btc_data_dir() / "test_set" / "public_sample" or args.config or args.relabel:
+            print("--report needs finished runs (--run, --asr-run), or --scenarios and no --config to make one; "
+                  "making one spends model calls.")
+            return 2
+    if args.kb_version is not None:
+        from ...components.knowledge import corpus
+        from ...config.config_manager import kb_dir
+
+        if not corpus.version_file(kb_dir(), args.kb_version).is_file():
+            print(f"No knowledge version {args.kb_version} in {kb_dir()}")
+            return 2
+        # In the environment, so the MCP servers this command starts read the same version.
+        os.environ["KNOWLEDGE_VERSION"] = str(args.kb_version)
     from ...mcp.server_base import use_selector_loop_on_windows
 
     use_selector_loop_on_windows()
@@ -171,6 +257,19 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.asr_hypotheses or args.asr_transcribe or args.asr_entity_review:
         print("ASR options require --asr")
         return 2
+    if args.sessions and args.performance is not True:
+        print("--sessions needs --performance without a run directory: it runs the agent")
+        return 2
+    if isinstance(args.performance, Path):
+        from . import performance
+
+        try:
+            figures = performance.measure(args.performance.resolve())
+        except (OSError, ValueError) as error:
+            print(error)
+            return 2
+        print(performance.table(figures))
+        return 0
     if bool(args.provider) != bool(args.model):
         print("--provider and --model go together")
         return 2
@@ -195,24 +294,26 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 2
         return asyncio.run(judge_agreement.judge_run(args.judge_run.resolve(), out, _judge()))
     if args.relabel:
-        if args.no_extract or args.config or args.judge or args.provider or args.model or args.only:
-            print("--relabel runs only the extractor; agent/config/selection options are not supported")
+        if args.no_extract or args.judge or args.provider or args.model or args.only:
+            print("--relabel runs only the extractor; agent/selection options are not supported (--config is)")
             return 2
         from . import relabel
 
         out = (args.out or RUNS / (datetime.now().strftime("%Y%m%d-%H%M%S") + "-relabel")).resolve()
         try:
-            validate_ledger()
+            capped = validate_ledger()
         except RuntimeError as error:
             print(error)
             return 2
+        _say_cap(capped)
         print(f"Relabel {args.relabel.resolve()} into {out}")
         try:
             extractor = _extractor()
         except (RuntimeError, ValueError) as error:
             print(f"Extractor setup error: {error}")
             return 2
-        return asyncio.run(relabel.relabel(args.relabel.resolve(), out, extractor))
+        return asyncio.run(relabel.relabel(args.relabel.resolve(), out, extractor,
+                                           (args.config,) if args.config else None))
     if not args.scenarios.is_dir():
         print(f"{args.scenarios} is not a directory")
         return 2
@@ -232,11 +333,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     run_id = datetime.now().strftime("%Y%m%d-%H%M%S")
     layout = _layout(args, run_id)
     try:
-        validate_ledger()
+        capped = validate_ledger()
         prepare_output(layout)
     except (OSError, ValueError, RuntimeError) as error:
         print(error)
         return 2
+    _say_cap(capped)
 
     # Imported here: the evaluation database must be chosen before anything opens a pool.
     from . import runner
@@ -261,6 +363,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 1
 
 
+def _say_cap(capped: bool) -> None:
+    if not capped:
+        print("EVAL_BUDGET_DB is not set: model calls have no spending cap.")
+
+
 def _layout(args: argparse.Namespace, run_id: str) -> Layout:
     if args.config:
         name = "full.jsonl" if args.config == "full" else "baseline.jsonl"
@@ -274,17 +381,23 @@ def prepare_output(layout: Layout) -> None:
     """Refuse stale evidence before opening a database or paying for a model."""
     layout.directory.mkdir(parents=True, exist_ok=True)
     claim = layout.directory / ".eval-prepare.lock"
+    # Created exclusively, then closed: Windows cannot delete a file that is still open.
     with claim.open("x", encoding="utf-8"):
-        try:
-            existing = (path for path in layout.directory.iterdir()
-                        if path != claim and path.name.startswith(layout.prefix))
-            if ((layout.directory / "run.lock").exists()
-                    or any(path.exists() for path in layout.traces.values()) or next(existing, None) is not None):
-                raise ValueError(f"Output already contains run evidence: {layout.directory}. Choose a new --out.")
-            with layout.side("run.lock").open("x", encoding="utf-8"):
-                pass
-        finally:
-            claim.unlink()
+        pass
+    try:
+        existing = (path for path in layout.directory.iterdir()
+                    if path != claim and path.name.startswith(layout.prefix))
+        if ((layout.directory / "run.lock").exists()
+                or any(path.exists() for path in layout.traces.values()) or next(existing, None) is not None):
+            only_lock = [path.name for path in layout.directory.iterdir() if path != claim] == ["run.lock"]
+            raise ValueError(
+                f"Output already contains only run.lock ({layout.directory}): a run stopped before its first turn, or is "
+                "starting now. Choose a new --out, or delete the folder if no run is going."
+                if only_lock else f"Output already contains run evidence: {layout.directory}. Choose a new --out.")
+        with layout.side("run.lock").open("x", encoding="utf-8"):
+            pass
+    finally:
+        claim.unlink()
 
 
 async def _evaluate_locked(args, **kwargs) -> int:
@@ -317,9 +430,11 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
     runs: dict[str, ConfigRun] = {}
     found: dict[str, dict[str, int]] = {}
     extractor = None
+    load: list[dict[str, Any]] = []
     try:
         rig = await runner.build(provider=args.provider, model=args.model)
         extractor = None if args.no_extract else _extractor()
+        print(f"Advisor context: {'full' if focus.full() else 'focused'} (ADVISOR_CONTEXT, also read from .env)")
         print(f"Advisor {rig.provider}/{rig.advisor.model_name}; extractor "
               f"{extractor.model_name if extractor else 'off'}; {len(ready)} scenarios; {', '.join(configs)}")
         await runner.warm_up(rig, ready[0], args.warmup, print)
@@ -345,7 +460,7 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
                 if integrity:
                     run.stopped.append({"scenario_id": ready[0].scenario_id, "error": "; ".join(integrity)})
             if extractor is not None and not run.stopped:
-                await _label(run, extractor)
+                await _label(run, extractor, ready)
             if args.judge and not run.stopped:
                 from ...components.evaluation.judge import judge_calls, summarise, table
 
@@ -366,6 +481,9 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
             if run.stopped:
                 break
         advisor = {"provider": rig.provider, "model": rig.advisor.model_name}
+        if args.sessions and not any(run.stopped for run in runs.values()):
+            load = await runner.load_test(rig, ready, args.sessions, print)
+            _write_json(layout.side("sessions.json"), load)
     finally:
         try:
             await mcp_client.close_all()
@@ -412,6 +530,17 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
     failures = report.errors(graded, [d for run in runs.values() for d in run.diagnostics])
     trace.write_jsonl(layout.side("errors.jsonl"), failures)
     table = f"{table}\n\n{retrieval}"
+    if args.performance:
+        from . import performance
+
+        figures = performance.measure(layout.directory)
+        figures["sessions"] = load
+        _write_json(layout.side("performance.json"), figures)
+        table = f"{table}\n\n{performance.table(figures, load)}"
+    if args.report:
+        from . import tables
+
+        table = f"{table}\n\n{tables.render(args.report, {'router': layout.directory})}"
     layout.side("table.txt").write_text(table + "\n", encoding="utf-8")
     record["status"] = "COMPLETE"
     _write_json(layout.side("manifest.json"), record)
@@ -451,7 +580,24 @@ def _extractor() -> Any:
                      cache_path=EXTRACTOR_CACHE)
 
 
-async def _label(run: ConfigRun, extractor: Any) -> None:
+def call_context(cohort: Any) -> dict[tuple[str, str], dict[str, Any]]:
+    """``today`` and ``crm_history`` of every call of *cohort* (planned scenarios), for the extractor.
+
+    The day is the call's own (``call_date`` or the days after the one before), so a time said in words can be
+    written as the scenario writes ``callback_at``; the CRM history is the ``seed_history`` the profile held.
+    """
+    context = {}
+    for scenario in cohort or ():
+        for plan in scenario.calls:
+            context[(scenario.scenario_id, plan.name)] = {
+                "today": plan.on,
+                "crm_history": [{"date": s.day, "channel": s.channel, "summary": s.summary, "outcome": s.outcome,
+                                 "facts": dict(s.facts)} for s in plan.seed],
+            }
+    return context
+
+
+async def _label(run: ConfigRun, extractor: Any, cohort: Any = None) -> None:
     """Fill ``questions``, ``claims`` and ``facts_used`` of every row, after the turns ran, so no extractor call
     ever queues in front of a timed turn.
 
@@ -468,17 +614,30 @@ async def _label(run: ConfigRun, extractor: Any) -> None:
     # A burst can reserve the remaining cap before any in-flight usage settles.
     gate = asyncio.Semaphore(1 if os.environ.get("EVAL_BUDGET_DB") else EXTRACTOR_CONCURRENCY)
     history = scorers.previous_sessions(run.rows)
+    context = call_context(cohort)
     halted = False
+    finished = 0
 
     async def one(index: int, row: dict[str, Any], diagnosis: dict[str, Any]) -> None:
-        nonlocal halted
-        data = scorers.turn_input(row["agent_text"], row["tool_calls"], history.get(index))
+        nonlocal halted, finished
+        call = context.get((row["scenario_id"], row["call"]), {})
+        data = scorers.turn_input(row["agent_text"], row["tool_calls"], history.get(index),
+                                  today=call.get("today"), crm_history=call.get("crm_history"))
         async with gate:
             if halted:
                 return
-            labels = await extractor.label(data)
+            try:
+                labels = await asyncio.wait_for(extractor.label(data), LABEL_TIMEOUT_S)
+            except asyncio.TimeoutError:
+                labels = {**scorers._labels([], 0, 0), "error": f"extractor gave no answer in {LABEL_TIMEOUT_S} s"}
+            finished += 1
+            if finished % LABEL_PROGRESS_EVERY == 0:
+                print(f"  labelled {finished}/{len(run.rows)} turns", flush=True)
             if labels.get("error"):
-                halted = True
+                # Under a spending cap the rest is not paid for; without one, the other turns are labelled, so a
+                # rerun repeats only those that failed (the rest are in the cache) and one bad turn of 3.747 does
+                # not cost the other 3.746. The table is withheld either way while a turn is unlabelled.
+                halted = bool(os.environ.get("EVAL_BUDGET_DB"))
                 run.stopped.append({"scenario_id": row["scenario_id"], "stage": "extraction", "error": labels["error"]})
         row["questions"], row["claims"] = labels["questions"], labels["claims"]
         row["facts_used"] = trace.merged_facts_used(labels["facts_used"], row["facts_used"])
@@ -494,8 +653,12 @@ async def _label(run: ConfigRun, extractor: Any) -> None:
         if labels.get("recovered_errors"):
             diagnosis["extraction_recovered_errors"] = labels["recovered_errors"]
 
-    await asyncio.gather(*(one(index, row, diagnosis)
-                           for index, (row, diagnosis) in enumerate(zip(run.rows, run.diagnostics))))
+    try:
+        await asyncio.gather(*(one(index, row, diagnosis)
+                               for index, (row, diagnosis) in enumerate(zip(run.rows, run.diagnostics))))
+    finally:
+        if hasattr(extractor, "flush"):
+            await extractor.flush()
     print(f"  labelled {sum('extraction_items' in d for d in run.diagnostics)} turns ({extractor.stats()})")
 
 

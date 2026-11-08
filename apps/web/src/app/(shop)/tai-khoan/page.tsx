@@ -53,7 +53,7 @@ export default function AccountPage() {
         </button>
       </div>
 
-      <div className="my-[18px] grid grid-cols-1 gap-3 xs:grid-cols-2 sm:grid-cols-3">
+      <div className="my-[18px] [display:grid] grid-cols-1 gap-3 xs:grid-cols-2 sm:grid-cols-3">
         <Link href="/don-hang" className="s-account-tile">
           <b>Đơn hàng</b>
           <span>Xem trạng thái, thanh toán</span>

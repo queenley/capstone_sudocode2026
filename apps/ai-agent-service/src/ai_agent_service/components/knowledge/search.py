@@ -5,10 +5,11 @@ question per customer turn, in a few milliseconds, with:
 
 - the top passages, keyword (BM25) and meaning (embedding) rankings fused by
   Reciprocal Rank Fusion, each with its flags: ``restricted`` (its text is
-  never handed out, only its code and what to do instead), ``superseded``
-  (not in force on the day that matters: the call's day, or the order's day
-  when the question is about an order, CL-01), and the changelog entries that
-  explain why;
+  never handed out, only its code and what to do instead), and the changelog
+  entries that explain them. A passage not in force on the day that matters
+  (the call's day, or the order's day when the question is about an order,
+  CL-01) is never among them: it is filtered out before the top is taken, so
+  its old figures cannot reach the model and a passage in force gets its place;
 - whether to **abstain**, and why, for the router's rule 5 and the advisor's
   "Dạ hiện em chưa có thông tin về…" (PB-05):
 
@@ -30,12 +31,12 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from datetime import date, timedelta
+from datetime import date
 from pathlib import Path
-from typing import Literal, Sequence
+from typing import Literal, Mapping, Sequence
 
 from ..intake.text import plain
-from .corpus import THROUGH_TOOLS, Chunk, by_id
+from .corpus import THROUGH_TOOLS, Chunk, by_id, covers
 from .lexical import Lexical, fuse
 from .semantic import Embedder, Vectors
 
@@ -56,10 +57,11 @@ REFUSE = ("Đoạn [{id}] ({title}) là tài liệu nội bộ: không đọc, k
           "đúng điều đó thì nói đây là thông tin nội bộ em không cung cấp được.")
 REDIRECT = ("Đoạn [{id}] ({title}) là tài liệu nội bộ: điều khách cần ở đây chỉ lấy từ kết quả của {tool}; không nói "
             "số lượng, giá nhập hay nhà cung cấp.")
-#: What the advisor is told of a passage not in force on the day that matters.
-EXPIRED = ("hết hiệu lực từ {day}; chỉ áp dụng cho đơn tạo trước ngày đó. Với đơn mới hay câu hỏi chung, nói theo bản "
-           "đang hiệu lực và ngày cập nhật, không nhắc lại con số của đoạn này")
-NOT_YET = "áp dụng cho đơn tạo từ {day}; đơn đang hỏi tạo trước ngày đó nên theo bản cũ"
+#: The day the customer says an order was placed, words without diacritics: "đơn tạo ngày 28/09/2026", "mua hôm 28/9",
+#: "đặt tháng 9/2026". A delivery day in between is not it, nor is the date a request was made.
+ORDER_DAY = re.compile(r"\b(?:don|dat|mua)\b(?P<between>[^.,;?!\n]{0,24}?)\b(?:(?P<day>\d{1,2})/|thang )"
+                       r"(?P<month>\d{1,2})(?:/(?P<year>\d{4}))?\b")
+NOT_PLACED = re.compile(r"\b(?:giao|nhan|ship|den)\b")
 
 
 @dataclass(frozen=True)
@@ -88,15 +90,14 @@ class Hit:
     cosine: float | None
     #: The share of the question's information this passage holds, 0 to 1.
     coverage: float
-    superseded: bool
     #: The sentence the question is about says there is no information, or bans saying it.
     absence: bool
     #: For a restricted passage: what to do instead of reading it.
     instruction: str | None
-    #: For a superseded passage: since or until when it holds, and what that means for the answer.
-    validity: str | None = None
     #: For a restricted passage whose one usable fact a tool gives instead: that tool.
     redirect: str | None = None
+    #: An entry written for a product of this call.
+    for_product: bool = False
 
 
 @dataclass(frozen=True)
@@ -111,6 +112,12 @@ class Result:
     changelog: dict[str, Chunk] = field(default_factory=dict)
     #: "hybrid" or "keyword": which retrieval produced the ranking.
     mode: str = "keyword"
+    #: Passages that ranked but were not in force on the day that matters, for the trace; never their text.
+    withheld: tuple[str, ...] = ()
+    #: The changelog entries that explain the withheld passages: what changed, and which orders keep the old rule.
+    explains: tuple[str, ...] = ()
+    #: The other orders' days on which a passage of this result would not hold: which order is meant must be asked.
+    version_differs: tuple[str, ...] = ()
 
 
 class KnowledgeBase:
@@ -123,6 +130,7 @@ class KnowledgeBase:
         settings: Settings = Settings(),
         embedder: Embedder | None = None,
         cache: Path | None = None,
+        categories: Mapping[str, str] | None = None,
     ) -> None:
         ids = [c.chunk_id for c in chunks]
         if len(ids) != len(set(ids)):
@@ -134,6 +142,8 @@ class KnowledgeBase:
         documents = [(c.chunk_id, c.indexed) for c in chunks]
         self._lexical = Lexical(documents, k1=settings.k1, b=settings.b, accents=settings.accents)
         self._embedder, self._cache = embedder, cache
+        #: The catalogue's category of each SKU, for an entry written for a category.
+        self._categories = dict(categories or {})
         self._vectors = Vectors(embedder, documents, cache=cache) if embedder is not None else None
 
     @property
@@ -142,7 +152,8 @@ class KnowledgeBase:
 
     def extended(self, extra: Sequence[Chunk]) -> "KnowledgeBase":
         """This base with *extra* chunks added (entries saved at runtime), same model and cache."""
-        return KnowledgeBase([*self.chunks, *extra], settings=self.settings, embedder=self._embedder, cache=self._cache)
+        return KnowledgeBase([*self.chunks, *extra], settings=self.settings, embedder=self._embedder, cache=self._cache,
+                             categories=self._categories)
 
     def search(
         self,
@@ -152,13 +163,21 @@ class KnowledgeBase:
         on: str | None = None,
         order_date: str | None = None,
         situation: str | None = None,
+        other_order_dates: Sequence[str] = (),
+        about: Sequence[str] = (),
     ) -> Result:
         """The top *k* passages for *query* and whether to abstain.
 
         *on* is the call's day; *order_date*, when the question is about an
         order already placed, decides which version of a policy holds (CL-01:
-        an order placed before 01/10 keeps the old returns policy). A playbook
-        entry for *situation* is preferred over others (section 7.3).
+        an order placed before 01/10 keeps the old returns policy). Without
+        either day nothing is filtered. A playbook entry for *situation* is
+        preferred over others (section 7.3). *other_order_dates* are this
+        customer's other orders when the question names none: the answer may
+        differ between them, and the result says so. *about* is the SKUs this
+        call is on: an entry written for one of them is preferred, an entry
+        written for other products is left out. Without any, entries are
+        found by their words alone.
         """
         k = k or self.settings.top_k
         lexical = self._lexical.ranking(query)
@@ -172,79 +191,53 @@ class KnowledgeBase:
                          if self._by_id[doc_id].source == "playbook" and self._by_id[doc_id].situation == situation]
             if preferred:
                 rankings.append(preferred)
+        for_product = [(doc_id, s) for doc_id, s in lexical if self._for_product(self._by_id[doc_id], about)]
+        if for_product:
+            rankings.append(for_product)
         fused = fuse(rankings, k=self.settings.fusion_k) if self._vectors is not None or len(rankings) > 1 else lexical
         day = order_date or on
-        top = self._with_versions_in_force([doc_id for doc_id, _ in fused], day, k)
+        ranked = [doc_id for doc_id, _ in fused]
+        top = [doc_id for doc_id in ranked if self._by_id[doc_id].in_force(day) and self._fits(self._by_id[doc_id], about)][:k]
+        reached = ranked[:ranked.index(top[-1])] if top else ranked
+        withheld = tuple(doc_id for doc_id in reached if not self._by_id[doc_id].in_force(day))
         scores = dict(fused)
-        hits = tuple(self._hit(query, doc_id, scores.get(doc_id, 0.0), rank, cosines.get(doc_id), day)
+        hits = tuple(self._hit(query, doc_id, scores.get(doc_id, 0.0), rank, cosines.get(doc_id), about)
                      for rank, doc_id in enumerate(top, 1))
         top_score = (hits[0].cosine if self._vectors is not None else hits[0].coverage) if hits else None
         reason = self._abstain(hits, top_score)
-        changelog = {entry: self._by_id[entry] for hit in hits for entry in hit.chunk.changelog
-                     if entry in self._by_id}
-        return Result(query, hits, top_score, reason is not None, reason, changelog, self.mode)
+        cited = [*(hit.chunk for hit in hits), *(self._by_id[doc_id] for doc_id in withheld)]
+        changelog = {entry: self._by_id[entry] for chunk in cited for entry in chunk.changelog if entry in self._by_id}
+        explains = tuple(dict.fromkeys(entry for doc_id in withheld for entry in self._by_id[doc_id].changelog
+                                       if entry in changelog))
+        differs = tuple(other for other in other_order_dates if any(not hit.chunk.in_force(other) for hit in hits))
+        return Result(query, hits, top_score, reason is not None, reason, changelog, self.mode, withheld, explains,
+                      differs)
 
-    def _with_versions_in_force(self, ranked: Sequence[str], day: str | None, k: int) -> list[str]:
-        """The top *k*, with the version in force placed just before any version that is not.
+    def _for_product(self, chunk: Chunk, about: Sequence[str]) -> bool:
+        return bool(chunk.applies_to) and any(covers(chunk.applies_to, sku, self._categories.get(sku)) for sku in about)
 
-        A question worded on an old rule finds the old text first; the passage
-        that holds on *day* must come with it, ahead of it, or the old number
-        is the only one the model reads (CL-01). Nothing is dropped: the old
-        passage stays, marked ``superseded`` (section 7.2).
-        """
-        top: list[str] = []
-        for doc_id in ranked:
-            if len(top) >= k:
-                break
-            if doc_id in top:
-                continue
-            current = self.counterpart(self._by_id[doc_id], day)
-            if current is not None and current.chunk_id not in top:
-                top.append(current.chunk_id)
-            if len(top) < k:
-                top.append(doc_id)
-        return top
+    def _fits(self, chunk: Chunk, about: Sequence[str]) -> bool:
+        """Whether *chunk* may be read on this call: it is for no product in particular, or for one of *about*."""
+        return not about or not chunk.applies_to or self._for_product(chunk, about)
 
-    def counterpart(self, chunk: Chunk, day: str | None) -> Chunk | None:
-        """The version of *chunk* in force on *day*, when *chunk* is not: DT-01 for DT-OLD-01 after 01/10, and back.
-
-        Versions pair by the changelog entry that windows them and the number
-        of their section ("DT-OLD-03" and "DT-03").
-        """
-        if chunk.in_force(day) or not (chunk.valid_from or chunk.valid_to):
-            return None
-        number = chunk.chunk_id.rsplit("-", 1)[-1]
-        for other in self.chunks:
-            if (other is not chunk and other.chunk_id.rsplit("-", 1)[-1] == number
-                    and set(other.changelog) & set(chunk.changelog)
-                    and (other.valid_from or other.valid_to) and other.in_force(day)):
-                return other
-        return None
-
-    def _hit(self, query: str, doc_id: str, score: float, rank: int, cosine: float | None, day: str | None) -> Hit:
+    def _hit(self, query: str, doc_id: str, score: float, rank: int, cosine: float | None,
+             about: Sequence[str] = ()) -> Hit:
         chunk = self._by_id[doc_id]
         instruction = None
         if chunk.restricted:
             tool = THROUGH_TOOLS.get(doc_id)
             instruction = (REDIRECT.format(id=doc_id, title=chunk.title, tool=tool) if tool
                            else REFUSE.format(id=doc_id, title=chunk.title))
-        superseded = not chunk.in_force(day)
-        validity = None
-        if superseded and chunk.valid_to and day and day > chunk.valid_to:
-            validity = EXPIRED.format(day=_label(date.fromisoformat(chunk.valid_to) + timedelta(days=1)))
-        elif superseded and chunk.valid_from:
-            validity = NOT_YET.format(day=_label(date.fromisoformat(chunk.valid_from)))
         return Hit(
             chunk=chunk,
             rank=rank,
             score=round(score, 6),
             cosine=round(cosine, 4) if cosine is not None else None,
             coverage=round(self._lexical.overlap(query, chunk.indexed), 4),
-            superseded=superseded,
             absence=self.about_absence(query, chunk),
             instruction=instruction,
-            validity=validity,
             redirect=THROUGH_TOOLS.get(doc_id) if chunk.restricted else None,
+            for_product=self._for_product(chunk, about),
         )
 
     def about_absence(self, query: str, chunk: Chunk) -> bool:
@@ -287,5 +280,22 @@ class KnowledgeBase:
         return max(sentences, key=lambda s: self._lexical.overlap(query, s), default="")
 
 
-def _label(day: date) -> str:
-    return day.strftime("%d/%m/%Y")
+def stated_order_day(said: str, on: str | None) -> str | None:
+    """The day *said* says an order was placed, ``YYYY-MM-DD``; a month alone counts as its first day.
+
+    Without a year it is the year of *on*. A day after *on* was not an order placed, whatever the words
+    around it say: choosing the old policy on such a reading would be worse than choosing none.
+    """
+    for match in ORDER_DAY.finditer(plain(said)):
+        if NOT_PLACED.search(match["between"]):
+            continue
+        year = match["year"] or (on or "")[:4]
+        if not year:
+            continue
+        try:
+            day = date(int(year), int(match["month"]), int(match["day"] or 1)).isoformat()
+        except ValueError:
+            continue
+        if on is None or day <= on:
+            return day
+    return None

@@ -254,7 +254,23 @@ class _Planner:
     ORDER_POOLS = ("open_order", "delivered_appliance", "expired_warranty", "delivered_fashion", "owns_filter_device")
 
     def _customer(self, variant: Variant, region: str, n: int) -> tuple[Customer, CustomerOrder | None]:
-        """The scenario's customer and, for an order pool, the order the scenario is about."""
+        """The scenario's customer and, for an order pool, the order the scenario is about.
+
+        A variant whose first call has a fixed day (``ba_kenh_lech_gia`` on 05/10) cannot take a customer with CRM
+        history after that day: a session or an order dated after the call is history from the future, which the
+        evaluation refuses to seed. Such a pick alone is replaced, by a customer of the same region whose history all
+        happened by then, on a rotation of its own, so every other scenario keeps its customer. The replaced pick
+        still counts as an appearance of the customer first picked (``counted_as``): the days of that customer's later
+        scenarios, and of the replacement's, stay what they were."""
+        customer, order = self._pick_customer(variant, region, n)
+        self.counted_as = customer.customer_id
+        first_day = date.fromisoformat(variant.calls[0].call_date) if variant.calls[0].call_date else None
+        if first_day is None or _history_by(customer, first_day) or variant.customer_pool in self.by_id:
+            return customer, order
+        dated = [c for c in self.src.customers if c.customer_id not in RESERVED_CUSTOMERS and _history_by(c, first_day)]
+        return self._next(f"dated:{first_day.isoformat()}", [c for c in dated if c.region == customer.region] or dated), None
+
+    def _pick_customer(self, variant: Variant, region: str, n: int) -> tuple[Customer, CustomerOrder | None]:
         pool_name = variant.customer_pool
         free = [c for c in self.src.customers if c.customer_id not in RESERVED_CUSTOMERS]
         if pool_name in self.by_id:
@@ -433,8 +449,11 @@ class _Planner:
             variant = variants[self.counters.get(f"variant:{persona_id}", 0) % len(variants)]
             self._bump(f"variant:{persona_id}")
             customer, order = self._customer(variant, REGIONS[n % len(REGIONS)], n)
-        session_index = self.occurrences.get(customer.customer_id, 0) + 1
-        self.occurrences[customer.customer_id] = session_index
+        # A replaced pick (``_customer``) counts as an appearance of the customer first picked, not of the replacement.
+        counted = getattr(self, "counted_as", None) or customer.customer_id
+        self.counted_as = None
+        self.occurrences[counted] = self.occurrences.get(counted, 0) + 1
+        session_index = self.occurrences.get(customer.customer_id, 0) + (counted != customer.customer_id)
         first = variant.calls[0]
         day1 = (date.fromisoformat(first.call_date) if first.call_date
                 else self.reference + timedelta(days=n % 3 + 14 * (session_index - 1)))
@@ -1333,6 +1352,11 @@ class _KeepMissing(dict):
 
 def _filter_for(parent_sku: str) -> str | None:
     return next((sku for prefix, sku in FILTER_FOR.items() if parent_sku.startswith(prefix)), None)
+
+
+def _history_by(customer: Customer, day: date) -> bool:
+    """Whether every session and order of *customer*'s CRM history is dated on or before *day*."""
+    return all(item.date <= day for item in [*customer.sessions, *customer.orders])
 
 
 def _anonymous_customer(k: int, region: str, known: dict[str, Customer]) -> Customer:

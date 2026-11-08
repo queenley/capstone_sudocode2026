@@ -9,6 +9,11 @@ organisers' ``reference_eval.py`` (``report.grade``) over them::
 
     python run_eval.py --relabel evaluation/runs/20261024-work/development-r2-v4-M2 --out <dir>
 
+``--config full`` labels and grades one configuration alone: a figure for that configuration, with no baseline
+column. It is also the one way to grade a run that stopped without recording why (the process died after its
+traces were written): the chosen configuration must still hold every planned turn once, with no failed turn
+or after-call, so what is graded is a whole run of that configuration, never a part.
+
 A run directory holds ``evidence/full.jsonl`` and ``evidence/baseline.jsonl``
 (or ``full.jsonl`` and ``baseline.jsonl`` at its top, as this command writes)
 and the scenarios it ran (``inputs/scenarios/`` or ``scenarios/``). Nothing in
@@ -62,8 +67,12 @@ def unlabelled(path: Path) -> list[dict[str, Any]]:
     return sorted(rows, key=lambda r: (r["scenario_id"], r["call"], r["turn"]))
 
 
-def source_errors(run: Path, traces: dict[str, Path], rows: dict[str, list[dict]]) -> list[str]:
-    """Relabelling repairs extraction, never missing replies or failed execution."""
+def source_errors(run: Path, traces: dict[str, Path], rows: dict[str, list[dict]], *, chosen: bool = False) -> list[str]:
+    """Relabelling repairs extraction, never missing replies or failed execution.
+
+    *chosen*: the configurations in *traces* were asked for by name. The others of the run are not needed, and a
+    run that stopped with no failure recorded is judged by its traces (:func:`report.trace_errors`) instead.
+    """
     errors = [f"{config}: empty trace" for config, items in rows.items() if not items]
     fatal = set(report.BLOCKING) - {"unlabelled_turns"}
     sources = {(run, ""), (run / "evidence", "")}
@@ -73,13 +82,14 @@ def source_errors(run: Path, traces: dict[str, Path], rows: dict[str, list[dict]
         if path.is_file():
             manifest = json.loads(path.read_text(encoding="utf-8"))
             failure = manifest.get("failure") or {}
-            if (failure and failure.get("stage") != "scoring") or (
-                    manifest.get("status") == "INCOMPLETE" and "problems" not in manifest
-                    and failure.get("stage") != "scoring"):
+            stopped_silently = (manifest.get("status") == "INCOMPLETE" and "problems" not in manifest and not failure)
+            if (failure and failure.get("stage") != "scoring") or (stopped_silently and not chosen):
                 errors.append("Source has an unresolved execution failure")
             for config, counts in manifest.get("problems", {}).items():
-                errors += [f"{config}: source {key}" for key in fatal if counts.get(key)]
-            errors += [f"{config}: missing source trace" for config in manifest.get("configs", {}) if config not in traces]
+                if config in traces:
+                    errors += [f"{config}: source {key}" for key in fatal if counts.get(key)]
+            if not chosen:
+                errors += [f"{config}: missing source trace" for config in manifest.get("configs", {}) if config not in traces]
         for name in ("diagnostics.jsonl", "scenario-errors.jsonl"):
             path = parent / f"{prefix}{name}"
             if not path.is_file():
@@ -93,17 +103,25 @@ def source_errors(run: Path, traces: dict[str, Path], rows: dict[str, list[dict]
     return errors
 
 
-async def relabel(run: Path, out: Path, extractor: Any) -> int:
-    """Label *run* again into *out* and grade it: 0 when every turn was labelled, 1 when one was not, 2 on bad input."""
+async def relabel(run: Path, out: Path, extractor: Any, configs: tuple[str, ...] | None = None) -> int:
+    """Label *run* again into *out* and grade it: 0 when every turn was labelled, 1 when one was not, 2 on bad input.
+
+    *configs*: only these configurations of the run (the module's docstring says what that allows).
+    """
     from .cli import Layout, _write_json, prepare_output
 
     try:
         traces, scenarios_dir = locate(run)
+        if configs:
+            missing = [config for config in configs if config not in traces]
+            if missing:
+                raise ValueError(f"{run} has no trace for {', '.join(missing)}")
+            traces = {config: path for config, path in traces.items() if config in configs}
         if out.resolve().is_relative_to(run.resolve()) or run.resolve().is_relative_to(out.resolve()):
             raise ValueError("Relabel output must be separate from the source run")
         prepared = {config: unlabelled(path) for config, path in traces.items()}
         cohort, rejected = scenarios.load(scenarios_dir)
-        failures = source_errors(run, traces, prepared)
+        failures = source_errors(run, traces, prepared, chosen=bool(configs))
         for config, rows in prepared.items():
             failures += report.trace_errors(scenarios_dir, rows, config)
         prepare_output(Layout(out, {}))
@@ -114,11 +132,13 @@ async def relabel(run: Path, out: Path, extractor: Any) -> int:
         _write_json(out / "relabel.json", {"source": str(run), "status": "INCOMPLETE", "source_errors": failures})
         print("Not scored: " + "; ".join(failures) + ". Relabelling cannot repair execution; no extractor calls.")
         return 1
-    record = {"source": str(run), "scenarios": str(scenarios_dir), "status": "INCOMPLETE"}
+    record = {"source": str(run), "scenarios": str(scenarios_dir), "status": "INCOMPLETE", "configs": list(traces)}
+    if configs:
+        record["note"] = "Chỉ chấm " + ", ".join(traces) + "; không có cột so sánh với cấu hình còn lại."
     _write_json(out / "relabel.json", record)
     try:
         frozen = report.freeze(cohort, rejected, out / "scenarios")
-        return await _label_and_grade(prepared, traces, frozen, out, extractor, record)
+        return await _label_and_grade(prepared, traces, frozen, out, extractor, record, cohort)
     except Exception as error:
         (out / "evaluation-error.log").write_text(traceback.format_exc(), encoding="utf-8")
         record.update(status="INCOMPLETE", failure={"type": type(error).__name__})
@@ -127,7 +147,7 @@ async def relabel(run: Path, out: Path, extractor: Any) -> int:
         return 1
 
 
-async def _label_and_grade(prepared, traces, scenarios_dir, out, extractor, record) -> int:
+async def _label_and_grade(prepared, traces, scenarios_dir, out, extractor, record, cohort=None) -> int:
     from .cli import ConfigRun, _label, _write_json
 
     found, diagnostics, written = {}, [], {}
@@ -135,7 +155,7 @@ async def _label_and_grade(prepared, traces, scenarios_dir, out, extractor, reco
         rows = prepared[config]
         done = ConfigRun(rows=rows, diagnostics=[{k: r[k] for k in ("config", "scenario_id", "call", "turn")} for r in rows])
         print(f"{config}: labelling {len(rows)} turns of {path}")
-        await _label(done, extractor)
+        await _label(done, extractor, cohort)
         invalid = sum(1 for row in rows if trace.schema_errors(row))
         found[config] = report.problems(rows, done.diagnostics, schema_errors=invalid, rejected=0, scenario_errors=0)
         written[config] = out / ("full.jsonl" if config == "full" else "baseline.jsonl")

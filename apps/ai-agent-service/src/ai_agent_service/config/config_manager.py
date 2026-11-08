@@ -540,8 +540,10 @@ def get_models_config() -> ModelsConfig:
 
 @lru_cache(maxsize=1)
 def get_knowledge_config() -> KnowledgeConfig:
-    """Parse ``config/knowledge.yaml``, validating its shape."""
-    return KnowledgeConfig.model_validate(_load_yaml(KNOWLEDGE_YAML))
+    """Parse ``config/knowledge.yaml``, validating its shape; ``KNOWLEDGE_VERSION`` picks another version for one process."""
+    config = KnowledgeConfig.model_validate(_load_yaml(KNOWLEDGE_YAML))
+    version = os.environ.get("KNOWLEDGE_VERSION")
+    return config.model_copy(update={"version": int(version)}) if version else config
 
 
 @lru_cache(maxsize=1)

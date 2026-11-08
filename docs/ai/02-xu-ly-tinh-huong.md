@@ -103,7 +103,7 @@ Lane `ORDER_SERVICE` khi khách có đơn và câu nói khớp regex về đơn 
 | Hỏi đơn đang ở đâu | `order_status`. Khách đã xác minh không nói mã đơn thì tự tra; một đơn chưa giao thì dùng luôn, nhiều đơn thì đọc danh sách cho chọn. **Không xin khách đọc mã đơn** (quy tắc 20) |
 | Đổi size / đổi sản phẩm | `order_update` với `exchange_size` / `exchange_product`; nói đúng số tiền hoàn hoặc phụ thu tool trả |
 | Đổi địa chỉ | `order_update update_address`; địa chỉ thật được harness điền lại từ vault (model chỉ thấy `<ADDR_1>`) |
-| Hỏi theo chính sách cũ | chính sách được chọn theo **ngày đặt đơn** (CL-01): đơn đặt trước 01/10 theo bản cũ (7 ngày), đơn mới theo bản hiện hành. Đoạn hết hiệu lực được đánh dấu ngày, model được dặn không nhắc con số cũ |
+| Hỏi theo chính sách cũ | chính sách được chọn theo **ngày đặt đơn** (CL-01): đơn đặt trước 01/10 theo bản cũ (14 ngày), đơn mới theo bản hiện hành (7 ngày). Đoạn không áp dụng bị lọc khỏi kết quả nên model không đọc con số cũ; mục changelog đi kèm để giải thích khi khách nhắc mức cũ. Khách có đơn ở cả hai bản mà chưa nói đơn nào thì agent hỏi trước khi nêu con số |
 | Đơn trên website | khách đăng nhập có `account_orders`, `account_cart` (mã dạng `#ABCD1234`); đơn qua hotline/Zalo vẫn tra bằng `order_status` |
 | Mã đơn với khách chưa xác minh | hard guard chặn đọc mã `OD...` dưới `VERIFIED` |
 

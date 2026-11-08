@@ -44,11 +44,9 @@ Chỉ một runner dùng database `_eval` tại một thời điểm; runner res
 
 ## Chạy lại một scenario sau khi xử lý hạ tầng
 
-Đây là lệnh **có thể tốn phí model**, chỉ dùng sau khi đã lấy bản sửa và xác nhận DB/MCP hoạt động. Giữ ledger ngân sách đang dùng, không tạo lại để vượt cap. Dùng đúng thư mục scenario trên máy đó như lệnh trong ảnh; không đổi nhãn.
+Đây là lệnh **có thể tốn phí model**, chỉ dùng sau khi đã lấy bản sửa và xác nhận DB/MCP hoạt động. Ledger ngân sách là tùy chọn: không đặt `EVAL_BUDGET_DB` thì không có trần chi tiêu; nếu dùng thì giữ sổ đang dùng, không tạo lại để vượt cap. Dùng đúng thư mục scenario trên máy đó như lệnh trong ảnh; không đổi nhãn.
 
 ```powershell
-$env:EVAL_BUDGET_DB = "evaluation/runs/20261024-work/budget.sqlite"
-if (-not (Test-Path $env:EVAL_BUDGET_DB)) { throw "Không tìm thấy ledger hiện có; không tạo ledger mới để chạy tiếp." }
 & .\apps\ai-agent-service\.venv\Scripts\python.exe run_eval.py --scenarios data/seed-dev/scenarios --only SCN-GEN-0001 --warmup 0 --out evaluation/runs/seed-dev-smoke-fixed-new
 $LASTEXITCODE
 ```

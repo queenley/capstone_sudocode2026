@@ -1,0 +1,179 @@
+{
+  "conversation_id": "SCN-GEN-0041__call_2",
+  "scenario_id": "SCN-GEN-0041",
+  "call": "call_2",
+  "customer_id": "C043",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-11-08",
+  "region": "trung",
+  "category": "thoi-trang/ao-khoac",
+  "persona": "khach_hoi_nhieu_khong_mua",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Tiến ạ, hôm trước anh có quan tâm Áo khoác gió Windbreak size L màu navy và muốn so sánh thêm. Anh muốn mình tiếp tục tư vấn gì thêm không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Anh muốn so sánh thêm đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "size",
+        "color",
+        "product_advised",
+        "variant_sku",
+        "price_quoted_vnd",
+        "blocker"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 690000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chào em, anh đã xem thêm nhưng vẫn thấy chưa thích lắm.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em cảm ơn anh đã xem thêm thông tin ạ. Anh có muốn em giới thiệu thêm mẫu áo khoác gió nào khác không ạ?",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "open",
+          "text": "Anh có muốn em giới thiệu thêm mẫu áo khoác gió nào khác không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Màu navy này có mẫu nào khác không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại bên em chỉ còn mẫu Windbreak size L màu navy thôi ạ, các mẫu khác màu navy đã hết hàng rồi anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá này thì hơi cao so với dự kiến của anh.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ, giá áo khoác gió Windbreak hiện là 690.000đ anh nhé. Sản phẩm này là hàng chính hãng, bảo hành đầy đủ và có thể đổi trả trong 7 ngày nếu chưa sử dụng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thôi anh không mua nữa đâu, cảm ơn em nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh Tiến đã quan tâm sản phẩm bên em ạ. Nếu sau này anh cần hỗ trợ thêm, anh cứ liên hệ lại shop nhé, em luôn sẵn sàng hỗ trợ anh.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "product_advised",
+          "value": "SKU-JK-WND",
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 690000,
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-JK-WND-L-NAVY",
+          "op": "set",
+          "source": "call_2#turn0"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tu_choi",
+    "outcome": "tu_choi",
+    "objection_type": "gia_cao",
+    "objection_handling": "Nhấn mạnh giá trị sản phẩm, chính hãng, bảo hành và đổi trả.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

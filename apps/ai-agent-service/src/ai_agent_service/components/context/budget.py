@@ -1,17 +1,11 @@
-"""The advisor's context, in priority order, cut from the bottom. ``docs/design.md`` section 4.4.
+"""The advisor's context, in priority order. ``docs/design.md`` section 4.4.
 
-1. hard rules and tone (never cut);
-2. ``stale_warnings`` (never cut);
-3. the lane's instruction;
-4. the brief lines;
-5. ``working_summary`` (the last four turns travel as messages);
-6. the turn's knowledge passages, retrieved by ``load_context``;
-7. the playbook entries of the situation;
-8. tool results already gathered, when a draft is regenerated;
-9. why the previous draft was blocked.
+Only the playbook is optional. Everything else is what the rules tell the model to rely on: rule 3 answers from the
+knowledge passages, an order uses a code from the products block, and with those cut the model answers from nothing.
+They were cut, and silently, while the rules alone filled the budget. The target is therefore soft, and what a turn
+loses is reported (``ContextPack.cut``, the run's diagnostics).
 
 Tokens use a four-character estimate, not the provider's billed count.
-The target is soft: required evidence survives; optional text uses the remainder.
 """
 
 from __future__ import annotations
@@ -19,7 +13,8 @@ from __future__ import annotations
 from typing import NamedTuple, Sequence
 
 #: Sections that are never cut, whatever the allowance.
-PROTECTED = frozenset({"rules", "skills", "today", "knowledge", "products", "earlier", "basket", "orders", "warnings", "lane", "brief", "tool_results", "opening", "blocked"})
+PROTECTED = frozenset({"rules", "skills", "today", "knowledge", "products", "earlier", "basket", "orders", "warnings", "lane", "brief",
+                       "tool_results", "opening", "blocked", "packs", "summary", "call_state"})
 
 
 class Section(NamedTuple):

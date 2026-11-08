@@ -119,7 +119,8 @@ test("skip link, mobile menu, chat focus, Escape and IME are keyboard usable", a
   await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0);
   await expect(trigger).toBeFocused();
-  const otherTrigger = page.getByRole("button", { name: "Chat với trợ lý AI", exact: true });
+  // The main action reads the same in the bar, the hero and the close (taste-skill, copy.md rule 5): the hero's.
+  const otherTrigger = page.locator(".hero").getByRole("button", { name: "Chat với trợ lý AI", exact: true });
   await otherTrigger.click();
   await page.getByRole("button", { name: "Đóng", exact: true }).click();
   await expect(otherTrigger).toBeFocused();

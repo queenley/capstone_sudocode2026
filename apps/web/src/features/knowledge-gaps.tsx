@@ -7,14 +7,23 @@ type Gap = {
   question: string;
   status: string;
   knowledge_version?: number;
+  faq_id?: string;
   occurrences: { call_id: string; turn_id: string }[];
 };
 
-export default function KnowledgeGaps({ token }: { token: string }) {
+export default function KnowledgeGaps({
+  token,
+  onFaqCreated,
+}: {
+  token: string;
+  /** Given where an admin works: answers can then become FAQ drafts. */
+  onFaqCreated?: () => void;
+}) {
   const [gaps, setGaps] = useState<Gap[]>([]);
   const [selected, setSelected] = useState("");
   const [answer, setAnswer] = useState("");
   const [sources, setSources] = useState("");
+  const [reason, setReason] = useState("");
   const [approved, setApproved] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -26,6 +35,7 @@ export default function KnowledgeGaps({ token }: { token: string }) {
     setSelected("");
     setAnswer("");
     setSources("");
+    setReason("");
     setApproved(false);
     setMessage("");
     setGaps([]);
@@ -60,18 +70,23 @@ export default function KnowledgeGaps({ token }: { token: string }) {
       {gaps.map((gap) => (
         <div key={gap.id}>
           <button
-            disabled={busy || gap.status === "resolved"}
+            disabled={busy || gap.status !== "open"}
             onClick={() => {
               setSelected(gap.id);
               setAnswer("");
               setSources("");
+              setReason("");
               setApproved(false);
             }}
           >
             {gap.question} · {gap.occurrences.length} lượt ·{" "}
             {gap.status === "resolved"
               ? `Đã xử lý, phiên bản ${gap.knowledge_version}`
-              : "Chờ duyệt"}
+              : gap.status === "dismissed"
+                ? "Đã bỏ qua"
+                : gap.status === "faq"
+                  ? `Đã chuyển thành FAQ ${gap.faq_id}`
+                  : "Chờ duyệt"}
           </button>
         </div>
       ))}
@@ -151,7 +166,100 @@ export default function KnowledgeGaps({ token }: { token: string }) {
             />
             Tôi đã đối chiếu nguồn và duyệt câu trả lời này
           </label>
-          <button disabled={busy || !approved}>Duyệt và lưu phiên bản</button>
+          <div className="faq-actions">
+            <button disabled={busy || !approved}>Duyệt và lưu phiên bản</button>
+            {onFaqCreated && (
+              <button
+                type="button"
+                disabled={busy || answer.trim().length < 3}
+                onClick={async () => {
+                  setBusy(true);
+                  setMessage("");
+                  try {
+                    const entry = await api<{ chunk_id: string }>(
+                      `/api/developer/knowledge-gaps/${selected}/faq`,
+                      token,
+                      {
+                        answer,
+                        cites: sources
+                          .split(",")
+                          .map((value) => value.trim())
+                          .filter(Boolean),
+                      },
+                    );
+                    if (currentToken.current !== token) return;
+                    setGaps((rows) =>
+                      rows.map((row) =>
+                        row.id === selected
+                          ? { ...row, status: "faq", faq_id: entry.chunk_id }
+                          : row,
+                      ),
+                    );
+                    setSelected("");
+                    setMessage(
+                      "Đã tạo FAQ nháp. Vào phần FAQ theo đợt để duyệt và bật.",
+                    );
+                    onFaqCreated();
+                  } catch (e) {
+                    if (currentToken.current === token)
+                      setMessage(
+                        e instanceof Error ? e.message : "Không tạo được FAQ",
+                      );
+                  } finally {
+                    if (currentToken.current === token) setBusy(false);
+                  }
+                }}
+              >
+                Chuyển thành FAQ nháp
+              </button>
+            )}
+          </div>
+          <label>
+            Lý do bỏ qua, nếu câu hỏi không cần trả lời
+            <input
+              minLength={3}
+              maxLength={500}
+              value={reason}
+              disabled={busy}
+              onChange={(e) => setReason(e.target.value)}
+            />
+          </label>
+          <div className="faq-actions">
+            <button
+              type="button"
+              disabled={busy || reason.trim().length < 3}
+              onClick={async () => {
+                setBusy(true);
+                setMessage("");
+                try {
+                  await api(
+                    `/api/developer/knowledge-gaps/${selected}/dismiss`,
+                    token,
+                    { reason },
+                  );
+                  if (currentToken.current !== token) return;
+                  setGaps((rows) =>
+                    rows.map((row) =>
+                      row.id === selected
+                        ? { ...row, status: "dismissed" }
+                        : row,
+                    ),
+                  );
+                  setSelected("");
+                  setMessage("Đã bỏ qua câu hỏi.");
+                } catch (e) {
+                  if (currentToken.current === token)
+                    setMessage(
+                      e instanceof Error ? e.message : "Không bỏ qua được",
+                    );
+                } finally {
+                  if (currentToken.current === token) setBusy(false);
+                }
+              }}
+            >
+              Bỏ qua câu hỏi
+            </button>
+          </div>
         </form>
       )}
     </section>

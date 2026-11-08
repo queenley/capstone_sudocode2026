@@ -1,7 +1,7 @@
 """Opt-in, process-shared evaluation spend cap; no prompts or secrets in the ledger.
 
-Create the ledger once with initialize(), then set EVAL_BUDGET_DB in every
-evaluation child. Reserve a whole model context before a request; reconcile
+Optional: without EVAL_BUDGET_DB a run has no spending cap. To cap one, create the
+ledger once with initialize(), then set EVAL_BUDGET_DB in every evaluation child. Reserve a whole model context before a request; reconcile
 only when usage is known. Failed/unknown requests keep their reservation.
 """
 from __future__ import annotations
@@ -55,11 +55,12 @@ def _ledger_totals(db: sqlite3.Connection) -> tuple[int, int]:
     return limits[0][0], spent
 
 
-def validate_ledger() -> None:
-    """Preflight an existing ledger without creating or changing it."""
+def validate_ledger() -> bool:
+    """Preflight the ledger EVAL_BUDGET_DB names, without creating or changing it: True when one caps the run,
+    False when none is set (no cap). A ledger that is named but missing, broken or spent is refused."""
     path = os.environ.get("EVAL_BUDGET_DB")
     if not path:
-        raise RuntimeError("EVAL_BUDGET_DB is required for model-backed evaluation")
+        return False
     try:
         with sqlite3.connect(Path(path).resolve().as_uri() + "?mode=ro", uri=True, timeout=30) as db:
             limit, spent = _ledger_totals(db)
@@ -67,6 +68,7 @@ def validate_ledger() -> None:
         raise RuntimeError("Evaluation budget ledger must exist and have a valid schema") from error
     if spent >= limit:
         raise RuntimeError("Evaluation budget exhausted; paid request blocked before dispatch")
+    return True
 
 
 def reserve(agent: str, dollars: float) -> str | None:

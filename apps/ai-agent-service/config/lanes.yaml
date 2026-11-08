@@ -20,7 +20,7 @@
 lanes:
   CLARIFY: []
   CONFIRM_IDENTITY: []
-  CONTINUITY: &business
+  NEW: &business
     - load_skill
     - account_cart
     - account_orders
@@ -39,4 +39,22 @@ lanes:
     - schedule_callback
     - handoff_transfer
     - memory_request_deletion
-  NEW: *business
+  # Only here: the rule that picks this lane has identified the customer.
+  CONTINUITY:
+    - load_skill
+    - account_cart
+    - account_orders
+    - account_profile
+    - catalog_search
+    - inventory_check
+    - pricing_get_quote
+    - delivery_estimate
+    - order_create
+    - order_status
+    - crm_get_customer
+    - order_update
+    - schedule_callback
+    - handoff_transfer
+    - memory_request_deletion
+    - memory_get_episodes
+    - memory_search_calls

@@ -17,11 +17,26 @@ knowledge server builds its index with it, and so does the evaluation's
 
 from __future__ import annotations
 
-from typing import Sequence
+import json
+from typing import Any, Sequence
 
 from ...config.config_manager import btc_data_dir, embedding_dir, get_knowledge_config, kb_dir
 from . import corpus, semantic
 from .search import KnowledgeBase, Settings
+
+
+def promotions() -> list[dict[str, Any]]:
+    """The organisers' promotions: what a campaign's entry takes its days and products from."""
+    data = json.loads((btc_data_dir() / "catalog" / "promotions.json").read_text(encoding="utf-8"))
+    return data if isinstance(data, list) else data["promotions"]
+
+
+def _categories() -> dict[str, str]:
+    """Each SKU's category, its variants' too."""
+    data = json.loads((btc_data_dir() / "catalog" / "products.json").read_text(encoding="utf-8"))
+    products = data if isinstance(data, list) else data["products"]
+    return {sku: product["category"] for product in products
+            for sku in (product["sku"], *(variant["variant_sku"] for variant in product.get("variants") or ()))}
 
 
 def build(entries: Sequence[corpus.Chunk] | None = None, *, embed: bool = True) -> KnowledgeBase:
@@ -34,7 +49,7 @@ def build(entries: Sequence[corpus.Chunk] | None = None, *, embed: bool = True) 
     """
     config = get_knowledge_config()
     team = list(entries) if entries is not None else corpus.load_version(kb_dir(), config.version)
-    chunks = corpus.policy_chunks(btc_data_dir() / "policy") + team
+    chunks = corpus.policy_chunks(btc_data_dir() / "policy") + corpus.with_campaigns(team, promotions())
     r = config.retrieval
     settings = Settings(top_k=r.top_k, fusion_k=r.fusion_k, k1=r.k1, b=r.b, accents=r.accents,
                         abstain_cosine=r.abstain_cosine, abstain_coverage=r.abstain_coverage)
@@ -44,4 +59,4 @@ def build(entries: Sequence[corpus.Chunk] | None = None, *, embed: bool = True) 
         embedder = semantic.ensure(config.embedding.repo, directory, model_file=config.embedding.model_file,
                                    threads=config.embedding.threads)
         cache = directory / "vectors.npz"
-    return KnowledgeBase(chunks, settings=settings, embedder=embedder, cache=cache)
+    return KnowledgeBase(chunks, settings=settings, embedder=embedder, cache=cache, categories=_categories())

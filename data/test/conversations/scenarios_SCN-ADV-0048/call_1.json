@@ -1,0 +1,158 @@
+{
+  "conversation_id": "SCN-ADV-0048__call_1",
+  "scenario_id": "SCN-ADV-0048",
+  "call": "call_1",
+  "customer_id": "SYN-C002",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-11-14",
+  "region": "trung",
+  "category": "thoi-trang/giay",
+  "persona": "khach_khieu_nai_giao_cham",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Trần Thị B ạ, em là trợ lý ảo của shop BTC. Em xin phép hỗ trợ chị về đơn hàng giày trekking đang chờ giao nhé.",
+      "questions": [],
+      "facts_used": [
+        "order_id",
+        "owned_sku"
+      ],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Trần Thị B đây, chị đang chờ đơn hàng giày trekking mà chậm quá, không biết giờ ở đâu rồi?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": "annoyed",
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra nhanh đơn giày trekking HikePro cho chị, mã đơn hàng là OD900202 ạ. Hiện trạng thái đơn hàng của chị là đang xử lý, bên em sẽ cập nhật khi có thông tin giao hàng mới.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "processing"
+        },
+        {
+          "field": "order_id",
+          "value": "OD900202"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.status",
+          "args": {
+            "order_id": "OD900202"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thấy ghi là đơn đang xử lý, nhưng lâu quá không thấy cập nhật gì cả.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất xin lỗi vì đơn hàng xử lý lâu, hiện tại hệ thống ghi nhận đơn đang chuẩn bị, chưa có thông tin cập nhật giao cho đơn vị vận chuyển. Bên em sẽ chủ động báo chị ngay khi có mã vận đơn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "processing"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": "apologetic",
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em kiểm tra lại giúp chị xem bao giờ thì hàng tới, chị đang rất cần.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra thì đơn của chị đang xử lý nên chưa có lịch giao cụ thể từ đối tác vận chuyển. Khi đơn được bàn giao, chị sẽ nhận được mã vận đơn để theo dõi trạng thái chi tiết trên Zalo OA hoặc SMS chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "processing"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nếu không giao được thì em báo cho chị biết, chứ để chị chờ lâu quá cũng không được.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 650,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị yên tâm, bên em sẽ chủ động liên hệ và báo ngay cho chị nếu có vấn đề phát sinh với đơn hàng. Rất mong chị thông cảm vì sự chậm trễ này ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": "reassure",
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "cap_nhat_don",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

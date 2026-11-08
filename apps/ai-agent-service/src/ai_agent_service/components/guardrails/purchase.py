@@ -27,6 +27,16 @@ YES = re.compile(
     r"(?:da )?(?:(?:vang|da|u|uh|co|dong y|xac nhan|ok|oke|dung roi)(?: a| nhe| nha)?|"
     r"(?:dong y |xac nhan )?(?:dat(?: hang| may| don)?|chot(?: don)?|len don|mua)"
     r"(?: cho (?:anh|chi|toi))?(?: di| a| nhe| nha)?)[.!]*")
+NO = re.compile(r"\b(?:khong (?:mua|dat|dong y)|huy|thoi|de sau)\b")
+#: A yes as people give it after the read-back ("Đúng rồi em, lên đơn giúp chị nhé"): a consent phrase, and beside it
+#: only address words and courtesy. Anything else left over ("đúng rồi nhưng đổi địa chỉ") keeps it from being a yes.
+CONSENT = re.compile(r"\b(?:dong y|xac nhan|dung(?: roi)?|chinh xac|vang|u|uh|um|ok|oke|"
+                     r"(?:len|lam|ghi) don|(?:dat|chot)(?: don| hang| may)?|mua)\b")
+#: "vậy", "làm (cho)", "luôn" are filler around a yes ("Ừ, vậy em lên đơn cho anh luôn đi", "Chị đồng ý lên đơn rồi, em
+#: làm cho chị nhé": eval2 SCN-GEN-0232, SCN-GEN-0240). A word that changes the order ("đổi", "nhưng", "thêm", a
+#: number) is not here, so "đúng rồi nhưng đổi địa chỉ" still is no yes.
+COURTESY = re.compile(r"\b(?:da|a|nhe|nha|nhen|em|anh|chi|co|chu|cau|bac|toi|minh|chau|con|oi|giup|gium|cho|luon|di|"
+                      r"voi|nhu vay|vay|lam|thong tin|la|du|roi|cam on|nay)\b")
 
 
 def now() -> float:
@@ -73,21 +83,59 @@ def _owner(context: Any) -> str:
     return hashlib.sha256(_json([context.customer_id, context.customer_phone]).encode()).hexdigest()
 
 
-def draft(args: Mapping[str, Any], context: Any, *, names: Mapping[str, str] | None = None,
-          quotes: Mapping[str, int] | None = None) -> dict[str, Any]:
-    """The order to read back, as it is said aloud: names and amounts, never a product code."""
+def missing(args: Mapping[str, Any], order: Mapping[str, Any], delivery: str | None) -> list[str]:
+    """What the order still lacks before it may be read back (PB-09), in the words the model is told.
+
+    Product and today's price are the action guard's (a trusted code, the current quote); the quantity reads back as
+    1 unless said. The payment must be one the model passed, from the customer or the brief: :func:`payload` would
+    write COD for a missing one, and a read-back the customer answers by naming the payment is a read-back wasted
+    (eval2: 116 of 153 read-backs were answered with a missing field, not a yes).
+    """
+    gaps = []
+    if not args.get("payment"):
+        gaps.append("phương thức thanh toán khách chọn (COD hay chuyển khoản)")
+    if not order.get("address"):
+        gaps.append("địa chỉ giao hàng (lời khách hoặc Call Brief)")
+    if not delivery:
+        gaps.append("ngày giao dự kiến (gọi delivery_estimate với địa chỉ giao)")
+    return gaps
+
+
+def estimated_delivery(results: Any) -> str | None:
+    """The day the latest successful ``delivery.estimate`` of the call gave, ``YYYY-MM-DD``."""
+    for result in reversed(list(results or ())):
+        envelope = result.get("result") if isinstance(result, Mapping) else None
+        if str(result.get("name", "")).replace("_", ".", 1) != "delivery.estimate" or not isinstance(envelope, Mapping):
+            continue
+        data = envelope.get("data") if "data" in envelope else envelope
+        if (envelope.get("ok", True) and isinstance(data, Mapping) and data.get("estimated_delivery")
+                and data.get("address_known", True)):
+            return str(data["estimated_delivery"])[:10]
+    return None
+
+
+def _day(value: str) -> str:
+    year, month, day = (int(part) for part in value.split("-"))
+    return f"{day}/{month}/{year}"
+
+
+def draft(args: Mapping[str, Any], context: Any, delivery: str | None = None, *,
+          names: Mapping[str, str] | None = None, quotes: Mapping[str, int] | None = None) -> dict[str, Any]:
+    """The order to read back, as it is said aloud: names and amounts, never a product code; with *delivery*,
+    the day :func:`estimated_delivery` found."""
     order = payload(args)
     known = {**{p.get("sku"): p.get("name") for p in context.seen_products if p.get("name")}, **(names or {})}
     address = context.vault.put("ADDR", order["address"]) if order["address"] else "chưa cung cấp địa chỉ"
     label = known.get(order["sku"]) or "đã chọn"
     promo = f", mã khuyến mãi: {order['promo_code']}" if order["promo_code"] else ""
     payment = {"COD": "trả tiền khi nhận hàng", "bank": "chuyển khoản"}.get(order["payment"], order["payment"])
+    arrives = f", giao dự kiến ngày {_day(delivery)}" if delivery else ""
     question = (f"Anh/chị xác nhận đặt {order['qty']} sản phẩm {label}, đơn giá {format_vnd(order['price_vnd'])}, "
                 f"tổng {format_vnd(order['price_vnd'] * order['qty'])}, thanh toán {payment}{promo}, "
-                f"địa chỉ giao hàng: {address}, đồng ý không ạ?")
+                f"địa chỉ giao hàng: {address}{arrives}, đồng ý không ạ?")
     read_back = (f"Dạ em đọc lại đơn: {order['qty']} sản phẩm {label}, đơn giá {format_vnd(order['price_vnd'])}, "
                  f"tổng {format_vnd(order['price_vnd'] * order['qty'])}, thanh toán {payment}{promo}, "
-                 f"địa chỉ giao hàng: {address}.")
+                 f"địa chỉ giao hàng: {address}{arrives}.")
     basket = [sku for sku in order.get("basket_skus") or [] if sku != order["sku"]]
     others = [known[sku] for sku in basket if known.get(sku)]
     if others:
@@ -119,7 +167,7 @@ def answer(pending: Mapping[str, Any] | None, *, call_id: str, channel: str, tur
     """The fallback when the PolicyAgent gave no answer: a short yes to a read-back the customer just heard, nothing else."""
     opened = still_open(pending, call_id=call_id, channel=channel, turn_id=turn_id)
     if (opened is None or not last_reply or not last_reply.endswith(opened.get("question") or "\0")
-            or not YES.fullmatch(plain(said).strip())):
+            or not agrees(said)):
         return None
     return authorize(opened, turn_id)
 
@@ -127,6 +175,14 @@ def answer(pending: Mapping[str, Any] | None, *, call_id: str, channel: str, tur
 def authorize(draft_record: Mapping[str, Any], turn_id: str | None) -> dict[str, Any]:
     """A draft the customer agreed to, in this turn."""
     return {**draft_record, "status": "authorized", "confirmed_turn_id": turn_id}
+
+
+def agrees(said: str) -> bool:
+    """Whether *said*, the whole of it, is a yes to the question just read out."""
+    if YES.fullmatch(plain(said).strip()):
+        return True
+    rest, found = CONSENT.subn(" ", " ".join(re.findall(r"[a-z0-9]+", plain(said))))
+    return bool(found) and not COURTESY.sub(" ", rest).strip()
 
 
 def matches(pending: Mapping[str, Any] | None, args: Mapping[str, Any], context: Any) -> bool:

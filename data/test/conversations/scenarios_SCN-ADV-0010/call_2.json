@@ -1,0 +1,171 @@
+{
+  "conversation_id": "SCN-ADV-0010__call_2",
+  "scenario_id": "SCN-ADV-0010",
+  "call": "call_2",
+  "customer_id": "C010",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-27",
+  "region": "nam",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_tra_hang_trong_han",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Đức ạ, em là trợ lý ảo của shop BTC. Anh vừa nhận máy lọc không khí AirPure Pro hôm trước, em hỗ trợ anh trả hàng ngay nhé.",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2",
+        "payment",
+        "delivery_area",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code",
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh vừa nhận hàng máy lọc không khí hôm trước.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận anh muốn trả hàng vì thấy máy to hơn mình nghĩ. Em sẽ tạo yêu cầu trả hàng cho anh, số tiền hoàn lại là 7.690.000 đồng và shop sẽ hoàn tiền trong 3-5 ngày làm việc sau khi nhận lại máy ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "refund_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD600001",
+            "action": "return",
+            "reason": "thấy to hơn mình nghĩ",
+            "on": "2026-10-27"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhưng mà anh thấy máy to hơn mình nghĩ, nên muốn trả hàng.",
+      "facts_stated": {
+        "return_reason": "thấy to hơn mình nghĩ"
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi anh, số tiền hoàn lại là 7.690.000 đồng. Sau khi shop nhận lại máy và kiểm tra, anh sẽ nhận được tiền hoàn trong 3-5 ngày làm việc theo chính sách ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "refund_vnd",
+          "value": 7690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh muốn hỏi là mình sẽ được hoàn bao nhiêu tiền và bao lâu thì nhận lại?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, anh sẽ được hoàn đúng 7.690.000 đồng vào tài khoản ngân hàng của mình. Thời gian hoàn là 3-5 ngày làm việc kể từ lúc shop nhận lại sản phẩm anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "refund_vnd",
+          "value": 7690000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có phải hoàn tiền trong 3-5 ngày làm việc không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi anh, shop sẽ hoàn tiền cho anh trong 3-5 ngày làm việc sau khi nhận lại hàng ạ. Nếu anh cần hỗ trợ thêm, anh cứ liên hệ lại bên em nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "tra_hang",
+    "outcome": "cap_nhat_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

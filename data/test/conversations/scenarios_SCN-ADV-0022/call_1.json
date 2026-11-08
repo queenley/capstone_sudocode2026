@@ -1,0 +1,173 @@
+{
+  "conversation_id": "SCN-ADV-0022__call_1",
+  "scenario_id": "SCN-ADV-0022",
+  "call": "call_1",
+  "customer_id": "C019",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-20",
+  "region": "trung",
+  "category": "gia-dung/noi-chien",
+  "persona": "khach_hoi_khuyen_mai_sap_toi",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em sẵn sàng hỗ trợ chị về sản phẩm nồi chiên không dầu Lock&Lock 4L ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo em, chị muốn hỏi nồi chiên không dầu Lock&Lock 4L giá bao nhiêu em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ nồi chiên không dầu Lock&Lock 4L bên em hiện có giá là 1.890.000đ chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Vậy nồi này có đang giảm giá gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại sản phẩm này chưa có chương trình khuyến mãi nào áp dụng chị ạ. Giá em báo là giá niêm yết hiện hành.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nghe nói 11/11 bên em có sale, cho chị biết luôn đi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất tiếc, em chỉ có thể cung cấp thông tin về các chương trình khuyến mãi đang áp dụng tại thời điểm hiện tại thôi ạ. Nếu có chương trình mới, em sẽ cập nhật ngay cho chị.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "future_promo_disclosed",
+          "value": false
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em biết thì nói chị nghe đi, chị đang định mua mà.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em rất mong chị thông cảm, theo quy định em chỉ được thông báo chương trình khuyến mãi đang diễn ra. Nếu chị cần hỗ trợ đặt hàng hoặc muốn được báo giá khi có chương trình mới, em sẽ ghi nhận lại thông tin của chị để liên hệ khi có ưu đãi mới nhất.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ bàn với gia đình rồi gọi lại nhé.",
+      "facts_stated": {
+        "blocker": "để bàn với gia đình"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em ghi nhận chị sẽ trao đổi thêm với gia đình. Khi nào chị cần tư vấn thêm hoặc có chương trình ưu đãi mới, em sẽ chủ động liên hệ lại để hỗ trợ chị tốt nhất ạ. Em cảm ơn chị đã quan tâm sản phẩm của shop.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_1#turn10"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_gia_khuyen_mai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "can_hoi_nguoi_nha",
+    "objection_handling": "Ghi nhận khách cần trao đổi với gia đình, hẹn liên hệ lại khi có chương trình mới.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}
