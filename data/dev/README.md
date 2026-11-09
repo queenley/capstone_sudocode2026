@@ -29,19 +29,22 @@ Các thư mục nhãn (`scenarios`, `metadata`, `asr_reference`, `tools`, `call_
 | 8 | `budget_vnd` bằng đúng số khách nói | 10 cuộc |
 | 9 | `promo_active: false` khi chỉ có freeship hoặc COD-0 | 130 cuộc |
 | 10 | Lời khách tự xưng khớp nhãn và CRM | 4 kịch bản |
-| 11 | Nhãn entity ASR: định dạng (màu, mã đơn, size, năm), theo nghĩa (`blocker`, `promo_expiry`, `phone`, nhãn tiền, `restock_date`), và `blocker` có từ gợi ý (11b) | 203 nhãn |
+| 11 | Nhãn entity ASR: định dạng (màu, mã đơn, size, năm), theo nghĩa (`blocker`, `promo_expiry`, `phone`, nhãn tiền, `restock_date`), và `blocker` có từ gợi ý (11b), `blocker` ở câu chỉ nói ngân sách (11c, người duyệt nêu) | 218 nhãn |
 | 12 | Tag `source:btc` / `source:team` trong `metadata/` | 404 kịch bản |
 | 14 | Khách nói đúng các fact mà nhãn ghi nhưng trước đó không nói ở đâu (diện tích, trẻ nhỏ, tuổi bé, ngân sách) | 144 cuộc |
 | 16 | Bỏ `freeship` khi không biết nơi giao | 2 cuộc |
 | 17 | Khách ẩn danh không đọc SĐT: cuộc sau chỉ giữ slot khách nói lại | 3 cuộc |
 | 18 | ADV-0045/c1: bỏ `owned_sku` (lịch sử CRM chỉ để tham khảo) | 1 cuộc |
+| 25 | GEN-0099/c1: câu "có một bé lớn" nói rõ "nhà không có trẻ nhỏ" (người duyệt nêu) | 1 cuộc |
 | 19–24 | Hành động kỳ vọng của agent: gọi lại khách hẹn, hoãn thì không tạo đơn, người chung SĐT, lịch gọi lại vào ngày nghỉ, xưng hô, kết quả gọi lại 22:00 ngày 11/11 (**chờ duyệt**) | 15 cuộc |
 
 Kiểm, không gọi model: 404/404 kịch bản nạp được bằng loader của `run_eval`; 0 lỗi theo `contracts/scenario/scenario-keys.yaml`; oracle qua `reference_eval.py` của BTC: CCR 100 · RQR 0 · TSR 100 · HR 0, 0 lỗi schema.
 
 Dựng lại từ gốc repo: `python evaluation/datasets/ground-truth-review/build_dev_r4.py`, rồi từ `evaluation/data-generation`: `python -m src.pipeline.build_ground_truth --root ../../data/dev` (viết lại `trace_log/` và báo cáo oracle trong `reports/`).
 
-**Audio chưa theo kịp nhãn:** các nhóm 1, 3, 10, 14, 21, 23 đổi hoặc thêm lời khách trong `scenarios/`, nhưng `audio/`, `asr_reference/` của những lượt đó và hội thoại mẫu (`conversations/`) vẫn là lời cũ. Sinh lại bằng `synthesize_scenario_audio --changed-only` khi người duyệt thấy nhãn đã ổn.
+**Hội thoại mẫu (`conversations/`) không phải ví dụ mẫu:** các ca J02 có câu bịa, ca agent mẫu không tạo đơn hoặc hỏi quá giới hạn, và mọi cuộc đã đổi lời khách được đánh dấu `approve: N` trong `review/needs_manual_review.csv` (`evaluation/datasets/ground-truth-review/mark_conversations.py`). Không dùng chúng làm few-shot hay dữ liệu vòng cải tiến. Bộ này chưa phải bộ vàng: `official_gt_approved: false`, chưa có `review/golden_manifest.json`. Kiểm tự động và đề xuất từng cuộc ở `review/auto_verified.json`, `review/review_sheet.csv` (`auto_verify.py`); người duyệt ký bằng `evaluation/datasets/ground-truth-review/approve_gold.py`.
+
+**Audio chưa theo kịp nhãn:** các nhóm 1, 3, 10, 14, 21, 23, 25 đổi hoặc thêm lời khách trong `scenarios/`, nhưng `audio/`, `asr_reference/` của những lượt đó và hội thoại mẫu (`conversations/`) vẫn là lời cũ. Sinh lại bằng `synthesize_scenario_audio --changed-only` khi người duyệt thấy nhãn đã ổn.
 
 ## Trong thư mục có gì
 

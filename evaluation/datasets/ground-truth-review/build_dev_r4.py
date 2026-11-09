@@ -662,6 +662,36 @@ BLOCKER_CUE = {
     "SCN-GEN-0173-call_2-t4": "vuot ngan sach",  # "anh cần giá tốt hơn để chốt đơn"
 }
 
+#: Group 11c (raised by the reviewer, 09/11/2026): "vuot ngan sach" on a line that only states the budget ("ngân sách
+#: của chị chỉ khoảng bốn triệu thôi"). The schema: null when the line gives no reason. Kept: SCN-ADV-0110-call_2-t4
+#: ("ngân sách eo hẹp quá nên cần trả góp"), a reason.
+BLOCKER_BUDGET_ONLY = """SCN-ADV-0012-call_2-t4 SCN-ADV-0025-call_1-t4 SCN-ADV-0038-call_1-t3 SCN-ADV-0073-call_2-t4
+SCN-ADV-0107-call_2-t4 SCN-ADV-0109-call_1-t4 SCN-ADV-0142-call_1-t4 SCN-GEN-0072-call_1-t3 SCN-GEN-0088-call_1-t4
+SCN-GEN-0099-call_2-t5 SCN-GEN-0103-call_1-t5 SCN-GEN-0125-call_1-t4 SCN-GEN-0137-call_1-t4 SCN-GEN-0222-call_1-t4
+SCN-GEN-0228-call_1-t3""".split()
+#: Group 25 (raised by the reviewer, 09/11/2026): "Chị có một bé lớn" with has_children false (no small child): the
+#: line says so plainly, the label stays.
+G25 = {ref("GEN-0099/c1"): ("Chị có một bé lớn, mà ngân sách", "Nhà chị không có trẻ nhỏ, bé nhà chị lớn rồi, mà ngân sách")}
+REVIEWER_RAISED = "Người duyệt nêu và yêu cầu sửa ngày 09/11/2026"
+
+#: Group 26 (the reviewer's decision, 09/11/2026): "Nhà anh có một phòng ngủ của con" with has_children false; the
+#: reviewer chose to change the label (the customer has a child), not the words.
+G26 = calls("ADV-0031/c1, ADV-0126/c1")
+
+
+def apply_g26(scenarios: dict, add) -> None:
+    """add(sid, call, field, source, proposed, evidence) records a change the reviewer decided."""
+    for sid, name in G26:
+        if sid not in scenarios:
+            continue
+        c = scenarios[sid]["calls"][name]
+        for key in ("facts_established", "memory_expectation"):
+            if (c.get(key) or {}).get("has_children") is False:
+                c[key]["has_children"] = True
+                add(sid, name, f"{key}.has_children", False, True, f"{REVIEWER_RAISED}, nhóm 26: khách nói \"Nhà anh có một "
+                    "phòng ngủ của con\"; người duyệt chọn đổi nhãn (khách có con) thay vì sửa lời.")
+
+
 # ── Group 10: what the customer calls themselves, to match the label "anh" ──────────────────────────────────────
 G10 = {"SCN-ADV-0021": "co", "SCN-ADV-0082": "co", "SCN-ADV-0116": "co", "SCN-ADV-0034": "chi"}
 
@@ -851,6 +881,17 @@ def main() -> int:
                         "evidence": evidence, "group": group, **status_action()})
 
     apply_actions(scenarios, OUT, add_action, "dev")
+    apply_g26(scenarios, lambda sid, name, field, source, proposed, evidence: record(sid, name, field, source, proposed,
+                                                                                     evidence, 26, True))
+    for (sid, name), (old_text, new_text) in G25.items():
+        c = call(sid, name)
+        i = next(k for k, turn in enumerate(c["customer_turns"]) if old_text in turn)
+        old = c["customer_turns"][i]
+        c["customer_turns"][i] = old.replace(old_text, new_text)
+        if c.get("customer_turns_asr"):
+            c["customer_turns_asr"][i] = plain(c["customer_turns"][i])
+        record(sid, name, f"customer_turns[{i}]", old, c["customer_turns"][i], f"{REVIEWER_RAISED}, nhóm 25: has_children: false "
+               "(nhà không có trẻ nhỏ) nhưng câu \"có một bé lớn\" dễ đọc thành có trẻ; nói rõ, nhãn giữ nguyên.", 25, True)
 
     def add_new(sid, name, field, source, proposed, evidence, group=14):
         changes.append({"scenario_id": sid, "call": name, "field": field, "source": source, "proposed": proposed,
@@ -961,6 +1002,9 @@ def relabel_asr() -> list[dict]:
                     change(d, field, None, "Tổng đơn hoặc giá đã mua: không có trường tương ứng (đề xuất của Claude).", False)
         if d["id"] in BLOCKER and "blocker" in e:
             change(d, "blocker", BLOCKER[d["id"]], "Đọc từng câu: câu không nêu rào cản này (đề xuất của Claude).", False)
+        if d["id"] in BLOCKER_BUDGET_ONLY and e.get("blocker") == "vuot ngan sach":
+            change(d, "blocker", None, f"{REVIEWER_RAISED}, nhóm 11c: câu chỉ nói ngân sách, không nói giá vượt ngân sách "
+                   "(schema: null khi câu không nêu lý do).", True)
         if d["id"] in BLOCKER_CUE and "blocker" in e:
             change(d, "blocker", BLOCKER_CUE[d["id"]], f"{NEW_SOURCE}, nhóm 11b: đọc câu có từ gợi ý; câu không nêu lý do "
                    "chưa mua, lý do đã xong, hoặc là chê giá chứ không so với nơi khác (đề xuất của Claude).", None)

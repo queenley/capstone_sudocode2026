@@ -67,6 +67,39 @@ Loại: dữ liệu · Trạng thái: xong · Chỉ số: không có (giao diệ
 - **Số đo:** 40/40 sản phẩm có ảnh.
 - **Còn lại:** vài ảnh chỉ gần đúng loại hàng (máy lọc nước nóng lạnh cho RO, bình sữa cho máy hâm và máy tiệt trùng). Cần chạy lại seed để ảnh vào database: `docker compose run --rm seed`.
 
+### 2026-11-09 · Tự động hoá phần kiểm trước bộ vàng; người duyệt ký bằng một lệnh
+
+Loại: evaluation · Trạng thái: xong (chờ người duyệt ký) · Chỉ số: không đổi
+
+- **Vấn đề:** người duyệt muốn hoàn tất bộ vàng tự động. Theo `SKILL.md`, nhãn chỉ thành vàng khi có người duyệt độc lập; Claude không tự duyệt nhãn mình sửa.
+- **Sửa:**
+  - Chạy lại `validate_rules` trên nhãn mới: dev 773/797 hội thoại mẫu qua, test 186/192.
+  - `auto_verify.py` kiểm mọi cuộc, không gọi model: khóa, pending, fact có căn cứ trong lời khách, lời đồng ý, outcome, dữ kiện so với mock BTC, gọi lại, validator, judge, đánh dấu N. Kết quả ghi vào `review/auto_verified.json` (`not_golden: true`) và `review/review_sheet.csv`, có đề xuất Y/N tách riêng cho nhãn (quyết định `official_gt_approved`) và cho hội thoại mẫu (quyết định `golden_manifest.json`); cột duyệt để trống.
+  - `approve_gold.py` cho người duyệt ký. `--accept-suggestions` nhận đề xuất nhưng manifest ghi `method` trung thực. Script không cho Y khi validator trượt.
+- **Đã kiểm:** dev có 785/801 cuộc nhãn qua, 411 hội thoại dùng được; test có 188/192 và 111. Chạy `approve_gold.py` trên bản sao tạm: không cờ thì từ chối; có cờ thì ghi manifest, `official_gt_approved` vẫn false vì còn nhãn N. Dữ liệu thật chưa ký.
+- **Bổ sung:** nhóm 26 do người duyệt quyết. ADV-0031/c1 (dev, test) và ADV-0126/c1 (dev) nói "Nhà anh có một phòng ngủ của con", nên đổi `has_children` false thành true; lời khách giữ nguyên. Regex `grounded` của `auto_verify.py` nhận thêm "của con". Sau khi dựng lại: dev 787/801 cuộc nhãn qua, test 189/192. Các cuộc còn N là nhóm 19–24 đang chờ duyệt và ADV-0024/0119 c2 (giá RUN-10 dùng một lần: nhãn đúng, bộ kiểm chặt).
+- **Còn lại:** người duyệt ký. Judge của 245 hội thoại cần chạy lại (gọi model) nếu muốn dùng chúng.
+
+### 2026-11-09 · Rà lại sau khi gộp: trạng thái pending, hội thoại mẫu lỗi, blocker chỉ nói ngân sách, GEN-0099
+
+Loại: dữ liệu · Trạng thái: xong (nhóm 19–24 vẫn chờ duyệt) · Chỉ số: entity_accuracy (ASR); hội thoại mẫu không vào chấm điểm
+
+- **Vấn đề:** người duyệt chỉ ra bốn điểm.
+  - `DISPUTES.md` ghi "không còn thay đổi nào ở trạng thái pending", trong khi `conversion-report.json` còn 21 (dev) và 2 (test). Câu này do Claude chèn sai khi thêm nhóm 19–24.
+  - Hội thoại mẫu lỗi (33 ca J02 có câu bịa, GEN-0133/c2, 4 ca hỏi quá `max_agent_questions`) chưa được đánh dấu là không dùng.
+  - Còn nhãn `vuot ngan sach` ở câu chỉ nói ngân sách.
+  - GEN-0099/c1 nói "có một bé lớn" mà `has_children: false`.
+- **Bằng chứng:**
+  - Đếm `decision` trong `conversion-report.json`.
+  - Đọc 29 nhãn `vuot ngan sach` của dev: 15 câu chỉ nói ngân sách, giữ ADV-0110 c2 t4 ("ngân sách eo hẹp quá nên cần trả góp"). Test không có câu loại này. Con số "khoảng 60" là trước khi nhóm 11 bỏ bớt.
+  - Quét `has_children: false` có nhắc tới con: chỉ GEN-0099 mơ hồ (GEN-0131 nói rõ "không có bé nhỏ").
+- **Sửa:**
+  - DISPUTES ghi đúng số đang chờ.
+  - Nhóm 11c (bỏ 15 nhãn) và 25 (GEN-0099 nói rõ "nhà không có trẻ nhỏ", nhãn giữ), ghi là người duyệt nêu.
+  - `mark_conversations.py` mới ghi `approve: N` kèm lý do vào `review/needs_manual_review.csv`, đúng cơ chế stage 8 của data-generation: người duyệt điền N thì hội thoại luôn bị loại. Đánh dấu dev 217 hội thoại (33 J02, 5 ca trên, 179 cuộc đã đổi lời khách), test 44. Script không ghi `Y` và không chạy `--ingest`, nên không tạo `golden_manifest.json`.
+- **Đã kiểm:** số `pending` khớp giữa report và DISPUTES (21, 2). 0 lỗi khóa; oracle CCR 100 · RQR 0 · TSR 100 · HR 0.
+- **Còn lại:** bộ vàng cần người duyệt độc lập (`official_gt_approved` vẫn false); nhóm 19–24 chờ duyệt; hội thoại mẫu và audio của các cuộc đổi lời cần sinh lại.
+
 ### 2026-11-09 · Một thư mục cho mỗi bộ: nhãn r4 vào thẳng data/dev, r1 vào data/test; ADV-0154 theo LN-02
 
 Loại: dữ liệu · Trạng thái: xong · Chỉ số: không đổi (cùng nhãn)

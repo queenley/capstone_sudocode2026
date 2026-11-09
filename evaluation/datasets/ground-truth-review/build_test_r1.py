@@ -322,6 +322,9 @@ def main() -> int:
                         "evidence": evidence, "group": group, **r4.status_action()})
 
     r4.apply_actions(scenarios, OUT, add_action, "test")
+    r4.apply_g26(scenarios, lambda sid, name, field, source, new, evidence: changes.append({
+        "scenario_id": sid, "call": name, "field": field, "source": source, "proposed": new, "evidence": evidence,
+        "group": 26, "rule_from": "dev-r4 nhóm 26", "reviewer": REVIEWER, "proposed_by": None, "decision": "revise"}))
 
     def add_new(sid, name, field, source, new, evidence, group=14):
         changes.append({"scenario_id": sid, "call": name, "field": field, "source": source, "proposed": new,

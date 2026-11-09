@@ -7,7 +7,7 @@
 - `decision: revise`, `proposed_by: claude`, `reviewed_on: 2026-11-09`: nhóm 14, 15, 17, 18, Claude đề xuất sau lần kiểm mâu thuẫn nhãn với lời khách; người duyệt chấp nhận cả bảng ngày 09/11/2026 (cờ `NEW_PROPOSALS_REVIEWED` trong `build_dev_r4.py`).
 - `decision: pending`, `proposed_by: claude`: nhóm 21, 22, Claude đề xuất ngày 09/11/2026 sau lần kiểm hành động kỳ vọng của agent (tool, tham số, kết quả) với lời khách và mock BTC, chưa ai duyệt (cờ `ACTION_PROPOSALS_REVIEWED` trong `build_dev_r4.py`).
 
-Hiện không còn thay đổi nào ở trạng thái `pending`.
+Còn **2 thay đổi** ở trạng thái `pending` (nhóm 21, 22). Đặt `ACTION_PROPOSALS_REVIEWED` trong `build_dev_r4.py` khi người duyệt chấp nhận.
 
 Muốn bỏ một đề xuất thì sửa bảng tương ứng trong `evaluation/datasets/ground-truth-review/build_test_r1.py` (hoặc đặt `CLAUDE_PROPOSALS_REVIEWED = None` để đưa cả nhóm về `pending`), rồi chạy lại script từ gốc repo. Script dựng từ nhãn ở commit `cfb43fbb` và ghi đè các thư mục nhãn của `data/test` (`scenarios`, `metadata`, `asr_reference`, `tools`, `call_brief`, `handoff_brief`), `conversion-report.json` và file này; audio và hội thoại mẫu không đổi. Bản gốc của file này ở `evaluation/datasets/ground-truth-review/notes/test/`.
 
@@ -51,9 +51,17 @@ Sửa ngày 09/11/2026 trong nhóm 14 (đã duyệt): câu thêm vào dùng các
 |---|---|
 | 35 nhãn `size_old` / `size_new` / `return_days` / `exchange_fee_vnd` của ASR | Đọc từng câu: `size_old` chỉ ở size khách đang có hoặc muốn đổi đi ("size 43 chật quá"), `size_new` ở size muốn mua, "đổi trả trong 14 ngày" là `return_days`. Không cần sửa |
 
+## Người duyệt quyết (09/11/2026)
+
+| Nhóm | Phạm vi | Sửa | Lý do |
+|---|---|---|---|
+| 26 | ADV-0031/c1 | `has_children` false thành true (`facts_established`, `memory_expectation`) | Khách nói "Nhà anh có một phòng ngủ của con": người duyệt chọn đổi nhãn (khách có con) thay vì sửa lời |
+
 ## Chưa làm
 
 | Phạm vi | Lý do |
 |---|---|
+| Bộ vàng | `official_gt_approved: false`, chưa có `review/golden_manifest.json`. `auto_verify.py` đã kiểm mọi cuộc: 188/192 cuộc nhãn qua, 111 hội thoại mẫu dùng được (`review/auto_verified.json`, `not_golden: true`); đề xuất từng cuộc ở `review/review_sheet.csv`. Người duyệt điền hoặc nhận đề xuất rồi chạy `approve_gold.py --dataset test --reviewer <tên>`. 3 cuộc đề xuất N: 2 cuộc nhóm 21–22 chờ duyệt; ADV-0024 c2 (giá RUN-10 dùng một lần) |
+| Hội thoại mẫu: 2 ca J02 và các cuộc đã đổi lời khách | Đã đánh dấu `approve: N` (kèm lý do) trong `review/needs_manual_review.csv` bằng `evaluation/datasets/ground-truth-review/mark_conversations.py`, để không dùng làm ví dụ mẫu hay dữ liệu vòng cải tiến. Cần sinh lại khi nhãn ổn |
 | Trùng mã và trùng khách với `data/dev` | Không sửa được bằng nhãn. Muốn có tập test độc lập thì cần sinh tập mới với mã riêng (vd. `SCN-TST-*`) và khách riêng |
 | Audio của các lượt khách đã đổi | Nhóm 1, 3, 10, 14, 15 đổi lời khách, nhưng audio và `asr_reference` vẫn là lời cũ |

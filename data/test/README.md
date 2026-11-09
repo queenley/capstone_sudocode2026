@@ -21,4 +21,6 @@ Kiểm, không gọi model: 99/99 kịch bản nạp được bằng loader củ
 
 Dựng lại từ gốc repo: `python evaluation/datasets/ground-truth-review/build_test_r1.py`, rồi từ `evaluation/data-generation`: `python -m src.pipeline.build_ground_truth --root ../../data/test`.
 
+**Hội thoại mẫu (`conversations/`) không phải ví dụ mẫu:** các ca J02 có câu bịa, ca agent mẫu không tạo đơn hoặc hỏi quá giới hạn, và mọi cuộc đã đổi lời khách được đánh dấu `approve: N` trong `review/needs_manual_review.csv` (`evaluation/datasets/ground-truth-review/mark_conversations.py`). Không dùng chúng làm few-shot hay dữ liệu vòng cải tiến. Bộ này chưa phải bộ vàng: `official_gt_approved: false`, chưa có `review/golden_manifest.json`. Kiểm tự động và đề xuất từng cuộc ở `review/auto_verified.json`, `review/review_sheet.csv` (`auto_verify.py`); người duyệt ký bằng `evaluation/datasets/ground-truth-review/approve_gold.py`.
+
 **Audio chưa theo kịp nhãn:** các nhóm 1, 3, 10, 14, 15, 21 đổi lời khách, nhưng audio, `asr_reference/` của những lượt đó và hội thoại mẫu vẫn là lời cũ.
