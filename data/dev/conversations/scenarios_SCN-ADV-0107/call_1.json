@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, em nhận được tin nhắn của anh về giỏ hàng gồm máy lọc không khí AirPure Y và AirPure Mini trên website. Em sẵn sàng hỗ trợ anh tính tổng tiền và thông tin chi tiết ạ.",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Em đã nhận được tin nhắn của anh về giỏ hàng gồm máy lọc không khí AirPure Y và Mini, phòng mình khoảng 25 mét vuông và có trẻ nhỏ đúng không anh?",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -25,8 +25,12 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh nhắn tin hỏi về giỏ hàng trên website, có máy lọc không khí AirPure Y và Mini.",
-      "facts_stated": {},
+      "text": "Alo, anh nhắn tin hỏi về giỏ hàng trên website, có máy lọc không khí AirPure Y và Mini. Phòng anh khoảng 25 mét vuông, nhà anh có trẻ nhỏ, ngân sách của anh tầm 5 triệu rưỡi.",
+      "facts_stated": {
+        "room_area_m2": 25,
+        "has_children": true,
+        "budget_vnd": 5500000
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -34,37 +38,12 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng anh, em kiểm tra giỏ hàng gồm 2 sản phẩm: máy lọc không khí AirPure Y và AirPure Mini. Anh cần hỏi tổng tiền cho cả hai đúng không ạ?",
-      "questions": [
-        {
-          "slot": "other",
-          "type": "open",
-          "text": "Anh cần hỏi tổng tiền cho cả hai đúng không ạ?"
-        }
+      "text": "Dạ em cảm ơn anh đã cung cấp thông tin ạ. Với diện tích phòng 25 mét vuông và nhà có trẻ nhỏ, AirPure Y là lựa chọn phù hợp. Em kiểm tra giá cho anh: AirPure Y là 5.200.000đ, AirPure Mini là 1.095.000đ.",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2",
+        "has_children"
       ],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Cho anh hỏi tổng tiền là bao nhiêu với hai món này?",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, tổng tiền cho hai sản phẩm là 6.295.000 đồng ạ. Cụ thể, máy lọc không khí AirPure Y có giá 5.200.000 đồng và AirPure Mini là 1.095.000 đồng. Giá này đã áp dụng khuyến mãi thanh toán khi nhận hàng và chương trình mua kèm giảm giá cho AirPure Mini.",
-      "questions": [],
-      "facts_used": [],
       "claims": [
         {
           "field": "price_vnd:SKU-AP-Y",
@@ -73,14 +52,6 @@
         {
           "field": "price_vnd:SKU-AP-MINI",
           "value": 1095000
-        },
-        {
-          "field": "total_vnd",
-          "value": 6295000
-        },
-        {
-          "field": "promo_COD-0_active",
-          "value": true
         }
       ],
       "tool_calls": [
@@ -115,6 +86,33 @@
     },
     {
       "speaker": "customer",
+      "text": "Cho anh hỏi tổng tiền là bao nhiêu với hai món này?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ tổng tiền cho hai sản phẩm là 6.295.000 đồng anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "total_vnd",
+          "value": 6295000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
       "text": "Có khuyến mãi nào khi mua cùng không em?",
       "facts_stated": {},
       "entities": [],
@@ -124,7 +122,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, hiện đơn hàng này đã áp dụng đầy đủ các khuyến mãi hiện tại anh nhé. Khi mua cùng lúc hai sản phẩm, AirPure Mini được giảm 50% giá, từ 2.190.000 đồng còn 1.095.000 đồng. Ngoài ra, anh được miễn phí vận chuyển toàn quốc và miễn phí thu hộ khi nhận hàng ạ.",
+      "text": "Dạ em kiểm tra thì AirPure Mini đang được giảm 50% khi anh mua cùng AirPure Y nên giá chỉ còn 1.095.000đ, còn AirPure Y áp dụng miễn phí thu hộ COD ạ. Tổng tiền đã là giá ưu đãi tốt nhất tại thời điểm hiện tại rồi anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -153,7 +151,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, đơn hàng của anh được miễn phí giao hàng toàn quốc anh nhé. Anh cứ suy nghĩ thêm, khi nào cần đặt hàng hoặc cần tư vấn, anh nhắn lại cho shop bất cứ lúc nào ạ.",
+      "text": "Dạ hai sản phẩm này đều được miễn phí vận chuyển toàn quốc anh nhé. Nếu anh cần thêm thời gian suy nghĩ thì bên em luôn sẵn sàng hỗ trợ khi anh quyết định.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -175,7 +173,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, em ghi nhận anh cần suy nghĩ thêm. Khi nào anh quyết định, em sẽ hỗ trợ đặt hàng nhanh chóng và giữ giá ưu đãi cho anh ạ. Em cảm ơn anh đã quan tâm sản phẩm của shop BTC!",
+      "text": "Dạ em ghi nhận, khi nào anh cần hỗ trợ thêm cứ nhắn lại cho shop nhé. Em cảm ơn anh đã quan tâm sản phẩm ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -186,6 +184,36 @@
           "value": "cần suy nghĩ thêm",
           "op": "set",
           "source": "call_1#turn10"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 5500000,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 25,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-Y",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5200000,
+          "op": "set",
+          "source": "call_1#turn3"
         }
       ],
       "entities": [],

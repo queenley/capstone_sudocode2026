@@ -12,22 +12,29 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Vy ạ, hôm trước chị có quan tâm Giày chạy bộ RunLite 2 Pro. Em là trợ lý ảo của shop, chị muốn mình tiếp tục thế nào ạ?",
-      "questions": [],
+      "text": "Dạ em chào chị Vy ạ, hôm trước chị có quan tâm Giày chạy bộ RunLite 2 Pro bên em; em xác nhận chị hỏi về size 42 màu đen đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Em xác nhận chị hỏi về size 42 màu đen đúng không ạ?"
+        }
+      ],
       "facts_used": [
         "product_advised",
-        "variant_sku",
-        "price_quoted_vnd",
-        "promo_code",
+        "size",
+        "color",
         "objection",
         "competitor_price_vnd",
-        "size"
+        "variant_sku",
+        "price_quoted_vnd",
+        "promo_code"
       ],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -36,26 +43,15 @@
       "text": "Chào em, hôm trước chị có hỏi về giày chạy bộ đó.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, chị đang quan tâm Giày chạy bộ RunLite 2 Pro size 42 màu đen chị hỏi hôm trước đúng không ạ? Em xin phép cập nhật giá và khuyến mãi mới nhất cho chị, vì chương trình RUN2-SALE đã hết hạn. Hiện tại, đôi này còn hàng với giá ưu đãi là 1.521.000đ áp dụng mã RUN-10 đến hết ngày 25/10.",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Chị xác nhận mình hỏi về Giày chạy bộ RunLite 2 Pro size 42 đen đúng không ạ?"
-        }
-      ],
-      "facts_used": [
-        "product_advised",
-        "variant_sku",
-        "size",
-        "color"
-      ],
+      "text": "Dạ vâng ạ, hiện tại Giày chạy bộ RunLite 2 Pro size 42 màu đen bên em đang sẵn hàng, giá hôm nay là 1.521.000đ đã áp dụng chương trình giảm 10%.",
+      "questions": [],
+      "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
@@ -72,14 +68,8 @@
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "1521000",
-          "spoken": "1.521.000"
-        }
-      ],
-      "pause_before_ms": 500,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -87,20 +77,14 @@
       "speaker": "customer",
       "text": "Giá hôm trước em báo là 1 triệu 521 nghìn đúng không?",
       "facts_stated": {},
-      "entities": [
-        {
-          "type": "money",
-          "value": "1521000",
-          "spoken": "1 triệu 521 nghìn"
-        }
-      ],
+      "entities": [],
       "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, giá hôm trước em báo cho chị là 1.352.000đ theo chương trình RUN2-SALE, nhưng chương trình đó đã hết hạn từ ngày 7/10 nên hiện tại shop áp dụng giá 1.521.000đ với mã RUN-10 ạ.",
+      "text": "Dạ em xin phép làm rõ, giá hôm trước chị được báo là 1.352.000đ theo chương trình RUN2-SALE, nhưng chương trình đó đã hết hạn từ ngày 7/10 rồi ạ. Hiện tại giá là 1.521.000đ theo chương trình RUN-10 mới nhất ạ.",
       "questions": [],
       "facts_used": [
         "price_quoted_vnd",
@@ -114,45 +98,11 @@
         {
           "field": "promo_RUN2-SALE_active",
           "value": false
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [
+        },
         {
-          "type": "money",
-          "value": "1352000",
-          "spoken": "1.352.000"
-        }
-      ],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Chị thấy bên khác còn rẻ hơn nữa, mà sao bên mình lại như vậy?",
-      "facts_stated": {
-        "competitor_price_vnd": 1240000,
-        "objection": "giá cao hơn chỗ khác"
-      },
-      "entities": [
-        {
-          "type": "money",
-          "value": "1240000",
-          "spoken": "rẻ hơn"
-        }
-      ],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn chị đã góp ý. Bên em cam kết sản phẩm chính hãng, bảo hành 12 tháng và hỗ trợ đổi trả theo chính sách của shop. Giá bên em đã áp dụng khuyến mãi hiện hành tốt nhất cho sản phẩm này rồi ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
+          "field": "price_vnd",
+          "value": 1521000
+        },
         {
           "field": "promo_RUN-10_active",
           "value": true
@@ -161,7 +111,39 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thấy bên khác còn rẻ hơn nữa, mà sao bên mình lại như vậy?",
+      "facts_stated": {
+        "competitor_price_vnd": 1240000
+      },
+      "entities": [],
       "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu chị so sánh giá các bên ạ. Giá bên em là giá đã giảm theo chương trình hiện hành và sản phẩm chính hãng, bảo hành đầy đủ, chị yên tâm sử dụng ạ.",
+      "questions": [],
+      "facts_used": [
+        "objection",
+        "competitor_price_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1521000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -170,13 +152,13 @@
       "text": "Chị sẽ xem lại rồi gọi lại em nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 300,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận ý kiến của chị, nếu cần tư vấn thêm chị cứ nhắn lại cho em nhé. Em chúc chị một ngày tốt lành ạ!",
+      "text": "Dạ vâng ạ, em ghi nhận ý kiến của chị. Nếu chị cần thêm thông tin hoặc quyết định mua, chị nhắn lại em bất cứ lúc nào nhé. Em cảm ơn chị Vy đã quan tâm ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -186,29 +168,29 @@
           "key": "product_advised",
           "value": "SKU-SN-RUN2",
           "op": "set",
-          "source": "call_2#turn10"
+          "source": "call_2#turn1"
         },
         {
           "key": "price_quoted_vnd",
           "value": 1521000,
           "op": "supersede",
-          "source": "call_2#turn10"
+          "source": "call_2#turn5"
         },
         {
           "key": "variant_sku",
           "value": "SKU-SN-RUN2-42-DEN",
           "op": "set",
-          "source": "call_2#turn10"
+          "source": "call_2#turn1"
         },
         {
           "key": "promo_code",
           "value": "RUN-10",
           "op": "supersede",
-          "source": "call_2#turn10"
+          "source": "call_2#turn5"
         }
       ],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
@@ -216,21 +198,21 @@
   "gold": {
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "giá cao hơn chỗ khác",
-    "objection_handling": "Nhấn mạnh cam kết hàng chính hãng, bảo hành và đổi trả, giá tốt nhất theo chương trình hiện hành.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],
     "supersedes": [
       {
         "slot": "price_quoted_vnd",
-        "old": 1352000,
-        "new": 1521000
+        "old_value": 1352000,
+        "new_value": 1521000
       },
       {
         "slot": "promo_code",
-        "old": "RUN2-SALE",
-        "new": "RUN-10"
+        "old_value": "RUN2-SALE",
+        "new_value": "RUN-10"
       }
     ],
     "callback": null,

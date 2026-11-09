@@ -12,10 +12,23 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, sẵn sàng hỗ trợ chị tư vấn về máy lọc không khí AirPure Y nhé ạ.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, em hỗ trợ tư vấn máy lọc không khí AirPure Y cho chị nhé.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5200000
+        },
+        {
+          "field": "warranty_months",
+          "value": 24
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -25,16 +38,20 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị muốn tìm hiểu thêm về máy lọc không khí AirPure Y.",
-      "facts_stated": {},
+      "text": "Alo, chị muốn tìm hiểu thêm về máy lọc không khí AirPure Y. Phòng chị khoảng 15 mét vuông, nhà chị có trẻ nhỏ, ngân sách của chị tầm 5 triệu rưỡi.",
+      "facts_stated": {
+        "room_area_m2": 15,
+        "has_children": true,
+        "budget_vnd": 5500000
+      },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, máy lọc không khí AirPure Y hiện đang có sẵn hàng với giá 5.200.000đ ạ. Em có thể hỗ trợ chị giải đáp các thông tin về sản phẩm, bảo hành hoặc chương trình khuyến mãi hiện tại.",
+      "text": "Dạ với phòng tầm 15m² và có trẻ nhỏ thì chị chọn AirPure Y là rất hợp lý ạ. Máy này phù hợp cho phòng đến 30m², có khóa trẻ em, giá hiện tại là 5.200.000đ, em kiểm tra hàng vẫn còn ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -59,13 +76,13 @@
       "text": "Máy này bảo hành bao lâu vậy em?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ máy AirPure Y được bảo hành 24 tháng chính hãng, chị hoàn toàn yên tâm sử dụng ạ.",
+      "text": "Dạ máy lọc không khí AirPure Y được bảo hành chính hãng 24 tháng ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -86,13 +103,13 @@
       "text": "Cho chị hỏi máy này dùng cho diện tích phòng bao nhiêu thì hợp lý?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, máy phù hợp cho phòng tối đa 30 mét vuông, chị dùng cho phòng ngủ, phòng khách nhỏ đều được ạ.",
+      "text": "Dạ máy AirPure Y phù hợp cho phòng tối đa 30 mét vuông chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -108,13 +125,13 @@
       "text": "Tính năng của máy này có gì đặc biệt không em?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, máy AirPure Y trang bị bộ lọc HEPA H13, màng than hoạt tính, kết nối app điều khiển từ xa, vận hành êm ái và có khoá trẻ em an toàn cho gia đình mình ạ.",
+      "text": "Dạ máy có màng lọc HEPA H13, thêm lớp than hoạt tính để khử mùi, có điều khiển qua app điện thoại, và đặc biệt là có khóa trẻ em an toàn cho gia đình có bé nhỏ ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -130,16 +147,21 @@
       "text": "Máy có khóa trẻ em không nhỉ?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, sản phẩm này có khoá trẻ em riêng biệt nên rất an toàn cho nhà mình có trẻ nhỏ chị nhé.",
+      "text": "Dạ máy AirPure Y có tích hợp khóa trẻ em, nên chị yên tâm sử dụng cho nhà có bé nhỏ ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "child_safe_lock",
+          "value": true
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -152,19 +174,19 @@
       "text": "Chị thấy trên mạng có khuyến mãi gì không?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại máy AirPure Y đang bán đúng giá niêm yết 5.200.000đ, chưa có khuyến mãi tặng quà hoặc giảm giá nào áp dụng cho model này tại ngày hôm nay ạ.",
+      "text": "Dạ hiện tại máy này giá 5.200.000đ, chưa có chương trình khuyến mãi giảm giá riêng, nhưng chị sẽ được miễn phí vận chuyển toàn quốc và miễn phí thu hộ khi nhận hàng ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 5200000
+          "field": "promo_COD-0_active",
+          "value": true
         },
         {
           "field": "promo_active",
@@ -183,13 +205,13 @@
       "text": "Giao hàng trong bao lâu thì nhận được vậy em?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, nếu chị ở nội thành Hà Nội, shop giao trong 1 đến 2 ngày làm việc, các khu vực khác từ 2 đến 4 ngày ạ. Đơn trên 2 triệu như AirPure Y sẽ được miễn phí vận chuyển toàn quốc cho chị.",
+      "text": "Dạ nếu chị ở nội thành Hà Nội, TP.HCM hoặc Đà Nẵng thì nhận hàng sau 1–2 ngày làm việc, các tỉnh khác từ 2–4 ngày tuỳ khu vực chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -207,13 +229,13 @@
         "blocker": "chờ cuối tháng nhận lương"
       },
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, em ghi nhận chị cần thời gian suy nghĩ thêm. Nếu chị quyết định đặt hàng vào cuối tháng, chị liên hệ lại shop bất cứ lúc nào, em sẽ giữ mức giá và hỗ trợ tư vấn nhanh cho mình ạ.",
+      "text": "Dạ em ghi nhận chị sẽ suy nghĩ thêm và đang chờ nhận lương cuối tháng ạ. Khi nào chị cần đặt hàng hoặc cần tư vấn thêm, chị cứ liên hệ lại shop nhé, em luôn sẵn sàng hỗ trợ ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -224,6 +246,36 @@
           "value": "chờ cuối tháng nhận lương",
           "op": "set",
           "source": "call_1#turn15"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 5500000,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 15,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-Y",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5200000,
+          "op": "set",
+          "source": "call_1#turn2"
         }
       ],
       "entities": [],
@@ -235,8 +287,8 @@
   "gold": {
     "intent": "tu_van_san_pham",
     "outcome": "hen_goi_lai",
-    "objection_type": "chờ cuối tháng nhận lương",
-    "objection_handling": "Ghi nhận nhu cầu chờ lương, hướng dẫn liên hệ lại khi sẵn sàng mua.",
+    "objection_type": "chờ_lương",
+    "objection_handling": "Ghi nhận khách chờ lương, chưa chốt đơn, hứa hỗ trợ thêm khi khách sẵn sàng.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

@@ -12,19 +12,19 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, chị cần tư vấn về máy lọc không khí phải không ạ?",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, chị cần hỗ trợ về máy lọc không khí đúng không ạ?",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "in_stock",
-          "value": true
+          "field": "is_human",
+          "value": false
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -35,33 +35,28 @@
         "room_area_m2": 35
       },
       "entities": [],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, với diện tích phòng 35 mét vuông, máy lọc không khí AirPure Pro là lựa chọn phù hợp đó chị. Máy này có khóa trẻ em, lọc bụi mịn và khử mùi hiệu quả.",
-      "questions": [
-        {
-          "slot": "budget_vnd",
-          "type": "open",
-          "text": "Chị dự kiến ngân sách cho sản phẩm này khoảng bao nhiêu ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
       "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
+      "speaker": "agent_ai",
+      "text": "Dạ với phòng khoảng 35 mét vuông, AirPure Pro là lựa chọn rất phù hợp chị nhé. Máy có công suất lớn, dùng được cho phòng từ 30 đến 45 mét vuông.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "customer",
-      "text": "Chị có một bé lớn, mà ngân sách của chị chỉ tầm 8 triệu thôi.",
+      "text": "Nhà chị không có trẻ nhỏ, bé nhà chị lớn rồi, mà ngân sách của chị chỉ tầm 8 triệu thôi.",
       "facts_stated": {
+        "has_children": false,
         "budget_vnd": 8000000
       },
       "entities": [],
@@ -71,7 +66,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, máy AirPure Pro hiện có giá 7.990.000đ, nằm trong ngân sách của chị luôn ạ.",
+      "text": "Dạ em ghi nhận nhà mình không có trẻ nhỏ và ngân sách khoảng 8 triệu ạ. Máy AirPure Pro hiện shop đang bán với giá 7.990.000đ, phù hợp với nhu cầu của chị.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -82,14 +77,8 @@
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "7990000",
-          "spoken": "7.990.000đ"
-        }
-      ],
-      "pause_before_ms": 600,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -104,33 +93,19 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ để em nhắc lại, giá máy AirPure Pro là 7.990.000đ chị nhé. Hiện tại chưa có chương trình khuyến mãi giảm giá cho sản phẩm này, nhưng chị sẽ được miễn phí vận chuyển toàn quốc và miễn phí thu hộ khi nhận hàng ạ.",
+      "text": "Dạ máy lọc không khí AirPure Pro bên em giá 7.990.000đ, bảo hành 12 tháng chính hãng chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 7990000
-        },
-        {
-          "field": "promo_active",
-          "value": false
-        },
-        {
-          "field": "promo_COD-0_active",
-          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "7990000",
-          "spoken": "7.990.000đ"
-        }
-      ],
-      "pause_before_ms": 700,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -139,13 +114,13 @@
       "text": "Em có biết là máy này có khuyến mãi gì không?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em kiểm tra thì hiện tại máy AirPure Pro chưa có khuyến mãi giảm giá, nhưng chị vẫn được freeship và miễn phí COD khi đặt hàng chị nha.",
+      "text": "Dạ hiện tại máy AirPure Pro chưa có chương trình khuyến mãi nào áp dụng, chị nhé. Shop vẫn hỗ trợ miễn phí thu hộ COD toàn quốc cho đơn này ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -161,7 +136,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -189,7 +164,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận, em sẽ gọi lại cho chị vào lúc 7 giờ tối thứ Hai, ngày 2/11 nhé chị. Cảm ơn chị đã quan tâm sản phẩm của shop ạ!",
+      "text": "Dạ em sẽ gọi lại cho chị vào lúc 7 giờ tối thứ Hai, ngày 2/11 để mình trao đổi thêm nhé. Em đã đặt lịch hẹn theo yêu cầu của chị rồi ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -216,16 +191,22 @@
           "source": "call_1#turn1"
         },
         {
+          "key": "has_children",
+          "value": false,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
           "key": "budget_vnd",
           "value": 8000000,
           "op": "set",
-          "source": "call_1#turn3"
+          "source": "call_1#turn2"
         },
         {
           "key": "blocker",
           "value": "để bàn với gia đình",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn4"
         },
         {
           "key": "product_advised",
@@ -237,22 +218,11 @@
           "key": "price_quoted_vnd",
           "value": 7990000,
           "op": "set",
-          "source": "call_1#turn5"
+          "source": "call_1#turn3"
         }
       ],
-      "entities": [
-        {
-          "type": "date",
-          "value": "2026-11-02",
-          "spoken": "ngày 2/11"
-        },
-        {
-          "type": "time",
-          "value": "19:00",
-          "spoken": "7 giờ"
-        }
-      ],
-      "pause_before_ms": 600,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
@@ -261,18 +231,19 @@
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
     "objection_type": "can_ban_voi_gia_dinh",
-    "objection_handling": "Hẹn lại thời gian gọi, xác nhận rõ khung giờ khách yêu cầu.",
+    "objection_handling": "Lắng nghe, xác nhận thời gian khách muốn gọi lại, đặt lịch hẹn đúng yêu cầu",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [
       {
-        "callback_at": "2026-11-02T19:00"
+        "action": "hen_goi_lai",
+        "value": "2026-11-02T19:00"
       }
     ],
     "supersedes": [],
     "callback": {
       "callback_at": "2026-11-02T19:00",
-      "note": "khách hỏi người nhà rồi báo lại"
+      "reason": "khách hỏi người nhà rồi báo lại"
     },
     "order": null
   }

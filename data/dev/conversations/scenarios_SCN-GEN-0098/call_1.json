@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Yến ạ, em là trợ lý ảo của shop BTC. Chị gọi lại để xác nhận đơn máy hâm sữa Fatz 4 chức năng đúng không ạ?",
+      "text": "Dạ em chào chị Yến ạ, em là trợ lý ảo của shop, chị gọi lại để xác nhận đơn máy hâm sữa Fatz 4 chức năng đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
@@ -20,6 +20,36 @@
           "text": "Chị gọi lại để xác nhận đơn máy hâm sữa Fatz 4 chức năng đúng không ạ?"
         }
       ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị Yến gọi lại để xác nhận mua máy hâm sữa Fatz 4 chức năng. Bé nhà chị được 2 tháng, ngân sách của chị tầm 1 triệu.",
+      "facts_stated": {
+        "child_age_months": 2,
+        "budget_vnd": 1000000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ máy hâm sữa Fatz 4 chức năng hiện đang còn hàng, giá là 490.000đ chị nhé. Máy phù hợp cho bé sơ sinh và có 4 chức năng tiện lợi.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
@@ -34,46 +64,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Alo, chị Yến gọi lại để xác nhận mua máy hâm sữa Fatz 4 chức năng.",
-      "facts_stated": {},
-      "entities": [],
       "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em xác nhận đơn hàng máy hâm sữa Fatz 4 chức năng giá 490.000đ vẫn còn hàng ạ. Chị chọn thanh toán qua ngân hàng phải không ạ?",
-      "questions": [
-        {
-          "slot": "payment",
-          "type": "confirm",
-          "text": "Chị chọn thanh toán qua ngân hàng phải không ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 490000
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "490000",
-          "spoken": "490.000đ"
-        }
-      ],
-      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -90,59 +81,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận phương thức thanh toán qua ngân hàng cho chị. Địa chỉ giao hàng của mình là Nha Trang, Khánh Hòa đúng không ạ?",
-      "questions": [
-        {
-          "slot": "delivery_area",
-          "type": "confirm",
-          "text": "Địa chỉ giao hàng của mình là Nha Trang, Khánh Hòa đúng không ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Khu vực giao hàng là Nha Trang, Khánh Hòa nhé.",
-      "facts_stated": {
-        "delivery_area": "Nha Trang, Khánh Hòa"
-      },
-      "entities": [
-        {
-          "type": "address",
-          "value": "Nha Trang, Khánh Hòa",
-          "spoken": "Nha Trang, Khánh Hòa"
-        }
-      ],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em đã xác nhận địa chỉ giao hàng tại Nha Trang, Khánh Hòa. Đơn hàng sẽ được giao dự kiến vào ngày 04/11/2026. Tổng giá trị đơn là 490.000đ, miễn phí thu hộ, chị kiểm tra hàng trước khi nhận giúp em nhé. Em đọc lại thông tin đơn: 1 máy hâm sữa Fatz 4 chức năng, giao Nha Trang, Khánh Hòa, thanh toán chuyển khoản ngân hàng, nhận hàng dự kiến 04/11/2026. Chị kiểm tra lại giúp em thông tin trên đã đúng chưa ạ?",
-      "questions": [
-        {
-          "slot": "order_summary",
-          "type": "confirm",
-          "text": "Em đọc lại thông tin đơn: 1 máy hâm sữa Fatz 4 chức năng, giao Nha Trang, Khánh Hòa, thanh toán chuyển khoản ngân hàng, nhận hàng dự kiến 04/11/2026. Chị kiểm tra lại giúp em thông tin trên đã đúng chưa ạ?"
-        }
-      ],
+      "text": "Dạ chị chọn thanh toán chuyển khoản ngân hàng, em ghi nhận ạ. Đơn hàng sẽ giao về Nha Trang, Khánh Hòa trong khoảng 4 ngày làm việc, dự kiến nhận vào ngày 04/11.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 490000
+          "field": "delivery_days",
+          "value": 4
         },
         {
-          "field": "in_stock",
-          "value": true
+          "field": "estimated_delivery",
+          "value": "2026-11-04"
         }
       ],
       "tool_calls": [
@@ -155,19 +104,38 @@
         }
       ],
       "memory_writes": [],
-      "entities": [
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là Nha Trang, Khánh Hòa nhé.",
+      "facts_stated": {
+        "delivery_area": "Nha Trang, Khánh Hòa"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em xin phép đọc lại đơn hàng: 1 máy hâm sữa Fatz 4 chức năng, giá 490.000đ, giao về Nha Trang, Khánh Hòa, thanh toán chuyển khoản ngân hàng. Giao dự kiến ngày 04/11. Chị xác nhận giúp em thông tin trên đúng chưa ạ?",
+      "questions": [
         {
-          "type": "money",
-          "value": "490000",
-          "spoken": "490.000đ"
-        },
-        {
-          "type": "date",
-          "value": "2026-11-04",
-          "spoken": "04/11/2026"
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Chị xác nhận giúp em đơn hàng: 1 máy hâm sữa Fatz 4 chức năng, giá 490.000đ, giao tại Nha Trang, Khánh Hòa, thanh toán chuyển khoản ngân hàng, giao dự kiến ngày 04/11 đúng chưa ạ?"
         }
       ],
-      "pause_before_ms": 600,
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -182,17 +150,13 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã lên đơn cho chị, mã đơn hàng là OD600001. Đơn hàng sẽ giao đến Nha Trang, Khánh Hòa dự kiến ngày 04/11/2026. Cảm ơn chị Yến đã mua hàng tại shop BTC, có gì chị cứ liên hệ lại nếu cần hỗ trợ thêm ạ!",
+      "text": "Dạ em đã tạo đơn thành công cho chị, mã đơn OD600001. Shop sẽ xử lý và giao hàng cho mình đúng như thông tin đã xác nhận. Cảm ơn chị Yến đã đặt hàng tại shop ạ!",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 490000
-        },
-        {
-          "field": "in_stock",
-          "value": true
         }
       ],
       "tool_calls": [
@@ -214,63 +178,47 @@
           "key": "child_age_months",
           "value": 2,
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn2"
         },
         {
           "key": "budget_vnd",
           "value": 1000000,
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn2"
         },
         {
           "key": "payment",
           "value": "bank",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn4"
         },
         {
           "key": "delivery_area",
           "value": "Nha Trang, Khánh Hòa",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn6"
         },
         {
           "key": "product_advised",
           "value": "SKU-MB-MON",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 490000,
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn2"
         },
         {
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn8"
         }
       ],
-      "entities": [
-        {
-          "type": "order_id",
-          "value": "OD600001",
-          "spoken": "OD600001"
-        },
-        {
-          "type": "money",
-          "value": "490000",
-          "spoken": "490.000đ"
-        },
-        {
-          "type": "date",
-          "value": "2026-11-04",
-          "spoken": "04/11/2026"
-        }
-      ],
-      "pause_before_ms": 700,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
@@ -286,12 +234,12 @@
     "supersedes": [],
     "callback": null,
     "order": {
-      "order_id": "OD600001",
-      "product": "Máy hâm sữa Fatz 4 chức năng",
+      "sku": "SKU-MB-MON",
       "qty": 1,
       "price_vnd": 490000,
-      "delivery_area": "Nha Trang, Khánh Hòa",
       "payment": "bank",
+      "address": "Nha Trang, Khánh Hòa",
+      "order_id": "OD600001",
       "estimated_delivery": "2026-11-04"
     }
   }

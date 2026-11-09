@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, em có thể hỗ trợ chị về máy lọc không khí AirPure Y ạ.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị đang quan tâm đến máy lọc không khí AirPure Y đúng không ạ?",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -25,28 +25,36 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị muốn hỏi về máy lọc không khí AirPure Y, giá hiện tại là bao nhiêu em nhỉ?",
-      "facts_stated": {},
+      "text": "Alo, chị muốn hỏi về máy lọc không khí AirPure Y, giá hiện tại là bao nhiêu em nhỉ? Phòng chị khoảng 20 mét vuông, nhà chị có trẻ nhỏ, ngân sách của chị tầm 5 triệu rưỡi.",
+      "facts_stated": {
+        "room_area_m2": 20,
+        "has_children": true,
+        "budget_vnd": 5500000
+      },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, giá máy lọc không khí AirPure Y hiện tại là 5.200.000đ chị nhé.",
+      "text": "Dạ, với phòng 20 mét vuông và nhà mình có trẻ nhỏ, AirPure Y là lựa chọn rất phù hợp vì máy có khóa trẻ em và app điều khiển. Giá hiện tại là 5.200.000đ, tặng kèm màng lọc chính hãng. Giá này đã áp dụng chương trình quà tặng đang có hiệu lực ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 5200000
+        },
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -55,13 +63,13 @@
       "text": "Chị thấy ghi trên mạng là 5 triệu 2, không biết bên mình có khuyến mãi gì không?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại bên em đang có chương trình tặng kèm một màng lọc thay thế chính hãng khi mua AirPure Y, chị nhận hàng sẽ được nhận cả quà tặng này ạ.",
+      "text": "Dạ đúng rồi chị, hiện máy AirPure Y đang tặng màng lọc chính hãng khi mua tại shop, chị không cần nhập mã, quà có sẵn khi nhận máy luôn ạ. Ngoài ra, đơn hàng này còn được miễn phí vận chuyển và thanh toán khi nhận không mất phí thu hộ chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -70,14 +78,14 @@
           "value": true
         },
         {
-          "field": "gift_sku",
-          "value": "SKU-AP-FLT-X"
+          "field": "promo_COD-0_active",
+          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 350,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -86,13 +94,13 @@
       "text": "Ngày 11/11 bên em có sale không, chị đợi đến lúc đó có rẻ hơn không?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xin phép trả lời theo quy định, hiện em chưa có thông tin về các chương trình khuyến mãi trong tương lai. Giá và ưu đãi em báo là áp dụng tại thời điểm hiện tại ạ.",
+      "text": "Dạ em xin phép trả lời theo chính sách là em chưa thể tiết lộ thông tin về các chương trình khuyến mãi chưa bắt đầu ạ. Giá và quà tặng em vừa báo là mức tốt nhất hiện tại chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -104,24 +112,22 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 350,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
       "text": "Em biết thì nói chị nghe đi, chị cần cân nhắc thêm trước khi quyết định.",
-      "facts_stated": {
-        "blocker": "cần suy nghĩ thêm"
-      },
+      "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 350,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em hoàn toàn hiểu, chị cứ cân nhắc thêm giúp em nhé. Nếu chị cần thêm thông tin hoặc quyết định đặt hàng sau, bên em luôn sẵn sàng hỗ trợ ạ.",
+      "text": "Dạ em hoàn toàn hiểu, chị cứ cân nhắc thêm nhé. Nếu cần thêm thông tin hoặc khi nào quyết định, chị gọi lại shop bất kỳ lúc nào ạ. Em sẽ ghi chú lại để hỗ trợ chị khi cần.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -130,6 +136,42 @@
         {
           "key": "blocker",
           "value": "cần suy nghĩ thêm",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 5500000,
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 20,
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-Y",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5200000,
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "promo_code",
+          "value": "GIFT-FILTER",
           "op": "set",
           "source": "call_1#turn8"
         }
@@ -141,10 +183,10 @@
     }
   ],
   "gold": {
-    "intent": "hoi_thong_tin_khuyen_mai",
+    "intent": "tu_van_san_pham",
     "outcome": "hen_goi_lai",
-    "objection_type": "can_suy_nghi_them",
-    "objection_handling": "Đồng ý để khách cân nhắc thêm, cam kết hỗ trợ khi khách cần.",
+    "objection_type": "can_suy_nghi",
+    "objection_handling": "Đã xác nhận và hẹn khách cân nhắc thêm, không tạo áp lực.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

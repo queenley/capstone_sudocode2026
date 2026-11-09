@@ -12,8 +12,14 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh Minh cần tư vấn về bình sữa Pigeon PPSU 240ml đúng không ạ?",
-      "questions": [],
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần tư vấn về bình sữa Pigeon PPSU 240ml đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh cần hỏi về bình sữa Pigeon PPSU 240ml đúng không ạ?"
+        }
+      ],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
@@ -25,8 +31,11 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh muốn hỏi về bình sữa Pigeon PPSU 240ml.",
-      "facts_stated": {},
+      "text": "Alo, anh muốn hỏi về bình sữa Pigeon PPSU 240ml. Ngân sách của anh tầm 500 nghìn.",
+      "facts_stated": {
+        "budget_vnd": 500000,
+        "product_advised": "SKU-MB-BOT"
+      },
       "entities": [],
       "pause_before_ms": 600,
       "emotion": null,
@@ -34,16 +43,14 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ bình sữa Pigeon PPSU 240ml hiện bên em đang có sẵn hàng anh nhé. Anh cần tư vấn cho bé mấy tháng tuổi ạ?",
-      "questions": [
-        {
-          "slot": "child_age_months",
-          "type": "open",
-          "text": "Anh cần tư vấn cho bé mấy tháng tuổi ạ?"
-        }
-      ],
+      "text": "Dạ sản phẩm bình sữa Pigeon PPSU 240ml bên em đang có giá là 289.000đ anh nhé. Hiện đang còn hàng tại shop.",
+      "questions": [],
       "facts_used": [],
       "claims": [
+        {
+          "field": "price_vnd",
+          "value": 289000
+        },
         {
           "field": "in_stock",
           "value": true
@@ -69,7 +76,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ bình sữa Pigeon PPSU 240ml phù hợp cho bé từ sơ sinh đến khoảng 2 tuổi, chất liệu PPSU rất bền, không chứa BPA, chịu nhiệt tốt và dễ làm sạch ạ.",
+      "text": "Dạ, bình sữa Pigeon PPSU 240ml được nhiều bố mẹ tin dùng vì chất liệu an toàn, bền, dễ vệ sinh và phù hợp với bé 13 tháng. Sản phẩm này không có thông tin về tương thích với bình Pigeon PPSU cho từng loại máy tiệt trùng, anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -91,7 +98,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ đúng rồi anh, giá bình sữa Pigeon PPSU 240ml hiện tại là 289.000đ anh nhé.",
+      "text": "Dạ đúng rồi anh, bình sữa Pigeon PPSU 240ml giá chính xác là 289.000đ ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -114,13 +121,13 @@
         "blocker": "muốn so sánh thêm"
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em hiểu ạ, anh muốn tham khảo thêm các loại bình sữa khác trước khi quyết định.",
+      "text": "Dạ vâng anh, anh có thể tham khảo thêm các loại bình sữa khác hoặc khi nào cần tư vấn thêm thì liên hệ lại shop em hỗ trợ chi tiết hơn ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -136,13 +143,13 @@
       "text": "Em cho anh xin thêm thông tin rồi anh gọi lại nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 300,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, em đã gửi thông tin chi tiết về bình sữa Pigeon PPSU 240ml cho anh rồi. Anh cần thêm gì cứ liên hệ lại shop bất cứ lúc nào ạ, em luôn sẵn sàng hỗ trợ.",
+      "text": "Dạ em đã ghi nhận mong muốn so sánh thêm của anh, khi nào anh quyết định hoặc cần thêm thông tin, anh cứ gọi lại shop BTC để được tư vấn chi tiết ạ. Em cảm ơn anh đã quan tâm sản phẩm bên em.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -188,8 +195,8 @@
   "gold": {
     "intent": "tu_van_binh_sua",
     "outcome": "hen_goi_lai",
-    "objection_type": "muon_so_sanh_them",
-    "objection_handling": "Ghi nhận khách muốn so sánh thêm, chủ động lưu lại thông tin.",
+    "objection_type": "muốn_so_sánh_thêm",
+    "objection_handling": "Đã ghi nhận khách muốn so sánh thêm, hướng dẫn gọi lại khi cần.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

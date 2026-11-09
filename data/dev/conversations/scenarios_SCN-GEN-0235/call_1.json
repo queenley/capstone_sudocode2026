@@ -12,23 +12,22 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị muốn hỏi về tình trạng đơn hàng đúng không ạ?",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị muốn kiểm tra tình trạng đơn hàng giày sneaker Urban Classic đúng không ạ?",
       "questions": [
         {
-          "slot": "other",
-          "type": "open",
-          "text": "Chị muốn hỏi về tình trạng đơn hàng đúng không ạ?"
+          "slot": "issue",
+          "type": "confirm",
+          "text": "Chị muốn kiểm tra tình trạng đơn hàng giày sneaker Urban Classic đúng không ạ?"
         }
       ],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 800,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -39,28 +38,20 @@
         "issue": "hỏi tình trạng đơn hàng"
       },
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 350,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em kiểm tra giúp chị ạ. Đơn hàng gần nhất chị đặt là giày sneaker Urban Classic, đúng không ạ?",
-      "questions": [
-        {
-          "slot": "order_id",
-          "type": "confirm",
-          "text": "Đơn hàng gần nhất chị đặt là giày sneaker Urban Classic, đúng không ạ?"
-        }
-      ],
-      "facts_used": [
-        "order_id"
-      ],
+      "text": "Dạ vâng, chị đợi em kiểm tra giúp chị ạ.",
+      "questions": [],
+      "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -69,22 +60,26 @@
       "text": "Chị không nhớ mã đơn, nhưng đơn đó đang xử lý, em xem giúp chị với.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, chị chờ em kiểm tra trên hệ thống một chút ạ.",
-      "questions": [],
-      "facts_used": [
-        "order_id"
+      "text": "Dạ em kiểm tra giúp chị ạ. Ngoài đơn giày sneaker Urban Classic đang xử lý, hệ thống còn đơn giày sneaker Urban Classic khác không chị?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Ngoài đơn giày sneaker Urban Classic đang xử lý, hệ thống còn đơn giày sneaker Urban Classic khác không chị?"
+        }
       ],
+      "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -93,17 +88,15 @@
       "text": "Hôm trước chị có gọi hỏi rồi, mà chưa thấy cập nhật gì mới.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 350,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã kiểm tra lại, hiện tại đơn hàng giày sneaker Urban Classic của chị đã giao thành công rồi ạ.",
+      "text": "Dạ em ghi nhận chị đã hỏi trước đó. Với đơn hàng giày sneaker Urban Classic mà chị đề cập, em kiểm tra lại thì đơn hàng đã giao thành công rồi ạ.",
       "questions": [],
-      "facts_used": [
-        "order_id"
-      ],
+      "facts_used": [],
       "claims": [
         {
           "field": "order_status",
@@ -120,7 +113,7 @@
       ],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -128,6 +121,31 @@
       "speaker": "customer",
       "text": "Chị chỉ muốn biết khi nào thì nhận được hàng thôi.",
       "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng giày sneaker Urban Classic của chị đã giao từ ngày 18/03/2025 rồi ạ. Nếu chị cần hỗ trợ thêm, em luôn sẵn sàng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_status",
+          "value": "delivered"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "issue",
+          "value": "hỏi tình trạng đơn hàng",
+          "op": "set",
+          "source": "call_1#turn8"
+        }
+      ],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,

@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, em có thể hỗ trợ chị về sản phẩm máy tiệt trùng sấy khô Moaz Bebe ạ.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, chị muốn tìm hiểu về máy tiệt trùng sấy khô Moaz Bebe đúng không ạ? Bé nhà mình 3 tháng, em sẽ tư vấn phù hợp cho chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -25,24 +25,27 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị muốn hỏi về máy tiệt trùng sấy khô Moaz Bebe.",
-      "facts_stated": {},
+      "text": "Alo, chị muốn hỏi về máy tiệt trùng sấy khô Moaz Bebe. Bé nhà chị được 3 tháng.",
+      "facts_stated": {
+        "child_age_months": 3
+      },
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ sản phẩm máy tiệt trùng sấy khô Moaz Bebe hiện bên em còn hàng chị nhé. Máy này có chức năng tiệt trùng hơi nước, sấy khô và bảo quản bình sữa 24 giờ, phù hợp cho bé sơ sinh đến lớn hơn.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
+      "text": "Dạ, máy tiệt trùng sấy khô Moaz Bebe phù hợp cho bé sơ sinh và trẻ nhỏ, có chức năng tiệt trùng hơi nước và sấy khô, giúp bảo vệ sức khỏe cho bé nhà mình. Chị quan tâm đến nhu cầu tiệt trùng bình sữa hay các vật dụng nào khác không ạ?",
+      "questions": [
         {
-          "field": "in_stock",
-          "value": true
+          "slot": "other",
+          "type": "open",
+          "text": "Chị quan tâm đến nhu cầu tiệt trùng bình sữa hay các vật dụng nào khác không ạ?"
         }
       ],
+      "facts_used": [],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -55,13 +58,13 @@
       "text": "Giá của máy này là bao nhiêu em nhỉ?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giá của máy tiệt trùng sấy khô Moaz Bebe hiện là 1.890.000đ chị nhé.",
+      "text": "Dạ, hiện tại máy tiệt trùng sấy khô Moaz Bebe có giá là 1.890.000đ chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -82,13 +85,13 @@
       "text": "Máy này có khuyến mãi gì không?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại máy được áp dụng chương trình miễn phí vận chuyển toàn quốc cho đơn từ 500.000đ theo chương trình MOM-FREESHIP chị nhé.",
+      "text": "Dạ, hiện tại máy này đang được áp dụng chương trình miễn phí vận chuyển toàn quốc cho ngành mẹ & bé, chị sẽ không mất phí ship khi đặt đơn qua shop ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -111,20 +114,14 @@
         "budget_vnd": 2500000
       },
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ sản phẩm này có giá 1.890.000đ nên nằm trong mức ngân sách của chị rồi ạ. Chị có muốn em tư vấn thêm các sản phẩm tương tự để chị so sánh không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "open",
-          "text": "Chị có muốn em tư vấn thêm các sản phẩm tiệt trùng khác để tham khảo không ạ?"
-        }
-      ],
+      "text": "Dạ, với ngân sách của chị thì máy Moaz Bebe đang nằm trong tầm giá ạ. Máy chính hãng bảo hành 12 tháng, phù hợp cho bé sơ sinh luôn chị nhé.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
@@ -146,13 +143,13 @@
         "blocker": "muốn so sánh thêm"
       },
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận chị muốn so sánh thêm. Nếu chị cần thông tin về các dòng máy tiệt trùng khác, em sẵn sàng hỗ trợ chị qua hotline hoặc Zalo bất cứ khi nào chị cần ạ.",
+      "text": "Dạ, ngoài Moaz Bebe, shop còn các mẫu máy tiệt trùng khác như Fatz và Chicco, mỗi loại có ưu điểm riêng về chức năng hoặc dung tích. Nếu chị cần tư vấn thêm về từng mẫu, em sẽ gửi thông tin chi tiết cho chị qua Zalo hoặc hotline nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -168,18 +165,24 @@
       "text": "Ừ, vậy chị sẽ suy nghĩ thêm rồi gọi lại nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, em cảm ơn chị đã quan tâm. Khi nào chị cần hỗ trợ thêm, chị cứ gọi lại cho shop BTC nhé. Chúc chị nhiều sức khỏe ạ.",
+      "text": "Dạ vâng chị, em ghi nhận mình đang muốn tham khảo thêm. Khi nào chị cần tư vấn hoặc quyết định đặt hàng, mình cứ liên hệ lại qua số này hoặc Zalo OA của shop nhé. Em cảm ơn chị đã quan tâm ạ!",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [
+        {
+          "key": "child_age_months",
+          "value": 3,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
         {
           "key": "budget_vnd",
           "value": 2500000,
@@ -196,19 +199,19 @@
           "key": "product_advised",
           "value": "SKU-MB-STER",
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn0"
         },
         {
           "key": "price_quoted_vnd",
           "value": 1890000,
           "op": "set",
-          "source": "call_1#turn5"
+          "source": "call_1#turn6"
         },
         {
           "key": "promo_code",
           "value": "MOM-FREESHIP",
           "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn6"
         }
       ],
       "entities": [],
@@ -218,7 +221,7 @@
     }
   ],
   "gold": {
-    "intent": "hoi_san_pham_tu_van_gia",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,

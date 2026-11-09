@@ -12,13 +12,19 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Ngọc ạ, hôm trước chị có quan tâm Máy lọc không khí AirPure Pro và có chia sẻ muốn để bàn với gia đình. Hôm nay chị quyết định mua luôn phải không ạ?",
-      "questions": [],
+      "text": "Dạ em chào chị Ngọc ạ, hôm trước chị có quan tâm Máy lọc không khí AirPure Pro để bàn cho gia đình. Hôm nay chị muốn mình tiếp tục đơn hàng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Hôm nay chị muốn mình tiếp tục đơn hàng đúng không ạ?"
+        }
+      ],
       "facts_used": [
         "blocker",
         "product_advised",
-        "room_area_m2",
-        "price_quoted_vnd"
+        "price_quoted_vnd",
+        "room_area_m2"
       ],
       "claims": [
         {
@@ -44,7 +50,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận chị chọn Máy lọc không khí AirPure Pro, giá hiện tại là 7.990.000đ, hàng còn sẵn kho và bảo hành 24 tháng chính hãng chị nhé.",
+      "text": "Dạ vâng chị, Máy lọc không khí AirPure Pro hiện còn hàng với giá 7.990.000đ ạ. Em ghi nhận nhu cầu của mình chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -69,13 +75,13 @@
       "text": "Chị cũng muốn mua một nồi chiên không dầu Xiaomi nữa.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 700,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ nồi chiên không dầu Xiaomi 4.5L bên em giá 1.590.000đ, còn hàng và bảo hành 12 tháng ạ.",
+      "text": "Dạ, nồi chiên không dầu Xiaomi 4.5L còn hàng, giá là 1.590.000đ chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -102,7 +108,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ quạt đứng Senko TS16 giá 590.000đ, hàng mới bảo hành 12 tháng chị nhé.",
+      "text": "Dạ chị, quạt đứng Senko TS16 giá là 590.000đ, hiện shop cũng có sẵn luôn ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -129,7 +135,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ màng lọc thay thế cho AirPure Pro giá 990.000đ, hàng chính hãng chị ạ.",
+      "text": "Dạ, màng lọc thay thế cho AirPure Pro có giá 990.000đ chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -152,23 +158,19 @@
         "budget_vnd": 8500000
       },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 700,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn chị đã chia sẻ ngân sách 8 triệu rưỡi. Tổng đơn hàng các sản phẩm chị chọn hiện là 11.160.000đ, em sẽ báo chi tiết để chị cân nhắc nhé. Đơn này vượt 10 triệu nên bên em chỉ nhận chuyển khoản, không hỗ trợ COD chị ạ.",
+      "text": "Dạ em ghi nhận ngân sách mới của chị là 8 triệu rưỡi. Với 4 sản phẩm chị chọn, tổng giá hiện là 11.160.000đ, vượt ngân sách mình một chút ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "total_vnd",
           "value": 11160000
-        },
-        {
-          "field": "cod_allowed",
-          "value": false
         }
       ],
       "tool_calls": [],
@@ -181,17 +183,15 @@
     {
       "speaker": "customer",
       "text": "Chị muốn trả COD cho đơn này.",
-      "facts_stated": {
-        "payment": "cod"
-      },
+      "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xin phép thông tin lại, đơn hàng trên 10 triệu như đơn của chị sẽ không áp dụng COD, chỉ hỗ trợ chuyển khoản trước thôi ạ.",
+      "text": "Dạ em xin phép thông tin, đơn hàng trên 10 triệu thì shop chưa hỗ trợ COD, mình có thể chuyển khoản để nhận ưu đãi và giao hàng nhanh chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -209,16 +209,38 @@
     },
     {
       "speaker": "customer",
-      "text": "Cho chị hỏi tổng tiền đơn hàng này là bao nhiêu em?",
+      "text": "Vậy chị chuyển khoản nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ tổng đơn hàng gồm Máy lọc không khí AirPure Pro 7.990.000đ, nồi chiên không dầu Xiaomi 1.590.000đ, quạt đứng Senko 590.000đ và màng lọc thay thế 990.000đ, tổng cộng là 11.160.000đ chị nhé.",
+      "text": "Dạ em cảm ơn chị. Đơn này mình thanh toán chuyển khoản, shop sẽ gửi thông tin tài khoản sau khi xác nhận đơn ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cho chị hỏi tổng tiền đơn hàng này là bao nhiêu em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ tổng tiền cho 4 sản phẩm là 11.160.000đ, đã gồm freeship toàn quốc chị nhé. Vì đơn trên 10 triệu nên mình áp dụng chuyển khoản, không COD được ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -241,28 +263,16 @@
         "delivery_area": "Nha Trang, Khánh Hòa"
       },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 700,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xác nhận địa chỉ nhận hàng là Nha Trang, Khánh Hòa. Đơn hàng sẽ được giao trong 4 ngày làm việc, dự kiến nhận hàng vào ngày 19/11/2026 chị nhé. Em sẽ lên đơn với phương thức chuyển khoản, chị đồng ý giúp em để em tạo đơn ngay ạ?",
-      "questions": [
-        {
-          "slot": "order_summary",
-          "type": "confirm",
-          "text": "Chị xác nhận giúp em: Máy lọc không khí AirPure Pro, nồi chiên không dầu Xiaomi 4.5L, quạt đứng Senko TS16 và màng lọc thay thế, tổng 11.160.000đ, giao tại Nha Trang, Khánh Hòa, thanh toán chuyển khoản, nhận hàng dự kiến 19/11/2026 đúng không ạ?"
-        }
-      ],
-      "facts_used": [
-        "delivery_area"
-      ],
+      "text": "Dạ mình nhận hàng tại Nha Trang, Khánh Hòa. Thời gian giao dự kiến là 4 ngày làm việc, khoảng ngày 19/11 chị nhận được hàng ạ.",
+      "questions": [],
+      "facts_used": [],
       "claims": [
-        {
-          "field": "total_vnd",
-          "value": 11160000
-        },
         {
           "field": "estimated_delivery",
           "value": "2026-11-19"
@@ -288,25 +298,44 @@
       "text": "Đúng rồi em, lên đơn giúp chị nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã tạo đơn thành công cho chị với tổng tiền 11.160.000đ, thanh toán chuyển khoản. Đơn sẽ giao dự kiến ngày 19/11/2026. Đơn hàng trên 10 triệu nên bên em không hỗ trợ COD, chỉ nhận chuyển khoản chị nhé. Cảm ơn chị đã đặt hàng tại shop BTC ạ!",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
+      "text": "Em xin phép xác nhận lại đơn: Máy lọc không khí AirPure Pro, nồi chiên không dầu Xiaomi 4.5L, quạt đứng Senko TS16 và màng lọc thay thế AirPure Pro. Tổng cộng 11.160.000đ, giao về Nha Trang, thanh toán chuyển khoản, dự kiến nhận hàng ngày 19/11. Chị xác nhận giúp em lên đơn nhé?",
+      "questions": [
         {
-          "field": "total_vnd",
-          "value": 11160000
-        },
-        {
-          "field": "cod_allowed",
-          "value": false
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Chị xác nhận giúp em lên đơn đúng các sản phẩm, giá và thông tin giao hàng trên nhé?"
         }
       ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ừ đúng rồi em.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em lên đơn cho chị với 4 sản phẩm, tổng 11.160.000đ, giao về Nha Trang và thanh toán chuyển khoản. Sau cuộc gọi em sẽ gửi chi tiết đơn và thông tin chuyển khoản để chị hoàn tất nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
       "tool_calls": [
         {
           "name": "order.create",
@@ -388,31 +417,31 @@
           "key": "delivery_area",
           "value": "Nha Trang, Khánh Hòa",
           "op": "set",
-          "source": "call_2#turn16"
+          "source": "call_2#turn18"
         },
         {
           "key": "payment",
           "value": "bank",
           "op": "set",
-          "source": "call_2#turn18"
+          "source": "call_2#turn14"
         },
         {
           "key": "product_advised",
           "value": "SKU-AP-PRO",
           "op": "set",
-          "source": "call_2#turn3"
+          "source": "call_2#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 7990000,
           "op": "set",
-          "source": "call_2#turn3"
+          "source": "call_2#turn2"
         },
         {
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_2#turn19"
+          "source": "call_2#turn22"
         }
       ],
       "entities": [],
@@ -424,8 +453,8 @@
   "gold": {
     "intent": "chot_don",
     "outcome": "chot_don",
-    "objection_type": "cod_not_allowed",
-    "objection_handling": "Giải thích chính sách đơn trên 10 triệu chỉ nhận chuyển khoản, không COD.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "positive",
     "decision_maker": null,
     "commitments": [],
@@ -463,7 +492,13 @@
       "total_vnd": 11160000,
       "payment": "bank",
       "delivery_area": "Nha Trang, Khánh Hòa",
-      "estimated_delivery": "2026-11-19"
+      "estimated_delivery": "2026-11-19",
+      "order_ids": [
+        "OD600001",
+        "OD600002",
+        "OD600003",
+        "OD600004"
+      ]
     }
   }
 }

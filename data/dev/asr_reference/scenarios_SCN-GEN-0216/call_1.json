@@ -2,15 +2,18 @@
   "scenario_id": "SCN-GEN-0216",
   "call": "call_1",
   "input_mode": "text",
-  "source_sha256": "7d1cf65b46c6a4eb725a798ddf1c4f794b71b722e94b6c7a5ec1db63978084f0",
+  "source_sha256": "4246b4de7224b2942ef984da1a086519eabbe9f3a250fad0bad05363dc17cdd5",
   "model": "gpt-4.1-mini",
   "turns": [
     {
       "idx": 1,
       "speaker": "C",
-      "text": "Alo em, chị muốn đặt mua lại cái máy lọc không khí AirPure X mà chị đã mua hồi tháng 2 á.",
-      "spoken_text": "alo em chị muốn đặt mua lại cái máy lọc không khí e pia x mà chị đã mua hồi tháng hai á",
+      "text": "Alo em, chị muốn đặt mua lại cái máy lọc không khí AirPure X mà chị đã mua hồi tháng 2 á. Nhà chị không có trẻ nhỏ, ngân sách của chị tầm 5 triệu. Phòng mới của chị khoảng 15 mét vuông.",
+      "spoken_text": "alo em chị muốn đặt mua lại cái máy lọc không khí e pia x mà chị đã mua hồi tháng hai á nhà chị không có trẻ nhỏ ngân sách của chị tầm năm triệu phòng mới của chị khoảng mười lăm mét vuông",
       "entities": {
+        "room_area_m2": 15,
+        "has_children": false,
+        "budget_vnd": 5000000,
         "sku": "SKU-AP-X"
       },
       "reference_source": "llm",
@@ -50,10 +53,11 @@
     {
       "idx": 5,
       "speaker": "C",
-      "text": "Chị cũng muốn hỏi là giá có khác gì không so với lần trước không?",
-      "spoken_text": "chị cũng muốn hỏi là giá có khác gì không so với lần trước không",
+      "text": "Chị cũng muốn hỏi là giá có khác gì không so với lần trước không? Chị thanh toán chuyển khoản ngân hàng nhé.",
+      "spoken_text": "chị cũng muốn hỏi là giá có khác gì không so với lần trước không chị thanh toán chuyển khoản ngân hàng nhé",
       "entities": {
-        "sku": "SKU-AP-X"
+        "payment": "bank",
+        "blocker": "so sanh gia"
       },
       "reference_source": "llm",
       "issues": []

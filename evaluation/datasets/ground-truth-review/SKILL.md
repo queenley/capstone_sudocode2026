@@ -22,6 +22,7 @@ Each revision of `data/dev` or `data/test` is a derived, BTC-compatible diagnost
 ## Publish a revision
 
 - Build a revision with a script that can be rerun, not by hand. The script reads the previous labels from a pinned git commit (`SOURCE_REF`), builds under `data/.build/`, and replaces only the label folders of `data/dev` or `data/test` (`scenarios`, `metadata`, `asr_reference`, `tools`, `call_brief`, `handoff_brief`) with an updated `conversion-report.json` and source hashes. One folder per dataset, no `dev-r<N>` copies (the reviewer's choice, 09/11/2026): the revision a run used stays in git at its commit, so name that commit in the run's notes and never compare runs across revisions without saying the labels changed. Example: `build_dev_r4.py`, `build_test_r1.py`.
+- After a revision changes customer words, write the reference conversations again with `regenerate_conversations.py --dataset <name>` (model money: `--list` first, then `--only <id>` as a trial) and the changed turns' audio with `synthesize_scenario_audio --changed-only` (ElevenLabs: `--dry-run` first). The builder keeps a re-spoken `asr_reference/<call>.json` and rewrites `ground_truth.json` from the clips.
 - Keep reviewer evidence with the new revision. Mark approval only for the scope actually reviewed; one approved field or call does not approve the whole dataset.
 - Run a model-backed evaluation only when requested or authorized, on the same pinned cohort, and report label changes separately from agent changes.
 

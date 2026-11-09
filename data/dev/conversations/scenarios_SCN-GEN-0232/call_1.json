@@ -12,40 +12,40 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh Phúc ạ, em là trợ lý ảo của shop BTC. Anh hôm trước có đặt Máy lọc không khí Samsung AX40, hiện đơn đó đang giao ạ. Anh muốn xác nhận mua Máy tiệt trùng sấy khô Moaz Bebe đúng không ạ?",
+      "text": "Dạ em chào anh Phúc ạ, hôm trước anh có quan tâm Máy lọc không khí AirPure Y và vừa đặt Samsung AX40; em ghi nhận anh muốn xác nhận mua máy tiệt trùng sấy khô Moaz Bebe cho bé 5 tháng, ngân sách khoảng 2 triệu rưỡi đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Anh muốn xác nhận mua Máy tiệt trùng sấy khô Moaz Bebe đúng không ạ?"
+          "text": "Anh xác nhận muốn lấy máy tiệt trùng sấy khô Moaz Bebe cho bé 5 tháng, ngân sách khoảng 2 triệu rưỡi đúng không ạ?"
         }
       ],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Alo, anh muốn xác nhận mua máy tiệt trùng sấy khô Moaz Bebe mà hôm trước em tư vấn.",
-      "facts_stated": {
-        "product_advised": "SKU-MB-STER"
-      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Alo, anh muốn xác nhận mua máy tiệt trùng sấy khô Moaz Bebe mà hôm trước em tư vấn. Bé nhà anh được 5 tháng, ngân sách của anh tầm 2 triệu rưỡi.",
+      "facts_stated": {
+        "budget_vnd": 2500000,
+        "child_age_months": 5
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ sản phẩm Máy tiệt trùng sấy khô Moaz Bebe bên em đang sẵn hàng, giá đúng là 1.890.000đ anh nhé. Đơn này được miễn phí vận chuyển toàn quốc với chương trình MOM-FREESHIP ạ.",
+      "text": "Dạ, em xác nhận anh chọn Máy tiệt trùng sấy khô Moaz Bebe, giá hiện tại là 1.890.000đ, đang còn hàng và nằm trong chương trình miễn phí vận chuyển MOM-FREESHIP ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -54,24 +54,22 @@
           "value": 1890000
         },
         {
+          "field": "in_stock",
+          "value": true
+        },
+        {
           "field": "promo_MOM-FREESHIP_active",
           "value": true
         },
         {
-          "field": "in_stock",
+          "field": "freeship",
           "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "1890000",
-          "spoken": "1.890.000đ"
-        }
-      ],
-      "pause_before_ms": 600,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -86,20 +84,14 @@
           "spoken": "1 triệu 890 ngàn"
         }
       ],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ đúng rồi anh, giá là 1.890.000đ, thanh toán COD và giao hàng tại quận Lê Chân, Hải Phòng đúng không ạ? Dự kiến giao hàng ngày 17/11/2026 anh nhé.",
-      "questions": [
-        {
-          "slot": "order_summary",
-          "type": "confirm",
-          "text": "Em xác nhận đơn hàng: Máy tiệt trùng sấy khô Moaz Bebe, giá 1.890.000đ, giao tại quận Lê Chân, Hải Phòng, thanh toán khi nhận hàng, dự kiến giao ngày 17/11/2026. Anh kiểm tra lại giúp em các thông tin này đúng chưa ạ?"
-        }
-      ],
+      "text": "Dạ đúng rồi anh, Máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ, chưa phát sinh thêm chi phí nào, mình được giao miễn phí tận nơi.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
@@ -107,9 +99,35 @@
           "value": 1890000
         },
         {
-          "field": "delivery_days",
-          "value": 4
-        },
+          "field": "freeship",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán là COD, giao hàng ở quận Lê Chân, Hải Phòng nhé!",
+      "facts_stated": {
+        "payment": "COD",
+        "delivery_area": "Lê Chân, Hải Phòng"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em ghi nhận giao hàng tại quận Lê Chân, Hải Phòng và anh chọn thanh toán khi nhận hàng. Thời gian giao dự kiến là khoảng 4 ngày làm việc, tức nhận hàng vào ngày 17/11 anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
         {
           "field": "estimated_delivery",
           "value": "2026-11-17"
@@ -125,48 +143,60 @@
         }
       ],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "address",
-          "value": "Lê Chân, Hải Phòng",
-          "spoken": "quận Lê Chân, Hải Phòng"
-        },
-        {
-          "type": "money",
-          "value": "1890000",
-          "spoken": "1.890.000đ"
-        },
-        {
-          "type": "date",
-          "value": "2026-11-17",
-          "spoken": "17/11/2026"
-        }
-      ],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Hình thức thanh toán là COD, giao hàng ở quận Lê Chân, Hải Phòng nhé!",
-      "facts_stated": {
-        "payment": "COD",
-        "delivery_area": "Lê Chân, Hải Phòng"
-      },
-      "entities": [
-        {
-          "type": "address",
-          "value": "Lê Chân, Hải Phòng",
-          "spoken": "quận Lê Chân, Hải Phòng"
-        }
-      ],
+      "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Ừ, vậy em lên đơn cho anh luôn đi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn anh đã xác nhận. Em sẽ tiến hành lên đơn Máy tiệt trùng sấy khô Moaz Bebe cho anh, giá cuối 1.890.000đ, giao tại Lê Chân, Hải Phòng, thanh toán khi nhận hàng. Anh vui lòng giữ điện thoại để nhận thông báo từ shop nhé!",
+      "text": "Dạ, em đọc lại đơn để anh xác nhận: Máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ, giao tại quận Lê Chân, Hải Phòng, thanh toán COD, dự kiến nhận hàng ngày 17/11. Anh kiểm tra giúp em thông tin trên đã chính xác chưa để em lên đơn ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh kiểm tra giúp em thông tin trên đã chính xác chưa để em lên đơn ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-17"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ừ, đúng rồi em.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em lên đơn cho anh ngay, đơn sẽ giao miễn phí khoảng ngày 17/11, em sẽ gửi mã đơn qua SMS/Zalo sau ít phút ạ. Cảm ơn anh đã đặt hàng tại shop!",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -175,8 +205,20 @@
           "value": 1890000
         },
         {
+          "field": "in_stock",
+          "value": true
+        },
+        {
           "field": "promo_MOM-FREESHIP_active",
           "value": true
+        },
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-17"
         }
       ],
       "tool_calls": [
@@ -210,13 +252,13 @@
           "key": "delivery_area",
           "value": "Lê Chân, Hải Phòng",
           "op": "set",
-          "source": "call_1#turn6"
+          "source": "call_1#turn5"
         },
         {
           "key": "payment",
           "value": "COD",
           "op": "set",
-          "source": "call_1#turn6"
+          "source": "call_1#turn5"
         },
         {
           "key": "product_advised",
@@ -240,29 +282,9 @@
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn11"
         }
       ],
-      "entities": [
-        {
-          "type": "money",
-          "value": "1890000",
-          "spoken": "1.890.000đ"
-        },
-        {
-          "type": "address",
-          "value": "Lê Chân, Hải Phòng",
-          "spoken": "Lê Chân, Hải Phòng"
-        }
-      ],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Ừ, vậy em lên đơn cho anh luôn đi.",
-      "facts_stated": {},
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -270,13 +292,17 @@
     }
   ],
   "gold": {
-    "intent": "xac_nhan_mua",
+    "intent": "chot_don",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
     "sentiment": "positive",
     "decision_maker": null,
-    "commitments": [],
+    "commitments": [
+      {
+        "text": "Sẽ gửi mã đơn qua SMS/Zalo sau ít phút."
+      }
+    ],
     "supersedes": [],
     "callback": null,
     "order": {
@@ -284,8 +310,7 @@
       "qty": 1,
       "price_vnd": 1890000,
       "payment": "COD",
-      "address": "Lê Chân, Hải Phòng",
-      "order_id": "OD600001",
+      "delivery_area": "Lê Chân, Hải Phòng",
       "estimated_delivery": "2026-11-17"
     }
   }

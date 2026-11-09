@@ -12,14 +12,8 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào cô ạ, hôm trước cô có hỏi về Xe đẩy gấp gọn Joie Pact và bảo để hỏi lại con cháu. Hôm nay mình muốn đặt hàng sản phẩm này đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Hôm nay mình muốn đặt hàng Xe đẩy gấp gọn Joie Pact đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em chào anh Kiên ạ, hôm trước anh có quan tâm Xe đẩy gấp gọn Joie Pact và cần hỏi người nhà, hôm nay anh muốn đặt luôn đúng không ạ?",
+      "questions": [],
       "facts_used": [
         "product_advised",
         "blocker",
@@ -27,25 +21,18 @@
         "price_quoted_vnd",
         "promo_code"
       ],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 3490000
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "alo chau co muon dat hang xe day joie pact",
-      "facts_stated": {
-        "product_advised": "SKU-MB-STR1"
-      },
+      "text": "alo em anh muon dat hang xe day joie pact",
+      "facts_stated": {},
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -53,20 +40,10 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xác nhận cô muốn đặt hàng Xe đẩy gấp gọn Joie Pact ạ. Sản phẩm này giá 3.490.000đ, hiện shop còn hàng và đang được miễn phí vận chuyển toàn quốc theo chương trình MOM-FREESHIP cô nhé.",
+      "text": "Dạ em xác nhận anh muốn đặt Xe đẩy Joie Pact ạ. Xe này hiện đang có hàng, mình hỏi anh muốn thanh toán và nhận hàng như thế nào cho tiện ạ?",
       "questions": [],
-      "facts_used": [
-        "product_advised"
-      ],
+      "facts_used": [],
       "claims": [
-        {
-          "field": "price_vnd",
-          "value": 3490000
-        },
-        {
-          "field": "promo_MOM-FREESHIP_active",
-          "value": true
-        },
         {
           "field": "in_stock",
           "value": true
@@ -90,11 +67,9 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giá của xe đẩy Joie Pact là 3.490.000đ cô nhé, giá này đã được áp dụng chương trình miễn phí vận chuyển toàn quốc cho mẹ & bé ạ.",
+      "text": "Dạ giá xe đẩy Joie Pact là 3.490.000đ anh nhé, hiện đang được miễn phí vận chuyển toàn quốc cho mẹ & bé.",
       "questions": [],
-      "facts_used": [
-        "product_advised"
-      ],
+      "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
@@ -103,18 +78,22 @@
         {
           "field": "promo_MOM-FREESHIP_active",
           "value": true
+        },
+        {
+          "field": "freeship",
+          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "co quyet dinh thanh toan bang ngan hang",
+      "text": "anh quyet dinh thanh toan bang ngan hang",
       "facts_stated": {
         "payment": "bank"
       },
@@ -125,29 +104,26 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, cô chọn thanh toán bằng chuyển khoản ngân hàng đúng không ạ? Em sẽ lên đơn cho cô với hình thức thanh toán này và giao hàng về Nha Trang, Khánh Hòa.",
+      "text": "Dạ mình chọn chuyển khoản ngân hàng đúng không anh? Anh muốn giao xe đẩy đến địa chỉ nào để em kiểm tra thời gian giao hàng cho mình ạ?",
       "questions": [
         {
-          "slot": "payment",
-          "type": "confirm",
-          "text": "Cô xác nhận sẽ thanh toán bằng chuyển khoản ngân hàng đúng không ạ?"
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Anh muốn giao xe đẩy đến địa chỉ nào để em kiểm tra thời gian giao hàng cho mình ạ?"
         }
       ],
-      "facts_used": [
-        "payment",
-        "delivery_area"
-      ],
+      "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "giao hang cho co o nha trang khanh hoa nhe",
+      "text": "giao hang cho anh o nha trang khanh hoa nhe",
       "facts_stated": {
         "delivery_area": "Nha Trang, Khánh Hòa"
       },
@@ -164,11 +140,9 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em giao xe đẩy Joie Pact về địa chỉ Nha Trang, Khánh Hòa cho cô, dự kiến nhận hàng từ nay đến ngày 22/10 cô nhé.",
+      "text": "Dạ em kiểm tra, giao về Nha Trang, Khánh Hòa dự kiến nhận hàng vào ngày 22/10 anh nhé.",
       "questions": [],
-      "facts_used": [
-        "delivery_area"
-      ],
+      "facts_used": [],
       "claims": [
         {
           "field": "estimated_delivery",
@@ -185,14 +159,20 @@
         }
       ],
       "memory_writes": [],
-      "entities": [],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-10-22",
+          "spoken": "22/10"
+        }
+      ],
       "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "co vua hoi lai chau la xe day joie pact dung khong",
+      "text": "anh vua hoi lai em la xe day joie pact dung khong",
       "facts_stated": {},
       "entities": [],
       "pause_before_ms": 0,
@@ -201,26 +181,10 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ đúng rồi cô, sản phẩm cô đặt là Xe đẩy gấp gọn Joie Pact chính hãng, giá 3.490.000đ, miễn phí vận chuyển và giao về Nha Trang, Khánh Hòa.",
+      "text": "Dạ đúng rồi anh, mình đặt Xe đẩy gấp gọn Joie Pact, hàng chính hãng bảo hành 12 tháng ạ.",
       "questions": [],
-      "facts_used": [
-        "product_advised",
-        "delivery_area"
-      ],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 3490000
-        },
-        {
-          "field": "promo_MOM-FREESHIP_active",
-          "value": true
-        },
-        {
-          "field": "delivery_days",
-          "value": 4
-        }
-      ],
+      "facts_used": [],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -230,7 +194,7 @@
     },
     {
       "speaker": "customer",
-      "text": "u co dong y mua cai xe nay",
+      "text": "u anh dong y mua cai xe nay",
       "facts_stated": {},
       "entities": [],
       "pause_before_ms": 0,
@@ -239,16 +203,15 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Em đọc lại đơn hàng: Xe đẩy gấp gọn Joie Pact, 1 chiếc, giá 3.490.000đ, giao về Nha Trang, Khánh Hòa, thanh toán chuyển khoản ngân hàng, nhận hàng dự kiến trong ngày 22/10. Cô xác nhận giúp em thông tin này để em lên đơn nhé?",
+      "text": "Em đọc lại đơn hàng để anh xác nhận nhé: Xe đẩy gấp gọn Joie Pact, 1 chiếc, giá 3.490.000đ, giao tại Nha Trang, Khánh Hòa, thanh toán chuyển khoản ngân hàng, dự kiến nhận hàng ngày 22/10. Anh xác nhận giúp em thông tin trên đúng chưa ạ?",
       "questions": [
         {
           "slot": "order_summary",
           "type": "confirm",
-          "text": "Cô xác nhận giúp em thông tin này để em lên đơn nhé?"
+          "text": "Anh xác nhận giúp em thông tin trên đúng chưa ạ?"
         }
       ],
       "facts_used": [
-        "product_advised",
         "delivery_area",
         "payment"
       ],
@@ -256,18 +219,38 @@
         {
           "field": "price_vnd",
           "value": 3490000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-22"
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 400,
+      "entities": [
+        {
+          "type": "money",
+          "value": "3490000",
+          "spoken": "3.490.000"
+        },
+        {
+          "type": "address",
+          "value": "Nha Trang, Khánh Hòa",
+          "spoken": "Nha Trang, Khánh Hòa"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-22",
+          "spoken": "22/10"
+        }
+      ],
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "u dung roi chau len don cho co nhe",
+      "text": "u dung roi em len don cho anh nhe",
       "facts_stated": {},
       "entities": [],
       "pause_before_ms": 0,
@@ -276,17 +259,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã lên đơn hàng cho cô thành công. Đơn sẽ được giao về Nha Trang, Khánh Hòa dự kiến đến ngày 22/10, cô thanh toán chuyển khoản khi nhận hàng. Nếu cần hỗ trợ thêm, cô cứ liên hệ shop nhé. Em cảm ơn cô đã đặt hàng ạ!",
+      "text": "Dạ em đã tạo đơn hàng cho anh, tổng cộng 3.490.000đ, miễn phí vận chuyển, giao dự kiến ngày 22/10. Shop sẽ gửi thông tin chuyển khoản qua Zalo hoặc SMS cho anh nhé. Cảm ơn anh đã đặt hàng tại Shop BTC ạ!",
       "questions": [],
-      "facts_used": [
-        "product_advised",
-        "delivery_area",
-        "payment"
-      ],
+      "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 3490000
+        },
+        {
+          "field": "freeship",
+          "value": true
         },
         {
           "field": "estimated_delivery",
@@ -312,53 +295,72 @@
           "key": "delivery_area",
           "value": "Nha Trang, Khánh Hòa",
           "op": "set",
-          "source": "call_2#turn10"
+          "source": "call_2#turn16"
         },
         {
           "key": "payment",
           "value": "bank",
           "op": "set",
-          "source": "call_2#turn10"
+          "source": "call_2#turn16"
         },
         {
           "key": "product_advised",
           "value": "SKU-MB-STR1",
           "op": "set",
-          "source": "call_2#turn10"
+          "source": "call_2#turn16"
         },
         {
           "key": "price_quoted_vnd",
           "value": 3490000,
           "op": "set",
-          "source": "call_2#turn10"
+          "source": "call_2#turn16"
         },
         {
           "key": "promo_code",
           "value": "MOM-FREESHIP",
           "op": "set",
-          "source": "call_2#turn10"
+          "source": "call_2#turn16"
         },
         {
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_2#turn10"
+          "source": "call_2#turn16"
         }
       ],
-      "entities": [],
-      "pause_before_ms": 0,
+      "entities": [
+        {
+          "type": "money",
+          "value": "3490000",
+          "spoken": "3.490.000"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-22",
+          "spoken": "22/10"
+        }
+      ],
+      "pause_before_ms": 800,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "dat_hang_xe_day_joie_pact",
+    "intent": "dat_hang",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
     "sentiment": "positive",
     "decision_maker": null,
-    "commitments": [],
+    "commitments": [
+      {
+        "product": "Xe đẩy gấp gọn Joie Pact",
+        "delivery_area": "Nha Trang, Khánh Hòa",
+        "payment": "bank",
+        "estimated_delivery": "2026-10-22",
+        "price_vnd": 3490000
+      }
+    ],
     "supersedes": [],
     "callback": null,
     "order": {
@@ -366,9 +368,9 @@
       "qty": 1,
       "price_vnd": 3490000,
       "payment": "bank",
-      "delivery_area": "Nha Trang, Khánh Hòa",
-      "estimated_delivery": "2026-10-22",
-      "order_id": "OD600001"
+      "address": "Nha Trang, Khánh Hòa",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-10-22"
     }
   }
 }

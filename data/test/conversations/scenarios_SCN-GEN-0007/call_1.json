@@ -12,31 +12,37 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em có thể hỗ trợ chị về máy lọc không khí AirPure X cho phòng 15 mét vuông ạ.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, chị cần tư vấn về máy lọc không khí đúng không ạ?",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Alo, chị muốn hỏi về máy lọc không khí AirPure X cho phòng khoảng 15 mét vuông.",
-      "facts_stated": {
-        "room_area_m2": 15
-      },
       "entities": [],
       "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về máy lọc không khí AirPure X cho phòng khoảng 15 mét vuông. Nhà chị không có trẻ nhỏ.",
+      "facts_stated": {
+        "room_area_m2": 15,
+        "has_children": false
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ với phòng 15 mét vuông thì máy lọc không khí AirPure X là phù hợp chị nhé. Máy này hiện shop đang bán với giá 4.890.000đ, hàng còn sẵn kho ạ.",
+      "text": "Dạ, với phòng 15 mét vuông thì máy lọc không khí AirPure X là lựa chọn phù hợp chị nhé. Máy này hiện đang có giá 4.890.000đ và còn hàng tại shop ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -51,8 +57,14 @@
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
+      "entities": [
+        {
+          "type": "money",
+          "value": "4890000",
+          "spoken": "4.890.000"
+        }
+      ],
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -62,30 +74,38 @@
       "facts_stated": {
         "competitor_price_vnd": 4300000
       },
-      "entities": [],
-      "pause_before_ms": 600,
+      "entities": [
+        {
+          "type": "money",
+          "value": "4300000",
+          "spoken": "4 triệu 3"
+        }
+      ],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn chị đã tham khảo nhiều nơi. Giá bên em là giá niêm yết chính hãng, đi kèm bảo hành 24 tháng và quà tặng màng lọc chính hãng cho chị ạ.",
+      "text": "Dạ em cảm ơn chị đã tham khảo nhiều nơi. Giá tại shop hiện là 4.890.000đ, sản phẩm chính hãng, bảo hành 12 tháng và được đổi trả trong 7 ngày nếu có lỗi từ nhà sản xuất chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 4890000
-        },
-        {
-          "field": "promo_GIFT-FILTER_active",
-          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
+      "entities": [
+        {
+          "type": "money",
+          "value": "4890000",
+          "spoken": "4.890.000"
+        }
+      ],
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -94,25 +114,29 @@
       "text": "Máy này có khuyến mãi gì không em?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại mua AirPure X bên em tặng kèm 1 màng lọc chính hãng, chương trình áp dụng đến hết ngày 22/10 chị nhé.",
+      "text": "Dạ hiện tại khi mua AirPure X, chị được tặng kèm một màng lọc thay thế chính hãng, và shop miễn phí vận chuyển toàn quốc cho đơn từ 500.000đ trở lên ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "promo_GIFT-FILTER_active",
           "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -123,14 +147,20 @@
         "budget_vnd": 5000000,
         "objection": "giá cao hơn chỗ khác"
       },
-      "entities": [],
-      "pause_before_ms": 600,
+      "entities": [
+        {
+          "type": "money",
+          "value": "5000000",
+          "spoken": "5 triệu"
+        }
+      ],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em hiểu chị quan tâm giá cả. Bên em cam kết hàng chính hãng, bảo hành 24 tháng và có quà tặng kèm, chị cân nhắc giúp em nhé.",
+      "text": "Dạ em hiểu băn khoăn của chị về giá ạ. Giá bên em là giá niêm yết chính hãng, kèm bảo hành và quà tặng. Nếu chị cần thêm hỗ trợ, bên em sẽ giữ mức giá và khuyến mãi này đến hết ngày 22/10 nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -145,8 +175,14 @@
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
+      "entities": [
+        {
+          "type": "money",
+          "value": "4890000",
+          "spoken": "4.890.000"
+        }
+      ],
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -155,13 +191,13 @@
       "text": "Thế thì chị phải hỏi ông xã đã, rồi gọi lại nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, chị cứ trao đổi thêm với gia đình rồi liên hệ lại giúp em. Em giữ thông tin báo giá và chương trình khuyến mãi cho chị đến hết ngày 22/10 ạ. Em cảm ơn chị đã quan tâm sản phẩm của shop BTC.",
+      "text": "Dạ vâng, chị cứ trao đổi thêm với gia đình. Khi nào cần tư vấn hoặc đặt hàng, chị liên hệ lại shop nhé. Em giữ thông tin tư vấn này cho chị đến hết ngày 22/10 ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -182,13 +218,13 @@
           "key": "competitor_price_vnd",
           "value": 4300000,
           "op": "set",
-          "source": "call_1#turn3"
+          "source": "call_1#turn4"
         },
         {
           "key": "has_children",
           "value": false,
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn2"
         },
         {
           "key": "objection",
@@ -200,40 +236,40 @@
           "key": "room_area_m2",
           "value": 15,
           "op": "set",
-          "source": "call_1#turn1"
+          "source": "call_1#turn2"
         },
         {
           "key": "product_advised",
           "value": "SKU-AP-X",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn3"
         },
         {
           "key": "price_quoted_vnd",
           "value": 4890000,
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn3"
         },
         {
           "key": "promo_code",
           "value": "GIFT-FILTER",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn7"
         }
       ],
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "hen_goi_lai",
+    "intent": "tu_van_may_loc_khong_khi",
     "outcome": "hen_goi_lai",
-    "objection_type": "so_sanh_gia",
-    "objection_handling": "Nêu giá trị đi kèm: bảo hành chính hãng, quà tặng màng lọc, không so sánh giá đối thủ.",
+    "objection_type": "gia_cao_hon_doi_thu",
+    "objection_handling": "Giải thích giá niêm yết chính hãng, nêu bảo hành và quà tặng, giữ khuyến mãi đến 22/10.",
     "sentiment": "neutral",
-    "decision_maker": "ông xã",
+    "decision_maker": "ong_xa",
     "commitments": [],
     "supersedes": [],
     "callback": null,

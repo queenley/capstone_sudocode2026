@@ -67,6 +67,64 @@ Loại: dữ liệu · Trạng thái: xong · Chỉ số: không có (giao diệ
 - **Số đo:** 40/40 sản phẩm có ảnh.
 - **Còn lại:** vài ảnh chỉ gần đúng loại hàng (máy lọc nước nóng lạnh cho RO, bình sữa cho máy hâm và máy tiệt trùng). Cần chạy lại seed để ảnh vào database: `docker compose run --rm seed`.
 
+### 2026-11-10 · Sinh lại hội thoại mẫu và audio theo nhãn mới (dev r4, test r1)
+
+Loại: dữ liệu · Trạng thái: xong (bộ vàng chờ người duyệt ký lại) · Chỉ số: TSR, CCR, WER
+
+- **Vấn đề:**
+  - Sau các nhóm sửa nhãn, nhiều hội thoại mẫu không còn khớp kịch bản, cụ thể ở các loại sau.
+
+    | Loại | dev | test |
+    |---|---|---|
+    | Lời khách đã đổi | 188 | 43 |
+    | Trượt validator | 31 | 6 |
+    | Agent mẫu bịa (J02) | 33 | 2 |
+    | Thiếu file | 4 | — |
+
+  - `approve_gold.py` chặn lần ký vì GEN-0184/c2 và GEN-0197/c2 trượt validator.
+  - 236 clip dev còn đọc lời khách cũ.
+- **Bằng chứng:** `review/auto_verified.json`, `reports/validation.json`, `synthesize_scenario_audio --changed-only --dry-run`. Dev có 266 lượt cần đọc, test 58.
+- **Sửa:**
+  - `regenerate_conversations.py` mới:
+    - chọn các cuộc;
+    - chuyển file cũ sang `data/.build/regen-backup/`;
+    - chạy `generate_dialogue --resume`, `validate_rules`, `llm_judge --resume` và `export_manual_review` (không `--ingest`);
+    - ghi `review/regenerated.json`;
+    - xoá `approve_conversation` cũ của các cuộc đó;
+    - chạy `mark_conversations.py` và `auto_verify.py`.
+  - `DATAGEN_REFRESH_CACHE=1` trong `openai_client.py`. Nếu không có cờ này, kịch bản không đổi sẽ nhận lại bản nháp cũ từ cache.
+  - `mark_conversations.py` không đánh dấu lại các cuộc đã sinh lại. Ca J02 vẫn lấy theo lần chấm mới.
+  - `write_ground_truth` lấy entity từ `asr_reference/<call>.json`, là file mà nhóm 11 đã sửa. Kiểm lại: 0 khác biệt trên 3.369 clip dev không đổi lời.
+  - `install` của builder giữ các `asr_reference` vừa đọc lại và dựng lại `ground_truth.json` từ clip.
+  - Đã chạy hai vòng. Vòng hai sinh lại 27 cuộc dev và 6 cuộc test còn J02 hoặc trượt validator.
+- **Đã kiểm:**
+  - Oracle hoàn hảo; `trace_log` không đổi.
+  - Validator: dev 801/801 (trước là 770), test 191/192 (trước là 186). Ca còn trượt là GEN-0042/c3, hỏi 3 câu trong khi tối đa là 2.
+  - Hội thoại qua mọi kiểm: dev 576/801 (trước là 415), test 148/192 (trước là 112). Phần còn lại phần lớn do bộ chấm bằng model gắn cờ cần người đọc.
+  - J02 còn lại: dev 13, test 2.
+  - `ground_truth.json` ASR không còn clip đọc lời cũ. Ở test, 114 nhãn chuyển sang `entities_not_stated`, khớp với dev (nhóm 32, người duyệt chấp nhận 10/11/2026).
+  - Chi phí model (ước theo bảng giá trong `settings.yaml`): dev khoảng 6,25 USD, test khoảng 1,41 USD. ElevenLabs: 27.756 ký tự.
+- **Còn lại:** người duyệt ký lại bằng `approve_gold.py` cho dev và test.
+- **Số đo:** chưa đo trên agent thật.
+
+### 2026-11-09 · Duyệt nhóm 19–24 và 31: không còn nhãn chờ duyệt
+
+Loại: dữ liệu · Trạng thái: xong (bộ vàng chờ người duyệt ký lại) · Chỉ số: TSR, RQR, CCR
+
+- **Vấn đề:** 25 thay đổi Claude đề xuất (dev 23 ở nhóm 19–24, 31; test 2 ở nhóm 21, 22) vẫn là `decision: pending`, nên các cuộc đó nằm ngoài bộ vàng.
+- **Bằng chứng:** người duyệt (dngan0365) đọc bảng các thay đổi từng nhóm và đồng ý tất cả.
+- **Sửa:**
+  - Đặt `ACTION_PROPOSALS_REVIEWED = "2026-11-09"` trong `build_dev_r4.py`. Builder của test đọc cùng cờ này.
+  - Dựng lại cả hai bộ: 25 thay đổi thành `decision: revise` với `reviewer` và `reviewed_on`. Lời khách và nhãn không đổi.
+  - DISPUTES và README ghi 0 thay đổi chờ duyệt.
+- **Đã kiểm:**
+  - Oracle hoàn hảo, 0 file lỗi schema.
+  - Validator: dev 770/797, test 186/192.
+  - `auto_verify` (nhãn qua mọi kiểm): dev 799/801, test 191/192. Chỉ còn ADV-0024/0119 c2 là N; luật RUN-10 dùng một lần, nhãn đúng.
+  - `review_sheet.csv` giữ nguyên các ô duyệt của người duyệt; chỉ cột gợi ý thay đổi.
+- **Còn lại:** người duyệt đặt Y cho ADV-0024/0119 c2, rồi chạy `approve_gold.py` cho dev và test để ký lại bộ vàng.
+- **Số đo:** chưa đo trên agent thật.
+
 ### 2026-11-09 · Lần kiểm thứ hai: thanh toán, diện tích, kịch bản chung SĐT (nhóm 27–31)
 
 Loại: dữ liệu · Trạng thái: xong (nhóm 19–24, 31 chờ duyệt) · Chỉ số: TSR, RQR, CCR

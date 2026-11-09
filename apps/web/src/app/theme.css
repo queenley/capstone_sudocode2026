@@ -2,11 +2,11 @@
    and dark. Every colour in globals.css, shop.css and sales.css is one of these;
    nothing else names a colour.
 
-   The light palette is the one taste-skill dealt for the shop (white-navy-tab:
-   navy ink on white, an orange action with a navy label) with Work Sans, the
+   The palette follows the logo (public/logo/main.svg, emerald #059669): deep
+   green ink on white, an emerald action with a white label, with Work Sans, the
    first of the product pairings that sets Vietnamese; the storefront loads the
-   kit itself from public/assets and these names follow it. Orange is too pale
-   for text on white, so --brand-ink is a darker orange (6.9:1).
+   kit itself from public/assets and site.css repeats these colours for it.
+   Brand-coloured text on white uses the darker --brand-ink (#047857, 5.5:1).
 
    The theme follows the system unless the person picked one: <html
    data-theme="light|dark"> (components/theme/ThemeToggle.tsx, remembered in
@@ -50,26 +50,26 @@
   /* Surfaces, from the page to the most raised. */
   --bg: #ffffff;
   --surface: #ffffff;
-  --surface-2: #f8f8f6;
-  --surface-3: #f4f4f2;
-  --line: #e3e4e9;
-  --line-strong: #8a90a3;
+  --surface-2: #f6f9f7;
+  --surface-3: #eff4f1;
+  --line: #dfe7e3;
+  --line-strong: #839189;
 
   /* Text. */
-  --ink: #1f2b4d;
-  --ink-2: #3c4766;
-  --muted: #646b81;
+  --ink: #12352a;
+  --ink-2: #2e4a3f;
+  --muted: #5d6c65;
 
-  /* Brand: the orange action with a navy label. --brand-ink is brand-coloured text on a surface. */
-  --brand: #f7941d;
-  --brand-strong: #e07f0a;
-  --brand-deep: #1f2b4d;
-  --on-brand: #1f2b4d;
-  --brand-ink: #a85a00;
-  --brand-soft: #fff4e6;
-  --brand-soft-2: #ffe6c7;
-  --brand-line: #fbc98a;
-  --accent: #f7941d;
+  /* Brand: the logo's emerald action with a white label. --brand-ink is brand-coloured text on a surface. */
+  --brand: #059669;
+  --brand-strong: #047857;
+  --brand-deep: #064e3b;
+  --on-brand: #ffffff;
+  --brand-ink: #047857;
+  --brand-soft: #ecfdf5;
+  --brand-soft-2: #d1fae5;
+  --brand-line: #6ee7b7;
+  --accent: #059669;
 
   /* States. Solid colours carry white text in both themes. */
   --danger: #dc2626;
@@ -85,20 +85,20 @@
   --info-ink: #1d4ed8;
 
   /* Dark chrome: the staff sidebar. */
-  --chrome: #1f2b4d;
-  --chrome-2: #18223d;
+  --chrome: #0b3d2e;
+  --chrome-2: #072f23;
   --on-chrome: #ffffff;
   --on-chrome-muted: rgb(255 255 255 / 0.72);
-  --chrome-label: #fbc98a;
+  --chrome-label: #a7f3d0;
   --chrome-active: #ffffff;
-  --on-chrome-active: #1f2b4d;
+  --on-chrome-active: #0b3d2e;
 
-  --overlay: rgb(15 22 40 / 0.45);
-  --shadow-rgb: 31 43 77;
+  --overlay: rgb(6 28 21 / 0.45);
+  --shadow-rgb: 18 53 42;
   --shadow-sm: 0 1px 2px rgb(var(--shadow-rgb) / 0.06);
   --shadow: 0 1px 2px rgb(var(--shadow-rgb) / 0.05), 0 8px 24px rgb(var(--shadow-rgb) / 0.07);
   --shadow-lg: 0 24px 64px rgb(var(--shadow-rgb) / 0.18);
-  --focus: 0 0 0 3px rgb(247 148 29 / 0.35);
+  --focus: 0 0 0 3px rgb(5 150 105 / 0.35);
   --skeleton: linear-gradient(90deg, var(--surface-3) 25%, var(--surface-2) 50%, var(--surface-3) 75%);
 
   /* Names the pages used before the tokens: kept as aliases. */
@@ -111,24 +111,24 @@
    (CSS has no way to share a block between a selector and a media query). */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #0e1424;
-  --surface: #151c30;
-  --surface-2: #1a2238;
-  --surface-3: #212a42;
-  --line: #2a3450;
-  --line-strong: #6b7591;
-  --ink: #eef0f6;
-  --ink-2: #c9cedc;
-  --muted: #9aa1b5;
-  --brand: #f7941d;
-  --brand-strong: #ffa940;
-  --brand-deep: #2a2010;
-  --on-brand: #1f2b4d;
-  --brand-ink: #ffb057;
-  --brand-soft: #2a1f10;
-  --brand-soft-2: #3a2a12;
-  --brand-line: #6a4a1c;
-  --accent: #f7941d;
+  --bg: #0a1511;
+  --surface: #101e19;
+  --surface-2: #14251f;
+  --surface-3: #1a2e27;
+  --line: #243a31;
+  --line-strong: #64806f;
+  --ink: #edf5f0;
+  --ink-2: #c6d6cd;
+  --muted: #94a89d;
+  --brand: #10b981;
+  --brand-strong: #34d399;
+  --brand-deep: #0d2a20;
+  --on-brand: #022c22;
+  --brand-ink: #34d399;
+  --brand-soft: #0f2a21;
+  --brand-soft-2: #13392c;
+  --brand-line: #1f6049;
+  --accent: #10b981;
   --danger: #dc2626;
   --danger-soft: #2a1414;
   --danger-line: #5a2424;
@@ -140,40 +140,40 @@
   --info: #3b82f6;
   --info-soft: #111d33;
   --info-ink: #93c5fd;
-  --chrome: #0a0f1c;
-  --chrome-2: #0f1526;
-  --chrome-label: #ffb057;
-  --chrome-active: #212a42;
-  --on-chrome-active: #ffb057;
+  --chrome: #06100c;
+  --chrome-2: #0a1712;
+  --chrome-label: #6ee7b7;
+  --chrome-active: #1a2e27;
+  --on-chrome-active: #6ee7b7;
   --overlay: rgb(0 0 0 / 0.6);
   --shadow-rgb: 0 0 0;
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
   --shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 24px rgb(0 0 0 / 0.35);
   --shadow-lg: 0 24px 64px rgb(0 0 0 / 0.6);
-  --focus: 0 0 0 3px rgb(247 148 29 / 0.4);
+  --focus: 0 0 0 3px rgb(16 185 129 / 0.4);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #0e1424;
-    --surface: #151c30;
-    --surface-2: #1a2238;
-    --surface-3: #212a42;
-    --line: #2a3450;
-    --line-strong: #6b7591;
-    --ink: #eef0f6;
-    --ink-2: #c9cedc;
-    --muted: #9aa1b5;
-    --brand: #f7941d;
-    --brand-strong: #ffa940;
-    --brand-deep: #2a2010;
-    --on-brand: #1f2b4d;
-    --brand-ink: #ffb057;
-    --brand-soft: #2a1f10;
-    --brand-soft-2: #3a2a12;
-    --brand-line: #6a4a1c;
-    --accent: #f7941d;
+    --bg: #0a1511;
+    --surface: #101e19;
+    --surface-2: #14251f;
+    --surface-3: #1a2e27;
+    --line: #243a31;
+    --line-strong: #64806f;
+    --ink: #edf5f0;
+    --ink-2: #c6d6cd;
+    --muted: #94a89d;
+    --brand: #10b981;
+    --brand-strong: #34d399;
+    --brand-deep: #0d2a20;
+    --on-brand: #022c22;
+    --brand-ink: #34d399;
+    --brand-soft: #0f2a21;
+    --brand-soft-2: #13392c;
+    --brand-line: #1f6049;
+    --accent: #10b981;
     --danger: #dc2626;
     --danger-soft: #2a1414;
     --danger-line: #5a2424;
@@ -185,17 +185,17 @@
     --info: #3b82f6;
     --info-soft: #111d33;
     --info-ink: #93c5fd;
-    --chrome: #0a0f1c;
-    --chrome-2: #0f1526;
-    --chrome-label: #ffb057;
-    --chrome-active: #212a42;
-    --on-chrome-active: #ffb057;
+    --chrome: #06100c;
+    --chrome-2: #0a1712;
+    --chrome-label: #6ee7b7;
+    --chrome-active: #1a2e27;
+    --on-chrome-active: #6ee7b7;
     --overlay: rgb(0 0 0 / 0.6);
     --shadow-rgb: 0 0 0;
     --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
     --shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 24px rgb(0 0 0 / 0.35);
     --shadow-lg: 0 24px 64px rgb(0 0 0 / 0.6);
-    --focus: 0 0 0 3px rgb(247 148 29 / 0.4);
+    --focus: 0 0 0 3px rgb(16 185 129 / 0.4);
   }
 }
 

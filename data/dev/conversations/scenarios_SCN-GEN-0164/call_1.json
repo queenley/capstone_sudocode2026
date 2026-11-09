@@ -12,8 +12,14 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em sẵn sàng hỗ trợ chị về giày chạy bộ RunLite 2 Pro size 42 màu đen ạ.",
-      "questions": [],
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị cần tư vấn về giày chạy bộ RunLite 2 Pro size 42 màu đen đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị cần tư vấn về giày chạy bộ RunLite 2 Pro size 42 màu đen đúng không ạ?"
+        }
+      ],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
@@ -38,20 +44,20 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, sản phẩm giày chạy bộ RunLite 2 Pro size 42 màu đen hiện bên em còn hàng. Giá ưu đãi hiện tại là 1.352.000đ, đã áp dụng chương trình khuyến mãi RUN2-SALE đến hết ngày 07/10. Nếu chị quan tâm, em sẽ tư vấn thêm các thông tin cần thiết cho mình ạ.",
+      "text": "Dạ, sản phẩm giày chạy bộ RunLite 2 Pro size 42 màu đen bên em đang có giá khuyến mãi 1.352.000đ, đang còn hàng và áp dụng chương trình RUN2-SALE đến hết ngày 07/10 ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
-        {
-          "field": "in_stock",
-          "value": true
-        },
         {
           "field": "price_vnd",
           "value": 1352000
         },
         {
           "field": "promo_RUN2-SALE_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
           "value": true
         }
       ],
@@ -69,14 +75,20 @@
         "competitor_price_vnd": 1240000,
         "objection": "giá cao hơn chỗ khác"
       },
-      "entities": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1240000",
+          "spoken": "1 triệu 240 ngàn"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em cảm ơn chị đã chia sẻ thông tin ạ. Bên em bán đúng hàng chính hãng, giá đã giảm từ 1.690.000đ còn 1.352.000đ theo chương trình RUN2-SALE và áp dụng chính sách bảo hành 12 tháng, đổi trả trong 7 ngày nếu chưa sử dụng. Bên em không so sánh giá với bên khác nhưng luôn đảm bảo quyền lợi chính hãng cho khách hàng ạ.",
+      "text": "Dạ em hiểu băn khoăn của chị ạ. Bên em báo giá theo chương trình khuyến mãi hiện hành, giá đã giảm từ 1.690.000đ còn 1.352.000đ, kèm bảo hành chính hãng và đổi trả trong 7 ngày ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -87,10 +99,6 @@
         {
           "field": "list_price_vnd",
           "value": 1690000
-        },
-        {
-          "field": "promo_RUN2-SALE_active",
-          "value": true
         }
       ],
       "tool_calls": [],
@@ -111,14 +119,10 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, sản phẩm đang được giảm giá theo chương trình RUN2-SALE, chị mua trong hôm nay đến hết ngày 07/10 sẽ được giá 1.352.000đ. Ngoài ra, đơn hàng của chị còn được miễn phí COD toàn quốc và đổi trả miễn phí lần đầu trong 7 ngày ạ.",
+      "text": "Dạ hiện tại sản phẩm này áp dụng khuyến mãi RUN2-SALE và miễn phí thu hộ khi nhận hàng, thời hạn đến hết ngày 07/10 chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1352000
-        },
         {
           "field": "promo_RUN2-SALE_active",
           "value": true
@@ -137,19 +141,32 @@
     },
     {
       "speaker": "customer",
-      "text": "Chị cần hỏi thêm một chút rồi sẽ quyết định gọi lại nhé.",
-      "facts_stated": {},
-      "entities": [],
+      "text": "Chị cần hỏi thêm một chút rồi sẽ quyết định gọi lại nhé. Số chị là 0981933190.",
+      "facts_stated": {
+        "phone_provided": true
+      },
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0981933190",
+          "spoken": "0981933190"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, chị cứ cân nhắc thêm ạ. Khi nào chị quyết định hoặc cần hỗ trợ gì thêm, chị nhắn lại cho em nhé. Em cảm ơn chị đã quan tâm sản phẩm của shop BTC ạ.",
+      "text": "Dạ vâng, chị cứ cân nhắc thêm ạ. Chương trình khuyến mãi đang áp dụng đến hết ngày 07/10, nếu cần hỗ trợ thêm chị cứ nhắn em nhé.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "promo_RUN2-SALE_active",
+          "value": true
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [
         {
@@ -208,10 +225,10 @@
     }
   ],
   "gold": {
-    "intent": "hoi_gia_giay_khuyen_mai",
+    "intent": "hoi_gia_giay_km",
     "outcome": "hen_goi_lai",
-    "objection_type": "gia_cao_hon_doi_thu",
-    "objection_handling": "Nêu giá trị chính hãng, ưu đãi hiện hành, không so sánh giá đối thủ.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

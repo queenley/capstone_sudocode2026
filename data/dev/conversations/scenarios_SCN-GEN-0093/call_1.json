@@ -12,73 +12,14 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ chào anh ạ, em là trợ lý ảo của shop BTC, anh cần tư vấn về máy lọc nước đúng không ạ?",
+      "text": "Dạ em chào anh ạ, anh muốn tư vấn về máy lọc nước UF Sunhouse đúng không ạ?",
       "questions": [
         {
           "slot": "usage_need",
-          "type": "open",
-          "text": "Anh muốn dùng cho mấy người trong gia đình hay nhu cầu như thế nào ạ?"
+          "type": "confirm",
+          "text": "Anh dùng cho gia đình 5 người đúng không ạ?"
         }
       ],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "alo anh muon hoi ve may loc nuoc uf sunhouse cho gia dinh 5 nguoi",
-      "facts_stated": {
-        "usage_need": "gia đình 5 người"
-      },
-      "entities": [],
-      "pause_before_ms": 350,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, với gia đình 5 người thì máy lọc nước UF Sunhouse là phù hợp anh nhé. Máy dùng công nghệ UF, không cần điện, lọc được nước máy đạt chuẩn, công suất lọc 15 lít/giờ.",
-      "questions": [
-        {
-          "slot": "budget_vnd",
-          "type": "open",
-          "text": "Anh dự định chi khoảng bao nhiêu cho máy lọc nước này ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 3290000
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "ngan sach cua anh tam 3 trieu rưỡi thoi",
-      "facts_stated": {
-        "budget_vnd": 3500000
-      },
-      "entities": [],
-      "pause_before_ms": 350,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, hiện tại máy UF Sunhouse giá 3.290.000đ, nằm trong ngân sách của anh nhé. Máy đang có sẵn hàng tại shop.",
-      "questions": [],
       "facts_used": [],
       "claims": [
         {
@@ -99,16 +40,84 @@
     },
     {
       "speaker": "customer",
-      "text": "may nay co khuyen mai gi khong em nhi",
-      "facts_stated": {},
+      "text": "alo anh muon hoi ve may loc nuoc uf sunhouse cho gia dinh 5 nguoi",
+      "facts_stated": {
+        "usage_need": "gia đình 5 người"
+      },
       "entities": [],
-      "pause_before_ms": 350,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em kiểm tra thì hiện tại máy lọc nước UF Sunhouse chưa có chương trình khuyến mãi nào áp dụng. Tuy nhiên, đơn từ 500.000đ sẽ được miễn phí vận chuyển toàn quốc anh nhé.",
+      "text": "Dạ, máy lọc nước UF Sunhouse phù hợp với gia đình 4–6 người, giá là 3.290.000đ, hiện còn hàng anh nhé.",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Anh dự kiến ngân sách cho máy lọc nước này là khoảng bao nhiêu ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3290000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "ngan sach cua anh tam 3 trieu rưỡi thoi",
+      "facts_stated": {
+        "budget_vnd": 3500000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với ngân sách khoảng 3 triệu rưỡi thì mẫu UF Sunhouse này là phù hợp nhất anh nhé, hiện tại shop đang bán với giá 3.290.000đ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3290000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "may nay co khuyen mai gi khong em nhi",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại mẫu này chưa có khuyến mãi giảm giá, nhưng được miễn phí vận chuyển và hỗ trợ thanh toán khi nhận hàng anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -130,18 +139,25 @@
     },
     {
       "speaker": "customer",
-      "text": "a anh muon goi hotline hoi them mot so thong tin nua",
+      "text": "a anh muon goi hotline hoi them mot so thong tin nua so anh la 0975475177",
       "facts_stated": {
-        "blocker": "muốn gọi hotline hỏi thêm"
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "phone_provided": true
       },
-      "entities": [],
-      "pause_before_ms": 350,
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0975475177",
+          "spoken": "0975475177"
+        }
+      ],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, anh có thể gọi hotline của shop để được hỗ trợ thêm chi tiết. Em đã ghi nhận nhu cầu và thông tin của anh rồi ạ.",
+      "text": "Dạ em đã ghi nhận số điện thoại của anh. Nhân viên tổng đài sẽ gọi lại hỗ trợ anh trong thời gian sớm nhất nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -175,7 +191,7 @@
           "key": "price_quoted_vnd",
           "value": 3290000,
           "op": "set",
-          "source": "call_1#turn6"
+          "source": "call_1#turn4"
         }
       ],
       "entities": [],
@@ -193,7 +209,10 @@
     "decision_maker": null,
     "commitments": [],
     "supersedes": [],
-    "callback": null,
+    "callback": {
+      "phone": "0975475177",
+      "reason": "muốn gọi hotline hỏi thêm"
+    },
     "order": null
   }
 }

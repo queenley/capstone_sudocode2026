@@ -21,11 +21,17 @@ from src.schemas.scenario import Scenario
 from src.utils.dataset import Dataset
 from src.utils.io import write_json
 from src.utils.memory import known_facts_before
-from src.utils.paths import DATA_DIR, VALIDATION_JSON
+from src.utils.paths import DATA_DIR, PROMPTS_DIR, VALIDATION_JSON
 from src.utils.settings import load_settings, model_client, sampling
 from src.utils.quota import DailyLimitReached, stop_on_daily_limit
 
 RUBRIC = json.loads((DATA_DIR / "eval" / "llm_judge_rubric.json").read_text(encoding="utf-8"))
+#: The team's reading of the BTC criteria (evidence from the agent's words, what a J02/J03 FAIL needs), appended
+#: after BTC's judge_prompt_template; the criteria themselves are BTC's, unchanged.
+GUIDANCE = (PROMPTS_DIR / "judge_guidance.md").read_text(encoding="utf-8")
+PROMOTIONS = {p["promo_code"]: p for p in
+              json.loads((DATA_DIR / "catalog" / "promotions.json").read_text(encoding="utf-8"))["promotions"]}
+PROMO_FIELDS = ("name", "type", "applies_to", "discount_percent", "discount_vnd", "gift_sku", "conditions")
 CONFLICT_CASES = {"ba_kenh_bao_gia_lech", "doi_khuyen_mai_het_han", "ba_phien_doi_thong_tin", "phien_ban_chinh_sach_cu"}
 
 
@@ -52,6 +58,15 @@ def applicable_criteria(scenario: Scenario, call_name: str) -> list[str]:
     return [c["id"] for c in RUBRIC["criteria"] if rules.get(c["id"], False)]
 
 
+def active_promotions(facts: dict) -> list[dict]:
+    """Name and terms of each promotion the labels mark active (promo_<CODE>_active: true), so a judge can tell a
+    correct promotion from an invented one."""
+    codes = [key[len("promo_"):-len("_active")] for key, value in facts.items()
+             if key.startswith("promo_") and key.endswith("_active") and value is True]
+    return [{"promo_code": code, **{k: PROMOTIONS[code][k] for k in PROMO_FIELDS if k in PROMOTIONS[code]}}
+            for code in codes if code in PROMOTIONS]
+
+
 def transcript_text(conversation: Conversation) -> str:
     lines = []
     for turn in conversation.turns:
@@ -65,7 +80,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--limit", type=int, help="max conversations to judge")
     parser.add_argument("--resume", action="store_true", help="skip conversations already judged")
+    parser.add_argument("--only", default="", help="comma-separated conversation ids to judge (again), e.g. a trial")
     args = parser.parse_args()
+    only = {c.strip() for c in args.only.split(",") if c.strip()}
 
     settings = load_settings()
     client = model_client("judge", settings)
@@ -80,7 +97,9 @@ def main() -> None:
     for conversation in dataset.iter_conversations(args.limit):
         cid, scenario_id, call_name = conversation.conversation_id, conversation.scenario_id, conversation.call
         dest = dataset.judgment_path(scenario_id, call_name)
-        if args.resume and dest.exists():
+        if only and cid not in only:
+            continue
+        if args.resume and dest.exists() and not only:
             continue
         scenario = dataset.scenario(scenario_id)
         if scenario is None:
@@ -88,11 +107,13 @@ def main() -> None:
         applied = applicable_criteria(scenario, call_name)
         scenario_json = {"customer_goal": scenario.calls[call_name].customer_goal,
                          "facts_from_previous_sessions": known_facts_before(scenario, call_name),
-                         **scenario.btc_export()["calls"][call_name]}
+                         **scenario.btc_export()["calls"][call_name],
+                         "active_promotions": active_promotions(scenario.calls[call_name].ground_truth_facts)}
         prompt = RUBRIC["judge_prompt_template"].format(
             scenario_json=json.dumps(scenario_json, ensure_ascii=False),
             transcript=transcript_text(conversation),
             criteria=json.dumps([criteria_by_id[c] for c in applied], ensure_ascii=False))
+        prompt += "\n\n" + GUIDANCE
         prompt += "\n\nTrả về JSON {\"verdicts\": [ ... một phần tử cho MỖI tiêu chí ở trên ... ]}."
         try:
             output = client.generate(prompt, JudgeOutput, temperature=params["judge_temperature"], max_output_tokens=2048)

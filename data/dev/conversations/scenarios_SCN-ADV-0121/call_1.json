@@ -12,41 +12,14 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị cần tư vấn về máy lọc không khí AirPure Y và quà tặng đúng không ạ?",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị muốn tư vấn về máy lọc không khí AirPure Y đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Chị đang quan tâm tới máy lọc không khí AirPure Y đúng không ạ?"
+          "text": "Chị muốn tư vấn về máy lọc không khí AirPure Y đúng không ạ?"
         }
       ],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "promo_GIFT-FILTER_active",
-          "value": true
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Alo, chị muốn hỏi về máy lọc không khí AirPure Y đang có quà tặng.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ máy AirPure Y bên em đang có giá 5.200.000đ, tặng kèm một màng lọc thay thế chính hãng chị nhé. Chương trình quà tặng này đang áp dụng và hàng vẫn còn sẵn.",
-      "questions": [],
       "facts_used": [],
       "claims": [
         {
@@ -56,26 +29,47 @@
         {
           "field": "in_stock",
           "value": true
-        },
-        {
-          "field": "promo_GIFT-FILTER_active",
-          "value": true
-        },
-        {
-          "field": "gift_sku",
-          "value": "SKU-AP-FLT-X"
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về máy lọc không khí AirPure Y đang có quà tặng. Phòng chị khoảng 15 mét vuông, nhà chị không có trẻ nhỏ, ngân sách của chị tầm 5 triệu rưỡi.",
+      "facts_stated": {
+        "room_area_m2": 15,
+        "has_children": false,
+        "budget_vnd": 5500000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại máy lọc không khí AirPure Y đang có giá 5.200.000đ, phù hợp với phòng 15m² và nhà không có trẻ nhỏ thì rất hợp lý ạ. Máy còn tặng kèm màng lọc dự phòng, chương trình này đang áp dụng đến ngày 22/10/2026.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
         {
-          "type": "money",
-          "value": "5200000",
-          "spoken": "5.200.000đ"
+          "field": "price_vnd",
+          "value": 5200000
+        },
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
         }
       ],
-      "pause_before_ms": 500,
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -90,29 +84,19 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chương trình quà tặng không quy đổi thành tiền hoặc trừ vào giá sản phẩm chị nhé. Nếu chị không nhận quà thì giá máy vẫn là 5.200.000đ ạ.",
+      "text": "Dạ em thông tin với chị là quà tặng kèm chương trình hiện tại không quy đổi thành tiền và không trừ vào giá sản phẩm được ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "gift_cash_convertible",
           "value": false
-        },
-        {
-          "field": "price_vnd",
-          "value": 5200000
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "5200000",
-          "spoken": "5.200.000đ"
-        }
-      ],
-      "pause_before_ms": 500,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -127,7 +111,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em hiểu chị muốn cân nhắc thêm ạ. Chương trình quà tặng còn đến ngày 22/10 nên nếu chị quyết định trước thời gian đó sẽ vẫn được nhận ưu đãi. Em sẽ lưu lại thông tin để hỗ trợ chị khi cần nhé.",
+      "text": "Dạ vâng, chị cứ cân nhắc thêm nhé. Nếu chị quyết định thì chương trình quà tặng còn áp dụng đến hết ngày 22/10/2026 ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -138,14 +122,8 @@
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "date",
-          "value": "2026-10-22",
-          "spoken": "22/10"
-        }
-      ],
-      "pause_before_ms": 500,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -160,7 +138,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ rất tiếc, bên em chưa áp dụng giảm giá khi không lấy quà, nên giá máy sẽ giữ nguyên ạ. Nếu chị cần thêm thông tin hoặc quyết định đặt đơn, em luôn sẵn sàng hỗ trợ.",
+      "text": "Dạ em rất tiếc, giá máy hiện tại không thể thấp hơn vì chương trình tặng quà không đổi ra tiền và giá đã áp dụng ưu đãi tốt nhất rồi ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -179,62 +157,56 @@
           "key": "blocker",
           "value": "chờ cuối tháng nhận lương",
           "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn9"
         },
         {
           "key": "budget_vnd",
           "value": 5500000,
           "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn9"
         },
         {
           "key": "has_children",
           "value": false,
           "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn9"
         },
         {
           "key": "room_area_m2",
           "value": 15,
           "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn9"
         },
         {
           "key": "product_advised",
           "value": "SKU-AP-Y",
           "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn9"
         },
         {
           "key": "price_quoted_vnd",
           "value": 5200000,
           "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn9"
         },
         {
           "key": "promo_code",
           "value": "GIFT-FILTER",
           "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn9"
         }
       ],
-      "entities": [
-        {
-          "type": "money",
-          "value": "5200000",
-          "spoken": "giá máy sẽ giữ nguyên"
-        }
-      ],
-      "pause_before_ms": 500,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "hoi_qua_tang_giam_gia",
+    "intent": "tu_van_khuyen_mai_gift_no_cash",
     "outcome": "hen_goi_lai",
-    "objection_type": null,
-    "objection_handling": null,
+    "objection_type": "khong_can_qua_khong_giam_gia",
+    "objection_handling": "Giải thích rõ quà tặng không quy đổi thành tiền, không trừ vào giá",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

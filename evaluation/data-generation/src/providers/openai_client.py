@@ -42,6 +42,15 @@ class OpenAIClient:
         self._not_strict: set[str] = set()
         cache_dir.mkdir(parents=True, exist_ok=True)
 
+    #: Reasoning models (gpt-5, o-series) take no temperature and count their reasoning in max_completion_tokens.
+    REASONING_PREFIXES = ("gpt-5", "o1", "o3", "o4")
+
+    def _sampling(self, temperature: float, max_output_tokens: int) -> dict:
+        if self.model.startswith(self.REASONING_PREFIXES):
+            return {"max_completion_tokens": max(max_output_tokens * 4, 16384),
+                    "reasoning_effort": os.getenv("DATAGEN_REASONING_EFFORT", "medium")}
+        return {"temperature": temperature, "max_tokens": max_output_tokens}
+
     def generate(self, prompt: str, schema: type[T], *, temperature: float = 0.7,
                  max_output_tokens: int = 8192) -> T:
         response_schema = schema.model_json_schema()
@@ -50,7 +59,9 @@ class OpenAIClient:
               "schema": response_schema, "strict": False}
         digest = hashlib.sha256((prompt + json.dumps(params, sort_keys=True)).encode()).hexdigest()
         cache_file = self.cache_dir / f"{digest}.json"
-        if cache_file.exists():
+        # DATAGEN_REFRESH_CACHE=1: ask the model again and overwrite the cached answer (to regenerate a transcript whose
+        # prompt did not change, e.g. one the judge failed for fabrication).
+        if cache_file.exists() and os.getenv("DATAGEN_REFRESH_CACHE") != "1":
             self._log({"provider": "openai", "model": self.model, "cache_hit": True,
                        "elapsed_seconds": 0, "error": None})
             return schema.model_validate_json(cache_file.read_text(encoding="utf-8"))
@@ -69,8 +80,7 @@ class OpenAIClient:
                                (f"\n\nPrevious output validation error: {prior_error}" if prior_error else "")}],
                     response_format={"type": "json_schema", "json_schema": {
                         "name": schema.__name__, "strict": strict is not None, "schema": strict or response_schema}},
-                    temperature=temperature,
-                    max_tokens=max_output_tokens,
+                    **self._sampling(temperature, max_output_tokens),
                     # One key per stage: requests that share the fixed prefix (instructions, policies) go to the
                     # same cache, which bills those tokens at the cached rate. The answer does not depend on it.
                     prompt_cache_key=f"datagen-{schema.__name__}",

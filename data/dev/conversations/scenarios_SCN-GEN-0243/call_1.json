@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh, em là trợ lý ảo của shop BTC. Anh cần tư vấn về ghế ngồi ô tô cho bé Chicco đúng không ạ?",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần tư vấn về ghế ngồi ô tô cho bé Chicco đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
@@ -21,12 +21,7 @@
         }
       ],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -45,12 +40,12 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, hiện tại ghế ngồi ô tô cho bé Chicco đang còn hàng tại shop, giá là 4.990.000đ. Anh cho em hỏi bé nhà mình được mấy tháng tuổi và mình dự kiến ngân sách khoảng bao nhiêu để em tư vấn kỹ hơn nhé?",
+      "text": "Dạ với bé 8 tháng tuổi, ghế Chicco rất phù hợp cho bé từ sơ sinh đến 4 tuổi ạ. Giá hiện tại là 4.990.000đ, trong tầm ngân sách anh nêu.",
       "questions": [
         {
-          "slot": "child_age_months",
-          "type": "open",
-          "text": "Anh cho em hỏi bé nhà mình được mấy tháng tuổi và mình dự kiến ngân sách khoảng bao nhiêu để em tư vấn kỹ hơn nhé?"
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của anh là khoảng 5 triệu đúng không ạ?"
         }
       ],
       "facts_used": [],
@@ -81,19 +76,14 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ sản phẩm ghế ngồi ô tô Chicco phù hợp cho bé từ sơ sinh đến 18kg, giá 4.990.000đ trong tầm ngân sách của mình ạ. Anh muốn biết thêm về ưu điểm hay chương trình khuyến mãi hiện tại không ạ?",
-      "questions": [
-        {
-          "slot": "other",
-          "type": "open",
-          "text": "Anh muốn biết thêm về ưu điểm hay chương trình khuyến mãi hiện tại không ạ?"
-        }
-      ],
-      "facts_used": [
-        "child_age_months",
-        "budget_vnd"
-      ],
+      "text": "Dạ hiện tại sản phẩm chưa có khuyến mãi nào áp dụng, giá đang là 4.990.000đ anh nhé.",
+      "questions": [],
+      "facts_used": [],
       "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
         {
           "field": "price_vnd",
           "value": 4990000
@@ -117,44 +107,9 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em kiểm tra thì hiện tại sản phẩm này chưa có chương trình khuyến mãi giảm giá nào anh nhé. Giá bán là 4.990.000đ, đã áp dụng mức tốt nhất theo chính sách của shop rồi ạ.",
+      "text": "Dạ em đã ghi nhận số điện thoại 0936270107 của anh. Nhân viên bên em sẽ gọi lại tư vấn chi tiết hơn qua hotline cho anh trong hôm nay hoặc ngày mai ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 4990000
-        },
-        {
-          "field": "promo_active",
-          "value": false
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "a ma anh muon goi hotline hoi them em cho anh so voi nhe",
-      "facts_stated": {
-        "blocker": "muốn gọi hotline hỏi thêm"
-      },
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ vâng, em đã ghi nhận anh muốn gọi hotline để được tư vấn thêm. Em sẽ nhờ nhân viên gọi lại cho anh trong thời gian sớm nhất nhé ạ.",
-      "questions": [],
-      "facts_used": [
-        "blocker"
-      ],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [
@@ -162,53 +117,71 @@
           "key": "blocker",
           "value": "muốn gọi hotline hỏi thêm",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn7"
         },
         {
           "key": "budget_vnd",
           "value": 5000000,
           "op": "set",
-          "source": "call_1#turn5"
+          "source": "call_1#turn7"
         },
         {
           "key": "child_age_months",
           "value": 8,
           "op": "set",
-          "source": "call_1#turn5"
+          "source": "call_1#turn7"
         },
         {
           "key": "product_advised",
           "value": "SKU-MB-CAR",
           "op": "set",
-          "source": "call_1#turn1"
+          "source": "call_1#turn7"
         },
         {
           "key": "price_quoted_vnd",
           "value": 4990000,
           "op": "set",
-          "source": "call_1#turn3"
+          "source": "call_1#turn7"
         }
       ],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "a ma anh muon goi hotline hoi them em cho anh so voi nhe so anh la 0936270107",
+      "facts_stated": {
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "phone_provided": true
+      },
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0936270107",
+          "spoken": "0936270107"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
     }
   ],
   "gold": {
-    "intent": "hen_goi_lai",
+    "intent": "hoi_tu_van",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
-    "commitments": [
-      {
-        "action": "hẹn nhân viên gọi lại"
-      }
-    ],
+    "commitments": [],
     "supersedes": [],
-    "callback": null,
+    "callback": {
+      "phone": "0936270107",
+      "reason": "Khách muốn được tư vấn qua hotline",
+      "timeframe": "trong hôm nay hoặc ngày mai"
+    },
     "order": null
   }
 }

@@ -12,21 +12,16 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, chị muốn tư vấn về máy lọc không khí AirPure X đúng không ạ? Em sẵn sàng hỗ trợ chị ạ.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, chị cần tư vấn về máy lọc không khí AirPure X đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Chị muốn tư vấn về máy lọc không khí AirPure X đúng không ạ?"
+          "text": "Chị muốn hỏi về máy lọc không khí AirPure X đúng không ạ?"
         }
       ],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -41,18 +36,23 @@
         "product_advised": "SKU-AP-X"
       },
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xác nhận chị đang quan tâm máy lọc không khí AirPure X ạ. Chị có thể cho em biết diện tích phòng mình dự định đặt máy là bao nhiêu mét vuông không ạ?",
+      "text": "Dạ dòng AirPure X phù hợp cho phòng tới 25m², chị dùng cho phòng diện tích khoảng bao nhiêu mét vuông và nhà mình có trẻ nhỏ không ạ?",
       "questions": [
         {
           "slot": "room_area_m2",
           "type": "open",
-          "text": "Chị có thể cho em biết diện tích phòng mình dự định đặt máy là bao nhiêu mét vuông không ạ?"
+          "text": "Chị dùng cho phòng diện tích khoảng bao nhiêu mét vuông ạ?"
+        },
+        {
+          "slot": "has_children",
+          "type": "open",
+          "text": "Nhà mình có trẻ nhỏ không ạ?"
         }
       ],
       "facts_used": [],
@@ -72,15 +72,18 @@
         "has_children": false
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ với phòng khoảng 25 mét vuông như nhà chị, AirPure X là lựa chọn phù hợp ạ. Máy hiện đang có sẵn hàng và giá là 4.890.000đ, tặng kèm một màng lọc thay thế chính hãng. Máy phù hợp cho nhà không có trẻ nhỏ vì không có khóa trẻ em chị nhé.",
+      "text": "Dạ em cảm ơn chị đã cung cấp thông tin. Hiện máy AirPure X phù hợp phòng 25m², giá 4.890.000đ, đang có tặng kèm 1 màng lọc thay thế, và vẫn còn hàng chị nhé.",
       "questions": [],
-      "facts_used": [],
+      "facts_used": [
+        "room_area_m2",
+        "has_children"
+      ],
       "claims": [
         {
           "field": "price_vnd",
@@ -109,15 +112,17 @@
         "budget_vnd": 5500000
       },
       "entities": [],
-      "pause_before_ms": 550,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại máy AirPure X đang áp dụng khuyến mãi tặng kèm một màng lọc thay thế chính hãng cho đơn hàng đến ngày 22/10. Giá cuối là 4.890.000đ, không phát sinh thêm phí vận chuyển hoặc thu hộ chị nhé.",
+      "text": "Dạ, ngân sách của chị hoàn toàn đủ để mua AirPure X ạ. Máy hiện đang có chương trình tặng màng lọc thay thế, và shop miễn phí vận chuyển toàn quốc cho đơn này luôn chị nhé.",
       "questions": [],
-      "facts_used": [],
+      "facts_used": [
+        "budget_vnd"
+      ],
       "claims": [
         {
           "field": "price_vnd",
@@ -125,10 +130,6 @@
         },
         {
           "field": "promo_GIFT-FILTER_active",
-          "value": true
-        },
-        {
-          "field": "promo_COD-0_active",
           "value": true
         }
       ],
@@ -141,20 +142,30 @@
     },
     {
       "speaker": "customer",
-      "text": "chi muon goi hotline hoi them mot so thong tin nua co duoc khong?",
+      "text": "chi muon goi hotline hoi them mot so thong tin nua co duoc khong? so chi la 0992298369",
       "facts_stated": {
-        "blocker": "muốn gọi hotline hỏi thêm"
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "phone_provided": true
       },
-      "entities": [],
-      "pause_before_ms": 500,
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0992298369",
+          "spoken": "0992298369"
+        }
+      ],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chị hoàn toàn có thể gọi hotline của shop để được tư vấn thêm thông tin chi tiết ạ. Em đã ghi nhận nhu cầu của chị về máy lọc không khí AirPure X và các thông tin mình trao đổi trong buổi tư vấn hôm nay.",
+      "text": "Dạ chị hoàn toàn có thể gọi hotline của shop để được nhân viên hỗ trợ thêm thông tin chi tiết nhé. Em đã ghi nhận số điện thoại của chị, khi cần thiết shop sẽ liên hệ lại để hỗ trợ chị tốt nhất ạ. Cảm ơn chị đã quan tâm sản phẩm của shop!",
       "questions": [],
-      "facts_used": [],
+      "facts_used": [
+        "blocker",
+        "phone_provided"
+      ],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [
@@ -162,43 +173,43 @@
           "key": "room_area_m2",
           "value": 25,
           "op": "set",
-          "source": "call_1#turn2"
+          "source": "call_1#turn4"
         },
         {
           "key": "has_children",
           "value": false,
           "op": "set",
-          "source": "call_1#turn2"
+          "source": "call_1#turn4"
         },
         {
           "key": "budget_vnd",
           "value": 5500000,
           "op": "set",
-          "source": "call_1#turn3"
+          "source": "call_1#turn6"
         },
         {
           "key": "blocker",
           "value": "muốn gọi hotline hỏi thêm",
           "op": "set",
-          "source": "call_1#turn4"
+          "source": "call_1#turn8"
         },
         {
           "key": "product_advised",
           "value": "SKU-AP-X",
           "op": "set",
-          "source": "call_1#turn1"
+          "source": "call_1#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 4890000,
           "op": "set",
-          "source": "call_1#turn3"
+          "source": "call_1#turn6"
         },
         {
           "key": "promo_code",
           "value": "GIFT-FILTER",
           "op": "set",
-          "source": "call_1#turn3"
+          "source": "call_1#turn6"
         }
       ],
       "entities": [],

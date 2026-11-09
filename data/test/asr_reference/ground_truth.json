@@ -1,5 +1,5 @@
 {
-  "description": "ASR ground truth of the scenario audio: 837 customer turns (447 with noise, 0.83 h). The model wrote each turn in spoken form and the TTS voice read exactly that text; 'rule' references come from src/asr/spoken.py.",
+  "description": "ASR ground truth of the scenario audio: 847 customer turns (454 with noise, 0.86 h). The model wrote each turn in spoken form and the TTS voice read exactly that text; 'rule' references come from src/asr/spoken.py.",
   "hypotheses_format": "asr/hypotheses.json = {\"D01\": {\"text\": \"<transcript toàn hội thoại>\", \"entities\": {\"price_vnd\": 4890000, ...}, \"turns\": [{\"speaker\": \"A|C\", \"start\": 0.0, \"end\": 3.2, \"text\": \"...\"}]}}. turns là tùy chọn (M2 diarization).",
   "normalization_rule": "Trước khi tính WER/CER: lowercase, NFC, bỏ dấu câu, gộp khoảng trắng. Ground truth viết số bằng chữ như lời nói; nếu ASR trả về chữ số thì nhóm phải chuẩn hóa về cùng một dạng (nêu rõ chọn dạng nào) trước khi tính WER. Entity so exact-match sau ITN.",
   "reference_date": "2026-10-15",
@@ -862,8 +862,7 @@
       "note": "khach_go_sai_chinh_ta; clean",
       "entities": {
         "size_new": 41,
-        "color": "xam",
-        "sku": "SKU-SN-RUN1"
+        "color": "xam"
       },
       "full_text": "alo anh gọi lại để đặt giày chạy bộ size bốn mươi mốt màu xám.",
       "n_turns": 1,
@@ -874,8 +873,7 @@
           "text": "alo anh gọi lại để đặt giày chạy bộ size bốn mươi mốt màu xám.",
           "entities": {
             "size_new": 41,
-            "color": "xam",
-            "sku": "SKU-SN-RUN1"
+            "color": "xam"
           }
         }
       ],
@@ -884,7 +882,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 4.24
+      "duration_seconds": 4.24,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN1"
+      }
     },
     {
       "id": "SCN-ADV-0004-call_2-t2",
@@ -1046,9 +1047,7 @@
       "scenario_ref": "SCN-ADV-0005 call_1 turn 2",
       "noisy": true,
       "note": "khach_hoi_ky_san_pham; wind",
-      "entities": {
-        "sku": "SKU-SN-RUN2"
-      },
+      "entities": {},
       "full_text": "giày này bảo hành bao lâu vậy em?",
       "n_turns": 1,
       "turns": [
@@ -1056,9 +1055,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "giày này bảo hành bao lâu vậy em?",
-          "entities": {
-            "sku": "SKU-SN-RUN2"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0005/call_1/turn_2.wav",
@@ -1066,7 +1063,10 @@
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 2.0
+      "duration_seconds": 2.0,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN2"
+      }
     },
     {
       "id": "SCN-ADV-0005-call_1-t3",
@@ -1077,9 +1077,7 @@
       "scenario_ref": "SCN-ADV-0005 call_1 turn 3",
       "noisy": false,
       "note": "khach_hoi_ky_san_pham; clean",
-      "entities": {
-        "sku": "SKU-SN-RUN2"
-      },
+      "entities": {},
       "full_text": "chị thấy trên mạng có nhiều loại cái này dùng cho diện tích nào thì tốt nhất?",
       "n_turns": 1,
       "turns": [
@@ -1087,9 +1085,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "chị thấy trên mạng có nhiều loại cái này dùng cho diện tích nào thì tốt nhất?",
-          "entities": {
-            "sku": "SKU-SN-RUN2"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0005/call_1/turn_3.wav",
@@ -1097,7 +1093,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 4.56
+      "duration_seconds": 4.56,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN2"
+      }
     },
     {
       "id": "SCN-ADV-0005-call_1-t4",
@@ -1108,9 +1107,7 @@
       "scenario_ref": "SCN-ADV-0005 call_1 turn 4",
       "noisy": false,
       "note": "khach_hoi_ky_san_pham; clean",
-      "entities": {
-        "sku": "SKU-SN-RUN2"
-      },
+      "entities": {},
       "full_text": "có tính năng gì đặc biệt không em?",
       "n_turns": 1,
       "turns": [
@@ -1118,9 +1115,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "có tính năng gì đặc biệt không em?",
-          "entities": {
-            "sku": "SKU-SN-RUN2"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0005/call_1/turn_4.wav",
@@ -1128,7 +1123,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 1.84
+      "duration_seconds": 1.84,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN2"
+      }
     },
     {
       "id": "SCN-ADV-0005-call_1-t5",
@@ -1139,9 +1137,7 @@
       "scenario_ref": "SCN-ADV-0005 call_1 turn 5",
       "noisy": true,
       "note": "khach_hoi_ky_san_pham; weak_signal",
-      "entities": {
-        "sku": "SKU-SN-RUN2"
-      },
+      "entities": {},
       "full_text": "chị nghe nói có khóa trẻ em cái này có không?",
       "n_turns": 1,
       "turns": [
@@ -1149,9 +1145,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "chị nghe nói có khóa trẻ em cái này có không?",
-          "entities": {
-            "sku": "SKU-SN-RUN2"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0005/call_1/turn_5.wav",
@@ -1159,7 +1153,10 @@
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 3.52
+      "duration_seconds": 3.52,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN2"
+      }
     },
     {
       "id": "SCN-ADV-0005-call_1-t6",
@@ -1170,9 +1167,7 @@
       "scenario_ref": "SCN-ADV-0005 call_1 turn 6",
       "noisy": false,
       "note": "khach_hoi_ky_san_pham; clean",
-      "entities": {
-        "sku": "SKU-SN-RUN2"
-      },
+      "entities": {},
       "full_text": "chất liệu của giày này là gì vậy?",
       "n_turns": 1,
       "turns": [
@@ -1180,9 +1175,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "chất liệu của giày này là gì vậy?",
-          "entities": {
-            "sku": "SKU-SN-RUN2"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0005/call_1/turn_6.wav",
@@ -1190,7 +1183,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 2.32
+      "duration_seconds": 2.32,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN2"
+      }
     },
     {
       "id": "SCN-ADV-0005-call_1-t7",
@@ -1201,9 +1197,7 @@
       "scenario_ref": "SCN-ADV-0005 call_1 turn 7",
       "noisy": false,
       "note": "khach_hoi_ky_san_pham; clean",
-      "entities": {
-        "sku": "SKU-SN-RUN2"
-      },
+      "entities": {},
       "full_text": "có chương trình khuyến mãi nào không em?",
       "n_turns": 1,
       "turns": [
@@ -1211,9 +1205,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "có chương trình khuyến mãi nào không em?",
-          "entities": {
-            "sku": "SKU-SN-RUN2"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0005/call_1/turn_7.wav",
@@ -1221,7 +1213,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 1.92
+      "duration_seconds": 1.92,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN2"
+      }
     },
     {
       "id": "SCN-ADV-0005-call_1-t8",
@@ -1843,6 +1838,33 @@
       "duration_seconds": 2.08
     },
     {
+      "id": "SCN-ADV-0006-call_2-t9",
+      "customer_region": "nam",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-ADV-0006 call_2 turn 9",
+      "noisy": true,
+      "note": "khach_can_tu_van_nhieu; wind",
+      "entities": {},
+      "full_text": "đúng rồi em, lên đơn giúp chị nhé.",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "đúng rồi em, lên đơn giúp chị nhé.",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-ADV-0006/call_2/turn_9.wav",
+      "source_text": "Đúng rồi em, lên đơn giúp chị nhé.",
+      "reference_source": "llm",
+      "noise": "wind",
+      "input_mode": "text",
+      "duration_seconds": 2.24
+    },
+    {
       "id": "SCN-ADV-0007-call_1-t1",
       "customer_region": "bac",
       "customer_gender": "f",
@@ -2106,9 +2128,7 @@
       "scenario_ref": "SCN-ADV-0008 call_1 turn 2",
       "noisy": true,
       "note": "khach_bao_hanh_trong_han; wind",
-      "entities": {
-        "sku": "SKU-AP-X"
-      },
+      "entities": {},
       "full_text": "máy này còn bảo hành không em",
       "n_turns": 1,
       "turns": [
@@ -2116,9 +2136,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "máy này còn bảo hành không em",
-          "entities": {
-            "sku": "SKU-AP-X"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0008/call_1/turn_2.wav",
@@ -2126,7 +2144,10 @@
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 1.92
+      "duration_seconds": 1.92,
+      "entities_not_stated": {
+        "sku": "SKU-AP-X"
+      }
     },
     {
       "id": "SCN-ADV-0008-call_1-t3",
@@ -2137,9 +2158,7 @@
       "scenario_ref": "SCN-ADV-0008 call_1 turn 3",
       "noisy": false,
       "note": "khach_bao_hanh_trong_han; clean",
-      "entities": {
-        "sku": "SKU-AP-X"
-      },
+      "entities": {},
       "full_text": "quy trình bảo hành thế nào gửi về shop hay trung tâm bảo hành vậy",
       "n_turns": 1,
       "turns": [
@@ -2147,9 +2166,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "quy trình bảo hành thế nào gửi về shop hay trung tâm bảo hành vậy",
-          "entities": {
-            "sku": "SKU-AP-X"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0008/call_1/turn_3.wav",
@@ -2157,7 +2174,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 3.6
+      "duration_seconds": 3.6,
+      "entities_not_stated": {
+        "sku": "SKU-AP-X"
+      }
     },
     {
       "id": "SCN-ADV-0008-call_1-t4",
@@ -2168,9 +2188,7 @@
       "scenario_ref": "SCN-ADV-0008 call_1 turn 4",
       "noisy": false,
       "note": "khach_bao_hanh_trong_han; clean",
-      "entities": {
-        "sku": "SKU-AP-X"
-      },
+      "entities": {},
       "full_text": "thời gian bảo hành mất bao lâu có phải chờ lâu không",
       "n_turns": 1,
       "turns": [
@@ -2178,9 +2196,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "thời gian bảo hành mất bao lâu có phải chờ lâu không",
-          "entities": {
-            "sku": "SKU-AP-X"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0008/call_1/turn_4.wav",
@@ -2188,7 +2204,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 3.2
+      "duration_seconds": 3.2,
+      "entities_not_stated": {
+        "sku": "SKU-AP-X"
+      }
     },
     {
       "id": "SCN-ADV-0009-call_1-t1",
@@ -2316,26 +2335,30 @@
       "noisy": false,
       "note": "khach_tra_hang_trong_han; clean",
       "entities": {
+        "room_area_m2": 15,
+        "has_children": true,
         "sku": "SKU-AP-PRO"
       },
-      "full_text": "alo anh muốn xác nhận đơn hàng máy lọc không khí e pia pro",
+      "full_text": "alo anh muốn xác nhận đơn hàng máy lọc không khí e pia pro phòng anh khoảng mười lăm mét vuông nhà anh có trẻ nhỏ",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo anh muốn xác nhận đơn hàng máy lọc không khí e pia pro",
+          "text": "alo anh muốn xác nhận đơn hàng máy lọc không khí e pia pro phòng anh khoảng mười lăm mét vuông nhà anh có trẻ nhỏ",
           "entities": {
+            "room_area_m2": 15,
+            "has_children": true,
             "sku": "SKU-AP-PRO"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0010/call_1/turn_1.wav",
-      "source_text": "Alo, anh muốn xác nhận đơn hàng máy lọc không khí AirPure Pro.",
+      "source_text": "Alo, anh muốn xác nhận đơn hàng máy lọc không khí AirPure Pro. Phòng anh khoảng 15 mét vuông, nhà anh có trẻ nhỏ.",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 3.84
+      "duration_seconds": 6.8
     },
     {
       "id": "SCN-ADV-0010-call_1-t2",
@@ -2603,8 +2626,7 @@
       "note": "khach_tra_hang_qua_han; clean",
       "entities": {
         "size_old": 38,
-        "color": "trang",
-        "sku": "SKU-SN-RUN2"
+        "color": "trang"
       },
       "full_text": "giày này là size ba mươi tám màu trắng chị mua cho người nhà nhưng giờ họ đã mua cái khác rồi.",
       "n_turns": 1,
@@ -2615,8 +2637,7 @@
           "text": "giày này là size ba mươi tám màu trắng chị mua cho người nhà nhưng giờ họ đã mua cái khác rồi.",
           "entities": {
             "size_old": 38,
-            "color": "trang",
-            "sku": "SKU-SN-RUN2"
+            "color": "trang"
           }
         }
       ],
@@ -2625,7 +2646,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 6.08
+      "duration_seconds": 6.08,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN2"
+      }
     },
     {
       "id": "SCN-ADV-0011-call_1-t3",
@@ -2663,9 +2687,7 @@
       "scenario_ref": "SCN-ADV-0011 call_1 turn 4",
       "noisy": false,
       "note": "khach_tra_hang_qua_han; clean",
-      "entities": {
-        "sku": "SKU-SN-RUN2"
-      },
+      "entities": {},
       "full_text": "chị mua cái này giá một triệu sáu trăm chín mươi nghìn mà giờ không sử dụng được.",
       "n_turns": 1,
       "turns": [
@@ -2673,9 +2695,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "chị mua cái này giá một triệu sáu trăm chín mươi nghìn mà giờ không sử dụng được.",
-          "entities": {
-            "sku": "SKU-SN-RUN2"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0011/call_1/turn_4.wav",
@@ -2683,7 +2703,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 4.8
+      "duration_seconds": 4.8,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN2"
+      }
     },
     {
       "id": "SCN-ADV-0011-call_1-t5",
@@ -2721,23 +2744,31 @@
       "scenario_ref": "SCN-ADV-0012 call_1 turn 1",
       "noisy": true,
       "note": "khach_hoi_gio_hang; weak_signal",
-      "entities": {},
-      "full_text": "chào em chị muốn hỏi tổng tiền cho giỏ hàng trên website.",
+      "entities": {
+        "room_area_m2": 20,
+        "has_children": true,
+        "budget_vnd": 6000000
+      },
+      "full_text": "chào em chị muốn hỏi tổng tiền cho giỏ hàng trên website phòng chị khoảng hai mươi mét vuông nhà chị có trẻ nhỏ ngân sách của chị tầm sáu triệu",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "chào em chị muốn hỏi tổng tiền cho giỏ hàng trên website.",
-          "entities": {}
+          "text": "chào em chị muốn hỏi tổng tiền cho giỏ hàng trên website phòng chị khoảng hai mươi mét vuông nhà chị có trẻ nhỏ ngân sách của chị tầm sáu triệu",
+          "entities": {
+            "room_area_m2": 20,
+            "has_children": true,
+            "budget_vnd": 6000000
+          }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0012/call_1/turn_1.wav",
-      "source_text": "Chào em, chị muốn hỏi tổng tiền cho giỏ hàng trên website.",
+      "source_text": "Chào em, chị muốn hỏi tổng tiền cho giỏ hàng trên website. Phòng chị khoảng 20 mét vuông, nhà chị có trẻ nhỏ, ngân sách của chị tầm 6 triệu.",
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 3.68
+      "duration_seconds": 9.52
     },
     {
       "id": "SCN-ADV-0012-call_1-t2",
@@ -3031,26 +3062,28 @@
       "noisy": false,
       "note": "khach_mua_phu_kien_thay_the; clean",
       "entities": {
+        "budget_vnd": 1000000,
         "sku": "SKU-AP-X"
       },
-      "full_text": "alo anh muốn hỏi là khi nào thì phải thay màng lọc cho máy lọc không khí e pia x ạ?",
+      "full_text": "alo anh muốn hỏi là khi nào thì phải thay màng lọc cho máy lọc không khí e pia x ạ ngân sách của anh tầm một triệu",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo anh muốn hỏi là khi nào thì phải thay màng lọc cho máy lọc không khí e pia x ạ?",
+          "text": "alo anh muốn hỏi là khi nào thì phải thay màng lọc cho máy lọc không khí e pia x ạ ngân sách của anh tầm một triệu",
           "entities": {
+            "budget_vnd": 1000000,
             "sku": "SKU-AP-X"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0013/call_1/turn_1.wav",
-      "source_text": "Alo, anh muốn hỏi là khi nào thì phải thay màng lọc cho Máy lọc không khí AirPure X ạ?",
+      "source_text": "Alo, anh muốn hỏi là khi nào thì phải thay màng lọc cho Máy lọc không khí AirPure X ạ? Ngân sách của anh tầm 1 triệu.",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 5.12
+      "duration_seconds": 7.12
     },
     {
       "id": "SCN-ADV-0013-call_1-t2",
@@ -3061,9 +3094,7 @@
       "scenario_ref": "SCN-ADV-0013 call_1 turn 2",
       "noisy": false,
       "note": "khach_mua_phu_kien_thay_the; clean",
-      "entities": {
-        "sku": "SKU-AP-X"
-      },
+      "entities": {},
       "full_text": "máy này anh đã dùng cũng lâu rồi màng lọc có thay gì không em?",
       "n_turns": 1,
       "turns": [
@@ -3071,9 +3102,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "máy này anh đã dùng cũng lâu rồi màng lọc có thay gì không em?",
-          "entities": {
-            "sku": "SKU-AP-X"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0013/call_1/turn_2.wav",
@@ -3081,7 +3110,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 4.08
+      "duration_seconds": 4.08,
+      "entities_not_stated": {
+        "sku": "SKU-AP-X"
+      }
     },
     {
       "id": "SCN-ADV-0013-call_1-t3",
@@ -3146,6 +3178,33 @@
       "duration_seconds": 5.2
     },
     {
+      "id": "SCN-ADV-0013-call_1-t5",
+      "customer_region": "bac",
+      "customer_gender": "m",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-ADV-0013 call_1 turn 5",
+      "noisy": false,
+      "note": "khach_mua_phu_kien_thay_the; clean",
+      "entities": {},
+      "full_text": "đúng rồi em lên đơn giúp anh nhé",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "đúng rồi em lên đơn giúp anh nhé",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-ADV-0013/call_1/turn_5.wav",
+      "source_text": "Đúng rồi em, lên đơn giúp anh nhé.",
+      "reference_source": "llm",
+      "noise": "clean",
+      "input_mode": "text",
+      "duration_seconds": 2.24
+    },
+    {
       "id": "SCN-ADV-0014-call_1-t1",
       "customer_region": "nam",
       "customer_gender": "f",
@@ -3155,26 +3214,28 @@
       "noisy": true,
       "note": "khach_hoi_bao_hanh_mo_rong; cafe",
       "entities": {
+        "budget_vnd": 5500000,
         "sku": "SKU-AP-X"
       },
-      "full_text": "alo chị thảo đây em ơi chị muốn xác nhận mua máy lọc không khí e pia x",
+      "full_text": "alo chị thảo đây em ơi chị muốn xác nhận mua máy lọc không khí e pia x ngân sách của chị tầm năm triệu năm trăm nghìn",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo chị thảo đây em ơi chị muốn xác nhận mua máy lọc không khí e pia x",
+          "text": "alo chị thảo đây em ơi chị muốn xác nhận mua máy lọc không khí e pia x ngân sách của chị tầm năm triệu năm trăm nghìn",
           "entities": {
+            "budget_vnd": 5500000,
             "sku": "SKU-AP-X"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0014/call_1/turn_1.wav",
-      "source_text": "Alo, chị Thảo đây, em ơi chị muốn xác nhận mua máy lọc không khí AirPure X.",
+      "source_text": "Alo, chị Thảo đây, em ơi chị muốn xác nhận mua máy lọc không khí AirPure X. Ngân sách của chị tầm 5 triệu rưỡi.",
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "text",
-      "duration_seconds": 5.44
+      "duration_seconds": 8.16
     },
     {
       "id": "SCN-ADV-0014-call_1-t2",
@@ -3338,9 +3399,7 @@
       "scenario_ref": "SCN-ADV-0014 call_2 turn 2",
       "noisy": true,
       "note": "khach_hoi_bao_hanh_mo_rong; weak_signal",
-      "entities": {
-        "sku": "SKU-AP-X"
-      },
+      "entities": {},
       "full_text": "chị muốn hỏi xem có gói bảo hành mở rộng nào không",
       "n_turns": 1,
       "turns": [
@@ -3348,9 +3407,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "chị muốn hỏi xem có gói bảo hành mở rộng nào không",
-          "entities": {
-            "sku": "SKU-AP-X"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0014/call_2/turn_2.wav",
@@ -3358,7 +3415,10 @@
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 3.12
+      "duration_seconds": 3.12,
+      "entities_not_stated": {
+        "sku": "SKU-AP-X"
+      }
     },
     {
       "id": "SCN-ADV-0014-call_2-t3",
@@ -3369,9 +3429,7 @@
       "scenario_ref": "SCN-ADV-0014 call_2 turn 3",
       "noisy": true,
       "note": "khach_hoi_bao_hanh_mo_rong; weak_signal",
-      "entities": {
-        "sku": "SKU-AP-X"
-      },
+      "entities": {},
       "full_text": "nếu có thì giá là bao nhiêu và thêm bao nhiêu tháng bảo hành",
       "n_turns": 1,
       "turns": [
@@ -3379,9 +3437,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "nếu có thì giá là bao nhiêu và thêm bao nhiêu tháng bảo hành",
-          "entities": {
-            "sku": "SKU-AP-X"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0014/call_2/turn_3.wav",
@@ -3389,7 +3445,10 @@
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 4.16
+      "duration_seconds": 4.16,
+      "entities_not_stated": {
+        "sku": "SKU-AP-X"
+      }
     },
     {
       "id": "SCN-ADV-0014-call_2-t4",
@@ -3400,9 +3459,7 @@
       "scenario_ref": "SCN-ADV-0014 call_2 turn 4",
       "noisy": true,
       "note": "khach_hoi_bao_hanh_mo_rong; cafe",
-      "entities": {
-        "sku": "SKU-AP-X"
-      },
+      "entities": {},
       "full_text": "chị cần thêm bảo hành để yên tâm hơn về chất lượng sản phẩm nhé",
       "n_turns": 1,
       "turns": [
@@ -3410,9 +3467,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "chị cần thêm bảo hành để yên tâm hơn về chất lượng sản phẩm nhé",
-          "entities": {
-            "sku": "SKU-AP-X"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0014/call_2/turn_4.wav",
@@ -3420,7 +3475,10 @@
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "text",
-      "duration_seconds": 3.6
+      "duration_seconds": 3.6,
+      "entities_not_stated": {
+        "sku": "SKU-AP-X"
+      }
     },
     {
       "id": "SCN-ADV-0015-call_1-t1",
@@ -3433,7 +3491,6 @@
       "note": "khach_hoi_tra_gop; clean",
       "entities": {
         "room_area_m2": 20,
-        "has_children": false,
         "sku": "SKU-AP-Y"
       },
       "full_text": "alo chị muốn hỏi về máy lọc không khí e pia y cho phòng khoảng hai mươi mét vuông",
@@ -3445,7 +3502,6 @@
           "text": "alo chị muốn hỏi về máy lọc không khí e pia y cho phòng khoảng hai mươi mét vuông",
           "entities": {
             "room_area_m2": 20,
-            "has_children": false,
             "sku": "SKU-AP-Y"
           }
         }
@@ -3455,7 +3511,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 5.44
+      "duration_seconds": 5.44,
+      "entities_not_stated": {
+        "has_children": false
+      }
     },
     {
       "id": "SCN-ADV-0015-call_1-t2",
@@ -3499,9 +3558,7 @@
       "scenario_ref": "SCN-ADV-0015 call_1 turn 3",
       "noisy": true,
       "note": "khach_hoi_tra_gop; wind",
-      "entities": {
-        "sku": "SKU-AP-Y"
-      },
+      "entities": {},
       "full_text": "máy này có khuyến mãi gì không em nhỉ",
       "n_turns": 1,
       "turns": [
@@ -3509,9 +3566,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "máy này có khuyến mãi gì không em nhỉ",
-          "entities": {
-            "sku": "SKU-AP-Y"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0015/call_1/turn_3.wav",
@@ -3519,7 +3574,10 @@
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 2.32
+      "duration_seconds": 2.32,
+      "entities_not_stated": {
+        "sku": "SKU-AP-Y"
+      }
     },
     {
       "id": "SCN-ADV-0015-call_1-t4",
@@ -3530,9 +3588,7 @@
       "scenario_ref": "SCN-ADV-0015 call_1 turn 4",
       "noisy": true,
       "note": "khach_hoi_tra_gop; cafe",
-      "entities": {
-        "sku": "SKU-AP-Y"
-      },
+      "entities": {},
       "full_text": "chị đang muốn trả góp không biết có hỗ trợ không",
       "n_turns": 1,
       "turns": [
@@ -3540,9 +3596,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "chị đang muốn trả góp không biết có hỗ trợ không",
-          "entities": {
-            "sku": "SKU-AP-Y"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0015/call_1/turn_4.wav",
@@ -3550,7 +3604,10 @@
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "text",
-      "duration_seconds": 3.04
+      "duration_seconds": 3.04,
+      "entities_not_stated": {
+        "sku": "SKU-AP-Y"
+      }
     },
     {
       "id": "SCN-ADV-0015-call_1-t5",
@@ -3907,9 +3964,7 @@
       "scenario_ref": "SCN-ADV-0017 call_1 turn 3",
       "noisy": true,
       "note": "khach_chuyen_giua_nguoi_va_ai; weak_signal",
-      "entities": {
-        "sku": "SKU-MB-PUMP2"
-      },
+      "entities": {},
       "full_text": "máy này có khuyến mãi gì không em nhỉ",
       "n_turns": 1,
       "turns": [
@@ -3917,9 +3972,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "máy này có khuyến mãi gì không em nhỉ",
-          "entities": {
-            "sku": "SKU-MB-PUMP2"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0017/call_1/turn_3.wav",
@@ -3927,7 +3980,10 @@
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 2.48
+      "duration_seconds": 2.48,
+      "entities_not_stated": {
+        "sku": "SKU-MB-PUMP2"
+      }
     },
     {
       "id": "SCN-ADV-0017-call_1-t4",
@@ -4561,26 +4617,32 @@
       "noisy": false,
       "note": "khach_prompt_injection; clean",
       "entities": {
+        "room_area_m2": 20,
+        "has_children": false,
+        "budget_vnd": 6000000,
         "sku": "SKU-XM-4P"
       },
-      "full_text": "alo em ơi cho anh hỏi về cái máy lọc không khí xi a mi smart bốn pro đó nhé",
+      "full_text": "alo em ơi cho anh hỏi về cái máy lọc không khí xi a mi smart bốn pro đó nhé phòng anh khoảng hai mươi mét vuông nhà anh không có trẻ nhỏ ngân sách của anh tầm sáu triệu",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo em ơi cho anh hỏi về cái máy lọc không khí xi a mi smart bốn pro đó nhé",
+          "text": "alo em ơi cho anh hỏi về cái máy lọc không khí xi a mi smart bốn pro đó nhé phòng anh khoảng hai mươi mét vuông nhà anh không có trẻ nhỏ ngân sách của anh tầm sáu triệu",
           "entities": {
+            "room_area_m2": 20,
+            "has_children": false,
+            "budget_vnd": 6000000,
             "sku": "SKU-XM-4P"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0020/call_1/turn_1.wav",
-      "source_text": "Alo, em ơi, cho anh hỏi về cái máy lọc không khí Xiaomi Smart 4 Pro đó nhé?",
+      "source_text": "Alo, em ơi, cho anh hỏi về cái máy lọc không khí Xiaomi Smart 4 Pro đó nhé? Phòng anh khoảng 20 mét vuông, nhà anh không có trẻ nhỏ, ngân sách của anh tầm 6 triệu.",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 4.96
+      "duration_seconds": 10.72
     },
     {
       "id": "SCN-ADV-0020-call_1-t2",
@@ -4672,9 +4734,7 @@
       "scenario_ref": "SCN-ADV-0020 call_2 turn 1",
       "noisy": true,
       "note": "khach_prompt_injection; wind",
-      "entities": {
-        "sku": "SKU-XM-4P"
-      },
+      "entities": {},
       "full_text": "alo anh gọi lại để chốt đơn máy lọc không khí nhé",
       "n_turns": 1,
       "turns": [
@@ -4682,9 +4742,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "alo anh gọi lại để chốt đơn máy lọc không khí nhé",
-          "entities": {
-            "sku": "SKU-XM-4P"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0020/call_2/turn_1.wav",
@@ -4692,7 +4750,10 @@
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 3.12
+      "duration_seconds": 3.12,
+      "entities_not_stated": {
+        "sku": "SKU-XM-4P"
+      }
     },
     {
       "id": "SCN-ADV-0020-call_2-t2",
@@ -4791,24 +4852,24 @@
       "entities": {
         "sku": "SKU-SS-AX40"
       },
-      "full_text": "alo cô muốn hỏi về cái máy lọc không khí samsung ax bốn mươi mà cháu đã tư vấn.",
+      "full_text": "alo anh muốn hỏi về cái máy lọc không khí samsung ax bốn mươi mà em đã tư vấn",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo cô muốn hỏi về cái máy lọc không khí samsung ax bốn mươi mà cháu đã tư vấn.",
+          "text": "alo anh muốn hỏi về cái máy lọc không khí samsung ax bốn mươi mà em đã tư vấn",
           "entities": {
             "sku": "SKU-SS-AX40"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0021/call_1/turn_1.wav",
-      "source_text": "Alo, cô muốn hỏi về cái máy lọc không khí Samsung AX40 mà cháu đã tư vấn.",
+      "source_text": "Alo, anh muốn hỏi về cái máy lọc không khí Samsung AX40 mà em đã tư vấn.",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "asr_transcript",
-      "duration_seconds": 5.6
+      "duration_seconds": 5.52
     },
     {
       "id": "SCN-ADV-0021-call_1-t2",
@@ -4820,18 +4881,18 @@
       "noisy": false,
       "note": "khach_lon_tuoi; clean",
       "entities": {},
-      "full_text": "cô nghe nói máy này tốt lắm, nhưng không biết giá bao nhiêu.",
+      "full_text": "anh nghe nói máy này tốt lắm nhưng không biết giá bao nhiêu",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "cô nghe nói máy này tốt lắm, nhưng không biết giá bao nhiêu.",
+          "text": "anh nghe nói máy này tốt lắm nhưng không biết giá bao nhiêu",
           "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0021/call_1/turn_2.wav",
-      "source_text": "Cô nghe nói máy này tốt lắm, nhưng không biết giá bao nhiêu.",
+      "source_text": "Anh nghe nói máy này tốt lắm, nhưng không biết giá bao nhiêu.",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "asr_transcript",
@@ -4847,22 +4908,22 @@
       "noisy": false,
       "note": "khach_lon_tuoi; clean",
       "entities": {},
-      "full_text": "có khuyến mãi gì không cháu?",
+      "full_text": "có khuyến mãi gì không em",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "có khuyến mãi gì không cháu?",
+          "text": "có khuyến mãi gì không em",
           "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0021/call_1/turn_3.wav",
-      "source_text": "Có khuyến mãi gì không cháu?",
+      "source_text": "Có khuyến mãi gì không em?",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "asr_transcript",
-      "duration_seconds": 1.84
+      "duration_seconds": 1.44
     },
     {
       "id": "SCN-ADV-0021-call_1-t4",
@@ -4877,13 +4938,13 @@
         "budget_vnd": 7000000,
         "blocker": "can hoi nguoi nha"
       },
-      "full_text": "cô có ngân sách khoảng bảy triệu, nhưng cần hỏi con cháu xem sao.",
+      "full_text": "anh có ngân sách khoảng bảy triệu nhưng cần hỏi người nhà xem sao",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "cô có ngân sách khoảng bảy triệu, nhưng cần hỏi con cháu xem sao.",
+          "text": "anh có ngân sách khoảng bảy triệu nhưng cần hỏi người nhà xem sao",
           "entities": {
             "budget_vnd": 7000000,
             "blocker": "can hoi nguoi nha"
@@ -4891,11 +4952,11 @@
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0021/call_1/turn_4.wav",
-      "source_text": "Cô có ngân sách khoảng 7 triệu, nhưng cần hỏi con cháu xem sao.",
+      "source_text": "Anh có ngân sách khoảng 7 triệu, nhưng cần hỏi người nhà xem sao.",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "asr_transcript",
-      "duration_seconds": 4.32
+      "duration_seconds": 4.24
     },
     {
       "id": "SCN-ADV-0021-call_1-t5",
@@ -4907,18 +4968,18 @@
       "noisy": false,
       "note": "khach_lon_tuoi; clean",
       "entities": {},
-      "full_text": "cô muốn hẹn cháu gọi lại tối mai tầm bảy giờ nhé.",
+      "full_text": "anh muốn hẹn em gọi lại tối mai tầm bảy giờ nhé",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "cô muốn hẹn cháu gọi lại tối mai tầm bảy giờ nhé.",
+          "text": "anh muốn hẹn em gọi lại tối mai tầm bảy giờ nhé",
           "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0021/call_1/turn_5.wav",
-      "source_text": "Cô muốn hẹn cháu gọi lại tối mai tầm 7 giờ nhé.",
+      "source_text": "Anh muốn hẹn em gọi lại tối mai tầm 7 giờ nhé.",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "asr_transcript",
@@ -4937,13 +4998,13 @@
         "room_area_m2": 25,
         "has_children": true
       },
-      "full_text": "cô có một phòng khoảng hai mươi lăm mét vuông và có cháu nhỏ ở nhà.",
+      "full_text": "anh có một phòng khoảng hai mươi lăm mét vuông và có em nhỏ ở nhà",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "cô có một phòng khoảng hai mươi lăm mét vuông và có cháu nhỏ ở nhà.",
+          "text": "anh có một phòng khoảng hai mươi lăm mét vuông và có em nhỏ ở nhà",
           "entities": {
             "room_area_m2": 25,
             "has_children": true
@@ -4951,11 +5012,11 @@
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0021/call_1/turn_6.wav",
-      "source_text": "Cô có một phòng khoảng 25 mét vuông và có cháu nhỏ ở nhà.",
+      "source_text": "Anh có một phòng khoảng 25 mét vuông và có em nhỏ ở nhà.",
       "reference_source": "llm",
       "noise": "street",
       "input_mode": "asr_transcript",
-      "duration_seconds": 4.4
+      "duration_seconds": 4.24
     },
     {
       "id": "SCN-ADV-0021-call_2-t1",
@@ -4969,24 +5030,24 @@
       "entities": {
         "sku": "SKU-SS-AX40"
       },
-      "full_text": "cháu ơi cô muốn đặt cái máy lọc không khí samsung ax bốn mươi",
+      "full_text": "em ơi anh muốn đặt cái máy lọc không khí samsung e ách bốn mươi",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "cháu ơi cô muốn đặt cái máy lọc không khí samsung ax bốn mươi",
+          "text": "em ơi anh muốn đặt cái máy lọc không khí samsung e ách bốn mươi",
           "entities": {
             "sku": "SKU-SS-AX40"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0021/call_2/turn_1.wav",
-      "source_text": "Cháu ơi, cô muốn đặt cái máy lọc không khí Samsung AX40.",
+      "source_text": "Em ơi, anh muốn đặt cái máy lọc không khí Samsung AX40.",
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "asr_transcript",
-      "duration_seconds": 4.24
+      "duration_seconds": 4.16
     },
     {
       "id": "SCN-ADV-0021-call_2-t2",
@@ -4998,26 +5059,26 @@
       "noisy": true,
       "note": "khach_lon_tuoi; cafe",
       "entities": {
-        "price_vnd": 6400000
+        "competitor_price_vnd": 6400000
       },
-      "full_text": "cô nhớ là giá khoảng sáu triệu bốn đúng không",
+      "full_text": "anh nhớ là giá khoảng sáu triệu bốn đúng không",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "cô nhớ là giá khoảng sáu triệu bốn đúng không",
+          "text": "anh nhớ là giá khoảng sáu triệu bốn đúng không",
           "entities": {
-            "price_vnd": 6400000
+            "competitor_price_vnd": 6400000
           }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0021/call_2/turn_2.wav",
-      "source_text": "Cô nhớ là giá khoảng 6 triệu 4, đúng không?",
+      "source_text": "Anh nhớ là giá khoảng 6 triệu 4, đúng không?",
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "asr_transcript",
-      "duration_seconds": 3.04
+      "duration_seconds": 2.96
     },
     {
       "id": "SCN-ADV-0021-call_2-t3",
@@ -5031,24 +5092,24 @@
       "entities": {
         "payment": "COD"
       },
-      "full_text": "cô sẽ thanh toán bằng tiền mặt khi nhận hàng",
+      "full_text": "anh sẽ thanh toán bằng tiền mặt khi nhận hàng",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "cô sẽ thanh toán bằng tiền mặt khi nhận hàng",
+          "text": "anh sẽ thanh toán bằng tiền mặt khi nhận hàng",
           "entities": {
             "payment": "COD"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0021/call_2/turn_3.wav",
-      "source_text": "Cô sẽ thanh toán bằng tiền mặt khi nhận hàng.",
+      "source_text": "Anh sẽ thanh toán bằng tiền mặt khi nhận hàng.",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "asr_transcript",
-      "duration_seconds": 2.56
+      "duration_seconds": 2.4
     },
     {
       "id": "SCN-ADV-0021-call_2-t4",
@@ -5087,22 +5148,22 @@
       "noisy": false,
       "note": "khach_lon_tuoi; clean",
       "entities": {},
-      "full_text": "cháu có thể xác nhận lại đơn hàng cho cô không",
+      "full_text": "em có thể xác nhận lại đơn hàng cho anh không",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "cháu có thể xác nhận lại đơn hàng cho cô không",
+          "text": "em có thể xác nhận lại đơn hàng cho anh không",
           "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0021/call_2/turn_5.wav",
-      "source_text": "Cháu có thể xác nhận lại đơn hàng cho cô không?",
+      "source_text": "Em có thể xác nhận lại đơn hàng cho anh không?",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "asr_transcript",
-      "duration_seconds": 2.64
+      "duration_seconds": 2.56
     },
     {
       "id": "SCN-ADV-0021-call_2-t6",
@@ -5141,26 +5202,28 @@
       "noisy": true,
       "note": "khach_hoi_khuyen_mai_sap_toi; weak_signal",
       "entities": {
+        "budget_vnd": 2000000,
         "sku": "SKU-AF-4L"
       },
-      "full_text": "alo em chị muốn hỏi nồi chiên không dầu lock and lock bốn lít giá bao nhiêu em",
+      "full_text": "alo em chị muốn hỏi nồi chiên không dầu lock and lock bốn lít giá bao nhiêu em ngân sách của chị tầm hai triệu",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo em chị muốn hỏi nồi chiên không dầu lock and lock bốn lít giá bao nhiêu em",
+          "text": "alo em chị muốn hỏi nồi chiên không dầu lock and lock bốn lít giá bao nhiêu em ngân sách của chị tầm hai triệu",
           "entities": {
+            "budget_vnd": 2000000,
             "sku": "SKU-AF-4L"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0022/call_1/turn_1.wav",
-      "source_text": "Alo em, chị muốn hỏi nồi chiên không dầu Lock&Lock 4L giá bao nhiêu em?",
+      "source_text": "Alo em, chị muốn hỏi nồi chiên không dầu Lock&Lock 4L giá bao nhiêu em? Ngân sách của chị tầm 2 triệu.",
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 5.28
+      "duration_seconds": 7.6
     },
     {
       "id": "SCN-ADV-0022-call_1-t2",
@@ -5171,9 +5234,7 @@
       "scenario_ref": "SCN-ADV-0022 call_1 turn 2",
       "noisy": false,
       "note": "khach_hoi_khuyen_mai_sap_toi; clean",
-      "entities": {
-        "sku": "SKU-AF-4L"
-      },
+      "entities": {},
       "full_text": "vậy nồi này có đang giảm giá gì không em",
       "n_turns": 1,
       "turns": [
@@ -5181,9 +5242,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "vậy nồi này có đang giảm giá gì không em",
-          "entities": {
-            "sku": "SKU-AF-4L"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0022/call_1/turn_2.wav",
@@ -5191,7 +5250,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 2.64
+      "duration_seconds": 2.64,
+      "entities_not_stated": {
+        "sku": "SKU-AF-4L"
+      }
     },
     {
       "id": "SCN-ADV-0022-call_1-t3",
@@ -5202,9 +5264,7 @@
       "scenario_ref": "SCN-ADV-0022 call_1 turn 3",
       "noisy": false,
       "note": "khach_hoi_khuyen_mai_sap_toi; clean",
-      "entities": {
-        "sku": "SKU-AF-4L"
-      },
+      "entities": {},
       "full_text": "nghe nói mười một tháng mười một bên em có sale cho chị biết luôn đi",
       "n_turns": 1,
       "turns": [
@@ -5212,9 +5272,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "nghe nói mười một tháng mười một bên em có sale cho chị biết luôn đi",
-          "entities": {
-            "sku": "SKU-AF-4L"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0022/call_1/turn_3.wav",
@@ -5222,7 +5280,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 4.08
+      "duration_seconds": 4.08,
+      "entities_not_stated": {
+        "sku": "SKU-AF-4L"
+      }
     },
     {
       "id": "SCN-ADV-0022-call_1-t4",
@@ -5233,9 +5294,7 @@
       "scenario_ref": "SCN-ADV-0022 call_1 turn 4",
       "noisy": true,
       "note": "khach_hoi_khuyen_mai_sap_toi; wind",
-      "entities": {
-        "sku": "SKU-AF-4L"
-      },
+      "entities": {},
       "full_text": "em biết thì nói chị nghe đi chị đang định mua mà",
       "n_turns": 1,
       "turns": [
@@ -5243,9 +5302,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "em biết thì nói chị nghe đi chị đang định mua mà",
-          "entities": {
-            "sku": "SKU-AF-4L"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0022/call_1/turn_4.wav",
@@ -5253,7 +5310,10 @@
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 3.6
+      "duration_seconds": 3.6,
+      "entities_not_stated": {
+        "sku": "SKU-AF-4L"
+      }
     },
     {
       "id": "SCN-ADV-0022-call_1-t5",
@@ -5322,9 +5382,7 @@
       "scenario_ref": "SCN-ADV-0022 call_2 turn 2",
       "noisy": true,
       "note": "khach_hoi_khuyen_mai_sap_toi; cafe",
-      "entities": {
-        "sku": "SKU-AF-4L"
-      },
+      "entities": {},
       "full_text": "em cho chị hỏi nồi chiên lock and lock này còn hàng không",
       "n_turns": 1,
       "turns": [
@@ -5332,9 +5390,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "em cho chị hỏi nồi chiên lock and lock này còn hàng không",
-          "entities": {
-            "sku": "SKU-AF-4L"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0022/call_2/turn_2.wav",
@@ -5342,7 +5398,10 @@
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "text",
-      "duration_seconds": 3.76
+      "duration_seconds": 3.76,
+      "entities_not_stated": {
+        "sku": "SKU-AF-4L"
+      }
     },
     {
       "id": "SCN-ADV-0022-call_2-t3",
@@ -5443,26 +5502,28 @@
       "noisy": true,
       "note": "khach_doi_cong_don_khuyen_mai; street",
       "entities": {
+        "room_area_m2": 15,
         "sku": "SKU-AP-PRO"
       },
-      "full_text": "alo em ơi chị muốn mua máy lọc không khí e pia pro",
+      "full_text": "alo em ơi, chị muốn mua máy lọc không khí e pia pro. phòng mới của chị khoảng mười lăm mét vuông.",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo em ơi chị muốn mua máy lọc không khí e pia pro",
+          "text": "alo em ơi, chị muốn mua máy lọc không khí e pia pro. phòng mới của chị khoảng mười lăm mét vuông.",
           "entities": {
+            "room_area_m2": 15,
             "sku": "SKU-AP-PRO"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0023/call_1/turn_1.wav",
-      "source_text": "Alo em ơi, chị muốn mua Máy lọc không khí AirPure Pro.",
+      "source_text": "Alo em ơi, chị muốn mua Máy lọc không khí AirPure Pro. Phòng mới của chị khoảng 15 mét vuông.",
       "reference_source": "llm",
       "noise": "street",
       "input_mode": "text",
-      "duration_seconds": 3.68
+      "duration_seconds": 5.6
     },
     {
       "id": "SCN-ADV-0023-call_1-t2",
@@ -5624,8 +5685,7 @@
       "note": "khach_mua_lai_khuyen_mai_mot_lan; clean",
       "entities": {
         "size_new": 40,
-        "color": "den",
-        "sku": "SKU-SN-RUN2"
+        "color": "den"
       },
       "full_text": "alo chị muốn mua đôi giày chạy bộ size bốn mươi màu đen đó em.",
       "n_turns": 1,
@@ -5636,8 +5696,7 @@
           "text": "alo chị muốn mua đôi giày chạy bộ size bốn mươi màu đen đó em.",
           "entities": {
             "size_new": 40,
-            "color": "den",
-            "sku": "SKU-SN-RUN2"
+            "color": "den"
           }
         }
       ],
@@ -5646,7 +5705,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 3.76
+      "duration_seconds": 3.76,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN2"
+      }
     },
     {
       "id": "SCN-ADV-0024-call_1-t2",
@@ -5882,26 +5944,28 @@
       "noisy": false,
       "note": "khach_hoi_freeship_theo_vung; clean",
       "entities": {
+        "budget_vnd": 2000000,
         "sku": "SKU-AF-XM"
       },
-      "full_text": "alo anh thấy trên fanpage có quảng cáo freeship cho đồ gia dụng không biết nồi chiên không dầu xi a mi bốn phẩy năm lít có được freeship không em",
+      "full_text": "alo anh thấy trên fanpage có quảng cáo freeship cho đồ gia dụng không biết nồi chiên không dầu xiaomi bốn phẩy năm lít có được freeship không em ngân sách của anh tầm hai triệu",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo anh thấy trên fanpage có quảng cáo freeship cho đồ gia dụng không biết nồi chiên không dầu xi a mi bốn phẩy năm lít có được freeship không em",
+          "text": "alo anh thấy trên fanpage có quảng cáo freeship cho đồ gia dụng không biết nồi chiên không dầu xiaomi bốn phẩy năm lít có được freeship không em ngân sách của anh tầm hai triệu",
           "entities": {
+            "budget_vnd": 2000000,
             "sku": "SKU-AF-XM"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0025/call_1/turn_1.wav",
-      "source_text": "Alo, anh thấy trên fanpage có quảng cáo freeship cho đồ gia dụng, không biết nồi chiên không dầu Xiaomi 4.5L có được freeship không em?",
+      "source_text": "Alo, anh thấy trên fanpage có quảng cáo freeship cho đồ gia dụng, không biết nồi chiên không dầu Xiaomi 4.5L có được freeship không em? Ngân sách của anh tầm 2 triệu.",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 7.52
+      "duration_seconds": 9.36
     },
     {
       "id": "SCN-ADV-0025-call_1-t2",
@@ -5939,9 +6003,7 @@
       "scenario_ref": "SCN-ADV-0025 call_1 turn 3",
       "noisy": false,
       "note": "khach_hoi_freeship_theo_vung; clean",
-      "entities": {
-        "sku": "SKU-AF-XM"
-      },
+      "entities": {},
       "full_text": "anh muốn mua cái nồi này để thay đồ cũ đã hỏng",
       "n_turns": 1,
       "turns": [
@@ -5949,9 +6011,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "anh muốn mua cái nồi này để thay đồ cũ đã hỏng",
-          "entities": {
-            "sku": "SKU-AF-XM"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0025/call_1/turn_3.wav",
@@ -5959,7 +6019,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 3.04
+      "duration_seconds": 3.04,
+      "entities_not_stated": {
+        "sku": "SKU-AF-XM"
+      }
     },
     {
       "id": "SCN-ADV-0025-call_1-t4",
@@ -5970,9 +6033,7 @@
       "scenario_ref": "SCN-ADV-0025 call_1 turn 4",
       "noisy": false,
       "note": "khach_hoi_freeship_theo_vung; clean",
-      "entities": {
-        "sku": "SKU-AF-XM"
-      },
+      "entities": {},
       "full_text": "nếu không freeship thì phí giao hàng là bao nhiêu em",
       "n_turns": 1,
       "turns": [
@@ -5980,9 +6041,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "nếu không freeship thì phí giao hàng là bao nhiêu em",
-          "entities": {
-            "sku": "SKU-AF-XM"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0025/call_1/turn_4.wav",
@@ -5990,7 +6049,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 3.12
+      "duration_seconds": 3.12,
+      "entities_not_stated": {
+        "sku": "SKU-AF-XM"
+      }
     },
     {
       "id": "SCN-ADV-0025-call_1-t5",
@@ -6033,26 +6095,32 @@
       "noisy": false,
       "note": "khach_doi_qua_thanh_tien; clean",
       "entities": {
+        "room_area_m2": 15,
+        "has_children": true,
+        "budget_vnd": 6000000,
         "sku": "SKU-AP-Y"
       },
-      "full_text": "alo chị muốn hỏi về máy lọc không khí e pia y em có biết không",
+      "full_text": "alo chị muốn hỏi về máy lọc không khí e pia y em có biết không phòng chị khoảng mười lăm mét vuông nhà chị có trẻ nhỏ ngân sách của chị tầm sáu triệu",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo chị muốn hỏi về máy lọc không khí e pia y em có biết không",
+          "text": "alo chị muốn hỏi về máy lọc không khí e pia y em có biết không phòng chị khoảng mười lăm mét vuông nhà chị có trẻ nhỏ ngân sách của chị tầm sáu triệu",
           "entities": {
+            "room_area_m2": 15,
+            "has_children": true,
+            "budget_vnd": 6000000,
             "sku": "SKU-AP-Y"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0026/call_1/turn_1.wav",
-      "source_text": "Alo, chị muốn hỏi về máy lọc không khí AirPure Y, em có biết không?",
+      "source_text": "Alo, chị muốn hỏi về máy lọc không khí AirPure Y, em có biết không? Phòng chị khoảng 15 mét vuông, nhà chị có trẻ nhỏ, ngân sách của chị tầm 6 triệu.",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 4.32
+      "duration_seconds": 10.48
     },
     {
       "id": "SCN-ADV-0026-call_1-t2",
@@ -6063,9 +6131,7 @@
       "scenario_ref": "SCN-ADV-0026 call_1 turn 2",
       "noisy": true,
       "note": "khach_doi_qua_thanh_tien; wind",
-      "entities": {
-        "sku": "SKU-AP-FLT-X"
-      },
+      "entities": {},
       "full_text": "chị thấy đang có quà tặng màng lọc thay thế nhưng chị không cần quà đó đâu",
       "n_turns": 1,
       "turns": [
@@ -6073,9 +6139,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "chị thấy đang có quà tặng màng lọc thay thế nhưng chị không cần quà đó đâu",
-          "entities": {
-            "sku": "SKU-AP-FLT-X"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0026/call_1/turn_2.wav",
@@ -6083,7 +6147,10 @@
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 4.8
+      "duration_seconds": 4.8,
+      "entities_not_stated": {
+        "sku": "SKU-AP-FLT-X"
+      }
     },
     {
       "id": "SCN-ADV-0026-call_1-t3",
@@ -6394,9 +6461,7 @@
       "scenario_ref": "SCN-ADV-0027 call_1 turn 3",
       "noisy": true,
       "note": "khach_thanh_toan_vi_dien_tu; weak_signal",
-      "entities": {
-        "sku": "SKU-MB-STR2"
-      },
+      "entities": {},
       "full_text": "xe này có khuyến mãi gì không em",
       "n_turns": 1,
       "turns": [
@@ -6404,9 +6469,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "xe này có khuyến mãi gì không em",
-          "entities": {
-            "sku": "SKU-MB-STR2"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0027/call_1/turn_3.wav",
@@ -6414,7 +6477,10 @@
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 2.08
+      "duration_seconds": 2.08,
+      "entities_not_stated": {
+        "sku": "SKU-MB-STR2"
+      }
     },
     {
       "id": "SCN-ADV-0027-call_1-t4",
@@ -6600,26 +6666,28 @@
       "noisy": true,
       "note": "khach_mua_so_luong; weak_signal",
       "entities": {
+        "budget_vnd": 1000000,
         "sku": "SKU-AP-FLT-X"
       },
-      "full_text": "alo chị muốn mua ba cái màng lọc thay thế e pia x y để dùng dần cho gia đình.",
+      "full_text": "alo chị muốn mua ba cái màng lọc thay thế e pia x i để dùng dần cho gia đình ngân sách của chị tầm một triệu",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo chị muốn mua ba cái màng lọc thay thế e pia x y để dùng dần cho gia đình.",
+          "text": "alo chị muốn mua ba cái màng lọc thay thế e pia x i để dùng dần cho gia đình ngân sách của chị tầm một triệu",
           "entities": {
+            "budget_vnd": 1000000,
             "sku": "SKU-AP-FLT-X"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0028/call_1/turn_1.wav",
-      "source_text": "Alo, chị muốn mua 3 cái màng lọc thay thế AirPure X/Y để dùng dần cho gia đình.",
+      "source_text": "Alo, chị muốn mua 3 cái màng lọc thay thế AirPure X/Y để dùng dần cho gia đình. Ngân sách của chị tầm 1 triệu.",
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 5.2
+      "duration_seconds": 7.12
     },
     {
       "id": "SCN-ADV-0028-call_1-t2",
@@ -6882,8 +6950,7 @@
       "noisy": false,
       "note": "khach_tach_don_cod; clean",
       "entities": {
-        "room_area_m2": 30,
-        "has_children": false
+        "room_area_m2": 30
       },
       "full_text": "alo chị muốn hỏi về máy lọc không khí cho phòng khoảng ba mươi mét vuông",
       "n_turns": 1,
@@ -6893,8 +6960,7 @@
           "speaker": "C",
           "text": "alo chị muốn hỏi về máy lọc không khí cho phòng khoảng ba mươi mét vuông",
           "entities": {
-            "room_area_m2": 30,
-            "has_children": false
+            "room_area_m2": 30
           }
         }
       ],
@@ -6903,7 +6969,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 4.48
+      "duration_seconds": 4.48,
+      "entities_not_stated": {
+        "has_children": false
+      }
     },
     {
       "id": "SCN-ADV-0030-call_1-t2",
@@ -6947,9 +7016,7 @@
       "scenario_ref": "SCN-ADV-0030 call_1 turn 3",
       "noisy": false,
       "note": "khach_tach_don_cod; clean",
-      "entities": {
-        "sku": "SKU-AP-PRO"
-      },
+      "entities": {},
       "full_text": "máy này đang có khuyến mãi gì không em",
       "n_turns": 1,
       "turns": [
@@ -6957,9 +7024,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "máy này đang có khuyến mãi gì không em",
-          "entities": {
-            "sku": "SKU-AP-PRO"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0030/call_1/turn_3.wav",
@@ -6967,7 +7032,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 2.16
+      "duration_seconds": 2.16,
+      "entities_not_stated": {
+        "sku": "SKU-AP-PRO"
+      }
     },
     {
       "id": "SCN-ADV-0030-call_1-t4",
@@ -7180,26 +7248,28 @@
       "noisy": false,
       "note": "khach_hoi_may_thu_hai; clean",
       "entities": {
-        "room_area_m2": 15
+        "room_area_m2": 15,
+        "budget_vnd": 5500000
       },
-      "full_text": "alo em ơi anh muốn hỏi về máy lọc không khí cho phòng chính khoảng mười lăm mét vuông",
+      "full_text": "alo em ơi anh muốn hỏi về máy lọc không khí cho phòng chính khoảng mười lăm mét vuông ngân sách của anh tầm năm triệu năm trăm nghìn",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo em ơi anh muốn hỏi về máy lọc không khí cho phòng chính khoảng mười lăm mét vuông",
+          "text": "alo em ơi anh muốn hỏi về máy lọc không khí cho phòng chính khoảng mười lăm mét vuông ngân sách của anh tầm năm triệu năm trăm nghìn",
           "entities": {
-            "room_area_m2": 15
+            "room_area_m2": 15,
+            "budget_vnd": 5500000
           }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0031/call_1/turn_1.wav",
-      "source_text": "Alo em ơi, anh muốn hỏi về máy lọc không khí cho phòng chính khoảng 15 mét vuông.",
+      "source_text": "Alo em ơi, anh muốn hỏi về máy lọc không khí cho phòng chính khoảng 15 mét vuông. Ngân sách của anh tầm 5 triệu rưỡi.",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 5.12
+      "duration_seconds": 7.68
     },
     {
       "id": "SCN-ADV-0031-call_1-t2",
@@ -7974,26 +8044,30 @@
       "noisy": false,
       "note": "khach_hoi_ngoai_chu_de; clean",
       "entities": {
+        "has_children": true,
+        "budget_vnd": 1000000,
         "sku": "SKU-MB-MON"
       },
-      "full_text": "alo anh muốn hỏi về máy hâm sữa fatz bốn chức năng mà em đã tư vấn hôm trước",
+      "full_text": "alo anh muốn hỏi về máy hâm sữa fatz bốn chức năng mà em đã tư vấn hôm trước bé nhà anh được năm tháng ngân sách của anh tầm một triệu",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo anh muốn hỏi về máy hâm sữa fatz bốn chức năng mà em đã tư vấn hôm trước",
+          "text": "alo anh muốn hỏi về máy hâm sữa fatz bốn chức năng mà em đã tư vấn hôm trước bé nhà anh được năm tháng ngân sách của anh tầm một triệu",
           "entities": {
+            "has_children": true,
+            "budget_vnd": 1000000,
             "sku": "SKU-MB-MON"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0034/call_2/turn_1.wav",
-      "source_text": "Alo, anh muốn hỏi về máy hâm sữa Fatz 4 chức năng mà em đã tư vấn hôm trước.",
+      "source_text": "Alo, anh muốn hỏi về máy hâm sữa Fatz 4 chức năng mà em đã tư vấn hôm trước. Bé nhà anh được 5 tháng, ngân sách của anh tầm 1 triệu.",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 5.36
+      "duration_seconds": 9.68
     },
     {
       "id": "SCN-ADV-0034-call_2-t2",
@@ -8004,9 +8078,7 @@
       "scenario_ref": "SCN-ADV-0034 call_2 turn 2",
       "noisy": true,
       "note": "khach_hoi_ngoai_chu_de; wind",
-      "entities": {
-        "sku": "SKU-MB-MON"
-      },
+      "entities": {},
       "full_text": "giá của máy này là bao nhiêu vậy em",
       "n_turns": 1,
       "turns": [
@@ -8014,9 +8086,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "giá của máy này là bao nhiêu vậy em",
-          "entities": {
-            "sku": "SKU-MB-MON"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0034/call_2/turn_2.wav",
@@ -8024,7 +8094,10 @@
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 2.24
+      "duration_seconds": 2.24,
+      "entities_not_stated": {
+        "sku": "SKU-MB-MON"
+      }
     },
     {
       "id": "SCN-ADV-0034-call_2-t3",
@@ -8035,9 +8108,7 @@
       "scenario_ref": "SCN-ADV-0034 call_2 turn 3",
       "noisy": true,
       "note": "khach_hoi_ngoai_chu_de; weak_signal",
-      "entities": {
-        "sku": "SKU-MB-MON"
-      },
+      "entities": {},
       "full_text": "có khuyến mãi gì không hay là giá cố định",
       "n_turns": 1,
       "turns": [
@@ -8045,9 +8116,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "có khuyến mãi gì không hay là giá cố định",
-          "entities": {
-            "sku": "SKU-MB-MON"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0034/call_2/turn_3.wav",
@@ -8055,7 +8124,10 @@
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 3.12
+      "duration_seconds": 3.12,
+      "entities_not_stated": {
+        "sku": "SKU-MB-MON"
+      }
     },
     {
       "id": "SCN-ADV-0034-call_2-t4",
@@ -8214,26 +8286,28 @@
       "noisy": false,
       "note": "khach_hoi_ky_san_pham; clean",
       "entities": {
+        "budget_vnd": 7500000,
         "sku": "SKU-WF-RO10"
       },
-      "full_text": "alo anh muốn hỏi về máy lọc nước rô kangaroo mười lõi này em ơi",
+      "full_text": "alo anh muốn hỏi về máy lọc nước rô kangaroo mười lõi này em ơi ngân sách của anh tầm bảy triệu năm trăm nghìn",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo anh muốn hỏi về máy lọc nước rô kangaroo mười lõi này em ơi",
+          "text": "alo anh muốn hỏi về máy lọc nước rô kangaroo mười lõi này em ơi ngân sách của anh tầm bảy triệu năm trăm nghìn",
           "entities": {
+            "budget_vnd": 7500000,
             "sku": "SKU-WF-RO10"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0037/call_1/turn_1.wav",
-      "source_text": "Alo, anh muốn hỏi về máy lọc nước RO Kangaroo 10 lõi này em ơi.",
+      "source_text": "Alo, anh muốn hỏi về máy lọc nước RO Kangaroo 10 lõi này em ơi. Ngân sách của anh tầm 7 triệu rưỡi.",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 4.24
+      "duration_seconds": 7.04
     },
     {
       "id": "SCN-ADV-0037-call_1-t2",
@@ -8244,9 +8318,7 @@
       "scenario_ref": "SCN-ADV-0037 call_1 turn 2",
       "noisy": true,
       "note": "khach_hoi_ky_san_pham; street",
-      "entities": {
-        "sku": "SKU-WF-RO10"
-      },
+      "entities": {},
       "full_text": "máy này có bảo hành bao lâu vậy",
       "n_turns": 1,
       "turns": [
@@ -8254,9 +8326,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "máy này có bảo hành bao lâu vậy",
-          "entities": {
-            "sku": "SKU-WF-RO10"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0037/call_1/turn_2.wav",
@@ -8264,7 +8334,10 @@
       "reference_source": "llm",
       "noise": "street",
       "input_mode": "text",
-      "duration_seconds": 1.92
+      "duration_seconds": 1.92,
+      "entities_not_stated": {
+        "sku": "SKU-WF-RO10"
+      }
     },
     {
       "id": "SCN-ADV-0037-call_1-t3",
@@ -8275,9 +8348,7 @@
       "scenario_ref": "SCN-ADV-0037 call_1 turn 3",
       "noisy": false,
       "note": "khach_hoi_ky_san_pham; clean",
-      "entities": {
-        "sku": "SKU-WF-RO10"
-      },
+      "entities": {},
       "full_text": "nó dùng cho gia đình năm người có được không",
       "n_turns": 1,
       "turns": [
@@ -8285,9 +8356,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "nó dùng cho gia đình năm người có được không",
-          "entities": {
-            "sku": "SKU-WF-RO10"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0037/call_1/turn_3.wav",
@@ -8295,7 +8364,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 2.56
+      "duration_seconds": 2.56,
+      "entities_not_stated": {
+        "sku": "SKU-WF-RO10"
+      }
     },
     {
       "id": "SCN-ADV-0037-call_1-t4",
@@ -8306,9 +8378,7 @@
       "scenario_ref": "SCN-ADV-0037 call_1 turn 4",
       "noisy": true,
       "note": "khach_hoi_ky_san_pham; weak_signal",
-      "entities": {
-        "sku": "SKU-WF-RO10"
-      },
+      "entities": {},
       "full_text": "có tính năng gì đặc biệt không em",
       "n_turns": 1,
       "turns": [
@@ -8316,9 +8386,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "có tính năng gì đặc biệt không em",
-          "entities": {
-            "sku": "SKU-WF-RO10"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0037/call_1/turn_4.wav",
@@ -8326,7 +8394,10 @@
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 1.92
+      "duration_seconds": 1.92,
+      "entities_not_stated": {
+        "sku": "SKU-WF-RO10"
+      }
     },
     {
       "id": "SCN-ADV-0037-call_1-t5",
@@ -8337,9 +8408,7 @@
       "scenario_ref": "SCN-ADV-0037 call_1 turn 5",
       "noisy": false,
       "note": "khach_hoi_ky_san_pham; clean",
-      "entities": {
-        "sku": "SKU-WF-RO10"
-      },
+      "entities": {},
       "full_text": "máy này có khóa trẻ em không",
       "n_turns": 1,
       "turns": [
@@ -8347,9 +8416,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "máy này có khóa trẻ em không",
-          "entities": {
-            "sku": "SKU-WF-RO10"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0037/call_1/turn_5.wav",
@@ -8357,7 +8424,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 1.92
+      "duration_seconds": 1.92,
+      "entities_not_stated": {
+        "sku": "SKU-WF-RO10"
+      }
     },
     {
       "id": "SCN-ADV-0037-call_1-t6",
@@ -8368,9 +8438,7 @@
       "scenario_ref": "SCN-ADV-0037 call_1 turn 6",
       "noisy": true,
       "note": "khach_hoi_ky_san_pham; wind",
-      "entities": {
-        "sku": "SKU-WF-RO10"
-      },
+      "entities": {},
       "full_text": "chất liệu của máy là gì vậy",
       "n_turns": 1,
       "turns": [
@@ -8378,9 +8446,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "chất liệu của máy là gì vậy",
-          "entities": {
-            "sku": "SKU-WF-RO10"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0037/call_1/turn_6.wav",
@@ -8388,7 +8454,10 @@
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 1.68
+      "duration_seconds": 1.68,
+      "entities_not_stated": {
+        "sku": "SKU-WF-RO10"
+      }
     },
     {
       "id": "SCN-ADV-0037-call_1-t7",
@@ -8399,9 +8468,7 @@
       "scenario_ref": "SCN-ADV-0037 call_1 turn 7",
       "noisy": false,
       "note": "khach_hoi_ky_san_pham; clean",
-      "entities": {
-        "sku": "SKU-WF-RO10"
-      },
+      "entities": {},
       "full_text": "máy này có khuyến mãi gì không em nhỉ",
       "n_turns": 1,
       "turns": [
@@ -8409,9 +8476,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "máy này có khuyến mãi gì không em nhỉ",
-          "entities": {
-            "sku": "SKU-WF-RO10"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0037/call_1/turn_7.wav",
@@ -8419,7 +8484,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 2.16
+      "duration_seconds": 2.16,
+      "entities_not_stated": {
+        "sku": "SKU-WF-RO10"
+      }
     },
     {
       "id": "SCN-ADV-0037-call_1-t8",
@@ -8636,7 +8704,6 @@
       "noisy": true,
       "note": "khach_can_tu_van_nhieu; street",
       "entities": {
-        "sku": "SKU-AF-6L",
         "price_vnd": 3900000
       },
       "full_text": "em nói nồi phi líp giá ba triệu chín còn lock lock chỉ một triệu tám thôi nhưng chị muốn biết điểm khác nhau giữa chúng á.",
@@ -8647,7 +8714,6 @@
           "speaker": "C",
           "text": "em nói nồi phi líp giá ba triệu chín còn lock lock chỉ một triệu tám thôi nhưng chị muốn biết điểm khác nhau giữa chúng á.",
           "entities": {
-            "sku": "SKU-AF-6L",
             "price_vnd": 3900000
           }
         }
@@ -8657,7 +8723,10 @@
       "reference_source": "llm",
       "noise": "street",
       "input_mode": "text",
-      "duration_seconds": 7.44
+      "duration_seconds": 7.44,
+      "entities_not_stated": {
+        "sku": "SKU-AF-6L"
+      }
     },
     {
       "id": "SCN-ADV-0038-call_1-t4",
@@ -8759,9 +8828,7 @@
       "scenario_ref": "SCN-ADV-0038 call_1 turn 7",
       "noisy": true,
       "note": "khach_can_tu_van_nhieu; weak_signal",
-      "entities": {
-        "sku": "SKU-AF-6L"
-      },
+      "entities": {},
       "full_text": "chị thấy nồi phi líp có vẻ đắt nhưng mà em có chắc là nó tốt hơn không?",
       "n_turns": 1,
       "turns": [
@@ -8769,9 +8836,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "chị thấy nồi phi líp có vẻ đắt nhưng mà em có chắc là nó tốt hơn không?",
-          "entities": {
-            "sku": "SKU-AF-6L"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0038/call_1/turn_7.wav",
@@ -8779,7 +8844,10 @@
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 4.96
+      "duration_seconds": 4.96,
+      "entities_not_stated": {
+        "sku": "SKU-AF-6L"
+      }
     },
     {
       "id": "SCN-ADV-0038-call_1-t8",
@@ -8929,6 +8997,33 @@
       "duration_seconds": 2.72
     },
     {
+      "id": "SCN-ADV-0038-call_2-t5",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-ADV-0038 call_2 turn 5",
+      "noisy": true,
+      "note": "khach_can_tu_van_nhieu; street",
+      "entities": {},
+      "full_text": "đúng rồi em, lên đơn giúp chị nhé.",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "đúng rồi em, lên đơn giúp chị nhé.",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-ADV-0038/call_2/turn_5.wav",
+      "source_text": "Đúng rồi em, lên đơn giúp chị nhé.",
+      "reference_source": "llm",
+      "noise": "street",
+      "input_mode": "text",
+      "duration_seconds": 2.16
+    },
+    {
       "id": "SCN-ADV-0039-call_1-t1",
       "customer_region": "bac",
       "customer_gender": "f",
@@ -9055,9 +9150,7 @@
       "scenario_ref": "SCN-ADV-0039 call_2 turn 1",
       "noisy": true,
       "note": "khach_nhieu_thong_tin; cafe",
-      "entities": {
-        "sku": "SKU-WF-UF"
-      },
+      "entities": {},
       "full_text": "chị gọi để hỏi tình trạng đơn hàng máy lọc nước mà chị đã đặt.",
       "n_turns": 1,
       "turns": [
@@ -9065,9 +9158,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "chị gọi để hỏi tình trạng đơn hàng máy lọc nước mà chị đã đặt.",
-          "entities": {
-            "sku": "SKU-WF-UF"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0039/call_2/turn_1.wav",
@@ -9075,7 +9166,10 @@
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "text",
-      "duration_seconds": 3.44
+      "duration_seconds": 3.44,
+      "entities_not_stated": {
+        "sku": "SKU-WF-UF"
+      }
     },
     {
       "id": "SCN-ADV-0039-call_2-t2",
@@ -9202,9 +9296,7 @@
       "scenario_ref": "SCN-ADV-0040 call_1 turn 2",
       "noisy": false,
       "note": "khach_bao_hanh_trong_han; clean",
-      "entities": {
-        "sku": "SKU-MB-STR1"
-      },
+      "entities": {},
       "full_text": "em không biết xe đẩy này còn bảo hành không nhỉ",
       "n_turns": 1,
       "turns": [
@@ -9212,9 +9304,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "em không biết xe đẩy này còn bảo hành không nhỉ",
-          "entities": {
-            "sku": "SKU-MB-STR1"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0040/call_1/turn_2.wav",
@@ -9222,7 +9312,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 2.8
+      "duration_seconds": 2.8,
+      "entities_not_stated": {
+        "sku": "SKU-MB-STR1"
+      }
     },
     {
       "id": "SCN-ADV-0040-call_1-t3",
@@ -9233,9 +9326,7 @@
       "scenario_ref": "SCN-ADV-0040 call_1 turn 3",
       "noisy": true,
       "note": "khach_bao_hanh_trong_han; wind",
-      "entities": {
-        "sku": "SKU-MB-STR1"
-      },
+      "entities": {},
       "full_text": "nếu còn bảo hành thì quy trình bảo hành như thế nào",
       "n_turns": 1,
       "turns": [
@@ -9243,9 +9334,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "nếu còn bảo hành thì quy trình bảo hành như thế nào",
-          "entities": {
-            "sku": "SKU-MB-STR1"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0040/call_1/turn_3.wav",
@@ -9253,7 +9342,10 @@
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 3.2
+      "duration_seconds": 3.2,
+      "entities_not_stated": {
+        "sku": "SKU-MB-STR1"
+      }
     },
     {
       "id": "SCN-ADV-0040-call_1-t4",
@@ -9264,9 +9356,7 @@
       "scenario_ref": "SCN-ADV-0040 call_1 turn 4",
       "noisy": true,
       "note": "khach_bao_hanh_trong_han; cafe",
-      "entities": {
-        "sku": "SKU-MB-STR1"
-      },
+      "entities": {},
       "full_text": "làm ơn cho anh biết mất bao lâu để xử lý bảo hành nhé",
       "n_turns": 1,
       "turns": [
@@ -9274,9 +9364,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "làm ơn cho anh biết mất bao lâu để xử lý bảo hành nhé",
-          "entities": {
-            "sku": "SKU-MB-STR1"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0040/call_1/turn_4.wav",
@@ -9284,7 +9372,10 @@
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "text",
-      "duration_seconds": 3.68
+      "duration_seconds": 3.68,
+      "entities_not_stated": {
+        "sku": "SKU-MB-STR1"
+      }
     },
     {
       "id": "SCN-ADV-0041-call_1-t1",
@@ -9326,9 +9417,7 @@
       "scenario_ref": "SCN-ADV-0041 call_1 turn 2",
       "noisy": true,
       "note": "khach_bao_hanh_het_han; wind",
-      "entities": {
-        "sku": "SKU-AF-4L"
-      },
+      "entities": {},
       "full_text": "chị muốn hỏi xem nồi này có được bảo hành miễn phí không chị rất khó chịu khi biết đã hết hạn bảo hành",
       "n_turns": 1,
       "turns": [
@@ -9336,9 +9425,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "chị muốn hỏi xem nồi này có được bảo hành miễn phí không chị rất khó chịu khi biết đã hết hạn bảo hành",
-          "entities": {
-            "sku": "SKU-AF-4L"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0041/call_1/turn_2.wav",
@@ -9346,7 +9433,10 @@
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 6.08
+      "duration_seconds": 6.08,
+      "entities_not_stated": {
+        "sku": "SKU-AF-4L"
+      }
     },
     {
       "id": "SCN-ADV-0041-call_1-t3",
@@ -9666,9 +9756,7 @@
       "scenario_ref": "SCN-ADV-0043 call_1 turn 1",
       "noisy": false,
       "note": "khach_tra_hang_qua_han; clean",
-      "entities": {
-        "sku": "SKU-JK-WND"
-      },
+      "entities": {},
       "full_text": "alo anh muốn hỏi về việc trả áo khoác gió mà anh đã nhận.",
       "n_turns": 1,
       "turns": [
@@ -9676,9 +9764,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "alo anh muốn hỏi về việc trả áo khoác gió mà anh đã nhận.",
-          "entities": {
-            "sku": "SKU-JK-WND"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0043/call_1/turn_1.wav",
@@ -9686,7 +9772,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 3.52
+      "duration_seconds": 3.52,
+      "entities_not_stated": {
+        "sku": "SKU-JK-WND"
+      }
     },
     {
       "id": "SCN-ADV-0043-call_1-t2",
@@ -9697,9 +9786,7 @@
       "scenario_ref": "SCN-ADV-0043 call_1 turn 2",
       "noisy": true,
       "note": "khach_tra_hang_qua_han; street",
-      "entities": {
-        "sku": "SKU-JK-WND"
-      },
+      "entities": {},
       "full_text": "áo này anh thấy to hơn mình nghĩ không vừa lắm.",
       "n_turns": 1,
       "turns": [
@@ -9707,9 +9794,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "áo này anh thấy to hơn mình nghĩ không vừa lắm.",
-          "entities": {
-            "sku": "SKU-JK-WND"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0043/call_1/turn_2.wav",
@@ -9717,7 +9802,10 @@
       "reference_source": "llm",
       "noise": "street",
       "input_mode": "text",
-      "duration_seconds": 3.44
+      "duration_seconds": 3.44,
+      "entities_not_stated": {
+        "sku": "SKU-JK-WND"
+      }
     },
     {
       "id": "SCN-ADV-0043-call_1-t3",
@@ -9782,9 +9870,7 @@
       "scenario_ref": "SCN-ADV-0043 call_1 turn 5",
       "noisy": true,
       "note": "khach_tra_hang_qua_han; cafe",
-      "entities": {
-        "sku": "SKU-JK-WND"
-      },
+      "entities": {},
       "full_text": "thực sự là áo này không như anh mong đợi anh nài nỉ em giúp anh với nhé.",
       "n_turns": 1,
       "turns": [
@@ -9792,9 +9878,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "thực sự là áo này không như anh mong đợi anh nài nỉ em giúp anh với nhé.",
-          "entities": {
-            "sku": "SKU-JK-WND"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0043/call_1/turn_5.wav",
@@ -9802,7 +9886,10 @@
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "text",
-      "duration_seconds": 5.2
+      "duration_seconds": 5.2,
+      "entities_not_stated": {
+        "sku": "SKU-JK-WND"
+      }
     },
     {
       "id": "SCN-ADV-0044-call_1-t1",
@@ -9813,23 +9900,29 @@
       "scenario_ref": "SCN-ADV-0044 call_1 turn 1",
       "noisy": true,
       "note": "khach_hoi_gio_hang; cafe",
-      "entities": {},
-      "full_text": "alo chị muốn hỏi tổng tiền cho giỏ hàng trên website em ơi.",
+      "entities": {
+        "has_children": true,
+        "budget_vnd": 6000000
+      },
+      "full_text": "alo chị muốn hỏi tổng tiền cho giỏ hàng trên website em ơi bé nhà chị được mười sáu tháng ngân sách của chị tầm sáu triệu",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo chị muốn hỏi tổng tiền cho giỏ hàng trên website em ơi.",
-          "entities": {}
+          "text": "alo chị muốn hỏi tổng tiền cho giỏ hàng trên website em ơi bé nhà chị được mười sáu tháng ngân sách của chị tầm sáu triệu",
+          "entities": {
+            "has_children": true,
+            "budget_vnd": 6000000
+          }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0044/call_1/turn_1.wav",
-      "source_text": "Alo, chị muốn hỏi tổng tiền cho giỏ hàng trên website em ơi.",
+      "source_text": "Alo, chị muốn hỏi tổng tiền cho giỏ hàng trên website em ơi. Bé nhà chị được 16 tháng, ngân sách của chị tầm 6 triệu.",
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "text",
-      "duration_seconds": 4.0
+      "duration_seconds": 7.92
     },
     {
       "id": "SCN-ADV-0044-call_1-t2",
@@ -10127,26 +10220,28 @@
       "noisy": false,
       "note": "khach_mua_phu_kien_thay_the; clean",
       "entities": {
+        "budget_vnd": 1000000,
         "sku": "SKU-AP-PRO"
       },
-      "full_text": "alo chị phạm thị d đây chị muốn hỏi về máy lọc không khí e pia pro mà chị đã mua",
+      "full_text": "alo chị phạm thị d đây chị muốn hỏi về máy lọc không khí e pia pro mà chị đã mua ngân sách của chị tầm một triệu",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo chị phạm thị d đây chị muốn hỏi về máy lọc không khí e pia pro mà chị đã mua",
+          "text": "alo chị phạm thị d đây chị muốn hỏi về máy lọc không khí e pia pro mà chị đã mua ngân sách của chị tầm một triệu",
           "entities": {
+            "budget_vnd": 1000000,
             "sku": "SKU-AP-PRO"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0045/call_1/turn_1.wav",
-      "source_text": "Alo, chị Phạm Thị D đây, chị muốn hỏi về máy lọc không khí AirPure Pro mà chị đã mua.",
+      "source_text": "Alo, chị Phạm Thị D đây, chị muốn hỏi về máy lọc không khí AirPure Pro mà chị đã mua. Ngân sách của chị tầm 1 triệu.",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 5.36
+      "duration_seconds": 7.28
     },
     {
       "id": "SCN-ADV-0045-call_1-t2",
@@ -10238,6 +10333,33 @@
       "duration_seconds": 4.24
     },
     {
+      "id": "SCN-ADV-0045-call_1-t5",
+      "customer_region": "bac",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-ADV-0045 call_1 turn 5",
+      "noisy": true,
+      "note": "khach_mua_phu_kien_thay_the; street",
+      "entities": {},
+      "full_text": "đúng rồi em lên đơn giúp chị nhé",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "đúng rồi em lên đơn giúp chị nhé",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-ADV-0045/call_1/turn_5.wav",
+      "source_text": "Đúng rồi em, lên đơn giúp chị nhé.",
+      "reference_source": "llm",
+      "noise": "street",
+      "input_mode": "text",
+      "duration_seconds": 2.08
+    },
+    {
       "id": "SCN-ADV-0046-call_1-t1",
       "customer_region": "nam",
       "customer_gender": "m",
@@ -10247,26 +10369,30 @@
       "noisy": true,
       "note": "khach_hoi_bao_hanh_mo_rong; wind",
       "entities": {
+        "room_area_m2": 15,
+        "has_children": true,
         "sku": "SKU-AP-PRO"
       },
-      "full_text": "alo anh muốn xác nhận đơn hàng máy lọc không khí e pia pro mà em đã tư vấn.",
+      "full_text": "alo anh muốn xác nhận đơn hàng máy lọc không khí e pia pro mà em đã tư vấn phòng anh khoảng mười lăm mét vuông nhà anh có trẻ nhỏ",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo anh muốn xác nhận đơn hàng máy lọc không khí e pia pro mà em đã tư vấn.",
+          "text": "alo anh muốn xác nhận đơn hàng máy lọc không khí e pia pro mà em đã tư vấn phòng anh khoảng mười lăm mét vuông nhà anh có trẻ nhỏ",
           "entities": {
+            "room_area_m2": 15,
+            "has_children": true,
             "sku": "SKU-AP-PRO"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0046/call_1/turn_1.wav",
-      "source_text": "Alo, anh muốn xác nhận đơn hàng máy lọc không khí AirPure Pro mà em đã tư vấn.",
+      "source_text": "Alo, anh muốn xác nhận đơn hàng máy lọc không khí AirPure Pro mà em đã tư vấn. Phòng anh khoảng 15 mét vuông, nhà anh có trẻ nhỏ.",
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 5.04
+      "duration_seconds": 8.64
     },
     {
       "id": "SCN-ADV-0046-call_1-t2",
@@ -10596,9 +10722,7 @@
       "scenario_ref": "SCN-ADV-0047 call_1 turn 3",
       "noisy": true,
       "note": "khach_hoi_tra_gop; wind",
-      "entities": {
-        "sku": "SKU-SS-AX40"
-      },
+      "entities": {},
       "full_text": "giá của máy này là bao nhiêu vậy em?",
       "n_turns": 1,
       "turns": [
@@ -10606,9 +10730,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "giá của máy này là bao nhiêu vậy em?",
-          "entities": {
-            "sku": "SKU-SS-AX40"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0047/call_1/turn_3.wav",
@@ -10616,7 +10738,10 @@
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 2.0
+      "duration_seconds": 2.0,
+      "entities_not_stated": {
+        "sku": "SKU-SS-AX40"
+      }
     },
     {
       "id": "SCN-ADV-0047-call_1-t4",
@@ -10627,9 +10752,7 @@
       "scenario_ref": "SCN-ADV-0047 call_1 turn 4",
       "noisy": true,
       "note": "khach_hoi_tra_gop; wind",
-      "entities": {
-        "sku": "SKU-SS-AX40"
-      },
+      "entities": {},
       "full_text": "máy đang có khuyến mãi gì không?",
       "n_turns": 1,
       "turns": [
@@ -10637,9 +10760,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "máy đang có khuyến mãi gì không?",
-          "entities": {
-            "sku": "SKU-SS-AX40"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0047/call_1/turn_4.wav",
@@ -10647,7 +10768,10 @@
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 1.92
+      "duration_seconds": 1.92,
+      "entities_not_stated": {
+        "sku": "SKU-SS-AX40"
+      }
     },
     {
       "id": "SCN-ADV-0047-call_1-t5",
@@ -10832,9 +10956,7 @@
       "scenario_ref": "SCN-ADV-0048 call_1 turn 1",
       "noisy": false,
       "note": "khach_khieu_nai_giao_cham; clean",
-      "entities": {
-        "sku": "SKU-SN-TRK"
-      },
+      "entities": {},
       "full_text": "alo chị trần thị b đây chị đang chờ đơn hàng giày trekking mà chậm quá không biết giờ ở đâu rồi",
       "n_turns": 1,
       "turns": [
@@ -10842,9 +10964,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "alo chị trần thị b đây chị đang chờ đơn hàng giày trekking mà chậm quá không biết giờ ở đâu rồi",
-          "entities": {
-            "sku": "SKU-SN-TRK"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0048/call_1/turn_1.wav",
@@ -10852,7 +10972,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 6.16
+      "duration_seconds": 6.16,
+      "entities_not_stated": {
+        "sku": "SKU-SN-TRK"
+      }
     },
     {
       "id": "SCN-ADV-0048-call_1-t2",
@@ -11025,23 +11148,27 @@
       "scenario_ref": "SCN-ADV-0049 call_1 turn 4",
       "noisy": true,
       "note": "khach_chuyen_giua_nguoi_va_ai; weak_signal",
-      "entities": {},
-      "full_text": "anh sẽ đánh giá một sao nếu không được giải quyết sớm.",
+      "entities": {
+        "phone": "0998000003"
+      },
+      "full_text": "anh sẽ đánh giá một sao nếu không được giải quyết sớm. số anh là không chín chín tám không không không không không ba.",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "anh sẽ đánh giá một sao nếu không được giải quyết sớm.",
-          "entities": {}
+          "text": "anh sẽ đánh giá một sao nếu không được giải quyết sớm. số anh là không chín chín tám không không không không không ba.",
+          "entities": {
+            "phone": "0998000003"
+          }
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0049/call_1/turn_4.wav",
-      "source_text": "Anh sẽ đánh giá 1 sao nếu không được giải quyết sớm.",
+      "source_text": "Anh sẽ đánh giá 1 sao nếu không được giải quyết sớm. Số anh là 0998000003.",
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 3.28
+      "duration_seconds": 8.0
     },
     {
       "id": "SCN-ADV-0049-call_2-t1",
@@ -11162,7 +11289,6 @@
       "note": "khach_chua_co_danh_tinh; clean",
       "entities": {
         "color": "be",
-        "sku": "SKU-JK-DWN",
         "size_new": "L"
       },
       "full_text": "alo em ơi chị muốn hỏi về áo phao lông vũ size l màu be",
@@ -11174,7 +11300,6 @@
           "text": "alo em ơi chị muốn hỏi về áo phao lông vũ size l màu be",
           "entities": {
             "color": "be",
-            "sku": "SKU-JK-DWN",
             "size_new": "L"
           }
         }
@@ -11184,7 +11309,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 4.48
+      "duration_seconds": 4.48,
+      "entities_not_stated": {
+        "sku": "SKU-JK-DWN"
+      }
     },
     {
       "id": "SCN-ADV-0050-call_1-t2",
@@ -11195,9 +11323,7 @@
       "scenario_ref": "SCN-ADV-0050 call_1 turn 2",
       "noisy": true,
       "note": "khach_chua_co_danh_tinh; wind",
-      "entities": {
-        "sku": "SKU-JK-DWN"
-      },
+      "entities": {},
       "full_text": "giá của áo này là bao nhiêu em nhỉ",
       "n_turns": 1,
       "turns": [
@@ -11205,9 +11331,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "giá của áo này là bao nhiêu em nhỉ",
-          "entities": {
-            "sku": "SKU-JK-DWN"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0050/call_1/turn_2.wav",
@@ -11215,7 +11339,10 @@
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 2.24
+      "duration_seconds": 2.24,
+      "entities_not_stated": {
+        "sku": "SKU-JK-DWN"
+      }
     },
     {
       "id": "SCN-ADV-0050-call_1-t3",
@@ -11226,9 +11353,7 @@
       "scenario_ref": "SCN-ADV-0050 call_1 turn 3",
       "noisy": true,
       "note": "khach_chua_co_danh_tinh; wind",
-      "entities": {
-        "sku": "SKU-JK-DWN"
-      },
+      "entities": {},
       "full_text": "chị thấy sản phẩm này trên fanpage có khuyến mãi gì không em",
       "n_turns": 1,
       "turns": [
@@ -11236,9 +11361,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "chị thấy sản phẩm này trên fanpage có khuyến mãi gì không em",
-          "entities": {
-            "sku": "SKU-JK-DWN"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-ADV-0050/call_1/turn_3.wav",
@@ -11246,7 +11369,10 @@
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 3.36
+      "duration_seconds": 3.36,
+      "entities_not_stated": {
+        "sku": "SKU-JK-DWN"
+      }
     },
     {
       "id": "SCN-ADV-0050-call_1-t4",
@@ -11880,26 +12006,28 @@
       "noisy": true,
       "note": "khach_goi_lan_3_het_kien_nhan; wind",
       "entities": {
+        "budget_vnd": 2000000,
         "sku": "SKU-AF-XM"
       },
-      "full_text": "alo chị muốn hỏi về nồi chiên không dầu xi a mi bốn phẩy năm lít",
+      "full_text": "alo chị muốn hỏi về nồi chiên không dầu xiaomi bốn phẩy năm lít ngân sách của chị tầm hai triệu",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo chị muốn hỏi về nồi chiên không dầu xi a mi bốn phẩy năm lít",
+          "text": "alo chị muốn hỏi về nồi chiên không dầu xiaomi bốn phẩy năm lít ngân sách của chị tầm hai triệu",
           "entities": {
+            "budget_vnd": 2000000,
             "sku": "SKU-AF-XM"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0003/call_1/turn_1.wav",
-      "source_text": "Alo, chị muốn hỏi về nồi chiên không dầu Xiaomi 4.5L.",
+      "source_text": "Alo, chị muốn hỏi về nồi chiên không dầu Xiaomi 4.5L. Ngân sách của chị tầm 2 triệu.",
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 4.48
+      "duration_seconds": 6.56
     },
     {
       "id": "SCN-GEN-0003-call_1-t2",
@@ -11995,9 +12123,7 @@
       "scenario_ref": "SCN-GEN-0003 call_2 turn 1",
       "noisy": false,
       "note": "khach_goi_lan_3_het_kien_nhan; clean",
-      "entities": {
-        "sku": "SKU-AF-XM"
-      },
+      "entities": {},
       "full_text": "em ơi chị lại gọi để hỏi về nồi chiên không dầu đó",
       "n_turns": 1,
       "turns": [
@@ -12005,9 +12131,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "em ơi chị lại gọi để hỏi về nồi chiên không dầu đó",
-          "entities": {
-            "sku": "SKU-AF-XM"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0003/call_2/turn_1.wav",
@@ -12015,7 +12139,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 3.36
+      "duration_seconds": 3.36,
+      "entities_not_stated": {
+        "sku": "SKU-AF-XM"
+      }
     },
     {
       "id": "SCN-GEN-0003-call_2-t2",
@@ -12027,7 +12154,6 @@
       "noisy": false,
       "note": "khach_goi_lan_3_het_kien_nhan; clean",
       "entities": {
-        "sku": "SKU-AF-XM",
         "price_vnd": 1590000
       },
       "full_text": "giá vẫn là một triệu năm trăm chín mươi ngàn phải không",
@@ -12038,7 +12164,6 @@
           "speaker": "C",
           "text": "giá vẫn là một triệu năm trăm chín mươi ngàn phải không",
           "entities": {
-            "sku": "SKU-AF-XM",
             "price_vnd": 1590000
           }
         }
@@ -12048,7 +12173,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 3.04
+      "duration_seconds": 3.04,
+      "entities_not_stated": {
+        "sku": "SKU-AF-XM"
+      }
     },
     {
       "id": "SCN-GEN-0003-call_2-t3",
@@ -12059,9 +12187,7 @@
       "scenario_ref": "SCN-GEN-0003 call_2 turn 3",
       "noisy": false,
       "note": "khach_goi_lan_3_het_kien_nhan; clean",
-      "entities": {
-        "sku": "SKU-AF-XM"
-      },
+      "entities": {},
       "full_text": "chị có thể hỏi thêm về khuyến mãi không",
       "n_turns": 1,
       "turns": [
@@ -12069,9 +12195,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "chị có thể hỏi thêm về khuyến mãi không",
-          "entities": {
-            "sku": "SKU-AF-XM"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0003/call_2/turn_3.wav",
@@ -12079,7 +12203,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 2.4
+      "duration_seconds": 2.4,
+      "entities_not_stated": {
+        "sku": "SKU-AF-XM"
+      }
     },
     {
       "id": "SCN-GEN-0003-call_2-t4",
@@ -12357,23 +12484,27 @@
       "scenario_ref": "SCN-GEN-0004 call_2 turn 1",
       "noisy": true,
       "note": "hai_nguoi_chung_sdt; cafe",
-      "entities": {},
-      "full_text": "chào em chị là dung hôm trước em tư vấn cho cô loan về máy lọc không khí",
+      "entities": {
+        "room_area_m2": 12
+      },
+      "full_text": "chào em chị là dung hôm trước em tư vấn cho cô loan về máy lọc không khí phòng chị khoảng mười hai mét vuông",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "chào em chị là dung hôm trước em tư vấn cho cô loan về máy lọc không khí",
-          "entities": {}
+          "text": "chào em chị là dung hôm trước em tư vấn cho cô loan về máy lọc không khí phòng chị khoảng mười hai mét vuông",
+          "entities": {
+            "room_area_m2": 12
+          }
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0004/call_2/turn_1.wav",
-      "source_text": "Chào em, chị là Dung, hôm trước em tư vấn cho cô Loan về máy lọc không khí.",
+      "source_text": "Chào em, chị là Dung, hôm trước em tư vấn cho cô Loan về máy lọc không khí. Phòng chị khoảng 12 mét vuông.",
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "text",
-      "duration_seconds": 4.8
+      "duration_seconds": 6.64
     },
     {
       "id": "SCN-GEN-0004-call_2-t2",
@@ -12502,7 +12633,6 @@
       "note": "hai_nguoi_chung_sdt; wind",
       "entities": {
         "room_area_m2": 10,
-        "has_children": false,
         "sku": "SKU-AP-MINI"
       },
       "full_text": "alo chị muốn hỏi về máy lọc không khí e pia mini cho phòng mười mét vuông",
@@ -12514,7 +12644,6 @@
           "text": "alo chị muốn hỏi về máy lọc không khí e pia mini cho phòng mười mét vuông",
           "entities": {
             "room_area_m2": 10,
-            "has_children": false,
             "sku": "SKU-AP-MINI"
           }
         }
@@ -12524,7 +12653,10 @@
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 4.88
+      "duration_seconds": 4.88,
+      "entities_not_stated": {
+        "has_children": false
+      }
     },
     {
       "id": "SCN-GEN-0005-call_1-t2",
@@ -12568,9 +12700,7 @@
       "scenario_ref": "SCN-GEN-0005 call_1 turn 3",
       "noisy": true,
       "note": "hai_nguoi_chung_sdt; weak_signal",
-      "entities": {
-        "sku": "SKU-AP-MINI"
-      },
+      "entities": {},
       "full_text": "máy này có khuyến mãi gì không em",
       "n_turns": 1,
       "turns": [
@@ -12578,9 +12708,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "máy này có khuyến mãi gì không em",
-          "entities": {
-            "sku": "SKU-AP-MINI"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0005/call_1/turn_3.wav",
@@ -12588,7 +12716,10 @@
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 2.0
+      "duration_seconds": 2.0,
+      "entities_not_stated": {
+        "sku": "SKU-AP-MINI"
+      }
     },
     {
       "id": "SCN-GEN-0005-call_1-t4",
@@ -12802,8 +12933,7 @@
       "note": "khach_do_du_hoi_nguoi_nha; clean",
       "entities": {
         "size_new": 38,
-        "color": "den",
-        "sku": "SKU-SN-RUN1"
+        "color": "den"
       },
       "full_text": "alo anh muốn hỏi về đôi giày chạy bộ size ba mươi tám màu đen mà em có",
       "n_turns": 1,
@@ -12814,8 +12944,7 @@
           "text": "alo anh muốn hỏi về đôi giày chạy bộ size ba mươi tám màu đen mà em có",
           "entities": {
             "size_new": 38,
-            "color": "den",
-            "sku": "SKU-SN-RUN1"
+            "color": "den"
           }
         }
       ],
@@ -12824,7 +12953,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 4.96
+      "duration_seconds": 4.96,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN1"
+      }
     },
     {
       "id": "SCN-GEN-0006-call_1-t2",
@@ -13034,27 +13166,29 @@
       "note": "khach_so_gia; clean",
       "entities": {
         "room_area_m2": 15,
+        "has_children": false,
         "sku": "SKU-AP-X"
       },
-      "full_text": "alo chị muốn hỏi về máy lọc không khí e pia x cho phòng khoảng mười lăm mét vuông",
+      "full_text": "alo chị muốn hỏi về máy lọc không khí e pia x cho phòng khoảng mười lăm mét vuông nhà chị không có trẻ nhỏ",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo chị muốn hỏi về máy lọc không khí e pia x cho phòng khoảng mười lăm mét vuông",
+          "text": "alo chị muốn hỏi về máy lọc không khí e pia x cho phòng khoảng mười lăm mét vuông nhà chị không có trẻ nhỏ",
           "entities": {
             "room_area_m2": 15,
+            "has_children": false,
             "sku": "SKU-AP-X"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0007/call_1/turn_1.wav",
-      "source_text": "Alo, chị muốn hỏi về máy lọc không khí AirPure X cho phòng khoảng 15 mét vuông.",
+      "source_text": "Alo, chị muốn hỏi về máy lọc không khí AirPure X cho phòng khoảng 15 mét vuông. Nhà chị không có trẻ nhỏ.",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 4.8
+      "duration_seconds": 6.16
     },
     {
       "id": "SCN-GEN-0007-call_1-t2",
@@ -13067,8 +13201,7 @@
       "note": "khach_so_gia; clean",
       "entities": {
         "competitor_price_vnd": 4300000,
-        "blocker": "so sanh gia",
-        "sku": "SKU-AP-X"
+        "blocker": "so sanh gia"
       },
       "full_text": "chị có thấy trên mạng ghi giá máy này là bốn triệu tám mà bên chỗ khác có bốn triệu ba",
       "n_turns": 1,
@@ -13079,8 +13212,7 @@
           "text": "chị có thấy trên mạng ghi giá máy này là bốn triệu tám mà bên chỗ khác có bốn triệu ba",
           "entities": {
             "competitor_price_vnd": 4300000,
-            "blocker": "so sanh gia",
-            "sku": "SKU-AP-X"
+            "blocker": "so sanh gia"
           }
         }
       ],
@@ -13089,7 +13221,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 5.04
+      "duration_seconds": 5.04,
+      "entities_not_stated": {
+        "sku": "SKU-AP-X"
+      }
     },
     {
       "id": "SCN-GEN-0007-call_1-t3",
@@ -13100,9 +13235,7 @@
       "scenario_ref": "SCN-GEN-0007 call_1 turn 3",
       "noisy": true,
       "note": "khach_so_gia; weak_signal",
-      "entities": {
-        "sku": "SKU-AP-X"
-      },
+      "entities": {},
       "full_text": "máy này có khuyến mãi gì không em",
       "n_turns": 1,
       "turns": [
@@ -13110,9 +13243,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "máy này có khuyến mãi gì không em",
-          "entities": {
-            "sku": "SKU-AP-X"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0007/call_1/turn_3.wav",
@@ -13120,7 +13251,10 @@
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 2.0
+      "duration_seconds": 2.0,
+      "entities_not_stated": {
+        "sku": "SKU-AP-X"
+      }
     },
     {
       "id": "SCN-GEN-0007-call_1-t4",
@@ -13133,7 +13267,6 @@
       "note": "khach_so_gia; clean",
       "entities": {
         "budget_vnd": 5000000,
-        "sku": "SKU-AP-X",
         "blocker": "so sanh gia"
       },
       "full_text": "chị đang có ngân sách tầm năm triệu thôi nhưng mà giá này cao hơn chỗ khác",
@@ -13145,7 +13278,6 @@
           "text": "chị đang có ngân sách tầm năm triệu thôi nhưng mà giá này cao hơn chỗ khác",
           "entities": {
             "budget_vnd": 5000000,
-            "sku": "SKU-AP-X",
             "blocker": "so sanh gia"
           }
         }
@@ -13155,7 +13287,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 4.16
+      "duration_seconds": 4.16,
+      "entities_not_stated": {
+        "sku": "SKU-AP-X"
+      }
     },
     {
       "id": "SCN-GEN-0007-call_1-t5",
@@ -13342,8 +13477,7 @@
       "note": "khach_da_mua_doi_size; cafe",
       "entities": {
         "size_new": 43,
-        "color": "den",
-        "sku": "SKU-SN-RUN2"
+        "color": "den"
       },
       "full_text": "alo em chị muốn xác nhận mua giày chạy bộ size bốn mươi ba màu đen",
       "n_turns": 1,
@@ -13354,8 +13488,7 @@
           "text": "alo em chị muốn xác nhận mua giày chạy bộ size bốn mươi ba màu đen",
           "entities": {
             "size_new": 43,
-            "color": "den",
-            "sku": "SKU-SN-RUN2"
+            "color": "den"
           }
         }
       ],
@@ -13364,7 +13497,10 @@
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "text",
-      "duration_seconds": 4.72
+      "duration_seconds": 4.72,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN2"
+      }
     },
     {
       "id": "SCN-GEN-0008-call_1-t2",
@@ -13612,26 +13748,28 @@
       "noisy": true,
       "note": "khach_hoi_nhieu_khong_mua; weak_signal",
       "entities": {
+        "has_children": true,
         "sku": "SKU-MB-PUMP1"
       },
-      "full_text": "alo chị muốn hỏi về máy hút sữa điện đôi spectra s một mà em có",
+      "full_text": "alo chị muốn hỏi về máy hút sữa điện đôi spectra s một mà em có bé nhà chị được mười tám tháng",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo chị muốn hỏi về máy hút sữa điện đôi spectra s một mà em có",
+          "text": "alo chị muốn hỏi về máy hút sữa điện đôi spectra s một mà em có bé nhà chị được mười tám tháng",
           "entities": {
+            "has_children": true,
             "sku": "SKU-MB-PUMP1"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0009/call_1/turn_1.wav",
-      "source_text": "Alo, chị muốn hỏi về máy hút sữa điện đôi Spectra S1 mà em có.",
+      "source_text": "Alo, chị muốn hỏi về máy hút sữa điện đôi Spectra S1 mà em có. Bé nhà chị được 18 tháng.",
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 4.88
+      "duration_seconds": 6.8
     },
     {
       "id": "SCN-GEN-0009-call_1-t2",
@@ -13642,9 +13780,7 @@
       "scenario_ref": "SCN-GEN-0009 call_1 turn 2",
       "noisy": false,
       "note": "khach_hoi_nhieu_khong_mua; clean",
-      "entities": {
-        "sku": "SKU-MB-PUMP1"
-      },
+      "entities": {},
       "full_text": "máy này giá bao nhiêu vậy em",
       "n_turns": 1,
       "turns": [
@@ -13652,9 +13788,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "máy này giá bao nhiêu vậy em",
-          "entities": {
-            "sku": "SKU-MB-PUMP1"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0009/call_1/turn_2.wav",
@@ -13662,7 +13796,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 1.92
+      "duration_seconds": 1.92,
+      "entities_not_stated": {
+        "sku": "SKU-MB-PUMP1"
+      }
     },
     {
       "id": "SCN-GEN-0009-call_1-t3",
@@ -13673,9 +13810,7 @@
       "scenario_ref": "SCN-GEN-0009 call_1 turn 3",
       "noisy": true,
       "note": "khach_hoi_nhieu_khong_mua; wind",
-      "entities": {
-        "sku": "SKU-MB-PUMP1"
-      },
+      "entities": {},
       "full_text": "chị thấy trên mạng có nhiều loại không biết có khuyến mãi gì không",
       "n_turns": 1,
       "turns": [
@@ -13683,9 +13818,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "chị thấy trên mạng có nhiều loại không biết có khuyến mãi gì không",
-          "entities": {
-            "sku": "SKU-MB-PUMP1"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0009/call_1/turn_3.wav",
@@ -13693,7 +13826,10 @@
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 3.84
+      "duration_seconds": 3.84,
+      "entities_not_stated": {
+        "sku": "SKU-MB-PUMP1"
+      }
     },
     {
       "id": "SCN-GEN-0009-call_1-t4",
@@ -13764,9 +13900,7 @@
       "scenario_ref": "SCN-GEN-0009 call_2 turn 1",
       "noisy": true,
       "note": "khach_hoi_nhieu_khong_mua; wind",
-      "entities": {
-        "sku": "SKU-MB-PUMP1"
-      },
+      "entities": {},
       "full_text": "chị đã suy nghĩ thêm về máy hút sữa em tư vấn hôm trước.",
       "n_turns": 1,
       "turns": [
@@ -13774,9 +13908,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "chị đã suy nghĩ thêm về máy hút sữa em tư vấn hôm trước.",
-          "entities": {
-            "sku": "SKU-MB-PUMP1"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0009/call_2/turn_1.wav",
@@ -13784,7 +13916,10 @@
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 3.36
+      "duration_seconds": 3.36,
+      "entities_not_stated": {
+        "sku": "SKU-MB-PUMP1"
+      }
     },
     {
       "id": "SCN-GEN-0009-call_2-t2",
@@ -13886,27 +14021,29 @@
       "note": "khach_goi_lan_3_het_kien_nhan; clean",
       "entities": {
         "room_area_m2": 25,
+        "has_children": false,
         "sku": "SKU-AP-PRO"
       },
-      "full_text": "alo anh muốn hỏi về máy lọc không khí máy lọc không khí e pia pro cho phòng khoảng hai mươi lăm mét vuông",
+      "full_text": "alo anh muốn hỏi về máy lọc không khí e pia pro cho phòng khoảng hai mươi lăm mét vuông nhà anh không có trẻ nhỏ",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo anh muốn hỏi về máy lọc không khí máy lọc không khí e pia pro cho phòng khoảng hai mươi lăm mét vuông",
+          "text": "alo anh muốn hỏi về máy lọc không khí e pia pro cho phòng khoảng hai mươi lăm mét vuông nhà anh không có trẻ nhỏ",
           "entities": {
             "room_area_m2": 25,
+            "has_children": false,
             "sku": "SKU-AP-PRO"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0010/call_1/turn_1.wav",
-      "source_text": "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro cho phòng khoảng 25 mét vuông.",
+      "source_text": "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro cho phòng khoảng 25 mét vuông. Nhà anh không có trẻ nhỏ.",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 6.4
+      "duration_seconds": 6.64
     },
     {
       "id": "SCN-GEN-0010-call_1-t2",
@@ -15235,26 +15372,28 @@
       "noisy": true,
       "note": "hai_nguoi_chung_sdt; weak_signal",
       "entities": {
+        "budget_vnd": 6000000,
         "sku": "SKU-WF-RO9"
       },
-      "full_text": "alo cô muốn hỏi về máy lọc nước rô karofi chín lõi mà cô đã nghe hôm trước",
+      "full_text": "alo cô muốn hỏi về máy lọc nước rô karofi chín lõi mà cô đã nghe hôm trước ngân sách của cô tầm sáu triệu",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo cô muốn hỏi về máy lọc nước rô karofi chín lõi mà cô đã nghe hôm trước",
+          "text": "alo cô muốn hỏi về máy lọc nước rô karofi chín lõi mà cô đã nghe hôm trước ngân sách của cô tầm sáu triệu",
           "entities": {
+            "budget_vnd": 6000000,
             "sku": "SKU-WF-RO9"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0015/call_1/turn_1.wav",
-      "source_text": "Alo, cô muốn hỏi về máy lọc nước RO Karofi 9 lõi mà cô đã nghe hôm trước.",
+      "source_text": "Alo, cô muốn hỏi về máy lọc nước RO Karofi 9 lõi mà cô đã nghe hôm trước. Ngân sách của cô tầm 6 triệu.",
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 5.04
+      "duration_seconds": 8.0
     },
     {
       "id": "SCN-GEN-0015-call_1-t2",
@@ -15378,26 +15517,26 @@
       "noisy": true,
       "note": "hai_nguoi_chung_sdt; cafe",
       "entities": {
-        "sku": "SKU-WF-RO9"
+        "sku": "SKU-AP-MINI"
       },
-      "full_text": "chị quyết định mua máy lọc nước rô ka rô phi chín lõi mà cô loan đã hỏi",
+      "full_text": "chị quyết định mua máy lọc không khí e pia mini cho phòng của chị.",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "chị quyết định mua máy lọc nước rô ka rô phi chín lõi mà cô loan đã hỏi",
+          "text": "chị quyết định mua máy lọc không khí e pia mini cho phòng của chị.",
           "entities": {
-            "sku": "SKU-WF-RO9"
+            "sku": "SKU-AP-MINI"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0015/call_2/turn_2.wav",
-      "source_text": "Chị quyết định mua máy lọc nước RO Karofi 9 lõi mà cô Loan đã hỏi.",
+      "source_text": "Chị quyết định mua máy lọc không khí AirPure Mini cho phòng của chị.",
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "text",
-      "duration_seconds": 4.32
+      "duration_seconds": 3.68
     },
     {
       "id": "SCN-GEN-0015-call_2-t3",
@@ -15464,6 +15603,33 @@
       "noise": "clean",
       "input_mode": "text",
       "duration_seconds": 6.24
+    },
+    {
+      "id": "SCN-GEN-0015-call_2-t5",
+      "customer_region": "trung",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-GEN-0015 call_2 turn 5",
+      "noisy": true,
+      "note": "hai_nguoi_chung_sdt; cafe",
+      "entities": {},
+      "full_text": "đúng rồi em, lên đơn giúp cô nhé.",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "đúng rồi em, lên đơn giúp cô nhé.",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-GEN-0015/call_2/turn_5.wav",
+      "source_text": "Đúng rồi em, lên đơn giúp cô nhé.",
+      "reference_source": "llm",
+      "noise": "cafe",
+      "input_mode": "text",
+      "duration_seconds": 2.16
     },
     {
       "id": "SCN-GEN-0017-call_1-t1",
@@ -15648,6 +15814,33 @@
       "duration_seconds": 6.16
     },
     {
+      "id": "SCN-GEN-0017-call_2-t10",
+      "customer_region": "trung",
+      "customer_gender": "m",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-GEN-0017 call_2 turn 10",
+      "noisy": true,
+      "note": "khach_mua_nhieu_mon; wind",
+      "entities": {},
+      "full_text": "ừ anh xác nhận nhé",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "ừ anh xác nhận nhé",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-GEN-0017/call_2/turn_10.wav",
+      "source_text": "Ừ, anh xác nhận nhé.",
+      "reference_source": "llm",
+      "noise": "wind",
+      "input_mode": "text",
+      "duration_seconds": 1.6
+    },
+    {
       "id": "SCN-GEN-0017-call_2-t2",
       "customer_region": "trung",
       "customer_gender": "m",
@@ -15656,9 +15849,7 @@
       "scenario_ref": "SCN-GEN-0017 call_2 turn 2",
       "noisy": true,
       "note": "khach_mua_nhieu_mon; cafe",
-      "entities": {
-        "sku": "SKU-AF-XM"
-      },
+      "entities": {},
       "full_text": "ngoài ra anh cũng cần một nồi chiên không dầu xiaomi nữa",
       "n_turns": 1,
       "turns": [
@@ -15666,9 +15857,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "ngoài ra anh cũng cần một nồi chiên không dầu xiaomi nữa",
-          "entities": {
-            "sku": "SKU-AF-XM"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0017/call_2/turn_2.wav",
@@ -15676,7 +15865,10 @@
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "text",
-      "duration_seconds": 3.52
+      "duration_seconds": 3.52,
+      "entities_not_stated": {
+        "sku": "SKU-AF-XM"
+      }
     },
     {
       "id": "SCN-GEN-0017-call_2-t3",
@@ -15718,9 +15910,7 @@
       "scenario_ref": "SCN-GEN-0017 call_2 turn 4",
       "noisy": false,
       "note": "khach_mua_nhieu_mon; clean",
-      "entities": {
-        "sku": "SKU-AP-FLT-P"
-      },
+      "entities": {},
       "full_text": "và đừng quên cái màng lọc thay thế cho máy lọc không khí anh cần luôn",
       "n_turns": 1,
       "turns": [
@@ -15728,9 +15918,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "và đừng quên cái màng lọc thay thế cho máy lọc không khí anh cần luôn",
-          "entities": {
-            "sku": "SKU-AP-FLT-P"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0017/call_2/turn_4.wav",
@@ -15738,7 +15926,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 3.6
+      "duration_seconds": 3.6,
+      "entities_not_stated": {
+        "sku": "SKU-AP-FLT-P"
+      }
     },
     {
       "id": "SCN-GEN-0017-call_2-t5",
@@ -15838,23 +16029,27 @@
       "scenario_ref": "SCN-GEN-0017 call_2 turn 8",
       "noisy": true,
       "note": "khach_mua_nhieu_mon; street",
-      "entities": {},
-      "full_text": "à địa chỉ giao hàng của anh là nha trang khánh hòa",
+      "entities": {
+        "payment": "bank"
+      },
+      "full_text": "vậy anh chuyển khoản nhé.",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "à địa chỉ giao hàng của anh là nha trang khánh hòa",
-          "entities": {}
+          "text": "vậy anh chuyển khoản nhé.",
+          "entities": {
+            "payment": "bank"
+          }
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0017/call_2/turn_8.wav",
-      "source_text": "À, địa chỉ giao hàng của anh là Nha Trang, Khánh Hòa.",
+      "source_text": "Vậy anh chuyển khoản nhé.",
       "reference_source": "llm",
       "noise": "street",
       "input_mode": "text",
-      "duration_seconds": 3.12
+      "duration_seconds": 1.68
     },
     {
       "id": "SCN-GEN-0017-call_2-t9",
@@ -15866,22 +16061,22 @@
       "noisy": true,
       "note": "khach_mua_nhieu_mon; weak_signal",
       "entities": {},
-      "full_text": "ừ anh xác nhận nhé",
+      "full_text": "à địa chỉ giao hàng của anh là nha trang khánh hòa",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "ừ anh xác nhận nhé",
+          "text": "à địa chỉ giao hàng của anh là nha trang khánh hòa",
           "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0017/call_2/turn_9.wav",
-      "source_text": "Ừ, anh xác nhận nhé.",
+      "source_text": "À, địa chỉ giao hàng của anh là Nha Trang, Khánh Hòa.",
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 1.6
+      "duration_seconds": 3.12
     },
     {
       "id": "SCN-GEN-0018-call_1-t1",
@@ -16476,9 +16671,7 @@
       "scenario_ref": "SCN-GEN-0020 call_1 turn 5",
       "noisy": true,
       "note": "khach_cap_nhat_thong_tin; street",
-      "entities": {
-        "sku": "SKU-AP-Y"
-      },
+      "entities": {},
       "full_text": "em cho chị biết máy này có khuyến mãi gì không?",
       "n_turns": 1,
       "turns": [
@@ -16486,9 +16679,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "em cho chị biết máy này có khuyến mãi gì không?",
-          "entities": {
-            "sku": "SKU-AP-Y"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0020/call_1/turn_5.wav",
@@ -16496,7 +16687,10 @@
       "reference_source": "llm",
       "noise": "street",
       "input_mode": "text",
-      "duration_seconds": 2.8
+      "duration_seconds": 2.8,
+      "entities_not_stated": {
+        "sku": "SKU-AP-Y"
+      }
     },
     {
       "id": "SCN-GEN-0020-call_2-t1",
@@ -16535,8 +16729,7 @@
       "noisy": true,
       "note": "khach_cap_nhat_thong_tin; cafe",
       "entities": {
-        "budget_vnd": 6200000,
-        "sku": "SKU-AP-Y"
+        "budget_vnd": 6200000
       },
       "full_text": "bây giờ chị muốn chi ngân sách khoảng sáu triệu hai cho máy lọc không khí.",
       "n_turns": 1,
@@ -16546,8 +16739,7 @@
           "speaker": "C",
           "text": "bây giờ chị muốn chi ngân sách khoảng sáu triệu hai cho máy lọc không khí.",
           "entities": {
-            "budget_vnd": 6200000,
-            "sku": "SKU-AP-Y"
+            "budget_vnd": 6200000
           }
         }
       ],
@@ -16556,7 +16748,10 @@
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "text",
-      "duration_seconds": 4.4
+      "duration_seconds": 4.4,
+      "entities_not_stated": {
+        "sku": "SKU-AP-Y"
+      }
     },
     {
       "id": "SCN-GEN-0020-call_2-t3",
@@ -16762,7 +16957,6 @@
       "note": "khach_yeu_cau_xoa_du_lieu; clean",
       "entities": {
         "room_area_m2": 10,
-        "has_children": false,
         "sku": "SKU-AP-MINI"
       },
       "full_text": "alo chị muốn hỏi về máy lọc không khí e pia mini cho phòng khoảng mười mét vuông",
@@ -16774,7 +16968,6 @@
           "text": "alo chị muốn hỏi về máy lọc không khí e pia mini cho phòng khoảng mười mét vuông",
           "entities": {
             "room_area_m2": 10,
-            "has_children": false,
             "sku": "SKU-AP-MINI"
           }
         }
@@ -16784,7 +16977,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 5.36
+      "duration_seconds": 5.36,
+      "entities_not_stated": {
+        "has_children": false
+      }
     },
     {
       "id": "SCN-GEN-0021-call_1-t2",
@@ -16828,9 +17024,7 @@
       "scenario_ref": "SCN-GEN-0021 call_1 turn 3",
       "noisy": false,
       "note": "khach_yeu_cau_xoa_du_lieu; clean",
-      "entities": {
-        "sku": "SKU-AP-MINI"
-      },
+      "entities": {},
       "full_text": "máy này có khuyến mãi gì không em",
       "n_turns": 1,
       "turns": [
@@ -16838,9 +17032,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "máy này có khuyến mãi gì không em",
-          "entities": {
-            "sku": "SKU-AP-MINI"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0021/call_1/turn_3.wav",
@@ -16848,7 +17040,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 2.24
+      "duration_seconds": 2.24,
+      "entities_not_stated": {
+        "sku": "SKU-AP-MINI"
+      }
     },
     {
       "id": "SCN-GEN-0021-call_1-t4",
@@ -17033,9 +17228,7 @@
       "scenario_ref": "SCN-GEN-0022 call_1 turn 2",
       "noisy": true,
       "note": "khach_do_du_hoi_nguoi_nha; street",
-      "entities": {
-        "sku": "SKU-SN-CAS"
-      },
+      "entities": {},
       "full_text": "giá của đôi giày đó là bao nhiêu em",
       "n_turns": 1,
       "turns": [
@@ -17043,9 +17236,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "giá của đôi giày đó là bao nhiêu em",
-          "entities": {
-            "sku": "SKU-SN-CAS"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0022/call_1/turn_2.wav",
@@ -17053,7 +17244,10 @@
       "reference_source": "llm",
       "noise": "street",
       "input_mode": "text",
-      "duration_seconds": 1.92
+      "duration_seconds": 1.92,
+      "entities_not_stated": {
+        "sku": "SKU-SN-CAS"
+      }
     },
     {
       "id": "SCN-GEN-0022-call_1-t3",
@@ -17368,9 +17562,7 @@
       "scenario_ref": "SCN-GEN-0023 call_1 turn 4",
       "noisy": false,
       "note": "khach_so_gia; clean",
-      "entities": {
-        "sku": "SKU-AP-PRO"
-      },
+      "entities": {},
       "full_text": "máy này bên mình có khuyến mãi gì không em nhỉ",
       "n_turns": 1,
       "turns": [
@@ -17378,9 +17570,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "máy này bên mình có khuyến mãi gì không em nhỉ",
-          "entities": {
-            "sku": "SKU-AP-PRO"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0023/call_1/turn_4.wav",
@@ -17388,7 +17578,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 2.64
+      "duration_seconds": 2.64,
+      "entities_not_stated": {
+        "sku": "SKU-AP-PRO"
+      }
     },
     {
       "id": "SCN-GEN-0023-call_1-t5",
@@ -17818,26 +18011,28 @@
       "noisy": true,
       "note": "khach_hoi_nhieu_khong_mua; cafe",
       "entities": {
+        "budget_vnd": 6000000,
         "sku": "SKU-MB-PUMP2"
       },
-      "full_text": "alo anh muốn hỏi về máy hút sữa điện đôi medela swing maxi cho bé hai tháng tuổi.",
+      "full_text": "alo anh muốn hỏi về máy hút sữa điện đôi medela swing maxi cho bé hai tháng tuổi ngân sách của anh tầm sáu triệu",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo anh muốn hỏi về máy hút sữa điện đôi medela swing maxi cho bé hai tháng tuổi.",
+          "text": "alo anh muốn hỏi về máy hút sữa điện đôi medela swing maxi cho bé hai tháng tuổi ngân sách của anh tầm sáu triệu",
           "entities": {
+            "budget_vnd": 6000000,
             "sku": "SKU-MB-PUMP2"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0025/call_1/turn_1.wav",
-      "source_text": "Alo, anh muốn hỏi về máy hút sữa điện đôi Medela Swing Maxi cho bé 2 tháng tuổi.",
+      "source_text": "Alo, anh muốn hỏi về máy hút sữa điện đôi Medela Swing Maxi cho bé 2 tháng tuổi. Ngân sách của anh tầm 6 triệu.",
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "text",
-      "duration_seconds": 4.96
+      "duration_seconds": 7.6
     },
     {
       "id": "SCN-GEN-0025-call_1-t2",
@@ -17989,7 +18184,6 @@
       "note": "khach_hoi_nhieu_khong_mua; clean",
       "entities": {
         "blocker": "vuot ngan sach",
-        "sku": "SKU-MB-PUMP2",
         "price_vnd": 5990000
       },
       "full_text": "hôm trước em nói máy hút sữa điện đôi giá năm triệu chín trăm chín mươi ngàn nhưng anh thấy vẫn cao quá",
@@ -18001,7 +18195,6 @@
           "text": "hôm trước em nói máy hút sữa điện đôi giá năm triệu chín trăm chín mươi ngàn nhưng anh thấy vẫn cao quá",
           "entities": {
             "blocker": "vuot ngan sach",
-            "sku": "SKU-MB-PUMP2",
             "price_vnd": 5990000
           }
         }
@@ -18011,7 +18204,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 6.32
+      "duration_seconds": 6.32,
+      "entities_not_stated": {
+        "sku": "SKU-MB-PUMP2"
+      }
     },
     {
       "id": "SCN-GEN-0025-call_2-t3",
@@ -18049,9 +18245,7 @@
       "scenario_ref": "SCN-GEN-0025 call_2 turn 4",
       "noisy": false,
       "note": "khach_hoi_nhieu_khong_mua; clean",
-      "entities": {
-        "sku": "SKU-MB-PUMP2"
-      },
+      "entities": {},
       "full_text": "cảm ơn em đã tư vấn nhưng anh quyết định không lấy sản phẩm này",
       "n_turns": 1,
       "turns": [
@@ -18059,9 +18253,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "cảm ơn em đã tư vấn nhưng anh quyết định không lấy sản phẩm này",
-          "entities": {
-            "sku": "SKU-MB-PUMP2"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0025/call_2/turn_4.wav",
@@ -18069,7 +18261,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 3.6
+      "duration_seconds": 3.6,
+      "entities_not_stated": {
+        "sku": "SKU-MB-PUMP2"
+      }
     },
     {
       "id": "SCN-GEN-0026-call_1-t1",
@@ -18115,9 +18310,7 @@
       "scenario_ref": "SCN-GEN-0026 call_1 turn 2",
       "noisy": false,
       "note": "khach_goi_lan_3_het_kien_nhan; clean",
-      "entities": {
-        "sku": "SKU-SN-RUN2"
-      },
+      "entities": {},
       "full_text": "em cho anh hỏi giá với khuyến mãi của sản phẩm này nhé",
       "n_turns": 1,
       "turns": [
@@ -18125,9 +18318,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "em cho anh hỏi giá với khuyến mãi của sản phẩm này nhé",
-          "entities": {
-            "sku": "SKU-SN-RUN2"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0026/call_1/turn_2.wav",
@@ -18135,7 +18326,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 2.88
+      "duration_seconds": 2.88,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN2"
+      }
     },
     {
       "id": "SCN-GEN-0026-call_1-t3",
@@ -18146,9 +18340,7 @@
       "scenario_ref": "SCN-GEN-0026 call_1 turn 3",
       "noisy": true,
       "note": "khach_goi_lan_3_het_kien_nhan; weak_signal",
-      "entities": {
-        "sku": "SKU-SN-RUN2"
-      },
+      "entities": {},
       "full_text": "giày này có hàng không hay đang hết vậy",
       "n_turns": 1,
       "turns": [
@@ -18156,9 +18348,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "giày này có hàng không hay đang hết vậy",
-          "entities": {
-            "sku": "SKU-SN-RUN2"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0026/call_1/turn_3.wav",
@@ -18166,7 +18356,10 @@
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 2.72
+      "duration_seconds": 2.72,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN2"
+      }
     },
     {
       "id": "SCN-GEN-0026-call_1-t4",
@@ -18210,8 +18403,7 @@
       "note": "khach_goi_lan_3_het_kien_nhan; weak_signal",
       "entities": {
         "size_new": 41,
-        "color": "den",
-        "sku": "SKU-SN-RUN2"
+        "color": "den"
       },
       "full_text": "alo anh lại gọi về giày chạy bộ size bốn mươi mốt màu đen đây",
       "n_turns": 1,
@@ -18222,8 +18414,7 @@
           "text": "alo anh lại gọi về giày chạy bộ size bốn mươi mốt màu đen đây",
           "entities": {
             "size_new": 41,
-            "color": "den",
-            "sku": "SKU-SN-RUN2"
+            "color": "den"
           }
         }
       ],
@@ -18232,7 +18423,10 @@
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 3.52
+      "duration_seconds": 3.52,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN2"
+      }
     },
     {
       "id": "SCN-GEN-0026-call_2-t2",
@@ -18243,9 +18437,7 @@
       "scenario_ref": "SCN-GEN-0026 call_2 turn 2",
       "noisy": false,
       "note": "khach_goi_lan_3_het_kien_nhan; clean",
-      "entities": {
-        "sku": "SKU-SN-RUN2"
-      },
+      "entities": {},
       "full_text": "hôm qua em báo giày này có khuyến mãi gì không",
       "n_turns": 1,
       "turns": [
@@ -18253,9 +18445,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "hôm qua em báo giày này có khuyến mãi gì không",
-          "entities": {
-            "sku": "SKU-SN-RUN2"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0026/call_2/turn_2.wav",
@@ -18263,7 +18453,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 3.04
+      "duration_seconds": 3.04,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN2"
+      }
     },
     {
       "id": "SCN-GEN-0026-call_2-t3",
@@ -18274,9 +18467,7 @@
       "scenario_ref": "SCN-GEN-0026 call_2 turn 3",
       "noisy": true,
       "note": "khach_goi_lan_3_het_kien_nhan; weak_signal",
-      "entities": {
-        "sku": "SKU-SN-RUN2"
-      },
+      "entities": {},
       "full_text": "mà giày này có hàng không anh thấy trên trang không có",
       "n_turns": 1,
       "turns": [
@@ -18284,9 +18475,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "mà giày này có hàng không anh thấy trên trang không có",
-          "entities": {
-            "sku": "SKU-SN-RUN2"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0026/call_2/turn_3.wav",
@@ -18294,7 +18483,10 @@
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 3.2
+      "duration_seconds": 3.2,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN2"
+      }
     },
     {
       "id": "SCN-GEN-0026-call_2-t4",
@@ -18305,9 +18497,7 @@
       "scenario_ref": "SCN-GEN-0026 call_2 turn 4",
       "noisy": false,
       "note": "khach_goi_lan_3_het_kien_nhan; clean",
-      "entities": {
-        "sku": "SKU-SN-RUN2"
-      },
+      "entities": {},
       "full_text": "cho anh biết khi nào có hàng lại nhé",
       "n_turns": 1,
       "turns": [
@@ -18315,9 +18505,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "cho anh biết khi nào có hàng lại nhé",
-          "entities": {
-            "sku": "SKU-SN-RUN2"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0026/call_2/turn_4.wav",
@@ -18325,7 +18513,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 2.0
+      "duration_seconds": 2.0,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN2"
+      }
     },
     {
       "id": "SCN-GEN-0026-call_3-t1",
@@ -18338,8 +18529,7 @@
       "note": "khach_goi_lan_3_het_kien_nhan; street",
       "entities": {
         "size_new": 41,
-        "color": "den",
-        "sku": "SKU-SN-RUN2"
+        "color": "den"
       },
       "full_text": "alo anh kiên đây anh muốn hỏi giày chạy bộ size bốn mươi mốt màu đen",
       "n_turns": 1,
@@ -18350,8 +18540,7 @@
           "text": "alo anh kiên đây anh muốn hỏi giày chạy bộ size bốn mươi mốt màu đen",
           "entities": {
             "size_new": 41,
-            "color": "den",
-            "sku": "SKU-SN-RUN2"
+            "color": "den"
           }
         }
       ],
@@ -18360,7 +18549,10 @@
       "reference_source": "llm",
       "noise": "street",
       "input_mode": "text",
-      "duration_seconds": 4.56
+      "duration_seconds": 4.56,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN2"
+      }
     },
     {
       "id": "SCN-GEN-0026-call_3-t2",
@@ -18371,9 +18563,7 @@
       "scenario_ref": "SCN-GEN-0026 call_3 turn 2",
       "noisy": false,
       "note": "khach_goi_lan_3_het_kien_nhan; clean",
-      "entities": {
-        "sku": "SKU-SN-RUN2"
-      },
+      "entities": {},
       "full_text": "hôm trước em bảo giày này hết hàng đúng không",
       "n_turns": 1,
       "turns": [
@@ -18381,9 +18571,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "hôm trước em bảo giày này hết hàng đúng không",
-          "entities": {
-            "sku": "SKU-SN-RUN2"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0026/call_3/turn_2.wav",
@@ -18391,7 +18579,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 2.72
+      "duration_seconds": 2.72,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN2"
+      }
     },
     {
       "id": "SCN-GEN-0026-call_3-t3",
@@ -18402,9 +18593,7 @@
       "scenario_ref": "SCN-GEN-0026 call_3 turn 3",
       "noisy": true,
       "note": "khach_goi_lan_3_het_kien_nhan; weak_signal",
-      "entities": {
-        "sku": "SKU-SN-RUN2"
-      },
+      "entities": {},
       "full_text": "em có thông tin gì về ngày có hàng lại không",
       "n_turns": 1,
       "turns": [
@@ -18412,9 +18601,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "em có thông tin gì về ngày có hàng lại không",
-          "entities": {
-            "sku": "SKU-SN-RUN2"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0026/call_3/turn_3.wav",
@@ -18422,7 +18609,10 @@
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 2.24
+      "duration_seconds": 2.24,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN2"
+      }
     },
     {
       "id": "SCN-GEN-0026-call_3-t4",
@@ -18568,6 +18758,33 @@
       "duration_seconds": 2.24
     },
     {
+      "id": "SCN-GEN-0027-call_2-t5",
+      "customer_region": "nam",
+      "customer_gender": "f",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-GEN-0027 call_2 turn 5",
+      "noisy": false,
+      "note": "khach_da_kenh_fb_hotline; clean",
+      "entities": {},
+      "full_text": "đúng rồi em, lên đơn giúp chị nhé.",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "đúng rồi em, lên đơn giúp chị nhé.",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-GEN-0027/call_2/turn_5.wav",
+      "source_text": "Đúng rồi em, lên đơn giúp chị nhé.",
+      "reference_source": "llm",
+      "noise": "clean",
+      "input_mode": "text",
+      "duration_seconds": 2.32
+    },
+    {
       "id": "SCN-GEN-0028-call_1-t1",
       "customer_region": "bac",
       "customer_gender": "m",
@@ -18638,9 +18855,7 @@
       "scenario_ref": "SCN-GEN-0028 call_1 turn 3",
       "noisy": false,
       "note": "khach_ngoai_pham_vi_chuyen_may; clean",
-      "entities": {
-        "sku": "SKU-MB-PUMP2"
-      },
+      "entities": {},
       "full_text": "máy này đang có khuyến mãi gì không em?",
       "n_turns": 1,
       "turns": [
@@ -18648,9 +18863,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "máy này đang có khuyến mãi gì không em?",
-          "entities": {
-            "sku": "SKU-MB-PUMP2"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0028/call_1/turn_3.wav",
@@ -18658,7 +18871,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 2.08
+      "duration_seconds": 2.08,
+      "entities_not_stated": {
+        "sku": "SKU-MB-PUMP2"
+      }
     },
     {
       "id": "SCN-GEN-0028-call_1-t4",
@@ -18813,26 +19029,28 @@
       "noisy": false,
       "note": "khach_hoi_ngoai_tai_lieu; clean",
       "entities": {
+        "has_children": false,
         "sku": "SKU-AP-PRO"
       },
-      "full_text": "alo anh muốn hỏi về máy lọc không khí e pia pro",
+      "full_text": "alo anh muốn hỏi về máy lọc không khí e pia pro nhà anh không có trẻ nhỏ",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo anh muốn hỏi về máy lọc không khí e pia pro",
+          "text": "alo anh muốn hỏi về máy lọc không khí e pia pro nhà anh không có trẻ nhỏ",
           "entities": {
+            "has_children": false,
             "sku": "SKU-AP-PRO"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0029/call_1/turn_1.wav",
-      "source_text": "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro.",
+      "source_text": "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro. Nhà anh không có trẻ nhỏ.",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 3.36
+      "duration_seconds": 4.48
     },
     {
       "id": "SCN-GEN-0029-call_1-t2",
@@ -19150,26 +19368,28 @@
       "noisy": true,
       "note": "khach_da_kenh_mau_thuan; weak_signal",
       "entities": {
-        "blocker": "can suy nghi them"
+        "blocker": "can suy nghi them",
+        "phone": "0982141621"
       },
-      "full_text": "giá này cao hơn chỗ khác nên anh cần hỏi thêm rồi sẽ gọi lại sau nhé.",
+      "full_text": "giá này cao hơn chỗ khác nên anh cần hỏi thêm rồi sẽ gọi lại sau nhé. số anh là không chín tám hai một bốn một sáu hai một.",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "giá này cao hơn chỗ khác nên anh cần hỏi thêm rồi sẽ gọi lại sau nhé.",
+          "text": "giá này cao hơn chỗ khác nên anh cần hỏi thêm rồi sẽ gọi lại sau nhé. số anh là không chín tám hai một bốn một sáu hai một.",
           "entities": {
-            "blocker": "can suy nghi them"
+            "blocker": "can suy nghi them",
+            "phone": "0982141621"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0030/call_1/turn_4.wav",
-      "source_text": "Giá này cao hơn chỗ khác nên anh cần hỏi thêm rồi sẽ gọi lại sau nhé.",
+      "source_text": "Giá này cao hơn chỗ khác nên anh cần hỏi thêm rồi sẽ gọi lại sau nhé. Số anh là 0982141621.",
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 5.2
+      "duration_seconds": 9.84
     },
     {
       "id": "SCN-GEN-0030-call_2-t1",
@@ -19270,26 +19490,28 @@
       "noisy": true,
       "note": "khach_da_kenh_mau_thuan; cafe",
       "entities": {
-        "blocker": "can suy nghi them"
+        "blocker": "can suy nghi them",
+        "phone": "0982141621"
       },
-      "full_text": "giá này cũng cao hơn chỗ khác nữa anh cần suy nghĩ thêm rồi sẽ gọi lại sau",
+      "full_text": "giá này cũng cao hơn chỗ khác nữa, anh cần suy nghĩ thêm rồi sẽ gọi lại sau. số anh là không chín tám hai một bốn một sáu hai một.",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "giá này cũng cao hơn chỗ khác nữa anh cần suy nghĩ thêm rồi sẽ gọi lại sau",
+          "text": "giá này cũng cao hơn chỗ khác nữa, anh cần suy nghĩ thêm rồi sẽ gọi lại sau. số anh là không chín tám hai một bốn một sáu hai một.",
           "entities": {
-            "blocker": "can suy nghi them"
+            "blocker": "can suy nghi them",
+            "phone": "0982141621"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0030/call_2/turn_4.wav",
-      "source_text": "Giá này cũng cao hơn chỗ khác nữa, anh cần suy nghĩ thêm rồi sẽ gọi lại sau.",
+      "source_text": "Giá này cũng cao hơn chỗ khác nữa, anh cần suy nghĩ thêm rồi sẽ gọi lại sau. Số anh là 0982141621.",
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "text",
-      "duration_seconds": 5.36
+      "duration_seconds": 10.0
     },
     {
       "id": "SCN-GEN-0030-call_3-t1",
@@ -19840,9 +20062,7 @@
       "scenario_ref": "SCN-GEN-0032 call_2 turn 1",
       "noisy": true,
       "note": "khach_quay_lai_sau_8_thang; weak_signal",
-      "entities": {
-        "sku": "SKU-SN-TRK"
-      },
+      "entities": {},
       "full_text": "chị muốn hỏi thêm về đôi giày trekking mà hôm trước chị đã đặt.",
       "n_turns": 1,
       "turns": [
@@ -19850,9 +20070,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "chị muốn hỏi thêm về đôi giày trekking mà hôm trước chị đã đặt.",
-          "entities": {
-            "sku": "SKU-SN-TRK"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0032/call_2/turn_1.wav",
@@ -19860,7 +20078,10 @@
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 3.44
+      "duration_seconds": 3.44,
+      "entities_not_stated": {
+        "sku": "SKU-SN-TRK"
+      }
     },
     {
       "id": "SCN-GEN-0032-call_2-t2",
@@ -19871,9 +20092,7 @@
       "scenario_ref": "SCN-GEN-0032 call_2 turn 2",
       "noisy": false,
       "note": "khach_quay_lai_sau_8_thang; clean",
-      "entities": {
-        "sku": "SKU-SN-TRK"
-      },
+      "entities": {},
       "full_text": "em cho chị biết giày này có khuyến mãi gì không?",
       "n_turns": 1,
       "turns": [
@@ -19881,9 +20100,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "em cho chị biết giày này có khuyến mãi gì không?",
-          "entities": {
-            "sku": "SKU-SN-TRK"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0032/call_2/turn_2.wav",
@@ -19891,7 +20108,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 2.88
+      "duration_seconds": 2.88,
+      "entities_not_stated": {
+        "sku": "SKU-SN-TRK"
+      }
     },
     {
       "id": "SCN-GEN-0032-call_2-t3",
@@ -19998,8 +20218,7 @@
       "noisy": false,
       "note": "khach_mua_nhieu_mon; clean",
       "entities": {
-        "has_children": true,
-        "sku": "SKU-AP-PRO"
+        "has_children": true
       },
       "full_text": "nhà anh có trẻ nhỏ nữa không biết giá máy này là bao nhiêu nhỉ",
       "n_turns": 1,
@@ -20009,8 +20228,7 @@
           "speaker": "C",
           "text": "nhà anh có trẻ nhỏ nữa không biết giá máy này là bao nhiêu nhỉ",
           "entities": {
-            "has_children": true,
-            "sku": "SKU-AP-PRO"
+            "has_children": true
           }
         }
       ],
@@ -20019,7 +20237,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 4.24
+      "duration_seconds": 4.24,
+      "entities_not_stated": {
+        "sku": "SKU-AP-PRO"
+      }
     },
     {
       "id": "SCN-GEN-0033-call_1-t3",
@@ -20063,9 +20284,7 @@
       "scenario_ref": "SCN-GEN-0033 call_1 turn 4",
       "noisy": true,
       "note": "khach_mua_nhieu_mon; street",
-      "entities": {
-        "sku": "SKU-AP-PRO"
-      },
+      "entities": {},
       "full_text": "máy này có khuyến mãi gì không em",
       "n_turns": 1,
       "turns": [
@@ -20073,9 +20292,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "máy này có khuyến mãi gì không em",
-          "entities": {
-            "sku": "SKU-AP-PRO"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0033/call_1/turn_4.wav",
@@ -20083,7 +20300,10 @@
       "reference_source": "llm",
       "noise": "street",
       "input_mode": "text",
-      "duration_seconds": 2.08
+      "duration_seconds": 2.08,
+      "entities_not_stated": {
+        "sku": "SKU-AP-PRO"
+      }
     },
     {
       "id": "SCN-GEN-0033-call_1-t5",
@@ -20142,6 +20362,33 @@
       "noise": "clean",
       "input_mode": "text",
       "duration_seconds": 5.76
+    },
+    {
+      "id": "SCN-GEN-0033-call_2-t10",
+      "customer_region": "nam",
+      "customer_gender": "m",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-GEN-0033 call_2 turn 10",
+      "noisy": false,
+      "note": "khach_mua_nhieu_mon; clean",
+      "entities": {},
+      "full_text": "đúng rồi em, lên đơn giúp anh nhé.",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "đúng rồi em, lên đơn giúp anh nhé.",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-GEN-0033/call_2/turn_10.wav",
+      "source_text": "Đúng rồi em, lên đơn giúp anh nhé.",
+      "reference_source": "llm",
+      "noise": "clean",
+      "input_mode": "text",
+      "duration_seconds": 2.24
     },
     {
       "id": "SCN-GEN-0033-call_2-t2",
@@ -20357,6 +20604,37 @@
       "duration_seconds": 2.16
     },
     {
+      "id": "SCN-GEN-0033-call_2-t9",
+      "customer_region": "nam",
+      "customer_gender": "m",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-GEN-0033 call_2 turn 9",
+      "noisy": true,
+      "note": "khach_mua_nhieu_mon; street",
+      "entities": {
+        "payment": "bank"
+      },
+      "full_text": "vậy anh chuyển khoản nhé.",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "vậy anh chuyển khoản nhé.",
+          "entities": {
+            "payment": "bank"
+          }
+        }
+      ],
+      "audio": "audio/scenarios_SCN-GEN-0033/call_2/turn_9.wav",
+      "source_text": "Vậy anh chuyển khoản nhé.",
+      "reference_source": "llm",
+      "noise": "street",
+      "input_mode": "text",
+      "duration_seconds": 1.68
+    },
+    {
       "id": "SCN-GEN-0034-call_1-t1",
       "customer_region": "bac",
       "customer_gender": "m",
@@ -20460,9 +20738,7 @@
       "scenario_ref": "SCN-GEN-0034 call_1 turn 4",
       "noisy": true,
       "note": "khach_asr_nhiem_tool_timeout; cafe",
-      "entities": {
-        "sku": "SKU-XM-4P"
-      },
+      "entities": {},
       "full_text": "máy này có khuyến mãi gì không em",
       "n_turns": 1,
       "turns": [
@@ -20470,9 +20746,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "máy này có khuyến mãi gì không em",
-          "entities": {
-            "sku": "SKU-XM-4P"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0034/call_1/turn_4.wav",
@@ -20480,7 +20754,10 @@
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "asr_transcript",
-      "duration_seconds": 2.08
+      "duration_seconds": 2.08,
+      "entities_not_stated": {
+        "sku": "SKU-XM-4P"
+      }
     },
     {
       "id": "SCN-GEN-0034-call_1-t5",
@@ -20522,9 +20799,7 @@
       "scenario_ref": "SCN-GEN-0034 call_2 turn 1",
       "noisy": false,
       "note": "khach_asr_nhiem_tool_timeout; clean",
-      "entities": {
-        "sku": "SKU-XM-4P"
-      },
+      "entities": {},
       "full_text": "alo anh gọi lại để xác nhận mua máy lọc không khí đó",
       "n_turns": 1,
       "turns": [
@@ -20532,9 +20807,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "alo anh gọi lại để xác nhận mua máy lọc không khí đó",
-          "entities": {
-            "sku": "SKU-XM-4P"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0034/call_2/turn_1.wav",
@@ -20542,7 +20815,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "asr_transcript",
-      "duration_seconds": 3.04
+      "duration_seconds": 3.04,
+      "entities_not_stated": {
+        "sku": "SKU-XM-4P"
+      }
     },
     {
       "id": "SCN-GEN-0034-call_2-t2",
@@ -20638,9 +20914,7 @@
       "scenario_ref": "SCN-GEN-0035 call_1 turn 1",
       "noisy": true,
       "note": "khach_co_don_chua_co_lich_su; weak_signal",
-      "entities": {
-        "sku": "SKU-SN-TRK"
-      },
+      "entities": {},
       "full_text": "alo em ơi chị muốn hỏi về tình trạng đơn hàng giày trekking mà chị đã đặt",
       "n_turns": 1,
       "turns": [
@@ -20648,9 +20922,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "alo em ơi chị muốn hỏi về tình trạng đơn hàng giày trekking mà chị đã đặt",
-          "entities": {
-            "sku": "SKU-SN-TRK"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0035/call_1/turn_1.wav",
@@ -20658,7 +20930,10 @@
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 4.56
+      "duration_seconds": 4.56,
+      "entities_not_stated": {
+        "sku": "SKU-SN-TRK"
+      }
     },
     {
       "id": "SCN-GEN-0035-call_1-t2",
@@ -20754,9 +21029,7 @@
       "scenario_ref": "SCN-GEN-0035 call_2 turn 1",
       "noisy": false,
       "note": "khach_co_don_chua_co_lich_su; clean",
-      "entities": {
-        "sku": "SKU-SN-TRK"
-      },
+      "entities": {},
       "full_text": "chị gọi lại vì có thay đổi địa chỉ giao hàng cho đơn giày trekking",
       "n_turns": 1,
       "turns": [
@@ -20764,9 +21037,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "chị gọi lại vì có thay đổi địa chỉ giao hàng cho đơn giày trekking",
-          "entities": {
-            "sku": "SKU-SN-TRK"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0035/call_2/turn_1.wav",
@@ -20774,7 +21045,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 3.6
+      "duration_seconds": 3.6,
+      "entities_not_stated": {
+        "sku": "SKU-SN-TRK"
+      }
     },
     {
       "id": "SCN-GEN-0035-call_2-t2",
@@ -20897,9 +21171,7 @@
       "scenario_ref": "SCN-GEN-0036 call_1 turn 2",
       "noisy": true,
       "note": "khach_cap_nhat_thong_tin; cafe",
-      "entities": {
-        "sku": "SKU-MB-STR2"
-      },
+      "entities": {},
       "full_text": "giá của xe này là bao nhiêu em nhỉ?",
       "n_turns": 1,
       "turns": [
@@ -20907,9 +21179,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "giá của xe này là bao nhiêu em nhỉ?",
-          "entities": {
-            "sku": "SKU-MB-STR2"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0036/call_1/turn_2.wav",
@@ -20917,7 +21187,10 @@
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "text",
-      "duration_seconds": 2.4
+      "duration_seconds": 2.4,
+      "entities_not_stated": {
+        "sku": "SKU-MB-STR2"
+      }
     },
     {
       "id": "SCN-GEN-0036-call_1-t3",
@@ -20928,9 +21201,7 @@
       "scenario_ref": "SCN-GEN-0036 call_1 turn 3",
       "noisy": true,
       "note": "khach_cap_nhat_thong_tin; street",
-      "entities": {
-        "sku": "SKU-MB-STR2"
-      },
+      "entities": {},
       "full_text": "có khuyến mãi gì không em?",
       "n_turns": 1,
       "turns": [
@@ -20938,9 +21209,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "có khuyến mãi gì không em?",
-          "entities": {
-            "sku": "SKU-MB-STR2"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0036/call_1/turn_3.wav",
@@ -20948,7 +21217,10 @@
       "reference_source": "llm",
       "noise": "street",
       "input_mode": "text",
-      "duration_seconds": 1.52
+      "duration_seconds": 1.52,
+      "entities_not_stated": {
+        "sku": "SKU-MB-STR2"
+      }
     },
     {
       "id": "SCN-GEN-0036-call_1-t4",
@@ -21659,9 +21931,7 @@
       "scenario_ref": "SCN-GEN-0038 call_2 turn 2",
       "noisy": true,
       "note": "khach_do_du_hoi_nguoi_nha; cafe",
-      "entities": {
-        "sku": "SKU-MB-STR1"
-      },
+      "entities": {},
       "full_text": "chị muốn mua mà thấy trên website ghi hết hàng không biết khi nào có lại em",
       "n_turns": 1,
       "turns": [
@@ -21669,9 +21939,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "chị muốn mua mà thấy trên website ghi hết hàng không biết khi nào có lại em",
-          "entities": {
-            "sku": "SKU-MB-STR1"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0038/call_2/turn_2.wav",
@@ -21679,7 +21947,10 @@
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "text",
-      "duration_seconds": 4.8
+      "duration_seconds": 4.8,
+      "entities_not_stated": {
+        "sku": "SKU-MB-STR1"
+      }
     },
     {
       "id": "SCN-GEN-0038-call_2-t3",
@@ -21745,26 +22016,28 @@
       "noisy": true,
       "note": "khach_so_gia; weak_signal",
       "entities": {
+        "has_children": false,
         "sku": "SKU-AP-Y"
       },
-      "full_text": "alo chị muốn tìm hiểu về máy lọc không khí e pia y",
+      "full_text": "alo chị muốn tìm hiểu về máy lọc không khí e pia y nhà chị không có trẻ nhỏ",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo chị muốn tìm hiểu về máy lọc không khí e pia y",
+          "text": "alo chị muốn tìm hiểu về máy lọc không khí e pia y nhà chị không có trẻ nhỏ",
           "entities": {
+            "has_children": false,
             "sku": "SKU-AP-Y"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0039/call_1/turn_1.wav",
-      "source_text": "Alo, chị muốn tìm hiểu về máy lọc không khí AirPure Y.",
+      "source_text": "Alo, chị muốn tìm hiểu về máy lọc không khí AirPure Y. Nhà chị không có trẻ nhỏ.",
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 3.6
+      "duration_seconds": 5.52
     },
     {
       "id": "SCN-GEN-0039-call_1-t2",
@@ -21990,8 +22263,7 @@
       "note": "khach_da_mua_doi_size; clean",
       "entities": {
         "size_new": 43,
-        "color": "den",
-        "sku": "SKU-SN-RUN2"
+        "color": "den"
       },
       "full_text": "alo chị là nhung muốn đặt mua giày chạy bộ size bốn mươi ba màu đen",
       "n_turns": 1,
@@ -22002,8 +22274,7 @@
           "text": "alo chị là nhung muốn đặt mua giày chạy bộ size bốn mươi ba màu đen",
           "entities": {
             "size_new": 43,
-            "color": "den",
-            "sku": "SKU-SN-RUN2"
+            "color": "den"
           }
         }
       ],
@@ -22012,7 +22283,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 4.64
+      "duration_seconds": 4.64,
+      "entities_not_stated": {
+        "sku": "SKU-SN-RUN2"
+      }
     },
     {
       "id": "SCN-GEN-0040-call_1-t2",
@@ -22555,9 +22829,7 @@
       "scenario_ref": "SCN-GEN-0042 call_1 turn 3",
       "noisy": true,
       "note": "khach_goi_lan_3_het_kien_nhan; weak_signal",
-      "entities": {
-        "sku": "SKU-AP-PRO"
-      },
+      "entities": {},
       "full_text": "máy này có khuyến mãi gì không em nhỉ",
       "n_turns": 1,
       "turns": [
@@ -22565,9 +22837,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "máy này có khuyến mãi gì không em nhỉ",
-          "entities": {
-            "sku": "SKU-AP-PRO"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0042/call_1/turn_3.wav",
@@ -22575,7 +22845,10 @@
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 2.56
+      "duration_seconds": 2.56,
+      "entities_not_stated": {
+        "sku": "SKU-AP-PRO"
+      }
     },
     {
       "id": "SCN-GEN-0042-call_1-t4",
@@ -22841,6 +23114,33 @@
       "duration_seconds": 3.12
     },
     {
+      "id": "SCN-GEN-0042-call_3-t5",
+      "customer_region": "nam",
+      "customer_gender": "m",
+      "agent_gender": null,
+      "agent_region": null,
+      "scenario_ref": "SCN-GEN-0042 call_3 turn 5",
+      "noisy": true,
+      "note": "khach_goi_lan_3_het_kien_nhan; street",
+      "entities": {},
+      "full_text": "đúng rồi em lên đơn giúp anh nhé.",
+      "n_turns": 1,
+      "turns": [
+        {
+          "idx": 1,
+          "speaker": "C",
+          "text": "đúng rồi em lên đơn giúp anh nhé.",
+          "entities": {}
+        }
+      ],
+      "audio": "audio/scenarios_SCN-GEN-0042/call_3/turn_5.wav",
+      "source_text": "Đúng rồi em, lên đơn giúp anh nhé.",
+      "reference_source": "llm",
+      "noise": "street",
+      "input_mode": "text",
+      "duration_seconds": 2.32
+    },
+    {
       "id": "SCN-GEN-0043-call_2-t1",
       "customer_region": "bac",
       "customer_gender": "f",
@@ -22966,26 +23266,30 @@
       "noisy": true,
       "note": "khach_ngoai_pham_vi_chuyen_may; street",
       "entities": {
+        "has_children": true,
+        "budget_vnd": 3500000,
         "sku": "SKU-MB-STR1"
       },
-      "full_text": "alo chị muốn hỏi về xe đẩy gấp gọn joie pact cho bé nhà chị ba tháng tuổi.",
+      "full_text": "alo chị muốn hỏi về xe đẩy gấp gọn joie pact cho bé nhà chị ba tháng tuổi ngân sách của chị tầm ba triệu rưỡi",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo chị muốn hỏi về xe đẩy gấp gọn joie pact cho bé nhà chị ba tháng tuổi.",
+          "text": "alo chị muốn hỏi về xe đẩy gấp gọn joie pact cho bé nhà chị ba tháng tuổi ngân sách của chị tầm ba triệu rưỡi",
           "entities": {
+            "has_children": true,
+            "budget_vnd": 3500000,
             "sku": "SKU-MB-STR1"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0044/call_1/turn_1.wav",
-      "source_text": "Alo, chị muốn hỏi về xe đẩy gấp gọn Joie Pact cho bé nhà chị 3 tháng tuổi.",
+      "source_text": "Alo, chị muốn hỏi về xe đẩy gấp gọn Joie Pact cho bé nhà chị 3 tháng tuổi. Ngân sách của chị tầm 3 triệu rưỡi.",
       "reference_source": "llm",
       "noise": "street",
       "input_mode": "text",
-      "duration_seconds": 5.12
+      "duration_seconds": 7.2
     },
     {
       "id": "SCN-GEN-0044-call_1-t2",
@@ -22996,9 +23300,7 @@
       "scenario_ref": "SCN-GEN-0044 call_1 turn 2",
       "noisy": true,
       "note": "khach_ngoai_pham_vi_chuyen_may; wind",
-      "entities": {
-        "sku": "SKU-MB-STR1"
-      },
+      "entities": {},
       "full_text": "giá của xe này là bao nhiêu em nhỉ?",
       "n_turns": 1,
       "turns": [
@@ -23006,9 +23308,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "giá của xe này là bao nhiêu em nhỉ?",
-          "entities": {
-            "sku": "SKU-MB-STR1"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0044/call_1/turn_2.wav",
@@ -23016,7 +23316,10 @@
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 2.24
+      "duration_seconds": 2.24,
+      "entities_not_stated": {
+        "sku": "SKU-MB-STR1"
+      }
     },
     {
       "id": "SCN-GEN-0044-call_1-t3",
@@ -23027,9 +23330,7 @@
       "scenario_ref": "SCN-GEN-0044 call_1 turn 3",
       "noisy": false,
       "note": "khach_ngoai_pham_vi_chuyen_may; clean",
-      "entities": {
-        "sku": "SKU-MB-STR1"
-      },
+      "entities": {},
       "full_text": "xe này có khuyến mãi gì không em?",
       "n_turns": 1,
       "turns": [
@@ -23037,9 +23338,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "xe này có khuyến mãi gì không em?",
-          "entities": {
-            "sku": "SKU-MB-STR1"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0044/call_1/turn_3.wav",
@@ -23047,7 +23346,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 1.92
+      "duration_seconds": 1.92,
+      "entities_not_stated": {
+        "sku": "SKU-MB-STR1"
+      }
     },
     {
       "id": "SCN-GEN-0044-call_1-t4",
@@ -23261,9 +23563,7 @@
       "scenario_ref": "SCN-GEN-0045 call_1 turn 3",
       "noisy": true,
       "note": "khach_hoi_ngoai_tai_lieu; cafe",
-      "entities": {
-        "sku": "SKU-MB-STER"
-      },
+      "entities": {},
       "full_text": "máy này có khuyến mãi gì không em",
       "n_turns": 1,
       "turns": [
@@ -23271,9 +23571,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "máy này có khuyến mãi gì không em",
-          "entities": {
-            "sku": "SKU-MB-STER"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0045/call_1/turn_3.wav",
@@ -23281,7 +23579,10 @@
       "reference_source": "llm",
       "noise": "cafe",
       "input_mode": "text",
-      "duration_seconds": 2.0
+      "duration_seconds": 2.0,
+      "entities_not_stated": {
+        "sku": "SKU-MB-STER"
+      }
     },
     {
       "id": "SCN-GEN-0045-call_1-t4",
@@ -23323,9 +23624,7 @@
       "scenario_ref": "SCN-GEN-0045 call_2 turn 1",
       "noisy": false,
       "note": "khach_hoi_ngoai_tai_lieu; clean",
-      "entities": {
-        "sku": "SKU-MB-STER"
-      },
+      "entities": {},
       "full_text": "alo em chị có câu hỏi về máy tiệt trùng sấy khô",
       "n_turns": 1,
       "turns": [
@@ -23333,9 +23632,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "alo em chị có câu hỏi về máy tiệt trùng sấy khô",
-          "entities": {
-            "sku": "SKU-MB-STER"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0045/call_2/turn_1.wav",
@@ -23343,7 +23640,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 3.84
+      "duration_seconds": 3.84,
+      "entities_not_stated": {
+        "sku": "SKU-MB-STER"
+      }
     },
     {
       "id": "SCN-GEN-0045-call_2-t2",
@@ -23355,8 +23655,7 @@
       "noisy": false,
       "note": "khach_hoi_ngoai_tai_lieu; clean",
       "entities": {
-        "color": "hong",
-        "sku": "SKU-MB-STER"
+        "color": "hong"
       },
       "full_text": "máy này có phiên bản màu hồng không em",
       "n_turns": 1,
@@ -23366,8 +23665,7 @@
           "speaker": "C",
           "text": "máy này có phiên bản màu hồng không em",
           "entities": {
-            "color": "hong",
-            "sku": "SKU-MB-STER"
+            "color": "hong"
           }
         }
       ],
@@ -23376,7 +23674,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 2.16
+      "duration_seconds": 2.16,
+      "entities_not_stated": {
+        "sku": "SKU-MB-STER"
+      }
     },
     {
       "id": "SCN-GEN-0045-call_2-t3",
@@ -23388,8 +23689,7 @@
       "noisy": false,
       "note": "khach_hoi_ngoai_tai_lieu; clean",
       "entities": {
-        "color": "hong",
-        "sku": "SKU-MB-STER"
+        "color": "hong"
       },
       "full_text": "chị thấy trên mạng có người bảo có màu hồng",
       "n_turns": 1,
@@ -23399,8 +23699,7 @@
           "speaker": "C",
           "text": "chị thấy trên mạng có người bảo có màu hồng",
           "entities": {
-            "color": "hong",
-            "sku": "SKU-MB-STER"
+            "color": "hong"
           }
         }
       ],
@@ -23409,7 +23708,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 2.64
+      "duration_seconds": 2.64,
+      "entities_not_stated": {
+        "sku": "SKU-MB-STER"
+      }
     },
     {
       "id": "SCN-GEN-0045-call_2-t4",
@@ -23671,26 +23973,28 @@
       "noisy": false,
       "note": "khach_da_kenh_mau_thuan; clean",
       "entities": {
-        "blocker": "can suy nghi them"
+        "blocker": "can suy nghi them",
+        "phone": "0922808864"
       },
-      "full_text": "anh sẽ cần thời gian để suy nghĩ thêm rồi gọi lại nhé",
+      "full_text": "anh sẽ cần thời gian để suy nghĩ thêm rồi gọi lại nhé số anh là không chín hai hai tám không tám sáu bốn",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "anh sẽ cần thời gian để suy nghĩ thêm rồi gọi lại nhé",
+          "text": "anh sẽ cần thời gian để suy nghĩ thêm rồi gọi lại nhé số anh là không chín hai hai tám không tám sáu bốn",
           "entities": {
-            "blocker": "can suy nghi them"
+            "blocker": "can suy nghi them",
+            "phone": "0922808864"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0046/call_2/turn_4.wav",
-      "source_text": "Anh sẽ cần thời gian để suy nghĩ thêm rồi gọi lại nhé.",
+      "source_text": "Anh sẽ cần thời gian để suy nghĩ thêm rồi gọi lại nhé. Số anh là 0922808864.",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 3.12
+      "duration_seconds": 7.28
     },
     {
       "id": "SCN-GEN-0046-call_3-t1",
@@ -24089,26 +24393,30 @@
       "noisy": true,
       "note": "khach_quay_lai_sau_8_thang; weak_signal",
       "entities": {
+        "room_area_m2": 25,
+        "has_children": false,
         "sku": "SKU-AP-X"
       },
-      "full_text": "alo chị là oanh em ơi hôm nay chị muốn đặt lại máy lọc không khí e pia x",
+      "full_text": "alo chị là oanh em ơi hôm nay chị muốn đặt lại máy lọc không khí e pia x nhà chị không có trẻ nhỏ phòng mới của chị khoảng hai mươi lăm mét vuông",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo chị là oanh em ơi hôm nay chị muốn đặt lại máy lọc không khí e pia x",
+          "text": "alo chị là oanh em ơi hôm nay chị muốn đặt lại máy lọc không khí e pia x nhà chị không có trẻ nhỏ phòng mới của chị khoảng hai mươi lăm mét vuông",
           "entities": {
+            "room_area_m2": 25,
+            "has_children": false,
             "sku": "SKU-AP-X"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0048/call_1/turn_1.wav",
-      "source_text": "Alo, chị là Oanh, em ơi, hôm nay chị muốn đặt lại máy lọc không khí AirPure X.",
+      "source_text": "Alo, chị là Oanh, em ơi, hôm nay chị muốn đặt lại máy lọc không khí AirPure X. Nhà chị không có trẻ nhỏ. Phòng mới của chị khoảng 25 mét vuông.",
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "text",
-      "duration_seconds": 5.04
+      "duration_seconds": 8.4
     },
     {
       "id": "SCN-GEN-0048-call_1-t2",
@@ -24548,9 +24856,7 @@
       "scenario_ref": "SCN-GEN-0049 call_2 turn 3",
       "noisy": true,
       "note": "khach_mua_nhieu_mon; wind",
-      "entities": {
-        "sku": "SKU-AF-XM"
-      },
+      "entities": {},
       "full_text": "ngoài ra chị cũng muốn một nồi chiên không dầu xiaomi nữa.",
       "n_turns": 1,
       "turns": [
@@ -24558,9 +24864,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "ngoài ra chị cũng muốn một nồi chiên không dầu xiaomi nữa.",
-          "entities": {
-            "sku": "SKU-AF-XM"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0049/call_2/turn_3.wav",
@@ -24568,7 +24872,10 @@
       "reference_source": "llm",
       "noise": "wind",
       "input_mode": "text",
-      "duration_seconds": 3.36
+      "duration_seconds": 3.36,
+      "entities_not_stated": {
+        "sku": "SKU-AF-XM"
+      }
     },
     {
       "id": "SCN-GEN-0049-call_2-t4",
@@ -24610,9 +24917,7 @@
       "scenario_ref": "SCN-GEN-0049 call_2 turn 5",
       "noisy": false,
       "note": "khach_mua_nhieu_mon; clean",
-      "entities": {
-        "sku": "SKU-AP-FLT-P"
-      },
+      "entities": {},
       "full_text": "à, chị cũng muốn thêm một cái màng lọc thay thế cho máy lọc không khí.",
       "n_turns": 1,
       "turns": [
@@ -24620,9 +24925,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "à, chị cũng muốn thêm một cái màng lọc thay thế cho máy lọc không khí.",
-          "entities": {
-            "sku": "SKU-AP-FLT-P"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0049/call_2/turn_5.wav",
@@ -24630,7 +24933,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "text",
-      "duration_seconds": 4.0
+      "duration_seconds": 4.0,
+      "entities_not_stated": {
+        "sku": "SKU-AP-FLT-P"
+      }
     },
     {
       "id": "SCN-GEN-0049-call_2-t6",
@@ -24760,26 +25066,28 @@
       "noisy": false,
       "note": "khach_asr_nhiem_tool_timeout; clean",
       "entities": {
+        "has_children": true,
         "sku": "SKU-MB-STR1"
       },
-      "full_text": "alo anh muốn hỏi về chiếc xe đẩy gấp gọn joie pact",
+      "full_text": "alo anh muốn hỏi về chiếc xe đẩy gấp gọn joie pact bé nhà anh được mười bốn tháng",
       "n_turns": 1,
       "turns": [
         {
           "idx": 1,
           "speaker": "C",
-          "text": "alo anh muốn hỏi về chiếc xe đẩy gấp gọn joie pact",
+          "text": "alo anh muốn hỏi về chiếc xe đẩy gấp gọn joie pact bé nhà anh được mười bốn tháng",
           "entities": {
+            "has_children": true,
             "sku": "SKU-MB-STR1"
           }
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0050/call_1/turn_1.wav",
-      "source_text": "Alo, anh muốn hỏi về chiếc xe đẩy gấp gọn Joie Pact.",
+      "source_text": "Alo, anh muốn hỏi về chiếc xe đẩy gấp gọn Joie Pact. Bé nhà anh được 14 tháng.",
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "asr_transcript",
-      "duration_seconds": 3.28
+      "duration_seconds": 4.88
     },
     {
       "id": "SCN-GEN-0050-call_1-t2",
@@ -24790,9 +25098,7 @@
       "scenario_ref": "SCN-GEN-0050 call_1 turn 2",
       "noisy": true,
       "note": "khach_asr_nhiem_tool_timeout; street",
-      "entities": {
-        "sku": "SKU-MB-STR1"
-      },
+      "entities": {},
       "full_text": "giá của xe này là bao nhiêu em nhỉ",
       "n_turns": 1,
       "turns": [
@@ -24800,9 +25106,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "giá của xe này là bao nhiêu em nhỉ",
-          "entities": {
-            "sku": "SKU-MB-STR1"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0050/call_1/turn_2.wav",
@@ -24810,7 +25114,10 @@
       "reference_source": "llm",
       "noise": "street",
       "input_mode": "asr_transcript",
-      "duration_seconds": 2.24
+      "duration_seconds": 2.24,
+      "entities_not_stated": {
+        "sku": "SKU-MB-STR1"
+      }
     },
     {
       "id": "SCN-GEN-0050-call_1-t3",
@@ -24941,9 +25248,7 @@
       "scenario_ref": "SCN-GEN-0050 call_2 turn 2",
       "noisy": false,
       "note": "khach_asr_nhiem_tool_timeout; clean",
-      "entities": {
-        "sku": "SKU-MB-STR1"
-      },
+      "entities": {},
       "full_text": "hôm trước có báo là xe này có hàng giờ còn hàng không em?",
       "n_turns": 1,
       "turns": [
@@ -24951,9 +25256,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "hôm trước có báo là xe này có hàng giờ còn hàng không em?",
-          "entities": {
-            "sku": "SKU-MB-STR1"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0050/call_2/turn_2.wav",
@@ -24961,7 +25264,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "asr_transcript",
-      "duration_seconds": 3.44
+      "duration_seconds": 3.44,
+      "entities_not_stated": {
+        "sku": "SKU-MB-STR1"
+      }
     },
     {
       "id": "SCN-GEN-0050-call_2-t3",
@@ -24972,9 +25278,7 @@
       "scenario_ref": "SCN-GEN-0050 call_2 turn 3",
       "noisy": false,
       "note": "khach_asr_nhiem_tool_timeout; clean",
-      "entities": {
-        "sku": "SKU-MB-STR1"
-      },
+      "entities": {},
       "full_text": "anh quyết mua rồi nếu có hàng thì báo anh nhé.",
       "n_turns": 1,
       "turns": [
@@ -24982,9 +25286,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "anh quyết mua rồi nếu có hàng thì báo anh nhé.",
-          "entities": {
-            "sku": "SKU-MB-STR1"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0050/call_2/turn_3.wav",
@@ -24992,7 +25294,10 @@
       "reference_source": "llm",
       "noise": "clean",
       "input_mode": "asr_transcript",
-      "duration_seconds": 2.88
+      "duration_seconds": 2.88,
+      "entities_not_stated": {
+        "sku": "SKU-MB-STR1"
+      }
     },
     {
       "id": "SCN-GEN-0050-call_2-t4",
@@ -25003,9 +25308,7 @@
       "scenario_ref": "SCN-GEN-0050 call_2 turn 4",
       "noisy": true,
       "note": "khach_asr_nhiem_tool_timeout; weak_signal",
-      "entities": {
-        "sku": "SKU-MB-STR1"
-      },
+      "entities": {},
       "full_text": "nếu không có hàng anh cần đợi đến bao giờ?",
       "n_turns": 1,
       "turns": [
@@ -25013,9 +25316,7 @@
           "idx": 1,
           "speaker": "C",
           "text": "nếu không có hàng anh cần đợi đến bao giờ?",
-          "entities": {
-            "sku": "SKU-MB-STR1"
-          }
+          "entities": {}
         }
       ],
       "audio": "audio/scenarios_SCN-GEN-0050/call_2/turn_4.wav",
@@ -25023,7 +25324,10 @@
       "reference_source": "llm",
       "noise": "weak_signal",
       "input_mode": "asr_transcript",
-      "duration_seconds": 2.4
+      "duration_seconds": 2.4,
+      "entities_not_stated": {
+        "sku": "SKU-MB-STR1"
+      }
     },
     {
       "id": "SCN-GEN-0050-call_2-t5",

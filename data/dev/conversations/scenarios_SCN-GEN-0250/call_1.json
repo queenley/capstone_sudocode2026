@@ -12,66 +12,14 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần tư vấn về xe đẩy gấp gọn Joie Pact đúng không ạ?",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh muốn tìm hiểu về xe đẩy gấp gọn Joie Pact đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Anh cần tư vấn về xe đẩy gấp gọn Joie Pact đúng không ạ?"
+          "text": "Anh muốn tìm hiểu về xe đẩy gấp gọn Joie Pact đúng không ạ?"
         }
       ],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 3490000
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "alo anh muon hoi ve xe day gap gon joie pact",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ xe đẩy Joie Pact hiện đang được nhiều bố mẹ lựa chọn cho bé từ sơ sinh đến khoảng 4 tuổi anh nhé. Xe này gấp gọn một tay, chịu tải tối đa 22kg, phù hợp cho bé nhà mình 11 tháng tuổi luôn ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 350,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "be nha anh hien tai duoc 11 thang ngan sach khoang 3 trieu roi",
-      "facts_stated": {
-        "child_age_months": 11,
-        "budget_vnd": 3000000
-      },
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn anh đã chia sẻ ạ. Xe Joie Pact bên em giá 3.490.000đ, tạm thời cao hơn ngân sách mình một chút. Hiện xe đang hết hàng, dự kiến cuối tháng tới sẽ về lại kho.",
-      "questions": [],
       "facts_used": [],
       "claims": [
         {
@@ -85,14 +33,73 @@
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo anh muon hoi ve xe day gap gon joie pact",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": true
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ xe đẩy Joie Pact hiện đang hết hàng tại shop anh nhé. Giá niêm yết là 3.490.000đ, được tặng miễn phí vận chuyển toàn quốc theo chương trình MOM-FREESHIP. Khi nào có hàng về lại hoặc có chương trình mới, bên em sẽ liên hệ anh ngay ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
         {
-          "type": "money",
-          "value": "3490000",
-          "spoken": "3.490.000"
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": false
         }
       ],
-      "pause_before_ms": 450,
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "be nha anh hien tai duoc 11 thang ngan sach khoang 3 trieu roi",
+      "facts_stated": {
+        "child_age_months": 11,
+        "budget_vnd": 3000000
+      },
+      "entities": [],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ bé nhà mình 11 tháng dùng Joie Pact sẽ rất phù hợp anh nhé. Tuy nhiên hiện tại giá xe là 3.490.000đ, hơi cao hơn ngân sách của mình một chút ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -101,25 +108,29 @@
       "text": "xe nay co khuyen mai gi khong nhỉ",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 350,
+      "pause_before_ms": 300,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại xe Joie Pact đang có chương trình miễn phí vận chuyển toàn quốc cho đơn từ 500.000đ, anh mua sẽ được áp dụng luôn ạ.",
+      "text": "Hiện tại xe Joie Pact đang áp dụng chương trình miễn phí vận chuyển toàn quốc cho đơn từ 500.000đ với ngành mẹ & bé, nhưng không có giảm giá trực tiếp trên sản phẩm anh ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "promo_MOM-FREESHIP_active",
           "value": true
+        },
+        {
+          "field": "promo_active",
+          "value": false
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -130,13 +141,13 @@
         "blocker": "chờ cuối tháng nhận lương"
       },
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 300,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận anh chờ cuối tháng nhận lương rồi sẽ liên hệ lại. Khi nào xe về hàng hoặc có chương trình mới, bên em sẽ báo ngay cho anh nhé. Em cảm ơn anh đã quan tâm sản phẩm của shop BTC ạ.",
+      "text": "Dạ vâng, khi nào anh sẵn sàng mua hoặc có nhu cầu hỏi lại về xe Joie Pact, anh cứ gọi cho shop nhé. Em sẽ lưu lại thông tin để liên hệ lại anh khi xe về hàng hoặc có chương trình ưu đãi mới.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -146,37 +157,37 @@
           "key": "blocker",
           "value": "chờ cuối tháng nhận lương",
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn9"
         },
         {
           "key": "budget_vnd",
           "value": 3500000,
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn9"
         },
         {
           "key": "child_age_months",
           "value": 11,
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn9"
         },
         {
           "key": "product_advised",
           "value": "SKU-MB-STR1",
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn9"
         },
         {
           "key": "price_quoted_vnd",
           "value": 3490000,
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn9"
         },
         {
           "key": "promo_code",
           "value": "MOM-FREESHIP",
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn9"
         }
       ],
       "entities": [],
@@ -188,8 +199,8 @@
   "gold": {
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "chua_co_ngan_sach",
-    "objection_handling": "Ghi nhận nhu cầu, hẹn báo lại khi có hàng và khi khách sẵn sàng mua.",
+    "objection_type": "chờ cuối tháng nhận lương",
+    "objection_handling": "Ghi nhận thời điểm khách muốn liên hệ lại, hứa sẽ báo khi có hàng hoặc có chương trình mới.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

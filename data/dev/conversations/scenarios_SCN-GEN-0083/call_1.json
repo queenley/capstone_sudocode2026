@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em có thể hỗ trợ chị thông tin về máy lọc không khí AirPure Pro ạ.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em có thể hỗ trợ chị về máy lọc không khí AirPure Pro cho phòng 30 mét vuông ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -25,18 +25,19 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị muốn hỏi về máy lọc không khí AirPure Pro cho phòng khoảng 30 mét vuông.",
+      "text": "Alo, chị muốn hỏi về máy lọc không khí AirPure Pro cho phòng khoảng 30 mét vuông. Ngân sách của chị tầm 8 triệu rưỡi.",
       "facts_stated": {
-        "room_area_m2": 30
+        "room_area_m2": 30,
+        "budget_vnd": 8500000
       },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ với phòng khoảng 30 mét vuông, máy lọc không khí AirPure Pro là lựa chọn phù hợp chị nhé. Máy này có khóa trẻ em, rất an toàn cho gia đình có trẻ nhỏ ạ.",
+      "text": "Dạ với phòng 30 mét vuông và ngân sách khoảng 8 triệu rưỡi, chị chọn AirPure Pro là rất hợp lý ạ. Máy này phù hợp diện tích từ 30 đến 45 mét vuông, công suất mạnh và lọc hiệu quả.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -54,13 +55,13 @@
         "has_children": true
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ máy AirPure Pro có khóa trẻ em và lọc được bụi mịn, phấn hoa, lông thú, rất phù hợp nhà có trẻ nhỏ chị nhé.",
+      "text": "Dạ máy AirPure Pro có khóa trẻ em, rất an toàn cho nhà có trẻ nhỏ, và có thêm app điều khiển tiện lợi cho chị ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -76,13 +77,13 @@
       "text": "Chị thấy cái này giá bao nhiêu vậy em? Có khuyến mãi gì không?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ máy AirPure Pro hiện tại giá là 7.690.000đ, đang áp dụng khuyến mãi AIR-OCT giảm 300.000đ so với giá niêm yết chị ạ. Shop cũng đang miễn phí vận chuyển và thu hộ khi chị đặt hàng đó chị.",
+      "text": "Dạ hiện tại AirPure Pro đang có giá ưu đãi 7.690.000đ, giảm từ giá niêm yết 7.990.000đ nhờ chương trình AIR-OCT. Đơn hàng còn được miễn phí vận chuyển và thanh toán khi nhận hàng không mất phí thu hộ ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -117,16 +118,21 @@
         "blocker": "cần suy nghĩ thêm"
       },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, chị cứ suy nghĩ thêm ạ. Khi nào chị cần tư vấn thêm hoặc quyết định đặt hàng, chị gọi lại shop bất cứ lúc nào nhé. Em sẽ ghi nhận lại nhu cầu của chị để hỗ trợ tốt hơn ở lần sau.",
+      "text": "Dạ em ghi nhận chị muốn suy nghĩ thêm ạ. Chương trình ưu đãi AIR-OCT còn trong hôm nay, nếu chị cần tư vấn lại hoặc quyết định đặt hàng, shop luôn sẵn sàng hỗ trợ chị ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [
         {
@@ -140,6 +146,12 @@
           "value": true,
           "op": "set",
           "source": "call_1#turn4"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 8500000,
+          "op": "set",
+          "source": "call_1#turn2"
         },
         {
           "key": "blocker",
@@ -173,10 +185,10 @@
     }
   ],
   "gold": {
-    "intent": "hoi_may_loc_khong_khi",
+    "intent": "tu_van_may_loc_khong_khi",
     "outcome": "hen_goi_lai",
     "objection_type": "can_suy_nghi_them",
-    "objection_handling": "Đồng ý cho khách suy nghĩ thêm, ghi nhận nhu cầu và hướng dẫn liên hệ lại khi cần.",
+    "objection_handling": "Ghi nhận mong muốn suy nghĩ thêm, nhắc thời hạn ưu đãi và cam kết hỗ trợ khi khách cần.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

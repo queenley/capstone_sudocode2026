@@ -12,14 +12,8 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào cô ạ, hôm trước cô có hỏi về nồi chiên không dầu và cần trao đổi thêm với con cháu, cô muốn mình tiếp tục đặt hàng nồi Philips 6.2L đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Cô muốn đặt nồi chiên không dầu Philips 6.2L đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em chào anh Sơn ạ, hôm trước anh có quan tâm Nồi chiên không dầu Philips 6.2L và cần hỏi ý kiến người nhà, anh muốn mình tiếp tục thế nào ạ?",
+      "questions": [],
       "facts_used": [
         "decision_maker",
         "blocker",
@@ -35,22 +29,44 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 550,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "alo chau oi hom truoc co da hoi ve cai noi chien khong dau roi",
+      "text": "alo em oi hom truoc anh da hoi ve cai noi chien khong dau roi",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, nồi chiên không dầu Philips dung tích 6.2 lít hiện bên cháu còn hàng, giá là 3.990.000đ cô nhé. Sản phẩm được bảo hành 12 tháng chính hãng.",
+      "text": "Dạ vâng, anh đã xem mẫu Philips 6.2L rồi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "anh da hoi y kien nguoi nha va quyet dinh mua cai philips 6 2l",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã tin tưởng. Giá của Nồi chiên không dầu Philips 6.2L hiện tại là 3.990.000đ, hàng còn sẵn tại shop ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -66,109 +82,80 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "co da hoi y kien con chau va quyet dinh mua cai philips 6.2l",
-      "facts_stated": {
-        "product_advised": "SKU-AF-6L"
-      },
-      "entities": [],
-      "pause_before_ms": 700,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, cô muốn thanh toán chuyển khoản ngân hàng phải không ạ?",
-      "questions": [
-        {
-          "slot": "payment",
-          "type": "confirm",
-          "text": "Cô muốn thanh toán chuyển khoản ngân hàng phải không ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
       "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "co muon thanh toan qua ngan hang chau co the giup co khong",
+      "text": "anh muon thanh toan qua ngan hang em co the giup anh khong",
       "facts_stated": {
         "payment": "bank"
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, cô cho cháu xin địa chỉ giao hàng để cháu lên đơn nhé.",
+      "text": "Dạ shop hỗ trợ thanh toán chuyển khoản ngân hàng anh nhé. Anh xác nhận nhận hàng tại Long Biên, Hà Nội như lần trước giúp em đúng không ạ?",
       "questions": [
         {
           "slot": "delivery_area",
-          "type": "open",
-          "text": "Cô cho cháu xin địa chỉ giao hàng để lên đơn nhé?"
+          "type": "confirm",
+          "text": "Anh xác nhận nhận hàng tại Long Biên, Hà Nội như lần trước giúp em đúng không ạ?"
         }
       ],
-      "facts_used": [],
+      "facts_used": [
+        "delivery_area"
+      ],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [],
+      "entities": [
+        {
+          "type": "address",
+          "value": "Long Biên, Hà Nội",
+          "spoken": "Long Biên, Hà Nội"
+        }
+      ],
       "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "khu vuc giao hang la long bien ha noi chau ghi chu giup co nhe",
+      "text": "khu vuc giao hang la long bien ha noi em ghi chu giup anh nhe",
       "facts_stated": {
         "delivery_area": "Long Biên, Hà Nội"
       },
-      "entities": [],
-      "pause_before_ms": 500,
+      "entities": [
+        {
+          "type": "address",
+          "value": "Long Biên, Hà Nội",
+          "spoken": "long bien ha noi"
+        }
+      ],
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, cháu xác nhận đơn cho cô: Nồi chiên không dầu Philips 6.2L, giá 3.990.000đ, giao tại Long Biên, Hà Nội, thanh toán chuyển khoản. Dự kiến giao trong 2 ngày làm việc, khoảng ngày 20/10. Thông tin như vậy đã đúng và cô đồng ý lên đơn chưa ạ?",
+      "text": "Dạ em đã ghi nhận địa chỉ giao hàng Long Biên, Hà Nội cho anh. Để em đọc lại đơn hàng: anh đặt 1 Nồi chiên không dầu Philips 6.2L giá 3.990.000đ, giao về Long Biên, Hà Nội, thanh toán chuyển khoản ngân hàng, dự kiến nhận hàng ngày 20/10. Anh xác nhận giúp em các thông tin này đúng chưa ạ?",
       "questions": [
         {
           "slot": "order_summary",
           "type": "confirm",
-          "text": "Dạ, thông tin đơn hàng đã đúng và cô đồng ý lên đơn chưa ạ?"
+          "text": "Anh xác nhận giúp em các thông tin này đúng chưa ạ?"
         }
       ],
-      "facts_used": [
-        "payment",
-        "delivery_area",
-        "product_advised",
-        "price_quoted_vnd"
-      ],
+      "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 3990000
-        },
-        {
-          "field": "delivery_days",
-          "value": 2
-        },
-        {
-          "field": "estimated_delivery",
-          "value": "2026-10-20"
         }
       ],
       "tool_calls": [
@@ -181,8 +168,24 @@
         }
       ],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 700,
+      "entities": [
+        {
+          "type": "money",
+          "value": "3990000",
+          "spoken": "3.990.000đ"
+        },
+        {
+          "type": "address",
+          "value": "Long Biên, Hà Nội",
+          "spoken": "Long Biên, Hà Nội"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-20",
+          "spoken": "20/10"
+        }
+      ],
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
@@ -191,29 +194,15 @@
       "text": "dung roi em len don giup anh nhe",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 800,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "co cam on chau mong nhan hang som",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 800,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, cháu đã lên đơn thành công cho cô rồi ạ. Shop sẽ gửi thông tin chuyển khoản và cập nhật hành trình đơn hàng qua Zalo hoặc SMS cho cô. Cô kiểm tra giúp cháu nhé, cảm ơn cô đã đặt hàng!",
+      "text": "Dạ em lên đơn cho anh ngay. Đơn hàng của anh đã được tạo thành công, tổng giá trị 3.990.000đ, shop sẽ giao về Long Biên, Hà Nội và anh thanh toán chuyển khoản ngân hàng. Dự kiến nhận hàng ngày 20/10 anh nhé.",
       "questions": [],
-      "facts_used": [
-        "payment",
-        "delivery_area",
-        "product_advised",
-        "price_quoted_vnd"
-      ],
+      "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
@@ -239,25 +228,25 @@
           "key": "payment",
           "value": "bank",
           "op": "set",
-          "source": "call_2#turn6"
+          "source": "call_2#turn10"
         },
         {
           "key": "delivery_area",
           "value": "Long Biên, Hà Nội",
           "op": "set",
-          "source": "call_2#turn8"
+          "source": "call_2#turn10"
         },
         {
           "key": "product_advised",
           "value": "SKU-AF-6L",
           "op": "set",
-          "source": "call_2#turn4"
+          "source": "call_2#turn10"
         },
         {
           "key": "price_quoted_vnd",
           "value": 3990000,
           "op": "set",
-          "source": "call_2#turn4"
+          "source": "call_2#turn10"
         },
         {
           "key": "order_id",
@@ -266,8 +255,46 @@
           "source": "call_2#turn10"
         }
       ],
+      "entities": [
+        {
+          "type": "money",
+          "value": "3990000",
+          "spoken": "3.990.000đ"
+        },
+        {
+          "type": "address",
+          "value": "Long Biên, Hà Nội",
+          "spoken": "Long Biên, Hà Nội"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-20",
+          "spoken": "20/10"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "anh cam on em mong nhan hang som",
+      "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 800,
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn anh đã đặt hàng tại shop, có gì bên em sẽ liên hệ hỗ trợ thêm nếu cần. Kính chúc anh nhiều sức khỏe ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     }
@@ -279,7 +306,11 @@
     "objection_handling": null,
     "sentiment": "positive",
     "decision_maker": "con",
-    "commitments": [],
+    "commitments": [
+      {
+        "text": "Lên đơn đúng thông tin anh xác nhận, giao Philips 6.2L về Long Biên, Hà Nội, thanh toán chuyển khoản ngân hàng, dự kiến nhận hàng ngày 20/10."
+      }
+    ],
     "supersedes": [],
     "callback": null,
     "order": {
@@ -288,7 +319,8 @@
       "price_vnd": 3990000,
       "payment": "bank",
       "address": "Long Biên, Hà Nội",
-      "order_id": "OD600001"
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-10-20"
     }
   }
 }

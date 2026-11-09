@@ -22,6 +22,7 @@ import importlib.util
 import hashlib
 import io
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -55,11 +56,32 @@ def source_tree(name: str, ref: str) -> Path:
 
 
 def install(out: Path, dest: Path) -> None:
-    """Replace the label folders of *dest* (data/dev, data/test) with the built ones; nothing else is touched."""
+    """Replace the label folders of *dest* (data/dev, data/test) with the built ones; nothing else is touched.
+
+    Except the spoken forms of calls whose audio was made again after a label revision (synthesize_scenario_audio
+    --changed-only): such an asr_reference/<call>.json in *dest* covers other words than the built one (another
+    source_sha256), so it stays, and asr_reference/ground_truth.json is then rewritten from the clips on disk, taking
+    each clip's entities from those call files (src/asr/reference.write_ground_truth).
+    """
+    respoken: dict[Path, bytes] = {}
+    for kept in (dest / "asr_reference").glob("scenarios_*/call_*.json"):
+        built = out / "asr_reference" / kept.relative_to(dest / "asr_reference")
+        sha = json.loads(kept.read_text(encoding="utf-8")).get("source_sha256")
+        if sha and (not built.exists() or json.loads(built.read_text(encoding="utf-8")).get("source_sha256") != sha):
+            respoken[kept.relative_to(dest)] = kept.read_bytes()
     for folder in LABEL_FOLDERS:
         if (dest / folder).exists():
             shutil.rmtree(dest / folder)
         shutil.copytree(out / folder, dest / folder)
+    for relative, data in respoken.items():
+        (dest / relative).parent.mkdir(parents=True, exist_ok=True)
+        (dest / relative).write_bytes(data)
+    if respoken:
+        datagen = ROOT / "evaluation" / "data-generation"
+        python = datagen / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+        subprocess.run([str(python), "-m", "src.pipeline.synthesize_scenario_audio", "--ground-truth-only"], cwd=datagen,
+                       env={**os.environ, "DATAGEN_SEED": dest.name, "PYTHONIOENCODING": "utf-8"}, check=True)
+        print(f"kept {len(respoken)} re-spoken asr_reference calls; ground_truth.json rewritten from the clips")
     for name in ("conversion-report.json", "DISPUTES.md"):
         if (out / name).exists():
             shutil.copyfile(out / name, dest / name)
@@ -271,8 +293,8 @@ def stated_line(honorific: str, facts: dict, slots: list[str]) -> str:
 
 
 # ── Groups 19-22: a check of the agent's expected actions against the customer's words, 2026-11-09 ─────────────
-#: Not decided by the reviewer yet. A date: accepted that day.
-ACTION_PROPOSALS_REVIEWED: str | None = None
+#: Groups 19-24, 31: the reviewer (dngan0365) accepted them all on this date. None: not decided.
+ACTION_PROPOSALS_REVIEWED: str | None = "2026-11-09"
 ACTION_SOURCE = "Kiểm hành động kỳ vọng của agent với lời khách và mock BTC, 09/11/2026"
 
 

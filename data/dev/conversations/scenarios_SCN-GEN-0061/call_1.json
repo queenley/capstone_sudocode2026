@@ -12,17 +12,16 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, anh cần tư vấn về combo Spectra S1 cùng máy hâm sữa Fatz đúng không ạ?",
+      "text": "Dạ em chào anh Nguyễn Văn A, hôm trước anh có đặt Máy lọc không khí AirPure Mini, đơn hàng đang giao ạ. Anh cần tư vấn về combo Spectra S1 với máy hâm sữa Fatz đúng không anh?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Anh đang quan tâm combo Spectra S1 với máy hâm sữa Fatz phải không ạ?"
+          "text": "Anh cần tư vấn về combo Spectra S1 với máy hâm sữa Fatz đúng không anh?"
         }
       ],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
       "claims": [],
       "tool_calls": [],
@@ -43,8 +42,14 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Combo này gồm máy hút sữa Spectra S1, máy hâm sữa Fatz và tặng kèm 50 túi trữ sữa, phù hợp cho bé 4 tháng tuổi của anh nhé.",
-      "questions": [],
+      "text": "Dạ combo bên em gồm máy hút sữa Spectra S1, máy hâm sữa Fatz và tặng 50 túi trữ sữa, phù hợp cho bé nhỏ. Anh muốn hỏi giá combo đúng không ạ?",
+      "questions": [
+        {
+          "slot": "price_quoted_vnd",
+          "type": "open",
+          "text": "Anh muốn hỏi giá combo đúng không ạ?"
+        }
+      ],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
@@ -65,8 +70,14 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giá combo hiện tại là 4.790.000đ anh nhé. Giá này đã áp dụng chương trình miễn phí vận chuyển toàn quốc cho mẹ & bé.",
-      "questions": [],
+      "text": "Dạ giá combo Spectra S1 và máy hâm sữa Fatz hiện tại là 4.790.000đ anh nhé. Giá này đã áp dụng chương trình miễn phí vận chuyển toàn quốc cho mẹ & bé. Anh có ngân sách khoảng bao nhiêu để em tư vấn phù hợp hơn ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Anh có ngân sách khoảng bao nhiêu để em tư vấn phù hợp hơn ạ?"
+        }
+      ],
       "facts_used": [],
       "claims": [
         {
@@ -91,17 +102,40 @@
       "facts_stated": {
         "budget_vnd": 5500000
       },
-      "entities": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "5500000",
+          "spoken": "5 trieu rưỡi"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ combo này hoàn toàn nằm trong ngân sách 5 triệu rưỡi của anh, rất phù hợp nhu cầu hiện tại ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
+      "text": "Với ngân sách 5 triệu rưỡi của anh thì combo này rất phù hợp, giá chỉ 4.790.000đ và đã bao gồm quà tặng 50 túi trữ sữa, miễn phí giao hàng tận nơi cho đơn ngành mẹ & bé từ 500.000đ trở lên ạ. Bé nhà mình 4 tháng phải không anh?",
+      "questions": [
+        {
+          "slot": "child_age_months",
+          "type": "confirm",
+          "text": "Bé nhà mình 4 tháng phải không anh?"
+        }
+      ],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4790000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -122,10 +156,23 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Bé 4 tháng dùng combo này rất hợp, máy hút sữa Spectra S1 và máy hâm sữa Fatz đều an toàn cho trẻ nhỏ anh nhé.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
+      "text": "Dạ combo này dùng cho bé sơ sinh từ 0 đến 12 tháng rất tiện anh nhé. Ngoài ra, chương trình miễn phí vận chuyển MOM-FREESHIP đang áp dụng đến hết ngày 29/11/2026. Anh muốn em tư vấn thêm về khuyến mãi của combo này không ạ?",
+      "questions": [
+        {
+          "slot": "promo_code",
+          "type": "open",
+          "text": "Anh muốn em tư vấn thêm về khuyến mãi của combo này không ạ?"
+        }
+      ],
+      "facts_used": [
+        "child_age_months"
+      ],
+      "claims": [
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -144,39 +191,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ combo đang có khuyến mãi miễn phí vận chuyển toàn quốc cho đơn mẹ & bé và tặng kèm 50 túi trữ sữa anh nha.",
+      "text": "Dạ hiện tại combo này đang áp dụng chương trình MOM-FREESHIP, miễn phí vận chuyển toàn quốc cho đơn mẹ & bé từ 500.000đ, và tặng kèm 50 túi trữ sữa khi mua anh nhé. Nếu anh cần hỏi thêm chi tiết về sản phẩm hoặc hướng dẫn sử dụng, anh có thể gọi hotline 0998000001, nhân viên bên em sẽ hỗ trợ chi tiết ạ.",
       "questions": [],
-      "facts_used": [],
+      "facts_used": [
+        "promo_code"
+      ],
       "claims": [
         {
           "field": "promo_MOM-FREESHIP_active",
           "value": true
         }
       ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "anh muon goi hotline hoi them mot so thong tin nua",
-      "facts_stated": {
-        "blocker": "muốn gọi hotline hỏi thêm"
-      },
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận nhu cầu của anh, anh có thể gọi trực tiếp hotline để được nhân viên tư vấn chi tiết hơn bất cứ lúc nào ạ. Cảm ơn anh đã quan tâm sản phẩm bên em!",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
       "tool_calls": [],
       "memory_writes": [
         {
@@ -195,7 +220,7 @@
           "key": "blocker",
           "value": "muốn gọi hotline hỏi thêm",
           "op": "set",
-          "source": "call_1#turn12"
+          "source": "call_1#turn10"
         },
         {
           "key": "product_advised",
@@ -213,20 +238,38 @@
           "key": "promo_code",
           "value": "MOM-FREESHIP",
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn8"
         }
       ],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "anh muon goi hotline hoi them mot so thong tin nua so anh la 0998000001",
+      "facts_stated": {
+        "phone_provided": true,
+        "blocker": "muốn gọi hotline hỏi thêm"
+      },
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0998000001",
+          "spoken": "0998000001"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
     }
   ],
   "gold": {
-    "intent": "hoi_combo_me_va_be",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "muon_tu_tim_hieu_them",
-    "objection_handling": "Đã ghi nhận nhu cầu gọi hotline, hướng dẫn liên hệ trực tiếp để được tư vấn thêm.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

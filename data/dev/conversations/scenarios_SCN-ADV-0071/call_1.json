@@ -12,16 +12,20 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em xác nhận chị muốn mua xe đẩy gấp gọn Joie Pact đúng không ạ?",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị muốn xác nhận mua xe đẩy gấp gọn Joie Pact đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Em xác nhận chị muốn mua xe đẩy gấp gọn Joie Pact đúng không ạ?"
+          "text": "Chị muốn xác nhận mua xe đẩy gấp gọn Joie Pact đúng không ạ?"
         }
       ],
       "facts_used": [],
       "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
         {
           "field": "in_stock",
           "value": true
@@ -36,8 +40,11 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo em, chị muốn xác nhận mua xe đẩy gấp gọn Joie Pact.",
-      "facts_stated": {},
+      "text": "Alo em, chị muốn xác nhận mua xe đẩy gấp gọn Joie Pact. Bé nhà chị được 6 tháng.",
+      "facts_stated": {
+        "product_advised": "SKU-MB-STR1",
+        "child_age_months": 6
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -45,7 +52,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, sản phẩm xe đẩy Joie Pact bên em đang sẵn hàng, giá 3.490.000đ và được miễn phí vận chuyển toàn quốc chị nhé.",
+      "text": "Dạ xe đẩy Joie Pact phù hợp cho bé 6 tháng tuổi, giá là 3.490.000đ, hiện đang còn hàng và được miễn phí vận chuyển toàn quốc qua chương trình MOM-FREESHIP ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -54,11 +61,15 @@
           "value": 3490000
         },
         {
+          "field": "in_stock",
+          "value": true
+        },
+        {
           "field": "promo_MOM-FREESHIP_active",
           "value": true
         },
         {
-          "field": "in_stock",
+          "field": "freeship",
           "value": true
         }
       ],
@@ -82,14 +93,39 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận chị chọn thanh toán COD. Đơn hàng này đủ điều kiện miễn phí vận chuyển và sẽ giao trong 2 ngày làm việc tới Quận 7, TP.HCM ạ.",
+      "text": "Dạ chị chọn thanh toán COD, đơn này vẫn áp dụng được COD vì dưới 10 triệu đồng ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "promo_MOM-FREESHIP_active",
-          "value": true
-        },
+          "field": "price_vnd",
+          "value": 3490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị ở Quận 7, TP.HCM, em ghi chú giúp chị nhé.",
+      "facts_stated": {
+        "delivery_area": "Quận 7, TP.HCM"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi chú địa chỉ nhận hàng là Quận 7, TP.HCM. Thời gian giao dự kiến từ 1 đến 2 ngày làm việc, khoảng ngày 19/10 chị nhận hàng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
         {
           "field": "delivery_days",
           "value": 2
@@ -116,36 +152,6 @@
     },
     {
       "speaker": "customer",
-      "text": "Chị ở Quận 7, TP.HCM, em ghi chú giúp chị nhé.",
-      "facts_stated": {
-        "delivery_area": "Quận 7, TP.HCM"
-      },
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em đã cập nhật địa chỉ giao hàng là Quận 7, TP.HCM cho mình ạ. Cho em hỏi ngân sách của chị là khoảng bao nhiêu để em xác nhận lại thông tin trước khi lên đơn ạ?",
-      "questions": [
-        {
-          "slot": "budget_vnd",
-          "type": "open",
-          "text": "Cho em hỏi ngân sách của chị là khoảng bao nhiêu để em xác nhận lại thông tin trước khi lên đơn ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
       "text": "Ngân sách của chị là 3 triệu rưỡi thôi.",
       "facts_stated": {
         "budget_vnd": 3500000
@@ -157,12 +163,39 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, sản phẩm này giá đúng trong ngân sách của chị là 3.490.000đ. Em xin phép đọc lại đơn hàng: chị đặt 1 xe đẩy gấp gọn Joie Pact, giá 3.490.000đ, giao về Quận 7, TP.HCM, thanh toán COD và nhận hàng dự kiến ngày 19/10. Chị xác nhận giúp em thông tin này trước khi em lên đơn nhé?",
+      "text": "Dạ giá xe đẩy Joie Pact hiện tại là 3.490.000đ, đúng với ngân sách của chị rồi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đồng ý lên đơn nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em xác nhận lại đơn hàng: 1 xe đẩy gấp gọn Joie Pact, giá 3.490.000đ, giao tại Quận 7, TP.HCM, thanh toán COD, dự kiến giao ngày 19/10. Chị xác nhận giúp em thông tin này để em tiến hành lên đơn nhé.",
       "questions": [
         {
           "slot": "order_summary",
           "type": "confirm",
-          "text": "Em xin phép đọc lại đơn hàng: chị đặt 1 xe đẩy gấp gọn Joie Pact, giá 3.490.000đ, giao về Quận 7, TP.HCM, thanh toán COD và nhận hàng dự kiến ngày 19/10. Chị xác nhận giúp em thông tin này trước khi em lên đơn nhé?"
+          "text": "Chị xác nhận giúp em thông tin này để em tiến hành lên đơn nhé."
         }
       ],
       "facts_used": [],
@@ -185,7 +218,7 @@
     },
     {
       "speaker": "customer",
-      "text": "Chị đồng ý lên đơn nhé.",
+      "text": "Chị xác nhận đúng rồi em.",
       "facts_stated": {},
       "entities": [],
       "pause_before_ms": 0,
@@ -194,10 +227,14 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã tạo đơn hàng cho chị. Nhân viên bên em sẽ gọi xác nhận đơn trước khi giao. Cảm ơn chị đã đặt hàng tại shop BTC, có gì cần hỗ trợ thêm chị nhắn lại em nhé.",
+      "text": "Dạ em đã lên đơn hàng cho chị, mã đơn OD600001. Nhân viên bên em sẽ gọi xác nhận đơn trước khi giao hàng, chị yên tâm nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
         {
           "field": "needs_confirmation_call",
           "value": true
@@ -222,49 +259,49 @@
           "key": "child_age_months",
           "value": 6,
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn2"
         },
         {
           "key": "budget_vnd",
           "value": 3500000,
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn8"
         },
         {
           "key": "payment",
           "value": "COD",
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn4"
         },
         {
           "key": "delivery_area",
           "value": "Quận 7, TP.HCM",
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn6"
         },
         {
           "key": "product_advised",
           "value": "SKU-MB-STR1",
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 3490000,
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn3"
         },
         {
           "key": "promo_code",
           "value": "MOM-FREESHIP",
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn3"
         },
         {
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn13"
         }
       ],
       "entities": [],
@@ -274,11 +311,11 @@
     }
   ],
   "gold": {
-    "intent": "xac_nhan_mua_xe_day_joie_pact",
+    "intent": "xac_nhan_mua",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
-    "sentiment": "neutral",
+    "sentiment": "positive",
     "decision_maker": null,
     "commitments": [],
     "supersedes": [],

@@ -12,24 +12,18 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chú ạ, em là trợ lý ảo của shop BTC, hôm trước chú có đặt Áo khoác gió Windbreak; hôm nay chú cần tư vấn về ghế ngồi ô tô cho bé đúng không ạ?",
+      "text": "Dạ em chào chú Lê Văn Bình ạ, hôm trước chú có đặt Áo khoác gió Windbreak, đơn OD902002 bên em đang xử lý. Chú cần em hỗ trợ thông tin về ghế ngồi ô tô Chicco cho bé đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Hôm nay chú muốn hỏi về ghế ngồi ô tô Chicco cho bé đúng không ạ?"
+          "text": "Chú cần em hỗ trợ thông tin về ghế ngồi ô tô Chicco cho bé đúng không ạ?"
         }
       ],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
-      "claims": [
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -42,27 +36,29 @@
       "text": "alo chu muon hoi ve ghe ngoi o to cho be chicco",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ ghế ngồi ô tô Chicco bên em hiện còn hàng ạ. Chú muốn chọn cho bé nhà mình, bé bao nhiêu tháng rồi và mình dự kiến ngân sách khoảng bao nhiêu ạ?",
+      "text": "Dạ ghế ngồi ô tô Chicco cho bé bên em đang có hàng, giá là 4.990.000đ và phù hợp cho bé từ sơ sinh đến 4 tuổi, cân nặng đến 18kg. Chú muốn tìm ghế cho bé 15 tháng tuổi, ngân sách khoảng 5 triệu phải không ạ?",
       "questions": [
         {
-          "slot": "child_age_months",
-          "type": "open",
-          "text": "Bé nhà mình được bao nhiêu tháng rồi ạ?"
-        },
-        {
           "slot": "budget_vnd",
-          "type": "open",
-          "text": "Chú dự kiến ngân sách tầm khoảng bao nhiêu cho sản phẩm này ạ?"
+          "type": "confirm",
+          "text": "Chú muốn tìm ghế cho bé 15 tháng tuổi, ngân sách khoảng 5 triệu phải không ạ?"
         }
       ],
-      "facts_used": [],
+      "facts_used": [
+        "child_age_months",
+        "budget_vnd"
+      ],
       "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4990000
+        },
         {
           "field": "in_stock",
           "value": true
@@ -83,13 +79,13 @@
         "budget_vnd": 5000000
       },
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ với bé 15 tháng và ngân sách tầm 5.000.000đ, bên em có ghế ngồi ô tô Chicco ạ. Giá hiện tại là 4.990.000đ, đang có ưu đãi miễn phí vận chuyển toàn quốc cho đơn từ 500.000đ trở lên, chú nhé.",
+      "text": "Dạ chú chọn đúng loại rồi ạ, ghế Chicco dùng được cho bé 15 tháng, lắp xe dễ và an toàn. Giá đúng 4.990.000đ, hiện tại bên em áp dụng chương trình miễn phí vận chuyển toàn quốc với đơn từ 500.000đ trở lên cho sản phẩm mẹ & bé, chú không cần trả thêm phí ship nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -114,19 +110,27 @@
       "text": "ghe nay co khuyen mai gi khong em",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại chương trình khuyến mãi cho ghế ngồi ô tô Chicco là miễn phí vận chuyển toàn quốc khi đơn từ 500.000đ, chú không cần trả thêm phí ship ạ.",
+      "text": "Dạ hiện tại ghế Chicco chưa có giảm giá, nhưng chú được miễn phí vận chuyển toàn quốc với chương trình MOM-FREESHIP đang áp dụng. Tổng giá vẫn là 4.990.000đ, shop giao tận nơi cho chú luôn ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
+          "field": "price_vnd",
+          "value": 4990000
+        },
+        {
           "field": "promo_MOM-FREESHIP_active",
           "value": true
+        },
+        {
+          "field": "promo_active",
+          "value": false
         }
       ],
       "tool_calls": [],
@@ -138,18 +142,25 @@
     },
     {
       "speaker": "customer",
-      "text": "chu muon goi hotline hoi them nen phai hen lai nhe",
+      "text": "chu muon goi hotline hoi them nen phai hen lai nhe so chu la 0998000020",
       "facts_stated": {
-        "blocker": "muốn gọi hotline hỏi thêm"
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "phone_provided": true
       },
-      "entities": [],
-      "pause_before_ms": 400,
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0998000020",
+          "spoken": "0998000020"
+        }
+      ],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận chú muốn gọi hotline để hỏi thêm thông tin ạ. Khi nào tiện chú cứ liên hệ tổng đài bên em, nhân viên sẽ hỗ trợ chi tiết hơn cho chú nhé. Em cảm ơn chú đã nhắn tin cho shop BTC ạ!",
+      "text": "Dạ em ghi nhận chú muốn gọi hotline hỏi thêm. Shop sẽ liên hệ lại với chú qua số 0998000020 để hỗ trợ chi tiết hơn ạ. Nếu chú cần tư vấn thêm về sản phẩm hoặc đặt hàng sau, bên em luôn sẵn sàng hỗ trợ chú nhé!",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -159,7 +170,7 @@
           "key": "blocker",
           "value": "muốn gọi hotline hỏi thêm",
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn9"
         },
         {
           "key": "budget_vnd",
@@ -177,13 +188,13 @@
           "key": "product_advised",
           "value": "SKU-MB-CAR",
           "op": "set",
-          "source": "call_1#turn4"
+          "source": "call_1#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 4990000,
           "op": "set",
-          "source": "call_1#turn5"
+          "source": "call_1#turn6"
         },
         {
           "key": "promo_code",
@@ -199,15 +210,22 @@
     }
   ],
   "gold": {
-    "intent": "hoi_tu_van_san_pham",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "can_tu_van_ky_hon",
-    "objection_handling": "Ghi nhận nhu cầu hẹn gọi lại để hỏi thêm qua tổng đài.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
-    "commitments": [],
+    "commitments": [
+      {
+        "commitment": "sẽ liên hệ lại qua hotline"
+      }
+    ],
     "supersedes": [],
-    "callback": null,
+    "callback": {
+      "time": null,
+      "reason": "Khách muốn được gọi hotline hỏi thêm"
+    },
     "order": null
   }
 }

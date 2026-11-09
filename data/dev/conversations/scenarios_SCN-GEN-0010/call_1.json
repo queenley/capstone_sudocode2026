@@ -12,32 +12,25 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần hỗ trợ về máy lọc không khí AirPure Pro đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Anh đang quan tâm đến máy lọc không khí AirPure Pro đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh muốn tư vấn máy lọc không khí AirPure Pro cho phòng 25 mét vuông, em xin phép hỗ trợ anh luôn ạ.",
+      "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro.",
-      "facts_stated": {},
+      "text": "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro. Phòng anh khoảng 25 mét vuông, nhà anh không có trẻ nhỏ, ngân sách của anh tầm 8 triệu rưỡi.",
+      "facts_stated": {
+        "room_area_m2": 25,
+        "has_children": false,
+        "budget_vnd": 8500000
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -45,19 +38,19 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ máy AirPure Pro hiện đang có sẵn hàng anh nhé. Máy phù hợp phòng 30 đến 45 mét vuông, có khóa trẻ em và app điều khiển.",
+      "text": "Dạ, với diện tích phòng 25 mét vuông như anh nói thì AirPure Pro rất phù hợp. Máy này đang có giá 7.690.000đ, nằm trong ngân sách của anh ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "in_stock",
-          "value": true
+          "field": "price_vnd",
+          "value": 7690000
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -72,7 +65,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ máy AirPure Pro đang được giảm còn 7.690.000đ trong chương trình AIR-OCT anh ạ, giá niêm yết là 7.990.000đ.",
+      "text": "Dạ, giá hiện tại của máy lọc không khí AirPure Pro là 7.690.000đ anh nhé, đã được giảm từ giá niêm yết 7.990.000đ nhờ chương trình khuyến mãi tháng này.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -87,14 +80,8 @@
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "7690000",
-          "spoken": "7.690.000"
-        }
-      ],
-      "pause_before_ms": 450,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -109,7 +96,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại đang áp dụng khuyến mãi AIR-OCT giảm trực tiếp 300.000đ cho máy AirPure Pro, anh mua sẽ được giá ưu đãi 7.690.000đ và miễn phí vận chuyển toàn quốc.",
+      "text": "Dạ, shop đang có chương trình AIR-OCT giảm 300.000đ cho sản phẩm này trong tháng 10, kèm miễn phí vận chuyển toàn quốc và miễn phí thu hộ khi thanh toán COD anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -124,14 +111,8 @@
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "7690000",
-          "spoken": "7.690.000"
-        }
-      ],
-      "pause_before_ms": 500,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -148,7 +129,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em hiểu ạ, chương trình khuyến mãi AIR-OCT sẽ kết thúc ngày 30/10 nên anh có thể cân nhắc đặt trước thời điểm đó để được giá tốt nhất.",
+      "text": "Dạ em hiểu ạ. Chương trình khuyến mãi hiện tại sẽ kết thúc vào ngày 30/10, anh cân nhắc giúp em để kịp hưởng ưu đãi anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -160,7 +141,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -172,69 +153,13 @@
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ vâng, anh cần hỗ trợ thêm cứ liên hệ lại shop BTC bất cứ lúc nào anh nhé. Em giữ thông tin và sẽ nhắc lại chương trình nếu anh cần.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [
-        {
-          "key": "room_area_m2",
-          "value": 25,
-          "op": "set",
-          "source": "call_1#turn2"
-        },
-        {
-          "key": "has_children",
-          "value": false,
-          "op": "set",
-          "source": "call_1#turn2"
-        },
-        {
-          "key": "budget_vnd",
-          "value": 8500000,
-          "op": "set",
-          "source": "call_1#turn2"
-        },
-        {
-          "key": "blocker",
-          "value": "chờ cuối tháng nhận lương",
-          "op": "set",
-          "source": "call_1#turn8"
-        },
-        {
-          "key": "product_advised",
-          "value": "SKU-AP-PRO",
-          "op": "set",
-          "source": "call_1#turn2"
-        },
-        {
-          "key": "price_quoted_vnd",
-          "value": 7690000,
-          "op": "set",
-          "source": "call_1#turn5"
-        },
-        {
-          "key": "promo_code",
-          "value": "AIR-OCT",
-          "op": "set",
-          "source": "call_1#turn6"
-        }
-      ],
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
     }
   ],
   "gold": {
-    "intent": "hoi_gia_khuyen_mai_va_lich_mua_air_pure_pro",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "chua_co_tien_phai_cho_luong",
-    "objection_handling": "Nhắc thời hạn khuyến mãi, giữ thông tin cho khách.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

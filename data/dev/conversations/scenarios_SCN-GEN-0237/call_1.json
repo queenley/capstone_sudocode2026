@@ -12,67 +12,40 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh Khải ạ, em là trợ lý ảo của shop BTC. Anh đang quan tâm đến quạt đứng Senko TS16 đúng không ạ?",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, hôm trước anh có đặt Combo Spectra S1 và máy hâm sữa Fatz, đơn đang giao. Anh cần tư vấn về quạt đứng Senko TS16 đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Anh đang muốn hỏi về quạt đứng Senko TS16 đúng không ạ?"
+          "text": "Anh cần tư vấn về quạt đứng Senko TS16 đúng không ạ?"
         }
       ],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Alo, em ơi, anh muốn hỏi về quạt đứng Senko TS16.",
+      "text": "Alo, em ơi, anh muốn hỏi về quạt đứng Senko TS16. Ngân sách của anh tầm 1 triệu.",
       "facts_stated": {
+        "budget_vnd": 1000000,
         "product_advised": "SKU-FAN-SEN"
       },
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, quạt đứng Senko TS16 hiện bên em còn hàng anh nhé. Anh cần em tư vấn thêm về thông số hay tính năng nào của quạt không ạ?",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 650,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Giá của quạt này là bao nhiêu vậy em?",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ quạt đứng Senko TS16 giá là 590.000đ anh nhé.",
+      "text": "Dạ cảm ơn anh đã chia sẻ nhu cầu ạ. Quạt đứng Senko TS16 hiện giá là 590.000đ, phù hợp với ngân sách của anh.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -84,7 +57,38 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá của quạt này là bao nhiêu vậy em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giá hiện tại của quạt Senko TS16 là 590.000đ anh nhé. Sản phẩm đang sẵn hàng tại shop.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 590000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -93,13 +97,13 @@
       "text": "Quạt này có khuyến mãi gì không?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại quạt Senko TS16 chưa có chương trình khuyến mãi anh ạ. Tuy nhiên, đơn từ 500.000đ vẫn được miễn phí vận chuyển nội thành và đơn từ 2 triệu thì miễn phí toàn quốc ạ.",
+      "text": "Dạ hiện tại quạt Senko TS16 chưa có chương trình khuyến mãi riêng, nhưng anh được miễn phí thu hộ khi thanh toán COD toàn quốc ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -115,7 +119,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 750,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -137,13 +141,13 @@
           "spoken": "7 giờ"
         }
       ],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, em sẽ gọi lại cho anh vào 7 giờ tối thứ Hai ngày 16/11 nhé. Cảm ơn anh đã quan tâm, chúc anh buổi tối vui vẻ ạ.",
+      "text": "Dạ em ghi nhận, tối thứ Hai ngày 16/11 vào lúc 7 giờ em sẽ gọi lại cho anh để trao đổi tiếp ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -173,13 +177,13 @@
           "key": "budget_vnd",
           "value": 1000000,
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn2"
         },
         {
           "key": "usage_need",
           "value": "thay đồ cũ đã hỏng",
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn2"
         },
         {
           "key": "product_advised",
@@ -191,11 +195,11 @@
           "key": "price_quoted_vnd",
           "value": 590000,
           "op": "set",
-          "source": "call_1#turn5"
+          "source": "call_1#turn4"
         }
       ],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
@@ -203,19 +207,20 @@
   "gold": {
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "can_hoi_nguoi_nha",
-    "objection_handling": "Đã xác nhận thời gian gọi lại cụ thể và lên lịch hẹn cho khách.",
+    "objection_type": "can_ban_voi_gia_dinh",
+    "objection_handling": "Đã xác nhận thời điểm gọi lại vào 7 giờ tối thứ Hai theo yêu cầu khách.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [
       {
-        "hứa_gọi_lại": "2026-11-16T19:00"
+        "type": "callback",
+        "time": "2026-11-16T19:00",
+        "note": "khách hỏi người nhà rồi báo lại"
       }
     ],
     "supersedes": [],
     "callback": {
-      "customer_phone": "0998000015",
-      "callback_at": "2026-11-16T19:00",
+      "time": "2026-11-16T19:00",
       "note": "khách hỏi người nhà rồi báo lại"
     },
     "order": null

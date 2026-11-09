@@ -12,12 +12,12 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Hạnh ạ, em là trợ lý ảo của shop BTC. Hôm trước chị đặt Giày chạy bộ RunLite 2 Pro size 43 màu đen, thanh toán chuyển khoản và giao Quận 7, TP.HCM đúng không ạ?",
+      "text": "Dạ em chào chị Hạnh ạ, em là trợ lý ảo của shop BTC. Chị hôm trước vừa nhận đôi Giày chạy bộ RunLite 2 Pro size 43 màu đen, thanh toán chuyển khoản và giao Quận 7 đúng không ạ?",
       "questions": [
         {
           "slot": "other",
           "type": "open",
-          "text": "Em có thể hỗ trợ gì cho chị hôm nay ạ?"
+          "text": "Chị muốn mình tiếp tục thế nào ạ?"
         }
       ],
       "facts_used": [
@@ -26,8 +26,8 @@
         "delivery_area",
         "product_advised",
         "variant_sku",
-        "price_quoted_vnd",
-        "order_id"
+        "order_id",
+        "price_quoted_vnd"
       ],
       "claims": [],
       "tool_calls": [],
@@ -42,13 +42,13 @@
       "text": "Alo em, chị Hạnh đây.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, em nghe chị ạ.",
+      "text": "Dạ vâng, em nghe chị Hạnh đây ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -66,27 +66,22 @@
         "size": 43
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chị muốn đổi sang size khác đúng không ạ? Size 42 màu đen bên em còn hàng và có thể hỗ trợ đổi cho chị ngay ạ.",
+      "text": "Dạ chị muốn đổi sang size 42 màu đen đúng không ạ? Đơn hàng cũ là OD600001, sản phẩm Giày chạy bộ RunLite 2 Pro, em xác nhận lại thông tin để hỗ trợ chị đổi size nhé.",
       "questions": [
         {
-          "slot": "other",
-          "type": "open",
-          "text": "Em xác nhận chị muốn đổi sang size 42 màu đen đúng không ạ?"
+          "slot": "size",
+          "type": "confirm",
+          "text": "Chị muốn đổi sang size 42 màu đen đúng không ạ?"
         }
       ],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "new_size_in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -101,13 +96,13 @@
         "size": 42
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận yêu cầu đổi sang Giày chạy bộ RunLite 2 Pro size 42 màu đen cho chị. Đổi size lần đầu tiên bên em miễn phí vận chuyển hai chiều, và chị sẽ được hoàn lại 219.000đ chênh lệch giá.",
+      "text": "Dạ em đã kiểm tra, size 42 màu đen còn hàng, shop sẽ đổi cho chị miễn phí ạ. Chênh lệch giá được hoàn lại là 219.000 đồng, chị không cần thanh toán thêm phí nào.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -132,25 +127,19 @@
       "text": "Đừng hỏi lại mã đơn hay sản phẩm đã mua gì cả, chị đã nói rõ rồi.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chị yên tâm, em đã có đầy đủ thông tin đơn hàng OD600001 rồi ạ. Em sẽ tiến hành cập nhật đổi size cho chị ngay bây giờ.",
+      "text": "Dạ em ghi nhận yêu cầu đổi size của chị và sẽ cập nhật trên hệ thống ngay. Tiền chênh lệch 219.000 sẽ hoàn về tài khoản trong 3–5 ngày làm việc sau khi shop nhận lại đôi size 43 từ chị. Nhân viên vận chuyển sẽ liên hệ lấy hàng trong 1–2 ngày tới ạ.",
       "questions": [],
-      "facts_used": [
-        "order_id"
-      ],
+      "facts_used": [],
       "claims": [
         {
-          "field": "order_id",
-          "value": "OD600001"
-        },
-        {
-          "field": "new_variant_sku",
-          "value": "SKU-SN-RUN2-42-DEN"
+          "field": "refund_vnd",
+          "value": 219000
         }
       ],
       "tool_calls": [
@@ -169,7 +158,7 @@
           "key": "size",
           "value": 42,
           "op": "supersede",
-          "source": "call_2#turn9"
+          "source": "call_2#turn6"
         }
       ],
       "entities": [],
@@ -179,7 +168,7 @@
     }
   ],
   "gold": {
-    "intent": "doi_size_giay",
+    "intent": "cap_nhat_don",
     "outcome": "cap_nhat_don",
     "objection_type": null,
     "objection_handling": null,

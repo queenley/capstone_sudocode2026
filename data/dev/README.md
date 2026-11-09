@@ -35,17 +35,20 @@ Các thư mục nhãn (`scenarios`, `metadata`, `asr_reference`, `tools`, `call_
 | 16 | Bỏ `freeship` khi không biết nơi giao | 2 cuộc |
 | 17 | Khách ẩn danh không đọc SĐT: cuộc sau chỉ giữ slot khách nói lại | 3 cuộc |
 | 18 | ADV-0045/c1: bỏ `owned_sku` (lịch sử CRM chỉ để tham khảo) | 1 cuộc |
-| 26–30 | `has_children` theo lời khách; khách nói cách thanh toán và diện tích phòng mới mà nhãn ghi; bỏ fact của người kia ở kịch bản chung SĐT; câu lẫn vai (người duyệt yêu cầu, sau lần kiểm thứ hai) | 39 cuộc |
+| 19–24 | Hành động kỳ vọng của agent: gọi lại khách hẹn, hoãn thì không tạo đơn, người chung SĐT, lịch gọi lại vào ngày nghỉ, xưng hô, kết quả gọi lại 22:00 ngày 11/11 | 12 cuộc |
 | 25 | GEN-0099/c1: câu "có một bé lớn" nói rõ "nhà không có trẻ nhỏ" (người duyệt nêu) | 1 cuộc |
-| 19–24 | Hành động kỳ vọng của agent: gọi lại khách hẹn, hoãn thì không tạo đơn, người chung SĐT, lịch gọi lại vào ngày nghỉ, xưng hô, kết quả gọi lại 22:00 ngày 11/11 (**chờ duyệt**) | 15 cuộc |
+| 26–30 | `has_children` theo lời khách; khách nói cách thanh toán và diện tích phòng mới mà nhãn ghi; bỏ fact của người kia ở kịch bản chung SĐT; câu lẫn vai (người duyệt yêu cầu, sau lần kiểm thứ hai) | 33 cuộc |
+| 31 | GEN-0066/c1, GEN-0181/c1: khách nói có hay không có trẻ nhỏ như `has_children` | 2 cuộc |
+
+Mọi nhóm đã được người duyệt chấp nhận; không còn thay đổi `pending`.
 
 Kiểm, không gọi model: 404/404 kịch bản nạp được bằng loader của `run_eval`; 0 lỗi theo `contracts/scenario/scenario-keys.yaml`; oracle qua `reference_eval.py` của BTC: CCR 100 · RQR 0 · TSR 100 · HR 0, 0 lỗi schema.
 
 Dựng lại từ gốc repo: `python evaluation/datasets/ground-truth-review/build_dev_r4.py`, rồi từ `evaluation/data-generation`: `python -m src.pipeline.build_ground_truth --root ../../data/dev` (viết lại `trace_log/` và báo cáo oracle trong `reports/`).
 
-**Hội thoại mẫu (`conversations/`) không phải ví dụ mẫu:** các ca J02 có câu bịa, ca agent mẫu không tạo đơn hoặc hỏi quá giới hạn, và mọi cuộc đã đổi lời khách được đánh dấu `approve: N` trong `review/needs_manual_review.csv` (`evaluation/datasets/ground-truth-review/mark_conversations.py`). Không dùng chúng làm few-shot hay dữ liệu vòng cải tiến. Bộ này chưa phải bộ vàng: `official_gt_approved: false`, chưa có `review/golden_manifest.json`. Kiểm tự động và đề xuất từng cuộc ở `review/auto_verified.json`, `review/review_sheet.csv` (`auto_verify.py`); người duyệt ký bằng `evaluation/datasets/ground-truth-review/approve_gold.py`.
+**Hội thoại mẫu (`conversations/`) đã sinh lại theo nhãn r4** (09–10/11/2026, [`regenerate_conversations.py`](../../evaluation/datasets/ground-truth-review/regenerate_conversations.py)): 230 cuộc có lời khách đã đổi, trượt validator, agent mẫu bịa (J02) hoặc thiếu file được viết lại (danh sách ở `review/regenerated.json`). Validator: 801/801. 576/801 hội thoại qua mọi kiểm tự động; phần còn lại phần lớn chỉ vì bộ chấm bằng model cần người đọc, vài ca J02 vẫn còn (đánh dấu `approve: N` trong `review/needs_manual_review.csv`, không dùng làm few-shot hay dữ liệu vòng cải tiến). Bộ này chưa phải bộ vàng: `official_gt_approved: false`. Quyết định `approve_conversation` cũ của các cuộc sinh lại đã xoá trong `review/review_sheet.csv` (người duyệt đã duyệt hội thoại cũ), nên cần ký lại. Kiểm tự động và đề xuất từng cuộc ở `review/auto_verified.json`, `review/review_sheet.csv` (`auto_verify.py`); người duyệt ký bằng `evaluation/datasets/ground-truth-review/approve_gold.py`.
 
-**Audio chưa theo kịp nhãn:** các nhóm 1, 3, 10, 14, 21, 23, 25 đổi hoặc thêm lời khách trong `scenarios/`, nhưng `audio/`, `asr_reference/` của những lượt đó và hội thoại mẫu (`conversations/`) vẫn là lời cũ. Sinh lại bằng `synthesize_scenario_audio --changed-only` khi người duyệt thấy nhãn đã ổn.
+**Audio đã theo kịp nhãn** (09–10/11/2026): mọi lượt khách đổi lời được đọc lại bằng `synthesize_scenario_audio --changed-only` (266 lượt, 22.963 ký tự ElevenLabs); `asr_reference/ground_truth.json` dựng lại từ clip trên đĩa, không còn clip đọc lời cũ. Nhãn entity lấy từ `asr_reference/<call>.json` (đã sửa ở nhóm 11), không lấy bản chép cạnh clip.
 
 ## Trong thư mục có gì
 
@@ -60,7 +63,7 @@ Dựng lại từ gốc repo: `python evaluation/datasets/ground-truth-review/bu
 | `reports/` | kiểm tra nhãn, oracle, audio, chi phí sinh dữ liệu | đọc trước khi chạy |
 | `review/needs_manual_review.csv` | các ca cần người duyệt | duyệt tay |
 
-**Nhãn là chẩn đoán.** Chưa có `review/golden_manifest.json` (chưa ai duyệt tay), nên số đo trên bộ này là chẩn đoán, chưa phải bộ vàng (quy tắc 5).
+**Nhãn là chẩn đoán.** `official_gt_approved: false` (15 cuộc chưa duyệt nhãn, xem [DISPUTES.md](DISPUTES.md)), nên số đo trên bộ này là chẩn đoán, chưa phải bộ vàng (quy tắc 5).
 
 ## 0. Kiểm nhãn trước (miễn phí, không gọi model)
 

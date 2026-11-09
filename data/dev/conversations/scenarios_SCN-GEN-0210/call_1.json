@@ -12,47 +12,8 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, chị cần tư vấn về máy lọc không khí AirPure Pro đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Chị cần tư vấn về máy lọc không khí AirPure Pro đúng không ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Alo chị, chị muốn hỏi về máy lọc không khí AirPure Pro.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ sản phẩm AirPure Pro phù hợp cho phòng từ 30 đến 45 mét vuông, nhưng phòng 15 mét vuông dùng cũng rất tốt, máy chạy êm và có khóa trẻ em. Giá hiện tại là 7.990.000đ, hàng đang sẵn kho chị nhé.",
-      "questions": [
-        {
-          "slot": "room_area_m2",
-          "type": "confirm",
-          "text": "Phòng chị khoảng 15 mét vuông đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, chị muốn tư vấn về máy lọc không khí AirPure Pro đúng không ạ? Máy này hiện còn hàng, giá là 7.990.000đ chị nhé.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
@@ -67,7 +28,37 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo chị, chị muốn hỏi về máy lọc không khí AirPure Pro. Nhà chị không có trẻ nhỏ.",
+      "facts_stated": {
+        "has_children": false
+      },
+      "entities": [],
       "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy AirPure Pro phù hợp mọi gia đình, kể cả nhà không có trẻ nhỏ chị nhé. Chị muốn dùng cho diện tích phòng khoảng bao nhiêu mét vuông ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "open",
+          "text": "Chị muốn dùng cho diện tích phòng khoảng bao nhiêu mét vuông ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -78,18 +69,18 @@
         "room_area_m2": 15
       },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ với diện tích phòng 15 mét vuông thì AirPure Pro dùng rất thoải mái ạ. Hiện giá là 7.990.000đ, bên em chưa có chương trình khuyến mãi cho sản phẩm này, nhưng được miễn phí vận chuyển toàn quốc và miễn phí thu hộ khi nhận hàng chị nhé.",
+      "text": "Dạ, với phòng 15 mét vuông thì AirPure Pro dùng rất thoải mái chị nhé, máy này lọc tối đa 45 mét vuông. Hiện giá là 7.990.000đ, chưa có khuyến mãi nào ngoài miễn phí vận chuyển và COD toàn quốc ạ. Chị dự kiến ngân sách khoảng bao nhiêu để em tư vấn thêm nếu cần?",
       "questions": [
         {
           "slot": "budget_vnd",
-          "type": "confirm",
-          "text": "Ngân sách của chị là khoảng 9 triệu đúng không ạ?"
+          "type": "open",
+          "text": "Chị dự kiến ngân sách khoảng bao nhiêu để em tư vấn thêm nếu cần?"
         }
       ],
       "facts_used": [],
@@ -110,7 +101,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -121,20 +112,60 @@
         "budget_vnd": 9000000
       },
       "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy AirPure Pro hiện giá 7.990.000đ, chưa có chương trình giảm giá thêm chị nhé. Shop đang miễn phí vận chuyển toàn quốc và hỗ trợ thanh toán khi nhận hàng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7990000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị phải bàn với gia đình đã, tối thứ Hai (16/11) tầm 7 giờ em gọi lại chị nhé.",
+      "facts_stated": {},
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-11-16",
+          "spoken": "tối thứ Hai (16/11)"
+        },
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 giờ"
+        }
+      ],
       "pause_before_ms": 700,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận chị cần thời gian bàn với gia đình. Em sẽ gọi lại cho chị vào 7 giờ tối thứ Hai, tức ngày 16 tháng 11 để hỗ trợ thêm và giữ giá cho chị ạ.",
-      "questions": [
-        {
-          "slot": "other",
-          "type": "open",
-          "text": "Chị xác nhận giúp em em gọi lại vào 7 giờ tối thứ Hai nhé?"
-        }
-      ],
+      "text": "Dạ em ghi nhận, tối thứ Hai ngày 16/11 vào 7 giờ em sẽ gọi lại cho chị để chị có thời gian trao đổi với gia đình nhé.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
@@ -152,31 +183,46 @@
           }
         }
       ],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Chị phải bàn với gia đình đã, tối thứ Hai (16/11) tầm 7 giờ em gọi lại chị nhé.",
-      "facts_stated": {
-        "blocker": "để bàn với gia đình"
-      },
-      "entities": [
+      "memory_writes": [
         {
-          "type": "date",
-          "value": "2026-11-16",
-          "spoken": "thứ Hai (16/11)"
+          "key": "blocker",
+          "value": "để bàn với gia đình",
+          "op": "set",
+          "source": "call_1#turn9"
         },
         {
-          "type": "time",
-          "value": "19:00",
-          "spoken": "7 giờ"
+          "key": "budget_vnd",
+          "value": 9000000,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "has_children",
+          "value": false,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 15,
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7990000,
+          "op": "set",
+          "source": "call_1#turn9"
         }
       ],
-      "pause_before_ms": 600,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
@@ -184,13 +230,13 @@
   "gold": {
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "can_hoi_nguoi_nha",
-    "objection_handling": "Đã xác nhận thời gian gọi lại, hẹn cụ thể vào 7 giờ tối thứ Hai.",
+    "objection_type": "can_hoi_gia_dinh",
+    "objection_handling": "Đồng ý hẹn gọi lại đúng thời điểm khách yêu cầu.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [
       {
-        "promise": "Giữ giá và gọi lại vào 7 giờ tối ngày 16/11."
+        "text": "Gọi lại cho khách lúc 19 giờ ngày 16/11"
       }
     ],
     "supersedes": [],

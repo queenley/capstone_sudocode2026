@@ -12,15 +12,16 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Dung ạ, em là trợ lý ảo của shop BTC. Em cảm ơn chị đã gọi đến, em sẽ hỗ trợ tư vấn máy lọc không khí cho chị nhé.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
+      "text": "Dạ em chào chị Dung ạ, em là trợ lý ảo của shop BTC. Chị muốn tìm máy lọc không khí AirPure Mini đúng không ạ?",
+      "questions": [
         {
-          "field": "in_stock",
-          "value": true
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn tư vấn máy lọc không khí AirPure Mini đúng không ạ?"
         }
       ],
+      "facts_used": [],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -30,34 +31,32 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị Dung đây, hôm nay chị muốn hỏi về máy lọc không khí AirPure Mini.",
-      "facts_stated": {},
+      "text": "Alo, chị Dung đây, hôm nay chị muốn hỏi về máy lọc không khí AirPure Mini. Ngân sách của chị tầm 2 triệu rưỡi.",
+      "facts_stated": {
+        "product_advised": "SKU-AP-MINI",
+        "budget_vnd": 2500000
+      },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xác nhận với chị Dung đúng không ạ? Máy lọc không khí AirPure Mini phù hợp phòng diện tích bao nhiêu mét vuông chị đang quan tâm ạ?",
+      "text": "Dạ, với ngân sách khoảng 2 triệu rưỡi, AirPure Mini là lựa chọn phù hợp cho phòng nhỏ. Chị có thể cho em biết diện tích phòng mình khoảng bao nhiêu mét vuông không ạ?",
       "questions": [
         {
           "slot": "room_area_m2",
           "type": "open",
-          "text": "Máy lọc không khí AirPure Mini phù hợp phòng diện tích bao nhiêu mét vuông chị đang quan tâm ạ?"
+          "text": "Chị cho em hỏi diện tích phòng mình khoảng bao nhiêu mét vuông ạ?"
         }
       ],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -69,20 +68,20 @@
         "has_children": true
       },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ phòng khoảng 10m² và nhà mình có bé nhỏ thì AirPure Mini là lựa chọn phù hợp ạ. Máy này dành cho phòng đến 12m², lọc bụi mịn, vận hành êm và dễ sử dụng. Em tư vấn đúng nhu cầu của chị nhé.",
+      "text": "Dạ, máy AirPure Mini phù hợp phòng dưới 12m², dùng an toàn cho gia đình có trẻ nhỏ ạ. Hiện máy này có màng lọc HEPA H13 giúp lọc bụi mịn, phấn hoa và vi khuẩn.",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 800,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -91,13 +90,13 @@
       "text": "Em cho chị biết giá máy đó với, có khuyến mãi gì không?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giá máy lọc không khí AirPure Mini hiện là 2.190.000đ, hiện tại chưa có khuyến mãi cho sản phẩm này chị nhé. Máy còn hàng tại shop, chị yên tâm ạ.",
+      "text": "Dạ, giá máy lọc không khí AirPure Mini hiện là 2.190.000đ, chưa có chương trình khuyến mãi thêm tại thời điểm này chị nha.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -108,16 +107,12 @@
         {
           "field": "promo_active",
           "value": false
-        },
-        {
-          "field": "in_stock",
-          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -128,13 +123,13 @@
         "blocker": "chờ cuối tháng nhận lương"
       },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em hiểu ạ, em sẽ ghi nhận chị Dung dự kiến mua sau khi nhận lương cuối tháng này. Em giữ thông tin tư vấn, đến gần cuối tháng em liên hệ lại để hỗ trợ nếu chị cần nhé.",
+      "text": "Dạ em hiểu ạ, chị cân nhắc thêm cũng được. Nếu cần tư vấn lại hoặc đặt hàng cuối tháng, chị gọi vào số này giúp em nhé. Em cảm ơn chị Dung nhiều ạ!",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -150,35 +145,35 @@
           "key": "budget_vnd",
           "value": 2500000,
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn2"
         },
         {
           "key": "has_children",
           "value": true,
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn4"
         },
         {
           "key": "room_area_m2",
           "value": 10,
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn4"
         },
         {
           "key": "product_advised",
           "value": "SKU-AP-MINI",
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 2190000,
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn7"
         }
       ],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
@@ -186,16 +181,13 @@
   "gold": {
     "intent": "hoi_gia_may_loc_khong_khi",
     "outcome": "hen_goi_lai",
-    "objection_type": "chua_co_tien",
-    "objection_handling": "Ghi nhận thời điểm khách nhận lương, hẹn liên hệ lại cuối tháng.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],
     "supersedes": [],
-    "callback": {
-      "reason": "Khách chờ cuối tháng nhận lương mới quyết định mua.",
-      "timeframe": "Cuối tháng 1/2027"
-    },
+    "callback": null,
     "order": null
   }
 }

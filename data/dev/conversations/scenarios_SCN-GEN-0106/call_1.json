@@ -12,34 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần tư vấn về sản phẩm nào hôm nay ạ?",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "is_human",
-          "value": false
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Alo, anh muốn hỏi về xe đẩy gấp gọn Joie Pact.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 700,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ xe đẩy gấp gọn Joie Pact là dòng xe nhẹ, gấp một tay, dùng cho bé từ sơ sinh đến khoảng 4 tuổi, chịu tải đến 22kg.",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần tư vấn về xe đẩy gấp gọn Joie Pact đúng không ạ?",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -52,22 +25,60 @@
     },
     {
       "speaker": "customer",
-      "text": "Giá của xe này là bao nhiêu em nhỉ?",
-      "facts_stated": {},
+      "text": "Alo, anh muốn hỏi về xe đẩy gấp gọn Joie Pact. Bé nhà anh được 6 tháng, ngân sách của anh tầm 4 triệu.",
+      "facts_stated": {
+        "child_age_months": 6,
+        "budget_vnd": 4000000
+      },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giá của xe đẩy Joie Pact hiện là 3.490.000đ anh nhé.",
+      "text": "Dạ, xe đẩy gấp gọn Joie Pact phù hợp cho bé từ sơ sinh đến khoảng 4 tuổi, chịu tải 22kg, hiện đang sẵn hàng ở shop. Giá của xe là 3.490.000đ anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 3490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá của xe này là bao nhiêu em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giá xe đẩy Joie Pact hiện tại là 3.490.000đ anh ạ. Anh có thể nhận thêm ưu đãi miễn phí vận chuyển toàn quốc với chương trình MOM-FREESHIP đang áp dụng cho ngành mẹ & bé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
         }
       ],
       "tool_calls": [],
@@ -82,13 +93,13 @@
       "text": "Có khuyến mãi gì không?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại xe đẩy Joie Pact đang áp dụng chương trình miễn phí vận chuyển toàn quốc cho đơn từ 500.000đ, thuộc chương trình MOM-FREESHIP. Ngoài ra, shop miễn phí thanh toán khi nhận hàng cho mọi đơn dưới 10 triệu đồng ạ.",
+      "text": "Dạ hiện tại shop đang áp dụng chương trình miễn phí vận chuyển MOM-FREESHIP cho sản phẩm này, ngoài ra chưa có chương trình giảm giá khác anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -97,8 +108,8 @@
           "value": true
         },
         {
-          "field": "promo_COD-0_active",
-          "value": true
+          "field": "promo_active",
+          "value": false
         }
       ],
       "tool_calls": [],
@@ -113,13 +124,13 @@
       "text": "Vợ anh chưa có thời gian để quyết định, để anh hỏi lại rồi hẹn gọi lại nhé, khoảng 7 giờ tối mai em gọi lại cho anh nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận, em sẽ hẹn gọi lại cho anh vào lúc 7 giờ tối ngày mai để hỗ trợ thêm thông tin nếu cần ạ.",
+      "text": "Dạ em ghi nhận anh hẹn 7 giờ tối mai, ngày 16/10 em sẽ gọi lại cho anh để hỗ trợ thêm thông tin hoặc đặt hàng nếu anh cần ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -143,43 +154,43 @@
           "key": "child_age_months",
           "value": 6,
           "op": "set",
-          "source": "call#turn1"
+          "source": "call_1#turn1"
         },
         {
           "key": "budget_vnd",
           "value": 4000000,
           "op": "set",
-          "source": "call#turn1"
+          "source": "call_1#turn1"
         },
         {
           "key": "decision_maker",
           "value": "vợ",
           "op": "set",
-          "source": "call#turn1"
+          "source": "call_1#turn1"
         },
         {
           "key": "blocker",
           "value": "cần hỏi vợ",
           "op": "set",
-          "source": "call#turn1"
+          "source": "call_1#turn1"
         },
         {
           "key": "product_advised",
           "value": "SKU-MB-STR1",
           "op": "set",
-          "source": "call#turn1"
+          "source": "call_1#turn1"
         },
         {
           "key": "price_quoted_vnd",
           "value": 3490000,
           "op": "set",
-          "source": "call#turn1"
+          "source": "call_1#turn1"
         },
         {
           "key": "promo_code",
           "value": "MOM-FREESHIP",
           "op": "set",
-          "source": "call#turn1"
+          "source": "call_1#turn1"
         }
       ],
       "entities": [],
@@ -192,18 +203,14 @@
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
     "objection_type": "cần hỏi người nhà",
-    "objection_handling": "Đã xác nhận lý do, hẹn gọi lại vào thời gian khách yêu cầu.",
+    "objection_handling": "Lịch hẹn gọi lại đúng khung giờ khách yêu cầu, xác nhận lại ngày giờ hẹn.",
     "sentiment": "neutral",
     "decision_maker": "vợ",
-    "commitments": [
-      {
-        "hẹn_gọi_lại": "2026-10-16T19:00"
-      }
-    ],
+    "commitments": [],
     "supersedes": [],
     "callback": {
       "callback_at": "2026-10-16T19:00",
-      "reason": "khách hỏi người nhà rồi báo lại"
+      "note": "khách hỏi người nhà rồi báo lại"
     },
     "order": null
   }

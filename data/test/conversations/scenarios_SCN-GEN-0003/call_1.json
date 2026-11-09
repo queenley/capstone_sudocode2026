@@ -12,12 +12,12 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Loan ạ, em là trợ lý ảo của shop. Hôm trước chị có hỏi về Nồi chiên không dầu Xiaomi 4.5L và bảo để Tết mua, hôm nay chị muốn mình tiếp tục tư vấn đúng không ạ?",
+      "text": "Dạ em chào chị Loan ạ, hôm trước chị có hỏi về nồi chiên không dầu Xiaomi 4.5L và để Tết mua. Em là trợ lý ảo của shop, chị muốn mình tiếp tục tư vấn sản phẩm này đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Hôm trước chị có hỏi về Nồi chiên không dầu Xiaomi 4.5L và bảo để Tết mua, hôm nay chị muốn mình tiếp tục tư vấn đúng không ạ?"
+          "text": "Chị muốn mình tiếp tục tư vấn nồi chiên không dầu Xiaomi 4.5L đúng không ạ?"
         }
       ],
       "facts_used": [
@@ -26,12 +26,8 @@
       ],
       "claims": [
         {
-          "field": "price_vnd",
+          "field": "price_quoted_vnd",
           "value": 1590000
-        },
-        {
-          "field": "in_stock",
-          "value": true
         }
       ],
       "tool_calls": [],
@@ -43,18 +39,18 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị muốn hỏi về nồi chiên không dầu Xiaomi 4.5L.",
+      "text": "Alo, chị muốn hỏi về nồi chiên không dầu Xiaomi 4.5L. Ngân sách của chị tầm 2 triệu.",
       "facts_stated": {
-        "product_advised": "SKU-AF-XM"
+        "budget_vnd": 2000000
       },
       "entities": [],
-      "pause_before_ms": 450,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, Nồi chiên không dầu Xiaomi 4.5L bên em vẫn còn hàng, giá hiện tại là 1.590.000đ chị nhé.",
+      "text": "Dạ em cảm ơn chị đã chia sẻ ngân sách ạ. Hiện tại nồi chiên không dầu Xiaomi 4.5L bên em đang có giá 1.590.000đ, còn hàng và phù hợp với nhu cầu gia đình.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -77,24 +73,22 @@
     {
       "speaker": "customer",
       "text": "Bữa trước em có báo giá 1 triệu 590 ngàn đúng không?",
-      "facts_stated": {
-        "price_quoted_vnd": 1590000
-      },
+      "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ đúng rồi chị, giá em đã báo đợt trước là 1.590.000đ và hiện tại vẫn không thay đổi ạ.",
+      "text": "Dạ đúng rồi chị, giá em báo từ trước đến nay vẫn là 1.590.000đ ạ.",
       "questions": [],
       "facts_used": [
         "price_quoted_vnd"
       ],
       "claims": [
         {
-          "field": "price_vnd",
+          "field": "price_quoted_vnd",
           "value": 1590000
         }
       ],
@@ -110,23 +104,23 @@
       "text": "Chị có cần biết khuyến mãi gì không?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 350,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại sản phẩm này chưa có chương trình khuyến mãi mới, giá vẫn là 1.590.000đ chị nhé.",
+      "text": "Dạ hiện tại sản phẩm này chưa có chương trình khuyến mãi giảm giá nào thêm, nhưng chị sẽ được miễn phí thu hộ khi thanh toán COD ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 1590000
-        },
-        {
           "field": "promo_active",
           "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
         }
       ],
       "tool_calls": [],
@@ -143,13 +137,13 @@
         "blocker": "chờ cuối tháng nhận lương"
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận chị sẽ liên hệ lại khi nhận lương cuối tháng. Khi nào chị sẵn sàng mua cứ gọi em hỗ trợ ngay ạ, em giữ thông tin cho chị.",
+      "text": "Dạ em ghi nhận chị sẽ liên hệ lại khi nhận lương cuối tháng. Khi nào chị sẵn sàng, cứ gọi cho shop để được giữ giá và hỗ trợ nhanh nhất ạ. Em cảm ơn chị Loan đã quan tâm sản phẩm của shop!",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -159,7 +153,7 @@
           "key": "blocker",
           "value": "chờ cuối tháng nhận lương",
           "op": "supersede",
-          "source": "call_1#turn9"
+          "source": "call_1#turn8"
         }
       ],
       "entities": [],

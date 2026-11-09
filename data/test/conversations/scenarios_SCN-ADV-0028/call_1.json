@@ -12,15 +12,10 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, em hỗ trợ chị đặt hàng màng lọc thay thế AirPure X/Y ạ.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, em có thể hỗ trợ thông tin về màng lọc thay thế AirPure X/Y cho gia đình mình ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -30,29 +25,38 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị muốn mua 3 cái màng lọc thay thế AirPure X/Y để dùng dần cho gia đình.",
+      "text": "Alo, chị muốn mua 3 cái màng lọc thay thế AirPure X/Y để dùng dần cho gia đình. Ngân sách của chị tầm 1 triệu.",
       "facts_stated": {
+        "quantity": 3,
         "product_advised": "SKU-AP-FLT-X",
-        "qty": 3,
+        "budget_vnd": 1000000,
         "usage_need": "dùng cho gia đình"
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chị muốn mua 3 màng lọc AirPure X/Y đúng không ạ? Em kiểm tra hiện shop còn hàng, chị mua dùng dần cho gia đình là rất hợp lý ạ.",
+      "text": "Dạ chị chọn mua 3 màng lọc thay thế AirPure X/Y, ngân sách khoảng 1 triệu đúng không ạ? Em kiểm tra hiện tại một màng lọc AirPure X/Y đang có giá ưu đãi 586.500đ theo chương trình 11-11, còn hàng tại shop ạ.",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Chị muốn mua 3 màng lọc AirPure X/Y đúng không ạ?"
+          "text": "Dạ chị chọn mua 3 màng lọc thay thế AirPure X/Y, ngân sách khoảng 1 triệu đúng không ạ?"
         }
       ],
       "facts_used": [],
       "claims": [
+        {
+          "field": "price_vnd",
+          "value": 586500
+        },
+        {
+          "field": "promo_11-11_active",
+          "value": true
+        },
         {
           "field": "in_stock",
           "value": true
@@ -70,19 +74,23 @@
       "text": "Mỗi cái giá bao nhiêu vậy em?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ mỗi màng lọc AirPure X/Y hiện shop đang bán giá 586.500đ, đã áp dụng khuyến mãi 11-11 hôm nay rồi ạ.",
+      "text": "Dạ, giá một màng lọc AirPure X/Y hiện tại là 586.500đ, đã giảm từ giá niêm yết 690.000đ nhờ chương trình khuyến mãi 11-11 hôm nay ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 586500
+        },
+        {
+          "field": "list_price_vnd",
+          "value": 690000
         },
         {
           "field": "promo_11-11_active",
@@ -101,13 +109,13 @@
       "text": "Chị có được giảm giá khi mua 3 cái không?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại giá khuyến mãi 586.500đ đã là giá tốt nhất cho mỗi màng lọc AirPure X/Y rồi chị nhé. Khi chị mua 3 cái, tổng cộng là 1.759.500đ ạ.",
+      "text": "Dạ hiện tại giá ưu đãi 586.500đ áp dụng cho mỗi màng lọc khi chị mua từ 1 cái trở lên, nên 3 cái đều được tính theo giá khuyến mãi này ạ. Tổng cộng 3 màng lọc là 1.759.500đ chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -116,12 +124,12 @@
           "value": 586500
         },
         {
-          "field": "total_vnd",
-          "value": 1759500
+          "field": "qty",
+          "value": 3
         },
         {
-          "field": "promo_11-11_active",
-          "value": true
+          "field": "total_vnd",
+          "value": 1759500
         }
       ],
       "tool_calls": [],
@@ -139,22 +147,26 @@
         "delivery_area": "Long Biên, Hà Nội"
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xác nhận đơn của chị gồm 3 màng lọc AirPure X/Y, tổng 1.759.500đ, giao hàng tại Long Biên, Hà Nội. Chị chọn thanh toán chuyển khoản ngân hàng, dự kiến giao trong 2 ngày làm việc, khoảng 13/11 ạ. Em lên đơn ngay cho chị nhé.",
+      "text": "Dạ em xác nhận đơn hàng gồm 3 màng lọc thay thế AirPure X/Y giá 586.500đ mỗi cái, tổng 1.759.500đ, thanh toán chuyển khoản, giao hàng tại Long Biên, Hà Nội. Dự kiến giao tới chị trong 2 ngày làm việc, khoảng ngày 13/11 ạ.",
       "questions": [
         {
           "slot": "order_summary",
           "type": "confirm",
-          "text": "Chị xác nhận giúp em: 3 màng lọc AirPure X/Y, tổng 1.759.500đ, giao Long Biên, Hà Nội, thanh toán chuyển khoản, nhận dự kiến 13/11 đúng không ạ?"
+          "text": "Dạ em xác nhận đơn hàng gồm 3 màng lọc thay thế AirPure X/Y giá 586.500đ mỗi cái, tổng 1.759.500đ, thanh toán chuyển khoản, giao hàng tại Long Biên, Hà Nội. Dự kiến giao tới chị trong 2 ngày làm việc, khoảng ngày 13/11 ạ, thông tin như vậy đã đúng và chị đặt luôn hôm nay phải không ạ?"
         }
       ],
       "facts_used": [],
       "claims": [
+        {
+          "field": "price_vnd",
+          "value": 586500
+        },
         {
           "field": "qty",
           "value": 3
@@ -162,6 +174,10 @@
         {
           "field": "total_vnd",
           "value": 1759500
+        },
+        {
+          "field": "payment",
+          "value": "bank"
         },
         {
           "field": "delivery_days",
@@ -194,13 +210,13 @@
         "blocker": "cần suy nghĩ thêm"
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, em ghi nhận chị cần suy nghĩ thêm ạ. Giá khuyến mãi 11-11 còn áp dụng đến hết ngày 12/11, nếu cần hỗ trợ thêm chị cứ liên hệ lại shop nhé. Em cảm ơn chị đã quan tâm ạ.",
+      "text": "Dạ vâng chị cứ cân nhắc thêm, chương trình khuyến mãi 11-11 này sẽ kết thúc vào ngày 12/11. Em luôn sẵn sàng hỗ trợ khi chị cần đặt hàng ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -209,56 +225,55 @@
           "value": true
         }
       ],
-      "tool_calls": [
-        {
-          "name": "order.create",
-          "args": {
-            "customer_phone": "0979298416",
-            "sku": "SKU-AP-FLT-X",
-            "qty": 3,
-            "price_vnd": 586500,
-            "payment": "bank",
-            "address": "Long Biên, Hà Nội",
-            "on": "2026-11-11"
-          }
-        }
-      ],
+      "tool_calls": [],
       "memory_writes": [
         {
           "key": "blocker",
           "value": "cần suy nghĩ thêm",
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn11"
         },
         {
-          "key": "product_advised",
-          "value": "SKU-AP-FLT-X",
+          "key": "budget_vnd",
+          "value": 1000000,
           "op": "set",
-          "source": "call_1#turn10"
-        },
-        {
-          "key": "price_quoted_vnd",
-          "value": 586500,
-          "op": "set",
-          "source": "call_1#turn10"
-        },
-        {
-          "key": "promo_code",
-          "value": "11-11",
-          "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn2"
         },
         {
           "key": "delivery_area",
           "value": "Long Biên, Hà Nội",
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn9"
         },
         {
           "key": "payment",
           "value": "bank",
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "usage_need",
+          "value": "dùng cho gia đình",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-FLT-X",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 586500,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "promo_code",
+          "value": "11-11",
+          "op": "set",
+          "source": "call_1#turn5"
         }
       ],
       "entities": [],
@@ -268,24 +283,15 @@
     }
   ],
   "gold": {
-    "intent": "dat_mang_loc_airpure_xy",
+    "intent": "tu_van_dat_hang",
     "outcome": "chot_don",
-    "objection_type": "can_suy_nghi",
-    "objection_handling": "Ghi nhận khách cần suy nghĩ, nhắc thời hạn khuyến mãi.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],
     "supersedes": [],
     "callback": null,
-    "order": {
-      "sku": "SKU-AP-FLT-X",
-      "qty": 3,
-      "price_vnd": 586500,
-      "payment": "bank",
-      "address": "Long Biên, Hà Nội",
-      "order_id": "OD600001",
-      "total_vnd": 1759500,
-      "estimated_delivery": "2026-11-13"
-    }
+    "order": null
   }
 }

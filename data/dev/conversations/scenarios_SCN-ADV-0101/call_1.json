@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có quan tâm Máy lọc không khí AirPure Y và hiện tại đơn Samsung AX40 của anh đang vận chuyển; em có thể hỗ trợ anh so sánh các mẫu anh đang phân vân nhé.",
+      "text": "Dạ em chào anh Ngô Văn Phúc ạ, hôm trước anh có quan tâm Máy lọc không khí AirPure Y. Em đã ghi nhận đơn Samsung AX40 của anh đang giao, mình muốn trao đổi thêm về dòng máy lọc không khí đúng không ạ?",
       "questions": [],
       "facts_used": [
         "order_id",
@@ -28,8 +28,11 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh muốn hỏi về máy lọc không khí mà em tư vấn hôm trước.",
-      "facts_stated": {},
+      "text": "Alo, anh muốn hỏi về máy lọc không khí mà em tư vấn hôm trước. Phòng anh khoảng 25 mét vuông, nhà anh không có trẻ nhỏ.",
+      "facts_stated": {
+        "room_area_m2": 25,
+        "has_children": false
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -37,14 +40,8 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng ạ, anh đang muốn tìm máy lọc cho phòng diện tích bao nhiêu mét vuông và ngân sách mình dự kiến khoảng bao nhiêu vậy anh?",
-      "questions": [
-        {
-          "slot": "room_area_m2",
-          "type": "open",
-          "text": "anh đang muốn tìm máy lọc cho phòng diện tích bao nhiêu mét vuông"
-        }
-      ],
+      "text": "Dạ với phòng 25 mét vuông thì mình có thể chọn AirPure X, AirPure Y hoặc Samsung AX40 anh nhé. Nhà mình không có trẻ nhỏ nên các dòng đều phù hợp ạ.",
+      "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
@@ -65,17 +62,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ cả hai mẫu AirPure Y và AirPure X đều phù hợp cho phòng đến 25m² như anh, tuy nhiên AirPure Y có thêm than hoạt tính giúp khử mùi tốt hơn, có app điều khiển và khóa trẻ em, giá cao hơn X là 310.000đ. AirPure X thì đơn giản hơn, giá tốt hơn. Anh thích tính năng nào hơn ạ?",
+      "text": "Dạ hai máy đều dùng cho phòng tới 25 mét vuông, nhưng AirPure Y có thêm than hoạt tính, app điều khiển và khóa trẻ em, giá cao hơn X 310.000đ anh nhé. AirPure X thì đơn giản hơn, không có khóa trẻ em hoặc app.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "price_vnd:SKU-AP-Y",
-          "value": 5200000
-        },
-        {
           "field": "price_vnd:SKU-AP-X",
           "value": 4890000
+        },
+        {
+          "field": "price_vnd:SKU-AP-Y",
+          "value": 5200000
         }
       ],
       "tool_calls": [],
@@ -96,7 +93,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ Samsung AX40 cũng phù hợp cho phòng 25m², có màng than hoạt tính, khóa trẻ em và app điều khiển như AirPure Y, công suất lớn hơn một chút, nhưng giá là 6.490.000đ cao hơn hai mẫu kia. Anh cần ưu tiên thêm tính năng nào không ạ?",
+      "text": "Dạ Samsung AX40 phù hợp phòng tối đa 40 mét vuông, cũng có khóa trẻ em và màng lọc than hoạt tính như AirPure Y. Máy này lớn hơn, giá 6.490.000đ, bảo hành 24 tháng chính hãng.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -125,24 +122,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ trong khoảng 5 triệu rưỡi thì AirPure Y giá 5.200.000đ đang vừa ngân sách anh, tặng kèm màng lọc thay thế; AirPure X giá 4.890.000đ, chưa có quà tặng. Hai máy đều phù hợp nhu cầu phòng 25m² của anh.",
+      "text": "Dạ trong tầm giá 5 triệu rưỡi anh có thể chọn AirPure X giá 4.890.000đ hoặc AirPure Y giá 5.200.000đ, cả hai đều đang sẵn hàng và phù hợp diện tích phòng mình.",
       "questions": [],
-      "facts_used": [
-        "room_area_m2",
-        "budget_vnd"
-      ],
+      "facts_used": [],
       "claims": [
-        {
-          "field": "price_vnd:SKU-AP-Y",
-          "value": 5200000
-        },
         {
           "field": "price_vnd:SKU-AP-X",
           "value": 4890000
         },
         {
-          "field": "promo_GIFT-FILTER_active",
-          "value": true
+          "field": "price_vnd:SKU-AP-Y",
+          "value": 5200000
         }
       ],
       "tool_calls": [],
@@ -163,7 +153,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ để em tóm tắt ạ: AirPure Y hơn AirPure X ở chỗ có màng than hoạt tính khử mùi, app điều khiển qua điện thoại và khóa trẻ em, thích hợp cho gia đình có trẻ nhỏ. AirPure X thì không có ba tính năng này nhưng giá thấp hơn, vẫn lọc bụi mịn và dùng màng lọc như Y. Cả hai đều bảo hành 24 tháng.",
+      "text": "Dạ AirPure X đơn giản, không có app hoặc khóa trẻ em, giá tốt và dễ dùng. AirPure Y có thêm tính năng khóa trẻ em, điều khiển qua app, màng lọc than hoạt tính giúp khử mùi tốt hơn. Samsung AX40 mạnh nhất, dùng phòng lớn hơn, giá cao hơn một chút và bảo hành 24 tháng anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -185,13 +175,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ đúng rồi anh, AirPure Y hiện tặng kèm một màng lọc thay thế chính hãng khi mua trong hôm nay, chương trình quà tặng GIFT-FILTER đang còn hiệu lực. Quà số lượng có hạn theo chương trình.",
+      "text": "Dạ đúng rồi anh, AirPure Y hiện đang tặng kèm một màng lọc thay thế khi mua trong hôm nay, chương trình quà tặng đã áp dụng sẵn giá 5.200.000đ anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "promo_GIFT-FILTER_active",
           "value": true
+        },
+        {
+          "field": "price_vnd:SKU-AP-Y",
+          "value": 5200000
         }
       ],
       "tool_calls": [],
@@ -212,7 +206,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ ba mẫu này đều bảo hành 24 tháng chính hãng, chất lượng tương đương nhau vì cùng đạt tiêu chuẩn lọc HEPA H13. Anh yên tâm sử dụng lâu dài ạ.",
+      "text": "Dạ cả ba máy đều của hãng chính hãng, bảo hành 12 tháng cho AirPure X và Y, 24 tháng cho Samsung AX40. Độ bền thực tế đều tốt, anh chỉ cần vệ sinh định kỳ và thay màng lọc đúng hướng dẫn.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -236,7 +230,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ tất nhiên rồi anh, khi nào anh cần thêm thông tin hoặc muốn chốt mẫu nào thì nhắn em trên Fanpage hoặc gọi hotline shop, em luôn sẵn sàng hỗ trợ anh so sánh chi tiết hơn ạ. Em ghi nhận anh muốn so sánh thêm trước khi quyết định nhé.",
+      "text": "Dạ tất nhiên rồi anh, mình cứ cân nhắc thoải mái, khi nào cần hỗ trợ thêm hoặc muốn chốt máy nào thì nhắn em nhé. Em sẽ ghi chú lại để tư vấn tiếp cho anh khi cần.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -255,6 +249,12 @@
           "source": "call_1#turn9"
         },
         {
+          "key": "has_children",
+          "value": false,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
           "key": "room_area_m2",
           "value": 25,
           "op": "set",
@@ -270,7 +270,7 @@
           "key": "price_quoted_vnd",
           "value": 5200000,
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn7"
         },
         {
           "key": "promo_code",
@@ -288,8 +288,8 @@
   "gold": {
     "intent": "so_sanh_may_loc_khong_khi",
     "outcome": "hen_goi_lai",
-    "objection_type": "cần_so_sánh_thêm",
-    "objection_handling": "Ghi nhận khách muốn so sánh thêm, hẹn khách liên hệ lại khi quyết định.",
+    "objection_type": "muốn so sánh thêm",
+    "objection_handling": "Đã ghi chú nhu cầu so sánh thêm, hẹn tư vấn lại khi khách cần.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

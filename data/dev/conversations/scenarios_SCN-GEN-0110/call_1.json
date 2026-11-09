@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, chị muốn tìm hiểu về máy lọc không khí AirPure Pro đúng không ạ?",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, chị muốn tư vấn về máy lọc không khí AirPure Pro phải không ạ?",
       "questions": [
         {
           "slot": "product_advised",
@@ -31,9 +31,11 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo em, chị muốn hỏi về máy lọc không khí AirPure Pro.",
+      "text": "Alo em, chị muốn hỏi về máy lọc không khí AirPure Pro. Phòng chị khoảng 20 mét vuông, nhà chị không có trẻ nhỏ, ngân sách của chị tầm 8 triệu rưỡi.",
       "facts_stated": {
-        "product_advised": "SKU-AP-PRO"
+        "room_area_m2": 20,
+        "has_children": false,
+        "budget_vnd": 8500000
       },
       "entities": [],
       "pause_before_ms": 0,
@@ -42,7 +44,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ máy lọc không khí AirPure Pro phù hợp phòng từ 30 đến 45 mét vuông, có khóa trẻ em và điều khiển qua app chị nhé.",
+      "text": "Dạ, với phòng 20 mét vuông thì AirPure Pro là lựa chọn rất tốt chị nha. Máy này phù hợp phòng đến 45 mét vuông, có khóa trẻ em và app điều khiển luôn ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -64,7 +66,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giá của máy lọc không khí AirPure Pro hiện tại là 7.690.000đ chị nhé. Hàng đang có sẵn tại shop.",
+      "text": "Dạ, hiện tại máy lọc không khí AirPure Pro đang có giá ưu đãi 7.690.000đ chị nhé, giá niêm yết là 7.990.000đ. Shop đang áp dụng khuyến mãi AIR-OCT cho sản phẩm này ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -73,7 +75,7 @@
           "value": 7690000
         },
         {
-          "field": "in_stock",
+          "field": "promo_AIR-OCT_active",
           "value": true
         }
       ],
@@ -95,16 +97,16 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại máy AirPure Pro đang được giảm giá 300.000đ theo chương trình AIR-OCT, giá đã giảm còn 7.690.000đ so với niêm yết 7.990.000đ ạ.",
+      "text": "Dạ, chương trình AIR-OCT giảm ngay 300.000đ cho AirPure Pro đang còn hiệu lực hôm nay chị nhé, tặng kèm miễn phí vận chuyển toàn quốc và COD không phí thu hộ ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 7690000
+          "field": "promo_AIR-OCT_active",
+          "value": true
         },
         {
-          "field": "promo_AIR-OCT_active",
+          "field": "promo_COD-0_active",
           "value": true
         }
       ],
@@ -128,15 +130,27 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em hiểu, khi nào chị sẵn sàng quyết định thì chị cứ liên hệ lại shop nhé. Em sẽ lưu lại nhu cầu của chị để hỗ trợ tốt nhất khi chị cần.",
+      "text": "Dạ em hiểu, chị cứ yên tâm khi nào sẵn sàng mình liên hệ lại, nếu chương trình khuyến mãi còn thì shop sẽ giữ giá ưu đãi cho chị. Nếu cần hỗ trợ thêm, chị cứ gọi hotline của shop BTC nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [
         {
-          "key": "product_advised",
-          "value": "SKU-AP-PRO",
+          "key": "room_area_m2",
+          "value": 20,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "has_children",
+          "value": false,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 8500000,
           "op": "set",
           "source": "call_1#turn2"
         },
@@ -145,6 +159,24 @@
           "value": "chờ cuối tháng nhận lương",
           "op": "set",
           "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7690000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "promo_code",
+          "value": "AIR-OCT",
+          "op": "set",
+          "source": "call_1#turn5"
         }
       ],
       "entities": [],

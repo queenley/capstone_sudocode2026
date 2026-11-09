@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, rất vui hỗ trợ chị về giỏ hàng trên website.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, chị cần hỗ trợ về giỏ hàng máy hút sữa và máy tiệt trùng đúng không ạ?",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -25,22 +25,29 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo em, chị đang xem giỏ hàng trên website, có sản phẩm máy hút sữa điện đôi Medela Swing Maxi với máy tiệt trùng sấy khô Moaz Bebe.",
-      "facts_stated": {},
+      "text": "Alo em, chị đang xem giỏ hàng trên website, có sản phẩm máy hút sữa điện đôi Medela Swing Maxi với máy tiệt trùng sấy khô Moaz Bebe. Bé nhà chị được 16 tháng, ngân sách của chị tầm 6 triệu.",
+      "facts_stated": {
+        "child_age_months": 16,
+        "budget_vnd": 6000000
+      },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xác nhận trong giỏ hàng của chị gồm máy hút sữa điện đôi Medela Swing Maxi và máy tiệt trùng sấy khô Moaz Bebe. Để em tra giá và khuyến mãi cho mình ngay ạ.",
+      "text": "Dạ em cảm ơn chị đã chia sẻ thông tin. Với ngân sách khoảng 6 triệu, sản phẩm máy hút sữa điện đôi Medela Swing Maxi hiện có giá 5.990.000đ và máy tiệt trùng sấy khô Moaz Bebe là 1.890.000đ chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "in_stock",
-          "value": true
+          "field": "price_vnd:SKU-MB-PUMP2",
+          "value": 5990000
+        },
+        {
+          "field": "price_vnd:SKU-MB-STER",
+          "value": 1890000
         }
       ],
       "tool_calls": [
@@ -78,30 +85,22 @@
       "text": "Chị muốn biết tổng tiền cho cả hai món này là bao nhiêu?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ tổng tiền cho cả hai sản phẩm là 7.880.000, trong đó máy hút sữa điện đôi Medela Swing Maxi giá 5.990.000đ và máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ. Cả hai sản phẩm đều còn hàng ạ.",
+      "text": "Dạ tổng tiền cho cả hai sản phẩm là 7.880.000, đã gồm chương trình miễn phí vận chuyển toàn quốc cho mẹ và bé chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
-        {
-          "field": "price_vnd:SKU-MB-PUMP2",
-          "value": 5990000
-        },
-        {
-          "field": "price_vnd:SKU-MB-STER",
-          "value": 1890000
-        },
         {
           "field": "total_vnd",
           "value": 7880000
         },
         {
-          "field": "in_stock",
+          "field": "promo_MOM-FREESHIP_active",
           "value": true
         }
       ],
@@ -117,22 +116,18 @@
       "text": "Ngoài ra có khuyến mãi gì khi mua cả hai không em?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại, khi chị mua hai sản phẩm này sẽ được miễn phí giao hàng toàn quốc và miễn phí thu hộ COD theo chương trình MOM-FREESHIP và COD-0 đang áp dụng ạ.",
+      "text": "Dạ hiện tại khi chị mua combo này sẽ được miễn phí vận chuyển toàn quốc theo chương trình MOM-FREESHIP, ngoài ra chưa có thêm khuyến mãi giảm giá khác cho hai sản phẩm này trong hôm nay chị ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "promo_MOM-FREESHIP_active",
-          "value": true
-        },
-        {
-          "field": "promo_COD-0_active",
           "value": true
         }
       ],
@@ -148,22 +143,18 @@
       "text": "Chị cũng muốn hỏi phí giao hàng là bao nhiêu, chị chưa đặt ngay đâu, hẹn khi nào có tiền chị sẽ gọi lại.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chị được miễn phí giao hàng cho đơn này nhờ chương trình MOM-FREESHIP, và phí thu hộ COD cũng là 0 đồng luôn ạ. Khi nào chị sẵn sàng đặt, chị nhắn lại cho shop, em sẽ giữ lại thông tin cho mình đến lúc đó nhé.",
+      "text": "Dạ phí giao hàng cho đơn này là 0 đồng vì chị được miễn phí vận chuyển toàn quốc. Khi nào sẵn sàng đặt hàng, chị nhắn lại em hỗ trợ nhanh nhất ạ. Em cảm ơn chị đã quan tâm sản phẩm của shop BTC!",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "promo_MOM-FREESHIP_active",
-          "value": true
-        },
-        {
-          "field": "promo_COD-0_active",
           "value": true
         }
       ],
@@ -173,37 +164,37 @@
           "key": "budget_vnd",
           "value": 6000000,
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn2"
         },
         {
           "key": "blocker",
           "value": "chờ cuối tháng nhận lương",
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn2"
         },
         {
           "key": "child_age_months",
           "value": 16,
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn2"
         },
         {
           "key": "product_advised",
           "value": "SKU-MB-PUMP2",
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 5990000,
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn2"
         },
         {
           "key": "promo_code",
           "value": "MOM-FREESHIP",
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn2"
         }
       ],
       "entities": [],
@@ -213,7 +204,7 @@
     }
   ],
   "gold": {
-    "intent": "xin_tong_tien_km_gio_hang",
+    "intent": "hoi_gia_khuyen_mai",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,

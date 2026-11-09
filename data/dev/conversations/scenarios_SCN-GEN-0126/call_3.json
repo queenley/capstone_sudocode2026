@@ -12,35 +12,20 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Quỳnh ạ, hôm trước chị có quan tâm Giày chạy bộ RunLite 2 Pro và còn để bàn với gia đình. Chị muốn đặt đôi giày size 41 màu đen đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Chị muốn đặt đôi giày size 41 màu đen đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em chào chị Quỳnh ạ, hôm trước chị có quan tâm Giày chạy bộ RunLite 2 Pro và còn để bàn với gia đình. Em hỗ trợ đặt hàng cho chị nhé.",
+      "questions": [],
       "facts_used": [
         "product_advised",
-        "variant_sku",
-        "price_quoted_vnd",
+        "blocker",
         "size",
-        "blocker"
+        "variant_sku",
+        "price_quoted_vnd"
       ],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1690000
-        },
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 800,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -58,15 +43,18 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ sản phẩm Giày chạy bộ RunLite 2 Pro size 41 màu đen đang có sẵn hàng, giá là 1.690.000đ. Chị chọn thanh toán chuyển khoản ngân hàng đúng không ạ?",
+      "text": "Dạ, chị chọn Giày chạy bộ RunLite 2 Pro size 41 màu đen, giá 1.690.000đ. Chị muốn thanh toán qua ngân hàng đúng không ạ?",
       "questions": [
         {
           "slot": "payment",
           "type": "confirm",
-          "text": "Chị chọn thanh toán chuyển khoản ngân hàng đúng không ạ?"
+          "text": "Chị muốn thanh toán qua ngân hàng đúng không ạ?"
         }
       ],
-      "facts_used": [],
+      "facts_used": [
+        "size",
+        "color"
+      ],
       "claims": [
         {
           "field": "price_vnd",
@@ -80,7 +68,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -97,20 +85,36 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận thanh toán qua ngân hàng ạ. Chị muốn giao hàng đến Ninh Kiều, Cần Thơ phải không ạ?",
+      "text": "Dạ, shop sẽ giao hàng đến Ninh Kiều, Cần Thơ cho chị. Dự kiến nhận hàng vào ngày 12/11/2026. Em đọc lại đơn: Giày chạy bộ RunLite 2 Pro size 41 màu đen, 1 đôi, giá 1.690.000đ, giao Ninh Kiều, Cần Thơ, thanh toán chuyển khoản, nhận hàng dự kiến ngày 12/11. Chị xác nhận giúp em thông tin đơn hàng đúng chưa ạ?",
       "questions": [
         {
-          "slot": "delivery_area",
+          "slot": "order_summary",
           "type": "confirm",
-          "text": "Chị muốn giao hàng đến Ninh Kiều, Cần Thơ phải không ạ?"
+          "text": "Chị xác nhận giúp em thông tin đơn hàng đúng chưa ạ?"
         }
       ],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
+      "facts_used": [
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-12"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Ninh Kiều, Cần Thơ",
+            "on": "2026-11-07"
+          }
+        }
+      ],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -127,64 +131,10 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xác nhận giao hàng đến Ninh Kiều, Cần Thơ. Em xin phép đọc lại đơn hàng để chị kiểm tra giúp em: Đơn hàng gồm 1 đôi Giày chạy bộ RunLite 2 Pro size 41 màu đen, giá 1.690.000đ, thanh toán chuyển khoản ngân hàng, giao tại Ninh Kiều, Cần Thơ. Thời gian giao dự kiến là ngày 12/11/2026. Thông tin này đúng rồi chị xác nhận giúp em nhé?",
-      "questions": [
-        {
-          "slot": "order_summary",
-          "type": "confirm",
-          "text": "Em xin phép đọc lại đơn hàng để chị kiểm tra giúp em: Đơn hàng gồm 1 đôi Giày chạy bộ RunLite 2 Pro size 41 màu đen, giá 1.690.000đ, thanh toán chuyển khoản ngân hàng, giao tại Ninh Kiều, Cần Thơ. Thời gian giao dự kiến là ngày 12/11/2026. Thông tin này đúng rồi chị xác nhận giúp em nhé?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1690000
-        },
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
-      "tool_calls": [
-        {
-          "name": "delivery_estimate",
-          "args": {
-            "address": "Ninh Kiều, Cần Thơ",
-            "on": "2026-11-07"
-          }
-        }
-      ],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 700,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Chốt đơn giùm chị nhé.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em đã tạo đơn hàng cho chị thành công. Mã đơn là OD600001, giao dự kiến ngày 12/11/2026. Cảm ơn chị đã đặt hàng tại shop BTC, em chúc chị nhiều sức khỏe ạ!",
+      "text": "Dạ em đã ghi nhận. Em sẽ tiến hành tạo đơn hàng cho chị ngay bây giờ ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1690000
-        },
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [
         {
           "name": "order.create",
@@ -234,17 +184,26 @@
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_3#turn9"
+          "source": "call_3#turn7"
         }
       ],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chốt đơn giùm chị nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "dat_hang_giay",
+    "intent": "chot_don",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
@@ -259,7 +218,8 @@
       "price_vnd": 1690000,
       "payment": "bank",
       "address": "Ninh Kiều, Cần Thơ",
-      "order_id": "OD600001"
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-11-12"
     }
   }
 }

@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, rất vui được hỗ trợ chị về sản phẩm Combo Spectra S1.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, rất vui được hỗ trợ chị về sản phẩm Combo Spectra S1 hôm trước mình quan tâm.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -25,36 +25,30 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị muốn hỏi về sản phẩm Combo Spectra S1 mà em đã tư vấn hôm trước.",
-      "facts_stated": {},
+      "text": "Alo, chị muốn hỏi về sản phẩm Combo Spectra S1 mà em đã tư vấn hôm trước. Bé nhà chị được 18 tháng.",
+      "facts_stated": {
+        "child_age_months": 18
+      },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, Combo Spectra S1 bên em gồm máy hút sữa Spectra S1, máy hâm sữa Fatz và tặng kèm 50 túi trữ sữa chị nhé. Hiện đang có giá 4.790.000đ và áp dụng chương trình miễn phí vận chuyển toàn quốc cho mẹ & bé.",
+      "text": "Dạ combo này gồm máy hút sữa đôi Spectra S1, một máy hâm sữa Fatz và 50 túi trữ sữa chị nhé. Giá hiện tại là 4.790.000đ, trong ngân sách của mình luôn ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 4790000
-        },
-        {
-          "field": "promo_MOM-FREESHIP_active",
-          "value": true
-        },
-        {
-          "field": "in_stock",
-          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -63,13 +57,13 @@
       "text": "Sản phẩm này có những gì em nhỉ? Có khuyến mãi gì không?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, Combo này gồm có máy hút sữa Spectra S1, máy hâm sữa Fatz và tặng thêm 50 túi trữ sữa, chị nhận đủ trong một hộp ạ. Hiện tại đang có ưu đãi miễn phí vận chuyển toàn quốc cho đơn hàng mẹ & bé từ 500.000đ trở lên, chị nhé.",
+      "text": "Hiện tại đơn combo này sẽ được miễn phí vận chuyển toàn quốc nhờ chương trình MOM-FREESHIP, ngoài ra chưa có quà tặng thêm nào khác ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -81,7 +75,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -89,17 +83,16 @@
       "speaker": "customer",
       "text": "Chị đang có ngân sách tầm 5 triệu, nhưng chị cần suy nghĩ thêm một chút.",
       "facts_stated": {
-        "budget_vnd": 5000000,
-        "blocker": "cần suy nghĩ thêm"
+        "budget_vnd": 5000000
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em hiểu, giá Combo Spectra S1 hiện là 4.790.000đ nên chị vừa trong ngân sách của mình ạ. Chương trình ưu đãi miễn phí vận chuyển áp dụng đến hết ngày 29/11/2026, chị cân nhắc thêm giúp em nhé.",
+      "text": "Dạ vâng chị cân nhắc thêm cũng hợp lý ạ. Giá combo hiện tại là 4.790.000đ, vẫn chưa hết chương trình freeship đâu chị, nên chị gọi lại khi nào cần đặt hàng nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -113,9 +106,46 @@
         }
       ],
       "tool_calls": [],
-      "memory_writes": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm",
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 5000000,
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "child_age_months",
+          "value": 18,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-BDL-MOM",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 4790000,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_1#turn4"
+        }
+      ],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -124,66 +154,16 @@
       "text": "Chị sẽ gọi lại sau nhé, cảm ơn em.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn chị đã quan tâm, khi nào cần tư vấn thêm chị cứ liên hệ với shop BTC qua hotline hoặc Zalo OA nhé. Em chúc chị một ngày tốt lành ạ!",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [
-        {
-          "key": "blocker",
-          "value": "cần suy nghĩ thêm",
-          "op": "set",
-          "source": "call_1#turn7"
-        },
-        {
-          "key": "budget_vnd",
-          "value": 5000000,
-          "op": "set",
-          "source": "call_1#turn7"
-        },
-        {
-          "key": "child_age_months",
-          "value": 18,
-          "op": "set",
-          "source": "call_1#turn7"
-        },
-        {
-          "key": "product_advised",
-          "value": "SKU-BDL-MOM",
-          "op": "set",
-          "source": "call_1#turn7"
-        },
-        {
-          "key": "price_quoted_vnd",
-          "value": 4790000,
-          "op": "set",
-          "source": "call_1#turn7"
-        },
-        {
-          "key": "promo_code",
-          "value": "MOM-FREESHIP",
-          "op": "set",
-          "source": "call_1#turn7"
-        }
-      ],
-      "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "tu_van_san_pham",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "can_suy_nghi",
-    "objection_handling": "Nhắc lại giá trong ngân sách, thông báo thời hạn ưu đãi, tôn trọng quyết định khách.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

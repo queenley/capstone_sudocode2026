@@ -12,12 +12,12 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị, chị muốn hỏi về giày chạy bộ RunLite 2 Pro size 40 màu đen đúng không ạ?",
+      "text": "Dạ em chào chị, em là trợ lý ảo của shop BTC. Chị cần tư vấn về giày chạy bộ RunLite 2 Pro size 40 màu đen đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Chị muốn hỏi về giày chạy bộ RunLite 2 Pro size 40 màu đen đúng không ạ?"
+          "text": "Chị cần tư vấn về giày chạy bộ RunLite 2 Pro size 40 màu đen đúng không ạ?"
         }
       ],
       "facts_used": [],
@@ -44,7 +44,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ mẫu giày RunLite 2 Pro size 40 màu đen hiện bên em còn hàng chị nhé.",
+      "text": "Dạ đôi giày chị hỏi hiện shop còn hàng size 40 màu đen. Giày chạy bộ RunLite 2 Pro có form ôm chân, chị nên chọn lớn hơn nửa size so với giày thường nếu chân mình form trung bình ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -71,7 +71,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giá đôi giày này là 1.690.000đ chị nha.",
+      "text": "Giá của đôi RunLite 2 Pro size 40 màu đen là 1.690.000đ chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -98,7 +98,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại sản phẩm này chưa có chương trình khuyến mãi nào áp dụng chị ạ.",
+      "text": "Hiện tại mẫu giày này chưa có chương trình khuyến mãi nào áp dụng chị nha. Giá em báo là giá chuẩn của shop rồi ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -116,18 +116,25 @@
     },
     {
       "speaker": "customer",
-      "text": "a chi muon goi hotline hoi them thong tin",
+      "text": "a chi muon goi hotline hoi them thong tin so chi la 0980737028",
       "facts_stated": {
-        "blocker": "muốn gọi hotline hỏi thêm"
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "phone_provided": true
       },
-      "entities": [],
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0980737028",
+          "spoken": "0980737028"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, chị có thể gọi lên hotline của shop để được hỗ trợ thêm thông tin chi tiết nhé. Em luôn sẵn sàng hỗ trợ chị khi cần ạ.",
+      "text": "Dạ em đã ghi nhận số điện thoại của chị. Nhân viên shop sẽ gọi lại tư vấn chi tiết hơn cho mình qua số 0980737028 trong giờ làm việc chị nhé. Cảm ơn chị đã liên hệ shop BTC!",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -137,7 +144,13 @@
           "key": "blocker",
           "value": "muốn gọi hotline hỏi thêm",
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "phone_provided",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn9"
         },
         {
           "key": "color",
@@ -177,13 +190,18 @@
     }
   ],
   "gold": {
-    "intent": "hoi_giay_chay_bo",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
-    "commitments": [],
+    "commitments": [
+      {
+        "action": "nhân viên gọi lại",
+        "phone": "0980737028"
+      }
+    ],
     "supersedes": [],
     "callback": null,
     "order": null

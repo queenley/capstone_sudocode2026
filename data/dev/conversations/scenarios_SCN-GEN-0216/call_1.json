@@ -12,28 +12,27 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Oanh ạ, em là trợ lý ảo của shop BTC. Hôm trước chị có mua Máy lọc không khí AirPure X bản 2024, hiện sản phẩm này đã ngừng bán rồi chị nhé.",
+      "text": "Dạ em chào chị Oanh ạ, hôm trước chị có mua Máy lọc không khí AirPure X bản 2024 bên em. Em cảm ơn chị đã quay lại ủng hộ shop mình ạ.",
       "questions": [],
       "facts_used": [
         "owned_sku"
       ],
-      "claims": [
-        {
-          "field": "successor_sku",
-          "value": "SKU-AP-X"
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Alo em, chị muốn đặt mua lại cái máy lọc không khí AirPure X mà chị đã mua hồi tháng 2 á.",
-      "facts_stated": {},
+      "text": "Alo em, chị muốn đặt mua lại cái máy lọc không khí AirPure X mà chị đã mua hồi tháng 2 á. Nhà chị không có trẻ nhỏ, ngân sách của chị tầm 5 triệu. Phòng mới của chị khoảng 15 mét vuông.",
+      "facts_stated": {
+        "room_area_m2": 15,
+        "budget_vnd": 5000000,
+        "has_children": false
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -41,25 +40,45 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn chị đã tin tưởng sản phẩm bên em. Hiện tại shop đang có Máy lọc không khí AirPure X mẫu mới, vẫn phù hợp với nhu cầu của chị ạ.",
+      "text": "Dạ em xác nhận chị muốn mua lại AirPure X cho phòng khoảng 15 mét vuông, ngân sách tầm 5 triệu và nhà mình không có trẻ nhỏ đúng không ạ? Máy AirPure X phù hợp phòng dưới 25 mét vuông, hiện giá ưu đãi thu cũ đổi mới là 4.490.000đ, còn hàng tại shop chị nhé.",
       "questions": [
         {
-          "slot": "room_area_m2",
+          "slot": "order_summary",
           "type": "confirm",
-          "text": "Chị xác nhận phòng mình giờ diện tích khoảng 15 mét vuông đúng không ạ?"
+          "text": "Em xác nhận lại thông tin: Máy lọc không khí AirPure X, giao về địa chỉ mới của chị, giá 4.490.000đ, thanh toán chuyển khoản ngân hàng, chị đồng ý em lên đơn luôn nhé?"
         }
       ],
-      "facts_used": [],
+      "facts_used": [
+        "room_area_m2",
+        "budget_vnd",
+        "has_children"
+      ],
       "claims": [
         {
-          "field": "successor_sku",
-          "value": "SKU-AP-X"
+          "field": "price_vnd",
+          "value": 4490000
+        },
+        {
+          "field": "promo_TRADE-IN-AP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
         }
       ],
-      "tool_calls": [],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Cầu Giấy, Hà Nội",
+            "on": "2026-10-23"
+          }
+        }
+      ],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -69,42 +88,28 @@
       "facts_stated": {
         "delivery_area": "Cầu Giấy, Hà Nội"
       },
-      "entities": [
-        {
-          "type": "address",
-          "value": "Cầu Giấy, Hà Nội",
-          "spoken": "Cầu Giấy, Hà Nội"
-        }
-      ],
+      "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận địa chỉ mới của chị ở Cầu Giấy, Hà Nội. Sản phẩm AirPure X mẫu mới bên em còn hàng và đang áp dụng chương trình thu cũ đổi mới, chị nhé.",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Chị muốn lấy Máy lọc không khí AirPure X đúng không ạ?"
-        }
+      "text": "Dạ em đã ghi nhận địa chỉ mới là Cầu Giấy, Hà Nội. Đơn hàng sẽ được giao trong khoảng 2 ngày làm việc, dự kiến nhận hàng ngày 27/10 chị nhé.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
       ],
-      "facts_used": [],
       "claims": [
         {
-          "field": "in_stock",
-          "value": true
-        },
-        {
-          "field": "promo_TRADE-IN-AP_active",
-          "value": true
+          "field": "estimated_delivery",
+          "value": "2026-10-27"
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -119,23 +124,25 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ đúng rồi chị, bản AirPure X 2024 đã ngừng bán, nhưng hiện tại shop có mẫu AirPure X mới thay thế, vẫn còn hàng và đủ chương trình ưu đãi thu cũ đổi mới cho khách hàng đã mua trước đó ạ.",
+      "text": "Dạ AirPure X bản 2024 đã ngừng bán, nhưng bản mới AirPure X vẫn còn hàng và đang áp dụng chương trình thu cũ đổi mới cho khách từng mua bản 2024 như chị ạ.",
       "questions": [],
-      "facts_used": [],
+      "facts_used": [
+        "owned_sku"
+      ],
       "claims": [
         {
           "field": "in_stock",
           "value": true
         },
         {
-          "field": "promo_TRADE-IN-AP_active",
-          "value": true
+          "field": "successor_sku",
+          "value": "SKU-AP-X"
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -150,7 +157,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chương trình thu cũ đổi mới TRADE-IN-AP áp dụng cho khách đã mua AirPure X bản 2024 như chị, khi mua AirPure X mới sẽ được giảm giá trực tiếp còn 4.490.000đ chị nhé.",
+      "text": "Dạ đúng rồi chị, chương trình thu cũ đổi mới đang áp dụng cho khách đã mua AirPure X bản 2024, giảm ngay 400.000đ khi mua AirPure X mới, giá còn 4.490.000đ chị nhé.",
       "questions": [],
       "facts_used": [
         "owned_sku"
@@ -167,21 +174,17 @@
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "4490000",
-          "spoken": "4.490.000"
-        }
-      ],
-      "pause_before_ms": 400,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Chị cũng muốn hỏi là giá có khác gì không so với lần trước không?",
-      "facts_stated": {},
+      "text": "Chị cũng muốn hỏi là giá có khác gì không so với lần trước không? Chị thanh toán chuyển khoản ngân hàng nhé.",
+      "facts_stated": {
+        "payment": "bank"
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -189,16 +192,9 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giá hiện tại của AirPure X mới là 4.490.000đ, đã áp dụng ưu đãi thu cũ đổi mới cho chị rồi ạ. Giá này tốt hơn giá niêm yết 4.890.000đ và đã bao gồm miễn phí vận chuyển toàn quốc.",
-      "questions": [
-        {
-          "slot": "order_summary",
-          "type": "confirm",
-          "text": "Em xin phép đọc lại đơn: Máy lọc không khí AirPure X, 1 máy, giá 4.490.000đ, giao về Cầu Giấy, Hà Nội, thanh toán chuyển khoản, nhận hàng dự kiến ngày 27/10. Chị xác nhận giúp em thông tin trên đúng chưa ạ?"
-        }
-      ],
+      "text": "Dạ giá hiện tại là 4.490.000đ đã trừ ưu đãi thu cũ đổi mới, cao hơn lần trước một chút do chương trình cũ đã kết thúc, nhưng đây là giá tốt nhất hiện tại chị ạ. Shop nhận chuyển khoản ngân hàng và miễn phí vận chuyển toàn quốc cho đơn này.",
+      "questions": [],
       "facts_used": [
-        "delivery_area",
         "payment"
       ],
       "claims": [
@@ -207,46 +203,14 @@
           "value": 4490000
         },
         {
-          "field": "list_price_vnd",
-          "value": 4890000
-        },
-        {
           "field": "freeship",
           "value": true
-        },
-        {
-          "field": "estimated_delivery",
-          "value": "2026-10-27"
         }
       ],
-      "tool_calls": [
-        {
-          "name": "delivery_estimate",
-          "args": {
-            "address": "Cầu Giấy, Hà Nội",
-            "on": "2026-10-23"
-          }
-        }
-      ],
+      "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "4490000",
-          "spoken": "4.490.000"
-        },
-        {
-          "type": "money",
-          "value": "4890000",
-          "spoken": "4.890.000"
-        },
-        {
-          "type": "date",
-          "value": "2026-10-27",
-          "spoken": "27/10"
-        }
-      ],
-      "pause_before_ms": 600,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -261,7 +225,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em lên đơn cho chị ngay ạ. Đơn hàng sẽ được giao dự kiến vào ngày 27/10 và đã miễn phí vận chuyển. Cảm ơn chị đã tin tưởng shop BTC!",
+      "text": "Dạ em lên đơn cho chị: Máy lọc không khí AirPure X, giá 4.490.000đ, giao về Cầu Giấy, Hà Nội, thanh toán chuyển khoản ngân hàng. Đơn sẽ giao dự kiến ngày 27/10. Em cảm ơn chị đã đặt hàng tại shop!",
       "questions": [],
       "facts_used": [
         "delivery_area",
@@ -271,10 +235,6 @@
         {
           "field": "price_vnd",
           "value": 4490000
-        },
-        {
-          "field": "freeship",
-          "value": true
         },
         {
           "field": "estimated_delivery",
@@ -300,7 +260,7 @@
           "key": "budget_vnd",
           "value": 5000000,
           "op": "set",
-          "source": "call_1#turn13"
+          "source": "call_1#turn1"
         },
         {
           "key": "delivery_area",
@@ -312,59 +272,53 @@
           "key": "has_children",
           "value": false,
           "op": "set",
-          "source": "call_1#turn13"
+          "source": "call_1#turn1"
         },
         {
           "key": "payment",
           "value": "bank",
           "op": "set",
-          "source": "call_1#turn13"
+          "source": "call_1#turn10"
         },
         {
           "key": "room_area_m2",
           "value": 15,
           "op": "supersede",
-          "source": "call_1#turn3"
+          "source": "call_1#turn1"
         },
         {
           "key": "product_advised",
           "value": "SKU-AP-X",
           "op": "set",
-          "source": "call_1#turn13"
+          "source": "call_1#turn3"
         },
         {
           "key": "price_quoted_vnd",
           "value": 4490000,
           "op": "set",
-          "source": "call_1#turn13"
+          "source": "call_1#turn8"
         },
         {
           "key": "promo_code",
           "value": "TRADE-IN-AP",
           "op": "set",
-          "source": "call_1#turn13"
+          "source": "call_1#turn8"
         },
         {
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_1#turn13"
+          "source": "call_1#turn12"
         }
       ],
-      "entities": [
-        {
-          "type": "date",
-          "value": "2026-10-27",
-          "spoken": "27/10"
-        }
-      ],
-      "pause_before_ms": 600,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "dat_mua_lai_airpure_x",
+    "intent": "chot_don",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
@@ -374,13 +328,13 @@
     "supersedes": [
       {
         "slot": "delivery_area",
-        "old_value": "Đống Đa, Hà Nội",
-        "new_value": "Cầu Giấy, Hà Nội"
+        "old": "Đống Đa, Hà Nội",
+        "new": "Cầu Giấy, Hà Nội"
       },
       {
         "slot": "room_area_m2",
-        "old_value": 20,
-        "new_value": 15
+        "old": 20,
+        "new": 15
       }
     ],
     "callback": null,
@@ -390,7 +344,7 @@
       "qty": 1,
       "price_vnd": 4490000,
       "payment": "bank",
-      "delivery_area": "Cầu Giấy, Hà Nội",
+      "address": "Cầu Giấy, Hà Nội",
       "estimated_delivery": "2026-10-27"
     }
   }

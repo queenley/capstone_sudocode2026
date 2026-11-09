@@ -11,6 +11,8 @@ with the reason, for:
 - SCN-GEN-0133/call_2 (no order.create) and the call_3 that ask more than max_agent_questions;
 - every call whose customer words a label revision changed (conversion-report.json): the transcript no longer
   matches its scenario.
+A call listed in review/regenerated.json (regenerate_conversations.py wrote its transcript again from the current
+labels) is not marked for the last two reasons; a J02 from its new judgment still marks it.
 It never writes "Y" and never builds a golden manifest: those stay a person's decision.
 """
 from __future__ import annotations
@@ -44,13 +46,19 @@ def mark(name: str) -> dict[str, int]:
     for r in rows:
         if "J02" in r["reason"]:
             why[r["conversation_id"]] = "Agent mẫu nói thông tin không có trong ground_truth_facts (J02_no_fabrication)."
-    why.update(FIXED[name])
+    # Transcripts written again from the current labels (regenerate_conversations.py): the fixed and changed-words
+    # reasons no longer hold; a J02 still comes from the new judgment above.
+    regenerated_path = root / "review" / "regenerated.json"
+    regenerated = set(json.loads(regenerated_path.read_text(encoding="utf-8"))["conversation_ids"]) \
+        if regenerated_path.exists() else set()
+    why.update({cid: reason for cid, reason in FIXED[name].items() if cid not in regenerated})
     report = json.loads((root / "conversion-report.json").read_text(encoding="utf-8"))
     revision = report.get("revision", "?")
     for change in report["changes"]:
         if change["call"].startswith("call_") and change["field"].startswith("customer_turns"):
             cid = f"{change['scenario_id']}__{change['call']}"
-            why.setdefault(cid, f"Lời khách đã đổi ở bản nhãn {revision}; hội thoại mẫu còn theo lời cũ.")
+            if cid not in regenerated:
+                why.setdefault(cid, f"Lời khách đã đổi ở bản nhãn {revision}; hội thoại mẫu còn theo lời cũ.")
     counts = {"marked": 0, "added": 0}
     for cid, reason in sorted(why.items()):
         row = by_id.get(cid)

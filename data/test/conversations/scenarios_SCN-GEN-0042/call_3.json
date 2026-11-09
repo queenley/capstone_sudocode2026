@@ -12,20 +12,14 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh Toàn ạ, hôm trước anh có quan tâm Máy lọc không khí AirPure Pro và còn chờ cuối tháng nhận lương, hôm nay anh muốn đặt luôn đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Hôm nay anh muốn đặt Máy lọc không khí AirPure Pro đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em chào anh Toàn ạ, hôm trước anh có quan tâm Máy lọc không khí AirPure Pro và bảo chờ cuối tháng nhận lương; hôm nay em sẵn sàng hỗ trợ lên đơn cho mình khi anh cần ạ.",
+      "questions": [],
       "facts_used": [
         "product_advised",
-        "blocker",
-        "room_area_m2",
         "price_quoted_vnd",
-        "promo_code"
+        "promo_code",
+        "blocker",
+        "room_area_m2"
       ],
       "claims": [
         {
@@ -41,46 +35,33 @@
           "value": true
         }
       ],
-      "tool_calls": [
-        {
-          "name": "delivery_estimate",
-          "args": {
-            "address": "Quận 7, TP.HCM",
-            "on": "2026-10-21"
-          }
-        }
-      ],
+      "tool_calls": [],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Alo, anh muốn đặt máy lọc không khí AirPure Pro.",
-      "facts_stated": {
-        "product_advised": "SKU-AP-PRO"
-      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Alo, anh muốn đặt máy lọc không khí AirPure Pro.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ, giá máy AirPure Pro hôm nay là 7.690.000đ, đang áp dụng khuyến mãi AIR-OCT và còn hàng sẵn anh nhé. Anh chọn thanh toán chuyển khoản ngân hàng, em ghi nhận ạ. Đơn sẽ giao về Quận 7, TP.HCM trong 2 ngày làm việc, dự kiến nhận hàng ngày 23/10.",
+      "text": "Dạ sản phẩm AirPure Pro hiện đang sẵn hàng, giá sau khuyến mãi AIR-OCT là 7.690.000đ và được miễn phí vận chuyển toàn quốc cho đơn này. Anh muốn chọn thanh toán chuyển khoản hay COD ạ?",
       "questions": [
         {
-          "slot": "order_summary",
-          "type": "confirm",
-          "text": "Em xác nhận lại: anh đặt 1 Máy lọc không khí AirPure Pro giá 7.690.000đ, giao về Quận 7, TP.HCM và thanh toán chuyển khoản ngân hàng, đúng không ạ?"
+          "slot": "payment",
+          "type": "open",
+          "text": "Anh muốn chọn thanh toán chuyển khoản hay COD ạ?"
         }
       ],
-      "facts_used": [
-        "delivery_area",
-        "payment"
-      ],
+      "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
@@ -91,18 +72,18 @@
           "value": true
         },
         {
-          "field": "in_stock",
+          "field": "freeship",
           "value": true
         },
         {
-          "field": "estimated_delivery",
-          "value": "2026-10-23"
+          "field": "in_stock",
+          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -113,33 +94,26 @@
         "payment": "bank"
       },
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận đơn hàng của anh, em tiến hành tạo đơn ngay bây giờ ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [
+      "text": "Dạ vâng, anh chọn chuyển khoản ngân hàng ạ. Anh nhận hàng ở địa chỉ nào để em kiểm tra thời gian giao dự kiến cho anh nhé.",
+      "questions": [
         {
-          "name": "order.create",
-          "args": {
-            "customer_phone": "0911265844",
-            "sku": "SKU-AP-PRO",
-            "qty": 1,
-            "price_vnd": 7690000,
-            "payment": "bank",
-            "address": "Quận 7, TP.HCM",
-            "on": "2026-10-21"
-          }
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Anh nhận hàng ở địa chỉ nào để em kiểm tra thời gian giao dự kiến cho anh nhé."
         }
       ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -156,62 +130,41 @@
           "spoken": "Quận 7, TP.HCM"
         }
       ],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Đơn hàng đã tạo thành công, anh sẽ nhận Máy lọc không khí AirPure Pro tại Quận 7, TP.HCM vào ngày 23/10. Shop sẽ gửi thông tin đơn hàng và hướng dẫn chuyển khoản cho anh qua Zalo hoặc SMS. Cảm ơn anh đã đặt hàng tại shop ạ.",
+      "text": "Dạ với địa chỉ Quận 7, TP.HCM, đơn của anh sẽ được giao dự kiến trong 1 đến 2 ngày làm việc, sớm nhất là ngày 23/10. Shop miễn phí vận chuyển cho đơn này luôn ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "delivery_days",
+          "value": 2
+        },
         {
           "field": "estimated_delivery",
           "value": "2026-10-23"
         }
       ],
-      "tool_calls": [],
-      "memory_writes": [
+      "tool_calls": [
         {
-          "key": "delivery_area",
-          "value": "Quận 7, TP.HCM",
-          "op": "set",
-          "source": "call_3#turn6"
-        },
-        {
-          "key": "payment",
-          "value": "bank",
-          "op": "set",
-          "source": "call_3#turn4"
-        },
-        {
-          "key": "product_advised",
-          "value": "SKU-AP-PRO",
-          "op": "set",
-          "source": "call_3#turn2"
-        },
-        {
-          "key": "price_quoted_vnd",
-          "value": 7690000,
-          "op": "set",
-          "source": "call_3#turn2"
-        },
-        {
-          "key": "promo_code",
-          "value": "AIR-OCT",
-          "op": "set",
-          "source": "call_3#turn2"
-        },
-        {
-          "key": "order_id",
-          "value": "OD600001",
-          "op": "set",
-          "source": "call_3#turn6"
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-10-21"
+          }
         }
       ],
+      "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -220,13 +173,156 @@
       "text": "Mong là nhanh chóng để anh có máy dùng cho bé.",
       "facts_stated": {},
       "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em sẽ ưu tiên xử lý đơn để anh nhận máy sớm nhất, máy AirPure Pro có khóa trẻ em nên rất phù hợp gia đình có bé nhỏ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi em, lên đơn giúp anh nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em xin phép đọc lại thông tin đơn hàng: 1 máy lọc không khí AirPure Pro, giá sau khuyến mãi là 7.690.000đ, giao về Quận 7, TP.HCM, thanh toán chuyển khoản ngân hàng, dự kiến nhận hàng ngày 23/10. Thông tin như vậy đúng và em lên đơn cho anh nhé?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Thông tin như vậy đúng và em lên đơn cho anh nhé?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area",
+        "payment",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-23"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi em, lên đơn giúp anh nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã lên đơn thành công cho anh, mã đơn OD600001. Anh chuyển khoản theo hướng dẫn sẽ nhận máy AirPure Pro dự kiến ngày 23/10. Nếu cần hỗ trợ thêm, anh cứ liên hệ shop bất cứ lúc nào ạ. Em cảm ơn anh đã đặt hàng tại Shop BTC!",
+      "questions": [],
+      "facts_used": [
+        "delivery_area",
+        "payment",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0911265844",
+            "sku": "SKU-AP-PRO",
+            "qty": 1,
+            "price_vnd": 7690000,
+            "payment": "bank",
+            "address": "Quận 7, TP.HCM",
+            "on": "2026-10-21"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Quận 7, TP.HCM",
+          "op": "set",
+          "source": "call_3#turn12"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_3#turn12"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_3#turn12"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7690000,
+          "op": "set",
+          "source": "call_3#turn12"
+        },
+        {
+          "key": "promo_code",
+          "value": "AIR-OCT",
+          "op": "set",
+          "source": "call_3#turn12"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_3#turn12"
+        }
+      ],
+      "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "dat_hang",
+    "intent": "dat_may_loc_airpure_pro",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,

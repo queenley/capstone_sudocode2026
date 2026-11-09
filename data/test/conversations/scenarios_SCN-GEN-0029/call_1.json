@@ -12,13 +12,19 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh, em là trợ lý ảo của shop BTC, anh cần tư vấn về sản phẩm nào ạ?",
-      "questions": [],
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần tư vấn về máy lọc không khí AirPure Pro đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh cần tư vấn về máy lọc không khí AirPure Pro đúng không ạ?"
+        }
+      ],
       "facts_used": [],
       "claims": [
         {
-          "field": "is_human",
-          "value": false
+          "field": "in_stock",
+          "value": true
         }
       ],
       "tool_calls": [],
@@ -30,16 +36,19 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro.",
-      "facts_stated": {},
+      "text": "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro. Nhà anh không có trẻ nhỏ.",
+      "facts_stated": {
+        "product_advised": "SKU-AP-PRO",
+        "has_children": false
+      },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, máy lọc không khí AirPure Pro bên em đang sẵn hàng, phù hợp cho phòng diện tích lớn và có nhiều tính năng hiện đại ạ.",
+      "text": "Dạ máy AirPure Pro phù hợp cho gia đình không có trẻ nhỏ, và có khóa trẻ em nếu anh cần dùng sau này ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -62,13 +71,13 @@
         "room_area_m2": 30
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, AirPure Pro phù hợp cho phòng 30 mét vuông anh nhé, công suất lớn, lọc không khí hiệu quả cho phòng từ 30 đến 45 mét vuông ạ.",
+      "text": "Dạ AirPure Pro lọc tối đa cho phòng đến 45 mét vuông, nên phòng 30 mét vuông thì rất phù hợp anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -86,13 +95,13 @@
         "budget_vnd": 8000000
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, hiện máy AirPure Pro giá sau khuyến mãi chỉ còn 7.690.000đ, đang áp dụng chương trình AIR-OCT đến hết 30/10 anh nhé. Đơn này cũng được miễn phí vận chuyển và hỗ trợ COD toàn quốc ạ.",
+      "text": "Dạ giá máy AirPure Pro hiện tại là 7.690.000đ, đang áp dụng khuyến mãi AIR-OCT giảm 300.000đ so với giá niêm yết anh nhé. Shop cũng miễn phí vận chuyển toàn quốc cho đơn từ 2 triệu trở lên.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -129,13 +138,13 @@
           "spoken": "7 giờ"
         }
       ],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, em sẽ gọi lại cho anh vào 7 giờ tối mai để hỗ trợ tiếp nhé. Em đã ghi chú lại anh muốn trao đổi thêm với gia đình ạ. Cảm ơn anh đã quan tâm sản phẩm bên em!",
+      "text": "Dạ vâng, em đã ghi chú anh hẹn gọi lại vào 7 giờ tối mai ạ. Em sẽ liên hệ lại anh lúc 19 giờ ngày mai để hỗ trợ thêm nếu anh cần.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -166,6 +175,12 @@
           "value": 8000000,
           "op": "set",
           "source": "call_1#turn6"
+        },
+        {
+          "key": "has_children",
+          "value": false,
+          "op": "set",
+          "source": "call_1#turn2"
         },
         {
           "key": "room_area_m2",
@@ -201,19 +216,19 @@
   "gold": {
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "phai_hoi_gd",
-    "objection_handling": "Ghi nhận và hẹn gọi lại đúng thời gian khách yêu cầu, nhắc lại thời gian 7 giờ tối.",
+    "objection_type": "can_hoi_gia_dinh",
+    "objection_handling": "Xác nhận thời điểm gọi lại theo đề nghị của khách, nhắc lại chính xác khung giờ.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [
       {
-        "text": "Hẹn gọi lại khách vào 19 giờ ngày 17/10/2026"
+        "callback_at": "2026-10-17T19:00"
       }
     ],
     "supersedes": [],
     "callback": {
       "callback_at": "2026-10-17T19:00",
-      "reason": "khách hỏi người nhà rồi báo lại"
+      "note": "khách hỏi người nhà rồi báo lại"
     },
     "order": null
   }

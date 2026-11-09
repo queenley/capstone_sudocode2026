@@ -12,13 +12,17 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em hỗ trợ tư vấn về máy lọc không khí Xiaomi Smart 4 Pro cho chị nhé.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em hỗ trợ thông tin về máy lọc không khí Xiaomi Smart 4 Pro chị đang quan tâm nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 5490000
+        },
+        {
+          "field": "promo_XM-COMBO_active",
+          "value": true
         }
       ],
       "tool_calls": [],
@@ -30,25 +34,36 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị muốn hỏi về cái máy lọc không khí Xiaomi Smart 4 Pro.",
-      "facts_stated": {},
+      "text": "Alo, chị muốn hỏi về cái máy lọc không khí Xiaomi Smart 4 Pro. Nhà chị không có trẻ nhỏ.",
+      "facts_stated": {
+        "has_children": false
+      },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chị đang quan tâm đến máy Xiaomi Smart 4 Pro đúng không ạ? Cho em hỏi chị dùng cho phòng diện tích khoảng bao nhiêu mét vuông để em tư vấn phù hợp.",
+      "text": "Dạ máy lọc không khí Xiaomi Smart 4 Pro phù hợp cho nhiều đối tượng sử dụng, không cần có trẻ nhỏ vẫn dùng tốt ạ. Chị cho em xin diện tích phòng của mình để em tư vấn phù hợp hơn nhé.",
       "questions": [
         {
           "slot": "room_area_m2",
           "type": "open",
-          "text": "Cho em hỏi chị dùng cho phòng diện tích khoảng bao nhiêu mét vuông để em tư vấn phù hợp."
+          "text": "Chị cho em xin diện tích phòng của mình để em tư vấn phù hợp hơn nhé."
         }
       ],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "promo_XM-COMBO_active",
+          "value": true
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -63,24 +78,31 @@
         "room_area_m2": 15
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ phòng 15 mét vuông thì máy Xiaomi Smart 4 Pro là dư công suất, đáp ứng tốt nhu cầu của chị ạ. Chị có ngân sách dự kiến cho sản phẩm này chưa để em kiểm tra khuyến mãi phù hợp?",
+      "text": "Dạ với phòng khoảng 15 mét vuông, máy Xiaomi Smart 4 Pro đáp ứng rất tốt nhu cầu lọc không khí cho chị ạ. Em kiểm tra thì giá máy hiện tại là 5.490.000đ, đang có khuyến mãi XM-COMBO tặng kèm màng lọc chính hãng.",
       "questions": [
         {
           "slot": "budget_vnd",
           "type": "open",
-          "text": "Chị có ngân sách dự kiến cho sản phẩm này chưa để em kiểm tra khuyến mãi phù hợp?"
+          "text": "Chị dự kiến ngân sách khoảng bao nhiêu để em tư vấn chi tiết chương trình ưu đãi phù hợp ạ?"
         }
       ],
-      "facts_used": [
-        "room_area_m2"
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "promo_XM-COMBO_active",
+          "value": true
+        }
       ],
-      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -95,17 +117,15 @@
         "budget_vnd": 6500000
       },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ sản phẩm Xiaomi Smart 4 Pro bên em giá 5.490.000đ, hiện đang áp dụng khuyến mãi combo lọc không khí tặng kèm màng lọc chính hãng. Giá và quà tặng này còn áp dụng đến 14/11 nên chị yên tâm ạ.",
+      "text": "Dạ máy Xiaomi Smart 4 Pro hiện tại có giá 5.490.000đ, đang áp dụng khuyến mãi XM-COMBO tặng kèm một màng lọc chính hãng cho đơn hàng trong thời gian này. Giá phù hợp với ngân sách của chị và mình được nhận quà luôn ạ.",
       "questions": [],
-      "facts_used": [
-        "budget_vnd"
-      ],
+      "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
@@ -114,10 +134,6 @@
         {
           "field": "promo_XM-COMBO_active",
           "value": true
-        },
-        {
-          "field": "gift_sku",
-          "value": "SKU-XM-FLT"
         }
       ],
       "tool_calls": [],
@@ -132,13 +148,13 @@
       "text": "Chị nghe nói máy này hết hàng, không biết khi nào có lại?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ đúng rồi chị, hiện tại máy Xiaomi Smart 4 Pro đang tạm hết hàng. Dự kiến đến ngày 19/10 bên em sẽ nhập lại hàng mới, chị có thể cân nhắc đặt sau ngày 19 tháng này ạ.",
+      "text": "Dạ hiện tại máy Xiaomi Smart 4 Pro đang tạm hết hàng, dự kiến có lại vào ngày 19/10 tới chị nhé. Khi nào về hàng em sẽ chủ động liên hệ lại để phục vụ chị sớm nhất ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -165,37 +181,46 @@
         "blocker": "chờ cuối tháng nhận lương"
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận, khi nào chị thuận tiện cứ liên hệ lại với shop để được giữ chương trình khuyến mãi tốt nhất cho mình ạ. Em chúc chị ngày mới vui vẻ!",
+      "text": "Dạ em ghi nhận chị sẽ liên hệ lại sau khi nhận lương. Máy về hàng ngày 19/10 nên nếu chị cần giữ ưu đãi hoặc hỗ trợ đặt giữ hàng thì chị báo giúp em nhé. Em cảm ơn chị đã quan tâm ạ!",
       "questions": [],
-      "facts_used": [
-        "blocker"
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "restock_date",
+          "value": "2026-10-19"
+        }
       ],
-      "claims": [],
       "tool_calls": [],
       "memory_writes": [
         {
           "key": "blocker",
           "value": "chờ cuối tháng nhận lương",
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn11"
         },
         {
           "key": "budget_vnd",
           "value": 6500000,
           "op": "set",
-          "source": "call_1#turn6"
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "has_children",
+          "value": false,
+          "op": "set",
+          "source": "call_1#turn3"
         },
         {
           "key": "room_area_m2",
           "value": 15,
           "op": "set",
-          "source": "call_1#turn4"
+          "source": "call_1#turn5"
         }
       ],
       "entities": [],
@@ -205,10 +230,10 @@
     }
   ],
   "gold": {
-    "intent": "hoi_may_loc_khong_khi_xiaomi_4_pro",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "chua_co_luong",
-    "objection_handling": "Ghi nhận nhu cầu và tư vấn chương trình khuyến mãi còn hiệu lực.",
+    "objection_type": "chưa nhận lương",
+    "objection_handling": "Dạ em ghi nhận chị sẽ liên hệ sau khi nhận lương, máy về hàng ngày 19/10 nên chị cần giữ ưu đãi thì báo em nhé.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

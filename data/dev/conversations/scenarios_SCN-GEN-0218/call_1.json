@@ -12,14 +12,8 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị, em là trợ lý ảo của shop BTC. Chị cần hỏi về xe đẩy gấp gọn Joie Pact đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Chị cần hỏi về xe đẩy gấp gọn Joie Pact đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em hỗ trợ tư vấn xe đẩy gấp gọn Joie Pact cho bé 18 tháng nhà mình ạ.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
@@ -30,14 +24,16 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "alo chi muon hoi ve xe day gap gon joie pact",
-      "facts_stated": {},
+      "text": "alo chi muon hoi ve xe day gap gon joie pact be nha chi duoc 18 thang",
+      "facts_stated": {
+        "child_age_months": 18
+      },
       "entities": [],
       "pause_before_ms": 500,
       "emotion": null,
@@ -45,19 +41,10 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ xe đẩy Joie Pact hiện bên em giá 3.490.000đ, có chương trình miễn phí vận chuyển toàn quốc cho đơn từ 500.000đ ngành mẹ & bé chị nhé.",
+      "text": "Dạ xe đẩy Joie Pact phù hợp cho bé từ sơ sinh đến 4 tuổi, chịu tải tối đa 22kg nên bé 18 tháng dùng rất tốt ạ. Xe có thể gấp gọn, nặng 6kg, dễ mang theo.",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 3490000
-        },
-        {
-          "field": "promo_MOM-FREESHIP_active",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -76,25 +63,23 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ đúng rồi chị, giá xe Joie Pact là 3.490.000đ ạ. Chị dự kiến ngân sách khoảng 4 triệu phải không ạ?",
-      "questions": [
-        {
-          "slot": "budget_vnd",
-          "type": "confirm",
-          "text": "Chị dự kiến ngân sách khoảng 4 triệu phải không ạ?"
-        }
-      ],
+      "text": "Dạ đúng rồi chị, giá xe Joie Pact hiện tại là 3.490.000đ và đang được miễn phí vận chuyển toàn quốc ạ.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 3490000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
@@ -111,19 +96,23 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận chị có ngân sách khoảng 4 triệu. Hiện xe Joie Pact đang tạm hết hàng, dự kiến cuối tháng chị nhận lương thì bên em sẽ kiểm tra lại tồn kho và thông báo cho chị ngay khi có hàng nhé.",
+      "text": "Dạ giá xe Joie Pact nằm trong ngân sách của chị và hiện shop còn chương trình miễn phí vận chuyển, chị cân nhắc thêm nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "in_stock",
-          "value": false
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
@@ -134,21 +123,16 @@
         "blocker": "chờ cuối tháng nhận lương"
       },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em sẽ lưu lại thông tin, đến cuối tháng em chủ động gọi lại để báo chị về tình trạng hàng và ưu đãi hiện hành ạ. Em cảm ơn chị đã quan tâm sản phẩm Joie Pact của shop BTC.",
+      "text": "Dạ em ghi nhận chị sẽ chờ đến cuối tháng mới mua ạ. Em sẽ lưu lại thông tin và gọi lại cho chị khi gần hết tháng để mình tiện sắp xếp đặt hàng nhé.",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "in_stock",
-          "value": false
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [
         {
@@ -162,16 +146,40 @@
           "value": 4000000,
           "op": "set",
           "source": "call_1#turn6"
+        },
+        {
+          "key": "child_age_months",
+          "value": 18,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-STR1",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 3490000,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_1#turn4"
         }
       ],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 800,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "hoi_ton_gia_hen_goi_lai",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,
@@ -179,14 +187,14 @@
     "decision_maker": null,
     "commitments": [
       {
-        "note": "Gọi lại báo khách khi có hàng cuối tháng."
+        "action": "gọi lại cuối tháng"
+      },
+      {
+        "action": "giữ thông tin tư vấn"
       }
     ],
     "supersedes": [],
-    "callback": {
-      "note": "Gọi lại cuối tháng báo lại tình trạng hàng và giá.",
-      "timeframe": "Cuối tháng 11/2026"
-    },
+    "callback": null,
     "order": null
   }
 }

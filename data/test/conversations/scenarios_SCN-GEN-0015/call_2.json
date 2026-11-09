@@ -12,14 +12,8 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em xin phép xác nhận, chị là chị Dung đúng không ạ?",
-      "questions": [
-        {
-          "slot": "other",
-          "type": "open",
-          "text": "Chị là chị Dung đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em đã nhận được cuộc gọi của chị về máy lọc nước hôm qua, em có thể hỗ trợ chị ngay bây giờ ạ.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
@@ -39,18 +33,18 @@
       "text": "Alo em, chị Dung đây. Hôm qua có cô Loan gọi cho em về máy lọc nước RO.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn chị đã xác nhận. Em hỗ trợ chị về sản phẩm máy lọc nước RO Karofi 9 lõi ạ.",
+      "text": "Dạ em cảm ơn chị đã xác nhận, chị Dung cần tư vấn về máy lọc nước hay sản phẩm khác ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "open",
-          "text": "Chị muốn mua loại nào và cần tư vấn thêm gì không ạ?"
+          "text": "Chị Dung cần tư vấn về máy lọc nước hay sản phẩm khác ạ?"
         }
       ],
       "facts_used": [],
@@ -64,26 +58,39 @@
     },
     {
       "speaker": "customer",
-      "text": "Chị quyết định mua máy lọc nước RO Karofi 9 lõi mà cô Loan đã hỏi.",
-      "facts_stated": {},
+      "text": "Chị quyết định mua máy lọc không khí AirPure Mini cho phòng của chị.",
+      "facts_stated": {
+        "product_advised": "SKU-AP-MINI"
+      },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chị chọn máy lọc nước RO Karofi 9 lõi, em ghi nhận ạ. Chị muốn giao hàng ở đâu và thanh toán theo hình thức nào để em lên đơn cho mình ạ?",
-      "questions": [
+      "text": "Dạ máy lọc không khí AirPure Mini hiện có giá 2.190.000đ, đang còn hàng chị nhé. Em kiểm tra lại thông tin đặt hàng cho chị ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
         {
-          "slot": "delivery_area",
-          "type": "open",
-          "text": "Chị muốn giao hàng ở đâu và thanh toán theo hình thức nào để em lên đơn cho mình ạ?"
+          "field": "price_vnd",
+          "value": 2190000
+        },
+        {
+          "field": "in_stock",
+          "value": true
         }
       ],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
+      "tool_calls": [
+        {
+          "name": "pricing.get_quote",
+          "args": {
+            "sku": "SKU-AP-MINI",
+            "on": "2026-11-07"
+          }
+        }
+      ],
       "memory_writes": [],
       "entities": [],
       "pause_before_ms": 0,
@@ -98,52 +105,32 @@
         "delivery_area": "Ninh Kiều, Cần Thơ"
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xác nhận đơn của chị: giao máy lọc nước RO Karofi 9 lõi đến Ninh Kiều, Cần Thơ, thanh toán COD. Giá sản phẩm là 2.190.000đ, đã bao gồm miễn phí vận chuyển. Dự kiến giao hàng vào ngày 12/11/2026. Trước khi giao, nhân viên bên em sẽ gọi xác nhận đơn với chị ạ. Chị vui lòng xác nhận lại giúp em thông tin đơn hàng này đúng chưa để em tiến hành đặt hàng cho mình nhé?",
+      "text": "Dạ chị muốn nhận hàng ở Ninh Kiều, Cần Thơ và thanh toán COD đúng không ạ? Shop mình hiện miễn phí vận chuyển toàn quốc với đơn này, phí thu hộ COD là 0đ luôn chị nhé.",
       "questions": [
         {
-          "slot": "order_summary",
+          "slot": "delivery_area",
           "type": "confirm",
-          "text": "Chị vui lòng xác nhận lại giúp em thông tin đơn hàng này đúng chưa để em tiến hành đặt hàng cho mình nhé?"
+          "text": "Chị muốn nhận hàng ở Ninh Kiều, Cần Thơ và thanh toán COD đúng không ạ?"
         }
       ],
       "facts_used": [],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 2190000
-        },
-        {
-          "field": "promo_COD-0_active",
-          "value": true
-        },
-        {
           "field": "freeship",
           "value": true
         },
         {
-          "field": "estimated_delivery",
-          "value": "2026-11-12"
-        },
-        {
-          "field": "needs_confirmation_call",
+          "field": "promo_COD-0_active",
           "value": true
         }
       ],
-      "tool_calls": [
-        {
-          "name": "delivery_estimate",
-          "args": {
-            "address": "Ninh Kiều, Cần Thơ",
-            "on": "2026-11-07"
-          }
-        }
-      ],
+      "tool_calls": [],
       "memory_writes": [],
       "entities": [],
       "pause_before_ms": 0,
@@ -159,16 +146,101 @@
         "budget_vnd": 2500000
       },
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn chị đã xác nhận thông tin. Em sẽ tiến hành đặt đơn hàng cho mình ngay bây giờ ạ.",
+      "text": "Dạ với diện tích phòng 12 mét vuông như chị nói thì AirPure Mini rất phù hợp. Giá sản phẩm là 2.190.000đ, nằm trong ngân sách của chị ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi em, lên đơn giúp cô nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xin phép đọc lại đơn: 1 máy lọc không khí AirPure Mini, giá 2.190.000đ, giao tại Ninh Kiều, Cần Thơ, thanh toán COD. Đơn hàng sẽ được giao dự kiến trong 4 ngày làm việc, khoảng ngày 12/11. Nhân viên bên em sẽ gọi xác nhận đơn trước khi giao hàng chị nhé. Em tiến hành lên đơn cho chị ngay ạ.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em xin phép đọc lại đơn: 1 máy lọc không khí AirPure Mini, giá 2.190.000đ, giao tại Ninh Kiều, Cần Thơ, thanh toán COD. Đơn hàng sẽ được giao dự kiến trong 4 ngày làm việc, khoảng ngày 12/11. Nhân viên bên em sẽ gọi xác nhận đơn trước khi giao hàng chị nhé. Chị xác nhận giúp em thông tin này đúng chưa ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        },
+        {
+          "field": "delivery_days",
+          "value": 4
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-12"
+        },
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi em, lên đơn giúp cô nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã tạo đơn hàng cho chị thành công. Mã đơn là OD600001, tổng giá trị 2.190.000đ. Nhân viên shop sẽ gọi xác nhận đơn trước khi giao hàng và đơn dự kiến giao vào ngày 12/11 tại Ninh Kiều, Cần Thơ. Em cảm ơn chị Dung đã đặt hàng tại shop BTC ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-12"
+        },
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        }
+      ],
       "tool_calls": [
         {
           "name": "order.create",
@@ -188,7 +260,7 @@
           "key": "budget_vnd",
           "value": 2500000,
           "op": "set",
-          "source": "call_2#turn8"
+          "source": "call_2#turn10"
         },
         {
           "key": "delivery_area",
@@ -218,19 +290,19 @@
           "key": "product_advised",
           "value": "SKU-AP-MINI",
           "op": "set",
-          "source": "call_2#turn2"
+          "source": "call_2#turn4"
         },
         {
           "key": "price_quoted_vnd",
           "value": 2190000,
           "op": "set",
-          "source": "call_2#turn7"
+          "source": "call_2#turn5"
         },
         {
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_2#turn9"
+          "source": "call_2#turn12"
         }
       ],
       "entities": [],
@@ -240,7 +312,7 @@
     }
   ],
   "gold": {
-    "intent": "dat_mua_may_loc_nuoc",
+    "intent": "chot_don",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
@@ -255,8 +327,8 @@
       "price_vnd": 2190000,
       "payment": "COD",
       "address": "Ninh Kiều, Cần Thơ",
-      "estimated_delivery": "2026-11-12",
-      "order_id": "OD600001"
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-11-12"
     }
   }
 }

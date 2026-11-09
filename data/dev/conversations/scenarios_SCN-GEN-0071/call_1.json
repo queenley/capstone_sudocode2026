@@ -12,44 +12,50 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, bạn nhân viên đã hỗ trợ mình hôm trước đặt Áo khoác gió Windbreak. Em là trợ lý ảo của shop, anh muốn mình tư vấn về sản phẩm nào tiếp theo ạ?",
+      "text": "Dạ em chào anh Nguyễn Văn An ạ, hôm trước anh có đặt Giày sneaker Urban Classic. Anh đang quan tâm đến máy hút sữa Medela Swing Maxi đúng không ạ?",
       "questions": [],
       "facts_used": [
-        "owned_sku",
         "order_id"
       ],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Alo em, anh muốn hỏi về máy hút sữa điện đôi Medela Swing Maxi.",
-      "facts_stated": {},
+      "text": "Alo em, anh muốn hỏi về máy hút sữa điện đôi Medela Swing Maxi. Bé nhà anh được 12 tháng, ngân sách của anh tầm 6 triệu.",
+      "facts_stated": {
+        "child_age_months": 12,
+        "budget_vnd": 6000000
+      },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn anh đã quan tâm. Máy hút sữa điện đôi Medela Swing Maxi bên em hiện đang còn hàng, hàng mới 100% chính hãng, bảo hành 12 tháng ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
+      "text": "Dạ em cảm ơn anh đã chia sẻ ạ. Máy hút sữa điện đôi Medela Swing Maxi phù hợp với bé nhà mình 12 tháng tuổi. Anh quan tâm mức giá trong khoảng 6 triệu, đúng không ạ?",
+      "questions": [
         {
-          "field": "in_stock",
-          "value": true
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Anh quan tâm mức giá trong khoảng 6 triệu, đúng không ạ?"
         }
       ],
+      "facts_used": [
+        "child_age_months",
+        "budget_vnd"
+      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -58,13 +64,13 @@
       "text": "Giá của máy này là bao nhiêu vậy em?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giá của máy Medela Swing Maxi là 5.990.000đ ạ.",
+      "text": "Dạ máy hút sữa điện đôi Medela Swing Maxi bên em đang bán giá 5.990.000đ ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -76,7 +82,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -85,13 +91,13 @@
       "text": "Máy có khuyến mãi gì không?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại sản phẩm này đang được miễn phí vận chuyển toàn quốc theo chương trình MOM-FREESHIP anh nhé.",
+      "text": "Dạ hiện tại bên em đang có miễn phí vận chuyển toàn quốc cho máy này thông qua chương trình MOM-FREESHIP anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -103,7 +109,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -113,20 +119,14 @@
       "facts_stated": {
         "blocker": "để bàn với gia đình"
       },
-      "entities": [
-        {
-          "type": "time",
-          "value": "19:00",
-          "spoken": "7 giờ"
-        }
-      ],
-      "pause_before_ms": 600,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận, em sẽ gọi lại cho anh vào lúc 7 giờ tối mai để mình tiện trao đổi thêm ạ. Cảm ơn anh đã quan tâm, chúc anh một ngày tốt lành!",
+      "text": "Dạ em ghi nhận, tối mai lúc 7 giờ em sẽ chủ động gọi lại cho anh để hỗ trợ thêm thông tin ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -147,14 +147,44 @@
       ],
       "memory_writes": [
         {
+          "key": "child_age_months",
+          "value": 12,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 6000000,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
           "key": "blocker",
           "value": "để bàn với gia đình",
           "op": "set",
           "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-PUMP2",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5990000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_1#turn7"
         }
       ],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
@@ -162,13 +192,13 @@
   "gold": {
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "cần hỏi người nhà",
-    "objection_handling": "Đồng ý hẹn gọi lại đúng khung giờ khách yêu cầu, xác nhận thời gian rõ ràng.",
+    "objection_type": "can_ban_gia_dinh",
+    "objection_handling": "Đồng ý và hẹn giờ gọi lại vào 19 giờ hôm sau.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [
       {
-        "callback_at": "2026-10-17T19:00"
+        "hẹn_gọi_lại": "2026-10-17T19:00"
       }
     ],
     "supersedes": [],

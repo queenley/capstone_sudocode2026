@@ -12,16 +12,15 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần tư vấn máy lọc không khí cho phòng khoảng 25 mét vuông phải không ạ?",
-      "questions": [
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, em hỗ trợ tư vấn máy lọc không khí cho anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
         {
-          "slot": "room_area_m2",
-          "type": "confirm",
-          "text": "Anh cần máy cho phòng chính khoảng 25 mét vuông đúng không ạ?"
+          "field": "is_human",
+          "value": false
         }
       ],
-      "facts_used": [],
-      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -31,9 +30,10 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo em, anh muốn hỏi tư vấn máy lọc không khí cho phòng chính khoảng 25 mét vuông.",
+      "text": "Alo em, anh muốn hỏi tư vấn máy lọc không khí cho phòng chính khoảng 25 mét vuông. Ngân sách của anh tầm 5 triệu.",
       "facts_stated": {
-        "room_area_m2": 25
+        "room_area_m2": 25,
+        "budget_vnd": 5000000
       },
       "entities": [],
       "pause_before_ms": 0,
@@ -42,7 +42,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ với phòng chính khoảng 25 mét vuông, anh có thể tham khảo máy lọc không khí AirPure X, công suất phù hợp và đang còn hàng. Giá hiện tại là 4.890.000đ, tặng kèm một màng lọc thay thế chính hãng cho anh luôn ạ.",
+      "text": "Dạ với phòng chính khoảng 25 mét vuông và ngân sách 5 triệu, anh có thể tham khảo máy lọc không khí AirPure X, giá hiện tại là 4.890.000đ. Máy phù hợp diện tích phòng anh và đang còn hàng ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -51,7 +51,7 @@
           "value": 4890000
         },
         {
-          "field": "promo_GIFT-FILTER_active",
+          "field": "in_stock",
           "value": true
         }
       ],
@@ -73,7 +73,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ phòng ngủ 10 mét vuông, anh có thể chọn máy lọc không khí AirPure Mini, phù hợp diện tích nhỏ và tiết kiệm điện. Nếu mua cùng đơn với máy AirPure X, chiếc thứ hai là AirPure Mini sẽ được giảm 50% còn 1.095.000đ thôi anh nhé.",
+      "text": "Dạ với phòng ngủ cho bé khoảng 10 mét vuông, anh có thể chọn máy lọc không khí AirPure Mini, giá 2.190.000đ. Nếu anh mua cùng lúc hai máy, bên em đang có chương trình máy thứ hai giảm 50% cho máy có giá thấp hơn, nên AirPure Mini chỉ còn 1.095.000đ khi mua chung với AirPure X ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -116,7 +116,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại khi anh mua máy AirPure X sẽ được tặng thêm một màng lọc thay thế chính hãng, và mua cùng lúc máy thứ hai là AirPure Mini sẽ được giảm 50% cho chiếc Mini ạ.",
+      "text": "Dạ hiện tại khi mua AirPure X, anh được tặng kèm một màng lọc thay thế chính hãng. Ngoài ra, chương trình máy thứ hai giảm 50% cho AirPure Mini vẫn đang áp dụng đến ngày 22/10 ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -125,8 +125,8 @@
           "value": true
         },
         {
-          "field": "promo_AIR-2ND-50_active",
-          "value": true
+          "field": "gift_sku",
+          "value": "SKU-AP-FLT-X"
         }
       ],
       "tool_calls": [],
@@ -147,7 +147,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chương trình giảm giá 50% áp dụng cho chiếc thứ hai có giá thấp hơn, nên AirPure Mini sẽ còn 1.095.000đ khi anh mua cùng AirPure X anh nhé.",
+      "text": "Dạ chương trình giảm giá áp dụng cho máy thứ hai có giá thấp hơn trong đơn, nên AirPure Mini sẽ được giảm 50%, còn 1.095.000đ khi mua cùng AirPure X anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -169,7 +169,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, khi anh mua cùng đơn với AirPure X, máy AirPure Mini cho phòng con sẽ còn 1.095.000đ, tiết kiệm một nửa so với giá lẻ 2.190.000đ anh ạ.",
+      "text": "Dạ, khi anh mua AirPure Mini cùng AirPure X, giá AirPure Mini chỉ còn 1.095.000đ ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -188,69 +188,13 @@
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ vâng, em ghi nhận anh sẽ cân nhắc thêm. Nếu cần tư vấn hoặc chốt đơn, anh cứ nhắn lại shop bất kỳ lúc nào anh nhé, ưu đãi máy thứ hai giảm 50% còn áp dụng tới ngày 22/10 ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [
-        {
-          "key": "room_area_m2",
-          "value": 25,
-          "op": "set",
-          "source": "call_1#turn1"
-        },
-        {
-          "key": "has_children",
-          "value": true,
-          "op": "set",
-          "source": "call_1#turn1"
-        },
-        {
-          "key": "budget_vnd",
-          "value": 5000000,
-          "op": "set",
-          "source": "call_1#turn1"
-        },
-        {
-          "key": "blocker",
-          "value": "chờ cuối tháng nhận lương",
-          "op": "set",
-          "source": "call_1#turn1"
-        },
-        {
-          "key": "product_advised",
-          "value": "SKU-AP-X",
-          "op": "set",
-          "source": "call_1#turn1"
-        },
-        {
-          "key": "price_quoted_vnd",
-          "value": 4890000,
-          "op": "set",
-          "source": "call_1#turn1"
-        },
-        {
-          "key": "promo_code",
-          "value": "GIFT-FILTER",
-          "op": "set",
-          "source": "call_1#turn1"
-        }
-      ],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
     }
   ],
   "gold": {
-    "intent": "tu_van_may_loc_khong_khi_va_khuyen_mai",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "can_hoi_nguoi_nha",
-    "objection_handling": "Nhắc lại ưu đãi còn hạn, hẹn khách liên hệ lại khi quyết định.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

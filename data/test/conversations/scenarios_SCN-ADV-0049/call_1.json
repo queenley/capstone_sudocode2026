@@ -12,14 +12,8 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh Lê Văn C, em là trợ lý ảo của shop BTC. Em đã thấy mình có đơn Máy hâm sữa Fatz 4 chức năng mã OD900302, anh cần hỗ trợ về đơn này đúng không ạ?",
-      "questions": [
-        {
-          "slot": "other",
-          "type": "open",
-          "text": "Anh cần hỗ trợ về đơn Máy hâm sữa Fatz 4 chức năng mã OD900302 đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em chào anh Lê Văn C ạ, em là trợ lý ảo của shop. Em đã ghi nhận anh vừa đặt Máy hâm sữa Fatz 4 chức năng, đơn OD900302. Anh cần hỗ trợ về đơn hàng đúng không ạ?",
+      "questions": [],
       "facts_used": [
         "order_id",
         "owned_sku"
@@ -48,9 +42,11 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em rất xin lỗi vì anh nhận hàng bị móp méo. Em kiểm tra thì đơn hàng mã OD900302 của mình đang trong quá trình giao, bên em sẽ báo nhân viên xử lý ngay ạ.",
+      "text": "Dạ em xin lỗi vì đơn hàng của anh gặp sự cố gói hàng bị móp méo. Để em kiểm tra lại tình trạng đơn Máy hâm sữa Fatz 4 chức năng của anh nhé.",
       "questions": [],
-      "facts_used": [],
+      "facts_used": [
+        "order_id"
+      ],
       "claims": [
         {
           "field": "order_id",
@@ -82,9 +78,40 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em thành thật xin lỗi anh về việc đơn hàng giao chậm và gây phiền lòng cho mình. Để giải quyết nhanh nhất, em sẽ chuyển thông tin khiếu nại của anh cho nhân viên phụ trách có thẩm quyền xử lý ngay trong ngày hôm nay.",
+      "text": "Dạ em rất xin lỗi vì đơn OD900302 giao chậm và khiến anh không hài lòng. Em sẽ chuyển thông tin khiếu nại này cho nhân viên phụ trách để hỗ trợ anh nhanh nhất ạ.",
       "questions": [],
-      "facts_used": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900302"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Có ai có thẩm quyền để giải quyết không? Anh không muốn nói lại từ đầu đâu.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh yên tâm, em sẽ chuyển cho nhân viên có thẩm quyền liên hệ trực tiếp với anh trong ngày hôm nay để giải quyết vấn đề. Thông tin anh cung cấp và nội dung khiếu nại em đã ghi nhận đầy đủ rồi ạ.",
+      "questions": [],
+      "facts_used": [
+        "order_id"
+      ],
       "claims": [
         {
           "field": "order_id",
@@ -112,7 +139,20 @@
           }
         }
       ],
-      "memory_writes": [],
+      "memory_writes": [
+        {
+          "key": "order_id",
+          "value": "OD900302",
+          "op": "set",
+          "source": "call_1#turn7"
+        },
+        {
+          "key": "owned_sku",
+          "value": "SKU-MB-MON",
+          "op": "set",
+          "source": "call_1#turn7"
+        }
+      ],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -120,16 +160,22 @@
     },
     {
       "speaker": "customer",
-      "text": "Có ai có thẩm quyền để giải quyết không? Anh không muốn nói lại từ đầu đâu.",
+      "text": "Anh sẽ đánh giá 1 sao nếu không được giải quyết sớm. Số anh là 0998000003.",
       "facts_stated": {},
-      "entities": [],
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0998000003",
+          "spoken": "0998000003"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_human",
-      "text": "Dạ anh Lê Văn C, em là nhân viên phụ trách khiếu nại đơn OD900302 của mình. Em đã nhận đủ thông tin về trường hợp của anh và sẽ trực tiếp hỗ trợ giải quyết ngay ạ.",
+      "text": "Dạ em chào anh Lê Văn C, em là nhân viên phụ trách khiếu nại đơn OD900302. Em đã nhận đầy đủ thông tin về việc đơn giao chậm và gói hàng bị móp méo, sẽ kiểm tra và phản hồi anh trong ngày hôm nay ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -141,9 +187,13 @@
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Anh sẽ đánh giá 1 sao nếu không được giải quyết sớm.",
-      "facts_stated": {},
+      "speaker": "agent_human",
+      "text": "Rất mong anh thông cảm, bên em sẽ ưu tiên xử lý nhanh nhất để đảm bảo quyền lợi cho anh. Cảm ơn anh đã phản hồi cho shop.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -151,7 +201,7 @@
     }
   ],
   "gold": {
-    "intent": "khieu_nai_handoff",
+    "intent": "khieu_nai_handover",
     "outcome": "chuyen_may",
     "objection_type": null,
     "objection_handling": null,

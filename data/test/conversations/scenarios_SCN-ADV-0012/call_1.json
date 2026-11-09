@@ -12,38 +12,15 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, sẵn sàng hỗ trợ chị Trang về giỏ hàng trên website nhé.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, sẵn sàng hỗ trợ chị về giỏ hàng trên website nhé.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Chào em, chị muốn hỏi tổng tiền cho giỏ hàng trên website.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ chị có thể cho em biết cụ thể trong giỏ hàng của mình gồm những sản phẩm nào không ạ?",
-      "questions": [
+      "claims": [
         {
-          "slot": "other",
-          "type": "open",
-          "text": "Dạ chị có thể cho em biết cụ thể trong giỏ hàng của mình gồm những sản phẩm nào không ạ?"
+          "field": "promo_active",
+          "value": true
         }
       ],
-      "facts_used": [],
-      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -53,16 +30,20 @@
     },
     {
       "speaker": "customer",
-      "text": "Chị có một máy lọc không khí AirPure Y và một máy lọc không khí AirPure Mini.",
-      "facts_stated": {},
+      "text": "Chào em, chị muốn hỏi tổng tiền cho giỏ hàng trên website. Phòng chị khoảng 20 mét vuông, nhà chị có trẻ nhỏ, ngân sách của chị tầm 6 triệu.",
+      "facts_stated": {
+        "room_area_m2": 20,
+        "has_children": true,
+        "budget_vnd": 6000000
+      },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã kiểm tra, với giỏ hàng gồm một máy lọc không khí AirPure Y và một máy lọc không khí AirPure Mini, tổng tiền sau khuyến mãi là 6.295.000đ chị nhé.",
+      "text": "Dạ với diện tích phòng 20m² và nhà có trẻ nhỏ, chị chọn Máy lọc không khí AirPure Y là phù hợp nhất. Tổng tiền cho giỏ hàng gồm AirPure Y giá 5.200.000đ và AirPure Mini giá 1.095.000đ, tổng cộng là 6.295.000 cho hai máy chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -111,22 +92,26 @@
     },
     {
       "speaker": "customer",
-      "text": "Chị không nhớ rõ là có khuyến mãi gì không khi mua cả hai không nhỉ?",
+      "text": "Chị có một máy lọc không khí AirPure Y và một máy lọc không khí AirPure Mini.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, hiện tại chị mua cả hai sản phẩm sẽ được tặng màng lọc thay thế cho máy AirPure Y và giảm 50% cho máy AirPure Mini, tổng cộng được áp dụng khuyến mãi GIFT-FILTER và AIR-2ND-50 chị nhé.",
+      "text": "Dạ, khi chị mua cả hai máy, AirPure Mini được giảm 50% giá còn 1.095.000đ nhờ chương trình AIR-2ND-50. Máy AirPure Y được tặng thêm một màng lọc dự phòng theo chương trình GIFT-FILTER chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "promo_GIFT-FILTER_active",
           "value": true
+        },
+        {
+          "field": "gift_sku",
+          "value": "SKU-AP-FLT-X"
         }
       ],
       "tool_calls": [],
@@ -138,16 +123,16 @@
     },
     {
       "speaker": "customer",
-      "text": "Còn phí giao hàng thì sao em?",
+      "text": "Chị không nhớ rõ là có khuyến mãi gì không khi mua cả hai không nhỉ?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, đơn hàng của chị được miễn phí vận chuyển toàn quốc ạ, không phát sinh thêm phí ship nào.",
+      "text": "Dạ em xin xác nhận lại, hiện tại chị được miễn phí vận chuyển toàn quốc cho đơn này, không phát sinh thêm phí giao hàng nào chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -165,18 +150,45 @@
     },
     {
       "speaker": "customer",
-      "text": "Chị cần suy nghĩ thêm một chút, hẹn em gọi lại nhé.",
-      "facts_stated": {
-        "blocker": "cần suy nghĩ thêm"
-      },
+      "text": "Còn phí giao hàng thì sao em?",
+      "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, em đã ghi nhận chị cần suy nghĩ thêm. Khi nào chị quyết định đặt hàng, chị nhắn lại cho shop bất cứ lúc nào nhé. Em cảm ơn chị Trang đã quan tâm sản phẩm của shop ạ!",
+      "text": "Dạ tổng đơn 6.295.000 đã bao gồm toàn bộ ưu đãi và miễn phí vận chuyển, chị không cần trả thêm chi phí nào khác ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "total_vnd",
+          "value": 6295000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị cần suy nghĩ thêm một chút, hẹn em gọi lại nhé.",
+      "facts_stated": {
+        "blocker": "cần suy nghĩ thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em đã ghi nhận chị cần suy nghĩ thêm. Em sẽ giữ lại thông tin giỏ hàng và gọi lại hỗ trợ chị sau ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -187,6 +199,42 @@
           "value": "cần suy nghĩ thêm",
           "op": "set",
           "source": "call_1#turn11"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 6000000,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "has_children",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 20,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-Y",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5200000,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "promo_code",
+          "value": "GIFT-FILTER",
+          "op": "set",
+          "source": "call_1#turn5"
         }
       ],
       "entities": [],
@@ -196,10 +244,10 @@
     }
   ],
   "gold": {
-    "intent": "hen_goi_lai",
+    "intent": "hoi_tong_tien_km",
     "outcome": "hen_goi_lai",
-    "objection_type": null,
-    "objection_handling": null,
+    "objection_type": "can_suy_nghi",
+    "objection_handling": "Đã xác nhận và ghi nhận lịch gọi lại.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

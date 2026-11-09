@@ -12,12 +12,12 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị muốn tìm hiểu về máy hâm sữa Fatz 4 chức năng đúng không ạ?",
+      "text": "Dạ shop BTC chào chị, em là trợ lý ảo hỗ trợ tư vấn sản phẩm ạ. Chị muốn hỏi về máy hâm sữa Fatz 4 chức năng đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Chị muốn tìm hiểu về máy hâm sữa Fatz 4 chức năng đúng không ạ?"
+          "text": "Chị muốn hỏi về máy hâm sữa Fatz 4 chức năng đúng không ạ?"
         }
       ],
       "facts_used": [],
@@ -34,13 +34,13 @@
       "text": "alo chi muon hoi ve may ham sua fazt 4 chuc nang",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ sản phẩm máy hâm sữa Fatz 4 chức năng bên em đang có giá 490.000đ, hàng chính hãng mới 100% chị nhé. Máy phù hợp cho bé 17 tháng tuổi và trong tầm giá chị mong muốn ạ.",
+      "text": "Dạ máy hâm sữa Fatz 4 chức năng bên em đang có giá 490.000đ, hiện còn hàng tại shop chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -56,7 +56,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -68,33 +68,25 @@
         "budget_vnd": 1000000
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại máy hâm sữa Fatz 4 chức năng bên em chưa có chương trình khuyến mãi nào áp dụng thêm chị ạ. Giá đang là 490.000đ và có hỗ trợ miễn phí thu hộ khi nhận hàng toàn quốc ạ.",
+      "text": "Dạ mức giá 490.000đ phù hợp với ngân sách của chị, mình dùng được cho bé 17 tháng luôn ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 490000
-        },
-        {
-          "field": "promo_active",
-          "value": false
-        },
-        {
-          "field": "promo_COD-0_active",
-          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -103,14 +95,60 @@
       "text": "may nay co khuyen mai gi khong em",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận nhu cầu của chị muốn gọi hotline để được tư vấn thêm. Em sẽ lưu lại thông tin và nhân viên sẽ liên hệ với chị trong thời gian sớm nhất để hỗ trợ kỹ hơn nhé.",
+      "text": "Dạ hiện tại sản phẩm này chưa có chương trình khuyến mãi nào áp dụng, giá đã niêm yết là 490.000đ chị nhé.",
       "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "price_vnd",
+          "value": 490000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "chi muon goi hotline de hoi them em nha so chi la 0992566636",
+      "facts_stated": {
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "phone_provided": true
+      },
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0992566636",
+          "spoken": "0992566636"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận, chị muốn được tư vấn thêm qua hotline số 0992566636 đúng không ạ? Shop sẽ sớm liên hệ lại để hỗ trợ chi tiết cho chị.",
+      "questions": [
+        {
+          "slot": "blocker",
+          "type": "confirm",
+          "text": "Chị muốn được tư vấn thêm qua hotline số 0992566636 đúng không ạ?"
+        }
+      ],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
@@ -119,60 +157,39 @@
           "key": "blocker",
           "value": "muốn gọi hotline hỏi thêm",
           "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn9"
         },
         {
-          "key": "budget_vnd",
-          "value": 1000000,
+          "key": "phone_provided",
+          "value": true,
           "op": "set",
-          "source": "call_1#turn7"
-        },
-        {
-          "key": "child_age_months",
-          "value": 17,
-          "op": "set",
-          "source": "call_1#turn7"
-        },
-        {
-          "key": "product_advised",
-          "value": "SKU-MB-MON",
-          "op": "set",
-          "source": "call_1#turn7"
-        },
-        {
-          "key": "price_quoted_vnd",
-          "value": 490000,
-          "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn9"
         }
       ],
       "entities": [],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "chi muon goi hotline de hoi them em nha",
-      "facts_stated": {
-        "blocker": "muốn gọi hotline hỏi thêm"
-      },
-      "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "hoi_tu_van_san_pham",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
-    "commitments": [],
+    "commitments": [
+      {
+        "action": "shop sẽ liên hệ lại qua hotline",
+        "phone": "0992566636"
+      }
+    ],
     "supersedes": [],
-    "callback": null,
+    "callback": {
+      "time": null,
+      "reason": "khách muốn shop gọi lại qua hotline"
+    },
     "order": null
   }
 }

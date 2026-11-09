@@ -15,12 +15,15 @@ Các thư mục nhãn (`scenarios`, `metadata`, `asr_reference`, `tools`, `call_
 | 14 | Khách nói đúng các fact nhãn ghi mà trước đó không nói ở đâu | 27 cuộc |
 | 15 | Thêm lời đồng ý cho cuộc tạo đơn mà khách chưa đồng ý | 8 cuộc |
 | 17, 18 | Khách ẩn danh (ADV-0050/c2), `owned_sku` của ADV-0045/c1 | 2 cuộc |
-| 21, 22 | Người chung SĐT mua đúng món của nhãn (GEN-0015/c2); gọi lại vào ngày nghỉ (GEN-0022/c1) (**chờ duyệt**) | 2 cuộc |
+| 21, 22 | Người chung SĐT mua đúng món của nhãn (GEN-0015/c2); gọi lại vào ngày nghỉ (GEN-0022/c1) | 2 cuộc |
+| 26, 28, 29 | `has_children` theo lời khách (ADV-0031/c1); khách nói diện tích phòng mới (GEN-0048/c1, ADV-0023/c1); bỏ fact của người kia ở kịch bản chung SĐT (GEN-0004, 0005, 0031, 0047 call_2) (người duyệt yêu cầu, sau lần kiểm thứ hai) | 7 cuộc |
+
+Mọi nhóm đã được người duyệt chấp nhận; không còn thay đổi `pending`.
 
 Kiểm, không gọi model: 99/99 kịch bản nạp được bằng loader của `run_eval`; 0 lỗi khóa; oracle qua `reference_eval.py` của BTC: CCR 100 · RQR 0 · TSR 100 · HR 0, 0 lỗi schema.
 
 Dựng lại từ gốc repo: `python evaluation/datasets/ground-truth-review/build_test_r1.py`, rồi từ `evaluation/data-generation`: `python -m src.pipeline.build_ground_truth --root ../../data/test`.
 
-**Hội thoại mẫu (`conversations/`) không phải ví dụ mẫu:** các ca J02 có câu bịa, ca agent mẫu không tạo đơn hoặc hỏi quá giới hạn, và mọi cuộc đã đổi lời khách được đánh dấu `approve: N` trong `review/needs_manual_review.csv` (`evaluation/datasets/ground-truth-review/mark_conversations.py`). Không dùng chúng làm few-shot hay dữ liệu vòng cải tiến. Bộ này chưa phải bộ vàng: `official_gt_approved: false`, chưa có `review/golden_manifest.json`. Kiểm tự động và đề xuất từng cuộc ở `review/auto_verified.json`, `review/review_sheet.csv` (`auto_verify.py`); người duyệt ký bằng `evaluation/datasets/ground-truth-review/approve_gold.py`.
+**Hội thoại mẫu (`conversations/`) đã sinh lại theo nhãn r1** (09–10/11/2026, [`regenerate_conversations.py`](../../evaluation/datasets/ground-truth-review/regenerate_conversations.py)): 46 cuộc có lời khách đã đổi, trượt validator, agent mẫu bịa (J02) hoặc thiếu file được viết lại (danh sách ở `review/regenerated.json`). Validator: 191/192. 148/192 hội thoại qua mọi kiểm tự động; phần còn lại phần lớn chỉ vì bộ chấm bằng model cần người đọc, vài ca J02 vẫn còn (đánh dấu `approve: N` trong `review/needs_manual_review.csv`, không dùng làm few-shot hay dữ liệu vòng cải tiến). Bộ này chưa phải bộ vàng: `official_gt_approved: false`. Quyết định `approve_conversation` cũ của các cuộc sinh lại đã xoá trong `review/review_sheet.csv` (người duyệt đã duyệt hội thoại cũ), nên cần ký lại. Kiểm tự động và đề xuất từng cuộc ở `review/auto_verified.json`, `review/review_sheet.csv` (`auto_verify.py`); người duyệt ký bằng `evaluation/datasets/ground-truth-review/approve_gold.py`.
 
-**Audio chưa theo kịp nhãn:** các nhóm 1, 3, 10, 14, 15, 21 đổi lời khách, nhưng audio, `asr_reference/` của những lượt đó và hội thoại mẫu vẫn là lời cũ.
+**Audio đã theo kịp nhãn** (09–10/11/2026): mọi lượt khách đổi lời được đọc lại bằng `synthesize_scenario_audio --changed-only` (58 lượt, 4.793 ký tự ElevenLabs); `asr_reference/ground_truth.json` dựng lại từ clip trên đĩa, không còn clip đọc lời cũ. Nhãn entity lấy từ `asr_reference/<call>.json` (đã sửa ở nhóm 11), không lấy bản chép cạnh clip. Ở 114 clip mà khách không nói tên món ("xe này có khuyến mãi gì không em?"), `sku` (110) và `has_children` (4) chuyển sang `entities_not_stated`, như dev đã làm (nhóm 32, người duyệt chấp nhận 10/11/2026; xem [DISPUTES.md](DISPUTES.md)).

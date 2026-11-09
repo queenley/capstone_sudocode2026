@@ -12,12 +12,17 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần tư vấn về máy lọc không khí đúng không ạ?",
+      "text": "Dạ em chào anh, em là trợ lý ảo của shop BTC, anh cần tư vấn về máy lọc không khí phải không ạ? Anh muốn dùng cho phòng khoảng 30 mét vuông và ngân sách tầm 8 triệu đúng không anh?",
       "questions": [
         {
-          "slot": "product_advised",
-          "type": "open",
-          "text": "Anh đang quan tâm đến dòng máy nào hoặc diện tích phòng của mình là bao nhiêu mét vuông vậy ạ?"
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Anh muốn dùng cho phòng khoảng 30 mét vuông đúng không ạ?"
+        },
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của anh tầm 8 triệu đúng không ạ?"
         }
       ],
       "facts_used": [],
@@ -31,32 +36,28 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro cho phòng khoảng 30 mét vuông.",
+      "text": "Alo, anh muốn hỏi về máy lọc không khí AirPure Pro cho phòng khoảng 30 mét vuông. Ngân sách của anh tầm 8 triệu.",
       "facts_stated": {
-        "room_area_m2": 30
+        "room_area_m2": 30,
+        "budget_vnd": 8000000
       },
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ cho phòng 30 mét vuông thì AirPure Pro là lựa chọn rất phù hợp ạ. Máy này có khóa trẻ em, lọc bụi mịn và khử mùi hiệu quả, rất an toàn cho gia đình có trẻ nhỏ.",
+      "text": "Dạ cảm ơn anh đã chia sẻ. Với phòng 30 mét vuông và nhà có trẻ nhỏ, AirPure Pro là lựa chọn rất phù hợp vì máy có khóa trẻ em, công suất lớn và lọc được bụi mịn, khói mùi, rất an toàn cho bé ạ.",
       "questions": [
         {
           "slot": "has_children",
-          "type": "open",
-          "text": "Nhà mình có trẻ nhỏ hoặc nhu cầu gì đặc biệt về chức năng không anh ạ?"
+          "type": "confirm",
+          "text": "Nhà mình có trẻ nhỏ đúng không anh?"
         }
       ],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -71,40 +72,18 @@
         "has_children": true
       },
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ máy AirPure Pro có khóa trẻ em và màng lọc HEPA H13, phù hợp với nhà có trẻ nhỏ anh nhé. Máy cũng có chế độ ngủ êm và lọc được bụi mịn, vi khuẩn, khử mùi rất tốt.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Giá của máy này là bao nhiêu và có khuyến mãi gì không em?",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ giá máy AirPure Pro hôm nay là 7.690.000đ anh ạ, đang được giảm 300.000đ từ chương trình AIR-OCT so với giá niêm yết 7.990.000đ. Ngoài ra, đơn hàng này đang được miễn phí vận chuyển và phí COD toàn quốc luôn anh nhé.",
+      "text": "Dạ, máy AirPure Pro phù hợp với gia đình có trẻ nhỏ anh nhé. Giá hiện tại của máy là 7.690.000đ, đang giảm 300.000đ từ giá niêm yết nhờ chương trình AIR-OCT, và hiện còn hàng tại shop ạ.",
       "questions": [
         {
-          "slot": "budget_vnd",
-          "type": "confirm",
-          "text": "Mức giá này phù hợp với dự định của mình không anh?"
+          "slot": "other",
+          "type": "open",
+          "text": "Anh xác nhận giúp em, giá đang là 7.690.000đ đúng không ạ?"
         }
       ],
       "facts_used": [],
@@ -118,7 +97,38 @@
           "value": true
         },
         {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá của máy này là bao nhiêu và có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, ngoài ra hiện tại còn chương trình miễn phí thu hộ COD toàn quốc, anh có thể nhận hàng rồi thanh toán mà không mất phí gì thêm. Chương trình khuyến mãi AIR-OCT sẽ kết thúc vào ngày 30/10, nên nếu anh quyết định đặt mua sau ngày này thì sẽ áp dụng giá mới theo thời điểm ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
           "field": "promo_COD-0_active",
+          "value": true
+        },
+        {
+          "field": "promo_AIR-OCT_active",
           "value": true
         }
       ],
@@ -136,27 +146,16 @@
         "blocker": "chờ cuối tháng nhận lương"
       },
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận anh sẽ cân nhắc sau khi nhận lương vào cuối tháng ạ. Chương trình khuyến mãi AIR-OCT sẽ kết thúc ngày 30/10, nếu anh cần giữ giá em có thể nhắc lại cho mình trước khi hết khuyến mãi. Anh muốn em lưu lịch gọi lại và nhắc anh vào ngày nào thì tiện nhất ạ?",
-      "questions": [
-        {
-          "slot": "other",
-          "type": "open",
-          "text": "Anh muốn em gọi lại vào ngày nào thì phù hợp nhất với mình ạ?"
-        }
-      ],
+      "text": "Dạ em hiểu ạ, anh cứ cân nhắc thêm. Nếu anh muốn giữ mức giá ưu đãi, em có thể gọi lại cho anh vào đầu tháng 11 để mình chốt đơn khi anh nhận lương ạ.",
+      "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "promo_AIR-OCT_active",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [
         {
@@ -172,6 +171,12 @@
           "source": "call_1#turn4"
         },
         {
+          "key": "budget_vnd",
+          "value": 8000000,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
           "key": "blocker",
           "value": "chờ cuối tháng nhận lương",
           "op": "set",
@@ -181,7 +186,7 @@
           "key": "product_advised",
           "value": "SKU-AP-PRO",
           "op": "set",
-          "source": "call_1#turn2"
+          "source": "call_1#turn4"
         },
         {
           "key": "price_quoted_vnd",
@@ -203,15 +208,22 @@
     }
   ],
   "gold": {
-    "intent": "hoi_tu_van_may_loc_khong_khi",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": null,
-    "objection_handling": null,
+    "objection_type": "chưa sẵn sàng mua",
+    "objection_handling": "Đề xuất gọi lại đầu tháng 11 khi anh nhận lương, nhắc thời hạn khuyến mãi.",
     "sentiment": "neutral",
     "decision_maker": null,
-    "commitments": [],
+    "commitments": [
+      {
+        "call_later": "Đầu tháng 11, sau khi anh nhận lương"
+      }
+    ],
     "supersedes": [],
-    "callback": null,
+    "callback": {
+      "time": "2026-11-01",
+      "reason": "Khách chờ nhận lương, hẹn gọi lại để chốt đơn"
+    },
     "order": null
   }
 }

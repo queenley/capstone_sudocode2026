@@ -12,14 +12,8 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần hỗ trợ về nồi chiên không dầu Lock&Lock 4L đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Anh cần tư vấn về nồi chiên không dầu Lock&Lock 4L đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Em hỗ trợ thông tin về nồi chiên không dầu Lock&Lock 4L cho anh nhé.",
+      "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
@@ -31,18 +25,18 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh muốn hỏi về nồi chiên không dầu Lock&Lock 4L.",
+      "text": "Alo, anh muốn hỏi về nồi chiên không dầu Lock&Lock 4L. Ngân sách của anh tầm 2 triệu.",
       "facts_stated": {
-        "product_advised": "SKU-AF-4L"
+        "budget_vnd": 2000000
       },
       "entities": [],
-      "pause_before_ms": 800,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, nồi chiên không dầu Lock&Lock 4L bên em hiện giá là 1.890.000đ và đang còn hàng anh nhé. Sản phẩm được bảo hành 12 tháng chính hãng.",
+      "text": "Dạ, nồi chiên không dầu Lock&Lock 4L bên em hiện giá 1.890.000đ, phù hợp với ngân sách của anh. Sản phẩm đang còn hàng tại shop.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -53,10 +47,6 @@
         {
           "field": "in_stock",
           "value": true
-        },
-        {
-          "field": "warranty_months",
-          "value": 12
         }
       ],
       "tool_calls": [],
@@ -71,13 +61,13 @@
       "text": "Nó bảo hành bao lâu vậy?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, nồi này được bảo hành 12 tháng anh nhé.",
+      "text": "Dạ, sản phẩm này được bảo hành chính hãng 12 tháng anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -98,13 +88,13 @@
       "text": "Cái này dùng cho diện tích bao nhiêu thì hợp lý nhỉ?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, nồi chiên không dầu Lock&Lock 4L phù hợp cho gia đình 2–3 người, hoặc dùng nấu các món cho bữa nhỏ anh nhé.",
+      "text": "Dạ, nồi chiên Lock&Lock 4L phù hợp cho gia đình 2 đến 3 người dùng, hoặc nấu các món ăn cho phòng bếp nhỏ anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -120,13 +110,13 @@
       "text": "Nồi này có tính năng gì đặc biệt không?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, nồi có dung tích 4 lít, công suất 1.400W, điều chỉnh nhiệt 80–200°C và sử dụng núm vặn cơ. Lòng nồi phủ chống dính dễ vệ sinh anh ạ.",
+      "text": "Dạ, nồi này có dung tích 4 lít, công suất 1.400W, điều chỉnh nhiệt độ từ 80 đến 200 độ C, điều khiển núm cơ và dễ vệ sinh. Anh có thể chiên, nướng đa dạng món ăn tiện lợi ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -142,13 +132,13 @@
       "text": "Có khóa trẻ em không em?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, sản phẩm này chưa hỗ trợ khóa trẻ em anh nhé.",
+      "text": "Dạ, nồi chiên Lock&Lock 4L hiện chưa có tính năng khóa trẻ em anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -164,13 +154,13 @@
       "text": "Chất liệu của nồi này là gì vậy?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, nồi có vỏ ngoài bằng nhựa chịu nhiệt và lòng nồi phủ chống dính, dễ làm sạch anh nha.",
+      "text": "Dạ, lòng nồi làm bằng hợp kim phủ chống dính, vỏ ngoài bằng nhựa chịu nhiệt và kim loại sơn tĩnh điện. Anh yên tâm sử dụng nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -186,23 +176,19 @@
       "text": "Có khuyến mãi gì không?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại sản phẩm này chưa có khuyến mãi giảm giá, nhưng vẫn được miễn phí thu hộ khi thanh toán COD anh nhé.",
+      "text": "Dạ hiện tại sản phẩm này chưa có chương trình khuyến mãi giảm giá nào anh nhé. Giá 1.890.000đ là giá niêm yết của shop ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "promo_active",
           "value": false
-        },
-        {
-          "field": "promo_COD-0_active",
-          "value": true
         }
       ],
       "tool_calls": [],
@@ -217,60 +203,16 @@
       "text": "Để anh suy nghĩ thêm đã nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ vâng, anh cứ cân nhắc thêm nhé. Khi nào cần tư vấn thêm hoặc muốn đặt hàng, anh liên hệ lại shop em hỗ trợ ngay ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [
-        {
-          "key": "usage_need",
-          "value": "mua làm quà",
-          "op": "set",
-          "source": "call_1#turn16"
-        },
-        {
-          "key": "budget_vnd",
-          "value": 2000000,
-          "op": "set",
-          "source": "call_1#turn16"
-        },
-        {
-          "key": "blocker",
-          "value": "để bàn với gia đình",
-          "op": "set",
-          "source": "call_1#turn16"
-        },
-        {
-          "key": "product_advised",
-          "value": "SKU-AF-4L",
-          "op": "set",
-          "source": "call_1#turn16"
-        },
-        {
-          "key": "price_quoted_vnd",
-          "value": 1890000,
-          "op": "set",
-          "source": "call_1#turn16"
-        }
-      ],
-      "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "tu_van_san_pham",
+    "intent": "tuvan_sanpham",
     "outcome": "hen_goi_lai",
-    "objection_type": "can_suy_nghi",
-    "objection_handling": "Đã xác nhận và hướng dẫn gọi lại khi cần.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

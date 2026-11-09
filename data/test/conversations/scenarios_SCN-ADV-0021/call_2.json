@@ -12,20 +12,14 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào cô ạ, cô là khách cũ hôm trước có hỏi về máy lọc không khí Samsung AX40, còn cần hỏi con cháu đúng không ạ? Hôm nay cô muốn đặt hàng sản phẩm này phải không ạ?",
-      "questions": [
-        {
-          "slot": "other",
-          "type": "open",
-          "text": "Hôm nay cô muốn đặt hàng sản phẩm này phải không ạ?"
-        }
-      ],
+      "text": "Dạ em chào anh ạ, hôm trước anh có hỏi về Máy lọc không khí Samsung AX40 và cần hỏi lại người nhà, hôm nay anh muốn đặt hàng đúng không ạ?",
+      "questions": [],
       "facts_used": [
-        "product_advised",
-        "price_quoted_vnd",
         "blocker",
+        "product_advised",
+        "room_area_m2",
         "decision_maker",
-        "room_area_m2"
+        "price_quoted_vnd"
       ],
       "claims": [
         {
@@ -42,16 +36,61 @@
     },
     {
       "speaker": "customer",
-      "text": "chau oi co muon dat cai may loc khong khi samsung ax40",
-      "facts_stated": {},
+      "text": "em oi anh muon dat cai may loc khong khi samsung ax40",
+      "facts_stated": {
+        "product_advised": "SKU-SS-AX40"
+      },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xác nhận cô muốn đặt mua Máy lọc không khí Samsung AX40 ạ. Giá sản phẩm hiện tại là 6.490.000đ, đang có miễn phí vận chuyển toàn quốc cho khu vực phía Nam, cô nhé.",
+      "text": "Dạ, Máy lọc không khí Samsung AX40 hiện còn hàng, giá 6.490.000đ ạ. Đơn này sẽ được miễn phí vận chuyển về Quận 7, TP.HCM. Anh muốn lấy 1 máy đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh muốn lấy 1 máy đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised"
+      ],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "price_vnd",
+          "value": 6490000
+        },
+        {
+          "field": "freeship",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "anh nho la gia khoang 6 trieu 4 dung khong",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đúng rồi anh, giá hiện tại là 6.490.000đ cho 1 máy Samsung AX40, chưa có chương trình giảm giá thêm nhưng đã được tặng miễn phí vận chuyển toàn quốc.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -62,89 +101,40 @@
         {
           "field": "promo_NAM-SHIP0_active",
           "value": true
-        },
-        {
-          "field": "freeship",
-          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "6490000",
-          "spoken": "6.490.000đ"
-        }
-      ],
-      "pause_before_ms": 500,
+      "entities": [],
+      "pause_before_ms": 350,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "co nho la gia khoang 6 trieu 4 dung khong",
-      "facts_stated": {},
-      "entities": [
-        {
-          "type": "money",
-          "value": "6400000",
-          "spoken": "6 triệu 4"
-        }
-      ],
-      "pause_before_ms": 700,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ đúng rồi cô, giá báo hôm trước cho Máy lọc không khí Samsung AX40 là 6.490.000đ, giữ nguyên cho đơn hôm nay ạ. Giá này đã bao gồm chương trình freeship khu vực phía Nam cô nhé.",
-      "questions": [],
-      "facts_used": [
-        "price_quoted_vnd"
-      ],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 6490000
-        },
-        {
-          "field": "promo_NAM-SHIP0_active",
-          "value": true
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "6490000",
-          "spoken": "6.490.000đ"
-        }
-      ],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "co se thanh toan bang tien mat khi nhan hang",
+      "text": "anh se thanh toan bang tien mat khi nhan hang",
       "facts_stated": {
         "payment": "COD"
       },
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ cô chọn thanh toán tiền mặt khi nhận hàng (COD) ạ. Đơn hàng của cô được miễn phí thu hộ, không phát sinh phí COD cô nhé.",
+      "text": "Dạ, đơn của anh sẽ thanh toán bằng tiền mặt khi nhận hàng, tổng cộng 6.490.000đ và không mất phí thu hộ anh nhé.",
       "questions": [],
-      "facts_used": [
-        "payment"
-      ],
+      "facts_used": [],
       "claims": [
+        {
+          "field": "payment",
+          "value": "COD"
+        },
+        {
+          "field": "price_vnd",
+          "value": 6490000
+        },
         {
           "field": "promo_COD-0_active",
           "value": true
@@ -153,7 +143,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 300,
+      "pause_before_ms": 350,
       "emotion": null,
       "barge_in": false
     },
@@ -170,17 +160,15 @@
           "spoken": "quan 7 tp hcm"
         }
       ],
-      "pause_before_ms": 800,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận địa chỉ giao hàng là Quận 7, TP.HCM. Dự kiến cô sẽ nhận được hàng trong 2 ngày làm việc, khoảng ngày 6/11 ạ.",
+      "text": "Dạ em đã ghi địa chỉ giao hàng là Quận 7, TP.HCM. Dự kiến giao trong 2 ngày làm việc, tức ngày 6/11 anh sẽ nhận được hàng.",
       "questions": [],
-      "facts_used": [
-        "delivery_area"
-      ],
+      "facts_used": [],
       "claims": [
         {
           "field": "delivery_days",
@@ -205,7 +193,7 @@
         {
           "type": "date",
           "value": "2026-11-06",
-          "spoken": "ngày 6/11"
+          "spoken": "ngay 6 thang 11"
         }
       ],
       "pause_before_ms": 400,
@@ -214,28 +202,28 @@
     },
     {
       "speaker": "customer",
-      "text": "chau co the xac nhan lai don hang cho co khong",
+      "text": "em co the xac nhan lai don hang cho anh khong",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 900,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xin xác nhận lại: cô đặt 1 Máy lọc không khí Samsung AX40, giá 6.490.000đ, giao về Quận 7, TP.HCM, thanh toán tiền mặt khi nhận hàng. Dự kiến giao trong 2 ngày làm việc. Đơn này sẽ được nhân viên bên em gọi xác nhận trước khi giao hàng cô nhé. Cô xác nhận giúp em thông tin trên là đúng chưa ạ?",
+      "text": "Dạ, em xin phép đọc lại đơn hàng: 1 Máy lọc không khí Samsung AX40, giá 6.490.000đ, giao tại Quận 7, TP.HCM, thanh toán tiền mặt khi nhận hàng, dự kiến nhận ngày 6/11 và được miễn phí vận chuyển. Anh xác nhận đơn giúp em ạ?",
       "questions": [
         {
           "slot": "order_summary",
           "type": "confirm",
-          "text": "Cô xác nhận giúp em thông tin trên là đúng chưa ạ?"
+          "text": "Anh xác nhận đơn giúp em ạ?"
         }
       ],
       "facts_used": [
-        "product_advised",
-        "price_quoted_vnd",
         "delivery_area",
-        "payment"
+        "payment",
+        "product_advised",
+        "price_quoted_vnd"
       ],
       "claims": [
         {
@@ -243,12 +231,12 @@
           "value": 6490000
         },
         {
-          "field": "estimated_delivery",
-          "value": "2026-11-06"
+          "field": "freeship",
+          "value": true
         },
         {
-          "field": "needs_confirmation_call",
-          "value": true
+          "field": "estimated_delivery",
+          "value": "2026-11-06"
         }
       ],
       "tool_calls": [],
@@ -257,20 +245,15 @@
         {
           "type": "money",
           "value": "6490000",
-          "spoken": "6.490.000đ"
-        },
-        {
-          "type": "address",
-          "value": "Quận 7, TP.HCM",
-          "spoken": "Quận 7, TP.HCM"
+          "spoken": "6.490.000"
         },
         {
           "type": "date",
           "value": "2026-11-06",
-          "spoken": "2 ngày làm việc"
+          "spoken": "ngay 6 thang 11"
         }
       ],
-      "pause_before_ms": 600,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
@@ -279,16 +262,21 @@
       "text": "da dung roi",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn cô đã xác nhận. Em tiến hành tạo đơn cho cô ngay bây giờ ạ.",
+      "text": "Dạ em đã ghi nhận đơn hàng cho anh. Vì đơn COD trên 2 triệu nên nhân viên bên em sẽ gọi xác nhận đơn trước khi giao hàng. Cảm ơn anh đã đặt hàng tại shop, chúc anh một ngày tốt lành ạ!",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        }
+      ],
       "tool_calls": [
         {
           "name": "order.create",
@@ -308,41 +296,41 @@
           "key": "delivery_area",
           "value": "Quận 7, TP.HCM",
           "op": "set",
-          "source": "call_2#turn9"
+          "source": "call_2#turn8"
         },
         {
           "key": "payment",
           "value": "COD",
           "op": "set",
-          "source": "call_2#turn7"
+          "source": "call_2#turn6"
         },
         {
           "key": "product_advised",
           "value": "SKU-SS-AX40",
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 6490000,
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn4"
         },
         {
           "key": "promo_code",
           "value": "NAM-SHIP0",
           "op": "set",
-          "source": "call_2#turn3"
+          "source": "call_2#turn4"
         },
         {
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_2#turn11"
+          "source": "call_2#turn12"
         }
       ],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 350,
       "emotion": null,
       "barge_in": false
     }
@@ -354,11 +342,7 @@
     "objection_handling": null,
     "sentiment": "positive",
     "decision_maker": null,
-    "commitments": [
-      {
-        "text": "Tạo đơn hàng Samsung AX40 cho khách, nhân viên sẽ gọi xác nhận trước khi giao."
-      }
-    ],
+    "commitments": [],
     "supersedes": [],
     "callback": null,
     "order": {
@@ -367,7 +351,7 @@
       "price_vnd": 6490000,
       "payment": "COD",
       "delivery_area": "Quận 7, TP.HCM",
-      "estimated_delivery": "2026-11-06"
+      "order_id": "OD600001"
     }
   }
 }

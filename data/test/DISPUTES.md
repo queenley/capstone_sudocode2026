@@ -5,9 +5,9 @@
 - `decision: revise`, `proposed_by: null`: quy tắc đã duyệt ở dev-r4, áp theo yêu cầu của người duyệt (nhóm 5, 9, phần định dạng của 11, nhóm 12).
 - `decision: revise`, `proposed_by: claude`, `reviewed_on: 2026-11-08`: Claude đề xuất sau khi đọc từng câu của tập test; người duyệt (dngan0365) chấp nhận cả bảng dưới ngày 08/11/2026.
 - `decision: revise`, `proposed_by: claude`, `reviewed_on: 2026-11-09`: nhóm 14, 15, 17, 18, Claude đề xuất sau lần kiểm mâu thuẫn nhãn với lời khách; người duyệt chấp nhận cả bảng ngày 09/11/2026 (cờ `NEW_PROPOSALS_REVIEWED` trong `build_dev_r4.py`).
-- `decision: pending`, `proposed_by: claude`: nhóm 21, 22, Claude đề xuất ngày 09/11/2026 sau lần kiểm hành động kỳ vọng của agent (tool, tham số, kết quả) với lời khách và mock BTC, chưa ai duyệt (cờ `ACTION_PROPOSALS_REVIEWED` trong `build_dev_r4.py`).
+- `decision: revise`, `proposed_by: claude`, `reviewed_on: 2026-11-09`: nhóm 21, 22, Claude đề xuất ngày 09/11/2026 sau lần kiểm hành động kỳ vọng của agent (tool, tham số, kết quả) với lời khách và mock BTC; người duyệt chấp nhận cả bảng ngày 09/11/2026 (cờ `ACTION_PROPOSALS_REVIEWED` trong `build_dev_r4.py`).
 
-Còn **2 thay đổi** ở trạng thái `pending` (nhóm 21, 22). Đặt `ACTION_PROPOSALS_REVIEWED` trong `build_dev_r4.py` khi người duyệt chấp nhận.
+Không còn thay đổi nào ở trạng thái `pending`: nhóm 21, 22 (2 thay đổi) được người duyệt chấp nhận ngày 09/11/2026.
 
 Muốn bỏ một đề xuất thì sửa bảng tương ứng trong `evaluation/datasets/ground-truth-review/build_test_r1.py` (hoặc đặt `CLAUDE_PROPOSALS_REVIEWED = None` để đưa cả nhóm về `pending`), rồi chạy lại script từ gốc repo. Script dựng từ nhãn ở commit `cfb43fbb` và ghi đè các thư mục nhãn của `data/test` (`scenarios`, `metadata`, `asr_reference`, `tools`, `call_brief`, `handoff_brief`), `conversion-report.json` và file này; audio và hội thoại mẫu không đổi. Bản gốc của file này ở `evaluation/datasets/ground-truth-review/notes/test/`.
 
@@ -38,7 +38,7 @@ Muốn bỏ một đề xuất thì sửa bảng tương ứng trong `evaluation
 
 Sửa ngày 09/11/2026 trong nhóm 14 (đã duyệt): câu thêm vào dùng cách người gọi tự xưng trong chính cuộc đó, không lấy `honorific` của kịch bản. Ở các kịch bản hai người chung SĐT, người gọi call_2 (chị Dung) đã bị ghi "Phòng cô…" theo cô Loan của kịch bản.
 
-## Đã sửa, chờ duyệt (hành động của agent, 09/11/2026)
+## Đề xuất của Claude, đã duyệt 09/11/2026 (hành động của agent)
 
 | Nhóm | Phạm vi | Đề xuất | Lý do |
 |---|---|---|---|
@@ -58,12 +58,12 @@ Sửa ngày 09/11/2026 trong nhóm 14 (đã duyệt): câu thêm vào dùng các
 | 26 | ADV-0031/c1 | `has_children` false thành true (`facts_established`, `memory_expectation`) | Khách nói "Nhà anh có một phòng ngủ của con": người duyệt chọn đổi nhãn (khách có con) thay vì sửa lời |
 | 28 | GEN-0048/c1, ADV-0023/c1 | Khách nói "Phòng mới của chị khoảng … mét vuông" | Như nhóm 28 của dev: diện tích không có trong lời khách, lịch sử CRM đã quá hạn |
 | 29 | GEN-0004, 0005, 0031, 0047 call_2 | Bỏ các fact người gọi call_2 không nói | Hai người chung SĐT, như nhóm 29 của dev |
+| 32 | 114 clip ASR (`asr_reference/ground_truth.json`) | `sku` (110 clip) và `has_children` (4 clip) chuyển từ `entities` sang `entities_not_stated` | Khách không nói tên món ("xe này có khuyến mãi gì không em?"); quy tắc có sẵn của bộ sinh (`src/asr/reference.stated_in_clip`), dev đã áp ở 543 clip. Lộ ra khi `ground_truth.json` dựng lại từ clip sau khi sinh lại audio. Người duyệt chấp nhận ngày 10/11/2026 |
 
 ## Chưa làm
 
 | Phạm vi | Lý do |
 |---|---|
-| Bộ vàng | `official_gt_approved: false`. `review/golden_manifest.json` đã có (dngan0365, 09/11/2026, `accepted_suggestions`: 188/192 nhãn, 111 hội thoại), ký trước khi nhóm 26, 28, 29 đổi nhãn: chạy lại `auto_verify.py` rồi ký lại. Còn N: GEN-0015/c2, GEN-0022/c1 (nhóm 21–22 chờ duyệt) và ADV-0024/c2 (giá RUN-10 dùng một lần) |
-| Hội thoại mẫu: 2 ca J02 và các cuộc đã đổi lời khách | Đã đánh dấu `approve: N` (kèm lý do) trong `review/needs_manual_review.csv` bằng `evaluation/datasets/ground-truth-review/mark_conversations.py`, để không dùng làm ví dụ mẫu hay dữ liệu vòng cải tiến. Cần sinh lại khi nhãn ổn |
+| Bộ vàng | `official_gt_approved: false`. `review/golden_manifest.json` ký ngày 09/11/2026 trước khi hội thoại mẫu được sinh lại; quyết định `approve_conversation` của các cuộc sinh lại đã xoá, nên cần ký lại bằng `approve_gold.py`. Nhãn còn N: ADV-0024/c2 (giá RUN-10 dùng một lần, nhãn đúng). `official_gt_approved` chỉ thành true khi nhãn của mọi cuộc là Y |
+| Hội thoại mẫu và audio | Đã sinh lại 09–10/11/2026: 46 hội thoại (`regenerate_conversations.py`, `review/regenerated.json`), 58 lượt, 4.793 ký tự ElevenLabs. Còn vài ca J02 mà bản viết mới vẫn bị bộ chấm bằng model đánh dấu bịa: giữ `approve: N` |
 | Trùng mã và trùng khách với `data/dev` | Không sửa được bằng nhãn. Muốn có tập test độc lập thì cần sinh tập mới với mã riêng (vd. `SCN-TST-*`) và khách riêng |
-| Audio của các lượt khách đã đổi | Nhóm 1, 3, 10, 14, 15 đổi lời khách, nhưng audio và `asr_reference` vẫn là lời cũ |

@@ -278,6 +278,7 @@ def write_ground_truth(audio_root: Path = AUDIO_DIR, out: Path = ASR_REFERENCE_D
     from src.utils.crm import SourceData
     products = {product.sku: product.name for product in SourceData.load().catalog.products}
     dialogues, left_out = [], {}
+    references: dict[Path, dict[str, Any]] = {}
     for meta_path in sorted(audio_root.glob("scenarios_*/call_*/turn_*.json")):
         meta = json.loads(meta_path.read_text(encoding="utf-8"))
         scenario = dataset.scenario(meta.get("scenario_id", ""))
@@ -296,7 +297,16 @@ def write_ground_truth(audio_root: Path = AUDIO_DIR, out: Path = ASR_REFERENCE_D
             left_out[reason] = left_out.get(reason, 0) + 1
             continue
         spoken = meta["spoken_text"]
-        stated, unstated = stated_in_clip(meta.get("entities") or {}, meta.get("text") or "", spoken, products)
+        # The call's reference file is the label of record (a label revision corrects its entities, e.g.
+        # evaluation/datasets/ground-truth-review); the copy beside the clip is what was known when it was spoken.
+        reference_file = out.parent / call_folder(meta["scenario_id"]) / f"{meta['call']}.json"
+        if reference_file not in references:
+            references[reference_file] = json.loads(reference_file.read_text(encoding="utf-8")) \
+                if reference_file.exists() else {}
+        line = next((t for t in references[reference_file].get("turns", [])
+                     if t.get("idx") == turn and t.get("spoken_text") == spoken), None)
+        entities = line["entities"] if line is not None and line.get("entities") is not None else meta.get("entities")
+        stated, unstated = stated_in_clip(entities or {}, meta.get("text") or "", spoken, products)
         noise = (meta.get("noise") or {}).get("type")
         dialogues.append({
             "id": f"{meta['scenario_id']}-{meta['call']}-t{turn}",

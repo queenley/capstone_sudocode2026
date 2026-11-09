@@ -12,14 +12,8 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị, chị cần hỏi về giày trekking HikePro màu trắng size 40 đúng không ạ? Em sẵn sàng hỗ trợ chị nhé.",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Chị cần hỏi về giày trekking HikePro màu trắng size 40 đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị cần tư vấn về giày trekking HikePro đúng không ạ?",
+      "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
@@ -33,9 +27,9 @@
       "speaker": "customer",
       "text": "alo em chi muon hoi ve giay trekking hikepro mau trang size 40",
       "facts_stated": {
+        "product_advised": "SKU-SN-TRK",
         "color": "trang",
-        "size": 40,
-        "product_advised": "SKU-SN-TRK"
+        "size": 40
       },
       "entities": [],
       "pause_before_ms": 0,
@@ -44,7 +38,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ mẫu giày trekking HikePro màu trắng size 40 bên em hiện đang còn hàng chị nhé.",
+      "text": "Dạ hiện tại shop có giày trekking HikePro màu trắng size 40 còn hàng chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -71,7 +65,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Giá của đôi giày trekking HikePro màu trắng size 40 là 1.990.000đ chị nha.",
+      "text": "Giá của giày trekking HikePro màu trắng size 40 là 1.990.000đ chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -98,17 +92,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại sản phẩm này đang giữ mức giá 1.990.000đ, chưa có chương trình khuyến mãi riêng chị ạ. Tuy nhiên, đơn từ 500.000đ được miễn phí vận chuyển toàn quốc chị nhé.",
+      "text": "Hiện tại sản phẩm này đang bán đúng giá niêm yết 1.990.000đ, chưa có chương trình khuyến mãi nào áp dụng chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "promo_active",
-          "value": false
+          "field": "price_vnd",
+          "value": 1990000
         },
         {
-          "field": "promo_COD-0_active",
-          "value": true
+          "field": "promo_active",
+          "value": false
         }
       ],
       "tool_calls": [],
@@ -120,18 +114,25 @@
     },
     {
       "speaker": "customer",
-      "text": "chi muon goi hotline de hoi them mot so thu nua",
+      "text": "chi muon goi hotline de hoi them mot so thu nua so chi la 0990853801",
       "facts_stated": {
-        "blocker": "muốn gọi hotline hỏi thêm"
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "phone_provided": true
       },
-      "entities": [],
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0990853801",
+          "spoken": "0990853801"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận chị muốn gọi hotline để hỏi thêm. Em sẽ lưu lại thông tin để nhân viên liên hệ hỗ trợ chị nhé. Em cảm ơn chị đã quan tâm sản phẩm ạ!",
+      "text": "Dạ em đã ghi nhận số điện thoại của chị. Nhân viên bên em sẽ gọi lại cho chị qua hotline để hỗ trợ thêm thông tin nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -141,37 +142,37 @@
           "key": "blocker",
           "value": "muốn gọi hotline hỏi thêm",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn8"
         },
         {
           "key": "color",
           "value": "trang",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn2"
         },
         {
           "key": "size",
           "value": 40,
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn2"
         },
         {
           "key": "product_advised",
           "value": "SKU-SN-TRK",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 1990000,
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn5"
         },
         {
           "key": "variant_sku",
           "value": "SKU-SN-TRK-40-TRANG",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn2"
         }
       ],
       "entities": [],
@@ -187,9 +188,19 @@
     "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
-    "commitments": [],
+    "commitments": [
+      {
+        "action": "call_back",
+        "channel": "hotline",
+        "phone": "0990853801"
+      }
+    ],
     "supersedes": [],
-    "callback": null,
+    "callback": {
+      "phone": "0990853801",
+      "channel": "hotline",
+      "reason": "Khách muốn hỏi thêm qua hotline"
+    },
     "order": null
   }
 }

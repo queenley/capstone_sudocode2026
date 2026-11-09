@@ -12,18 +12,12 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Thảo ạ, hôm trước chị có hỏi về Máy lọc không khí AirPure Y và muốn so sánh thêm, hôm nay chị muốn tiếp tục đặt hàng đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Hôm trước chị đã quan tâm Máy lọc không khí AirPure Y, đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em chào chị Thảo ạ, hôm trước chị có hỏi về Máy lọc không khí AirPure Y và còn muốn so sánh thêm, hôm nay mình muốn đặt hàng đúng không chị?",
+      "questions": [],
       "facts_used": [
+        "room_area_m2",
         "blocker",
         "product_advised",
-        "room_area_m2",
         "price_quoted_vnd",
         "promo_code"
       ],
@@ -35,16 +29,12 @@
         {
           "field": "promo_GIFT-FILTER_active",
           "value": true
-        },
-        {
-          "field": "in_stock",
-          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 800,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -53,22 +43,15 @@
       "text": "Alo, chị là Thảo đây, hôm trước chị đã hỏi về máy lọc không khí AirPure Y.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn chị đã quay lại. Máy lọc không khí AirPure Y hiện đang có giá 5.200.000đ, tặng kèm màng lọc thay thế. Chị muốn đặt hàng đúng không ạ?",
-      "questions": [
-        {
-          "slot": "other",
-          "type": "open",
-          "text": "Chị muốn đặt hàng Máy lọc không khí AirPure Y đúng không ạ?"
-        }
-      ],
+      "text": "Dạ vâng chị, hiện tại Máy lọc không khí AirPure Y bên em đang có sẵn hàng, giá 5.200.000đ, tặng kèm màng lọc thay thế. Em nhắc lại giá này đúng chương trình khuyến mãi GIFT-FILTER chị được báo hôm trước ạ.",
+      "questions": [],
       "facts_used": [
-        "product_advised",
         "price_quoted_vnd",
         "promo_code"
       ],
@@ -80,16 +63,12 @@
         {
           "field": "promo_GIFT-FILTER_active",
           "value": true
-        },
-        {
-          "field": "in_stock",
-          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -98,13 +77,13 @@
       "text": "Chị muốn đặt hàng cái AirPure Y, giá 5 triệu 2 phải không em?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 800,
+      "pause_before_ms": 700,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ đúng rồi chị, giá hiện tại của AirPure Y là 5.200.000đ, đã bao gồm chương trình tặng màng lọc. Chị muốn thanh toán bằng hình thức nào ạ?",
+      "text": "Dạ đúng rồi chị, giá Máy lọc không khí AirPure Y là 5.200.000đ, tặng kèm một màng lọc chính hãng. Chị muốn thanh toán bằng hình thức nào ạ?",
       "questions": [
         {
           "slot": "payment",
@@ -112,10 +91,7 @@
           "text": "Chị muốn thanh toán bằng hình thức nào ạ?"
         }
       ],
-      "facts_used": [
-        "price_quoted_vnd",
-        "promo_code"
-      ],
+      "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
@@ -125,7 +101,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 800,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -136,26 +112,31 @@
         "payment": "COD"
       },
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận thanh toán COD ạ. Địa chỉ giao hàng mình ở đâu để em kiểm tra thời gian giao cho chị nhé?",
+      "text": "Dạ em ghi nhận chị chọn thanh toán COD toàn quốc, đơn này được miễn phí thu hộ ạ. Chị cần giao hàng về địa chỉ nào giúp em với?",
       "questions": [
         {
           "slot": "delivery_area",
           "type": "open",
-          "text": "Địa chỉ giao hàng mình ở đâu để em kiểm tra thời gian giao cho chị nhé?"
+          "text": "Chị cần giao hàng về địa chỉ nào giúp em với?"
         }
       ],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -172,37 +153,28 @@
           "spoken": "Ninh Kiều, Cần Thơ"
         }
       ],
-      "pause_before_ms": 600,
+      "pause_before_ms": 700,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ khu vực Ninh Kiều, Cần Thơ sẽ giao trong khoảng 4 ngày làm việc, dự kiến nhận hàng là ngày 24/10. Sau đây em xin đọc lại đơn hàng để chị kiểm tra giúp em nhé: 1 Máy lọc không khí AirPure Y, giá 5.200.000đ, tặng kèm 1 màng lọc, giao về Ninh Kiều, Cần Thơ, thanh toán COD, nhận hàng dự kiến ngày 24/10.",
+      "text": "Dạ em xác nhận lại: chị đặt 1 Máy lọc không khí AirPure Y giá 5.200.000đ, tặng màng lọc, giao về Ninh Kiều, Cần Thơ, thanh toán COD. Dự kiến giao hàng trong 4 ngày làm việc, tức khoảng 24/10. Thông tin này đúng chưa chị, em lên đơn nhé?",
       "questions": [
         {
           "slot": "order_summary",
           "type": "confirm",
-          "text": "Chị kiểm tra lại giúp em thông tin đơn hàng như trên đã chính xác chưa ạ?"
+          "text": "Thông tin này đúng chưa chị, em lên đơn nhé?"
         }
       ],
       "facts_used": [
         "delivery_area",
-        "payment"
+        "payment",
+        "product_advised",
+        "price_quoted_vnd",
+        "promo_code"
       ],
       "claims": [
-        {
-          "field": "price_vnd",
-          "value": 5200000
-        },
-        {
-          "field": "promo_GIFT-FILTER_active",
-          "value": true
-        },
-        {
-          "field": "in_stock",
-          "value": true
-        },
         {
           "field": "estimated_delivery",
           "value": "2026-10-24"
@@ -219,7 +191,7 @@
       ],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 900,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -228,30 +200,16 @@
       "text": "Chị đồng ý lên đơn hàng cho em.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em lên đơn cho chị ngay. Đơn hàng sẽ được xác nhận qua điện thoại trước khi giao, nhân viên bên em sẽ gọi xác nhận đơn với chị ạ. Em cảm ơn chị đã đặt hàng!",
+      "text": "Dạ em đã tạo đơn hàng cho chị rồi ạ. Nhân viên bên em sẽ gọi xác nhận đơn trước khi giao hàng, chị lưu ý điện thoại giúp em nhé. Cảm ơn chị đã tin tưởng shop!",
       "questions": [],
-      "facts_used": [
-        "delivery_area",
-        "payment",
-        "product_advised",
-        "price_quoted_vnd",
-        "promo_code"
-      ],
+      "facts_used": [],
       "claims": [
-        {
-          "field": "price_vnd",
-          "value": 5200000
-        },
-        {
-          "field": "promo_GIFT-FILTER_active",
-          "value": true
-        },
         {
           "field": "needs_confirmation_call",
           "value": true
@@ -271,9 +229,46 @@
           }
         }
       ],
-      "memory_writes": [],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Ninh Kiều, Cần Thơ",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_2#turn6"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-Y",
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5200000,
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "promo_code",
+          "value": "GIFT-FILTER",
+          "op": "set",
+          "source": "call_2#turn0"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn12"
+        }
+      ],
       "entities": [],
-      "pause_before_ms": 800,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -282,20 +277,20 @@
       "text": "Có gì cần xác nhận nữa không em?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 300,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chị đã cung cấp đầy đủ thông tin rồi ạ. Khi nhận hàng, chị kiểm tra ngoại quan sản phẩm trước khi thanh toán giúp em nhé. Nếu cần hỗ trợ gì thêm chị có thể liên hệ lại tổng đài ạ.",
+      "text": "Dạ hiện tại thông tin đã đầy đủ rồi chị, em sẽ gửi SMS/Zalo khi đơn hàng được bàn giao cho bên vận chuyển ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -304,20 +299,20 @@
       "text": "Chị rất ưng cái máy này, cảm ơn em nhiều!",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 300,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn chị Thảo đã tin tưởng shop. Chúc chị sử dụng máy AirPure Y thật hài lòng ạ!",
+      "text": "Dạ em cảm ơn chị Thảo rất nhiều đã ủng hộ shop. Nếu cần hỗ trợ gì thêm chị cứ liên hệ tổng đài hoặc Zalo OA giúp em ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -326,63 +321,35 @@
       "text": "Em giúp chị nhanh nhanh với nhé!",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 350,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã lên đơn thành công, bên em sẽ xử lý và giao hàng cho chị đúng lịch sớm nhất ạ.",
+      "text": "Dạ đơn hàng của chị đã được ưu tiên xử lý rồi ạ, em sẽ cố gắng giao nhanh nhất có thể theo chính sách của shop.",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
-      "memory_writes": [
-        {
-          "key": "delivery_area",
-          "value": "Ninh Kiều, Cần Thơ",
-          "op": "set",
-          "source": "call_2#turn9"
-        },
-        {
-          "key": "payment",
-          "value": "COD",
-          "op": "set",
-          "source": "call_2#turn7"
-        },
-        {
-          "key": "product_advised",
-          "value": "SKU-AP-Y",
-          "op": "set",
-          "source": "call_2#turn1"
-        },
-        {
-          "key": "price_quoted_vnd",
-          "value": 5200000,
-          "op": "set",
-          "source": "call_2#turn1"
-        },
-        {
-          "key": "promo_code",
-          "value": "GIFT-FILTER",
-          "op": "set",
-          "source": "call_2#turn1"
-        },
-        {
-          "key": "order_id",
-          "value": "OD600001",
-          "op": "set",
-          "source": "call_2#turn11"
-        }
-      ],
+      "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi em, lên đơn giúp chị nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "dat_hang_may_loc_khong_khi",
+    "intent": "xac_nhan_don",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,

@@ -12,50 +12,51 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, hôm trước chị có đặt Máy lọc không khí AirPure X, hôm nay chị muốn hỏi về mẫu AirPure Pro đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Hôm nay chị muốn tư vấn về máy lọc không khí AirPure Pro đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Hôm trước chị có đặt Máy lọc không khí AirPure X, em có thể hỗ trợ chị về AirPure Pro hôm nay ạ.",
+      "questions": [],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị muốn hỏi về máy lọc không khí AirPure Pro mà hôm trước có tư vấn.",
-      "facts_stated": {},
+      "text": "Alo, chị muốn hỏi về máy lọc không khí AirPure Pro mà hôm trước có tư vấn. Nhà chị không có trẻ nhỏ.",
+      "facts_stated": {
+        "has_children": false
+      },
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, em sẵn sàng hỗ trợ chị về máy AirPure Pro ạ. Đây là dòng máy phù hợp cho phòng diện tích lên tới 45 mét vuông, rất phù hợp với nhu cầu của chị.",
-      "questions": [],
+      "text": "Dạ em ghi nhận nhà mình không có trẻ nhỏ ạ. Chị cần tư vấn về máy AirPure Pro, chị cho em xin diện tích phòng dự kiến sử dụng để em kiểm tra máy phù hợp không nhé.",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "open",
+          "text": "Chị cho em xin diện tích phòng dự kiến sử dụng để em kiểm tra máy phù hợp không nhé."
+        }
+      ],
       "facts_used": [],
       "claims": [
         {
-          "field": "product_advised",
-          "value": "SKU-AP-PRO"
+          "field": "promo_AIR-OCT_active",
+          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 800,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -66,22 +67,33 @@
         "room_area_m2": 30
       },
       "entities": [],
-      "pause_before_ms": 800,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, phòng 30 mét vuông dùng AirPure Pro là rất hợp lý chị nhé, máy đáp ứng tốt cho phòng từ 30 đến 45 mét vuông và lọc sạch không khí nhanh ạ.",
+      "text": "Dạ, Máy lọc không khí AirPure Pro phù hợp cho phòng tối đa 45 mét vuông nên dùng cho phòng 30 mét vuông rất tốt chị nhé. Máy này đang còn hàng, giá ưu đãi 7.690.000đ, đã giảm 300.000đ với chương trình AIR-OCT đến hết ngày 30/10.",
       "questions": [],
-      "facts_used": [
-        "room_area_m2"
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        }
       ],
-      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 900,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -89,16 +101,17 @@
       "speaker": "customer",
       "text": "Chị thấy giá là 7 triệu 690 ngàn nhưng ở chỗ khác có 6 triệu 770 ngàn, sao lại chênh lệch nhiều vậy?",
       "facts_stated": {
-        "competitor_price_vnd": 6770000
+        "competitor_price_vnd": 6770000,
+        "objection": "giá cao hơn chỗ khác"
       },
       "entities": [],
-      "pause_before_ms": 800,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xin phép giải thích, giá bên em là 7.690.000đ đã áp dụng khuyến mãi AIR-OCT giảm 300.000đ so với giá niêm yết 7.990.000đ. Máy bên em là hàng chính hãng bảo hành 24 tháng, được đổi trả 30 ngày nếu có lỗi kỹ thuật và shop hỗ trợ giao hàng toàn quốc ạ.",
+      "text": "Dạ em hiểu chị quan tâm giá ạ. Máy AirPure Pro bên em là hàng chính hãng, bảo hành 12 tháng và được đổi trả trong 30 ngày nếu có lỗi kỹ thuật. Giá đã áp dụng khuyến mãi tốt nhất hiện tại, ngoài ra bên em miễn phí vận chuyển toàn quốc và hỗ trợ COD với đơn dưới 10 triệu.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -114,7 +127,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 1200,
+      "pause_before_ms": 700,
       "emotion": null,
       "barge_in": false
     },
@@ -125,17 +138,15 @@
         "budget_vnd": 8000000
       },
       "entities": [],
-      "pause_before_ms": 900,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại giá máy AirPure Pro là 7.690.000đ đã được giảm theo chương trình AIR-OCT, trong ngân sách 8 triệu của chị rồi ạ. Ngoài ra, đơn từ 2 triệu được miễn phí vận chuyển và chị được kiểm tra hàng trước khi nhận ạ.",
+      "text": "Dạ hiện tại giá ưu đãi 7.690.000đ đã là tốt nhất cho chương trình AIR-OCT, trong ngân sách 8 triệu của chị rồi ạ. Chương trình này chỉ còn đến hết ngày 30/10, chị cân nhắc giúp em nhé.",
       "questions": [],
-      "facts_used": [
-        "budget_vnd"
-      ],
+      "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
@@ -149,7 +160,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 900,
+      "pause_before_ms": 650,
       "emotion": null,
       "barge_in": false
     },
@@ -158,34 +169,39 @@
       "text": "Ừm, chị cần hỏi thêm một chút rồi sẽ gọi lại nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 1100,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, chị cứ cân nhắc thêm ạ. Khuyến mãi AIR-OCT còn đến ngày 30/10 nên nếu chị cần giữ giá, mình gọi lại trước thời gian này giúp em nhé. Em cảm ơn chị đã quan tâm ạ.",
+      "text": "Dạ vâng, em ghi nhận chị sẽ cân nhắc thêm. Nếu cần tư vấn gì thêm về AirPure Pro hoặc đặt hàng, chị gọi lại cho shop bất cứ lúc nào nhé. Em cảm ơn chị ạ.",
       "questions": [],
-      "facts_used": [
-        "promo_code"
-      ],
-      "claims": [
-        {
-          "field": "promo_AIR-OCT_active",
-          "value": true
-        }
-      ],
+      "facts_used": [],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [
         {
           "key": "budget_vnd",
           "value": 8000000,
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn10"
         },
         {
           "key": "competitor_price_vnd",
           "value": 6770000,
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "has_children",
+          "value": false,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "objection",
+          "value": "giá cao hơn chỗ khác",
           "op": "set",
           "source": "call_1#turn6"
         },
@@ -199,7 +215,7 @@
           "key": "product_advised",
           "value": "SKU-AP-PRO",
           "op": "set",
-          "source": "call_1#turn2"
+          "source": "call_1#turn4"
         },
         {
           "key": "price_quoted_vnd",
@@ -215,16 +231,16 @@
         }
       ],
       "entities": [],
-      "pause_before_ms": 900,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "hoi_gia_tu_van_may_loc_khong_khi",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "gia_cao_hon_cho_khac",
-    "objection_handling": "Trình bày giá đã áp dụng khuyến mãi, nêu giá trị bảo hành đổi trả và miễn phí giao hàng.",
+    "objection_type": "gia_canh_tranh",
+    "objection_handling": "Nêu giá trị đi kèm, nhấn mạnh bảo hành, đổi trả và khuyến mãi tốt nhất",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

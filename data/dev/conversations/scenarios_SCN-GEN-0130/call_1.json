@@ -12,8 +12,14 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần tư vấn về sản phẩm nào ạ?",
-      "questions": [],
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần tư vấn về giày chạy bộ RunLite 2 Pro size 42 màu đen đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh cần tư vấn về giày chạy bộ RunLite 2 Pro size 42 màu đen đúng không ạ?"
+        }
+      ],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
@@ -37,7 +43,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giày chạy bộ RunLite 2 Pro size 42 màu đen hiện còn hàng anh nhé. Giá đang giảm còn 1.352.000đ theo chương trình RUN2-SALE, đã áp dụng cho size 42.",
+      "text": "Dạ sản phẩm RunLite 2 Pro size 42 màu đen bên em hiện đang còn hàng, giá ưu đãi hiện tại là 1.352.000đ áp dụng chương trình RUN2-SALE đến hết ngày 07/10 ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -72,17 +78,13 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xin lỗi vì có sự khác biệt giá giữa các kênh. Giá 1.352.000đ là giá đã giảm mới nhất cho chương trình RUN2-SALE, áp dụng tại thời điểm anh hỏi hôm nay ạ. Giá có thể thay đổi theo chương trình khuyến mãi còn hiệu lực.",
+      "text": "Dạ em xin phép giải thích, giá sản phẩm sẽ áp dụng theo chương trình khuyến mãi tại thời điểm khách hỏi hoặc đặt hàng. Hiện tại giá ưu đãi cho RunLite 2 Pro là 1.352.000đ, có thể trước đó chương trình hoặc mức giá khác đã kết thúc hoặc thay đổi rồi ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 1352000
-        },
-        {
-          "field": "promo_RUN2-SALE_active",
-          "value": true
         }
       ],
       "tool_calls": [],
@@ -103,15 +105,10 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em rất hiểu tâm lý so sánh giá ạ. Shop BTC cam kết hàng chính hãng, bảo hành 12 tháng, đổi trả trong 7 ngày nếu có lỗi và miễn phí vận chuyển với đơn từ 500.000đ. Ngoài ra, giá bên em đã áp dụng khuyến mãi tốt nhất hiện tại cho anh rồi ạ.",
+      "text": "Dạ em rất cảm ơn anh đã phản hồi. Shop em cam kết hàng chính hãng, bảo hành 12 tháng theo chính sách và hỗ trợ đổi trả trong 7 ngày nếu có vấn đề về sản phẩm ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1352000
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -130,7 +127,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại RunLite 2 Pro đang được giảm giá còn 1.352.000đ theo chương trình RUN2-SALE và miễn phí vận chuyển toàn quốc cho đơn từ 500.000đ anh nhé.",
+      "text": "Dạ hiện tại RunLite 2 Pro đang được giảm giá còn 1.352.000đ theo chương trình RUN2-SALE, anh mua size 42 màu đen vẫn được áp dụng ưu đãi này đến hết ngày 07/10 ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -140,10 +137,6 @@
         },
         {
           "field": "promo_RUN2-SALE_active",
-          "value": true
-        },
-        {
-          "field": "promo_COD-0_active",
           "value": true
         }
       ],
@@ -156,16 +149,24 @@
     },
     {
       "speaker": "customer",
-      "text": "Thế thì để anh hỏi lại bạn bè rồi gọi lại nhé.",
-      "facts_stated": {},
-      "entities": [],
+      "text": "Thế thì để anh hỏi lại bạn bè rồi gọi lại nhé. Số anh là 0930976582.",
+      "facts_stated": {
+        "phone_provided": true
+      },
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0930976582",
+          "spoken": "0930976582"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, em ghi nhận nhu cầu của anh. Nếu cần hỗ trợ thêm anh cứ nhắn lại, giá khuyến mãi còn đến hết ngày 07/10/2026 ạ. Em cảm ơn anh đã quan tâm sản phẩm của shop BTC.",
+      "text": "Dạ vâng, em đã ghi nhận số của anh. Chương trình RUN2-SALE còn đến hết ngày 07/10, anh cân nhắc giúp em nhé. Nếu cần hỗ trợ thêm hoặc đặt hàng anh cứ nhắn lại cho shop bất kỳ lúc nào ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -180,49 +181,49 @@
           "key": "size",
           "value": 42,
           "op": "set",
-          "source": "call_1#turn2"
+          "source": "call_1#turn10"
         },
         {
           "key": "color",
           "value": "den",
           "op": "set",
-          "source": "call_1#turn2"
+          "source": "call_1#turn10"
         },
         {
           "key": "competitor_price_vnd",
           "value": 1240000,
           "op": "set",
-          "source": "call_1#turn6"
+          "source": "call_1#turn10"
         },
         {
           "key": "objection",
           "value": "giá cao hơn chỗ khác",
           "op": "set",
-          "source": "call_1#turn6"
+          "source": "call_1#turn10"
         },
         {
           "key": "product_advised",
           "value": "SKU-SN-RUN2",
           "op": "set",
-          "source": "call_1#turn2"
+          "source": "call_1#turn10"
         },
         {
           "key": "price_quoted_vnd",
           "value": 1352000,
           "op": "set",
-          "source": "call_1#turn3"
+          "source": "call_1#turn10"
         },
         {
           "key": "variant_sku",
           "value": "SKU-SN-RUN2-42-DEN",
           "op": "set",
-          "source": "call_1#turn2"
+          "source": "call_1#turn10"
         },
         {
           "key": "promo_code",
           "value": "RUN2-SALE",
           "op": "set",
-          "source": "call_1#turn3"
+          "source": "call_1#turn10"
         }
       ],
       "entities": [],
@@ -232,10 +233,10 @@
     }
   ],
   "gold": {
-    "intent": "hoi_gia_giay_km",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "gia_cao_hon_doi_thu",
-    "objection_handling": "Nhấn mạnh giá trị bảo hành, đổi trả, freeship, cam kết chính hãng, giải thích giá đã áp dụng KM tốt nhất.",
+    "objection_type": "giá cao hơn chỗ khác",
+    "objection_handling": "Nêu giá trị hàng chính hãng, bảo hành 12 tháng, đổi trả 7 ngày, nhấn mạnh khuyến mãi và thời hạn ưu đãi.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

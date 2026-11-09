@@ -12,12 +12,12 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị cần tư vấn về máy lọc không khí AirPure X cho phòng khoảng 25 mét vuông đúng không ạ? Em sẵn sàng hỗ trợ chị nhé.",
+      "text": "Dạ em chào chị ạ, chị muốn hỏi về máy lọc không khí AirPure X cho phòng khoảng 25 mét vuông đúng không ạ?",
       "questions": [
         {
           "slot": "room_area_m2",
           "type": "confirm",
-          "text": "Chị cần tư vấn máy lọc cho phòng khoảng 25 mét vuông đúng không ạ?"
+          "text": "Chị muốn hỏi cho phòng diện tích khoảng 25 mét vuông đúng không ạ?"
         }
       ],
       "facts_used": [],
@@ -47,14 +47,8 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ với phòng 25 mét vuông, AirPure X là lựa chọn phù hợp chị nhé. Máy hiện đang còn hàng tại shop, giá là 4.890.000đ. Chị đang cân nhắc trong khoảng ngân sách nào để em tư vấn kỹ hơn cho mình ạ?",
-      "questions": [
-        {
-          "slot": "budget_vnd",
-          "type": "open",
-          "text": "Chị đang cân nhắc trong khoảng ngân sách nào để em tư vấn kỹ hơn cho mình ạ?"
-        }
-      ],
+      "text": "Dạ sản phẩm AirPure X phù hợp cho phòng 25m² chị nhé. Máy đang có hàng, giá hiện tại là 4.890.000đ. Chị chưa có trẻ nhỏ thì mẫu này rất hợp ạ.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
@@ -87,23 +81,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ trong tầm ngân sách 5 triệu rưỡi thì AirPure X rất hợp lý chị nhé. Máy phù hợp phòng 25 mét vuông, lọc bụi mịn và vận hành êm. Hiện tại, giá máy là 4.890.000đ và đang có tặng kèm một màng lọc thay thế chính hãng. Chị có muốn em gửi thêm thông tin khuyến mãi hiện tại không ạ?",
-      "questions": [
-        {
-          "slot": "other",
-          "type": "open",
-          "text": "Chị muốn biết thêm về khuyến mãi hiện tại của máy đúng không ạ?"
-        }
-      ],
+      "text": "Với ngân sách 5 triệu rưỡi, chị chọn AirPure X là hợp lý nhất ạ. Hiện tại máy đang có khuyến mãi tặng màng lọc thay thế, tổng giá vẫn là 4.890.000đ chị nhé.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 4890000
-        },
-        {
           "field": "promo_GIFT-FILTER_active",
           "value": true
+        },
+        {
+          "field": "price_vnd",
+          "value": 4890000
         }
       ],
       "tool_calls": [],
@@ -124,14 +112,8 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại khi mua AirPure X, chị sẽ được tặng kèm một màng lọc thay thế chính hãng, chị nhé. Chương trình này còn hiệu lực đến hết ngày 22/10. Ngoài ra, shop miễn phí vận chuyển toàn quốc cho đơn này. Chị cần hỏi thêm về tính năng hay muốn gọi trực tiếp hotline để được tư vấn kỹ hơn không ạ?",
-      "questions": [
-        {
-          "slot": "other",
-          "type": "open",
-          "text": "Chị cần hỏi thêm về tính năng hay muốn gọi trực tiếp hotline để được tư vấn kỹ hơn không ạ?"
-        }
-      ],
+      "text": "Dạ, máy AirPure X đang có chương trình tặng kèm một màng lọc thay thế chính hãng khi mua trong tháng 10 này, chị nhận máy sẽ có luôn quà tặng đi kèm ạ.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
@@ -148,18 +130,25 @@
     },
     {
       "speaker": "customer",
-      "text": "the chi muon goi hotline hoi them cho chac chan",
+      "text": "the chi muon goi hotline hoi them cho chac chan so chi la 0992298369",
       "facts_stated": {
-        "blocker": "muốn gọi hotline hỏi thêm"
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "phone_provided": true
       },
-      "entities": [],
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0992298369",
+          "spoken": "0992298369"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận nhu cầu của chị muốn gọi hotline để được tư vấn thêm cho yên tâm ạ. Chúc chị sớm chọn được sản phẩm phù hợp. Nếu cần thông tin gì nữa chị cứ nhắn cho shop nhé!",
+      "text": "Dạ em đã ghi nhận số điện thoại của chị. Nhân viên bên em sẽ gọi lại cho chị qua hotline để tư vấn chi tiết hơn và giải đáp mọi thắc mắc cho chị ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -175,37 +164,37 @@
           "key": "budget_vnd",
           "value": 5500000,
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn4"
         },
         {
           "key": "has_children",
           "value": false,
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn4"
         },
         {
           "key": "room_area_m2",
           "value": 25,
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn2"
         },
         {
           "key": "product_advised",
           "value": "SKU-AP-X",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 4890000,
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn4"
         },
         {
           "key": "promo_code",
           "value": "GIFT-FILTER",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn6"
         }
       ],
       "entities": [],
@@ -215,7 +204,7 @@
     }
   ],
   "gold": {
-    "intent": "tu_van_may_loc_khong_khi",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,
@@ -223,7 +212,10 @@
     "decision_maker": null,
     "commitments": [],
     "supersedes": [],
-    "callback": null,
+    "callback": {
+      "phone": "0992298369",
+      "reason": "khách muốn gọi hotline hỏi thêm"
+    },
     "order": null
   }
 }

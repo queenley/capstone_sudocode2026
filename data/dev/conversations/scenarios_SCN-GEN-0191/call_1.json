@@ -12,8 +12,14 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần tư vấn về máy lọc nước đúng không ạ?",
-      "questions": [],
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh Dũng muốn tư vấn máy lọc nước RO Karofi 9 lõi cho gia đình đúng không ạ?",
+      "questions": [
+        {
+          "slot": "usage_need",
+          "type": "confirm",
+          "text": "Anh muốn tìm máy lọc nước cho gia đình 4 người đúng không ạ?"
+        }
+      ],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
@@ -25,21 +31,24 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh muốn hỏi về máy lọc nước RO Karofi 9 lõi cho gia đình mình.",
-      "facts_stated": {},
+      "text": "Alo, anh muốn hỏi về máy lọc nước RO Karofi 9 lõi cho gia đình mình. Ngân sách của anh tầm 7 triệu.",
+      "facts_stated": {
+        "product_advised": "SKU-WF-RO9",
+        "budget_vnd": 7000000
+      },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ máy lọc nước RO Karofi 9 lõi là lựa chọn rất phù hợp, anh quan tâm dùng cho bao nhiêu người và nguồn nước nhà mình là gì ạ?",
+      "text": "Dạ, với ngân sách khoảng 7 triệu, máy lọc nước RO Karofi 9 lõi là lựa chọn rất phù hợp cho gia đình 4 người, đáp ứng tốt nhu cầu sử dụng nước sạch hằng ngày. Anh có muốn biết thêm chi tiết về máy không ạ?",
       "questions": [
         {
           "slot": "usage_need",
-          "type": "open",
-          "text": "Anh quan tâm dùng cho bao nhiêu người và nguồn nước nhà mình là gì ạ?"
+          "type": "confirm",
+          "text": "Gia đình mình có 4 người đúng không anh?"
         }
       ],
       "facts_used": [],
@@ -58,13 +67,13 @@
         "usage_need": "gia đình 4 người"
       },
       "entities": [],
-      "pause_before_ms": 650,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ máy RO Karofi 9 lõi đáp ứng tốt cho gia đình 4 người anh nhé, công suất lọc của máy là 10 lít một giờ, phù hợp nước máy sinh hoạt thành phố.",
+      "text": "Dạ, máy RO Karofi 9 lõi có công suất lọc 10 lít/giờ, phù hợp cho gia đình 4–6 người nên mình yên tâm sử dụng anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -80,13 +89,13 @@
       "text": "Giá em báo là bao nhiêu vậy? Có khuyến mãi gì không?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ máy RO Karofi 9 lõi hiện có giá 5.990.000đ ạ, giá này là giá chuẩn của hãng và hiện chưa có chương trình khuyến mãi giảm giá nào áp dụng cho sản phẩm này. Tuy nhiên, anh được miễn phí thu hộ khi chọn COD và shop giao hàng toàn quốc.",
+      "text": "Dạ, giá máy lọc nước RO Karofi 9 lõi hiện tại là 5.990.000đ, chưa có chương trình khuyến mãi giảm giá thêm trong hôm nay anh nhé. Đơn trên 500.000đ sẽ được miễn phí vận chuyển toàn quốc, và mình được kiểm tra hàng khi nhận.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -97,10 +106,6 @@
         {
           "field": "promo_active",
           "value": false
-        },
-        {
-          "field": "promo_COD-0_active",
-          "value": true
         }
       ],
       "tool_calls": [],
@@ -117,50 +122,6 @@
         "blocker": "muốn so sánh thêm"
       },
       "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ vâng, em ghi nhận anh muốn so sánh thêm. Khi nào anh cần tư vấn tiếp, anh cứ liên hệ lại shop nhé. Em giữ lại thông tin tư vấn hôm nay để hỗ trợ anh nhanh hơn lần sau ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [
-        {
-          "key": "blocker",
-          "value": "muốn so sánh thêm",
-          "op": "set",
-          "source": "call_1#turn9"
-        },
-        {
-          "key": "budget_vnd",
-          "value": 7000000,
-          "op": "set",
-          "source": "call_1#turn9"
-        },
-        {
-          "key": "usage_need",
-          "value": "gia đình 4 người",
-          "op": "set",
-          "source": "call_1#turn9"
-        },
-        {
-          "key": "product_advised",
-          "value": "SKU-WF-RO9",
-          "op": "set",
-          "source": "call_1#turn9"
-        },
-        {
-          "key": "price_quoted_vnd",
-          "value": 5990000,
-          "op": "set",
-          "source": "call_1#turn9"
-        }
-      ],
-      "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
@@ -169,8 +130,8 @@
   "gold": {
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "muon_so_sanh_them",
-    "objection_handling": "Ghi nhận khách muốn so sánh thêm, giữ lại thông tin tư vấn để hỗ trợ lần sau.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],
