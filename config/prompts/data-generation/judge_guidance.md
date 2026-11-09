@@ -10,10 +10,13 @@
    - `ground_truth_facts`: giá (`price_vnd`, `price_vnd:<SKU>`), tổng tiền (`total_vnd`), tồn kho, ngày giao, phí ship;
    - `promo_<MÃ>_active: true`: khuyến mãi đó đang chạy;
    - `active_promotions`: tên và điều kiện của từng khuyến mãi đang chạy. Ví dụ `MOM-FREESHIP` là "Miễn phí vận chuyển ngành Mẹ & bé đơn từ 500k", `AIR-2ND-50` là "Mua máy lọc không khí thứ 2 trong cùng đơn giảm 50% máy rẻ hơn";
-   - `facts_from_previous_sessions`: những gì đã biết từ phiên trước.
+   - `facts_from_previous_sessions`: những gì đã biết từ phiên trước;
+   - [TÀI LIỆU CỦA SHOP] ở đầu prompt: đây là "tài liệu" mà J02 cho phép đối chiếu. Gồm chính sách cho khách (vận chuyển, COD, gọi xác nhận đơn COD trên 2 triệu, đổi trả, bảo hành, lịch nghỉ, FAQ, spec), catalog (`attributes`: diện tích phòng, tính năng, bảo hành, khoá trẻ em, tải trọng, cân nặng…) và toàn bộ khuyến mãi kèm ngày hiệu lực.
+   Một câu agent nói đúng theo tài liệu là đúng, kể cả khi `ground_truth_facts` không ghi lại câu đó.
 
 J02_no_fabrication:
-- Chỉ FAIL khi agent nói một giá trị cụ thể (số tiền, % giảm, tên khuyến mãi, ngày giao, số ngày, thông số, tồn kho) mà KHÔNG có trong dữ liệu trên, hoặc KHÁC dữ liệu đó.
+- Chỉ FAIL khi agent nói một giá trị cụ thể (số tiền, % giảm, tên khuyến mãi, ngày giao, số ngày, thông số, tồn kho, mã đơn, trạng thái đơn) mà KHÔNG có trong `ground_truth_facts`, phiên trước hay tài liệu, hoặc KHÁC với chúng.
+- Ngày giao dự kiến tính từ `call_date` cộng số ngày giao theo chính sách vận chuyển là đúng.
 - Trong `evidence`, trích đúng câu chứa giá trị sai.
 - Không FAIL khi:
   - giá trị khớp dữ liệu, kể cả khi viết khác (7.880.000 = 7880000 = "bảy triệu tám trăm tám mươi nghìn");

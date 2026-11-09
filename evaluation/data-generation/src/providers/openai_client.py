@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 import random
+import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -40,6 +41,7 @@ class OpenAIClient:
         self._calls_today = self._read_calls_today()
         #: Schemas the API refused in strict mode (a free-form object such as a tool's args): sent non-strict.
         self._not_strict: set[str] = set()
+        self._lock = threading.Lock()
         cache_dir.mkdir(parents=True, exist_ok=True)
 
     #: Reasoning models (gpt-5, o-series) take no temperature and count their reasoning in max_completion_tokens.
@@ -133,6 +135,11 @@ class OpenAIClient:
         return converted
 
     def _wait_for_rate_limit(self) -> None:
+        # Several threads may share one client (llm_judge --workers): requests start one at a time, spaced by rpm.
+        with self._lock:
+            self._wait_for_rate_limit_locked()
+
+    def _wait_for_rate_limit_locked(self) -> None:
         utc_day = datetime.now(timezone.utc).date()
         if utc_day != self._call_day:
             self._call_day, self._calls_today = utc_day, self._read_calls_today()
@@ -156,7 +163,7 @@ class OpenAIClient:
     def _log(self, record: dict) -> None:
         self.log_path.parent.mkdir(parents=True, exist_ok=True)
         record = {"timestamp_utc": datetime.now(timezone.utc).isoformat(), **record}
-        with self.log_path.open("a", encoding="utf-8") as stream:
+        with self._lock, self.log_path.open("a", encoding="utf-8") as stream:
             stream.write(json.dumps(record, ensure_ascii=False) + "\n")
 
     def _read_calls_today(self) -> int:

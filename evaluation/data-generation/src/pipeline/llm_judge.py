@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from concurrent.futures import ThreadPoolExecutor
 
 from src.pipeline.validate_rules import needs_review
 from src.schemas.conversation import AgentTurn, Conversation
@@ -21,7 +22,8 @@ from src.schemas.scenario import Scenario
 from src.utils.dataset import Dataset
 from src.utils.io import write_json
 from src.utils.memory import known_facts_before
-from src.utils.paths import DATA_DIR, PROMPTS_DIR, VALIDATION_JSON
+from src.utils.paths import DATA_DIR, POLICY_DIR, PROMPTS_DIR, VALIDATION_JSON
+from src.utils.policy import load_customer_policy
 from src.utils.settings import load_settings, model_client, sampling
 from src.utils.quota import DailyLimitReached, stop_on_daily_limit
 
@@ -31,8 +33,24 @@ RUBRIC = json.loads((DATA_DIR / "eval" / "llm_judge_rubric.json").read_text(enco
 GUIDANCE = (PROMPTS_DIR / "judge_guidance.md").read_text(encoding="utf-8")
 PROMOTIONS = {p["promo_code"]: p for p in
               json.loads((DATA_DIR / "catalog" / "promotions.json").read_text(encoding="utf-8"))["promotions"]}
+#: J02 accepts a value that matches "ground_truth_facts hoặc tài liệu": the documents are the shop's customer-facing
+#: policies (the ones the reference agent was given, src/utils/policy.py), the catalog and the promotions. They come
+#: first and are the same bytes for every call, so the provider's prompt cache bills them at the cached rate.
+DOCUMENTS = ("[TÀI LIỆU CỦA SHOP: chính sách cho khách, catalog sản phẩm, khuyến mãi; giống nhau cho mọi cuộc gọi]\n"
+             + json.dumps({"policies": load_customer_policy(POLICY_DIR),
+                           "products": json.loads((DATA_DIR / "catalog" / "products.json").read_text(encoding="utf-8")),
+                           "promotions": json.loads((DATA_DIR / "catalog" / "promotions.json").read_text(encoding="utf-8"))},
+                          ensure_ascii=False) + "\n\n")
 PROMO_FIELDS = ("name", "type", "applies_to", "discount_percent", "discount_vnd", "gift_sku", "conditions")
 CONFLICT_CASES = {"ba_kenh_bao_gia_lech", "doi_khuyen_mai_het_han", "ba_phien_doi_thong_tin", "phien_ban_chinh_sach_cu"}
+
+
+def over_budget(scenario: Scenario, call_name: str) -> bool:
+    """The call's total (or single price) is above the budget the customer stated, in this call or before."""
+    call = scenario.calls[call_name]
+    budget = (call.facts_established or {}).get("budget_vnd") or known_facts_before(scenario, call_name).get("budget_vnd")
+    total = call.ground_truth_facts.get("total_vnd") or call.ground_truth_facts.get("price_vnd")
+    return isinstance(budget, (int, float)) and isinstance(total, (int, float)) and total > budget
 
 
 def applicable_criteria(scenario: Scenario, call_name: str) -> list[str]:
@@ -52,7 +70,8 @@ def applicable_criteria(scenario: Scenario, call_name: str) -> list[str]:
         "J08_over_confirmation": True,
         "J09_pii_handling": pii,
         "J10_honest_ai": "is_human" in gt,
-        "J11_budget_transparency": gt.get("cod_allowed") is False or bool(si.also_ordered),
+        # BTC: "đơn vượt ngân sách / >10tr COD": the order total (or price) above the budget the customer stated.
+        "J11_budget_transparency": gt.get("cod_allowed") is False or bool(si.also_ordered) or over_budget(scenario, call_name),
         "J12_out_of_stock": gt.get("in_stock") is False,
     }
     return [c["id"] for c in RUBRIC["criteria"] if rules.get(c["id"], False)]
@@ -81,6 +100,7 @@ def main() -> None:
     parser.add_argument("--limit", type=int, help="max conversations to judge")
     parser.add_argument("--resume", action="store_true", help="skip conversations already judged")
     parser.add_argument("--only", default="", help="comma-separated conversation ids to judge (again), e.g. a trial")
+    parser.add_argument("--workers", type=int, default=1, help="calls judged at once (the provider's rpm_limit still holds)")
     args = parser.parse_args()
     only = {c.strip() for c in args.only.split(",") if c.strip()}
 
@@ -94,22 +114,27 @@ def main() -> None:
     judged = 0
     skipped: list[str] = []
     dataset = Dataset()
+    todo = []
     for conversation in dataset.iter_conversations(args.limit):
-        cid, scenario_id, call_name = conversation.conversation_id, conversation.scenario_id, conversation.call
-        dest = dataset.judgment_path(scenario_id, call_name)
+        cid = conversation.conversation_id
         if only and cid not in only:
             continue
-        if args.resume and dest.exists() and not only:
+        if args.resume and dataset.judgment_path(conversation.scenario_id, conversation.call).exists() and not only:
             continue
+        if dataset.scenario(conversation.scenario_id) is not None:
+            todo.append(conversation)
+
+    def judge(conversation) -> bool:
+        """Judge one call and write its verdict; False when the model could not produce one."""
+        cid, scenario_id, call_name = conversation.conversation_id, conversation.scenario_id, conversation.call
+        dest = dataset.judgment_path(scenario_id, call_name)
         scenario = dataset.scenario(scenario_id)
-        if scenario is None:
-            continue
         applied = applicable_criteria(scenario, call_name)
         scenario_json = {"customer_goal": scenario.calls[call_name].customer_goal,
                          "facts_from_previous_sessions": known_facts_before(scenario, call_name),
                          **scenario.btc_export()["calls"][call_name],
                          "active_promotions": active_promotions(scenario.calls[call_name].ground_truth_facts)}
-        prompt = RUBRIC["judge_prompt_template"].format(
+        prompt = DOCUMENTS + RUBRIC["judge_prompt_template"].format(
             scenario_json=json.dumps(scenario_json, ensure_ascii=False),
             transcript=transcript_text(conversation),
             criteria=json.dumps([criteria_by_id[c] for c in applied], ensure_ascii=False))
@@ -122,8 +147,7 @@ def main() -> None:
         except RuntimeError as error:
             # One verdict the model cannot produce must not stop the others; --resume retries it.
             print(f"  SKIPPED {cid}: {error}", flush=True)
-            skipped.append(cid)
-            continue
+            return False
         verdicts = [v for v in output.verdicts if v.criterion_id in applied]
         missing = sorted(set(applied) - {v.criterion_id for v in verdicts})
         failed = [v.criterion_id for v in verdicts if v.verdict == "FAIL"]
@@ -134,7 +158,17 @@ def main() -> None:
             needs_manual_review=bool(failed or missing or rule_failed or needs_review(scenario)),
             reasons="; ".join([*(f"FAIL {c}" for c in failed), *(f"missing {c}" for c in missing),
                                *(["rule failures"] if rule_failed else [])])))
-        judged += 1
+        return True
+
+    # Each call is judged on its own; a reasoning judge takes ~30 s a call, so --workers runs several at once.
+    with ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
+        for conversation, done in zip(todo, pool.map(judge, todo)):
+            if done:
+                judged += 1
+                if judged % 25 == 0:
+                    print(f"  judged {judged}/{len(todo)}", flush=True)
+            else:
+                skipped.append(conversation.conversation_id)
     print(f"Judged {judged} conversations -> {dataset.root / 'judgments'}")
     if skipped:
         print(f"{len(skipped)} conversation(s) not judged ({', '.join(skipped)}); rerun with --resume.", flush=True)
