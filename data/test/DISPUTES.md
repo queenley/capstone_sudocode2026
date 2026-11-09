@@ -56,12 +56,14 @@ Sửa ngày 09/11/2026 trong nhóm 14 (đã duyệt): câu thêm vào dùng các
 | Nhóm | Phạm vi | Sửa | Lý do |
 |---|---|---|---|
 | 26 | ADV-0031/c1 | `has_children` false thành true (`facts_established`, `memory_expectation`) | Khách nói "Nhà anh có một phòng ngủ của con": người duyệt chọn đổi nhãn (khách có con) thay vì sửa lời |
+| 28 | GEN-0048/c1, ADV-0023/c1 | Khách nói "Phòng mới của chị khoảng … mét vuông" | Như nhóm 28 của dev: diện tích không có trong lời khách, lịch sử CRM đã quá hạn |
+| 29 | GEN-0004, 0005, 0031, 0047 call_2 | Bỏ các fact người gọi call_2 không nói | Hai người chung SĐT, như nhóm 29 của dev |
 
 ## Chưa làm
 
 | Phạm vi | Lý do |
 |---|---|
-| Bộ vàng | `official_gt_approved: false`, chưa có `review/golden_manifest.json`. `auto_verify.py` đã kiểm mọi cuộc: 188/192 cuộc nhãn qua, 111 hội thoại mẫu dùng được (`review/auto_verified.json`, `not_golden: true`); đề xuất từng cuộc ở `review/review_sheet.csv`. Người duyệt điền hoặc nhận đề xuất rồi chạy `approve_gold.py --dataset test --reviewer <tên>`. 3 cuộc đề xuất N: 2 cuộc nhóm 21–22 chờ duyệt; ADV-0024 c2 (giá RUN-10 dùng một lần) |
+| Bộ vàng | `official_gt_approved: false`. `review/golden_manifest.json` đã có (dngan0365, 09/11/2026, `accepted_suggestions`: 188/192 nhãn, 111 hội thoại), ký trước khi nhóm 26, 28, 29 đổi nhãn: chạy lại `auto_verify.py` rồi ký lại. Còn N: GEN-0015/c2, GEN-0022/c1 (nhóm 21–22 chờ duyệt) và ADV-0024/c2 (giá RUN-10 dùng một lần) |
 | Hội thoại mẫu: 2 ca J02 và các cuộc đã đổi lời khách | Đã đánh dấu `approve: N` (kèm lý do) trong `review/needs_manual_review.csv` bằng `evaluation/datasets/ground-truth-review/mark_conversations.py`, để không dùng làm ví dụ mẫu hay dữ liệu vòng cải tiến. Cần sinh lại khi nhãn ổn |
 | Trùng mã và trùng khách với `data/dev` | Không sửa được bằng nhãn. Muốn có tập test độc lập thì cần sinh tập mới với mã riêng (vd. `SCN-TST-*`) và khách riêng |
 | Audio của các lượt khách đã đổi | Nhóm 1, 3, 10, 14, 15 đổi lời khách, nhưng audio và `asr_reference` vẫn là lời cũ |

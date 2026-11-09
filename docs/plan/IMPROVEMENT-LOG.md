@@ -67,6 +67,31 @@ Loại: dữ liệu · Trạng thái: xong · Chỉ số: không có (giao diệ
 - **Số đo:** 40/40 sản phẩm có ảnh.
 - **Còn lại:** vài ảnh chỉ gần đúng loại hàng (máy lọc nước nóng lạnh cho RO, bình sữa cho máy hâm và máy tiệt trùng). Cần chạy lại seed để ảnh vào database: `docker compose run --rm seed`.
 
+### 2026-11-09 · Lần kiểm thứ hai: thanh toán, diện tích, kịch bản chung SĐT (nhóm 27–31)
+
+Loại: dữ liệu · Trạng thái: xong (nhóm 19–24, 31 chờ duyệt) · Chỉ số: TSR, RQR, CCR
+
+- **Vấn đề:** một người kiểm khác đọc từng cuộc của dev và test, báo khoảng 40 nhãn sai.
+  - `args_match.payment` ghi cách thanh toán khách không nói (4 cuộc dev).
+  - `room_area_m2` không có trong lời khách: khách quay lại đã chuyển nhà, lịch sử CRM 20 m² đã quá hạn (9 cuộc dev, 2 test).
+  - Ở kịch bản hai người chung SĐT, call_2 gán fact của người kia (dev 18, test 4), kèm vài câu lẫn vai.
+  - README của test mô tả sai ("chỉ lời khách được viết lại").
+  - DISPUTES ghi "chưa có golden_manifest".
+- **Bằng chứng:** đọc lại từng cuộc trong danh sách của người kiểm; mọi mục đều đúng. So test với dev: 51 cuộc đổi ngày, GEN-0033/c2 và GEN-0049/c2 đổi `hen_goi_lai` sang `chot_don`. `auto_verify.py` (và danh sách nhóm 14) đã coi lịch sử CRM là "khách đã nói", và chỉ cần có một số đi kèm m², không đối chiếu giá trị.
+- **Sửa:**
+  - Nhóm 27: khách nói cách thanh toán.
+  - Nhóm 28: khách nói diện tích phòng mới.
+  - Nhóm 29: bỏ fact người gọi call_2 không nói.
+  - Nhóm 30: câu đúng vai; cô Loan xưng "cô" như CRM.
+  - Nhóm 27–30 ghi là người duyệt yêu cầu.
+  - `grounded` của `auto_verify.py` giờ khớp giá trị, không tính lịch sử CRM, và ở kịch bản chung SĐT chỉ tính lời trong chính cuộc đó. Bộ đọc số đọc được "4.500.000đ" và "7 triệu bảy trăm".
+  - Bộ kiểm chặt hơn lộ thêm 2 nhãn `has_children` không có căn cứ (GEN-0066/c1, GEN-0181/c1): thành nhóm 31, chờ duyệt.
+  - Xoá quyết định cũ trong `review_sheet.csv` ở 36 cuộc dev và 7 cuộc test có nhãn đổi sau lần ký, để ký lại.
+  - Sửa README và DISPUTES.
+- **Đã kiểm:** 0 lỗi khóa; oracle CCR 100 · RQR 0 · TSR 100 · HR 0; validator dev 770/797, test 186/192. `auto_verify`: dev 785/801 cuộc nhãn qua, test 189/192; các nhãn còn N chỉ là các nhóm chờ duyệt và ADV-0024/0119 c2 (RUN-10 dùng một lần, nhãn đúng). Pending khớp DISPUTES: dev 23, test 2.
+- **Số đo:** chưa đo trên agent thật.
+- **Còn lại:** người duyệt duyệt nhóm 19–24, 31 rồi ký lại. Audio và hội thoại mẫu chưa sinh lại (người duyệt chờ tập khách ổn định).
+
 ### 2026-11-09 · Tự động hoá phần kiểm trước bộ vàng; người duyệt ký bằng một lệnh
 
 Loại: evaluation · Trạng thái: xong (chờ người duyệt ký) · Chỉ số: không đổi

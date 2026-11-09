@@ -35,6 +35,7 @@ Các thư mục nhãn (`scenarios`, `metadata`, `asr_reference`, `tools`, `call_
 | 16 | Bỏ `freeship` khi không biết nơi giao | 2 cuộc |
 | 17 | Khách ẩn danh không đọc SĐT: cuộc sau chỉ giữ slot khách nói lại | 3 cuộc |
 | 18 | ADV-0045/c1: bỏ `owned_sku` (lịch sử CRM chỉ để tham khảo) | 1 cuộc |
+| 26–30 | `has_children` theo lời khách; khách nói cách thanh toán và diện tích phòng mới mà nhãn ghi; bỏ fact của người kia ở kịch bản chung SĐT; câu lẫn vai (người duyệt yêu cầu, sau lần kiểm thứ hai) | 39 cuộc |
 | 25 | GEN-0099/c1: câu "có một bé lớn" nói rõ "nhà không có trẻ nhỏ" (người duyệt nêu) | 1 cuộc |
 | 19–24 | Hành động kỳ vọng của agent: gọi lại khách hẹn, hoãn thì không tạo đơn, người chung SĐT, lịch gọi lại vào ngày nghỉ, xưng hô, kết quả gọi lại 22:00 ngày 11/11 (**chờ duyệt**) | 15 cuộc |
 

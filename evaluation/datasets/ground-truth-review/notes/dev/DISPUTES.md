@@ -5,10 +5,10 @@
 - `decision: revise`, `proposed_by: null`: người duyệt chấp nhận đề xuất của bản tổng hợp 08/11/2026.
 - `decision: revise`, `proposed_by: claude`, `reviewed_on: 2026-11-08`: Claude đề xuất sau khi đọc từng câu; người duyệt (dngan0365) chấp nhận cả bảng dưới ngày 08/11/2026.
 - `decision: revise`, `proposed_by: claude`, `reviewed_on: 2026-11-09`: nhóm 11b, 14, 16, 17, 18, Claude đề xuất sau lần kiểm mâu thuẫn nhãn với lời khách; người duyệt chấp nhận cả bảng ngày 09/11/2026 (cờ `NEW_PROPOSALS_REVIEWED` trong `build_dev_r4.py`).
-- `decision: pending`, `proposed_by: claude`: nhóm 19, 20, 21, 22, 23, 24, Claude đề xuất ngày 09/11/2026 sau lần kiểm hành động kỳ vọng của agent (tool, tham số, kết quả) với lời khách và mock BTC, chưa ai duyệt (cờ `ACTION_PROPOSALS_REVIEWED` trong `build_dev_r4.py`).
-- `decision: revise`, `proposed_by: null`, bằng chứng bắt đầu "Người duyệt nêu": nhóm 11c, 25, 26, người duyệt tự nêu hoặc quyết và yêu cầu sửa ngày 09/11/2026.
+- `decision: pending`, `proposed_by: claude`: nhóm 19, 20, 21, 22, 23, 24, 31, Claude đề xuất ngày 09/11/2026 sau lần kiểm hành động kỳ vọng của agent (tool, tham số, kết quả) với lời khách và mock BTC, chưa ai duyệt (cờ `ACTION_PROPOSALS_REVIEWED` trong `build_dev_r4.py`).
+- `decision: revise`, `proposed_by: null`, bằng chứng bắt đầu "Người duyệt nêu": nhóm 11c, 25–30, người duyệt tự nêu hoặc quyết (27–30 từ lần kiểm thứ hai của người kiểm khác) và yêu cầu sửa ngày 09/11/2026.
 
-Còn **21 thay đổi** ở trạng thái `pending` (nhóm 19–24). Đặt `ACTION_PROPOSALS_REVIEWED` trong `build_dev_r4.py` khi người duyệt chấp nhận.
+Còn **23 thay đổi** ở trạng thái `pending` (nhóm 19–24, 31). Đặt `ACTION_PROPOSALS_REVIEWED` trong `build_dev_r4.py` khi người duyệt chấp nhận.
 
 Muốn bỏ một đề xuất thì sửa bảng tương ứng trong `evaluation/datasets/ground-truth-review/build_dev_r4.py` (hoặc đặt `CLAUDE_PROPOSALS_REVIEWED = None` để đưa cả nhóm về `pending`), rồi chạy lại script từ gốc repo. Script dựng từ nhãn ở commit `46b2f2ff` và ghi đè các thư mục nhãn của `data/dev` (`scenarios`, `metadata`, `asr_reference`, `tools`, `call_brief`, `handoff_brief`), `conversion-report.json` và file này; audio và hội thoại mẫu không đổi. Bản gốc của file này ở `evaluation/datasets/ground-truth-review/notes/dev/`.
 
@@ -49,6 +49,7 @@ Sửa ngày 09/11/2026 trong nhóm 14 (đã duyệt): câu thêm vào dùng các
 | 22 | ADV-0151/c1, GEN-0022/c1, GEN-0056/c1, GEN-0102/c1, GEN-0138/c1, GEN-0172/c1, GEN-0206/c1 | Bỏ `args_match.callback_at`; giữ `tool_called: schedule.callback`, `ground_truth_facts.callback_at` (giờ đã dời) và `must_say_any` (27/10, 02/01) | Giờ khách hẹn rơi vào ngày nghỉ (LN-02: 26/10, 01/01). `args_match` ghim giờ khách xin, nên agent tự đề xuất khung gần nhất theo LN-01 thì trượt TSR, dù kết quả giống hệt agent để tool tự dời |
 | 23 | ADV-0117/c1 | "chị đợi" thành "anh đợi" ở hai lượt | Nhãn và CRM là "anh", các lượt khác khách tự xưng "anh"; bộ sinh lỡ hai chỗ (như nhóm 10) |
 | 24 | ADV-0154/c1 | Kết quả `schedule.callback` trong `tools/` của đáp án: 22:00, `moved_from: null` (trước là 08:00 do mock thô dời) | LN-02: ngày 11/11 tổng đài mở 07:00–23:00. Tool `schedule_callback` của agent (`mcp/servers/crm.py`, `clock.SPECIAL_HOURS`) giữ 22:00; chỉ `mock_tools.schedule_callback` thô của BTC chưa có ngoại lệ này. Kết quả trong đáp án lấy theo tool agent thật dùng, khớp `ground_truth_facts.callback_at` và `must_say_any` |
+| 31 | GEN-0066/c1, GEN-0181/c1 | Khách nói "nhà anh có trẻ nhỏ" / "nhà chị không có trẻ nhỏ" ở lượt đầu | `has_children` có trong nhãn nhưng khách không nói; lộ ra khi `auto_verify.py` khớp giá trị thay vì bất kỳ từ nào |
 
 ## Người duyệt nêu, đã sửa (09/11/2026)
 
@@ -57,6 +58,10 @@ Sửa ngày 09/11/2026 trong nhóm 14 (đã duyệt): câu thêm vào dùng các
 | 11c | 15 nhãn `blocker` ASR (`BLOCKER_BUDGET_ONLY`) | Bỏ `vuot ngan sach` | Câu chỉ nói ngân sách ("chị có ngân sách khoảng bốn triệu thôi"), không nói giá vượt ngân sách; schema: `null` khi câu không nêu lý do. Đếm trên nhãn hiện tại còn 15 câu loại này (các câu khác đã bỏ ở nhóm 11). Giữ ADV-0110 c2 t4 ("ngân sách eo hẹp quá nên cần trả góp") |
 | 25 | GEN-0099/c1 | "Chị có một bé lớn" thành "Nhà chị không có trẻ nhỏ, bé nhà chị lớn rồi" | `has_children: false` (nhà không có trẻ nhỏ) đúng ý, nhưng câu cũ dễ đọc thành có trẻ. Nhãn giữ nguyên |
 | 26 | ADV-0031/c1, ADV-0126/c1 | `has_children` false thành true (`facts_established`, `memory_expectation`) | Khách nói "Nhà anh có một phòng ngủ của con": người duyệt chọn đổi nhãn (khách có con) thay vì sửa lời |
+| 27 | ADV-0053/c2, GEN-0001/c1, GEN-0216/c1, GEN-0248/c1 | Khách nói cách thanh toán của `args_match.payment` ở lượt trước lượt cuối | Nhãn ghi bank/COD nhưng khách không nói (ADV-0053 hỏi "thanh toán bằng cách nào thì được?" rồi không chọn). Agent hỏi lại thì lời cố định không có câu trả lời (TSR); call_2 còn đòi nhớ và cấm hỏi `payment` |
+| 28 | GEN-0016, 0048, 0082, 0148, 0182, 0216, 0248, ADV-0023, ADV-0118 call_1 | Khách nói "Phòng mới của chị khoảng … mét vuông" bằng đúng giá trị nhãn | Khách quay lại đã chuyển nhà; diện tích 20 m² trong lịch sử CRM đã quá hạn, khách không nói diện tích mới, mà call_2 cấm hỏi (RQR). `auto_verify.py` và danh sách nhóm 14 đã coi lịch sử là "đã nói": nay chỉ tính lời khách và phải khớp giá trị |
+| 29 | 18 cuộc call_2 hai người chung SĐT (`G29` trong `build_dev_r4.py`) | Bỏ khỏi `facts_established`/`memory_expectation` các fact người gọi call_2 không nói | Người gọi call_2 là người còn lại; ngân sách, "gia đình 4 người", `has_children` là của người kia hoặc không ai nói |
+| 30 | GEN-0081, 0131, 0097 call_2; cô Loan tự xưng "chị" ở GEN-0005, 0055, 0081, 0131, 0181 call_2 | Câu mở đầu đúng vai ("hôm trước cô có hỏi em về máy lọc nước RO"); cô Loan xưng "cô" (CRM C034) | Lẫn vai giữa hai người chung SĐT |
 
 ## Đã rà, đề xuất giữ nguyên
 
@@ -73,7 +78,7 @@ Sửa ngày 09/11/2026 trong nhóm 14 (đã duyệt): câu thêm vào dùng các
 
 | Phạm vi | Lý do |
 |---|---|
-| Bộ vàng | `official_gt_approved: false`, chưa có `review/golden_manifest.json`. Đã tự động hoá phần máy làm được: `auto_verify.py` kiểm mọi cuộc (khóa, pending, nhãn có căn cứ trong lời khách, lời đồng ý, outcome, dữ kiện so với mock BTC, gọi lại, validator, judge, đánh dấu N) và ghi `review/auto_verified.json` (785/801 cuộc nhãn qua, 411 hội thoại mẫu dùng được; `not_golden: true`) cùng `review/review_sheet.csv` có đề xuất từng cuộc. Bước còn lại là của người duyệt: điền `approve_labels` / `approve_conversation` (hoặc nhận đề xuất bằng `--accept-suggestions`, manifest sẽ ghi rõ) rồi chạy `approve_gold.py --dataset dev --reviewer <tên>`. `official_gt_approved` chỉ thành true khi nhãn của mọi cuộc là Y: còn 14 cuộc đề xuất N (12 cuộc nhóm 19–24 chờ duyệt; ADV-0024/0119 c2 giá RUN-10 dùng một lần, bộ kiểm chặt) |
+| Bộ vàng | `official_gt_approved: false`. `review/golden_manifest.json` đã có (dngan0365, 09/11/2026, `method: accepted_suggestions`: 785/801 nhãn, 411 hội thoại), nhưng được ký **trước** lần kiểm thứ hai: các nhóm 26–31 đổi nhãn sau đó, nên cần chạy lại `auto_verify.py` rồi ký lại bằng `approve_gold.py`. `official_gt_approved` chỉ thành true khi nhãn của mọi cuộc là Y; hiện còn N: các cuộc của nhóm 19–24, 31 (chờ duyệt) và ADV-0024/0119 c2 (giá RUN-10 dùng một lần: nhãn đúng, bộ kiểm chặt) |
 | Hội thoại mẫu của các cuộc đã đổi lời khách | Không còn khớp kịch bản. Đã đánh dấu `approve: N` (kèm lý do) trong `review/needs_manual_review.csv` bằng `evaluation/datasets/ground-truth-review/mark_conversations.py`, để không dùng làm ví dụ mẫu hay dữ liệu vòng cải tiến. Cần sinh lại (gọi model) khi nhãn ổn |
 | Clip khách đọc SĐT 10 số | Cần sinh audio mới |
 | Audio của các lượt khách đã đổi | Nhóm 1, 3, 10, 14 đổi hoặc thêm lời khách trong `scenarios/`, nhưng `audio/` và `asr_reference/` vẫn là lời cũ. Cần chạy `synthesize_scenario_audio --changed-only` |

@@ -331,6 +331,9 @@ def main() -> int:
                         "evidence": evidence, "group": group, **r4.status_new()})
 
     r4.add_stated_facts(scenarios, G14, add_new)
+    r4.apply_second_check(scenarios, "test", lambda sid, name, field, source, new, evidence, group: changes.append({
+        "scenario_id": sid, "call": name, "field": field, "source": source, "proposed": new, "evidence": evidence,
+        "group": group, "rule_from": f"dev-r4 nhóm {group}", "reviewer": REVIEWER, "proposed_by": None, "decision": "revise"}))
     r4.apply_anon_and_owned(scenarios, r4.G17, r4.G18, add_new)
     for sid, name in G15:
         s, c = scenarios[sid], call(sid, name)

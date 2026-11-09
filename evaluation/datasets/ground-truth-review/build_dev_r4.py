@@ -336,6 +336,9 @@ G23 = {ref("ADV-0117/c1"): [("chị đợi đến lúc đó", "anh đợi đến
 #: Group 22: a callback asked for on a day off (LN-02: 26/10, 01/01). args_match pinned the asked time, so an agent
 #: that proposes the next working slot itself (LN-01) fails; ground_truth_facts.callback_at and must_say_any keep the
 #: moved time, which both ways reach.
+#: Group 31: has_children labelled but never said (found once auto_verify.py matched values, not any mention):
+#: the customer now says it, in the first turn, as group 14.
+G31 = {ref("GEN-0066/c1"): "has_children", ref("GEN-0181/c1"): "has_children"}
 #: Group 24: the oracle's schedule.callback result for 22:00 on 11/11 (LN-02 hours).
 G24 = calls("ADV-0154/c1")
 G22 = calls("ADV-0151/c1, GEN-0022/c1, GEN-0056/c1, GEN-0102/c1, GEN-0138/c1, GEN-0172/c1, GEN-0206/c1")
@@ -401,6 +404,15 @@ def apply_actions(scenarios: dict, out_dir: Path, add, which: str) -> None:
         kept = [t for t in planned if t.get("name") != "order.create"]
         tools.write_text(json.dumps(kept, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         add(sid, name, "tools (oracle)", [t["name"] for t in planned], [t["name"] for t in kept], "Không tạo đơn.", 20)
+    for (sid, name), slot in (G31.items() if which == "dev" else []):
+        s, c = scenarios[sid], scenarios[sid]["calls"][name]
+        line = stated_line(speaker_pronoun(s, c), c["facts_established"], [slot])
+        old = c["customer_turns"][0]
+        c["customer_turns"][0] = f"{old.rstrip()} {line}"
+        if c.get("customer_turns_asr"):
+            c["customer_turns_asr"][0] = f"{c['customer_turns_asr'][0].rstrip()} {plain(line)}"
+        add(sid, name, "customer_turns[0]", old, c["customer_turns"][0], f"{ACTION_SOURCE}, nhóm 31: facts_established có "
+            f"{slot}={c['facts_established'][slot]} nhưng khách không nói ở cuộc nào; thêm lời khách (như nhóm 14).", 31)
     for sid, name in (G24 if which == "dev" else []):
         tools = out_dir / "tools" / f"scenarios_{sid}" / f"{name}.json"
         planned = json.loads(tools.read_text(encoding="utf-8"))
@@ -692,6 +704,90 @@ def apply_g26(scenarios: dict, add) -> None:
                     "phòng ngủ của con\"; người duyệt chọn đổi nhãn (khách có con) thay vì sửa lời.")
 
 
+#: Groups 27-30: a second check of every call (09/11/2026), the reviewer asked for these fixes.
+SECOND_CHECK = "Lần kiểm thứ hai (người kiểm khác) báo, người duyệt yêu cầu sửa ngày 09/11/2026"
+#: Group 27: args_match.payment the customer never says; the customer now says it, before the last turn.
+G27 = {"dev": {ref("ADV-0053/c2"): "bank", ref("GEN-0001/c1"): "COD", ref("GEN-0216/c1"): "bank", ref("GEN-0248/c1"): "COD"},
+       "test": {}}
+#: Group 28: room_area_m2 the customer never says (the returning customers moved house; the CRM's 20 m² is from the
+#: expired history), while call_2 forbids asking it: the customer now says the room of the new home.
+G28 = {"dev": calls("GEN-0016/c1, GEN-0048/c1, GEN-0082/c1, GEN-0148/c1, GEN-0182/c1, GEN-0216/c1, GEN-0248/c1, "
+                    "ADV-0023/c1, ADV-0118/c1"),
+       "test": calls("GEN-0048/c1, ADV-0023/c1")}
+#: Group 29: two people on one phone. call_2's caller is the other person: facts they do not say are not theirs.
+G29 = {"dev": {ref(k): v.split() for k, v in {
+    "GEN-0004/c2": "has_children budget_vnd", "GEN-0015/c2": "has_children budget_vnd", "GEN-0047/c2": "budget_vnd",
+    "GEN-0065/c2": "has_children", "GEN-0081/c2": "usage_need budget_vnd", "GEN-0097/c2": "has_children budget_vnd",
+    "GEN-0105/c2": "budget_vnd", "GEN-0115/c2": "has_children", "GEN-0131/c2": "budget_vnd",
+    "GEN-0147/c2": "has_children", "GEN-0155/c2": "usage_need", "GEN-0165/c2": "budget_vnd",
+    "GEN-0181/c2": "usage_need budget_vnd", "GEN-0197/c2": "has_children", "GEN-0205/c2": "usage_need",
+    "GEN-0215/c2": "has_children budget_vnd", "GEN-0231/c2": "budget_vnd", "GEN-0247/c2": "has_children"}.items()},
+       "test": {ref(k): v.split() for k, v in {
+    "GEN-0004/c2": "has_children budget_vnd", "GEN-0005/c2": "budget_vnd", "GEN-0031/c2": "budget_vnd",
+    "GEN-0047/c2": "budget_vnd"}.items()}}
+#: Group 30: who says what on a shared phone. Loan is "cô" in the CRM (C034), Dung "chị" (C035).
+LOAN_SELF = re.compile(r"\b([Cc])hị\b(?! Dung)")
+G30_LINES = {"dev": {
+    ref("GEN-0081/c2"): [("hôm trước em tư vấn cho chị Dung về máy lọc nước RO Karofi 9 lõi", "hôm trước cô có hỏi em về máy lọc nước RO Karofi 9 lõi")],
+    ref("GEN-0131/c2"): [("Hôm qua em đã tư vấn cho chị Dung về máy lọc nước RO đúng không?", "Hôm qua cô có hỏi em về máy lọc nước RO đúng không?")],
+    ref("GEN-0097/c2"): [("hôm trước có tư vấn cho cô Loan", "hôm trước em có tư vấn cho cô Loan")]}, "test": {}}
+G30_LOAN = {"dev": calls("GEN-0005/c2, GEN-0055/c2, GEN-0081/c2, GEN-0131/c2, GEN-0181/c2"), "test": []}
+
+
+def apply_second_check(scenarios: dict, which: str, add) -> None:
+    """Groups 27-30; add(sid, call, field, source, proposed, evidence, group)."""
+    def say(c, index, line):
+        old = c["customer_turns"][index]
+        c["customer_turns"][index] = f"{old.rstrip()} {line}"
+        if c.get("customer_turns_asr"):
+            c["customer_turns_asr"][index] = f"{c['customer_turns_asr'][index].rstrip()} {plain(line)}"
+        return old
+    for (sid, name), pay in G27[which].items():
+        s, c = scenarios[sid], scenarios[sid]["calls"][name]
+        who = speaker_pronoun(s, c)
+        line = f"{who.capitalize()} thanh toán chuyển khoản ngân hàng nhé." if pay == "bank" else \
+            f"{who.capitalize()} trả tiền mặt khi nhận hàng nhé."
+        i = len(c["customer_turns"]) - 2
+        old = say(c, i, line)
+        add(sid, name, f"customer_turns[{i}]", old, c["customer_turns"][i], f"{SECOND_CHECK}, nhóm 27: args_match.payment={pay} "
+            "nhưng khách không nói cách thanh toán; agent hỏi lại thì không có câu trả lời (TSR).", 27)
+    for sid, name in G28[which]:
+        s, c = scenarios[sid], scenarios[sid]["calls"][name]
+        area = c["facts_established"]["room_area_m2"]
+        line = f"Phòng mới của {speaker_pronoun(s, c)} khoảng {area} mét vuông."
+        old = say(c, 0, line)
+        add(sid, name, "customer_turns[0]", old, c["customer_turns"][0], f"{SECOND_CHECK}, nhóm 28: room_area_m2={area} nhưng khách "
+            "không nói (khách đã chuyển nhà, lịch sử CRM 20 m² đã quá hạn); call_2 cấm hỏi diện tích (RQR).", 28)
+    for (sid, name), slots in G29[which].items():
+        c = scenarios[sid]["calls"][name]
+        for key in ("facts_established", "memory_expectation"):
+            for slot in slots:
+                if slot in (c.get(key) or {}):
+                    add(sid, name, f"{key}.{slot}", c[key].pop(slot), "<bỏ>", f"{SECOND_CHECK}, nhóm 29: hai người chung SĐT; "
+                        "người gọi cuộc này không nói điều đó, fact là của người kia.", 29)
+    for (sid, name), swaps in G30_LINES[which].items():
+        c = scenarios[sid]["calls"][name]
+        for i, turn in enumerate(c["customer_turns"]):
+            new = turn
+            for old, repl in swaps:
+                new = new.replace(old, repl)
+            if new != turn:
+                c["customer_turns"][i] = new
+                if c.get("customer_turns_asr"):
+                    c["customer_turns_asr"][i] = plain(new)
+                add(sid, name, f"customer_turns[{i}]", turn, new, f"{SECOND_CHECK}, nhóm 30: câu mở đầu lẫn vai giữa hai người chung SĐT.", 30)
+    for sid, name in G30_LOAN[which]:
+        c = scenarios[sid]["calls"][name]
+        for i, turn in enumerate(c["customer_turns"]):
+            new = LOAN_SELF.sub(lambda m: "Cô" if m.group(1) == "C" else "cô", turn)
+            if new != turn:
+                c["customer_turns"][i] = new
+                if c.get("customer_turns_asr"):
+                    c["customer_turns_asr"][i] = plain(new)
+                add(sid, name, f"customer_turns[{i}]", turn, new, f"{SECOND_CHECK}, nhóm 30: người gọi là cô Loan (CRM C034, "
+                    "\"cô\"), lời lại tự xưng \"chị\".", 30)
+
+
 # ── Group 10: what the customer calls themselves, to match the label "anh" ──────────────────────────────────────
 G10 = {"SCN-ADV-0021": "co", "SCN-ADV-0082": "co", "SCN-ADV-0116": "co", "SCN-ADV-0034": "chi"}
 
@@ -898,6 +994,8 @@ def main() -> int:
                         "evidence": evidence, "group": group, **status_new()})
 
     add_stated_facts(scenarios, G14, add_new)
+    apply_second_check(scenarios, "dev", lambda sid, name, field, source, proposed, evidence, group:
+                       record(sid, name, field, source, proposed, evidence, group, True))
     apply_anon_and_owned(scenarios, G17, G18, add_new)
     for sid, name in G16:
         g = call(sid, name)["ground_truth_facts"]

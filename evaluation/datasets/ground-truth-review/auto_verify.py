@@ -15,8 +15,9 @@ Writes, for each dataset:
 Checks (no model call; BTC's mock_tools read-only):
   keys          the scenario passes contracts/scenario/scenario-keys.yaml (src/schemas/keys.py)
   pending       no change on the call waits for the reviewer (conversion-report.json)
-  grounded      room_area_m2 / has_children / child_age_months / budget_vnd of facts_established are said in this
-                call, an earlier one or the seed history
+  grounded      the value of room_area_m2 / has_children / child_age_months / budget_vnd in facts_established is
+                said by the customer in this call or an earlier one (not the CRM history, which may be stale; on a
+                shared phone only this call, the earlier one being the other person's)
   consent       order.create is asked for only after a yes in the last two customer turns
   outcome       expected_outcome agrees with success_if.tool_called
   btc_facts     price_vnd, list_price_vnd, in_stock and promo_<CODE>_active agree with BTC's mock on the call's day
@@ -57,14 +58,44 @@ def plain(text: str) -> str:
     return "".join(ch for ch in text if not unicodedata.combining(ch))
 
 
-NUMBER_WORD = r"(mot|hai|ba|bon|nam|sau|bay|tam|chin|muoi)"
-SAID = {
-    "room_area_m2": re.compile(r"\d+\s*(m2|m²|met vuong|m vuong|met\b)"),
-    "has_children": re.compile(r"\b(co (mot |hai |ba )?(be|tre|con|chau|em nho)|be nha|be (nho|cua|lon|\d)|con (chi|anh|em|minh|toi|nha)|"
-                               r"tre nho|chau nho|cho be|cho con|(cua|phong) (con|be)\b|khong co (tre|be|con|chau)|chua co (con|be))"),
-    "child_age_months": re.compile(rf"(\d+|{NUMBER_WORD})( \w+)? thang|\d+\s*tuoi|so sinh|moi sinh"),
-    "budget_vnd": re.compile(rf"(ngan sach|tam|khoang|du kien|toi da|duoi|chi co).{{0,25}}(\d+|{NUMBER_WORD}) *(trieu|nghin|ngan|k\b)|\d{{6,}}"),
-}
+NUMBERS = {"mot": 1, "hai": 2, "ba": 3, "bon": 4, "nam": 5, "sau": 6, "bay": 7, "tam": 8, "chin": 9, "muoi": 10}
+NUM = r"(\d+(?:[.,]\d+)?|(?:muoi|mot|hai|bay|bon|ba|nam|sau|tam|chin)(?![a-z]))"  # "bay" before "ba"; "12m²" stays a number
+KIDS = re.compile(r"\b(co (mot |hai |ba )?(be|tre|con|chau|em nho)|be nha|be (nho|cua|\d)|con (chi|anh|em|minh|toi|nha)|"
+                  r"tre nho|chau nho|cho be|cho con|(cua|phong) (con|be)\b)")
+NO_KIDS = re.compile(r"\b(khong co (tre|be|con|chau)|chua co (con|be)|nha (chi|anh|co|em) khong co tre)")
+
+
+def _num(word: str) -> float:
+    return float(word.replace(",", ".")) if word[0].isdigit() else NUMBERS[word]
+
+
+def said_values(slot: str, text: str) -> set:
+    """The values of *slot* a customer's words state (plain text). A fact is grounded only when its value is here."""
+    if slot == "room_area_m2":
+        return {int(_num(m.group(1))) for m in re.finditer(rf"{NUM}\s*(m2|m²|met vuong|m vuong)", text)}
+    if slot == "child_age_months":
+        out = {int(_num(m.group(1))) for m in re.finditer(rf"{NUM}( \w+)? thang", text)}
+        out |= {int(_num(m.group(1))) * 12 for m in re.finditer(rf"{NUM} tuoi", text)}
+        return out | ({0, 1} if re.search(r"so sinh|moi sinh", text) else set())
+    if slot == "budget_vnd":
+        out = set()
+        for m in re.finditer(rf"{NUM}\s*trieu(\s*(ruoi|{NUM})(\s*tram)?)?", text):
+            value = _num(m.group(1)) * 1_000_000
+            tail = m.group(3)
+            if tail == "ruoi":
+                value += 500_000
+            elif tail:  # "6 triệu 2", "5 triệu bảy trăm (nghìn)", "4 triệu 890"
+                value += _num(tail) * (100_000 if m.group(5) or _num(tail) < 10 else 1_000)
+            out.add(int(value))
+        out |= {int(m.replace(".", "")) for m in re.findall(r"\b\d{1,3}(?:\.\d{3}){2,}(?!\d)", text)}  # 4.500.000đ
+        out |= {int(_num(m.group(1))) * 1000 for m in re.finditer(rf"{NUM}\s*(nghin|ngan|k)\b", text) if _num(m.group(1)) >= 100}
+        return out | {int(x) for x in re.findall(r"\b\d{6,}\b", text)}
+    if slot == "has_children":
+        return ({True} if KIDS.search(text) else set()) | ({False} if NO_KIDS.search(text) else set())
+    return set()
+
+
+GROUNDED = ("room_area_m2", "has_children", "child_age_months", "budget_vnd")
 YES = re.compile(r"\b(dung roi|dong y|xac nhan|chinh xac|len don|chot|dat (don|hang)|lam don|ghi don|vang|u)\b")
 
 
@@ -86,7 +117,8 @@ def label_checks(root: Path, scenario: dict, report_pending: set[tuple[str, str]
     sid = scenario["scenario_id"]
     days = call_days(scenario)
     errors = check_scenario(scenario)
-    seed = plain(json.dumps([c.get("seed_history") for c in scenario["calls"].values()], ensure_ascii=False))
+    # Two people on one phone: an earlier call is the other person's, not what this caller said.
+    shared_phone = scenario.get("persona") == "hai_nguoi_chung_sdt"
     said_before = ""
     found: dict[str, list[str]] = {}
     for name in sorted(scenario["calls"]):
@@ -96,9 +128,14 @@ def label_checks(root: Path, scenario: dict, report_pending: set[tuple[str, str]
         if (sid, name) in report_pending:
             why.append("pending: thay đổi trên cuộc này đang chờ duyệt")
         text = plain(" ".join(c.get("customer_turns") or []))
-        for slot, rx in SAID.items():
-            if slot in (c.get("facts_established") or {}) and not (rx.search(text) or rx.search(said_before) or rx.search(seed)):
-                why.append(f"grounded: {slot}={c['facts_established'][slot]} không thấy khách nói")
+        for slot in GROUNDED:
+            value = (c.get("facts_established") or {}).get(slot)
+            if value is None:
+                continue
+            # The CRM history does not count: it may be stale (the returning customers moved house).
+            heard = said_values(slot, text) | (set() if shared_phone else said_values(slot, said_before))
+            if value not in heard:
+                why.append(f"grounded: {slot}={value} không thấy khách nói (nghe được: {sorted(heard, key=str) or 'không'})")
         si = c.get("success_if") or {}
         tool = si.get("tool_called")
         if tool == "order.create" and not any(YES.search(plain(t)) for t in (c.get("customer_turns") or [])[-2:]):
