@@ -6,7 +6,7 @@ BTC allows extra tools/params ("Được thêm tool/tham số riêng"); they mus
 
 ## Tools used by our data that are NOT in the BTC set
 
-- `delivery_estimate` — used 466× (oracle_trace 235, reference_transcripts 231)
+- `delivery_estimate` — used 235× (oracle_trace 235)
 
 ## Extra parameters passed to official tools
 
@@ -16,13 +16,13 @@ BTC allows extra tools/params ("Được thêm tool/tham số riêng"); they mus
 
 | Tool | Official | Level | Required params (mock) | Args we use | Used |
 |---|---|---|---|---|---|
-| `catalog.search` | yes | M1 | — | query | oracle_trace: 6, reference_transcripts: 6 |
+| `catalog.search` | yes | M1 | — | query | oracle_trace: 6 |
 | `crm.get_customer` | yes | M1 | — | phone | oracle_trace: 801 |
-| `delivery_estimate` | **no** | team | — | address, on | oracle_trace: 235, reference_transcripts: 231 |
-| `handoff.transfer` | yes | M1 | brief | brief | success_if.must_not_call_tools: 21, success_if.tool_called: 20, oracle_trace: 20, reference_transcripts: 20 |
+| `delivery_estimate` | **no** | team | — | address, on | oracle_trace: 235 |
+| `handoff.transfer` | yes | M1 | brief | brief | success_if.must_not_call_tools: 21, success_if.tool_called: 20, oracle_trace: 20 |
 | `inventory.check` | yes | M1 | sku | on, sku | fault_injection: 15, oracle_trace: 587 |
-| `order.create` | yes | M1 | customer_phone, sku | address, basket_skus, customer_phone, on, order_group, payment, price_vnd, qty, sku | success_if.must_not_call_tools: 476, success_if.tool_called: 235, oracle_trace: 284, reference_transcripts: 280 |
-| `order.status` | yes | M2 | — | order_id | success_if.tool_called: 47, oracle_trace: 64, reference_transcripts: 63 |
-| `order.update` | yes | M1 | order_id, action | action, new_variant_sku, on, order_id, reason | success_if.must_not_call_tools: 19, success_if.tool_called: 36, oracle_trace: 36, reference_transcripts: 36 |
-| `pricing.get_quote` | yes | M2 | sku | basket_skus, customer_phone, on, sku | success_if.tool_called: 6, oracle_trace: 605, reference_transcripts: 17 |
-| `schedule.callback` | yes | M1 | customer_phone, callback_at | callback_at, customer_phone, note | success_if.tool_called: 91, oracle_trace: 91, reference_transcripts: 87 |
+| `order.create` | yes | M1 | customer_phone, sku | address, basket_skus, customer_phone, on, order_group, payment, price_vnd, qty, sku | success_if.must_not_call_tools: 479, success_if.tool_called: 232, oracle_trace: 281 |
+| `order.status` | yes | M2 | — | order_id | success_if.tool_called: 47, oracle_trace: 64 |
+| `order.update` | yes | M1 | order_id, action | action, new_variant_sku, on, order_id, reason | success_if.must_not_call_tools: 19, success_if.tool_called: 36, oracle_trace: 36 |
+| `pricing.get_quote` | yes | M2 | sku | basket_skus, customer_phone, on, sku | success_if.tool_called: 6, oracle_trace: 605 |
+| `schedule.callback` | yes | M1 | customer_phone, callback_at | callback_at, customer_phone, note | success_if.tool_called: 92, oracle_trace: 92 |

@@ -12,7 +12,7 @@
       "call_date": "2026-11-11",
       "customer_goal": "Mua 3 cái màng lọc thay thế AirPure X/Y",
       "customer_turns": [
-        "Alo, chị muốn mua 3 cái màng lọc thay thế AirPure X/Y để dùng dần cho gia đình.",
+        "Alo, chị muốn mua 3 cái màng lọc thay thế AirPure X/Y để dùng dần cho gia đình. Ngân sách của chị tầm 1 triệu.",
         "Mỗi cái giá bao nhiêu vậy em?",
         "Chị có được giảm giá khi mua 3 cái không?",
         "Chị dự kiến thanh toán bằng ngân hàng, giao ở Long Biên, Hà Nội.",
@@ -28,18 +28,13 @@
         "product_advised": "SKU-AP-FLT-X",
         "price_quoted_vnd": 586500,
         "promo_code": "11-11",
-        "promo_expiry": "2026-11-12",
-        "order_id": "OD600001"
+        "promo_expiry": "2026-11-12"
       },
       "success_if": {
-        "tool_called": "order.create",
-        "args_match": {
-          "sku": "SKU-AP-FLT-X",
-          "price_vnd": 586500,
-          "payment": "bank",
-          "qty": 3
-        },
-        "total_match_vnd": 1759500
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ]
       },
       "ground_truth_facts": {
         "price_vnd": 586500,
@@ -64,8 +59,7 @@
         "usage_need": "dùng cho gia đình",
         "product_advised": "SKU-AP-FLT-X",
         "price_quoted_vnd": 586500,
-        "promo_code": "11-11",
-        "order_id": "OD600001"
+        "promo_code": "11-11"
       },
       "relevant_policy_ids": [
         "PB-09",
@@ -73,7 +67,7 @@
         "KM-05",
         "VC-04"
       ],
-      "expected_outcome": "chot_don"
+      "expected_outcome": "hen_goi_lai"
     }
   }
 }

@@ -86,10 +86,10 @@ services:
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8100/health/ready')"]
       interval: 5s
-      timeout: 3s
+      timeout: 10s
       retries: 20
       # A busy machine (image builds, other jobs) starts it in minutes; healthy as soon as it answers.
-      start_period: 180s
+      start_period: 600s
   identity-service:
     build:
       context: .
@@ -103,10 +103,10 @@ services:
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8200/health/ready')"]
       interval: 5s
-      timeout: 3s
+      timeout: 10s
       retries: 20
       # A busy machine (image builds, other jobs) starts it in minutes; healthy as soon as it answers.
-      start_period: 180s
+      start_period: 600s
   sales-service:
     build:
       context: .
@@ -120,10 +120,10 @@ services:
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8300/health/ready')"]
       interval: 5s
-      timeout: 3s
+      timeout: 10s
       retries: 20
       # A busy machine (image builds, other jobs) starts it in minutes; healthy as soon as it answers.
-      start_period: 180s
+      start_period: 600s
   # Speech recognition for calls (apps/asr-service). On this machine's CPU by default;
   # to use one hosted elsewhere (a rented GPU, Dockerfile.gpu), set ASR_URL (and
   # ASR_API_KEY) to it and ASR_LOCAL=0 so this container does not start.
@@ -221,7 +221,7 @@ services:
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8400/health/ready')"]
       interval: 5s
-      timeout: 3s
+      timeout: 10s
       retries: 20
       # Startup loads the MCP servers and the embedding model (downloaded on the first start): minutes, not seconds,
       # and over 10 on a busy machine (751s seen while a data-generation run and tests shared it).
@@ -255,10 +255,10 @@ services:
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready')"]
       interval: 5s
-      timeout: 3s
+      timeout: 10s
       retries: 20
       # A busy machine (image builds, other jobs) starts it in minutes; healthy as soon as it answers.
-      start_period: 180s
+      start_period: 600s
   commerce-events:
     <<: *runtime
     command: ["python", "-m", "src.messaging.worker", "--service", "commerce"]

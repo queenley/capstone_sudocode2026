@@ -1,5 +1,7 @@
 # Đánh giá agent trên bộ `data/dev`
 
+> **Nhãn hiện tại là bản r4 (08–09/11/2026): xem [Nhãn đã sửa](#nhãn-đã-sửa-bản-r4-0809112026).** Đoạn dưới mô tả bản r3.
+>
 > **Bộ dev duy nhất, trước đây tên `seed-dev-r3`, revision của `seed-dev-r2` (05/11/2026).** Nhãn vẫn là chẩn đoán, chưa có người duyệt. Dựng offline; từng trường đổi và hash nguồn ở [`conversion-report.json`](conversion-report.json), phần chưa quyết ở [`DISPUTES.md`](DISPUTES.md).
 >
 > - 73 cuộc được trả lại câu xác nhận cuối bị cắt khỏi kịch bản; 42 cuộc `order.create` được thêm câu đồng ý sau câu đọc lại (chờ duyệt).
@@ -11,6 +13,35 @@
 > Kiểm offline: 404/404 kịch bản nạp được; oracle CCR 100 · RQR 0 · TSR 100 · HR 0; hội thoại mẫu TSR 98,8. Oracle dựng từ nhãn nên không chứng minh nhãn đúng: xem `reports/label_check.json` (stage `check_labels`).
 
 Bộ dữ liệu do [`evaluation/data-generation`](../../evaluation/data-generation/README.md) sinh, theo định dạng kịch bản của BTC. README này chỉ cách dùng nó để chấm agent. Con số chính thức luôn là `reference_eval.py` của BTC, chạy qua `run_eval.py` ở gốc repo (quy tắc trong [`evaluation/README.md`](../../evaluation/README.md)).
+
+## Nhãn đã sửa (bản r4, 08–09/11/2026)
+
+Các thư mục nhãn (`scenarios`, `metadata`, `asr_reference`, `tools`, `call_brief`, `handoff_brief`), `conversion-report.json` và `DISPUTES.md` do [`build_dev_r4.py`](../../evaluation/datasets/ground-truth-review/build_dev_r4.py) ghi, dựng từ nhãn ở commit `46b2f2ff` (bản r3 ở trên), theo [quy trình duyệt nhãn](../../evaluation/datasets/ground-truth-review/SKILL.md). Bản r3 vẫn lấy lại được từ commit đó. Các run cũ trong `evaluation/runs/` chấm trên r3: không so số trực tiếp với run mới, mà ghi rõ là đổi nhãn. Nhãn vẫn là chẩn đoán (`official_gt_approved: false`). Từng trường đổi ở `conversion-report.json`, lý do và phần chưa làm ở [`DISPUTES.md`](DISPUTES.md).
+
+| Nhóm | Sửa | Phạm vi |
+|---|---|---|
+| 1 | Cuộc chat mang mã kênh không có trong CRM: khách đọc SĐT ở lượt cuối (SAMPLE-04) | 29 cuộc |
+| 2 | Bỏ `owned_sku` khỏi `must_carry_over` khi cuộc gọi nói về món khác | 115 cuộc |
+| 3 | Đơn vượt hạn mức COD: thêm lượt khách đồng ý chuyển khoản | 11 cuộc |
+| 4 | ADV-0028, ADV-0023 call_1: khách hoãn, `hen_goi_lai`, không tạo đơn | 2 cuộc |
+| 5 | Bỏ `room_area_m2`/`blocker` khỏi `must_carry_over` của cuộc tra hoặc đổi đơn | 22 cuộc |
+| 7 | Bỏ `phone_provided` ở cuộc hotline khách không đọc số của mình | 7 cuộc |
+| 8 | `budget_vnd` bằng đúng số khách nói | 10 cuộc |
+| 9 | `promo_active: false` khi chỉ có freeship hoặc COD-0 | 130 cuộc |
+| 10 | Lời khách tự xưng khớp nhãn và CRM | 4 kịch bản |
+| 11 | Nhãn entity ASR: định dạng (màu, mã đơn, size, năm), theo nghĩa (`blocker`, `promo_expiry`, `phone`, nhãn tiền, `restock_date`), và `blocker` có từ gợi ý (11b) | 203 nhãn |
+| 12 | Tag `source:btc` / `source:team` trong `metadata/` | 404 kịch bản |
+| 14 | Khách nói đúng các fact mà nhãn ghi nhưng trước đó không nói ở đâu (diện tích, trẻ nhỏ, tuổi bé, ngân sách) | 144 cuộc |
+| 16 | Bỏ `freeship` khi không biết nơi giao | 2 cuộc |
+| 17 | Khách ẩn danh không đọc SĐT: cuộc sau chỉ giữ slot khách nói lại | 3 cuộc |
+| 18 | ADV-0045/c1: bỏ `owned_sku` (lịch sử CRM chỉ để tham khảo) | 1 cuộc |
+| 19–24 | Hành động kỳ vọng của agent: gọi lại khách hẹn, hoãn thì không tạo đơn, người chung SĐT, lịch gọi lại vào ngày nghỉ, xưng hô, kết quả gọi lại 22:00 ngày 11/11 (**chờ duyệt**) | 15 cuộc |
+
+Kiểm, không gọi model: 404/404 kịch bản nạp được bằng loader của `run_eval`; 0 lỗi theo `contracts/scenario/scenario-keys.yaml`; oracle qua `reference_eval.py` của BTC: CCR 100 · RQR 0 · TSR 100 · HR 0, 0 lỗi schema.
+
+Dựng lại từ gốc repo: `python evaluation/datasets/ground-truth-review/build_dev_r4.py`, rồi từ `evaluation/data-generation`: `python -m src.pipeline.build_ground_truth --root ../../data/dev` (viết lại `trace_log/` và báo cáo oracle trong `reports/`).
+
+**Audio chưa theo kịp nhãn:** các nhóm 1, 3, 10, 14, 21, 23 đổi hoặc thêm lời khách trong `scenarios/`, nhưng `audio/`, `asr_reference/` của những lượt đó và hội thoại mẫu (`conversations/`) vẫn là lời cũ. Sinh lại bằng `synthesize_scenario_audio --changed-only` khi người duyệt thấy nhãn đã ổn.
 
 ## Trong thư mục có gì
 

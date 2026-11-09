@@ -67,6 +67,87 @@ Loại: dữ liệu · Trạng thái: xong · Chỉ số: không có (giao diệ
 - **Số đo:** 40/40 sản phẩm có ảnh.
 - **Còn lại:** vài ảnh chỉ gần đúng loại hàng (máy lọc nước nóng lạnh cho RO, bình sữa cho máy hâm và máy tiệt trùng). Cần chạy lại seed để ảnh vào database: `docker compose run --rm seed`.
 
+### 2026-11-09 · Một thư mục cho mỗi bộ: nhãn r4 vào thẳng data/dev, r1 vào data/test; ADV-0154 theo LN-02
+
+Loại: dữ liệu · Trạng thái: xong · Chỉ số: không đổi (cùng nhãn)
+
+- **Vấn đề:** hai bản (`data/dev` và `data/dev-r4`, `data/test` và `data/test-r1`) dễ chạy nhầm bản cũ. Người duyệt chọn giữ một thư mục cho mỗi bộ. Ở SCN-ADV-0154/call_1, đáp án ghi kết quả `schedule.callback` là 08:00 (mock BTC thô dời 22:00), trong khi nhãn và `must_say_any` là 22:00.
+- **Bằng chứng:** tool `schedule_callback` của agent (`mcp/servers/crm.py`, `clock.SPECIAL_HOURS`) giữ 22:00 ngày 11/11 theo LN-02 (tổng đài 07:00–23:00). Chỉ `mock_tools.schedule_callback` của BTC chưa có ngoại lệ này.
+- **Sửa:**
+  - `build_dev_r4.py` và `build_test_r1.py` đọc nhãn gốc từ git (`SOURCE_REF` là `46b2f2ff` và `cfb43fbb`), dựng trong `data/.build/` (gitignored). Sau đó chỉ thay các thư mục nhãn, `conversion-report.json` và `DISPUTES.md` của `data/dev` và `data/test`; audio và hội thoại mẫu không đụng tới.
+  - README của bản sửa gộp vào `data/dev/README.md` và `data/test/README.md` (mới). Notes chuyển sang `notes/dev`, `notes/test`; `SKILL.md` ghi quy ước mới.
+  - `ground_truth.json` ghi lại với thụt lề 2 như bộ sinh, nên diff chỉ còn các dòng đổi.
+  - Nhóm 24 (chờ duyệt): kết quả trong `tools/` của ADV-0154 là 22:00, `moved_from: null`.
+- **Đã kiểm:** so từng byte, `data/dev` giống bản dev-r4 ngoại trừ đúng `tools/` của ADV-0154, `data/test` giống hệt test-r1. Mọi file kịch bản git báo đổi đều có mục trong `conversion-report.json`. 0 lỗi khóa; loader `run_eval` nạp 404/404 và 99/99; oracle qua `reference_eval.py` CCR 100 · RQR 0 · TSR 100 · HR 0. `tests/agent/test_extractor_vocabulary.py`, `test_btc_pack.py`: 30 pass; test của `evaluation/data-generation`: 112 pass.
+- **Số đo:** không có (nhãn không đổi so với bản đã kiểm).
+- **Còn lại:** nhóm 19–24 chờ duyệt. Các run cũ trong `evaluation/runs/` chấm trên nhãn r3: không so số trực tiếp với run mới.
+
+### 2026-11-09 · Hành động kỳ vọng của agent: dev-r4 và test-r1, nhóm 19–23
+
+Loại: dữ liệu · Trạng thái: đang đo · Chỉ số: TSR, HR
+
+- **Vấn đề:** một số `success_if`, tham số và `tools/` của đáp án chuẩn không khớp lời khách hoặc chính sách. Khách hẹn giờ gọi lại mà nhãn không đòi `schedule.callback`. Khách hoãn mà nhãn vẫn đòi tạo đơn. Lời khách mua một món, nhãn ghi món khác. Lịch gọi lại rơi vào ngày nghỉ thì `args_match` chỉ chấp nhận một trong hai cách làm đúng.
+- **Bằng chứng:** bộ kiểm hành động không gọi model. Nó đối chiếu `schedule.callback` (ngày, giờ, kết quả `mock_tools.schedule_callback`), `order.create` (sản phẩm được nhắc, số lượng, câu cuối có hoãn không), `order.update` (action và size so với lời khách), `order.status`, `handoff.transfer` (khách đòi người hoặc hỏi y tế). Khoảng 60 mục bị báo, đọc từng câu: phần lớn là báo động giả (câu hỏi y tế chuyển máy đúng luật, khách nhắc nhân viên cũ, "Thứ Hai tuần sau"…). Còn lại 5 lỗi thật, và 1 chỗ chính sách mâu thuẫn với mock BTC.
+- **Sửa (chờ duyệt, cờ `ACTION_PROPOSALS_REVIEWED`):**
+  - Nhóm 19: GEN-0184/c2 đòi `schedule.callback` 19:00 ngày hôm sau.
+  - Nhóm 20: ADV-0123/c1 đổi thành `hen_goi_lai`, không tạo đơn.
+  - Nhóm 21: GEN-0197/c2 (dev) và GEN-0015/c2 (test), lời khách đổi sang mua AirPure Mini đúng nhãn.
+  - Nhóm 22: 7 cuộc dev và 1 cuộc test, bỏ `args_match.callback_at` khi giờ hẹn rơi vào ngày nghỉ LN-02; giữ giờ đã dời ở `ground_truth_facts` và `must_say_any`.
+  - Nhóm 23: ADV-0117/c1, khách tự xưng nhất quán là "anh".
+  - Cũng sửa lỗi của chính nhóm 14 (đã duyệt): câu thêm vào dùng cách người gọi tự xưng, không theo `honorific` của kịch bản. Ở các kịch bản hai người chung SĐT, chị Dung từng bị ghi "Phòng cô…".
+- **Đã kiểm:** dựng lại hai revision; 0 lỗi khoá; loader `run_eval` nạp 404/404 và 99/99; oracle qua `reference_eval.py` cho CCR 100 · RQR 0 · TSR 100 · HR 0, 0 lỗi schema.
+- **Số đo:** chưa đo trên agent thật.
+- **Còn lại:** chờ duyệt. Ở SCN-ADV-0154/call_1, LN-02 cho gọi 22:00 ngày 11/11 nhưng mock BTC dời về 08:00; cần người duyệt chọn theo chính sách hay theo mock.
+
+### 2026-11-09 · Nhãn có căn cứ trong lời khách: dev-r4 và test-r1, nhóm 14–16
+
+Loại: dữ liệu · Trạng thái: đang đo · Chỉ số: CCR, RQR, TSR, HR
+
+- **Vấn đề:** `facts_established` ghi diện tích, trẻ nhỏ, tuổi bé, ngân sách mà khách không nói ở cuộc nào, seed_history cũng không có. Cuộc sau lại cấm hỏi (RQR) hoặc bắt nhớ (CCR) chính các slot đó: agent hỏi lại vì chưa biết thì bị trừ điểm, còn agent bịa ra số thì được cộng. Ở tập test, 8 cuộc đòi `order.create` mà khách không nói lời đồng ý nào. Ở dev, 2 cuộc ghi `freeship: true` khi không biết nơi giao.
+- **Bằng chứng:** bộ kiểm mâu thuẫn không gọi model, chạy trên dev, dev-r4, test, test-r1. Nó đối chiếu nhãn với lời khách, `ground_truth_facts` với `mock_tools.py` của BTC theo ngày cuộc gọi (giá, tồn kho, khuyến mãi), danh tính với CRM, `expected_outcome` với tool, ngày giữa các cuộc.
+  - Giá, tồn kho, khuyến mãi, outcome, ngày, thanh toán: không có mâu thuẫn. ADV-0024/0119 trông như sai giá nhưng là RUN-10 `once_per_customer`; các khách không có trong CRM đều là persona ẩn danh hoặc số mới.
+  - Facts không nói ở đâu, trên dev-r4: room 29, has_children 29, child_age 41, budget khoảng 105; trên test-r1: 6, 11, 4, 21. Đa số bị cuộc sau dùng tới.
+- **Sửa:** nhóm 14 thêm câu khách nói đúng giá trị đã gán, nối vào lượt đầu nên số lượt không đổi. Đây là cách đã duyệt ở nhóm 1 và 3, giữ được phép thử trí nhớ. dev-r4 có 144 cuộc / 196 nhãn, test-r1 có 27 cuộc / 37 nhãn; danh sách đọc lại từng cuộc. Nhóm 15 (test-r1) thêm lượt đồng ý cho 8 cuộc tạo đơn. Nhóm 16 (dev-r4) bỏ `freeship` ở 2 cuộc. Người duyệt chấp nhận các nhóm 11b, 14–18 ngày 09/11/2026 (cờ `NEW_PROPOSALS_REVIEWED` trong `build_dev_r4.py`; dựng lại, 2.582 và 612 file nhãn không đổi byte nào).
+- **Đã kiểm:** dựng lại cả hai revision; 0 lỗi khoá. Oracle qua `reference_eval.py`: CCR 100 · RQR 0 · TSR 100 · HR 0, 0 lỗi schema. Kiểm lại thì không còn fact nào khách không nói (8 mục còn lại đều đã đọc, khách nói bằng chữ như "một tháng", "một triệu"); 0 cuộc tạo đơn thiếu lời đồng ý.
+- **Số đo:** chưa đo trên agent thật.
+- **Bổ sung cùng ngày:**
+  - Nhóm 11b (dev-r4): đọc 432 nhãn `blocker` của ASR, gồm những câu có từ gợi ý. Bỏ 8 nhãn (câu không nêu lý do, xin chuyển máy, lý do đã xong như "đã hỏi vợ và quyết định mua rồi"). Đổi 4 nhãn chê giá mà không so với nơi khác sang `vuot ngan sach`.
+  - Nhóm 17: theo quy tắc người duyệt đưa ra, khách ẩn danh không đọc SĐT thì cuộc sau không nối được với cuộc đầu, nên chỉ giữ slot khách nói lại. Áp cho ADV-0050/0093/0145 call_2; nếu khách đọc số thì phải lưu và giữ ngữ cảnh.
+  - Nhóm 18: bỏ `owned_sku` khỏi `must_carry_over` ở ADV-0045/c1, vì `seed_history` chỉ là thông tin tham khảo.
+  - Size và `return_days` của ASR test-r1: đọc 35 nhãn, đều đúng.
+  - Dựng lại: 0 lỗi khoá, oracle CCR 100 · RQR 0 · TSR 100 · HR 0.
+- **Còn lại:** audio của các lượt có lời mới chưa sinh lại (người duyệt sẽ sinh khi dữ liệu ổn).
+
+### 2026-11-08 · data/test-r1: sửa nhãn tập test theo các nhóm của dev-r4
+
+Loại: dữ liệu · Trạng thái: đang đo · Chỉ số: CCR, RQR, TSR, HR, entity_accuracy (ASR)
+
+- **Vấn đề:** `data/test` mang lại các lỗi nhãn đã sửa ở dev-r4, vì nó được sinh lại từ 99 kịch bản đầu của `data/dev` (cùng mã, khách, persona và kế hoạch cuộc gọi; chỉ lời khách khác). Đây cũng là lý do tập này không độc lập với dev.
+- **Bằng chứng:**
+  - Chạy kiểm không gọi model trên dev, dev-r4 và test: khoá theo `scenario-keys.yaml`, loader `run_eval`, oracle qua `reference_eval.py` của BTC, schema, độ khớp giữa các thư mục.
+  - So mã: 99/99 mã của test có trong dev, cùng số điện thoại, 0 kịch bản trùng nội dung.
+  - Đo từng nhóm của dev-r4 thành quy tắc trên dev: nhóm 5 khớp 22/22, nhóm 9 khớp 130/130. Các nhóm còn lại không tái tạo được danh sách đã duyệt (G1 độ chính xác 0,68, G3 0,79, G7 và G8 không dùng được), nên phải đọc câu.
+  - Cũng trong lần kiểm này, phát hiện nhóm 7 của dev-r4 để lại `facts_established: {}` ở 5 cuộc. Đã sửa trong `build_dev_r4.py`, dựng lại; đúng 5 file đổi, oracle không đổi.
+- **Sửa:** revision mới `data/test-r1`, dựng bằng `evaluation/datasets/ground-truth-review/build_test_r1.py` (dùng lại các hàm của `build_dev_r4.py`); `data/test` không đổi.
+  - 43 thay đổi theo quy tắc đã duyệt: nhóm 5 có 5, nhóm 9 có 31, phần định dạng của 11 có 6, nhóm 12 có 1.
+  - 83 thay đổi Claude đề xuất sau khi đọc câu: nhóm 1, 2, 3, 4, 7, 8, 10 và phần nghĩa của 11. Người duyệt chấp nhận cả bảng cùng ngày (`proposed_by: claude`, `reviewed_on: 2026-11-08`; cờ `CLAUDE_PROPOSALS_REVIEWED` trong script). Chi tiết ở `DISPUTES.md`.
+  - `data/test-r*/` thêm vào `.gitignore` như `data/dev-r*/`. README và DISPUTES của cả hai revision chuyển vào `evaluation/datasets/ground-truth-review/notes/`; script chép nguyên byte khi dựng.
+  - 21 cuộc có `budget_vnd` mà khách không nói ngân sách: để lại cho người duyệt.
+- **Đã kiểm:** 99/99 kịch bản nạp được bằng loader của `run_eval`; 0 lỗi khoá. Oracle trên test-r1: CCR 100 · RQR 0 · TSR 100 · HR 0, 0 vi phạm, 0 lỗi schema.
+- **Số đo:** chưa đo trên agent thật.
+- **Còn lại:** 21 cuộc `budget_vnd` khách không nói chờ người duyệt chọn cách sửa; audio của các lượt khách đã đổi chưa sinh lại; `size_old`/`return_days` của ASR ở test chưa đọc. Muốn có tập test độc lập thì phải sinh tập mới với mã và khách riêng.
+
+### 2026-11-08 · data/dev-r4: sửa nhãn theo bản tổng hợp 08/11/2026
+
+Loại: dữ liệu · Trạng thái: đang đo · Chỉ số: CCR, RQR, TSR, HR, entity_accuracy (ASR)
+
+- **Vấn đề:** nhãn của `data/dev` mâu thuẫn với lời khách, với dữ liệu BTC hoặc với chính bộ dữ liệu, nên agent làm đúng vẫn bị chấm trượt. Ví dụ: cuộc chat không nối được với cuộc sau; đòi nhớ `owned_sku` của món không liên quan; đơn vượt hạn mức COD mà khách chưa đồng ý chuyển khoản; `promo_active: true` khi chỉ có freeship.
+- **Bằng chứng:** bản tổng hợp nhãn của người làm tập dev (08/11/2026). Mình tính lại từng nhóm trên `data/dev` và pack BTC (`promotions.json`, `crm_seed.json`, `inventory_timeline.json`), vì các file bằng chứng mà bản tổng hợp dẫn tới không có trên máy. Khi đọc lại nhãn ASR, mình thấy 22 nhãn `promo_expiry` thật ra là ngày hẹn gọi lại.
+- **Sửa:** revision mới `data/dev-r4`, dựng bằng `evaluation/datasets/ground-truth-review/build_dev_r4.py`; `data/dev` không đổi. 515 dòng thay đổi (tính cả bản ASR của lời khách) được người duyệt chấp nhận (nhóm 1, 2, 3, 4 cho ADV-0028, 5, 8, 9, 10, phần định dạng của 11). 124 thay đổi do Claude đề xuất (ADV-0023, hotline nhóm 7, `blocker`/tiền/`promo_expiry`/`phone`/`restock_date` của ASR, tag nguồn), người duyệt chấp nhận cả bảng cùng ngày. Trong `conversion-report.json`, các mục này có `decision: revise`, `proposed_by: claude`, `reviewed_on: 2026-11-08`; cờ `CLAUDE_PROPOSALS_REVIEWED` trong script đưa chúng về `pending` nếu cần. Phần giữ nguyên và chưa làm ghi trong `DISPUTES.md`.
+- **Đã kiểm:** 404/404 kịch bản nạp được; độ dài `customer_turns_asr` khớp. Oracle trên r4: CCR 100 · RQR 0 · TSR 100 · HR 0, 0 vi phạm, 0 lỗi schema. Khi chuyển 124 đề xuất sang đã duyệt: dựng lại bằng `--force`, 2.582 file nhãn giống hệt từng byte, và 640 thay đổi trong report giữ nguyên nội dung, chỉ đổi trạng thái.
+- **Số đo:** chưa đo trên agent thật.
+- **Còn lại:** audio của các lượt khách đã đổi (nhóm 1, 3, 10) chưa được sinh lại; hội thoại mẫu J02 và max_agent_questions chưa sinh lại (cần model); nhãn `blocker` có từ gợi ý chưa đọc; `official_gt_approved` vẫn false.
+
 ### 2026-11-08 · Chỉ đọc lại đơn khi đủ thông tin, và "đồng ý" kèm từ đệm vẫn tạo được đơn
 
 Loại: hard guard, prompt · Trạng thái: đang đo · Chỉ số: TSR

@@ -58,8 +58,7 @@
         "product_advised": "SKU-AP-PRO",
         "price_quoted_vnd": 7590000,
         "promo_code": "TRADE-IN-AP",
-        "promo_expiry": "2026-12-14",
-        "order_id": "OD600001"
+        "promo_expiry": "2026-12-14"
       },
       "must_carry_over": [
         "owned_sku"
@@ -68,12 +67,10 @@
         "owned_sku"
       ],
       "success_if": {
-        "tool_called": "order.create",
-        "args_match": {
-          "sku": "SKU-AP-PRO",
-          "price_vnd": 7590000,
-          "payment": "bank"
-        },
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
         "forbidden_claims": [
           {
             "field": "price_vnd",
@@ -109,7 +106,6 @@
         "product_advised": "SKU-AP-PRO",
         "price_quoted_vnd": 7590000,
         "promo_code": "TRADE-IN-AP",
-        "order_id": "OD600001",
         "superseded": {
           "delivery_area": "Đống Đa, Hà Nội",
           "room_area_m2": 20
@@ -123,7 +119,7 @@
         "VC-04",
         "PB-01"
       ],
-      "expected_outcome": "chot_don"
+      "expected_outcome": "hen_goi_lai"
     }
   }
 }

@@ -5,13 +5,13 @@ description: Review, approve, or revise evaluation scenarios and ground-truth la
 
 # Ground-truth review for evaluation data
 
-> **Current dataset:** the run path is named in `evaluation/README.md` (`data/dev/scenarios`, formerly `seed-dev-r3`). A new revision folder is needed only when labels are changed under review.
+> **Current dataset:** the run path is named in `evaluation/README.md` (`data/dev/scenarios`; labels revision r4 since 09/11/2026). A revision rewrites the labels of `data/dev` or `data/test` in place through its build script (below).
 
-This is the single instruction file for creating, reviewing, and revising team evaluation data. Team data lives under `data/dev-r<N>/` (the current revision is named in `evaluation/README.md`); the old `create-data-diagnostic-v<N>/` folders are in git history only. Treat the organisers' pack in `apps/ai-agent-service/data/btc/` as an immutable reference: a BTC schema defines the shape, not the truth of an answer. Verify prices, promotions, inventory, order state, and effective dates against that pack's catalog, policy, and `eval/mock_tools.py`. The seven BTC public samples (`test_set/public_sample/`) are development examples; they are not the future organiser golden set. Do not use frozen or hidden cases to teach FAQ, Reflection, or Exemplar Bank.
+This is the single instruction file for creating, reviewing, and revising team evaluation data. Team data lives under `data/dev/` and `data/test/` (their current revisions are named in `evaluation/README.md`); the old `create-data-diagnostic-v<N>/` folders are in git history only. Treat the organisers' pack in `apps/ai-agent-service/data/btc/` as an immutable reference: a BTC schema defines the shape, not the truth of an answer. Verify prices, promotions, inventory, order state, and effective dates against that pack's catalog, policy, and `eval/mock_tools.py`. The seven BTC public samples (`test_set/public_sample/`) are development examples; they are not the future organiser golden set. Do not use frozen or hidden cases to teach FAQ, Reflection, or Exemplar Bank.
 
 Before running a new case, check the BTC scenario format (`schemas/scenario_format.md`) and make sure every call has a reviewed grading method, expected tools for both the `full` and the `baseline_no_memory` configuration, a source/provenance and a PII decision. A structurally valid JSON file with a wrong business fact or an unsupported field is not ready. Keep new or corrected labels in a new revision; never overwrite a used revision.
 
-Each `data/dev-r<N>/` is a derived, BTC-compatible diagnostic revision of `evaluation/data-generation` output, not approved official GT. Its `conversion-report.json` records every changed field; `official_gt_approved: false` must remain truthful. `QaAgent` and model judgments can propose or flag labels, but cannot approve their own labels. A human reviewer makes the final decision.
+Each revision of `data/dev` or `data/test` is a derived, BTC-compatible diagnostic revision of `evaluation/data-generation` output, not approved official GT. Its `conversion-report.json` records every changed field; `official_gt_approved: false` must remain truthful. `QaAgent` and model judgments can propose or flag labels, but cannot approve their own labels. A human reviewer makes the final decision.
 
 ## Before changing data
 
@@ -21,8 +21,7 @@ Each `data/dev-r<N>/` is a derived, BTC-compatible diagnostic revision of `evalu
 
 ## Publish a revision
 
-- Write a new versioned folder (`data/dev-r<N+1>/`) with its scenarios, an updated conversion report and source hashes. Do not overwrite a revision a run has used.
-- Build a revision with a script that can be rerun, not by hand.
+- Build a revision with a script that can be rerun, not by hand. The script reads the previous labels from a pinned git commit (`SOURCE_REF`), builds under `data/.build/`, and replaces only the label folders of `data/dev` or `data/test` (`scenarios`, `metadata`, `asr_reference`, `tools`, `call_brief`, `handoff_brief`) with an updated `conversion-report.json` and source hashes. One folder per dataset, no `dev-r<N>` copies (the reviewer's choice, 09/11/2026): the revision a run used stays in git at its commit, so name that commit in the run's notes and never compare runs across revisions without saying the labels changed. Example: `build_dev_r4.py`, `build_test_r1.py`.
 - Keep reviewer evidence with the new revision. Mark approval only for the scope actually reviewed; one approved field or call does not approve the whole dataset.
 - Run a model-backed evaluation only when requested or authorized, on the same pinned cohort, and report label changes separately from agent changes.
 
