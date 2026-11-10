@@ -16,7 +16,7 @@ Bộ dữ liệu do [`evaluation/data-generation`](../../evaluation/data-generat
 
 ## Nhãn đã sửa (bản r4, 08–09/11/2026)
 
-Các thư mục nhãn (`scenarios`, `metadata`, `asr_reference`, `tools`, `call_brief`, `handoff_brief`), `conversion-report.json` và `DISPUTES.md` do [`build_dev_r4.py`](../../evaluation/datasets/ground-truth-review/build_dev_r4.py) ghi, dựng từ nhãn ở commit `46b2f2ff` (bản r3 ở trên), theo [quy trình duyệt nhãn](../../evaluation/datasets/ground-truth-review/SKILL.md). Bản r3 vẫn lấy lại được từ commit đó. Các run cũ trong `evaluation/runs/` chấm trên r3: không so số trực tiếp với run mới, mà ghi rõ là đổi nhãn. Nhãn vẫn là chẩn đoán (`official_gt_approved: false`). Từng trường đổi ở `conversion-report.json`, lý do và phần chưa làm ở [`DISPUTES.md`](DISPUTES.md).
+Các thư mục nhãn (`scenarios`, `metadata`, `asr_reference`, `tools`, `call_brief`, `handoff_brief`), `conversion-report.json` và `DISPUTES.md` do [`build_dev_r4.py`](../../evaluation/datasets/ground-truth-review/build_dev_r4.py) ghi, dựng từ nhãn ở commit `46b2f2ff` (bản r3 ở trên), theo [quy trình duyệt nhãn](../../evaluation/datasets/ground-truth-review/SKILL.md). Bản r3 vẫn lấy lại được từ commit đó. Các run cũ trong `evaluation/runs/` chấm trên r3: không so số trực tiếp với run mới, mà ghi rõ là đổi nhãn. Người duyệt (dngan0365) đã ký nhãn từng cuộc ngày 10/11/2026: 801/801 (`official_gt_approved: true`, `review/golden_manifest.json`). Từng trường đổi ở `conversion-report.json`, lý do và phần chưa làm ở [`DISPUTES.md`](DISPUTES.md).
 
 | Nhóm | Sửa | Phạm vi |
 |---|---|---|
@@ -46,7 +46,7 @@ Kiểm, không gọi model: 404/404 kịch bản nạp được bằng loader c�
 
 Dựng lại từ gốc repo: `python evaluation/datasets/ground-truth-review/build_dev_r4.py`, rồi từ `evaluation/data-generation`: `python -m src.pipeline.build_ground_truth --root ../../data/dev` (viết lại `trace_log/` và báo cáo oracle trong `reports/`).
 
-**Hội thoại mẫu (`conversations/`) đã sinh lại theo nhãn r4** (09–10/11/2026, [`regenerate_conversations.py`](../../evaluation/datasets/ground-truth-review/regenerate_conversations.py)): 230 cuộc có lời khách đã đổi, trượt validator, agent mẫu bịa (J02) hoặc thiếu file được viết lại (danh sách ở `review/regenerated.json`). Validator: 801/801. 576/801 hội thoại qua mọi kiểm tự động; phần còn lại phần lớn chỉ vì bộ chấm bằng model cần người đọc, vài ca J02 vẫn còn (đánh dấu `approve: N` trong `review/needs_manual_review.csv`, không dùng làm few-shot hay dữ liệu vòng cải tiến). Bộ này chưa phải bộ vàng: `official_gt_approved: false`. Quyết định `approve_conversation` cũ của các cuộc sinh lại đã xoá trong `review/review_sheet.csv` (người duyệt đã duyệt hội thoại cũ), nên cần ký lại. Kiểm tự động và đề xuất từng cuộc ở `review/auto_verified.json`, `review/review_sheet.csv` (`auto_verify.py`); người duyệt ký bằng `evaluation/datasets/ground-truth-review/approve_gold.py`.
+**Hội thoại mẫu (`conversations/`) đã sinh lại theo nhãn r4** (09–10/11/2026, [`regenerate_conversations.py`](../../evaluation/datasets/ground-truth-review/regenerate_conversations.py)): 230 cuộc có lời khách đã đổi, trượt validator, agent mẫu bịa (J02) hoặc thiếu file được viết lại (danh sách ở `review/regenerated.json`). Validator: 801/801. 576/801 hội thoại qua mọi kiểm tự động; phần còn lại phần lớn chỉ vì bộ chấm bằng model cần người đọc, vài ca J02 vẫn còn (đánh dấu `approve: N` trong `review/needs_manual_review.csv`, không dùng làm few-shot hay dữ liệu vòng cải tiến). Người duyệt đã ký lại ngày 10/11/2026: 578/801 hội thoại vào `review/golden_manifest.json` (nhãn và hội thoại cùng Y). Kiểm tự động và đề xuất từng cuộc ở `review/auto_verified.json`, `review/review_sheet.csv` (`auto_verify.py`); người duyệt ký bằng `evaluation/datasets/ground-truth-review/approve_gold.py`.
 
 **Audio đã theo kịp nhãn** (09–10/11/2026): mọi lượt khách đổi lời được đọc lại bằng `synthesize_scenario_audio --changed-only` (266 lượt, 22.963 ký tự ElevenLabs); `asr_reference/ground_truth.json` dựng lại từ clip trên đĩa, không còn clip đọc lời cũ. Nhãn entity lấy từ `asr_reference/<call>.json` (đã sửa ở nhóm 11), không lấy bản chép cạnh clip.
 
@@ -63,7 +63,7 @@ Dựng lại từ gốc repo: `python evaluation/datasets/ground-truth-review/bu
 | `reports/` | kiểm tra nhãn, oracle, audio, chi phí sinh dữ liệu | đọc trước khi chạy |
 | `review/needs_manual_review.csv` | các ca cần người duyệt | duyệt tay |
 
-**Nhãn là chẩn đoán.** `official_gt_approved: false` (15 cuộc chưa duyệt nhãn, xem [DISPUTES.md](DISPUTES.md)), nên số đo trên bộ này là chẩn đoán, chưa phải bộ vàng (quy tắc 5).
+**Nhãn đã duyệt.** `official_gt_approved: true`: người duyệt ký nhãn 801/801 cuộc (10/11/2026, `review/golden_manifest.json`); hội thoại mẫu vàng 578/801. Lý do từng nhóm sửa ở [DISPUTES.md](DISPUTES.md).
 
 ## 0. Kiểm nhãn trước (miễn phí, không gọi model)
 

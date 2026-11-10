@@ -6,7 +6,7 @@ Kịch bản nằm ở [`data/dev/scenarios`](../../data/dev/README.md) (404 k�
 |---|---|
 | `ground-truth-review/` | Quy tắc duyệt và sửa nhãn (`SKILL.md`): đọc trước khi thêm hoặc sửa kịch bản |
 
-Trạng thái: **diagnostic** (`official_gt_approved: false`). Nhãn do bộ sinh gán; người duyệt đã chấp nhận từng nhóm sửa (`DISPUTES.md` của `data/dev` và `data/test`), và `review/golden_manifest.json` đã ký từng cuộc (dev 786/801 nhãn, test 189/192); bộ vàng chính thức khi mọi cuộc được duyệt. Mọi điểm đo trên bộ này là điểm chẩn đoán, không phải điểm chính thức.
+Trạng thái: **nhãn đã duyệt** (`official_gt_approved: true`, 10/11/2026). Nhãn do bộ sinh gán; người duyệt đã chấp nhận từng nhóm sửa (`DISPUTES.md` của `data/dev` và `data/test`) và ký từng cuộc trong `review/golden_manifest.json`: dev 801/801 nhãn (578 hội thoại), test 192/192 nhãn (149 hội thoại). `data/test` không độc lập với `data/dev` (xem README của nó).
 
 ## Chạy thử
 
