@@ -12,11 +12,16 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có đặt Quạt đứng Senko, em hỗ trợ anh về máy hút sữa Spectra S1 nhé.",
-      "questions": [],
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần tư vấn về máy hút sữa điện đôi Spectra S1 đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh muốn tìm hiểu về máy hút sữa điện đôi Spectra S1 đúng không ạ?"
+        }
+      ],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
       "claims": [],
       "tool_calls": [],
@@ -28,43 +33,18 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh muốn hỏi về máy hút sữa điện đôi Spectra S1.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 700,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, máy hút sữa điện đôi Spectra S1 hiện bên em còn hàng anh nhé.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
+      "text": "Alo, anh muốn hỏi về máy hút sữa điện đôi Spectra S1. Bé nhà anh được 6 tháng.",
+      "facts_stated": {
+        "child_age_months": 6
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Máy này giá bao nhiêu em nhỉ?",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
       "speaker": "agent_ai",
-      "text": "Dạ, giá máy hút sữa Spectra S1 hiện tại là 4.290.000đ anh nhé.",
+      "text": "Dạ cảm ơn anh đã chia sẻ, bé nhà mình 6 tháng dùng Spectra S1 là phù hợp ạ. Em xin báo giá máy này: 4.290.000đ, hàng chính hãng, bảo hành 12 tháng.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -82,16 +62,47 @@
     },
     {
       "speaker": "customer",
-      "text": "Ở đây có khuyến mãi gì không?",
+      "text": "Máy này giá bao nhiêu em nhỉ?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, máy Spectra S1 đang được áp dụng chương trình miễn phí vận chuyển toàn quốc theo khuyến mãi MOM-FREESHIP ạ.",
+      "text": "Dạ giá máy hút sữa điện đôi Spectra S1 bên em là 4.290.000đ anh nhé. Hiện tại đang có chương trình miễn phí giao hàng toàn quốc cho đơn mẹ & bé từ 500.000đ trở lên.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4290000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ở đây có khuyến mãi gì không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại sản phẩm này chưa có quà tặng kèm, nhưng anh được miễn phí vận chuyển toàn quốc theo chương trình MOM-FREESHIP ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -114,19 +125,23 @@
         "budget_vnd": 4500000
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, giá hiện tại là 4.290.000đ nên nằm trong ngân sách của anh rồi ạ. Nếu anh cần thêm tư vấn về sản phẩm hoặc phụ kiện thì em hỗ trợ thêm nhé.",
+      "text": "Dạ ngân sách của anh 4 triệu rưỡi là vừa đủ để mua Spectra S1 anh nhé. Máy này giá 4.290.000đ, đã bao gồm miễn phí vận chuyển ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 4290000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
         }
       ],
       "tool_calls": [],
@@ -143,16 +158,20 @@
         "blocker": "chờ cuối tháng nhận lương"
       },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận, cuối tháng anh nhận lương rồi mình liên hệ lại cũng được ạ. Chương trình miễn phí vận chuyển MOM-FREESHIP còn hiệu lực đến ngày 29/11/2026 anh nhé.",
+      "text": "Dạ em hiểu, anh chờ cuối tháng nhận lương rồi liên hệ lại cũng được ạ. Giá và chương trình miễn phí giao hàng hiện áp dụng đến hết ngày 29/11/2026, nếu cần hỗ trợ thêm anh cứ liên hệ shop nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4290000
+        },
         {
           "field": "promo_MOM-FREESHIP_active",
           "value": true
@@ -160,6 +179,12 @@
       ],
       "tool_calls": [],
       "memory_writes": [
+        {
+          "key": "child_age_months",
+          "value": 6,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
         {
           "key": "budget_vnd",
           "value": 4500000,
@@ -173,22 +198,22 @@
           "source": "call_1#turn10"
         },
         {
+          "key": "product_advised",
+          "value": "SKU-MB-PUMP1",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
           "key": "price_quoted_vnd",
           "value": 4290000,
           "op": "set",
-          "source": "call_1#turn5"
+          "source": "call_1#turn4"
         },
         {
           "key": "promo_code",
           "value": "MOM-FREESHIP",
           "op": "set",
-          "source": "call_1#turn7"
-        },
-        {
-          "key": "product_advised",
-          "value": "SKU-MB-PUMP1",
-          "op": "set",
-          "source": "call_1#turn2"
+          "source": "call_1#turn6"
         }
       ],
       "entities": [],

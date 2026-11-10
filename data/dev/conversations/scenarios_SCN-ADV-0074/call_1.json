@@ -12,14 +12,8 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh Trần Văn J ạ, hôm trước anh có mua Máy lọc nước UF Sunhouse bên em. Em là trợ lý ảo của shop, anh cần tư vấn về thay màng lọc đúng không ạ?",
-      "questions": [
-        {
-          "slot": "usage_need",
-          "type": "confirm",
-          "text": "Anh cần tư vấn về thay màng lọc đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có quan tâm Máy lọc nước UF Sunhouse, anh muốn mình tiếp tục tư vấn về thay màng lọc đúng không ạ?",
+      "questions": [],
       "facts_used": [
         "order_id",
         "owned_sku"
@@ -28,29 +22,36 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh muốn hỏi về thời gian thay màng lọc cho máy lọc nước UF Sunhouse mình đã mua.",
-      "facts_stated": {},
+      "text": "Alo, anh muốn hỏi về thời gian thay màng lọc cho máy lọc nước UF Sunhouse mình đã mua. Ngân sách của anh tầm 500 nghìn.",
+      "facts_stated": {
+        "budget_vnd": 500000
+      },
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, với máy lọc nước UF Sunhouse, lõi lọc số 1 đến 3 nên thay trong khoảng 6–9 tháng sử dụng để đảm bảo chất lượng nước anh nhé.",
+      "text": "Dạ với máy lọc nước UF Sunhouse, lõi lọc thô 1–3 nên thay định kỳ 6–9 tháng để đảm bảo chất lượng nước anh nhé. Bộ lõi lọc thay thế RO 1-2-3 bên em đang có sẵn, giá 390.000đ phù hợp ngân sách của anh ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 390000
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -59,20 +60,20 @@
       "text": "Máy này anh dùng cũng lâu rồi, không biết bao lâu thì phải thay hả em?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ anh, thông thường bộ lõi lọc số 1-3 sẽ dùng tốt nhất trong 6–9 tháng, sau đó mình nên thay mới để nước luôn sạch. Nếu anh dùng lâu rồi thì anh nên thay anh nhé.",
+      "text": "Dạ thông thường anh nên thay lõi số 1–3 sau mỗi 6–9 tháng sử dụng, tùy theo nguồn nước và tần suất dùng anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -81,29 +82,31 @@
       "text": "À, anh muốn đặt mua Bộ lõi lọc thay thế RO 1-2-3 luôn, giá khoảng bao nhiêu nhỉ?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ bộ lõi lọc thay thế RO 1-2-3 bên em đang có giá 390.000đ, hiện còn sẵn hàng anh nhé.",
-      "questions": [],
+      "text": "Dạ Bộ lõi lọc thay thế RO 1-2-3 hiện giá là 390.000đ, hàng có sẵn tại shop. Anh chọn thanh toán COD đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Anh chọn thanh toán COD đúng không ạ?"
+        }
+      ],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 390000
-        },
-        {
-          "field": "in_stock",
-          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -114,18 +117,18 @@
         "payment": "COD"
       },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ anh chọn thanh toán khi nhận hàng (COD) ạ. Anh muốn giao bộ lõi về Lê Chân, Hải Phòng phải không ạ?",
+      "text": "Dạ em ghi nhận thanh toán COD. Mình giao hàng về địa chỉ Lê Chân, Hải Phòng như lần trước đúng không ạ?",
       "questions": [
         {
           "slot": "delivery_area",
           "type": "confirm",
-          "text": "Anh muốn giao bộ lõi về Lê Chân, Hải Phòng phải không ạ?"
+          "text": "Mình giao hàng về địa chỉ Lê Chân, Hải Phòng như lần trước đúng không ạ?"
         }
       ],
       "facts_used": [],
@@ -133,7 +136,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -143,25 +146,19 @@
       "facts_stated": {
         "delivery_area": "Lê Chân, Hải Phòng"
       },
-      "entities": [
-        {
-          "type": "address",
-          "value": "Lê Chân, Hải Phòng",
-          "spoken": "Lê Chân, Hải Phòng"
-        }
-      ],
-      "pause_before_ms": 600,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xác nhận lại: anh đặt 1 bộ lõi lọc thay thế RO 1-2-3 giá 390.000đ, giao về Lê Chân, Hải Phòng, thanh toán COD. Dự kiến anh nhận hàng trong 4 ngày làm việc, khoảng ngày 21/10/2026. Anh kiểm tra thông tin giúp em nhé, đúng em lên đơn luôn ạ.",
+      "text": "Dạ em xác nhận giao Bộ lõi lọc thay thế RO 1-2-3 giá 390.000đ, thanh toán COD, giao về Lê Chân, Hải Phòng. Dự kiến anh nhận hàng trong 4 ngày làm việc, khoảng ngày 21/10 ạ. Em lên đơn ngay cho anh, anh xác nhận giúp thông tin đơn hàng này đúng nhé?",
       "questions": [
         {
           "slot": "order_summary",
           "type": "confirm",
-          "text": "Anh kiểm tra thông tin giúp em nhé, đúng em lên đơn luôn ạ."
+          "text": "Anh xác nhận giúp thông tin đơn hàng này đúng nhé?"
         }
       ],
       "facts_used": [],
@@ -182,7 +179,7 @@
       ],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -191,16 +188,21 @@
       "text": "Đúng rồi em, lên đơn giúp anh nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã lên đơn hàng cho anh rồi ạ. Anh sẽ nhận bộ lõi lọc thay thế RO 1-2-3 tại Lê Chân, Hải Phòng trong khoảng ngày 21/10/2026 và thanh toán khi nhận hàng. Cảm ơn anh đã đặt hàng tại shop BTC ạ!",
+      "text": "Dạ em đã đặt đơn Bộ lõi lọc thay thế RO 1-2-3 giá 390.000đ, thanh toán COD, giao về Lê Chân, Hải Phòng. Anh sẽ nhận hàng dự kiến vào ngày 21/10. Cảm ơn anh đã tin tưởng shop BTC, cần hỗ trợ thêm anh cứ liên hệ em nhé.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 390000
+        }
+      ],
       "tool_calls": [
         {
           "name": "order.create",
@@ -220,69 +222,68 @@
           "key": "usage_need",
           "value": "thay đồ cũ đã hỏng",
           "op": "set",
-          "source": "call_1#turn12"
+          "source": "call_1#turn14"
         },
         {
           "key": "budget_vnd",
           "value": 500000,
           "op": "set",
-          "source": "call_1#turn12"
+          "source": "call_1#turn14"
         },
         {
           "key": "payment",
           "value": "COD",
           "op": "set",
-          "source": "call_1#turn12"
+          "source": "call_1#turn14"
         },
         {
           "key": "delivery_area",
           "value": "Lê Chân, Hải Phòng",
           "op": "set",
-          "source": "call_1#turn12"
+          "source": "call_1#turn14"
         },
         {
           "key": "product_advised",
           "value": "SKU-WF-CORE",
           "op": "set",
-          "source": "call_1#turn12"
+          "source": "call_1#turn14"
         },
         {
           "key": "price_quoted_vnd",
           "value": 390000,
           "op": "set",
-          "source": "call_1#turn12"
+          "source": "call_1#turn14"
         },
         {
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_1#turn12"
+          "source": "call_1#turn14"
         }
       ],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "mua_phu_kien_loc_nuoc",
+    "intent": "dat_mua_loi_loc_nuoc_uf_sunhouse",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
-    "sentiment": "positive",
+    "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],
     "supersedes": [],
     "callback": null,
     "order": {
-      "order_id": "OD600001",
       "sku": "SKU-WF-CORE",
       "qty": 1,
       "price_vnd": 390000,
       "payment": "COD",
       "address": "Lê Chân, Hải Phòng",
-      "estimated_delivery": "2026-10-21"
+      "order_id": "OD600001"
     }
   }
 }

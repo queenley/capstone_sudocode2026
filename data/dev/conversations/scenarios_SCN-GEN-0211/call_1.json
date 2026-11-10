@@ -12,16 +12,15 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh, em là trợ lý ảo của shop BTC. Anh cần tư vấn về giày chạy bộ size 38 màu đen đúng không ạ?",
-      "questions": [
+      "text": "Dạ em chào anh, em là trợ lý ảo của shop BTC. Anh muốn tư vấn về giày chạy bộ đúng không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
         {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Anh cần tư vấn về giày chạy bộ size 38 màu đen đúng không ạ?"
+          "field": "in_stock",
+          "value": true
         }
       ],
-      "facts_used": [],
-      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -37,13 +36,13 @@
         "color": "den"
       },
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ đôi giày chạy bộ RunLite 2 Pro size 38 màu đen bên em hiện còn hàng anh nhé.",
+      "text": "Dạ, giày chạy bộ RunLite 2 Pro size 38 màu đen bên em còn hàng anh nhé. Anh cần em tư vấn thêm về chất liệu hay phù hợp cho mục đích chạy nào không ạ?",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -64,13 +63,13 @@
       "text": "gia cua doi giay nay la bao nhieu vay em",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giá của đôi RunLite 2 Pro size 38 màu đen là 1.690.000đ anh nha.",
+      "text": "Dạ, giày chạy bộ RunLite 2 Pro size 38 màu đen có giá là 1.690.000đ anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -91,13 +90,13 @@
       "text": "em co biet co khuyen mai gi khong",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại mẫu này chưa có chương trình khuyến mãi nào áp dụng anh ạ.",
+      "text": "Dạ hiện tại mẫu giày này bên em chưa có chương trình khuyến mãi nào áp dụng anh ạ. Nếu có ưu đãi mới em sẽ báo lại cho anh ngay.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -115,18 +114,25 @@
     },
     {
       "speaker": "customer",
-      "text": "a anh muon goi hotline hoi them nua",
+      "text": "a anh muon goi hotline hoi them nua so anh la 0963279264",
       "facts_stated": {
-        "blocker": "muốn gọi hotline hỏi thêm"
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "phone_provided": true
       },
-      "entities": [],
-      "pause_before_ms": 0,
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0963279264",
+          "spoken": "0963279264"
+        }
+      ],
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng anh có thể gọi hotline 1900 1234 để được nhân viên shop tư vấn chi tiết hơn ạ. Em cảm ơn anh đã liên hệ shop BTC!",
+      "text": "Dạ, em đã ghi nhận số điện thoại của anh là 0963279264 để nhân viên shop gọi lại hỗ trợ thêm cho anh nhé. Cảm ơn anh đã liên hệ shop BTC ạ!",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -136,7 +142,13 @@
           "key": "blocker",
           "value": "muốn gọi hotline hỏi thêm",
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "phone_provided",
+          "value": true,
+          "op": "set",
+          "source": "call_1#turn9"
         },
         {
           "key": "color",
@@ -176,15 +188,24 @@
     }
   ],
   "gold": {
-    "intent": "hoi_gia_giay_chay_bo",
+    "intent": "hoi_giay_chay_bo",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
-    "commitments": [],
+    "commitments": [
+      {
+        "action": "hen_goi_lai",
+        "by": "nhan_vien",
+        "note": "gọi lại theo số khách cung cấp"
+      }
+    ],
     "supersedes": [],
-    "callback": null,
+    "callback": {
+      "phone": "0963279264",
+      "reason": "muốn gọi hotline hỏi thêm"
+    },
     "order": null
   }
 }

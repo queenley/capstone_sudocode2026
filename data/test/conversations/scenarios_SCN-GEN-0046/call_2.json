@@ -12,14 +12,14 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh Tú ạ, hôm trước anh có quan tâm Giày chạy bộ RunLite 2 Pro size 42 màu đen bên em, anh muốn mình tiếp tục trao đổi thế nào ạ?",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có hỏi về Giày chạy bộ RunLite 2 Pro size 42 màu đen, em hỗ trợ anh tiếp nhé.",
       "questions": [],
       "facts_used": [
         "size",
         "product_advised",
-        "variant_sku",
         "objection",
         "competitor_price_vnd",
+        "variant_sku",
         "price_quoted_vnd",
         "promo_code"
       ],
@@ -39,19 +39,15 @@
         "size": 42
       },
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, anh hỏi về RunLite 2 Pro size 42 màu đen đúng không ạ? Hiện tại sản phẩm này đang có giá 1.521.000đ, áp dụng khuyến mãi RUN-10 giảm 10% từ giá niêm yết 1.690.000đ, còn hàng tại shop anh nhé.",
+      "text": "Dạ, hiện tại giá Giày chạy bộ RunLite 2 Pro size 42 màu đen là 1.521.000đ, đã áp dụng khuyến mãi RUN-10 giảm 10% trên giá niêm yết 1.690.000đ. Sản phẩm đang còn hàng anh nhé.",
       "questions": [],
-      "facts_used": [
-        "product_advised",
-        "size",
-        "variant_sku"
-      ],
+      "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
@@ -78,30 +74,23 @@
       "text": "Giá hôm trước là 1 triệu 352 ngàn, giờ có khuyến mãi gì không?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xin phép thông tin lại anh: chương trình RUN2-SALE đã kết thúc từ ngày 7/10 nên giá ưu đãi cũ không còn áp dụng, hiện bên em áp dụng RUN-10 giảm 10% cho sản phẩm này nên giá mới là 1.521.000đ anh nhé. Anh còn thắc mắc gì về chương trình khuyến mãi hiện tại không ạ?",
+      "text": "Dạ em xin phép thông tin lại, chương trình RUN2-SALE đã kết thúc nên giá giảm hôm trước không còn hiệu lực. Hiện chỉ còn khuyến mãi RUN-10 giảm 10% thôi ạ.",
       "questions": [],
-      "facts_used": [
-        "promo_code",
-        "price_quoted_vnd"
-      ],
+      "facts_used": [],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 1521000
+          "field": "promo_RUN2-SALE_active",
+          "value": false
         },
         {
           "field": "promo_RUN-10_active",
           "value": true
-        },
-        {
-          "field": "promo_RUN2-SALE_active",
-          "value": false
         }
       ],
       "tool_calls": [],
@@ -115,27 +104,20 @@
       "speaker": "customer",
       "text": "Anh thấy giá bên chỗ khác vẫn rẻ hơn, nên chưa quyết định được.",
       "facts_stated": {
-        "competitor_price_vnd": 1190000
+        "competitor_price_vnd": 1190000,
+        "objection": "giá cao hơn chỗ khác"
       },
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em hiểu băn khoăn của anh về giá ạ. Bên em cam kết hàng chính hãng, bảo hành 12 tháng, đổi trả trong 7 ngày đầu nếu có lỗi từ nhà sản xuất. Ngoài ra giá hiện tại đã giảm tối đa theo chương trình đang áp dụng rồi anh nhé.",
+      "text": "Dạ em hiểu anh quan tâm về giá. Bên em cam kết hàng chính hãng, bảo hành 12 tháng và hỗ trợ đổi trả 7 ngày nếu có lỗi từ nhà sản xuất anh nhé.",
       "questions": [],
-      "facts_used": [
-        "competitor_price_vnd",
-        "objection"
-      ],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1521000
-        }
-      ],
+      "facts_used": [],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -145,19 +127,32 @@
     },
     {
       "speaker": "customer",
-      "text": "Anh sẽ cần thời gian để suy nghĩ thêm rồi gọi lại nhé.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
+      "text": "Anh sẽ cần thời gian để suy nghĩ thêm rồi gọi lại nhé. Số anh là 0922808864.",
+      "facts_stated": {
+        "phone_provided": true
+      },
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0922808864",
+          "spoken": "0922808864"
+        }
+      ],
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận ý kiến của anh, nếu cần hỗ trợ thêm về sản phẩm hoặc khuyến mãi anh cứ nhắn lại shop bất cứ lúc nào ạ. Em cảm ơn anh Tú đã quan tâm sản phẩm bên em.",
+      "text": "Dạ vâng, em ghi nhận anh sẽ cân nhắc thêm. Khuyến mãi RUN-10 còn đến hết ngày 25/10, nếu cần hỗ trợ hoặc chốt đơn anh liên hệ lại giúp em trước thời gian đó nhé.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [
         {
@@ -169,8 +164,8 @@
         {
           "key": "price_quoted_vnd",
           "value": 1521000,
-          "op": "supersede",
-          "source": "call_2#turn5"
+          "op": "set",
+          "source": "call_2#turn3"
         },
         {
           "key": "variant_sku",
@@ -181,8 +176,8 @@
         {
           "key": "promo_code",
           "value": "RUN-10",
-          "op": "supersede",
-          "source": "call_2#turn5"
+          "op": "set",
+          "source": "call_2#turn3"
         }
       ],
       "entities": [],
@@ -194,8 +189,8 @@
   "gold": {
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": null,
-    "objection_handling": null,
+    "objection_type": "competitor_price",
+    "objection_handling": "Đã giải thích lý do giá, nêu giá trị hàng chính hãng và đổi trả.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

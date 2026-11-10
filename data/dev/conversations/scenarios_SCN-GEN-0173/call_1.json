@@ -12,15 +12,16 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần tư vấn về sản phẩm nào bên em vậy ạ?",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh muốn tư vấn máy lọc nước RO Karofi 9 lõi cho gia đình 4 người đúng không ạ?",
+      "questions": [
         {
-          "field": "in_stock",
-          "value": true
+          "slot": "usage_need",
+          "type": "confirm",
+          "text": "Anh muốn tư vấn máy lọc nước RO Karofi 9 lõi cho gia đình 4 người đúng không ạ?"
         }
       ],
+      "facts_used": [],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -30,9 +31,10 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh muốn hỏi về máy lọc nước RO Karofi 9 lõi cho gia đình 4 người.",
+      "text": "Alo, anh muốn hỏi về máy lọc nước RO Karofi 9 lõi cho gia đình 4 người. Ngân sách của anh tầm 7 triệu.",
       "facts_stated": {
-        "usage_need": "gia đình 4 người"
+        "usage_need": "gia đình 4 người",
+        "budget_vnd": 7000000
       },
       "entities": [],
       "pause_before_ms": 0,
@@ -41,16 +43,14 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ với nhu cầu gia đình 4 người, anh có thể tham khảo máy lọc nước RO Karofi 9 lõi bên em ạ. Sản phẩm đang có sẵn hàng, dùng công nghệ RO với 9 lõi lọc, đáp ứng tốt cho gia đình mình.",
-      "questions": [
-        {
-          "slot": "budget_vnd",
-          "type": "open",
-          "text": "Anh dự kiến ngân sách cho máy lọc nước này khoảng bao nhiêu không ạ?"
-        }
-      ],
+      "text": "Dạ với nhu cầu cho gia đình 4 người, em tư vấn anh máy lọc nước RO Karofi 9 lõi, giá hiện tại bên em là 5.990.000đ. Máy đủ đáp ứng nhu cầu gia đình và đang còn hàng sẵn kho ạ.",
+      "questions": [],
       "facts_used": [],
       "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
         {
           "field": "in_stock",
           "value": true
@@ -58,8 +58,14 @@
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 500,
+      "entities": [
+        {
+          "type": "money",
+          "value": "5990000",
+          "spoken": "5.990.000"
+        }
+      ],
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
@@ -74,7 +80,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ máy lọc nước RO Karofi 9 lõi bên em hiện có giá 5.990.000đ anh nhé. Giá này đã là giá niêm yết hiện tại, chưa có chương trình khuyến mãi nào áp dụng thêm cho sản phẩm này hôm nay ạ.",
+      "text": "Dạ, giá máy lọc nước RO Karofi 9 lõi bên em đang là 5.990.000đ anh nhé. Giá này là giá chính hãng, đã áp dụng chương trình miễn phí thu hộ khi nhận hàng COD ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -83,8 +89,8 @@
           "value": 5990000
         },
         {
-          "field": "promo_active",
-          "value": false
+          "field": "promo_COD-0_active",
+          "value": true
         }
       ],
       "tool_calls": [],
@@ -96,7 +102,7 @@
           "spoken": "5.990.000"
         }
       ],
-      "pause_before_ms": 700,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
@@ -109,7 +115,7 @@
       "entities": [
         {
           "type": "money",
-          "value": "5500000",
+          "value": "5510000",
           "spoken": "5 triệu 5"
         }
       ],
@@ -119,30 +125,20 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em rất xin lỗi, giá bên em hiện đang là 5.990.000đ và chưa có chương trình giảm thêm cho sản phẩm này anh ạ. Máy bên em là chính hãng, bảo hành 36 tháng, đổi trả trong 7 ngày nếu có lỗi từ nhà sản xuất. Anh cân nhắc giúp em nhé.",
+      "text": "Dạ em rất hiểu tâm lý so sánh giá, nhưng bên em chỉ áp dụng giá đúng theo chương trình của hãng và chính sách hiện hành, không tự giảm thêm ngoài chương trình. Em xin phép không so sánh với giá bên khác, tuy nhiên bên em cam kết hàng chính hãng, bảo hành 36 tháng và hỗ trợ đổi trả theo quy định ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 5990000
-        },
-        {
-          "field": "promo_active",
-          "value": false
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "5990000",
-          "spoken": "5.990.000"
-        }
-      ],
+      "entities": [],
       "pause_before_ms": 800,
-      "emotion": "neutral",
+      "emotion": null,
       "barge_in": false
     },
     {
@@ -158,15 +154,20 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em hiểu ạ, anh cứ trao đổi thêm với vợ. Khi nào anh cần tư vấn hoặc quyết định, anh cứ liên hệ lại bên em, em luôn sẵn sàng hỗ trợ anh ạ.",
+      "text": "Dạ em ghi nhận ý kiến của anh. Khi nào anh và vợ quyết định, anh có thể liên hệ lại hotline hoặc Zalo shop bất cứ lúc nào, em sẽ giữ thông tin tư vấn và giá báo hôm nay cho anh trong ngày ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [
         {
-          "key": "usage_need",
-          "value": "gia đình 4 người",
+          "key": "budget_vnd",
+          "value": 7000000,
           "op": "set",
           "source": "call_1#turn2"
         },
@@ -183,35 +184,35 @@
           "source": "call_1#turn8"
         },
         {
+          "key": "usage_need",
+          "value": "gia đình 4 người",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
           "key": "product_advised",
           "value": "SKU-WF-RO9",
           "op": "set",
-          "source": "call_1#turn3"
+          "source": "call_1#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 5990000,
           "op": "set",
-          "source": "call_1#turn5"
-        },
-        {
-          "key": "budget_vnd",
-          "value": 7000000,
-          "op": "set",
-          "source": "call_1#turn3"
+          "source": "call_1#turn4"
         }
       ],
       "entities": [],
-      "pause_before_ms": 700,
-      "emotion": "neutral",
+      "pause_before_ms": 600,
+      "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "hoi_may_loc_nuoc",
+    "intent": "tuvan_may_loc_nuoc",
     "outcome": "hen_goi_lai",
-    "objection_type": "gia_cao_hon_cho_khac",
-    "objection_handling": "Nhấn mạnh hàng chính hãng, bảo hành 36 tháng, đổi trả 7 ngày, giải thích giá niêm yết chưa có khuyến mãi.",
+    "objection_type": "giá cao hơn chỗ khác",
+    "objection_handling": "Giải thích giá theo chính sách hãng, cam kết hàng chính hãng và dịch vụ bảo hành, không so sánh giá đối thủ.",
     "sentiment": "neutral",
     "decision_maker": "vợ",
     "commitments": [],

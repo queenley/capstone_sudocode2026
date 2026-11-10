@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Em đã ghi nhận đơn hàng anh vừa đặt trước đó.",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Em đã xác nhận đơn hàng áo phao anh đặt trước đó.",
       "questions": [],
       "facts_used": [
         "order_id",
@@ -31,18 +31,18 @@
       "text": "Alo, anh muốn đổi địa chỉ giao hàng cho đơn hàng áo phao anh đã đặt.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ anh muốn đổi địa chỉ giao hàng cho đơn áo phao, anh vui lòng cho em biết địa chỉ mới để em hỗ trợ cập nhật ạ.",
+      "text": "Dạ anh muốn cập nhật địa chỉ giao hàng mới đúng không ạ? Anh vui lòng cho em biết địa chỉ mới để em hỗ trợ cập nhật đơn.",
       "questions": [
         {
           "slot": "delivery_area",
           "type": "open",
-          "text": "anh vui lòng cho em biết địa chỉ mới để em hỗ trợ cập nhật ạ."
+          "text": "Anh vui lòng cho em biết địa chỉ mới để em hỗ trợ cập nhật đơn."
         }
       ],
       "facts_used": [],
@@ -67,15 +67,17 @@
           "spoken": "Hải Châu, Đà Nẵng"
         }
       ],
-      "pause_before_ms": 500,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận địa chỉ giao hàng mới là Hải Châu, Đà Nẵng cho đơn của anh. Em sẽ tiến hành cập nhật ngay trên hệ thống ạ.",
+      "text": "Dạ em đã ghi nhận địa chỉ nhận hàng mới là Hải Châu, Đà Nẵng cho đơn áo phao của anh. Em sẽ tiến hành cập nhật ngay trên hệ thống ạ.",
       "questions": [],
-      "facts_used": [],
+      "facts_used": [
+        "order_id"
+      ],
       "claims": [],
       "tool_calls": [
         {
@@ -104,9 +106,11 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em kiểm tra thì đơn hàng này đã được giao thành công rồi ạ. Nếu cần hỗ trợ gì thêm về sản phẩm, anh báo lại giúp em nhé.",
+      "text": "Dạ em kiểm tra thì đơn hàng áo phao của anh đã được giao thành công rồi ạ.",
       "questions": [],
-      "facts_used": [],
+      "facts_used": [
+        "order_id"
+      ],
       "claims": [
         {
           "field": "order_status",
@@ -125,15 +129,16 @@
       "text": "Hy vọng chuyển đến địa chỉ mới sẽ không mất thêm thời gian nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 350,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã hoàn tất cập nhật địa chỉ cho anh. Nếu có nhu cầu đặt đơn mới về địa chỉ này, anh chỉ cần báo em hỗ trợ ngay ạ. Em cảm ơn anh đã liên hệ shop!",
+      "text": "Dạ em đã cập nhật địa chỉ mới cho anh rồi ạ. Nếu cần hỗ trợ thêm về giao hàng hoặc đổi trả, anh có thể liên hệ lại shop bất cứ lúc nào.",
       "questions": [],
       "facts_used": [
+        "order_id",
         "delivery_area"
       ],
       "claims": [],

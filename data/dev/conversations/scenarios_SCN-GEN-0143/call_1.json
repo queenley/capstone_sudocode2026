@@ -12,17 +12,16 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, hôm trước bạn nhân viên đã hỗ trợ mình đặt Giày chạy bộ RunLite, anh muốn hỏi về bình sữa Pigeon cho bé 9 tháng đúng không ạ?",
+      "text": "Dạ em chào anh Nguyễn Văn E ạ, hôm trước anh có đặt Giày chạy bộ RunLite 1, hiện đơn đang giao. Anh hỏi về bình sữa Pigeon cho bé 9 tháng đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Anh muốn tư vấn về bình sữa Pigeon cho bé nhà mình đúng không ạ?"
+          "text": "Anh hỏi về bình sữa Pigeon cho bé 9 tháng đúng không ạ?"
         }
       ],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
       "claims": [],
       "tool_calls": [],
@@ -36,8 +35,7 @@
       "speaker": "customer",
       "text": "alo anh muon hoi ve binh sua pigeon cho be 9 thang a",
       "facts_stated": {
-        "child_age_months": 9,
-        "product_advised": "SKU-MB-BOT"
+        "child_age_months": 9
       },
       "entities": [],
       "pause_before_ms": 0,
@@ -46,7 +44,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ anh, shop mình có sẵn bình sữa Pigeon PPSU 240ml, phù hợp cho bé từ sơ sinh tới trên 6 tháng, giá là 289.000đ. Hiện sản phẩm đang còn hàng ạ.",
+      "text": "Dạ anh, shop hiện có sẵn bình sữa Pigeon PPSU 240ml, giá là 289.000đ ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -79,17 +77,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Hiện tại sản phẩm này chưa có chương trình khuyến mãi nào áp dụng anh nhé. Giá 289.000đ đã là giá niêm yết mới nhất rồi ạ.",
+      "text": "Dạ hiện tại sản phẩm này chưa có chương trình khuyến mãi nào áp dụng anh nhé. Giá bán là 289.000đ ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 289000
-        },
-        {
           "field": "promo_active",
           "value": false
+        },
+        {
+          "field": "price_vnd",
+          "value": 289000
         }
       ],
       "tool_calls": [],
@@ -110,7 +108,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, bình sữa Pigeon này đang có sẵn tại shop, anh cần là mình giữ hàng luôn cho anh được ạ.",
+      "text": "Dạ bình sữa Pigeon này đang còn hàng anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -128,18 +126,25 @@
     },
     {
       "speaker": "customer",
-      "text": "a anh muon goi hotline de hoi them mot so thong tin nua",
+      "text": "a anh muon goi hotline de hoi them mot so thong tin nua so anh la 0998000005",
       "facts_stated": {
+        "phone_provided": true,
         "blocker": "muốn gọi hotline hỏi thêm"
       },
-      "entities": [],
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0998000005",
+          "spoken": "0998000005"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, anh có thể gọi vào số hotline của shop để được nhân viên tư vấn chi tiết hơn ạ. Em đã lưu lại thông tin trao đổi hôm nay, nếu cần hỗ trợ thêm anh nhắn lại em bất cứ lúc nào nhé.",
+      "text": "Dạ em đã ghi nhận số điện thoại của anh. Nhân viên bên em sẽ gọi lại cho anh qua hotline để hỗ trợ thêm thông tin chi tiết ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -173,7 +178,7 @@
           "key": "price_quoted_vnd",
           "value": 289000,
           "op": "set",
-          "source": "call_1#turn2"
+          "source": "call_1#turn4"
         }
       ],
       "entities": [],
@@ -183,15 +188,18 @@
     }
   ],
   "gold": {
-    "intent": "hoi_binh_sua_pigeon",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "muốn gọi hotline hỏi thêm",
-    "objection_handling": "Đã hướng dẫn khách gọi hotline để được tư vấn thêm, đồng thời lưu lại thông tin trao đổi.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],
     "supersedes": [],
-    "callback": null,
+    "callback": {
+      "phone": "0998000005",
+      "reason": "Khách muốn gọi hotline hỏi thêm thông tin"
+    },
     "order": null
   }
 }

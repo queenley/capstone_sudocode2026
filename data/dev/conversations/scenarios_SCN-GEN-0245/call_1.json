@@ -12,8 +12,14 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, rất vui được hỗ trợ chị về quạt tháp Xiaomi cho gia đình.",
-      "questions": [],
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị muốn tìm quạt tháp Xiaomi cho gia đình đúng không ạ?",
+      "questions": [
+        {
+          "slot": "usage_need",
+          "type": "confirm",
+          "text": "Chị muốn tìm quạt tháp Xiaomi dùng cho gia đình đúng không ạ?"
+        }
+      ],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
@@ -30,18 +36,18 @@
         "usage_need": "dùng cho gia đình"
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chị đang quan tâm quạt tháp Xiaomi Tower Fan đúng không ạ? Em kiểm tra thì sản phẩm này phù hợp cho gia đình, có thiết kế hiện đại, gió êm và tiết kiệm điện.",
+      "text": "Dạ em cảm ơn chị đã quan tâm. Với nhu cầu dùng cho gia đình và ngân sách khoảng 2 triệu, bên em có quạt tháp Xiaomi Tower Fan, giá hiện tại là 1.790.000đ ạ.",
       "questions": [
         {
           "slot": "budget_vnd",
           "type": "open",
-          "text": "Chị dự kiến ngân sách khoảng bao nhiêu cho quạt ạ?"
+          "text": "Chị dự tính ngân sách cho quạt là khoảng bao nhiêu ạ?"
         }
       ],
       "facts_used": [],
@@ -71,7 +77,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ với ngân sách khoảng 2 triệu, quạt tháp Xiaomi Tower Fan đang có giá 1.790.000đ và rất phù hợp cho gia đình ạ. Tuy nhiên, hiện tại sản phẩm đang tạm hết hàng tại shop, em chưa có thông tin về ngày về hàng mới. Nếu chị quan tâm, em có thể ghi chú lại và báo chị ngay khi có hàng.",
+      "text": "Dạ, với ngân sách của chị thì quạt tháp Xiaomi Tower Fan là phù hợp nhất chị nhé. Tuy nhiên hiện tại mẫu này đang tạm hết hàng, chưa có lịch về lại ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -96,13 +102,13 @@
       "text": "Quạt này có khuyến mãi gì không hả em?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại quạt tháp Xiaomi Tower Fan chưa có chương trình khuyến mãi riêng nào, giá đang là 1.790.000đ. Tuy nhiên, đơn từ 2 triệu sẽ được miễn phí vận chuyển toàn quốc ạ.",
+      "text": "Dạ hiện tại quạt tháp Xiaomi Tower Fan chưa có chương trình khuyến mãi nào, giá đang là 1.790.000đ. Khi nào có chương trình mới bên em sẽ thông báo cho chị ngay ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -129,13 +135,13 @@
         "blocker": "chờ cuối tháng nhận lương"
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận chị đang chờ cuối tháng nhận lương. Em sẽ ghi chú lại và chủ động liên hệ lại khi sản phẩm có hàng hoặc khi chị sẵn sàng đặt nhé. Nếu chị cần thêm thông tin, em luôn sẵn sàng hỗ trợ ạ.",
+      "text": "Dạ em ghi nhận chị đang đợi cuối tháng nhận lương. Khi nào bên em có hàng lại hoặc có chương trình ưu đãi mới, em sẽ chủ động liên hệ lại cho chị nhé. Cảm ơn chị đã quan tâm đến sản phẩm của shop ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -145,19 +151,19 @@
           "key": "blocker",
           "value": "chờ cuối tháng nhận lương",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn8"
         },
         {
           "key": "budget_vnd",
           "value": 2000000,
           "op": "set",
-          "source": "call_1#turn5"
+          "source": "call_1#turn4"
         },
         {
           "key": "usage_need",
           "value": "dùng cho gia đình",
           "op": "set",
-          "source": "call_1#turn3"
+          "source": "call_1#turn2"
         },
         {
           "key": "product_advised",
@@ -169,7 +175,7 @@
           "key": "price_quoted_vnd",
           "value": 1790000,
           "op": "set",
-          "source": "call_1#turn5"
+          "source": "call_1#turn6"
         }
       ],
       "entities": [],
@@ -179,13 +185,17 @@
     }
   ],
   "gold": {
-    "intent": "tu_van_quat_xiaomi",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "khach_cho_nhan_luong",
-    "objection_handling": "Dạ em ghi nhận và sẽ liên hệ lại khi chị sẵn sàng hoặc sản phẩm có hàng.",
+    "objection_type": "chua_nhan_luong",
+    "objection_handling": "Đã ghi nhận nhu cầu và hẹn liên hệ lại khi có hàng hoặc có chương trình mới.",
     "sentiment": "neutral",
     "decision_maker": null,
-    "commitments": [],
+    "commitments": [
+      {
+        "commitment": "Báo lại cho khách khi có hàng hoặc chương trình mới."
+      }
+    ],
     "supersedes": [],
     "callback": null,
     "order": null

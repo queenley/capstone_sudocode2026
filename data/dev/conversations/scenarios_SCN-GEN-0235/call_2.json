@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Lê Thị Hoa ạ, em là trợ lý ảo của shop. Em ghi nhận chị muốn thay đổi địa chỉ giao hàng cho đơn giày sneaker.",
+      "text": "Dạ em chào chị Lê Thị Hoa ạ, hôm trước chị có hỏi về tình trạng đơn hàng mã OD901402. Em là trợ lý ảo của shop, chị cần em hỗ trợ thay đổi địa chỉ cho đơn nào ạ?",
       "questions": [],
       "facts_used": [
         "issue",
@@ -23,7 +23,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -32,35 +32,26 @@
       "text": "Alo, chị gọi lại để thay đổi địa chỉ giao hàng cho đơn hàng giày sneaker.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chị muốn đổi địa chỉ giao hàng sang Hải Châu, Đà Nẵng đúng không ạ? Em sẽ tiến hành cập nhật giúp chị ngay.",
+      "text": "Dạ chị muốn cập nhật địa chỉ nhận hàng cho đơn giày sneaker đúng không ạ? Chị đọc giúp em địa chỉ mới để em ghi nhận lại nhé.",
       "questions": [
         {
           "slot": "delivery_area",
-          "type": "confirm",
-          "text": "Chị muốn đổi địa chỉ giao hàng sang Hải Châu, Đà Nẵng đúng không ạ?"
+          "type": "open",
+          "text": "Chị đọc giúp em địa chỉ mới để em ghi nhận lại nhé."
         }
       ],
       "facts_used": [],
       "claims": [],
-      "tool_calls": [
-        {
-          "name": "order.update",
-          "args": {
-            "order_id": "OD901403",
-            "action": "update_address",
-            "on": "2026-11-27"
-          }
-        }
-      ],
+      "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -77,13 +68,46 @@
           "spoken": "Hải Châu, Đà Nẵng"
         }
       ],
-      "pause_before_ms": 0,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã cập nhật địa chỉ giao hàng thành Hải Châu, Đà Nẵng cho đơn hàng của chị. Đơn hàng của chị hiện đang được xử lý, khi bàn giao cho đơn vị vận chuyển bên em sẽ gửi mã vận đơn qua SMS hoặc Zalo cho chị theo chính sách.",
+      "text": "Dạ em đã ghi nhận yêu cầu đổi địa chỉ giao hàng sang Hải Châu, Đà Nẵng cho chị rồi ạ. Em sẽ tiến hành cập nhật trên hệ thống ngay bây giờ, chị vui lòng chờ em một chút nhé.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD901403",
+            "action": "update_address",
+            "on": "2026-11-27"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đơn hàng vẫn đang xử lý phải không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra thì đơn hàng giày sneaker của chị đã được giao thành công rồi ạ. Nếu chị cần hỗ trợ gì thêm với đơn này hoặc muốn đặt lại, em sẵn sàng hỗ trợ chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -95,22 +119,22 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Đơn hàng vẫn đang xử lý phải không em?",
-      "facts_stated": {},
-      "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Chị cần nhanh chóng nhận hàng, mong em giúp chị với.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ đơn hàng của chị đã được giao thành công rồi ạ. Nếu chị cần hỗ trợ thêm về đơn hàng khác, chị có thể cung cấp giúp em mã đơn để em kiểm tra nhanh nhất nhé.",
+      "text": "Dạ em rất tiếc đơn hàng này đã giao thành công. Nếu chị muốn đặt lại sản phẩm hoặc có nhu cầu khác, em sẽ hỗ trợ chị ngay ạ. Cảm ơn chị đã liên hệ với shop.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -128,15 +152,6 @@
           "source": "call_2#turn4"
         }
       ],
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Chị cần nhanh chóng nhận hàng, mong em giúp chị với.",
-      "facts_stated": {},
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,

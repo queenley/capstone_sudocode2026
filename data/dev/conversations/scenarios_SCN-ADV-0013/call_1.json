@@ -12,50 +12,52 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh có thể cho em biết mình cần hỗ trợ về sản phẩm nào hoặc đơn hàng nào không ạ?",
+      "text": "Dạ em chào anh ạ, hôm trước anh có quan tâm Máy lọc không khí AirPure X; em là trợ lý ảo của shop, anh cần hỗ trợ thay màng lọc đúng không ạ?",
       "questions": [
         {
-          "slot": "other",
-          "type": "open",
-          "text": "Anh có thể cho em biết mình cần hỗ trợ về sản phẩm nào hoặc đơn hàng nào không ạ?"
+          "slot": "usage_need",
+          "type": "confirm",
+          "text": "Anh muốn hỏi về thay màng lọc cho máy AirPure X đúng không ạ?"
         }
       ],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "owned_sku",
+        "order_id"
       ],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 650,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh muốn hỏi là máy lọc không khí AirPure X của anh thì bao lâu thì phải thay màng lọc nhỉ?",
-      "facts_stated": {},
+      "text": "Alo, anh muốn hỏi là máy lọc không khí AirPure X của anh thì bao lâu thì phải thay màng lọc nhỉ? Ngân sách của anh tầm 1 triệu.",
+      "facts_stated": {
+        "budget_vnd": 1000000
+      },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ với máy AirPure X, màng lọc nên thay định kỳ từ 6–12 tháng tùy môi trường sử dụng anh nhé. Nếu anh dùng lâu rồi thì anh cân nhắc thay màng mới để đảm bảo hiệu quả lọc không khí ạ.",
+      "text": "Dạ với máy AirPure X, màng lọc nên thay từ 6–12 tháng tùy môi trường sử dụng anh nhé. Bên em có sẵn màng lọc thay thế AirPure X/Y, giá là 690.000đ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "owned_sku",
-          "value": "SKU-AP-X"
+          "field": "price_vnd",
+          "value": 690000
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -64,20 +66,14 @@
       "text": "Máy này anh đã dùng khá lâu rồi, mà màng lọc thì có đặt mua được không em?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ shop hiện có sẵn màng lọc thay thế cho AirPure X anh nhé. Màng lọc này cũng dùng chung với AirPure Y, hàng mới nguyên hộp. Anh muốn đặt mua luôn không ạ?",
-      "questions": [
-        {
-          "slot": "other",
-          "type": "open",
-          "text": "Anh muốn đặt mua luôn không ạ?"
-        }
-      ],
+      "text": "Dạ màng lọc AirPure X/Y bên em đang sẵn hàng, anh đặt mua được luôn ạ.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
@@ -88,7 +84,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -97,13 +93,13 @@
       "text": "Giá màng lọc khoảng bao nhiêu vậy?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giá màng lọc AirPure X/Y là 690.000đ anh nhé. Giá này đã niêm yết, hàng chính hãng, bảo đảm mới 100% ạ.",
+      "text": "Dạ giá màng lọc AirPure X/Y là 690.000đ, giá này đã cố định theo hãng anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -115,7 +111,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 350,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -126,20 +122,20 @@
         "payment": "bank"
       },
       "entities": [],
-      "pause_before_ms": 350,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, em đã ghi nhận anh thanh toán chuyển khoản ngân hàng.",
+      "text": "Dạ em ghi nhận thanh toán chuyển khoản ngân hàng cho đơn hàng này ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 350,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -149,32 +145,20 @@
       "facts_stated": {
         "delivery_area": "Lê Chân, Hải Phòng"
       },
-      "entities": [
-        {
-          "type": "address",
-          "value": "Lê Chân, Hải Phòng",
-          "spoken": "Lê Chân, Hải Phòng"
-        }
-      ],
-      "pause_before_ms": 400,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Em xác nhận đơn hàng: 1 màng lọc thay thế AirPure X/Y, giá 690.000đ, giao về Lê Chân, Hải Phòng, anh thanh toán chuyển khoản ngân hàng. Dự kiến giao hàng ngày 03/11/2026. Anh kiểm tra lại giúp em thông tin đơn hàng như trên đúng chưa để em lên đơn nhé?",
-      "questions": [
-        {
-          "slot": "order_summary",
-          "type": "confirm",
-          "text": "Anh kiểm tra lại giúp em thông tin đơn hàng như trên đúng chưa để em lên đơn nhé?"
-        }
-      ],
+      "text": "Dạ em đã ghi địa chỉ giao hàng là Lê Chân, Hải Phòng. Dự kiến giao hàng vào ngày 03/11/2026 anh nhé.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 690000
+          "field": "estimated_delivery",
+          "value": "2026-11-03"
         }
       ],
       "tool_calls": [
@@ -188,7 +172,7 @@
       ],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -197,21 +181,44 @@
       "text": "Đúng rồi em, lên đơn giúp anh nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 350,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Em đã lên đơn hàng 1 màng lọc AirPure X/Y, giao về Lê Chân, Hải Phòng, thanh toán chuyển khoản ngân hàng. Đơn sẽ được giao dự kiến vào ngày 03/11/2026 anh nhé. Cảm ơn anh đã đặt hàng tại shop BTC!",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
+      "text": "Dạ em xác nhận: anh đặt 1 màng lọc AirPure X/Y, giá 690.000đ, giao về Lê Chân, Hải Phòng, thanh toán chuyển khoản ngân hàng, nhận dự kiến ngày 03/11/2026. Anh xác nhận giúp em để em tạo đơn nhé ạ?",
+      "questions": [
         {
-          "field": "price_vnd",
-          "value": 690000
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh xác nhận đơn hàng như trên để em lên đơn cho mình nhé ạ?"
         }
       ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi em.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã lên đơn thành công cho anh. Shop sẽ giao hàng vào khoảng 03/11/2026, bên vận chuyển sẽ liên hệ trước khi giao. Cảm ơn anh đã tin tưởng shop ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
       "tool_calls": [
         {
           "name": "order.create",
@@ -231,43 +238,43 @@
           "key": "usage_need",
           "value": "thay đồ cũ đã hỏng",
           "op": "set",
-          "source": "call#turn13"
+          "source": "call_1#turn1"
         },
         {
           "key": "budget_vnd",
           "value": 1000000,
           "op": "set",
-          "source": "call#turn13"
+          "source": "call_1#turn2"
         },
         {
           "key": "payment",
           "value": "bank",
           "op": "set",
-          "source": "call#turn13"
+          "source": "call_1#turn7"
         },
         {
           "key": "delivery_area",
           "value": "Lê Chân, Hải Phòng",
           "op": "set",
-          "source": "call#turn13"
+          "source": "call_1#turn9"
         },
         {
           "key": "product_advised",
           "value": "SKU-AP-FLT-X",
           "op": "set",
-          "source": "call#turn13"
+          "source": "call_1#turn3"
         },
         {
           "key": "price_quoted_vnd",
           "value": 690000,
           "op": "set",
-          "source": "call#turn13"
+          "source": "call_1#turn3"
         },
         {
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call#turn13"
+          "source": "call_1#turn13"
         }
       ],
       "entities": [],
@@ -277,7 +284,7 @@
     }
   ],
   "gold": {
-    "intent": "dat_mua_mang_loc",
+    "intent": "dat_hang_mang_loc_airpurex",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
@@ -288,11 +295,9 @@
     "callback": null,
     "order": {
       "sku": "SKU-AP-FLT-X",
-      "qty": 1,
       "price_vnd": 690000,
       "payment": "bank",
-      "delivery_area": "Lê Chân, Hải Phòng",
-      "order_id": "OD600001",
+      "address": "Lê Chân, Hải Phòng",
       "estimated_delivery": "2026-11-03"
     }
   }

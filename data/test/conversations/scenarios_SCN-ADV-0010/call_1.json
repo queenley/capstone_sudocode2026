@@ -12,25 +12,10 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh muốn xác nhận đơn hàng máy lọc không khí AirPure Pro đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Anh muốn xác nhận đơn hàng máy lọc không khí AirPure Pro đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh muốn xác nhận đơn hàng máy lọc không khí AirPure Pro, em sẵn sàng hỗ trợ mình nhé.",
+      "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 7690000
-        },
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -40,8 +25,11 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh muốn xác nhận đơn hàng máy lọc không khí AirPure Pro.",
-      "facts_stated": {},
+      "text": "Alo, anh muốn xác nhận đơn hàng máy lọc không khí AirPure Pro. Phòng anh khoảng 15 mét vuông, nhà anh có trẻ nhỏ.",
+      "facts_stated": {
+        "room_area_m2": 15,
+        "has_children": true
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -49,7 +37,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ sản phẩm máy lọc không khí AirPure Pro hiện đang còn hàng, giá sau ưu đãi AIR-OCT là 7.690.000đ, được freeship toàn quốc và bảo hành 24 tháng ạ.",
+      "text": "Dạ với diện tích phòng 15 mét vuông và nhà mình có trẻ nhỏ, AirPure Pro là lựa chọn rất phù hợp. Máy có khóa trẻ em và màng lọc HEPA, bảo hành 24 tháng.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -62,7 +50,7 @@
           "value": true
         },
         {
-          "field": "freeship",
+          "field": "in_stock",
           "value": true
         }
       ],
@@ -86,16 +74,27 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận anh chọn thanh toán chuyển khoản ngân hàng ạ. Anh nhận hàng tại khu vực nào để em kiểm tra thời gian giao dự kiến nhé?",
-      "questions": [
+      "text": "Dạ em ghi nhận anh chọn chuyển khoản ngân hàng nhé. Đơn hàng máy lọc không khí AirPure Pro hiện đang có giá ưu đãi 7.690.000đ nhờ chương trình AIR-OCT, hàng còn sẵn kho và được freeship toàn quốc ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
         {
-          "slot": "delivery_area",
-          "type": "open",
-          "text": "Anh nhận hàng tại khu vực nào để em kiểm tra thời gian giao dự kiến nhé?"
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        },
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
         }
       ],
-      "facts_used": [],
-      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -116,17 +115,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ với địa chỉ Ninh Kiều, Cần Thơ, đơn hàng của anh sẽ được giao dự kiến trong 4 ngày làm việc, tức khoảng ngày 29/10/2026 ạ.",
+      "text": "Dạ với địa chỉ ở Ninh Kiều, Cần Thơ, thời gian giao dự kiến là khoảng 4 ngày, anh sẽ nhận hàng vào ngày 29/10/2026 ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "delivery_days",
-          "value": 4
-        },
-        {
           "field": "estimated_delivery",
           "value": "2026-10-29"
+        },
+        {
+          "field": "delivery_days",
+          "value": 4
         }
       ],
       "tool_calls": [
@@ -157,12 +156,12 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ với ngân sách 8 triệu, máy lọc không khí AirPure Pro giá 7.690.000đ là phù hợp, anh chọn thanh toán chuyển khoản và nhận hàng tại Ninh Kiều, Cần Thơ đúng không ạ? Đơn hàng sẽ được giao dự kiến trong 4 ngày làm việc. Em xin phép xác nhận lại: 1 máy lọc không khí AirPure Pro, giá 7.690.000đ, giao về Ninh Kiều, Cần Thơ, thanh toán chuyển khoản ngân hàng và được freeship. Anh xác nhận giúp em để em lên đơn nhé!",
+      "text": "Dạ tổng đơn như sau: 1 máy lọc không khí AirPure Pro, giá 7.690.000đ, giao về Ninh Kiều, Cần Thơ, thanh toán chuyển khoản ngân hàng, dự kiến giao ngày 29/10/2026, freeship toàn quốc. Anh vui lòng xác nhận lại thông tin giúp em để em lên đơn nhé.",
       "questions": [
         {
           "slot": "order_summary",
           "type": "confirm",
-          "text": "Anh xác nhận giúp em: 1 máy lọc không khí AirPure Pro, giá 7.690.000đ, giao về Ninh Kiều, Cần Thơ, thanh toán chuyển khoản ngân hàng và được freeship đúng không ạ?"
+          "text": "Anh vui lòng xác nhận lại đơn hàng gồm 1 máy lọc không khí AirPure Pro, giá 7.690.000đ, giao về Ninh Kiều, Cần Thơ, thanh toán chuyển khoản ngân hàng, giao dự kiến 29/10/2026, đúng không ạ?"
         }
       ],
       "facts_used": [],
@@ -172,8 +171,8 @@
           "value": 7690000
         },
         {
-          "field": "freeship",
-          "value": true
+          "field": "estimated_delivery",
+          "value": "2026-10-29"
         }
       ],
       "tool_calls": [],
@@ -194,17 +193,13 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã tạo đơn hàng máy lọc không khí AirPure Pro, giá 7.690.000đ, giao về Ninh Kiều, Cần Thơ. Anh sẽ nhận hàng dự kiến khoảng ngày 29/10/2026 và thanh toán chuyển khoản khi nhận ạ. Đơn đã được xác nhận thành công, em cảm ơn anh đã mua hàng tại shop BTC!",
+      "text": "Dạ em đã tạo đơn hàng máy lọc không khí AirPure Pro cho anh với giá 7.690.000đ, giao về Ninh Kiều, Cần Thơ, thanh toán chuyển khoản. Anh sẽ nhận hàng dự kiến vào ngày 29/10/2026, shop sẽ gửi thông tin đơn hàng và hướng dẫn chuyển khoản chi tiết cho mình ạ. Cảm ơn anh đã đặt hàng tại BTC!",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 7690000
-        },
-        {
-          "field": "in_stock",
-          "value": true
         },
         {
           "field": "estimated_delivery",
@@ -242,7 +237,7 @@
           "key": "has_children",
           "value": true,
           "op": "set",
-          "source": "call_1#turn1"
+          "source": "call_1#turn2"
         },
         {
           "key": "payment",
@@ -254,7 +249,7 @@
           "key": "room_area_m2",
           "value": 15,
           "op": "set",
-          "source": "call_1#turn1"
+          "source": "call_1#turn2"
         },
         {
           "key": "product_advised",
@@ -266,13 +261,13 @@
           "key": "price_quoted_vnd",
           "value": 7690000,
           "op": "set",
-          "source": "call_1#turn3"
+          "source": "call_1#turn5"
         },
         {
           "key": "promo_code",
           "value": "AIR-OCT",
           "op": "set",
-          "source": "call_1#turn3"
+          "source": "call_1#turn5"
         },
         {
           "key": "order_id",
@@ -288,7 +283,7 @@
     }
   ],
   "gold": {
-    "intent": "xac_nhan_don_dat_hang",
+    "intent": "chot_don",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
@@ -302,8 +297,8 @@
       "qty": 1,
       "price_vnd": 7690000,
       "payment": "bank",
-      "address": "Ninh Kiều, Cần Thơ",
-      "on": "2026-10-23",
+      "delivery_area": "Ninh Kiều, Cần Thơ",
+      "estimated_delivery": "2026-10-29",
       "order_id": "OD600001"
     }
   }

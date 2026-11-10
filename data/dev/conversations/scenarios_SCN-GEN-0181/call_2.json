@@ -12,12 +12,12 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào cô Loan ạ, em là trợ lý ảo của shop. Hôm trước cô có hỏi về Máy lọc nước RO Karofi 9 lõi, nhà mình ở Cần Thơ đúng không ạ?",
+      "text": "Dạ em chào cô Loan ạ, em là trợ lý ảo của shop BTC. Hôm trước cô có hỏi về Máy lọc nước RO Karofi 9 lõi, nhà mình ở Cần Thơ đúng không cô? Em có thể hỗ trợ cô tiếp tục đặt hàng ạ.",
       "questions": [
         {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Hôm trước cô có hỏi về Máy lọc nước RO Karofi 9 lõi, nhà mình ở Cần Thơ đúng không ạ?"
+          "slot": "other",
+          "type": "open",
+          "text": "Cô là cô Loan, mình đã trao đổi về máy lọc nước RO Karofi 9 lõi và giao ở Cần Thơ đúng không ạ?"
         }
       ],
       "facts_used": [
@@ -25,16 +25,11 @@
         "delivery_area",
         "decision_maker"
       ],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 5990000
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -43,31 +38,27 @@
       "text": "Alo, cô Loan đây, hôm trước em tư vấn cho cô về máy lọc nước.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn cô đã liên hệ lại ạ. Máy lọc nước RO Karofi 9 lõi hiện còn hàng, giá là 5.990.000đ, freeship toàn quốc. Mình dùng cho gia đình 3 người đúng không cô?",
+      "text": "Dạ em cảm ơn cô đã gọi lại ạ. Máy lọc nước RO Karofi 9 lõi hiện bên em còn hàng, giá là 5.990.000đ, đúng như báo giá hôm trước cô nhé.",
       "questions": [
         {
-          "slot": "usage_need",
-          "type": "confirm",
-          "text": "Mình dùng cho gia đình 3 người đúng không cô?"
+          "slot": "other",
+          "type": "open",
+          "text": "Cô muốn đặt mua Máy lọc nước RO Karofi 9 lõi đúng không ạ?"
         }
       ],
       "facts_used": [
-        "usage_need"
+        "product_advised"
       ],
       "claims": [
         {
           "field": "price_vnd",
           "value": 5990000
-        },
-        {
-          "field": "freeship",
-          "value": true
         },
         {
           "field": "in_stock",
@@ -77,45 +68,64 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
       "text": "Cô muốn mua máy lọc nước RO Karofi 9 lõi mà em nói.",
-      "facts_stated": {
-        "product_advised": "SKU-WF-RO9"
-      },
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, cô chọn thanh toán COD phải không ạ? Đơn này sẽ miễn phí vận chuyển toàn quốc cho cô luôn ạ.",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Cô xác nhận sẽ thanh toán khi nhận hàng (COD) đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "freeship",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán sẽ là COD, em nhé.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ cô xác nhận mua Máy lọc nước RO Karofi 9 lõi, giá 5.990.000đ, giao về Cần Thơ và thanh toán COD đúng không ạ? Đơn hàng này sẽ được giao dự kiến vào ngày 12/11 theo chính sách của shop.",
-      "questions": [
-        {
-          "slot": "order_summary",
-          "type": "confirm",
-          "text": "Cô xác nhận mua Máy lọc nước RO Karofi 9 lõi, giá 5.990.000đ, giao về Cần Thơ và thanh toán COD đúng không ạ?"
-        }
-      ],
+      "text": "Dạ, khu vực giao hàng là Cần Thơ, thời gian giao dự kiến là ngày 12/11/2026 cô nhé.",
+      "questions": [],
       "facts_used": [
-        "price_quoted_vnd",
-        "delivery_area",
-        "payment"
+        "delivery_area"
       ],
       "claims": [
-        {
-          "field": "price_vnd",
-          "value": 5990000
-        },
-        {
-          "field": "delivery_days",
-          "value": 4
-        },
         {
           "field": "estimated_delivery",
           "value": "2026-11-12"
@@ -132,33 +142,68 @@
       ],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Hình thức thanh toán sẽ là COD, em nhé.",
-      "facts_stated": {
-        "payment": "COD"
-      },
-      "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng là Cần Thơ, cho cô biết khi nào được giao nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận. Em sẽ lên đơn Máy lọc nước RO Karofi 9 lõi, giá 5.990.000đ và giao về Cần Thơ, thanh toán COD cho cô ạ.",
-      "questions": [],
-      "facts_used": [],
+      "text": "Em xin phép đọc lại đơn hàng: 1 Máy lọc nước RO Karofi 9 lõi, giá 5.990.000đ, giao tại Cần Thơ, thanh toán COD, dự kiến nhận hàng ngày 12/11/2026. Cô kiểm tra giúp em thông tin đã đúng và xác nhận để em lên đơn nhé.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Cô kiểm tra giúp em thông tin đơn hàng trên đã đúng chưa ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "delivery_area",
+        "payment"
+      ],
       "claims": [
         {
           "field": "price_vnd",
           "value": 5990000
         },
         {
-          "field": "freeship",
+          "field": "estimated_delivery",
+          "value": "2026-11-12"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi em, lên đơn giúp cô nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã lên đơn thành công cho cô. Đơn hàng sẽ được nhân viên gọi xác nhận trước khi giao, dự kiến nhận ngày 12/11/2026. Cảm ơn cô Loan đã đặt hàng tại shop BTC ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "needs_confirmation_call",
           "value": true
         }
       ],
@@ -176,92 +221,38 @@
           }
         }
       ],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Khu vực giao hàng là Cần Thơ, cho cô biết khi nào được giao nhé.",
-      "facts_stated": {
-        "delivery_area": "Cần Thơ"
-      },
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Đơn của cô sẽ được giao dự kiến vào ngày 12/11. Nhân viên bên em sẽ gọi xác nhận đơn trước khi giao, cô chú ý điện thoại giúp em nhé ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "estimated_delivery",
-          "value": "2026-11-12"
-        },
-        {
-          "field": "needs_confirmation_call",
-          "value": true
-        }
-      ],
-      "tool_calls": [],
       "memory_writes": [
-        {
-          "key": "budget_vnd",
-          "value": 6000000,
-          "op": "set",
-          "source": "call#turn0"
-        },
         {
           "key": "delivery_area",
           "value": "Cần Thơ",
           "op": "set",
-          "source": "call#turn0"
+          "source": "call_2#turn11"
         },
         {
           "key": "payment",
           "value": "COD",
           "op": "set",
-          "source": "call#turn0"
-        },
-        {
-          "key": "usage_need",
-          "value": "gia đình 3 người",
-          "op": "set",
-          "source": "call#turn0"
+          "source": "call_2#turn11"
         },
         {
           "key": "product_advised",
           "value": "SKU-WF-RO9",
           "op": "set",
-          "source": "call#turn0"
+          "source": "call_2#turn11"
         },
         {
           "key": "price_quoted_vnd",
           "value": 5990000,
           "op": "set",
-          "source": "call#turn0"
+          "source": "call_2#turn11"
         },
         {
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call#turn0"
+          "source": "call_2#turn11"
         }
       ],
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Đúng rồi em, lên đơn giúp chị nhé.",
-      "facts_stated": {},
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -283,9 +274,9 @@
       "qty": 1,
       "price_vnd": 5990000,
       "payment": "COD",
-      "delivery_area": "Cần Thơ",
-      "estimated_delivery": "2026-11-12",
-      "order_id": "OD600001"
+      "address": "Cần Thơ",
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-11-12"
     }
   }
 }

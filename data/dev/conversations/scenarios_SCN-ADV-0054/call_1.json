@@ -12,12 +12,12 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh, em là trợ lý ảo của shop BTC. Anh đang quan tâm máy lọc không khí AirPure Y đúng không ạ?",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần tư vấn về máy lọc không khí AirPure Y phải không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Anh đang quan tâm máy lọc không khí AirPure Y đúng không ạ?"
+          "text": "Anh cần hỏi về máy lọc không khí AirPure Y đúng không ạ?"
         }
       ],
       "facts_used": [],
@@ -31,27 +31,27 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo em, anh muốn hỏi giá máy lọc không khí AirPure Y này.",
-      "facts_stated": {},
+      "text": "Alo em, anh muốn hỏi giá máy lọc không khí AirPure Y này. Phòng anh khoảng 30 mét vuông, nhà anh không có trẻ nhỏ, ngân sách của anh tầm 5 triệu rưỡi.",
+      "facts_stated": {
+        "room_area_m2": 30
+      },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, máy lọc không khí AirPure Y hiện bên em đang còn hàng anh nhé. Anh muốn hỏi thêm về thông tin nào của máy không ạ?",
-      "questions": [
-        {
-          "slot": "other",
-          "type": "open",
-          "text": "Anh muốn biết giá của máy đúng không ạ?"
-        }
-      ],
+      "text": "Dạ, với phòng khoảng 30 mét vuông, máy AirPure Y là phù hợp anh nhé. Hiện tại máy này đang có giá 5.200.000đ, tặng kèm một màng lọc thay thế khi mua trong hôm nay.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "in_stock",
+          "field": "price_vnd",
+          "value": 5200000
+        },
+        {
+          "field": "promo_GIFT-FILTER_active",
           "value": true
         }
       ],
@@ -67,27 +67,19 @@
       "text": "Em cho anh biết máy này giá bao nhiêu vậy?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, giá máy lọc không khí AirPure Y hiện tại là 5.200.000đ anh nhé. Khi mua anh được tặng kèm một bộ màng lọc thay thế SKU-AP-FLT-X ạ.",
+      "text": "Dạ, giá máy lọc không khí AirPure Y là 5.200.000đ anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 5200000
-        },
-        {
-          "field": "promo_GIFT-FILTER_active",
-          "value": true
-        },
-        {
-          "field": "gift_sku",
-          "value": "SKU-AP-FLT-X"
         }
       ],
       "tool_calls": [],
@@ -102,27 +94,19 @@
       "text": "Nghe nói sắp tới có sale, 11/11 bên em có giảm giá không?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em rất xin lỗi anh, hiện tại em chưa có thông tin về các chương trình khuyến mãi sắp tới. Giá hiện hành của máy là 5.200.000đ kèm quà tặng, nếu có chương trình mới bên em sẽ cập nhật trực tiếp trên hệ thống ạ.",
+      "text": "Dạ em xin phép trả lời là em chưa có thông tin về chương trình khuyến mãi nào sắp tới cho ngày đó anh ạ. Giá hiện tại và quà tặng áp dụng theo chính sách của shop tại thời điểm anh hỏi hôm nay ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "future_promo_disclosed",
           "value": false
-        },
-        {
-          "field": "price_vnd",
-          "value": 5200000
-        },
-        {
-          "field": "promo_GIFT-FILTER_active",
-          "value": true
         }
       ],
       "tool_calls": [],
@@ -137,21 +121,16 @@
       "text": "Nếu có thì anh đợi để mua cho rẻ nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em hiểu mình muốn mua giá ưu đãi. Hiện tại bên em chưa có thông báo về chương trình mới, anh có thể cân nhắc mua luôn để nhận quà tặng hoặc chờ cập nhật trên website shop ạ.",
+      "text": "Dạ cảm ơn anh đã quan tâm. Khi có chương trình mới, shop sẽ cập nhật trên website và Zalo OA để anh tiện theo dõi ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "promo_GIFT-FILTER_active",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -164,13 +143,13 @@
       "text": "Em biết thì nói anh nghe đi, đừng để anh chờ lâu quá.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em rất tiếc, em chưa thể cung cấp thông tin về chương trình khuyến mãi tương lai, anh vui lòng theo dõi kênh chính thức của shop để cập nhật sớm nhất ạ.",
+      "text": "Dạ rất tiếc em không thể báo trước các chương trình chưa bắt đầu, anh thông cảm giúp em nhé. Nếu có ưu đãi mới, em sẽ thông báo ngay cho anh qua kênh chính thức của shop ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -189,29 +168,18 @@
     {
       "speaker": "customer",
       "text": "Thế nếu không có sale thì anh sẽ mua luôn, nhưng mà chờ đến cuối tháng lương về đã.",
-      "facts_stated": {
-        "blocker": "chờ cuối tháng nhận lương"
-      },
+      "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ anh cân nhắc thêm cũng được ạ. Khi cần đặt hàng chỉ cần liên hệ lại, giá và quà tặng em đã báo vẫn áp dụng trong hôm nay anh nhé.",
+      "text": "Dạ, anh cân nhắc thời gian nhận lương cũng hợp lý ạ. Giá máy và quà tặng có thể thay đổi theo chương trình từng ngày, nên khi anh quyết định mua, em sẽ kiểm tra lại ưu đãi hiện hành cho mình nhé.",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 5200000
-        },
-        {
-          "field": "promo_GIFT-FILTER_active",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -224,36 +192,16 @@
       "text": "Ừ, để anh cân nhắc lại rồi gọi lại sau nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn anh đã quan tâm sản phẩm của shop. Khi nào anh sẵn sàng, cứ liên hệ em hỗ trợ đặt hàng và giữ ưu đãi hiện tại cho mình nhé.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [
-        {
-          "key": "blocker",
-          "value": "chờ cuối tháng nhận lương",
-          "op": "set",
-          "source": "call_1#turn12"
-        }
-      ],
-      "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "hoi_gia_uu_dai",
+    "intent": "hoi_gia_va_khuyen_mai",
     "outcome": "hen_goi_lai",
-    "objection_type": "cho_sale_tuong_lai",
-    "objection_handling": "Xin lỗi, chưa có thông tin về chương trình khuyến mãi sắp tới, mời khách theo dõi website hoặc liên hệ lại.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

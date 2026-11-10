@@ -12,27 +12,33 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC rất vui được hỗ trợ chị. Chị muốn hỏi về tổng tiền và khuyến mãi cho giỏ hàng đúng không ạ?",
-      "questions": [
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em sẵn sàng hỗ trợ chị về giỏ hàng trên website ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
         {
-          "slot": "other",
-          "type": "open",
-          "text": "Chị muốn hỏi về tổng tiền và khuyến mãi cho giỏ hàng đúng không ạ?"
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
         }
       ],
-      "facts_used": [],
-      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị muốn hỏi tổng tiền cho giỏ hàng trên website em ơi.",
-      "facts_stated": {},
+      "text": "Alo, chị muốn hỏi tổng tiền cho giỏ hàng trên website em ơi. Bé nhà chị được 16 tháng, ngân sách của chị tầm 6 triệu.",
+      "facts_stated": {
+        "child_age_months": 16,
+        "budget_vnd": 6000000
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -40,27 +46,38 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em kiểm tra giỏ hàng gồm máy hút sữa Medela Swing Maxi và máy tiệt trùng sấy khô Moaz Bebe đúng không ạ?",
+      "text": "Dạ em ghi nhận chị cần tư vấn tổng tiền giỏ hàng, bé nhà mình 16 tháng và ngân sách khoảng 6 triệu đúng không ạ? Chị vui lòng cho em biết cụ thể sản phẩm chị đang quan tâm để em báo giá chi tiết nhất ạ.",
       "questions": [
         {
-          "slot": "other",
+          "slot": "product_advised",
           "type": "open",
-          "text": "Giỏ hàng của chị gồm máy hút sữa Medela Swing Maxi và máy tiệt trùng sấy khô Moaz Bebe đúng không ạ?"
+          "text": "Chị vui lòng cho em biết cụ thể sản phẩm chị đang quan tâm để em báo giá chi tiết nhất ạ."
         }
       ],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-MB-PUMP2",
+          "value": 5990000
+        },
+        {
+          "field": "price_vnd:SKU-MB-STER",
+          "value": 1890000
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
       "text": "Trong giỏ hàng có máy hút sữa Medela Swing Maxi và máy tiệt trùng Moaz Bebe.",
-      "facts_stated": {},
+      "facts_stated": {
+        "product_advised": "SKU-MB-PUMP2"
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -68,7 +85,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ tổng tiền cho hai sản phẩm này là 7.880.000đ chị nhé. Máy hút sữa Medela Swing Maxi giá 5.990.000đ và máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ.",
+      "text": "Dạ, tổng giỏ hàng gồm máy hút sữa điện đôi Medela Swing Maxi giá 5.990.000đ và máy tiệt trùng sấy khô Moaz Bebe giá 1.890.000đ. Tổng cộng hai sản phẩm là 7.880.000đ chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -110,24 +127,8 @@
         }
       ],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "5990000",
-          "spoken": "5.990.000"
-        },
-        {
-          "type": "money",
-          "value": "1890000",
-          "spoken": "1.890.000"
-        },
-        {
-          "type": "money",
-          "value": "7880000",
-          "spoken": "7.880.000"
-        }
-      ],
-      "pause_before_ms": 500,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -142,19 +143,23 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại hai sản phẩm đều được áp dụng khuyến mãi miễn phí vận chuyển toàn quốc theo chương trình MOM-FREESHIP chị nhé. Giá sản phẩm không thay đổi, nhưng chị sẽ được freeship khi đặt đơn từ 500.000đ ạ.",
+      "text": "Dạ hiện tại hai sản phẩm này đều áp dụng chương trình miễn phí vận chuyển toàn quốc cho đơn từ 500.000đ, nên chị được freeship khi đặt cùng nhau ạ. Ngoài ra, tổng đơn 7.880.000đ đã là giá tốt nhất tại thời điểm này, chưa có thêm khuyến mãi giảm giá cho combo chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "promo_MOM-FREESHIP_active",
           "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -169,25 +174,23 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ phí giao hàng cho đơn này là 0đ chị nhé, shop miễn phí vận chuyển toàn quốc cho đơn hàng từ 500.000đ thuộc ngành mẹ & bé trong chương trình khuyến mãi hiện tại.",
+      "text": "Dạ chị yên tâm, với đơn hàng trên 500.000đ như giỏ hàng của mình thì shop miễn phí vận chuyển toàn quốc cho chị. Khi nhận hàng, chị chỉ cần thanh toán đúng tổng tiền 7.880.000đ ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "promo_MOM-FREESHIP_active",
           "value": true
+        },
+        {
+          "field": "total_vnd",
+          "value": 7880000
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "0",
-          "spoken": "0"
-        }
-      ],
-      "pause_before_ms": 500,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -199,66 +202,20 @@
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận chị sẽ gọi lại hotline để đặt đơn sau ạ. Nếu cần hỗ trợ thêm về sản phẩm, chị cứ nhắn em bất cứ lúc nào nhé. Em cảm ơn chị đã quan tâm đến sản phẩm của shop.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [
-        {
-          "key": "blocker",
-          "value": "chờ cuối tháng nhận lương",
-          "op": "set",
-          "source": "call_1#turn11"
-        },
-        {
-          "key": "budget_vnd",
-          "value": 6000000,
-          "op": "set",
-          "source": "call_1#turn11"
-        },
-        {
-          "key": "child_age_months",
-          "value": 16,
-          "op": "set",
-          "source": "call_1#turn11"
-        },
-        {
-          "key": "product_advised",
-          "value": "SKU-MB-PUMP2",
-          "op": "set",
-          "source": "call_1#turn11"
-        },
-        {
-          "key": "price_quoted_vnd",
-          "value": 5990000,
-          "op": "set",
-          "source": "call_1#turn11"
-        },
-        {
-          "key": "promo_code",
-          "value": "MOM-FREESHIP",
-          "op": "set",
-          "source": "call_1#turn11"
-        }
-      ],
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
     }
   ],
   "gold": {
-    "intent": "hoi_gia_tong_khuyenmai",
+    "intent": "tu_van_gio_hang",
     "outcome": "hen_goi_lai",
-    "objection_type": null,
-    "objection_handling": null,
+    "objection_type": "chua_quyet_dinh",
+    "objection_handling": "Xác nhận sẽ giữ lại thông tin và hướng dẫn liên hệ lại hotline khi cần đặt đơn.",
     "sentiment": "neutral",
     "decision_maker": null,
-    "commitments": [],
+    "commitments": [
+      {
+        "text": "Ghi nhận thông tin giỏ hàng và chương trình khuyến mãi hiện tại, sẽ hỗ trợ khi khách gọi lại."
+      }
+    ],
     "supersedes": [],
     "callback": null,
     "order": null

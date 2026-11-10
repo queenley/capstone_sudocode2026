@@ -12,32 +12,18 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh Đức ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có hỏi về giày chạy bộ RunLite 2 Pro size 42 màu đen, hiện em tiếp tục hỗ trợ mình nhé.",
+      "text": "Dạ em chào anh Đức ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có hỏi về Giày chạy bộ RunLite 2 Pro size 42, anh cần em hỗ trợ lại thông tin đúng không ạ?",
       "questions": [],
       "facts_used": [
-        "size",
-        "color",
         "product_advised",
         "variant_sku",
         "price_quoted_vnd",
         "promo_code",
+        "size",
         "objection",
         "competitor_price_vnd"
       ],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1521000
-        },
-        {
-          "field": "promo_RUN-10_active",
-          "value": true
-        },
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -60,14 +46,14 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ mẫu RunLite 2 Pro size 42 màu đen bên em đang còn hàng, giá hiện tại là 1.521.000đ.",
+      "text": "Dạ sản phẩm Giày chạy bộ RunLite 2 Pro size 42 màu đen bên em hiện đang còn hàng anh nhé.",
       "questions": [],
-      "facts_used": [],
+      "facts_used": [
+        "product_advised",
+        "variant_sku",
+        "size"
+      ],
       "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1521000
-        },
         {
           "field": "in_stock",
           "value": true
@@ -91,7 +77,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xin phép báo lại nhé, hôm trước chương trình RUN2-SALE của shop đã kết thúc nên giá cũ 1.352.000đ không còn áp dụng nữa ạ. Nay áp dụng khuyến mãi RUN-10, giá hiện tại là 1.521.000đ.",
+      "text": "Dạ anh ơi, giá bên em hiện tại là 1.521.000đ sau khi áp dụng khuyến mãi RUN-10 anh nhé. Giá này có thay đổi so với lần báo trước do chương trình RUN2-SALE đã hết hiệu lực ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -100,12 +86,12 @@
           "value": 1521000
         },
         {
-          "field": "promo_RUN2-SALE_active",
-          "value": false
-        },
-        {
           "field": "promo_RUN-10_active",
           "value": true
+        },
+        {
+          "field": "promo_RUN2-SALE_active",
+          "value": false
         }
       ],
       "tool_calls": [],
@@ -126,14 +112,10 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại giày này đang có khuyến mãi RUN-10 giảm 10% từ giá niêm yết, còn 1.521.000đ anh nhé. Ngoài ra, anh được miễn phí vận chuyển toàn quốc và miễn phí COD.",
+      "text": "Dạ hiện tại shop áp dụng khuyến mãi RUN-10, giảm 10% trên giá niêm yết cho dòng RunLite 2 Pro, nên anh được giá 1.521.000đ rồi ạ. Ngoài ra, phí thu hộ COD là 0đ và đơn của mình được miễn phí vận chuyển toàn quốc anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1521000
-        },
         {
           "field": "promo_RUN-10_active",
           "value": true
@@ -152,10 +134,11 @@
     },
     {
       "speaker": "customer",
-      "text": "Anh thấy giá bên kia cũng khá rẻ, anh cần nghĩ thêm rồi sẽ gọi lại.",
+      "text": "Anh thấy giá bên kia cũng khá rẻ, anh cần nghĩ thêm rồi sẽ gọi lại. Số anh là 0993186032.",
       "facts_stated": {
+        "objection": "giá cao hơn chỗ khác",
         "competitor_price_vnd": 1240000,
-        "objection": "giá cao hơn chỗ khác"
+        "phone_provided": true
       },
       "entities": [],
       "pause_before_ms": 0,
@@ -164,40 +147,35 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em hiểu mình cần cân nhắc thêm ạ. Anh cứ tham khảo, nếu cần hỗ trợ thêm hoặc muốn đặt hàng thì liên hệ lại shop bất cứ lúc nào nhé. Em giữ lại thông tin sản phẩm cho anh đến ngày 25/10 – khi chương trình khuyến mãi RUN-10 còn hiệu lực ạ.",
+      "text": "Dạ em hiểu ạ, anh cứ cân nhắc thêm. Giá bên em đã áp dụng chương trình khuyến mãi tốt nhất hiện tại, ngoài ra còn có chính sách đổi trả 7 ngày và bảo hành chính hãng 12 tháng. Nếu anh cần hỗ trợ hoặc muốn đặt hàng, anh nhắn lại cho shop bất cứ lúc nào nhé!",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "promo_RUN-10_active",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [
         {
           "key": "product_advised",
           "value": "SKU-SN-RUN2",
           "op": "set",
-          "source": "call_2#turn8"
+          "source": "call_2#turn1"
         },
         {
           "key": "price_quoted_vnd",
           "value": 1521000,
           "op": "supersede",
-          "source": "call_2#turn8"
+          "source": "call_2#turn5"
         },
         {
           "key": "variant_sku",
           "value": "SKU-SN-RUN2-42-DEN",
           "op": "set",
-          "source": "call_2#turn8"
+          "source": "call_2#turn1"
         },
         {
           "key": "promo_code",
           "value": "RUN-10",
           "op": "supersede",
-          "source": "call_2#turn8"
+          "source": "call_2#turn5"
         }
       ],
       "entities": [],
@@ -207,17 +185,13 @@
     }
   ],
   "gold": {
-    "intent": "hen_goi_lai",
+    "intent": "tu_van_gia_giay",
     "outcome": "hen_goi_lai",
-    "objection_type": "giá cao hơn chỗ khác",
-    "objection_handling": "Giải thích lý do giá thay đổi, nhấn mạnh khuyến mãi hiện hành và quyền lợi đi kèm.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
-    "commitments": [
-      {
-        "giữ thông tin sản phẩm và khuyến mãi RUN-10 đến 25/10/2026": true
-      }
-    ],
+    "commitments": [],
     "supersedes": [
       {
         "slot": "price_quoted_vnd",

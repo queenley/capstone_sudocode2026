@@ -21,9 +21,104 @@
         }
       ],
       "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn tìm hiểu về máy lọc không khí AirPure Y. Nhà chị không có trẻ nhỏ.",
+      "facts_stated": {
+        "product_advised": "SKU-AP-Y",
+        "has_children": false
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã quan tâm. Máy AirPure Y phù hợp cho phòng diện tích đến 30 mét vuông, có khóa trẻ em và điều khiển qua app. Nhà mình không có trẻ nhỏ thì vẫn dùng tốt chị nhé.",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "open",
+          "text": "Phòng mình khoảng bao nhiêu mét vuông để em tư vấn kỹ hơn ạ?"
+        }
+      ],
+      "facts_used": [],
       "claims": [
         {
-          "field": "in_stock",
+          "field": "product_advised",
+          "value": "SKU-AP-Y"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Phòng chị khoảng 15 mét vuông, mà ngân sách chỉ tầm 5 triệu rưỡi thôi.",
+      "facts_stated": {
+        "room_area_m2": 15,
+        "budget_vnd": 5500000
+      },
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ với phòng 15 mét vuông, AirPure Y đáp ứng tốt nhu cầu lọc không khí. Giá máy hiện tại là 5.200.000đ, nằm trong ngân sách của mình ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5200000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thấy trên mạng có giá 4 triệu 7, sao bên mình lại cao hơn vậy?",
+      "facts_stated": {
+        "competitor_price_vnd": 4780000,
+        "objection": "giá cao hơn chỗ khác"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu băn khoăn của chị. Giá bên em là giá niêm yết chính hãng, hàng mới nguyên hộp, bảo hành 12 tháng và được tặng kèm màng lọc chính hãng khi mua trong tuần này ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5200000
+        },
+        {
+          "field": "promo_GIFT-FILTER_active",
           "value": true
         }
       ],
@@ -36,132 +131,18 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị muốn tìm hiểu về máy lọc không khí AirPure Y.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, máy lọc không khí AirPure Y phù hợp cho phòng diện tích đến 30 mét vuông, hiện đang còn hàng tại shop với giá 5.200.000đ. Sản phẩm này có khóa trẻ em, màng lọc HEPA và app điều khiển trên điện thoại.",
-      "questions": [
-        {
-          "slot": "room_area_m2",
-          "type": "open",
-          "text": "Phòng chị khoảng bao nhiêu mét vuông để em tư vấn chính xác hơn ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 5200000
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "5200000",
-          "spoken": "5.200.000đ"
-        }
-      ],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Phòng chị khoảng 15 mét vuông, mà ngân sách chỉ tầm 5 triệu rưỡi thôi.",
-      "facts_stated": {
-        "room_area_m2": 15,
-        "budget_vnd": 5500000
-      },
-      "entities": [
-        {
-          "type": "money",
-          "value": "5500000",
-          "spoken": "5 triệu rưỡi"
-        }
-      ],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, với phòng 15 mét vuông thì AirPure Y sử dụng rất tốt chị nhé. Giá hiện tại là 5.200.000đ, nằm trong ngân sách của chị. Máy có khóa trẻ em và app điều khiển rất tiện lợi ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 5200000
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "5200000",
-          "spoken": "5.200.000đ"
-        }
-      ],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Chị thấy trên mạng có giá 4 triệu 7, sao bên mình lại cao hơn vậy?",
-      "facts_stated": {
-        "competitor_price_vnd": 4780000
-      },
-      "entities": [
-        {
-          "type": "money",
-          "value": "4780000",
-          "spoken": "4 triệu 7"
-        }
-      ],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em hiểu thắc mắc của chị ạ. Giá bên em là giá niêm yết chính hãng, đã bao gồm bảo hành 24 tháng và quà tặng màng lọc chính hãng. Shop luôn cam kết hàng chính hãng, đổi trả trong 7 ngày và hỗ trợ bảo hành tận nơi cho chị.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 5200000
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
       "text": "Có khuyến mãi gì không em? Chị cần hỏi thêm rồi sẽ gọi lại nhé.",
-      "facts_stated": {},
+      "facts_stated": {
+        "promo_code": "GIFT-FILTER"
+      },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại mua AirPure Y chị được tặng thêm một màng lọc chính hãng, và shop đang miễn phí vận chuyển toàn quốc cho đơn này. Nếu chị cần thêm thông tin hoặc muốn đặt hàng, chị cứ liên hệ lại cho em nhé. Em cảm ơn chị đã quan tâm ạ!",
+      "text": "Dạ hiện tại mua AirPure Y sẽ được tặng kèm màng lọc chính hãng, chương trình áp dụng đến hết ngày 22/10. Chị cứ cân nhắc thêm, khi cần hỗ trợ chị gọi lại cho em nhé ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -173,12 +154,6 @@
       "tool_calls": [],
       "memory_writes": [
         {
-          "key": "room_area_m2",
-          "value": 15,
-          "op": "set",
-          "source": "call_1#turn4"
-        },
-        {
           "key": "budget_vnd",
           "value": 5500000,
           "op": "set",
@@ -189,10 +164,46 @@
           "value": 4780000,
           "op": "set",
           "source": "call_1#turn6"
+        },
+        {
+          "key": "has_children",
+          "value": false,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "objection",
+          "value": "giá cao hơn chỗ khác",
+          "op": "set",
+          "source": "call_1#turn6"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 15,
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-Y",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5200000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "promo_code",
+          "value": "GIFT-FILTER",
+          "op": "set",
+          "source": "call_1#turn8"
         }
       ],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
@@ -201,7 +212,7 @@
     "intent": "tu_van_may_loc_khong_khi",
     "outcome": "hen_goi_lai",
     "objection_type": "gia_cao_hon_doi_thu",
-    "objection_handling": "Nêu giá trị đi kèm: bảo hành, quà tặng, cam kết chính hãng, đổi trả.",
+    "objection_handling": "Nêu giá trị hàng chính hãng, bảo hành và tặng màng lọc chính hãng.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

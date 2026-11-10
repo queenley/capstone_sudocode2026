@@ -12,54 +12,15 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh Duy ạ, em là trợ lý ảo của shop. Hôm trước anh đã đặt Giày chạy bộ RunLite 2 Pro, mình muốn đổi sang sản phẩm khác đúng không anh?",
+      "text": "Dạ em chào anh Duy ạ, anh vừa đặt Giày chạy bộ RunLite 2 Pro size 42 màu đen hôm trước đúng không ạ? Em là trợ lý ảo của shop BTC, anh cần hỗ trợ đổi sang sản phẩm khác ạ?",
       "questions": [],
       "facts_used": [
         "size",
+        "product_advised",
         "payment",
         "delivery_area",
-        "product_advised",
         "variant_sku",
         "price_quoted_vnd",
-        "order_id",
-        "owned_sku"
-      ],
-      "claims": [
-        {
-          "field": "order_id",
-          "value": "OD600001"
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 800,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Alo, anh Duy đây, hôm trước mình đã đặt giày chạy bộ nhưng giờ muốn đổi sang giày sneaker Urban Classic.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, anh muốn đổi sang Giày sneaker Urban Classic đúng không ạ? Em kiểm tra đơn hàng của anh, mình muốn chọn size 42 màu đen phải không anh?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Anh muốn đổi sang Giày sneaker Urban Classic đúng không ạ?"
-        }
-      ],
-      "facts_used": [
-        "size",
-        "product_advised",
-        "variant_sku",
         "order_id"
       ],
       "claims": [
@@ -71,7 +32,42 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh Duy đây, hôm trước mình đã đặt giày chạy bộ nhưng giờ muốn đổi sang giày sneaker Urban Classic.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ anh muốn đổi sang Giày sneaker Urban Classic size 42 màu đen đúng không ạ? Em kiểm tra đơn hàng của anh, sản phẩm này hiện có hàng và anh sẽ được hoàn tiền chênh lệch sau khi đổi.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh xác nhận giúp em mình muốn đổi sang Giày sneaker Urban Classic size 42 màu đen đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "new_variant_sku",
+          "value": "SKU-SN-CAS-42-DEN"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -86,40 +82,19 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, Giày sneaker Urban Classic size 42 màu đen hiện tại còn hàng anh nhé. Anh muốn shop tiến hành đổi luôn cho mình phải không ạ?",
-      "questions": [
-        {
-          "slot": "order_summary",
-          "type": "confirm",
-          "text": "Anh xác nhận giúp em: mình sẽ đổi sang Giày sneaker Urban Classic size 42 màu đen, không phát sinh phí đổi, số tiền hoàn lại là 800.000đ, nhận tại Hải Châu, Đà Nẵng và thanh toán COD như đơn trước, đúng không anh?"
-        }
-      ],
-      "facts_used": [
-        "size",
-        "payment",
-        "delivery_area",
-        "product_advised",
-        "variant_sku",
-        "order_id"
-      ],
+      "text": "Dạ Giày sneaker Urban Classic size 42 màu đen vẫn còn hàng anh nhé. Em sẽ tiến hành cập nhật đơn hàng đổi sản phẩm cho mình ạ.",
+      "questions": [],
+      "facts_used": [],
       "claims": [
         {
-          "field": "new_variant_sku",
-          "value": "SKU-SN-CAS-42-DEN"
-        },
-        {
-          "field": "refund_vnd",
-          "value": 800000
-        },
-        {
-          "field": "exchange_fee_vnd",
-          "value": 0
+          "field": "new_size_in_stock",
+          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -128,13 +103,13 @@
       "text": "Mình muốn đổi sang cái đó vì nó rẻ hơn, hoàn tiền cho mình bao nhiêu?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 350,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, đổi sang Giày sneaker Urban Classic, anh sẽ được hoàn lại 800.000đ vào tài khoản ngân hàng, shop không thu phí đổi sản phẩm ạ. Sau khi shop nhận lại hàng cũ và kiểm tra, tiền hoàn sẽ chuyển cho anh trong 3–5 ngày làm việc.",
+      "text": "Dạ khi anh đổi sang Giày sneaker Urban Classic, shop sẽ hoàn lại cho anh 800.000đ, không mất phí đổi sản phẩm ạ. Số tiền hoàn sẽ chuyển khoản cho anh trong 3–5 ngày làm việc sau khi shop nhận lại giày cũ chưa qua sử dụng.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -147,20 +122,10 @@
           "value": 0
         }
       ],
-      "tool_calls": [
-        {
-          "name": "order.update",
-          "args": {
-            "order_id": "OD600001",
-            "action": "exchange_product",
-            "new_variant_sku": "SKU-SN-CAS-42-DEN",
-            "on": "2026-11-02"
-          }
-        }
-      ],
+      "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -175,20 +140,30 @@
           "spoken": "190157371104"
         }
       ],
-      "pause_before_ms": 600,
+      "pause_before_ms": 350,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận yêu cầu đổi sản phẩm và hoàn tiền cho anh. Nhân viên bên em sẽ liên hệ lại để xác nhận thông tin tài khoản và hướng dẫn nhận hàng đổi trong hôm nay ạ. Cảm ơn anh Duy đã tin tưởng shop!",
+      "text": "Dạ em đã ghi nhận anh yêu cầu nhận tiền hoàn vào tài khoản ngân hàng, thông tin này sẽ được chuyển vào hệ thống thanh toán và đảm bảo bảo mật theo quy định, em không nhắc lại số tài khoản của anh để bảo mật thông tin cá nhân ạ. Em sẽ cập nhật đơn hàng đổi sản phẩm cho mình ngay bây giờ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
-      "tool_calls": [],
+      "tool_calls": [
+        {
+          "name": "order.update",
+          "args": {
+            "order_id": "OD600001",
+            "action": "exchange_product",
+            "new_variant_sku": "SKU-SN-CAS-42-DEN",
+            "on": "2026-11-02"
+          }
+        }
+      ],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }

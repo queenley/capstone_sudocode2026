@@ -12,12 +12,12 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần tư vấn về máy lọc nước RO Kangaroo 10 lõi đúng không ạ?",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh muốn tư vấn máy lọc nước RO Kangaroo 10 lõi đúng không ạ?",
       "questions": [
         {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Anh cần tư vấn về máy lọc nước RO Kangaroo 10 lõi đúng không ạ?"
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Anh dự kiến ngân sách cho máy lọc nước khoảng bao nhiêu ạ?"
         }
       ],
       "facts_used": [],
@@ -25,15 +25,15 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh muốn hỏi về máy lọc nước RO Kangaroo 10 lõi.",
+      "text": "Alo, anh muốn hỏi về máy lọc nước RO Kangaroo 10 lõi. Ngân sách của anh tầm 7 triệu.",
       "facts_stated": {
-        "product_advised": "SKU-WF-RO10"
+        "budget_vnd": 7000000
       },
       "entities": [],
       "pause_before_ms": 0,
@@ -42,25 +42,19 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, máy lọc nước RO Kangaroo 10 lõi hiện bên em còn hàng anh nhé. Máy sử dụng công nghệ RO với 10 lõi lọc, phù hợp cho gia đình 4–6 người sử dụng.",
-      "questions": [
-        {
-          "slot": "usage_need",
-          "type": "open",
-          "text": "Anh mua cho mấy người dùng ạ?"
-        }
-      ],
+      "text": "Dạ, máy lọc nước RO Kangaroo 10 lõi shop đang bán là 6.890.000đ anh nhé. Máy này phù hợp với ngân sách của anh luôn ạ.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "in_stock",
-          "value": true
+          "field": "price_vnd",
+          "value": 6890000
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -75,25 +69,23 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, giá của máy lọc nước RO Kangaroo 10 lõi là 6.890.000đ anh nhé.",
+      "text": "Em xin xác nhận lại, giá máy RO Kangaroo 10 lõi là 6.890.000đ, giá này không có khuyến mãi giảm tiền trực tiếp ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 6890000
+        },
+        {
+          "field": "promo_active",
+          "value": false
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "6890000",
-          "spoken": "6.890.000"
-        }
-      ],
-      "pause_before_ms": 500,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -110,14 +102,14 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, máy Kangaroo 10 lõi đáp ứng tốt cho gia đình 6 người anh nhé. Công suất lọc tiêu chuẩn 12 lít/giờ, phù hợp dùng cho cả nhà mình.",
+      "text": "Với gia đình 6 người, máy RO 10 lõi này đáp ứng tốt nhu cầu sử dụng hàng ngày anh nhé. Công suất lọc 12 lít một giờ, dùng đủ cho 4–6 người ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -132,7 +124,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại máy Kangaroo 10 lõi đang bán giá niêm yết, bên em chưa có khuyến mãi cho sản phẩm này. Tuy nhiên, anh được miễn phí thu hộ khi chọn COD toàn quốc ạ.",
+      "text": "Dạ hiện tại sản phẩm này chưa có chương trình khuyến mãi giảm giá, nhưng anh sẽ được miễn phí thu hộ khi thanh toán COD toàn quốc ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -148,7 +140,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -165,7 +157,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, anh cứ tham khảo thêm thông tin các sản phẩm khác. Khi nào cần hỗ trợ hoặc cần tư vấn chi tiết hơn, anh liên hệ lại giúp em nhé. Em sẽ lưu lại nhu cầu và giá máy cho anh ạ.",
+      "text": "Dạ vâng, anh cứ tìm hiểu thêm các sản phẩm khác nhé. Nếu cần tư vấn chi tiết từng loại, anh cứ liên hệ lại shop bất cứ lúc nào ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -175,44 +167,44 @@
           "key": "blocker",
           "value": "muốn so sánh thêm",
           "op": "set",
-          "source": "call_1#turn11"
+          "source": "call_1#turn10"
         },
         {
           "key": "budget_vnd",
           "value": 7000000,
           "op": "set",
-          "source": "call_1#turn11"
+          "source": "call_1#turn2"
         },
         {
           "key": "usage_need",
           "value": "gia đình 6 người",
           "op": "set",
-          "source": "call_1#turn11"
+          "source": "call_1#turn6"
         },
         {
           "key": "product_advised",
           "value": "SKU-WF-RO10",
           "op": "set",
-          "source": "call_1#turn11"
+          "source": "call_1#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 6890000,
           "op": "set",
-          "source": "call_1#turn11"
+          "source": "call_1#turn4"
         }
       ],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "tu_van_may_loc_nuoc",
+    "intent": "tu_van_san_pham",
     "outcome": "hen_goi_lai",
-    "objection_type": "muon_so_sanh",
-    "objection_handling": "Ghi nhận nhu cầu so sánh, lưu lại thông tin và hướng dẫn khách liên hệ lại khi cần hỗ trợ.",
+    "objection_type": "muon_so_sanh_them",
+    "objection_handling": "Đồng ý để khách tìm hiểu thêm, không tạo áp lực chốt đơn.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

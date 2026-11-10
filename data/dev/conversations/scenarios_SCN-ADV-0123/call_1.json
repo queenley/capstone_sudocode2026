@@ -12,12 +12,12 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị muốn mua màng lọc thay thế AirPure X/Y phải không ạ? Em sẵn sàng hỗ trợ chị đặt hàng ạ.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị muốn mua 3 cái màng lọc thay thế AirPure X/Y đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Chị muốn mua màng lọc thay thế AirPure X/Y đúng không ạ?"
+          "text": "Chị muốn mua 3 cái màng lọc thay thế AirPure X/Y đúng không ạ?"
         }
       ],
       "facts_used": [],
@@ -30,7 +30,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -38,39 +38,30 @@
       "speaker": "customer",
       "text": "Alo em ơi, chị muốn mua 3 cái màng lọc thay thế AirPure X/Y để dùng dần.",
       "facts_stated": {
+        "product_advised": "SKU-AP-FLT-X",
         "quantity": 3,
-        "product_advised": "SKU-AP-FLT-X"
+        "usage_need": "thay đồ cũ đã hỏng"
       },
       "entities": [],
-      "pause_before_ms": 300,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại shop có sẵn màng lọc thay thế AirPure X/Y, giá mỗi cái là 690.000đ chị nhé.",
-      "questions": [
-        {
-          "slot": "quantity",
-          "type": "confirm",
-          "text": "Chị lấy 3 cái đúng không ạ?"
-        }
-      ],
+      "text": "Dạ, màng lọc thay thế AirPure X/Y bên em đang còn hàng, giá là 690.000đ một cái chị nhé.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 690000
-        },
-        {
-          "field": "in_stock",
-          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -79,48 +70,23 @@
       "text": "Mỗi cái giá bao nhiêu em nhỉ?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 300,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, một màng lọc AirPure X/Y có giá 690.000đ chị ạ.",
+      "text": "Giá mỗi màng lọc là 690.000đ chị ạ. Tổng 3 cái sẽ là 2.070.000đ, hiện chưa có chương trình giảm giá cho sản phẩm này.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 690000
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Chị có ngân sách khoảng 1 triệu thôi, mua nhiều có giảm không?",
-      "facts_stated": {
-        "budget_vnd": 1000000
-      },
-      "entities": [],
-      "pause_before_ms": 300,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em thông báo là hiện shop chưa có chương trình giảm giá cho màng lọc AirPure X/Y, giá mỗi cái vẫn là 690.000đ chị nhé.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
+        },
         {
-          "field": "price_vnd",
-          "value": 690000
+          "field": "total_vnd",
+          "value": 2070000
         },
         {
           "field": "promo_active",
@@ -130,7 +96,50 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có ngân sách khoảng 1 triệu thôi, mua nhiều có giảm không?",
+      "facts_stated": {
+        "budget_vnd": 1000000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "1000000",
+          "spoken": "1 triệu"
+        }
+      ],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em kiểm tra thì hiện tại chưa có khuyến mãi hoặc giảm giá cho màng lọc AirPure X/Y chị nhé. Giá mỗi cái là 690.000đ, tổng 3 cái là 2.070.000đ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "price_vnd",
+          "value": 690000
+        },
+        {
+          "field": "total_vnd",
+          "value": 2070000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -142,37 +151,19 @@
         "delivery_area": "Ninh Kiều, Cần Thơ"
       },
       "entities": [],
-      "pause_before_ms": 300,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em đã ghi nhận chị chọn thanh toán COD và giao tại Ninh Kiều, Cần Thơ. Tổng đơn 3 màng lọc là 2.070.000đ, phí ship đã gồm trong giá.",
-      "questions": [
-        {
-          "slot": "order_summary",
-          "type": "confirm",
-          "text": "Chị xác nhận đặt 3 màng lọc AirPure X/Y, giao Ninh Kiều, Cần Thơ, thanh toán COD, tổng 2.070.000đ và nhận hàng dự kiến ngày 19/11/2026 đúng không ạ?"
-        }
-      ],
+      "text": "Dạ chị chọn thanh toán COD và giao tại Ninh Kiều, Cần Thơ. Đơn hàng sẽ được giao dự kiến vào ngày 19/11/2026. Đơn này trên 2 triệu nên nhân viên bên em sẽ gọi xác nhận với chị trước khi giao hàng ạ.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 690000
-        },
-        {
-          "field": "qty",
-          "value": 3
-        },
-        {
-          "field": "total_vnd",
-          "value": 2070000
-        },
-        {
-          "field": "promo_COD-0_active",
-          "value": true
+          "field": "payment",
+          "value": "COD"
         },
         {
           "field": "delivery_days",
@@ -181,6 +172,10 @@
         {
           "field": "estimated_delivery",
           "value": "2026-11-19"
+        },
+        {
+          "field": "needs_confirmation_call",
+          "value": true
         }
       ],
       "tool_calls": [
@@ -194,7 +189,7 @@
       ],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -205,109 +200,41 @@
         "blocker": "để bàn với gia đình"
       },
       "entities": [],
-      "pause_before_ms": 300,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, khi chị chốt đơn em sẽ hỗ trợ lên đơn ngay cho mình. Đơn hàng COD trên 2 triệu sẽ được nhân viên gọi xác nhận trước khi giao chị nhé.",
+      "text": "Dạ vâng, chị cứ trao đổi với gia đình rồi liên hệ lại khi cần đặt hàng nhé. Em luôn sẵn sàng hỗ trợ chị ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "needs_confirmation_call",
-          "value": true
-        }
-      ],
-      "tool_calls": [
-        {
-          "name": "order.create",
-          "args": {
-            "customer_phone": "0994893949",
-            "sku": "SKU-AP-FLT-X",
-            "qty": 3,
-            "price_vnd": 690000,
-            "payment": "COD",
-            "address": "Ninh Kiều, Cần Thơ",
-            "on": "2026-11-14"
-          }
-        }
-      ],
+      "claims": [],
+      "tool_calls": [],
       "memory_writes": [
         {
           "key": "blocker",
           "value": "để bàn với gia đình",
           "op": "set",
           "source": "call_1#turn10"
-        },
-        {
-          "key": "budget_vnd",
-          "value": 1000000,
-          "op": "set",
-          "source": "call_1#turn10"
-        },
-        {
-          "key": "delivery_area",
-          "value": "Ninh Kiều, Cần Thơ",
-          "op": "set",
-          "source": "call_1#turn10"
-        },
-        {
-          "key": "payment",
-          "value": "COD",
-          "op": "set",
-          "source": "call_1#turn10"
-        },
-        {
-          "key": "usage_need",
-          "value": "thay đồ cũ đã hỏng",
-          "op": "set",
-          "source": "call_1#turn10"
-        },
-        {
-          "key": "product_advised",
-          "value": "SKU-AP-FLT-X",
-          "op": "set",
-          "source": "call_1#turn10"
-        },
-        {
-          "key": "price_quoted_vnd",
-          "value": 690000,
-          "op": "set",
-          "source": "call_1#turn10"
-        },
-        {
-          "key": "order_id",
-          "value": "OD600001",
-          "op": "set",
-          "source": "call_1#turn10"
         }
       ],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "tu_van_mua_hang",
+    "intent": "mua_mang_loc_airpure",
     "outcome": "chot_don",
-    "objection_type": "can_hoi_gia_dinh",
-    "objection_handling": "Trợ lý ghi nhận và để khách tự quyết định, không tạo áp lực.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],
     "supersedes": [],
     "callback": null,
-    "order": {
-      "sku": "SKU-AP-FLT-X",
-      "qty": 3,
-      "price_vnd": 690000,
-      "total_vnd": 2070000,
-      "payment": "COD",
-      "address": "Ninh Kiều, Cần Thơ",
-      "estimated_delivery": "2026-11-19"
-    }
+    "order": null
   }
 }

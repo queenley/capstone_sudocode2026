@@ -12,46 +12,39 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, rất vui được hỗ trợ chị về máy hút sữa Spectra S1.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em có thể hỗ trợ chị về máy hút sữa điện đôi Spectra S1 hoặc các sản phẩm mẹ & bé khác ngay bây giờ ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Alo, chị muốn hỏi về máy hút sữa điện đôi Spectra S1 mà em đã tư vấn lần trước.",
-      "facts_stated": {},
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về máy hút sữa điện đôi Spectra S1 mà em đã tư vấn lần trước. Bé nhà chị được 3 tháng.",
+      "facts_stated": {
+        "child_age_months": 3,
+        "product_advised": "SKU-MB-PUMP1"
+      },
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, máy hút sữa điện đôi Spectra S1 hiện đang còn hàng ạ. Dòng này có pin sạc, hút đôi và động cơ êm, phù hợp cho mẹ sử dụng thường xuyên.",
+      "text": "Dạ cảm ơn chị đã quan tâm tới máy hút sữa điện đôi Spectra S1. Bé nhà mình 3 tháng là dùng rất phù hợp chị nhé. Máy này có lực hút mạnh, động cơ êm, pin sạc dùng được 3 giờ và đi kèm đầy đủ phụ kiện.",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -60,13 +53,13 @@
       "text": "Máy này có giá bao nhiêu em nhỉ?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, giá của máy hút sữa điện đôi Spectra S1 là 4.290.000đ chị nhé.",
+      "text": "Dạ giá máy hút sữa điện đôi Spectra S1 hiện tại là 4.290.000đ chị nhé. Giá này đã áp dụng đúng theo niêm yết của shop BTC.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -77,14 +70,8 @@
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "4290000",
-          "spoken": "4.290.000đ"
-        }
-      ],
-      "pause_before_ms": 400,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -94,27 +81,17 @@
       "facts_stated": {
         "budget_vnd": 4500000
       },
-      "entities": [
-        {
-          "type": "money",
-          "value": "4500000",
-          "spoken": "4 triệu rưỡi"
-        }
-      ],
-      "pause_before_ms": 0,
+      "entities": [],
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại giá máy là 4.290.000đ, nằm trong ngân sách của chị. Shop đang có chương trình miễn phí vận chuyển toàn quốc cho đơn từ 500.000đ, chị sẽ được freeship khi đặt hàng ạ.",
+      "text": "Dạ với ngân sách của chị thì máy Spectra S1 rất phù hợp ạ. Hiện tại sản phẩm được tặng miễn phí vận chuyển toàn quốc theo chương trình MOM-FREESHIP, chưa có giảm giá trực tiếp chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
-        {
-          "field": "price_vnd",
-          "value": 4290000
-        },
         {
           "field": "promo_MOM-FREESHIP_active",
           "value": true
@@ -122,14 +99,8 @@
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "4290000",
-          "spoken": "4.290.000đ"
-        }
-      ],
-      "pause_before_ms": 500,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -146,13 +117,13 @@
           "spoken": "7 giờ"
         }
       ],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng chị, em đã ghi nhận. Em sẽ gọi lại cho chị vào lúc 7 giờ tối ngày mai để hỗ trợ thêm thông tin nếu mình cần ạ.",
+      "text": "Dạ em sẽ đặt lịch gọi lại cho chị vào 7 giờ tối ngày mai nhé. Chúc chị sớm trao đổi thuận lợi với gia đình ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -185,10 +156,22 @@
           "source": "call_1#turn6"
         },
         {
+          "key": "child_age_months",
+          "value": 3,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-PUMP1",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
           "key": "price_quoted_vnd",
           "value": 4290000,
           "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn5"
         },
         {
           "key": "promo_code",
@@ -197,14 +180,8 @@
           "source": "call_1#turn7"
         }
       ],
-      "entities": [
-        {
-          "type": "time",
-          "value": "19:00",
-          "spoken": "7 giờ"
-        }
-      ],
-      "pause_before_ms": 500,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
@@ -212,14 +189,13 @@
   "gold": {
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "can_tham_khao_nguoi_nha",
-    "objection_handling": "Ghi nhận nhu cầu, xác nhận thời gian gọi lại cụ thể theo yêu cầu khách.",
+    "objection_type": "can_ban_gia_dinh",
+    "objection_handling": "Xác nhận sẽ gọi lại đúng giờ khách hẹn, chúc khách trao đổi thuận lợi.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [
       {
-        "time": "2026-11-14T19:00",
-        "action": "gọi lại"
+        "commitment": "Đặt lịch gọi lại cho khách vào 7 giờ tối ngày mai"
       }
     ],
     "supersedes": [],

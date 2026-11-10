@@ -63,7 +63,7 @@ from ..guardrails.hard import HUMAN
 
 logger = logging.getLogger(__name__)
 #: The instrument's version, written into every run's manifest beside :data:`prompt_sha`.
-VERSION = "product-extractor-v11"
+VERSION = "product-extractor-v12"
 AUTOMATED = re.compile(r"\b(?:em|tôi|mình)\s+là\s+(?:một\s+)?(?:trợ lý (?:ảo|tự động)|(?:chat)?bot|AI)\b", re.IGNORECASE)
 RESTOCK = re.compile(r"\b(?:về\s+kho|hàng(?:\s+(?:sẽ|sắp|mới|lại|dự\s+kiến))*\s+về|"
                      r"nhập(?:\s+(?:lại|thêm|mới))*\s+hàng|bổ\s+sung\s+(?:hàng|kho|tồn\s+kho)|"
@@ -461,6 +461,82 @@ def _labels(items: list[dict[str, Any]], dropped: int, changed: int) -> dict[str
     }
 
 
+#: Slots whose value is a catalogue product, and slots whose value is an amount of money.
+PRODUCT_SLOTS = frozenset({"product_advised", "owned_sku", "alt_suggested", "variant_sku"})
+MONEY_SLOTS = frozenset({"price_quoted_vnd", "budget_vnd"})
+#: A room size in a reply is usually the product's rating ("phù hợp phòng tối đa 25m²"), equal to the customer's
+#: by chance: it is not taken as reuse by value.
+NOT_BY_VALUE = frozenset({"room_area_m2"})
+
+
+def _earlier_values(data: dict[str, Any]) -> dict[str, set[Any]]:
+    """Slot -> values established before this call: the CRM history's facts and what earlier calls stated.
+
+    Earlier calls are read with the same spoken-commerce extractor the ASR scoring uses: a product named, an amount
+    the agent quoted, a room size, a payment method... A product without a role there is the one advised.
+    """
+    from ..intake import commerce
+
+    allowed, known = vocabulary(), {}
+    for session in data.get("crm_history") or []:
+        for slot, value in (session.get("facts") or {}).items():
+            if slot in allowed and value not in (None, ""):
+                known.setdefault(slot, set()).add(value)
+    for session in data.get("previous_sessions") or []:
+        for turn in session.get("turns", []):
+            for speaker, text in (("customer", turn.get("customer")), ("agent", turn.get("agent"))):
+                if not text:
+                    continue
+                seen = commerce.observe(text, speaker="agent" if speaker == "agent" else "customer")
+                for slot, value in seen["scenario_entities"].items():
+                    if slot in allowed and isinstance(value, (str, int)) and not isinstance(value, bool):
+                        known.setdefault(slot, set()).add(value)
+                if "sku" in seen["asr_entities"] and not PRODUCT_SLOTS & set(seen["scenario_entities"]):
+                    known.setdefault("product_advised", set()).add(seen["asr_entities"]["sku"])
+                if speaker == "agent" and "price_vnd" in seen["asr_entities"]:
+                    known.setdefault("price_quoted_vnd", set()).add(seen["asr_entities"]["price_vnd"])
+    return known
+
+
+def reused_values(data: dict[str, Any]) -> list[dict[str, Any]]:
+    """v12: a fact use for each earlier value the reply says again, whether or not the model labelled it.
+
+    BTC's ``facts_used`` is a slot from the previous session that the turn uses. The model labels a reuse it reads
+    as one ("hôm trước em báo ..."); a reply that simply names the product advised before, its price or the order
+    ("đơn Samsung AX40 ... hoàn 6.490.000đ") uses those slots too. The value must match exactly: the same catalogue
+    product, the same amount, the same order code or text. The quote is the whole reply, which states it.
+    """
+    from ..intake import commerce, itn
+
+    text = data.get("agent_text") or ""
+    if not text or not has_history(data):
+        return []
+    known = _earlier_values(data)
+    if not known:
+        return []
+    now = commerce.observe(text, speaker="agent")
+    products = commerce._named_products(text) | ({now["asr_entities"]["sku"]} if "sku" in now["asr_entities"] else set())
+    amounts = {span.value for span in itn.money_spans(itn.normalise(text.lower(), datetime.fromisoformat(
+        data.get("today") or commerce._catalogue()["reference_date"])))}
+    plain = text.lower()
+    found = []
+    for slot in sorted(set(known) - NOT_BY_VALUE):
+        for value in known[slot]:
+            if slot in PRODUCT_SLOTS:
+                hit = value in products
+            elif slot in MONEY_SLOTS:
+                hit = value in amounts
+            else:
+                hit = (now["scenario_entities"].get(slot) == value
+                       or (isinstance(value, str) and len(value) >= 3 and value.lower() in plain))
+            if hit:
+                found.append({"kind": "fact_usage", "slot_or_field": slot, "value": value, "question_type": None,
+                              "speaker": "agent", "source_field": "agent_text", "quote": text,
+                              "purpose": "Nhắc lại giá trị đã có ở phiên trước (luật v12).", "start": 0, "end": len(text)})
+                break
+    return found
+
+
 def label_items(raw: list[dict[str, Any]], data: dict[str, Any], *, recovered: list[str] | None = None) -> dict[str, Any]:
     """The model's raw items, located in *data* and kept to the vocabularies, in the trace's shapes."""
     kept = [item for item in raw if item.get("kind") != "other"]
@@ -470,6 +546,8 @@ def label_items(raw: list[dict[str, Any]], data: dict[str, Any], *, recovered: l
     if not has_history(data):
         changed += sum(item["kind"] == "fact_usage" for item in items)
         items = [item for item in items if item["kind"] != "fact_usage"]
+    used = {item["slot_or_field"] for item in items if item["kind"] == "fact_usage"}
+    items += [item for item in reused_values(data) if item["slot_or_field"] not in used]
     labels = _labels(items, dropped, changed)
     return {**labels, "recovered_errors": recovered} if recovered else labels
 

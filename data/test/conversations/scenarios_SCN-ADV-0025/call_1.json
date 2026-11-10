@@ -12,23 +12,23 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, anh cần tư vấn về nồi chiên không dầu Xiaomi 4.5L đúng không anh?",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh hỏi về nồi chiên không dầu Xiaomi 4.5L đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Anh cần tư vấn về nồi chiên không dầu Xiaomi 4.5L đúng không ạ?"
+          "text": "Anh hỏi về nồi chiên không dầu Xiaomi 4.5L đúng không ạ?"
         }
       ],
       "facts_used": [],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 1590000
-        },
-        {
           "field": "in_stock",
           "value": true
+        },
+        {
+          "field": "price_vnd",
+          "value": 1590000
         }
       ],
       "tool_calls": [],
@@ -40,8 +40,10 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh thấy trên fanpage có quảng cáo freeship cho đồ gia dụng, không biết nồi chiên không dầu Xiaomi 4.5L có được freeship không em?",
-      "facts_stated": {},
+      "text": "Alo, anh thấy trên fanpage có quảng cáo freeship cho đồ gia dụng, không biết nồi chiên không dầu Xiaomi 4.5L có được freeship không em? Ngân sách của anh tầm 2 triệu.",
+      "facts_stated": {
+        "budget_vnd": 2000000
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -49,16 +51,18 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn anh đã quan tâm. Với nồi chiên không dầu Xiaomi 4.5L, hiện tại chưa áp dụng chương trình freeship cho khu vực của anh. Chính sách freeship áp dụng theo địa chỉ giao hàng, chủ yếu cho miền Nam thôi anh nhé.",
-      "questions": [
-        {
-          "slot": "delivery_area",
-          "type": "open",
-          "text": "Anh cho em xin địa chỉ giao hàng cụ thể để em kiểm tra phí vận chuyển cho mình nhé?"
-        }
-      ],
+      "text": "Dạ em cảm ơn anh đã quan tâm sản phẩm. Nồi chiên không dầu Xiaomi 4.5L hiện giá 1.590.000đ, đang còn hàng. Với sản phẩm này, chương trình freeship chỉ áp dụng cho miền Nam, địa chỉ giao của anh ở Hải Phòng nên chưa được freeship ạ.",
+      "questions": [],
       "facts_used": [],
       "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1590000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
         {
           "field": "freeship",
           "value": false
@@ -84,15 +88,13 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã nhận được địa chỉ giao hàng ở Lê Chân, Hải Phòng của anh. Đơn hàng dưới 2 triệu đồng như nồi chiên Xiaomi 4.5L sẽ có phí vận chuyển 35.000đ đến Hải Phòng anh nhé.",
+      "text": "Dạ em đã ghi nhận địa chỉ giao là Lê Chân, Hải Phòng. Nếu giao về địa chỉ này, phí vận chuyển là 35.000đ, đơn từ 2 triệu mới miễn phí ship ngoài ngành mẹ & bé ạ.",
       "questions": [],
-      "facts_used": [
-        "delivery_area"
-      ],
+      "facts_used": [],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 1590000
+          "field": "freeship",
+          "value": false
         }
       ],
       "tool_calls": [],
@@ -115,17 +117,10 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ anh chọn nồi chiên Xiaomi 4.5L để thay đồ cũ đã hỏng, bên em còn hàng sẵn.",
+      "text": "Dạ anh mua thay cho đồ cũ đã hỏng, mẫu Xiaomi 4.5L rất phù hợp cho gia đình 2–4 người. Sản phẩm được bảo hành 12 tháng, anh yên tâm sử dụng ạ.",
       "questions": [],
-      "facts_used": [
-        "usage_need"
-      ],
-      "claims": [
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "facts_used": [],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -144,16 +139,10 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xác nhận lại, phí giao hàng cho nồi chiên Xiaomi 4.5L giao đến Lê Chân, Hải Phòng là 35.000đ anh nhé. Nếu đơn đạt từ 2 triệu đồng thì sẽ được miễn phí vận chuyển toàn quốc, còn đơn dưới 2 triệu sẽ tính phí theo khu vực giao hàng.",
+      "text": "Dạ phí giao hàng đến Lê Chân, Hải Phòng là 35.000đ đối với sản phẩm này anh nhé.",
       "questions": [],
-      "facts_used": [
-        "delivery_area"
-      ],
+      "facts_used": [],
       "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1590000
-        },
         {
           "field": "freeship",
           "value": false
@@ -179,11 +168,9 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, em ghi nhận anh sẽ quyết định mua khi nhận lương cuối tháng. Nếu anh cần tư vấn thêm về sản phẩm hoặc chương trình ưu đãi mới, anh cứ nhắn lại cho em bất cứ lúc nào ạ. Em cảm ơn anh đã quan tâm shop!",
+      "text": "Dạ em ghi nhận anh sẽ cân nhắc cuối tháng. Anh cần thêm thông tin hoặc muốn đặt hàng cứ nhắn lại cho shop bất kỳ lúc nào nhé, em luôn sẵn sàng hỗ trợ ạ.",
       "questions": [],
-      "facts_used": [
-        "blocker"
-      ],
+      "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [
@@ -197,31 +184,31 @@
           "key": "budget_vnd",
           "value": 2000000,
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn2"
         },
         {
           "key": "delivery_area",
           "value": "Lê Chân, Hải Phòng",
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn4"
         },
         {
           "key": "usage_need",
           "value": "thay đồ cũ đã hỏng",
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn6"
         },
         {
           "key": "product_advised",
           "value": "SKU-AF-XM",
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 1590000,
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn3"
         }
       ],
       "entities": [],
@@ -231,10 +218,10 @@
     }
   ],
   "gold": {
-    "intent": "hoi_feeship_khu_vuc",
+    "intent": "tu_van_freeship",
     "outcome": "hen_goi_lai",
-    "objection_type": null,
-    "objection_handling": null,
+    "objection_type": "chua_nhan_luong",
+    "objection_handling": "Đã ghi nhận thời điểm khách cân nhắc, hướng dẫn liên hệ lại khi cần.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

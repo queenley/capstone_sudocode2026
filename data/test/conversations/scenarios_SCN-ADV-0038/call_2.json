@@ -12,14 +12,8 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Nhung ạ, hôm trước chị có quan tâm Nồi chiên không dầu Philips 6.2L và còn muốn so sánh thêm; hôm nay mình quyết định đặt hàng đúng không chị?",
-      "questions": [
-        {
-          "slot": "order_summary",
-          "type": "confirm",
-          "text": "Dạ chị xác nhận giúp em: mình đặt Nồi chiên không dầu Philips 6.2L, giá là 3.990.000đ, thanh toán qua ngân hàng, giao về Lê Chân, Hải Phòng đúng không chị?"
-        }
-      ],
+      "text": "Dạ em chào chị Nhung ạ, hôm trước chị có quan tâm đến Nồi chiên không dầu Philips 6.2L, còn muốn so sánh thêm. Em sẵn sàng hỗ trợ chị đặt hàng nhé.",
+      "questions": [],
       "facts_used": [
         "blocker",
         "product_advised",
@@ -35,6 +29,97 @@
           "value": true
         }
       ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị đã quyết định mua nồi chiên không dầu Philips 6.2L rồi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã chọn mua sản phẩm này ạ. Giá hiện tại của Nồi chiên không dầu Philips 6.2L là 3.990.000đ, hàng đang sẵn kho chị nhé. Cho em xác nhận lại, chị muốn thanh toán qua ngân hàng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Cho em xác nhận lại, chị muốn thanh toán qua ngân hàng đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Hình thức thanh toán là qua ngân hàng nhé.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị chọn thanh toán chuyển khoản qua ngân hàng, em ghi nhận rồi ạ. Địa chỉ giao hàng của chị vẫn ở Lê Chân, Hải Phòng phải không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Địa chỉ giao hàng của chị vẫn ở Lê Chân, Hải Phòng phải không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giao hàng cho chị ở Lê Chân, Hải Phòng.",
+      "facts_stated": {
+        "delivery_area": "Lê Chân, Hải Phòng"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã xác nhận địa chỉ giao hàng là Lê Chân, Hải Phòng. Em kiểm tra lịch giao giúp chị ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
       "tool_calls": [
         {
           "name": "delivery_estimate",
@@ -46,28 +131,96 @@
       ],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Chị đã quyết định mua nồi chiên không dầu Philips 6.2L rồi.",
+      "text": "Cho chị biết thời gian giao hàng khoảng bao lâu nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận đơn của chị: Nồi chiên không dầu Philips 6.2L, giá 3.990.000đ, thanh toán chuyển khoản ngân hàng. Em sẽ tiến hành tạo đơn ngay cho mình ạ.",
+      "text": "Dạ đơn hàng sẽ được giao đến Lê Chân, Hải Phòng trong khoảng 4 ngày làm việc, dự kiến nhận hàng vào ngày 05/11/2026 chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "delivery_days",
+          "value": 4
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-05"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi em, lên đơn giúp chị nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em lên đơn cho chị: Nồi chiên không dầu Philips 6.2L, 1 chiếc, giá 3.990.000đ, giao tại Lê Chân, Hải Phòng, thanh toán chuyển khoản ngân hàng, dự kiến giao ngày 05/11/2026. Chị kiểm tra lại giúp em các thông tin trên đã đúng chưa để em xác nhận lên đơn nhé.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Chị kiểm tra lại giúp em các thông tin trên đã đúng chưa để em xác nhận lên đơn nhé."
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3990000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi em, lên đơn giúp chị nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã lên đơn thành công cho chị, mã đơn hàng là OD600001. Đơn hàng sẽ được giao dự kiến ngày 05/11/2026 chị nhé. Cảm ơn chị đã tin tưởng và lựa chọn shop ạ!",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 3990000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-05"
         }
       ],
       "tool_calls": [
@@ -84,130 +237,46 @@
           }
         }
       ],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Hình thức thanh toán là qua ngân hàng nhé.",
-      "facts_stated": {
-        "payment": "bank"
-      },
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ đơn đã được tạo thành công chị nhé. Mình thanh toán chuyển khoản ngân hàng và shop sẽ gửi thông tin qua Zalo cho chị ngay sau cuộc gọi ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Giao hàng cho chị ở Lê Chân, Hải Phòng.",
-      "facts_stated": {
-        "delivery_area": "Lê Chân, Hải Phòng"
-      },
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ địa chỉ giao hàng là Lê Chân, Hải Phòng. Đơn hàng sẽ được giao trong khoảng 4 ngày làm việc, dự kiến nhận vào ngày 05/11/2026 chị nhé.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "estimated_delivery",
-          "value": "2026-11-05"
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Cho chị biết thời gian giao hàng khoảng bao lâu nhé.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em thông báo lại đơn của mình: Nồi chiên không dầu Philips 6.2L, giá 3.990.000đ, giao về Lê Chân, Hải Phòng, thanh toán chuyển khoản ngân hàng. Dự kiến giao hàng ngày 05/11/2026. Shop cảm ơn chị đã đặt hàng ạ!",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 3990000
-        },
-        {
-          "field": "estimated_delivery",
-          "value": "2026-11-05"
-        }
-      ],
-      "tool_calls": [],
       "memory_writes": [
         {
           "key": "delivery_area",
           "value": "Lê Chân, Hải Phòng",
           "op": "set",
-          "source": "call_2#turn7"
+          "source": "call_2#turn6"
         },
         {
           "key": "payment",
           "value": "bank",
           "op": "set",
-          "source": "call_2#turn3"
+          "source": "call_2#turn4"
         },
         {
           "key": "product_advised",
           "value": "SKU-AF-6L",
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn0"
         },
         {
           "key": "price_quoted_vnd",
           "value": 3990000,
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn0"
         },
         {
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_2#turn3"
+          "source": "call_2#turn13"
         }
       ],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "dat_hang",
+    "intent": "chot_don",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
@@ -221,7 +290,7 @@
       "qty": 1,
       "price_vnd": 3990000,
       "payment": "bank",
-      "delivery_area": "Lê Chân, Hải Phòng",
+      "address": "Lê Chân, Hải Phòng",
       "order_id": "OD600001",
       "estimated_delivery": "2026-11-05"
     }

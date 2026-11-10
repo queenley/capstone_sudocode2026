@@ -12,13 +12,18 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em đã ghi nhận chị có đơn hàng gần đây và muốn đổi địa chỉ giao hàng, em hỗ trợ chị ngay nhé.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em đã ghi nhận đơn hàng của chị và sẵn sàng hỗ trợ cập nhật địa chỉ giao hàng cho mình ạ.",
       "questions": [],
       "facts_used": [
         "order_id",
         "owned_sku"
       ],
-      "claims": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900203"
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -31,20 +36,14 @@
       "text": "Chào em, chị muốn đổi địa chỉ giao hàng cho đơn hàng OD900202.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chị muốn đổi địa chỉ giao hàng, chị vui lòng cho em biết địa chỉ mới mình muốn chuyển tới là gì ạ?",
-      "questions": [
-        {
-          "slot": "delivery_area",
-          "type": "open",
-          "text": "Chị vui lòng cho em biết địa chỉ mới mình muốn chuyển tới là gì ạ?"
-        }
-      ],
+      "text": "Dạ chị muốn đổi địa chỉ giao hàng cho đơn, em xác nhận lại thông tin để hỗ trợ chị nhanh nhất ạ.",
+      "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
@@ -60,52 +59,26 @@
       "facts_stated": {
         "delivery_area": "Hải Châu, Đà Nẵng"
       },
-      "entities": [],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em xác nhận chị muốn đổi địa chỉ giao hàng sang Hải Châu, Đà Nẵng đúng không ạ?",
-      "questions": [
+      "entities": [
         {
-          "slot": "delivery_area",
-          "type": "confirm",
-          "text": "Dạ em xác nhận chị muốn đổi địa chỉ giao hàng sang Hải Châu, Đà Nẵng đúng không ạ?"
+          "type": "address",
+          "value": "Hải Châu, Đà Nẵng",
+          "spoken": "Hải Châu"
         }
       ],
-      "facts_used": [
-        "delivery_area"
-      ],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
-      "speaker": "customer",
-      "text": "Chị đã đặt giày trekking, mà giờ địa chỉ có chút thay đổi.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận yêu cầu đổi địa chỉ giao hàng cho đơn hàng mới nhất của chị. Em sẽ tiến hành cập nhật ngay trên hệ thống.",
+      "text": "Dạ em đã ghi nhận địa chỉ mới là Hải Châu, Đà Nẵng cho đơn hàng của chị. Em sẽ tiến hành cập nhật ngay trên hệ thống ạ.",
       "questions": [],
-      "facts_used": [
-        "delivery_area"
-      ],
+      "facts_used": [],
       "claims": [
         {
-          "field": "order_status",
-          "value": "delivered"
+          "field": "order_id",
+          "value": "OD900203"
         }
       ],
       "tool_calls": [
@@ -126,30 +99,42 @@
     },
     {
       "speaker": "customer",
-      "text": "Em có thể giúp chị cập nhật địa chỉ này không?",
+      "text": "Chị đã đặt giày trekking, mà giờ địa chỉ có chút thay đổi.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã cập nhật địa chỉ giao hàng sang Hải Châu, Đà Nẵng cho đơn hàng của chị thành công. Nếu cần hỗ trợ thêm, chị cứ liên hệ shop nhé, em cảm ơn chị ạ.",
+      "text": "Dạ em đã cập nhật thành công địa chỉ giao hàng mới cho đơn hàng của chị. Nếu cần hỗ trợ thêm gì, chị cứ liên hệ shop bất cứ lúc nào ạ.",
       "questions": [],
-      "facts_used": [
-        "delivery_area"
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD900203"
+        }
       ],
-      "claims": [],
       "tool_calls": [],
       "memory_writes": [
         {
           "key": "delivery_area",
           "value": "Hải Châu, Đà Nẵng",
           "op": "set",
-          "source": "call_2#turn9"
+          "source": "call_2#turn4"
         }
       ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em có thể giúp chị cập nhật địa chỉ này không?",
+      "facts_stated": {},
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,

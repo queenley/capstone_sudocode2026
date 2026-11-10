@@ -12,49 +12,44 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, chị cần tư vấn về máy tiệt trùng sấy khô Moaz Bebe phải không ạ? Em sẵn sàng hỗ trợ chị ạ.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop. Chị cần tư vấn về máy tiệt trùng sấy khô Moaz Bebe cho bé đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Chị đang quan tâm đến máy tiệt trùng sấy khô Moaz Bebe đúng không ạ?"
+          "text": "Chị cần tư vấn về máy tiệt trùng sấy khô Moaz Bebe đúng không ạ?"
         }
       ],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 800,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị muốn hỏi về máy tiệt trùng sấy khô Moaz Bebe em ơi.",
-      "facts_stated": {},
+      "text": "Alo, chị muốn hỏi về máy tiệt trùng sấy khô Moaz Bebe em ơi. Bé nhà chị được 16 tháng.",
+      "facts_stated": {
+        "child_age_months": 16
+      },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ máy tiệt trùng sấy khô Moaz Bebe hiện đang còn hàng tại shop chị nhé. Chị muốn em tư vấn về giá hay tính năng của máy này ạ?",
-      "questions": [
-        {
-          "slot": "other",
-          "type": "open",
-          "text": "Chị muốn biết giá máy hay cần tư vấn chi tiết về tính năng ạ?"
-        }
-      ],
+      "text": "Dạ, máy tiệt trùng sấy khô Moaz Bebe phù hợp cho bé nhà mình 16 tháng tuổi ạ. Sản phẩm này hiện bên em còn hàng, giá là 1.890.000đ chị nhé.",
+      "questions": [],
       "facts_used": [],
       "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1890000
+        },
         {
           "field": "in_stock",
           "value": true
@@ -63,7 +58,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -72,13 +67,13 @@
       "text": "Máy này giá bao nhiêu vậy?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ máy tiệt trùng sấy khô Moaz Bebe hiện có giá 1.890.000đ chị nhé.",
+      "text": "Dạ, giá máy tiệt trùng sấy khô Moaz Bebe hiện tại là 1.890.000đ ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -90,7 +85,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -101,29 +96,25 @@
         "budget_vnd": 2000000
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ sản phẩm này đang trong ngân sách của chị, giá hiện tại là 1.890.000đ. Shop đang có chương trình miễn phí vận chuyển toàn quốc dành cho đơn từ 500.000đ của ngành mẹ & bé, chị nhé.",
+      "text": "Dạ máy Moaz Bebe có giá trong ngân sách của chị ạ. Sản phẩm này rất được các mẹ tin dùng cho bé nhỏ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 1890000
-        },
-        {
-          "field": "promo_MOM-FREESHIP_active",
-          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -132,25 +123,29 @@
       "text": "Máy có khuyến mãi gì không em nhỉ?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại, sản phẩm đang được miễn phí vận chuyển toàn quốc theo chương trình MOM-FREESHIP, áp dụng đến hết ngày 29/11/2026 chị nhé.",
+      "text": "Dạ, hiện máy tiệt trùng sấy khô Moaz Bebe được miễn phí vận chuyển toàn quốc với chương trình MOM-FREESHIP chị nhé. Ngoài ra, shop chưa có chương trình giảm giá cho sản phẩm này ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "promo_MOM-FREESHIP_active",
           "value": true
+        },
+        {
+          "field": "promo_active",
+          "value": false
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -161,18 +156,24 @@
         "blocker": "cần suy nghĩ thêm"
       },
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, chị cứ suy nghĩ thêm ạ. Nếu cần hỗ trợ thêm về thông tin hoặc đặt hàng, chị cứ liên hệ lại shop bất cứ lúc nào chị nhé. Em xin phép lưu lại tư vấn hôm nay cho chị tiện theo dõi sau này.",
+      "text": "Dạ vâng, chị cứ cân nhắc thêm ạ. Nếu cần hỗ trợ gì thêm về máy tiệt trùng sấy khô Moaz Bebe hoặc các sản phẩm khác cho bé, chị cứ liên hệ lại shop bất cứ lúc nào nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [
+        {
+          "key": "child_age_months",
+          "value": 16,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
         {
           "key": "budget_vnd",
           "value": 2000000,
@@ -189,32 +190,32 @@
           "key": "product_advised",
           "value": "SKU-MB-STER",
           "op": "set",
-          "source": "call_1#turn1"
+          "source": "call_1#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 1890000,
           "op": "set",
-          "source": "call_1#turn5"
+          "source": "call_1#turn4"
         },
         {
           "key": "promo_code",
           "value": "MOM-FREESHIP",
           "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn8"
         }
       ],
       "entities": [],
-      "pause_before_ms": 350,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "hen_goi_lai",
+    "intent": "hoi_gia_thong_tin_sp",
     "outcome": "hen_goi_lai",
-    "objection_type": "cần suy nghĩ thêm",
-    "objection_handling": "Lịch sự ghi nhận và động viên khách liên hệ lại khi cần.",
+    "objection_type": "can_suy_nghi_them",
+    "objection_handling": "Lịch sự ghi nhận, mời khách liên hệ lại khi cần.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

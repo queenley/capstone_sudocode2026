@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị cần tư vấn về giày chạy bộ RunLite 2 Pro size 42 màu đen đúng không ạ?",
+      "text": "Dạ em chào chị ạ, chị cần tư vấn về giày chạy bộ RunLite 2 Pro size 42 màu đen đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
@@ -49,7 +49,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, hiện tại giày chạy bộ RunLite 2 Pro size 42 màu đen đang còn hàng chị nhé. Giá niêm yết là 1.690.000đ, đang áp dụng khuyến mãi còn 1.352.000đ. Đây là giá cuối đã giảm theo chương trình RUN2-SALE ạ.",
+      "text": "Dạ sản phẩm RunLite 2 Pro size 42 màu đen bên em đang còn hàng, giá sau giảm là 1.352.000đ chị nhé. Đây là giá đã áp dụng khuyến mãi RUN2-SALE hiện hành.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -79,20 +79,34 @@
       "facts_stated": {
         "competitor_price_vnd": 1240000
       },
-      "entities": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "1240000",
+          "spoken": "1 triệu 240 nghìn"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em rất hiểu cảm giác của chị khi thấy giá chênh lệch giữa các nơi ạ. Bên em cam kết hàng chính hãng, bảo hành đầy đủ và hỗ trợ đổi trả trong 7 ngày nếu có vấn đề. Giá 1.352.000đ là đã áp dụng khuyến mãi tốt nhất hiện tại rồi chị nhé.",
+      "text": "Dạ em xin phép không so sánh giá cụ thể với bên khác ạ. Bên em cam kết hàng chính hãng, bảo hành đầy đủ theo chính sách, giá hiện tại đã giảm từ 1.690.000đ xuống còn 1.352.000đ nhờ chương trình RUN2-SALE. Chị có thể kiểm tra hàng trước khi nhận và được đổi trả trong 7 ngày nếu chưa sử dụng.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 1352000
+        },
+        {
+          "field": "list_price_vnd",
+          "value": 1690000
+        },
+        {
+          "field": "promo_RUN2-SALE_active",
+          "value": true
         }
       ],
       "tool_calls": [],
@@ -113,7 +127,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, hiện tại sản phẩm đang được giảm giá theo chương trình RUN2-SALE còn 1.352.000đ, giảm từ giá niêm yết 1.690.000đ chị nha. Ngoài ra, đơn từ 500.000đ còn được miễn phí vận chuyển toàn quốc và được kiểm tra hàng trước khi thanh toán ạ.",
+      "text": "Dạ hiện tại sản phẩm này đang áp dụng khuyến mãi RUN2-SALE giảm còn 1.352.000đ, miễn phí thu hộ khi chị chọn COD, và hỗ trợ đổi size miễn phí lần đầu trong 7 ngày ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -123,6 +137,10 @@
         },
         {
           "field": "promo_RUN2-SALE_active",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
           "value": true
         }
       ],
@@ -135,16 +153,24 @@
     },
     {
       "speaker": "customer",
-      "text": "Thế chị cần hỏi thêm một chút rồi gọi lại nhé.",
-      "facts_stated": {},
-      "entities": [],
+      "text": "Thế chị cần hỏi thêm một chút rồi gọi lại nhé. Số chị là 0913301756.",
+      "facts_stated": {
+        "phone_provided": true
+      },
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0913301756",
+          "spoken": "0913301756"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, chị cứ cân nhắc thêm ạ. Nếu cần hỗ trợ hoặc đặt hàng, chị nhắn lại cho shop bất cứ lúc nào nhé. Em rất sẵn sàng hỗ trợ chị ạ!",
+      "text": "Dạ vâng, em đã ghi nhận nhu cầu của chị. Khi cần tư vấn thêm hoặc quyết định đặt hàng, chị nhắn lại cho shop nhé. Em cảm ơn chị đã liên hệ ạ!",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -169,28 +195,22 @@
           "source": "call_1#turn2"
         },
         {
-          "key": "competitor_price_vnd",
-          "value": 1240000,
+          "key": "price_quoted_vnd",
+          "value": 1352000,
           "op": "set",
           "source": "call_1#turn4"
         },
         {
-          "key": "price_quoted_vnd",
-          "value": 1352000,
+          "key": "promo_code",
+          "value": "RUN2-SALE",
           "op": "set",
-          "source": "call_1#turn3"
+          "source": "call_1#turn6"
         },
         {
           "key": "variant_sku",
           "value": "SKU-SN-RUN2-42-DEN",
           "op": "set",
           "source": "call_1#turn2"
-        },
-        {
-          "key": "promo_code",
-          "value": "RUN2-SALE",
-          "op": "set",
-          "source": "call_1#turn3"
         }
       ],
       "entities": [],
@@ -200,10 +220,10 @@
     }
   ],
   "gold": {
-    "intent": "tu_van_gia_giay",
+    "intent": "hoi_gia_giay",
     "outcome": "hen_goi_lai",
-    "objection_type": "gia_cao",
-    "objection_handling": "Nêu cam kết chính hãng, bảo hành và đổi trả, giải thích giá đã áp dụng khuyến mãi tốt nhất.",
+    "objection_type": "gia_cao_hon_cho_khac",
+    "objection_handling": "Không so sánh giá đối thủ, giải thích giá đã giảm và quyền lợi đi kèm.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

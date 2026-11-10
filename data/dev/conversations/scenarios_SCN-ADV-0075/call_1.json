@@ -12,13 +12,23 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Hôm trước chị mình đã được tư vấn về Máy lọc nước RO Karofi 9 lõi và đã đặt Máy lọc nước RO Kangaroo 10 lõi; hôm nay em sẵn sàng hỗ trợ chị xác nhận đơn mới ạ.",
-      "questions": [],
-      "facts_used": [
-        "order_id",
-        "owned_sku"
+      "text": "Dạ em chào chị Lê Thị G ạ, hôm trước mình có đặt Máy lọc nước RO Karofi 9 lõi đúng không chị? Đơn trước của chị là OD900702 đang giao, em xin phép xác nhận lại thông tin đơn mới giúp chị nhé.",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "confirm",
+          "text": "Ngân sách của mình là 6 triệu rưỡi như chị trao đổi hôm trước đúng không ạ?"
+        }
       ],
-      "claims": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -28,25 +38,28 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị đây. Chị muốn xác nhận mua cái máy lọc nước RO Karofi 9 lõi mà mình đã nói hôm trước.",
-      "facts_stated": {},
+      "text": "Alo, chị đây. Chị muốn xác nhận mua cái máy lọc nước RO Karofi 9 lõi mà mình đã nói hôm trước. Ngân sách của chị tầm 6 triệu rưỡi.",
+      "facts_stated": {
+        "budget_vnd": 6500000
+      },
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 800,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chị muốn xác nhận mua Máy lọc nước RO Karofi 9 lõi phải không ạ? Sản phẩm này đang còn hàng với giá 5.990.000đ, phù hợp cho gia đình 3 người như mình đã trao đổi.",
+      "text": "Dạ máy lọc nước RO Karofi 9 lõi bên em giá 5.990.000đ, hiện đang còn hàng và phù hợp với ngân sách của chị ạ. Sản phẩm này freeship toàn quốc, giao tại Cầu Giấy, Hà Nội dự kiến ngày 20/10 ạ.",
       "questions": [
         {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Chị xác nhận lại là mình lấy Máy lọc nước RO Karofi 9 lõi đúng không ạ?"
+          "slot": "other",
+          "type": "open",
+          "text": "Giá chị nhớ là 5.990.000đ đúng không ạ?"
         }
       ],
       "facts_used": [
-        "usage_need"
+        "budget_vnd",
+        "delivery_area"
       ],
       "claims": [
         {
@@ -56,119 +69,10 @@
         {
           "field": "in_stock",
           "value": true
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Giá là 5 triệu 990 ngàn đúng không em?",
-      "facts_stated": {},
-      "entities": [
-        {
-          "type": "money",
-          "value": "5990000",
-          "spoken": "5 triệu 990 ngàn"
-        }
-      ],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ đúng rồi chị, giá Máy lọc nước RO Karofi 9 lõi hôm nay là 5.990.000đ, đã miễn phí vận chuyển toàn quốc cho đơn này ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 5990000
         },
         {
           "field": "freeship",
           "value": true
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Chị sẽ thanh toán bằng hình thức COD nhé.",
-      "facts_stated": {
-        "payment": "COD"
-      },
-      "entities": [],
-      "pause_before_ms": 400,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ chị chọn thanh toán khi nhận hàng (COD) ạ, đơn này đủ điều kiện COD mà không mất phí thu hộ. Đơn giá dưới 10 triệu nên COD được áp dụng chị nhé.",
-      "questions": [
-        {
-          "slot": "payment",
-          "type": "confirm",
-          "text": "Em xác nhận mình thanh toán COD đúng không ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "promo_COD-0_active",
-          "value": true
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Chị ở Cầu Giấy, Hà Nội, em nhớ giao hàng cho chị nhé.",
-      "facts_stated": {
-        "delivery_area": "Cầu Giấy, Hà Nội"
-      },
-      "entities": [
-        {
-          "type": "address",
-          "value": "Cầu Giấy, Hà Nội",
-          "spoken": "Cầu Giấy, Hà Nội"
-        }
-      ],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận địa chỉ giao hàng ở Cầu Giấy, Hà Nội. Dự kiến giao hàng trong 2 ngày làm việc, nhận hàng vào khoảng ngày 20/10/2026 chị nhé.",
-      "questions": [
-        {
-          "slot": "delivery_area",
-          "type": "confirm",
-          "text": "Em xác nhận lại địa chỉ giao là Cầu Giấy, Hà Nội đúng không ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "delivery_days",
-          "value": 2
         },
         {
           "field": "estimated_delivery",
@@ -192,7 +96,7 @@
     },
     {
       "speaker": "customer",
-      "text": "Ừm, vậy chị đồng ý lên đơn luôn.",
+      "text": "Giá là 5 triệu 990 ngàn đúng không em?",
       "facts_stated": {},
       "entities": [],
       "pause_before_ms": 600,
@@ -201,23 +105,115 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em tổng kết đơn hàng của mình: 1 Máy lọc nước RO Karofi 9 lõi, giá 5.990.000đ, giao tại Cầu Giấy, Hà Nội, thanh toán COD, nhận hàng dự kiến ngày 20/10/2026. Nhân viên bên em sẽ gọi xác nhận đơn trước khi giao hàng đến cho chị. Chị vui lòng xác nhận lại thông tin để em tiến hành lên đơn ạ.",
+      "text": "Dạ đúng rồi chị, giá chính xác là 5.990.000đ và hiện tại chưa có chương trình khuyến mãi thêm. Chị muốn thanh toán COD đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Chị xác nhận thanh toán COD đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ thanh toán bằng hình thức COD nhé.",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận thanh toán COD, đơn hàng sẽ được freeship toàn quốc ạ. Địa chỉ giao là Cầu Giấy, Hà Nội, thông tin này đúng chưa chị?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Địa chỉ giao là Cầu Giấy, Hà Nội đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "freeship",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị ở Cầu Giấy, Hà Nội, em nhớ giao hàng cho chị nhé.",
+      "facts_stated": {
+        "delivery_area": "Cầu Giấy, Hà Nội"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Cầu Giấy, Hà Nội",
+          "spoken": "Cầu Giấy, Hà Nội"
+        }
+      ],
+      "pause_before_ms": 900,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã xác nhận. Em xin phép đọc lại thông tin đơn hàng: Máy lọc nước RO Karofi 9 lõi, số lượng 1, giá 5.990.000đ, giao tại Cầu Giấy, Hà Nội, thanh toán COD, dự kiến giao ngày 20/10. Đơn này sẽ có nhân viên gọi xác nhận trước khi giao ạ. Chị kiểm tra giúp em các thông tin trên đã đủ và đúng chưa ạ?",
       "questions": [
         {
           "slot": "order_summary",
           "type": "confirm",
-          "text": "Chị xác nhận lại đơn hàng này giúp em nhé?"
+          "text": "Em đọc lại: Máy lọc nước RO Karofi 9 lõi, số lượng 1, giá 5.990.000đ, giao tại Cầu Giấy, Hà Nội, COD, dự kiến giao 20/10. Các thông tin trên đã đủ và đúng chưa chị?"
         }
       ],
       "facts_used": [
-        "delivery_area",
-        "payment",
-        "product_advised"
+        "delivery_area"
       ],
       "claims": [
         {
           "field": "price_vnd",
           "value": 5990000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-20"
         },
         {
           "field": "needs_confirmation_call",
@@ -233,19 +229,30 @@
     },
     {
       "speaker": "customer",
-      "text": "Chị xác nhận đủ thông tin rồi em nhé.",
+      "text": "Ừm, vậy chị đồng ý lên đơn luôn.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em lên đơn ngay cho chị. Đơn sẽ được giao tận nơi, chị kiểm tra hàng trước khi thanh toán giúp em. Cảm ơn chị đã tin tưởng shop BTC, chúc chị một ngày tốt lành ạ!",
+      "text": "Dạ em tiến hành lên đơn giúp chị ngay. Thông tin đơn hàng đã được ghi nhận, mã đơn OD600001. Nhân viên bên em sẽ gọi xác nhận đơn trước khi giao để đảm bảo quyền lợi của chị ạ.",
       "questions": [],
-      "facts_used": [],
-      "claims": [],
+      "facts_used": [
+        "order_id"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        }
+      ],
       "tool_calls": [
         {
           "name": "order.create",
@@ -308,6 +315,15 @@
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị xác nhận đủ thông tin rồi em nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
     }
   ],
   "gold": {
@@ -319,7 +335,7 @@
     "decision_maker": null,
     "commitments": [
       {
-        "text": "Nhân viên sẽ gọi xác nhận đơn trước khi giao hàng."
+        "text": "Đơn hàng sẽ được nhân viên gọi xác nhận trước khi giao."
       }
     ],
     "supersedes": [],
@@ -329,8 +345,8 @@
       "qty": 1,
       "price_vnd": 5990000,
       "payment": "COD",
-      "delivery_area": "Cầu Giấy, Hà Nội",
-      "estimated_delivery": "2026-10-20"
+      "address": "Cầu Giấy, Hà Nội",
+      "order_id": "OD600001"
     }
   }
 }

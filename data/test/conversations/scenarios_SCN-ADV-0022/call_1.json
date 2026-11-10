@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em sẵn sàng hỗ trợ chị về sản phẩm nồi chiên không dầu Lock&Lock 4L ạ.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị đang quan tâm đến nồi chiên không dầu Lock&Lock 4L đúng không ạ?",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -25,8 +25,10 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo em, chị muốn hỏi nồi chiên không dầu Lock&Lock 4L giá bao nhiêu em?",
-      "facts_stated": {},
+      "text": "Alo em, chị muốn hỏi nồi chiên không dầu Lock&Lock 4L giá bao nhiêu em? Ngân sách của chị tầm 2 triệu.",
+      "facts_stated": {
+        "budget_vnd": 2000000
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -34,7 +36,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ nồi chiên không dầu Lock&Lock 4L bên em hiện có giá là 1.890.000đ chị nhé.",
+      "text": "Dạ nồi chiên không dầu Lock&Lock 4L bên em hiện có giá 1.890.000đ ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -61,13 +63,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại sản phẩm này chưa có chương trình khuyến mãi nào áp dụng chị ạ. Giá em báo là giá niêm yết hiện hành.",
+      "text": "Dạ hiện tại sản phẩm này chưa có chương trình khuyến mãi nào áp dụng ạ. Tuy nhiên chị sẽ được miễn phí vận chuyển nếu chọn COD nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "promo_active",
           "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
         }
       ],
       "tool_calls": [],
@@ -88,7 +94,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em rất tiếc, em chỉ có thể cung cấp thông tin về các chương trình khuyến mãi đang áp dụng tại thời điểm hiện tại thôi ạ. Nếu có chương trình mới, em sẽ cập nhật ngay cho chị.",
+      "text": "Dạ em rất tiếc, em chưa có thông tin về các chương trình khuyến mãi sắp tới ạ. Nếu có chương trình mới, shop sẽ cập nhật công khai trên fanpage và website cho mình tham khảo nha chị.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -115,10 +121,15 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em rất mong chị thông cảm, theo quy định em chỉ được thông báo chương trình khuyến mãi đang diễn ra. Nếu chị cần hỗ trợ đặt hàng hoặc muốn được báo giá khi có chương trình mới, em sẽ ghi nhận lại thông tin của chị để liên hệ khi có ưu đãi mới nhất.",
+      "text": "Dạ chị thông cảm giúp em, thật sự hiện tại em chưa có thông tin về chương trình khuyến mãi sắp tới. Có gì mới shop sẽ đăng ngay để chị cập nhật kịp thời ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "future_promo_disclosed",
+          "value": false
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -139,7 +150,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, em ghi nhận chị sẽ trao đổi thêm với gia đình. Khi nào chị cần tư vấn thêm hoặc có chương trình ưu đãi mới, em sẽ chủ động liên hệ lại để hỗ trợ chị tốt nhất ạ. Em cảm ơn chị đã quan tâm sản phẩm của shop.",
+      "text": "Dạ em ghi nhận chị sẽ trao đổi thêm với gia đình. Khi nào cần hỗ trợ thêm, chị cứ nhắn tin hoặc gọi lại cho shop nhé. Em cảm ơn chị đã quan tâm ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -149,7 +160,13 @@
           "key": "blocker",
           "value": "để bàn với gia đình",
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 2000000,
+          "op": "set",
+          "source": "call_1#turn1"
         }
       ],
       "entities": [],
@@ -159,10 +176,10 @@
     }
   ],
   "gold": {
-    "intent": "hoi_gia_khuyen_mai",
+    "intent": "hoi_khuyen_mai_tuong_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "can_hoi_nguoi_nha",
-    "objection_handling": "Ghi nhận khách cần trao đổi với gia đình, hẹn liên hệ lại khi có chương trình mới.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

@@ -61,8 +61,11 @@ evaluation/agent-evaluation/runs/
 # User-supplied private ASR hard-test audio and references
 data/seed/catalog/asr_hard_vi/
 
-# A label revision being built (ground-truth-review/SKILL.md) stays local until it replaces data/dev.
+# A label revision being built (ground-truth-review/SKILL.md) stays local until it replaces data/dev or data/test.
+# Its build script and the reviewer's notes (ground-truth-review/notes/) are in git; the script rebuilds it.
 /data/dev-r*/
+/data/test-r*/
+/data/.build/
 
 # taste-skill's working files beside a page (its deal history, found photos, browser profiles).
 .taste-skill/

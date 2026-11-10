@@ -12,7 +12,7 @@
       "call_date": "2026-10-16",
       "customer_goal": "Mua máy lọc không khí AirPure Pro và áp dụng khuyến mãi.",
       "customer_turns": [
-        "Alo, chị Oanh đây, hôm nay chị muốn mua máy lọc không khí AirPure Pro.",
+        "Alo, chị Oanh đây, hôm nay chị muốn mua máy lọc không khí AirPure Pro. Phòng mới của chị khoảng 15 mét vuông.",
         "Chị đã thấy chương trình giảm giá tháng 10 và khuyến mãi thu cũ đổi mới, em ơi.",
         "Chị muốn áp dụng cả hai chương trình này cho đơn hàng của chị nhé, cộng cả hai cho chị nhé!",
         "À, chị đã chuyển nhà rồi, bây giờ chị giao ở Cầu Giấy, Hà Nội nhé.",
@@ -59,8 +59,7 @@
         "product_advised": "SKU-AP-PRO",
         "price_quoted_vnd": 7590000,
         "promo_code": "TRADE-IN-AP",
-        "promo_expiry": "2026-12-14",
-        "order_id": "OD600001"
+        "promo_expiry": "2026-12-14"
       },
       "must_carry_over": [
         "owned_sku"
@@ -69,12 +68,10 @@
         "owned_sku"
       ],
       "success_if": {
-        "tool_called": "order.create",
-        "args_match": {
-          "sku": "SKU-AP-PRO",
-          "price_vnd": 7590000,
-          "payment": "bank"
-        },
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
+        ],
         "forbidden_claims": [
           {
             "field": "price_vnd",
@@ -110,7 +107,6 @@
         "product_advised": "SKU-AP-PRO",
         "price_quoted_vnd": 7590000,
         "promo_code": "TRADE-IN-AP",
-        "order_id": "OD600001",
         "superseded": {
           "room_area_m2": 20,
           "delivery_area": "Đống Đa, Hà Nội"
@@ -124,7 +120,7 @@
         "VC-04",
         "PB-01"
       ],
-      "expected_outcome": "chot_don"
+      "expected_outcome": "hen_goi_lai"
     }
   }
 }

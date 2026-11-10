@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Phạm Thị D ạ, hôm trước chị có hỏi về Giày chạy bộ RunLite 2 Pro size 42 màu đen bên em, em xin phép cập nhật giá mới và ưu đãi hiện tại cho chị nhé.",
+      "text": "Dạ em chào chị Phạm Thị D ạ, hôm trước chị có hỏi về Giày chạy bộ RunLite 2 Pro size 42 màu đen, giá hôm nay em sẽ báo theo khuyến mãi hiện hành ạ.",
       "questions": [],
       "facts_used": [
         "size",
@@ -22,15 +22,10 @@
         "price_quoted_vnd",
         "promo_code",
         "order_id",
-        "owned_sku",
         "objection",
         "competitor_price_vnd"
       ],
       "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1521000
-        },
         {
           "field": "promo_RUN-10_active",
           "value": true
@@ -58,21 +53,13 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại Giày chạy bộ RunLite 2 Pro size 42 màu đen bên em đang có giá 1.521.000đ sau khuyến mãi RUN-10, hàng còn sẵn kho chị nha.",
+      "text": "Dạ, giá Giày chạy bộ RunLite 2 Pro size 42 màu đen hôm nay là 1.521.000đ chị nhé. Sản phẩm đang áp dụng khuyến mãi RUN-10 và còn hàng tại shop ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 1521000
-        },
-        {
-          "field": "promo_RUN-10_active",
-          "value": true
-        },
-        {
-          "field": "in_stock",
-          "value": true
         }
       ],
       "tool_calls": [],
@@ -93,10 +80,19 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xin phép giải thích, hôm trước chương trình RUN2-SALE đã hết hạn vào ngày 7/10, nên giá hiện nay áp dụng theo khuyến mãi RUN-10 đang còn hiệu lực chị nhé.",
+      "text": "Dạ em xin phép giải thích: chương trình RUN2-SALE mà shop báo hôm trước đã kết thúc từ ngày 7/10 rồi chị ạ. Giá hiện tại là theo khuyến mãi mới RUN-10, áp dụng đến ngày 25/10. Em rất mong chị thông cảm giúp em ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "promo_RUN2-SALE_active",
+          "value": false
+        },
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -107,7 +103,9 @@
     {
       "speaker": "customer",
       "text": "Chị vẫn thấy bên kia rẻ hơn.",
-      "facts_stated": {},
+      "facts_stated": {
+        "competitor_price_vnd": 1190000
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -115,7 +113,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em hiểu ạ, bên em cam kết hàng chính hãng, bảo hành 12 tháng, đổi trả 7 ngày và hỗ trợ miễn phí vận chuyển với đơn từ 500.000đ. Giá bên em đã áp dụng khuyến mãi tốt nhất hiện tại rồi chị ạ.",
+      "text": "Dạ em hiểu băn khoăn của chị về giá. Bên em cam kết chính hãng 100%, bảo hành 12 tháng và đổi trả trong 7 ngày nếu có lỗi. Giá đã là mức ưu đãi tốt nhất theo chương trình hiện hành rồi ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -137,16 +135,16 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, hiện tại khuyến mãi RUN-10 giảm 10% đang được áp dụng cho sản phẩm này, giá sau ưu đãi là 1.521.000đ chị nhé.",
+      "text": "Dạ hiện tại sản phẩm đang giảm 10% với mã RUN-10, chỉ còn 1.521.000đ, và miễn phí vận chuyển toàn quốc cho đơn từ 500.000đ trở lên chị nhé. Nếu chị đặt trước ngày 25/10 sẽ được giữ giá ưu đãi này ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 1521000
+          "field": "promo_RUN-10_active",
+          "value": true
         },
         {
-          "field": "promo_RUN-10_active",
+          "field": "promo_COD-0_active",
           "value": true
         }
       ],
@@ -159,44 +157,57 @@
     },
     {
       "speaker": "customer",
-      "text": "Chị sẽ gọi lại sau khi tham khảo thêm nhé.",
-      "facts_stated": {},
-      "entities": [],
+      "text": "Chị sẽ gọi lại sau khi tham khảo thêm nhé. Số chị là 0998000004.",
+      "facts_stated": {
+        "phone_provided": true
+      },
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0998000004",
+          "spoken": "0998000004"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, em ghi nhận thông tin của chị. Nếu cần tư vấn thêm hoặc chốt đơn, chị liên hệ lại bất cứ lúc nào nhé. Em cảm ơn chị ạ!",
+      "text": "Dạ em ghi nhận nhu cầu của chị, chị cứ cân nhắc thêm ạ. Khuyến mãi RUN-10 còn đến ngày 25/10, nếu chị quyết định mua em rất sẵn sàng hỗ trợ đặt đơn giá ưu đãi cho mình.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "promo_RUN-10_active",
+          "value": true
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [
         {
           "key": "product_advised",
           "value": "SKU-SN-RUN2",
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn11"
         },
         {
           "key": "price_quoted_vnd",
           "value": 1521000,
           "op": "supersede",
-          "source": "call_2#turn3"
+          "source": "call_2#turn11"
         },
         {
           "key": "variant_sku",
           "value": "SKU-SN-RUN2-42-DEN",
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn11"
         },
         {
           "key": "promo_code",
           "value": "RUN-10",
           "op": "supersede",
-          "source": "call_2#turn3"
+          "source": "call_2#turn11"
         }
       ],
       "entities": [],
@@ -206,10 +217,10 @@
     }
   ],
   "gold": {
-    "intent": "hoi_gia_lai_giay_runlite_2_pro",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "gia_cao_hon_noi_khac",
-    "objection_handling": "Nêu cam kết hàng chính hãng, bảo hành đổi trả, miễn phí vận chuyển và giải thích giá áp theo khuyến mãi hiện tại.",
+    "objection_type": "chê giá",
+    "objection_handling": "Giải thích giá thay đổi do hết khuyến mãi cũ, giới thiệu ưu đãi hiện tại, nhấn mạnh bảo hành và quyền lợi khách.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

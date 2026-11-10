@@ -12,44 +12,49 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào cô Loan ạ, em là trợ lý ảo của shop. Hôm trước cô có quan tâm Máy lọc nước RO Karofi 9 lõi và để lại thông tin giao hàng ở Cần Thơ, hôm nay cô muốn mình tiếp tục đặt hàng đúng không ạ?",
+      "text": "Dạ em chào cô Loan ạ, hôm trước em đã tư vấn cho cô về máy lọc nước RO Karofi 9 lõi, đúng không cô? Dạ cô muốn mình tiếp tục thế nào ạ?",
       "questions": [
         {
           "slot": "other",
           "type": "open",
-          "text": "Dạ em xác nhận cô là cô Loan gọi đúng không ạ?"
+          "text": "Em xác nhận với cô, mình là cô Loan, muốn hỏi tiếp về máy lọc nước RO Karofi 9 lõi đúng không ạ?"
         }
       ],
       "facts_used": [
-        "product_advised",
         "delivery_area",
-        "decision_maker"
+        "decision_maker",
+        "product_advised"
       ],
-      "claims": [],
+      "claims": [
+        {
+          "field": "product_advised",
+          "value": "SKU-WF-RO9"
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Chào em, cô Loan đây. Hôm trước em có tư vấn cho chị về máy lọc nước RO Karofi 9 lõi.",
-      "facts_stated": {},
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Chào em, cô Loan đây. Hôm trước em có tư vấn cho cô về máy lọc nước RO Karofi 9 lõi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn cô đã xác nhận ạ. Máy lọc nước RO Karofi 9 lõi hiện đang có hàng, giá 5.990.000đ cô nhé. Dạ, sản phẩm này phù hợp cho gia đình 3 người như nhu cầu của cô.",
+      "text": "Dạ vâng cô, hiện tại máy lọc nước RO Karofi 9 lõi đang còn hàng với giá 5.990.000đ.",
       "questions": [
         {
-          "slot": "budget_vnd",
-          "type": "confirm",
-          "text": "Ngân sách của cô là khoảng 6 triệu đúng không ạ?"
+          "slot": "usage_need",
+          "type": "open",
+          "text": "Cô mua cho mấy người dùng và có yêu cầu gì đặc biệt không ạ?"
         }
       ],
       "facts_used": [],
@@ -66,7 +71,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -78,31 +83,31 @@
         "budget_vnd": 6000000
       },
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận nhu cầu của cô là dùng cho gia đình 3 người, ngân sách 6 triệu. Cô chọn thanh toán qua ngân hàng và giao hàng đến Cần Thơ đúng không ạ?",
+      "text": "Dạ máy RO Karofi 9 lõi rất phù hợp cho gia đình 3 người, giá hiện tại là 5.990.000đ nằm trong ngân sách của cô. Cô muốn thanh toán và giao hàng như thế nào ạ?",
       "questions": [
         {
           "slot": "payment",
-          "type": "confirm",
-          "text": "Cô chọn thanh toán ngân hàng đúng không ạ?"
-        },
-        {
-          "slot": "delivery_area",
-          "type": "confirm",
-          "text": "Giao hàng đến Cần Thơ đúng không ạ?"
+          "type": "open",
+          "text": "Cô muốn thanh toán chuyển khoản ngân hàng hay nhận hàng trả tiền mặt ạ?"
         }
       ],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -114,25 +119,35 @@
         "delivery_area": "Cần Thơ"
       },
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn cô Loan. Em xin phép đọc lại đơn hàng: Máy lọc nước RO Karofi 9 lõi, 1 máy, giá 5.990.000đ, giao về Cần Thơ, thanh toán qua ngân hàng. Thời gian giao dự kiến là ngày 19/11/2026. Cô kiểm tra giúp em thông tin đã đúng và xác nhận để em lên đơn nhé ạ?",
+      "text": "Dạ cô chọn thanh toán chuyển khoản và giao hàng về Cần Thơ, em ghi nhận ạ. Dự kiến giao hàng trong 4 ngày làm việc, nhận hàng tại nhà cô ở Cần Thơ. Em xin phép đọc lại thông tin đơn hàng để cô kiểm tra giúp em nhé: 1 máy lọc nước RO Karofi 9 lõi, giá 5.990.000đ, thanh toán chuyển khoản, giao về Cần Thơ, dự kiến nhận ngày 19/11/2026. Cô xác nhận giúp em các thông tin trên đúng chưa ạ?",
       "questions": [
         {
           "slot": "order_summary",
           "type": "confirm",
-          "text": "Cô kiểm tra giúp em thông tin đã đúng và xác nhận để em lên đơn nhé ạ?"
+          "text": "Cô kiểm tra giúp em: 1 máy lọc nước RO Karofi 9 lõi, giá 5.990.000đ, chuyển khoản, giao Cần Thơ, nhận hàng ngày 19/11/2026. Đúng không cô ạ?"
         }
       ],
-      "facts_used": [],
+      "facts_used": [
+        "delivery_area"
+      ],
       "claims": [
         {
           "field": "price_vnd",
           "value": 5990000
+        },
+        {
+          "field": "delivery_days",
+          "value": 4
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-19"
         }
       ],
       "tool_calls": [
@@ -146,7 +161,7 @@
       ],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -155,13 +170,13 @@
       "text": "Em làm đơn giúp cô nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 700,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã tiếp nhận và lên đơn thành công cho cô: Máy lọc nước RO Karofi 9 lõi, giá 5.990.000đ, giao Cần Thơ, thanh toán ngân hàng. Dự kiến cô sẽ nhận hàng vào ngày 19/11/2026. Cảm ơn cô đã đặt hàng tại shop ạ!",
+      "text": "Dạ em lên đơn cho cô ngay bây giờ ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -184,30 +199,57 @@
           }
         }
       ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi em, lên đơn giúp cô nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng của cô đã được tạo thành công, dự kiến giao ngày 19/11/2026 về địa chỉ Cần Thơ. Khi nhận hàng, cô chỉ cần xác nhận với bên vận chuyển và thanh toán qua ngân hàng như đã đăng ký. Cảm ơn cô đã tin tưởng shop ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-19"
+        }
+      ],
+      "tool_calls": [],
       "memory_writes": [
         {
           "key": "usage_need",
           "value": "gia đình 3 người",
           "op": "set",
-          "source": "call_2#turn4"
+          "source": "call_2#turn5"
         },
         {
           "key": "budget_vnd",
           "value": 6000000,
           "op": "set",
-          "source": "call_2#turn4"
+          "source": "call_2#turn5"
         },
         {
           "key": "payment",
           "value": "bank",
           "op": "set",
-          "source": "call_2#turn6"
+          "source": "call_2#turn7"
         },
         {
           "key": "delivery_area",
           "value": "Cần Thơ",
           "op": "set",
-          "source": "call_2#turn6"
+          "source": "call_2#turn7"
         },
         {
           "key": "product_advised",
@@ -225,18 +267,9 @@
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_2#turn8"
+          "source": "call_2#turn9"
         }
       ],
-      "entities": [],
-      "pause_before_ms": 700,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Đúng rồi em, lên đơn giúp chị nhé.",
-      "facts_stated": {},
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -249,7 +282,7 @@
     "objection_type": null,
     "objection_handling": null,
     "sentiment": "positive",
-    "decision_maker": "con gái",
+    "decision_maker": null,
     "commitments": [],
     "supersedes": [],
     "callback": null,
@@ -259,6 +292,7 @@
       "price_vnd": 5990000,
       "payment": "bank",
       "address": "Cần Thơ",
+      "order_id": "OD600001",
       "estimated_delivery": "2026-11-19"
     }
   }

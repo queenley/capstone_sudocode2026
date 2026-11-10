@@ -12,12 +12,12 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Bích ạ, em là trợ lý ảo của shop BTC. Hôm trước chị có đặt Máy tiệt trùng sấy khô Moaz Bebe, đơn hàng đang xử lý. Chị muốn được tư vấn về máy lọc nước RO đúng không ạ?",
+      "text": "Dạ em chào chị Bích ạ, em là trợ lý ảo của shop BTC. Hôm trước chị có đặt Máy tiệt trùng sấy khô Moaz Bebe, hiện đơn hàng đó đang xử lý. Chị muốn mình tư vấn thêm về máy lọc nước RO đúng không ạ?",
       "questions": [
         {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Chị muốn được tư vấn về máy lọc nước RO đúng không ạ?"
+          "slot": "usage_need",
+          "type": "open",
+          "text": "Chị định dùng cho gia đình mấy người hay nhu cầu thế nào ạ?"
         }
       ],
       "facts_used": [
@@ -34,25 +34,34 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị Bích đây, chị muốn hỏi về máy lọc nước RO ấy.",
-      "facts_stated": {},
+      "text": "Alo, chị Bích đây, chị muốn hỏi về máy lọc nước RO ấy. Ngân sách của chị tầm 7 triệu.",
+      "facts_stated": {
+        "budget_vnd": 7000000
+      },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, chị có thể chia sẻ nhu cầu sử dụng hay số lượng thành viên trong gia đình để em tư vấn loại phù hợp không ạ?",
+      "text": "Dạ với ngân sách khoảng 7 triệu, em tư vấn chị máy lọc nước RO Karofi 9 lõi phù hợp cho gia đình. Dòng này đáp ứng cho 4–6 người dùng nước máy, lọc được 9 cấp và có bình chứa 10 lít.",
       "questions": [
         {
           "slot": "usage_need",
-          "type": "open",
-          "text": "Chị có thể chia sẻ nhu cầu sử dụng hay số lượng thành viên trong gia đình để em tư vấn loại phù hợp không ạ?"
+          "type": "confirm",
+          "text": "Nhà mình là 4 người như chị chia sẻ đúng không ạ?"
         }
       ],
-      "facts_used": [],
-      "claims": [],
+      "facts_used": [
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -67,20 +76,39 @@
         "usage_need": "gia đình 4 người"
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ với gia đình 4 người, chị nên chọn máy lọc nước RO 9 lõi Karofi, đáp ứng tốt nhu cầu sử dụng nước hàng ngày và phù hợp nguồn nước máy thành phố. Máy này lọc sạch, cho nước uống trực tiếp luôn ạ.",
+      "text": "Dạ cho gia đình 4 người thì máy RO Karofi 9 lõi là phù hợp nhất chị nha. Máy này giá 5.990.000đ, hiện đang còn hàng tại shop. Sản phẩm chưa có chương trình khuyến mãi giảm giá, nhưng đã miễn phí vận chuyển toàn quốc cho đơn trên 2 triệu đồng rồi ạ.",
       "questions": [],
-      "facts_used": [],
-      "claims": [],
+      "facts_used": [
+        "usage_need"
+      ],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5990000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -89,13 +117,13 @@
       "text": "Máy này có giá bao nhiêu và có khuyến mãi gì không em?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ máy lọc nước RO Karofi 9 lõi hiện giá 5.990.000đ, hiện chưa có chương trình khuyến mãi giảm giá nào cho dòng này chị nha. Đơn từ 500.000đ bên em miễn phí vận chuyển toàn quốc, và nhận thanh toán khi nhận hàng không mất phí thu hộ.",
+      "text": "Dạ máy Karofi 9 lõi hiện giá 5.990.000đ, chị được miễn phí vận chuyển và hỗ trợ thanh toán khi nhận hàng (COD) không mất phí. Hiện tại chưa có chương trình giảm thêm cho sản phẩm này chị nha.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -106,18 +134,16 @@
         {
           "field": "promo_active",
           "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "5990000",
-          "spoken": "5.990.000đ"
-        }
-      ],
-      "pause_before_ms": 600,
+      "entities": [],
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
@@ -128,26 +154,22 @@
         "blocker": "muốn so sánh thêm"
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, chị có thể cho em biết các sản phẩm chị muốn so sánh để em chuẩn bị thông tin chi tiết gửi chị nhé. Khi nào chị cần thêm hỗ trợ, em luôn sẵn sàng ạ.",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "open",
-          "text": "Chị có thể cho em biết các sản phẩm chị muốn so sánh để em chuẩn bị thông tin chi tiết gửi chị nhé."
-        }
+      "text": "Dạ em ghi nhận nhu cầu so sánh thêm của chị. Khi nào cần tư vấn chi tiết từng mẫu máy hoặc muốn xem bảng so sánh, chị cứ liên hệ lại shop em hỗ trợ ngay ạ.",
+      "questions": [],
+      "facts_used": [
+        "blocker"
       ],
-      "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
@@ -156,13 +178,13 @@
       "text": "Chị sẽ gọi lại sau nhé, để chị tham khảo thêm.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận nhu cầu của chị, khi nào chị cần tư vấn thêm hoặc muốn đặt hàng, chị cứ gọi lại cho shop bất cứ lúc nào ạ. Cảm ơn chị đã quan tâm sản phẩm bên em.",
+      "text": "Dạ vâng chị Bích tham khảo thêm rồi cần hỗ trợ khi nào cứ nhắn hoặc gọi lại cho shop nhé. Em lưu lại nhu cầu của mình, khi chị sẵn sàng quyết định cứ báo em ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -172,26 +194,44 @@
           "key": "usage_need",
           "value": "gia đình 4 người",
           "op": "set",
-          "source": "call_1#turn4"
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 7000000,
+          "op": "set",
+          "source": "call_1#turn2"
         },
         {
           "key": "blocker",
           "value": "muốn so sánh thêm",
           "op": "set",
           "source": "call_1#turn8"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-WF-RO9",
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5990000,
+          "op": "set",
+          "source": "call_1#turn5"
         }
       ],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "hen_goi_lai",
+    "intent": "tu_van_san_pham",
     "outcome": "hen_goi_lai",
-    "objection_type": "muốn so sánh thêm",
-    "objection_handling": "Đã ghi nhận nhu cầu so sánh thêm và đề nghị hỗ trợ thêm thông tin khi khách cần.",
+    "objection_type": "muốn_so_sánh_thêm",
+    "objection_handling": "Ghi nhận nhu cầu so sánh, hướng dẫn liên hệ lại khi cần.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

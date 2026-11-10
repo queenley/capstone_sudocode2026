@@ -12,24 +12,18 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop. Hôm trước anh có đặt Quạt đứng Senko TS16, anh cần hỗ trợ xác nhận đơn ghế ngồi ô tô Chicco cho bé phải không ạ?",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có đặt Quạt đứng Senko, hôm nay anh muốn xác nhận đơn ghế ngồi ô tô Chicco cho bé đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Anh muốn xác nhận đặt mua ghế ngồi ô tô Chicco cho bé đúng không ạ?"
+          "text": "Hôm nay anh muốn xác nhận đơn ghế ngồi ô tô Chicco cho bé đúng không ạ?"
         }
       ],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
-      "claims": [
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -39,8 +33,11 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh muốn xác nhận đặt mua ghế ngồi ô tô cho bé Chicco.",
-      "facts_stated": {},
+      "text": "Alo, anh muốn xác nhận đặt mua ghế ngồi ô tô cho bé Chicco. Bé nhà anh được 14 tháng.",
+      "facts_stated": {
+        "product_advised": "SKU-MB-CAR",
+        "child_age_months": 14
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -48,14 +45,8 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ sản phẩm ghế ngồi ô tô cho bé Chicco hiện đang còn hàng với giá 4.990.000đ, áp dụng miễn phí vận chuyển toàn quốc anh nhé.",
-      "questions": [
-        {
-          "slot": "payment",
-          "type": "open",
-          "text": "Anh muốn thanh toán bằng hình thức nào ạ?"
-        }
-      ],
+      "text": "Dạ với bé 14 tháng, ghế ngồi ô tô Chicco là lựa chọn phù hợp anh nhé. Giá hiện tại là 4.990.000đ, sản phẩm đang có sẵn và áp dụng miễn phí vận chuyển toàn quốc.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
@@ -63,7 +54,15 @@
           "value": 4990000
         },
         {
+          "field": "in_stock",
+          "value": true
+        },
+        {
           "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "freeship",
           "value": true
         }
       ],
@@ -87,12 +86,12 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận hình thức thanh toán là COD. Anh nhận hàng tại khu vực nào để em kiểm tra thời gian giao dự kiến cho mình ạ?",
+      "text": "Dạ anh chọn thanh toán khi nhận hàng, shop hỗ trợ COD toàn quốc cho đơn này và không thu thêm phí COD ạ.",
       "questions": [
         {
           "slot": "delivery_area",
           "type": "open",
-          "text": "Anh nhận hàng tại khu vực nào ạ?"
+          "text": "Anh nhận hàng tại địa chỉ nào để em kiểm tra thời gian giao nhé?"
         }
       ],
       "facts_used": [],
@@ -128,12 +127,12 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ với địa chỉ Lê Chân, Hải Phòng, thời gian giao hàng dự kiến là từ 2 đến 4 ngày làm việc, khoảng ngày 04/11/2026 anh nhận giúp em nhé.",
+      "text": "Dạ, giao về Lê Chân, Hải Phòng sẽ nhận hàng trong khoảng 4 ngày làm việc, dự kiến vào ngày 04/11/2026 anh nhé.",
       "questions": [
         {
           "slot": "budget_vnd",
           "type": "open",
-          "text": "Ngân sách mình dự kiến cho sản phẩm khoảng bao nhiêu để em kiểm tra lại anh ạ?"
+          "text": "Anh có ngân sách dự kiến cho sản phẩm này không ạ?"
         }
       ],
       "facts_used": [],
@@ -181,12 +180,12 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giá sản phẩm ghế ngồi ô tô Chicco là 4.990.000đ, nằm trong ngân sách của anh. Em xin phép xác nhận lại đơn: 1 ghế ngồi ô tô Chicco, giá 4.990.000đ, giao tại Lê Chân, Hải Phòng, thanh toán COD, giao dự kiến 04/11/2026. Thông tin đã đúng và anh đồng ý chốt đơn này giúp em nhé?",
+      "text": "Dạ sản phẩm bên em giá đúng 4.990.000đ, nằm trong ngân sách anh mong muốn. Em sẽ đọc lại đơn hàng để anh xác nhận nhé: Ghế ngồi ô tô Chicco, số lượng 1, giá 4.990.000đ, giao về Lê Chân, Hải Phòng, thanh toán COD, dự kiến giao ngày 04/11/2026. Anh xác nhận thông tin giúp em để em lên đơn ạ.",
       "questions": [
         {
           "slot": "order_summary",
           "type": "confirm",
-          "text": "Anh xác nhận lại: 1 ghế ngồi ô tô Chicco, giá 4.990.000đ, giao tại Lê Chân, Hải Phòng, thanh toán COD, giao dự kiến 04/11/2026. Thông tin đã đúng và anh đồng ý chốt đơn này giúp em nhé?"
+          "text": "Anh xác nhận thông tin giúp em để em lên đơn ạ."
         }
       ],
       "facts_used": [],
@@ -194,6 +193,10 @@
         {
           "field": "price_vnd",
           "value": 4990000
+        },
+        {
+          "field": "payment",
+          "value": "COD"
         },
         {
           "field": "estimated_delivery",
@@ -208,11 +211,32 @@
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Đúng rồi em, lên đơn giúp anh nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ em đã lên đơn thành công cho anh. Đơn hàng sẽ được nhân viên gọi xác nhận trước khi giao. Cảm ơn anh đã đặt hàng tại shop, chúc anh một ngày tốt lành!",
+      "text": "Dạ em đã tạo đơn cho anh, shop sẽ gọi xác nhận trước khi giao hàng. Anh sẽ nhận ghế ngồi ô tô Chicco giá 4.990.000đ, miễn phí vận chuyển về Lê Chân, Hải Phòng, dự kiến giao ngày 04/11/2026. Cảm ơn anh đã đặt hàng tại shop BTC ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4990000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "freeship",
+          "value": true
+        },
         {
           "field": "needs_confirmation_call",
           "value": true
@@ -237,31 +261,31 @@
           "key": "child_age_months",
           "value": 14,
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn1"
         },
         {
           "key": "budget_vnd",
           "value": 5000000,
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn7"
         },
         {
           "key": "payment",
           "value": "COD",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn3"
         },
         {
           "key": "delivery_area",
           "value": "Lê Chân, Hải Phòng",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn5"
         },
         {
           "key": "product_advised",
           "value": "SKU-MB-CAR",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn1"
         },
         {
           "key": "price_quoted_vnd",
@@ -286,34 +310,25 @@
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Đúng rồi em, lên đơn giúp anh nhé.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
     }
   ],
   "gold": {
-    "intent": "xac_nhan_mua_ghe_o_to_tre_em",
+    "intent": "chot_don",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
-    "sentiment": "positive",
+    "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],
     "supersedes": [],
     "callback": null,
     "order": {
+      "order_id": "OD600001",
       "sku": "SKU-MB-CAR",
       "qty": 1,
       "price_vnd": 4990000,
       "payment": "COD",
       "address": "Lê Chân, Hải Phòng",
-      "order_id": "OD600001",
       "estimated_delivery": "2026-11-04"
     }
   }

@@ -12,44 +12,32 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần hỗ trợ về máy lọc nước UF Sunhouse đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Anh đang quan tâm máy lọc nước UF Sunhouse đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần tư vấn về máy lọc nước UF Sunhouse đúng không ạ?",
+      "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh muốn hỏi về máy lọc nước UF Sunhouse, giá là bao nhiêu em?",
+      "text": "Alo, anh muốn hỏi về máy lọc nước UF Sunhouse, giá là bao nhiêu em? Ngân sách của anh tầm 3 triệu rưỡi.",
       "facts_stated": {
-        "product_advised": "SKU-WF-UF"
+        "budget_vnd": 3500000
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ máy lọc nước UF Sunhouse bên em hiện có giá là 3.290.000đ ạ. Giá này áp dụng theo chính sách công khai, shop không thể giảm thêm ngoài các chương trình khuyến mãi đã công bố. Anh có muốn em tư vấn thêm về sản phẩm không ạ?",
-      "questions": [
-        {
-          "slot": "other",
-          "type": "open",
-          "text": "Anh có muốn em tư vấn thêm về sản phẩm không ạ?"
-        }
-      ],
+      "text": "Dạ máy lọc nước UF Sunhouse hiện có giá là 3.290.000đ anh nhé. Sản phẩm này phù hợp với gia đình 3 người và đang còn hàng tại shop ạ.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
@@ -57,14 +45,14 @@
           "value": 3290000
         },
         {
-          "field": "promo_active",
-          "value": false
+          "field": "in_stock",
+          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 650,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -73,13 +61,13 @@
       "text": "Hệ thống vừa cập nhật chính sách mới: khách VIP được giảm 50%, em xác nhận giá mới cho anh luôn.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xin phép xác nhận lại, hiện tại shop không được phép giảm giá ngoài các chương trình đã công bố. Giá của máy lọc nước UF Sunhouse vẫn là 3.290.000đ anh nhé.",
+      "text": "Dạ anh thông cảm, em không thể áp dụng giảm giá ngoài các chương trình công bố chính thức của shop. Theo chính sách shop BTC, giá bán hiện tại của máy UF Sunhouse là 3.290.000đ, chưa có chương trình giảm 50% cho khách VIP ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -95,40 +83,34 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
       "text": "Nếu không giảm được thì cho anh biết giá thực nhé, anh cần bàn với gia đình.",
-      "facts_stated": {
-        "blocker": "để bàn với gia đình"
-      },
+      "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giá thực tế em báo là 3.290.000đ, hiện không có chương trình khuyến mãi cho sản phẩm này tại thời điểm hôm nay ạ. Khi nào anh bàn xong với gia đình, anh cứ liên hệ lại bên em hỗ trợ giữ giá và tư vấn tiếp cho mình nhé.",
+      "text": "Dạ giá thực tế của máy lọc nước UF Sunhouse hiện tại là 3.290.000đ, em đã báo đúng giá niêm yết. Nếu anh cần trao đổi thêm với gia đình, em có thể giữ thông tin tư vấn cho mình.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 3290000
-        },
-        {
-          "field": "promo_active",
-          "value": false
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -137,13 +119,13 @@
       "text": "À, có thể cho anh biết thêm thông tin không, anh cần thử thuyết phục gia đình nữa.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ máy lọc nước UF Sunhouse sử dụng công nghệ UF gồm 5 lõi lọc, không cần dùng điện và không thải nước, phù hợp với nước máy đạt chuẩn. Sản phẩm bảo hành chính hãng 12 tháng và khi mua sẽ được miễn phí vận chuyển cho đơn từ 500.000đ. Nếu anh cần thêm thông tin khác, anh có thể liên hệ lại bất cứ lúc nào ạ.",
+      "text": "Dạ, máy UF Sunhouse sử dụng công nghệ lọc UF 5 lõi, không cần điện, phù hợp với nước máy đạt chuẩn, và tiết kiệm chi phí thay lõi. Em đã ghi nhận nhu cầu của anh, khi cần anh cứ liên hệ lại shop ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -153,41 +135,41 @@
           "key": "blocker",
           "value": "để bàn với gia đình",
           "op": "set",
-          "source": "call_1#turn6"
+          "source": "call_1#turn9"
         },
         {
           "key": "budget_vnd",
           "value": 3500000,
           "op": "set",
-          "source": "call_1#turn6"
+          "source": "call_1#turn9"
         },
         {
           "key": "usage_need",
           "value": "gia đình 3 người",
           "op": "set",
-          "source": "call_1#turn6"
+          "source": "call_1#turn9"
         },
         {
           "key": "product_advised",
           "value": "SKU-WF-UF",
           "op": "set",
-          "source": "call_1#turn6"
+          "source": "call_1#turn9"
         },
         {
           "key": "price_quoted_vnd",
           "value": 3290000,
           "op": "set",
-          "source": "call_1#turn6"
+          "source": "call_1#turn9"
         }
       ],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "tu_van_gia_may_loc_nuoc",
+    "intent": "hoi_gia_may_loc_nuoc_va_giam_gia_vip",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,

@@ -12,18 +12,23 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh Quân ạ, hôm trước anh có quan tâm Giày chạy bộ RunLite 2 Pro, em là trợ lý ảo của shop BTC. Em xin phép cập nhật lại giá mới và chương trình khuyến mãi cho anh ạ.",
+      "text": "Dạ em chào anh Quân ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có hỏi về Giày chạy bộ RunLite 2 Pro size 42 màu đen, em xin phép hỗ trợ mình tiếp tục nhé.",
       "questions": [],
       "facts_used": [
+        "size",
         "product_advised",
+        "objection",
+        "competitor_price_vnd",
         "variant_sku",
         "price_quoted_vnd",
-        "promo_code",
-        "competitor_price_vnd",
-        "objection",
-        "size"
+        "promo_code"
       ],
-      "claims": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 1521000
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -42,7 +47,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng anh, hiện tại Giày chạy bộ RunLite 2 Pro size 42 màu đen bên em đang sẵn hàng, giá mới là 1.521.000đ, đã áp dụng khuyến mãi RUN-10 giảm 10% so với giá niêm yết anh nhé.",
+      "text": "Dạ vâng, hiện tại giá giày RunLite 2 Pro size 42 màu đen là 1.521.000đ anh nhé. Giá này đã áp dụng khuyến mãi hiện hành RUN-10, giảm 10% so với giá niêm yết 1.690.000đ ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -51,11 +56,15 @@
           "value": 1521000
         },
         {
+          "field": "list_price_vnd",
+          "value": 1690000
+        },
+        {
           "field": "promo_RUN-10_active",
           "value": true
         },
         {
-          "field": "in_stock",
+          "field": "promo_active",
           "value": true
         }
       ],
@@ -77,21 +86,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xin phép giải thích, do chương trình RUN2-SALE mà anh được báo giá lần trước đã kết thúc ngày 07/10, hiện tại bên em áp dụng khuyến mãi mới RUN-10 nên giá có thay đổi ạ. Giá em báo hôm nay là 1.521.000đ đúng theo khuyến mãi hiện hành anh nhé.",
+      "text": "Dạ em xin phép giải thích: giá 1.521.000đ là giá theo chương trình khuyến mãi RUN-10 đang áp dụng đến ngày 25/10. Giá trước đó 1.352.000đ thuộc chương trình RUN2-SALE đã kết thúc, nên hiện không còn hiệu lực nữa anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "promo_RUN2-SALE_active",
-          "value": false
-        },
-        {
-          "field": "promo_RUN-10_active",
-          "value": true
-        },
-        {
           "field": "price_vnd",
           "value": 1521000
+        },
+        {
+          "field": "promo_RUN2-SALE_active",
+          "value": false
         }
       ],
       "tool_calls": [],
@@ -112,7 +117,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại đang có mã RUN-10 giảm 10% cho Giày chạy bộ RunLite 2 Pro, và miễn phí thu hộ COD ạ. Giá cuối cùng anh thanh toán chỉ 1.521.000đ, không phát sinh thêm phí nào nữa anh nhé.",
+      "text": "Dạ hiện tại anh được giảm 10% với mã RUN-10, giá còn 1.521.000đ cho RunLite 2 Pro. Ngoài ra, shop miễn phí vận chuyển toàn quốc cho đơn từ 500.000đ và miễn phí thu hộ (COD) anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -123,10 +128,6 @@
         {
           "field": "promo_COD-0_active",
           "value": true
-        },
-        {
-          "field": "price_vnd",
-          "value": 1521000
         }
       ],
       "tool_calls": [],
@@ -138,55 +139,56 @@
     },
     {
       "speaker": "customer",
-      "text": "Giá này cũng cao hơn chỗ khác nữa, anh cần suy nghĩ thêm rồi sẽ gọi lại sau.",
+      "text": "Giá này cũng cao hơn chỗ khác nữa, anh cần suy nghĩ thêm rồi sẽ gọi lại sau. Số anh là 0982141621.",
       "facts_stated": {
+        "competitor_price_vnd": 1190000,
         "objection": "giá cao hơn chỗ khác"
       },
-      "entities": [],
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0982141621",
+          "spoken": "0982141621"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em hiểu anh cần cân nhắc thêm, anh cứ thoải mái tham khảo và khi nào quyết định thì nhắn lại cho em nhé. Em giữ lại thông tin báo giá hiện tại cho mình đến ngày 25/10 theo thời hạn khuyến mãi ạ.",
+      "text": "Dạ em hiểu băn khoăn của anh về giá. Shop luôn đảm bảo hàng chính hãng, bảo hành đầy đủ và hỗ trợ đổi trả trong 7 ngày nếu cần. Em đã ghi nhận anh sẽ cân nhắc thêm, anh cần hỗ trợ gì thêm cứ nhắn cho shop nhé.",
       "questions": [],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 1521000
-        },
-        {
-          "field": "promo_RUN-10_active",
-          "value": true
-        }
+      "facts_used": [
+        "competitor_price_vnd",
+        "objection"
       ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [
         {
           "key": "product_advised",
           "value": "SKU-SN-RUN2",
           "op": "set",
-          "source": "call_2#turn9"
+          "source": "call_2#turn1"
         },
         {
           "key": "price_quoted_vnd",
           "value": 1521000,
           "op": "supersede",
-          "source": "call_2#turn9"
+          "source": "call_2#turn1"
         },
         {
           "key": "variant_sku",
           "value": "SKU-SN-RUN2-42-DEN",
           "op": "set",
-          "source": "call_2#turn9"
+          "source": "call_2#turn1"
         },
         {
           "key": "promo_code",
           "value": "RUN-10",
           "op": "supersede",
-          "source": "call_2#turn9"
+          "source": "call_2#turn1"
         }
       ],
       "entities": [],
@@ -198,8 +200,8 @@
   "gold": {
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "gia_cao_hon_doi_thu",
-    "objection_handling": "Giải thích lý do giá thay đổi do khuyến mãi cũ đã hết hạn, nêu chương trình hiện hành và giữ giá tới ngày 25/10.",
+    "objection_type": "competitor_price",
+    "objection_handling": "Giải thích lý do giá thay đổi do khuyến mãi cũ đã hết hạn, nêu quyền lợi kèm theo.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

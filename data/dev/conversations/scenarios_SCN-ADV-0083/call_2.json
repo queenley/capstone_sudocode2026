@@ -12,11 +12,10 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm qua anh có hỏi về nồi chiên không dầu, em sẵn sàng hỗ trợ tiếp cho anh nhé.",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước em có tư vấn cho anh về nồi chiên không dầu, mình cần em hỗ trợ tiếp thông tin nào không anh?",
       "questions": [],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
       "claims": [],
       "tool_calls": [],
@@ -28,24 +27,22 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh gọi lại đây, hôm qua em có tư vấn nồi chiên không dầu cho anh.",
-      "facts_stated": {},
+      "text": "Alo, anh gọi lại đây, hôm qua em có tư vấn nồi chiên không dầu cho anh. Ngân sách của anh tầm 2 triệu.",
+      "facts_stated": {
+        "budget_vnd": 2000000
+      },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn anh đã gọi lại. Anh muốn tìm hiểu về nồi chiên không dầu Xiaomi 4.5L đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Anh muốn tìm hiểu về nồi chiên không dầu Xiaomi 4.5L đúng không ạ?"
-        }
+      "text": "Dạ em cảm ơn anh đã gọi lại ạ. Với ngân sách khoảng 2 triệu, nồi chiên không dầu Xiaomi 4.5L đang là lựa chọn rất phù hợp cho gia đình mình, anh nhé.",
+      "questions": [],
+      "facts_used": [
+        "budget_vnd"
       ],
-      "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
@@ -59,23 +56,19 @@
       "text": "Cho anh hỏi nồi chiên không dầu Xiaomi 4.5L giá bao nhiêu vậy em?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 300,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ nồi chiên không dầu Xiaomi 4.5L hiện tại giá là 1.590.000đ anh nhé. Sản phẩm đang có sẵn hàng tại shop ạ.",
+      "text": "Dạ giá nồi chiên không dầu Xiaomi 4.5L hiện tại là 1.590.000đ anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 1590000
-        },
-        {
-          "field": "in_stock",
-          "value": true
         }
       ],
       "tool_calls": [],
@@ -90,13 +83,13 @@
       "text": "Em có khuyến mãi gì cho nồi chiên không dầu này không?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 350,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại nồi chiên không dầu Xiaomi 4.5L chưa có chương trình khuyến mãi giảm giá nào anh ạ. Tuy nhiên, khi mua anh được miễn phí thu hộ COD nếu chọn thanh toán khi nhận hàng ạ.",
+      "text": "Dạ hiện tại nồi chiên không dầu Xiaomi 4.5L chưa có chương trình khuyến mãi áp dụng riêng anh ạ. Tuy nhiên, đơn từ 500.000đ bên em vẫn hỗ trợ miễn phí vận chuyển toàn quốc cho đơn gia dụng, và đơn này cũng được kiểm tra hàng trước khi thanh toán.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -120,17 +113,17 @@
       "speaker": "customer",
       "text": "Anh dự định mua cho gia đình nhưng vẫn chưa quyết định, chờ lương cuối tháng đã.",
       "facts_stated": {
-        "usage_need": "dùng cho gia đình",
-        "blocker": "chờ cuối tháng nhận lương"
+        "blocker": "chờ cuối tháng nhận lương",
+        "usage_need": "dùng cho gia đình"
       },
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận nhu cầu dùng cho gia đình của anh và thông tin anh sẽ cân nhắc khi nhận lương cuối tháng. Anh cứ yên tâm, em sẽ giữ lại thông tin và liên hệ lại theo ý anh nhé.",
+      "text": "Dạ em ghi nhận nhu cầu của anh là mua cho gia đình và hiện anh đang chờ lương cuối tháng. Khi nào anh sẵn sàng đặt hàng, anh chỉ cần gọi lại cho shop hoặc nhắn Zalo OA bên em hỗ trợ ngay ạ.",
       "questions": [],
       "facts_used": [
         "usage_need",
@@ -149,32 +142,6 @@
       "text": "À, nếu có gì thì em gọi cho anh nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 350,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ vâng anh, em sẽ chủ động liên hệ lại với anh vào cuối tháng để hỗ trợ nếu anh cần mua nồi chiên không dầu Xiaomi 4.5L nhé. Em cảm ơn anh đã quan tâm đến sản phẩm của shop.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [
-        {
-          "key": "usage_need",
-          "value": "dùng cho gia đình",
-          "op": "set",
-          "source": "call_2#turn8"
-        },
-        {
-          "key": "blocker",
-          "value": "chờ cuối tháng nhận lương",
-          "op": "set",
-          "source": "call_2#turn8"
-        }
-      ],
-      "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
@@ -183,20 +150,18 @@
   "gold": {
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "chờ lương cuối tháng",
-    "objection_handling": "Ghi nhận nhu cầu và hẹn liên hệ lại khi khách đã nhận lương.",
+    "objection_type": "chờ lương/cuối tháng",
+    "objection_handling": "Ghi nhận nhu cầu và blocker, hướng dẫn khách chủ động liên hệ khi sẵn sàng đặt hàng.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [
       {
-        "hứa_gọi_lại_cuối_tháng": "Sẽ liên hệ lại với anh khi anh nhận lương cuối tháng"
+        "type": "callback_offer",
+        "value": "Sẽ liên hệ lại khi có ưu đãi hoặc khi khách cần."
       }
     ],
     "supersedes": [],
-    "callback": {
-      "timeframe": "cuối tháng 10/2026",
-      "reason": "Khách chờ nhận lương, hẹn gọi lại để chốt mua nồi chiên không dầu Xiaomi 4.5L"
-    },
+    "callback": null,
     "order": null
   }
 }

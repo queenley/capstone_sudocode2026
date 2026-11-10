@@ -138,6 +138,9 @@ def parser() -> argparse.ArgumentParser:
     parser.add_argument("--asr-transcribe", action="store_true", help="Explicitly decode existing audio with local ASR; never downloads weights.")
     parser.add_argument("--asr-model", default="zipformer-30m")
     parser.add_argument("--asr-denoiser", choices=["none", "rnnoise"], default="none")
+    parser.add_argument("--asr-turns", action="store_true",
+                        help="With --asr-transcribe: split each call by speaker into turns[] (idx, speaker A/C, start, end) "
+                             "for the organisers' per-turn entity accuracy and diarization; implausible splits give no turns")
     parser.add_argument("--asr-entity-review", type=Path, help="Versioned canonical entity labels; pending review stays diagnostic, never self-approved.")
     parser.add_argument("--performance", nargs="?", const=True, type=Path, metavar="RUN_DIR",
                         help="Print the speed and cost table: of this run, or, given RUN_DIR, of a finished one (no model call).")
@@ -229,7 +232,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 asr.private_output(out)
                 source = prepare(args.asr_package, out / "input", unit=args.asr_unit, only=set(args.only) or None)
                 result = asr.evaluate(source, args.asr_hypotheses, out / "result", model=args.asr_model,
-                                      transcribe=args.asr_transcribe, entity_review=args.asr_entity_review, denoiser=args.asr_denoiser)
+                                      transcribe=args.asr_transcribe, entity_review=args.asr_entity_review, denoiser=args.asr_denoiser,
+                                      turns=args.asr_turns)
                 print(json.dumps({"status": result["status"], "main_scorer": result["main_scorer"],
                                   "entity_accuracy_a5": result.get("entity_accuracy_a5"), "out": str(out)}, ensure_ascii=False, indent=2))
                 return 0 if result["status"] == "COMPLETE" else 1
@@ -241,7 +245,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 print(f"Private evidence: {out}")
                 return 0
             result = asr.evaluate(args.asr, args.asr_hypotheses, out, model=args.asr_model,
-                                  transcribe=args.asr_transcribe, only=set(args.only) or None, entity_review=args.asr_entity_review, denoiser=args.asr_denoiser)
+                                  transcribe=args.asr_transcribe, only=set(args.only) or None, entity_review=args.asr_entity_review, denoiser=args.asr_denoiser,
+                                      turns=args.asr_turns)
         except (ValueError, OSError, RuntimeError, ImportError) as error:
             print(f"ASR setup error: {error}")
             return 2

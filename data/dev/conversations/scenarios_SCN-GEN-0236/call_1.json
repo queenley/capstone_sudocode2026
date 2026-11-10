@@ -12,30 +12,31 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có đặt Áo phao lông vũ Warmly, đơn hàng đang giao phải không anh? Anh cần em hỗ trợ về quạt đứng DC inverter Panasonic F-409 đúng không ạ?",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop. Hôm trước anh có đặt Áo phao lông vũ Warmly, đơn đang giao. Anh muốn tìm hiểu về quạt đứng DC inverter Panasonic F-409 đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Anh cần em hỗ trợ về quạt đứng DC inverter Panasonic F-409 đúng không ạ?"
+          "text": "Anh muốn tìm hiểu về quạt đứng DC inverter Panasonic F-409 đúng không ạ?"
         }
       ],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh muốn hỏi về quạt đứng DC inverter Panasonic F-409.",
-      "facts_stated": {},
+      "text": "Alo, anh muốn hỏi về quạt đứng DC inverter Panasonic F-409. Ngân sách của anh tầm 3 triệu.",
+      "facts_stated": {
+        "budget_vnd": 3000000
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -43,51 +44,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, quạt đứng DC inverter Panasonic F-409 là mẫu quạt tiết kiệm điện, chạy rất êm và có 9 mức gió, remote điều khiển từ xa, phù hợp dùng trong gia đình anh ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Máy này dùng có ổn không em?",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, sản phẩm này được nhiều khách đánh giá chạy ổn định, độ ồn thấp chỉ 22 dB ở mức thấp nhất, công suất 25W, bảo hành 12 tháng chính hãng anh nhé.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 700,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Giá của nó là bao nhiêu vậy?",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, quạt đứng DC inverter Panasonic F-409 hiện bên em đang bán giá 2.450.000đ anh nhé. Sản phẩm đang có sẵn hàng tại shop.",
+      "text": "Dạ quạt Panasonic F-409 là dòng DC inverter tiết kiệm điện, êm và có remote điều khiển. Sản phẩm này phù hợp dùng phòng khách hoặc phòng ngủ, công suất 25W, có 9 mức gió và độ ồn rất thấp chỉ 22 dB ở mức nhỏ nhất.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -103,7 +60,60 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này dùng có ổn không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ quạt Panasonic F-409 được đánh giá là chạy rất ổn định, bền, tiết kiệm điện và vận hành êm á anh. Ngoài ra, máy còn có remote tiện lợi và chế độ hẹn giờ tới 8 tiếng, phù hợp dùng lâu dài.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giá của nó là bao nhiêu vậy?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại giá bán của quạt đứng Panasonic F-409 là 2.450.000đ anh nhé. Sản phẩm đang sẵn hàng tại shop, giá đã bao gồm remote và bảo hành chính hãng 12 tháng.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2450000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -120,7 +130,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, anh cứ suy nghĩ thêm ạ. Khi nào anh có quyết định hoặc cần hỗ trợ gì thêm về quạt Panasonic F-409, anh cứ liên hệ lại với shop em nhé. Em sẽ lưu lại thông tin để hỗ trợ anh lần tới.",
+      "text": "Dạ vâng, anh cứ cân nhắc thêm nhé. Khi nào anh quyết định hoặc cần tư vấn thêm về quạt Panasonic F-409 thì liên hệ lại cho shop, em luôn sẵn sàng hỗ trợ anh ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -130,11 +140,29 @@
           "key": "blocker",
           "value": "cần suy nghĩ thêm",
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 3000000,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-FAN-DC1",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 2450000,
+          "op": "set",
+          "source": "call_1#turn7"
         }
       ],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
@@ -142,8 +170,8 @@
   "gold": {
     "intent": "tu_van_san_pham",
     "outcome": "hen_goi_lai",
-    "objection_type": "chua_quyet_dinh",
-    "objection_handling": "Đã ghi nhận khách cần suy nghĩ thêm, hẹn khách khi nào quyết định liên hệ lại",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

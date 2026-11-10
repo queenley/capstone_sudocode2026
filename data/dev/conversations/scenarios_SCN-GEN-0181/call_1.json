@@ -12,12 +12,12 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị cần tư vấn máy lọc không khí cho phòng khoảng 10 mét vuông đúng không ạ?",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop, chị cần tư vấn máy lọc không khí cho phòng 10 mét vuông đúng không ạ?",
       "questions": [
         {
           "slot": "room_area_m2",
           "type": "confirm",
-          "text": "Chị cần tư vấn máy lọc không khí cho phòng khoảng 10 mét vuông đúng không ạ?"
+          "text": "Chị muốn tìm máy cho phòng khoảng 10 mét vuông đúng không ạ?"
         }
       ],
       "facts_used": [],
@@ -31,9 +31,10 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo em, chị muốn hỏi máy lọc không khí cho phòng khoảng 10 mét vuông.",
+      "text": "Alo em, chị muốn hỏi máy lọc không khí cho phòng khoảng 10 mét vuông. Nhà chị không có trẻ nhỏ.",
       "facts_stated": {
-        "room_area_m2": 10
+        "room_area_m2": 10,
+        "has_children": false
       },
       "entities": [],
       "pause_before_ms": 600,
@@ -42,52 +43,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ với diện tích phòng 10 mét vuông, chị có thể tham khảo máy lọc không khí AirPure Mini. Máy này phù hợp phòng nhỏ, giá tại shop là 2.190.000đ và hiện còn hàng ạ.",
-      "questions": [
-        {
-          "slot": "budget_vnd",
-          "type": "open",
-          "text": "Chị dự kiến ngân sách cho máy lọc khoảng bao nhiêu ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 2190000
-        },
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Chị có ngân sách tầm 2 triệu rưỡi, không biết có máy nào phù hợp không?",
-      "facts_stated": {
-        "budget_vnd": 2500000
-      },
-      "entities": [
-        {
-          "type": "money",
-          "value": "2500000",
-          "spoken": "2 triệu rưỡi"
-        }
-      ],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ ngân sách 2 triệu rưỡi thì AirPure Mini là lựa chọn phù hợp nhất cho phòng nhỏ như của chị ạ. Giá hiện tại là 2.190.000đ, nằm trong ngân sách của mình chị nhé.",
+      "text": "Dạ với phòng khoảng 10 mét vuông và không có trẻ nhỏ, chị có thể tham khảo máy lọc không khí AirPure Mini bên em. Máy này phù hợp diện tích dưới 12 mét vuông, giá là 2.190.000đ ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -105,16 +61,45 @@
     },
     {
       "speaker": "customer",
-      "text": "Em cho chị biết máy này có khuyến mãi gì không?",
-      "facts_stated": {},
+      "text": "Chị có ngân sách tầm 2 triệu rưỡi, không biết có máy nào phù hợp không?",
+      "facts_stated": {
+        "budget_vnd": 2500000
+      },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại máy AirPure Mini chưa có chương trình khuyến mãi giảm giá, nhưng chị được miễn phí thu hộ khi thanh toán COD ạ.",
+      "text": "Dạ trong tầm giá 2 triệu rưỡi, AirPure Mini là lựa chọn phù hợp nhất cho diện tích phòng của chị và đang có sẵn hàng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Em cho chị biết máy này có khuyến mãi gì không?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại máy AirPure Mini chưa có chương trình khuyến mãi giảm giá nào, tuy nhiên đơn hàng từ 500.000đ vẫn được miễn phí vận chuyển và COD bên em không thu phí ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -140,20 +125,14 @@
       "facts_stated": {
         "blocker": "để bàn với gia đình"
       },
-      "entities": [
-        {
-          "type": "time",
-          "value": "19:00",
-          "spoken": "7 giờ"
-        }
-      ],
-      "pause_before_ms": 800,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận chị sẽ trao đổi với gia đình trước. Em sẽ gọi lại cho chị vào lúc 7 giờ tối ngày mai, ngày 6 tháng 11 để hỗ trợ mình tiếp ạ.",
+      "text": "Dạ em ghi nhận chị cần trao đổi thêm với gia đình, em sẽ gọi lại cho chị vào lúc 7 giờ tối ngày mai để hỗ trợ tiếp ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -177,19 +156,19 @@
           "key": "blocker",
           "value": "để bàn với gia đình",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn8"
         },
         {
           "key": "budget_vnd",
           "value": 2500000,
           "op": "set",
-          "source": "call_1#turn4"
+          "source": "call_1#turn3"
         },
         {
           "key": "has_children",
           "value": false,
           "op": "set",
-          "source": "call_1#turn0"
+          "source": "call_1#turn2"
         },
         {
           "key": "room_area_m2",
@@ -201,13 +180,13 @@
           "key": "product_advised",
           "value": "SKU-AP-MINI",
           "op": "set",
-          "source": "call_1#turn2"
+          "source": "call_1#turn3"
         },
         {
           "key": "price_quoted_vnd",
           "value": 2190000,
           "op": "set",
-          "source": "call_1#turn2"
+          "source": "call_1#turn3"
         }
       ],
       "entities": [],
@@ -219,19 +198,20 @@
   "gold": {
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "can_ban_gia_dinh",
-    "objection_handling": "Xác nhận thời điểm gọi lại cụ thể và ghi lịch hẹn.",
+    "objection_type": "cần hỏi người nhà",
+    "objection_handling": "Đã xác nhận và hẹn lịch gọi lại theo yêu cầu khách, nhắc rõ thời gian.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [
       {
+        "type": "callback",
         "callback_at": "2026-11-06T19:00"
       }
     ],
     "supersedes": [],
     "callback": {
       "callback_at": "2026-11-06T19:00",
-      "note": "khách hỏi người nhà rồi báo lại"
+      "reason": "Khách cần bàn với gia đình"
     },
     "order": null
   }

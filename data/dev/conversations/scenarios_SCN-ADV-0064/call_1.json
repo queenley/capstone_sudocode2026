@@ -12,31 +12,31 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh muốn hỏi về quạt đúng không ạ?",
+      "text": "Dạ em chào anh Lê Văn C ạ, hôm trước anh có mua Xe đẩy gấp gọn Joie Pact bên em.",
       "questions": [
         {
           "slot": "usage_need",
           "type": "confirm",
-          "text": "Anh cần tư vấn quạt cho gia đình đúng không ạ?"
+          "text": "Anh dùng cho gia đình đúng không ạ?"
         }
       ],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "alo anh muon hoi ve quat dung senko ts16 cho gia dinh",
+      "text": "alo anh muon hoi ve quat dung senko ts16 cho gia dinh ngan sach cua anh tam 1 trieu",
       "facts_stated": {
-        "usage_need": "dùng cho gia đình"
+        "usage_need": "dùng cho gia đình",
+        "budget_vnd": 1000000
       },
       "entities": [],
       "pause_before_ms": 0,
@@ -45,10 +45,14 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ dòng quạt đứng Senko TS16 bên em đang sẵn hàng, phù hợp sử dụng cho gia đình. Quạt có 3 mức gió, không remote, công suất 45W, dùng rất bền ạ.",
+      "text": "Dạ em cảm ơn anh đã chia sẻ nhu cầu. Quạt đứng Senko TS16 hiện đang có giá 501.500đ, phù hợp với ngân sách của anh luôn ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
+        {
+          "field": "price_vnd",
+          "value": 501500
+        },
         {
           "field": "in_stock",
           "value": true
@@ -57,7 +61,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -72,25 +76,23 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giá quạt Senko TS16 hôm nay là 501.500đ anh nhé.",
+      "text": "Dạ giá quạt Senko TS16 hôm nay là 501.500đ anh nhé, đang có sẵn hàng luôn ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 501500
+        },
+        {
+          "field": "in_stock",
+          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "501500",
-          "spoken": "501.500đ"
-        }
-      ],
-      "pause_before_ms": 500,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -105,7 +107,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại giá đã áp dụng khuyến mãi 11-11 rồi anh nhé. Giá gốc là 590.000đ, nay giảm còn 501.500đ. Chương trình chỉ áp dụng trong hôm nay ạ.",
+      "text": "Hiện quạt được giảm giá từ 590.000đ còn 501.500đ trong chương trình 11-11, ngoài ra có miễn phí thu hộ COD toàn quốc luôn anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -114,25 +116,26 @@
           "value": 590000
         },
         {
+          "field": "price_vnd",
+          "value": 501500
+        },
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
           "field": "promo_11-11_active",
+          "value": true
+        },
+        {
+          "field": "promo_COD-0_active",
           "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "590000",
-          "spoken": "590.000đ"
-        },
-        {
-          "type": "money",
-          "value": "501500",
-          "spoken": "501.500đ"
-        }
-      ],
-      "pause_before_ms": 700,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -149,20 +152,21 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận anh muốn chờ cuối tháng nhận lương rồi mua quạt nhé. Nếu anh cần giữ giá ưu đãi, anh nhắn lại cho shop sớm trong hôm nay giúp em, vì khuyến mãi chỉ áp dụng tới hết ngày nay ạ.",
+      "text": "Dạ em ghi nhận anh chờ cuối tháng nhận lương rồi sẽ chốt. Nếu anh cần giữ giá ưu đãi, anh nhắn lại cho em trước khi kết thúc chương trình ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "promo_11-11_active",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [
         {
           "key": "usage_need",
           "value": "dùng cho gia đình",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 1000000,
           "op": "set",
           "source": "call_1#turn2"
         },
@@ -182,7 +186,7 @@
           "key": "price_quoted_vnd",
           "value": 501500,
           "op": "set",
-          "source": "call_1#turn6"
+          "source": "call_1#turn4"
         },
         {
           "key": "promo_code",
@@ -192,16 +196,16 @@
         }
       ],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "hoi_gia_quat_khuyen_mai",
+    "intent": "hoi_tu_van_quat_gia_dung",
     "outcome": "hen_goi_lai",
-    "objection_type": null,
-    "objection_handling": null,
+    "objection_type": "can_cho_luong",
+    "objection_handling": "Ghi nhận nhu cầu, nhắc khách giữ giá ưu đãi nếu cần chốt.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

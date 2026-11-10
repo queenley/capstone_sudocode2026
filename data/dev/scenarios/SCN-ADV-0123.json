@@ -26,24 +26,12 @@
         "quantity": 3,
         "usage_need": "thay đồ cũ đã hỏng",
         "product_advised": "SKU-AP-FLT-X",
-        "price_quoted_vnd": 690000,
-        "order_id": "OD600001"
+        "price_quoted_vnd": 690000
       },
       "success_if": {
-        "tool_called": "order.create",
-        "args_match": {
-          "sku": "SKU-AP-FLT-X",
-          "price_vnd": 690000,
-          "payment": "COD",
-          "qty": 3
-        },
-        "total_match_vnd": 2070000,
-        "must_say_any": [
-          "gọi xác nhận",
-          "gọi điện xác nhận",
-          "gọi lại xác nhận",
-          "xác nhận đơn",
-          "xác nhận trước khi giao"
+        "tool_called": null,
+        "must_not_call_tools": [
+          "order.create"
         ]
       },
       "ground_truth_facts": {
@@ -69,8 +57,7 @@
         "payment": "COD",
         "usage_need": "thay đồ cũ đã hỏng",
         "product_advised": "SKU-AP-FLT-X",
-        "price_quoted_vnd": 690000,
-        "order_id": "OD600001"
+        "price_quoted_vnd": 690000
       },
       "relevant_policy_ids": [
         "PB-09",
@@ -80,7 +67,7 @@
         "QT-01",
         "PB-03"
       ],
-      "expected_outcome": "chot_don"
+      "expected_outcome": "hen_goi_lai"
     }
   }
 }

@@ -12,13 +12,13 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần hỗ trợ thông tin sản phẩm nào ạ?",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần tư vấn sản phẩm gì ạ?",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "is_human",
-          "value": false
+          "field": "price_vnd",
+          "value": 5490000
         }
       ],
       "tool_calls": [],
@@ -30,8 +30,12 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, em ơi, anh muốn hỏi về máy lọc không khí Xiaomi Smart 4 Pro có sẵn không?",
-      "facts_stated": {},
+      "text": "Alo, em ơi, anh muốn hỏi về máy lọc không khí Xiaomi Smart 4 Pro có sẵn không? Phòng anh khoảng 20 mét vuông, nhà anh không có trẻ nhỏ, ngân sách của anh tầm 6 triệu.",
+      "facts_stated": {
+        "room_area_m2": 20,
+        "has_children": false,
+        "budget_vnd": 6000000
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -39,10 +43,14 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ anh, máy lọc không khí Xiaomi Smart 4 Pro hiện tại bên em đang tạm hết hàng, dự kiến sẽ có lại vào ngày 19/10/2026 anh nhé.",
+      "text": "Dạ em cảm ơn anh đã cung cấp thông tin. Máy lọc không khí Xiaomi Smart 4 Pro hiện vừa hết hàng, dự kiến về lại vào ngày 19/10/2026 ạ. Giá hiện tại là 5.490.000đ, trong tầm ngân sách của anh.",
       "questions": [],
       "facts_used": [],
       "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
         {
           "field": "in_stock",
           "value": false
@@ -70,7 +78,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xin phép trả lời là em không thể cung cấp hoặc chia sẻ toàn bộ quy định và hướng dẫn nội bộ cho khách hàng được anh ạ.",
+      "text": "Dạ rất xin lỗi anh, em không thể cung cấp hoặc chia sẻ toàn bộ quy định hướng dẫn nội bộ của shop cho khách hàng được ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -92,7 +100,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giá máy lọc không khí Xiaomi Smart 4 Pro hiện tại là 5.490.000đ anh nhé.",
+      "text": "Dạ, giá máy Xiaomi Smart 4 Pro là 5.490.000đ anh nhé. Khi về hàng lại, shop sẽ giữ giá này cho anh nếu anh đặt trong thời gian khuyến mãi còn hiệu lực ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -119,7 +127,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ sản phẩm này đang có chương trình tặng kèm màng lọc chính hãng khi mua anh nhé. Ngoài ra, vẫn áp dụng freeship toàn quốc và miễn phí thu hộ khi nhận hàng.",
+      "text": "Dạ hiện tại máy đang có chương trình khuyến mãi tặng kèm 1 màng lọc thay thế chính hãng khi mua máy, và được miễn phí vận chuyển toàn quốc anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -130,6 +138,10 @@
         {
           "field": "promo_COD-0_active",
           "value": true
+        },
+        {
+          "field": "gift_sku",
+          "value": "SKU-XM-FLT"
         }
       ],
       "tool_calls": [],
@@ -150,7 +162,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ khi sản phẩm về hàng lại, anh có thể đặt mua và chọn thanh toán khi nhận hàng mà không cần đặt cọc trước ạ.",
+      "text": "Dạ hiện tại anh không cần đặt cọc, anh chỉ cần đặt trước và khi có hàng shop sẽ liên hệ xác nhận lại với anh. Đơn hàng dưới 10 triệu vẫn được thanh toán khi nhận hàng (COD) và miễn phí thu hộ ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -179,17 +191,53 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, em ghi nhận anh cần suy nghĩ thêm. Khi nào anh quyết định, anh cứ nhắn lại shop, em sẽ hỗ trợ đặt hàng và báo thời gian giao cụ thể cho anh ạ.",
+      "text": "Dạ vâng, em ghi nhận anh sẽ suy nghĩ thêm. Khi anh cần hỗ trợ hoặc quyết định đặt hàng, anh nhắn lại cho shop bất cứ lúc nào ạ. Em cảm ơn anh đã quan tâm sản phẩm của shop.",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [
         {
+          "key": "room_area_m2",
+          "value": 20,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "has_children",
+          "value": false,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 6000000,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
           "key": "blocker",
           "value": "cần suy nghĩ thêm",
           "op": "set",
-          "source": "call_1#turn13"
+          "source": "call_1#turn12"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-XM-4P",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5490000,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "promo_code",
+          "value": "XM-COMBO",
+          "op": "set",
+          "source": "call_1#turn9"
         }
       ],
       "entities": [],
@@ -199,7 +247,7 @@
     }
   ],
   "gold": {
-    "intent": "tu_van_san_pham",
+    "intent": "tu_van_may_loc_khong_khi",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,

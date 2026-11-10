@@ -12,49 +12,52 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chú Lê Văn Bình ạ, hôm trước chú có đặt Áo khoác gió Windbreak, hiện đơn đang xử lý. Dạ chú muốn tư vấn về máy lọc không khí Xiaomi Smart 4 Pro đúng không ạ?",
+      "text": "Dạ em chào chú ạ, em là trợ lý ảo của shop BTC. Chú muốn tìm hiểu về máy lọc không khí Xiaomi Smart 4 Pro đúng không ạ?",
       "questions": [
         {
-          "slot": "product_advised",
+          "slot": "room_area_m2",
           "type": "confirm",
-          "text": "Dạ chú muốn tư vấn về máy lọc không khí Xiaomi Smart 4 Pro đúng không ạ?"
+          "text": "Phòng chú khoảng 25 mét vuông phải không ạ?"
         }
       ],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 700,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Alo, chú muốn hỏi về máy lọc không khí Xiaomi Smart 4 Pro.",
-      "facts_stated": {
-        "product_advised": "SKU-XM-4P"
-      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Alo, chú muốn hỏi về máy lọc không khí Xiaomi Smart 4 Pro. Phòng chú khoảng 25 mét vuông.",
+      "facts_stated": {
+        "room_area_m2": 25
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ máy lọc không khí Xiaomi Smart 4 Pro bên em đang sẵn hàng chú nhé. Chú muốn mua cho phòng khoảng bao nhiêu mét vuông để em tư vấn kỹ hơn ạ?",
+      "text": "Dạ máy Xiaomi Smart 4 Pro phù hợp phòng 25 mét vuông chú nhé. Máy này đang có hàng tại shop với giá 5.490.000đ.",
       "questions": [
         {
-          "slot": "room_area_m2",
+          "slot": "budget_vnd",
           "type": "open",
-          "text": "Chú muốn mua cho phòng khoảng bao nhiêu mét vuông để em tư vấn kỹ hơn ạ?"
+          "text": "Chú dự kiến ngân sách cho máy lọc không khí này khoảng bao nhiêu ạ?"
         }
       ],
       "facts_used": [],
       "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
         {
           "field": "in_stock",
           "value": true
@@ -63,7 +66,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -72,13 +75,13 @@
       "text": "Giá của máy này là bao nhiêu vậy?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ máy Xiaomi Smart 4 Pro bên em có giá là 5.490.000đ chú nhé. Giá này đã gồm quà tặng màng lọc thay thế chính hãng ạ.",
+      "text": "Dạ giá máy Xiaomi Smart 4 Pro bên shop hiện là 5.490.000đ chú ạ. Giá này đã áp dụng chương trình khuyến mãi XM-COMBO đang hiệu lực.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -87,14 +90,14 @@
           "value": 5490000
         },
         {
-          "field": "gift_sku",
-          "value": "SKU-XM-FLT"
+          "field": "promo_XM-COMBO_active",
+          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -105,25 +108,29 @@
         "competitor_price_vnd": 4830000
       },
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 700,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em hiểu chú so sánh giá ạ. Máy bên em là hàng chính hãng, bảo hành 12 tháng, có sẵn quà tặng màng lọc chính hãng và được kiểm tra hàng trước khi thanh toán chú nha.",
+      "text": "Dạ em hiểu băn khoăn của chú về giá. Máy bên shop là hàng chính hãng, bảo hành 12 tháng, và giá đã gồm khuyến mãi XM-COMBO chú nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 5490000
+        },
+        {
+          "field": "promo_XM-COMBO_active",
+          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 800,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -134,16 +141,20 @@
         "budget_vnd": 6500000
       },
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại máy đang áp dụng chương trình tặng màng lọc chính hãng kèm máy và miễn phí vận chuyển toàn quốc chú nhé. Ngoài ra chương trình khuyến mãi XM-COMBO chỉ còn tới ngày 14 tháng 11, chú cân nhắc giúp em ạ.",
+      "text": "Dạ với ngân sách của chú, máy Xiaomi Smart 4 Pro đang có khuyến mãi XM-COMBO và tặng kèm màng lọc chính hãng. Giá cuối vẫn là 5.490.000đ chú nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
         {
           "field": "promo_XM-COMBO_active",
           "value": true
@@ -152,7 +163,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -164,20 +175,29 @@
         "objection": "giá cao hơn chỗ khác"
       },
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 800,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em hiểu nhu cầu nhà có trẻ nhỏ ạ. Máy Xiaomi Smart 4 Pro có lọc bụi mịn và khử mùi tốt, phù hợp cho gia đình chú. Nếu chú cần thêm thông tin hoặc hỗ trợ gì, em luôn sẵn sàng ạ.",
+      "text": "Dạ máy Xiaomi Smart 4 Pro có chức năng lọc bụi mịn, khử mùi và phù hợp gia đình có trẻ nhỏ. Nếu chú cần thêm thời gian suy nghĩ thì shop vẫn giữ giá ưu đãi đến hết ngày 14/11 nhé.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5490000
+        },
+        {
+          "field": "promo_XM-COMBO_active",
+          "value": true
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -186,13 +206,13 @@
       "text": "Để chú hỏi thử lại rồi gọi lại cho em nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 900,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, chú cứ cân nhắc và khi nào cần tư vấn thêm hoặc quyết định, chú gọi lại cho em bất kỳ lúc nào ạ. Em cảm ơn chú đã quan tâm sản phẩm bên em.",
+      "text": "Dạ vâng, chú cứ cân nhắc thêm ạ. Khi nào cần hỗ trợ hoặc muốn đặt hàng, chú gọi lại cho shop bất cứ lúc nào nhé. Em cảm ơn chú đã quan tâm sản phẩm của shop.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -202,62 +222,62 @@
           "key": "budget_vnd",
           "value": 6500000,
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn12"
         },
         {
           "key": "competitor_price_vnd",
           "value": 4830000,
           "op": "set",
-          "source": "call_1#turn5"
+          "source": "call_1#turn6"
         },
         {
           "key": "has_children",
           "value": true,
           "op": "set",
-          "source": "call_1#turn11"
+          "source": "call_1#turn10"
         },
         {
           "key": "objection",
           "value": "giá cao hơn chỗ khác",
           "op": "set",
-          "source": "call_1#turn11"
+          "source": "call_1#turn10"
         },
         {
           "key": "room_area_m2",
           "value": 25,
           "op": "set",
-          "source": "call_1#turn3"
+          "source": "call_1#turn2"
         },
         {
           "key": "product_advised",
           "value": "SKU-XM-4P",
           "op": "set",
-          "source": "call_1#turn1"
+          "source": "call_1#turn4"
         },
         {
           "key": "price_quoted_vnd",
           "value": 5490000,
           "op": "set",
-          "source": "call_1#turn5"
+          "source": "call_1#turn4"
         },
         {
           "key": "promo_code",
           "value": "XM-COMBO",
           "op": "set",
-          "source": "call_1#turn7"
+          "source": "call_1#turn6"
         }
       ],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "hen_goi_lai",
+    "intent": "hoi_gia_tu_van_may_loc_khong_khi",
     "outcome": "hen_goi_lai",
-    "objection_type": "so_sanh_gia",
-    "objection_handling": "Giải thích giá trị đi kèm (bảo hành, quà tặng, chính hãng), nhắc khuyến mãi hiện tại.",
+    "objection_type": "gia_cao_hon_cho_khac",
+    "objection_handling": "Giải thích giá đã gồm khuyến mãi, hàng chính hãng, bảo hành 12 tháng.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

@@ -12,65 +12,70 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, em có thể hỗ trợ chị Dung ạ.",
-      "questions": [
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em sẵn sàng hỗ trợ chị đặt máy lọc không khí ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
         {
-          "slot": "other",
-          "type": "open",
-          "text": "Em có thể hỗ trợ chị Dung về sản phẩm nào ạ?"
+          "field": "is_human",
+          "value": false
         }
       ],
-      "facts_used": [],
-      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị Dung đây, hôm trước cô Loan đã hỏi máy lọc nước, bây giờ chị muốn đặt hàng.",
-      "facts_stated": {},
+      "text": "Alo, chị Dung đây, hôm trước cô Loan đã hỏi máy lọc nước, bây giờ chị muốn đặt hàng. Phòng chị khoảng 12 mét vuông, ngân sách của chị tầm 2 triệu rưỡi.",
+      "facts_stated": {
+        "room_area_m2": 12,
+        "budget_vnd": 2500000
+      },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn chị Dung đã gọi lại cho shop. Chị muốn đặt sản phẩm nào ạ, em kiểm tra hàng và giá cho chị ngay.",
+      "text": "Dạ chị muốn đặt máy lọc không khí cho phòng 12 mét vuông, ngân sách khoảng 2 triệu rưỡi đúng không ạ? Với diện tích này, em tư vấn chị chọn Máy lọc không khí AirPure Mini, hiện giá là 2.190.000đ ạ.",
       "questions": [
         {
           "slot": "product_advised",
-          "type": "open",
-          "text": "Chị muốn đặt sản phẩm nào ạ?"
+          "type": "confirm",
+          "text": "Chị muốn lấy máy lọc không khí AirPure Mini đúng không ạ?"
         }
       ],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 2190000
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
       "text": "Chị quyết định mua máy lọc không khí AirPure Mini, giá bao nhiêu vậy em?",
-      "facts_stated": {
-        "product_advised": "SKU-AP-MINI"
-      },
+      "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 800,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ máy lọc không khí AirPure Mini hiện đang có sẵn, giá là 2.190.000đ ạ. Sản phẩm được miễn phí vận chuyển toàn quốc và giao dự kiến trong 2–4 ngày làm việc tùy khu vực.",
+      "text": "Dạ, giá Máy lọc không khí AirPure Mini là 2.190.000đ, hàng đang có sẵn. Giá này đã áp dụng miễn phí vận chuyển và không có phụ phí COD ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -83,12 +88,45 @@
           "value": true
         },
         {
-          "field": "freeship",
+          "field": "promo_COD-0_active",
           "value": true
         },
         {
-          "field": "delivery_days",
-          "value": 2
+          "field": "freeship",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thanh toán bằng COD, và khu vực giao hàng là Thủ Đức, TP.HCM.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị chọn thanh toán COD và giao về Thủ Đức, TP.HCM. Em xác nhận lại đơn: Máy lọc không khí AirPure Mini, số lượng 1, giá 2.190.000đ, giao tận nơi Thủ Đức, TP.HCM, thanh toán khi nhận hàng. Dự kiến giao trong 2 ngày làm việc, tức ngày 01/12/2026.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Chị kiểm tra lại giúp em thông tin đơn như trên đã chính xác để em lên đơn nhé?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-12-01"
         }
       ],
       "tool_calls": [
@@ -101,76 +139,8 @@
         }
       ],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "2190000",
-          "spoken": "2.190.000đ"
-        }
-      ],
-      "pause_before_ms": 700,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Chị thanh toán bằng COD, và khu vực giao hàng là Thủ Đức, TP.HCM.",
-      "facts_stated": {
-        "payment": "COD",
-        "delivery_area": "Thủ Đức, TP.HCM"
-      },
-      "entities": [
-        {
-          "type": "address",
-          "value": "Thủ Đức, TP.HCM",
-          "spoken": "Thủ Đức, TP.HCM"
-        }
-      ],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em xác nhận chị chọn thanh toán COD và giao hàng tại Thủ Đức, TP.HCM. Đơn hàng sẽ được giao dự kiến vào ngày 01/12/2026. Với đơn trên 2 triệu thanh toán COD, nhân viên bên em sẽ gọi xác nhận đơn trước khi giao ạ.",
-      "questions": [
-        {
-          "slot": "order_summary",
-          "type": "confirm",
-          "text": "Em xin phép đọc lại: Máy lọc không khí AirPure Mini, giá 2.190.000đ, giao tại Thủ Đức, TP.HCM, thanh toán COD, giao dự kiến ngày 01/12/2026. Chị xác nhận giúp em thông tin này đúng chưa ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "estimated_delivery",
-          "value": "2026-12-01"
-        },
-        {
-          "field": "needs_confirmation_call",
-          "value": true
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "2190000",
-          "spoken": "2.190.000đ"
-        },
-        {
-          "type": "address",
-          "value": "Thủ Đức, TP.HCM",
-          "spoken": "Thủ Đức, TP.HCM"
-        },
-        {
-          "type": "date",
-          "value": "2026-12-01",
-          "spoken": "01/12/2026"
-        }
-      ],
-      "pause_before_ms": 1000,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -179,27 +149,19 @@
       "text": "Vậy thì chị đồng ý lên đơn nhé, cảm ơn em!",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận đơn hàng máy lọc không khí AirPure Mini cho chị, giá 2.190.000đ thanh toán COD, giao dự kiến ngày 01/12/2026. Nhân viên bên em sẽ gọi xác nhận đơn trước khi giao ạ. Em cảm ơn chị Dung đã đặt hàng tại shop BTC!",
+      "text": "Dạ em đã lên đơn cho chị. Nhân viên bên em sẽ gọi xác nhận đơn trước khi giao hàng. Cảm ơn chị Dung đã đặt hàng tại shop BTC ạ!",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 2190000
-        },
-        {
           "field": "needs_confirmation_call",
           "value": true
-        },
-        {
-          "field": "estimated_delivery",
-          "value": "2026-12-01"
         }
       ],
       "tool_calls": [
@@ -224,12 +186,6 @@
           "source": "call_2#turn1"
         },
         {
-          "key": "has_children",
-          "value": false,
-          "op": "set",
-          "source": "call_2#turn1"
-        },
-        {
           "key": "budget_vnd",
           "value": 2500000,
           "op": "set",
@@ -239,46 +195,35 @@
           "key": "payment",
           "value": "COD",
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn3"
         },
         {
           "key": "delivery_area",
           "value": "Thủ Đức, TP.HCM",
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn3"
         },
         {
           "key": "product_advised",
           "value": "SKU-AP-MINI",
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn3"
         },
         {
           "key": "price_quoted_vnd",
           "value": 2190000,
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn3"
         },
         {
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn3"
         }
       ],
-      "entities": [
-        {
-          "type": "money",
-          "value": "2190000",
-          "spoken": "2.190.000đ"
-        },
-        {
-          "type": "date",
-          "value": "2026-12-01",
-          "spoken": "01/12/2026"
-        }
-      ],
-      "pause_before_ms": 800,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
@@ -294,13 +239,13 @@
     "supersedes": [],
     "callback": null,
     "order": {
+      "order_id": "OD600001",
       "sku": "SKU-AP-MINI",
       "qty": 1,
       "price_vnd": 2190000,
       "payment": "COD",
-      "address": "Thủ Đức, TP.HCM",
-      "estimated_delivery": "2026-12-01",
-      "order_id": "OD600001"
+      "delivery_area": "Thủ Đức, TP.HCM",
+      "estimated_delivery": "2026-12-01"
     }
   }
 }

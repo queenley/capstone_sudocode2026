@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Thủy ạ, hôm trước chị có quan tâm Xe đẩy gấp gọn Joie Pact và còn chờ cuối tháng nhận lương; hiện tại em kiểm tra thì sản phẩm này vẫn đang hết hàng ạ.",
+      "text": "Dạ em chào chị Thủy ạ, hôm trước chị có hỏi về xe đẩy gấp gọn Joie Pact nhưng đang chờ cuối tháng nhận lương. Hiện tại em kiểm tra thì sản phẩm này vẫn đang hết hàng chị nhé.",
       "questions": [],
       "facts_used": [
         "blocker",
@@ -24,16 +24,12 @@
         {
           "field": "in_stock",
           "value": false
-        },
-        {
-          "field": "price_vnd",
-          "value": 3490000
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -42,13 +38,13 @@
       "text": "alo chi goi lai de hoi xe day joie pact co hang chua",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại Xe đẩy Joie Pact vẫn chưa có hàng về chị ạ. Giá sản phẩm là 3.490.000đ và chương trình miễn phí vận chuyển MOM-FREESHIP vẫn còn hiệu lực đến hết ngày 29/11.",
+      "text": "Dạ xe đẩy Joie Pact bên em vẫn chưa về hàng chị ạ. Giá sản phẩm là 3.490.000đ, hiện có áp dụng miễn phí vận chuyển toàn quốc cho đơn mẹ & bé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -58,10 +54,6 @@
         },
         {
           "field": "promo_MOM-FREESHIP_active",
-          "value": true
-        },
-        {
-          "field": "promo_active",
           "value": true
         }
       ],
@@ -83,7 +75,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em rất tiếc, hiện em chưa có thông tin về ngày dự kiến có hàng trở lại của Xe đẩy Joie Pact ạ. Khi shop có lịch nhập hàng mới, em sẽ báo lại ngay cho chị nhé.",
+      "text": "Dạ em rất tiếc, hiện tại shop chưa có thông tin về ngày xe Joie Pact về hàng lại ạ. Nếu chị cần em có thể lưu lại yêu cầu và báo chị ngay khi sản phẩm có hàng.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -95,7 +87,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 550,
       "emotion": null,
       "barge_in": false
     },
@@ -110,14 +102,14 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em hiểu mong muốn của chị ạ. Chị yên tâm, khi Xe đẩy Joie Pact về hàng em sẽ liên hệ lại ngay để hỗ trợ chị đặt hàng sớm nhất.",
+      "text": "Dạ em hiểu mong muốn của chị ạ. Em sẽ ghi chú lại để ưu tiên thông báo cho chị ngay khi có hàng về nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -132,39 +124,44 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Rất xin lỗi chị, hiện em chưa có thông tin về ngày về hàng mới của Xe đẩy Joie Pact. Em sẽ lưu lại yêu cầu của chị để báo ngay khi có hàng ạ.",
+      "text": "Hiện tại bên em chưa có thông tin về ngày dự kiến hàng về cho xe Joie Pact, em sẽ chủ động liên hệ lại khi có cập nhật mới nhất chị nhé.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": false
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [
         {
           "key": "product_advised",
           "value": "SKU-MB-STR1",
           "op": "set",
-          "source": "call_2#turn7"
+          "source": "call_2#turn9"
         },
         {
           "key": "price_quoted_vnd",
           "value": 3490000,
           "op": "set",
-          "source": "call_2#turn7"
+          "source": "call_2#turn9"
         },
         {
           "key": "promo_code",
           "value": "MOM-FREESHIP",
           "op": "set",
-          "source": "call_2#turn7"
+          "source": "call_2#turn9"
         }
       ],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "hoi_ton_kho",
+    "intent": "hoi_tinh_trang_hang",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,
@@ -172,7 +169,9 @@
     "decision_maker": null,
     "commitments": [
       {
-        "commit": "báo lại khi có hàng"
+        "action": "hen_goi_lai",
+        "slot": "in_stock",
+        "note": "báo lại khi có hàng Joie Pact"
       }
     ],
     "supersedes": [],

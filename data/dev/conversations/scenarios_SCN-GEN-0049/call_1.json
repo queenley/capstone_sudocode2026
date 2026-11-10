@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em sẵn sàng hỗ trợ chị về máy lọc không khí AirPure Pro cho phòng 30 mét vuông ạ.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em sẵn sàng hỗ trợ chị về máy lọc không khí AirPure Pro cho phòng 30m² ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -25,18 +25,19 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị muốn hỏi về máy lọc không khí AirPure Pro, cho phòng khoảng 30 mét vuông.",
+      "text": "Alo, chị muốn hỏi về máy lọc không khí AirPure Pro, cho phòng khoảng 30 mét vuông. Ngân sách của chị tầm 8 triệu rưỡi.",
       "facts_stated": {
-        "room_area_m2": 30
+        "room_area_m2": 30,
+        "budget_vnd": 8500000
       },
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ với diện tích phòng khoảng 30 mét vuông, AirPure Pro là lựa chọn rất phù hợp chị nhé. Máy có công suất lớn, lọc hiệu quả cho không gian như vậy ạ.",
+      "text": "Dạ với phòng 30m², AirPure Pro là lựa chọn phù hợp chị nhé. Máy có khóa trẻ em, rất an toàn cho nhà có trẻ nhỏ và giá hiện tại là 7.690.000đ. Máy đang có chương trình khuyến mãi AIR-OCT áp dụng đến hết ngày 30/10 ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -45,7 +46,7 @@
           "value": 7690000
         },
         {
-          "field": "in_stock",
+          "field": "promo_AIR-OCT_active",
           "value": true
         }
       ],
@@ -63,13 +64,13 @@
         "has_children": true
       },
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, máy AirPure Pro có chức năng khóa trẻ em, an toàn và phù hợp với gia đình có trẻ nhỏ chị nhé.",
+      "text": "Dạ máy AirPure Pro có bộ lọc HEPA H13 và khóa trẻ em, phù hợp gia đình có trẻ nhỏ chị ạ. Máy lọc bụi mịn PM2.5 và khử mùi hiệu quả.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -85,13 +86,13 @@
       "text": "Chị thấy cái máy này giá 7 triệu 690 ngàn, không biết có khuyến mãi gì không nhỉ?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giá máy AirPure Pro hiện đang là 7.690.000đ chị ạ. Shop đang có chương trình khuyến mãi AIR-OCT giảm trực tiếp trên giá niêm yết, và miễn phí vận chuyển toàn quốc. Chị cũng được kiểm tra hàng trước khi thanh toán ạ.",
+      "text": "Dạ giá hiện tại đã được giảm còn 7.690.000đ nhờ khuyến mãi AIR-OCT. Ngoài ra, đơn hàng trên 500.000đ được miễn phí vận chuyển toàn quốc và chị có thể thanh toán khi nhận hàng không mất phí thu hộ ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -122,53 +123,64 @@
         "blocker": "cần suy nghĩ thêm"
       },
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, em ghi nhận chị cần thêm thời gian suy nghĩ. Em sẽ lưu lại thông tin tư vấn hôm nay để khi chị cần sẽ hỗ trợ nhanh nhất. Nếu chị muốn đặt hàng hoặc cần hỗ trợ thêm, chị cứ liên hệ lại shop bất cứ lúc nào nhé.",
+      "text": "Dạ vâng, chị cứ cân nhắc thêm ạ. Em sẽ lưu lại thông tin phòng 30m², có trẻ nhỏ và ngân sách 8 triệu rưỡi của chị. Khuyến mãi AIR-OCT còn áp dụng đến hết ngày 30/10, nếu chị cần đặt hàng hoặc tư vấn thêm thì cứ liên hệ lại shop bất cứ lúc nào ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [
         {
           "key": "room_area_m2",
           "value": 30,
           "op": "set",
-          "source": "call_1#turn2"
+          "source": "call_1#turn9"
         },
         {
           "key": "has_children",
           "value": true,
           "op": "set",
-          "source": "call_1#turn4"
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 8500000,
+          "op": "set",
+          "source": "call_1#turn9"
         },
         {
           "key": "blocker",
           "value": "cần suy nghĩ thêm",
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn9"
         },
         {
           "key": "product_advised",
           "value": "SKU-AP-PRO",
           "op": "set",
-          "source": "call_1#turn2"
+          "source": "call_1#turn9"
         },
         {
           "key": "price_quoted_vnd",
           "value": 7690000,
           "op": "set",
-          "source": "call_1#turn6"
+          "source": "call_1#turn9"
         },
         {
           "key": "promo_code",
           "value": "AIR-OCT",
           "op": "set",
-          "source": "call_1#turn6"
+          "source": "call_1#turn9"
         }
       ],
       "entities": [],
@@ -178,10 +190,10 @@
     }
   ],
   "gold": {
-    "intent": "hoi_gia_may_loc_khong_khi",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "cần suy nghĩ thêm",
-    "objection_handling": "Ghi nhận và hẹn khách khi thuận tiện sẽ liên hệ lại.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

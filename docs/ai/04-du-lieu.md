@@ -158,7 +158,7 @@ Danh sách đủ 15 loại: [evaluation/data-generation/README.md §3](../../eva
 
 Lệnh đánh giá (`run_eval.py`) chấm trên [`data/dev/scenarios`](../../data/dev/README.md): bộ dữ liệu duy nhất, 404 kịch bản (250 `SCN-GEN-*` và 154 `SCN-ADV-*`), 801 cuộc, sinh sau lần đổi CRM tổng hợp ngày 28/10 nên đơn trong `seed_history` khớp đơn mà `crm`/`order.status` trả về. Các bản v1 đến v4 đã xóa khỏi cây thư mục; v4 lệch CRM ở 28 kịch bản (ví dụ SCN-GEN-0051: lời khách nói xe đẩy Combi Sugocal, CRM ghi OD900302 là máy hâm sữa).
 
-> Dataset có trạng thái **diagnostic**: nhãn do bộ sinh gán, **chưa có người duyệt** (chưa có `review/golden_manifest.json`). Đổi nhãn theo quy tắc [ground-truth-review](../../evaluation/datasets/ground-truth-review/SKILL.md): tạo revision mới, không ghi đè.
+> Nhãn **đã duyệt** (`official_gt_approved: true`, 10/11/2026): nhãn do bộ sinh gán, người duyệt đã chấp nhận từng nhóm sửa (nhãn bản r4, [`DISPUTES.md`](../../data/dev/DISPUTES.md)) và ký 801/801 nhãn trong `review/golden_manifest.json` (578 hội thoại mẫu). Đổi nhãn theo quy tắc [ground-truth-review](../../evaluation/datasets/ground-truth-review/SKILL.md): script dựng lại có thể chạy lại, ghi đè các thư mục nhãn của `data/dev` hoặc `data/test`, từng trường đổi ghi ở `conversion-report.json`.
 
 **Lịch sử cuộc cũ** (`seed_history`): trước khi chạy, lệnh đánh giá ghi các phiên cũ và đơn cũ vào bộ nhớ của khách ở cả hai cấu hình; cấu hình baseline chỉ là **không đọc lại** chúng.
 

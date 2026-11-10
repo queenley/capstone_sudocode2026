@@ -12,14 +12,8 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị, em là trợ lý ảo của shop BTC. Chị muốn tìm xe đẩy gấp gọn cho bé 1 tháng tuổi đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Chị muốn tìm xe đẩy gấp gọn cho bé 1 tháng tuổi đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em có thể hỗ trợ chị về xe đẩy gấp gọn cho bé ạ.",
+      "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
@@ -42,21 +36,10 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, với bé 1 tháng tuổi, em tư vấn cho chị mẫu xe đẩy gấp gọn Joie Pact. Xe này dùng cho trẻ từ sơ sinh đến khoảng 4 tuổi, gấp gọn được một tay và có mái che UPF 50 rất tiện. Giá hiện tại là 3.490.000đ chị nhé.",
-      "questions": [
-        {
-          "slot": "budget_vnd",
-          "type": "open",
-          "text": "Chị dự kiến ngân sách khoảng bao nhiêu cho xe đẩy ạ?"
-        }
-      ],
+      "text": "Dạ với bé 1 tháng tuổi, chị có thể tham khảo xe đẩy gấp gọn Joie Pact bên em, dùng cho bé từ sơ sinh đến 4 tuổi, gấp gọn dễ mang đi lại.",
+      "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 3490000
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -70,24 +53,26 @@
       "facts_stated": {
         "budget_vnd": 3500000
       },
-      "entities": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "3500000",
+          "spoken": "3 triệu rưỡi"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ xe Joie Pact đúng với ngân sách của chị luôn ạ. Hiện shop đang có chương trình miễn phí vận chuyển toàn quốc cho đơn mẹ & bé từ 500.000đ trở lên, nên chị được freeship khi mua xe này chị nhé.",
+      "text": "Dạ xe đẩy Joie Pact hiện giá là 3.490.000đ, phù hợp với ngân sách của chị ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 3490000
-        },
-        {
-          "field": "promo_MOM-FREESHIP_active",
-          "value": true
         }
       ],
       "tool_calls": [],
@@ -108,12 +93,12 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, ngoài miễn phí vận chuyển MOM-FREESHIP, xe Joie Pact đang có sẵn hàng tại shop và chị vẫn được hưởng chính sách đổi trả trong 7 ngày nếu chưa sử dụng nhé.",
+      "text": "Dạ hiện tại xe đẩy Joie Pact đang được miễn phí vận chuyển toàn quốc với chương trình MOM-FREESHIP ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "in_stock",
+          "field": "promo_MOM-FREESHIP_active",
           "value": true
         }
       ],
@@ -137,7 +122,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, em ghi nhận chị muốn gọi hotline để hỏi thêm thông tin. Nếu chị cần tư vấn thêm, tổng đài của shop hỗ trợ từ 8h sáng tới 21h từ thứ Hai đến thứ Bảy, Chủ nhật từ 9h đến 18h ạ.",
+      "text": "Dạ em đã ghi nhận, chị có thể gọi hotline của shop để được nhân viên hỗ trợ chi tiết hơn nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -150,16 +135,24 @@
     },
     {
       "speaker": "customer",
-      "text": "u de chi goi lai sau nhe",
-      "facts_stated": {},
-      "entities": [],
+      "text": "u de chi goi lai sau nhe so chi la 0994893949",
+      "facts_stated": {
+        "phone_provided": true
+      },
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0994893949",
+          "spoken": "0994893949"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em cảm ơn chị đã quan tâm. Khi nào cần hỗ trợ thêm, chị cứ gọi lại shop nhé. Chúc chị một ngày tốt lành!",
+      "text": "Dạ em cảm ơn chị đã cung cấp số điện thoại. Nếu cần hỗ trợ thêm chị cứ nhắn tin hoặc gọi lại cho shop bất cứ lúc nào nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -169,31 +162,31 @@
           "key": "child_age_months",
           "value": 1,
           "op": "set",
-          "source": "call_1#turn2"
+          "source": "call_1#turn1"
         },
         {
           "key": "budget_vnd",
           "value": 3500000,
           "op": "set",
-          "source": "call_1#turn4"
+          "source": "call_1#turn3"
         },
         {
           "key": "blocker",
           "value": "muốn gọi hotline hỏi thêm",
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn7"
         },
         {
           "key": "product_advised",
           "value": "SKU-MB-STR1",
           "op": "set",
-          "source": "call_1#turn3"
+          "source": "call_1#turn5"
         },
         {
           "key": "price_quoted_vnd",
           "value": 3490000,
           "op": "set",
-          "source": "call_1#turn3"
+          "source": "call_1#turn5"
         },
         {
           "key": "promo_code",
@@ -209,7 +202,7 @@
     }
   ],
   "gold": {
-    "intent": "hoi_sp_xe_day",
+    "intent": "hoi_tu_van_san_pham",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,

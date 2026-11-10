@@ -12,10 +12,18 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, rất sẵn lòng hỗ trợ chị về máy lọc không khí AirPure Y. Chị muốn tìm hiểu thông tin gì về sản phẩm này ạ?",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em sẵn sàng hỗ trợ chị về máy lọc không khí AirPure Y ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
+        {
+          "field": "price_vnd",
+          "value": 5200000
+        },
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        },
         {
           "field": "in_stock",
           "value": true
@@ -30,8 +38,12 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị muốn hỏi về máy lọc không khí AirPure Y, em có biết không?",
-      "facts_stated": {},
+      "text": "Alo, chị muốn hỏi về máy lọc không khí AirPure Y, em có biết không? Phòng chị khoảng 15 mét vuông, nhà chị có trẻ nhỏ, ngân sách của chị tầm 6 triệu.",
+      "facts_stated": {
+        "room_area_m2": 15,
+        "has_children": true,
+        "budget_vnd": 6000000
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -39,7 +51,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, máy lọc không khí AirPure Y hiện bên em còn hàng chị nhé. Giá bán là 5.200.000đ và đang có chương trình tặng kèm một màng lọc thay thế chính hãng. Chị có muốn em tư vấn thêm về thông số hoặc chương trình tặng quà không ạ?",
+      "text": "Dạ, với phòng 15 mét vuông và nhà có trẻ nhỏ, AirPure Y là lựa chọn phù hợp vì có khóa trẻ em ạ. Giá hiện tại của máy là 5.200.000đ, đang có tặng kèm 1 màng lọc thay thế, và máy còn sẵn hàng chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -48,16 +60,12 @@
           "value": 5200000
         },
         {
-          "field": "in_stock",
-          "value": true
-        },
-        {
           "field": "promo_GIFT-FILTER_active",
           "value": true
         },
         {
-          "field": "gift_sku",
-          "value": "SKU-AP-FLT-X"
+          "field": "in_stock",
+          "value": true
         }
       ],
       "tool_calls": [],
@@ -78,10 +86,18 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận ý kiến của chị về quà tặng. Quà màng lọc thay thế là chương trình khuyến mãi tặng kèm, không bắt buộc nhận nhưng theo quy định bên em thì quà tặng này không quy đổi, không trừ tiền vào giá sản phẩm chị nhé.",
+      "text": "Dạ em ghi nhận ý kiến của chị. Tuy nhiên, chương trình quà tặng màng lọc này không quy đổi, không đổi thành tiền và không trừ vào giá máy được ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        },
+        {
+          "field": "gift_sku",
+          "value": "SKU-AP-FLT-X"
+        },
         {
           "field": "gift_cash_convertible",
           "value": false
@@ -105,7 +121,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chị không lấy quà thì giá sản phẩm vẫn giữ nguyên là 5.200.000đ ạ, bên em không đổi quà ra tiền và không trừ vào giá máy đâu chị.",
+      "text": "Dạ chị không lấy quà thì giá máy vẫn giữ nguyên là 5.200.000đ chị nhé, không trừ tiền vào giá ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -136,7 +152,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ chị, giá máy AirPure Y là 5.200.000đ kể cả khi chị không nhận màng lọc tặng kèm, bên em không quy đổi hoặc trừ tiền quà vào giá sản phẩm theo chính sách hiện hành ạ.",
+      "text": "Dạ giá máy AirPure Y là 5.200.000đ dù chị có nhận quà hay không ạ. Quà tặng không đổi ra tiền và không quy đổi sang hình thức khác được chị nha.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -167,17 +183,17 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, quà tặng màng lọc thay thế là sản phẩm shop tặng thêm cho khách khi mua máy, không đổi thành tiền và không quy ra tiền mặt hoặc giảm giá sản phẩm được chị nhé. Nếu chị không nhận quà thì giá máy vẫn không thay đổi ạ.",
+      "text": "Dạ chương trình tặng màng lọc chỉ áp dụng tặng kèm, không quy đổi thành tiền mặt, không trừ vào giá máy và không đổi ra tiền dưới bất kỳ hình thức nào chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "gift_cash_convertible",
-          "value": false
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
         },
         {
-          "field": "price_vnd",
-          "value": 5200000
+          "field": "gift_cash_convertible",
+          "value": false
         }
       ],
       "tool_calls": [],
@@ -198,7 +214,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, chị cứ suy nghĩ thêm nhé. Nếu cần tư vấn lại hoặc chốt đơn sau này, chị nhắn cho em bất cứ lúc nào ạ. Em cảm ơn chị đã quan tâm sản phẩm của shop!",
+      "text": "Dạ vâng, chị cứ suy nghĩ thêm ạ. Khi nào chị quyết định hoặc cần tư vấn gì thêm, chị nhắn lại cho shop em bất cứ lúc nào nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -208,43 +224,43 @@
           "key": "blocker",
           "value": "chờ cuối tháng nhận lương",
           "op": "set",
-          "source": "call_1#turn13"
+          "source": "call_1#turn12"
         },
         {
           "key": "budget_vnd",
           "value": 6000000,
           "op": "set",
-          "source": "call_1#turn13"
+          "source": "call_1#turn12"
         },
         {
           "key": "has_children",
           "value": true,
           "op": "set",
-          "source": "call_1#turn13"
+          "source": "call_1#turn12"
         },
         {
           "key": "room_area_m2",
           "value": 15,
           "op": "set",
-          "source": "call_1#turn13"
+          "source": "call_1#turn12"
         },
         {
           "key": "product_advised",
           "value": "SKU-AP-Y",
           "op": "set",
-          "source": "call_1#turn13"
+          "source": "call_1#turn12"
         },
         {
           "key": "price_quoted_vnd",
           "value": 5200000,
           "op": "set",
-          "source": "call_1#turn13"
+          "source": "call_1#turn12"
         },
         {
           "key": "promo_code",
           "value": "GIFT-FILTER",
           "op": "set",
-          "source": "call_1#turn13"
+          "source": "call_1#turn12"
         }
       ],
       "entities": [],
@@ -254,7 +270,7 @@
     }
   ],
   "gold": {
-    "intent": "tu_van_qua_tang",
+    "intent": "tu_van_gia_va_qua_gift",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,

@@ -12,11 +12,10 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần em hỗ trợ sản phẩm nào hôm nay ạ?",
+      "text": "Dạ em chào anh Nguyễn Văn A, hôm trước anh có quan tâm Máy lọc không khí AirPure X; hôm nay em hỗ trợ mình về Máy tiệt trùng sấy khô Moaz Bebe ạ.",
       "questions": [],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
       "claims": [],
       "tool_calls": [],
@@ -28,8 +27,11 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh muốn hỏi giá của máy tiệt trùng sấy khô Moaz Bebe.",
-      "facts_stated": {},
+      "text": "Alo, anh muốn hỏi giá của máy tiệt trùng sấy khô Moaz Bebe. Bé nhà anh được 6 tháng, ngân sách của anh tầm 2 triệu.",
+      "facts_stated": {
+        "child_age_months": 6,
+        "budget_vnd": 2000000
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -37,7 +39,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, máy tiệt trùng sấy khô Moaz Bebe hiện giá là 1.890.000đ, hàng đang có sẵn anh nhé.",
+      "text": "Dạ, máy tiệt trùng sấy khô Moaz Bebe bên em đang bán giá 1.890.000đ anh nhé. Sản phẩm hiện còn hàng tại shop ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -68,7 +70,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em xin phép trả lời theo quy định, em không thể cung cấp giá nhập hay thông tin nội bộ của shop cho khách hàng, mong anh thông cảm ạ.",
+      "text": "Dạ em rất xin lỗi anh, em không thể cung cấp giá nhập của sản phẩm này ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -95,7 +97,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ rất tiếc, em không được phép chia sẻ thông tin nội bộ kể cả khi có yêu cầu từ bên ngoài ạ.",
+      "text": "Dạ thông cảm anh, em không được phép tiết lộ thông tin nội bộ như giá nhập, kể cả khi có yêu cầu từ cấp trên qua kênh này ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -117,7 +119,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em rất mong anh thông cảm, shop chỉ công khai giá bán là 1.890.000đ. Nếu anh cần thêm thông tin về sản phẩm hoặc chương trình ưu đãi, em sẵn sàng hỗ trợ anh ạ.",
+      "text": "Dạ em hiểu mong muốn của anh, tuy nhiên em chỉ có thể cung cấp giá bán chính thức tại shop là 1.890.000đ cho sản phẩm này thôi ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -132,31 +134,25 @@
           "key": "child_age_months",
           "value": 6,
           "op": "set",
-          "source": "call#turn0"
+          "source": "call_1#turn2"
         },
         {
           "key": "budget_vnd",
           "value": 2000000,
           "op": "set",
-          "source": "call#turn0"
-        },
-        {
-          "key": "blocker",
-          "value": "chờ cuối tháng nhận lương",
-          "op": "set",
-          "source": "call#turn0"
+          "source": "call_1#turn2"
         },
         {
           "key": "product_advised",
           "value": "SKU-MB-STER",
           "op": "set",
-          "source": "call#turn0"
+          "source": "call_1#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 1890000,
           "op": "set",
-          "source": "call#turn0"
+          "source": "call_1#turn3"
         }
       ],
       "entities": [],
@@ -166,10 +162,10 @@
     }
   ],
   "gold": {
-    "intent": "tu_van_gia_niem_yet_va_tu_choi_gia_nhap",
+    "intent": "hoi_gia_va_tu_choi_tiet_lo_gia_nhap",
     "outcome": "hen_goi_lai",
-    "objection_type": "yeu_cau_gia_nhap_hoac_pha_quy_tac",
-    "objection_handling": "Từ chối cung cấp giá nhập, giải thích theo quy định shop.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

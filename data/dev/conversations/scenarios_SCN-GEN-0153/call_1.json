@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị muốn tìm hiểu về máy lọc nước RO cho gia đình 3 người đúng không ạ?",
+      "text": "Dạ em chào chị Bích ạ, em là trợ lý ảo của shop BTC. Hôm trước chị có đặt Máy tiệt trùng Moaz Bebe, hiện đơn vẫn đang xử lý. Em có thể hỗ trợ chị về máy lọc nước RO cho gia đình mình ạ.",
       "questions": [],
       "facts_used": [
         "order_id",
@@ -22,37 +22,41 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Alo, chị muốn hỏi về máy lọc nước RO cho gia đình 3 người.",
-      "facts_stated": {
-        "usage_need": "gia đình 3 người"
-      },
-      "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "Alo, chị muốn hỏi về máy lọc nước RO cho gia đình 3 người. Ngân sách của chị tầm 8 triệu.",
+      "facts_stated": {
+        "usage_need": "gia đình 3 người",
+        "budget_vnd": 8000000
+      },
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ với gia đình 3 người, bên em tư vấn máy lọc nước RO Kangaroo 10 lõi, phù hợp dùng cho sinh hoạt hàng ngày và có bình chứa 10 lít. Chị muốn em báo giá sản phẩm này luôn không ạ?",
-      "questions": [
+      "text": "Dạ với nhu cầu gia đình 3 người, em tư vấn chị Máy lọc nước RO Kangaroo 10 lõi, phù hợp sử dụng và nằm trong ngân sách của mình. Máy đang sẵn hàng tại shop ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
         {
-          "slot": "price_quoted_vnd",
-          "type": "open",
-          "text": "Chị muốn em báo giá sản phẩm này luôn không ạ?"
+          "field": "price_vnd",
+          "value": 6890000
+        },
+        {
+          "field": "in_stock",
+          "value": true
         }
       ],
-      "facts_used": [],
-      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -61,13 +65,13 @@
       "text": "Em cho chị biết giá máy lọc nước này là bao nhiêu với.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, giá máy lọc nước RO Kangaroo 10 lõi bên em là 6.890.000đ chị nhé.",
+      "text": "Dạ giá máy lọc nước RO Kangaroo 10 lõi bên em là 6.890.000đ, giá niêm yết đã bao gồm VAT chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -79,7 +83,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -90,32 +94,21 @@
         "competitor_price_vnd": 6340000,
         "objection": "giá cao hơn chỗ khác"
       },
-      "entities": [
-        {
-          "type": "money",
-          "value": "6340000",
-          "spoken": "6 triệu 340 ngàn"
-        }
-      ],
-      "pause_before_ms": 0,
+      "entities": [],
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn chị đã phản hồi. Giá bên em là giá niêm yết chính hãng kèm bảo hành 36 tháng, đổi trả 7 ngày và hỗ trợ lắp đặt tận nơi. Sản phẩm luôn đảm bảo hàng mới, có hóa đơn và nguồn gốc rõ ràng ạ.",
+      "text": "Dạ em cảm ơn chị đã phản hồi. Bên em cam kết máy chính hãng mới 100%, bảo hành 36 tháng, hỗ trợ đổi trả theo chính sách, và có giao hàng miễn phí toàn quốc với đơn từ 2 triệu ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 6890000
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -124,13 +117,13 @@
       "text": "Có khuyến mãi gì không em?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại sản phẩm này bên em chưa có chương trình khuyến mãi giảm giá, nhưng chị sẽ được miễn phí vận chuyển toàn quốc và không mất phí thu hộ khi nhận hàng ạ.",
+      "text": "Dạ hiện tại sản phẩm này chưa có khuyến mãi giảm giá, nhưng chị được miễn phí vận chuyển và miễn phí thu hộ khi nhận hàng COD ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -146,7 +139,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -155,13 +148,13 @@
       "text": "Thế này nhé, chị cần hỏi thêm rồi sẽ gọi lại sau.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 0,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, chị cứ cân nhắc thêm, khi nào cần tư vấn hoặc đặt hàng chị gọi lại cho shop BTC nhé. Em cảm ơn chị đã liên hệ ạ.",
+      "text": "Dạ vâng, chị cứ cân nhắc thêm giúp em ạ. Khi nào chị cần tư vấn hoặc đặt hàng, chị liên hệ lại shop BTC nhé, em luôn sẵn sàng hỗ trợ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -171,50 +164,50 @@
           "key": "budget_vnd",
           "value": 8000000,
           "op": "set",
-          "source": "call_1#turn12"
+          "source": "call_1#turn2"
         },
         {
           "key": "competitor_price_vnd",
           "value": 6340000,
           "op": "set",
-          "source": "call_1#turn12"
+          "source": "call_1#turn6"
         },
         {
           "key": "objection",
           "value": "giá cao hơn chỗ khác",
           "op": "set",
-          "source": "call_1#turn12"
+          "source": "call_1#turn6"
         },
         {
           "key": "usage_need",
           "value": "gia đình 3 người",
           "op": "set",
-          "source": "call_1#turn12"
+          "source": "call_1#turn2"
         },
         {
           "key": "product_advised",
           "value": "SKU-WF-RO10",
           "op": "set",
-          "source": "call_1#turn12"
+          "source": "call_1#turn3"
         },
         {
           "key": "price_quoted_vnd",
           "value": 6890000,
           "op": "set",
-          "source": "call_1#turn12"
+          "source": "call_1#turn5"
         }
       ],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "hen_goi_lai",
+    "intent": "hoi_san_pham_gia_km",
     "outcome": "hen_goi_lai",
-    "objection_type": "giá cao hơn chỗ khác",
-    "objection_handling": "Nêu giá trị bảo hành, đổi trả, chính hãng, miễn phí vận chuyển và COD.",
+    "objection_type": "so_sanh_gia",
+    "objection_handling": "Nêu giá trị đi kèm: chính hãng, bảo hành 36 tháng, đổi trả, freeship.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

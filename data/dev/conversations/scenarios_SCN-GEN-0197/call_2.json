@@ -12,16 +12,15 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Dung ạ, em là trợ lý ảo của shop BTC. Hôm qua chị có gọi hỏi về máy lọc nước đúng không ạ?",
-      "questions": [
+      "text": "Dạ em chào chị Dung ạ, em là trợ lý ảo của shop BTC, em có thể hỗ trợ gì cho mình hôm nay ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
         {
-          "slot": "other",
-          "type": "open",
-          "text": "Hôm qua chị có gọi hỏi về máy lọc nước đúng không ạ?"
+          "field": "is_human",
+          "value": false
         }
       ],
-      "facts_used": [],
-      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -31,46 +30,19 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị Dung đây, hôm qua có gọi hỏi máy lọc nước.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ vâng, em cảm ơn chị đã gọi lại. Chị muốn đặt máy lọc nước RO Karofi 9 lõi đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Chị muốn đặt máy lọc nước RO Karofi 9 lõi đúng không ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Bây giờ chị muốn mua máy lọc nước RO Karofi 9 lõi rồi.",
+      "text": "Alo, chị Dung đây, hôm qua cô Loan có gọi hỏi máy lọc nước. Phòng chị khoảng 10 mét vuông, ngân sách của chị tầm 2 triệu rưỡi.",
       "facts_stated": {
-        "product_advised": "SKU-WF-RO9"
+        "room_area_m2": 10,
+        "budget_vnd": 2500000
       },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận nhu cầu của chị. Tuy nhiên hiện tại bên em chỉ còn hàng máy lọc không khí AirPure Mini với giá 2.190.000đ, phù hợp phòng nhỏ như phòng chị đã trao đổi trước đó ạ.",
+      "text": "Dạ em cảm ơn chị đã chia sẻ thông tin. Với phòng 10 mét vuông và ngân sách 2 triệu rưỡi, hiện tại máy lọc không khí AirPure Mini là phù hợp nhất, giá 2.190.000đ và đang còn hàng ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -92,35 +64,59 @@
     },
     {
       "speaker": "customer",
+      "text": "Bây giờ chị muốn mua máy lọc không khí AirPure Mini.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ chị chọn máy AirPure Mini, em ghi nhận nhu cầu của mình ạ. Mình muốn giao hàng ở đâu và chọn phương thức thanh toán nào ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "open",
+          "text": "Mình muốn giao hàng ở đâu và chọn phương thức thanh toán nào ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
       "text": "Chị thanh toán bằng chuyển khoản và giao ở Quận 7, TP.HCM nhé.",
       "facts_stated": {
         "payment": "bank",
         "delivery_area": "Quận 7, TP.HCM"
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, chị chọn thanh toán chuyển khoản và giao hàng tại Quận 7, TP.HCM đúng không ạ? Máy AirPure Mini bên em đang có sẵn, giá 2.190.000đ đã bao gồm miễn phí vận chuyển. Em xin phép đọc lại đơn hàng để chị xác nhận nhé: 1 máy lọc không khí AirPure Mini, giao tại Quận 7, TP.HCM, thanh toán chuyển khoản. Dự kiến giao ngày 09/11/2026. Thông tin như vậy đúng chưa chị?",
+      "text": "Dạ em xác nhận: chị đặt 1 máy lọc không khí AirPure Mini, giá 2.190.000đ, giao ở Quận 7, TP.HCM và thanh toán chuyển khoản. Dự kiến giao hàng ngày 09/11/2026. Em lên đơn cho chị nhé, các thông tin đã đúng chưa ạ?",
       "questions": [
         {
           "slot": "order_summary",
           "type": "confirm",
-          "text": "Em xin phép đọc lại đơn hàng để chị xác nhận nhé: 1 máy lọc không khí AirPure Mini, giao tại Quận 7, TP.HCM, thanh toán chuyển khoản. Dự kiến giao ngày 09/11/2026. Thông tin như vậy đúng chưa chị?"
+          "text": "Em lên đơn cho chị nhé, các thông tin đã đúng chưa ạ?"
         }
       ],
       "facts_used": [],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 2190000
-        },
-        {
-          "field": "in_stock",
-          "value": true
+          "field": "estimated_delivery",
+          "value": "2026-11-09"
         }
       ],
       "tool_calls": [
@@ -143,19 +139,23 @@
       "text": "Làm ơn giúp chị làm đơn hàng này đi.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã tạo đơn cho chị thành công ạ. Đơn hàng sẽ được giao dự kiến vào ngày 09/11/2026. Cảm ơn chị Dung đã đặt hàng tại shop BTC!",
+      "text": "Dạ em đã lên đơn hàng cho chị thành công, mã đơn OD600001, tổng cộng 2.190.000đ. Shop sẽ giao hàng dự kiến ngày 09/11/2026 và em sẽ gửi thông tin chi tiết qua Zalo hoặc SMS cho chị ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 2190000
+        },
+        {
+          "field": "in_stock",
+          "value": true
         }
       ],
       "tool_calls": [
@@ -183,19 +183,13 @@
           "key": "delivery_area",
           "value": "Quận 7, TP.HCM",
           "op": "set",
-          "source": "call_2#turn1"
-        },
-        {
-          "key": "has_children",
-          "value": true,
-          "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn5"
         },
         {
           "key": "payment",
           "value": "bank",
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn5"
         },
         {
           "key": "room_area_m2",
@@ -207,19 +201,19 @@
           "key": "product_advised",
           "value": "SKU-AP-MINI",
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn3"
         },
         {
           "key": "price_quoted_vnd",
           "value": 2190000,
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn3"
         },
         {
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_2#turn1"
+          "source": "call_2#turn9"
         }
       ],
       "entities": [],
@@ -229,10 +223,10 @@
     },
     {
       "speaker": "customer",
-      "text": "Đúng rồi cháu, lên đơn giúp cô nhé.",
+      "text": "Đúng rồi em, lên đơn giúp chị nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
@@ -253,8 +247,8 @@
       "price_vnd": 2190000,
       "payment": "bank",
       "address": "Quận 7, TP.HCM",
-      "estimated_delivery": "2026-11-09",
-      "order_id": "OD600001"
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-11-09"
     }
   }
 }

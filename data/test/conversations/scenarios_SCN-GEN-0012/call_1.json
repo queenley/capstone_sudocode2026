@@ -12,14 +12,29 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, rất vui được hỗ trợ anh về máy hút sữa điện đôi Spectra S1.",
-      "questions": [],
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh muốn tư vấn về máy hút sữa điện đôi Spectra S1 đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh đang quan tâm đến máy hút sữa điện đôi Spectra S1 đúng không ạ?"
+        }
+      ],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4290000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -31,18 +46,18 @@
         "child_age_months": 12
       },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ anh quan tâm máy hút sữa điện đôi Spectra S1 cho bé 12 tháng đúng không ạ? Máy này hiện shop đang có hàng với giá 4.290.000đ, được miễn phí vận chuyển toàn quốc theo chương trình MOM-FREESHIP ạ.",
+      "text": "Dạ, máy Spectra S1 hiện tại bên em đang sẵn hàng với giá 4.290.000đ. Đơn từ 500.000đ sẽ được miễn phí vận chuyển toàn quốc theo chương trình MOM-FREESHIP ạ. Anh có ngân sách dự kiến cho sản phẩm này không để em tư vấn phù hợp hơn?",
       "questions": [
         {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Anh quan tâm máy hút sữa điện đôi Spectra S1 cho bé 12 tháng đúng không ạ?"
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Anh có ngân sách dự kiến cho sản phẩm này không để em tư vấn phù hợp hơn?"
         }
       ],
       "facts_used": [],
@@ -56,24 +71,14 @@
           "value": true
         },
         {
-          "field": "promo_active",
-          "value": true
-        },
-        {
           "field": "in_stock",
           "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "4290000",
-          "spoken": "4.290.000"
-        }
-      ],
-      "pause_before_ms": 400,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -83,20 +88,14 @@
       "facts_stated": {
         "budget_vnd": 4500000
       },
-      "entities": [
-        {
-          "type": "money",
-          "value": "4500000",
-          "spoken": "4 triệu rưỡi"
-        }
-      ],
-      "pause_before_ms": 600,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giá máy hiện tại là 4.290.000đ, nằm trong ngân sách của anh và đã áp dụng chương trình miễn phí vận chuyển MOM-FREESHIP. Máy còn hàng tại shop, anh có thể nhận hàng nhanh trong 1–4 ngày tùy khu vực ạ.",
+      "text": "Dạ, hiện tại máy Spectra S1 đúng với ngân sách 4 triệu rưỡi của anh ạ. Máy đang áp dụng khuyến mãi miễn phí vận chuyển toàn quốc theo chương trình MOM-FREESHIP, tuy nhiên chưa có giảm giá trực tiếp cho sản phẩm này tại thời điểm hôm nay ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -110,23 +109,13 @@
         },
         {
           "field": "promo_active",
-          "value": true
-        },
-        {
-          "field": "in_stock",
-          "value": true
+          "value": false
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "4290000",
-          "spoken": "4.290.000"
-        }
-      ],
-      "pause_before_ms": 400,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -135,20 +124,20 @@
       "text": "Máy này có an toàn cho bé không nhỉ?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ về độ an toàn, máy hút sữa Spectra S1 là dòng chính hãng, đạt tiêu chuẩn của nhà sản xuất và phù hợp sử dụng cho bé nhỏ. Tuy nhiên, em chưa có thông tin về các tác dụng y tế cụ thể hoặc liên quan đến sức khỏe bé, nếu anh cần tư vấn sâu hơn về y tế em sẽ chuyển máy cho nhân viên chuyên môn hỗ trợ thêm ạ.",
+      "text": "Dạ, về an toàn sản phẩm, máy Spectra S1 là hàng chính hãng, sử dụng chất liệu an toàn và đạt tiêu chuẩn của nhà sản xuất. Tuy nhiên, em chưa có thông tin y tế chuyên sâu về tác động đối với bé nên sẽ ghi nhận câu hỏi của anh và chuyển cho nhân viên chuyên môn phản hồi thêm nếu anh cần ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -170,13 +159,13 @@
           "spoken": "7 giờ"
         }
       ],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận, em sẽ gọi lại cho anh vào 7 giờ tối thứ Hai, ngày 19/10 để hỗ trợ tiếp anh nhé. Em chúc anh và gia đình nhiều sức khỏe ạ!",
+      "text": "Dạ em đã ghi nhận, em sẽ gọi lại cho anh vào lúc 7 giờ tối thứ Hai ngày 19/10 để hỗ trợ thêm cho mình ạ. Cảm ơn anh đã quan tâm sản phẩm của shop BTC! Chúc anh buổi tối vui vẻ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -224,28 +213,17 @@
           "key": "price_quoted_vnd",
           "value": 4290000,
           "op": "set",
-          "source": "call_1#turn3"
+          "source": "call_1#turn5"
         },
         {
           "key": "promo_code",
           "value": "MOM-FREESHIP",
           "op": "set",
-          "source": "call_1#turn3"
+          "source": "call_1#turn5"
         }
       ],
-      "entities": [
-        {
-          "type": "date",
-          "value": "2026-10-19",
-          "spoken": "ngày 19/10"
-        },
-        {
-          "type": "time",
-          "value": "19:00",
-          "spoken": "7 giờ"
-        }
-      ],
-      "pause_before_ms": 400,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
@@ -253,21 +231,19 @@
   "gold": {
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "phai_hoi_nguoi_nha",
-    "objection_handling": "Đặt lịch gọi lại đúng thời gian khách mong muốn, nhắc lại khung giờ cụ thể.",
+    "objection_type": "can_hoi_nguoi_nha",
+    "objection_handling": "Đã xác nhận thời điểm gọi lại và ghi chú lý do khách cần hỏi gia đình.",
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [
       {
-        "type": "callback",
-        "time": "2026-10-19T19:00",
-        "note": "khách hỏi người nhà rồi báo lại"
+        "callback_at": "2026-10-19T19:00"
       }
     ],
     "supersedes": [],
     "callback": {
       "callback_at": "2026-10-19T19:00",
-      "note": "khách hỏi người nhà rồi báo lại"
+      "reason": "khách hỏi người nhà rồi báo lại"
     },
     "order": null
   }

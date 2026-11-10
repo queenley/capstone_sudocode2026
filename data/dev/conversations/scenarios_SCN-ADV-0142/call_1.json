@@ -12,28 +12,22 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần hỗ trợ về xe đẩy Combi Sugocal đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Anh cần tư vấn về xe đẩy 2 chiều Combi Sugocal đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, rất vui được hỗ trợ anh về xe đẩy Combi Sugocal cho bé 11 tháng tuổi.",
+      "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh muốn hỏi về xe đẩy 2 chiều Combi Sugocal mà em đã tư vấn hôm trước.",
+      "text": "Alo, anh muốn hỏi về xe đẩy 2 chiều Combi Sugocal mà em đã tư vấn hôm trước. Bé nhà anh được 11 tháng.",
       "facts_stated": {
-        "product_advised": "SKU-MB-STR2"
+        "child_age_months": 11
       },
       "entities": [],
       "pause_before_ms": 0,
@@ -42,19 +36,14 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ xe đẩy 2 chiều Combi Sugocal hiện bên em đang có sẵn hàng anh nhé. Sản phẩm này phù hợp cho bé từ sơ sinh đến khoảng 3 tuổi, có thể gập gọn và đủ tiêu chuẩn xách tay lên máy bay.",
+      "text": "Dạ xe đẩy 2 chiều Combi Sugocal phù hợp cho bé từ sơ sinh đến khoảng 3 tuổi, chịu tải đến 15kg, gấp hai chiều tiện lợi và có màu navy hoặc be ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -81,7 +70,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -96,7 +85,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại anh được miễn phí vận chuyển toàn quốc cho đơn hàng này theo chương trình MOM-FREESHIP, ngoài ra còn được miễn phí thu hộ khi nhận hàng anh nhé.",
+      "text": "Dạ hiện tại xe đẩy Combi Sugocal đang được miễn phí vận chuyển toàn quốc với chương trình MOM-FREESHIP, ngoài ra chưa có giảm giá trực tiếp hay quà tặng kèm anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -105,14 +94,14 @@
           "value": true
         },
         {
-          "field": "promo_COD-0_active",
-          "value": true
+          "field": "promo_active",
+          "value": false
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -129,19 +118,14 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giá sản phẩm hiện tại là 6.790.000đ nên nằm trong ngân sách của anh rồi ạ.",
+      "text": "Dạ sản phẩm này nằm trong ngân sách của anh, giá đã bao gồm miễn phí vận chuyển rồi ạ.",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 6790000
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -158,14 +142,14 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại bên em chưa hỗ trợ trả góp qua công ty tài chính hay thẻ tín dụng anh nhé. Anh có thể thanh toán chuyển khoản hoặc nhận hàng thanh toán COD ạ.",
+      "text": "Dạ hiện tại shop chưa hỗ trợ trả góp qua công ty tài chính hay thẻ tín dụng, anh có thể thanh toán chuyển khoản hoặc COD đơn dưới 10 triệu ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -180,14 +164,20 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ xe đẩy Combi Sugocal có hai màu navy và be, trọng lượng nhẹ chỉ 5,2kg, chịu tải đến 15kg và có thể gập gọn một tay rất tiện cho việc di chuyển anh nhé. Sản phẩm bảo hành 12 tháng chính hãng ạ.",
-      "questions": [],
+      "text": "Dạ anh muốn biết thêm thông tin gì về xe đẩy hoặc cần so sánh với dòng khác không ạ? Em sẵn sàng hỗ trợ anh thêm thông tin về sản phẩm hoặc chế độ bảo hành, đổi trả nếu anh quan tâm.",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh cần tư vấn thêm về điểm nào hay muốn so sánh với xe đẩy khác không ạ?"
+        }
+      ],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -199,63 +189,13 @@
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ vâng, anh cứ cân nhắc thêm nhé. Nếu cần hỗ trợ hoặc muốn đặt hàng, anh cứ liên hệ lại cho shop bất cứ lúc nào ạ. Em cảm ơn anh đã quan tâm sản phẩm của shop BTC.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [
-        {
-          "key": "blocker",
-          "value": "muốn trả góp",
-          "op": "set",
-          "source": "call_1#turn13"
-        },
-        {
-          "key": "budget_vnd",
-          "value": 7000000,
-          "op": "set",
-          "source": "call_1#turn9"
-        },
-        {
-          "key": "child_age_months",
-          "value": 11,
-          "op": "set",
-          "source": "call_1#turn1"
-        },
-        {
-          "key": "product_advised",
-          "value": "SKU-MB-STR2",
-          "op": "set",
-          "source": "call_1#turn1"
-        },
-        {
-          "key": "price_quoted_vnd",
-          "value": 6790000,
-          "op": "set",
-          "source": "call_1#turn5"
-        },
-        {
-          "key": "promo_code",
-          "value": "MOM-FREESHIP",
-          "op": "set",
-          "source": "call_1#turn7"
-        }
-      ],
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
     }
   ],
   "gold": {
-    "intent": "tu_van_xe_day_combi_sugocal",
+    "intent": "tu_van_xe_day_combi",
     "outcome": "hen_goi_lai",
-    "objection_type": "muon_tra_gop",
-    "objection_handling": "Thông báo shop chưa hỗ trợ trả góp, hướng dẫn thanh toán chuyển khoản hoặc COD.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],

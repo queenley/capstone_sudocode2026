@@ -12,33 +12,38 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào cô ạ, em là trợ lý ảo của shop BTC. Cô muốn hỏi về xe đẩy cho bé 13 tháng tuổi đúng không ạ?",
+      "text": "Dạ em chào anh, em là trợ lý ảo của shop BTC. Anh muốn tìm xe đẩy cho bé 13 tháng, ngân sách khoảng 4 triệu đúng không ạ?",
       "questions": [
         {
-          "slot": "child_age_months",
+          "slot": "product_advised",
           "type": "confirm",
-          "text": "Cô hỏi xe đẩy cho bé 13 tháng tuổi đúng không ạ?"
+          "text": "Anh muốn tham khảo xe đẩy cho bé 13 tháng tuổi và ngân sách khoảng 4 triệu phải không ạ?"
         }
       ],
       "facts_used": [],
       "claims": [
         {
-          "field": "child_age_months",
-          "value": 13
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 800,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "alo co muon hoi ve cai xe day cho chau 13 thang tuoi",
+      "text": "alo anh muon hoi ve cai xe day cho be nha anh 13 thang tuoi ngan sach cua anh tam 4 trieu",
       "facts_stated": {
-        "child_age_months": 13
+        "child_age_months": 13,
+        "budget_vnd": 4000000
       },
       "entities": [],
       "pause_before_ms": 0,
@@ -47,10 +52,19 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ dòng xe đẩy cho bé 13 tháng, bên shop còn mẫu Joie Pact gấp gọn, dùng từ sơ sinh đến 4 tuổi, gấp một tay rất tiện cô nhé.",
+      "text": "Dạ hiện tại, shop đang có mẫu Xe đẩy gấp gọn Joie Pact phù hợp cho bé từ sơ sinh đến 4 tuổi, giá 3.490.000đ anh nhé.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -60,7 +74,7 @@
     },
     {
       "speaker": "customer",
-      "text": "cai xe day nay co gia bao nhieu vay chau",
+      "text": "cai xe day nay co gia bao nhieu vay em",
       "facts_stated": {},
       "entities": [],
       "pause_before_ms": 0,
@@ -69,19 +83,23 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại xe đẩy Joie Pact bên shop đang có giá 3.490.000đ cô ạ.",
+      "text": "Dạ, xe đẩy Joie Pact bên em giá 3.490.000đ ạ. Xe còn hàng, bảo hành 12 tháng chính hãng anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 3490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 300,
+      "pause_before_ms": 350,
       "emotion": null,
       "barge_in": false
     },
@@ -96,7 +114,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, xe đẩy Joie Pact đang áp dụng chương trình miễn phí vận chuyển toàn quốc cho đơn từ 500.000đ, cô mua sẽ được freeship ngay cô nhé.",
+      "text": "Dạ, xe này đang được miễn phí vận chuyển toàn quốc với chương trình MOM-FREESHIP, anh không mất phí ship khi đặt hàng ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -108,15 +126,15 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 350,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "co can hoi con chau da nhe",
+      "text": "anh can hoi nguoi nha da nhe",
       "facts_stated": {
-        "blocker": "cần hỏi con cháu"
+        "blocker": "cần hỏi người nhà"
       },
       "entities": [],
       "pause_before_ms": 0,
@@ -125,29 +143,35 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, cô cứ hỏi lại ý con rồi báo cho shop sau cũng được cô nhé.",
+      "text": "Dạ vâng, anh cứ trao đổi thêm với người nhà rồi báo lại cho em sau nhé. Khi nào anh quyết định, em sẽ hỗ trợ giữ ưu đãi và chốt đơn nhanh cho mình.",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 350,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "co hen chau toi mai tam 7 gio nhe",
+      "text": "anh hen em toi mai tam 7 gio nhe",
       "facts_stated": {},
-      "entities": [],
+      "entities": [
+        {
+          "type": "time",
+          "value": "19:00",
+          "spoken": "7 gio"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em ghi nhận hẹn gọi lại cho cô vào lúc 7 giờ tối ngày mai ạ.",
+      "text": "Dạ, em đã ghi nhận lịch hẹn gọi lại cho anh vào 7 giờ tối mai ạ. Em sẽ liên hệ đúng 19 giờ ngày mai để hỗ trợ thêm cho anh.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -174,7 +198,7 @@
     },
     {
       "speaker": "customer",
-      "text": "chau goi lai cho co dung gio do nhe",
+      "text": "em goi lai cho anh dung gio do nhe",
       "facts_stated": {},
       "entities": [],
       "pause_before_ms": 0,
@@ -183,7 +207,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, em sẽ gọi lại cho cô đúng vào 7 giờ tối ngày mai nhé. Cô cứ yên tâm ạ.",
+      "text": "Dạ anh yên tâm, em sẽ gọi lại đúng 7 giờ tối mai để hỗ trợ anh. Em cám ơn anh đã quan tâm sản phẩm của shop BTC ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -196,7 +220,7 @@
       "memory_writes": [
         {
           "key": "blocker",
-          "value": "cần hỏi con cháu",
+          "value": "cần hỏi người nhà",
           "op": "set",
           "source": "call_1#turn8"
         },
@@ -204,25 +228,25 @@
           "key": "budget_vnd",
           "value": 4000000,
           "op": "set",
-          "source": "call_1#turn0"
+          "source": "call_1#turn2"
         },
         {
           "key": "child_age_months",
           "value": 13,
           "op": "set",
-          "source": "call_1#turn0"
+          "source": "call_1#turn2"
         },
         {
           "key": "decision_maker",
           "value": "con",
           "op": "set",
-          "source": "call_1#turn0"
+          "source": "call_1#turn2"
         },
         {
           "key": "product_advised",
           "value": "SKU-MB-STR1",
           "op": "set",
-          "source": "call_1#turn0"
+          "source": "call_1#turn2"
         },
         {
           "key": "price_quoted_vnd",
@@ -247,18 +271,18 @@
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
     "objection_type": "cần hỏi người nhà",
-    "objection_handling": "Đồng ý cho khách hỏi ý người nhà, hẹn gọi lại theo giờ khách yêu cầu.",
+    "objection_handling": "Đồng ý cho khách hỏi người nhà, ghi nhận hẹn gọi lại đúng thời gian khách yêu cầu.",
     "sentiment": "neutral",
     "decision_maker": "con",
     "commitments": [
       {
-        "commitment": "Gọi lại khách vào 19h ngày 17/10/2026"
+        "hẹn_gọi_lại": "2026-10-17T19:00"
       }
     ],
     "supersedes": [],
     "callback": {
       "callback_at": "2026-10-17T19:00",
-      "reason": "khách hỏi người nhà rồi báo lại"
+      "note": "khách hỏi người nhà rồi báo lại"
     },
     "order": null
   }

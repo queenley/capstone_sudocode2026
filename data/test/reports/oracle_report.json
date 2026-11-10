@@ -7,8 +7,8 @@
   },
   "context_carryover_rate": {
     "value": 100.0,
-    "used": 464,
-    "required": 464
+    "used": 449,
+    "required": 449
   },
   "task_success_rate": {
     "value": 100.0,
@@ -31,10 +31,10 @@
     },
     "examples": []
   },
-  "avg_turns_per_call": 4.55,
+  "avg_turns_per_call": 4.6,
   "calls_to_close": {
-    "value": 1.81,
-    "n_closed": 59,
+    "value": 1.84,
+    "n_closed": 57,
     "n_scenarios": 99
   },
   "guardrail_violations": {
@@ -641,7 +641,7 @@
       "scenario": "SCN-ADV-0021",
       "call": "call_1",
       "expected": {
-        "blocker": "cần hỏi con cháu",
+        "blocker": "cần hỏi người nhà",
         "budget_vnd": 7000000,
         "decision_maker": "con",
         "has_children": true,
@@ -730,7 +730,6 @@
         "product_advised": "SKU-AP-PRO",
         "price_quoted_vnd": 7590000,
         "promo_code": "TRADE-IN-AP",
-        "order_id": "OD600001",
         "superseded": {
           "delivery_area": "Đống Đa, Hà Nội",
           "room_area_m2": 20
@@ -746,8 +745,7 @@
         "room_area_m2": true,
         "product_advised": true,
         "price_quoted_vnd": true,
-        "promo_code": true,
-        "order_id": true
+        "promo_code": true
       },
       "has_memory_writes": true,
       "verdict": "likely_ok"
@@ -927,8 +925,7 @@
         "usage_need": "dùng cho gia đình",
         "product_advised": "SKU-AP-FLT-X",
         "price_quoted_vnd": 586500,
-        "promo_code": "11-11",
-        "order_id": "OD600001"
+        "promo_code": "11-11"
       },
       "found_in_memory_writes": {
         "blocker": true,
@@ -938,8 +935,7 @@
         "usage_need": true,
         "product_advised": true,
         "price_quoted_vnd": true,
-        "promo_code": true,
-        "order_id": true
+        "promo_code": true
       },
       "has_memory_writes": true,
       "verdict": "likely_ok"
@@ -996,7 +992,7 @@
       "expected": {
         "blocker": "để bàn với gia đình",
         "budget_vnd": 5500000,
-        "has_children": false,
+        "has_children": true,
         "room_area_m2": 15,
         "product_advised": "SKU-AP-X",
         "price_quoted_vnd": 4890000,
@@ -1432,7 +1428,7 @@
       "scenario": "SCN-ADV-0046",
       "call": "call_1",
       "expected": {
-        "budget_vnd": 8500000,
+        "budget_vnd": 8000000,
         "delivery_area": "Thủ Đức, TP.HCM",
         "has_children": true,
         "payment": "bank",
@@ -1662,9 +1658,7 @@
       "scenario": "SCN-GEN-0004",
       "call": "call_2",
       "expected": {
-        "budget_vnd": 2500000,
         "delivery_area": "Ninh Kiều, Cần Thơ",
-        "has_children": false,
         "payment": "bank",
         "room_area_m2": 12,
         "product_advised": "SKU-AP-MINI",
@@ -1674,9 +1668,7 @@
         "must_not_write_to": "C034"
       },
       "found_in_memory_writes": {
-        "budget_vnd": true,
         "delivery_area": true,
-        "has_children": true,
         "payment": true,
         "room_area_m2": true,
         "product_advised": true,
@@ -1714,7 +1706,6 @@
       "scenario": "SCN-GEN-0005",
       "call": "call_2",
       "expected": {
-        "budget_vnd": 6000000,
         "delivery_area": "Cần Thơ",
         "payment": "COD",
         "usage_need": "gia đình 5 người",
@@ -1724,7 +1715,6 @@
         "must_not_write_to": "C035"
       },
       "found_in_memory_writes": {
-        "budget_vnd": true,
         "delivery_area": true,
         "payment": true,
         "usage_need": true,
@@ -1915,7 +1905,7 @@
       "call": "call_1",
       "expected": {
         "blocker": "chờ cuối tháng nhận lương",
-        "budget_vnd": 8500000,
+        "budget_vnd": 8000000,
         "has_children": false,
         "room_area_m2": 25,
         "product_advised": "SKU-AP-PRO",
@@ -2761,7 +2751,6 @@
       "scenario": "SCN-GEN-0031",
       "call": "call_2",
       "expected": {
-        "budget_vnd": 6000000,
         "delivery_area": "Cần Thơ",
         "payment": "COD",
         "usage_need": "gia đình 6 người",
@@ -2772,7 +2761,6 @@
         "must_not_write_to": "C035"
       },
       "found_in_memory_writes": {
-        "budget_vnd": true,
         "delivery_area": true,
         "payment": true,
         "usage_need": true,
@@ -2971,7 +2959,7 @@
       "scenario": "SCN-GEN-0036",
       "call": "call_2",
       "expected": {
-        "budget_vnd": 8100000,
+        "budget_vnd": 8500000,
         "delivery_area": "Thủ Đức, TP.HCM",
         "payment": "bank",
         "product_advised": "SKU-MB-STR2",
@@ -3438,7 +3426,6 @@
       "scenario": "SCN-GEN-0047",
       "call": "call_2",
       "expected": {
-        "budget_vnd": 2500000,
         "delivery_area": "Thủ Đức, TP.HCM",
         "has_children": true,
         "payment": "bank",
@@ -3450,7 +3437,6 @@
         "must_not_write_to": "C034"
       },
       "found_in_memory_writes": {
-        "budget_vnd": true,
         "delivery_area": true,
         "has_children": true,
         "payment": true,
@@ -3501,7 +3487,7 @@
       "call": "call_1",
       "expected": {
         "blocker": "cần suy nghĩ thêm",
-        "budget_vnd": 8500000,
+        "budget_vnd": 8000000,
         "has_children": true,
         "room_area_m2": 30,
         "product_advised": "SKU-AP-PRO",
@@ -3522,7 +3508,7 @@
       "scenario": "SCN-GEN-0049",
       "call": "call_2",
       "expected": {
-        "budget_vnd": 8500000,
+        "budget_vnd": 8000000,
         "delivery_area": "Cầu Giấy, Hà Nội",
         "payment": "bank",
         "product_advised": "SKU-AP-PRO",
@@ -3580,15 +3566,15 @@
     }
   ],
   "latency": {
-    "n_turns": 874,
+    "n_turns": 884,
     "warning": null,
     "ttft": {
-      "n": 874,
+      "n": 884,
       "p50_ms": 0,
       "p95_ms": 0
     },
     "total": {
-      "n": 874,
+      "n": 884,
       "p50_ms": 0,
       "p95_ms": 0
     },

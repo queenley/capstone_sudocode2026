@@ -12,19 +12,44 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Anh cần hỗ trợ về xe đẩy gấp gọn Joie Pact đúng không ạ?",
+      "text": "Dạ em chào anh, em là trợ lý ảo của shop BTC. Anh muốn tư vấn xe đẩy gấp gọn Joie Pact đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Anh cần hỗ trợ về xe đẩy gấp gọn Joie Pact đúng không ạ?"
+          "text": "Anh cần tư vấn xe đẩy gấp gọn Joie Pact đúng không ạ?"
         }
       ],
       "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo em oi anh muon hoi xe day gap gon joie pact be nha anh duoc 6 thang ngan sach cua anh tam 4 trieu",
+      "facts_stated": {
+        "child_age_months": 6,
+        "budget_vnd": 4000000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ xe đẩy Joie Pact phù hợp cho bé từ sơ sinh đến 4 tuổi, tải trọng 22kg, rất tiện cho mình mang đi xa. Xe đang có giá 3.490.000đ, nằm trong ngân sách của anh ạ.",
+      "questions": [],
+      "facts_used": [],
       "claims": [
         {
-          "field": "in_stock",
-          "value": true
+          "field": "price_vnd",
+          "value": 3490000
         }
       ],
       "tool_calls": [],
@@ -36,51 +61,30 @@
     },
     {
       "speaker": "customer",
-      "text": "alo em oi anh muon hoi xe day gap gon joie pact",
-      "facts_stated": {
-        "product_advised": "SKU-MB-STR1"
-      },
-      "entities": [],
-      "pause_before_ms": 350,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ hiện tại xe đẩy gấp gọn Joie Pact bên em đang có hàng sẵn, phù hợp cho bé từ sơ sinh tới khoảng 4 tuổi, tải trọng tối đa 22kg anh nhé.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 450,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
       "text": "gia cua xe nay la bao nhieu em nhỉ",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giá xe đẩy Joie Pact hiện tại là 3.490.000đ anh nhé.",
+      "text": "Dạ xe đẩy gấp gọn Joie Pact hiện tại giá 3.490.000đ anh nhé. Xe còn hàng tại shop và miễn phí vận chuyển toàn quốc cho ngành mẹ & bé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 3490000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
         }
       ],
       "tool_calls": [],
@@ -95,13 +99,13 @@
       "text": "nghe noi co khuyen mai gi khong",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 350,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại khi mua xe đẩy Joie Pact, đơn từ 500.000đ sẽ được miễn phí vận chuyển toàn quốc theo chương trình MOM-FREESHIP anh nhé. Ngoài ra, đơn hàng dưới 10 triệu có thể thanh toán khi nhận hàng và shop cũng miễn phí thu hộ.",
+      "text": "Dạ hiện tại xe đẩy Joie Pact được miễn phí vận chuyển toàn quốc theo chương trình MOM-FREESHIP. Ngoài ra, shop còn hỗ trợ thanh toán khi nhận hàng với đơn dưới 10 triệu ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -117,7 +121,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 400,
       "emotion": null,
       "barge_in": false
     },
@@ -128,53 +132,62 @@
         "blocker": "cần suy nghĩ thêm"
       },
       "entities": [],
-      "pause_before_ms": 350,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng em ghi nhận, khi nào anh cần tư vấn thêm hoặc quyết định đặt hàng cứ liên hệ lại shop bất cứ lúc nào anh nhé. Em cảm ơn anh đã quan tâm sản phẩm ạ.",
+      "text": "Dạ vâng, anh cứ suy nghĩ thêm giúp em ạ. Khi nào anh quyết định, anh liên hệ lại shop em sẽ giữ giá và ưu đãi miễn phí vận chuyển cho mình đến ngày 29/11 nhé.",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [
         {
           "key": "child_age_months",
           "value": 6,
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn2"
         },
         {
           "key": "budget_vnd",
           "value": 4000000,
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn2"
         },
         {
           "key": "blocker",
           "value": "cần suy nghĩ thêm",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn8"
         },
         {
           "key": "product_advised",
           "value": "SKU-MB-STR1",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 3490000,
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn2"
         },
         {
           "key": "promo_code",
           "value": "MOM-FREESHIP",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn2"
         }
       ],
       "entities": [],
@@ -184,13 +197,17 @@
     }
   ],
   "gold": {
-    "intent": "hoi_mua_xe_day",
+    "intent": "hoi_mua_xe_day_joie_pact",
     "outcome": "hen_goi_lai",
-    "objection_type": "can_suy_nghi",
-    "objection_handling": "Đã xác nhận khách cần suy nghĩ thêm và ghi nhận yêu cầu, mời khách liên hệ lại khi cần.",
+    "objection_type": "can_suy_nghi_them",
+    "objection_handling": "Hẹn khách khi quyết định gọi lại, giữ giá và ưu đãi đến hết ngày 29/11.",
     "sentiment": "neutral",
     "decision_maker": null,
-    "commitments": [],
+    "commitments": [
+      {
+        "giữ giá và ưu đãi miễn phí vận chuyển đến 29/11/2026": true
+      }
+    ],
     "supersedes": [],
     "callback": null,
     "order": null

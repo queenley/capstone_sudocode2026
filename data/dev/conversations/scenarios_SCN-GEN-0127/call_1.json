@@ -12,20 +12,16 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị quan tâm đến nồi chiên không dầu Philips 6.2L đúng không ạ?",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, chị cần tư vấn về nồi chiên không dầu Philips 6.2L đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Chị quan tâm đến nồi chiên không dầu Philips 6.2L đúng không ạ?"
+          "text": "Chị muốn hỏi về nồi chiên không dầu Philips 6.2L đúng không ạ?"
         }
       ],
       "facts_used": [],
       "claims": [
-        {
-          "field": "price_vnd",
-          "value": 3990000
-        },
         {
           "field": "in_stock",
           "value": true
@@ -34,7 +30,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -49,14 +45,16 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, nồi chiên không dầu Philips 6.2L bên em hiện đang còn hàng, giá là 3.990.000đ chị nhé.",
-      "questions": [],
+      "text": "Dạ, sản phẩm nồi chiên không dầu Philips 6.2L hiện bên em đang có sẵn hàng, phù hợp cho gia đình 4–6 người. Chị dự định ngân sách khoảng bao nhiêu để em tư vấn thêm ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Chị dự định ngân sách khoảng bao nhiêu để em tư vấn thêm ạ?"
+        }
+      ],
       "facts_used": [],
       "claims": [
-        {
-          "field": "price_vnd",
-          "value": 3990000
-        },
         {
           "field": "in_stock",
           "value": true
@@ -65,7 +63,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -73,7 +71,6 @@
       "speaker": "customer",
       "text": "chi dinh mua cho gia dinh ngan sach khoang 4 trieu rưỡi",
       "facts_stated": {
-        "usage_need": "dùng cho gia đình",
         "budget_vnd": 4500000
       },
       "entities": [],
@@ -83,7 +80,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, với ngân sách 4 triệu rưỡi thì nồi Philips 6.2L rất phù hợp cho gia đình chị, công suất lớn, có nhiều chế độ nấu và dung tích 6.2 lít phù hợp 4–6 người ạ.",
+      "text": "Dạ, nồi chiên không dầu Philips 6.2L giá hiện tại là 3.990.000đ chị nhé. Sản phẩm này phù hợp với nhu cầu cho gia đình, dung tích 6.2L, có 7 chế độ nấu và lòng nồi rửa máy được ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -95,7 +92,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -110,40 +107,47 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại sản phẩm này chưa có chương trình khuyến mãi giảm giá nào chị nhé. Giá bán là 3.990.000đ, chưa bao gồm quà tặng thêm ạ.",
+      "text": "Dạ, hiện tại sản phẩm này chưa có chương trình khuyến mãi giảm giá, giá 3.990.000đ là giá niêm yết mới nhất ạ. Tuy nhiên, bên em miễn phí vận chuyển toàn quốc với đơn hàng trên 2 triệu và hỗ trợ thanh toán COD không phí thu hộ chị nha.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 3990000
-        },
-        {
           "field": "promo_active",
           "value": false
+        },
+        {
+          "field": "promo_COD-0_active",
+          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "chi muon goi hotline hoi them mot so thong tin nua hen em lan sau nhe",
-      "facts_stated": {
-        "blocker": "muốn gọi hotline hỏi thêm"
-      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
+      "speaker": "customer",
+      "text": "chi muon goi hotline hoi them mot so thong tin nua hen em lan sau nhe so chi la 0930048764",
+      "facts_stated": {
+        "blocker": "muốn gọi hotline hỏi thêm",
+        "phone_provided": true
+      },
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0930048764",
+          "spoken": "0930048764"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, chị cứ gọi hotline bất cứ khi nào cần thêm thông tin nhé. Em giữ lại thông tin tư vấn hôm nay để hỗ trợ chị tốt hơn lần sau ạ.",
+      "text": "Dạ em đã ghi nhận số điện thoại của chị. Nhân viên bên em sẽ gọi lại qua hotline để hỗ trợ thêm các thông tin chị cần nhé. Em cảm ơn chị đã liên hệ shop BTC ạ!",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -171,7 +175,7 @@
           "key": "product_advised",
           "value": "SKU-AF-6L",
           "op": "set",
-          "source": "call_1#turn4"
+          "source": "call_1#turn2"
         },
         {
           "key": "price_quoted_vnd",
@@ -181,21 +185,28 @@
         }
       ],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "tu_van_san_pham",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
-    "commitments": [],
+    "commitments": [
+      {
+        "message": "Nhân viên sẽ gọi lại qua hotline để hỗ trợ thêm thông tin."
+      }
+    ],
     "supersedes": [],
-    "callback": null,
+    "callback": {
+      "phone": "0930048764",
+      "reason": "Khách muốn gọi hotline hỏi thêm thông tin"
+    },
     "order": null
   }
 }

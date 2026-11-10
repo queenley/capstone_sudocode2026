@@ -12,51 +12,52 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh, em là trợ lý ảo của shop BTC, anh muốn tư vấn về xe đẩy gấp gọn Joie Pact đúng không ạ?",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần hỗ trợ về xe đẩy gấp gọn Joie Pact cho bé 14 tháng đúng không ạ?",
       "questions": [
         {
           "slot": "product_advised",
           "type": "confirm",
-          "text": "Anh muốn hỏi về xe đẩy gấp gọn Joie Pact đúng không ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 700,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "alo anh muon hoi ve chiec xe day gap gon joie pact",
-      "facts_stated": {
-        "product_advised": "SKU-MB-STR1"
-      },
-      "entities": [],
-      "pause_before_ms": 700,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ xe đẩy Joie Pact hiện bên em đang còn hàng anh nhé. Xe này phù hợp cho bé từ sơ sinh đến khoảng 4 tuổi, gấp gọn một tay, nặng 6kg, phù hợp đi du lịch. Anh quan tâm về giá hay cần tư vấn thêm đặc điểm nào nữa không ạ?",
-      "questions": [
-        {
-          "slot": "other",
-          "type": "open",
-          "text": "Anh quan tâm về giá hay cần tư vấn thêm đặc điểm nào nữa không ạ?"
+          "text": "Anh cần tư vấn về xe đẩy gấp gọn Joie Pact đúng không ạ?"
         }
       ],
       "facts_used": [],
       "claims": [
         {
-          "field": "in_stock",
-          "value": true
+          "field": "is_human",
+          "value": false
         }
       ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo anh muon hoi ve chiec xe day gap gon joie pact be nha anh duoc 14 thang",
+      "facts_stated": {
+        "product_advised": "SKU-MB-STR1",
+        "child_age_months": 14
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, xe đẩy Joie Pact phù hợp cho bé 14 tháng, tải trọng tối đa 22kg, gấp gọn dễ mang đi du lịch ạ. Anh hỏi giá của xe đúng không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh muốn hỏi giá của xe này đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -69,19 +70,23 @@
       "text": "gia cua xe nay la bao nhieu em nhi",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ xe đẩy Joie Pact giá hiện tại là 3.490.000đ anh nhé, đã được miễn phí vận chuyển toàn quốc theo chương trình MOM-FREESHIP. Giá này áp dụng cho đơn đặt trước ngày 29/11.",
+      "text": "Dạ, xe đẩy Joie Pact giá 3.490.000đ, hiện shop còn hàng và đang miễn phí vận chuyển toàn quốc với chương trình MOM-FREESHIP ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 3490000
+        },
+        {
+          "field": "in_stock",
+          "value": true
         },
         {
           "field": "promo_MOM-FREESHIP_active",
@@ -114,23 +119,19 @@
           "spoken": "3 triệu rưỡi"
         }
       ],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ ngân sách của anh là khoảng 3 triệu rưỡi thì Joie Pact đúng trong tầm giá này luôn anh nhé. Bên em vẫn còn chương trình miễn phí vận chuyển toàn quốc cho sản phẩm này.",
+      "text": "Dạ, ngân sách của anh 3 triệu rưỡi thì mẫu Joie Pact đang vừa khớp với mức giá 3.490.000đ anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 3490000
-        },
-        {
-          "field": "promo_MOM-FREESHIP_active",
-          "value": true
         }
       ],
       "tool_calls": [],
@@ -147,26 +148,29 @@
         "blocker": "để bàn với gia đình"
       },
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng anh cứ bàn thêm với gia đình ạ. Anh muốn em hẹn gọi lại vào thời gian nào tiện cho anh không?",
-      "questions": [
+      "text": "Dạ vâng anh cứ bàn với gia đình trước ạ. Nếu anh cần đặt lại, shop vẫn giữ chương trình freeship với giá này đến hết tháng 11.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
         {
-          "slot": "other",
-          "type": "open",
-          "text": "Anh muốn em hẹn gọi lại vào thời gian nào tiện cho anh không?"
+          "field": "price_vnd",
+          "value": 3490000
+        },
+        {
+          "field": "promo_MOM-FREESHIP_active",
+          "value": true
         }
       ],
-      "facts_used": [],
-      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 600,
       "emotion": null,
       "barge_in": false
     },
@@ -181,13 +185,13 @@
           "spoken": "7 gio"
         }
       ],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em sẽ gọi lại cho anh vào 7 giờ tối ngày mai để hỗ trợ thêm thông tin nhé. Em ghi chú anh cần bàn với gia đình rồi sẽ báo lại ạ.",
+      "text": "Dạ em sẽ gọi lại cho anh vào 7 giờ tối ngày mai, đúng 19 giờ để anh tiện trao đổi với gia đình nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -211,13 +215,19 @@
           "key": "blocker",
           "value": "để bàn với gia đình",
           "op": "set",
-          "source": "call_1#turn10"
+          "source": "call_1#turn8"
         },
         {
           "key": "budget_vnd",
           "value": 3500000,
           "op": "set",
           "source": "call_1#turn6"
+        },
+        {
+          "key": "child_age_months",
+          "value": 14,
+          "op": "set",
+          "source": "call_1#turn2"
         },
         {
           "key": "product_advised",
@@ -245,7 +255,7 @@
           "spoken": "7 giờ tối"
         }
       ],
-      "pause_before_ms": 600,
+      "pause_before_ms": 700,
       "emotion": null,
       "barge_in": false
     }
@@ -253,11 +263,15 @@
   "gold": {
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "phai hoi nguoi nha",
-    "objection_handling": "Ghi nhận và hẹn gọi lại đúng thời gian khách yêu cầu",
+    "objection_type": "can_ban_gia_dinh",
+    "objection_handling": "Đồng ý cho khách bàn với gia đình, đề xuất giữ ưu đãi đến hết tháng 11.",
     "sentiment": "neutral",
     "decision_maker": null,
-    "commitments": [],
+    "commitments": [
+      {
+        "commitment": "Gọi lại khách vào 19 giờ ngày 17/10/2026"
+      }
+    ],
     "supersedes": [],
     "callback": {
       "callback_at": "2026-10-17T19:00",

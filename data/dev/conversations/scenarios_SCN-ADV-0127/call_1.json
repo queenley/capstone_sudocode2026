@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em rất vui được tiếp tục hỗ trợ chị về máy lọc không khí AirPure Pro mà mình đã trao đổi hôm trước.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Máy lọc không khí AirPure Pro hiện đang có hàng với giá 7.990.000đ, phù hợp với ngân sách chị nói ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -28,38 +28,32 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 700,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Chị muốn hỏi về máy lọc không khí AirPure Pro mà em tư vấn hôm trước.",
-      "facts_stated": {},
+      "text": "Chị muốn hỏi về máy lọc không khí AirPure Pro mà em tư vấn hôm trước. Ngân sách của chị tầm 8 triệu.",
+      "facts_stated": {
+        "product_advised": "SKU-AP-PRO",
+        "budget_vnd": 8000000
+      },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, máy lọc không khí AirPure Pro hiện bên em đang còn hàng, giá 7.990.000đ. Sản phẩm phù hợp phòng diện tích đến 45 mét vuông, có khóa trẻ em và chế độ app điều khiển rất tiện lợi cho nhà có bé nhỏ.",
+      "text": "Dạ máy AirPure Pro phù hợp cho phòng diện tích đến 45 mét vuông, rất ổn với phòng 40 mét vuông của chị.",
       "questions": [],
       "facts_used": [],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 7990000
-        },
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -70,20 +64,20 @@
         "room_area_m2": 40
       },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ phòng 40 mét vuông thì AirPure Pro đáp ứng rất tốt chị nhé. Máy có công suất lớn, lọc hiệu quả cho diện tích này.",
+      "text": "Dạ nhà có bé nhỏ thì máy AirPure Pro rất phù hợp vì có khóa trẻ em và màng HEPA lọc bụi mịn, đảm bảo an toàn cho gia đình mình chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -94,38 +88,13 @@
         "has_children": true
       },
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, AirPure Pro có khóa trẻ em nên rất an toàn cho nhà có bé nhỏ, và có thể điều khiển bằng app trên điện thoại ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Chị sẽ trả tiền qua chuyển khoản, nhưng mà... chị chờ cuối tháng nhận lương rồi mới mua được nhé.",
-      "facts_stated": {
-        "payment": "bank",
-        "blocker": "chờ cuối tháng nhận lương"
-      },
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận, khi nào chị sẵn sàng đặt mua thì nhắn lại giúp em nhé. Giá hiện tại là 7.990.000đ, nếu có chương trình ưu đãi mới em sẽ báo lại cho chị ngay.",
+      "text": "Dạ chị chọn thanh toán chuyển khoản rất tiện lợi ạ. Khi nào chị sẵn sàng mua, chị nhắn lại để em hỗ trợ lên đơn và giữ đúng giá 7.990.000đ cho mình nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -140,53 +109,65 @@
           "key": "blocker",
           "value": "chờ cuối tháng nhận lương",
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn7"
         },
         {
           "key": "budget_vnd",
           "value": 8000000,
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn7"
         },
         {
           "key": "delivery_area",
           "value": "Cầu Giấy, Hà Nội",
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn7"
         },
         {
           "key": "has_children",
           "value": true,
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn7"
         },
         {
           "key": "payment",
           "value": "bank",
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn7"
         },
         {
           "key": "room_area_m2",
           "value": 40,
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn7"
         },
         {
           "key": "product_advised",
           "value": "SKU-AP-PRO",
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn7"
         },
         {
           "key": "price_quoted_vnd",
           "value": 7990000,
           "op": "set",
-          "source": "call_1#turn8"
+          "source": "call_1#turn7"
         }
       ],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ trả tiền qua chuyển khoản, nhưng mà... chị chờ cuối tháng nhận lương rồi mới mua được nhé.",
+      "facts_stated": {
+        "payment": "bank",
+        "blocker": "chờ cuối tháng nhận lương"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
@@ -194,15 +175,11 @@
   "gold": {
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "chờ nhận lương",
-    "objection_handling": "Ghi nhận thời điểm khách sẽ mua và cam kết báo giá mới nếu có ưu đãi.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
-    "commitments": [
-      {
-        "text": "Báo lại nếu có chương trình ưu đãi mới"
-      }
-    ],
+    "commitments": [],
     "supersedes": [],
     "callback": null,
     "order": null

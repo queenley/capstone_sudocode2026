@@ -12,10 +12,15 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, sẵn sàng hỗ trợ anh về giỏ hàng trên website.",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, sẵn sàng hỗ trợ anh Trung với giỏ hàng trên website. Anh cần tư vấn tổng tiền và khuyến mãi đúng không ạ?",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
@@ -25,8 +30,12 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo em, anh muốn hỏi tổng tiền cho giỏ hàng trên website.",
-      "facts_stated": {},
+      "text": "Alo em, anh muốn hỏi tổng tiền cho giỏ hàng trên website. Phòng anh khoảng 25 mét vuông, nhà anh có trẻ nhỏ, ngân sách của anh tầm 6 triệu.",
+      "facts_stated": {
+        "room_area_m2": 25,
+        "has_children": true,
+        "budget_vnd": 6000000
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -34,8 +43,14 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, anh để em kiểm tra giỏ hàng gồm những sản phẩm nào để tính tổng tiền chính xác cho anh nhé.",
-      "questions": [],
+      "text": "Dạ em ghi nhận phòng mình khoảng 25m², có trẻ nhỏ và ngân sách tầm 6 triệu ạ. Anh đang tham khảo máy lọc không khí AirPure Y và AirPure Mini đúng không anh?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Anh đang tham khảo máy lọc không khí AirPure Y và AirPure Mini đúng không anh?"
+        }
+      ],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
@@ -56,16 +71,27 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, anh chọn Máy lọc không khí AirPure Y và AirPure Mini phải không ạ? Em kiểm tra giá thông tin khuyến mãi hiện tại giúp anh.",
-      "questions": [
+      "text": "Dạ tổng tiền cho hai sản phẩm là 6.295.000 đồng ạ, gồm AirPure Y giá 5.200.000 và AirPure Mini giá 1.095.000. Giá này đã áp dụng khuyến mãi hiện hành và chưa có quà tặng kèm.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
         {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Anh xác nhận giỏ hàng gồm Máy lọc không khí AirPure Y và AirPure Mini đúng không ạ?"
+          "field": "price_vnd:SKU-AP-Y",
+          "value": 5200000
+        },
+        {
+          "field": "price_vnd:SKU-AP-MINI",
+          "value": 1095000
+        },
+        {
+          "field": "promo_active",
+          "value": false
+        },
+        {
+          "field": "total_vnd",
+          "value": 6295000
         }
       ],
-      "facts_used": [],
-      "claims": [],
       "tool_calls": [
         {
           "name": "pricing.get_quote",
@@ -107,13 +133,13 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, tổng tiền cho hai sản phẩm là 6.295.000đ, đã áp dụng khuyến mãi giảm 50% cho AirPure Mini khi mua kèm AirPure Y. Hiện không có quà tặng kèm cho hai sản phẩm này ạ.",
+      "text": "Dạ hiện tại, khi anh mua cả hai sản phẩm, AirPure Mini được giảm 50% nhờ chương trình AIR-2ND-50, giá từ 2.190.000 còn 1.095.000 đồng. Ngoài ra, phí thu hộ COD là 0 đồng, chưa có quà tặng kèm cho hai sản phẩm này ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "total_vnd",
-          "value": 6295000
+          "field": "promo_COD-0_active",
+          "value": true
         },
         {
           "field": "promo_GIFT-FILTER_active",
@@ -138,13 +164,13 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ anh được miễn phí vận chuyển toàn quốc cho đơn hàng này, không mất phí giao hàng hay thu hộ ạ.",
+      "text": "Dạ hai sản phẩm này đều được miễn phí giao hàng toàn quốc cho đơn trên 500.000 đồng, nên anh không mất thêm chi phí vận chuyển nào nữa ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "promo_COD-0_active",
-          "value": true
+          "field": "total_vnd",
+          "value": 6295000
         }
       ],
       "tool_calls": [],
@@ -162,56 +188,6 @@
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận anh hẹn gọi lại để chốt đơn. Khi nào anh sẵn sàng đặt, anh chỉ cần nhắn lại cho shop, em sẽ hỗ trợ anh lên đơn nhanh nhất ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [
-        {
-          "key": "room_area_m2",
-          "value": 25,
-          "op": "set",
-          "source": "call_1#turn2"
-        },
-        {
-          "key": "has_children",
-          "value": true,
-          "op": "set",
-          "source": "call_1#turn2"
-        },
-        {
-          "key": "budget_vnd",
-          "value": 6000000,
-          "op": "set",
-          "source": "call_1#turn2"
-        },
-        {
-          "key": "blocker",
-          "value": "để bàn với gia đình",
-          "op": "set",
-          "source": "call_1#turn2"
-        },
-        {
-          "key": "product_advised",
-          "value": "SKU-AP-Y",
-          "op": "set",
-          "source": "call_1#turn2"
-        },
-        {
-          "key": "price_quoted_vnd",
-          "value": 5200000,
-          "op": "set",
-          "source": "call_1#turn2"
-        }
-      ],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
     }
   ],
   "gold": {
@@ -221,7 +197,11 @@
     "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
-    "commitments": [],
+    "commitments": [
+      {
+        "callback_time": "khách sẽ gọi lại để chốt đơn"
+      }
+    ],
     "supersedes": [],
     "callback": null,
     "order": null

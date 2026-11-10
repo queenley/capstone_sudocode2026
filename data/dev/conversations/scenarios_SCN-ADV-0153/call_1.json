@@ -1,0 +1,207 @@
+{
+  "conversation_id": "SCN-ADV-0153__call_1",
+  "scenario_id": "SCN-ADV-0153",
+  "call": "call_1",
+  "customer_id": "C006",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-22",
+  "region": "bac",
+  "category": "thoi-trang/giay",
+  "persona": "khach_do_du_hoi_nguoi_nha",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần tư vấn về giày sneaker Urban Classic size 38 màu trắng đúng không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, em chào anh. Anh muốn hỏi về giày sneaker Urban Classic size 38 màu trắng.",
+      "facts_stated": {
+        "size": 38,
+        "color": "trang"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, mẫu giày sneaker Urban Classic size 38 màu trắng hiện bên em đang còn hàng anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giày này còn hàng không em? Anh thấy trên website ghi là có.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, giá của đôi này là 890.000đ anh ạ. Hiện tại bên em chưa có khuyến mãi cho mẫu này.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "À, giá cả như thế nào nhỉ? Anh muốn biết thêm về khuyến mãi nếu có.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em ghi nhận anh muốn trao đổi thêm với vợ trước khi quyết định. Em sẽ đặt lịch gọi lại cho anh vào tối thứ Bảy, lúc 8 giờ rưỡi nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Tối thứ Bảy này tầm 10 giờ em gọi lại anh nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ nếu 10 giờ tối trễ quá, em xin phép gọi lại anh vào 8 giờ rưỡi tối thứ Bảy, tức là 20:30 anh nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "schedule.callback",
+          "args": {
+            "customer_phone": "0929486628",
+            "callback_at": "2026-10-24T20:30"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "size",
+          "value": 38,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "color",
+          "value": "trang",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "decision_maker",
+          "value": "vợ",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "blocker",
+          "value": "cần hỏi vợ",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-SN-CAS",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 890000,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "variant_sku",
+          "value": "SKU-SN-CAS-38-TRANG",
+          "op": "set",
+          "source": "call_1#turn2"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ừ, 8 giờ rưỡi tối cũng được em.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hen_goi_lai",
+    "outcome": "hen_goi_lai",
+    "objection_type": "cần hỏi người nhà",
+    "objection_handling": "Chủ động xác nhận khách cần hỏi vợ, đề xuất thời gian gọi lại cụ thể và đặt lịch.",
+    "sentiment": "neutral",
+    "decision_maker": "vợ",
+    "commitments": [
+      {
+        "callback_at": "2026-10-24T20:30"
+      }
+    ],
+    "supersedes": [],
+    "callback": {
+      "callback_at": "2026-10-24T20:30",
+      "note": null
+    },
+    "order": null
+  }
+}

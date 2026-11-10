@@ -12,7 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, rất vui được hỗ trợ anh xác nhận đơn máy lọc không khí AirPure Pro.",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Em sẵn sàng hỗ trợ anh xác nhận đơn hàng máy lọc không khí AirPure Pro theo nhu cầu của mình ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -25,8 +25,11 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh muốn xác nhận đơn hàng máy lọc không khí AirPure Pro mà em đã tư vấn.",
-      "facts_stated": {},
+      "text": "Alo, anh muốn xác nhận đơn hàng máy lọc không khí AirPure Pro mà em đã tư vấn. Phòng anh khoảng 15 mét vuông, nhà anh có trẻ nhỏ.",
+      "facts_stated": {
+        "room_area_m2": 15,
+        "has_children": true
+      },
       "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
@@ -34,7 +37,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ đơn hàng anh chọn là máy lọc không khí AirPure Pro, giá hiện tại sau khuyến mãi AIR-OCT là 7.690.000đ, sản phẩm còn hàng và sẽ giao trong 2 ngày tới.",
+      "text": "Dạ, với phòng 15 mét vuông và nhà có trẻ nhỏ, máy lọc không khí AirPure Pro là lựa chọn rất phù hợp. Máy này có khóa trẻ em và phù hợp phòng đến 45m² ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -45,14 +48,57 @@
         {
           "field": "promo_AIR-OCT_active",
           "value": true
-        },
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Cho anh hỏi, có thể thanh toán bằng chuyển khoản được không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, anh hoàn toàn có thể thanh toán bằng chuyển khoản ngân hàng khi đặt hàng tại shop bên em ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Khu vực giao hàng của anh là Thủ Đức, TP.HCM nhé.",
+      "facts_stated": {
+        "delivery_area": "Thủ Đức, TP.HCM"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, shop giao hàng miễn phí tới Thủ Đức, TP.HCM cho anh. Thời gian dự kiến nhận hàng là trong vòng 2 ngày làm việc, khoảng ngày 17/10 ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
         {
-          "field": "in_stock",
+          "field": "freeship",
           "value": true
-        },
-        {
-          "field": "delivery_days",
-          "value": 2
         },
         {
           "field": "estimated_delivery",
@@ -76,81 +122,18 @@
     },
     {
       "speaker": "customer",
-      "text": "Cho anh hỏi, có thể thanh toán bằng chuyển khoản được không em?",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ anh hoàn toàn có thể thanh toán qua chuyển khoản ngân hàng với đơn hàng này ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Khu vực giao hàng của anh là Thủ Đức, TP.HCM nhé.",
-      "facts_stated": {
-        "delivery_area": "Thủ Đức, TP.HCM"
-      },
-      "entities": [
-        {
-          "type": "address",
-          "value": "Thủ Đức, TP.HCM",
-          "spoken": "Thủ Đức, TP.HCM"
-        }
-      ],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận địa chỉ giao hàng của anh là Thủ Đức, TP.HCM. Đơn sẽ được giao trong khoảng 2 ngày làm việc, em sẽ ưu tiên giao sớm nhất cho anh.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "delivery_days",
-          "value": 2
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
       "text": "Ngân sách của anh khoảng 8 triệu, không biết sản phẩm này có đủ không?",
       "facts_stated": {
         "budget_vnd": 8000000
       },
-      "entities": [
-        {
-          "type": "money",
-          "value": "8000000",
-          "spoken": "8 triệu"
-        }
-      ],
+      "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ ngân sách của anh là 8 triệu thì AirPure Pro rất phù hợp ạ, giá sau giảm chỉ 7.690.000đ và đã gồm freeship toàn quốc.",
+      "text": "Dạ, hiện tại máy lọc không khí AirPure Pro đang được khuyến mãi còn 7.690.000đ, nằm trong ngân sách của anh ạ. Giá đã ưu đãi theo chương trình AIR-OCT đến hết 30/10.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -159,7 +142,7 @@
           "value": 7690000
         },
         {
-          "field": "freeship",
+          "field": "promo_AIR-OCT_active",
           "value": true
         }
       ],
@@ -181,12 +164,12 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Em xin phép xác nhận lại: anh đặt 1 máy lọc không khí AirPure Pro, giá sau khuyến mãi AIR-OCT là 7.690.000đ, giao về Thủ Đức, TP.HCM, thanh toán chuyển khoản, thời gian giao dự kiến ngày 17/10. Anh xác nhận giúp em thông tin trên đúng chưa để em lên đơn ạ?",
+      "text": "Dạ em cảm ơn anh đã đồng ý đặt hàng. Để em xác nhận lại: anh đặt 1 máy lọc không khí AirPure Pro, giá 7.690.000đ, giao đến Thủ Đức, TP.HCM, thanh toán chuyển khoản. Dự kiến nhận hàng ngày 17/10. Anh xác nhận giúp em thông tin trên đúng không ạ?",
       "questions": [
         {
           "slot": "order_summary",
           "type": "confirm",
-          "text": "Anh xác nhận giúp em thông tin trên đúng chưa để em lên đơn ạ?"
+          "text": "Anh xác nhận giúp em: đặt 1 máy lọc không khí AirPure Pro, giá 7.690.000đ, giao Thủ Đức, TP.HCM, thanh toán chuyển khoản, nhận hàng dự kiến 17/10 đúng không ạ?"
         }
       ],
       "facts_used": [],
@@ -218,10 +201,23 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã lên đơn thành công cho anh. Anh sẽ nhận máy lọc không khí AirPure Pro trong khoảng 2 ngày tới và shop sẽ liên hệ lại khi giao hàng. Cảm ơn anh đã mua hàng tại shop BTC, chúc anh nhiều sức khỏe ạ!",
+      "text": "Dạ em đã lên đơn thành công cho anh. Anh sẽ nhận được máy lọc không khí AirPure Pro, giá 7.690.000đ, giao miễn phí đến Thủ Đức, TP.HCM trong ngày 17/10. Cảm ơn anh đã đặt hàng tại shop BTC ạ!",
       "questions": [],
       "facts_used": [],
-      "claims": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-17"
+        }
+      ],
       "tool_calls": [
         {
           "name": "order.create",
@@ -239,57 +235,57 @@
       "memory_writes": [
         {
           "key": "budget_vnd",
-          "value": 8500000,
+          "value": 8000000,
           "op": "set",
-          "source": "call_1#turn0"
+          "source": "call_1#turn8"
         },
         {
           "key": "delivery_area",
           "value": "Thủ Đức, TP.HCM",
           "op": "set",
-          "source": "call_1#turn0"
+          "source": "call_1#turn6"
         },
         {
           "key": "has_children",
           "value": true,
           "op": "set",
-          "source": "call_1#turn0"
+          "source": "call_1#turn2"
         },
         {
           "key": "payment",
           "value": "bank",
           "op": "set",
-          "source": "call_1#turn0"
+          "source": "call_1#turn10"
         },
         {
           "key": "room_area_m2",
           "value": 15,
           "op": "set",
-          "source": "call_1#turn0"
+          "source": "call_1#turn2"
         },
         {
           "key": "product_advised",
           "value": "SKU-AP-PRO",
           "op": "set",
-          "source": "call_1#turn0"
+          "source": "call_1#turn2"
         },
         {
           "key": "price_quoted_vnd",
           "value": 7690000,
           "op": "set",
-          "source": "call_1#turn0"
+          "source": "call_1#turn10"
         },
         {
           "key": "promo_code",
           "value": "AIR-OCT",
           "op": "set",
-          "source": "call_1#turn0"
+          "source": "call_1#turn10"
         },
         {
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_1#turn0"
+          "source": "call_1#turn12"
         }
       ],
       "entities": [],
@@ -299,7 +295,7 @@
     }
   ],
   "gold": {
-    "intent": "xac_nhan_mua",
+    "intent": "xac_nhan_mua_hang",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
@@ -314,8 +310,7 @@
       "price_vnd": 7690000,
       "payment": "bank",
       "address": "Thủ Đức, TP.HCM",
-      "order_id": "OD600001",
-      "estimated_delivery": "2026-10-17"
+      "order_id": "OD600001"
     }
   }
 }

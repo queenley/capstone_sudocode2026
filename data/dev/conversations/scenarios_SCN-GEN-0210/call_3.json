@@ -12,54 +12,35 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị Xuân ạ, hôm trước chị có quan tâm Máy lọc không khí AirPure Pro để bàn với gia đình, nay chị muốn đặt luôn máy đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Chị muốn đặt Máy lọc không khí AirPure Pro đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em chào chị Xuân ạ, hôm trước chị có quan tâm Máy lọc không khí AirPure Pro để bàn với gia đình, em hỗ trợ đặt hàng luôn cho mình nhé.",
+      "questions": [],
       "facts_used": [
-        "room_area_m2",
-        "blocker",
         "product_advised",
+        "blocker",
+        "room_area_m2",
         "price_quoted_vnd"
       ],
-      "claims": [
-        {
-          "field": "price_vnd",
-          "value": 7990000
-        }
-      ],
+      "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 750,
+      "pause_before_ms": 700,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
       "text": "Alo, chị muốn đặt máy lọc không khí AirPure Pro.",
-      "facts_stated": {
-        "product_advised": "SKU-AP-PRO"
-      },
+      "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 550,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, Máy lọc không khí AirPure Pro hiện còn hàng, giá 7.990.000đ. Chị muốn thanh toán chuyển khoản hay nhận hàng trả tiền mặt ạ?",
-      "questions": [
-        {
-          "slot": "payment",
-          "type": "open",
-          "text": "Chị muốn thanh toán chuyển khoản hay nhận hàng trả tiền mặt ạ?"
-        }
-      ],
+      "text": "Dạ, Máy lọc không khí AirPure Pro hiện còn hàng, giá 7.990.000đ. Em ghi nhận chị chọn sản phẩm này ạ.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
@@ -73,13 +54,7 @@
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "7990000",
-          "spoken": "7.990.000đ"
-        }
-      ],
+      "entities": [],
       "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
@@ -91,20 +66,14 @@
         "payment": "bank"
       },
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 420,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận thanh toán qua ngân hàng. Chị cho em xin khu vực giao hàng để em báo thời gian nhận dự kiến ạ.",
-      "questions": [
-        {
-          "slot": "delivery_area",
-          "type": "open",
-          "text": "Chị cho em xin khu vực giao hàng để em báo thời gian nhận dự kiến ạ."
-        }
-      ],
+      "text": "Dạ, chị chọn thanh toán chuyển khoản ngân hàng, em đã ghi nhận thông tin này.",
+      "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
@@ -127,25 +96,19 @@
           "spoken": "Thủ Đức, TP.HCM"
         }
       ],
-      "pause_before_ms": 400,
+      "pause_before_ms": 410,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, đơn giao về Thủ Đức, TP.HCM sẽ nhận trong 2 ngày làm việc, dự kiến ngày 20/11/2026. Em đọc lại đơn hàng: Máy lọc không khí AirPure Pro, 1 máy, giá 7.990.000đ, giao Thủ Đức, TP.HCM, thanh toán chuyển khoản ngân hàng. Thông tin này đúng chị xác nhận giúp em để em lên đơn nhé?",
-      "questions": [
-        {
-          "slot": "order_summary",
-          "type": "confirm",
-          "text": "Em đọc lại đơn hàng: Máy lọc không khí AirPure Pro, 1 máy, giá 7.990.000đ, giao Thủ Đức, TP.HCM, thanh toán chuyển khoản ngân hàng. Thông tin này đúng chị xác nhận giúp em để em lên đơn nhé?"
-        }
-      ],
+      "text": "Dạ, địa chỉ giao hàng là Thủ Đức, TP.HCM. Em báo chị dự kiến nhận hàng trong 2 ngày làm việc, khoảng ngày 20/11.",
+      "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "price_vnd",
-          "value": 7990000
+          "field": "delivery_days",
+          "value": 2
         },
         {
           "field": "estimated_delivery",
@@ -164,22 +127,12 @@
       "memory_writes": [],
       "entities": [
         {
-          "type": "money",
-          "value": "7990000",
-          "spoken": "7.990.000đ"
-        },
-        {
-          "type": "address",
-          "value": "Thủ Đức, TP.HCM",
-          "spoken": "Thủ Đức, TP.HCM"
-        },
-        {
           "type": "date",
           "value": "2026-11-20",
-          "spoken": "20/11/2026"
+          "spoken": "20/11"
         }
       ],
-      "pause_before_ms": 600,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     },
@@ -188,20 +141,59 @@
       "text": "Chốt đơn cho chị đi.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 420,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã lên đơn thành công cho chị. Máy sẽ được giao dự kiến vào ngày 20/11/2026 về Thủ Đức, TP.HCM. Cảm ơn chị đã đặt hàng tại shop ạ!",
-      "questions": [],
+      "text": "Em xác nhận lại đơn: Máy lọc không khí AirPure Pro, số lượng 1, giá 7.990.000đ, giao tại Thủ Đức, TP.HCM, thanh toán chuyển khoản ngân hàng, dự kiến nhận hàng ngày 20/11. Chị đồng ý em lên đơn nhé?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em xác nhận lại đơn: Máy lọc không khí AirPure Pro, số lượng 1, giá 7.990.000đ, giao tại Thủ Đức, TP.HCM, thanh toán chuyển khoản ngân hàng, dự kiến nhận hàng ngày 20/11. Chị đồng ý em lên đơn nhé?"
+        }
+      ],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 7990000
         },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-11-20"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "date",
+          "value": "2026-11-20",
+          "spoken": "20/11"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Ừ, lên đơn đi.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã tạo đơn thành công cho chị. Shop sẽ gửi thông tin chuyển khoản qua Zalo hoặc SMS, và giao hàng dự kiến ngày 20/11 nhé chị.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
         {
           "field": "estimated_delivery",
           "value": "2026-11-20"
@@ -238,39 +230,29 @@
           "key": "product_advised",
           "value": "SKU-AP-PRO",
           "op": "set",
-          "source": "call_3#turn2"
+          "source": "call_3#turn1"
         },
         {
           "key": "price_quoted_vnd",
           "value": 7990000,
           "op": "set",
-          "source": "call_3#turn2"
+          "source": "call_3#turn1"
         },
         {
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_3#turn8"
+          "source": "call_3#turn12"
         }
       ],
       "entities": [
         {
-          "type": "money",
-          "value": "7990000",
-          "spoken": "7.990.000đ"
-        },
-        {
-          "type": "address",
-          "value": "Thủ Đức, TP.HCM",
-          "spoken": "Thủ Đức, TP.HCM"
-        },
-        {
           "type": "date",
           "value": "2026-11-20",
-          "spoken": "20/11/2026"
+          "spoken": "20/11"
         }
       ],
-      "pause_before_ms": 600,
+      "pause_before_ms": 700,
       "emotion": null,
       "barge_in": false
     }
@@ -291,7 +273,8 @@
       "price_vnd": 7990000,
       "payment": "bank",
       "address": "Thủ Đức, TP.HCM",
-      "order_id": "OD600001"
+      "order_id": "OD600001",
+      "estimated_delivery": "2026-11-20"
     }
   }
 }

@@ -12,17 +12,11 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có đặt Áo khoác gió Windbreak, hôm nay anh cần tư vấn về giày chạy bộ đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Anh cần hỏi về giày chạy bộ RunLite 1 phải không ạ?"
-        }
-      ],
+      "text": "Dạ em chào anh Duy ạ, hôm trước anh có đặt Áo khoác gió Windbreak bên em; hôm nay anh muốn hỏi về sản phẩm nào ạ?",
+      "questions": [],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "owned_sku",
+        "order_id"
       ],
       "claims": [],
       "tool_calls": [],
@@ -46,12 +40,15 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giày chạy bộ RunLite 1 size 42 màu xám bên em đang còn hàng anh nhé. Anh muốn hỏi thêm thông tin gì về sản phẩm này không ạ?",
-      "questions": [],
-      "facts_used": [
-        "size",
-        "color"
+      "text": "Dạ anh hỏi về giày chạy bộ RunLite 1 size 42 màu xám đúng không ạ? Sản phẩm này đang còn hàng tại shop.",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh hỏi về giày chạy bộ RunLite 1 size 42 màu xám đúng không ạ?"
+        }
       ],
+      "facts_used": [],
       "claims": [
         {
           "field": "in_stock",
@@ -76,21 +73,13 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giá của đôi giày này hiện tại là 1.161.000đ anh nhé. Giá đã áp dụng khuyến mãi RUN-10 giảm 10% từ giá niêm yết 1.290.000đ ạ.",
+      "text": "Dạ giá hiện tại của giày RunLite 1 size 42 màu xám là 1.161.000đ anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 1161000
-        },
-        {
-          "field": "list_price_vnd",
-          "value": 1290000
-        },
-        {
-          "field": "promo_RUN-10_active",
-          "value": true
         }
       ],
       "tool_calls": [],
@@ -111,17 +100,13 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ hiện tại anh được giảm 10% với mã RUN-10, giá còn 1.161.000đ. Ngoài ra, đơn từ 500.000đ sẽ được miễn phí vận chuyển toàn quốc anh nhé.",
+      "text": "Dạ sản phẩm đang được giảm 10% với mã RUN-10, giá đã áp dụng ưu đãi là 1.161.000đ rồi anh nha.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "promo_RUN-10_active",
           "value": true
-        },
-        {
-          "field": "price_vnd",
-          "value": 1161000
         }
       ],
       "tool_calls": [],
@@ -144,11 +129,9 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, anh có thể gọi hotline của shop để được hỗ trợ thêm chi tiết nhé. Nếu cần, em có thể giữ lại thông tin tư vấn hôm nay để anh tiện trao đổi khi gọi tổng đài ạ.",
+      "text": "Dạ em ghi nhận anh muốn trao đổi thêm qua hotline, bên em sẽ sắp xếp nhân viên gọi lại cho anh sớm nhất nhé.",
       "questions": [],
-      "facts_used": [
-        "blocker"
-      ],
+      "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
@@ -159,21 +142,26 @@
     },
     {
       "speaker": "customer",
-      "text": "the em co the cho anh biet la co hang khong nhe",
-      "facts_stated": {},
-      "entities": [],
+      "text": "the em co the cho anh biet la co hang khong nhe so anh la 0998000017",
+      "facts_stated": {
+        "phone_provided": true
+      },
+      "entities": [
+        {
+          "type": "phone",
+          "value": "0998000017",
+          "spoken": "0998000017"
+        }
+      ],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ giày chạy bộ RunLite 1 size 42 màu xám hiện vẫn còn hàng anh nhé. Khi nào anh cần đặt, chỉ cần nhắn lại hoặc gọi hotline là được ạ.",
+      "text": "Dạ sản phẩm giày RunLite 1 size 42 màu xám hiện còn hàng anh nhé. Nhân viên sẽ gọi vào số 0998000017 để tư vấn chi tiết cho anh trong hôm nay ạ.",
       "questions": [],
-      "facts_used": [
-        "size",
-        "color"
-      ],
+      "facts_used": [],
       "claims": [
         {
           "field": "in_stock",
@@ -204,7 +192,7 @@
           "key": "product_advised",
           "value": "SKU-SN-RUN1",
           "op": "set",
-          "source": "call_1#turn1"
+          "source": "call_1#turn2"
         },
         {
           "key": "price_quoted_vnd",
@@ -222,7 +210,7 @@
           "key": "promo_code",
           "value": "RUN-10",
           "op": "set",
-          "source": "call_1#turn5"
+          "source": "call_1#turn7"
         }
       ],
       "entities": [],
@@ -232,15 +220,24 @@
     }
   ],
   "gold": {
-    "intent": "hoi_giay_chay_bo",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
     "objection_type": null,
     "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
-    "commitments": [],
+    "commitments": [
+      {
+        "call": "call_1",
+        "turn": 8,
+        "text": "Bên em sẽ sắp xếp nhân viên gọi lại cho anh sớm nhất nhé."
+      }
+    ],
     "supersedes": [],
-    "callback": null,
+    "callback": {
+      "time": null,
+      "reason": "Khách muốn gọi hotline để hỏi thêm"
+    },
     "order": null
   }
 }

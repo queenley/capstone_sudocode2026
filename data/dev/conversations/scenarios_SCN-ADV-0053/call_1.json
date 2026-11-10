@@ -12,35 +12,7 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, chị cần hỗ trợ về combo Spectra S1 và máy hâm sữa Fatz đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "chị cần hỏi về combo Spectra S1 và máy hâm sữa Fatz đúng không ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 700,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "alo chi chao em hom nay chi muon hoi ve cai combo spectra s1 voi may ham sua fatz day",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 0,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, combo này gồm máy hút sữa Spectra S1, máy hâm sữa Fatz và tặng kèm 50 túi trữ sữa chị nhé.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, chị cần tư vấn combo Spectra S1 và máy hâm sữa Fatz đúng không ạ?",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -52,7 +24,37 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "alo chi chao em hom nay chi muon hoi ve cai combo spectra s1 voi may ham sua fatz day be nha chi duoc 11 thang ngan sach cua chi tam 5 trieu ruoi",
+      "facts_stated": {
+        "child_age_months": 11,
+        "budget_vnd": 5500000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ sản phẩm combo Spectra S1, máy hâm sữa Fatz và 50 túi trữ sữa bên em đang sẵn hàng, phù hợp cho bé 11 tháng. Với ngân sách 5 triệu rưỡi của chị thì combo này nằm trong tầm giá, chị yên tâm ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -67,29 +69,19 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, giá của combo Spectra S1 và máy hâm sữa Fatz hiện tại là 4.790.000đ chị nhé. Giá này đã áp dụng chương trình miễn phí vận chuyển toàn quốc cho mẹ và bé.",
+      "text": "Dạ giá của combo này là 4.790.000đ chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
           "field": "price_vnd",
           "value": 4790000
-        },
-        {
-          "field": "promo_MOM-FREESHIP_active",
-          "value": true
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
-      "entities": [
-        {
-          "type": "money",
-          "value": "4790000",
-          "spoken": "4.790.000"
-        }
-      ],
-      "pause_before_ms": 500,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -104,7 +96,7 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ đúng rồi chị, hiện combo này đang có chương trình MOM-FREESHIP, miễn phí vận chuyển cho đơn mẹ và bé từ 500.000đ trở lên. Mình sẽ không mất phí ship khi đặt combo này ạ.",
+      "text": "Dạ hiện tại combo này đang áp dụng chương trình miễn phí vận chuyển toàn quốc cho đơn hàng mẹ & bé chị nhé, tên chương trình là MOM-FREESHIP ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -116,7 +108,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -124,7 +116,8 @@
       "speaker": "customer",
       "text": "chi dinh mua nhung can hoi con chau truoc da",
       "facts_stated": {
-        "blocker": "cần hỏi con cháu"
+        "blocker": "cần hỏi con cháu",
+        "decision_maker": "con"
       },
       "entities": [],
       "pause_before_ms": 0,
@@ -133,19 +126,25 @@
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng chị, mình hỏi ý kiến con cháu trước cũng rất chu đáo ạ. Khi nào chị quyết định, bên em sẽ giữ giá và ưu đãi này cho chị đến hết ngày 29/11 nhé.",
-      "questions": [],
+      "text": "Dạ chị cứ tham khảo thêm ý kiến con cháu ạ. Nếu chị cần em sẽ đặt lịch gọi lại vào 7 giờ tối ngày mai để hỗ trợ chị chốt đơn, được không ạ?",
+      "questions": [
+        {
+          "slot": "other",
+          "type": "open",
+          "text": "Nếu chị cần em sẽ đặt lịch gọi lại vào 7 giờ tối ngày mai để hỗ trợ chị chốt đơn, được không ạ?"
+        }
+      ],
       "facts_used": [],
       "claims": [
         {
-          "field": "promo_MOM-FREESHIP_active",
-          "value": true
+          "field": "callback_at",
+          "value": "2026-10-31T19:00"
         }
       ],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -153,20 +152,14 @@
       "speaker": "customer",
       "text": "em co the goi lai cho chi toi mai tam 7 gio duoc khong",
       "facts_stated": {},
-      "entities": [
-        {
-          "type": "time",
-          "value": "19:00",
-          "spoken": "7 gio"
-        }
-      ],
+      "entities": [],
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ được chị, em sẽ đặt lịch gọi lại cho chị vào 7 giờ tối ngày mai, tức ngày 31 tháng 10, để mình trao đổi tiếp ạ.",
+      "text": "Dạ em ghi nhận, em sẽ gọi lại cho chị vào lúc 19 giờ ngày mai để hỗ trợ thêm cho mình ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -185,15 +178,52 @@
           }
         }
       ],
-      "memory_writes": [],
-      "entities": [
+      "memory_writes": [
         {
-          "type": "time",
-          "value": "19:00",
-          "spoken": "7 giờ"
+          "key": "child_age_months",
+          "value": 11,
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 5500000,
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "decision_maker",
+          "value": "con",
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "blocker",
+          "value": "cần hỏi con cháu",
+          "op": "set",
+          "source": "call_1#turn4"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-BDL-MOM",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 4790000,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "promo_code",
+          "value": "MOM-FREESHIP",
+          "op": "set",
+          "source": "call_1#turn3"
         }
       ],
-      "pause_before_ms": 400,
+      "entities": [],
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -205,80 +235,26 @@
       "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận chị sẽ bàn với con cháu rồi quyết định. Em sẽ gọi lại đúng hẹn, nếu cần hỗ trợ thêm chị cứ liên hệ shop ạ. Em cảm ơn chị đã quan tâm sản phẩm của bên em.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [],
-      "tool_calls": [],
-      "memory_writes": [
-        {
-          "key": "child_age_months",
-          "value": 11,
-          "op": "set",
-          "source": "call_1#turn7"
-        },
-        {
-          "key": "budget_vnd",
-          "value": 5500000,
-          "op": "set",
-          "source": "call_1#turn7"
-        },
-        {
-          "key": "decision_maker",
-          "value": "con",
-          "op": "set",
-          "source": "call_1#turn7"
-        },
-        {
-          "key": "blocker",
-          "value": "cần hỏi con cháu",
-          "op": "set",
-          "source": "call_1#turn7"
-        },
-        {
-          "key": "product_advised",
-          "value": "SKU-BDL-MOM",
-          "op": "set",
-          "source": "call_1#turn7"
-        },
-        {
-          "key": "price_quoted_vnd",
-          "value": 4790000,
-          "op": "set",
-          "source": "call_1#turn7"
-        },
-        {
-          "key": "promo_code",
-          "value": "MOM-FREESHIP",
-          "op": "set",
-          "source": "call_1#turn7"
-        }
-      ],
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
     }
   ],
   "gold": {
     "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "can_hoi_nguoi_nha",
-    "objection_handling": "Xác nhận sẽ gọi lại đúng khung giờ khách yêu cầu, nhắc thời hạn ưu đãi, giữ lịch hẹn.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
-    "decision_maker": "con",
+    "decision_maker": null,
     "commitments": [
       {
-        "text": "Gọi lại vào 19 giờ ngày 31/10/2026 theo yêu cầu khách"
+        "type": "callback",
+        "time": "2026-10-31T19:00",
+        "note": "khách hỏi người nhà rồi báo lại"
       }
     ],
     "supersedes": [],
     "callback": {
       "callback_at": "2026-10-31T19:00",
-      "reason": "khách hỏi người nhà rồi báo lại"
+      "note": "khách hỏi người nhà rồi báo lại"
     },
     "order": null
   }

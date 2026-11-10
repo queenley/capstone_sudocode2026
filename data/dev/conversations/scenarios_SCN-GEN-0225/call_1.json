@@ -12,17 +12,10 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, hôm trước mình có đặt ghế ngồi ô tô Chicco, giờ anh muốn hỏi thêm về máy hâm sữa Fatz đúng không ạ?",
-      "questions": [
-        {
-          "slot": "product_advised",
-          "type": "confirm",
-          "text": "Anh xác nhận mình đang quan tâm đến máy hâm sữa Fatz đúng không ạ?"
-        }
-      ],
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC. Hôm trước anh có hỏi về Máy tiệt trùng Moaz Bebe và hôm nay mình quan tâm đến máy hâm sữa Fatz phải không anh?",
+      "questions": [],
       "facts_used": [
-        "order_id",
-        "owned_sku"
+        "order_id"
       ],
       "claims": [],
       "tool_calls": [],
@@ -34,16 +27,19 @@
     },
     {
       "speaker": "customer",
-      "text": "Alo, anh muốn hỏi về cái máy hâm sữa Fatz mà em đã tư vấn hôm trước đó.",
-      "facts_stated": {},
+      "text": "Alo, anh muốn hỏi về cái máy hâm sữa Fatz mà em đã tư vấn hôm trước đó. Bé nhà anh được 14 tháng, ngân sách của anh tầm 500 nghìn.",
+      "facts_stated": {
+        "child_age_months": 14,
+        "budget_vnd": 500000
+      },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em cảm ơn anh đã quan tâm. Máy hâm sữa Fatz 4 chức năng đang sẵn hàng tại shop, giá là 490.000đ anh nhé.",
+      "text": "Dạ em ghi nhận anh muốn tìm máy hâm sữa cho bé 14 tháng, ngân sách khoảng 500.000đ. Máy hâm sữa Fatz 4 chức năng hiện shop đang có hàng với giá 490.000đ anh nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -59,7 +55,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -68,20 +64,20 @@
       "text": "Máy này có nhiều chức năng không em?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, máy hâm sữa Fatz này có 4 chức năng: hâm sữa, hâm thức ăn, tiệt trùng 1 bình và rã đông, rất tiện lợi cho gia đình có bé nhỏ ạ.",
+      "text": "Dạ máy hâm sữa Fatz này có 4 chức năng: hâm sữa, hâm thức ăn, tiệt trùng và rã đông. Dung tích phù hợp với bình sữa thông dụng, sử dụng dễ dàng và tiết kiệm điện ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -90,13 +86,13 @@
       "text": "Giá của máy bây giờ là bao nhiêu vậy?",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, giá hiện tại của máy hâm sữa Fatz là 490.000đ anh nhé.",
+      "text": "Dạ giá hiện tại của máy hâm sữa Fatz là 490.000đ, anh nhé. Giá này đã là giá tốt nhất tại thời điểm hôm nay ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -108,7 +104,7 @@
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 400,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
@@ -119,13 +115,13 @@
         "blocker": "muốn so sánh thêm"
       },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng, anh cứ tham khảo thêm các sản phẩm khác. Khi nào anh cần tư vấn tiếp hoặc muốn đặt hàng, shop luôn sẵn sàng hỗ trợ anh ạ.",
+      "text": "Dạ vâng, em đã ghi nhận anh muốn tham khảo thêm sản phẩm khác. Khi nào anh cần tư vấn tiếp cứ liên hệ lại shop, em luôn sẵn sàng hỗ trợ anh ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
@@ -136,19 +132,43 @@
           "value": "muốn so sánh thêm",
           "op": "set",
           "source": "call_1#turn8"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 500000,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "child_age_months",
+          "value": 14,
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-MB-MON",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 490000,
+          "op": "set",
+          "source": "call_1#turn6"
         }
       ],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 0,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "hoi_gia_may_ham_sua",
+    "intent": "hen_goi_lai",
     "outcome": "hen_goi_lai",
-    "objection_type": "muon_so_sanh_them",
-    "objection_handling": "Xác nhận anh muốn so sánh thêm, mời anh liên hệ lại khi cần.",
+    "objection_type": null,
+    "objection_handling": null,
     "sentiment": "neutral",
     "decision_maker": null,
     "commitments": [],
