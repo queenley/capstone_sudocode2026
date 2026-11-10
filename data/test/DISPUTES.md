@@ -1,6 +1,6 @@
 # Nhãn đã duyệt, đã rà và chưa làm của `data/test`
 
-`official_gt_approved: false`. Từng thay đổi nằm trong [`conversion-report.json`](conversion-report.json), mỗi mục có `rule_from` là nhóm tương ứng của dev-r4:
+`official_gt_approved: true` (người duyệt ký mọi nhãn ngày 10/11/2026). Từng thay đổi nằm trong [`conversion-report.json`](conversion-report.json), mỗi mục có `rule_from` là nhóm tương ứng của dev-r4:
 
 - `decision: revise`, `proposed_by: null`: quy tắc đã duyệt ở dev-r4, áp theo yêu cầu của người duyệt (nhóm 5, 9, phần định dạng của 11, nhóm 12).
 - `decision: revise`, `proposed_by: claude`, `reviewed_on: 2026-11-08`: Claude đề xuất sau khi đọc từng câu của tập test; người duyệt (dngan0365) chấp nhận cả bảng dưới ngày 08/11/2026.
@@ -64,6 +64,6 @@ Sửa ngày 09/11/2026 trong nhóm 14 (đã duyệt): câu thêm vào dùng các
 
 | Phạm vi | Lý do |
 |---|---|
-| Bộ vàng | `official_gt_approved: false`. `review/golden_manifest.json` ký ngày 09/11/2026 trước khi hội thoại mẫu được sinh lại; quyết định `approve_conversation` của các cuộc sinh lại đã xoá, nên cần ký lại bằng `approve_gold.py`. Nhãn còn N: ADV-0024/c2 (giá RUN-10 dùng một lần, nhãn đúng). `official_gt_approved` chỉ thành true khi nhãn của mọi cuộc là Y |
+| Hội thoại đã ký nhưng bộ chấm mới gắn cờ | `official_gt_approved: true`: người duyệt ký 192/192 nhãn và 149 hội thoại ngày 10/11/2026 (`review/golden_manifest.json`). Bộ chấm hội thoại sau đó chấm lại bằng gpt-5 có tài liệu shop: 64 trong 149 hội thoại đã ký nay bị gắn cờ (nhiều nhất là J02, agent mẫu nói sai chính sách miễn phí vận chuyển hoặc bảo hành; sau đó J08). Cần người duyệt xem lại `approve_conversation` của các cuộc đó; nhãn không bị ảnh hưởng |
 | Hội thoại mẫu và audio | Đã sinh lại 09–10/11/2026: 46 hội thoại (`regenerate_conversations.py`, `review/regenerated.json`), 58 lượt, 4.793 ký tự ElevenLabs. Còn vài ca J02 mà bản viết mới vẫn bị bộ chấm bằng model đánh dấu bịa: giữ `approve: N` |
 | Trùng mã và trùng khách với `data/dev` | Không sửa được bằng nhãn. Muốn có tập test độc lập thì cần sinh tập mới với mã riêng (vd. `SCN-TST-*`) và khách riêng |

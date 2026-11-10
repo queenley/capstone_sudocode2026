@@ -62,7 +62,13 @@ def mask(data: Any) -> Any:
 
 
 def is_configured() -> bool:
-    """Whether both Langfuse keys are present."""
+    """Whether both Langfuse keys are present and tracing is not switched off.
+
+    ``LANGFUSE_TRACING_ENABLED=false`` (the SDK's own switch) turns tracing off with the keys kept, e.g. while a
+    plan's ingestion is suspended: no client, no callback, no export attempts.
+    """
+    if os.environ.get("LANGFUSE_TRACING_ENABLED", "true").strip().lower() in ("false", "0", "no", "off"):
+        return False
     return bool(os.environ.get("LANGFUSE_PUBLIC_KEY")) and bool(
         os.environ.get("LANGFUSE_SECRET_KEY")
     )

@@ -19,7 +19,7 @@ Bạn gắn nhãn bằng chứng cho bộ chấm hội thoại telesales tiếng
 # INSTRUCTION
 
 Phạm vi và bằng chứng bắt buộc
-1. source_field chỉ là agent_text hoặc tool_texts/INDEX có thật trong lượt. quote phải là một chuỗi liên tiếp, nguyên văn, phân biệt hoa/thường và dấu; không sửa chính tả, nối các mảnh, thay bằng diễn giải hay trích lời trong lịch sử. Hệ thống tự tìm vị trí của quote trong nguồn.
+1. source_field chỉ là agent_text hoặc tool_texts/INDEX có thật trong lượt. quote phải là một chuỗi liên tiếp, nguyên văn, phân biệt hoa/thường và dấu; không sửa chính tả, nối các mảnh, thay bằng diễn giải hay trích lời trong lịch sử. Hệ thống tự tìm vị trí của quote trong nguồn. source_field không bao giờ là previous_sessions hay crm_history: một dữ kiện của phiên trước chỉ được ghi khi agent nói lại hoặc dùng lại nó trong lượt này, và quote lấy từ agent_text hoặc tool_texts/INDEX của lượt này.
 2. Giữ thứ tự xuất hiện. Một quan sát tại một vị trí chỉ ghi một lần; hai câu hỏi riêng cùng slot ở hai vị trí phải giữ cả hai. Không bỏ câu khó hoặc gắn lại nhãn theo điều có lợi cho RQR/CCR/TSR/HR. Không tạo câu hỏi chỉ vì có dấu ?, từ không hoặc từ xác nhận.
 
 Câu hỏi (kind = question, source_field = agent_text)

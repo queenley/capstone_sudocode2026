@@ -349,6 +349,81 @@ Loại: dữ liệu · Trạng thái: xong · Chỉ số: không có (giao diệ
 - **Số đo:** 40/40 sản phẩm có ảnh.
 - **Còn lại:** vài ảnh chỉ gần đúng loại hàng (máy lọc nước nóng lạnh cho RO, bình sữa cho máy hâm và máy tiệt trùng). Cần chạy lại seed để ảnh vào database: `docker compose run --rm seed`.
 
+### 2026-11-10 · Extractor v13: tự sửa lỗi luật trước khi thử lại; tắt Langfuse khi hết hạn mức
+
+Loại: evaluation · Trạng thái: xong · Chỉ số: RQR, CCR, HR (công cụ đo đổi: `product-extractor-v13`)
+
+- **Vấn đề:**
+  - Log của `run_eval` có `Items attempt 1 invalid (InvalidOutput); asking again`.
+  - Có thêm `Failed to export spans batch code: 403`.
+- **Bằng chứng:**
+  - Cache extractor có 4.507 lượt. 30 lượt (0,7%) phải thử lại, và cả 30 đều đúng ở lần thứ hai.
+
+    | Lỗi | Lượt |
+    |---|---|
+    | `source_field` là `previous_sessions` | 17 |
+    | `kind` lạ (`alt_suggested`), câu hỏi `open` có `value`, thiếu `purpose` | 13 |
+
+    JSON của các lỗi này đúng cú pháp, nên `json_repair` (đã chạy trước khi thử lại) không sửa được.
+  - Langfuse trả `403 Ingestion suspended: Usage threshold exceeded`. Key vẫn hợp lệ (`auth_check` ok, vùng jp).
+- **Sửa:**
+  - `Item.settle` (`mode="before"`) sửa sẵn những gì luật đã định cách xử lý:
+    - `kind` lạ thành `other`;
+    - câu hỏi `open` có `value` thì đặt `value = null`;
+    - claim và fact_usage bỏ `question_type`;
+    - thiếu `purpose` thì để rỗng.
+
+    Lỗi trích dẫn từ lịch sử vẫn để model sửa lại.
+  - Prompt `extractor.txt`, quy tắc 1: `source_field` không bao giờ là `previous_sessions` hay `crm_history`.
+  - Log thử lại in nguyên văn lỗi.
+  - `VERSION` lên v13.
+  - `LANGFUSE_TRACING_ENABLED=false` trong `.env`. `tracing.is_configured` đọc cờ này. Thêm cờ vào `.env.example`.
+- **Đã kiểm:** 176 test liên quan qua (chạy với `PYTHONUTF8=1`; không có cờ này, console cp1252 làm vỡ một số test ASR).
+- **Số đo:** chưa chạy. Không so điểm v13 với run v12 trừ khi dùng `run_eval.py --relabel`.
+
+### 2026-11-10 · Bộ chấm hội thoại mẫu: gpt-5, tài liệu shop, hướng dẫn chấm, J11 theo ngân sách
+
+Loại: dữ liệu · Trạng thái: xong (chưa đo đồng thuận với người) · Chỉ số: J01–J12 trên hội thoại mẫu
+
+- **Vấn đề:** bộ chấm cũ (gpt-4o-mini) chấm sai theo cả hai chiều.
+  - Báo J02 (bịa) khi agent nói đúng giá hoặc khuyến mãi đang chạy (ADV-0044, ADV-0031). Lấy lời của khách làm bằng chứng J03.
+  - Bỏ sót lỗi thật: sai món của mã đơn (GEN-0169, GEN-0235), sai thời gian giao (GEN-0020/c3).
+  - J02 cho đối chiếu với "tài liệu", nhưng bộ chấm không nhận được tài liệu nào.
+  - J11 không áp dụng cho đơn vượt ngân sách khách nêu (13 cuộc dev, 3 cuộc test).
+- **Sửa:**
+  - Model chấm `gpt-5`. Client tự xử lý model suy luận: không gửi `temperature`, dùng `max_completion_tokens`, có khoá luồng.
+  - Thêm phần mở đầu cố định: chính sách cho khách, catalog, khuyến mãi. Phần này được tính giá cache, khoảng 84% prompt.
+  - Thêm `active_promotions` cho từng cuộc.
+  - Thêm `config/prompts/data-generation/judge_guidance.md`, nối sau prompt của BTC. Prompt và tiêu chí của BTC giữ nguyên.
+  - J11 áp dụng khi tổng tiền vượt ngân sách. Thêm `--workers` và `--only`.
+- **Đã kiểm:**
+  - Trên 23 ca bộ chấm cũ FAIL: 16 ca thành PASS. 4 trong 7 ca còn FAIL đối chiếu lại thấy là lỗi thật; 1 ca bị chấm sai (GEN-0123, "đổi trả 7 ngày" đúng chính sách).
+  - Chấm lại toàn bộ: dev 801 cuộc, test 192 cuộc. Tỷ lệ FAIL theo tiêu chí ở dev:
+
+    | Tiêu chí | FAIL |
+    |---|---|
+    | J02 | 184/801 |
+    | J08 | 95/801 |
+    | J07 | 32/232 |
+    | J01 | 38/377 |
+    | J05 | 18/20 |
+    | J10 | 10/12 |
+    | J11 | 16/36 |
+
+  - J02 nhóm theo nội dung câu bị FAIL (dev và test):
+
+    | Loại | Số câu | Ghi chú |
+    |---|---|---|
+    | Miễn phí ship | 69 | Agent nói "đơn từ 500.000đ freeship toàn quốc" với hàng không phải Mẹ & bé; chính sách: chỉ Mẹ & bé, ngành khác miễn phí từ 2.000.000đ |
+    | Bảo hành | 55 | Agent nói "bảo hành 12 tháng" với AirPure Pro (24 tháng theo catalog), hoặc với giày và áo (không bảo hành) |
+    | Thông số | 48 | |
+    | Giá | 24 | |
+    | Đơn hàng | 23 | |
+
+    Đó là lỗi thật của bộ viết hội thoại (gpt-4.1), không phải lỗi của nhãn.
+  - Chi phí chấm khoảng 34 USD.
+- **Số đo:** hội thoại qua mọi kiểm tự động: dev 381/801, test 88/192 (trước, với bộ chấm cũ: 576 và 148). Chưa đo kappa với người (BTC yêu cầu ≥ 20 mẫu).
+
 ### 2026-11-10 · Sinh lại hội thoại mẫu và audio theo nhãn mới (dev r4, test r1)
 
 Loại: dữ liệu · Trạng thái: xong (bộ vàng chờ người duyệt ký lại) · Chỉ số: TSR, CCR, WER

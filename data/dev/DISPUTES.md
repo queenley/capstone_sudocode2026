@@ -1,6 +1,6 @@
 # Nhãn đã duyệt, đã rà và chưa làm của `data/dev`
 
-`official_gt_approved: false`. Từng thay đổi nằm trong [`conversion-report.json`](conversion-report.json):
+`official_gt_approved: true` (người duyệt ký mọi nhãn ngày 10/11/2026). Từng thay đổi nằm trong [`conversion-report.json`](conversion-report.json):
 
 - `decision: revise`, `proposed_by: null`: người duyệt chấp nhận đề xuất của bản tổng hợp 08/11/2026.
 - `decision: revise`, `proposed_by: claude`, `reviewed_on: 2026-11-08`: Claude đề xuất sau khi đọc từng câu; người duyệt (dngan0365) chấp nhận cả bảng dưới ngày 08/11/2026.
@@ -78,6 +78,6 @@ Sửa ngày 09/11/2026 trong nhóm 14 (đã duyệt): câu thêm vào dùng các
 
 | Phạm vi | Lý do |
 |---|---|
-| Bộ vàng | `official_gt_approved: false`. `review/golden_manifest.json` ký ngày 09/11/2026 trước khi hội thoại mẫu được sinh lại; quyết định `approve_conversation` của các cuộc sinh lại đã xoá, nên cần ký lại bằng `approve_gold.py`. Nhãn còn N trong sheet: ADV-0123/c1, ADV-0151/c1, ADV-0154/c1, GEN-0066/c1, GEN-0181/c1 (nhóm đã duyệt) và ADV-0024/c2 nếu chưa đặt Y. `official_gt_approved` chỉ thành true khi nhãn của mọi cuộc là Y |
+| Hội thoại đã ký nhưng bộ chấm mới gắn cờ | `official_gt_approved: true`: người duyệt ký 801/801 nhãn và 578 hội thoại ngày 10/11/2026 (`review/golden_manifest.json`). Bộ chấm hội thoại sau đó chấm lại bằng gpt-5 có tài liệu shop: 234 trong 578 hội thoại đã ký nay bị gắn cờ (nhiều nhất là J02, agent mẫu nói sai chính sách miễn phí vận chuyển hoặc bảo hành; sau đó J08). Cần người duyệt xem lại `approve_conversation` của các cuộc đó; nhãn không bị ảnh hưởng |
 | Hội thoại mẫu và audio | Đã sinh lại 09–10/11/2026: 230 hội thoại (`regenerate_conversations.py`, `review/regenerated.json`), 266 lượt, 22.963 ký tự ElevenLabs. Còn vài ca J02 mà bản viết mới vẫn bị bộ chấm bằng model đánh dấu bịa: giữ `approve: N` |
 | Nhóm 13 | Đã chọn quy ước: `budget_vnd` bằng đúng số khách nói (khác SAMPLE-01); `promo_active` là có giảm giá hoặc quà tặng (theo SAMPLE-01, khác SAMPLE-02) |

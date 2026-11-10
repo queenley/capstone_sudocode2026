@@ -63,7 +63,7 @@ from ..guardrails.hard import HUMAN
 
 logger = logging.getLogger(__name__)
 #: The instrument's version, written into every run's manifest beside :data:`prompt_sha`.
-VERSION = "product-extractor-v12"
+VERSION = "product-extractor-v13"
 AUTOMATED = re.compile(r"\b(?:em|tôi|mình)\s+là\s+(?:một\s+)?(?:trợ lý (?:ảo|tự động)|(?:chat)?bot|AI)\b", re.IGNORECASE)
 RESTOCK = re.compile(r"\b(?:về\s+kho|hàng(?:\s+(?:sẽ|sắp|mới|lại|dự\s+kiến))*\s+về|"
                      r"nhập(?:\s+(?:lại|thêm|mới))*\s+hàng|bổ\s+sung\s+(?:hàng|kho|tồn\s+kho)|"
@@ -177,6 +177,25 @@ class Item(BaseModel):
                        "và phạm vi phủ định/lựa chọn/xác nhận, không chỉ cắt cụm đúng không.")
     purpose: str = Field(description="Lý do ngắn theo ngôn ngữ: dữ kiện dùng để làm gì; câu hỏi xin giá trị, lựa chọn "
                          "hay xác nhận mệnh đề nào. Không suy luận từ điểm số hoặc nhãn kịch bản.")
+
+    @model_validator(mode="before")
+    @classmethod
+    def settle(cls, data: Any) -> Any:
+        """Apply, before validation, the fixes the rules below already dictate, so a retry is spent only on what
+        the model must decide again (v13). Seen in the v12 cache (30 of 4507 turns needed a retry): an invented
+        kind ("alt_suggested"), an open question with a value, a claim with a question_type, a missing purpose.
+        A quote taken from previous_sessions is left to the retry: only the model can find the agent's words."""
+        if not isinstance(data, dict):
+            return data
+        data = dict(data)
+        if data.get("kind") not in get_args(Item.model_fields["kind"].annotation):
+            data["kind"], data["question_type"] = "other", None   # dropped by label_items, as "other" always was
+        if data.get("kind") in ("claim", "fact_usage"):
+            data["question_type"] = None
+        if data.get("kind") == "question" and data.get("question_type") == "open":
+            data["value"] = None
+        data.setdefault("purpose", "")
+        return data
 
     @model_validator(mode="after")
     def consistent(self) -> Item:

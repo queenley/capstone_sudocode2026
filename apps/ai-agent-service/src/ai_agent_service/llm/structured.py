@@ -177,8 +177,10 @@ class StructuredOutput(Generic[T]):
         if not is_output_error(error) or report.attempts >= self.attempts:
             raise StructuredOutputError(f"{self.schema.__name__}: {report.errors[-1]}", cause=error,
                                         report=report) from error
-        logger.warning("%s attempt %d invalid (%s); asking again", self.schema.__name__, report.attempts,
-                       type(error).__name__)
+        # The first lines of the error say which field broke which rule; the type alone said nothing to act on.
+        detail = " | ".join(line.strip() for line in str(error).splitlines()[:3] if line.strip())[:240]
+        logger.warning("%s attempt %d invalid (%s: %s); asking again", self.schema.__name__, report.attempts,
+                       type(error).__name__, detail)
         if isinstance(error, TruncatedOutput) or type(error).__name__ == "LengthFinishReasonError":
             note = f"{self.length_hint}\nLỗi nguyên văn: {error}"
         else:
