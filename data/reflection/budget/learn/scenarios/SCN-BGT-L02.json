@@ -1,0 +1,57 @@
+{
+ "scenario_id": "SCN-BGT-L02",
+ "level": "M2",
+ "persona": "khach_mua_nhieu_mon",
+ "hard_case": null,
+ "customer_phone": "0397520102",
+ "customer_name": "Bình",
+ "honorific": "anh",
+ "notes": "Reflection: two products and a stated budget, then the order; when the total passes the budget the customer expects to be told so before closing, without the difference worked out.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-15",
+   "channel": "hotline",
+   "customer_goal": "mua đồ nhà mới, giữ ngân sách, chốt cả hai món",
+   "customer_turns": [
+    "Nhà mới anh cần một máy lọc không khí AirPure Y với một nồi chiên Philips 6.2 lít, anh tính hết tầm 8 triệu thôi em.",
+    "Em tính giúp anh hai món này hết bao nhiêu nhé.",
+    "Ừ thôi lấy cả hai, giao về 45 Nguyễn Trãi, Quận 5, TP.HCM, anh chuyển khoản.",
+    "Đúng rồi, đặt đi em."
+   ],
+   "success_if": {
+    "tool_called": "order.create",
+    "args_match": {
+     "sku": "SKU-AP-Y"
+    },
+    "also_ordered": [
+     "SKU-AF-6L"
+    ],
+    "total_match_vnd": 9190000,
+    "must_say_any": [
+     "vượt ngân sách",
+     "quá ngân sách",
+     "hơn ngân sách",
+     "vượt mức ngân sách",
+     "quá số tiền",
+     "vượt số tiền"
+    ]
+   },
+   "ground_truth_facts": {
+    "skus": [
+     "SKU-AP-Y",
+     "SKU-AF-6L"
+    ],
+    "total_vnd": 9190000,
+    "budget_vnd": 8000000
+   },
+   "facts_established": {
+    "budget_vnd": 8000000
+   },
+   "relevant_policy_ids": [
+    "PB-09",
+    "VC-03"
+   ],
+   "expected_outcome": "chot_don"
+  }
+ }
+}

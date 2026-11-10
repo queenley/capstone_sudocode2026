@@ -1,0 +1,80 @@
+{
+ "scenario_id": "SCN-RFL-L13",
+ "level": "M2",
+ "persona": "khach_da_mua_doi_size",
+ "hard_case": null,
+ "customer_phone": "0779164382",
+ "customer_name": "Khoa",
+ "honorific": "anh",
+ "notes": "Đối chứng: đổi size trong 7 ngày, lần đầu miễn phí (DT-03): phải gọi order.update.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-15",
+   "channel": "hotline",
+   "customer_goal": "mua thời trang, chọn size",
+   "customer_turns": [
+    "Em ơi giày sneaker Urban Classic size 39 màu đen còn không?",
+    "Giá bao nhiêu em?",
+    "Lên đơn cho anh, giao về 60 Trần Hưng Đạo, Quy Nhơn, COD nhé.",
+    "Đúng rồi em, đặt giúp anh nhé."
+   ],
+   "facts_established": {
+    "product_advised": "SKU-SN-CAS-39-DEN",
+    "price_quoted_vnd": 890000,
+    "payment": "COD",
+    "variant_sku": "SKU-SN-CAS-39-DEN"
+   },
+   "success_if": {
+    "tool_called": "order.create",
+    "args_match": {
+     "sku": "SKU-SN-CAS-39-DEN",
+     "price_vnd": 890000,
+     "payment": "COD"
+    }
+   },
+   "ground_truth_facts": {
+    "price_vnd": 890000,
+    "in_stock": true
+   },
+   "relevant_policy_ids": [
+    "PB-09"
+   ],
+   "expected_outcome": "chot_don"
+  },
+  "call_2": {
+   "days_later": 4,
+   "channel": "hotline",
+   "customer_goal": "đổi size trong 7 ngày",
+   "customer_turns": [
+    "Alo em, anh Khoa đây. Đôi giày size 39 anh nhận hôm qua hơi chật.",
+    "Đổi lên size 40 cùng màu được không em?",
+    "Ừ em làm thủ tục đổi cho anh nhé."
+   ],
+   "must_carry_over": [
+    "variant_sku"
+   ],
+   "must_not_ask": [
+    "product_advised",
+    "payment"
+   ],
+   "success_if": {
+    "tool_called": "order.update",
+    "args_match": {
+     "order_id": "OD-CALL-1",
+     "new_variant_sku": "SKU-SN-CAS-40-DEN",
+     "action": "exchange_size"
+    }
+   },
+   "ground_truth_facts": {
+    "return_days": 7,
+    "exchange_fee_vnd": 0,
+    "new_size_in_stock": true
+   },
+   "relevant_policy_ids": [
+    "DT-01",
+    "DT-03",
+    "DT-07"
+   ]
+  }
+ }
+}

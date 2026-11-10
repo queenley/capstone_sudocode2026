@@ -21,7 +21,7 @@ import json
 from typing import Any, Sequence
 
 from ...config.config_manager import btc_data_dir, embedding_dir, get_knowledge_config, kb_dir
-from . import corpus, semantic
+from . import corpus, expand, semantic
 from .search import KnowledgeBase, Settings
 
 
@@ -49,7 +49,7 @@ def build(entries: Sequence[corpus.Chunk] | None = None, *, embed: bool = True) 
     """
     config = get_knowledge_config()
     team = list(entries) if entries is not None else corpus.load_version(kb_dir(), config.version)
-    chunks = corpus.policy_chunks(btc_data_dir() / "policy") + corpus.with_campaigns(team, promotions())
+    chunks = expand.attach(corpus.policy_chunks(btc_data_dir() / "policy")) + corpus.with_campaigns(team, promotions())
     r = config.retrieval
     settings = Settings(top_k=r.top_k, fusion_k=r.fusion_k, k1=r.k1, b=r.b, accents=r.accents,
                         abstain_cosine=r.abstain_cosine, abstain_coverage=r.abstain_coverage)

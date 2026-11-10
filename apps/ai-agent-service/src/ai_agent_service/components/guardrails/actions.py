@@ -27,7 +27,7 @@ from typing import Any, Mapping, Sequence
 from .. import btc_schemas, clock
 from ..intake.itn import format_vnd
 from ..intake.text import plain
-from . import Verdict
+from . import Verdict, purchase
 
 #: Tools with an effect wait for the reviews of what was just said (section 4.8).
 #: They are the write tools, so the two sets are one.
@@ -62,6 +62,7 @@ def check(
     mode: str,
     has_phone: bool,
     quotes: Mapping[str, int],
+    order_quotes: Mapping[str, Any] | None = None,
     orders: frozenset[str] = frozenset(),
     trusted: frozenset[str] | None = None,
     lane: str | None = None,
@@ -110,7 +111,8 @@ def check(
     if mode == "copilot":
         return Verdict(False, ("Chế độ copilot: tư vấn viên thực hiện thao tác này, trợ lý chỉ gợi ý.",))
     checks = {
-        "order_create": lambda: _order_create(args, tier=tier, has_phone=has_phone, quotes=quotes, trusted=trusted,
+        "order_create": lambda: _order_create(args, tier=tier, has_phone=has_phone, quotes=quotes,
+                                              order_quotes=order_quotes or {}, trusted=trusted,
                                               created=created, customer_said=customer_said, placed=placed,
                                               said=f"{last_agent_said or ''} {customer_said or ''}",
                                               wants_more=(intents or {}).get("one_more")),
@@ -136,6 +138,13 @@ def placed_lines(results: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
         if result.get("name") != "order.create" or not envelope.get("ok") or not order_id:
             continue
         args = result.get("args") or {}
+        if args.get("lines"):  # an order of lines is one order: its total, its skus
+            items = purchase.lines_of(args)
+            lines[order_id] = {"order_id": order_id, "sku": purchase.target(args), "qty": 1,
+                               "price_vnd": sum(int(i["price_vnd"] or 0) * i["qty"] for i in items),
+                               "skus": sorted({i["sku"] for i in items}),
+                               "payment": args.get("payment") or "COD", "order_group": args.get("order_group")}
+            continue
         lines[order_id] = {"order_id": order_id, "sku": args.get("sku"), "qty": int(args.get("qty") or 1),
                            "price_vnd": int(args.get("price_vnd") or 0), "payment": args.get("payment") or "COD",
                            "order_group": args.get("order_group")}
@@ -173,8 +182,15 @@ def _cod_order(args: Mapping[str, Any], line: int, placed: Sequence[Mapping[str,
 def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes: Mapping[str, int],
                   trusted: frozenset[str] | None, created: Sequence[Mapping[str, Any]] = (),
                   customer_said: str | None = None, placed: Sequence[Mapping[str, Any]] = (),
-                  said: str = "", wants_more: bool | None = None) -> list[str]:
-    again = [o for o in created if o.get("sku") and o.get("sku") == args.get("sku")]
+                  said: str = "", wants_more: bool | None = None,
+                  order_quotes: Mapping[str, Any] | None = None) -> list[str]:
+    if args.get("lines"):
+        return _order_of_lines(args, tier=tier, has_phone=has_phone, trusted=trusted, created=created,
+                               customer_said=customer_said, placed=placed, said=said, wants_more=wants_more,
+                               order_quotes=order_quotes or {})
+    # An order of lines placed earlier holds every one of its skus (2026-11-10: the second product of a two-product
+    # order was ordered again on the customer's "đặt đi", as its own order).
+    again = [o for o in created if args.get("sku") and args.get("sku") in (o.get("skus") or [o.get("sku")])]
     # The same sku in the other half of a split order (QT-01) is the order the customer agreed to, not a repeat.
     other_half = args.get("order_group") is not None and all(
         p.get("order_group") != args.get("order_group") for p in placed if p.get("sku") == args.get("sku"))
@@ -206,6 +222,46 @@ def _order_create(args: Mapping[str, Any], *, tier: str, has_phone: bool, quotes
     return reasons + _cod_order(args, int(price) * qty, placed, said, quotes)
 
 
+def _order_of_lines(args: Mapping[str, Any], *, tier: str, has_phone: bool, trusted: frozenset[str] | None,
+                    created: Sequence[Mapping[str, Any]], customer_said: str | None, placed: Sequence[Mapping[str, Any]],
+                    said: str, wants_more: bool | None, order_quotes: Mapping[str, Any]) -> list[str]:
+    """An order of more than one unit (organisers, 11/2026): every line's price is the unit's in the
+    ``pricing.quote_order`` of exactly these units."""
+    try:
+        lines = purchase.lines_of(args)
+    except (TypeError, ValueError):
+        return ["Mỗi dòng của lines cần sku, qty là số nguyên dương và price_vnd."]
+    skus = {line["sku"] for line in lines}
+    again = [o for o in created if skus & set(o.get("skus") or [o.get("sku")])]
+    if wants_more is None:
+        wants_more = bool(ONE_MORE.search(plain(customer_said or "")))
+    if again and not wants_more:
+        return [f"Đơn {again[-1]['order_id']} có sản phẩm này đã tạo trong cuộc này. Khách bổ sung hay đổi địa chỉ, "
+                "thanh toán thì gọi order_update trên đơn đó; chỉ tạo đơn mới khi khách muốn mua thêm."]
+    reasons = []
+    if not has_phone:
+        reasons.append("Chưa có số điện thoại của khách để tạo đơn; xin số điện thoại trước.")
+    if tier in ("PROBABLE", "AMBIGUOUS"):
+        reasons.append("Danh tính khách chưa được xác nhận; hỏi xác nhận trước khi tạo đơn.")
+    if any(line["qty"] < 1 for line in lines):
+        return reasons + ["Số lượng mỗi dòng phải là số nguyên dương."]
+    unknown = sorted(sku for sku in skus if trusted is not None and sku not in trusted)
+    if unknown:
+        return reasons + [f"Mã {', '.join(unknown)} chưa xuất hiện trong kết quả tool của cuộc gọi; tra catalog_search để "
+                          "lấy đúng mã trước."]
+    units = order_quotes.get(purchase.units_key(lines))
+    if not units:
+        return reasons + ["Chưa có báo giá hôm nay cho đúng các máy của đơn này; gọi pricing_quote_order với các dòng "
+                          "của đơn trước (đơn nhiều máy không dùng giá của pricing_get_quote)."]
+    asked = sorted((line["sku"], line["price_vnd"]) for line in lines for _ in range(line["qty"]))
+    if None in (price for _, price in asked) or asked != sorted((sku, int(price)) for sku, price in units):
+        return reasons + ["Giá các dòng khác báo giá hôm nay của pricing_quote_order: "
+                          + "; ".join(f"{sku} {format_vnd(int(price))}" for sku, price in units)
+                          + ". Mỗi giá một dòng, đúng giá từng máy."]
+    total = sum(line["price_vnd"] * line["qty"] for line in lines)
+    return reasons + _cod_order(args, total, placed, said)
+
+
 def _order_update(args: Mapping[str, Any], *, orders: frozenset[str], trusted: frozenset[str] | None,
                   updated: Sequence[Mapping[str, Any]] = (), agreed: bool | None = None) -> list[str]:
     order_id, action = args.get("order_id"), args.get("action")
@@ -229,7 +285,7 @@ def _order_update(args: Mapping[str, Any], *, orders: frozenset[str], trusted: f
             reasons.append(f"Mã {new} chưa xuất hiện trong kết quả tool của cuộc gọi; tra catalog_search hoặc inventory_check trước.")
     if agreed is False:
         reasons.append("Khách chưa chọn hay đồng ý thay đổi này: đề xuất cách xử lý (đổi size, đổi sản phẩm, trả hàng) "
-                       "kèm phí theo chính sách, hỏi khách chọn, chỉ gọi order_update khi khách đồng ý (luật 20).")
+                       "kèm phí theo chính sách, hỏi khách chọn, chỉ gọi order_update khi khách đồng ý.")
     return reasons
 
 

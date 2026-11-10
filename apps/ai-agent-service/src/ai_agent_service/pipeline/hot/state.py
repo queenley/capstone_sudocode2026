@@ -117,6 +117,8 @@ class HotState(TurnInput, total=False):
     draft: dict[str, Any] | None
     #: Today's price per sku from every quote this call.
     quotes: dict[str, int]
+    #: Orders of more than one unit priced this call (``pricing.quote_order``): units key to ``[[sku, price], ...]``.
+    order_quotes: dict[str, list[list[Any]]]
     #: Order lines created this call, retained across turn resets (``actions.placed_lines``).
     placed_lines: list[dict[str, Any]]
     #: Public catalogue codes seen in this call, retained across turn resets.

@@ -1,0 +1,40 @@
+{
+ "scenario_id": "SCN-WTY-L03",
+ "level": "M2",
+ "persona": "khach_lo_do_ben",
+ "hard_case": null,
+ "customer_phone": "0397510103",
+ "customer_name": "Mai",
+ "honorific": "chị",
+ "notes": "Reflection: a customer worried the product will break; the shop's extended warranty (BH-05) answers it for home appliances over 3,000,000d only.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-15",
+   "channel": "hotline",
+   "customer_goal": "tìm hiểu, lo máy mau hư",
+   "customer_turns": [
+    "Cho chị hỏi máy lọc nước Karofi 9 lõi giá sao em?",
+    "Máy lọc nước chị tính dùng cả chục năm, chị lo mấy năm sau hỏng thì sửa tốn lắm.",
+    "Ừ chị biết rồi, chị tính thêm nha."
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_say_any": [
+     "bảo hành mở rộng",
+     "gói bảo hành thêm",
+     "mua thêm bảo hành"
+    ]
+   },
+   "ground_truth_facts": {
+    "sku": "SKU-WF-RO9",
+    "price_vnd": 5990000
+   },
+   "relevant_policy_ids": [
+    "BH-01",
+    "BH-05",
+    "PB-02"
+   ],
+   "expected_outcome": "hen_goi_lai"
+  }
+ }
+}

@@ -257,18 +257,25 @@ async def reset() -> None:
 def enrich(name: str, result: Any) -> Any:
     """A mock result with our additions; anything the mock said stays as it said it.
 
-    ``pricing.get_quote``: each applied promotion gets ``end``, its last day
+    ``pricing.get_quote`` (and each unit of ``pricing.quote_order``): each applied promotion gets ``end``, its last day
     in ``promotions.json``, the only source of a promotion's expiry, and
     ``name``, what the promotion gives in the shop's words: a gift reported
     as a ``gift_sku`` alone leaves the model to describe it, and it described
     a value the tools never gave.
     """
-    if name != "pricing.get_quote" or not isinstance(result, dict) or not result.get("applied_promos"):
+    if not isinstance(result, dict):
         return result
     known = {promo["promo_code"]: promo for promo in mock().PROMOS}
-    return {**result, "applied_promos": [
-        {**p, "name": (known.get(p.get("promo_code")) or {}).get("name"), "end": (known.get(p.get("promo_code")) or {}).get("end")}
-        for p in result["applied_promos"]]}
+
+    def named(promos: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        return [{**p, "name": (known.get(p.get("promo_code")) or {}).get("name"),
+                 "end": (known.get(p.get("promo_code")) or {}).get("end")} for p in promos]
+
+    if name == "pricing.get_quote" and result.get("applied_promos"):
+        return {**result, "applied_promos": named(result["applied_promos"])}
+    if name == "pricing.quote_order" and result.get("units"):  # the same for each unit of an order
+        return {**result, "units": [{**u, "applied_promos": named(u.get("applied_promos") or [])} for u in result["units"]]}
+    return result
 
 
 def product_of(sku: str) -> tuple[str | None, dict[str, Any] | None]:

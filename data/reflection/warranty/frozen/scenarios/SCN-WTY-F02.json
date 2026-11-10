@@ -1,0 +1,40 @@
+{
+ "scenario_id": "SCN-WTY-F02",
+ "level": "M2",
+ "persona": "khach_lo_do_ben",
+ "hard_case": null,
+ "customer_phone": "0397510202",
+ "customer_name": "Phong",
+ "honorific": "anh",
+ "notes": "Reflection: a customer worried the product will break; the shop's extended warranty (BH-05) answers it for home appliances over 3,000,000d only.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-15",
+   "channel": "hotline",
+   "customer_goal": "tìm hiểu, lo máy mau hư",
+   "customer_turns": [
+    "Xiaomi Smart 4 Pro bên em giá sao?",
+    "Hàng điện tử anh hay gặp hết hạn bảo hành là hư, anh hơi ngại.",
+    "Ừ để anh cân nhắc."
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_say_any": [
+     "bảo hành mở rộng",
+     "gói bảo hành thêm",
+     "mua thêm bảo hành"
+    ]
+   },
+   "ground_truth_facts": {
+    "sku": "SKU-XM-4P",
+    "price_vnd": 5490000
+   },
+   "relevant_policy_ids": [
+    "BH-01",
+    "BH-05",
+    "PB-02"
+   ],
+   "expected_outcome": "hen_goi_lai"
+  }
+ }
+}

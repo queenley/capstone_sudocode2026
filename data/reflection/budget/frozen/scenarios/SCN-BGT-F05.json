@@ -1,0 +1,53 @@
+{
+ "scenario_id": "SCN-BGT-F05",
+ "level": "M2",
+ "persona": "khach_mua_nhieu_mon",
+ "hard_case": null,
+ "customer_phone": "0397520205",
+ "customer_name": "Liên",
+ "honorific": "chị",
+ "notes": "Reflection: two products and a stated budget, then the order; when the total passes the budget the customer expects to be told so before closing, without the difference worked out.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-15",
+   "channel": "hotline",
+   "customer_goal": "mua đồ nhà mới, giữ ngân sách, chốt cả hai món",
+   "customer_turns": [
+    "Nhà mới chị cần một máy lọc không khí AirPure Mini với một nồi chiên Lock&Lock 4 lít, chị tính hết tầm 5 triệu thôi em.",
+    "Em tính giúp chị hai món này hết bao nhiêu nhé.",
+    "Ừ thôi lấy cả hai, giao về 60 Võ Văn Tần, Quận 3, TP.HCM, chị chuyển khoản.",
+    "Đúng rồi, đặt đi em."
+   ],
+   "success_if": {
+    "tool_called": "order.create",
+    "args_match": {
+     "sku": "SKU-AP-MINI"
+    },
+    "also_ordered": [
+     "SKU-AF-4L"
+    ],
+    "total_match_vnd": 4080000,
+    "forbidden_claims": [
+     "vượt ngân sách",
+     "quá ngân sách"
+    ]
+   },
+   "ground_truth_facts": {
+    "skus": [
+     "SKU-AP-MINI",
+     "SKU-AF-4L"
+    ],
+    "total_vnd": 4080000,
+    "budget_vnd": 5000000
+   },
+   "facts_established": {
+    "budget_vnd": 5000000
+   },
+   "relevant_policy_ids": [
+    "PB-09",
+    "VC-03"
+   ],
+   "expected_outcome": "chot_don"
+  }
+ }
+}

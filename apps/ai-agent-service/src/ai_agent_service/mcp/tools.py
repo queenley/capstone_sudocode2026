@@ -559,7 +559,9 @@ def idempotency_key(context: Any, name: str, args: Mapping[str, Any]) -> str | N
     if not call_id or not turn_id:
         return None
     if name == "order_create":
-        return purchase.order_key(str(call_id), args)
+        # An order of lines is keyed on its normal form, as the backend reads it (a line's qty may be left out);
+        # one product keeps the key it always had, so a retry across a deploy is still the same order.
+        return purchase.order_key(str(call_id), purchase.payload(args) if args.get("lines") else args)
     payload = json.dumps({k: v for k, v in args.items() if k != IDEMPOTENCY_ARG},
                          ensure_ascii=False, sort_keys=True, default=str)
     digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]

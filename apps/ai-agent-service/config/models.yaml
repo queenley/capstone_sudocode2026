@@ -53,6 +53,10 @@ defaults:
   use_responses_api: null
   # OpenAI only: the processing tier. Null sends none.
   service_tier: null
+  # OpenAI Responses API only (config_manager.Generation): null sends none.
+  store: null
+  include: null
+  output_version: null
   # Enough for a short structured reply. An agent that reasons, or that answers
   # at length, raises it in its own block below.
   max_tokens: 1024
@@ -129,14 +133,60 @@ agents:
     generation:
       max_tokens: 1024
 
-  # Section 10.3: the QaAgent's reflection, which proposes the playbook hints
-  # the exploration tries. Not the evaluation's judge: that one is pinned on
-  # the evaluation side and no improvement round ever changes it.
+  # Section 10.3: the QaAgent scores a learning run's calls on the BTC rubric
+  # and says what kind of failure each is. Not the evaluation's judge: that one
+  # is pinned on the evaluation side and no improvement round ever changes it.
+  # 2026-11-09: the advisor's own model, with reasoning: whether a skill
+  # already covers a failure decides what Reflection may learn, so the
+  # diagnosis is not left to a weaker model than the one it judges.
   qa:
     provider: openai
-    model: gpt-4.1-mini
+    model: gpt-5.6-luna
     generation:
-      max_tokens: 2048
+      temperature: null
+      reasoning_effort: medium
+      use_responses_api: false
+      # Reasoning tokens count against this budget before the answer does.
+      max_tokens: 8192
+
+  # Section 7.3: the questions each policy section answers, written once into
+  # data/kb/questions.jsonl and indexed with it (components/knowledge/expand.py).
+  # Offline and once per section's words; never on the hot path.
+  knowledge:
+    provider: openai
+    model: gpt-5.6-luna
+    generation:
+      temperature: null
+      reasoning_effort: low
+      use_responses_api: false
+      max_tokens: 4096
+
+  # Section 10.3: the advisor's reflection on its own calls, after they end:
+  # lesson cards, and the one sentence of a skill several cards share. A larger
+  # model than the advisor's (2026-11-10): off the hot path, a few calls a
+  # round, and the lessons are only as good as the model drawing them (ACE).
+  # gpt-6.1-sol has no `none` effort and needs the Responses API
+  # (openai.model_generation below).
+  reflection:
+    provider: openai
+    model: gpt-6.1-sol
+    generation:
+      temperature: null
+      reasoning_effort: low
+      use_responses_api: true
+      max_tokens: 8192
+
+  # Section 10.4: decides a Reflection change against what the people who
+  # wrote the learning set expect it to learn (agents/approval.py). One call
+  # per change, on a model as strong as the one that wrote it.
+  approval:
+    provider: openai
+    model: gpt-6.1-sol
+    generation:
+      temperature: null
+      reasoning_effort: low
+      use_responses_api: true
+      max_tokens: 4096
 
   # The exploration's customer (agents/simulator.py): its persona voice and
   # its observer of the agent's questions and prices. Offline, on the
@@ -158,7 +208,10 @@ profiles:
   local:
     provider: google_genai
     model: gemini-3.5-flash-lite
-    agents: [advisor, memory, compactor, qa]
+    # qa, reflection and approval are not moved (2026-11-09): the improvement loop's
+    # diagnosis and lessons stay on their own strong model on every machine,
+    # or a round run on a laptop would learn from a weaker judge.
+    agents: [advisor, memory, compactor]
     overrides:
       # The free tier stops a model at 500 requests a day (2026-10-25), and
       # the exploration's customer makes two or three calls per agent turn,
@@ -177,6 +230,7 @@ providers:
     models_url: https://generativelanguage.googleapis.com/v1beta/models
     models:
       - gemini-3.5-flash-lite
+      - gemini-3.5-flash
       - gemini-3.6-flash
       - gemini-3.1-flash-lite
     rate_limits:
@@ -227,9 +281,16 @@ providers:
   openai:
     label: OpenAI
     models_url: https://api.openai.com/v1/models
+    # gpt-6.1-sol: reasoning.effort is low, medium (default), high, xhigh or max, never none; tool calling
+    # requires the Responses API (developers.openai.com/api/docs/guides/latest-model, read 2026-11-10).
+    model_generation:
+      gpt-6.1-sol:
+        reasoning_effort: low
+        use_responses_api: true
     # gpt-4.1-mini is the default of the offline evaluation (run_eval.py);
     # it takes temperature 0, which the gpt-5 reasoning models refuse.
     models:
+      - gpt-6.1-sol
       - gpt-6-luna
       - gpt-5.6-luna
       - gpt-4.1-mini

@@ -1,0 +1,29 @@
+{
+ "scenario_id": "SCN-GAP-F11",
+ "level": "M2",
+ "persona": "khach_hoi_ngoai_tai_lieu",
+ "hard_case": null,
+ "customer_phone": "0380318562",
+ "customer_name": "Sang",
+ "honorific": "anh",
+ "notes": "documents-say-no-information (FAQ-03): control",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-20",
+   "channel": "hotline",
+   "customer_goal": "hỏi: documents-say-no-information (FAQ-03)",
+   "customer_turns": [
+    "Máy lọc không khí bên em có lọc được khí radon không em?",
+    "Ừ anh hiểu rồi, cảm ơn em."
+   ],
+   "success_if": {
+    "tool_called": "handoff.transfer",
+    "brief_must_contain": [
+     "escalation_reason"
+    ],
+    "agent_must_say": true
+   },
+   "expected_outcome": "chuyen_may"
+  }
+ }
+}

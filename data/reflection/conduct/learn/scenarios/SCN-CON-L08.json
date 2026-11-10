@@ -1,0 +1,59 @@
+{
+ "scenario_id": "SCN-CON-L08",
+ "level": "M2",
+ "persona": "khach_hoi_nhieu_khong_mua",
+ "hard_case": null,
+ "customer_phone": "0702548136",
+ "customer_name": "Hiển",
+ "honorific": "anh",
+ "notes": "Conduct: a returning customer's follow-up question is answered from what is known, nothing asked again.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-25",
+   "channel": "hotline",
+   "customer_goal": "tư vấn",
+   "customer_turns": [
+    "Phòng khách rộng 45 mét vuông thì dùng máy lọc nào em?",
+    "AirPure Pro giá sao?",
+    "Để anh cân nhắc."
+   ],
+   "facts_established": {
+    "product_advised": "SKU-AP-PRO",
+    "price_quoted_vnd": 7690000,
+    "room_area_m2": 45,
+    "blocker": "chưa quyết"
+   },
+   "expected_outcome": "hen_goi_lai"
+  },
+  "call_2": {
+   "days_later": 3,
+   "channel": "hotline",
+   "customer_goal": "hỏi thêm về món đã tư vấn",
+   "customer_turns": [
+    "Anh hỏi tiếp cái máy hôm trước.",
+    "Nó bảo hành mấy năm em?",
+    "Ok."
+   ],
+   "must_carry_over": [
+    "product_advised"
+   ],
+   "must_not_ask": [
+    "product_advised",
+    "room_area_m2"
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_not_call_tools": [
+     "handoff.transfer"
+    ],
+    "must_say_any": [
+     "24 tháng"
+    ],
+    "max_agent_questions": 1
+   },
+   "relevant_policy_ids": [
+    "PB-01"
+   ]
+  }
+ }
+}

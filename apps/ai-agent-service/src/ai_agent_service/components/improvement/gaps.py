@@ -19,9 +19,6 @@ from ..knowledge.corpus import policy_chunks
 
 #: Who approved an entry in an evaluation run, where no person does.
 SCRIPTED = "scripted-eval"
-#: Cosine of two questions that ask the same; of a scripted question and the gap it answers.
-SAME_QUESTION = 0.88
-SCRIPT_MATCH = 0.80
 
 
 def _path() -> Path:
@@ -55,6 +52,42 @@ def record(question: str, *, call_id: str, turn_id: str, recent: Sequence[str] =
     return key
 
 
+#: A transfer the advisor made because the documents do not answer (rule 4 of its prompt, PB-05).
+OUT_OF_DOCUMENTS = "ngoai_pham_vi_tai_lieu"
+
+
+def record_from_run(rows: Sequence[Mapping[str, Any]], diagnostics: Sequence[Mapping[str, Any]] = ()) -> int:
+    """The questions a finished run could not answer, recorded as a live call records them.
+
+    A run of the evaluation does not go through the live call's store, so its gaps are read from the trace: a turn
+    whose retrieval abstained (no passage, or the passage says there is no information, the harness's own rule) or
+    in which the advisor transferred the call because the documents do not answer. Both are structured fields of
+    the trace, not words. The earlier turns of the call go with it, for :func:`restate_open` to resolve "máy này".
+    """
+    abstained = {(str(d["scenario_id"]), str(d["call"]), int(d["turn"])) for d in diagnostics
+                 if d.get("config") in (None, "full") and d.get("turn") is not None
+                 and ((d.get("knowledge") or {}).get("abstain") in ("no_match", "absence"))}
+    by_call: dict[tuple[str, str], list[Mapping[str, Any]]] = {}
+    for row in rows:
+        by_call.setdefault((str(row["scenario_id"]), str(row["call"])), []).append(row)
+    recorded = 0
+    for (scenario, call), turns in by_call.items():
+        turns = sorted(turns, key=lambda r: int(r.get("turn") or 0))
+        for index, row in enumerate(turns):
+            transferred = any(tool.get("name") == "handoff.transfer"
+                              and (((tool.get("args") or {}).get("brief") or {}).get("escalation_reason") == OUT_OF_DOCUMENTS)
+                              for tool in row.get("tool_calls") or [])
+            if not str(row.get("customer_text") or "").strip():
+                continue
+            if not transferred and (scenario, call, int(row.get("turn") or 0)) not in abstained:
+                continue
+            recent = [str(t.get(key) or "") for t in turns[max(0, index - 2):index] for key in ("customer_text", "agent_text")]
+            if record(str(row.get("customer_text") or ""), call_id=f"{scenario}/{call}", turn_id=str(row.get("turn")),
+                      recent=recent):
+                recorded += 1
+    return recorded
+
+
 async def restate_open(restate: Callable[[str, Sequence[str]], Awaitable[Any]]) -> int:
     """Write each open question as a standalone one, with other ways to ask it. The answer is never touched."""
     done = 0
@@ -73,54 +106,80 @@ async def restate_open(restate: Callable[[str, Sequence[str]], Awaitable[Any]]) 
     return done
 
 
-def merge_same(embed: Callable[[Sequence[str]], Any], *, threshold: float = SAME_QUESTION) -> int:
-    """Questions that mean the same become one gap, its occurrences together: the count is what a reviewer reads."""
+#: Two questions whose cosine passes this are put to the QaAgent; the embedding only finds candidates, it never decides.
+SAME_CANDIDATE = 0.75
+#: Asks whether two standalone questions ask the same thing (``QaAgent.same_question``); None when it cannot tell.
+Same = Callable[[str, str], Awaitable[bool | None]]
+
+
+async def merge_same(embed: Callable[[Sequence[str]], Any], same: Same, *, threshold: float = SAME_CANDIDATE) -> int:
+    """Questions that mean the same become one gap, its occurrences together: the count is what a reviewer reads.
+
+    The embedding finds the candidates; a model reads both questions and decides. Nearness of words is not sameness of
+    meaning: "giao mấy lần không gặp" and "khách đổi ý không nhận hàng" are both about delivery and ask different things.
+    """
+    open_gaps = [gap for gap in _read().values() if gap["status"] == "open" and gap.get("restated")]
+    if len(open_gaps) < 2:
+        return 0
+    vectors = embed([gap["restated"] for gap in open_gaps])
+    into: dict[str, str] = {}
+    kept: list[int] = []
+    for index, gap in enumerate(open_gaps):
+        candidates = sorted((k for k in kept if float(vectors[index] @ vectors[k]) >= threshold),
+                            key=lambda k: -float(vectors[index] @ vectors[k]))
+        target = None
+        for k in candidates:
+            if await same(gap["restated"], open_gaps[k]["restated"]):
+                target = k
+                break
+        if target is None:
+            kept.append(index)
+        else:
+            into[gap["id"]] = open_gaps[target]["id"]
+    if not into:
+        return 0
     with locked(signals.home()):
         rows = _read()
-        open_gaps = [gap for gap in rows.values() if gap["status"] == "open" and gap.get("restated")]
-        if len(open_gaps) < 2:
-            return 0
-        vectors = embed([gap["restated"] for gap in open_gaps])
-        merged = 0
-        kept: list[int] = []
-        for index, gap in enumerate(open_gaps):
-            same = next((k for k in kept if float(vectors[index] @ vectors[k]) >= threshold), None)
-            if same is None:
-                kept.append(index)
-                continue
-            target = open_gaps[same]
-            target["occurrences"] += [o for o in gap["occurrences"] if o not in target["occurrences"]]
-            del rows[gap["id"]]
-            merged += 1
-        if merged:
-            atomic_text(_path(), json.dumps(rows, ensure_ascii=False, indent=2))
-    return merged
+        for source, target in into.items():
+            if source in rows and target in rows:
+                rows[target]["occurrences"] += [o for o in rows[source]["occurrences"] if o not in rows[target]["occurrences"]]
+                del rows[source]
+        atomic_text(_path(), json.dumps(rows, ensure_ascii=False, indent=2))
+    return len(into)
 
 
-def answer_from_script(script: Sequence[Mapping[str, Any]], embed: Callable[[Sequence[str]], Any], *,
-                       threshold: float = SCRIPT_MATCH) -> list[dict]:
-    """In an evaluation there is no consultant: each scripted answer goes to the open gap it best matches.
+async def answer_from_script(script: Sequence[Mapping[str, Any]], embed: Callable[[Sequence[str]], Any], fits: Same, *,
+                             threshold: float = SAME_CANDIDATE) -> list[dict]:
+    """In an evaluation there is no consultant: each scripted answer goes to the open gap it answers.
 
-    Each still passes the entry's gate and carries its sources. ``SCRIPTED`` as reviewer says in the record and the
-    log that no person approved it, and a report must say so too.
+    The embedding ranks the open gaps by the scripted question; the model reads the gap's question and the answer and
+    says whether the answer answers it (``fits(question, answer)``). A gap answered earlier in the same
+    script is no longer open, so one answer never lands twice. Each still passes the entry's gate and carries its
+    sources. ``SCRIPTED`` as reviewer says in the record and the log that no person approved it, and a report must
+    say so too.
     """
-    open_gaps = [gap for gap in list_gaps() if gap["status"] == "open" and gap.get("restated")]
     results: list[dict] = []
-    if not open_gaps or not script:
-        return results
-    vectors = embed([gap["restated"] for gap in open_gaps])
     for item in script:
-        scores = vectors @ embed([str(item["question"])])[0]
-        best = int(scores.argmax())
-        gap_row = open_gaps[best]
-        if float(scores[best]) < threshold:
+        open_gaps = [gap for gap in list_gaps() if gap["status"] == "open" and gap.get("restated")]
+        if not open_gaps:
+            results.append({"question": item["question"], "status": "no_gap"})
+            continue
+        scores = embed([gap["restated"] for gap in open_gaps]) @ embed([str(item["question"])])[0]
+        ranked = [int(i) for i in scores.argsort()[::-1] if float(scores[int(i)]) >= threshold]
+        gap_row = None
+        for index in ranked[:3]:
+            if await fits(open_gaps[index]["restated"], str(item["answer"])):
+                gap_row = open_gaps[index]
+                break
+        if gap_row is None:
             results.append({"question": item["question"], "status": "no_gap"})
             continue
         flags = gate(gap_row["restated"], str(item["answer"]))
         if flags:
             results.append({"question": item["question"], "status": "refused", "flags": list(flags)})
             continue
-        version = resolve(gap_row["id"], answer=str(item["answer"]), cites=list(item.get("cites") or []), reviewer=SCRIPTED)
+        version = resolve(gap_row["id"], answer=str(item["answer"]), cites=list(item.get("cites") or []), reviewer=SCRIPTED,
+                          source=str(item.get("source") or "documents"))
         results.append({"question": item["question"], "status": "published", "gap": gap_row["id"], "version": version})
     return results
 
@@ -130,9 +189,22 @@ def list_gaps() -> list[dict]:
     return sorted(_read().values(), key=lambda row: (row["status"] != "open", -len(row["occurrences"]), row["id"]))
 
 
-def resolve(key: str, *, answer: str, cites: list[str], reviewer: str,
+#: Where an entry's knowledge comes from: the organisers' documents it cites, or the consultant who answered the
+#: question the documents do not cover (the brief, C.5: "bổ sung vào tài liệu"), recorded with who approved it.
+SOURCES = ("documents", "consultant")
+
+
+def resolve(key: str, *, answer: str, cites: list[str], reviewer: str, source: str = "documents",
             directory: Path | None = None, config_path: Path | None = None) -> int:
-    if not re.fullmatch(r"[a-f0-9]{16}", key) or not answer.strip() or not cites:
+    """Publish a reviewed answer to gap *key* as a knowledge entry.
+
+    ``source="documents"``: every cited section must be public and in force. ``source="consultant"``: new knowledge
+    from the person who answered; citations are optional and, when given, still checked. Either way the gate holds:
+    no amount, promotion code or stock status, and no topic that must go to a person.
+    """
+    if source not in SOURCES:
+        raise ValueError(f"Unknown source {source!r}; one of {', '.join(SOURCES)}")
+    if not re.fullmatch(r"[a-f0-9]{16}", key) or not answer.strip() or (source == "documents" and not cites):
         raise ValueError("A gap, an answer and supporting sources are required")
     if not reviewer.strip() or reviewer.casefold() in review.AGENTS:
         raise ValueError("A human reviewer is required")
@@ -153,7 +225,7 @@ def resolve(key: str, *, answer: str, cites: list[str], reviewer: str,
         title = " | ".join(x for x in (gap.get("restated"), *(gap.get("variants") or [])) if x) or gap["question"]
         entry = {"chunk_id": "FAQ-GAP-" + key.upper(), "source": "faq", "title": title,
                  "text": answer.strip(), "approved_by": reviewer,
-                 "provenance": {"gap_id": key, "cites": cites}}
+                 "provenance": {"gap_id": key, "cites": cites, "source": source}}
         options = {"directory": directory} if directory else {}
         if config_path is not None:
             options["config_path"] = config_path

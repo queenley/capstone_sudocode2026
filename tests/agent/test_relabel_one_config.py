@@ -99,8 +99,8 @@ def test_an_item_that_is_none_of_the_three_kinds_is_dropped_not_fatal():
 def test_other_turns_are_still_labelled_after_one_fails_when_nothing_caps_spending(monkeypatch):
     monkeypatch.delenv("EVAL_BUDGET_DB", raising=False)
     empty = {"questions": [], "claims": [], "facts_used": [], "items": [], "dropped": 0, "changed": 0}
-    answers = iter([{**empty, "error": "synthetic"}, empty])
+    answers = iter([{**empty, "error": "synthetic"}, empty, empty])
     extractor = SimpleNamespace(label=AsyncMock(side_effect=lambda data: next(answers)), stats=lambda: {})
     run = cli.ConfigRun(rows=rows(), diagnostics=[{} for _ in rows()])
     asyncio.run(cli._label(run, extractor))
-    assert extractor.label.await_count == 2 and len(run.stopped) == 1
+    assert extractor.label.await_count == 3 and len(run.stopped) == 1

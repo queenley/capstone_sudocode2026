@@ -38,6 +38,7 @@ import hashlib
 import json
 import logging
 from dataclasses import dataclass, field
+from functools import lru_cache
 from typing import Any, Literal, Mapping
 
 from ..components.intake.itn import format_vnd
@@ -102,6 +103,43 @@ REASONS = {
                       "chỉ được nhắc như lời của khách); dùng đúng số đã có, chưa có thì gọi tool, không tự tính.",
 }
 
+
+#: Section 10.3: what a change to a skill may not teach. Its own definitions, read against the change, the rules it
+#: cites and the skill it changes.
+#: Read when first asked, off the hot path: a reply's review never needs them.
+#: "contradicts" asked of each source apart: a writer told only that its change contradicts something cannot tell what
+#: to fix (two rounds, 2026-11-10, refused the same lesson twice). One request still asks them all.
+CHANGE_CHECKS = ("promise", "pressure", "contradicts_cited", "contradicts_fixed", "contradicts_skill", "invents",
+                 "one_case")
+
+
+def change_rule(name: str) -> str:
+    """The text of one change check, as the PolicyAgent reads it: what a writer must fix when it fails."""
+    for line in change_rules()[0].splitlines():
+        if line.startswith(f"- {name}:"):
+            return line[2:].strip()
+    return CHANGE_REASONS.get(name, name)
+
+
+@lru_cache(maxsize=1)
+def change_rules() -> tuple[str, dict[str, Predicate]]:
+    rules = load_prompt("policy_change_rules.md")
+    sha = hashlib.sha256(rules.encode("utf-8")).hexdigest()
+    return rules, {name: Predicate(instructions=f"Chỉ dẫn đang xét có vi phạm luật {name} không?", rules_sha=sha)
+                   for name in CHANGE_CHECKS}
+
+#: Provisional, not set on labelled changes yet: no round has produced any. Set it on the first rounds' reviewed changes.
+CHANGE_THRESHOLD = 0.8
+CHANGE_REASONS = {
+    "promise": "Dạy trợ lý hứa, giảm giá, tặng hoặc cam kết điều chính sách được trích không cho phép.",
+    "pressure": "Dạy trợ lý tạo áp lực hay khan hiếm để khách chốt.",
+    "contradicts_cited": "Trái với chính sách được trích.",
+    "contradicts_fixed": "Trái với một luật cố định của trợ lý.",
+    "contradicts_skill": "Trái với một câu khác của skill.",
+    "invents": "Đặt ra quy định mà chính sách được trích không có.",
+    "one_case": "Chỉ đúng cho một khách, một sản phẩm hay một cuộc gọi.",
+    "unavailable": "Kiểm tra chính sách không trả lời.",
+}
 
 #: Section 4.4: actions whose condition is what the customer means, read in context. Each is
 #: asked alone, only when its action is about to run; the state is the last few messages,
@@ -223,13 +261,32 @@ class PolicyAgent(BaseAgent):
             seconds=round(decision.seconds, 3),
         )
 
-    async def review_change(self, text: str, *, kind: str, policy_snippets: tuple[str, ...] = ()) -> PolicyVerdict:
-        """Check a lesson or a playbook entry before QA sees it (section 10.3).
+    async def review_change(self, text: str, *, cited_rules: Mapping[str, str], skill_now: str,
+                            fixed_rules: str = "") -> PolicyVerdict:
+        """Check a change to a skill before a person sees it (section 10.3), against its own rules (:data:`CHANGE_RULES`).
 
-        A failure is a tag, not a rejection: the change still reaches QA with
-        the reason, because this agent can be wrong too.
+        A reply's questions do not fit here: an instruction names tools and states no tool result, so it would read as
+        an unbacked action. A failure flags the change, which is then never published; the person still sees it with
+        the reason, because this agent can be wrong too. No answer flags it as well (``unavailable``): a check that
+        did not run is not a check that passed.
         """
-        return await self.review(PolicyInput(text=text, tool_results=(), tier="VERIFIED", policy_snippets=policy_snippets))
+        evidence = {"change": text, "cited_rules": dict(cited_rules) or {"(none)": "no rule was cited"}, "skill_now": skill_now,
+                    "fixed_rules": fixed_rules or "(not given)"}
+        rules, questions = change_rules()
+        messages = [decisions.rules_message(rules),
+                    decisions.evidence_message(_plain(evidence), note="Chỉ dẫn đang xét và căn cứ của nó.")]
+        try:
+            decision = await decisions.evaluate(self.name, messages, questions, timeout=REVIEW_TIMEOUT, wait=True)
+        except DecisionUnavailable as unavailable:
+            logger.info("Change check unavailable: %s", unavailable)
+            return PolicyVerdict(False, reasons=("The policy check did not answer.",), failed=("unavailable",),
+                                 decided_by=f"skipped:{unavailable.code}")
+        probabilities = {name: float(answer.probability or 0.0) for name, answer in decision.answers.items()}
+        declined = [name for name, answer in decision.answers.items() if answer.probability is None]
+        failed = [name for name, p in probabilities.items() if p >= CHANGE_THRESHOLD and name not in declined]
+        failed += [f"{name}:declined" for name in declined]
+        return PolicyVerdict(passed=not failed, reasons=tuple(CHANGE_REASONS.get(name.split(":")[0], name) for name in failed),
+                             failed=tuple(failed), probabilities=probabilities, seconds=round(decision.seconds, 3))
 
     async def judge(self, intent: str, state: Mapping[str, Any]) -> bool | None:
         """What the customer means for one action (:data:`INTENTS`); None when the API gave no answer in time.

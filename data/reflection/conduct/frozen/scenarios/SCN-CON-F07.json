@@ -1,0 +1,38 @@
+{
+ "scenario_id": "SCN-CON-F07",
+ "level": "M2",
+ "persona": "khach_mua_nhieu_mon",
+ "hard_case": null,
+ "customer_phone": "0786304152",
+ "customer_name": "Vĩnh",
+ "honorific": "anh",
+ "notes": "Conduct: every order detail given at once; the read-back is the one confirmation, no question more.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-15",
+   "channel": "hotline",
+   "customer_goal": "đặt nhanh, đủ thông tin",
+   "customer_turns": [
+    "Đặt anh một bình sữa Pigeon PPSU 240ml, giao 2 Bạch Đằng, Hải Châu, Đà Nẵng, trả tiền khi nhận.",
+    "Đúng rồi em, đặt luôn nhé."
+   ],
+   "success_if": {
+    "tool_called": "order.create",
+    "args_match": {
+     "sku": "SKU-MB-BOT",
+     "price_vnd": 289000,
+     "payment": "COD"
+    },
+    "max_agent_questions": 1
+   },
+   "ground_truth_facts": {
+    "price_vnd": 289000,
+    "in_stock": true
+   },
+   "relevant_policy_ids": [
+    "PB-09"
+   ],
+   "expected_outcome": "chot_don"
+  }
+ }
+}

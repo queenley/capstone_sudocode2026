@@ -1,0 +1,36 @@
+{
+ "scenario_id": "SCN-GAP-F03",
+ "level": "M2",
+ "persona": "khach_hoi_ngoai_tai_lieu",
+ "hard_case": null,
+ "customer_phone": "0377519206",
+ "customer_name": "Vinh",
+ "honorific": "anh",
+ "notes": "xác nhận đơn trước khi giao (VC-05), asked in other words than the learning set.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-20",
+   "channel": "hotline",
+   "customer_goal": "hỏi chính sách: VC-05",
+   "customer_turns": [
+    "Lỡ anh không bắt máy khi bên em gọi thì đơn còn không?",
+    "Ừ anh hiểu rồi, cảm ơn em."
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_not_call_tools": [
+     "handoff.transfer"
+    ],
+    "must_say_any": [
+     "gọi xác nhận",
+     "gọi điện xác nhận",
+     "xác nhận trước khi giao",
+     "xác nhận đơn"
+    ]
+   },
+   "relevant_policy_ids": [
+    "VC-05"
+   ]
+  }
+ }
+}

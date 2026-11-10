@@ -1,0 +1,35 @@
+{
+ "scenario_id": "SCN-GAP-F13",
+ "level": "M2",
+ "persona": "khach_hoi_ngoai_tai_lieu",
+ "hard_case": null,
+ "customer_phone": "0349185027",
+ "customer_name": "Bảo",
+ "honorific": "chú",
+ "notes": "Control: retrieval already finds FAQ-19.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-20",
+   "channel": "hotline",
+   "customer_goal": "hỏi chính sách: FAQ-19",
+   "customer_turns": [
+    "Mua hai cái máy lọc không khí một lúc có được bớt gì không con?",
+    "Ừ cảm ơn con."
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_not_call_tools": [
+     "handoff.transfer"
+    ],
+    "must_say_any": [
+     "50%",
+     "máy thứ hai",
+     "máy thứ 2"
+    ]
+   },
+   "relevant_policy_ids": [
+    "FAQ-19"
+   ]
+  }
+ }
+}

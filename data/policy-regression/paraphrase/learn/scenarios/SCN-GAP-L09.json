@@ -1,0 +1,36 @@
+{
+ "scenario_id": "SCN-GAP-L09",
+ "level": "M2",
+ "persona": "khach_hoi_ngoai_tai_lieu",
+ "hard_case": null,
+ "customer_phone": "0392650718",
+ "customer_name": "Xuân",
+ "honorific": "chị",
+ "notes": "giờ làm việc tổng đài (LN-01): the passage is outside retrieval's top 5.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-20",
+   "channel": "hotline",
+   "customer_goal": "hỏi chính sách: LN-01",
+   "customer_turns": [
+    "Tối muộn chị gọi lên tổng đài thì còn ai nghe máy không em?",
+    "Dạ em, vậy là chị hiểu rồi, cảm ơn em."
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_not_call_tools": [
+     "handoff.transfer"
+    ],
+    "must_say_any": [
+     "21:00",
+     "21 giờ",
+     "9 giờ tối",
+     "21h"
+    ]
+   },
+   "relevant_policy_ids": [
+    "LN-01"
+   ]
+  }
+ }
+}

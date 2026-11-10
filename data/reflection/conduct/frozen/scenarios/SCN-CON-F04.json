@@ -1,0 +1,59 @@
+{
+ "scenario_id": "SCN-CON-F04",
+ "level": "M2",
+ "persona": "khach_hoi_nhieu_khong_mua",
+ "hard_case": null,
+ "customer_phone": "0391507263",
+ "customer_name": "Ánh",
+ "honorific": "chị",
+ "notes": "Conduct: a returning customer's follow-up question is answered from what is known, nothing asked again.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-15",
+   "channel": "hotline",
+   "customer_goal": "tư vấn",
+   "customer_turns": [
+    "Phòng 30 mét vuông có con nhỏ thì máy nào hợp em?",
+    "AirPure Y giá sao?",
+    "Để chị nghĩ."
+   ],
+   "facts_established": {
+    "product_advised": "SKU-AP-Y",
+    "price_quoted_vnd": 5200000,
+    "room_area_m2": 30,
+    "blocker": "chưa quyết"
+   },
+   "expected_outcome": "hen_goi_lai"
+  },
+  "call_2": {
+   "days_later": 3,
+   "channel": "hotline",
+   "customer_goal": "hỏi thêm về món đã tư vấn",
+   "customer_turns": [
+    "Chị hỏi thêm về cái máy hôm trước.",
+    "Máy đó bảo hành bao lâu em?",
+    "Cảm ơn em."
+   ],
+   "must_carry_over": [
+    "product_advised"
+   ],
+   "must_not_ask": [
+    "product_advised",
+    "room_area_m2"
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_not_call_tools": [
+     "handoff.transfer"
+    ],
+    "must_say_any": [
+     "24 tháng"
+    ],
+    "max_agent_questions": 1
+   },
+   "relevant_policy_ids": [
+    "PB-01"
+   ]
+  }
+ }
+}

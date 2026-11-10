@@ -1,0 +1,57 @@
+{
+ "scenario_id": "SCN-BGT-F03",
+ "level": "M2",
+ "persona": "khach_mua_nhieu_mon",
+ "hard_case": null,
+ "customer_phone": "0397520203",
+ "customer_name": "Hằng",
+ "honorific": "chị",
+ "notes": "Reflection: two products and a stated budget, then the order; when the total passes the budget the customer expects to be told so before closing, without the difference worked out.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-15",
+   "channel": "hotline",
+   "customer_goal": "mua đồ nhà mới, giữ ngân sách, chốt cả hai món",
+   "customer_turns": [
+    "Nhà mới chị cần một máy lọc nước Karofi 9 lõi với một nồi chiên Xiaomi 4.5 lít, chị tính hết tầm 7 triệu thôi em.",
+    "Em tính giúp chị hai món này hết bao nhiêu nhé.",
+    "Ừ thôi lấy cả hai, giao về 5 Bạch Đằng, Hải Châu, Đà Nẵng, chị chuyển khoản.",
+    "Đúng rồi, đặt đi em."
+   ],
+   "success_if": {
+    "tool_called": "order.create",
+    "args_match": {
+     "sku": "SKU-WF-RO9"
+    },
+    "also_ordered": [
+     "SKU-AF-XM"
+    ],
+    "total_match_vnd": 7580000,
+    "must_say_any": [
+     "vượt ngân sách",
+     "quá ngân sách",
+     "hơn ngân sách",
+     "vượt mức ngân sách",
+     "quá số tiền",
+     "vượt số tiền"
+    ]
+   },
+   "ground_truth_facts": {
+    "skus": [
+     "SKU-WF-RO9",
+     "SKU-AF-XM"
+    ],
+    "total_vnd": 7580000,
+    "budget_vnd": 7000000
+   },
+   "facts_established": {
+    "budget_vnd": 7000000
+   },
+   "relevant_policy_ids": [
+    "PB-09",
+    "VC-03"
+   ],
+   "expected_outcome": "chot_don"
+  }
+ }
+}

@@ -18,7 +18,7 @@ the other.
 
 from __future__ import annotations
 
-from typing import Any, Literal
+from typing import Any, Literal, TypedDict
 
 from ...components import clock
 from ..server_base import Server, ToolFailure, apply_schema
@@ -48,11 +48,22 @@ async def crm_get_customer(
     return await btc.call("crm.get_customer", m.crm_get_customer, phone=phone, zalo_id=zalo_id, fb_id=fb_id)
 
 
+# Typed, so a strict schema keeps its fields (an untyped object arrives empty, 2026-11-10). The docstring is the
+# model's: it is the schema's description.
+class OrderLine(TypedDict):
+    """One line of the order: the sku, how many, and one unit's price as pricing_quote_order gave it."""
+
+    sku: str
+    qty: int
+    price_vnd: int
+
+
 @server.tool(roles={"advisor"}, name="order_create")
 async def order_create(
-    sku: str,
-    price_vnd: int,
+    sku: str | None = None,
+    price_vnd: int | None = None,
     qty: int = 1,
+    lines: list[OrderLine] | None = None,
     promo_code: str | None = None,
     payment: Literal["COD", "bank", "momo", "zalopay"] = "COD",
     address: str | None = None,
@@ -65,27 +76,32 @@ async def order_create(
     turn_id: str | None = None,
     purchase_authorization: str | None = None,
 ) -> dict[str, Any]:
-    """Place one line of an order once the customer has agreed to buy.
+    """Place one order once the customer has asked to buy it.
 
-    Several products: one call per product, each with the others in
-    basket_skus. price_vnd is the unit price after promotions, exactly the
-    final_price_vnd pricing_get_quote gave for this sku today (with the same
-    basket_skus); any other number is refused. Cash on delivery (COD) is
+    One unit of one product: sku, qty and price_vnd, the final_price_vnd
+    pricing_get_quote gave for this sku today. More than one unit (two
+    products, or two of one): one call with lines, the prices
+    pricing_quote_order gave, one line per unit price (two units of one sku at
+    different prices are two lines of qty 1). Any other price is refused.
+    Cash on delivery (COD) is
     refused when the order's total, every COD line of the call together, is
     above 10.000.000đ: offer a bank transfer, or ask the customer whether to
     split it into two orders, and only once they agree give each line its
     order_group ("1" or "2"), each order at most 10.000.000đ.
 
     Args:
-        sku: The product sku or variant_sku being bought.
-        price_vnd: The unit price from pricing_get_quote, in VND.
-        qty: How many units.
+        sku: The product sku or variant_sku being bought; leave it out with lines.
+        price_vnd: The unit price from pricing_get_quote, in VND; leave it out with lines.
+        qty: How many units; leave it out with lines.
+        lines: An order of more than one unit: [{"sku", "qty", "price_vnd"}], each price_vnd one unit's
+            final_price_vnd from pricing_quote_order.
         promo_code: The promotion applied, as pricing_get_quote named it.
         payment: COD, bank, momo or zalopay: what the customer chose, or what the
             Call Brief records; COD when neither says, read back so the customer
             can change it. Never a reason to wait with the order.
         address: The delivery address the customer gave; leave it out when none was given.
-        basket_skus: The other skus in the same order, as when quoting (the second purifier's AIR-2ND-50).
+        basket_skus: Only for an order split in two with the customer's agreement (QT-01): the air purifiers
+            of the other order, so the second-item promotion is counted once.
         order_group: Only for an order split with the customer's agreement: which of the orders this line is in.
         customer_phone: Set by the system; leave it out.
         on: The day of the call. Set by the system; leave it out.
@@ -99,10 +115,20 @@ async def order_create(
     return await btc.call(
         "order.create", m.order_create, idempotency_key=idempotency_key,
         call_id=call_id, turn_id=turn_id, purchase_authorization=purchase_authorization, order_group=order_group,
-        customer_phone=customer_phone, sku=sku, qty=qty, price_vnd=price_vnd,
+        customer_phone=customer_phone, sku=None if lines else sku, qty=None if lines else qty,
+        price_vnd=None if lines else price_vnd, lines=_lines(lines),
         promo_code=promo_code, payment=payment, address=address, on=on or btc.reference_date(),
         basket_skus=basket_skus or None,
     )
+
+
+def _lines(lines: list[dict[str, Any]] | None) -> list[dict[str, Any]] | None:
+    """An order's lines as the organisers' mock takes them: sku, a whole quantity, a whole price."""
+    if not lines:
+        return None
+    return [{"sku": str(line.get("sku")), "qty": int(line.get("qty") or 1),
+             **({"price_vnd": int(line["price_vnd"])} if line.get("price_vnd") is not None else {})}
+            for line in lines]
 
 
 @server.tool(roles={"advisor"}, name="schedule_callback")

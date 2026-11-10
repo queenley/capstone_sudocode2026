@@ -1,0 +1,38 @@
+{
+ "scenario_id": "SCN-CON-L11",
+ "level": "M2",
+ "persona": "khach_mua_nhieu_mon",
+ "hard_case": null,
+ "customer_phone": "0857306142",
+ "customer_name": "Phát",
+ "honorific": "anh",
+ "notes": "Conduct: every order detail given at once; the read-back is the one confirmation, no question more.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-17",
+   "channel": "hotline",
+   "customer_goal": "đặt nhanh, đủ thông tin",
+   "customer_turns": [
+    "Lấy anh một máy hâm sữa Fatz, giao 5 Hùng Vương, Nha Trang, COD nhé em.",
+    "Đúng rồi em, đặt luôn nhé."
+   ],
+   "success_if": {
+    "tool_called": "order.create",
+    "args_match": {
+     "sku": "SKU-MB-MON",
+     "price_vnd": 490000,
+     "payment": "COD"
+    },
+    "max_agent_questions": 1
+   },
+   "ground_truth_facts": {
+    "price_vnd": 490000,
+    "in_stock": true
+   },
+   "relevant_policy_ids": [
+    "PB-09"
+   ],
+   "expected_outcome": "chot_don"
+  }
+ }
+}

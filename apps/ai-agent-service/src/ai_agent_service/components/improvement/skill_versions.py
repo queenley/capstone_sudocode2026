@@ -26,7 +26,8 @@ MAX_DESCRIPTION = 220
 
 
 def apply(book: Mapping[str, Any], patch: Mapping[str, Any]) -> dict[str, Any]:
-    """*book* with one sentence changed; raises ``ValueError`` on a change that cannot apply exactly."""
+    """*book* with one sentence changed, and the situation it is for added to the description (``when``) when the
+    description does not name it yet; raises ``ValueError`` on a change that cannot apply exactly."""
     changed = copy.deepcopy(dict(book))
     name, part = str(patch.get("skill")), str(patch.get("part"))
     if name not in changed or part not in ("body", "description"):
@@ -39,12 +40,18 @@ def apply(book: Mapping[str, Any], patch: Mapping[str, Any]) -> dict[str, Any]:
         if current.count(find) != 1:
             raise ValueError(f"The sentence to replace is not once in {name}.{part}")
         updated = current.replace(find, text)
-    else:
-        updated = f"{current} {text}"
+    else:  # a body written one instruction a line gets a line of its own
+        updated = f"{current}\n{text}" if "\n- " in current or current.startswith("- ") else f"{current} {text}"
     limit = MAX_BODY if part == "body" else MAX_DESCRIPTION
     if len(updated) > limit:
         raise ValueError(f"{name}.{part} would pass {limit} characters")
     changed[name][part] = updated
+    when = str(patch.get("when") or "").strip().rstrip(".")
+    if when and part == "body":
+        description = f"{changed[name]['description'].rstrip()} Cả khi {when[0].lower()}{when[1:]}."
+        if len(description) > MAX_DESCRIPTION:
+            raise ValueError(f"{name}.description would pass {MAX_DESCRIPTION} characters")
+        changed[name]["description"] = description
     return changed
 
 

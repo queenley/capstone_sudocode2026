@@ -94,7 +94,8 @@ def source_run(tmp_path, *, empty=False):
     (scenarios_dir / "SYNTHETIC-1.json").write_text(json.dumps({"scenario_id": "SYNTHETIC-1",
         "calls": {"call_1": {"customer_turns": ["Synthetic request"]}}}))
     for config, name in (("full", "full.jsonl"), ("baseline_no_memory", "baseline.jsonl")):
-        (source / name).write_text("" if empty else json.dumps(row(config)) + "\n")
+        closing = {**row(config), "turn": 2, "customer_text": ""}  # the organisers' closing turn (11/2026)
+        (source / name).write_text("" if empty else json.dumps(row(config)) + "\n" + json.dumps(closing) + "\n")
     return source
 
 
@@ -179,5 +180,5 @@ async def test_a_complete_trace_can_repair_only_old_extractor_failures(tmp_path,
     (source / "diagnostics.jsonl").write_text(json.dumps({"config": "full", "scenario_id": "SYNTHETIC-1",
         "call": "call_1", "turn": 1, "extraction_error": "synthetic old extractor failure"}) + "\n")
     assert await relabel.relabel(source, tmp_path / "relabeled", extractor) == 0
-    assert label.await_count == 2
+    assert label.await_count == 2  # once per configuration
     grade.assert_called_once()

@@ -136,15 +136,26 @@ class Vault:
     entries: dict[str, tuple[str, str]] = field(default_factory=dict)  # token -> (kind, value)
     #: Tokens added since the vault was loaded, for the caller to persist.
     added: list[str] = field(default_factory=list)
+    #: Tokens whose value the customer said in this call: repeating them to the customer reveals nothing they did
+    #: not just say (:func:`for_customer`). A value from a tool or a profile is never in it.
+    said: set[str] = field(default_factory=set)
+    #: Tokens already stored that the customer has now said too, for the caller to persist.
+    marked: list[str] = field(default_factory=list)
 
-    def put(self, kind: str, value: str) -> str:
+    def put(self, kind: str, value: str, *, said: bool = False) -> str:
         for token, (known_kind, known) in self.entries.items():
             if known_kind == kind and known == value:
+                if said and token not in self.said:
+                    self.said.add(token)
+                    if token not in self.added:
+                        self.marked.append(token)
                 return token
         index = 1 + sum(1 for k, _ in self.entries.values() if k == kind)
         token = f"<{kind}_{index}>"
         self.entries[token] = (kind, value)
         self.added.append(token)
+        if said:
+            self.said.add(token)
         return token
 
     def get(self, token: str) -> str | None:
@@ -155,16 +166,19 @@ class Vault:
         return [value for k, value in self.entries.values() if k == kind]
 
 
-def tokenise(text: str, vault: Vault) -> str:
-    """*text* with personal data replaced by this call's tokens: addresses first, then numbers."""
+def tokenise(text: str, vault: Vault, *, said: bool = False) -> str:
+    """*text* with personal data replaced by this call's tokens: addresses first, then numbers.
+
+    *said*: the text is the customer's own words in this call, so its values are theirs to hear again.
+    """
     for start, end in reversed(address_spans(text)):
-        text = text[:start] + vault.put("ADDR", text[start:end].strip()) + text[end:]
+        text = text[:start] + vault.put("ADDR", text[start:end].strip(), said=said) + text[end:]
     for kind, pattern in PATTERNS:
         def swap(match: re.Match[str], kind: str = kind) -> str:
             value = match.group(0)
             if kind == "PHONE":
                 value = normalise_phone(value) or value
-            return vault.put(kind, value)
+            return vault.put(kind, value, said=said)
 
         text = pattern.sub(swap, text)
     return text
@@ -215,16 +229,17 @@ SENTENCE = re.compile(r"(?<=[.!?…\n])\s+")
 
 
 def for_customer(text: str, vault: Vault) -> str:
-    """What the customer hears (PB-08): each sentence is restored on its own; a phone number stays whole only in a
-    sentence that confirms the delivery and is otherwise its last three digits; an address is the customer's own and
-    is restored, an ID card or account number is its last four digits as everywhere."""
+    """What the customer hears (PB-08): each sentence is restored on its own; a phone number stays whole in a sentence
+    that confirms the delivery, or when it is a number the customer said in this call (reading back what they just
+    said reveals nothing, signed in or not), and is otherwise its last three digits; an address is the customer's own
+    and is restored, an ID card or account number is its last four digits as everywhere."""
     def sentence(part: str) -> str:
         if DELIVERY_CUE.search(_plain(part)):
             return detokenize(part, vault)
 
         def swap(match: re.Match[str]) -> str:
             value = vault.get(match.group(0))
-            if match.group(1) != "PHONE" or value is None:
+            if match.group(1) != "PHONE" or value is None or match.group(0) in vault.said:
                 return detokenize(match.group(0), vault)
             return "*" * (len(value) - PHONE_TAIL) + value[-PHONE_TAIL:]
 

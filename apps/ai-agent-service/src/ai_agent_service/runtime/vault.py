@@ -34,22 +34,26 @@ def _open(blob: bytes) -> str:
 
 async def load(call_id: int) -> Vault:
     async with connection() as conn:
-        cursor = await conn.execute("SELECT token, kind, value_enc FROM pii_vault WHERE call_id = %s", (call_id,))
+        cursor = await conn.execute("SELECT token, kind, value_enc, said FROM pii_vault WHERE call_id = %s", (call_id,))
         rows = await cursor.fetchall()
-    return Vault(entries={r["token"]: (r["kind"], _open(bytes(r["value_enc"]))) for r in rows})
+    return Vault(entries={r["token"]: (r["kind"], _open(bytes(r["value_enc"]))) for r in rows},
+                 said={r["token"] for r in rows if r["said"]})
 
 
 async def save(call_id: int, vault: Vault, *, customer_id: str | None = None) -> None:
     """Write the entries added since the vault was loaded."""
-    if not vault.added:
+    if not vault.added and not vault.marked:
         return
     async with connection() as conn, conn.transaction():
         await require_writable_call(conn, call_id)
         for token in vault.added:
             kind, value = vault.entries[token]
             await conn.execute(
-                "INSERT INTO pii_vault (call_id, token, kind, value_enc, customer_id) VALUES (%s, %s, %s, %s, %s) "
+                "INSERT INTO pii_vault (call_id, token, kind, value_enc, customer_id, said) VALUES (%s, %s, %s, %s, %s, %s) "
                 "ON CONFLICT (call_id, token) DO NOTHING",
-                (call_id, token, kind, _seal(value), customer_id),
+                (call_id, token, kind, _seal(value), customer_id, token in vault.said),
             )
+        for token in vault.marked:
+            await conn.execute("UPDATE pii_vault SET said = true WHERE call_id = %s AND token = %s", (call_id, token))
     vault.added.clear()
+    vault.marked.clear()

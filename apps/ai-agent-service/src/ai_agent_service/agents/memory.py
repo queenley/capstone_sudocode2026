@@ -354,7 +354,8 @@ def from_tools(tool_log: Sequence[dict[str, Any]], *, on: str) -> list[Candidate
         if name == "pricing.get_quote" and data.get("sku"):
             quotes.append({"turn": turn, "sku": str(data["sku"]), "data": data, "position": position})
         elif name == "order.create" and data.get("order_id"):
-            orders.append({"turn": turn, "sku": str(args.get("sku") or ""), "args": args, "data": data,
+            first = (args.get("lines") or [{}])[0] if isinstance(args.get("lines"), list) else {}
+            orders.append({"turn": turn, "sku": str(args.get("sku") or first.get("sku") or ""), "args": args, "data": data,
                            "position": position})
             found += _tool(turn, order_id=data["order_id"], outcome="chot_don")
             if args.get("payment"):

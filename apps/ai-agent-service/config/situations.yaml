@@ -1,20 +1,26 @@
 # The situations a call can be in. docs/design.md section 10.3.
 #
-# One list, used in two places: the QaAgent tags each call after hang-up so
-# its lesson card joins the right body of evidence, and a playbook entry is
-# written for one situation and found by kb.search in it. If the two used
-# different lists, a lesson learned in one situation could never be applied
-# in it.
+# One list for every lesson card and every Reflection change: a card names the
+# situation its call was in, and a change is drafted only from cards of one
+# situation, one skill and one failure, so a lesson learned in one situation is
+# never applied as if it held in another.
 #
-# A first draft for the air purifier catalogue, to be settled before either
-# side is built. Descriptions are what a classifier reads, so they describe
-# what the customer does, not keywords.
+# The list follows the organisers' personas and hard cases and the shop's
+# playbook (data/btc/policy), not one product. Descriptions are what a model
+# reads to choose, so they describe what the customer does, not keywords.
 situations:
-  price_comparison: The customer says the same product is cheaper elsewhere.
-  too_expensive: The customer finds the price too high, without naming another shop.
+  price_comparison: The customer says the same product is cheaper elsewhere, or the shop's channels quoted different prices.
+  too_expensive: The customer finds the price too high or asks for a discount, without naming another shop.
   family_decision: The customer must ask someone at home before buying.
-  buying_for_elderly: The customer is buying for an older relative who wants something simple.
-  buying_for_children: The customer asks about safety or noise with small children at home.
-  unsure_which_model: The customer cannot choose between several products.
-  returning_undecided: A returning customer who was quoted before and has not decided.
+  undecided_many_questions: The customer asks a lot over several contacts and does not buy.
+  out_of_patience: The customer is annoyed at being asked again or at waiting, often on a third contact.
+  promotion_expired: The customer asks for a promotion or a price that is no longer in force.
+  out_of_stock: The product the customer decides on is out of stock.
+  shared_phone: The person speaking may not be the person the number belongs to.
+  durability_worry: The customer worries the product will break, or break once its warranty ends, before deciding to buy.
+  after_sale: The customer already received a product and wants to exchange, return, or have a fault fixed.
+  health_question: The customer asks a medical, pregnancy, medicine or child-safety question.
+  several_items: The customer buys several products in one call, or the order passes their budget or the COD limit.
+  bulk_order: The customer buys many units of a product at once, for a business, an office or a school.
+  returning_after_months: The customer comes back after many months; addresses, products or promotions may have changed.
   other: None of the above.

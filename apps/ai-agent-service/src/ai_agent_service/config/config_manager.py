@@ -181,6 +181,12 @@ class Generation(BaseModel):
     reasoning_effort: str | None = None
     use_responses_api: bool | None = None
     service_tier: str | None = None
+    # Responses API only. store false keeps no conversation on OpenAI's side; include
+    # ["reasoning.encrypted_content"] then returns each reasoning item encrypted, and output_version "responses/v1"
+    # keeps it on the message, so the next request of a tool loop carries it back (interleaved thinking).
+    store: bool | None = None
+    include: list[str] | None = None
+    output_version: str | None = None
 
     def merge(self, other: "Generation") -> "Generation":
         """This block, with everything *other* actually states laid over it.
@@ -210,6 +216,9 @@ class ProviderConfig(BaseModel):
     # to what an agent would like. Set it only where the provider rejects the
     # request outright; the smaller of this and the agent's max_tokens is sent.
     max_output_tokens: int | None = None
+    # What one model of this provider forces, whichever agent it serves, merged last: gpt-6.1-sol takes no
+    # reasoning effort "none" and calls tools only on the Responses API (OpenAI's latest-model guide, 2026-11).
+    model_generation: dict[str, Generation] = Field(default_factory=dict)
 
 
 class AgentModel(BaseModel):
@@ -438,6 +447,8 @@ class ModelsConfig(BaseModel):
         generation = self.defaults.merge(block.generation)
         if agent is not None:
             generation = generation.merge(self.agent(agent).generation)
+        if model in block.model_generation:
+            generation = generation.merge(block.model_generation[model])
 
         unset = [
             field

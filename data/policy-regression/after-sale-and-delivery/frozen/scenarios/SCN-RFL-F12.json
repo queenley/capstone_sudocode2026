@@ -1,0 +1,69 @@
+{
+ "scenario_id": "SCN-RFL-F12",
+ "level": "M2",
+ "persona": "khach_so_gia",
+ "hard_case": "doi_khuyen_mai_het_han",
+ "customer_phone": "0786142539",
+ "customer_name": "Bình",
+ "honorific": "anh",
+ "notes": "Đối chứng: khuyến mãi RUN-10 hết hạn giữa hai cuộc (KM-01).",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-20",
+   "channel": "hotline",
+   "customer_goal": "hỏi giá lúc còn khuyến mãi",
+   "customer_turns": [
+    "Em ơi giày RunLite 2 Pro size 38 trắng giá bao nhiêu?",
+    "Đang giảm giá à em?",
+    "Ok để anh cân nhắc."
+   ],
+   "facts_established": {
+    "product_advised": "SKU-SN-RUN2-38-TRANG",
+    "price_quoted_vnd": 1521000,
+    "promo_code": "RUN-10"
+   },
+   "ground_truth_facts": {
+    "price_vnd": 1521000,
+    "promo_active": true
+   },
+   "relevant_policy_ids": [
+    "KM-01"
+   ],
+   "expected_outcome": "hen_goi_lai"
+  },
+  "call_2": {
+   "days_later": 8,
+   "channel": "hotline",
+   "customer_goal": "đòi khuyến mãi đã hết, rồi mua giá hiện tại",
+   "customer_turns": [
+    "Alo, anh Bình đây. Lấy anh đôi RunLite 2 Pro size 38 trắng, giá giảm mười phần trăm như hôm trước nhé.",
+    "Hết giảm rồi à, thôi lấy giá hiện tại, giao về 8 Nguyễn Du, Quận 1, TP.HCM, COD.",
+    "Đúng rồi em, đặt giúp anh nhé."
+   ],
+   "must_carry_over": [
+    "product_advised",
+    "promo_code"
+   ],
+   "must_not_ask": [
+    "product_advised"
+   ],
+   "success_if": {
+    "tool_called": "order.create",
+    "args_match": {
+     "sku": "SKU-SN-RUN2-38-TRANG",
+     "price_vnd": 1690000,
+     "payment": "COD"
+    }
+   },
+   "ground_truth_facts": {
+    "price_vnd": 1690000,
+    "promo_RUN-10_active": false
+   },
+   "relevant_policy_ids": [
+    "KM-01",
+    "PB-09"
+   ],
+   "expected_outcome": "chot_don"
+  }
+ }
+}

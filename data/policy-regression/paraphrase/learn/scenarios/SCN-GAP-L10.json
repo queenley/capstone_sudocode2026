@@ -1,0 +1,35 @@
+{
+ "scenario_id": "SCN-GAP-L10",
+ "level": "M2",
+ "persona": "khach_hoi_ngoai_tai_lieu",
+ "hard_case": null,
+ "customer_phone": "0767320589",
+ "customer_name": "My",
+ "honorific": "chị",
+ "notes": "từ chối nhận hàng COD (QT-02): the passage is outside retrieval's top 5.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-20",
+   "channel": "hotline",
+   "customer_goal": "hỏi chính sách: QT-02",
+   "customer_turns": [
+    "Lỡ shipper tới mà chị đổi ý không nhận thì sao em?",
+    "Dạ em, vậy là chị hiểu rồi, cảm ơn em."
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_not_call_tools": [
+     "handoff.transfer"
+    ],
+    "must_say_any": [
+     "không phạt",
+     "không bị phạt",
+     "chuyển khoản trước"
+    ]
+   },
+   "relevant_policy_ids": [
+    "QT-02"
+   ]
+  }
+ }
+}

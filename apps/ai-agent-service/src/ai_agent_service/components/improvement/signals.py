@@ -87,24 +87,28 @@ async def alert_qa(call_id: str, turn_id: str | None, reason: str) -> None:
 
 # ── failures, as the organisers' grader sees them ─────────────────────────
 
-#: knowledge: the Gap Loop. behaviour: Reflection, a rule the agent has and did
-#: not apply. product: code to fix before the round's code is frozen, never
-#: learned (a price the guard let through is the guard's bug, not a lesson).
-#: review: a person reads it first; a phrase match is as likely a label as a habit.
+#: Three kinds, as the user set them (2026-11-09). behaviour: how the agent conducts a call (asking again what is
+#: known, too many questions for the customer's patience, a needless transfer, its opening, its manner of address,
+#: confirming twice): what Reflection learns. product: what the organisers' documents and tools already say (a tool
+#: not called or called against the rules, a policy fact said wrong, the rubric's policy criteria, a leak): the
+#: agent must do it right from R0, so it is fixed in the product, never learned. knowledge is kept for the record:
+#: a question the documents do not answer reaches the Knowledge Gap Loop from the trace, not from a code. review:
+#: a phrase match a person reads first.
 Route = Literal["knowledge", "behaviour", "product", "review"]
 
-#: First match wins. A code is ``<metric>.<what>``; see :func:`failures`.
+#: First match wins. A code is ``<metric>.<what>``; see :func:`failures`. ``J.<criterion>`` is a FAIL of the BTC
+#: rubric from the QaAgent (:func:`rubric_failures`).
 ROUTES: tuple[tuple[re.Pattern[str], Route], ...] = (
+    (re.compile(r"^J\.(J01|J06|J08)_"), "behaviour"),
+    (re.compile(r"^J\."), "product"),
     (re.compile(r"^RQR\."), "behaviour"),
     (re.compile(r"^SIM\."), "behaviour"),
-    (re.compile(r"^TSR\.(tool_missing|forbidden_tool|too_many_questions|handoff_brief|also_ordered|order_total)"), "behaviour"),
+    (re.compile(r"^TSR\.too_many_questions$"), "behaviour"),
     (re.compile(r"^GUARD\.over_escalation$"), "behaviour"),
     (re.compile(r"^TSR\.must_abstain$"), "knowledge"),
-    (re.compile(r"^TSR\.forbidden_claim:(price|list_price|promo)"), "product"),
-    (re.compile(r"^TSR\.forbidden_claim:"), "knowledge"),
-    (re.compile(r"^HR\.(price|list_price|promo)"), "product"),
-    (re.compile(r"^HR\."), "knowledge"),
-    (re.compile(r"^(CCR\.|GUARD\.|TSR\.leak$)"), "product"),
+    (re.compile(r"^TSR\.(tool_missing|forbidden_tool|handoff_brief|also_ordered|order_total|forbidden_claim|leak)"),
+     "product"),
+    (re.compile(r"^(HR\.|CCR\.|GUARD\.)"), "product"),
 )
 
 #: ``check_call``'s reasons, in its own words, to a code. Its wording is the
@@ -242,6 +246,55 @@ def failures(
         for example in g.guardrail_violations(one, trace)["examples"]:
             add(f"GUARD.{example['type']}", call, None, str(example.get("token") or example["type"]))
     return found
+
+
+def rubric_failures(scenario: Mapping[str, Any], call: str, judgment: Mapping[str, Any]) -> list[Failure]:
+    """The QaAgent's FAIL verdicts of one call as failures; an incomplete judgment yields none (it is not a verdict)."""
+    if judgment.get("status") != "COMPLETE":
+        return []
+    return [Failure(code=f"J.{item['criterion_id']}", route=route(f"J.{item['criterion_id']}"),
+                    scenario_id=str(scenario["scenario_id"]), call=call, turn=None, customer=customer_of(scenario),
+                    persona=scenario.get("persona"), hard_case=scenario.get("hard_case") or None, lane=None,
+                    reason=str(item.get("evidence") or ""))
+            for item in judgment.get("verdicts") or [] if item.get("verdict") == "FAIL"]
+
+
+@lru_cache(maxsize=1)
+def _criteria() -> dict[str, str]:
+    data = json.loads((btc_data_dir() / "eval" / "llm_judge_rubric.json").read_text(encoding="utf-8"))
+    return {item["id"]: f"{item['applies_to']}: {item['pass_if']}" for item in data.get("criteria") or []}
+
+
+#: What a check means, by code, for the models of the loop: the check's name and purpose, never what the grader
+#: expected to read (its words, its arguments), so a lesson says what to do and not what the test looks for.
+CHECKS: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile(r"^TSR\.tool_missing:(\S+)"), "The call's goal needed the tool {0}, and it was not called with what the "
+                                              "situation required."),
+    (re.compile(r"^TSR\.forbidden_tool:(\S+)"), "The tool {0} must not be called in this situation, and it was."),
+    (re.compile(r"^TSR\.must_say$"), "The assistant did not tell the customer something this situation requires."),
+    (re.compile(r"^TSR\.forbidden_phrase$"), "The assistant said something it must not say in this situation."),
+    (re.compile(r"^TSR\.forbidden_claim:(\w+)"), "The assistant made a claim about {0} that it must not make here."),
+    (re.compile(r"^TSR\.too_many_questions$"), "The assistant asked more questions than this customer's patience allows."),
+    (re.compile(r"^TSR\.handoff_brief$"), "The handoff brief lacked fields the person taking the call needs."),
+    (re.compile(r"^TSR\.(also_ordered|order_total)$"), "The order did not hold every item or the right total."),
+    (re.compile(r"^RQR\.(\w+)"), "The assistant asked again for {0}, which the system already knew."),
+    (re.compile(r"^GUARD\.over_escalation$"), "The assistant transferred the call to a person when it was not needed."),
+    (re.compile(r"^SIM\.lost$"), "The customer refused or ran out of turns where the call should have ended in a sale "
+                                 "or a callback."),
+    (re.compile(r"^SIM\.challenged$"), "The customer had to challenge something the assistant said."),
+)
+
+
+def describe(code: str) -> str:
+    """What the failed check *code* means, without its answer key."""
+    if code.startswith("J."):
+        criterion = code[2:]
+        return f"BTC rubric {criterion}, {_criteria().get(criterion, 'criterion')}"
+    for pattern, text in CHECKS:
+        match = pattern.search(code)
+        if match:
+            return text.format(*match.groups())
+    return f"The check {code} failed."
 
 
 #: Outcomes the customer did not reach the scenario's own ending with.

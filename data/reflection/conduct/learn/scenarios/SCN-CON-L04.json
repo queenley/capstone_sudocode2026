@@ -1,0 +1,70 @@
+{
+ "scenario_id": "SCN-CON-L04",
+ "level": "M2",
+ "persona": "khach_goi_lan_3_het_kien_nhan",
+ "hard_case": null,
+ "customer_phone": "0968215437",
+ "customer_name": "Tín",
+ "honorific": "anh",
+ "notes": "Conduct: a returning customer out of patience; nothing known may be asked again, one question at most.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-17",
+   "channel": "hotline",
+   "customer_goal": "tư vấn, để lại đủ thông tin",
+   "customer_turns": [
+    "Anh cần nồi chiên không dầu cỡ lớn cho nhà bốn người, tầm bốn triệu.",
+    "Philips 6.2 lít giá bao nhiêu em?",
+    "Giao về 9 Lê Lợi, TP Huế, trả khi nhận. Anh tính đã."
+   ],
+   "facts_established": {
+    "product_advised": "SKU-AF-6L",
+    "price_quoted_vnd": 3990000,
+    "room_area_m2": 15,
+    "budget_vnd": 4000000,
+    "address": "9 Lê Lợi, TP Huế",
+    "payment": "COD",
+    "blocker": "cần suy nghĩ"
+   },
+   "expected_outcome": "hen_goi_lai"
+  },
+  "call_2": {
+   "days_later": 2,
+   "channel": "hotline",
+   "customer_goal": "chốt nhanh, không muốn nói lại",
+   "customer_turns": [
+    "Alo, lại là anh đây, đừng hỏi lại từ đầu nữa nhé.",
+    "Lấy cái Philips hôm trước, giao như cũ.",
+    "Ok đặt đi em."
+   ],
+   "must_carry_over": [
+    "product_advised"
+   ],
+   "must_not_ask": [
+    "product_advised",
+    "room_area_m2",
+    "budget_vnd",
+    "address",
+    "payment"
+   ],
+   "success_if": {
+    "tool_called": "order.create",
+    "args_match": {
+     "sku": "SKU-AF-6L",
+     "price_vnd": 3990000,
+     "payment": "COD"
+    },
+    "max_agent_questions": 1
+   },
+   "ground_truth_facts": {
+    "price_vnd": 3990000,
+    "in_stock": true
+   },
+   "relevant_policy_ids": [
+    "PB-01",
+    "PB-10"
+   ],
+   "expected_outcome": "chot_don"
+  }
+ }
+}

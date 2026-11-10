@@ -80,7 +80,7 @@ IDENTITY_SECRET = hashlib.sha256(b"identity:evaluation").hexdigest()
 #: The organisers' business tools (``tools.schema.json``). In the harness's
 #: runs its own mock answers these instead of our MCP servers.
 BUSINESS_TOOLS = frozenset({
-    "catalog.search", "inventory.check", "pricing.get_quote", "crm.get_customer", "order.create",
+    "catalog.search", "inventory.check", "pricing.get_quote", "pricing.quote_order", "crm.get_customer", "order.create",
     "order.status", "order.update", "schedule.callback", "handoff.transfer",
 })
 
@@ -497,7 +497,8 @@ def record(state: Mapping[str, Any], turn_no: int, text: str, now: datetime, vau
     if said is None:
         # The graph failed before perceive wrote the turn: the API's fallback, harness._store_customer_fallback.
         said = pii.tokenise(itn.normalise(intake_text.clean(text)[0], now), vault)
-    transcript.append({"speaker": "customer", "text": str(said), "turn": turn_no})
+    if text.strip():  # the closing turn has no customer words to remember
+        transcript.append({"speaker": "customer", "text": str(said), "turn": turn_no})
     reply = (state.get("reply") or {}).get("text")
     if reply:
         transcript.append({"speaker": "agent", "text": reply, "turn": turn_no})
@@ -586,7 +587,9 @@ async def _run_call(rig: Rig, scenario: Scenario, plan: CallPlan, config: str, *
                                    memory=config == "full")
     connected = await session.connect()
     spent: dict[str, dict[str, int]] = {}
-    for text in plan.turns:
+    # The organisers' closing turn (11/2026): one agent turn after the customer's last, with customer_text "", for
+    # the agent to read the order back and place it.
+    for text in [*plan.turns, ""]:
         result = await session.turn(text)
         _add(spent, result.usage)
         state = result.state

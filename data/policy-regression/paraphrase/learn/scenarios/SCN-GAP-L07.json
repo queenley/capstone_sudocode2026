@@ -1,0 +1,34 @@
+{
+ "scenario_id": "SCN-GAP-L07",
+ "level": "M2",
+ "persona": "khach_hoi_ngoai_tai_lieu",
+ "hard_case": null,
+ "customer_phone": "0856213479",
+ "customer_name": "Sơn",
+ "honorific": "anh",
+ "notes": "kiểm tra hàng khi nhận COD (VC-03): the passage is outside retrieval's top 5.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-20",
+   "channel": "hotline",
+   "customer_goal": "hỏi chính sách: VC-03",
+   "customer_turns": [
+    "Anh có được bật máy lên xài thử trước khi trả tiền không em?",
+    "Ừ anh hiểu rồi, cảm ơn em."
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_not_call_tools": [
+     "handoff.transfer"
+    ],
+    "must_say_any": [
+     "ngoại quan",
+     "dùng thử"
+    ]
+   },
+   "relevant_policy_ids": [
+    "VC-03"
+   ]
+  }
+ }
+}

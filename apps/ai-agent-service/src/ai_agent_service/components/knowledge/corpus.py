@@ -120,6 +120,8 @@ class Chunk:
     applies_to: tuple[str, ...] = ()
     #: For a team entry: where it came from, who approved it, what it cites (section 5.5).
     provenance: Mapping[str, Any] = field(default_factory=dict)
+    #: The questions a customer would ask of it, in their words (:mod:`.expand`): indexed, never read to the advisor.
+    questions: tuple[str, ...] = ()
 
     @property
     def indexed(self) -> str:
@@ -129,7 +131,7 @@ class Chunk:
         such as "Hoàn tiền" means nothing on its own, "Chính sách đổi trả ...
         Hoàn tiền ..." does, and no model is needed to say so.
         """
-        return f"{self.doc_title}\n{self.title}\n{self.text}"
+        return "\n".join([self.doc_title, self.title, self.text, *self.questions])
 
     def in_force(self, day: str | None) -> bool:
         """Whether this chunk's rule holds on *day* (``YYYY-MM-DD``); always, without a day."""

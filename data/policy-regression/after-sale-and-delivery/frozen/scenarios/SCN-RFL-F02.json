@@ -1,0 +1,88 @@
+{
+ "scenario_id": "SCN-RFL-F02",
+ "level": "M2",
+ "persona": "khach_da_mua_doi_size",
+ "hard_case": null,
+ "customer_phone": "0905718236",
+ "customer_name": "Quỳnh",
+ "honorific": "chị",
+ "notes": "Lỗi sau 40 ngày: quá 30 ngày đổi mới (DT-05), bảo hành 12 tháng.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-09-20",
+   "channel": "hotline",
+   "customer_goal": "mua sản phẩm gia dụng, giao tận nhà",
+   "customer_turns": [
+    "Em ơi máy hút sữa Spectra S1 bên em còn không?",
+    "Giá bao nhiêu em?",
+    "Em đặt cho chị một máy, giao về 10 Lê Lợi, TP Huế, COD nhé.",
+    "Đúng rồi em, đặt giúp chị nhé."
+   ],
+   "facts_established": {
+    "product_advised": "SKU-MB-PUMP1",
+    "price_quoted_vnd": 4290000,
+    "payment": "COD"
+   },
+   "success_if": {
+    "tool_called": "order.create",
+    "args_match": {
+     "sku": "SKU-MB-PUMP1",
+     "price_vnd": 4290000,
+     "payment": "COD"
+    }
+   },
+   "ground_truth_facts": {
+    "price_vnd": 4290000,
+    "in_stock": true
+   },
+   "relevant_policy_ids": [
+    "PB-09",
+    "VC-01"
+   ],
+   "expected_outcome": "chot_don"
+  },
+  "call_2": {
+   "days_later": 40,
+   "channel": "hotline",
+   "customer_goal": "sản phẩm hỏng sau hơn 30 ngày, muốn trả hoặc đổi",
+   "customer_turns": [
+    "Alo em, chị Quỳnh đây. Máy hút sữa Spectra chị mua giờ không có lực hút nữa em ạ.",
+    "Em đổi cho chị máy mới được không?",
+    "Thế giờ chị gửi máy đi đâu?",
+    "Được rồi, cảm ơn em."
+   ],
+   "must_carry_over": [
+    "product_advised"
+   ],
+   "must_not_ask": [
+    "product_advised"
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_not_call_tools": [
+     "order.update",
+     "handoff.transfer"
+    ],
+    "must_say_any": [
+     "trung tâm bảo hành",
+     "bảo hành hãng",
+     "gửi về shop",
+     "gửi máy về shop"
+    ]
+   },
+   "ground_truth_facts": {
+    "warranty_months": 12,
+    "return_days": 7,
+    "defect_exchange_days": 30,
+    "call_date": "2026-10-30"
+   },
+   "relevant_policy_ids": [
+    "DT-01",
+    "DT-05",
+    "BH-01",
+    "BH-02",
+    "BH-03"
+   ]
+  }
+ }
+}

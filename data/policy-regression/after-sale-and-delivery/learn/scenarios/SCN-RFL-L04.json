@@ -1,0 +1,82 @@
+{
+ "scenario_id": "SCN-RFL-L04",
+ "level": "M2",
+ "persona": "khach_da_mua_doi_size",
+ "hard_case": null,
+ "customer_phone": "0368451209",
+ "customer_name": "Khang",
+ "honorific": "anh",
+ "notes": "Màng lọc đã bóc seal: không đổi trả (BH-04), dù còn trong 7 ngày.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-12",
+   "channel": "hotline",
+   "customer_goal": "mua phụ kiện hoặc đồ dùng cho bé",
+   "customer_turns": [
+    "Em ơi anh cần mua màng lọc thay thế cho máy AirPure X.",
+    "Giá màng lọc bao nhiêu em?",
+    "Ừ em đặt cho anh một cái, giao về 140 Lê Văn Sỹ, Phú Nhuận, TP.HCM, COD nhé.",
+    "Đúng rồi em, đặt giúp anh nhé."
+   ],
+   "facts_established": {
+    "product_advised": "SKU-AP-FLT-X",
+    "price_quoted_vnd": 690000,
+    "payment": "COD"
+   },
+   "success_if": {
+    "tool_called": "order.create",
+    "args_match": {
+     "sku": "SKU-AP-FLT-X",
+     "price_vnd": 690000,
+     "payment": "COD"
+    }
+   },
+   "ground_truth_facts": {
+    "price_vnd": 690000,
+    "in_stock": true
+   },
+   "relevant_policy_ids": [
+    "PB-09"
+   ],
+   "expected_outcome": "chot_don"
+  },
+  "call_2": {
+   "days_later": 3,
+   "channel": "hotline",
+   "customer_goal": "đã bóc seal, muốn trả lại",
+   "customer_turns": [
+    "Alo em, anh Khang đây. Màng lọc anh mua hôm trước anh bóc ra rồi mới thấy nhà còn một cái dự phòng.",
+    "Em tạo yêu cầu trả hàng giúp anh nhé, anh chưa lắp vào máy đâu.",
+    "Vậy à, thế anh để dành dùng sau vậy.",
+    "Ok cảm ơn em."
+   ],
+   "must_carry_over": [
+    "product_advised"
+   ],
+   "must_not_ask": [
+    "product_advised"
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_not_call_tools": [
+     "order.update",
+     "handoff.transfer"
+    ],
+    "must_say_any": [
+     "seal",
+     "đã bóc",
+     "đã mở"
+    ]
+   },
+   "ground_truth_facts": {
+    "return_after_opening": false,
+    "return_days": 7
+   },
+   "relevant_policy_ids": [
+    "BH-04",
+    "DT-01",
+    "DT-06"
+   ]
+  }
+ }
+}

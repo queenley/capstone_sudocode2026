@@ -73,8 +73,8 @@ def test_failures_are_the_graders_own_and_routed_by_code():
     found = signals.failures(scenario(call_1={"customer_turns": []}, call_2=spec), {"call_2": rows},
                              lanes={("call_2", 1): "CONTINUITY"})
     routed = {f.code: f.route for f in found}
-    assert routed == {"TSR.tool_missing:order.create": "behaviour", "RQR.room_area_m2": "behaviour",
-                      "CCR.room_area_m2": "product", "HR.return_days": "knowledge", "HR.price_vnd": "product"}
+    assert routed == {"TSR.tool_missing:order.create": "product", "RQR.room_area_m2": "behaviour",
+                      "CCR.room_area_m2": "product", "HR.return_days": "product", "HR.price_vnd": "product"}
     asked = next(f for f in found if f.code == "RQR.room_area_m2")
     assert (asked.turn, asked.lane, asked.customer) == (1, "CONTINUITY", "0900000001")
     assert asked.agent_text.startswith("Phòng chị")

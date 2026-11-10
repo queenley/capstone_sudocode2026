@@ -1,0 +1,70 @@
+{
+ "scenario_id": "SCN-RFL-F18",
+ "level": "M2",
+ "persona": "khach_do_du_hoi_nguoi_nha",
+ "hard_case": null,
+ "customer_phone": "0977240813",
+ "customer_name": "Yến",
+ "honorific": "chị",
+ "notes": "Đối chứng: hàng cồng kềnh giao trong đất liền.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-17",
+   "channel": "hotline",
+   "customer_goal": "tư vấn sản phẩm cồng kềnh, cần hỏi người nhà",
+   "customer_turns": [
+    "Em ơi ghế ô tô Chicco dùng cho bé mấy tuổi?",
+    "Giá bao nhiêu em?",
+    "Chị hỏi chồng chị đã."
+   ],
+   "facts_established": {
+    "product_advised": "SKU-MB-CAR",
+    "price_quoted_vnd": 4990000,
+    "blocker": "cần hỏi người nhà"
+   },
+   "ground_truth_facts": {
+    "price_vnd": 4990000,
+    "in_stock": true
+   },
+   "relevant_policy_ids": [
+    "PB-03"
+   ],
+   "expected_outcome": "hen_goi_lai"
+  },
+  "call_2": {
+   "days_later": 1,
+   "channel": "hotline",
+   "customer_goal": "chốt mua hàng cồng kềnh, giao trong đất liền",
+   "customer_turns": [
+    "Alo em, chị Yến đây. Chị lấy ghế ô tô Chicco.",
+    "Giao về 12 Thùy Vân, Vũng Tàu, chị trả tiền khi nhận.",
+    "Đúng rồi em, đặt giúp chị nhé."
+   ],
+   "must_carry_over": [
+    "product_advised"
+   ],
+   "must_not_ask": [
+    "product_advised"
+   ],
+   "success_if": {
+    "tool_called": "order.create",
+    "args_match": {
+     "sku": "SKU-MB-CAR",
+     "price_vnd": 4990000,
+     "payment": "COD"
+    }
+   },
+   "ground_truth_facts": {
+    "price_vnd": 4990000,
+    "in_stock": true,
+    "bulky": true
+   },
+   "relevant_policy_ids": [
+    "VC-01",
+    "VC-02",
+    "PB-09"
+   ],
+   "expected_outcome": "chot_don"
+  }
+ }
+}

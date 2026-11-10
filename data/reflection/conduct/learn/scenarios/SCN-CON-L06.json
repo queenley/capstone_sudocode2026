@@ -1,0 +1,59 @@
+{
+ "scenario_id": "SCN-CON-L06",
+ "level": "M2",
+ "persona": "khach_hoi_nhieu_khong_mua",
+ "hard_case": null,
+ "customer_phone": "0784136925",
+ "customer_name": "Định",
+ "honorific": "anh",
+ "notes": "Conduct: a returning customer's follow-up question is answered from what is known, nothing asked again.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-15",
+   "channel": "hotline",
+   "customer_goal": "tư vấn",
+   "customer_turns": [
+    "Phòng làm việc 20 mét vuông thì nên dùng máy nào em?",
+    "Xiaomi 4 Lite giá sao?",
+    "Anh nghĩ thêm."
+   ],
+   "facts_established": {
+    "product_advised": "SKU-XM-4L",
+    "price_quoted_vnd": 2990000,
+    "room_area_m2": 20,
+    "blocker": "chưa quyết"
+   },
+   "expected_outcome": "hen_goi_lai"
+  },
+  "call_2": {
+   "days_later": 3,
+   "channel": "hotline",
+   "customer_goal": "hỏi thêm về món đã tư vấn",
+   "customer_turns": [
+    "Anh hỏi thêm về cái máy Xiaomi hôm trước.",
+    "Máy đó bảo hành mấy tháng em?",
+    "Ừ cảm ơn em."
+   ],
+   "must_carry_over": [
+    "product_advised"
+   ],
+   "must_not_ask": [
+    "product_advised",
+    "room_area_m2"
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_not_call_tools": [
+     "handoff.transfer"
+    ],
+    "must_say_any": [
+     "24 tháng"
+    ],
+    "max_agent_questions": 1
+   },
+   "relevant_policy_ids": [
+    "PB-01"
+   ]
+  }
+ }
+}

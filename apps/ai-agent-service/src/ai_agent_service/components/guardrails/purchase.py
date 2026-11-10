@@ -47,10 +47,53 @@ def _json(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 
 
+def lines_of(args: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """An order's lines, ``[{sku, qty, price_vnd}]``, of either form: ``lines`` (more than one unit, 11/2026) or one
+    ``sku``."""
+    if isinstance(args.get("lines"), list) and args["lines"]:
+        return [{"sku": str(line.get("sku")), "qty": int(line.get("qty") or 1),
+                 "price_vnd": None if line.get("price_vnd") is None else int(line["price_vnd"])} for line in args["lines"]]
+    if not args.get("sku"):
+        return []
+    return [{"sku": str(args["sku"]), "qty": int(1 if args.get("qty") is None else args["qty"]),
+             "price_vnd": None if args.get("price_vnd") is None else int(args["price_vnd"])}]
+
+
+def units_key(lines: Any) -> str:
+    """Which units an order holds, whatever their order or grouping: what one ``pricing.quote_order`` priced."""
+    skus = [str(line.get("sku")) for line in lines or () for _ in range(int(line.get("qty") or 1)) if line.get("sku")]
+    return "|".join(sorted(skus))
+
+
+def quoted_units(data: Mapping[str, Any]) -> tuple[str, list[list[Any]]] | None:
+    """``(units_key, [[sku, unit price], ...])`` of a ``pricing.quote_order`` result, its units in order."""
+    units = data.get("units") if isinstance(data, Mapping) else None
+    if not units or any(u.get("final_price_vnd") is None for u in units):
+        return None
+    return units_key([{"sku": u["sku"]} for u in units]), [[str(u["sku"]), int(u["final_price_vnd"])] for u in units]
+
+
+def priced_lines(units: Any) -> list[dict[str, Any]]:
+    """An order's lines from its quoted units: one line per product and price, so two units of one product at two
+    prices (one with AIR-2ND-50) are two lines, as the organisers' ``order.create`` asks."""
+    lines: list[dict[str, Any]] = []
+    for sku, price in units:
+        same = next((line for line in lines if line["sku"] == sku and line["price_vnd"] == int(price)), None)
+        if same:
+            same["qty"] += 1
+        else:
+            lines.append({"sku": sku, "qty": 1, "price_vnd": int(price)})
+    return lines
+
+
 def payload(args: Mapping[str, Any]) -> dict[str, Any]:
-    values = {"sku": args.get("sku"), "price_vnd": int(args["price_vnd"]), "qty": int(1 if args.get("qty") is None else args["qty"]),
-            "payment": args.get("payment") or "COD", "promo_code": args.get("promo_code") or None,
-            "address": args.get("address") or None, "customer_phone": args.get("customer_phone"), "on": args.get("on")}
+    common = {"payment": args.get("payment") or "COD", "promo_code": args.get("promo_code") or None,
+              "address": args.get("address") or None, "customer_phone": args.get("customer_phone"), "on": args.get("on")}
+    if isinstance(args.get("lines"), list) and args["lines"]:
+        values = {"lines": [{**line, "price_vnd": int(line["price_vnd"])} for line in lines_of(args)], **common}
+    else:
+        values = {"sku": args.get("sku"), "price_vnd": int(args["price_vnd"]),
+                  "qty": int(1 if args.get("qty") is None else args["qty"]), **common}
     for field in ('basket_skus', 'order_group'):
         if args.get(field):
             values[field] = args[field]
@@ -119,6 +162,13 @@ def _day(value: str) -> str:
     return f"{day}/{month}/{year}"
 
 
+def addressed(context: Any) -> str:
+    """How the read-back addresses the customer: as they called themselves or as their profile says, else "Mình",
+    which fits anyone; never "Anh/chị" to a customer who already said which (rubric J06)."""
+    known = getattr(context, "self_called", None) or (getattr(context, "address_as", None) or "").split(" ")[0]
+    return known.capitalize() if known else "Mình"
+
+
 def draft(args: Mapping[str, Any], context: Any, delivery: str | None = None, *,
           names: Mapping[str, str] | None = None, quotes: Mapping[str, int] | None = None) -> dict[str, Any]:
     """The order to read back, as it is said aloud: names and amounts, never a product code; with *delivery*,
@@ -126,30 +176,36 @@ def draft(args: Mapping[str, Any], context: Any, delivery: str | None = None, *,
     order = payload(args)
     known = {**{p.get("sku"): p.get("name") for p in context.seen_products if p.get("name")}, **(names or {})}
     address = context.vault.put("ADDR", order["address"]) if order["address"] else "chưa cung cấp địa chỉ"
-    label = known.get(order["sku"]) or "đã chọn"
     promo = f", mã khuyến mãi: {order['promo_code']}" if order["promo_code"] else ""
     payment = {"COD": "trả tiền khi nhận hàng", "bank": "chuyển khoản"}.get(order["payment"], order["payment"])
     arrives = f", giao dự kiến ngày {_day(delivery)}" if delivery else ""
-    question = (f"Anh/chị xác nhận đặt {order['qty']} sản phẩm {label}, đơn giá {format_vnd(order['price_vnd'])}, "
-                f"tổng {format_vnd(order['price_vnd'] * order['qty'])}, thanh toán {payment}{promo}, "
+    lines = lines_of(order)
+    total = sum(line["price_vnd"] * line["qty"] for line in lines)
+    items = "; ".join(f"{line['qty']} sản phẩm {known.get(line['sku']) or 'đã chọn'}, đơn giá {format_vnd(line['price_vnd'])}"
+                      for line in lines)
+    question = (f"{addressed(context)} xác nhận đặt {items}, tổng {format_vnd(total)}, thanh toán {payment}{promo}, "
                 f"địa chỉ giao hàng: {address}{arrives}, đồng ý không ạ?")
-    read_back = (f"Dạ em đọc lại đơn: {order['qty']} sản phẩm {label}, đơn giá {format_vnd(order['price_vnd'])}, "
-                 f"tổng {format_vnd(order['price_vnd'] * order['qty'])}, thanh toán {payment}{promo}, "
+    read_back = (f"Dạ em đọc lại đơn: {items}, tổng {format_vnd(total)}, thanh toán {payment}{promo}, "
                  f"địa chỉ giao hàng: {address}{arrives}.")
-    basket = [sku for sku in order.get("basket_skus") or [] if sku != order["sku"]]
+    basket = [sku for sku in order.get("basket_skus") or [] if sku not in {line["sku"] for line in lines}]
     others = [known[sku] for sku in basket if known.get(sku)]
     if others:
         prices = [(quotes or {}).get(sku) for sku in basket]
-        whole = "" if None in prices else f", tổng cả giỏ {format_vnd(order['price_vnd'] * order['qty'] + sum(prices))}"
+        whole = "" if None in prices else f", tổng cả giỏ {format_vnd(total + sum(prices))}"
         question = f"Đơn này đi cùng {', '.join(others)}{whole}. " + question
         read_back = f"Đơn này đi cùng {', '.join(others)}{whole}. " + read_back
     if order.get("order_group"):
         question = f"Đây là đơn {order['order_group']} của phần tách đơn. " + question
     return {"draft_id": uuid4().hex, "call_id": context.call_id, "channel": context.channel,
             "owner": _owner(context), "issued_turn_id": context.turn_id, "action_type": "order_create",
-            "target_id": order["sku"], "payload_hash": fingerprint(order), "expires_at": now() + TTL_SECONDS,
+            "target_id": target(order), "payload_hash": fingerprint(order), "expires_at": now() + TTL_SECONDS,
             "status": "pending", "question": question, "read_back": read_back,
             "args": {k: (address if k == "address" else v) for k, v in order.items() if k in FILLED and v}}
+
+
+def target(args: Mapping[str, Any]) -> str:
+    """What an order is for, to tell a later call of the same order: its sku, or its skus joined."""
+    return ",".join(sorted({line["sku"] for line in lines_of(args)}))
 
 
 def still_open(pending: Mapping[str, Any] | None, *, call_id: str, channel: str, turn_id: str) -> dict[str, Any] | None:

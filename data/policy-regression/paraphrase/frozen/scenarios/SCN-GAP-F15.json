@@ -1,0 +1,35 @@
+{
+ "scenario_id": "SCN-GAP-F15",
+ "level": "M2",
+ "persona": "khach_hoi_ngoai_tai_lieu",
+ "hard_case": null,
+ "customer_phone": "0763018295",
+ "customer_name": "Tín",
+ "honorific": "anh",
+ "notes": "Control: retrieval already finds DT-04.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-20",
+   "channel": "hotline",
+   "customer_goal": "hỏi chính sách: DT-04",
+   "customer_turns": [
+    "Trả lại hàng rồi thì mấy ngày tiền về tài khoản em?",
+    "Ừ anh hiểu rồi, cảm ơn em."
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_not_call_tools": [
+     "handoff.transfer"
+    ],
+    "must_say_any": [
+     "3–5 ngày",
+     "3-5 ngày",
+     "3 đến 5 ngày"
+    ]
+   },
+   "relevant_policy_ids": [
+    "DT-04"
+   ]
+  }
+ }
+}

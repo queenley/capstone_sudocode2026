@@ -1,0 +1,38 @@
+{
+ "scenario_id": "SCN-WTY-F05",
+ "level": "M2",
+ "persona": "khach_lo_do_ben",
+ "hard_case": null,
+ "customer_phone": "0397510205",
+ "customer_name": "Quân",
+ "honorific": "anh",
+ "notes": "Reflection: a customer worried the product will break; the shop's extended warranty (BH-05) answers it for home appliances over 3,000,000d only.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-15",
+   "channel": "hotline",
+   "customer_goal": "tìm hiểu, lo máy mau hư",
+   "customer_turns": [
+    "Quạt đứng Panasonic F-409 giá sao em?",
+    "Quạt nhà anh cái nào cũng hư motor sau vài năm, anh ngại.",
+    "Ok để anh tính."
+   ],
+   "success_if": {
+    "tool_called": null,
+    "forbidden_claims": [
+     "bảo hành mở rộng"
+    ]
+   },
+   "ground_truth_facts": {
+    "sku": "SKU-FAN-DC1",
+    "price_vnd": 2450000
+   },
+   "relevant_policy_ids": [
+    "BH-01",
+    "BH-05",
+    "PB-02"
+   ],
+   "expected_outcome": "hen_goi_lai"
+  }
+ }
+}

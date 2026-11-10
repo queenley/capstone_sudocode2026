@@ -4,7 +4,8 @@ from datetime import date
 
 import pytest
 
-from ai_agent_service.agents.advisor import ALL_RULES, HARD_RULES, RULE_PACKS, AgentContext, system_prompt
+from ai_agent_service.agents.advisor import HARD_RULES, AgentContext, system_prompt
+from ai_agent_service.components.context import skills as skill_book
 from ai_agent_service.agents.memory import goal_of
 from ai_agent_service.components.context import focus
 from ai_agent_service.components.context.budget import tokens
@@ -37,10 +38,11 @@ def shown(said, **fields):
     return [line.id for line in focus.lines(LINES, said, **{"first_turn": False, "blocked": False, **fields})]
 
 
-def test_every_rule_stays_in_the_prompts_once():
-    numbers = "".join(f"\n{text}" for text in (HARD_RULES, *RULE_PACKS.values()))
-    assert sorted(map(int, {n for n in rule_numbers(numbers)})) == list(range(1, 24))
-    assert ALL_RULES.count("12. ") == 1
+def test_the_rules_are_numbered_once_in_order_and_say_no_procedure_a_skill_says():
+    assert list(map(int, rule_numbers(HARD_RULES))) == list(range(1, 18))
+    for skill in skill_book.SKILLS.values():  # a procedure is written in one place
+        for line in skill["body"].splitlines():
+            assert line.removeprefix("- ") not in HARD_RULES
 
 
 @pytest.mark.parametrize("text", ["Không bao giờ nhận là người", "Danh tính chưa xác minh", "Không đọc lại đầy đủ số điện thoại"])
@@ -64,38 +66,8 @@ def test_the_rules_come_first_and_the_request_last():
     assert prompt.index("Trạng thái cuộc") > prompt.index("Lane:")
 
 
-def test_a_quiet_turn_loads_no_pack_and_saves_the_tokens():
-    prompt, _ = system_prompt(context(customer_said="alo em"))
-    assert "Luật cho tình huống" not in prompt
-    assert tokens(HARD_RULES) < tokens(ALL_RULES) * 0.65
-
-
-@pytest.mark.parametrize("said, pack", [
-    ("cho anh lấy cái này", "purchase"), ("chi can ban voi gia dinh", "callback"), ("đơn của chị giao chưa", "orders"),
-    ("bên khác rẻ hơn em", "objection"), ("gio hang cua chi", "account"), ("nha co phong thu hai", "second_air"),
-])
-def test_the_words_load_a_pack_with_or_without_marks(said, pack):
-    assert pack in focus.packs(context(customer_said=said), RULE_PACKS)
-
-
-def test_what_the_call_holds_keeps_a_pack_whatever_the_customer_says():
-    assert "purchase" in focus.packs(context(customer_said="ừ", seen_products=({"sku": "X"},)), RULE_PACKS)
-    assert "orders" in focus.packs(context(customer_said="ừ", known_orders=frozenset({"OD1"})), RULE_PACKS)
-    assert "callback" in focus.packs(context(brief_lines=(LINES[5],)), RULE_PACKS)
-    assert "account" in focus.packs(context(account_id="A1"), RULE_PACKS)
-
-
-def test_a_tool_called_this_turn_brings_its_rules():
-    assert "callback" in focus.packs(context(customer_said="ừ"), RULE_PACKS, ["schedule_callback"])
-
-
-def test_a_blocked_draft_reads_every_rule_since_its_reason_may_name_one():
-    assert focus.packs(context(block_reasons=("Làm theo luật 20.",)), RULE_PACKS) == tuple(RULE_PACKS)
-
-
 def test_the_switch_restores_everything(monkeypatch):
     monkeypatch.setenv("ADVISOR_CONTEXT", "full")
-    assert focus.packs(context(customer_said="alo"), RULE_PACKS) == tuple(RULE_PACKS)
     assert shown("đơn của chị giao chưa") == [line.id for line in LINES]
 
 
@@ -156,16 +128,6 @@ def _now():
 def test_a_line_keeps_its_kind_through_the_state():
     assert BriefLine("B1", "x", kind="open").as_dict()["kind"] == "open"
     assert date(2026, 10, 19)
-
-
-@pytest.mark.parametrize("said, pack", [
-    ("hôm trước em báo khác mà", "past"), ("xoa du lieu cua chi di", "deletion"), ("may nay con hang khong", "advice")])
-def test_the_rules_moved_last_are_loaded_by_their_words(said, pack):
-    assert pack in focus.packs(context(customer_said=said), RULE_PACKS)
-
-
-def test_a_customer_with_a_brief_always_reads_how_to_use_the_past():
-    assert "past" in focus.packs(context(customer_said="ừ", brief_lines=(LINES[0],)), RULE_PACKS)
 
 
 def test_a_promise_of_the_last_call_is_open_and_a_fact_is_not_repeated():

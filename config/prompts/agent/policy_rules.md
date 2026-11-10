@@ -62,7 +62,7 @@ Trả lời đúng khi điều được hỏi là đúng. Thông tin về việc
 Đúng khi khách nói muốn làm đúng việc được nêu với đơn đã có, đưa đúng thông tin mà việc đó cần, hoặc đồng ý khi được đề xuất. Đơn còn thiếu địa chỉ mà khách cho địa chỉ tức là muốn cập nhật địa chỉ. Sai khi khách mới kể vấn đề mà chưa nói muốn làm gì, còn hỏi về các lựa chọn, muốn việc khác, hoặc từ chối.
 
 ## purchase
-Đúng khi khách đã nói muốn mua sản phẩm này, chưa đổi ý, và tin nhắn mới nhất làm đơn tiến lên: cho thêm thông tin cần cho đơn, hoặc đồng ý bằng bất kỳ cách nói nào khi được đọc lại đơn, kể cả giục lên đơn. Sai khi khách còn đang hỏi hay so sánh mà chưa quyết, do dự, từ chối, hoặc đơn khác với điều khách muốn.
+Đúng khi khách đã nói muốn mua sản phẩm này, chưa đổi ý, và tin nhắn mới nhất làm đơn tiến lên: cho thêm thông tin cần cho đơn, hoặc đồng ý bằng bất kỳ cách nói nào khi được đọc lại đơn, kể cả giục lên đơn. Khách đã bảo lên đơn rồi không nói thêm gì (vẫn nghe máy) cũng là đúng: im lặng sau lời bảo đặt không phải đổi ý. Sai khi khách còn đang hỏi hay so sánh mà chưa quyết, do dự, từ chối, hoặc đơn khác với điều khách muốn.
 
 ## identity
 Đúng khi trợ lý hỏi có phải người được nêu tên không và khách nói đúng là mình. Mọi câu trả lời khác là sai.

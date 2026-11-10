@@ -1,0 +1,68 @@
+{
+ "scenario_id": "SCN-RFL-L09",
+ "level": "M2",
+ "persona": "khach_do_du_hoi_nguoi_nha",
+ "hard_case": null,
+ "customer_phone": "0947316058",
+ "customer_name": "Lan",
+ "honorific": "cô",
+ "notes": "Máy lọc nước là hàng cồng kềnh (VC-02); Phú Quốc không nhận hàng cồng kềnh (VC-01).",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-19",
+   "channel": "hotline",
+   "customer_goal": "tư vấn sản phẩm cồng kềnh, cần hỏi người nhà",
+   "customer_turns": [
+    "Cháu ơi cô hỏi máy lọc nước Karofi 9 lõi.",
+    "Giá bao nhiêu cháu?",
+    "Để cô hỏi con trai cô đã."
+   ],
+   "facts_established": {
+    "product_advised": "SKU-WF-RO9",
+    "price_quoted_vnd": 5990000,
+    "blocker": "cần hỏi người nhà"
+   },
+   "ground_truth_facts": {
+    "price_vnd": 5990000,
+    "in_stock": true
+   },
+   "relevant_policy_ids": [
+    "PB-03"
+   ],
+   "expected_outcome": "hen_goi_lai"
+  },
+  "call_2": {
+   "days_later": 1,
+   "channel": "hotline",
+   "customer_goal": "chốt mua, giao ra Phú Quốc",
+   "customer_turns": [
+    "Alo cháu, cô Lan đây. Con cô bảo lấy máy Karofi 9 lõi, cháu đặt cho cô.",
+    "Giao về An Thới, Phú Quốc nhé cháu, cô trả tiền mặt.",
+    "Ừ vậy để cô bàn lại với con rồi cô gọi sau."
+   ],
+   "must_carry_over": [
+    "product_advised"
+   ],
+   "must_not_ask": [
+    "product_advised"
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_not_call_tools": [
+     "order.create"
+    ],
+    "must_say_any": [
+     "cồng kềnh"
+    ]
+   },
+   "ground_truth_facts": {
+    "bulky": true,
+    "island_delivery_bulky": false
+   },
+   "relevant_policy_ids": [
+    "VC-01",
+    "VC-02"
+   ]
+  }
+ }
+}
