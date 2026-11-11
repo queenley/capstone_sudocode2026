@@ -102,7 +102,7 @@ def manifest(
         },
         "advisor_context": "full" if focus.full() else "focused",
         "prompts_sha256": {
-            "advisor": _sha([advisor_prompts.HARD_RULES, advisor_prompts.RULE_PACKS, advisor_prompts.LANE_NOTES, advisor_prompts.CONFIRM_NOTES,
+            "advisor": _sha([advisor_prompts.HARD_RULES, dict(advisor_prompts.skill_book.SKILLS), advisor_prompts.LANE_NOTES, advisor_prompts.CONFIRM_NOTES,
                              advisor_prompts.OPENING, advisor_prompts.COPILOT_NOTE, advisor_prompts.SPOKEN_NOTE]),
             "lanes_yaml": hashlib.sha256(LANES_YAML.read_bytes()).hexdigest(),
             "policy": _sha([{name: question.model_dump() for name, question in policy_rules.QUESTIONS.items()},
@@ -187,8 +187,9 @@ def trace_errors(scenarios_dir: Path, rows: list[dict[str, Any]], config: str) -
     scenarios, rejected = load(scenarios_dir)
     if rejected or not scenarios:
         return ["invalid or empty scenario cohort"]
+    # Every planned customer turn, then the organisers' closing turn (11/2026): one more agent turn, customer_text "".
     expected = {(s.scenario_id, call.name, index): text
-                for s in scenarios for call in s.calls for index, text in enumerate(call.turns, 1)}
+                for s in scenarios for call in s.calls for index, text in enumerate([*call.turns, ""], 1)}
     seen = set()
     runs = set()
     for row in rows:

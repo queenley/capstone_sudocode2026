@@ -19,7 +19,7 @@ Agreement with people (the rubric's ``agreement_protocol``) is
 """
 import json
 import re
-from typing import Any, Literal, Mapping
+from typing import Callable, Any, Literal, Mapping
 
 from pydantic import BaseModel, Field
 
@@ -115,8 +115,10 @@ def applicable(scenario: Mapping[str, Any], call: str, rows: list[Mapping[str, A
     names = {tool.get("name") for tool in tools}
     said = " ".join(str(row.get("customer_text") or "") for row in rows)
     forbidden = {item.get("field") for item in success.get("forbidden_claims") or [] if isinstance(item, dict)}
-    ordered = sum(int((tool.get("args") or {}).get("price_vnd") or 0) * int((tool.get("args") or {}).get("qty") or 1)
-                  for tool in tools if tool.get("name") == "order.create")
+    # An order of several units carries its prices in lines (the organisers' update of 11/2026).
+    ordered = sum(int(line.get("price_vnd") or 0) * int(line.get("qty") or 1)
+                  for tool in tools if tool.get("name") == "order.create"
+                  for line in ((tool.get("args") or {}).get("lines") or [tool.get("args") or {}]))
     budget = _budget(scenario, call)
     out_of_stock = any(isinstance(tool.get("result"), dict) and tool["result"].get("in_stock") is False
                        for tool in tools if tool.get("name") == "inventory.check")
@@ -142,9 +144,11 @@ def applicable(scenario: Mapping[str, Any], call: str, rows: list[Mapping[str, A
 
 
 class BtcJudge:
-    def __init__(self, llm: Any):
+    def __init__(self, llm: Any, quoted: Callable[[str, str], bool] | None = None):
+        """*quoted* says whether a verdict's evidence is in the call's words; the evaluation keeps the exact match."""
         self.rubric = json.loads((btc_data_dir() / "eval/llm_judge_rubric.json").read_text(encoding="utf-8"))
         self.writer = llm.with_structured_output(Judgment)
+        self.quoted = quoted or (lambda evidence, words: evidence.strip() in words)
 
     async def grade(self, scenario: Mapping[str, Any], call: str, rows: list[dict]) -> dict:
         ids = applicable(scenario, call, rows)
@@ -164,7 +168,7 @@ class BtcJudge:
             return {"status": "INCOMPLETE", "criteria": ids, "verdicts": [], "error": type(error).__name__}
         actual = [item.criterion_id for item in verdicts]
         quotes = "\n".join(str(row.get(key) or "") for row in transcript for key in ("customer_text", "agent_text"))
-        complete = sorted(actual) == ids and all(item.evidence.strip() and item.evidence.strip() in quotes for item in verdicts)
+        complete = sorted(actual) == ids and all(item.evidence.strip() and self.quoted(item.evidence, quotes) for item in verdicts)
         return {"status": "COMPLETE" if complete else "INCOMPLETE", "criteria": ids,
                 "verdicts": [item.model_dump() for item in verdicts]}
 

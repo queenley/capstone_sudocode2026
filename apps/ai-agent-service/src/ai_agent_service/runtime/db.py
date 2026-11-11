@@ -99,6 +99,8 @@ CREATE TABLE IF NOT EXISTS pii_vault (
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     PRIMARY KEY (call_id, token)
 );
+-- Whether the customer said the value in this call: theirs to hear read back (pii.for_customer).
+ALTER TABLE pii_vault ADD COLUMN IF NOT EXISTS said BOOLEAN NOT NULL DEFAULT false;
 """
 
 _pool: AsyncConnectionPool | None = None

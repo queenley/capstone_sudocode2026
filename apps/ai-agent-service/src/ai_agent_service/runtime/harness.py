@@ -57,7 +57,7 @@ logger = logging.getLogger(__name__)
 WARMUP_TURNS = 3
 
 #: Tool results kept in a turn's meta in full; the rest are trimmed for the console.
-FULL_RESULTS = {"pricing.get_quote", "inventory.check", "order.create", "order.status", "order.update",
+FULL_RESULTS = {"pricing.get_quote", "pricing.quote_order", "inventory.check", "order.create", "order.status", "order.update",
                 "schedule.callback", "handoff.transfer", "crm.get_customer"}
 
 
@@ -611,7 +611,7 @@ async def _patch_meta(call_id: int, turn_id: str, speaker: str, patch: dict[str,
 async def _store_customer_fallback(call_id: int, turn_id: str, content: str, vault: pii.Vault, now: datetime) -> None:
     """When the graph failed before ``persist``, the customer's words still join the transcript, tokenised."""
     cleaned, _ = intake_text.clean(content)
-    tokenised = pii.tokenise(itn.normalise(cleaned, now), vault)
+    tokenised = pii.tokenise(itn.normalise(cleaned, now), vault, said=True)
     async with connection() as conn, conn.transaction():
         await require_writable_call(conn, call_id)
         await conn.execute(

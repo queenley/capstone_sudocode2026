@@ -20,7 +20,8 @@ def rows(config="full"):
              "turn": index, "customer_text": text, "agent_text": "Synthetic reply", "questions": [],
              "claims": [], "facts_used": [], "tool_calls": [], "memory_writes": [],
              "latency": {"ttft_ms": 1, "total_ms": 2, "ttfa_ms": None}}
-            for index, text in enumerate(("Synthetic request", "Synthetic followup"), 1)]
+            # The organisers' closing turn (11/2026) is one more agent turn with no customer words.
+            for index, text in enumerate(("Synthetic request", "Synthetic followup", ""), 1)]
 
 
 @pytest.mark.parametrize("options", [[], ["--no-extract"], ["--relabel", "SOURCE"]])
@@ -168,7 +169,7 @@ def evaluation(tmp_path, monkeypatch):
     args = cli.parser().parse_args(["--scenarios", str(source), "--config", "full", "--warmup", "0"])
     layout = cli.Layout(out, {"full": out / "full.jsonl"})
     run = runner.ScenarioRun(rows=rows(), diagnostics=[{"config": "full", "scenario_id": "SYNTHETIC-1",
-        "call": "call_1", "turn": index} for index in (1, 2)])
+        "call": "call_1", "turn": index} for index in (1, 2, 3)])
     monkeypatch.setattr(runner, "build", AsyncMock(return_value=SimpleNamespace(
         provider="synthetic", advisor=SimpleNamespace(model_name="synthetic"))))
     monkeypatch.setattr(runner, "warm_up", AsyncMock())
@@ -215,12 +216,12 @@ async def test_real_extractor_only_stop_can_be_relabelled(evaluation, monkeypatc
     assert await cli._evaluate(args, run_id="synthetic", layout=layout, database="synthetic_eval") == 1
     manifest = json.loads(layout.side("manifest.json").read_text())
     # Without a spending cap every turn is tried, so both failed (cli._label); the table is withheld all the same.
-    assert manifest["problems"]["full"]["unlabelled_turns"] == 2
+    assert manifest["problems"]["full"]["unlabelled_turns"] == 3
     assert manifest["problems"]["full"]["scenarios_stopped"] == 0
     fixed = SimpleNamespace(model_name="synthetic", stats=lambda: {}, label=AsyncMock(return_value=empty))
     out = layout.directory.parent / "relabelled"
     assert await relabel.relabel(layout.directory, out, fixed) == 0
-    assert fixed.label.await_count == 2
+    assert fixed.label.await_count == 3
     assert json.loads((out / "relabel.json").read_text())["status"] == "COMPLETE"
 
 

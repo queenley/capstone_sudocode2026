@@ -4,8 +4,9 @@ Mọi prompt đưa cho model đều nằm ở đây, mỗi thư mục con ứng 
 
 | File | Dùng ở | Ghi chú |
 |---|---|---|
-| `agent/advisor/rules.md` | `agents/advisor.py` (`HARD_RULES`) | Luật cứng, mục đầu của system prompt |
-| `agent/advisor/rule_packs.yaml` | `components/context/focus.py` | Luật nạp theo tình huống, số luật nối tiếp `rules.md`. Luật cấm mọi lượt đều cần giữ ở `rules.md` |
+| `agent/advisor/rules.md` | `agents/advisor.py` (`HARD_RULES`) | Tầng 1 của system prompt: luật mọi lượt đều cần, đánh số 1–17 theo nhóm (nguồn sự thật, hành động, an toàn, tiếp nối, cách trả lời). Cách làm từng việc không viết ở đây |
+| `agent/advisor/skills.yaml` | `components/context/skills.py` | Tầng 2: cách làm từng việc, mỗi quy trình viết đúng một chỗ, mỗi dòng một ý; Reflection sửa từng dòng |
+| `agent/approval_decide.md` | `agents/approval.py` | ApprovalAgent duyệt một thay đổi của Reflection theo `expected.yaml` của bộ dữ liệu |
 | `agent/advisor/notes.yaml` | `agents/advisor.py` | Ghi chú theo lane, câu xác minh danh tính, lời mở đầu, copilot, kênh chat/thoại. `{must_not_ask}` được điền lúc chạy |
 | `agent/policy_rules.md` | `agents/policy.py` (`RULES`) | Developer message của mọi request Decisions: định nghĩa vi phạm và ý khách |
 | `agent/memory_extractor.md` | `agents/memory.py` | Rút thông tin khách sau cuộc gọi. `{slots}` được điền lúc chạy |

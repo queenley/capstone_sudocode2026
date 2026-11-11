@@ -122,6 +122,8 @@ class AgentContext:
     tool_results: tuple[dict[str, Any], ...] = ()
     #: Today's price per sku from every quote in this call, for the order check.
     quotes: Mapping[str, int] = field(default_factory=dict)
+    #: Orders of more than one unit priced this call: units key to ``[[sku, unit price], ...]`` (``pricing.quote_order``).
+    order_quotes: Mapping[str, Any] = field(default_factory=dict)
     known_orders: frozenset[str] = frozenset()
     #: Order lines created earlier in this call (``actions.placed_lines``): the COD limit is on the whole order.
     placed_lines: tuple[Mapping[str, Any], ...] = ()
@@ -220,10 +222,6 @@ class AdvisorEvent:
 #: also enforced in code where code can (the guard, the before-write check).
 #: The codes in brackets are the policy sections the rule comes from.
 HARD_RULES = load_prompt("advisor/rules.md")
-#: Rules a turn loads by its situation (``components.context.focus``).
-RULE_PACKS: dict[str, str] = load_prompt_yaml("advisor/rule_packs.yaml")
-#: Every rule, for the run's manifest and for a reader.
-ALL_RULES = "\n\n".join((HARD_RULES, *RULE_PACKS.values()))
 
 #: The lane notes, the identity question, the opening and the channel notes.
 _NOTES = load_prompt_yaml("advisor/notes.yaml")
@@ -315,11 +313,6 @@ def prompt_parts(context: AgentContext, *, max_tokens: int = 3000) -> tuple[str,
     return static, pack.text, pack.cut
 
 
-def _packs_block(context: AgentContext, called: Sequence[str]) -> str:
-    chosen = focus.packs(context, RULE_PACKS, called)
-    return "Luật cho tình huống này:\n" + "\n".join(RULE_PACKS[name] for name in chosen) if chosen else ""
-
-
 def _state_block(context: AgentContext) -> str:
     """The call's state, then the request: what the answer has to be about."""
     parts = []
@@ -369,8 +362,11 @@ def _address_note(context: AgentContext) -> str:
         return f" Khách tự xưng là {context.self_called}: gọi khách là {context.self_called}, xưng em, dùng nhất quán."
     if context.honorific_asked:
         return " Chưa biết danh xưng và em đã hỏi rồi: gọi anh/chị, không hỏi lại."
-    return (" Chưa biết danh xưng: tạm gọi anh/chị. Ở lượt thứ hai, hoặc khi xin thông tin đặt hàng, hỏi đúng một lần, "
-            "gộp vào câu hỏi đang cần hỏi: \"Dạ cho em hỏi mình xưng hô là anh hay chị ạ?\"")
+    # The rule above reads only a few fixed forms ("tôi là chị Lan"); the model reads the rest of the customer's words.
+    return (" Chưa biết danh xưng: nếu trong lời khách đã tự xưng (\"anh muốn…\", \"chị hỏi…\", \"số của cô là…\") thì "
+            "gọi khách đúng như vậy và không hỏi. Chỉ khi khách chưa tự xưng: tạm gọi anh/chị, ở lượt thứ hai hoặc khi "
+            "xin thông tin đặt hàng hỏi đúng một lần, gộp vào câu hỏi đang cần hỏi: \"Dạ cho em hỏi mình xưng hô là anh "
+            "hay chị ạ?\"")
 
 
 WEEKDAYS = ("thứ Hai", "thứ Ba", "thứ Tư", "thứ Năm", "thứ Sáu", "thứ Bảy", "Chủ nhật")
@@ -572,14 +568,16 @@ class ActionGuardMiddleware(AgentMiddleware):
             args["customer_phone"] = context.customer_phone
         state = getattr(request, "state", None) or {}
         quotes = {**context.quotes, **_quotes_in(state)}
+        order_quotes = {**context.order_quotes, **_order_quotes_in(state)}
         if name == "order_create":
-            args = _filled_order(args, context, quotes)
+            args = _filled_order(args, context, quotes, order_quotes)
         codes, orders = _seen_in(state, context.tool_results)
         created = (*context.created_orders, *_created_in(state))
         intents = await _intents(name, args, context, created, state)
         verdict = actions.check(
             name, args, tier=context.tier, mode=context.mode, has_phone=bool(context.customer_phone),
-            quotes=quotes, orders=context.known_orders | orders, trusted=context.trusted_skus | codes | set(quotes),
+            quotes=quotes, order_quotes=order_quotes,
+            orders=context.known_orders | orders, trusted=context.trusted_skus | codes | set(quotes),
             lane=context.lane, intents=intents, now=context.now,
             last_agent_said=context.last_agent_said, customer_said=context.customer_said,
             deletion_asked=context.deletion_asked,
@@ -595,15 +593,13 @@ class ActionGuardMiddleware(AgentMiddleware):
             heard = bool(pending and pending.get("payload_hash") == record["payload_hash"]
                          and pending.get("owner") == record["owner"])
             agreed = None
-            # PB-09: the customer hears the price before an order exists. A quote only this run has seen is not heard yet.
-            told_price = heard or business_args.get("sku") in context.quotes
-            if not told_price:
-                agreed = False
-            elif context.judge is not None:
+            # PB-09 asks the order read back once before order.create, not a second yes after it: a customer who asked
+            # for the order hears it read back in the same reply that places it (the user's decision, 2026-11-10).
+            if context.judge is not None:
                 agreed = await context.judge("purchase", {
                     "recent_messages": [{"speaker": who, "text": text[:600]} for who, text in context.recent],
                     "order": record["read_back"]})
-            if agreed is None and told_price:  # no answer from the PolicyAgent: an order is placed only on a plain yes to what was just read back
+            if agreed is None:  # no answer from the PolicyAgent: an order is placed only on a plain yes to what was just read back
                 agreed = heard and purchase.answer(
                     pending, call_id=context.call_id, channel=context.channel, turn_id=str(context.turn_id),
                     said=context.customer_said or "", last_reply=context.last_agent_said) is not None
@@ -630,16 +626,26 @@ class ActionGuardMiddleware(AgentMiddleware):
         return await handler(request.override(tool_call={**call, "args": args}))
 
 
-def _filled_order(args: Mapping[str, Any], context: AgentContext, quotes: Mapping[str, int]) -> dict[str, Any]:
-    """What code knows of an order, so the model does not have to write it: the price is today's quote,
-    and what it left out of an order the customer already heard read back comes from that read-back."""
+def _filled_order(args: Mapping[str, Any], context: AgentContext, quotes: Mapping[str, int],
+                  order_quotes: Mapping[str, Any] | None = None) -> dict[str, Any]:
+    """What code knows of an order, so the model does not have to write it: the price is today's quote (each line's,
+    from the ``pricing.quote_order`` of the same units), and what it left out of an order the customer already heard
+    read back comes from that read-back."""
     order = dict(args)
+    if isinstance(order.get("lines"), list) and len(order["lines"]) == 1 and int(order["lines"][0].get("qty") or 1) == 1:
+        order.update({"sku": order["lines"][0].get("sku")})  # one unit is an order of one product
+        order.pop("lines")
     pending = context.pending_purchase
-    if pending and pending.get("target_id") == order.get("sku"):
+    if pending and pending.get("target_id") == purchase.target(order):
         for key, value in (pending.get("args") or {}).items():
             if order.get(key) in (None, "", []):
                 order[key] = value
-    if order.get("sku") in quotes:
+    if order.get("lines"):
+        units = (order_quotes or {}).get(purchase.units_key(order["lines"]))
+        if units:
+            order["lines"] = purchase.priced_lines(units)
+        order.pop("sku", None), order.pop("price_vnd", None), order.pop("qty", None)
+    elif order.get("sku") in quotes:
         order["price_vnd"] = quotes[order["sku"]]
     return order
 
@@ -683,7 +689,8 @@ async def _intents(name: str, args: Mapping[str, Any], context: AgentContext, cr
             return {}  # the address this order still lacks: the customer already agreed to the order
         change = {k: args.get(k) for k in ("order_id", "action", "new_variant_sku", "new_address") if args.get(k)}
         return {"change": await context.judge("change", {"recent_messages": said, "change": change})}
-    if name == "order_create" and any(o.get("sku") and o.get("sku") == args.get("sku") for o in created):
+    asked_skus = {line["sku"] for line in purchase.lines_of(args)}
+    if name == "order_create" and any(asked_skus & set(o.get("skus") or [o.get("sku")]) for o in created):
         return {"one_more": await context.judge("one_more", {"recent_messages": said,
                                                              "already_ordered": args.get("sku")})}
     return {}
@@ -726,7 +733,9 @@ def _created_in(state: Mapping[str, Any]) -> list[dict[str, Any]]:
             data = envelope.get("data") if isinstance(envelope, dict) and envelope.get("ok") else None
             if isinstance(data, dict) and data.get("order_id"):
                 order = asked.get(message.tool_call_id, {})
-                created.append({"order_id": data["order_id"], "sku": order.get("sku"), "no_address": not order.get("address")})
+                created.append({"order_id": data["order_id"], "sku": order.get("sku") or purchase.target(order),
+                                "skus": sorted({line["sku"] for line in purchase.lines_of(order)}),
+                                "no_address": not order.get("address")})
     return created
 
 
@@ -764,6 +773,17 @@ def _quotes_in(state: Mapping[str, Any]) -> dict[str, int]:
             if envelope.get("ok") and data.get("sku") and data.get("final_price_vnd") is not None:
                 quotes[data["sku"]] = int(data["final_price_vnd"])
     return quotes
+
+
+def _order_quotes_in(state: Mapping[str, Any]) -> dict[str, Any]:
+    """The orders of more than one unit priced in this run: units key to ``[[sku, unit price], ...]``."""
+    found: dict[str, Any] = {}
+    for message in state.get("messages") or []:
+        if isinstance(message, ToolMessage) and message.name == "pricing_quote_order":
+            envelope = envelope_of(message) or {}
+            if envelope.get("ok") and (priced := purchase.quoted_units(envelope.get("data") or {})):
+                found[priced[0]] = priced[1]
+    return found
 
 
 LOAD_SKILL = "load_skill"

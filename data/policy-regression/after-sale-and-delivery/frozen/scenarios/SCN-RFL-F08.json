@@ -1,0 +1,76 @@
+{
+ "scenario_id": "SCN-RFL-F08",
+ "level": "M2",
+ "persona": "khach_do_du_hoi_nguoi_nha",
+ "hard_case": null,
+ "customer_phone": "0372158946",
+ "customer_name": "Minh",
+ "honorific": "anh",
+ "notes": "Đối chứng: chờ người nhà, hẹn gọi lại.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-16",
+   "channel": "hotline",
+   "customer_goal": "tư vấn, cần hỏi người nhà, hẹn gọi lại",
+   "customer_turns": [
+    "Anh cần máy lọc không khí cho phòng khách khoảng 40 mét vuông.",
+    "Samsung AX40 giá bao nhiêu em?",
+    "Anh phải hỏi vợ, chiều mai ba giờ em gọi lại anh nhé."
+   ],
+   "facts_established": {
+    "product_advised": "SKU-SS-AX40",
+    "price_quoted_vnd": 6490000,
+    "blocker": "cần hỏi người nhà"
+   },
+   "success_if": {
+    "tool_called": "schedule.callback",
+    "must_not_call_tools": [
+     "order.create"
+    ]
+   },
+   "ground_truth_facts": {
+    "price_vnd": 6490000,
+    "in_stock": true
+   },
+   "relevant_policy_ids": [
+    "PB-03",
+    "LN-01"
+   ],
+   "expected_outcome": "hen_goi_lai"
+  },
+  "call_2": {
+   "days_later": 1,
+   "channel": "hotline",
+   "customer_goal": "người nhà đồng ý, chốt đơn",
+   "customer_turns": [
+    "Alo em, anh Minh đây, vợ anh đồng ý rồi.",
+    "Em lên đơn Samsung AX40, giao về 18 Nguyễn Trãi, Thanh Xuân, Hà Nội, COD.",
+    "Đúng rồi em, đặt giúp anh nhé."
+   ],
+   "must_carry_over": [
+    "product_advised",
+    "blocker"
+   ],
+   "must_not_ask": [
+    "product_advised"
+   ],
+   "success_if": {
+    "tool_called": "order.create",
+    "args_match": {
+     "sku": "SKU-SS-AX40",
+     "price_vnd": 6490000,
+     "payment": "COD"
+    }
+   },
+   "ground_truth_facts": {
+    "price_vnd": 6490000,
+    "in_stock": true
+   },
+   "relevant_policy_ids": [
+    "PB-01",
+    "PB-09"
+   ],
+   "expected_outcome": "chot_don"
+  }
+ }
+}

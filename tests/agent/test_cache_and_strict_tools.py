@@ -258,15 +258,19 @@ def test_a_read_back_says_names_and_never_a_product_code():
 
 
 @pytest.mark.asyncio
-async def test_an_order_waits_until_the_customer_has_heard_the_price_and_does_not_ask_the_model():
-    asked = []
+@pytest.mark.parametrize("asked_for_it", [True, False])
+async def test_an_order_the_customer_asked_for_is_read_back_and_placed_in_the_same_turn(asked_for_it):
+    """PB-09 asks the order read back once before order.create, not a second yes after it (2026-11-10): a price
+    quoted in this very turn is read back with the order; whether the customer asked for it is the PolicyAgent's."""
+    asked, placed = [], []
 
     async def judge(intent, state):
         asked.append(intent)
-        return True
+        return asked_for_it
 
     async def handler(request):
-        raise AssertionError("no order may be placed")
+        placed.append(request.tool_call["args"])
+        return ToolMessage(json.dumps({"ok": True, "data": {"order_id": "OD1"}}), tool_call_id="1", name="order_create")
 
     call = {"name": "order_create", "args": {"sku": "A", "qty": 1, "price_vnd": 100000, "payment": "COD"}, "id": "1"}
     ctx = order_context(judge=judge, trusted_skus=frozenset({"A"}), quotes={})
@@ -274,7 +278,11 @@ async def test_an_order_waits_until_the_customer_has_heard_the_price_and_does_no
                                       tool_call_id="q", name="pricing_get_quote")]}
     request = ToolCallRequest(tool_call=call, tool=None, state=state, runtime=SimpleNamespace(context=ctx))
     answer = await ActionGuardMiddleware().awrap_tool_call(request, handler)
-    assert json.loads(answer.content)["error"]["code"] == "CONFIRMATION_REQUIRED" and asked == []
+    assert asked == ["purchase"]
+    if asked_for_it:
+        assert len(placed) == 1 and ctx.consent["read_back"].startswith("Dạ em đọc lại đơn")
+    else:
+        assert placed == [] and json.loads(answer.content)["error"]["code"] == "CONFIRMATION_REQUIRED"
 
 
 def test_cod_limit_counts_the_basket_this_order_goes_with():

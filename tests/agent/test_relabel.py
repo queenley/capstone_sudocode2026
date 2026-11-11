@@ -40,7 +40,10 @@ async def test_relabel_replaces_old_labels_feeds_history_and_grades(tmp_path):
     (run / "inputs/scenarios/SAMPLE-01.json").write_text(json.dumps({"scenario_id": "SAMPLE-01",
         "calls": {"call_1": {"customer_turns": ["khach"]}, "call_2": {"customer_turns": ["khach"]}}}))
     for name, config in (("full", "full"), ("baseline", "baseline_no_memory")):
-        rows = [line(config, "call_2", 1, "agent 2"), line(config, "call_1", 1, "agent 1")]
+        rows = [line(config, "call_2", 1, "agent 2"), line(config, "call_1", 1, "agent 1"),
+                # The organisers' closing turn (11/2026) ends each call.
+                {**line(config, "call_1", 2, "agent 1b"), "customer_text": ""},
+                {**line(config, "call_2", 2, "agent 2b"), "customer_text": ""}]
         (run / f"evidence/{name}.jsonl").write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n", encoding="utf-8")
     before = {p: p.read_bytes() for p in run.rglob("*") if p.is_file()}
     llm = Shown()
@@ -48,8 +51,9 @@ async def test_relabel_replaces_old_labels_feeds_history_and_grades(tmp_path):
     assert code == 0
     assert {p: p.read_bytes() for p in run.rglob("*") if p.is_file()} == before          # the run is never changed
     rows = [json.loads(l) for l in (tmp_path / "out/full.jsonl").read_text(encoding="utf-8").splitlines()]
-    assert [(r["call"], r["questions"], r["facts_used"]) for r in rows] == [("call_1", [], []), ("call_2", [], [])]
-    assert sum("previous_sessions" in s for s in llm.seen) == 1                             # only call_2, per config
+    assert [(r["call"], r["questions"], r["facts_used"]) for r in rows] == [
+        ("call_1", [], []), ("call_1", [], []), ("call_2", [], []), ("call_2", [], [])]
+    assert sum("previous_sessions" in s for s in llm.seen) == 2                             # only call_2's turns, per config
     assert (tmp_path / "out/report.json").is_file() and (tmp_path / "out/table.txt").is_file()
 
 

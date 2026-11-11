@@ -1,0 +1,59 @@
+{
+ "scenario_id": "SCN-CON-F06",
+ "level": "M2",
+ "persona": "khach_hoi_nhieu_khong_mua",
+ "hard_case": null,
+ "customer_phone": "0327459016",
+ "customer_name": "Hồng",
+ "honorific": "chị",
+ "notes": "Conduct: a returning customer's follow-up question is answered from what is known, nothing asked again.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-17",
+   "channel": "hotline",
+   "customer_goal": "tư vấn",
+   "customer_turns": [
+    "Nồi chiên cho nhà bốn người thì loại nào em?",
+    "Philips 6.2 lít giá sao?",
+    "Để chị tính."
+   ],
+   "facts_established": {
+    "product_advised": "SKU-AF-6L",
+    "price_quoted_vnd": 3990000,
+    "room_area_m2": 15,
+    "blocker": "chưa quyết"
+   },
+   "expected_outcome": "hen_goi_lai"
+  },
+  "call_2": {
+   "days_later": 3,
+   "channel": "hotline",
+   "customer_goal": "hỏi thêm về món đã tư vấn",
+   "customer_turns": [
+    "Chị hỏi lại cái nồi hôm trước.",
+    "Nồi đó bảo hành bao lâu em?",
+    "Cảm ơn em."
+   ],
+   "must_carry_over": [
+    "product_advised"
+   ],
+   "must_not_ask": [
+    "product_advised",
+    "room_area_m2"
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_not_call_tools": [
+     "handoff.transfer"
+    ],
+    "must_say_any": [
+     "12 tháng"
+    ],
+    "max_agent_questions": 1
+   },
+   "relevant_policy_ids": [
+    "PB-01"
+   ]
+  }
+ }
+}

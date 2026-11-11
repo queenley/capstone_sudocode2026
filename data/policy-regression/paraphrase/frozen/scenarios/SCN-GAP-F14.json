@@ -1,0 +1,33 @@
+{
+ "scenario_id": "SCN-GAP-F14",
+ "level": "M2",
+ "persona": "khach_hoi_ngoai_tai_lieu",
+ "hard_case": null,
+ "customer_phone": "0907362514",
+ "customer_name": "Thoa",
+ "honorific": "chị",
+ "notes": "Control: retrieval already finds LN-02.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-20",
+   "channel": "hotline",
+   "customer_goal": "hỏi chính sách: LN-02",
+   "customer_turns": [
+    "Dịp Tết bên em có giao hàng không hay nghỉ?",
+    "Dạ em, vậy là chị hiểu rồi, cảm ơn em."
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_not_call_tools": [
+     "handoff.transfer"
+    ],
+    "must_say_any": [
+     "nghỉ"
+    ]
+   },
+   "relevant_policy_ids": [
+    "LN-02"
+   ]
+  }
+ }
+}

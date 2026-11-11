@@ -1,0 +1,57 @@
+{
+ "scenario_id": "SCN-BGT-F02",
+ "level": "M2",
+ "persona": "khach_mua_nhieu_mon",
+ "hard_case": null,
+ "customer_phone": "0397520202",
+ "customer_name": "Long",
+ "honorific": "anh",
+ "notes": "Reflection: two products and a stated budget, then the order; when the total passes the budget the customer expects to be told so before closing, without the difference worked out.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-15",
+   "channel": "hotline",
+   "customer_goal": "mua đồ nhà mới, giữ ngân sách, chốt cả hai món",
+   "customer_turns": [
+    "Nhà mới anh cần một máy lọc nước Kangaroo 10 lõi với một nồi chiên Xiaomi 4.5 lít, anh tính hết tầm 8 triệu thôi em.",
+    "Em tính giúp anh hai món này hết bao nhiêu nhé.",
+    "Ừ thôi lấy cả hai, giao về 77 Cầu Giấy, Hà Nội, anh chuyển khoản.",
+    "Đúng rồi, đặt đi em."
+   ],
+   "success_if": {
+    "tool_called": "order.create",
+    "args_match": {
+     "sku": "SKU-WF-RO10"
+    },
+    "also_ordered": [
+     "SKU-AF-XM"
+    ],
+    "total_match_vnd": 8480000,
+    "must_say_any": [
+     "vượt ngân sách",
+     "quá ngân sách",
+     "hơn ngân sách",
+     "vượt mức ngân sách",
+     "quá số tiền",
+     "vượt số tiền"
+    ]
+   },
+   "ground_truth_facts": {
+    "skus": [
+     "SKU-WF-RO10",
+     "SKU-AF-XM"
+    ],
+    "total_vnd": 8480000,
+    "budget_vnd": 8000000
+   },
+   "facts_established": {
+    "budget_vnd": 8000000
+   },
+   "relevant_policy_ids": [
+    "PB-09",
+    "VC-03"
+   ],
+   "expected_outcome": "chot_don"
+  }
+ }
+}

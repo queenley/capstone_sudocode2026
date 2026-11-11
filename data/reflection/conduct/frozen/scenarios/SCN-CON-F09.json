@@ -1,0 +1,38 @@
+{
+ "scenario_id": "SCN-CON-F09",
+ "level": "M2",
+ "persona": "khach_mua_nhieu_mon",
+ "hard_case": null,
+ "customer_phone": "0359810642",
+ "customer_name": "Đông",
+ "honorific": "anh",
+ "notes": "Conduct: every order detail given at once; the read-back is the one confirmation, no question more.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-17",
+   "channel": "hotline",
+   "customer_goal": "đặt nhanh, đủ thông tin",
+   "customer_turns": [
+    "Lấy anh một bộ tất thể thao RunLite ba đôi, giao 17 Lý Tự Trọng, Cần Thơ, trả tiền mặt.",
+    "Đúng rồi em, đặt luôn nhé."
+   ],
+   "success_if": {
+    "tool_called": "order.create",
+    "args_match": {
+     "sku": "SKU-SN-SOCK",
+     "price_vnd": 149000,
+     "payment": "COD"
+    },
+    "max_agent_questions": 1
+   },
+   "ground_truth_facts": {
+    "price_vnd": 149000,
+    "in_stock": true
+   },
+   "relevant_policy_ids": [
+    "PB-09"
+   ],
+   "expected_outcome": "chot_don"
+  }
+ }
+}

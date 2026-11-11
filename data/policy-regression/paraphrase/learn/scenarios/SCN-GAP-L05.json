@@ -1,0 +1,35 @@
+{
+ "scenario_id": "SCN-GAP-L05",
+ "level": "M2",
+ "persona": "khach_hoi_ngoai_tai_lieu",
+ "hard_case": null,
+ "customer_phone": "0328906147",
+ "customer_name": "Nga",
+ "honorific": "chị",
+ "notes": "theo dõi đơn hàng (VC-06): the passage is outside retrieval's top 5.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-20",
+   "channel": "hotline",
+   "customer_goal": "hỏi chính sách: VC-06",
+   "customer_turns": [
+    "Có cách nào chị coi hàng chị đang giao tới đâu không em?",
+    "Dạ em, vậy là chị hiểu rồi, cảm ơn em."
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_not_call_tools": [
+     "handoff.transfer"
+    ],
+    "must_say_any": [
+     "mã vận đơn",
+     "zalo oa",
+     "zalo"
+    ]
+   },
+   "relevant_policy_ids": [
+    "VC-06"
+   ]
+  }
+ }
+}

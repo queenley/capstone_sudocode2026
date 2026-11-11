@@ -185,7 +185,7 @@ async def test_same_customer_channels_isolate_pending_purchase_and_block_wrong_p
         assert b["pending_purchase"] is None
     a = await turn(101, "hotline", "vâng", "A-confirm-order")
     assert len(writes) == (2 if unsafe else 1)
-    assert a["created_orders"] == [{"order_id": "EC03-ORDER", "sku": SKU, "no_address": True}]
+    assert a["created_orders"] == [{"order_id": "EC03-ORDER", "sku": SKU, "skus": [SKU], "no_address": True}]
     assert a["pending_purchase"] is None
 
 

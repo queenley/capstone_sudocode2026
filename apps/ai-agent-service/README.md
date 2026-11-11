@@ -87,7 +87,7 @@ Những gì cần đọc hiểu lời khách không nằm trong luật mà nằm
 | `runtime/db.py`, `runtime/vault.py` | schema `agent`, pool, checkpointer; vault PII mã hóa |
 | `runtime/platform.py` | **chỗ duy nhất** chạm bảng platform |
 | `pipeline/hot`, `pipeline/cold` | đồ thị 7 bước; after_call |
-| `pipeline/improve` | vòng cải tiến offline: lấy lỗi từ bộ chấm, khám phá gợi ý (LATS rút gọn), đề xuất, publish |
+| `pipeline/improve` | vòng cải tiến offline: lấy lỗi từ bộ chấm, chẩn đoán, Reflection sửa skill, Gap Loop thêm tri thức, duyệt, publish, đo lại ([docs/ai/06](../../docs/ai/06-vong-cai-tien.md)) |
 | `agents/` | Advisor, Policy (Jev), Memory, QA, Simulator (khách của bước khám phá, không phải simulator đánh giá) |
 | `components/` | intake, identity, guardrails, memory/brief, handoff, voice, clock |
 | `mcp/client.py`, `mcp/servers/` | client phân quyền theo role (tự chèn `on`, `customer_phone`, bỏ trường `_internal`) và 5 server |
@@ -188,27 +188,20 @@ Docker: `docker compose up --build ai-agent-service`. Thêm voice bằng `--buil
 - `python -m ai_agent_service.pipeline.eval.rag --calibrate`: chỉ đo truy hồi và đề xuất θ từ nửa câu hỏi dùng để dò.
 - Chỉ số Chương A: `evaluation/data-generation` + `data/btc/eval/reference_eval.py`. Xem [docs/evaluation](../../docs/evaluation/README.md).
 
-## Vòng cải tiến (Reflection)
+## Vòng cải tiến (Reflection và Knowledge Gap Loop)
 
-Chạy offline trên tập học, không bao giờ trên tập kiểm. Trước tiên ghi `data/improvement/frozen.json`: danh sách id kịch bản của tập kiểm và holdout. Từ thư mục gốc repo, với `PYTHONPATH=apps/ai-agent-service/src`:
+Một vòng bắt đầu từ agent gốc, học trên tập học, đo trên tập frozen, rồi quay về agent gốc. Từ thư mục gốc repo:
 
 ```bash
-apps/ai-agent-service/.venv/bin/python -m ai_agent_service.pipeline.improve harvest --run apps/ai-agent-service/runs/<run> --round learn-1
-apps/ai-agent-service/.venv/bin/python -m ai_agent_service.pipeline.improve explore --round learn-1 --limit 1
-apps/ai-agent-service/.venv/bin/python -m ai_agent_service.pipeline.improve propose --round learn-1
-apps/ai-agent-service/.venv/bin/python -m ai_agent_service.pipeline.improve publish --review apps/ai-agent-service/data/improvement/review/learn-1.json
+export PYTHONPATH=apps/ai-agent-service/src:packages/backend-common
+apps/ai-agent-service/.venv/bin/python -m ai_agent_service.pipeline.improve round --name warranty-proof --learn data/reflection/warranty/learn/scenarios --frozen data/reflection/warranty/frozen/scenarios --frozen-ids data/reflection/warranty/frozen.json --r0-runs 2 --r1-runs 2 --scripted
 ```
 
-- `harvest`: lỗi theo đúng hàm của `reference_eval.py` (TSR theo lý do, RQR theo slot, CCR, HR, guardrail), phân luồng bằng code: `behaviour` vào Reflection, `knowledge` cho Gap Loop, `product` là lỗi code phải sửa trước khi đóng băng, `review` cho người xem.
-- `simulate --round R --scenarios <dir> --only <id>`: thay cho `harvest` khi muốn khách tự quyết. Chơi tập học với khách giả lập: 8 quy tắc BTC đi trước, rồi persona phản ứng đúng như prompt của nó (vẫn lăn tăn, vặn lại "chương trình gì?", bỏ đi). Ngoài lỗi của bộ chấm còn ghi `SIM.lost` (khách bỏ khi kịch bản chờ chốt/hẹn) và `SIM.challenged`.
-- `measure --label r0 --scenarios <dir> --only <id> --seeds 1 2` và `compare --labels r0 r1`: đo một tập (kể cả tập kiểm) với khách giả lập, rồi so hai lần đo theo từng cuộc và seed. Đây là số chẩn đoán của simulator khám phá, không phải số chính thức.
-- `explore`: mỗi lỗi hành vi, chạy lại cuộc gọi với khách giả lập, một nhánh không gợi ý để kiểm lỗi có tái hiện, rồi các nhánh mỗi nhánh một gợi ý do QaAgent đề xuất; điểm là của bộ chấm BTC cộng phản ứng của persona, nhánh chốt sớm hơn được ưu tiên. Mọi nhánh khôi phục cùng một snapshot DB, thread và vault riêng.
-- `propose`: lỗi có thẻ đã kiểm từ ít nhất 3 khách khác nhau thành một mục playbook, kiểm lại trên mọi cuộc lỗi cùng mã và vài cuộc đạt, rồi ghi file duyệt.
-- `publish`: chỉ mục do người (không phải agent) duyệt và không bị gắn cờ, ghi thành `data/kb/v<N+1>.jsonl`. `rollback --to N` và `revoke --chunk ID` để quay lui.
+Các bước (`harvest`, `score`, `reflect`, `gaps`, `publish`, `compare`, `rollback`, `revoke`), ApprovalAgent, bộ dữ liệu chứng minh, kết quả và phần chưa xong: [docs/ai/06-vong-cai-tien.md](../../docs/ai/06-vong-cai-tien.md).
 
 ## Giới hạn (kế thừa từ agent tham chiếu)
 
-- Gap Loop mới có bước tư vấn viên lưu câu trả lời thành FAQ (`runtime/calls.py`, `save_faq`); chưa gom câu hỏi chưa ai trả lời. Chưa chấm rubric J01–J12 trên cuộc gọi thật.
+- Rubric J01–J12 mới được QaAgent chấm trên tập học của vòng cải tiến, chưa chấm trên cuộc gọi thật.
 - Truy hồi trên 60 câu có nhãn của BTC (`rag_eval`): Recall@3 91,5, Recall@5 93,2, từ chối đúng 75% câu không có đáp án và 60% câu nội bộ, không từ chối nhầm câu nào.
 - WER/CER của ASR chưa có lệnh xuất `hypotheses.json`: gói BTC chưa kèm audio.
 - Lệnh xóa dữ liệu khách của platform chưa xóa `pii_vault` và fact ledger của agent.

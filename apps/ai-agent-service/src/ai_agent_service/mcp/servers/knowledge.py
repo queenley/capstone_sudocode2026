@@ -61,6 +61,9 @@ ALTER TABLE kb_chunks ADD COLUMN IF NOT EXISTS persona TEXT;
 ALTER TABLE kb_chunks ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
 ALTER TABLE kb_chunks ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'live';
 UPDATE kb_chunks SET status = 'draft' WHERE revoked AND status = 'live';
+-- A database made before 'faq' was a source keeps the old CHECK, and the startup seed then fails on it.
+ALTER TABLE kb_chunks DROP CONSTRAINT IF EXISTS kb_chunks_source_check;
+ALTER TABLE kb_chunks ADD CONSTRAINT kb_chunks_source_check CHECK (source IN ('faq', 'playbook')) NOT VALID;
 """
 
 #: How often a search checks whether ``kb_chunks`` changed under another process.

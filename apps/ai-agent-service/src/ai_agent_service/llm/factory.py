@@ -30,7 +30,9 @@ from langchain.chat_models import init_chat_model
 from langchain_core.language_models import BaseChatModel
 
 from ..config.config_manager import require_api_key
+from . import tracing
 from .callback_handler import TokenTrackingCallback
+from .spend_guard import StopSwitch
 from .rate_limiter import AdvancedTokenRateLimiter
 
 # Provider ids understood by init_chat_model, mapped to the package that
@@ -49,7 +51,7 @@ SUPPORTED_PROVIDERS = {
 # outright is expressed — ChatNVIDIA forwards unrecognised keyword arguments
 # into the request body, so `max_retries: null` is the only way to call it.
 GENERATION_PARAMS = ("temperature", "max_tokens", "timeout", "max_retries", "reasoning_effort", "use_responses_api",
-                     "service_tier")
+                     "service_tier", "store", "include", "output_version")
 
 # One limiter per model of a provider, shared by every agent that calls it.
 #
@@ -76,6 +78,11 @@ def limiter_stats() -> dict[str, dict[str, Any]]:
     """What each model's limiter has seen this run."""
     with _LIMITERS_LOCK:
         return {name: rl.stats() for name, rl in _LIMITERS.items()}
+
+
+#: Agents whose runs pass the Langfuse handler themselves (BaseAgent.run_config); tracing them here too would count
+#: each call twice.
+RUN_TRACED = frozenset({"advisor"})
 
 
 def cache_options(provider: str, agent_name: str) -> dict[str, Any]:
@@ -128,7 +135,8 @@ class LLMFactory:
         require_api_key(provider)
 
         kwargs: dict[str, Any] = {}
-        callbacks: list[Any] = []
+        # The spend switch first: with the stop file present no call of this model goes out (llm/spend_guard.py).
+        callbacks: list[Any] = [StopSwitch()]
         if os.environ.get("EVAL_BUDGET_DB"):
             from .evaluation_budget import BudgetCallback
 
@@ -144,11 +152,15 @@ class LLMFactory:
             kwargs["rate_limiter"] = limiter
             callbacks.append(TokenTrackingCallback(limiter, agent_name=agent_name))
 
-        # The Langfuse handler is deliberately not attached here. Attached to
-        # the model it traces model calls with no run around them and no
-        # session; docs/design.md section 8 wants the whole run, gathered by
-        # customer. BaseAgent.run_config passes it per invocation instead, and
-        # the probe passes it in its own call config.
+        # The advisor's Langfuse handler is not attached here: attached to the model it would trace calls with no
+        # run around them and no session; docs/design.md section 8 wants the whole run, gathered by customer, and
+        # BaseAgent.run_config passes it per invocation. Every other model (the MemoryAgent, the compactor, the
+        # improvement loop's agents, the evaluation's extractor and judge) has no run config, so it is attached here:
+        # without it their calls, and what they cost, are nowhere.
+        if agent_name not in RUN_TRACED:
+            trace = tracing.handler()
+            if trace is not None:
+                callbacks.append(trace)
 
         if callbacks:
             kwargs["callbacks"] = callbacks
@@ -163,11 +175,13 @@ class LLMFactory:
             # A client of our own turns this off by default, and without it a streamed call reports no tokens.
             kwargs["stream_usage"] = True
         else:
-            kwargs.pop("service_tier", None)
+            for name in ("service_tier", "store", "include", "output_version"):
+                kwargs.pop(name, None)
         if not takes_reasoning(provider, str(model)):
             # An agent's settings follow it when the Admin page or a run moves it to another model.
             kwargs.pop("reasoning_effort", None)
-            kwargs.pop("use_responses_api", None)
+            for name in ("use_responses_api", "store", "include", "output_version"):
+                kwargs.pop(name, None)
             kwargs.setdefault("temperature", 0.0)
 
         try:

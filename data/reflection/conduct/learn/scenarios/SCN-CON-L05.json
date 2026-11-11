@@ -1,0 +1,59 @@
+{
+ "scenario_id": "SCN-CON-L05",
+ "level": "M2",
+ "persona": "khach_hoi_nhieu_khong_mua",
+ "hard_case": null,
+ "customer_phone": "0359627014",
+ "customer_name": "Lý",
+ "honorific": "chị",
+ "notes": "Conduct: a returning customer's follow-up question is answered from what is known, nothing asked again.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-14",
+   "channel": "hotline",
+   "customer_goal": "tư vấn",
+   "customer_turns": [
+    "Em ơi máy lọc cho phòng 25 mét vuông thì lấy loại nào?",
+    "AirPure X giá bao nhiêu em?",
+    "Để chị suy nghĩ."
+   ],
+   "facts_established": {
+    "product_advised": "SKU-AP-X",
+    "price_quoted_vnd": 4890000,
+    "room_area_m2": 25,
+    "blocker": "chưa quyết"
+   },
+   "expected_outcome": "hen_goi_lai"
+  },
+  "call_2": {
+   "days_later": 3,
+   "channel": "hotline",
+   "customer_goal": "hỏi thêm về món đã tư vấn",
+   "customer_turns": [
+    "Alo em, chị hỏi thêm cái máy hôm trước em tư vấn.",
+    "Máy đó bảo hành bao lâu vậy em?",
+    "Ok cảm ơn em."
+   ],
+   "must_carry_over": [
+    "product_advised"
+   ],
+   "must_not_ask": [
+    "product_advised",
+    "room_area_m2"
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_not_call_tools": [
+     "handoff.transfer"
+    ],
+    "must_say_any": [
+     "24 tháng"
+    ],
+    "max_agent_questions": 1
+   },
+   "relevant_policy_ids": [
+    "PB-01"
+   ]
+  }
+ }
+}

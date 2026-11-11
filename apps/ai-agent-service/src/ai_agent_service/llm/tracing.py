@@ -85,6 +85,19 @@ def client() -> Any | None:
     return Langfuse(mask=mask)
 
 
+def record_generation(name: str, model: str, usage: dict[str, int], metadata: dict[str, Any] | None = None) -> None:
+    """One model call made outside LangChain, as a Langfuse generation with its usage, so Langfuse prices it by its
+    own model definition. Content is not sent: only the name, the model and the token counts."""
+    langfuse = client()
+    if langfuse is None:
+        return
+    try:
+        with langfuse.start_as_current_observation(as_type="generation", name=name, model=model) as generation:
+            generation.update(usage_details=usage, metadata=metadata or {})
+    except Exception as error:  # noqa: BLE001 - tracing never breaks a call
+        logger.debug("Could not record generation %s: %s", name, type(error).__name__)
+
+
 @lru_cache(maxsize=1)
 def handler() -> Any | None:
     """The LangChain callback handler, or None when tracing is off.

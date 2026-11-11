@@ -1,0 +1,64 @@
+{
+ "scenario_id": "SCN-RFL-F10",
+ "level": "M2",
+ "persona": "khach_hoi_nhieu_khong_mua",
+ "hard_case": "het_hang_luc_khach_quyet",
+ "customer_phone": "0849613752",
+ "customer_name": "Tâm",
+ "honorific": "anh",
+ "notes": "Đối chứng: hết hàng, có ngày về (FAQ-17).",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-14",
+   "channel": "hotline",
+   "customer_goal": "tư vấn, chưa quyết",
+   "customer_turns": [
+    "Em ơi anh so sánh Xiaomi Smart 4 Lite với Smart 4 Pro.",
+    "Bản Lite giá bao nhiêu em?",
+    "Để anh suy nghĩ đã."
+   ],
+   "facts_established": {
+    "product_advised": "SKU-XM-4L",
+    "price_quoted_vnd": 2990000,
+    "blocker": "chưa quyết"
+   },
+   "ground_truth_facts": {
+    "price_vnd": 2990000
+   },
+   "relevant_policy_ids": [
+    "PB-11"
+   ],
+   "expected_outcome": "hen_goi_lai"
+  },
+  "call_2": {
+   "days_later": 2,
+   "channel": "hotline",
+   "customer_goal": "quyết mua thì hết hàng",
+   "customer_turns": [
+    "Alo, anh Tâm đây. Anh lấy bản Xiaomi Smart 4 Pro.",
+    "Đặt luôn cho anh nhé, giao về 50 Hùng Vương, Đà Lạt, COD.",
+    "Vậy khi nào có hàng em báo anh."
+   ],
+   "must_carry_over": [
+    "product_advised"
+   ],
+   "must_not_ask": [
+    "product_advised"
+   ],
+   "success_if": {
+    "tool_called": "inventory.check",
+    "must_not_call_tools": [
+     "order.create"
+    ]
+   },
+   "ground_truth_facts": {
+    "in_stock": false,
+    "restock_date": "2026-10-19"
+   },
+   "relevant_policy_ids": [
+    "FAQ-17",
+    "FAQ-10"
+   ]
+  }
+ }
+}

@@ -1,0 +1,69 @@
+{
+ "scenario_id": "SCN-RFL-L12",
+ "level": "M2",
+ "persona": "khach_so_gia",
+ "hard_case": "doi_khuyen_mai_het_han",
+ "customer_phone": "0703651984",
+ "customer_name": "Dũng",
+ "honorific": "anh",
+ "notes": "Đối chứng: khuyến mãi hết hạn giữa hai cuộc (KM-01).",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-18",
+   "channel": "hotline",
+   "customer_goal": "hỏi giá lúc còn khuyến mãi",
+   "customer_turns": [
+    "Em ơi máy lọc không khí AirPure X giá bao nhiêu?",
+    "Có khuyến mãi gì không em?",
+    "Ok để anh cân nhắc thêm."
+   ],
+   "facts_established": {
+    "product_advised": "SKU-AP-X",
+    "price_quoted_vnd": 4890000,
+    "promo_code": "GIFT-FILTER"
+   },
+   "ground_truth_facts": {
+    "price_vnd": 4890000,
+    "promo_active": true
+   },
+   "relevant_policy_ids": [
+    "KM-01"
+   ],
+   "expected_outcome": "hen_goi_lai"
+  },
+  "call_2": {
+   "days_later": 7,
+   "channel": "hotline",
+   "customer_goal": "đòi khuyến mãi đã hết, rồi mua giá hiện tại",
+   "customer_turns": [
+    "Alo em, anh Dũng đây. Hôm trước em báo AirPure X có tặng màng lọc, anh lấy nhé.",
+    "Hết rồi à? Thôi được, vậy em lên đơn giá hiện tại cho anh, giao về 3 Lê Lợi, Quận 1, TP.HCM, COD.",
+    "Đúng rồi em, đặt giúp anh nhé."
+   ],
+   "must_carry_over": [
+    "product_advised",
+    "promo_code"
+   ],
+   "must_not_ask": [
+    "product_advised"
+   ],
+   "success_if": {
+    "tool_called": "order.create",
+    "args_match": {
+     "sku": "SKU-AP-X",
+     "price_vnd": 4890000,
+     "payment": "COD"
+    }
+   },
+   "ground_truth_facts": {
+    "price_vnd": 4890000,
+    "promo_GIFT-FILTER_active": false
+   },
+   "relevant_policy_ids": [
+    "KM-01",
+    "PB-09"
+   ],
+   "expected_outcome": "chot_don"
+  }
+ }
+}

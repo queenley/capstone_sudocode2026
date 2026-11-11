@@ -1,0 +1,36 @@
+{
+ "scenario_id": "SCN-GAP-L03",
+ "level": "M2",
+ "persona": "khach_hoi_ngoai_tai_lieu",
+ "hard_case": null,
+ "customer_phone": "0365281907",
+ "customer_name": "Diệp",
+ "honorific": "chị",
+ "notes": "xác nhận đơn trước khi giao (VC-05): the passage is outside retrieval's top 5.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-20",
+   "channel": "hotline",
+   "customer_goal": "hỏi chính sách: VC-05",
+   "customer_turns": [
+    "Sau khi chốt đơn bên em có liên lạc lại với chị không?",
+    "Dạ em, vậy là chị hiểu rồi, cảm ơn em."
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_not_call_tools": [
+     "handoff.transfer"
+    ],
+    "must_say_any": [
+     "gọi xác nhận",
+     "gọi điện xác nhận",
+     "xác nhận trước khi giao",
+     "xác nhận đơn"
+    ]
+   },
+   "relevant_policy_ids": [
+    "VC-05"
+   ]
+  }
+ }
+}

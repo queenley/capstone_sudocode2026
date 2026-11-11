@@ -1,0 +1,38 @@
+{
+ "scenario_id": "SCN-CON-L10",
+ "level": "M2",
+ "persona": "khach_mua_nhieu_mon",
+ "hard_case": null,
+ "customer_phone": "0396172805",
+ "customer_name": "Giao",
+ "honorific": "chị",
+ "notes": "Conduct: every order detail given at once; the read-back is the one confirmation, no question more.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-16",
+   "channel": "hotline",
+   "customer_goal": "đặt nhanh, đủ thông tin",
+   "customer_turns": [
+    "Chị đặt một nồi chiên Xiaomi 4.5 lít, giao 21 Võ Thị Sáu, Quận 3, TP.HCM, thanh toán khi nhận hàng.",
+    "Đúng rồi em, đặt luôn nhé."
+   ],
+   "success_if": {
+    "tool_called": "order.create",
+    "args_match": {
+     "sku": "SKU-AF-XM",
+     "price_vnd": 1590000,
+     "payment": "COD"
+    },
+    "max_agent_questions": 1
+   },
+   "ground_truth_facts": {
+    "price_vnd": 1590000,
+    "in_stock": true
+   },
+   "relevant_policy_ids": [
+    "PB-09"
+   ],
+   "expected_outcome": "chot_don"
+  }
+ }
+}

@@ -22,7 +22,7 @@ from typing import Any, Mapping, Sequence
 from langchain_core.messages import AIMessage, HumanMessage, RemoveMessage
 from langgraph.runtime import Runtime
 
-from ...agents.advisor import RULE_PACKS, AdvisorFailure, AgentContext, Draft, shown_passages, system_prompt, _seen_in
+from ...agents.advisor import AdvisorFailure, AgentContext, Draft, shown_passages, system_prompt, _seen_in
 from ...agents.policy import PolicyInput
 from ...components.context import compact, focus
 from ...components.context.budget import tokens as count_tokens
@@ -102,7 +102,12 @@ async def perceive(state: HotState, runtime: Runtime[HotContext]) -> dict[str, A
     update["pending_purchase"] = purchase.still_open(
         state.get("pending_purchase"), call_id=str(state["call_id"]), channel=state.get("channel") or "web",
         turn_id=state["turn_id"])
-    if state.get("phase") == "opening" or not raw:
+    if state.get("phase") == "opening":
+        return update
+    if not raw:
+        # A turn with no words after the call began (the organisers' closing turn, 11/2026; a pause on the line):
+        # the customer is still listening. Said to the model as such, so the call goes on from its own last line.
+        update["messages"] = [HumanMessage(content=SILENT, id=f"customer-{state['turn_id']}")]
         return update
 
     if state.get("input_mode") == "asr_transcript" or context.asr_confidence is not None:
@@ -110,7 +115,7 @@ async def perceive(state: HotState, runtime: Runtime[HotContext]) -> dict[str, A
         raw = lexicon.correct(raw)
     cleaned, teencode = intake_text.clean(raw)
     written = itn.normalise(cleaned, state["now"])
-    tokenised = pii.tokenise(written, context.vault)
+    tokenised = pii.tokenise(written, context.vault, said=True)
     seen = {k["digest"] for k in state.get("keys_seen") or []}
     # A phone number in the words the call has not seen yet is a new key.
     new_phones = [
@@ -289,7 +294,7 @@ async def _identify(state: HotState, context: HotContext) -> dict[str, Any]:
 STRANGER: dict[str, Any] = {
     "tier": "UNKNOWN", "customer_id": None, "customer_name": None, "honorific": None, "awaiting": None,
     "brief": None, "brief_lines": [], "freshness": [], "known_orders": [],
-    "phone_token": None, "phone_last4": None, "quotes": {}, "provisional": None,
+    "phone_token": None, "phone_last4": None, "quotes": {}, "order_quotes": {}, "provisional": None,
 }
 
 
@@ -324,6 +329,10 @@ async def _confirms(state: HotState, context: HotContext, answer: str) -> bool:
         if verdict is not None:
             return verdict
     return resolver.confirms(answer) is True
+
+
+#: What a turn with no words is, in the conversation the advisor and the PolicyAgent read.
+SILENT = "(Khách không nói thêm gì, vẫn đang nghe máy.)"
 
 
 def _recent(state: HotState, limit: int = 6) -> tuple[tuple[str, str], ...]:
@@ -495,7 +504,7 @@ async def advisor(state: HotState, runtime: Runtime[HotContext]) -> dict[str, An
     prompt, cut = system_prompt(agent_context)
     if cut:
         logger.warning("Call %s lost %s from its prompt", state.get("call_id"), ", ".join(cut))
-    update["prompt_stats"] = focus.stats(count_tokens(prompt), cut, focus.packs(agent_context, RULE_PACKS),
+    update["prompt_stats"] = focus.stats(count_tokens(prompt), cut,
                                          len(agent_context.brief_lines), len(state.get("brief_lines") or []))
     if state.get("lane") == "HANDOFF":
         # Rule 1: tools or the model keep failing. The model is what may be failing, so the
@@ -628,6 +637,7 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
         block_reasons=tuple(state.get("block_reasons") or []),
         tool_results=tuple(state.get("tool_results") or []),
         quotes=dict(state.get("quotes") or {}),
+        order_quotes=dict(state.get("order_quotes") or {}),
         known_orders=frozenset(state.get("known_orders") or []),
         placed_lines=tuple(state.get("placed_lines") or []),
         customer_phone=phone,
@@ -769,7 +779,7 @@ def _placed(earlier: Sequence[Mapping[str, Any]], results: Sequence[Mapping[str,
 
 
 #: Tools whose numbers a later turn of the call may repeat: prices, discounts, fees and delivery days.
-PRICED_TOOLS = frozenset({"pricing.get_quote", "catalog.search", "delivery.estimate"})
+PRICED_TOOLS = frozenset({"pricing.get_quote", "pricing.quote_order", "catalog.search", "delivery.estimate"})
 
 
 def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
@@ -777,6 +787,7 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
     new_results = [{**r, "turn": state.get("turn_no") or 0} for r in produced]
     codes, _ = _seen_in({}, new_results)
     quotes = dict(state.get("quotes") or {})
+    order_quotes = dict(state.get("order_quotes") or {})
     orders = list(state.get("known_orders") or [])
     created = list(state.get("created_orders") or [])
     deletion_recorded = bool(state.get("deletion_recorded"))
@@ -794,9 +805,13 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
             callback_booked = callback_booked or result["name"] == "schedule.callback"
             if result["name"] == "pricing.get_quote" and data.get("sku"):
                 quotes[data["sku"]] = int(data["final_price_vnd"])
+            if result["name"] == "pricing.quote_order" and (priced := purchase.quoted_units(data)):
+                order_quotes[priced[0]] = priced[1]
             if result["name"] == "order.create" and data.get("order_id"):
-                created.append({"order_id": data["order_id"], "sku": (result.get("args") or {}).get("sku"),
-                                "no_address": not (result.get("args") or {}).get("address")})
+                asked = result.get("args") or {}
+                created.append({"order_id": data["order_id"], "sku": asked.get("sku") or purchase.target(asked),
+                                "skus": sorted({line["sku"] for line in purchase.lines_of(asked)}),
+                                "no_address": not asked.get("address")})
                 pending_purchase = None
             if result["name"] == "order.update":
                 asked = result.get("args") or {}
@@ -812,6 +827,7 @@ def _absorb(state: HotState, produced: Sequence[Mapping[str, Any]]) -> dict[str,
             "result": json.dumps((r.get("result") or {}).get("data"), ensure_ascii=False, default=str)[:CALL_LOG_CHARS]}
            for r in new_results if (r.get("result") or {}).get("ok")]
     return {"tool_results": list(state.get("tool_results") or []) + new_results, "quotes": quotes,
+            "order_quotes": order_quotes,
             "call_log": [*(state.get("call_log") or []), *log][-CALL_LOG_SIZE:],
             "basket": _basket_after(state.get("basket") or {}, new_results),
             "known_orders": orders, "created_orders": created, "updated_orders": updated, "tool_failures": failures,
@@ -1264,7 +1280,8 @@ def guard_input(state: HotState, context: HotContext, text: str, results: tuple[
 
 
 #: The earlier results whose numbers the customer may hear again: what the shop stated, not a search's list prices.
-STATED_TOOLS = frozenset({"pricing.get_quote", "delivery.estimate", "order.status", "order.create", "order.update"})
+STATED_TOOLS = frozenset({"pricing.get_quote", "pricing.quote_order", "delivery.estimate", "order.status", "order.create",
+                          "order.update"})
 
 
 def _earlier_numbers(log: Sequence[Mapping[str, Any]]) -> frozenset[int]:
@@ -1423,7 +1440,8 @@ def _passages(state: HotState) -> tuple[dict[str, Any], ...]:
 #: otherwise outweighs rule 4 (FIX-07, 2026-11-01).
 NO_ANSWER = ("Tìm trong tài liệu không thấy đoạn khớp câu khách vừa hỏi; điều này chưa có nghĩa là shop không có. Câu về "
              "sản phẩm, giá, đơn thì xem mục \"Đã tra trong cuộc này\" rồi tra tool phù hợp. Cả hai đều không trả lời được "
-             "thì làm theo luật 4.")
+             "điều khách hỏi thì làm theo luật 4. Khách chỉ bày tỏ lo lắng hay băn khoăn mà không hỏi điều gì thì trả lời "
+             "bằng điều đã có, không chuyển máy (luật 9).")
 
 
 #: When the customer's orders fall under different versions of a policy and the question names none.

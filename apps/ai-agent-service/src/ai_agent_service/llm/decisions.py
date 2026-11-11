@@ -31,7 +31,7 @@ import openai
 from pydantic import BaseModel
 
 from ..config.config_manager import PROVIDER_ENV_VAR, get_models_config, has_api_key, require_api_key
-from . import evaluation_budget, token_ledger
+from . import evaluation_budget, spend_guard, token_ledger, tracing
 from .factory import limiter_for
 
 logger = logging.getLogger(__name__)
@@ -122,6 +122,7 @@ async def evaluate(
     Raises :class:`DecisionUnavailable` instead of retrying. ``wait`` lets a check running beside the reply wait for a
     slot of the limiter; a check that holds a reply is refused one instead.
     """
+    spend_guard.check()
     config = get_models_config().evaluator_config(caller)
     if timeout is not None:
         config = {**config, "timeout": timeout}
@@ -164,7 +165,11 @@ async def evaluate(
     details = usage.input_tokens_details
     cached, written = int(details.cached_tokens or 0), int(details.cache_write_tokens or 0)
     limiter.record_request(usage.input_tokens, usage.output_tokens)
-    token_ledger.record(f"{caller}:{config['model']}", usage.input_tokens, usage.output_tokens)
+    token_ledger.record(f"{caller}:{config['model']}", usage.input_tokens, usage.output_tokens, cached)
+    # Langfuse prices it by its own definition of the model, cached input at its cached rate: the real spend.
+    tracing.record_generation(f"decisions:{caller}", LANGFUSE_MODEL.get(config["model"], config["model"]), {
+        "input": max(0, usage.input_tokens - cached - written), "input_cached_tokens": cached,
+        "input_cache_creation": written, "output": usage.output_tokens}, {"questions": names})
     # Reads cost a tenth of the input rate and writes 1.25 times; both are within input_tokens. Output is not charged.
     evaluation_budget.settle(reservation, (usage.input_tokens - cached - written + cached * 0.1 + written * 1.25) * price)
 
@@ -178,6 +183,10 @@ async def evaluate(
         cached_tokens=cached,
         seconds=seconds,
     )
+
+
+#: Langfuse's own name for a Decisions model, the one its price table matches.
+LANGFUSE_MODEL = {"gpt-6-luna": "global.openai.gpt-6-luna"}
 
 
 def _retry_after(error: openai.APIStatusError) -> float | None:

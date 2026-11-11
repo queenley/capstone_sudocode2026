@@ -18,10 +18,12 @@ def test_reference_grader_uses_utf8_even_with_a_legacy_parent_encoding(tmp_path,
     (source / "synthetic.json").write_text(json.dumps({"scenario_id": "SYNTHETIC-UTF8",
         "calls": {"call_1": {"customer_turns": ["Synthetic request"]}}}), encoding="utf-8")
     full = tmp_path / "full.jsonl"
-    full.write_text(json.dumps({"run_id": "synthetic", "config": "full", "scenario_id": "SYNTHETIC-UTF8",
-        "call": "call_1", "turn": 1, "customer_text": "Synthetic request", "agent_text": "Synthetic reply",
-        "questions": [], "claims": [], "facts_used": [], "tool_calls": [], "memory_writes": [],
-        "latency": {"ttft_ms": 1, "total_ms": 2, "ttfa_ms": None}}) + "\n", encoding="utf-8")
+    rows = [{"run_id": "synthetic", "config": "full", "scenario_id": "SYNTHETIC-UTF8",
+             "call": "call_1", "turn": turn, "customer_text": text, "agent_text": "Synthetic reply",
+             "questions": [], "claims": [], "facts_used": [], "tool_calls": [], "memory_writes": [],
+             "latency": {"ttft_ms": 1, "total_ms": 2, "ttfa_ms": None}}
+            for turn, text in ((1, "Synthetic request"), (2, ""))]  # then the organisers' closing turn (11/2026)
+    full.write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
     code, table = report.grade(source, full=full, baseline=None, out=tmp_path / "report.json")
     assert code == 0, table
     assert "Chỉ số" in table and "Hệ thống" in table

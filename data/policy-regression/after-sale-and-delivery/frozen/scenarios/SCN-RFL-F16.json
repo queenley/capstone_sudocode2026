@@ -1,0 +1,80 @@
+{
+ "scenario_id": "SCN-RFL-F16",
+ "level": "M2",
+ "persona": "khach_da_mua_doi_size",
+ "hard_case": null,
+ "customer_phone": "0365027194",
+ "customer_name": "Thủy",
+ "honorific": "chị",
+ "notes": "Đối chứng: đổi size trong 7 ngày (DT-03).",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-18",
+   "channel": "hotline",
+   "customer_goal": "mua thời trang, chọn size",
+   "customer_turns": [
+    "Em ơi áo phao lông vũ Warmly size S màu navy còn không?",
+    "Giá bao nhiêu em?",
+    "Đặt giúp chị, giao về 4 Trần Phú, Hà Đông, Hà Nội, COD.",
+    "Đúng rồi em, đặt giúp chị nhé."
+   ],
+   "facts_established": {
+    "product_advised": "SKU-JK-DWN-S-NAVY",
+    "price_quoted_vnd": 1490000,
+    "payment": "COD",
+    "variant_sku": "SKU-JK-DWN-S-NAVY"
+   },
+   "success_if": {
+    "tool_called": "order.create",
+    "args_match": {
+     "sku": "SKU-JK-DWN-S-NAVY",
+     "price_vnd": 1490000,
+     "payment": "COD"
+    }
+   },
+   "ground_truth_facts": {
+    "price_vnd": 1490000,
+    "in_stock": true
+   },
+   "relevant_policy_ids": [
+    "PB-09"
+   ],
+   "expected_outcome": "chot_don"
+  },
+  "call_2": {
+   "days_later": 4,
+   "channel": "hotline",
+   "customer_goal": "đổi size trong 7 ngày",
+   "customer_turns": [
+    "Alo em, chị Thủy đây. Áo phao size S mặc chật quá.",
+    "Đổi cho chị size L màu navy được không em?",
+    "Ừ em đổi giúp chị nhé."
+   ],
+   "must_carry_over": [
+    "variant_sku"
+   ],
+   "must_not_ask": [
+    "product_advised",
+    "payment"
+   ],
+   "success_if": {
+    "tool_called": "order.update",
+    "args_match": {
+     "order_id": "OD-CALL-1",
+     "new_variant_sku": "SKU-JK-DWN-L-NAVY",
+     "action": "exchange_size"
+    }
+   },
+   "ground_truth_facts": {
+    "return_days": 7,
+    "exchange_fee_vnd": 0,
+    "new_size_in_stock": true
+   },
+   "relevant_policy_ids": [
+    "DT-01",
+    "DT-03",
+    "DT-07"
+   ]
+  }
+ }
+}

@@ -62,7 +62,8 @@ def section(loaded: Iterable[str], *, offered: bool) -> str:
     if not offered:
         return ""
     if not on_demand():
-        return "\n".join(f"Cách làm ({name}):\n{skill['body']}" for name, skill in SKILLS.items())
+        return "## Cách làm\n" + "\n\n".join(f"### {name}: {skill['description']}\n{skill['body']}"
+                                              for name, skill in SKILLS.items())
     bodies = [f"Cách làm ({name}):\n{SKILLS[name]['body']}" for name in loaded if name in SKILLS]
     return "\n".join([catalogue(loaded), *bodies])
 

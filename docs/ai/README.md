@@ -16,6 +16,7 @@ Mã nguồn chính: [`apps/ai-agent-service`](../../apps/ai-agent-service/). REA
 | 3 | [Thuật toán](03-thuat-toan.md) | Truy hồi tri thức, chọn lane, guardrail, chuẩn hóa số nói, che PII, cổng ghi bộ nhớ hoạt động thế nào? | dev, người làm AI |
 | 4 | [Dữ liệu](04-du-lieu.md) | Dữ liệu BTC gồm gì? Bộ kịch bản test được sinh ra sao? Bộ nhớ lưu những gì? | data, dev |
 | 5 | [Đánh giá](05-danh-gia.md) | Đo bằng chỉ số nào, chạy thế nào, kết quả hiện tại ra sao, còn thiếu gì? | cả nhóm |
+| 6 | [Vòng cải tiến](06-vong-cai-tien.md) | Reflection và Knowledge Gap Loop học gì, ai duyệt, chứng minh bằng bộ dữ liệu nào, kết quả và phần chưa xong? | người làm AI, cả nhóm |
 
 ---
 

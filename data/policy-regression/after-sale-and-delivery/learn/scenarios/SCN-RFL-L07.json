@@ -1,0 +1,68 @@
+{
+ "scenario_id": "SCN-RFL-L07",
+ "level": "M2",
+ "persona": "khach_do_du_hoi_nguoi_nha",
+ "hard_case": null,
+ "customer_phone": "0398527613",
+ "customer_name": "Long",
+ "honorific": "anh",
+ "notes": "Xe đẩy là hàng cồng kềnh (VC-02); Côn Đảo không nhận hàng cồng kềnh (VC-01).",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-16",
+   "channel": "hotline",
+   "customer_goal": "tư vấn sản phẩm cồng kềnh, cần hỏi người nhà",
+   "customer_turns": [
+    "Shop ơi anh muốn xem xe đẩy hai chiều cho em bé, loại Combi ấy.",
+    "Giá xe Combi Sugocal bao nhiêu?",
+    "Để anh hỏi vợ anh đã nhé."
+   ],
+   "facts_established": {
+    "product_advised": "SKU-MB-STR2",
+    "price_quoted_vnd": 6790000,
+    "blocker": "cần hỏi người nhà"
+   },
+   "ground_truth_facts": {
+    "price_vnd": 6790000,
+    "in_stock": true
+   },
+   "relevant_policy_ids": [
+    "PB-03"
+   ],
+   "expected_outcome": "hen_goi_lai"
+  },
+  "call_2": {
+   "days_later": 1,
+   "channel": "hotline",
+   "customer_goal": "chốt mua, giao ra Côn Đảo",
+   "customer_turns": [
+    "Alo, anh Long đây em. Vợ anh ưng cái xe đẩy Combi rồi, em chốt cho anh.",
+    "Giao về nhà anh ở Côn Đảo, Bà Rịa - Vũng Tàu nhé, COD.",
+    "Vậy thôi để anh nhờ người nhà nhận rồi tính sau."
+   ],
+   "must_carry_over": [
+    "product_advised"
+   ],
+   "must_not_ask": [
+    "product_advised"
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_not_call_tools": [
+     "order.create"
+    ],
+    "must_say_any": [
+     "cồng kềnh"
+    ]
+   },
+   "ground_truth_facts": {
+    "bulky": true,
+    "island_delivery_bulky": false
+   },
+   "relevant_policy_ids": [
+    "VC-01",
+    "VC-02"
+   ]
+  }
+ }
+}

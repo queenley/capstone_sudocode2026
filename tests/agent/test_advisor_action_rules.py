@@ -6,7 +6,7 @@ from ai_agent_service.components.context.skills import SKILLS
 def test_order_is_prepared_then_requires_confirmation_of_the_exact_payload():
     body = SKILLS["place-order"]["body"]
     assert "CONFIRMATION_REQUIRED" in body
-    assert "giá trong order_create do hệ thống điền" in body
+    assert "giá do hệ thống điền từ báo giá" in body
     assert "tự lấy từ catalog_search" in body
 
 

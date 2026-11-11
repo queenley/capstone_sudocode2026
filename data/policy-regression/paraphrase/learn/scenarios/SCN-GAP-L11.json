@@ -1,0 +1,35 @@
+{
+ "scenario_id": "SCN-GAP-L11",
+ "level": "M2",
+ "persona": "khach_hoi_ngoai_tai_lieu",
+ "hard_case": null,
+ "customer_phone": "0813597402",
+ "customer_name": "Quang",
+ "honorific": "anh",
+ "notes": "từ chối nhận hàng COD (QT-02): the passage is outside retrieval's top 5.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-20",
+   "channel": "hotline",
+   "customer_goal": "hỏi chính sách: QT-02",
+   "customer_turns": [
+    "Anh boom hàng một lần thì lần sau còn mua được không?",
+    "Ừ anh hiểu rồi, cảm ơn em."
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_not_call_tools": [
+     "handoff.transfer"
+    ],
+    "must_say_any": [
+     "không phạt",
+     "không bị phạt",
+     "chuyển khoản trước"
+    ]
+   },
+   "relevant_policy_ids": [
+    "QT-02"
+   ]
+  }
+ }
+}

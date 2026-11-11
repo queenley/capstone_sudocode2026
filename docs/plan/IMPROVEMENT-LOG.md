@@ -176,6 +176,39 @@ Loại: evaluation (bộ trích entity ASR, dùng chung với bộ nhớ của a
     - "người nhà mua cái khác rồi" gắn `can hoi nguoi nha`.
   - `entity_accuracy_per_turn` thấp chủ yếu vì `diarize.py` bỏ 36/100 cuộc ghép.
 
+### 2026-11-10 · Reflection học được bài mới: ApprovalAgent duyệt theo đáp án chấp nhận
+
+Loại: tính năng (vòng cải tiến) · Trạng thái: xong · Chỉ số: TSR frozen
+
+- **Vấn đề:** Reflection chưa bao giờ publish được một thay đổi. Vòng `warranty-1` không học gì vì lỗi `TSR.must_say` bị phân vào `review` nên không tới Reflection; `warranty-3` có 4 thẻ cùng dạy BH-05 nhưng gắn vào 3 skill khác nhau nên không nhóm nào đủ 3 khách; các đề xuất sau đó viết "nếu phù hợp" thay cho điều kiện của luật và dạy agent "tra tool để báo giá gói", việc không tool nào làm.
+- **Bằng chứng:** `evaluation/runs/warranty-1`, `warranty-3`, `warranty-4` (file `improvement/review/*.md`, `rounds/*/cards.jsonl`).
+- **Sửa:** `agents/approval.py` + `approval_decide.md`: một lần gọi cho mỗi đề xuất, chấp nhận nếu cùng ý với `accept` trong `data/reflection/<bộ>/expected.yaml`, từ chối nếu khác. Lỗi `review` của bộ có đáp án đi tới Reflection (`cli._admitted`). Gom thẻ theo tình huống, ghi vào skill nhiều thẻ chọn nhất (`lessons.clusters`). Reflection đọc danh sách tool (`lessons.advisor_tools`) và phải ghi nguyên điều kiện của luật (`reflection_patch.md`); đề xuất có thể thêm tình huống vào mô tả skill (`when`). Reflection và ApprovalAgent dùng `gpt-6.1-sol`. Bộ dữ liệu mới `data/reflection/warranty` và `budget`; bộ cũ chuyển vào `data/reflection/conduct`. Trang mô tả: `docs/ai/06-vong-cai-tien.md`.
+- **Đã kiểm:** `tests/agent/test_approval_agent.py`, `test_reflection_changes_skills.py`, `test_reflection_dataset.py` (không gọi model). Toàn bộ `tests/agent`: 1.512 passed, còn 9 failed và 12 errors đều là ASR, có từ trước.
+- **Số đo:** `proof-warranty`, tập frozen warranty 6 cuộc, `product-extractor-v11`: R0 50 / 50, R1 66,7 / 66,7. SCN-WTY-F01 trượt 2/2 trước, đạt 2/2 sau; 3 đối chứng vẫn đạt. `proof-budget`: không có đề xuất (agent gốc đã nói "vượt ngân sách" ở 3/4 cuộc học).
+- **Còn lại:** SCN-WTY-F02, F03 chưa áp dụng bài học; phần `when` thêm vào mô tả skill để sửa việc này chưa đo. Chưa có bộ nhãn để hiệu chỉnh ApprovalAgent. Đáp án `accept` do nhóm viết bộ dữ liệu; báo cáo phải ghi người duyệt là `approval-agent`.
+
+### 2026-11-10 · Viết lại prompt của advisor theo tầng, bỏ `rule_packs.yaml`
+
+Loại: prompt · Trạng thái: đang đo · Chỉ số: TSR, RQR
+
+- **Vấn đề:** `rule_packs.yaml` (khoảng 1.900 token) đã không còn được đưa vào prompt của advisor nhưng vẫn là "luật cố định" mà QaAgent, Reflection và PolicyAgent đọc, và mâu thuẫn với skill (COD mặc định, múi giờ của `callback_at`). Luật trong `rules.md` đánh số nhảy (7, 15, 21) và có ý viết hai nơi.
+- **Bằng chứng:** đọc code: `prompt_parts` không gọi `_packs_block`; `lessons.fixed_rules` đọc `rule_packs.yaml`.
+- **Sửa:** `rules.md` đánh số 1–17 theo năm nhóm; `skills.yaml` mỗi quy trình viết một chỗ, mỗi dòng một ý, có tiêu đề kèm mô tả; xóa `rule_packs.yaml` và phần chọn gói luật trong `focus.py`. Luật 4 khôi phục "Chỉ khi … thật sự" sau khi bản viết lại làm agent chuyển máy khi khách hỏi giá; luật 9 và ghi chú `NO_ANSWER` trong `nodes.py` thêm: khách chỉ bày tỏ lo lắng thì không chuyển máy.
+- **Đã kiểm:** `test_prompt_focus.py` (luật đánh số liền, không quy trình nào lặp giữa luật và skill), `test_advisor_action_rules.py`.
+- **Số đo:** tập frozen `data/reflection/conduct`, R0: trước (proof-3 đến 6) 66,7–77,8, sau (`proof-conduct`) 77,8 / 88,9, RQR 0. Cùng ngày còn nhiều thay đổi khác nên chưa tách được phần của prompt. Bản sửa luật 9 và `NO_ANSWER` chưa đo (SCN-WTY-F06 chuyển máy 1/2 lần ở R0, 2/2 lần ở R1 của `proof-warranty`).
+- **Còn lại:** chạy bộ chính thức để kiểm không hồi quy ở các tình huống khác.
+
+### 2026-11-10 · Guard chặn đơn trùng cho món đã nằm trong đơn nhiều dòng
+
+Loại: hard guard · Trạng thái: đang đo · Chỉ số: TSR
+
+- **Vấn đề:** khách chốt hai món, agent tạo một đơn hai dòng; lượt sau khách nói "Đúng rồi, đặt đi em" và agent tạo thêm một đơn riêng cho món thứ hai, nên tổng đơn bị cộng trùng.
+- **Bằng chứng:** `evaluation/runs/proof-budget/learn-budget` SCN-BGT-L02 call_1 turn 4 (tổng 13.180.000đ thay vì 9.190.000đ); `r1-budget` SCN-BGT-F05 turn 4.
+- **Sửa:** `components/guardrails/actions.py` `_order_create`: so món của đơn mới với `skus` của mọi đơn đã tạo trong cuộc, không chỉ `sku`. Cùng lúc `components/evaluation/judge.py` tính tổng đơn từ `lines`, để J11 áp được cho đơn nhiều dòng.
+- **Đã kiểm:** `tests/agent/test_order_lines.py::test_a_product_of_an_order_of_lines_already_placed_is_not_ordered_again_on_a_confirmation`.
+- **Số đo:** chưa đo.
+- **Còn lại:** chạy lại `data/reflection/budget` (hai kịch bản frozen chứa món hết hàng đã được thay).
+
 ### 2026-11-08 · Màn hình giám sát: gộp phiên theo khách, Call Brief lên đầu, chuông báo đỏ qua Kafka
 
 Loại: tính năng · Trạng thái: xong · Chỉ số: không có (giao diện nhân viên); e2e

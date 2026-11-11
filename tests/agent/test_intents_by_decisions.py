@@ -129,5 +129,5 @@ def test_an_order_is_changed_only_once_the_customer_chose_the_change():
                              tier="VERIFIED", mode="speak", has_phone=True, quotes={}, orders=frozenset({"OD1"}),
                              trusted=frozenset({"SKU-L"}), intents={"change": agreed})
     refused = update(False)
-    assert not refused.passed and "luật 20" in refused.reasons[0]
+    assert not refused.passed and "chỉ gọi order_update khi khách đồng ý" in refused.reasons[0]
     assert update(True).passed and update(None).passed
