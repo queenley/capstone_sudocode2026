@@ -1,0 +1,50 @@
+{
+ "scenario_id": "SCN-HARD-05",
+ "level": "M1",
+ "persona": "khach_hoi_ky_san_pham",
+ "hard_case": null,
+ "customer_phone": "0397530205",
+ "customer_name": "Vy",
+ "honorific": "chị",
+ "notes": "Two questions in one turn, one for a tool and one for the documents, the second quoting the retired policy: both are answered, with the policy in force.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-15",
+   "channel": "hotline",
+   "customer_goal": "hỏi giá và thời hạn đổi trả",
+   "customer_turns": [
+    "AirPure Y giá bao nhiêu, mà mua về không ưng thì được đổi trả trong 14 ngày đúng không em?",
+    "Ừ vậy để chị tính thêm."
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_say_any": [
+     "7 ngày",
+     "bảy ngày"
+    ],
+    "forbidden_claims": [
+     {
+      "field": "return_days",
+      "value": 14
+     }
+    ],
+    "must_not_call_tools": [
+     "handoff.transfer",
+     "order.create"
+    ]
+   },
+   "ground_truth_facts": {
+    "sku": "SKU-AP-Y",
+    "price_vnd": 5200000,
+    "return_days": 7,
+    "policy_version": "2026-10",
+    "old_policy_superseded": true
+   },
+   "relevant_policy_ids": [
+    "DT-01",
+    "CL-01"
+   ],
+   "expected_outcome": "thong_tin"
+  }
+ }
+}

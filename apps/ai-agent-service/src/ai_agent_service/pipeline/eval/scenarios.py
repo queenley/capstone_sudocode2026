@@ -186,10 +186,15 @@ def connection(scenario: Mapping[str, Any], spec: Mapping[str, Any]) -> tuple[st
 
     A call that names no channel is a hotline call; its number is the call's
     ``channel_identity`` when given, else the scenario's ``customer_phone``.
-    A chat is known by its ``channel_identity`` alone: without one it brings
-    no key, and the caller is a stranger until the words bring one, as on
-    the shop's own web chat. A channel the format does not name is an error,
-    not a guess: a wrong channel brings the wrong key.
+    A chat that gives a ``channel_identity`` is known by it alone. A Zalo or
+    Fanpage chat that gives none is the scenario's customer, known by
+    ``customer_phone``: the organisers' SAMPLE-06 continues a hotline call on
+    ``zalo_oa`` with no identity and expects the order placed without the
+    customer giving a number (2026-11-12: it was treated as a stranger and
+    the order was refused for want of a phone). The shop's own web chat
+    without an identity is still a stranger until the words bring a key. A
+    channel the format does not name is an error, not a guess: a wrong
+    channel brings the wrong key.
     """
     name = spec.get("channel") or "hotline"
     if name not in CHANNELS:
@@ -203,6 +208,8 @@ def connection(scenario: Mapping[str, Any], spec: Mapping[str, Any]) -> tuple[st
         keys["zalo_id"] = identity
     elif identity and channel == "facebook":
         keys["fb_id"] = identity
+    elif not identity and channel in ("zalo", "facebook"):
+        keys["caller_phone"] = scenario.get("customer_phone")
     return channel, keys
 
 

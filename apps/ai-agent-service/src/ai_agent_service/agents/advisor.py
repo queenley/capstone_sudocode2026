@@ -246,6 +246,8 @@ SPOKEN_NOTE = _NOTES["spoken"]
 
 #: Passages shown to the model per turn (section 4.2: five retrieved, three allowed in).
 KNOWLEDGE_SHOWN = 3
+#: Passages read on earlier turns of the call that stay shown, the latest first.
+EARLIER_SHOWN = 3
 
 
 def lane_instruction(context: AgentContext) -> str:
@@ -326,17 +328,20 @@ def _state_block(context: AgentContext) -> str:
 
 def shown_passages(knowledge: Sequence[Mapping[str, Any]]) -> tuple[list[Mapping[str, Any]], list[Mapping[str, Any]]]:
     """What the model reads of a turn's passages: the first three from the documents, one campaign entry for this
-    call's product if none of the three is one, what explains a withheld passage, and the playbook entries. The last
-    three take no place of the first three.
+    call's product if none of the three is one, the rules a published lesson cites (``pinned``), the latest passages
+    read earlier in the call (``earlier``), what explains a withheld passage, and the playbook entries. None of these
+    takes the place of the first three.
 
     The guard checks a reply against these and no others: a number from a
     passage the model never saw cannot be a number it read (section 4.5).
     """
-    documents = [p for p in knowledge if p.get("source") != "playbook" and not p.get("explains")]
+    earlier = [p for p in knowledge if p.get("earlier")][:EARLIER_SHOWN]
+    documents = [p for p in knowledge if p.get("source") != "playbook" and not p.get("explains") and not p.get("earlier")]
     first = documents[:KNOWLEDGE_SHOWN]
     campaign = [] if any(p.get("campaign") for p in first) else [
         p for p in documents[KNOWLEDGE_SHOWN:] if p.get("campaign") and p.get("for_product")][:1]
-    policy = [*first, *campaign, *(p for p in knowledge if p.get("explains"))]
+    pinned = [p for p in documents[KNOWLEDGE_SHOWN:] if p.get("pinned") and p not in campaign]
+    policy = [*first, *campaign, *pinned, *earlier, *(p for p in knowledge if p.get("explains"))]
     playbook = [p for p in knowledge if p.get("source") == "playbook"]
     return policy, playbook
 
@@ -352,7 +357,8 @@ def _knowledge_block(heading: str, passages: Sequence[Mapping[str, Any]]) -> str
         if passage.get("restricted"):
             lines.append(passage.get("instruction") or f"Đoạn [{code}] là thông tin nội bộ: không đọc, không trích.")
             continue
-        lines.append(f"[{code}] {title}: {str(passage.get('text') or '').strip()}")
+        label = f"{title}: " if title else ("(đã đọc ở lượt trước) " if passage.get("earlier") else "")
+        lines.append(f"[{code}] {label}{str(passage.get('text') or '').strip()}")
     return f"{heading}:\n" + "\n".join(lines)
 
 
@@ -531,6 +537,17 @@ def declared_arguments(tool: Any, args: Mapping[str, Any]) -> dict[str, Any]:
     return {key: value for key, value in args.items() if key in declared}
 
 
+def _asked_together(request: Any) -> list[str]:
+    """The tools the model asked for in the round this call belongs to, by wire name."""
+    state = getattr(request, "state", None) or {}
+    call_id = (request.tool_call or {}).get("id")
+    for message in reversed(list(state.get("messages") or [])):
+        calls = getattr(message, "tool_calls", None) or []
+        if any(c.get("id") == call_id for c in calls):
+            return [str(c.get("name")) for c in calls]
+    return []
+
+
 class ActionGuardMiddleware(AgentMiddleware):
     """The guardrail before act (section 4.4): a write tool runs only if its arguments pass."""
 
@@ -563,6 +580,10 @@ class ActionGuardMiddleware(AgentMiddleware):
                 return ToolMessage(content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=name,
                                    additional_kwargs={"args": args, "blocked_by": "guardrail"})
         if name == "handoff_transfer":
+            if context.lane != "HANDOFF" and actions.early_transfer(args, _asked_together(request)):
+                envelope = {"ok": False, "error": {"code": "PRECONDITION", "retryable": False, "message": actions.EARLY_TRANSFER}}
+                return ToolMessage(content=json.dumps(envelope, ensure_ascii=False), tool_call_id=call["id"], name=name,
+                                   additional_kwargs={"args": args, "blocked_by": "guardrail"})
             args["brief"] = actions.fill_handoff(args.get("brief") or {}, context.handoff_defaults)
         if name == "schedule_callback" and not args.get("customer_phone") and context.customer_phone:
             args["customer_phone"] = context.customer_phone
@@ -672,12 +693,17 @@ async def _intents(name: str, args: Mapping[str, Any], context: AgentContext, cr
     said = [{"speaker": who, "text": text[:600]} for who, text in context.recent]
     if name == "handoff_transfer" and context.lane != "HANDOFF":
         brief = args.get("brief") or {}
-        documents = [str(p.get("text") or "")[:400] for p in context.knowledge[:3] if p.get("text")]
+        # What the search found for this turn, and apart from it what was read earlier in the call: a question the
+        # search found nothing for is still unanswered when only an earlier, unrelated passage is in reach.
+        shown = [p for p in shown_passages(context.knowledge)[0] if p.get("text")]
+        documents = [str(p["text"])[:400] for p in shown if not p.get("earlier")]
+        earlier = [str(p["text"])[:400] for p in shown if p.get("earlier")]
         return {"handoff": await context.judge("handoff", {
             "recent_messages": said,
             "reason_given": {"escalation_reason": brief.get("escalation_reason"),
                              "detail": brief.get("escalation_reason_detail")},
             "shop_documents_found": documents or ["no passage matched the question"],
+            **({"documents_read_earlier_in_this_call": earlier} if earlier else {}),
             "tools_called": [r["name"] for r in (*context.tool_results, *tool_results_of((state or {}).get("messages") or []))],
             "known_this_call": [f"{r.get('tool')}: {r.get('result')}"[:500] for r in context.earlier_results[-6:]],
         })}

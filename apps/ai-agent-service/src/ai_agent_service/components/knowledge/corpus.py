@@ -217,7 +217,8 @@ def entry_chunk(entry: Mapping[str, Any], *, doc: str) -> Chunk:
     if source not in ("faq", "gap", "playbook"):
         raise ValueError(f"{doc}: entry {entry['chunk_id']} has source {source!r}; only faq, gap and playbook are added")
     title = str(entry["title"])
-    # campaign and applies_to stay in provenance too: that is the column that carries them through ``kb_chunks``.
+    # campaign, applies_to and questions stay in provenance too: that is the column that carries them through
+    # ``kb_chunks`` (mcp/servers/knowledge.py reads a row back as its provenance plus its own columns).
     known = {"chunk_id", "source", "title", "text", "situation", "persona", "valid_from", "valid_to"}
     applies_to = entry.get("applies_to") or ()
     if isinstance(applies_to, str) or not all(isinstance(target, str) for target in applies_to):
@@ -236,6 +237,9 @@ def entry_chunk(entry: Mapping[str, Any], *, doc: str) -> Chunk:
         campaign=entry.get("campaign") or None,
         applies_to=tuple(applies_to),
         provenance={k: v for k, v in entry.items() if k not in known},
+        # The questions a customer would ask of the entry, written when it was published: indexed with it, like a
+        # policy section's (:mod:`.expand`), and kept in the version's own line so a version reads the same anywhere.
+        questions=tuple(str(q) for q in entry.get("questions") or () if str(q).strip()),
     )
 
 

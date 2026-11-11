@@ -165,11 +165,17 @@ agents:
   # lesson cards, and the one sentence of a skill several cards share. A larger
   # model than the advisor's (2026-11-10): off the hot path, a few calls a
   # round, and the lessons are only as good as the model drawing them (ACE).
-  # gpt-6.1-sol has no `none` effort and needs the Responses API
+  # gpt-6.1-terra since 2026-11-12: on the four learning calls of the warranty
+  # set it wrote the same change as gpt-6.1-sol (the rule's term, fee, time
+  # limit and condition), and each model accepted the other's
+  # (evaluation/runs/probe-reflection-model/result.txt). Both refuse a
+  # temperature ("Unsupported parameter", probed the same day), so a round is
+  # reproduced from the answer store (IMPROVEMENT_CACHE), not from sampling.
+  # Neither has a `none` effort; both need the Responses API
   # (openai.model_generation below).
   reflection:
     provider: openai
-    model: gpt-6.1-sol
+    model: gpt-6.1-terra
     generation:
       temperature: null
       reasoning_effort: low
@@ -181,7 +187,7 @@ agents:
   # per change, on a model as strong as the one that wrote it.
   approval:
     provider: openai
-    model: gpt-6.1-sol
+    model: gpt-6.1-terra
     generation:
       temperature: null
       reasoning_effort: low
@@ -287,10 +293,14 @@ providers:
       gpt-6.1-sol:
         reasoning_effort: low
         use_responses_api: true
+      gpt-6.1-terra:
+        reasoning_effort: low
+        use_responses_api: true
     # gpt-4.1-mini is the default of the offline evaluation (run_eval.py);
     # it takes temperature 0, which the gpt-5 reasoning models refuse.
     models:
       - gpt-6.1-sol
+      - gpt-6.1-terra
       - gpt-6-luna
       - gpt-5.6-luna
       - gpt-4.1-mini

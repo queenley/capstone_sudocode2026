@@ -150,3 +150,29 @@ async def test_the_loose_search_keeps_the_kind_asked_for():
     assert found["match"] == "loose"
     assert {item["category"] for item in found["items"]} == {"gia-dung/noi-chien"}
     assert all(item["category"] == "me-be" for item in (await _search("xe day", category="me-be"))["items"])
+
+
+def test_a_transfer_for_nothing_answers_this_waits_for_the_lookups_asked_with_it():
+    from ai_agent_service.components.guardrails import actions
+
+    out = {"brief": {"escalation_reason": actions.OUT_OF_DOCUMENTS}}
+    assert actions.early_transfer(out, ["catalog_search", "handoff_transfer"])
+    assert not actions.early_transfer(out, ["handoff_transfer"])  # asked alone, after the lookups: the PolicyAgent reads it
+    assert not actions.early_transfer(out, ["load_skill", "handoff_transfer"])
+    asked = {"brief": {"escalation_reason": "khach_yeu_cau"}}
+    assert not actions.early_transfer(asked, ["catalog_search", "handoff_transfer"])  # a person asked for is never held back
+
+
+@pytest.mark.asyncio
+async def test_the_guard_holds_the_early_transfer_back_and_lets_the_lookup_run():
+    from ai_agent_service.components.guardrails import actions
+
+    transfer = {"id": "h", "name": "handoff_transfer", "args": {"brief": {"escalation_reason": actions.OUT_OF_DOCUMENTS}}}
+    lookup = {"id": "c", "name": "catalog_search", "args": {"query": "nồi chiên"}}
+    state = {"messages": [AIMessage(content="", tool_calls=[lookup, transfer])]}
+    runtime = SimpleNamespace(context=AgentContext(call_id="test", lane="NEW"))
+    handler = AsyncMock(return_value="ran")
+    held = await ActionGuardMiddleware().awrap_tool_call(SimpleNamespace(tool_call=transfer, state=state, runtime=runtime), handler)
+    assert isinstance(held, ToolMessage) and held.additional_kwargs["blocked_by"] == "guardrail"
+    assert json.loads(held.content)["error"]["message"] == actions.EARLY_TRANSFER and handler.await_count == 0
+    assert await ActionGuardMiddleware().awrap_tool_call(SimpleNamespace(tool_call=lookup, state=state, runtime=runtime), handler) == "ran"

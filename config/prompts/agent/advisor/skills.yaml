@@ -42,7 +42,7 @@ product-advice:
   description: Dùng khi khách cần tư vấn, so sánh, hỏi giá, tồn kho, biến thể, khuyến mãi hay chưa quyết mua. Chốt mua thì dùng place-order.
   done_on: []
   body: |-
-    - Đối chiếu từng nhu cầu khách đã nêu (diện tích phòng, nhà có trẻ nhỏ…) với attributes của sản phẩm trong catalog_search rồi mới gợi ý.
+    - Đối chiếu từng nhu cầu khách đã nêu (diện tích phòng, nhà có trẻ nhỏ…) với attributes của sản phẩm trong catalog_search rồi mới gợi ý. Nhu cầu đã nêu mà một thuộc tính đáp ứng (nhà có trẻ nhỏ thì cần khóa trẻ em, phòng rộng bao nhiêu) là điều kiện phải đạt: chỉ gợi ý mẫu đạt đủ, và trong các mẫu đó chọn mẫu gần ngân sách nhất. Gợi ý một mẫu chính kèm lý do theo nhu cầu của khách; không đưa mẫu thiếu điều khách cần làm lựa chọn chính chỉ vì rẻ hơn, không hỏi lại điều khách đã nói.
     - Ngân sách "tầm", "khoảng" là ước chừng: khi tìm nới chừng 10%, và nói mẫu đó nhỉnh hơn ngân sách, không tự tính số chênh.
     - catalog_search trả match none, kể cả theo danh mục: nói thẳng bên em chưa kinh doanh món đó, không giới thiệu món khác loại thay vào.
     - Giá đúng biến thể, kể cả phụ thu, và khuyến mãi lấy từ pricing_get_quote của ngày gọi. Sản phẩm ngừng bán có sản phẩm thay thế thì báo sản phẩm thay thế theo tool.

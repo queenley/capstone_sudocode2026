@@ -17,19 +17,22 @@ Một vòng chạy những bước nào, và bước nào gọi model?
 
 ```mermaid
 flowchart TD
-    S["Agent gốc<br/>(skill v0, kho tri thức v0)"] --> R0["Đo tập frozen: R0<br/>(--r0-runs lần)"]
-    R0 --> L["Chạy tập học<br/>(run_eval.py)"]
+    S["Agent gốc<br/>(skill v0, kho tri thức v0)"] --> L["Chạy tập học<br/>(run_eval.py)"]
     L --> H["harvest: lỗi theo bộ chấm BTC"]
     H --> SC["score: rubric + chẩn đoán<br/>(QaAgent)"]
     SC --> RF["reflect: thẻ bài học, đề xuất<br/>(ReflectionAgent, PolicyAgent, ApprovalAgent)"]
     RF --> G["gaps: diễn đạt lại câu hỏi,<br/>gộp câu trùng, trả lời theo script"]
-    G --> P["publish: thay đổi đã duyệt<br/>thành skill v1 / kho tri thức v1"]
+    G --> Q{"Có thay đổi<br/>được duyệt?"}
+    Q -- "không" --> E["Dừng, không đo frozen"]
+    Q -- "có" --> R0["Đo tập frozen: R0<br/>(--r0-runs lần, vẫn là agent gốc)"]
+    R0 --> P["publish: thay đổi đã duyệt<br/>thành skill v1 / kho tri thức v1"]
     P --> R1["Đo lại tập frozen: R1<br/>(--r1-runs lần)"]
     R1 --> C["compare: R0 với R1, từng cuộc"]
     C --> B["Quay về agent gốc<br/>(rollback 0), cất bản đã học vào learned/"]
 ```
 
-- **R0, R1**: mỗi lần là một `run_eval.py` thật trên tập frozen, chấm bằng [`reference_eval.py`](../../apps/ai-agent-service/data/btc/eval/reference_eval.py) của BTC. Agent dao động giữa các lần chạy (cùng một prompt, một cuộc lúc đạt lúc trượt), nên nên đo mỗi phía ít nhất hai lần: `--r0-runs 2 --r1-runs 2`. `compare` in TSR, RQR, CCR, HR giá và số vi phạm, kèm khoảng thấp nhất, cao nhất qua các lần, và từng cuộc **fixed** (trượt trước, đạt sau) hoặc **broken**.
+- **R0, R1**: mặc định mỗi phía đo một lần (`--r0-runs`, `--r1-runs` để đo thêm). Mỗi lần là một `run_eval.py` thật trên tập frozen, chấm bằng [`reference_eval.py`](../../apps/ai-agent-service/data/btc/eval/reference_eval.py) của BTC. Agent dao động giữa các lần chạy (cùng một prompt, một cuộc lúc đạt lúc trượt), nên nên đo mỗi phía ít nhất hai lần: `--r0-runs 2 --r1-runs 2`. `compare` in TSR, RQR, CCR, HR giá, số vi phạm và số lỗi ứng xử, kèm khoảng thấp nhất, cao nhất qua các lần. Một kiểm tra chỉ là **fixed** khi trượt ở mọi lần trước và đạt ở mọi lần sau, **broken** khi ngược lại; kiểm tra lúc đạt lúc trượt trong cùng một phía được liệt kê là **unstable** và không tính cho bên nào.
+- **Học trước, đo sau.** Tập học không cho thay đổi nào, hoặc không thay đổi nào được duyệt, thì vòng dừng và không chạy tập frozen: không có gì để đo.
 - **Tập học khác khách với tập frozen.** `harvest` từ chối nếu một kịch bản của lần chạy nằm trong danh sách frozen (`--frozen-ids`).
 - **Quay về agent gốc** đi qua `skill_versions.rollback` và `versions.rollback`, nên sổ cải tiến ghi lại việc quay lui. Bản đã học nằm ở `evaluation/runs/<vòng>/learned/`.
 - Chế độ `--scripted` dùng khi không có người: Gap Loop dùng câu trả lời viết sẵn, và quyết định duyệt ghi rõ người duyệt là `approval-agent` hoặc `scripted-eval`, không bao giờ là một người.
@@ -56,15 +59,16 @@ flowchart LR
 ```
 
 1. **Phân luồng** ([`signals.py`](../../apps/ai-agent-service/src/ai_agent_service/components/improvement/signals.py)). Mỗi lỗi lấy từ đúng các hàm của bộ chấm BTC thành một mã. `behaviour` (hỏi lại điều đã biết, hỏi quá nhiều, chuyển máy thừa, tiêu chí rubric J01, J06, J08) là phần Reflection học. `product` (gọi sai tool, nói sai chính sách, tổng đơn sai) là lỗi phải sửa trong code trước R0. `knowledge` thuộc Gap Loop. `review` (bộ chấm không thấy một cụm từ bắt buộc) chờ người đọc, **trừ khi** bộ dữ liệu có `expected.yaml`: khi đó lỗi đi tiếp tới Reflection và ApprovalAgent kiểm đầu ra.
-2. **Chẩn đoán** (QaAgent, `qa_diagnose.md`). Với mỗi lỗi, đọc cuộc gọi, các skill và luật cố định, rồi nói đây là `skill_gap` (skill chưa nói), `not_followed` (skill hay luật đã nói mà agent không theo, kèm câu đó), hay `unsettled` (nói là có nhưng không chỉ ra được câu nào). Code kiểm lại câu được trích có thật trong skill hay luật không ([`lessons.settle_kind`](../../apps/ai-agent-service/src/ai_agent_service/components/improvement/lessons.py)). Cuộc có vi phạm khác (hứa giá, lộ dữ liệu) bị loại, vì một cuộc thắng bằng lời hứa sai không phải bằng chứng.
+2. **Chẩn đoán** (QaAgent, `qa_diagnose.md`). Với mỗi lỗi, đọc cuộc gọi, các skill, luật cố định và tên các đoạn chính sách mà kịch bản ghi là liên quan (`relevant_policy_ids`: đoạn nào, không phải cụm từ bộ chấm chờ nghe), rồi nói đây là `skill_gap` (skill chưa nói), `not_followed` (skill hay luật đã nói mà agent không theo, kèm câu đó), hay `unsettled` (nói là có nhưng không chỉ ra được câu nào). Code kiểm lại câu được trích có thật trong skill hay luật không ([`lessons.settle_kind`](../../apps/ai-agent-service/src/ai_agent_service/components/improvement/lessons.py)). Cuộc có vi phạm khác (hứa giá, lộ dữ liệu) bị loại, vì một cuộc thắng bằng lời hứa sai không phải bằng chứng.
 3. **Rubric** (QaAgent chấm theo [`llm_judge_rubric.json`](../../apps/ai-agent-service/data/btc/eval/llm_judge_rubric.json) của BTC). Đây là nguồn tín hiệu không phụ thuộc bộ chấm. Bằng chứng của mỗi tiêu chí phải là lời trong cuộc gọi; QaAgent so như người đọc (bỏ qua hoa thường, ngoặc kép, khoảng trắng, chỉ so phần trong ngoặc kép), còn judge của phía đánh giá vẫn so nguyên văn.
-4. **Thẻ bài học** (ReflectionAgent, `reflection_lesson.md`): một thẻ cho mỗi cuộc, gồm tình huống, nên làm, không nên làm, câu mẫu, mã luật trích dẫn. Thẻ qua bộ lọc bằng code (không số tiền ngoài luật, không mã khuyến mãi, không tên khách hay sản phẩm cụ thể) rồi mới được lưu.
-5. **Gom nhóm** ([`lessons.clusters`](../../apps/ai-agent-service/src/ai_agent_service/components/improvement/lessons.py)): gom theo **tình huống**, cần ít nhất 3 khách khác nhau (`MIN_SUPPORT`); một khách nhiều thẻ vẫn là một phiếu. Dòng mới được ghi vào skill mà nhiều thẻ chọn nhất.
+4. **Thẻ bài học** (ReflectionAgent, `reflection_lesson.md`): một thẻ cho mỗi cuộc, gồm tình huống, nên làm, không nên làm, câu mẫu, mã luật trích dẫn. ReflectionAgent đọc câu chẩn đoán của QaAgent cho đúng cuộc đó (`QA FOUND`) và viết bài học cho lỗi ấy; trước 11/11/2026 nó tự đoán lại lỗi từ tên kiểm tra, và trong một vòng 2/3 thẻ của cùng một tình huống dạy điều khác với điều QaAgent đã tìm ra. Thẻ qua bộ lọc bằng code (không số tiền ngoài luật, không mã khuyến mãi, không tên khách hay sản phẩm cụ thể) rồi mới được lưu.
+5. **Gom nhóm** ([`lessons.clusters`](../../apps/ai-agent-service/src/ai_agent_service/components/improvement/lessons.py)): gom theo **tình huống** và **loại lỗi** (hỏi lại, xưng hô, chuyển máy, điều chưa nói; `lessons.kind_of`), cần ít nhất 3 khách khác nhau (`MIN_SUPPORT`); một khách nhiều thẻ vẫn là một phiếu. Dòng mới được ghi vào skill mà nhiều thẻ chọn nhất.
 6. **Đề xuất** (ReflectionAgent, `reflection_patch.md`): đúng một dòng, thay một câu có sẵn hoặc thêm cuối thân skill. Prompt có danh sách 17 tool của agent và việc mỗi tool làm ([`lessons.advisor_tools`](../../apps/ai-agent-service/src/ai_agent_service/components/improvement/lessons.py)), nên dòng mới không được dạy agent làm điều không tool nào làm được. Luật có điều kiện (số tiền, thời hạn, loại sản phẩm) phải ghi nguyên điều kiện. Khi mô tả skill chưa nhắc tình huống, đề xuất điền `when` và code thêm "Cả khi …" vào mô tả, vì agent chọn skill theo mô tả.
-7. **Kiểm tra**: bộ lọc bằng code (`screen_patch`), áp thử được vào skill hay không, rồi PolicyAgent hỏi các câu trong [`policy_change_rules.md`](../../config/prompts/agent/policy_change_rules.md) (hứa hẹn, ép khách, trái luật cố định, bịa, chỉ đúng một khách). PolicyAgent từ chối thì ReflectionAgent được viết lại **một** lần với các lý do đó.
-8. **Duyệt và publish**: xem mục 3. Phiên bản skill nằm ở `apps/ai-agent-service/data/skills/v<N>.yaml`, con trỏ ở `active.json`; quay lui chỉ là đổi con trỏ.
+7. **Kiểm tra**: bộ lọc bằng code (`screen_patch`), áp thử được vào skill hay không, rồi PolicyAgent hỏi các câu trong [`policy_change_rules.md`](../../config/prompts/agent/policy_change_rules.md) (hứa hẹn, ép khách, trái luật cố định, bịa, chỉ đúng một khách). PolicyAgent từ chối thì ReflectionAgent được viết lại **một** lần với các lý do đó. Bước kiểm này chạy offline nên chờ tới 45 giây và hỏi lại một lần; vẫn không trả lời thì đề xuất bị chặn (`policy:unavailable`), kể cả khi ApprovalAgent chấp nhận.
+8. **Luật được trích đi kèm bài học.** Advisor chỉ nói chính sách có trong mục "Tài liệu liên quan" của lượt (luật cố định 3) và chỉ đọc 3 đoạn đầu. Lời lo lắng của khách không truy xuất ra đoạn luật mà bài học áp dụng, nên bài học bị bỏ qua. Vì vậy mã luật mà một dòng skill đã publish trích dẫn ([`skills.learned_cites`](../../apps/ai-agent-service/src/ai_agent_service/components/context/skills.py)) được ghi ở cuối dòng skill khi publish (`skill_versions.apply`) và được `kb_search` trả kèm sau các đoạn xếp hạng (`include`, đánh dấu `pinned`) và advisor được đọc. Việc này không đổi điểm truy xuất hay quyết định "không có thông tin"; đoạn nội bộ hoặc hết hiệu lực không bao giờ đi kèm. Với agent gốc danh sách này rỗng.
+9. **Duyệt và publish**: xem mục 3. Phiên bản skill nằm ở `apps/ai-agent-service/data/skills/v<N>.yaml`, con trỏ ở `active.json`; quay lui chỉ là đổi con trỏ.
 
-Model: ReflectionAgent và ApprovalAgent dùng `gpt-6.1-sol` (reasoning `low`, Responses API), QaAgent dùng `gpt-5.6-luna` (reasoning `medium`), cấu hình trong [`models.yaml`](../../apps/ai-agent-service/config/models.yaml). Câu trả lời của các agent này được lưu cache theo đúng nội dung yêu cầu (`IMPROVEMENT_CACHE`), nên chạy lại một vòng ra cùng kết quả và không trả tiền lần hai.
+Model: ReflectionAgent và ApprovalAgent dùng `gpt-6.1-terra` từ 12/11/2026 (reasoning `low`, Responses API; trước đó `gpt-6.1-sol`). Cả hai model đều từ chối tham số `temperature` (lỗi 400, thử ngày 12/11), nên tính tái hiện dựa vào cache câu trả lời. Trên 4 cuộc học của warranty, terra và sol viết ra cùng một thay đổi và duyệt chéo đều chấp nhận (`evaluation/runs/probe-reflection-model/result.txt`), QaAgent dùng `gpt-5.6-luna` (reasoning `medium`), cấu hình trong [`models.yaml`](../../apps/ai-agent-service/config/models.yaml). Câu trả lời của các agent này được lưu cache theo đúng nội dung yêu cầu (`IMPROVEMENT_CACHE`), nên chạy lại một vòng ra cùng kết quả và không trả tiền lần hai.
 
 ---
 
@@ -136,10 +140,36 @@ Mọi số dưới đây là TSR frozen theo `reference_eval.py`, advisor `gpt-5
 
 | Vòng | Bộ | R0 | R1 | Đã publish | Ghi chú |
 |---|---|---|---|---|---|
-| `proof-warranty` | warranty | 50 / 50 | **66,7 / 66,7** | 1 dòng skill, ApprovalAgent chấp nhận | F01 trượt 2/2 trước, đạt 2/2 sau; 3 đối chứng vẫn đạt. F02, F03 chưa áp dụng bài học |
+| `proof-warranty` (10/11) | warranty | 50 / 50 | 66,7 / 66,7 | 1 dòng skill, ApprovalAgent chấp nhận | F01 trượt 2/2 trước, đạt 2/2 sau; 3 đối chứng vẫn đạt. F02, F03 chưa áp dụng bài học |
+| `reflect-warranty-2` (11/11) | warranty | 50 / 50 | không đo | không | ReflectionAgent chưa đọc chẩn đoán: 2/3 thẻ dạy điều khác, ApprovalAgent từ chối |
+| `reflect-warranty-3` (11/11) | warranty | 50 / 50 | 83,3 / 66,7 (66,7 / 66,7 theo nhãn đối chứng sửa ngày 12/11) | 1 dòng skill, ApprovalAgent chấp nhận | Cùng lần học với dòng trên, sau khi nối chẩn đoán và cho luật được trích đi kèm. F01 đạt 2/2, F02 đạt 1/2, F03 trượt 2/2; 3 đối chứng đạt 2/2. Nhãn đã sửa (xem dưới) |
 | `proof-budget` | budget | 66,7 / 66,7 | 50 (1 lần) | không | Agent gốc đã nói "vượt ngân sách" ở 3/4 cuộc học: không đủ 3 khách để học. Các cuộc trượt do lỗi đơn trùng (đã sửa) và hai kịch bản chứa món hết hàng (đã thay) |
 | `proof-conduct` | conduct | 88,9 / 77,8 | (dừng) | không | Chỉ 1/12 cuộc học trượt sau khi viết lại prompt; trước đó R0 là 66,7–77,8 |
 | `proof-4` (trước khi viết lại prompt) | gap-loop | 23,1 | 76,9 | 5 mục kho tri thức (`scripted-eval`) | Đối chứng F13 hỏng: agent chuyển máy |
+
+**Ba phép thử 4 cuộc (F02, F03, hai đối chứng) trước khi chạy vòng 11/11**, cùng dòng skill của `proof-warranty`: thêm "Cả khi…" vào mô tả skill: F02, F03 vẫn trượt; luật BH-05 được trả kèm nhưng ở vị trí thứ 6, advisor không đọc: vẫn trượt; advisor được đọc BH-05: F02, F03 đều đạt, đối chứng đạt. Kết quả ở `evaluation/runs/exp-warranty-{when,pin,pin2}`.
+
+**Nhãn warranty đã sửa ngày 11/11.** Bộ chấm so chuỗi. Agent gốc ở L01 nói "mua thêm gói bảo hành 12 tháng" (đúng việc) vẫn trượt, và một cuộc đối chứng chào gói bằng đúng câu đó vẫn đạt. Nhãn mới nhận các cách nói một lời chào gói, và đối chứng cấm thứ chỉ lời chào mới có ("có thể mua thêm", "8% giá sản phẩm"). Chấm lại các run cũ bằng nhãn mới không đổi số R0 (50/50) hay R1 của `proof-warranty` (66,7/66,7). Giới hạn: câu "em có thể chuyển nhân viên tư vấn gói bảo hành mở rộng" ở đối chứng F06 (R1) không bị nhãn bắt.
+
+**Các vòng ngày 12/11/2026** (mỗi phía đo 1 lần, cùng một lần học `reflect-warranty-4/learn-warranty`, Reflection và ApprovalAgent trên `gpt-6.1-terra`):
+
+| Vòng | Điều đổi so với vòng trước | R0 | R1 | Kết quả |
+|---|---|---|---|---|
+| `reflect-warranty-4` | prompt viết thay đổi mới, rubric, gom theo loại lỗi, chặn chuyển máy sớm | không đo | không đo | 3 cuộc ra 3 chẩn đoán khác nhau, không có thay đổi; vòng dừng, không tốn lượt frozen |
+| `reflect-warranty-5` | QaAgent đọc `relevant_policy_ids` | không đo | không đo | chẩn đoán đúng 3/3; kiểm chính sách hết giờ (5 giây), ApprovalAgent từ chối vì chữ hẹp hơn đáp án |
+| `reflect-warranty-6` | kiểm chính sách chờ 45 giây, làm rõ prompt duyệt | 50 | 50 | dòng được publish không ghi mã BH-05 nên luật không đi kèm: 0/3 cuộc áp dụng |
+| `reflect-warranty-7` | mã luật được ghi vào dòng khi publish | 50 | 83,3 | F01–F03 đạt; đối chứng F05 hỏng: agent chào gói cho quạt 2.450.000đ |
+| `reflect-warranty-8` | luật `over_promise` của guard gồm quyền lợi có điều kiện không đạt | 50 | **100** | F01–F03 đạt, F04–F06 đạt (F05, F06 nói đúng là chưa đủ điều kiện), 0 vi phạm |
+
+Vòng 6 và 7 chỉ khác nhau ở chỗ đoạn BH-05 có đi kèm hay không: 0/3 so với 3/3 cuộc cần học. F05 đạt ở vòng 8 mà không có bản nháp nào bị guard chặn, nên chưa thể nói guard là nguyên nhân; F05 có thể dao động giữa các lần chạy.
+
+Dòng skill được publish ở `reflect-warranty-8` (vào `objection-handling`):
+
+> Khi khách lo sản phẩm hỏng sau thời hạn bảo hành, nếu là gia dụng có giá đã tra trên 3.000.000đ và mua gói trong vòng 15 ngày kể từ ngày nhận hàng, ngoài bảo hành cơ bản hãy giới thiệu gói bảo hành mở rộng thêm 12 tháng, phí bằng 8% giá sản phẩm; không tự tính phí thành tiền và không nêu gói khi chưa đủ căn cứ đáp ứng các điều kiện này (BH-05).
+
+Dòng skill được publish ở `reflect-warranty-3` (vào `product-advice`, trích BH-05):
+
+> Khi khách lo máy hỏng hoặc tốn tiền sửa sau khi hết bảo hành, không chỉ lặp lại thông số hay thời hạn bảo hành để trấn an và không cam kết máy sẽ không hỏng; sau khi nêu bảo hành tiêu chuẩn, nếu sản phẩm thuộc gia dụng trên 3.000.000đ thì chủ động giới thiệu gói bảo hành mở rộng thêm 12 tháng, cần mua trong vòng 15 ngày kể từ ngày nhận hàng, không tự tính phí thành tiền khi chưa có báo giá từ tool.
 
 Dòng skill được publish ở `proof-warranty`:
 
@@ -187,7 +217,7 @@ PYTHONPATH=apps/ai-agent-service/src:packages/backend-common apps/ai-agent-servi
 
 **Đã sửa trong code nhưng chưa kiểm bằng lần chạy thật** (10/11/2026, sau `proof-warranty`):
 
-- Ghi tình huống vào mô tả skill (`when`): để F02, F03 của warranty áp dụng được bài học.
+- Ghi tình huống vào mô tả skill (`when`): đã thử ngày 11/11, riêng nó không làm F02, F03 áp dụng bài học (xem mục 6).
 - Agent không chuyển máy khi khách chỉ bày tỏ lo lắng (luật 9 và ghi chú khi tìm tài liệu không ra, [`nodes.py`](../../apps/ai-agent-service/src/ai_agent_service/pipeline/hot/nodes.py)): đối chứng F06 của warranty.
 - Guard không cho tạo đơn mới cho món đã nằm trong một đơn nhiều dòng ([`actions.py`](../../apps/ai-agent-service/src/ai_agent_service/components/guardrails/actions.py)): các cuộc trượt của budget.
 - Rubric so trích dẫn như người đọc, và judge tính tổng đơn nhiều dòng (J11 áp được).
@@ -198,6 +228,13 @@ PYTHONPATH=apps/ai-agent-service/src:packages/backend-common apps/ai-agent-servi
 2. Chạy lại `budget` với dữ liệu và guard đã sửa. Nếu agent gốc vẫn nói "vượt ngân sách" ở đa số cuộc học thì bỏ bộ này khỏi danh sách chứng minh Reflection (giữ làm kiểm tra hồi quy cho đơn nhiều món).
 3. Chạy lại `gap-loop` sau khi viết lại prompt, để có số R0 mới và xem đối chứng F13 còn chuyển máy không.
 4. Thêm một tình huống chưa dạy: khách hẹn mốc cần hàng mà giao không kịp (VC-01, LN-03), đối chứng là ca giao kịp.
+
+**Còn mở sau ngày 11/11:**
+
+- Kết quả 50 → 100 của `reflect-warranty-8` là một lần đo mỗi phía, duyệt bởi `approval-agent`. Đối chứng F05 hỏng ở vòng 7 và đạt ở vòng 8; cần đo thêm để biết tỉ lệ.
+- Đã sửa ngày 12/11: agent gốc chuyển máy ngay ở lượt hỏi giá (gọi `handoff_transfer` cùng lượt với tool tra cứu; `guardrails/actions.early_transfer`), 0 vi phạm trong 4 lần đo frozen sau đó; rubric giữ lại verdict dùng được thay vì bỏ cả phiếu (`agents/qa.settled`), 4/4 cuộc học có điểm.
+- Sửa luật `over_promise` của guard áp cho mọi cuộc, chưa đo trên `data/dev` hay mẫu BTC.
+- Bộ budget và conduct: agent gốc đã làm đúng (budget: các cuộc trượt cũ là do kịch bản có món hết hàng; conduct: mỗi lần chạy trượt 1–2 cuộc, mỗi lần một cuộc khác). Hai bộ này là kiểm tra hồi quy, không chứng minh Reflection.
 
 **Chưa làm:**
 

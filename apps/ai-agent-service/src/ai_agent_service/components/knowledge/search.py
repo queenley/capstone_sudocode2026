@@ -30,7 +30,7 @@ thông tin", that is the answer.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import date
 from pathlib import Path
 from typing import Literal, Mapping, Sequence
@@ -98,6 +98,8 @@ class Hit:
     redirect: str | None = None
     #: An entry written for a product of this call.
     for_product: bool = False
+    #: Not ranked for the question: a rule a published lesson cites, which comes along (``include``).
+    pinned: bool = False
 
 
 @dataclass(frozen=True)
@@ -165,6 +167,7 @@ class KnowledgeBase:
         situation: str | None = None,
         other_order_dates: Sequence[str] = (),
         about: Sequence[str] = (),
+        include: Sequence[str] = (),
     ) -> Result:
         """The top *k* passages for *query* and whether to abstain.
 
@@ -177,7 +180,11 @@ class KnowledgeBase:
         differ between them, and the result says so. *about* is the SKUs this
         call is on: an entry written for one of them is preferred, an entry
         written for other products is left out. Without any, entries are
-        found by their words alone.
+        found by their words alone. *include* are sections that come along
+        whatever the ranking, after the ranked ones, when public and in force:
+        the rules a lesson Reflection published cites, which the advisor may
+        only apply when it can read them. They never change the score or
+        whether the result abstains.
         """
         k = k or self.settings.top_k
         lexical = self._lexical.ranking(query)
@@ -205,6 +212,10 @@ class KnowledgeBase:
                      for rank, doc_id in enumerate(top, 1))
         top_score = (hits[0].cosine if self._vectors is not None else hits[0].coverage) if hits else None
         reason = self._abstain(hits, top_score)
+        extra = [doc_id for doc_id in dict.fromkeys(include) if doc_id in self._by_id and doc_id not in top
+                 and self._by_id[doc_id].in_force(day) and not self._by_id[doc_id].restricted]
+        hits += tuple(replace(self._hit(query, doc_id, 0.0, rank, cosines.get(doc_id), about), pinned=True)
+                      for rank, doc_id in enumerate(extra, len(hits) + 1))
         cited = [*(hit.chunk for hit in hits), *(self._by_id[doc_id] for doc_id in withheld)]
         changelog = {entry: self._by_id[entry] for chunk in cited for entry in chunk.changelog if entry in self._by_id}
         explains = tuple(dict.fromkeys(entry for doc_id in withheld for entry in self._by_id[doc_id].changelog

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -39,6 +40,26 @@ def read_book(folder: Path | None = None) -> dict[str, Any]:
 
 
 SKILLS: Mapping[str, Mapping[str, Any]] = read_book()
+
+
+def learned_cites(book: Mapping[str, Mapping[str, Any]], original: Mapping[str, Mapping[str, Any]]) -> tuple[str, ...]:
+    """The rule codes cited by the lines of *book* that *original* does not have: what Reflection's lessons rest on.
+
+    The advisor may state a policy only from the passages of the turn (its rule 3), and a customer's worry does not
+    retrieve the rule a lesson applies to it: on 2026-11-11 a lesson citing BH-05 was followed only where the passage
+    happened to be there. So the rules a published lesson cites come along with every turn's passages
+    (``pipeline/hot/nodes.py``). With the original skills there are none."""
+    codes: list[str] = []
+    for name, skill in book.items():
+        before = set(str((original.get(name) or {}).get("body") or "").splitlines())
+        for line in str(skill.get("body") or "").splitlines():
+            if line not in before:
+                codes += re.findall(r"\b[A-Z]{2,3}-\d{2}\b", line)
+    return tuple(dict.fromkeys(codes))
+
+
+#: Empty for the original agent.
+LEARNED_CITES: tuple[str, ...] = learned_cites(SKILLS, load_prompt_yaml("advisor/skills.yaml"))
 #: Past this many, the oldest leaves the prompt; the model can load it again.
 MAX_LOADED = 3
 

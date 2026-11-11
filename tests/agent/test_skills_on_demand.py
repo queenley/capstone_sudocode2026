@@ -90,3 +90,12 @@ def test_every_skill_in_the_prompt_never_pushes_the_documents_out(monkeypatch):
     passage = {"chunk_id": "BH-05", "source": "policy", "title": "Bảo hành mở rộng", "text": "Gói bảo hành mở rộng thêm 12 tháng."}
     prompt, cut = system_prompt(context(knowledge=(passage,), seen_products=({"sku": "SKU-A", "name": "Máy", "price_vnd": 1000},)))
     assert "Gói bảo hành mở rộng thêm 12 tháng." in prompt and "SKU-A" in prompt and cut == ()
+
+
+def test_the_rules_a_learned_line_cites_are_known_and_the_original_skills_have_none():
+    original = {"objection-handling": {"description": "d", "body": "- Chê đắt: nêu quyền lợi (PB-02, PB-04)."}}
+    learned = {"objection-handling": {"description": "d", "body": original["objection-handling"]["body"]
+                                      + "\n- Khách lo máy hỏng sau bảo hành: giới thiệu gói bảo hành mở rộng (BH-05)."}}
+    assert skills.learned_cites(original, original) == ()
+    assert skills.learned_cites(learned, original) == ("BH-05",)
+    assert skills.LEARNED_CITES == ()  # the tests run on the original agent

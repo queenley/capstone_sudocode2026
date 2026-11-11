@@ -1,0 +1,44 @@
+{
+ "scenario_id": "SCN-HARD-01",
+ "level": "M1",
+ "persona": "khach_hoi_ky_san_pham",
+ "hard_case": null,
+ "customer_phone": "0397530201",
+ "customer_name": "Hạnh",
+ "honorific": "chị",
+ "notes": "A follow-up question asked in few words, right after the passage that answers it was read: the answer must not be lost and the call must not be transferred.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-15",
+   "channel": "hotline",
+   "customer_goal": "hỏi bảo hành và quy trình gửi máy",
+   "customer_turns": [
+    "Máy lọc không khí AirPure X bên em bảo hành bao lâu?",
+    "Lỡ máy lỗi thì chị gửi đi đâu để bảo hành em?",
+    "Gửi đi vậy thì bao lâu chị nhận lại máy?"
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_say_any": [
+     "7–15 ngày",
+     "7-15 ngày",
+     "7 đến 15 ngày",
+     "15 ngày làm việc"
+    ],
+    "must_not_call_tools": [
+     "handoff.transfer",
+     "order.create"
+    ]
+   },
+   "ground_truth_facts": {
+    "sku": "SKU-AP-X",
+    "price_vnd": 4890000
+   },
+   "relevant_policy_ids": [
+    "BH-01",
+    "BH-03"
+   ],
+   "expected_outcome": "thong_tin"
+  }
+ }
+}

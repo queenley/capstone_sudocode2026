@@ -102,6 +102,22 @@ async def write(chunks: Sequence[corpus.Chunk], llm: Any, file: Path | None = No
     return len(todo)
 
 
+async def entry_questions(title: str, text: str, llm: Any) -> list[str]:
+    """The questions a customer would ask that a new entry answers, for the entry's own line in its knowledge version.
+
+    A Knowledge Gap Loop entry is indexed by the questions it was recorded with. On 2026-11-12, with five entries
+    learned, two frozen questions of ten did not reach theirs in the three passages the advisor reads ("shop có
+    showroom ở đâu" for an entry recorded as "có cho khách đến xem trực tiếp không"): the same doc2query that the
+    policy sections have. Empty when the model gives no answer: the entry is still found by its own words."""
+    request = f"{load_prompt('knowledge_questions.md')}\n\nDOCUMENT: Câu hỏi thường gặp\nSECTION {title}\n{text}"
+    try:
+        answer = await llm.with_structured_output(Questions).ainvoke(request)
+    except Exception as error:  # noqa: BLE001 - an entry without questions is still found by its own words
+        logger.warning("No questions for a new entry: %s", type(error).__name__)
+        return []
+    return [q.strip() for q in answer.questions if q.strip()][:8]
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="expand", description="Write the questions each policy section answers.")
     parser.add_argument("--check", action="store_true", help="Count the missing and stale sections, write nothing")

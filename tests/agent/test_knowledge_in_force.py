@@ -101,3 +101,67 @@ def test_a_named_order_or_a_stated_day_settles_it():
 def test_passages_outside_the_version_do_not_raise_the_question(kb):
     result = kb.search("giới hạn COD", on=AFTER, order_date="2026-10-10", other_order_dates=[BEFORE])
     assert result.version_differs == ()
+
+
+WORRY = "Chị sợ mấy năm sau máy trục trặc thì không ai lo cho."
+
+
+def test_a_rule_a_published_lesson_cites_comes_along_without_changing_the_ranking_or_the_abstention(kb):
+    plain, pinned = kb.search(WORRY, on=AFTER), kb.search(WORRY, on=AFTER, include=["BH-05", "BH-05", "NOT-A-RULE"])
+    assert "BH-05" not in ids(plain)  # a worry does not retrieve the rule that answers it
+    assert ids(pinned) == [*ids(plain), "BH-05"]
+    assert (pinned.top_score, pinned.abstain, pinned.reason) == (plain.top_score, plain.abstain, plain.reason)
+    ranked = ids(plain)[0]
+    assert ids(kb.search(WORRY, on=AFTER, include=[ranked])) == ids(plain)  # never twice
+
+
+def test_an_internal_or_retired_passage_never_comes_along(kb):
+    internal = next(chunk.chunk_id for chunk in policy_chunks(POLICY) if chunk.restricted)
+    retired = next(chunk.chunk_id for chunk in policy_chunks(POLICY) if not chunk.in_force(AFTER))
+    assert not {internal, retired} & set(ids(kb.search(WORRY, on=AFTER, include=[internal, retired])))
+
+
+def test_the_advisor_is_shown_the_cited_rule_beyond_the_three_it_reads_and_only_once(kb):
+    result = kb.search(WORRY, on=AFTER, include=["BH-05"])
+    assert [hit.pinned for hit in result.hits] == [False] * (len(result.hits) - 1) + [True]
+    hits = [{"chunk_id": hit.chunk.chunk_id, "text": hit.chunk.text, "pinned": hit.pinned} for hit in result.hits]
+    policy, _ = shown_passages(hits)
+    assert [p["chunk_id"] for p in policy] == [*ids(result)[:3], "BH-05"]
+    policy, _ = shown_passages([{"chunk_id": "BH-05", "text": "x", "pinned": True}, *hits[:3]])
+    assert [p["chunk_id"] for p in policy].count("BH-05") == 1
+
+
+def test_what_was_read_earlier_in_the_call_stays_readable_when_a_follow_up_does_not_bring_it_back():
+    from ai_agent_service.pipeline.hot.nodes import _passages_in_reach
+
+    # "Nếu gửi hàng thì mất bao lâu để xử lý": the delivery table ranks first, the warranty section is not shown.
+    hits = [{"chunk_id": code, "title": code, "text": f"text of {code}"} for code in ("VC-01", "QT-05", "QT-02", "QT-03")]
+    read = {"DT-05": "Đổi mới 1-1 trong 30 ngày.", "BH-03": "Thời gian xử lý 7–15 ngày làm việc.", "VC-01": "text of VC-01"}
+    readable = _passages_in_reach({"knowledge": {"hits": hits, "reason": None}, "passages_read": read})
+    assert [p["chunk_id"] for p in readable[:4]] == ["VC-01", "QT-05", "QT-02", "QT-03"]
+    assert [p["chunk_id"] for p in readable if p.get("earlier")] == ["BH-03", "DT-05"]  # the latest first, none twice
+    policy, _ = shown_passages(readable)
+    assert [p["chunk_id"] for p in policy] == ["VC-01", "QT-05", "QT-02", "BH-03", "DT-05"]
+    assert _passages_in_reach({"knowledge": {"hits": hits, "reason": None}}) == tuple(hits)  # a first turn reads only its own
+
+
+def test_a_learned_entry_is_found_by_the_questions_written_for_it_and_they_are_never_read_out():
+    from ai_agent_service.components.knowledge.corpus import entry_chunk
+
+    entry = {"chunk_id": "FAQ-GAP-X", "source": "faq", "title": "Cửa hàng có cho khách đến xem trực tiếp không?",
+             "text": "Dạ hiện bên em chỉ bán online, chưa có cửa hàng trưng bày."}
+    asked = "Shop có showroom ở đâu để anh ghé coi máy không?"
+    plain = KnowledgeBase([*policy_chunks(POLICY), entry_chunk(entry, doc="v1.jsonl")])
+    wider = KnowledgeBase([*policy_chunks(POLICY), entry_chunk(
+        {**entry, "questions": ["Shop có showroom không em?", "Anh ghé coi máy trực tiếp ở đâu được?"]}, doc="v1.jsonl")])
+    assert "FAQ-GAP-X" not in ids(plain.search(asked, on=AFTER))[:3]
+    found = wider.search(asked, on=AFTER)
+    assert ids(found)[0] == "FAQ-GAP-X"
+    chunk = found.hits[0].chunk
+    assert "showroom" not in chunk.text and len(chunk.questions) == 2
+    # The service reads entries back from kb_chunks as their provenance plus their own columns: the questions survive.
+    from ai_agent_service.mcp.servers.knowledge import _row_chunk
+
+    row = {"chunk_id": chunk.chunk_id, "source": chunk.source, "title": chunk.title, "text": chunk.text, "situation": None,
+           "persona": None, "valid_from": None, "valid_to": None, "provenance": dict(chunk.provenance), "scope": "release"}
+    assert _row_chunk(row).questions == chunk.questions

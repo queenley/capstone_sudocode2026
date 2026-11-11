@@ -53,6 +53,19 @@ def test_the_caller_may_correct_the_order_this_call_created_whatever_the_tier():
                              created=created).passed
 
 
+def test_an_unverified_caller_hears_the_code_of_the_order_this_call_created_and_no_other():
+    def said(text, **extra):
+        return check(GuardInput(text=text, tool_results=(), tier="UNKNOWN", **extra))
+
+    line = "Dạ em đã đặt đơn thành công, mã đơn OD600001 ạ."
+    assert said(line, own_orders=frozenset({"OD600001"})).passed
+    blocked = said(line)
+    assert not blocked.passed and "mã đơn" in blocked.reasons[0]
+    assert not said("Dạ đơn OD600001 và OD900201 của anh ạ.", own_orders=frozenset({"OD600001"})).passed
+    # A code the caller names may be someone else's order: it is not repeated.
+    assert not said("Dạ em đang tra đơn OD900201 ạ.", customer_said=("Em tra giúp anh đơn OD900201 nhé",)).passed
+
+
 # ── an order's state ──────────────────────────────────────────────────────
 
 

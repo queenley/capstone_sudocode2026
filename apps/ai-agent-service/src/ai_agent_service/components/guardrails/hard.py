@@ -93,6 +93,8 @@ class GuardInput:
     #: Every promotion the shop runs, code to ``(start, end)``, and the day of the call (KM-02).
     promotions: Mapping[str, tuple[str, str]] = field(default_factory=dict)
     on: str | None = None
+    #: The codes of the orders this call created: the caller placed them, whoever the number belongs to.
+    own_orders: frozenset[str] = field(default_factory=frozenset)
 
 
 def numbers_in(value: Any) -> set[int]:
@@ -252,11 +254,15 @@ def _durations(text: str, view: GuardInput) -> list[str]:
 
 
 def _tier(text: str, view: GuardInput) -> list[str]:
-    """Below VERIFIED the brief is someone's private record: its prices and any order code stay unsaid."""
+    """Below VERIFIED the brief is someone's private record: its prices and its order codes stay unsaid.
+
+    Not private: the code of an order this call created. A code the caller names is still not repeated: a caller
+    asking after someone else's order may hold its code. A new customer who places an order is told its code; before 2026-11-12 that sentence was blocked and written again on almost every
+    order of an unverified caller (33 times in four small runs), a model round each, and the code was never said."""
     if view.tier == "VERIFIED":
         return []
     reasons = []
-    if ORDER_CODE.search(text):
+    if any(code not in view.own_orders for code in ORDER_CODE.findall(text)):
         reasons.append("Chưa xác minh danh tính nên không được đọc mã đơn.")
     given = set().union(*(numbers_in(r.get("result")) for r in view.tool_results)) if view.tool_results else set()
     for value in amounts(text):

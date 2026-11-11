@@ -1,0 +1,38 @@
+{
+ "scenario_id": "SCN-HARD-02",
+ "level": "M1",
+ "persona": "khach_hoi_ky_san_pham",
+ "hard_case": null,
+ "customer_phone": "0397530202",
+ "customer_name": "Loan",
+ "honorific": "chị",
+ "notes": "A second product asked about with reference to the first: both prices come from the tools, and a price question is never a reason to transfer.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-15",
+   "channel": "hotline",
+   "customer_goal": "hỏi giá hai mẫu nồi chiên",
+   "customer_turns": [
+    "Nồi chiên Lock&Lock 4 lít giá bao nhiêu em?",
+    "Còn nồi Philips 6.2 lít thì giá sao em?",
+    "Ừ để chị tính."
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_say_any": [
+     "3.990.000"
+    ],
+    "must_not_call_tools": [
+     "handoff.transfer",
+     "order.create"
+    ]
+   },
+   "ground_truth_facts": {
+    "price_vnd:SKU-AF-4L": 1890000,
+    "price_vnd:SKU-AF-6L": 3990000
+   },
+   "relevant_policy_ids": [],
+   "expected_outcome": "thong_tin"
+  }
+ }
+}

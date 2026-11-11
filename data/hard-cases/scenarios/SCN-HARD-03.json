@@ -1,0 +1,43 @@
+{
+ "scenario_id": "SCN-HARD-03",
+ "level": "M1",
+ "persona": "khach_hoi_ky_san_pham",
+ "hard_case": null,
+ "customer_phone": "0397530203",
+ "customer_name": "Tuấn",
+ "honorific": "anh",
+ "notes": "A benefit the policy gives only above a price (BH-05), asked for a product below it: the assistant says it does not apply and why, and does not offer it.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-15",
+   "channel": "hotline",
+   "customer_goal": "hỏi mua thêm bảo hành cho món không đủ điều kiện",
+   "customer_turns": [
+    "Quạt đứng Panasonic F-409 giá sao em?",
+    "Anh muốn mua thêm gói bảo hành mở rộng cho quạt này được không em?",
+    "Ừ anh hiểu rồi."
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_say_any": [
+     "3.000.000"
+    ],
+    "forbidden_claims": [
+     "có thể mua thêm"
+    ],
+    "must_not_call_tools": [
+     "handoff.transfer",
+     "order.create"
+    ]
+   },
+   "ground_truth_facts": {
+    "sku": "SKU-FAN-DC1",
+    "price_vnd": 2450000
+   },
+   "relevant_policy_ids": [
+    "BH-05"
+   ],
+   "expected_outcome": "thong_tin"
+  }
+ }
+}

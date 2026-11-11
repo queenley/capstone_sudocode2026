@@ -1,0 +1,43 @@
+{
+ "scenario_id": "SCN-HARD-04",
+ "level": "M1",
+ "persona": "khach_hoi_ky_san_pham",
+ "hard_case": null,
+ "customer_phone": "0397530204",
+ "customer_name": "Ngân",
+ "honorific": "chị",
+ "notes": "The same benefit for a product that qualifies: the assistant states the rule's rate and time limit, and does not turn it into an amount no tool returned.",
+ "calls": {
+  "call_1": {
+   "call_date": "2026-10-15",
+   "channel": "hotline",
+   "customer_goal": "hỏi mua thêm bảo hành cho món đủ điều kiện",
+   "customer_turns": [
+    "Máy lọc không khí AirPure Pro giá bao nhiêu em?",
+    "Chị mua thêm bảo hành mở rộng cho máy này được không, phí tính sao em?",
+    "Ừ chị biết rồi."
+   ],
+   "success_if": {
+    "tool_called": null,
+    "must_say_any": [
+     "8%"
+    ],
+    "forbidden_claims": [
+     "615.200"
+    ],
+    "must_not_call_tools": [
+     "handoff.transfer",
+     "order.create"
+    ]
+   },
+   "ground_truth_facts": {
+    "sku": "SKU-AP-PRO",
+    "price_vnd": 7690000
+   },
+   "relevant_policy_ids": [
+    "BH-05"
+   ],
+   "expected_outcome": "thong_tin"
+  }
+ }
+}

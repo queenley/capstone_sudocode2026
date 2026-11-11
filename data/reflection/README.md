@@ -4,14 +4,20 @@ Reflection (the brief, C.5 mechanism 3) learns how the agent conducts calls, not
 documents say the agent must do right from R0 (`data/policy-regression`), and what they never say is the Knowledge
 Gap Loop's (`data/gap-loop`). Every check here is one the organisers' grader makes in code.
 
-Two sets, each with `learn/`, `frozen/`, `frozen.json` and `expected.yaml`:
+Three sets, each with `learn/`, `frozen/`, `frozen.json` and `expected.yaml`. They are text scenarios in the organisers' format, played without ASR:
 
 - `conduct/`: how the agent conducts a call (below).
 - `warranty/`: a customer worried a product will break. The shop's policy already holds the answer the agent was
   never taught to give: the 12-month extended warranty of BH-05, for home appliances over 3,000,000d only. Four
   learning customers; three frozen cases where it must be offered (`must_say_any`) and three controls under
   3,000,000d where offering it is a false claim (`forbidden_claims`), so a lesson that offers it to everyone shows as
-  harm.
+  harm. The grader matches phrases, so the labels hold the wordings an offer takes ("mua thêm gói bảo hành", "thêm 12
+  tháng bảo hành") and a control forbids what only an offer says ("có thể mua thêm", "8% giá sản phẩm"), not the
+  package's name: saying a product is not eligible is true and passes (corrected 2026-11-11, after the original
+  agent offered the package in other words and failed; `tests/agent/test_approval_agent.py` holds the sentences).
+  A worry does not retrieve BH-05, and the advisor states a policy only from the passages of its turn (rule 3): the
+  rule a published lesson cites therefore comes along with every turn's passages (`components/context/skills.py`,
+  `learned_cites`). Without that the lesson was followed in one frozen call of three.
 - `budget/`: the organisers' persona `khach_mua_nhieu_mon` expects to be told when an order of several products
   passes the budget they named ("nếu tổng tiền vượt ngân sách mà nhân viên không nói, bạn hỏi 'thế là bao nhiêu tất
   cả?'"); no skill says it. Four learning customers; three frozen orders over budget (`must_say_any`) and three
@@ -22,7 +28,7 @@ ApprovalAgent (`agents/approval.py`) takes the reviewer's place: it reads the ac
 was learned from and, in one call, accepts the change when it teaches the same lesson (in other words or not) and
 refuses it otherwise. A set with accepted lessons also lets its failures routed to review (a phrase the grader did not
 find) reach Reflection, since the ApprovalAgent checks what comes out. Reflection and the ApprovalAgent run on
-`gpt-6.1-sol` (`config/models.yaml`).
+`gpt-6.1-terra` (`config/models.yaml`; `gpt-6.1-sol` until 2026-11-12).
 
 ## conduct
 

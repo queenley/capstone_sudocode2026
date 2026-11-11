@@ -52,6 +52,9 @@ logger = logging.getLogger(__name__)
 
 #: A review runs beside the stream and holds nothing back, so it can wait longer than a check that delays a reply.
 REVIEW_TIMEOUT = 5.0
+#: A change to a skill is checked off the hot path, a few times a round: it waits as long as the API needs and asks
+#: once more before it says the check did not run (2026-11-12: at 5 s it gave no answer and the round stopped there).
+CHANGE_TIMEOUT = 45.0
 
 #: What is a violation and what is not, and what the customer means: the developer message of every request.
 RULES = load_prompt("policy_rules.md")
@@ -275,12 +278,17 @@ class PolicyAgent(BaseAgent):
         rules, questions = change_rules()
         messages = [decisions.rules_message(rules),
                     decisions.evidence_message(_plain(evidence), note="Chỉ dẫn đang xét và căn cứ của nó.")]
-        try:
-            decision = await decisions.evaluate(self.name, messages, questions, timeout=REVIEW_TIMEOUT, wait=True)
-        except DecisionUnavailable as unavailable:
-            logger.info("Change check unavailable: %s", unavailable)
+        decision, skipped = None, ""
+        for attempt in (1, 2):
+            try:
+                decision = await decisions.evaluate(self.name, messages, questions, timeout=CHANGE_TIMEOUT, wait=True)
+                break
+            except DecisionUnavailable as unavailable:
+                logger.info("Change check unavailable (attempt %d): %s", attempt, unavailable)
+                skipped = unavailable.code
+        if decision is None:
             return PolicyVerdict(False, reasons=("The policy check did not answer.",), failed=("unavailable",),
-                                 decided_by=f"skipped:{unavailable.code}")
+                                 decided_by=f"skipped:{skipped}")
         probabilities = {name: float(answer.probability or 0.0) for name, answer in decision.answers.items()}
         declined = [name for name, answer in decision.answers.items() if answer.probability is None]
         failed = [name for name, p in probabilities.items() if p >= CHANGE_THRESHOLD and name not in declined]

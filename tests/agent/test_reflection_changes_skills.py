@@ -96,7 +96,7 @@ def test_a_card_is_screened_before_it_is_stored_and_a_flagged_one_never_is(home)
 def test_three_customers_share_a_lesson_before_it_is_one_one_customer_is_one_vote():
     two = [card("A"), card("A"), card("B")]
     assert lessons.clusters(two) == {}
-    assert list(lessons.clusters([*two, card("C")])) == [("place-order", "after_sale")]
+    assert [key[:2] for key in lessons.clusters([*two, card("C")])] == [("place-order", "after_sale")]
     # Another situation or one customer's own preference is another lesson, or none.
     mixed = [card("A"), card("B", situation="bulk_order"), card("C", skill="conversation"), card("D", scope="this_customer")]
     assert lessons.clusters(mixed) == {}
@@ -104,12 +104,20 @@ def test_three_customers_share_a_lesson_before_it_is_one_one_customer_is_one_vot
 
 def test_one_lesson_whose_cards_name_different_skills_is_one_lesson_in_the_skill_most_name():
     split = [card("A", skill="objection-handling"), card("B", skill="product-advice"), card("C", skill="objection-handling")]
-    assert list(lessons.clusters(split)) == [("objection-handling", "after_sale")]
+    assert [key[:2] for key in lessons.clusters(split)] == [("objection-handling", "after_sale")]
 
 
 def test_one_lesson_seen_through_different_checks_is_still_one_lesson():
     symptoms = [card("A"), card("B", code="J.J01_opening_continuity"), card("C", code="TSR.too_many_questions")]
     assert [len(items) for items in lessons.clusters(symptoms).values()] == [3]
+
+
+def test_checks_of_another_kind_in_the_same_situation_are_another_lesson():
+    told = [card(c, code="TSR.must_say") for c in "ABC"]
+    manner = [card(c, code="J.J06_tone_vietnamese") for c in "ABD"]
+    found = lessons.clusters([*told, *manner])
+    assert sorted(key[2] for key in found) == ["manner", "telling"] and all(len(items) == 3 for items in found.values())
+    assert lessons.clusters([*told[:2], *manner[:2]]) == {}  # two and two never add up to three
 
 
 def test_not_followed_stands_only_with_a_sentence_that_is_in_the_skill():
@@ -137,7 +145,7 @@ def test_publishing_keeps_every_version_and_going_back_is_a_pointer(home, monkey
     monkeypatch.setattr(skill_book, "load_prompt_yaml", lambda name: BOOK)
     patch = {"skill": "place-order", "part": "body", "find": "Câu hai.", "text": "Câu mới.", "cites": ["PB-09"]}
     assert skill_versions.publish([patch], reviewer="scripted-eval", folder=folder) == 1
-    assert skill_book.read_book(folder)["place-order"]["body"] == "Câu một. Câu mới."
+    assert skill_book.read_book(folder)["place-order"]["body"] == "Câu một. Câu mới (PB-09)."
     first = (folder / "v1.yaml").read_text(encoding="utf-8")
     assert skill_versions.publish([{"skill": "place-order", "part": "body", "text": "Câu ba."}], reviewer="x", folder=folder) == 2
     assert skill_versions.rollback(0, reviewer="x", reason="tụt", folder=folder) == 2
@@ -164,7 +172,7 @@ def learning_round(home, tmp_path, calls):
     rows, found = [], []
     for (sid, customer), codes in calls.items():
         (run / "scenarios" / f"{sid}.json").write_text(json.dumps({"scenario_id": sid, "customer_phone": customer,
-                                                                   "calls": {"call_2": {}}}), encoding="utf-8")
+                                                                   "calls": {"call_2": {"relevant_policy_ids": ["BH-03"]}}}), encoding="utf-8")
         rows.append({"scenario_id": sid, "call": "call_2", "turn": 1, "customer_text": "Máy hỏng rồi em.",
                      "agent_text": "Dạ em làm thủ tục trả hàng ạ.", "tool_calls": [{"name": "order.update", "args": {}}]})
         found += [Failure(code=code, route=signals.route(code), scenario_id=sid, call="call_2", turn=None,
@@ -185,7 +193,8 @@ class ScriptedQa:
     async def score(self, scenario, call, rows):
         return {"status": "COMPLETE", "criteria": [], "verdicts": []}
 
-    async def diagnose(self, code, check, transcript, *, skills, situations, fixed_rules="", policy=None):
+    async def diagnose(self, code, check, transcript, *, skills, situations, fixed_rules="", policy=None, relevant=()):
+        self.relevant = getattr(self, "relevant", []) + [tuple(relevant)]
         self.seen.append((code, check, transcript))
         return Diagnosis(kind=self.kind, skill="place-order", covering_sentence=self.quote, situation="after_sale", why="w")
 
@@ -194,7 +203,9 @@ class ScriptedReflection:
     def __init__(self, text="Máy hỏng sau thời hạn đổi trả thì hướng dẫn bảo hành, không tạo yêu cầu trả hàng."):
         self.text, self.cards_seen, self.objections, self.revised = text, [], [], None
 
-    async def lesson(self, code, check, transcript, *, skill, skills, rules, situations, fixed_rules="", covering=""):
+    async def lesson(self, code, check, transcript, *, skill, skills, rules, situations, fixed_rules="", covering="",
+                     found=""):
+        self.found = getattr(self, "found", []) + [found]
         return LessonCard(situation="after_sale", what_happened="Làm thủ tục trả hàng cho máy đã quá hạn.",
                           do="Hướng dẫn bảo hành.", dont="Không tạo yêu cầu trả hàng.", sample_line="Dạ máy mình còn bảo hành ạ.",
                           cites=["BH-03"], scope="general")
@@ -240,10 +251,13 @@ async def test_qa_diagnoses_without_the_answer_key_and_a_violated_call_is_no_evi
 @pytest.mark.asyncio
 async def test_reflection_writes_cards_and_one_change_three_customers_share(home, tmp_path, book):
     learning_round(home, tmp_path, {(f"S{c}", c): ["RQR.budget_vnd"] for c in "ABC"})
-    await cli.score("r", ScriptedQa())
+    qa = ScriptedQa()
+    await cli.score("r", qa)
+    assert qa.relevant == [("BH-03",)] * 3  # the sections the scenario says the call is about, never its expected words
     reflection = ScriptedReflection()
     assert await cli.reflect("r", reflection, ScriptedPolicy()) == 0
     assert len(lessons.stored(skills_version=0)) == 3 and len(reflection.cards_seen[0]) == 3
+    assert reflection.found == ["w"] * 3  # each card answers what the QaAgent found in that call
     written = json.loads((signals.home() / "review" / "r.json").read_text(encoding="utf-8"))
     proposal = written["proposals"][0]
     assert proposal["author"] == "reflection" and proposal["flags"] == [] and proposal["counts"]["customers"] == 3
@@ -336,6 +350,33 @@ async def test_the_change_check_fails_closed_when_the_policy_api_does_not_answer
     agent.name = "policy"
     verdict = await agent.review_change("Đọc lại đơn.", cited_rules={"PB-09": "x"}, skill_now="y")
     assert verdict.passed is False and verdict.failed == ("unavailable",)
+
+
+@pytest.mark.asyncio
+async def test_the_change_check_asks_once_more_before_it_says_it_did_not_run(monkeypatch):
+    from ai_agent_service.agents import policy as policy_module
+    from ai_agent_service.llm.decisions import Answer, Decision, DecisionUnavailable
+
+    asked = []
+
+    async def second_time(name, messages, questions, *, timeout, wait):
+        asked.append(timeout)
+        if len(asked) == 1:
+            raise DecisionUnavailable("TIMEOUT", "no answer")
+        return Decision(model="m", answers={q: Answer(probability=0.0) for q in questions}, seconds=0.1)
+
+    monkeypatch.setattr(policy_module.decisions, "evaluate", second_time)
+    agent = policy_module.PolicyAgent.__new__(policy_module.PolicyAgent)
+    agent.name = "policy"
+    verdict = await agent.review_change("Đọc lại đơn.", cited_rules={"PB-09": "x"}, skill_now="y")
+    assert verdict.passed and asked == [policy_module.CHANGE_TIMEOUT] * 2
+
+
+def test_a_policy_check_that_did_not_run_keeps_a_change_out_even_when_the_approval_agent_accepts():
+    item = {"decision": "approved", "reviewer": review.APPROVAL_AGENT}
+    assert review.blocking({**item, "flags": ["policy:invents"]}) == []  # read and overruled, with a reason
+    assert review.blocking({**item, "flags": ["policy:unavailable"]}) == ["policy:unavailable"]
+    assert review.blocking({**item, "flags": ["amount"]}) == ["amount"]
 
 
 def vectors(table):
@@ -473,10 +514,31 @@ async def test_a_gap_answered_once_is_never_answered_again_in_the_same_script(ho
     assert [r["status"] for r in results] == ["published", "no_gap"] and published == ["g"]
 
 
-def round_args(tmp_path, **extra):
+@pytest.mark.asyncio
+async def test_a_published_answer_carries_the_other_ways_a_customer_asks_it(home, monkeypatch):
+    kept = {}
+    monkeypatch.setattr(gaps, "resolve", lambda key, **kw: kept.update(kw) or 1)
+    monkeypatch.setattr(gaps, "list_gaps", lambda: [] if kept else [
+        {"id": "g", "status": "open", "restated": "Cửa hàng có cho khách đến xem trực tiếp không?", "occurrences": []}])
+
+    async def same(a, b):
+        return True
+
+    async def questions_of(title, text):
+        assert title == "Cửa hàng có cho khách đến xem trực tiếp không?" and text == "Bên em chỉ bán online."
+        return ["Shop có showroom không em?", "Chị ghé lấy hàng tận nơi được không?"]
+
+    table = {"Cửa hàng có cho khách đến xem trực tiếp không?": [1.0, 0.0], "Có cửa hàng không?": [1.0, 0.0]}
+    await gaps.answer_from_script([{"question": "Có cửa hàng không?", "answer": "Bên em chỉ bán online.",
+                                    "source": "consultant"}], vectors(table), same, questions_of=questions_of)
+    assert kept["questions"] == ["Shop có showroom không em?", "Chị ghé lấy hàng tận nơi được không?"]
+
+
+def round_args(tmp_path, answers_file=False, **extra):
     import argparse
     return argparse.Namespace(name="rt", learn=[tmp_path / "learnset" / "learn" / "scenarios"], frozen=[tmp_path / "frozenset" / "frozen" / "scenarios"],
-                              frozen_ids=[], answers=None, r0_runs=2, r1_runs=1, scripted=True, approved=False, deadline_minutes=1, **extra)
+                              frozen_ids=[], answers=tmp_path / "answers.json" if answers_file else None, r0_runs=2, r1_runs=1,
+                              scripted=True, approved=False, deadline_minutes=1, **extra)
 
 
 @pytest.fixture(autouse=True)
@@ -526,10 +588,38 @@ async def test_a_round_measures_learns_measures_again_and_goes_back_to_the_origi
     monkeypatch.setattr(cli, "_back_to_original", lambda folder, reviewer: steps.append(f"back:{reviewer}"))
     review_dir = tmp_path / "runs" / "rt" / "improvement" / "review"
     review_dir.mkdir(parents=True)
-    (review_dir / "rt-learnset.json").write_text("{}", encoding="utf-8")
+    (review_dir / "rt-learnset.json").write_text('{"proposals": [{}]}', encoding="utf-8")
     assert await cli.run_round(round_args(tmp_path)) == 0
-    assert steps == ["r0-frozenset-1", "r0-frozenset-2", "learn-learnset", "harvest:rt-learnset", "score:rt-learnset",
-                     "reflect:rt-learnset", "publish", "r1-frozenset", "compare:2>1", "back:scripted-eval"]
+    assert steps == ["learn-learnset", "harvest:rt-learnset", "score:rt-learnset", "reflect:rt-learnset",
+                     "r0-frozenset-1", "r0-frozenset-2", "publish", "r1-frozenset", "compare:2>1", "back:scripted-eval"]
+    # The Knowledge Gap Loop's answers are published after R0, never before: R0 is the agent that has not learned.
+    async def gaps_round(answers, **kw):
+        steps.append("gaps")
+        return 0
+
+    monkeypatch.setattr(cli, "gaps_round", gaps_round)
+    (review_dir / "rt-learnset.json").write_text('{"proposals": []}', encoding="utf-8")
+    steps.clear()
+    assert await cli.run_round(round_args(tmp_path, answers_file=True)) == 0
+    assert steps == ["learn-learnset", "harvest:rt-learnset", "score:rt-learnset", "reflect:rt-learnset",
+                     "r0-frozenset-1", "r0-frozenset-2", "gaps", "publish", "r1-frozenset", "compare:2>1", "back:scripted-eval"]
+    # A learning set that gives no change, or none that is approved, costs no frozen run: there is nothing to measure.
+    for proposals in ('[]', '[{"flags": ["amount"]}]', '[{"approval": {"approve": false, "reason": "another lesson"}}]'):
+        (review_dir / "rt-learnset.json").write_text('{"proposals": %s}' % proposals, encoding="utf-8")
+        steps.clear()
+        assert await cli.run_round(round_args(tmp_path)) == 0
+        assert steps == ["learn-learnset", "harvest:rt-learnset", "score:rt-learnset", "reflect:rt-learnset"]
+
+
+def test_a_check_is_fixed_or_broken_only_when_every_run_of_each_side_agrees():
+    calls = {("S1", "call_1"), ("S2", "call_1")}
+    key = lambda scenario, code: (scenario, "call_1", code)
+    before = {key("S1", "RQR.address"): 1.0, key("S2", "GUARD.over_escalation"): 0.5, key("S1", "TSR.must_say"): 1.0,
+              key("S9", "RQR.address"): 1.0}
+    after = {key("S2", "GUARD.over_escalation"): 1.0, key("S1", "TSR.must_say"): 1.0, key("S2", "HR.price"): 1.0}
+    found = cli.changed(before, after, calls)
+    assert found == {"fixed": [key("S1", "RQR.address")], "broken": [key("S2", "HR.price")],
+                     "unstable": [key("S2", "GUARD.over_escalation")]}
 
 
 
@@ -596,6 +686,19 @@ def test_reflection_reads_every_tool_the_assistant_has_and_what_each_does():
     block = _tools_block()
     assert "pricing_quote_order: The price of every unit" in block and "handoff_transfer:" in block
     assert "load_skill" not in block and "kb_upsert" not in block  # what the advisor cannot call is not offered
+
+
+def test_a_published_change_names_the_rules_it_rests_on_so_they_come_along_with_the_turn():
+    from ai_agent_service.components.context import skills as skill_book
+
+    original = {"s": {"description": "d", "body": "- Chê đắt: nêu quyền lợi (PB-02)."}}
+    learned = skill_versions.apply(original, {"skill": "s", "part": "body", "find": "", "cites": ["BH-05", "PB-02"],
+                                              "text": "Khách lo máy hỏng sau bảo hành: giới thiệu gói mở rộng theo PB-02."})
+    assert learned["s"]["body"].endswith("giới thiệu gói mở rộng theo PB-02 (BH-05).")
+    assert skill_book.learned_cites(learned, original) == ("PB-02", "BH-05")
+    named = skill_versions.apply(original, {"skill": "s", "part": "body", "find": "", "cites": ["BH-05"],
+                                            "text": "Khách lo máy hỏng: giới thiệu gói mở rộng (BH-05)."})
+    assert named["s"]["body"].count("BH-05") == 1
 
 
 def test_a_line_added_to_a_body_of_lines_is_a_line_and_names_its_situation_in_the_description():
