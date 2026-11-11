@@ -41,9 +41,29 @@ Có `--config` thì chỉ chạy và ghi một file trace, không chấm (BTC s�
 
 ## 3. Công cụ nghiệp vụ
 
-Chín công cụ của BTC (`crm.get_customer`, `catalog.search`, `inventory.check`, `pricing.get_quote`, `order.create`, `order.status`, `order.update`, `schedule.callback`, `handoff.transfer`) do máy chủ MCP của sản phẩm trả lời (`mcp/servers/{catalog,crm,order}.py`). Chúng **bọc đúng `eval/mock_tools.py` của BTC**, không viết lại logic: giá sau khuyến mãi, tồn kho theo ngày, giới hạn COD, ngày nghỉ, SĐT dùng chung đều là hàm của BTC. Khách tổng hợp của đội (`catalog/crm_seed_synthetic.json`) được thêm vào CRM của mock trong bộ nhớ khi nạp; id và số điện thoại trùng khách BTC thì bị bỏ. Trạng thái (đơn, lịch hẹn, phiếu) lưu trong một dòng `mock_state` của Postgres, và được xóa giữa các kịch bản.
+Mười công cụ của BTC (`crm.get_customer`, `catalog.search`, `inventory.check`, `pricing.get_quote`, `pricing.quote_order`, `order.create`, `order.status`, `order.update`, `schedule.callback`, `handoff.transfer`) do máy chủ MCP của sản phẩm trả lời (`mcp/servers/{catalog,crm,order}.py`). Chúng **bọc đúng `eval/mock_tools.py` của BTC**, không viết lại logic: giá sau khuyến mãi, tồn kho theo ngày, giới hạn COD, ngày nghỉ, SĐT dùng chung đều là hàm của BTC. Khách tổng hợp của đội (`catalog/crm_seed_synthetic.json`) được thêm vào CRM của mock trong bộ nhớ khi nạp; id và số điện thoại trùng khách BTC thì bị bỏ. Trạng thái (đơn, lịch hẹn, phiếu) lưu trong một dòng `mock_state` của Postgres, và được xóa giữa các kịch bản.
 
 Sản phẩm thêm vài thứ ngoài mock: khóa idempotency cho lệnh ghi, `delivery.estimate`, tìm sản phẩm dễ tính hơn. Chúng nằm trong lớp bọc, không đổi kết quả của hàm BTC.
+
+**Bản cập nhật BTC 11/2026** (`eval/mock_tools.py`, `eval/reference_eval.py`, `schemas/tools.schema.json`, thay ngày 12/11/2026):
+
+- **Đơn từ hai máy lọc không khí trở lên** (đếm theo máy, `qty` 2 là hai máy):
+  - báo giá bằng `pricing.quote_order(lines)`, có giá từng máy;
+  - tạo một đơn bằng `order.create(lines=[{sku, qty, price_vnd}])`;
+  - AIR-2ND-50 chỉ giảm 50% cho đúng một máy mỗi đơn: máy có giá niêm yết thấp nhất, hai máy bằng giá thì máy đứng sau;
+  - mỗi máy nhận tối đa một khuyến mãi, và TRADE-IN-AP tối đa một máy mỗi đơn;
+  - cùng mã mà khác giá thì mỗi máy một dòng `qty` 1. Ví dụ hai AirPure Pro: 7.690.000đ (AIR-OCT) và 3.995.000đ (AIR-2ND-50), tổng 11.685.000đ.
+
+  Agent dùng `pricing_quote_order` cho các đơn này. Hệ thống điền giá từng máy từ báo giá đó (`purchase.priced_lines`): mỗi giá một dòng. Guard (`actions._order_of_lines`) kiểm giá từng máy và giới hạn COD trên tổng đơn.
+- **`reference_eval.py`:**
+  - `args_match` so `order.create` với từng dòng.
+  - `also_ordered` và `total_match_vnd` tính trên mọi dòng của các đơn tạo thành công; lệnh có `error` không được tính.
+  - Ngày giờ so tới phút; `promo_code` chỉ chấm khi agent có truyền.
+  - `must_say_any`, `forbidden_claims` dạng chuỗi và câu "không có thông tin" so theo **nguyên từ**, sau khi chuẩn hoá số ("1.521.000đ" = "1521000 đ"), nên "AI" không còn khớp nhầm "lại".
+  - `trace_must_not_match` chỉ quét lời agent và bộ nhớ, không quét tham số tool.
+  - PII chỉ tính những số khách đã nói.
+
+  Chạy lại oracle với bản mới: dev và test vẫn đạt CCR 100 · RQR 0 · TSR 100 · HR 0. Kết quả validator trên hội thoại mẫu không đổi.
 
 ## 4. Extractor
 

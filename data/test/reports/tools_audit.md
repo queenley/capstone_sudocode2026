@@ -21,7 +21,7 @@ BTC allows extra tools/params ("Được thêm tool/tham số riêng"); they mus
 | `delivery_estimate` | **no** | team | — | address, on | oracle_trace: 60 |
 | `handoff.transfer` | yes | M1 | brief | brief | success_if.must_not_call_tools: 5, success_if.tool_called: 5, oracle_trace: 5 |
 | `inventory.check` | yes | M1 | sku | on, sku | fault_injection: 3, oracle_trace: 135 |
-| `order.create` | yes | M1 | customer_phone, sku | address, basket_skus, customer_phone, on, order_group, payment, price_vnd, qty, sku | success_if.must_not_call_tools: 113, success_if.tool_called: 58, oracle_trace: 70 |
+| `order.create` | yes | M1 | customer_phone | address, basket_skus, customer_phone, on, order_group, payment, price_vnd, qty, sku | success_if.must_not_call_tools: 113, success_if.tool_called: 58, oracle_trace: 70 |
 | `order.status` | yes | M2 | — | order_id | success_if.tool_called: 12, oracle_trace: 19 |
 | `order.update` | yes | M1 | order_id, action | action, new_variant_sku, on, order_id, reason | success_if.must_not_call_tools: 6, success_if.tool_called: 8, oracle_trace: 8 |
 | `pricing.get_quote` | yes | M2 | sku | basket_skus, customer_phone, on, sku | success_if.tool_called: 2, oracle_trace: 141 |

@@ -349,6 +349,27 @@ Loại: dữ liệu · Trạng thái: xong · Chỉ số: không có (giao diệ
 - **Số đo:** 40/40 sản phẩm có ảnh.
 - **Còn lại:** vài ảnh chỉ gần đúng loại hàng (máy lọc nước nóng lạnh cho RO, bình sữa cho máy hâm và máy tiệt trùng). Cần chạy lại seed để ảnh vào database: `docker compose run --rm seed`.
 
+### 2026-11-12 · Gói BTC cập nhật 11/2026: đơn nhiều máy lọc không khí, so cụm theo nguyên từ
+
+Loại: evaluation, dữ liệu · Trạng thái: xong · Chỉ số: TSR, CCR (chấm chính thức)
+
+- **Vấn đề:** BTC thay `eval/mock_tools.py`, `eval/reference_eval.py` và `schemas/tools.schema.json`.
+  - Mock: AIR-2ND-50 chỉ một máy mỗi đơn (máy rẻ nhất, bằng giá thì máy sau). Thêm `pricing.quote_order(lines)` và `order.create(lines)`.
+  - Chấm: so cụm theo nguyên từ; `trace_must_not_match` bỏ tham số tool; không tính đơn có lỗi; so ngày giờ tới phút.
+  - Agent chỉ đặt được mỗi lệnh một mã, một giá. Vì vậy hai AirPure Pro hay `qty` 2 sẽ bị mock trả `price_mismatch`: mock chờ 7.690.000đ và 3.995.000đ.
+- **Bằng chứng:**
+  - Chạy `--selftest` của mock mới.
+  - Chạy oracle và validator của dev/test với `BTC_DATA_DIR` trỏ bản mới: không đổi kết quả. Bộ dữ liệu chỉ có cặp máy lệch giá, không có ca nhiều máy cùng mẫu.
+  - Bộ test của agent: chỉ hỏng test ghim hash.
+- **Sửa:**
+  - Ba file của gói và phần agent (`pricing_quote_order`, `order_create(lines)`, guard `_order_of_lines`, `purchase.priced_lines`, `test_order_lines.py`) đã có trên nhánh chính ở commit `91e8d113` (10/11/2026). Khi rebase, bản agent làm song song (`actions.priced_lines`, `test_air_purifier_orders.py`) bị bỏ, giữ bản của nhánh chính.
+  - Mục này thêm phần đánh giá và dữ liệu: ghi chú bản cập nhật trong `tests/agent/btc_pack.sha256.json`, `scenario-keys.yaml`, scoring-flow §3, `tools_audit` và `auto_verify` dev/test chạy lại.
+  - Test privacy của bộ sinh: tra SĐT người khác qua tool không còn là lộ thông tin theo BTC; guard của agent vẫn chặn việc đó.
+- **Đã kiểm:**
+  - Bộ sinh dữ liệu: 112/112 test qua.
+  - Oracle dev và test hoàn hảo; 0 lỗi khoá. `auto_verify`: nhãn dev 799/801, test 191/192.
+- **Số đo:** chưa chạy agent thật. Ca cần thử: hai máy cùng mẫu, ba máy, khách có máy cũ (TRADE-IN-AP và AIR-2ND-50).
+
 ### 2026-11-10 · Extractor v13: tự sửa lỗi luật trước khi thử lại; tắt Langfuse khi hết hạn mức
 
 Loại: evaluation · Trạng thái: xong · Chỉ số: RQR, CCR, HR (công cụ đo đổi: `product-extractor-v13`)

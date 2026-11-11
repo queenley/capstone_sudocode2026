@@ -139,14 +139,14 @@ memory_expectation:
 success_if:
   tool_called: {type: str, origin: btc_sample, nullable: true, values: tools, description: "the tool that must be called; null = none required"}
   args_match: {type: object, origin: btc_sample, keys: tool_args, description: "a subset of the call's arguments, exact values"}
-  also_ordered: {type: list, origin: btc_format, items: sku, description: "the other SKUs ordered, one order.create each"}
-  total_match_vnd: {type: int, origin: btc_format, description: "Σ price_vnd × qty over every order.create"}
+  also_ordered: {type: list, origin: btc_format, items: sku, description: "the other SKUs ordered: every line of every successful order.create (lines, BTC 11/2026)"}
+  total_match_vnd: {type: int, origin: btc_format, description: "Σ price_vnd × qty over every line of every successful order.create; an order.create with an error is not counted (BTC 11/2026)"}
   brief_must_contain: {type: list, origin: btc_format, description: "HandoffBrief fields that must be non-empty"}
-  must_say_any: {type: list, origin: btc_sample, description: "at least one phrase in the agent's words (substring)"}
+  must_say_any: {type: list, origin: btc_sample, description: "at least one phrase in the agent's words, as whole words after number normalisation (reference_eval.said, BTC 11/2026)"}
   agent_must_say: {type: list, origin: btc_format, description: "presence requires an abstain phrase (chưa có thông tin…)"}
   must_not_call_tools: {type: list, origin: btc_format, items: tools}
   forbidden_claims: {type: list, origin: btc_sample, description: "[{field, value}] with field a ground_truth_facts key, value \"*any*\" = every value; or a phrase"}
-  trace_must_not_match: {type: list, origin: btc_format, description: "regexes on agent text, memory writes and tool args (PII, internal data)"}
+  trace_must_not_match: {type: list, origin: btc_format, description: "regexes on agent text and memory writes, not tool args (PII, internal data; BTC 11/2026)"}
   max_agent_questions: {type: int, origin: btc_format}
   say_at_most: {type: list, origin: team, since: 2026-10-31, description: "[{pattern, max}]: at most max agent turns match the regex (0 = never); reference_eval ignores it, the harness writes team_checks.json (a diagnostic)"}
 
@@ -158,7 +158,7 @@ team_tools:
 
 team_tool_args:
   order.create:
-    basket_skus: {type: list, origin: team, since: 2026-10-30, description: "the other SKUs of the same order (AIR-2ND-50)"}
+    basket_skus: {type: list, origin: team, since: 2026-10-30, description: "the other SKUs of the same order (AIR-2ND-50); official in tools.schema.json since BTC 11/2026, for split orders"}
     order_group: {type: str, origin: team, since: 2026-10-30, description: "which order of a split (QT-01): \"1\" or \"2\""}
     "on": {type: date, origin: btc_format, description: "every tool takes on (tools.schema.json description)"}
 
