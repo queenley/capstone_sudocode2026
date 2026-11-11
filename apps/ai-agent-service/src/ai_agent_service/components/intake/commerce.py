@@ -23,7 +23,7 @@ from .pii import normalise_phone
 from .text import plain
 from . import spoken
 
-VERSION = 'scenario-commerce-v11'
+VERSION = 'scenario-commerce-v14'
 CATALOG_PATH = 'catalog/products.json'
 CONTRACT_PATH = (ROOT.parents[1] / 'contracts/scenario/scenario-keys.yaml'
                  if (ROOT.parents[1] / 'contracts/scenario/scenario-keys.yaml').is_file()
@@ -129,6 +129,10 @@ def _product_patterns(catalogue_json: str | None = None, corrections_json: str |
             # Full model codes can identify a product without its brand. A bare size/unit or X/Pro cannot.
             if re.search(r'\b[A-Za-z]{2,}[- ]?\d', model):
                 names.append(model)
+        elif start >= 0:
+            # v14: "combo" and its first item ("combo Spectra S1") name the combo, not that item; the longer
+            # name wins where they overlap.
+            names.append('Combo ' + re.split(r'\s*[+(]', product['name'][start:])[0].strip())
         names += [re.sub(re.escape(brand), alias, name, flags=re.IGNORECASE)
                   for name in list(names) for alias in _brand_aliases(brand, corrections) if brand]
         for name in names:
@@ -181,6 +185,7 @@ def _fuzzy_brand_product(surface: str) -> str | None:
                    and _distance(candidate, alias) <= min(2, int(max(len(candidate), len(alias)) * .30))
                    for candidate in candidates for alias in aliases):
                 codes.add(sku)
+    codes = {code for code in codes if not _part_without_its_kind(code, surface, codes)}  # v14: as for exact names
     return next(iter(codes)) if len(codes) == 1 else None
 
 
@@ -199,10 +204,12 @@ def _kind_and_name(product: dict) -> tuple[str, str]:
     words, brand = product['name'].split(), plain(product.get('brand', '')).lower()
     kind = []
     for i, word in enumerate(words):
-        if (i and (not word[:1].islower() or not word.isalpha())) or (brand and plain(word).lower() == brand):
+        # v13: a number inside the kind ("Xe đẩy 2 chiều") belongs to it; it is said as a word ("hai chiều").
+        inside = word.isdigit() and i + 1 < len(words) and words[i + 1][:1].islower() and words[i + 1].isalpha()
+        if (i and (not word[:1].islower() or not word.isalpha()) and not inside) or (brand and plain(word).lower() == brand):
             break
         kind.append(word)
-    return _surface(' '.join(kind)), re.split(r'\s*[+(]', ' '.join(words[len(kind):]))[0].strip()
+    return _surface(spoken.catalogue_spoken(' '.join(kind))), re.split(r'\s*[+(]', ' '.join(words[len(kind):]))[0].strip()
 
 
 @lru_cache(maxsize=8)
@@ -229,6 +236,9 @@ def _kinds(catalogue_json: str | None = None, corrections_json: str | None = Non
                 names |= {re.sub(re.escape(brand), alias, name, flags=re.IGNORECASE) for alias in _brand_aliases(brand, corrections)}
             if brand and sum(other == brand for _, other, _ in items) == 1:
                 names |= {brand} | _brand_aliases(brand, corrections)  # The brand's only one of its kind: the brand names it.
+            # v13: a heard spelling of the whole name ("drapark" -> Joie Pact) is a sound key too, so the
+            # spellings near it ("drap back", "dray park") are heard as that product.
+            names |= {alias for each in set(names) for alias in _brand_aliases(each, corrections)}
             entries.append((sku, keys(names)))
         # A brand with several products of this kind, said without a model, names none of them ("máy lọc không khí e pia").
         for brand in sorted({brand for _, brand, _ in items if brand and sum(other == brand for _, other, _ in items) > 1}):
@@ -246,6 +256,8 @@ NOT_A_NAME = frozenset({'cho', 'cua', 'nay', 'do', 'ay', 'kia', 'nao', 'ma', 'em
                         'nhat', 'gia', 'hang', 'mot', 'hai', 'ba'})
 #: Similarity a heard name needs: alone of its kind, among several, and ahead of the next candidate.
 SOUND_ALONE, SOUND_AMONG, SOUND_MARGIN = .6, .5, .1
+#: v12: similarity a model heard after its brand needs to win over the brand alone.
+SOUND_MODEL = .7
 
 
 def _heard_product(surface: str) -> str | None:
@@ -256,31 +268,88 @@ def _heard_product(surface: str) -> str | None:
     """
     found: dict[str, float] = {}
     surface = _surface(spoken.catalogue_numbers(surface))
-    for kind, entries in _kinds(*_index_keys()).items():
+    groups = _kind_groups(*_index_keys())
+    # The longest kind said at each place: "giày chạy bộ run lai" is read after "giày chạy bộ", not after "giày".
+    places: dict[int, re.Match] = {}
+    for kind in groups:
         for match in re.finditer(r'(?<!\w)' + re.escape(kind) + r'(?!\w)', surface):
-            window = surface[match.end():].split()[:6]
-            window = window[:next((i for i, word in enumerate(window) if word in NAME_ENDS), len(window))]
-            if not window or window[0] in NOT_A_NAME:
-                continue
-            heard = [_sound(' '.join(window[:n])) for n in range(1, len(window) + 1)]
-            scores = sorted(((max((1 - _distance(said, key) / max(len(said), len(key)) for said in heard for key in keys),
-                                  default=0), sku) for sku, keys in entries), reverse=True)
-            best, sku = scores[0]
-            runner_up = scores[1][0] if len(scores) > 1 else 0
-            if sku and best >= (SOUND_ALONE if len(entries) == 1 else SOUND_AMONG) and best - runner_up >= SOUND_MARGIN:
-                found[sku] = max(found.get(sku, 0), best)
+            if match.start() not in places or len(match.group()) > len(places[match.start()].group()):
+                places[match.start()] = match
+    for match in places.values():
+        entries = groups[match.group()]
+        window = surface[match.end():].split()[:6]
+        window = window[:next((i for i, word in enumerate(window) if word in NAME_ENDS), len(window))]
+        if not window or window[0] in NOT_A_NAME:
+            continue
+        heard = [_sound(' '.join(window[:n])) for n in range(1, len(window) + 1)]
+        # Each entry's best similarity, and how many heard words it took (-n so the fewest words wins a tie).
+        scores = sorted((max(((1 - _distance(said, key) / max(len(said), len(key)), -n) for n, said in enumerate(heard, 1)
+                              for key in keys), default=(0, 0)), sku) for sku, keys in entries)[::-1]
+        named = [(best, -words, sku) for (best, words), sku in scores if sku]
+        brand = next(((best, -words) for (best, words), sku in scores if not sku), (0, 0))
+        if not named:
+            continue
+        best, words, sku = named[0]
+        runner_up = named[1][0] if len(named) > 1 else 0
+        # v12: the brand alone matching its first words ("run lai") does not hide the model heard after it
+        # ("run lai hy pro" ~ RunLite 2 Pro); the model must then be heard well (SOUND_MODEL).
+        # The words heard beyond the brand must be able to name a model: not "cho" in "nimbolo cho người lớn".
+        model_words = window[brand[1]:words]
+        beats_brand = best - brand[0] >= SOUND_MARGIN or (words > brand[1] and best >= SOUND_MODEL and not any(
+            word in NOT_A_NAME and word not in ('mot', 'hai', 'ba') for word in model_words))
+        needed = SOUND_ALONE if len(entries) == 1 else SOUND_AMONG
+        if match.group() not in _kinds(*_index_keys()):
+            needed = max(needed, SOUND_MODEL)  # v12: a shortened kind says less, so the name must be heard well.
+        if best >= needed and best - runner_up >= SOUND_MARGIN and beats_brand:
+            found[sku] = max(found.get(sku, 0), best)
     return next(iter(found)) if len(found) == 1 else None
 
 
-def _part_without_its_kind(sku: str, surface: str) -> bool:
-    """A part whose name begins another product's ("Màng lọc Xiaomi Smart 4" in "Xiaomi Smart 4 Lite"), its kind unsaid."""
+#: One word that stands for its kinds of product on its own; other one-word shortenings are everyday words
+#: once their tones are gone ("nồi" ~ "nói", "bộ" ~ "bỏ", "máy" is every machine).
+KIND_ONE_WORD = frozenset({'giay'})
+
+
+@lru_cache(maxsize=8)
+def _kind_groups(catalogue_json: str | None = None, corrections_json: str | None = None) -> dict[str, list]:
+    """Each kind of product, and each shorter way to say it, with the products it may mean.
+
+    v12: customers shorten the kind ("giày" for "giày trekking", "xe đẩy" for "xe đẩy gấp gọn"), so the
+    leading words of a kind name every product whose kind starts with them.
+    """
+    groups: dict[str, list] = {}
+    for kind, entries in _kinds(catalogue_json, corrections_json).items():
+        words = kind.split()
+        for n in range(1, len(words) + 1):
+            short = ' '.join(words[:n])
+            if n == len(words) or n > 1 or short in KIND_ONE_WORD:
+                groups.setdefault(short, []).extend(entries)
+    return groups
+
+
+def _part_without_its_kind(sku: str, surface: str, codes: frozenset[str] | set[str] = frozenset()) -> bool:
+    """A part whose name begins another product's ("Màng lọc Xiaomi Smart 4" in "Xiaomi Smart 4 Lite"), its kind unsaid.
+
+    v14: or has the same name as another product of *codes* whose kind is said ("Màng lọc thay thế AirPure Pro"
+    in "giá máy AirPure Pro").
+    """
     products = [p for p in _catalogue()['products'] if 'NGỪNG BÁN' not in p['name'].upper()]
     product = next((p for p in products if p['sku'] == sku), None)
     if product is None:
         return False
     kind, name = _kind_and_name(product)
-    longer = any(other['sku'] != sku and _kind_and_name(other)[1].lower().startswith(name.lower() + ' ') for other in products)
-    return longer and bool(kind) and not re.search(r'(?<!\w)' + re.escape(kind.split()[0]) + r'(?!\w)', surface)
+
+    def said(words: str) -> bool:
+        return bool(words) and bool(re.search(r'(?<!\w)' + re.escape(words.split()[0]) + r'(?!\w)', surface))
+
+    if not kind or said(kind):
+        return False
+    for other in products:
+        other_kind, other_name = _kind_and_name(other)
+        if other['sku'] != sku and (other_name.lower().startswith(name.lower() + ' ') or (
+                other_name.lower() == name.lower() and other['sku'] in codes and said(other_kind))):
+            return True
+    return False
 
 
 def _model_in_context(text: str, previous: str) -> str | None:
@@ -334,7 +403,7 @@ def _named_products(text: str) -> set[str]:
             else:
                 hits.append((*match.span(), codes))
     codes = set().union(*(codes for _, _, codes in hits)) if hits else set()
-    return {code for code in codes if not _part_without_its_kind(code, surface)}
+    return {code for code in codes if not _part_without_its_kind(code, surface, codes)}
 
 
 def _clauses(text: str) -> list[str]:
@@ -371,24 +440,45 @@ BLOCKERS = {
     'can hoi vo': r'(?:hỏi|bàn|trao đổi|tham khảo|xin ý kiến)(?:\s+\w+){0,3}\s+(?:vợ|bà xã)',
     # v9: family named by its members ("hỏi ý kiến con cháu", "bàn với bố mẹ").
     'can hoi nguoi nha': r'(?:hỏi|bàn|trao đổi|tham khảo|xin ý kiến|hỏi ý kiến)(?:\s+\w+){0,3}\s+'
-                         r'(?:người nhà|gia đình|con cháu|con cái|bố mẹ|ba mẹ|cả nhà)',
+                         r'(?:người nhà|gia đình|con cháu|con cái|bố mẹ|ba mẹ|cả nhà)|'
+                         # v12: convincing the family first, asking friends.
+                         r'thuyết phục (?:gia đình|người nhà|cả nhà)|hỏi (?:lại |thêm )?bạn bè',
     # v9: the shop's price said to be above another's ("giá bên em vẫn cao hơn chỗ khác", "cân nhắc chỗ khác").
-    'so sanh gia': r'so sánh (?:giá|thêm)|(?:xem|tham khảo|khảo) giá (?:thêm|chỗ khác|bên khác)|'
-                   r'(?:cao|đắt|mắc) hơn (?:chỗ|bên|nơi|shop) khác|cân nhắc (?:thêm )?(?:chỗ|bên|nơi|shop) khác',
+    # v12: another seller's price said at all ("bên khác họ bán 3 triệu 780", "trên mạng có chỗ bán ..."),
+    # "rẻ hơn"/"thấp hơn", "sao bên mình lại cao hơn", "xem chỗ khác", "tham khảo vài nơi", "so sánh với".
+    'so sanh gia': r'so sánh (?:giá|thêm|với)|(?:xem|tham khảo|khảo) giá (?:thêm|chỗ khác|bên khác)|'
+                   r'(?:cao|đắt|mắc) hơn (?:giá )?(?:chỗ|bên|nơi|shop) (?:khác|kia)|cân nhắc (?:thêm )?(?:chỗ|bên|nơi|shop) khác|'
+                   r'(?:bên|chỗ|nơi|shop|cửa hàng) (?:khác|kia|ngoài)(?:\s+\w+){0,4}?\s+(?:bán|ghi|báo|có giá|giá|đang bán|rẻ|thấp)|'
+                   r'trên mạng(?:\s+\w+){0,4}?\s+(?:bán|giá|rẻ)|thấy(?:\s+\w+){0,8}?\s+(?:rẻ|thấp) hơn|sao (?:bên mình |bên em )?(?:lại )?cao hơn|'
+                   r'(?:xem|chọn) (?:chỗ|bên|nơi|shop) khác|tham khảo (?:vài|nhiều|mấy|các) (?:nơi|chỗ|bên)',
     # v9: a price over what was planned ("hơi cao so với dự kiến").
+    # v12: over the customer's own budget ("hơi cao so với ngân sách của chị", "ngân sách eo hẹp", "giá này thì cao quá").
     'vuot ngan sach': r'vượt (?:quá )?ngân sách|quá ngân sách|(?:không|chưa) đủ (?:tiền|ngân sách)|'
-                      r'(?:cao|đắt|mắc|vượt) (?:hơn |quá )?(?:so với )?(?:dự kiến|dự tính|khả năng)',
+                      r'(?:cao|đắt|mắc|vượt) (?:hơn |quá )?(?:so với )?(?:dự kiến|dự tính|dự định|khả năng)|'
+                      r'(?:cao|đắt|mắc)(?: quá)? so với ngân sách|ngân sách (?:eo hẹp|hạn hẹp|có hạn)|giá (?:này )?(?:thì )?(?:cao|đắt) quá',
     # v9: up to six words between the wait and the pay ("chờ đến cuối tháng mới nhận lương").
-    'cho luong': r'(?:chờ|đợi|đến khi|tới khi|khi nào)(?:\s+\w+){0,6}\s+(?:lương|lĩnh lương|nhận lương)',
+    # v12: the end of the month or having money ("phải chờ cuối tháng mới có tiền", "khi nào có tiền").
+    'cho luong': r'(?:chờ|đợi|đến khi|tới khi|khi nào)(?:\s+\w+){0,6}\s+(?:lương|lĩnh lương|nhận lương)|'
+                 r'(?:chờ|đợi)(?:\s+\w+){0,2}\s+cuối tháng|(?:cuối tháng|tháng sau) (?:\w+ )?mới (?:nhận lương|có tiền)|'
+                 r'(?:khi nào|lúc nào|mới) có tiền',
     # The same everyday intents documented by MemoryAgent's independent rule fallback; v9: "nghĩ thêm".
-    'can suy nghi them': r'suy nghĩ (?:thêm|đã|lại)|cân nhắc (?:thêm|đã|lại)|(?:cần|muốn|để (?:chị|anh|em|mình|tôi)) suy nghĩ|'
-                         r'để (?:chị|anh|em|mình|tôi) (?:xem|nghĩ|tính)\b|(?<!suy )nghĩ thêm',
+    # v12: asking around or reading up before deciding ("hỏi thêm rồi gọi lại", "tìm hiểu thêm", "phân vân",
+    # "cần thêm thời gian", "trước khi quyết định", "chưa quyết định"); not a question about something ("hỏi thêm về ...")
+    # nor a choice between models ("phân vân giữa vài mẫu").
+    'can suy nghi them': r'suy nghĩ (?:thêm|đã|lại)|cân nhắc (?:thêm|đã|lại|rồi)|(?:cần|muốn|để (?:chị|anh|em|mình|tôi)) suy nghĩ|'
+                         r'để (?:chị|anh|em|mình|tôi) (?:xem|nghĩ|tính)\b|(?<!suy )nghĩ thêm|đang suy nghĩ',
 }
+#: v12: hesitation said without "suy nghĩ"; a reason named in the same clause wins over it
+#: ("chờ cuối tháng mới nhận lương nên chưa quyết định" is the pay day, "... nên cần suy nghĩ thêm" stays hesitation).
+WEAK_HESITATION = (r'hỏi (?:thêm|lại)(?:\s+\w+){0,3}?\s+(?:rồi|đã)(?:\s+\w+){0,2}?\s+gọi lại|cần hỏi thêm(?!(?:\s+\w+){0,3}\s+về)|'
+                   r'(?:tìm hiểu|xem xét|tham khảo) thêm(?! về)|phân vân(?! giữa)|phân vân giữa cái này|cần (?:thêm )?thời gian|'
+                   r'trước khi quyết định|chưa quyết định|quyết định sau|xem lại thông tin')
 SIZE = r'(?:\d{1,3}|xxxl|xxl|xxs|xl|xs|s|m|l)'
 
 
 def _negated(prefix: str) -> bool:
-    return bool(re.search(r'\b(?:không|chẳng|chưa)(?:\s+(?:cần|muốn|chọn|lấy|mua|đặt|chốt|đổi|dùng|phải|là|có|còn|định|thanh toán|trả tiền|qua|bằng|tư vấn))*\s*$', prefix))
+    # v12: "đúng không"/"phải không" asks for a confirmation; it negates nothing after it.
+    return bool(re.search(r'\b(?<!đúng )(?<!phải )(?:không|chẳng|chưa)(?:\s+(?:cần|muốn|chọn|lấy|mua|đặt|chốt|đổi|dùng|phải|là|có|còn|định|thanh toán|trả tiền|qua|bằng|tư vấn))*\s*$', prefix))
 
 
 def _selected_product(text: str) -> str | None:
@@ -439,33 +529,50 @@ def _children(clause: str) -> bool | None:
         match = mentions[-1]
         if not _yes_no_tail(clause[match.end():]):
             return not _negated(clause[:match.start()])
-    if re.search(r'(?:bé|con)\s+(?:nhà |của )?(?:tôi|mình|anh|chị|em|cô|chú|bác)\s+\d+\s*(?:tháng|tuổi)\b', clause):
+    # v12: "bé nhà chị được 18 tháng", "bé mới có 3 tháng".
+    if re.search(r'(?:bé|con)\s+(?:(?:nhà |của )?(?:tôi|mình|anh|chị|em|cô|chú|bác)\s+(?:(?:được|mới|có|chỉ|tầm|khoảng)\s+)*'
+                 r'|(?:(?:được|mới|có|chỉ|tầm|khoảng)\s+)+)\d+\s*(?:tháng|tuổi)\b', clause):
         return True
     return None
 
 
+#: What follows a number that is not a size ("sai 40 lần", "sai bốn mươi nghìn").
+NOT_A_SIZE_AFTER = r'(?![.,]\d)(?!\s*(?:ngày|giờ|lần|đồng|triệu|tháng|nghìn|ngàn|trăm|tuổi|phút|năm|k|%)\b)'
+
+
 def _size_cues(text: str) -> str:
-    if not re.search(r'giày|áo|quần|váy|đầm|mặc|mang|đôi|cỡ', text):
-        return text
+    # v12: shoes named by their use ("chạy bộ", "trekking") and a change ("đổi sang") are clothing contexts too.
+    if not re.search(r'giày|áo|quần|váy|đầm|mặc|mang|đôi|cỡ|chạy bộ|trekking|sneaker|đổi (?:sang|lên|xuống)', text):
+        # v12: without that context only "sai" before a shoe size is the recogniser's "size".
+        return re.sub(r'\bsai\s+(3[5-9]|4[0-6])\b' + NOT_A_SIZE_AFTER, r'size \1', text)
     def replace(match):
         word = match[1]
         sound = re.sub(r'c(?=[iey])', 's', word).replace('z', 's').replace('y', 'i')
+        size = 'l' if match[2] in ('el', 'lờ') else match[2]
         # v9: "side", "sies", "site", "cit", "cy" are how the recogniser writes "size" before a size.
-        if sound == 'sise' or re.fullmatch(r'sai[sz]?', word) or re.fullmatch(r'si(?:[ds]e?|te?|es)?', sound):
-            return 'size ' + match[2]
+        # v12: "tay", "cy" before a number, and "syse", "sies" before a spoken letter ("syse el").
+        if (sound == 'sise' or re.fullmatch(r'sai[sz]?', word) or re.fullmatch(r'si(?:[ds]e?|te?|es)?', sound)
+                or (word in ('tay', 'cy', 'sy') and size.isdigit())):
+            return 'size ' + size
         return match.group()
-    return re.sub(r'\b([a-z]{3,5})\s+(' + SIZE + r')\b(?!\s*(?:ngày|giờ|lần|đồng|triệu|tháng)\b)', replace, text)
+    return re.sub(r'\b([a-z]{2,5})\s+(' + SIZE + r'|el|lờ)\b' + NOT_A_SIZE_AFTER, replace, text)
 
 
 def _payment(clause: str) -> str | None:
     choices = {kind for kind, pattern in [
         # v9: "c o d" / "ceo d" as the recogniser splits it; cash on delivery ("tiền mặt khi giao hàng").
         # "thanh toán qua ngân hàng và giao hàng ở ..." names a delivery place, not cash on delivery: "giao" needs "khi/lúc".
-        ('COD', r'\bc+o+d+\b|\b(?:c|ce|xe)\s*[oô]\s+(?:d|đê|dê)\b|\bceo\s+d\b|thu hộ|nhận hàng[^.!?;]{0,35}trả tiền|'
+        # v12: after "thanh toán"/"trả", how the recogniser writes COD ("ko d", "kod", "coop", "cây o d", "ceo đề"),
+        # and a "c" the clip ends on ("chọn thanh toán c").
+        ('COD', r'(?:thanh toán|trả)(?:\s+\S+){0,4}?\s+(?:k[oô]\s*d|kod|coop|cop|code|cây\s+[oô]\s+(?:d|đê)|ceo(?:\s+(?:d|đề|đê))?)\b|'
+                r'thanh toán\s+c\s*$|'
+                r'\bc+o+d+\b|\b(?:c|ce|xe)\s*[oô]\s+(?:d|đê|dê)\b|\bceo\s+d\b|thu hộ|nhận hàng[^.!?;]{0,35}trả tiền|'
                 r'(?:tiền mặt|trả tiền|thanh toán)[^.!?;]{0,35}(?:khi )?nhận hàng|(?:khi|lúc) giao hàng[^.!?;]{0,20}trả tiền|'
                 r'(?:trả tiền|thanh toán)[^.!?;]{0,20}(?:khi|lúc) giao hàng|tiền mặt'),
         # v9: "hình thức thanh toán là qua ngân hàng".
-        ('bank', r'chuyển khoản|\bbanking\b|\bbank\b|(?:thanh toán|trả tiền)[^.!?;]{0,20}(?:qua|bằng)\s+ngân hàng'),
+        # v12: "bằng thẻ ngân hàng", "trả bằng ngân hàng", "là ngân hàng", "bằng tài khoản" (the recogniser's "chuyển khoản").
+        ('bank', r'chuyển khoản|\bbanking\b|\bbank\b|(?:thanh toán|trả)(?:\s+tiền)?[^.!?;]{0,25}?(?:qua|bằng|là)\s+'
+                 r'(?:thẻ\s+|tài khoản\s+|khoản\s+)?ngân hàng|(?:thanh toán|trả)(?:\s+tiền)?\s+(?:qua|bằng)\s+tài khoản\s*$'),
         ('momo', r'\bmomo\b'), ('zalopay', r'\bzalopay\b')]
         for m in re.finditer(pattern, clause)
         if not _negated(clause[:m.start()]) and not _conditional(clause[:m.start()])
@@ -603,8 +710,10 @@ def _mentions(text: str, *, now: datetime | None = None, previous_size: int | st
         payment = _payment(clause)
         if payment in {'COD', 'bank'}:
             found['payment'] = payment
-        for start, end, value in sorted((m.start(), m.end(), value) for value, pattern in BLOCKERS.items()
-                                    for m in re.finditer(pattern, clause)):
+        # v12: weak hesitation is read first, so any blocker the clause names after or before it wins.
+        weak = [(m.start(), m.end(), 'can suy nghi them') for m in re.finditer(WEAK_HESITATION, clause)]
+        for start, end, value in weak + sorted((m.start(), m.end(), value) for value, pattern in BLOCKERS.items()
+                                               for m in re.finditer(pattern, clause)):
             consultation_done = (value.startswith('can hoi') or value == 'can suy nghi them') and _resolved(clause, start, end)
             if _negated(clause[:start]) or consultation_done:
                 if found.get('blocker') == value:
@@ -637,12 +746,15 @@ def _mentions(text: str, *, now: datetime | None = None, previous_size: int | st
                                    clause[sizes[-1].end():]))
                 found['size_old' if old else 'size_new'] = value(sizes[-1][2])
             earlier_size = found.get('size_new', found.get('size_old'))
-        colors = list(re.finditer(r'\bmàu\s+(xanh navy|xanh than|xanh dương|xanh lá|đen|trắng|xám|ghi|navy|be|đỏ|hồng|nâu|vàng|black|white|gray)\b', clause))
+        names = r'(xanh navy|xanh than|xanh dương|xanh lá|đen|trắng|xám|ghi|navy|navi|be|bè|đỏ|hồng|nâu|vàng|black|white|gray)'
+        # v12: a colour said right after the size ("size 39 xám"), and "navi", "bè" as the recogniser writes them.
+        colors = list(re.finditer(r'\bmàu\s+' + names + r'\b|\bsize\s+(?:' + SIZE + r')\s+' + names + r'\b', clause))
         if colors and re.search(r'\b(?:hay|hoặc)\b', clause[colors[0].end():]):
             colors = []
         for m in colors:
-            color = {'xanh navy': 'navy', 'xanh than': 'navy', 'ghi': 'xam',
-                     'black': 'den', 'white': 'trang', 'gray': 'xam'}.get(m[1], plain(m[1]).replace(' ', '_'))
+            said = m[1] or m[2]
+            color = {'xanh navy': 'navy', 'xanh than': 'navy', 'ghi': 'xam', 'navi': 'navy', 'bè': 'be',
+                     'black': 'den', 'white': 'trang', 'gray': 'xam'}.get(said, plain(said).replace(' ', '_'))
             if _negated(clause[:m.start()]):
                 if found.get('color') == color:
                     found.pop('color')

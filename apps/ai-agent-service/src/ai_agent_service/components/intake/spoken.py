@@ -178,7 +178,13 @@ def identifiers(text: str) -> dict[str, str]:
 def size_letters(text: str) -> str:
     forms = {'ích ích ích e lờ': 'XXXL', 'ích ích e lờ': 'XXL', 'ích ích ét': 'XXS',
              'ích e lờ': 'XL', 'ích ét': 'XS', 'em mờ': 'M', 'e lờ': 'L', 'ét': 'S'}
+    # v12 (scenario-commerce): letters as customers shorten them ("size em", "size lờ", "size ê xi el");
+    # only when no other letter follows, so an unknown code ("size em mờ e lờ") stays as said.
+    short = {'ê xi el': 'XL', 'i xi en': 'XL', 'ích xi el': 'XL', 'x l': 'XL', 'el': 'L', 'lờ': 'L', 'em': 'M'}
     letters = '|'.join(map(re.escape, sorted(set(LETTERS.values()), key=lambda s: (-len(s), s))))
     pattern = r'\b(size|cỡ)\s+(' + '|'.join(map(re.escape, forms)) + r')\b(?!\s+(?:' + letters + r')\b)'
-    return re.sub(pattern, lambda m: m[1] + ' ' + forms[m[2].lower()].lower(),
+    text = re.sub(pattern, lambda m: m[1] + ' ' + forms[m[2].lower()].lower(),
                   unicodedata.normalize('NFC', text), flags=re.IGNORECASE)
+    pattern = (r'\b(size|cỡ)\s+(' + '|'.join(map(re.escape, short)) + r')\b(?!\s+(?:' + letters
+               + r'|mờ|lờ|nờ|rờ|e|ê|i|x)\b)')
+    return re.sub(pattern, lambda m: m[1] + ' ' + short[m[2].lower()].lower(), text, flags=re.IGNORECASE)

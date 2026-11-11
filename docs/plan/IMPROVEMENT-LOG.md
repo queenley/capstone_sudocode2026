@@ -23,6 +23,159 @@ Loại: ... · Trạng thái: ... · Chỉ số: TSR / CCR / RQR / HR / latency 
 
 Sáu mục đầu được ghi lại sau khi làm, từ đợt sửa ngày 05-06/11/2026. Chưa mục nào có số đo trên agent thật.
 
+### 2026-11-10 · Combo, phụ kiện cùng tên sản phẩm; thử ngữ cảnh cuộc gọi (scenario-commerce-v14)
+
+Loại: evaluation (bộ trích entity ASR) · Trạng thái: xong · Chỉ số: entity accuracy ASR, `sku`
+
+- **Vấn đề:** trên lời gốc, bộ trích v13 vẫn sai 24/519 `sku` ở dev và 5/126 ở test. Có ba lỗi chung:
+  - "combo Spectra S1" bị nhận là máy hút sữa Spectra S1; "combo AirPure Y" bị nhận là AirPure Y;
+  - "giá máy AirPure Pro" khớp cả máy lẫn "Màng lọc thay thế AirPure Pro" nên bị bỏ trống;
+  - "máy lọc không khí xiaomi smart bốn lai" bị bước khớp mờ nhận là màng lọc "Xiaomi Smart 4".
+- **Bằng chứng:** `evaluation/runs/20261110-commerce-v13/{dev,test}-perfect`.
+- **Sửa** (`components/intake/commerce.py`):
+  - `_product_patterns`: thêm tên "Combo" + món đầu của combo. Tên dài hơn thắng ở chỗ hai tên chồng nhau.
+  - `_part_without_its_kind`: phụ kiện trùng tên một sản phẩm khác cũng được nhắc, có nói loại hàng của sản phẩm đó, thì bị bỏ. Không bỏ khi sản phẩm kia không được nhắc: "cái AirPure Y" vẫn là AirPure Y, không bị combo che.
+  - `_fuzzy_brand_product`: áp cùng quy tắc bỏ phụ kiện như khi khớp đúng tên.
+  - `VERSION` lên `scenario-commerce-v14`.
+- **Thử, không làm:** suy `sku` từ sản phẩm đã nhắc trước đó.
+  - Trần lợi ích, chỉ dùng lời khách: dev 3 lượt (cùng cuộc gọi), test 0. Nếu tính cả cuộc gọi trước thì dev 10, test 4.
+  - Nhãn theo lượt của BTC không gắn `sku` cho lượt chỉ ngầm nhắc sản phẩm. Trong mẫu: D01 "còn mẫu x thì bao nhiêu" để trống; D02 câu xác nhận "một máy e pia y" cũng để trống.
+  - Định dạng ASR của BTC là từng cuộc gọi riêng, không nối sang cuộc trước.
+  - Agent thật không dùng bộ trích này: LLM và `memory.extract` đã có cả hội thoại lẫn bộ nhớ.
+- **Đã kiểm:**
+  - `tests/agent/test_commerce_v14.py`: 7 ca.
+  - Toàn bộ `tests/`: 1.641 qua, 18 bỏ qua. 3 ca hỏng nằm trong `tests/agent/test_extractor_v9.py`, file chưa theo dõi và đã hỏng từ trước.
+- **Số đo:** `evaluation/runs/20261110-commerce-v14/`, chấm lại transcript đã lưu, cùng nhãn.
+
+  | Tập | Văn bản | Entity v13 → v14 | `sku` v13 → v14 |
+  |---|---|---|---|
+  | dev | Lời gốc | 95,4% → 95,7% | 495 → 502/519 |
+  | dev | Zipformer | 90,3% → 90,4% | 442 → 443/519 |
+  | test | Lời gốc | 95,4% → 95,4% | 121 → 121/126 |
+  | test | Zipformer | 91,0% → 91,0% | 110 → 110/126 |
+
+  - Không mất lượt nào.
+  - Test không có ca combo hay "giá máy AirPure Pro", nên không đổi.
+  - Bốn lượt dev đổi từ Spectra S1 sang combo, ở chỗ nhãn để trống. Đây không phải đoán nhầm mới: trước đó bộ trích đã đoán Spectra S1 ở các lượt này.
+- **Còn lại:**
+  - 17 lượt dev và 5 lượt test sai trên lời gốc đã được phân loại, chờ người duyệt (bảng đề xuất nhãn chưa đưa lên main):
+    - 14 lượt nhắc hai sản phẩm, nhãn ghi sản phẩm đầu (mẫu D01 của BTC để trống);
+    - 4 lượt combo để trống nhãn;
+    - 3 lượt câu chuẩn khác lời gốc.
+  - 6 lỗi bộ trích còn lại chưa sửa.
+
+### 2026-11-10 · Khớp tên sản phẩm nghe sai theo âm (scenario-commerce-v13)
+
+Loại: evaluation (bộ trích entity ASR, dùng chung với bộ nhớ của agent) · Trạng thái: xong · Chỉ số: entity accuracy ASR, `sku`
+
+- **Vấn đề:** trên dev, bộ trích lấy đúng 495/519 `sku` từ lời gốc nhưng chỉ 422/519 từ bản Zipformer. Zipformer viết một tên theo nhiều cách: riêng "Joie Pact" có khoảng 19 cách trên dev ("drapack", "rua pac", "drap back", "ra page"). Test lại có những cách chưa gặp ("grab parker", "drapuk"), nên thêm từng cách viết vào từ điển sẽ không bắt được test.
+- **Bằng chứng:**
+  - `sku` bị mất trên `evaluation/runs/20261110-hotwords/{dev,test}-greedy-rescored`.
+  - Vòng đo nhanh trên transcript đã lưu, theo đúng cách bench xử lý văn bản; khớp số của bench.
+- **Sửa:**
+  - `components/intake/commerce.py`:
+    - `_kinds`: dạng đọc cả tên trong từ điển ("drapark: Joie Pact", "aibia: AirPure Y") thành khoá âm của sản phẩm đó, như dạng đọc của hãng đã làm. Nhờ vậy các cách viết gần nó cũng được nhận.
+    - `_kind_and_name`: chữ số nằm giữa loại hàng ("Xe đẩy 2 chiều") thuộc về loại hàng và được đọc thành chữ. Trước đây loại hàng của Combi Sugocal bị cắt còn "xe đẩy", và chữ "hai" chặn tên.
+  - `config/models.yaml`, theo quy tắc v12 (nghe ít nhất hai lần, luôn cho cùng sản phẩm):
+    - "hy pro", "hypro" → "hai Pro": 47 lần trên dev, đều là RunLite 2 Pro.
+    - "run like" → RunLite.
+    - "tiệc trùng" → "tiệt trùng".
+  - `VERSION` lên `scenario-commerce-v13`; hai test ghim phiên bản được đổi theo.
+- **Đã kiểm:**
+  - `tests/agent/test_commerce_v13.py`: 11 ca, gồm 2 ca không được nhận ("hy vọng", "xe đẩy cho bé").
+  - Toàn bộ `tests/`: 1.634 qua, 18 bỏ qua. 3 ca hỏng nằm trong `tests/agent/test_extractor_v9.py`, file chưa theo dõi và đã hỏng từ trước.
+- **Số đo:** `evaluation/runs/20261110-commerce-v13/`, chấm lại transcript Zipformer greedy, không giải mã lại. Cùng nhãn.
+
+  | Tập | Văn bản | Entity v12 | Entity v13 | `sku` v12 | `sku` v13 |
+  |---|---|---|---|---|---|
+  | dev | Zipformer | 89,4% | 90,3% | 422/519 | 442/519 |
+  | test (không dùng để chỉnh luật) | Zipformer | 88,7% | 91,0% | 98/126 | 110/126 |
+  | dev | Lời gốc | 95,4% | 95,4% | 495/519 | 495/519 |
+  | test | Lời gốc | 95,4% | 95,4% | 121/126 | 121/126 |
+
+  - Chỉ trường `sku` thay đổi.
+  - Số lượt nhãn không có `sku` mà bộ trích vẫn đoán ra không đổi (dev 39, test 5). Số `sku` đoán sai sản phẩm cũng không đổi.
+  - WER trên văn bản đưa vào agent: dev 5,4 → 5,2, test 5,5 → 5,4.
+  - Trên dev có 4 lượt từng đúng nay bỏ trống:
+    - 2 lượt "xe đẩy" + tên yếu ("watach", "ra tắt"): "xe đẩy" giờ là cách nói tắt của hai loại hàng, nên tên phải giống ít nhất 0,7 theo quy tắc v12.
+    - 2 lượt câu có cả máy hút sữa và máy tiệt trùng: máy tiệt trùng nay được nhận, nên câu nhắc hai sản phẩm bị bỏ trống, trong khi nhãn ghi sản phẩm đầu.
+    - Riêng "abia mini" mất vì "aibia" (AirPure Y) nay cũng là khoá âm.
+- **Còn lại:**
+  - Phần còn mất do ASR phần lớn không sửa được từ văn bản:
+    - khách chỉ nói tên hãng ("máy lọc không khí epa");
+    - câu nhắc hai sản phẩm;
+    - "thay thế cho epi pro": chữ "cho" chặn tên. Không sửa, vì "thay thế cho máy lọc" có 6 lượt nhãn trống.
+  - Chưa đo trên agent thật.
+
+### 2026-11-10 · Trích entity từ lời ASR: tên sản phẩm nghe sai, size, COD, blocker (scenario-commerce-v12)
+
+Loại: evaluation (bộ trích entity ASR, dùng chung với bộ nhớ của agent) · Trạng thái: xong · Chỉ số: entity accuracy ASR
+
+- **Vấn đề:** chạy Zipformer 30M trên 3.616 clip lời khách của `data/dev` cho WER 5,6 nhưng entity accuracy chỉ 76,6%. Nếu chép đúng từng chữ thì bộ trích đạt 89,1%. Phần mất do ASR chủ yếu ở bốn trường:
+  - `sku` mất 183 entity:
+    - "run lai hy pro": tên hãng khớp riêng, làm khuất cả model;
+    - loại hàng nói tắt ("giày", "xe đẩy");
+    - tên nghe sai: "aibia", "drapark", "slicker up classige".
+  - `size_new`: "sai/tay/cy bốn mươi hai", "syse el", "size em".
+  - `payment`: "ko d", "kod", "coop", "cây o d", "thẻ ngân hàng".
+
+  Phần mất do bộ trích:
+  - `blocker` hụt 142: giá chỗ khác, "hỏi thêm rồi gọi lại", "chờ cuối tháng mới có tiền";
+  - `has_children` hụt 30: "bé nhà anh được mười hai tháng".
+- **Bằng chứng:** `evaluation/runs/20261110-093836-dev-asr/` gồm:
+  - `full-dev`: Zipformer;
+  - `perfect-text`: thay bản ASR bằng chính lời gốc;
+  - `replay-*`: dùng lại các transcript trên, không giải mã lại.
+- **Sửa:**
+  - `components/intake/commerce.py`:
+    - `_heard_product`: khi tên hãng khớp phần đầu, model nghe sau đó vẫn được nhận nếu giống ≥ 0,7 và các từ thêm vào có thể là tên model.
+    - `_kind_groups`: loại hàng nói tắt nhiều từ ("xe đẩy"), và "giày" một từ, gom mọi sản phẩm cùng loại. Từ một chữ khác bị loại vì mất dấu sẽ trùng từ thường ("nồi"/"nói", "bộ"/"bỏ"). Nói tắt thì tên phải khớp ≥ 0,7.
+    - `_size_cues`, `spoken.size_letters`: thêm dạng nghe sai của "size" và cỡ chữ. Không coi là size khi theo sau là tiền hay số lần.
+    - Màu đứng sau size; "navi", "bè".
+    - `_payment`: dạng COD nghe sai, chỉ nhận khi đi sau "thanh toán" hoặc "trả"; các cách nói chuyển khoản ngân hàng. `_negated` không coi "đúng không" là phủ định.
+    - `BLOCKERS`: thêm nhiều cách nói. `WEAK_HESITATION` ("hỏi thêm rồi gọi lại", "chưa quyết định") thua lý do cụ thể nói trong cùng mệnh đề.
+    - `_children`: tuổi của bé nói bằng chữ.
+  - `config/models.yaml` (`voice.lexicon.corrections`): 12 dạng ASR ghi sai, mỗi dạng nghe ≥ 2 lần trên clip dev và luôn ứng với cùng một sản phẩm.
+- **Đã kiểm:**
+  - `tests/agent/test_commerce_v12.py`: 53 ca câu tổng hợp, gồm cả ca không được nhận ("nói hôm trước", "phân vân giữa vài mẫu", "hoàn chênh lệch", "sai 40 nghìn").
+  - Hai test cũ ghim chuỗi phiên bản được đổi sang v12.
+  - Một ca trong `test_asr_entities.py` được đổi theo cách gán nhãn của `data/dev`: "bên khác có giá 8 triệu" nay có thêm `blocker: so sanh gia`.
+  - Toàn bộ `tests/`: 1.612 qua (trừ `tests/agent/test_extractor_v9.py`, file chưa theo dõi, đã hỏng từ trước).
+- **Số đo** (cùng nhãn và cùng transcript):
+
+  | Tập | Văn bản | v11 | v12 |
+  |---|---|---|---|
+  | dev | Zipformer | 76,6% | 89,4% |
+  | dev | Lời gốc | 89,1% | 95,4% |
+  | test (holdout, không dùng để chỉnh luật) | Zipformer | 77,9% | 88,7% |
+  | test | Lời gốc | 91,0% | 95,4% |
+
+  - Trên dev, so với v11 chỉ có 1 entity đúng thành sai (GEN-0130/c2-t1).
+  - Có thêm 24 blocker và 18 `has_children` ở các lượt nhãn bỏ trống. Ví dụ: "để anh hỏi thêm rồi gọi lại", "bé nhà chị được N tháng".
+  - Test không độc lập hẳn: cùng sản phẩm và giọng TTS với dev, chỉ khác lời.
+  - 100 cuộc ghép hai giọng từ clip dev (`20261110-093836-dev-turns-*`, cùng các lượt đã tách):
+    - entity accuracy theo lượt: 63,7% → 72,2% (259 entity, 64 cuộc tách được lượt);
+    - entity accuracy theo cuộc: 79,0% → 86,4%.
+  - So sánh ASR trên 3.616 clip dev (`viegem-full`, VieGem chạy qua asr-service trên MPS):
+
+    | Chỉ số | Zipformer 30M | VieGem |
+    |---|---|---|
+    | WER | 5,6 | 6,8 |
+    | CER | 2,9 | 4,2 |
+    | Entity accuracy, trích bằng v11 (chưa chỉnh theo bản ASR nào) | 76,6% | 65,7% |
+    | Entity accuracy, trích bằng v12 | 89,4% | 74,5% |
+    | Thời gian giải mã p50 / clip | 0,05 s (CPU) | 0,24 s (MPS) |
+
+    VieGem mất hẳn tên "e pia" (viết thành "f"), COD (viết "co", "tiêu") và số đếm ("mười lăm" thành "m"), nên giữ Zipformer làm mặc định.
+- **Còn lại:**
+  - Nhãn nên để người duyệt xem lại:
+    - số tài khoản nhận hoàn tiền gắn `payment: bank` (6 lượt);
+    - "ví momo", "zalo pay" gắn `bank`;
+    - "đen" có dấu ở GEN-0186;
+    - "so sánh thêm" lúc là `so sanh gia`, lúc là `can suy nghi them`;
+    - "người nhà mua cái khác rồi" gắn `can hoi nguoi nha`.
+  - `entity_accuracy_per_turn` thấp chủ yếu vì `diarize.py` bỏ 36/100 cuộc ghép.
+
 ### 2026-11-08 · Màn hình giám sát: gộp phiên theo khách, Call Brief lên đầu, chuông báo đỏ qua Kafka
 
 Loại: tính năng · Trạng thái: xong · Chỉ số: không có (giao diện nhân viên); e2e

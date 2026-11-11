@@ -106,7 +106,7 @@ def test_catalogue_identity_does_not_supply_unspoken_price_stock_or_policy(monke
 def test_main_metric_extractor_declares_contract_and_catalogue_versions():
     from ai_agent_service.components.intake.commerce import metadata
     instrument = metadata()
-    assert instrument['version'] == 'scenario-commerce-v11'
+    assert instrument['version'] == 'scenario-commerce-v14'
     assert len(instrument['contract_sha256']) == len(instrument['catalogue_sha256']) == 64
 
 
@@ -195,7 +195,9 @@ def test_five_inside_money_is_not_the_year_unit(amount):
     ('Tôi trả tiền mặt khi nhận hàng.', {'payment': 'COD'}),
     ('Chọn COOOD nhé.', {'payment': 'COD'}),
     ('Số tài khoản ngân hàng của tôi 123456789012.', {'bank_account': '123456789012'}),
-    ('Giá bên em 9 triệu bên khác có giá 8 triệu.', {'price_vnd': 9_000_000, 'competitor_price_vnd': 8_000_000}),
+    # scenario-commerce-v12: another seller's price is a price comparison, as data/dev labels it.
+    ('Giá bên em 9 triệu bên khác có giá 8 triệu.', {'price_vnd': 9_000_000, 'competitor_price_vnd': 8_000_000,
+                                                    'blocker': 'so sanh gia'}),
     ('Tôi đang mặc size 37.', {'size_old': 37}),
     ('Đổi size từ 37 sang 45 được không?', {'size_old': 37, 'size_new': 45}),
     ('Giày cice 40 màu trắng.', {'size_new': 40, 'color': 'trang'}),
