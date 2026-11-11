@@ -23,6 +23,28 @@ Loại: ... · Trạng thái: ... · Chỉ số: TSR / CCR / RQR / HR / latency 
 
 Sáu mục đầu được ghi lại sau khi làm, từ đợt sửa ngày 05-06/11/2026. Chưa mục nào có số đo trên agent thật.
 
+### 2026-11-12 · Số đo agent gốc trước và sau đợt sửa (commit `40fea307`)
+
+Loại: sửa agent gốc · Trạng thái: xong · Chỉ số: TSR, HR, RQR, CCR, vi phạm, TTFT
+
+- **Vấn đề:** các lỗi ở hai mục 12/11 bên dưới, cộng ba lỗi đọc từ trace lần chạy đầu: điều kiện chính sách không đạt bị coi là "chưa có thông tin" (`SCN-HARD-03`), nhắc lại con số của chính sách cũ (`SCN-HARD-05`), cuộc Zalo không có `channel_identity` bị coi là khách lạ (`SAMPLE-06`).
+- **Sửa:** `rules.md` (luật 4, 6), `skills.yaml` (`product-advice`), `pipeline/eval/scenarios.connection`, nhãn `SCN-HARD-02`; vòng cải tiến publish câu trả lời Gap Loop sau R0; `gaps.record_from_run` chỉ ghi lượt agent nói không có thông tin.
+- **Đã kiểm:** `tests/agent` trừ ASR: 1.453 qua.
+- **Số đo:** advisor `gpt-5.6-luna`, mỗi bộ chạy 1 lần; "trước" là cây làm việc sáng 12/11, "sau" là commit `40fea307`.
+
+  | Bộ | | TSR | HR (giá) | RQR | CCR | Vi phạm | TTFT p50 / p95 (ms) |
+  |---|---|---|---|---|---|---|---|
+  | `data/hard-cases` (5) | trước | 60,0 | 28,6 (20,0) | | | 1 | 1.349 / 4.320 |
+  | | sau | 100,0 | 0 (0) | | | 0 | 1.136 / 3.679 |
+  | Mẫu BTC (7) | trước | 71,4 | 19,4 (22,2) | 9,1 | 90,5 | 0 | 1.269 / 3.765 |
+  | | sau | 85,7 | 21,2 (25,0) | 10,0 | 76,2 | 0 | 1.606 / 3.886 |
+  | `data/gap-loop` frozen (13) | R0, `40fea307` | 23,1 | | | | 4 | 996 / 4.957 |
+  | | R1, 5 mục đã học | 100,0 | | | | 0 | 942 / 3.739 |
+
+  - R1 của Gap Loop đo ở `evaluation/runs/gap-20261112` (trước ba sửa prompt cuối), R0 đo ở `base-40fea307-gap-r0`: hai phía không cùng một commit.
+  - Bộ chấm cảnh báo cần từ 100 lượt để p95 có ý nghĩa; các bộ này có 19 đến 52 lượt.
+- **Còn lại:** `SAMPLE-01` vẫn trượt (tư vấn AirPure X thay vì Y, kéo theo 4 lần báo giá bị tính sai); CCR mẫu BTC tụt 90,5 → 76,2 chưa rõ nguyên nhân; `SAMPLE-07` vẫn kể thêm "30 ngày" và "30.000đ"; `SAMPLE-04` vẫn hỏi lại sản phẩm ở lượt mở đầu; TTFT p95 vẫn trên 3 giây. Hai cơ chế bớt vòng model và phép so sánh model chưa làm.
+
 ### 2026-11-12 · Agent gốc: giữ tài liệu đã đọc, đọc được mã đơn vừa tạo; mục Gap Loop có câu hỏi lập chỉ mục
 
 Loại: sửa agent gốc + Knowledge Gap Loop · Trạng thái: đang đo · Chỉ số: TSR, vi phạm guardrail (chuyển máy thừa), TTFT
