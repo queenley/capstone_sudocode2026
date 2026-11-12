@@ -34,6 +34,9 @@ CallKind = Literal[
     "order_split", "consult_ready", "order_readback",
     # a customer with a reason (a second room, "có khuyến mãi gì không") hears AIR-2ND-50 (KM-05, FAQ-19)
     "second_item_promo",
+    # BTC 11/2026: several air purifiers in one order (two of a model, three units): pricing.quote_order, one
+    # order.create with lines, AIR-2ND-50 on exactly one unit
+    "order_units",
 ]
 Gap = Literal["default", "price_change", "stock_change", "stale"]
 
@@ -51,7 +54,7 @@ KIND_OUTCOME: dict[str, str] = {
     "future_promo": "hen_goi_lai", "order_ewallet": "chot_don", "order_qty": "chot_don", "stack_promo": "chot_don",
     "regional_promo": "hen_goi_lai", "gift_to_cash": "hen_goi_lai", "unverified_identity": "thong_tin",
     "order_split": "chot_don", "consult_ready": "hen_goi_lai", "order_readback": "chot_don",
-    "second_item_promo": "hen_goi_lai",
+    "second_item_promo": "hen_goi_lai", "order_units": "chot_don",
 }
 #: How a kind reads in a scenario's notes (scenario_format.md: notes are written for people).
 KIND_LABELS: dict[str, str] = {
@@ -75,16 +78,17 @@ KIND_LABELS: dict[str, str] = {
     "order_split": "chốt hai món COD vượt 10 triệu, tách hai đơn", "consult_ready": "tư vấn, đã nói cách trả và nơi giao",
     "order_readback": "chốt đơn đã bàn, đọc lại đơn một lần",
     "second_item_promo": "có phòng thứ hai, hỏi khuyến mãi: nghe máy thứ hai giảm 50%",
+    "order_units": "chốt nhiều máy lọc không khí trong một đơn, chỉ một máy giảm 50% (BTC 11/2026)",
 }
 #: Kinds in which the agent (re)quotes price, promotion and stock of the scenario's product.
 QUOTE_KINDS = frozenset({"consult", "consult_callback_holiday", "decline", "price_probe", "order", "order_multi",
                          "deep_consult", "compare", "cart_quote", "prompt_injection", "future_promo", "order_ewallet",
                          "order_qty", "stack_promo", "regional_promo", "gift_to_cash", "order_split", "consult_ready",
-                         "order_readback", "second_item_promo"})
+                         "order_readback", "second_item_promo", "order_units"})
 #: Kinds that end with order.create: the quote takes the delivery address, and an item out of stock turns the call
 #: into a consult.
 ORDERING_KINDS = frozenset({"order", "order_multi", "order_ewallet", "order_qty", "stack_promo", "order_split",
-                            "order_readback"})
+                            "order_readback", "order_units"})
 #: Kinds about an order the customer already has (from the CRM or an earlier call).
 ORDER_KINDS = frozenset({"order_status", "address_change", "warranty_claim", "warranty_expired", "return_expired",
                          "complaint_handoff"})
@@ -159,6 +163,10 @@ SCENES: dict[str, str] = {
                     "nói để cân nhắc và hẹn lại.",
     "order_ewallet": "Khách đã tư vấn trước, nay đồng ý mua, nói muốn trả bằng {wallet} (ví điện tử), hỏi có được không "
                      "và có được giao sớm hơn không; nêu khu vực giao (chỉ quận/tỉnh) và chốt đơn.",
+    "order_units": "Khách gọi để mua đúng {items} trong MỘT đơn (mỗi máy cho một phòng), nói đúng số máy đó; KHÔNG tự "
+                   "nêu giá, không nói \"mỗi mẫu một máy\". Khách hỏi giá từng máy, máy nào được giảm 50% và tổng "
+                   "tiền; nói rõ từng slot trong customer_must_state bằng lời (thanh toán, khu vực giao chỉ quận/tỉnh, "
+                   "ngân sách cho cả đơn nếu có, đúng con số), rồi đồng ý chốt đơn.",
     "order_qty": "Khách muốn mua {qty} cái {product} cùng loại (để thay dần / dùng cho nhiều phòng), hỏi giá mỗi cái, "
                  "tổng tiền và có giảm khi mua nhiều không; nêu hình thức thanh toán, khu vực giao và chốt đơn đúng {qty} cái.",
     "stack_promo": "Khách cũ (đã mua {owned} ở shop) muốn mua {product}, nói đã đọc thấy cả chương trình giảm tháng 10 "

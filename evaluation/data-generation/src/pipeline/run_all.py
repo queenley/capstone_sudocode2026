@@ -8,6 +8,7 @@
     python -m src.pipeline.run_all --asr-dialogues 24                   # + team ASR test set (TTS)
     python -m src.pipeline.run_all --seed v5 --plan-only                # write into data/v5/ (default data/dev)
     python -m src.pipeline.run_all --fresh --output ../runs/datagen-thu # any folder; --fresh then clears only that one
+    python -m src.pipeline.run_all --personas advanced --only-persona khach_mua_nhieu_may_loc --id-start 154 --skip-audio --output ../runs/air-units  # new ids after the dataset
 
 ``--resume`` reuses files on disk and the model cache. ``--only-failed`` deletes
 transcripts/judgments that failed the last validation and regenerates just those.
@@ -92,6 +93,8 @@ def main() -> None:
     parser.add_argument("--only-failed", action="store_true")
     parser.add_argument("--skip-audio", action="store_true")
     parser.add_argument("--plan-only", action="store_true", help="labels + oracle check only (no API calls)")
+    parser.add_argument("--only-persona", help="plan this persona alone; with --output, new scenarios for a dataset")
+    parser.add_argument("--id-start", type=int, default=0, help="with --only-persona: number ids from N+1")
     parser.add_argument("--asr-dialogues", type=int, default=0, help="build a team ASR set of N dialogues (TTS)")
     parser.add_argument("--free-voices-only", action="store_true",
                         help="audio with premade ElevenLabs voices only (a free plan; English voices)")
@@ -112,6 +115,8 @@ def main() -> None:
     personas = ["--personas", args.personas, "--limit", str(args.limit)]
     if args.advanced_limit is not None:
         personas += ["--advanced-limit", str(args.advanced_limit)]
+    if args.only_persona:
+        personas += ["--only-persona", args.only_persona, "--id-start", str(args.id_start)]
 
     if args.plan_only:
         run("generate_scenarios", *personas, "--plan-only", check=True)

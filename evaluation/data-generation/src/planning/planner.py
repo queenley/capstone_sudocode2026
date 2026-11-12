@@ -20,6 +20,7 @@ from __future__ import annotations
 import json
 import random
 import re
+from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date, timedelta
 from typing import Any
@@ -629,7 +630,8 @@ class _Planner:
             # Several products are priced in the call and a claim names no SKU (extractor CLAIM_FIELDS): one
             # price_vnd would score a right price of the other item as wrong. Each item keeps its own key; the
             # order is still checked whole by total_vnd and total_match_vnd.
-            x.gt.setdefault(f"price_vnd:{x.sku}", x.gt.get("price_vnd"))
+            if pc.kind != "order_units":   # two units of one model can have two prices: the kind sets its own keys
+                x.gt.setdefault(f"price_vnd:{x.sku}", x.gt.get("price_vnd"))
             x.gt.pop("price_vnd", None)
             x.gt.pop("list_price_vnd", None)
         pc.changed = self._changed(x)
@@ -691,7 +693,7 @@ class _Planner:
         if not st["needs_given"]:
             pc.customer_must_state.update(self._needs(sku, x.rng))
             pc.customer_must_state.update(self._persona_slots(sp.persona_id, pc.speaker.honorific,
-                                                              truth["price_vnd"], x.rng, pc.kind == "order"))
+                                                              truth["price_vnd"], x.rng, pc.kind in ORDERING_KINDS))
             st["needs_given"] = True
         if "competitor_price_vnd" in pc.customer_must_state or st.get("competitor"):
             st["competitor"] = True
@@ -932,6 +934,94 @@ class _Planner:
         # No "tách" phrase: args_match's order_group already proves the split (the agent's guard sets it only once
         # the customer agreed), which leaves must_say_any to the confirmation call each COD order above 2M needs.
 
+    def _label_order_units(self, x: _Labels) -> None:
+        """BTC 11/2026 (``mock_tools.pricing_quote_order``): several air purifiers in ONE order, counted by unit (two
+        of one model, three units). AIR-2ND-50 takes exactly one unit (the lowest list price; on a tie the later one),
+        each unit one programme (KM-03/04), TRADE-IN-AP one unit. The ideal agent prices the units with
+        pricing.quote_order and places one order.create with lines, one line per product and price (two units of one
+        model at two prices are two lines of qty 1, as the mock's price check asks).
+
+        A model with units at two prices gets no ``price_vnd:<SKU>``: one value would score the other, right, price as
+        a hallucination. The total, the line args_match proves and the wrong totals carry the rule."""
+        pc, st, sp, on = x.pc, x.state, x.sp, x.pc.call_date
+        units = [x.sku, *sp.variant.extra_skus]
+        counts = Counter(units)                      # products in the order the customer names them
+        if sum(n for sku, n in counts.items() if self._category(sku).startswith("gia-dung/may-loc-khong-khi")) < 2:
+            raise ValueError(f"{sp.scenario_id} {pc.name}: order_units needs two or more air purifiers, got {units}")
+        pc.customer_must_state.setdefault("delivery_area", x.address)
+        st["address_stated"] = True
+        asked = [{"sku": sku, "qty": n} for sku, n in counts.items()]
+        quote = self._exec(pc, x.mock, "pricing.quote_order", {"lines": asked, "on": on.isoformat(),
+                                                               "customer_phone": pc.speaker.phone,
+                                                               "address": x.address})
+        total = quote["total_vnd"]
+        priced = Counter((u["sku"], u["final_price_vnd"]) for u in quote["units"])
+        lines = [{"sku": sku, "qty": n, "price_vnd": price} for (sku, price), n in priced.items()]
+        payment = "bank" if total > COD_LIMIT_VND else x.rng.choice(("COD", "bank"))
+        pc.customer_must_state["payment"] = payment
+        # Advice slots are not this call's test, and the writer dropped them from the customer's lines. A budget is
+        # said only when an earlier call gave one, and then for the whole order (BTC rubric J11 checks an order above
+        # the budget: one unit's budget made every reference order "over budget" without the customer meaning it).
+        for slot in ("room_area_m2", "has_children", "budget_vnd"):
+            pc.customer_must_state.pop(slot, None)
+        if any("budget_vnd" in earlier.customer_must_state for earlier in sp.calls if earlier.speaker is pc.speaker):
+            pc.customer_must_state["budget_vnd"] = -(-total * 11 // 10 // 1_000_000) * 1_000_000
+        if len(counts) == 1:
+            pc.customer_must_state["quantity"] = len(units)
+        if total > COD_LIMIT_VND:
+            pc.scene += (" Khách định trả COD; nghe đơn trên 10 triệu không trả COD được (VC-03) thì đồng ý chuyển "
+                         "khoản cho cả đơn.")
+        self._delivery(x)
+        result = self._exec(pc, x.mock, "order.create", {"customer_phone": pc.speaker.phone, "lines": lines,
+                                                         "payment": payment, "address": x.address,
+                                                         "on": on.isoformat()})
+        st["orders"].append(result["order_id"])
+        mine = sorted(price for sku, price in priced if sku == x.sku)
+        st.update(order_id=result["order_id"], order_price=mine[0])
+        pc.agent_facts["order_id"] = result["order_id"]
+        for sku in counts:
+            prices = {price for s, price in priced if s == sku}
+            if len(prices) == 1:
+                x.gt[f"price_vnd:{sku}"] = prices.pop()
+        x.gt.update(total_vnd=total, cod_allowed=total <= COD_LIMIT_VND, estimated_delivery=result["estimated_delivery"])
+        if len(counts) == 1:
+            x.gt["qty"] = len(units)
+        # Two wrong totals the rule exists to stop: no second-unit discount at all, and 50% on every unit after the
+        # first (the old reading of "máy thứ hai").
+        alone = [x.mock.pricing_get_quote(u["sku"], on.isoformat(), 1, pc.speaker.phone, x.address)["final_price_vnd"]
+                 for u in quote["units"]]
+        first = max(range(len(units)), key=lambda i: alone[i])
+        every = alone[first] + sum(u["list_price_vnd"] // 2 for i, u in enumerate(quote["units"]) if i != first)
+        for wrong in dict.fromkeys((sum(alone), every)):
+            if wrong != total:
+                x.forbidden.append({"field": "total_vnd", "value": wrong})
+        trade = [a["promo_code"] for u in quote["units"] for a in u["applied_promos"] if a["promo_code"] == "TRADE-IN-AP"]
+        owned = next((o.sku for o in pc.speaker.orders if o.sku == "SKU-AP-X-2024"), None)
+        said = " và ".join(f"{n} máy {self._name(sku)}" for sku, n in counts.items())
+        pc.scene_values["items"] = said
+        if trade and owned:
+            pc.scene += (f" Khách nhắc mình đang dùng {self._name(owned)} mua ở shop và hỏi có được thu cũ đổi mới "
+                         "không (một máy cũ đổi một máy mới).")
+        pc.agent_will_tell.pop("price_vnd", None)   # one unit's quote; the units below are the order's prices
+        pc.agent_will_tell.update(
+            units=[f"{self._name(u['sku'])} (máy {u['unit']}): {vnd(u['final_price_vnd'])}đ"
+                   + (f" ({', '.join(a['promo_code'] for a in u['applied_promos'])})" if u["applied_promos"] else "")
+                   for u in quote["units"]],
+            total_vnd=total, payment=payment,
+            rule=("AIR-2ND-50 giảm 50% cho đúng MỘT máy của đơn: máy giá niêm yết thấp nhất, bằng giá thì máy sau; "
+                  "mỗi máy chỉ một khuyến mãi; thu cũ đổi mới tối đa một máy"))
+        x.si.update(tool_called="order.create", args_match={"sku": x.sku, "price_vnd": mine[0], "payment": payment},
+                    total_match_vnd=total)
+        if total > COD_LIMIT_VND:
+            x.si["must_say_any"] = ["10 triệu", "10.000.000", "chuyển khoản"]   # J11: the COD limit and the way out
+        elif not result.get("needs_confirmation_call"):
+            # A COD order above 2.000.000đ keeps the confirmation-call phrase (VC-05, set after the labeller);
+            # total_match_vnd checks the total either way.
+            x.si["must_say_any"] = [vnd(total)]
+        others = [sku for sku in counts if sku != x.sku]
+        if others:
+            x.si["also_ordered"] = others
+
     def _label_consult_ready(self, x: _Labels) -> None:
         """A consultation in which the customer already says how they will pay and where to: the next call's order
         must not ask either again (must_not_ask payment, delivery_area)."""
@@ -958,6 +1048,8 @@ class _Planner:
         qty = 3
         x.pc.scene_values.update(qty=qty, product=self._name(x.sku))
         self._label_order(x, qty=qty)
+        if "budget_vnd" in x.pc.customer_must_state:   # the budget is for the whole order, not one unit (J11)
+            x.pc.customer_must_state["budget_vnd"] = -(-x.gt["total_vnd"] * 11 // 10 // 100_000) * 100_000
 
     def _label_stack_promo(self, x: _Labels) -> None:
         """KM-03/04/09: two programmes that do not stack: the better one only, never both."""
@@ -1414,9 +1506,10 @@ def _dedupe(items: list) -> list:
 # Public API                                                                   #
 # --------------------------------------------------------------------------- #
 def plan_scenarios(limit: int, source: SourceData, persona_set: PersonaSet, profiles: dict[str, Any],
-                   seed: int) -> list[ScenarioPlan]:
+                   seed: int, start: int = 0) -> list[ScenarioPlan]:
+    """*limit* scenarios numbered from ``start + 1`` (``start`` > 0: new ids after a dataset's, one persona alone)."""
     planner = _Planner(source, persona_set, profiles, seed)
-    return [planner.plan(n) for n in range(limit)]
+    return [planner.plan(n) for n in range(start, start + limit)]
 
 
 def first_contact(sp: ScenarioPlan, pc: PlannedCall) -> bool:
@@ -1480,7 +1573,8 @@ DATE_PROBE_LABELS = {
     "sunday": "Chủ nhật (LN-01: giờ 09:00–18:00, chỉ nhận đơn)",
 }
 #: Kinds whose call prices more than one product: their truth has price_vnd:<SKU> per item, no single price_vnd.
-MULTI_PRODUCT_KINDS = frozenset({"compare", "cart_quote", "order_multi", "order_split", "second_item_promo"})
+MULTI_PRODUCT_KINDS = frozenset({"compare", "cart_quote", "order_multi", "order_split", "second_item_promo",
+                                 "order_units"})
 #: PB-03 callbacks: the evening of the next working day, inside LN-01's hours (08:00–21:00).
 CALLBACK_HOUR = 19
 WEEKDAYS = ("thứ Hai", "thứ Ba", "thứ Tư", "thứ Năm", "thứ Sáu", "thứ Bảy", "Chủ nhật")

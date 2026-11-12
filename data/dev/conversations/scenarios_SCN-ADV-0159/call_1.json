@@ -1,0 +1,208 @@
+{
+  "conversation_id": "SCN-ADV-0159__call_1",
+  "scenario_id": "SCN-ADV-0159",
+  "call": "call_1",
+  "customer_id": "C004",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-20",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_mua_nhieu_may_loc",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh ạ, em là trợ lý ảo của shop BTC, anh cần tư vấn máy lọc không khí cho phòng khoảng 20 mét vuông đúng không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Anh cần máy lọc cho phòng khoảng 20 mét vuông đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh muốn hỏi về máy lọc không khí cho phòng khoảng 20 mét vuông.",
+      "facts_stated": {
+        "room_area_m2": 20
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, với phòng khoảng 20 mét vuông, anh có thể tham khảo Máy lọc không khí AirPure X. Máy này phù hợp phòng đến 25 mét vuông, dùng màng lọc HEPA H13 và có cảm biến bụi mịn PM2.5, giá hiện tại là 4.890.000đ. Anh dự kiến ngân sách cho máy lọc này khoảng bao nhiêu để em tư vấn kỹ hơn ạ?",
+      "questions": [
+        {
+          "slot": "budget_vnd",
+          "type": "open",
+          "text": "Anh dự kiến ngân sách cho máy lọc này khoảng bao nhiêu để em tư vấn kỹ hơn ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Nhà anh không có trẻ nhỏ, ngân sách tầm 5 triệu rưỡi thôi.",
+      "facts_stated": {
+        "has_children": false,
+        "budget_vnd": 5500000
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, trong tầm ngân sách 5 triệu rưỡi thì Máy lọc không khí AirPure X rất phù hợp anh nhé. Máy này hiện chưa có khóa trẻ em, bảo hành chính hãng 24 tháng tại shop. Anh quan tâm thêm tính năng nào nữa không ạ?",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4890000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này có khuyến mãi gì không em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ hiện tại mua Máy lọc không khí AirPure X sẽ được tặng kèm một màng lọc thay thế AirPure X/Y anh nhé, tổng giá vẫn giữ nguyên 4.890.000đ. Ngoài ra, shop còn miễn phí thu hộ khi nhận hàng và hỗ trợ đổi trả trong 7 ngày nếu có lỗi từ nhà sản xuất ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd",
+          "value": 4890000
+        },
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Anh cần suy nghĩ thêm rồi sẽ gọi lại cho em nhé.",
+      "facts_stated": {
+        "blocker": "cần suy nghĩ thêm"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, anh Minh cứ suy nghĩ thêm, khi nào cần hỗ trợ hoặc quyết định đặt hàng cứ nhắn lại cho shop bất cứ lúc nào anh nhé. Em sẽ lưu lại thông tin tư vấn cho anh.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [
+        {
+          "key": "blocker",
+          "value": "cần suy nghĩ thêm",
+          "op": "set",
+          "source": "call_1#turn9"
+        },
+        {
+          "key": "budget_vnd",
+          "value": 5500000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "has_children",
+          "value": false,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "room_area_m2",
+          "value": 20,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-X",
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 4890000,
+          "op": "set",
+          "source": "call_1#turn3"
+        },
+        {
+          "key": "promo_code",
+          "value": "GIFT-FILTER",
+          "op": "set",
+          "source": "call_1#turn7"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "hoi_may_loc_khong_khi",
+    "outcome": "hen_goi_lai",
+    "objection_type": "cần suy nghĩ thêm",
+    "objection_handling": "Tôn trọng ý kiến khách, lưu lại thông tin tư vấn và nhắc khách liên hệ lại khi cần.",
+    "sentiment": "neutral",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": null
+  }
+}

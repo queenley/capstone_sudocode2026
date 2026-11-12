@@ -1,0 +1,422 @@
+{
+  "conversation_id": "SCN-ADV-0158__call_1",
+  "scenario_id": "SCN-ADV-0158",
+  "call": "call_1",
+  "customer_id": "C031",
+  "session_index": 1,
+  "channel": "hotline",
+  "date": "2026-10-22",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_mua_nhieu_may_loc",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị Oanh ạ, hôm trước chị có mua Máy lọc không khí AirPure X bản 2024 cho phòng 20m², địa chỉ giao là Đống Đa, Hà Nội. Hôm nay chị muốn mua thêm 2 máy lọc không khí AirPure Pro đúng không ạ?",
+      "questions": [
+        {
+          "slot": "room_area_m2",
+          "type": "confirm",
+          "text": "Phòng chị định đặt máy mới vẫn là khoảng trên 20m² đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "owned_sku",
+        "room_area_m2",
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn mua 2 máy lọc không khí AirPure Pro cho 2 phòng khác nhau nhé.",
+      "facts_stated": {
+        "quantity": 2,
+        "product_advised": "SKU-AP-PRO"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em đã ghi nhận chị muốn lấy 2 máy AirPure Pro cho 2 phòng. Máy này phù hợp diện tích phòng từ 30 đến 45 mét vuông, có khóa trẻ em và bảo hành 24 tháng chính hãng ạ. Để em báo giá và các ưu đãi hiện tại cho chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy này có giá bao nhiêu từng cái em nhỉ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại giá niêm yết mỗi máy lọc không khí AirPure Pro là 7.990.000đ. Với đơn của chị, máy đầu tiên được giảm còn 7.590.000đ nhờ chương trình thu cũ đổi mới, và máy thứ hai giảm 50% chỉ còn 3.995.000đ nhờ chương trình mua 2 máy. Tổng cộng đơn này là 11.585.000đ chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "total_vnd",
+          "value": 11585000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "pricing.quote_order",
+          "args": {
+            "lines": [
+              {
+                "sku": "SKU-AP-PRO",
+                "qty": 2
+              }
+            ],
+            "on": "2026-10-22",
+            "customer_phone": "0985003703",
+            "address": "Đống Đa, Hà Nội"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "7990000",
+          "spoken": "7.990.000đ"
+        },
+        {
+          "type": "money",
+          "value": "7590000",
+          "spoken": "7.590.000đ"
+        },
+        {
+          "type": "money",
+          "value": "3995000",
+          "spoken": "3.995.000đ"
+        },
+        {
+          "type": "money",
+          "value": "11585000",
+          "spoken": "11.585.000đ"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy nào được giảm 50% ạ?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, theo chính sách, máy thứ hai trong đơn sẽ được giảm 50%, nên máy AirPure Pro thứ hai của chị chỉ còn 3.995.000đ. Mỗi máy chỉ áp dụng một khuyến mãi, và đơn này đã được tính đúng ưu đãi tốt nhất rồi ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "3995000",
+          "spoken": "3.995.000đ"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị có thể thanh toán qua ngân hàng cho đơn này.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, đơn này tổng trên 10 triệu nên shop chỉ nhận thanh toán chuyển khoản, không áp dụng COD ạ. Chị chuyển khoản ngân hàng sẽ được ưu tiên xử lý và giao hàng sớm nhất cho mình.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "cod_allowed",
+          "value": false
+        },
+        {
+          "field": "total_vnd",
+          "value": 11585000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "10000000",
+          "spoken": "10 triệu"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Địa chỉ giao hàng là Đống Đa, Hà Nội, em ghi đúng nhé.",
+      "facts_stated": {
+        "delivery_area": "Đống Đa, Hà Nội"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Đống Đa, Hà Nội",
+          "spoken": "Đống Đa, Hà Nội"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Em đã ghi nhận địa chỉ giao hàng là Đống Đa, Hà Nội. Đơn gồm 2 máy AirPure Pro: máy đầu 7.590.000đ, máy thứ hai 3.995.000đ, tổng 11.585.000đ, thanh toán chuyển khoản và nhận hàng trong 2 ngày tới. Em xin phép tạo đơn, chị xác nhận lại giúp em thông tin trên đúng chưa ạ?",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Em xin phép đọc lại: 2 máy AirPure Pro, máy đầu 7.590.000đ, máy thứ hai 3.995.000đ, tổng cộng 11.585.000đ, giao Đống Đa, Hà Nội, thanh toán chuyển khoản, nhận hàng dự kiến ngày 24/10. Chị xác nhận giúp em thông tin này đúng chưa ạ?"
+        }
+      ],
+      "facts_used": [
+        "delivery_area",
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "total_vnd",
+          "value": 11585000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-24"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Đống Đa, Hà Nội",
+            "on": "2026-10-22"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "7590000",
+          "spoken": "7.590.000đ"
+        },
+        {
+          "type": "money",
+          "value": "3995000",
+          "spoken": "3.995.000đ"
+        },
+        {
+          "type": "money",
+          "value": "11585000",
+          "spoken": "11.585.000đ"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-24",
+          "spoken": "24/10"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị xác nhận đúng nhé em.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em cảm ơn chị đã xác nhận. Em đã lên đơn hàng gồm 2 máy AirPure Pro, tổng 11.585.000đ, giao về Đống Đa, Hà Nội, thanh toán chuyển khoản. Hàng sẽ giao dự kiến ngày 24/10. Nếu cần hỗ trợ gì thêm chị cứ liên hệ shop nhé!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "total_vnd",
+          "value": 11585000
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-24"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0985003703",
+            "lines": [
+              {
+                "sku": "SKU-AP-PRO",
+                "qty": 1,
+                "price_vnd": 7590000
+              },
+              {
+                "sku": "SKU-AP-PRO",
+                "qty": 1,
+                "price_vnd": 3995000
+              }
+            ],
+            "payment": "bank",
+            "address": "Đống Đa, Hà Nội",
+            "on": "2026-10-22"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Đống Đa, Hà Nội",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_1#turn8"
+        },
+        {
+          "key": "issue",
+          "value": "đổi cũ lấy mới",
+          "op": "set",
+          "source": "call_1#turn1"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_1#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7590000,
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "promo_code",
+          "value": "TRADE-IN-AP",
+          "op": "set",
+          "source": "call_1#turn5"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_1#turn11"
+        }
+      ],
+      "entities": [
+        {
+          "type": "money",
+          "value": "11585000",
+          "spoken": "11.585.000đ"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-24",
+          "spoken": "24/10"
+        }
+      ],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_hang_2_may_loc_khong_khi",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "sku": "SKU-AP-PRO",
+      "qty": 2,
+      "unit_prices_vnd": [
+        7590000,
+        3995000
+      ],
+      "total_vnd": 11585000,
+      "payment": "bank",
+      "delivery_area": "Đống Đa, Hà Nội",
+      "estimated_delivery": "2026-10-24"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # Datasets của evaluation
 
-Kịch bản nằm ở [`data/dev/scenarios`](../../data/dev/README.md) (404 kịch bản: 250 persona BTC `SCN-GEN-*`, 154 persona của nhóm `SCN-ADV-*`). Định dạng của BTC (`apps/ai-agent-service/data/btc/schemas/scenario_format.md`), chạy bằng lệnh đánh giá duy nhất của repo. Thư mục này giữ quy tắc duyệt nhãn và danh sách ID đã dùng.
+Kịch bản nằm ở [`data/dev/scenarios`](../../data/dev/README.md) (409 kịch bản: 250 persona BTC `SCN-GEN-*`, 159 persona của nhóm `SCN-ADV-*`). Định dạng của BTC (`apps/ai-agent-service/data/btc/schemas/scenario_format.md`), chạy bằng lệnh đánh giá duy nhất của repo. Thư mục này giữ quy tắc duyệt nhãn và danh sách ID đã dùng.
 
 | Thư mục | Là gì |
 |---|---|

@@ -39,6 +39,7 @@ KIND_POLICIES: dict[str, tuple[str, ...]] = {
     "order": ("PB-09", "VC-01"), "order_multi": ("PB-09", "VC-01"), "order_qty": ("PB-09", "VC-01", "KM-05"),
     "order_ewallet": ("PB-09", "VC-01", "VC-04"), "order_split": ("PB-09", "VC-01", "VC-03", "QT-01"),
     "order_readback": ("PB-09", "VC-01"), "consult_ready": (),
+    "order_units": ("PB-09", "VC-01", "VC-03", "KM-03", "KM-04", "KM-05", "FAQ-19"),
     "order_status": ("VC-06",), "address_change": ("VC-06",),
     "exchange_size": ("DT-03", "QT-03"), "exchange_product": ("DT-01", "DT-04", "QT-03", "QT-04"),
     "return_policy": ("DT-01", "DT-02"), "return_request": ("DT-01", "DT-02", "DT-07", "QT-03"),

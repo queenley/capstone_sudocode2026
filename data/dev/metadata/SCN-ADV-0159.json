@@ -1,0 +1,62 @@
+{
+  "scenario_id": "SCN-ADV-0159",
+  "persona_source": "advanced",
+  "customer_id": "C004",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "normal",
+  "tags": [
+    "air_units",
+    "cross_channel",
+    "date:ordinary",
+    "giảm_giá",
+    "multi_item",
+    "máy_lọc_không_khí",
+    "second_item",
+    "tư_vấn",
+    "variant:tu_van_roi_mua_hai_may_x",
+    "đặt_hàng"
+  ],
+  "metric_focus": [
+    "CCR",
+    "RQR",
+    "TSR",
+    "HR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "consult",
+      "outcome_detail": "hen_goi_lai",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Máy lọc không khí AirPure X",
+        "price_vnd": 4890000,
+        "promo": "GIFT-FILTER",
+        "in_stock": true
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_mua_nhieu_may_loc",
+      "patience_start": 3
+    },
+    "call_2": {
+      "kind": "order_units",
+      "outcome_detail": "chot_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Máy lọc không khí AirPure X",
+        "promo": "GIFT-FILTER",
+        "in_stock": true,
+        "units": [
+          "Máy lọc không khí AirPure X (máy 1): 4.890.000đ (GIFT-FILTER)",
+          "Máy lọc không khí AirPure X (máy 2): 2.445.000đ (AIR-2ND-50)"
+        ],
+        "total_vnd": 7335000,
+        "payment": "COD",
+        "rule": "AIR-2ND-50 giảm 50% cho đúng MỘT máy của đơn: máy giá niêm yết thấp nhất, bằng giá thì máy sau; mỗi máy chỉ một khuyến mãi; thu cũ đổi mới tối đa một máy"
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_mua_nhieu_may_loc",
+      "patience_start": 3
+    }
+  }
+}

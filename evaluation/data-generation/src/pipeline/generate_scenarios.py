@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from dataclasses import replace
 
 from src.planning.persona_config import load_persona_set, load_persona_sets, load_profiles
 from src.planning.planner import ScenarioPlan, assemble, check_draft, plan_scenarios, writer_context
@@ -82,14 +83,27 @@ def write_draft(client, template: str, context: dict, sp, params: dict) -> Scena
     raise DraftRejected(sp.scenario_id, errors)
 
 
-def planned(personas: str, limit: int, advanced_limit: int | None, seed: int) -> list[ScenarioPlan]:
-    """The plans of each persona set asked for, BTC's first."""
+def planned(personas: str, limit: int, advanced_limit: int | None, seed: int, only_persona: str | None = None,
+            id_start: int = 0) -> list[ScenarioPlan]:
+    """The plans of each persona set asked for, BTC's first.
+
+    *only_persona* plans that persona alone, numbered from ``id_start + 1``: new scenarios added to a dataset whose
+    ids are taken, without replanning (and renumbering) the others. Its count is the persona's target unless a limit
+    says otherwise."""
     source, profiles = SourceData.load(), load_profiles()
     counts = {"btc": limit, "advanced": advanced_limit}
     if advanced_limit is None:
         counts["advanced"] = sum(x["target"] for x in load_persona_set("advanced").targets)
-    return [sp for persona_set in load_persona_sets(personas)
-            for sp in plan_scenarios(counts[persona_set.source], source, persona_set, profiles, seed)]
+    sets = load_persona_sets(personas)
+    if only_persona:
+        sets = [replace(s, targets=[x for x in s.targets if x["id"] == only_persona]) for s in sets]
+        sets = [s for s in sets if s.targets]
+        if not sets:
+            raise SystemExit(f"--only-persona {only_persona}: no such persona in --personas {personas}")
+        if advanced_limit is None:
+            counts["advanced"] = sets[-1].targets[0]["target"]
+    return [sp for persona_set in sets
+            for sp in plan_scenarios(counts[persona_set.source], source, persona_set, profiles, seed, start=id_start)]
 
 
 def main() -> None:
@@ -101,10 +115,13 @@ def main() -> None:
     parser.add_argument("--resume", action="store_true", help="keep scenarios already on disk")
     parser.add_argument("--fresh", action="store_true", help="delete every generated scenario and transcript first")
     parser.add_argument("--plan-only", action="store_true", help="write label previews without calling a model")
+    parser.add_argument("--only-persona", help="plan this persona alone (new scenarios for a dataset in use)")
+    parser.add_argument("--id-start", type=int, default=0, help="with --only-persona: number ids from N+1")
     args = parser.parse_args()
 
     settings = load_settings()
-    plans = planned(args.personas, args.limit, args.advanced_limit, int(settings["generation"]["seed"]))
+    plans = planned(args.personas, args.limit, args.advanced_limit, int(settings["generation"]["seed"]),
+                    args.only_persona, args.id_start)
 
     if args.plan_only:
         preview = Dataset(PLAN_PREVIEW_DIR)

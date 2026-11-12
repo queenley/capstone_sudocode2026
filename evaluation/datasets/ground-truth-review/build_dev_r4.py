@@ -63,6 +63,15 @@ def install(out: Path, dest: Path) -> None:
     source_sha256), so it stays, and asr_reference/ground_truth.json is then rewritten from the clips on disk, taking
     each clip's entities from those call files (src/asr/reference.write_ground_truth).
     """
+    # Scenarios added to the dataset after its source revision (add_scenarios.py) are not in the build: their label
+    # files stay as they are.
+    built_ids = {f.stem for f in (out / "scenarios").glob("*.json")}
+    added_ids = {f.stem for f in (dest / "scenarios").glob("*.json")} - built_ids
+    added: dict[Path, bytes] = {}
+    for folder in LABEL_FOLDERS:
+        for path in (dest / folder).rglob("*") if (dest / folder).exists() else ():
+            if path.is_file() and any(i in path.relative_to(dest).as_posix() for i in added_ids):
+                added[path.relative_to(dest)] = path.read_bytes()
     respoken: dict[Path, bytes] = {}
     for kept in (dest / "asr_reference").glob("scenarios_*/call_*.json"):
         built = out / "asr_reference" / kept.relative_to(dest / "asr_reference")
@@ -73,7 +82,7 @@ def install(out: Path, dest: Path) -> None:
         if (dest / folder).exists():
             shutil.rmtree(dest / folder)
         shutil.copytree(out / folder, dest / folder)
-    for relative, data in respoken.items():
+    for relative, data in [*added.items(), *respoken.items()]:
         (dest / relative).parent.mkdir(parents=True, exist_ok=True)
         (dest / relative).write_bytes(data)
     if respoken:
@@ -85,6 +94,8 @@ def install(out: Path, dest: Path) -> None:
     for name in ("conversion-report.json", "DISPUTES.md"):
         if (out / name).exists():
             shutil.copyfile(out / name, dest / name)
+    if added_ids:
+        print(f"kept the labels of {len(added_ids)} scenarios added after the source revision: {sorted(added_ids)}")
     print(f"installed into {dest} ({', '.join(LABEL_FOLDERS)}, conversion-report.json, DISPUTES.md)")
 OUT = BUILD / "dev"
 BTC = ROOT / "apps" / "ai-agent-service" / "data" / "btc"

@@ -26,8 +26,9 @@ from src.utils.paths import CATALOG_DIR, DATA_DIR, REPO_ROOT
 
 EVAL_DIR = DATA_DIR / "eval"
 OFFICIAL_TOOLS = ("crm.get_customer", "catalog.search", "inventory.check", "order.create", "order.update",
-                  "schedule.callback", "handoff.transfer", "pricing.get_quote", "order.status")
-M2_TOOLS = ("pricing.get_quote", "order.status")
+                  "schedule.callback", "handoff.transfer", "pricing.get_quote", "order.status",
+                  "pricing.quote_order")   # BTC 11/2026: several air purifiers in one order
+M2_TOOLS = ("pricing.get_quote", "order.status", "pricing.quote_order")
 #: The team's tools the planner labels with (contracts/scenario/scenario-keys.yaml team_tools).
 TEAM_TOOLS = ("delivery_estimate",)
 AGENT_DELIVERY = REPO_ROOT / "apps" / "ai-agent-service" / "src" / "ai_agent_service" / "mcp" / "servers" / "delivery.py"

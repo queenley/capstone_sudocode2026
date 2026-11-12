@@ -1,0 +1,397 @@
+{
+  "conversation_id": "SCN-ADV-0159__call_2",
+  "scenario_id": "SCN-ADV-0159",
+  "call": "call_2",
+  "customer_id": "C004",
+  "session_index": 2,
+  "channel": "hotline",
+  "date": "2026-10-22",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_mua_nhieu_may_loc",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào anh Minh, hôm trước anh có quan tâm Máy lọc không khí AirPure X và cần suy nghĩ thêm. Em là trợ lý ảo của shop, anh muốn mình tiếp tục đặt hàng sản phẩm này đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Anh muốn đặt Máy lọc không khí AirPure X đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "product_advised",
+        "blocker",
+        "room_area_m2",
+        "price_quoted_vnd",
+        "promo_code"
+      ],
+      "claims": [
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, anh đã đổi ý rồi em ơi, giờ anh muốn mua 2 máy lọc không khí AirPure X.",
+      "facts_stated": {
+        "product_advised": "SKU-AP-X",
+        "quantity": 2
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, anh muốn mua 2 máy lọc không khí AirPure X cho hai phòng ạ. Sản phẩm đang còn hàng, bảo hành chính hãng 24 tháng. Anh vui lòng cho em biết diện tích phòng để em kiểm tra lại cho phù hợp nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mỗi máy cho một phòng, ngân sách giờ là 9 triệu đồng.",
+      "facts_stated": {
+        "room_area_m2": 25,
+        "budget_vnd": 9000000
+      },
+      "entities": [
+        {
+          "type": "money",
+          "value": "9000000",
+          "spoken": "9 triệu đồng"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, với hai phòng diện tích 25m², AirPure X là phù hợp anh nhé. Ngân sách 9 triệu đồng hoàn toàn đủ cho đơn này. Hiện tại, shop đang áp dụng chương trình ưu đãi: mua máy đầu tiên giá 4.890.000đ, máy thứ hai được giảm 50% còn 2.445.000đ. Mỗi máy sẽ được tặng kèm một màng lọc thay thế.",
+      "questions": [],
+      "facts_used": [
+        "room_area_m2",
+        "budget_vnd"
+      ],
+      "claims": [
+        {
+          "field": "price_quoted_vnd",
+          "value": 4890000
+        },
+        {
+          "field": "promo_GIFT-FILTER_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "pricing.quote_order",
+          "args": {
+            "lines": [
+              {
+                "sku": "SKU-AP-X",
+                "qty": 2
+              }
+            ],
+            "on": "2026-10-22",
+            "customer_phone": "0952059972",
+            "address": "Lê Chân, Hải Phòng"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy nào được giảm 50% vậy em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, theo quy định chương trình AIR-2ND-50, máy thứ hai của đơn sẽ được giảm 50%, còn 2.445.000đ anh nhé. Máy đầu tiên giá 4.890.000đ, tổng cộng hai máy là 7.335.000đ. Mỗi máy chỉ áp dụng một khuyến mãi.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "total_vnd",
+          "value": 7335000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 700,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Giao hàng về Lê Chân, Hải Phòng nhé.",
+      "facts_stated": {
+        "delivery_area": "Lê Chân, Hải Phòng"
+      },
+      "entities": [
+        {
+          "type": "address",
+          "value": "Lê Chân, Hải Phòng",
+          "spoken": "Lê Chân, Hải Phòng"
+        }
+      ],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em sẽ giao hai máy về địa chỉ Lê Chân, Hải Phòng. Đơn này được miễn phí vận chuyển toàn quốc. Thời gian giao dự kiến là ngày 28/10/2026 anh nhé.",
+      "questions": [],
+      "facts_used": [
+        "delivery_area"
+      ],
+      "claims": [
+        {
+          "field": "freeship",
+          "value": true
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-28"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Lê Chân, Hải Phòng",
+            "on": "2026-10-22"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thanh toán thì anh chọn COD, tổng tiền là bao nhiêu?",
+      "facts_stated": {
+        "payment": "COD"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, anh chọn thanh toán khi nhận hàng (COD), đơn này tổng cộng 7.335.000đ, đã gồm ưu đãi và miễn phí vận chuyển. Đơn trên 2 triệu sẽ được nhân viên gọi xác nhận trước khi giao anh nhé.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Anh xác nhận đặt 2 máy lọc không khí AirPure X, tổng cộng 7.335.000đ, giao về Lê Chân, Hải Phòng, thanh toán COD và nhận hàng dự kiến ngày 28/10/2026 đúng không ạ?"
+        }
+      ],
+      "facts_used": [
+        "payment"
+      ],
+      "claims": [
+        {
+          "field": "total_vnd",
+          "value": 7335000
+        },
+        {
+          "field": "cod_allowed",
+          "value": true
+        },
+        {
+          "field": "needs_confirmation_call",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 800,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Thế anh đồng ý chốt đơn này rồi nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã ghi nhận, em tiến hành tạo đơn cho anh ngay bây giờ ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0952059972",
+            "lines": [
+              {
+                "sku": "SKU-AP-X",
+                "qty": 1,
+                "price_vnd": 4890000
+              },
+              {
+                "sku": "SKU-AP-X",
+                "qty": 1,
+                "price_vnd": 2445000
+              }
+            ],
+            "payment": "COD",
+            "address": "Lê Chân, Hải Phòng",
+            "on": "2026-10-22"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "budget_vnd",
+          "value": 9000000,
+          "op": "supersede",
+          "source": "call_2#turn4"
+        },
+        {
+          "key": "delivery_area",
+          "value": "Lê Chân, Hải Phòng",
+          "op": "set",
+          "source": "call_2#turn8"
+        },
+        {
+          "key": "payment",
+          "value": "COD",
+          "op": "set",
+          "source": "call_2#turn10"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-X",
+          "op": "set",
+          "source": "call_2#turn2"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 4890000,
+          "op": "set",
+          "source": "call_2#turn5"
+        },
+        {
+          "key": "promo_code",
+          "value": "GIFT-FILTER",
+          "op": "set",
+          "source": "call_2#turn5"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_2#turn12"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ đơn hàng đã được tạo thành công, tổng 7.335.000đ, giao về Lê Chân, Hải Phòng. Nhân viên bên em sẽ gọi xác nhận đơn trước khi giao, anh nghe máy giúp em nhé. Em cảm ơn anh Minh đã đặt hàng, chúc anh một ngày tốt lành!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 600,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [
+      {
+        "product": "Máy lọc không khí AirPure X",
+        "qty": 2,
+        "price_vnd": 7335000,
+        "promo": [
+          "GIFT-FILTER",
+          "AIR-2ND-50"
+        ],
+        "delivery": "Lê Chân, Hải Phòng",
+        "payment": "COD",
+        "estimated_delivery": "2026-10-28"
+      }
+    ],
+    "supersedes": [
+      {
+        "slot": "budget_vnd",
+        "old": 5500000,
+        "new": 9000000
+      }
+    ],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001",
+      "sku": "SKU-AP-X",
+      "qty": 2,
+      "total_vnd": 7335000,
+      "payment": "COD",
+      "delivery_area": "Lê Chân, Hải Phòng",
+      "estimated_delivery": "2026-10-28"
+    }
+  }
+}

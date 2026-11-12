@@ -119,6 +119,64 @@ Loại: cải tiến (vòng tự cải tiến) · Trạng thái: xong · Chỉ s
 
 - **Còn lại:** F03 trượt 2/2 và F02 đạt 1/2; chữ của bài học đổi giữa các vòng. F06 chuyển máy thừa ở agent gốc 1/2 lần. Chi tiết ở [06-vong-cai-tien.md](../ai/06-vong-cai-tien.md) mục 9.
 
+### 2026-11-12 · Kịch bản nhiều máy lọc không khí một đơn (luật BTC 11/2026): SCN-ADV-0155..0160
+
+Loại: dữ liệu · Trạng thái: đang đo · Chỉ số: TSR, HR
+
+- **Vấn đề:** dev và test chỉ có cặp máy lọc lệch giá (Pro + AX40, Y + Mini). Vì vậy các luật mới của BTC chưa được đo: hai máy cùng mẫu, ba máy, AIR-2ND-50 đúng một máy, thu cũ đổi mới kết hợp AIR-2ND-50.
+- **Bằng chứng:** chạy `pricing.quote_order` mới trên 29 cuộc đơn nhiều sản phẩm của dev/test: giá trùng nhãn cả 29. Không cuộc nào có hai máy lọc cùng mẫu hay `qty` ≥ 2.
+- **Sửa:**
+  - Loại cuộc `order_units`:
+    - định nghĩa ở `call_kinds.py`, `policies.py`, `planner._label_order_units`;
+    - oracle gọi `pricing.quote_order` rồi một `order.create` có `lines`, mỗi giá một dòng;
+    - `args_match` là dòng giá thấp nhất của mẫu chính, có `total_match_vnd`;
+    - cấm hai tổng sai: không giảm máy nào, và giảm 50% mọi máy sau máy đầu;
+    - mẫu có hai giá không ghi `price_vnd:SKU`;
+    - đơn trên 10 triệu: khách định trả COD rồi chuyển khoản, `must_say_any` có "10 triệu" / "chuyển khoản" (J11).
+  - Persona `khach_mua_nhieu_may_loc` (6 biến thể) trong `personas_advanced.yaml` / `.py`.
+  - `run_all` và `generate_scenarios` có thêm `--only-persona` và `--id-start`, để sinh ID mới mà không đánh số lại bộ cũ.
+  - `pricing.quote_order` được đưa vào `OFFICIAL_TOOLS`.
+  - `add_scenarios.py` cài kịch bản vào dataset và ghi `review/added.json` với trạng thái `pending`.
+  - `build_dev_r4.install` giữ lại kịch bản thêm khi dựng lại.
+  - Cài vào dev: ADV-0155..0159. Cài vào test: ADV-0160 (chỉ có ở test).
+- **Đã kiểm:**
+  - data-generation 112/112 test qua.
+  - Oracle dev và test tuyệt đối; validator dev 807/807, test 192/193 (GEN-0042/c3 cũ, người duyệt chọn không sửa).
+  - `auto_verify`: nhãn của 6/7 cuộc mới qua mọi kiểm. ADV-0155 bị kiểm `consent` bắt: hai lượt cuối thiếu lời đồng ý.
+- **Số đo:** chưa đo trên agent.
+- **Còn lại:**
+  - Người duyệt ký 7 cuộc mới trong `review_sheet.csv`, rồi chạy `approve_gold.py`.
+  - Judge còn gắn cờ cách hành văn ở 6/7 hội thoại mẫu (J07, J08, J02).
+  - Chưa có audio: chạy `synthesize_scenario_audio --only <id>` khi cần.
+  - Mất 4 lần sinh lại vì nhãn sai: ngày nghỉ 26/10, câu gọi xác nhận của đơn COD trên 2 triệu, ngân sách của một máy, lý do hoãn mua trong cuộc chốt.
+  - Bốn lỗi đó nay có test cố định trong `tests/test_label_sanity.py`. Planner được sửa theo:
+    - mọi cuộc chốt đơn (`ORDERING_KINDS`) không còn nhận lý do hoãn mua;
+    - ngân sách của `order_qty` tính trên cả đơn.
+  - Rà toàn bộ dev/test bằng 5 kiểm (ngày nghỉ, câu gọi xác nhận, ngân sách, hoãn mua, số tiền khách tự nêu). Có 2 cuộc đã ký bị lỗi cùng gốc:
+    - SCN-ADV-0057/call_1: khách nói "để anh bàn với gia đình" nhưng nhãn là chốt đơn; ngân sách 500.000đ là giá một lõi trong khi khách mua 3 lõi;
+    - SCN-ADV-0118/call_1: khách nói "chờ cuối tháng nhận lương" nhưng nhãn là chốt đơn.
+    - Sửa hai cuộc này cần một nhóm nhãn mới và người duyệt quyết.
+  - 25 cuộc vượt ngân sách còn lại là cố ý (ca J11 của giỏ hàng, mua nhiều món, máy thứ hai).
+
+### 2026-11-12 · Agent mẫu bịa chính sách và thông số sản phẩm (J02)
+
+Loại: dữ liệu · Trạng thái: đang đo · Chỉ số: chất lượng hội thoại mẫu (judge J02)
+
+- **Vấn đề:** bộ chấm gpt-5 gắn J02 cho 221 hội thoại mẫu ở dev/test. Agent mẫu nói "miễn phí vận chuyển toàn quốc cho đơn trên 500.000đ" với mọi ngành hàng, trong khi VC-02 chỉ áp cho mẹ & bé. Nó cũng tự nghĩ ra thời hạn bảo hành, chất liệu và tính năng.
+- **Bằng chứng:** trong 221 bằng chứng J02, 70 nhắc giá, 61 bảo hành, 57 miễn phí vận chuyển, 40 đổi trả. Prompt có đưa văn bản chính sách, nhưng không đưa bản ghi catalog (`warranty_months`, `features`). BH-01 nói catalog là nguồn ưu tiên.
+- **Sửa:**
+  - `generate_dialogue.product_facts` đưa bản ghi catalog của các sản phẩm được nhắc trong cuộc vào CALL JSON.
+  - Quy tắc 13 của `dialogue_full_call.jinja`:
+    - phí giao, bảo hành, đổi trả, quà và thông số chỉ nói theo nguồn, kèm đúng điều kiện;
+    - nêu rõ điều kiện của VC-02;
+    - không có nguồn thì nói "chưa có thông tin";
+    - không hứa giữ giá hay giữ khuyến mãi tới một ngày.
+- **Đã kiểm:**
+  - 112/112 test qua.
+  - Lô 6 kịch bản mới (7 hội thoại): lần đầu, J02 gắn cờ cho "freeship đến 30/10" và "giữ ưu đãi đến 14/12". Ở lần sinh cuối vẫn còn 3/7 cuộc bị J02, ví dụ "miễn phí vận chuyển toàn quốc cho đơn trên 10 triệu" và "mỗi máy tặng kèm màng lọc". Prompt chưa chặn hết.
+- **Số đo:** chưa đo trên 221 cuộc bị gắn cờ. Hội thoại mẫu cũ chưa sinh lại.
+- **Còn lại:** sinh lại các cuộc J02 bằng `regenerate_conversations.py --only` (tốn phí), rồi chấm lại bằng judge để đo.
+
 ### 2026-11-10 · Combo, phụ kiện cùng tên sản phẩm; thử ngữ cảnh cuộc gọi (scenario-commerce-v14)
 
 Loại: evaluation (bộ trích entity ASR) · Trạng thái: xong · Chỉ số: entity accuracy ASR, `sku`

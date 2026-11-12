@@ -1,0 +1,336 @@
+{
+  "conversation_id": "SCN-ADV-0157__call_1",
+  "scenario_id": "SCN-ADV-0157",
+  "call": "call_1",
+  "customer_id": "C001",
+  "session_index": 1,
+  "channel": "chat_fanpage",
+  "date": "2026-10-24",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_mua_nhieu_may_loc",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em cảm ơn chị đã liên hệ và muốn mua 2 máy lọc không khí AirPure Pro cùng 1 máy AirPure Mini cho các phòng ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn mua 2 máy lọc không khí AirPure Pro và 1 máy AirPure Mini cho các phòng.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, với nhu cầu của chị, em sẽ kiểm tra giá và ưu đãi hiện tại cho từng máy nhé. Chị cần giao hàng tới Long Biên, Hà Nội phải không ạ?",
+      "questions": [
+        {
+          "slot": "delivery_area",
+          "type": "confirm",
+          "text": "Chị cần giao hàng tới Long Biên, Hà Nội phải không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy AirPure Pro có mức giá là bao nhiêu?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, hiện tại máy lọc không khí AirPure Pro đang có giá là 7.690.000đ cho mỗi máy nhờ áp dụng khuyến mãi AIR-OCT. Máy còn đủ hàng và bảo hành chính hãng 24 tháng chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_vnd:SKU-AP-PRO",
+          "value": 7690000
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "pricing.quote_order",
+          "args": {
+            "lines": [
+              {
+                "sku": "SKU-AP-PRO",
+                "qty": 2
+              },
+              {
+                "sku": "SKU-AP-MINI",
+                "qty": 1
+              }
+            ],
+            "on": "2026-10-24",
+            "customer_phone": "0984726714",
+            "address": "Long Biên, Hà Nội"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Với đơn này thì máy nào được giảm 50% vậy em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, với chương trình AIR-2ND-50, máy được giảm 50% là máy AirPure Mini chị nhé. Mỗi đơn chỉ áp dụng giảm cho đúng một máy có giá thấp nhất, nên AirPure Mini sẽ còn 1.095.000đ sau ưu đãi.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_active",
+          "value": true
+        },
+        {
+          "field": "price_vnd:SKU-AP-MINI",
+          "value": 1095000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Tổng tiền của đơn này là bao nhiêu?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ tổng tiền 3 máy là 16.475.000đ, đã gồm giảm giá và miễn phí vận chuyển toàn quốc cho đơn trên 10 triệu. Chị sẽ thanh toán chuyển khoản đúng không ạ?",
+      "questions": [
+        {
+          "slot": "payment",
+          "type": "confirm",
+          "text": "Chị sẽ thanh toán chuyển khoản đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "total_vnd",
+          "value": 16475000
+        },
+        {
+          "field": "freeship",
+          "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "Long Biên, Hà Nội",
+            "on": "2026-10-24"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị sẽ thanh toán qua ngân hàng nhé.",
+      "facts_stated": {
+        "payment": "bank"
+      },
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận đơn của chị gồm 2 máy lọc không khí AirPure Pro giá 7.690.000đ mỗi máy và 1 máy AirPure Mini giá 1.095.000đ, tổng cộng 16.475.000đ. Giao về Long Biên, Hà Nội, chị thanh toán chuyển khoản. Thời gian giao dự kiến là ngày 28/10/2026. Chị kiểm tra lại giúp em thông tin trên, em lên đơn ngay cho mình nhé.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Chị kiểm tra lại giúp em thông tin trên, em lên đơn ngay cho mình nhé."
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-28"
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chốt đơn cho chị nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em đã tạo đơn thành công cho chị. Tổng đơn là 16.475.000đ, chị chuyển khoản khi nhận được thông tin thanh toán. Đơn sẽ được giao dự kiến vào ngày 28/10/2026. Em cảm ơn chị đã đặt hàng tại shop BTC ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "order_id",
+          "value": "OD600001"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0984726714",
+            "lines": [
+              {
+                "sku": "SKU-AP-PRO",
+                "qty": 2,
+                "price_vnd": 7690000
+              },
+              {
+                "sku": "SKU-AP-MINI",
+                "qty": 1,
+                "price_vnd": 1095000
+              }
+            ],
+            "payment": "bank",
+            "address": "Long Biên, Hà Nội",
+            "on": "2026-10-24"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "Long Biên, Hà Nội",
+          "op": "set",
+          "source": "call_1#turn12"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_1#turn12"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-PRO",
+          "op": "set",
+          "source": "call_1#turn12"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 7690000,
+          "op": "set",
+          "source": "call_1#turn12"
+        },
+        {
+          "key": "promo_code",
+          "value": "AIR-OCT",
+          "op": "set",
+          "source": "call_1#turn12"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_1#turn12"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "chot_don",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "order_id": "OD600001",
+      "lines": [
+        {
+          "sku": "SKU-AP-PRO",
+          "qty": 2,
+          "price_vnd": 7690000
+        },
+        {
+          "sku": "SKU-AP-MINI",
+          "qty": 1,
+          "price_vnd": 1095000
+        }
+      ],
+      "payment": "bank",
+      "address": "Long Biên, Hà Nội",
+      "total_vnd": 16475000,
+      "estimated_delivery": "2026-10-28"
+    }
+  }
+}

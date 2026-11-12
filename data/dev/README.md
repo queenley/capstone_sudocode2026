@@ -1,5 +1,7 @@
 # Đánh giá agent trên bộ `data/dev`
 
+> **12/11/2026: thêm SCN-ADV-0155..0159** (persona `khach_mua_nhieu_may_loc`, luật BTC 11/2026: nhiều máy lọc không khí trong một đơn, `pricing.quote_order` rồi một `order.create` có `lines`, AIR-2ND-50 đúng một máy). Tổng 409 kịch bản, 807 cuộc. Sinh riêng bằng `run_all --only-persona khach_mua_nhieu_may_loc --id-start 154 --skip-audio` (ID mới, không đánh số lại kịch bản cũ), cài bằng [`add_scenarios.py`](../../evaluation/datasets/ground-truth-review/add_scenarios.py); ghi ở `review/added.json` với `decision: pending`: **chưa người duyệt ký**, không có trong `golden_manifest.json` (vẫn 801 nhãn đã ký). Chưa có audio. Validator 807/807, oracle tuyệt đối.
+>
 > **Nhãn hiện tại là bản r4 (08–09/11/2026): xem [Nhãn đã sửa](#nhãn-đã-sửa-bản-r4-0809112026).** Đoạn dưới mô tả bản r3.
 >
 > **Bộ dev duy nhất, trước đây tên `seed-dev-r3`, revision của `seed-dev-r2` (05/11/2026).** Nhãn vẫn là chẩn đoán, chưa có người duyệt. Dựng offline; từng trường đổi và hash nguồn ở [`conversion-report.json`](conversion-report.json), phần chưa quyết ở [`DISPUTES.md`](DISPUTES.md).

@@ -1,0 +1,103 @@
+[
+  {
+    "name": "pricing.quote_order",
+    "args": {
+      "lines": [
+        {
+          "sku": "SKU-AP-Y",
+          "qty": 2
+        }
+      ],
+      "on": "2026-10-27",
+      "customer_phone": "0981933190",
+      "address": "TP Huế"
+    },
+    "result": {
+      "units": [
+        {
+          "unit": 1,
+          "line": 0,
+          "sku": "SKU-AP-Y",
+          "list_price_vnd": 5200000,
+          "final_price_vnd": 5200000,
+          "applied_promos": []
+        },
+        {
+          "unit": 2,
+          "line": 0,
+          "sku": "SKU-AP-Y",
+          "list_price_vnd": 5200000,
+          "final_price_vnd": 2600000,
+          "applied_promos": [
+            {
+              "promo_code": "AIR-2ND-50",
+              "type": "percent_second_item",
+              "discount_vnd": 2600000
+            }
+          ]
+        }
+      ],
+      "lines": [
+        {
+          "sku": "SKU-AP-Y",
+          "qty": 2,
+          "unit_prices_vnd": [
+            5200000,
+            2600000
+          ],
+          "line_total_vnd": 7800000
+        }
+      ],
+      "total_vnd": 7800000,
+      "order_promos": [
+        {
+          "promo_code": "COD-0",
+          "type": "freecod",
+          "discount_vnd": 0
+        }
+      ],
+      "freeship": true,
+      "note": "Khi giá trong một dòng khác nhau (VD 2 máy cùng SKU, 1 máy được giảm 50%), tạo đơn bằng mỗi máy một dòng qty=1."
+    }
+  },
+  {
+    "name": "delivery_estimate",
+    "args": {
+      "address": "TP Huế",
+      "on": "2026-10-27"
+    },
+    "result": {
+      "address_known": true,
+      "delivery_days": 4,
+      "estimated_delivery": "2026-10-31"
+    }
+  },
+  {
+    "name": "order.create",
+    "args": {
+      "customer_phone": "0981933190",
+      "lines": [
+        {
+          "sku": "SKU-AP-Y",
+          "qty": 1,
+          "price_vnd": 5200000
+        },
+        {
+          "sku": "SKU-AP-Y",
+          "qty": 1,
+          "price_vnd": 2600000
+        }
+      ],
+      "payment": "bank",
+      "address": "TP Huế",
+      "on": "2026-10-27"
+    },
+    "result": {
+      "order_id": "OD600001",
+      "status": "created",
+      "total_vnd": 7800000,
+      "needs_confirmation_call": false,
+      "estimated_delivery": "2026-10-31"
+    }
+  }
+]

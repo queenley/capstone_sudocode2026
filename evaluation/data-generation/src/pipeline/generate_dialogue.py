@@ -18,6 +18,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+from functools import lru_cache
 from typing import Any
 
 from src.ground_truth.traces import conversation_rows
@@ -31,7 +32,7 @@ from src.utils.crm import load_customers
 from src.utils.dataset import Dataset
 from src.utils.io import load_model, write_json
 from src.utils.memory import known_facts_before, speaker_of, stale_slots_before
-from src.utils.paths import POLICY_DIR, PROMPTS_DIR, REPORTS_DIR
+from src.utils.paths import CATALOG_DIR, POLICY_DIR, PROMPTS_DIR, REPORTS_DIR
 from src.utils.pii import redact_contacts
 from src.utils.policy import load_customer_policy
 from src.utils.quota import DailyLimitReached, stop_on_daily_limit
@@ -61,6 +62,35 @@ def customer_script(scenario: Scenario, call_name: str) -> list[str]:
     return call.customer_turns_asr if call.input_mode != "text" and call.customer_turns_asr else call.customer_turns
 
 
+SKU = re.compile(r"SKU-[A-Z0-9]+(?:-[A-Z0-9]+)*")
+
+
+@lru_cache(maxsize=1)
+def _catalog() -> dict[str, dict[str, Any]]:
+    """sku (product and variant) -> its product record."""
+    products = json.loads((CATALOG_DIR / "products.json").read_text(encoding="utf-8"))["products"]
+    out = {}
+    for product in products:
+        out[product["sku"]] = product
+        for variant in product.get("variants") or []:
+            out.setdefault(variant.get("variant_sku") or variant.get("sku") or "", product)
+    out.pop("", None)
+    return out
+
+
+def product_facts(*parts: Any) -> dict[str, dict[str, Any]]:
+    """Catalogue facts of every product a call names (warranty, features, specs), by parent sku. The reference agent
+    was left to recall them and made them up (J02: warranty months, materials, features); BH-01 says the catalogue's
+    warranty_months wins over the category default."""
+    catalog, out = _catalog(), {}
+    for sku in SKU.findall(json.dumps(parts, ensure_ascii=False)):
+        product = catalog.get(sku)
+        if product and product["sku"] not in out:
+            out[product["sku"]] = {"name": product["name"], "category": product["category"],
+                                   "brand": product.get("brand"), **(product.get("attributes") or {})}
+    return out
+
+
 def build_context(scenario: Scenario, call_name: str, customer, persona_style: str) -> dict:
     call = scenario.calls[call_name]
     call_payload = call.model_dump(mode="json", exclude={"simulator_persona_key", "patience_start", "speaker_customer_id",
@@ -74,6 +104,7 @@ def build_context(scenario: Scenario, call_name: str, customer, persona_style: s
         "required_phrases": {"say_exactly_one_of": call.success_if.must_say_any,
                              "say_abstain_phrase": bool(call.success_if.agent_must_say)},
         "agent_will_tell": call.agent_will_tell,
+        "product_facts": product_facts(call_payload, call.agent_will_tell),
         "call": call_payload,
         "memory": known_facts_before(scenario, call_name),
         "stale_slots": stale_slots_before(scenario, call_name),

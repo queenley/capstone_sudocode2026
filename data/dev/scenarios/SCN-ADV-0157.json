@@ -1,0 +1,99 @@
+{
+  "scenario_id": "SCN-ADV-0157",
+  "level": "M2",
+  "persona": "khach_mua_nhieu_may_loc",
+  "hard_case": null,
+  "customer_phone": "0984726714",
+  "customer_name": "Hoa",
+  "honorific": "chị",
+  "notes": "Persona khach_mua_nhieu_may_loc, biến thể hai_pro_mot_mini. call_1 (chat_fanpage): chốt nhiều máy lọc không khí trong một đơn, chỉ một máy giảm 50% (BTC 11/2026) → chot_don. Chấm chủ yếu: TSR, HR.",
+  "calls": {
+    "call_1": {
+      "channel": "chat_fanpage",
+      "channel_identity": "fb.hoa.479",
+      "call_date": "2026-10-24",
+      "customer_goal": "Chốt đơn hai máy lọc không khí AirPure Pro và một máy AirPure Mini.",
+      "customer_turns": [
+        "Alo, chị muốn mua 2 máy lọc không khí AirPure Pro và 1 máy AirPure Mini cho các phòng.",
+        "Máy AirPure Pro có mức giá là bao nhiêu?",
+        "Với đơn này thì máy nào được giảm 50% vậy em?",
+        "Tổng tiền của đơn này là bao nhiêu?",
+        "Chị sẽ thanh toán qua ngân hàng nhé.",
+        "Chốt đơn cho chị nhé."
+      ],
+      "facts_established": {
+        "delivery_area": "Long Biên, Hà Nội",
+        "payment": "bank",
+        "quantity": 3,
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT",
+        "promo_expiry": "2026-10-30",
+        "order_id": "OD600001"
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AP-PRO",
+          "price_vnd": 7690000,
+          "payment": "bank"
+        },
+        "also_ordered": [
+          "SKU-AP-MINI"
+        ],
+        "total_match_vnd": 16475000,
+        "must_say_any": [
+          "10 triệu",
+          "10.000.000",
+          "chuyển khoản"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "total_vnd",
+            "value": 17570000
+          },
+          {
+            "field": "total_vnd",
+            "value": 12780000
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_AIR-OCT_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "delivery_days": 2,
+        "price_vnd:SKU-AP-PRO": 7690000,
+        "price_vnd:SKU-AP-MINI": 1095000,
+        "total_vnd": 16475000,
+        "cod_allowed": false,
+        "estimated_delivery": "2026-10-28",
+        "call_date": "2026-10-24"
+      },
+      "memory_expectation": {
+        "delivery_area": "Long Biên, Hà Nội",
+        "payment": "bank",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7690000,
+        "promo_code": "AIR-OCT",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-03",
+        "KM-03",
+        "KM-04",
+        "KM-05",
+        "FAQ-19",
+        "VC-04",
+        "LN-03"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

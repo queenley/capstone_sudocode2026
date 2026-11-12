@@ -1,5 +1,5 @@
 {
-  "n_scenarios": 99,
+  "n_scenarios": 100,
   "system": {
     "repeat_question_rate": {
       "value": 0.0,
@@ -14,8 +14,8 @@
     },
     "task_success_rate": {
       "value": 100.0,
-      "passed": 99,
-      "total": 99,
+      "passed": 100,
+      "total": 100,
       "hard_cases": {
         "value": 100.0,
         "total": 40
@@ -25,19 +25,19 @@
     "hallucination_rate": {
       "value": 0.0,
       "wrong": 0,
-      "total_claims": 1328,
+      "total_claims": 1340,
       "price_promo_only": {
         "value": 0.0,
         "wrong": 0,
-        "total": 809
+        "total": 814
       },
       "examples": []
     },
-    "avg_turns_per_call": 4.6,
+    "avg_turns_per_call": 4.61,
     "calls_to_close": {
-      "value": 1.84,
-      "n_closed": 57,
-      "n_scenarios": 99
+      "value": 1.83,
+      "n_closed": 58,
+      "n_scenarios": 100
     },
     "guardrail_violations": {
       "total": 0,
@@ -1529,6 +1529,26 @@
           "product_advised": true,
           "price_quoted_vnd": true,
           "variant_sku": true,
+          "order_id": true
+        },
+        "has_memory_writes": true,
+        "verdict": "likely_ok"
+      },
+      {
+        "scenario": "SCN-ADV-0160",
+        "call": "call_1",
+        "expected": {
+          "delivery_area": "TP Huế",
+          "payment": "bank",
+          "product_advised": "SKU-AP-Y",
+          "price_quoted_vnd": 5200000,
+          "order_id": "OD600001"
+        },
+        "found_in_memory_writes": {
+          "delivery_area": true,
+          "payment": true,
+          "product_advised": true,
+          "price_quoted_vnd": true,
           "order_id": true
         },
         "has_memory_writes": true,
@@ -3568,15 +3588,15 @@
       }
     ],
     "latency": {
-      "n_turns": 884,
+      "n_turns": 890,
       "warning": null,
       "ttft": {
-        "n": 884,
+        "n": 890,
         "p50_ms": 0,
         "p95_ms": 0
       },
       "total": {
-        "n": 884,
+        "n": 890,
         "p50_ms": 0,
         "p95_ms": 0
       },

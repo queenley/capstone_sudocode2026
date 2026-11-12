@@ -1,0 +1,47 @@
+{
+  "scenario_id": "SCN-ADV-0156",
+  "persona_source": "advanced",
+  "customer_id": "C001",
+  "region": "bac",
+  "category": "gia-dung/may-loc-khong-khi",
+  "difficulty": "normal",
+  "tags": [
+    "air_units",
+    "cod_limit",
+    "dat_hang",
+    "date:ordinary",
+    "giam_gia",
+    "mua_may_loc",
+    "multi_item",
+    "second_item",
+    "thanh_toan",
+    "variant:ba_may_pro_chuyen_khoan"
+  ],
+  "metric_focus": [
+    "TSR",
+    "HR"
+  ],
+  "calls": {
+    "call_1": {
+      "kind": "order_units",
+      "outcome_detail": "chot_don",
+      "input_mode_detail": "text",
+      "agent_will_tell": {
+        "product": "Máy lọc không khí AirPure Pro",
+        "promo": "AIR-OCT",
+        "in_stock": true,
+        "units": [
+          "Máy lọc không khí AirPure Pro (máy 1): 7.690.000đ (AIR-OCT)",
+          "Máy lọc không khí AirPure Pro (máy 2): 7.690.000đ (AIR-OCT)",
+          "Máy lọc không khí AirPure Pro (máy 3): 3.995.000đ (AIR-2ND-50)"
+        ],
+        "total_vnd": 19375000,
+        "payment": "bank",
+        "rule": "AIR-2ND-50 giảm 50% cho đúng MỘT máy của đơn: máy giá niêm yết thấp nhất, bằng giá thì máy sau; mỗi máy chỉ một khuyến mãi; thu cũ đổi mới tối đa một máy"
+      },
+      "speaker_customer_id": null,
+      "simulator_persona_key": "khach_mua_nhieu_may_loc",
+      "patience_start": 3
+    }
+  }
+}

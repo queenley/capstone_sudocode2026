@@ -74,6 +74,17 @@ def main() -> int:
     report["golden_manifest"] = {k: manifest[k] for k in ("approved_by", "approved_on", "method", "calls_total",
                                                           "labels_approved", "conversations_approved")}
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    # Scenarios added after the revision (add_scenarios.py): their decision follows the reviewer's labels column.
+    added_path = root / "review" / "added.json"
+    if added_path.exists():
+        added = json.loads(added_path.read_text(encoding="utf-8"))
+        verdict = {r["conversation_id"]: r["approve_labels"].strip().upper() for r in rows}
+        for row in added["added"]:
+            calls = [verdict.get(f"{row['scenario_id']}__{call}") for call in row["calls"]]
+            row["decision"] = ("approved" if all(v == "Y" for v in calls)
+                               else "rejected" if any(v == "N" for v in calls) else "pending")
+            row["reviewer"], row["reviewed_on"] = args.reviewer, date.today().isoformat()
+        added_path.write_text(json.dumps(added, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(f"labels approved {len(labels_y)}/{len(rows)}, golden conversations {len(golden)} ({method})")
     return 0
 

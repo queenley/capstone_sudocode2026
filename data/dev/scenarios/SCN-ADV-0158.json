@@ -1,0 +1,125 @@
+{
+  "scenario_id": "SCN-ADV-0158",
+  "level": "M2",
+  "persona": "khach_mua_nhieu_may_loc",
+  "hard_case": null,
+  "customer_phone": "0985003703",
+  "customer_name": "Oanh",
+  "honorific": "chị",
+  "notes": "Persona khach_mua_nhieu_may_loc, biến thể thu_cu_hai_may_pro. call_1 (hotline): chốt nhiều máy lọc không khí trong một đơn, chỉ một máy giảm 50% (BTC 11/2026) → chot_don. Chấm chủ yếu: CCR, RQR, TSR, HR.",
+  "calls": {
+    "call_1": {
+      "call_date": "2026-10-22",
+      "customer_goal": "Mua 2 máy lọc không khí AirPure Pro",
+      "customer_turns": [
+        "Alo, chị muốn mua 2 máy lọc không khí AirPure Pro cho 2 phòng khác nhau nhé.",
+        "Máy này có giá bao nhiêu từng cái em nhỉ?",
+        "Máy nào được giảm 50% ạ?",
+        "Chị có thể thanh toán qua ngân hàng cho đơn này.",
+        "Địa chỉ giao hàng là Đống Đa, Hà Nội, em ghi đúng nhé.",
+        "Chị xác nhận đúng nhé em."
+      ],
+      "seed_history": [
+        {
+          "source": "crm_session",
+          "customer_id": "C031",
+          "session_id": "S-OLD-1",
+          "date": "2026-02-17",
+          "channel": "hotline",
+          "summary": "Mua AirPure X bản 2024 giá 4.290.000đ, phòng 20m², địa chỉ giao: 12 ngõ 38 Hoàng Cầu, Đống Đa, Hà Nội",
+          "outcome": "chot_don",
+          "stale": true,
+          "facts": {
+            "owned_sku": "SKU-AP-X-2024",
+            "room_area_m2": 20,
+            "delivery_area": "Đống Đa, Hà Nội"
+          }
+        },
+        {
+          "source": "crm_order",
+          "customer_id": "C031",
+          "order_id": "OD188213",
+          "date": "2026-02-17",
+          "sku": "SKU-AP-X-2024",
+          "status": "delivered",
+          "stale": false,
+          "facts": {
+            "owned_sku": "SKU-AP-X-2024"
+          }
+        }
+      ],
+      "facts_established": {
+        "delivery_area": "Đống Đa, Hà Nội",
+        "payment": "bank",
+        "quantity": 2,
+        "issue": "đổi cũ lấy mới",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7590000,
+        "promo_code": "TRADE-IN-AP",
+        "promo_expiry": "2026-12-14",
+        "order_id": "OD600001"
+      },
+      "must_carry_over": [
+        "owned_sku"
+      ],
+      "must_not_ask": [
+        "owned_sku"
+      ],
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AP-PRO",
+          "price_vnd": 3995000,
+          "payment": "bank"
+        },
+        "total_match_vnd": 11585000,
+        "must_say_any": [
+          "10 triệu",
+          "10.000.000",
+          "chuyển khoản"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "total_vnd",
+            "value": 15180000
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "promo_active": true,
+        "promo_COD-0_active": true,
+        "promo_TRADE-IN-AP_active": true,
+        "promo_NAM-SHIP0_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "delivery_days": 2,
+        "total_vnd": 11585000,
+        "cod_allowed": false,
+        "estimated_delivery": "2026-10-24",
+        "qty": 2,
+        "call_date": "2026-10-22"
+      },
+      "memory_expectation": {
+        "delivery_area": "Đống Đa, Hà Nội",
+        "payment": "bank",
+        "issue": "đổi cũ lấy mới",
+        "product_advised": "SKU-AP-PRO",
+        "price_quoted_vnd": 7590000,
+        "promo_code": "TRADE-IN-AP",
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-03",
+        "KM-03",
+        "KM-04",
+        "KM-05",
+        "FAQ-19",
+        "VC-04",
+        "PB-01"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

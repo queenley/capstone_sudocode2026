@@ -1,0 +1,124 @@
+[
+  {
+    "name": "pricing.quote_order",
+    "args": {
+      "lines": [
+        {
+          "sku": "SKU-AP-PRO",
+          "qty": 3
+        }
+      ],
+      "on": "2026-10-23",
+      "customer_phone": "0984726714",
+      "address": "Lê Chân, Hải Phòng"
+    },
+    "result": {
+      "units": [
+        {
+          "unit": 1,
+          "line": 0,
+          "sku": "SKU-AP-PRO",
+          "list_price_vnd": 7990000,
+          "final_price_vnd": 7690000,
+          "applied_promos": [
+            {
+              "promo_code": "AIR-OCT",
+              "type": "fixed",
+              "discount_vnd": 300000
+            }
+          ]
+        },
+        {
+          "unit": 2,
+          "line": 0,
+          "sku": "SKU-AP-PRO",
+          "list_price_vnd": 7990000,
+          "final_price_vnd": 7690000,
+          "applied_promos": [
+            {
+              "promo_code": "AIR-OCT",
+              "type": "fixed",
+              "discount_vnd": 300000
+            }
+          ]
+        },
+        {
+          "unit": 3,
+          "line": 0,
+          "sku": "SKU-AP-PRO",
+          "list_price_vnd": 7990000,
+          "final_price_vnd": 3995000,
+          "applied_promos": [
+            {
+              "promo_code": "AIR-2ND-50",
+              "type": "percent_second_item",
+              "discount_vnd": 3995000
+            }
+          ]
+        }
+      ],
+      "lines": [
+        {
+          "sku": "SKU-AP-PRO",
+          "qty": 3,
+          "unit_prices_vnd": [
+            7690000,
+            7690000,
+            3995000
+          ],
+          "line_total_vnd": 19375000
+        }
+      ],
+      "total_vnd": 19375000,
+      "order_promos": [
+        {
+          "promo_code": "COD-0",
+          "type": "freecod",
+          "discount_vnd": 0
+        }
+      ],
+      "freeship": true,
+      "note": "Khi giá trong một dòng khác nhau (VD 2 máy cùng SKU, 1 máy được giảm 50%), tạo đơn bằng mỗi máy một dòng qty=1."
+    }
+  },
+  {
+    "name": "delivery_estimate",
+    "args": {
+      "address": "Lê Chân, Hải Phòng",
+      "on": "2026-10-23"
+    },
+    "result": {
+      "address_known": true,
+      "delivery_days": 4,
+      "estimated_delivery": "2026-10-29"
+    }
+  },
+  {
+    "name": "order.create",
+    "args": {
+      "customer_phone": "0984726714",
+      "lines": [
+        {
+          "sku": "SKU-AP-PRO",
+          "qty": 2,
+          "price_vnd": 7690000
+        },
+        {
+          "sku": "SKU-AP-PRO",
+          "qty": 1,
+          "price_vnd": 3995000
+        }
+      ],
+      "payment": "bank",
+      "address": "Lê Chân, Hải Phòng",
+      "on": "2026-10-23"
+    },
+    "result": {
+      "order_id": "OD600001",
+      "status": "created",
+      "total_vnd": 19375000,
+      "needs_confirmation_call": false,
+      "estimated_delivery": "2026-10-29"
+    }
+  }
+]

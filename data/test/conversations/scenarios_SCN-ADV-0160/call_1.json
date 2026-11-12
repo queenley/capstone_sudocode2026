@@ -1,0 +1,309 @@
+{
+  "conversation_id": "SCN-ADV-0160__call_1",
+  "scenario_id": "SCN-ADV-0160",
+  "call": "call_1",
+  "customer_id": "C003",
+  "session_index": 1,
+  "channel": "zalo_oa",
+  "date": "2026-10-27",
+  "region": "trung",
+  "category": "gia-dung/may-loc-khong-khi",
+  "persona": "khach_mua_nhieu_may_loc",
+  "turns": [
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Chị muốn đặt 2 máy lọc không khí AirPure Y cho hai phòng đúng không ạ?",
+      "questions": [
+        {
+          "slot": "product_advised",
+          "type": "confirm",
+          "text": "Chị muốn đặt 2 máy lọc không khí AirPure Y cho hai phòng đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 0,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn đặt 2 máy lọc không khí AirPure Y cho hai phòng.",
+      "facts_stated": {
+        "quantity": 2,
+        "product_advised": "SKU-AP-Y"
+      },
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em xác nhận chị đặt 2 máy lọc không khí AirPure Y, mỗi máy cho một phòng riêng biệt ạ. Sản phẩm này phù hợp phòng tới 30 mét vuông và hiện đang còn hàng chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "in_stock",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Mỗi máy cho một phòng nhé, không phải mỗi mẫu một máy đâu.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ em hiểu ạ, cả hai máy đều là AirPure Y, mỗi phòng một máy đúng như chị yêu cầu. Khi mình mua 2 máy cùng mẫu AirPure Y trong một đơn, sẽ áp dụng chương trình AIR-2ND-50: máy thứ hai được giảm 50% giá niêm yết.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy nào được giảm 50% vậy em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Theo quy định AIR-2ND-50, máy thứ hai trong đơn sẽ được giảm 50%. Vì hai máy cùng giá, máy thứ hai được giảm còn 2.600.000đ, máy đầu giữ giá 5.200.000đ chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "price_quoted_vnd",
+          "value": 5200000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "pricing.quote_order",
+          "args": {
+            "lines": [
+              {
+                "sku": "SKU-AP-Y",
+                "qty": 2
+              }
+            ],
+            "on": "2026-10-27",
+            "customer_phone": "0981933190",
+            "address": "TP Huế"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 420,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị muốn biết giá từng máy và tổng tiền luôn.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, máy lọc không khí AirPure Y máy thứ nhất giá 5.200.000đ, máy thứ hai được giảm còn 2.600.000đ nhờ khuyến mãi AIR-2ND-50. Tổng cộng 7.800.000 cho hai máy chị nhé.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "total_vnd",
+          "value": 7800000
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 380,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Chị thanh toán qua ngân hàng, khu vực giao là TP Huế.",
+      "facts_stated": {
+        "payment": "bank",
+        "delivery_area": "TP Huế"
+      },
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em lên đơn như sau: 2 máy lọc không khí AirPure Y, tổng tiền 7.800.000 đồng, giao tại TP Huế, chị thanh toán chuyển khoản ngân hàng. Dự kiến giao hàng trong 4 ngày làm việc, khoảng ngày 31/10/2026. Em tiến hành đặt hàng ngay cho chị nhé.",
+      "questions": [
+        {
+          "slot": "order_summary",
+          "type": "confirm",
+          "text": "Chị xác nhận giúp em: 2 máy lọc không khí AirPure Y, tổng 7.800.000đ, giao TP Huế, thanh toán chuyển khoản ngân hàng, giao dự kiến 31/10/2026 đúng không ạ?"
+        }
+      ],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "total_vnd",
+          "value": 7800000
+        },
+        {
+          "field": "delivery_days",
+          "value": 4
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-31"
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "TP Huế",
+            "on": "2026-10-27"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 420,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Đúng rồi em, lên đơn giúp chị nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ, em đã đặt hàng cho chị: 2 máy lọc không khí AirPure Y, tổng cộng 7.800.000đ, giao tại TP Huế, thanh toán qua ngân hàng. Đơn hàng sẽ được xử lý và giao dự kiến vào ngày 31/10/2026. Cảm ơn chị đã đặt hàng tại shop BTC ạ!",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "total_vnd",
+          "value": 7800000
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "order.create",
+          "args": {
+            "customer_phone": "0981933190",
+            "lines": [
+              {
+                "sku": "SKU-AP-Y",
+                "qty": 1,
+                "price_vnd": 5200000
+              },
+              {
+                "sku": "SKU-AP-Y",
+                "qty": 1,
+                "price_vnd": 2600000
+              }
+            ],
+            "payment": "bank",
+            "address": "TP Huế",
+            "on": "2026-10-27"
+          }
+        }
+      ],
+      "memory_writes": [
+        {
+          "key": "delivery_area",
+          "value": "TP Huế",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "payment",
+          "value": "bank",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "product_advised",
+          "value": "SKU-AP-Y",
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "price_quoted_vnd",
+          "value": 5200000,
+          "op": "set",
+          "source": "call_1#turn10"
+        },
+        {
+          "key": "order_id",
+          "value": "OD600001",
+          "op": "set",
+          "source": "call_1#turn10"
+        }
+      ],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    }
+  ],
+  "gold": {
+    "intent": "dat_hang_2_may_airpure_y",
+    "outcome": "chot_don",
+    "objection_type": null,
+    "objection_handling": null,
+    "sentiment": "positive",
+    "decision_maker": null,
+    "commitments": [],
+    "supersedes": [],
+    "callback": null,
+    "order": {
+      "product": "Máy lọc không khí AirPure Y",
+      "qty": 2,
+      "unit_prices": [
+        5200000,
+        2600000
+      ],
+      "total_vnd": 7800000,
+      "payment": "bank",
+      "delivery_area": "TP Huế",
+      "estimated_delivery": "2026-10-31"
+    }
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "n_scenarios": 404,
+  "n_scenarios": 409,
   "system": {
     "repeat_question_rate": {
       "value": 0.0,
@@ -9,13 +9,13 @@
     },
     "context_carryover_rate": {
       "value": 100.0,
-      "used": 2091,
-      "required": 2091
+      "used": 2097,
+      "required": 2097
     },
     "task_success_rate": {
       "value": 100.0,
-      "passed": 404,
-      "total": 404,
+      "passed": 409,
+      "total": 409,
       "hard_cases": {
         "value": 100.0,
         "total": 193
@@ -25,19 +25,19 @@
     "hallucination_rate": {
       "value": 0.0,
       "wrong": 0,
-      "total_claims": 5608,
+      "total_claims": 5680,
       "price_promo_only": {
         "value": 0.0,
         "wrong": 0,
-        "total": 3541
+        "total": 3575
       },
       "examples": []
     },
-    "avg_turns_per_call": 4.69,
+    "avg_turns_per_call": 4.7,
     "calls_to_close": {
-      "value": 1.89,
-      "n_closed": 230,
-      "n_scenarios": 404
+      "value": 1.87,
+      "n_closed": 235,
+      "n_scenarios": 409
     },
     "guardrail_violations": {
       "total": 0,
@@ -4591,6 +4591,147 @@
           "product_advised": true,
           "price_quoted_vnd": true,
           "variant_sku": true
+        },
+        "has_memory_writes": true,
+        "verdict": "likely_ok"
+      },
+      {
+        "scenario": "SCN-ADV-0155",
+        "call": "call_1",
+        "expected": {
+          "delivery_area": "TP Huế",
+          "payment": "bank",
+          "product_advised": "SKU-AP-PRO",
+          "price_quoted_vnd": 7690000,
+          "promo_code": "AIR-OCT",
+          "order_id": "OD600001"
+        },
+        "found_in_memory_writes": {
+          "delivery_area": true,
+          "payment": true,
+          "product_advised": true,
+          "price_quoted_vnd": true,
+          "promo_code": true,
+          "order_id": true
+        },
+        "has_memory_writes": true,
+        "verdict": "likely_ok"
+      },
+      {
+        "scenario": "SCN-ADV-0156",
+        "call": "call_1",
+        "expected": {
+          "delivery_area": "Lê Chân, Hải Phòng",
+          "payment": "bank",
+          "product_advised": "SKU-AP-PRO",
+          "price_quoted_vnd": 7690000,
+          "promo_code": "AIR-OCT",
+          "order_id": "OD600001"
+        },
+        "found_in_memory_writes": {
+          "delivery_area": true,
+          "payment": true,
+          "product_advised": true,
+          "price_quoted_vnd": true,
+          "promo_code": true,
+          "order_id": true
+        },
+        "has_memory_writes": true,
+        "verdict": "likely_ok"
+      },
+      {
+        "scenario": "SCN-ADV-0157",
+        "call": "call_1",
+        "expected": {
+          "delivery_area": "Long Biên, Hà Nội",
+          "payment": "bank",
+          "product_advised": "SKU-AP-PRO",
+          "price_quoted_vnd": 7690000,
+          "promo_code": "AIR-OCT",
+          "order_id": "OD600001"
+        },
+        "found_in_memory_writes": {
+          "delivery_area": true,
+          "payment": true,
+          "product_advised": true,
+          "price_quoted_vnd": true,
+          "promo_code": true,
+          "order_id": true
+        },
+        "has_memory_writes": true,
+        "verdict": "likely_ok"
+      },
+      {
+        "scenario": "SCN-ADV-0158",
+        "call": "call_1",
+        "expected": {
+          "delivery_area": "Đống Đa, Hà Nội",
+          "payment": "bank",
+          "issue": "đổi cũ lấy mới",
+          "product_advised": "SKU-AP-PRO",
+          "price_quoted_vnd": 7590000,
+          "promo_code": "TRADE-IN-AP",
+          "order_id": "OD600001"
+        },
+        "found_in_memory_writes": {
+          "delivery_area": true,
+          "payment": true,
+          "issue": true,
+          "product_advised": true,
+          "price_quoted_vnd": true,
+          "promo_code": true,
+          "order_id": true
+        },
+        "has_memory_writes": true,
+        "verdict": "likely_ok"
+      },
+      {
+        "scenario": "SCN-ADV-0159",
+        "call": "call_1",
+        "expected": {
+          "blocker": "cần suy nghĩ thêm",
+          "budget_vnd": 5500000,
+          "has_children": false,
+          "room_area_m2": 20,
+          "product_advised": "SKU-AP-X",
+          "price_quoted_vnd": 4890000,
+          "promo_code": "GIFT-FILTER"
+        },
+        "found_in_memory_writes": {
+          "blocker": true,
+          "budget_vnd": true,
+          "has_children": true,
+          "room_area_m2": true,
+          "product_advised": true,
+          "price_quoted_vnd": true,
+          "promo_code": true
+        },
+        "has_memory_writes": true,
+        "verdict": "likely_ok"
+      },
+      {
+        "scenario": "SCN-ADV-0159",
+        "call": "call_2",
+        "expected": {
+          "budget_vnd": 9000000,
+          "delivery_area": "Lê Chân, Hải Phòng",
+          "payment": "COD",
+          "product_advised": "SKU-AP-X",
+          "price_quoted_vnd": 4890000,
+          "promo_code": "GIFT-FILTER",
+          "order_id": "OD600001",
+          "superseded": {
+            "budget_vnd": 5500000
+          }
+        },
+        "found_in_memory_writes": {
+          "budget_vnd": true,
+          "delivery_area": true,
+          "payment": true,
+          "product_advised": true,
+          "price_quoted_vnd": true,
+          "promo_code": true,
+          "order_id": true
         },
         "has_memory_writes": true,
         "verdict": "likely_ok"
@@ -14744,15 +14885,15 @@
       }
     ],
     "latency": {
-      "n_turns": 3758,
+      "n_turns": 3792,
       "warning": null,
       "ttft": {
-        "n": 3758,
+        "n": 3792,
         "p50_ms": 0,
         "p95_ms": 0
       },
       "total": {
-        "n": 3758,
+        "n": 3792,
         "p50_ms": 0,
         "p95_ms": 0
       },

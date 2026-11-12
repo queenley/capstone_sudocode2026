@@ -1,0 +1,85 @@
+{
+  "scenario_id": "SCN-ADV-0160",
+  "level": "M2",
+  "persona": "khach_mua_nhieu_may_loc",
+  "hard_case": null,
+  "customer_phone": "0981933190",
+  "customer_name": "Lan",
+  "honorific": "chị",
+  "notes": "Persona khach_mua_nhieu_may_loc, biến thể hai_may_y_cung_mau. call_1 (zalo_oa): chốt nhiều máy lọc không khí trong một đơn, chỉ một máy giảm 50% (BTC 11/2026) → chot_don. Chấm chủ yếu: TSR, HR.",
+  "calls": {
+    "call_1": {
+      "channel": "zalo_oa",
+      "channel_identity": "zalo_lan79",
+      "call_date": "2026-10-27",
+      "customer_goal": "Mua 2 máy lọc không khí AirPure Y cho 2 phòng.",
+      "customer_turns": [
+        "Alo, chị muốn đặt 2 máy lọc không khí AirPure Y cho hai phòng.",
+        "Mỗi máy cho một phòng nhé, không phải mỗi mẫu một máy đâu.",
+        "Máy nào được giảm 50% vậy em?",
+        "Chị muốn biết giá từng máy và tổng tiền luôn.",
+        "Chị thanh toán qua ngân hàng, khu vực giao là TP Huế.",
+        "Đúng rồi em, lên đơn giúp chị nhé."
+      ],
+      "facts_established": {
+        "delivery_area": "TP Huế",
+        "payment": "bank",
+        "quantity": 2,
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "order_id": "OD600001"
+      },
+      "success_if": {
+        "tool_called": "order.create",
+        "args_match": {
+          "sku": "SKU-AP-Y",
+          "price_vnd": 2600000,
+          "payment": "bank"
+        },
+        "total_match_vnd": 7800000,
+        "must_say_any": [
+          "7.800.000"
+        ],
+        "forbidden_claims": [
+          {
+            "field": "total_vnd",
+            "value": 10400000
+          }
+        ]
+      },
+      "ground_truth_facts": {
+        "promo_active": false,
+        "promo_COD-0_active": true,
+        "promo_GIFT-FILTER_active": false,
+        "promo_NAM-SHIP0_active": false,
+        "promo_TRADE-IN-AP_active": false,
+        "in_stock": true,
+        "freeship": true,
+        "delivery_days": 4,
+        "total_vnd": 7800000,
+        "cod_allowed": true,
+        "estimated_delivery": "2026-10-31",
+        "qty": 2,
+        "call_date": "2026-10-27"
+      },
+      "memory_expectation": {
+        "delivery_area": "TP Huế",
+        "payment": "bank",
+        "product_advised": "SKU-AP-Y",
+        "price_quoted_vnd": 5200000,
+        "order_id": "OD600001"
+      },
+      "relevant_policy_ids": [
+        "PB-09",
+        "VC-01",
+        "VC-03",
+        "KM-03",
+        "KM-04",
+        "KM-05",
+        "FAQ-19",
+        "VC-04"
+      ],
+      "expected_outcome": "chot_don"
+    }
+  }
+}

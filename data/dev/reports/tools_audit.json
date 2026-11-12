@@ -8,7 +8,8 @@
     "schedule.callback",
     "handoff.transfer",
     "pricing.get_quote",
-    "order.status"
+    "order.status",
+    "pricing.quote_order"
   ],
   "tools": [
     {
@@ -25,7 +26,8 @@
       ],
       "required_params": [],
       "used": {
-        "oracle_trace": 6
+        "oracle_trace": 6,
+        "reference_transcripts": 6
       },
       "args_used": [
         "query"
@@ -44,7 +46,7 @@
       ],
       "required_params": [],
       "used": {
-        "oracle_trace": 801
+        "oracle_trace": 807
       },
       "args_used": [
         "phone"
@@ -59,7 +61,8 @@
       "mock_params": [],
       "required_params": [],
       "used": {
-        "oracle_trace": 235
+        "oracle_trace": 240,
+        "reference_transcripts": 236
       },
       "args_used": [
         "address",
@@ -84,7 +87,8 @@
       "used": {
         "success_if.must_not_call_tools": 21,
         "success_if.tool_called": 20,
-        "oracle_trace": 20
+        "oracle_trace": 20,
+        "reference_transcripts": 20
       },
       "args_used": [
         "brief"
@@ -105,7 +109,7 @@
       ],
       "used": {
         "fault_injection": 15,
-        "oracle_trace": 587
+        "oracle_trace": 588
       },
       "args_used": [
         "on",
@@ -134,14 +138,16 @@
         "customer_phone"
       ],
       "used": {
-        "success_if.must_not_call_tools": 479,
-        "success_if.tool_called": 232,
-        "oracle_trace": 281
+        "success_if.must_not_call_tools": 480,
+        "success_if.tool_called": 237,
+        "oracle_trace": 286,
+        "reference_transcripts": 286
       },
       "args_used": [
         "address",
         "basket_skus",
         "customer_phone",
+        "lines",
         "on",
         "order_group",
         "payment",
@@ -165,7 +171,8 @@
       "required_params": [],
       "used": {
         "success_if.tool_called": 47,
-        "oracle_trace": 64
+        "oracle_trace": 64,
+        "reference_transcripts": 63
       },
       "args_used": [
         "order_id"
@@ -191,7 +198,8 @@
       "used": {
         "success_if.must_not_call_tools": 19,
         "success_if.tool_called": 36,
-        "oracle_trace": 36
+        "oracle_trace": 36,
+        "reference_transcripts": 36
       },
       "args_used": [
         "action",
@@ -221,13 +229,42 @@
       ],
       "used": {
         "success_if.tool_called": 6,
-        "oracle_trace": 605
+        "oracle_trace": 606,
+        "reference_transcripts": 17
       },
       "args_used": [
         "basket_skus",
         "customer_phone",
         "on",
         "sku"
+      ],
+      "extra_args_not_in_btc": [],
+      "note": ""
+    },
+    {
+      "tool": "pricing.quote_order",
+      "official": true,
+      "level": "M2",
+      "mock_params": [
+        "lines",
+        "on",
+        "customer_phone",
+        "address",
+        "_second_item_used",
+        "_tie_prefer_first"
+      ],
+      "required_params": [
+        "lines"
+      ],
+      "used": {
+        "oracle_trace": 5,
+        "reference_transcripts": 5
+      },
+      "args_used": [
+        "address",
+        "customer_phone",
+        "lines",
+        "on"
       ],
       "extra_args_not_in_btc": [],
       "note": ""
@@ -247,7 +284,8 @@
       ],
       "used": {
         "success_if.tool_called": 92,
-        "oracle_trace": 92
+        "oracle_trace": 92,
+        "reference_transcripts": 92
       },
       "args_used": [
         "callback_at",

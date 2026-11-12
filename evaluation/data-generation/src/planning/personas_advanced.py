@@ -40,6 +40,8 @@ Chốt đơn, đọc lại một lần (PB-09)       khach_chot_don_doc_lai: kh�
                                         đọc lại đơn một lần (một câu order_summary), ≤ 3 câu hỏi
 Có phòng thứ hai, hỏi khuyến mãi (KM-05) khach_hoi_may_thu_hai: nói AIR-2ND-50 đúng điều kiện (máy rẻ hơn,
                                         cùng một đơn), không giảm 50% cho một máy; rồi mua hai máy một đơn
+Nhiều máy lọc một đơn (BTC 11/2026)     khach_mua_nhieu_may_loc: pricing.quote_order, một order.create có lines;
+                                        AIR-2ND-50 đúng một máy (hai máy cùng mẫu, ba máy, thu cũ đổi mới)
 ======================================  ==========================================================
 
 Most variants start on Zalo or Facebook and continue on the hotline, so the
@@ -223,6 +225,30 @@ ADVANCED_PLANS: dict[str, PersonaPlan] = {p.persona_id: p for p in (
                                             T("order_multi", days_later=(1, 3))),
           product_pool="SKU-AP-X", extra_skus=("SKU-AP-MINI",), customer_pool="zalo",
           tags=("promotion", "second_item", "multi_item", "cross_channel")),
+    )),
+    # BTC 11/2026 (mock_tools.pricing_quote_order): units of air purifiers in ONE order. AIR-2ND-50 takes one unit
+    # (lowest list price, on a tie the later one); TRADE-IN-AP one unit (C031 owns an AirPure X 2024). Dated inside
+    # AIR-OCT (05–30/10), after AirPure Pro's stock gap (18–20/10) and not on 26/10 (a day off). The last variant is
+    # the test set's.
+    PersonaPlan("khach_mua_nhieu_may_loc", (
+        V("hai_may_pro_cung_mau", (T("order_units", call_date="2026-10-22", min_turns=5),),
+          product_pool="SKU-AP-PRO", extra_skus=("SKU-AP-PRO",), tags=("multi_item", "second_item", "air_units")),
+        V("ba_may_pro_chuyen_khoan", (T("order_units", channel="zalo_oa", call_date="2026-10-23", min_turns=5),),
+          product_pool="SKU-AP-PRO", extra_skus=("SKU-AP-PRO", "SKU-AP-PRO"), customer_pool="zalo",
+          tags=("multi_item", "second_item", "air_units", "cod_limit")),
+        V("hai_pro_mot_mini", (T("order_units", channel="chat_fanpage", call_date="2026-10-24", min_turns=5),),
+          product_pool="SKU-AP-PRO", extra_skus=("SKU-AP-PRO", "SKU-AP-MINI"), customer_pool="fanpage",
+          tags=("multi_item", "second_item", "air_units", "cod_limit")),
+        V("thu_cu_hai_may_pro", (T("order_units", call_date="2026-10-22", min_turns=5),),
+          product_pool="SKU-AP-PRO", extra_skus=("SKU-AP-PRO",), customer_pool="C031",
+          tags=("multi_item", "second_item", "air_units", "trade_in")),
+        V("tu_van_roi_mua_hai_may_x", (T("consult", channel="chat_fanpage", call_date="2026-10-20"),
+                                       T("order_units", days_later=(1, 3), min_turns=5)),
+          product_pool="SKU-AP-X", extra_skus=("SKU-AP-X",), customer_pool="fanpage",
+          tags=("multi_item", "second_item", "air_units", "cross_channel")),
+        V("hai_may_y_cung_mau", (T("order_units", channel="zalo_oa", call_date="2026-10-27", min_turns=5),),
+          product_pool="SKU-AP-Y", extra_skus=("SKU-AP-Y",), customer_pool="zalo",
+          tags=("multi_item", "second_item", "air_units")),
     )),
     PersonaPlan("khach_chot_don_doc_lai", (
         # The read-back is one confirm question (extractor v5: order_summary), so 3 leaves two more.

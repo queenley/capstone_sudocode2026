@@ -2,6 +2,8 @@
 
 99 kịch bản (50 `SCN-ADV`, 49 `SCN-GEN`), 192 cuộc, theo định dạng BTC, kèm audio, hội thoại mẫu và báo cáo của bộ sinh dữ liệu.
 
+**12/11/2026: thêm SCN-ADV-0160** (hai máy AirPure Y trong một đơn, luật BTC 11/2026; persona `khach_mua_nhieu_may_loc`). Kịch bản này **chỉ có ở test**, không có bản dev; cài bằng [`add_scenarios.py`](../../evaluation/datasets/ground-truth-review/add_scenarios.py), `review/added.json` ghi `decision: pending` (chưa người duyệt ký, không có trong `golden_manifest.json`), chưa có audio. Tổng 100 kịch bản, 193 cuộc.
+
 **Không phải tập test độc lập.** `data/test` là bản sinh lại của 50 `SCN-ADV` và 49 `SCN-GEN` đầu tiên của `data/dev`: cùng mã kịch bản, cùng khách và persona. Lời khách được viết lại; 51 cuộc được dời sang ngày khác (kéo theo giá và khuyến mãi khác, nhãn tính theo ngày mới), và SCN-GEN-0033/call_2, SCN-GEN-0049/call_2 đổi từ `hen_goi_lai` sang `chot_don`. Điểm trên bộ này đo khả năng chịu được cách diễn đạt khác, không đo khả năng tổng quát. Đừng chạy hai bộ vào cùng một thư mục run. Muốn có tập test thật thì sinh bộ mới với mã (vd. `SCN-TST-*`) và khách riêng.
 
 ## Nhãn đã sửa (bản r1, 08–09/11/2026)
