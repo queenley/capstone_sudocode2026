@@ -51,6 +51,22 @@ def test_a_column_with_the_routers_knowledge_is_called_a_rerun(tmp_path):
     assert any("khác bộ kịch bản" in note for note in found)
 
 
+def test_report_warns_when_a_column_label_does_not_match_its_profile(tmp_path):
+    router = write_run(tmp_path / "r")
+    gap = write_run(tmp_path / "g", knowledge="kb1")
+    manifest = json.loads((gap / "manifest.json").read_text(encoding="utf-8"))
+    manifest["evaluation"] = {"profile": "router"}
+    (gap / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    assert any("nhãn cột là gaploop" in note for note in tables.notes({"router": router, "gaploop": gap}))
+
+
+def test_parser_exposes_reproducible_evaluation_profiles():
+    gap = cli.parser().parse_args(["--profile", "gaploop", "--kb-version", "2"])
+    reflection = cli.parser().parse_args(["--profile", "reflection", "--skills-version", "0"])
+    assert (gap.profile, gap.kb_version) == ("gaploop", 2)
+    assert (reflection.profile, reflection.skills_version) == ("reflection", 0)
+
+
 def test_asr_scores_come_from_the_organisers_scorer_and_an_unrun_one_says_so(tmp_path):
     assert "| 1. WER (Word Error Rate) | chưa đo |" in tables.asr_table(None)
     (tmp_path / "report.json").write_text(json.dumps({"main_scorer": {

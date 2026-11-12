@@ -176,11 +176,24 @@ def notes(runs: Mapping[str, Path]) -> list[str]:
     found = [f"{label}: agent chưa có chế độ này, nên cột không có số." for name, label in NOT_BUILT.items() if name not in runs]
     manifests = {name: _json(directory / "manifest.json") or {} for name, directory in runs.items()}
     router = manifests.get("router") or {}
+    expected_profiles = {"router": "router", "gaploop": "gaploop", "reflection": "reflection"}
+    for name, manifest in manifests.items():
+        profile = (manifest.get("evaluation") or {}).get("profile")
+        expected = expected_profiles.get(name)
+        if profile and expected and profile != expected:
+            found.append(f"{COLUMNS[name]}: nhãn cột là {expected} nhưng manifest ghi profile {profile}.")
     for name, label in FROM_KNOWLEDGE.items():
         if name not in runs:
-            found.append(f"{label}: chưa có run; cần knowledge version có mục đã duyệt, rồi chạy với --kb-version <N>.")
+            requirement = "knowledge version có mục đã duyệt, rồi chạy với --kb-version <N>" if name == "gaploop" \
+                else "skills version đã duyệt, rồi chạy với --skills-version <N>"
+            found.append(f"{label}: chưa có run; cần {requirement}.")
         elif manifests[name].get("knowledge_sha256") == router.get("knowledge_sha256"):
             found.append(f"{label}: cùng knowledge với Router, nên số này chỉ là chạy lại Router.")
+    reflection = manifests.get("reflection") or {}
+    reflection_version = (reflection.get("evaluation") or {}).get("skills_version_override")
+    router_version = (router.get("evaluation") or {}).get("skills_version_override")
+    if "reflection" in manifests and reflection_version is not None and reflection_version == router_version:
+        found.append("Reflection: cùng skills version với Router, nên đây không phải phép đo thay đổi Reflection.")
     for name, manifest in manifests.items():
         if name != "router" and router and _scenario_set(manifest) != _scenario_set(router):
             found.append(f"{COLUMNS[name]}: khác bộ kịch bản với Router, không so được.")

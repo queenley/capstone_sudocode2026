@@ -20,6 +20,7 @@ from __future__ import annotations
 import json
 import random
 import re
+import unicodedata
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date, timedelta
@@ -1623,6 +1624,15 @@ def moved_address_errors(turns: list[str], area: str | None) -> list[str]:
     return errors
 
 
+#: A yes to the read-back (auto_verify.py's consent check, on text without accents): the order is placed after it.
+CONSENT = re.compile(r"\b(dung roi|dong y|xac nhan|chinh xac|len don|chot|dat (don|hang)|lam don|ghi don|vang|u)\b")
+
+
+def _plain(text: str) -> str:
+    text = unicodedata.normalize("NFD", (text or "").lower().replace("đ", "d"))
+    return "".join(ch for ch in text if not unicodedata.combining(ch))
+
+
 def check_draft(sp: ScenarioPlan, draft: ScenarioDraft) -> list[str]:
     """Deterministic checks on LLM output; a non-empty list triggers a retry."""
     errors = []
@@ -1661,6 +1671,12 @@ def check_draft(sp: ScenarioPlan, draft: ScenarioDraft) -> list[str]:
             errors.append(f"{pc.name}: customer has no prior conversation; do not say 'hôm trước/lần trước'")
         if re.search(PHONE_PATTERN, text):
             errors.append(f"{pc.name}: customer turns must not contain a phone number")
+        placed = any(t["name"] == "order.create" and not (t.get("result") or {}).get("error") for t in pc.oracle_tool_calls)
+        if placed and pc.outcome == "chot_don" and dc.customer_turns and not CONSENT.search(_plain(dc.customer_turns[-1])):
+            # PB-09: the order is placed only after the customer says yes to the read-back; without that line the
+            # reference agent placed it unasked (SCN-ADV-0155, 12/11/2026) and auto_verify's consent check failed.
+            errors.append(f"{pc.name}: the LAST customer turn must agree to the read-back order "
+                          "(\"Đúng rồi em, chốt đơn giúp chị nhé\"), after delivery area and payment were said")
     return errors
 
 

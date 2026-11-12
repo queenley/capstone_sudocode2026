@@ -20,6 +20,8 @@ Không suy rằng unit test API với ScriptedAgent đã kiểm chất lượng 
 
 `run_eval.py` ở gốc repo dùng MCP của sản phẩm cho công cụ nghiệp vụ, database có tên kết thúc `_eval` (tạo ở lần chạy đầu, xóa trạng thái giữa các kịch bản). Luồng từng bước và bảng "chỉ số nào đọc trường nào": [scoring-flow.md](scoring-flow.md). Cửa vào, lệnh và quy tắc: [`evaluation/README.md`](../../evaluation/README.md).
 
+Nhiều phép đo dùng cùng đường chạy và khác profile: Router dùng cấu hình active, GapLoop nhận `--profile gaploop --kb-version N`, Reflection nhận `--profile reflection --skills-version N`. Mỗi run giữ trace và `manifest.json` riêng; `--report --run router=... --run gaploop=... --run reflection=...` chỉ tổng hợp bằng chứng đã có, không gọi model. Vòng tạo version và phê duyệt vẫn do `pipeline.improve` điều phối.
+
 ## Lệnh offline đã kiểm
 
 Từ gốc repo, Python 3.12 trong `apps/ai-agent-service/.venv`:

@@ -10,6 +10,33 @@ Một trang để biết một con số RQR, CCR, TSR hay HR đến từ đâu. 
 
 ## 2. Luồng một lần chạy
 
+### 2.1. Profile cho nhiều phép đo
+
+`run_eval.py` có ba profile cho cùng một đường chấm:
+
+| Profile | Lệnh bổ sung | Biến thể được đo |
+|---|---|---|
+| `router` | `--profile router` hoặc bỏ qua | Knowledge và skills đang active |
+| `gaploop` | `--profile gaploop --kb-version N` | Knowledge `data/kb/v<N>.jsonl` |
+| `reflection` | `--profile reflection --skills-version N` | Skills `data/skills/v<N>.yaml`; `0` là prompt gốc |
+
+Profile được ghi trong `manifest.json` cùng các version override. Nó không thay `reference_eval.py`, không trộn trace giữa các run và không tự phê duyệt thay đổi. Vòng học/phê duyệt nằm ở `pipeline/improve`; sau đó đo R0/R1 trên cohort frozen bằng các profile tương ứng rồi dùng `--report --run ...` để ghép bảng. Vì vậy một cột Reflection chỉ có ý nghĩa khi skills version khác Router, và một cột GapLoop chỉ có ý nghĩa khi knowledge version khác Router.
+
+Sơ đồ dưới đây cho thấy cách tạo và ghép ba phép đo:
+
+```mermaid
+flowchart LR
+  S["Cùng cohort scenarios"] --> R["Router\nactive knowledge + skills"]
+  S --> G["GapLoop\n--kb-version N"]
+  S --> F["Reflection\n--skills-version N"]
+  R --> T["report.json + manifest.json"]
+  G --> T
+  F --> T
+  T --> C["run_eval.py --report\n--run router=... --run gaploop=...\n--run reflection=..."]
+```
+
+Các trace vẫn được chấm độc lập; chỉ bảng tổng hợp đọc nhiều thư mục run.
+
 ```
 run_eval.py --scenarios <thư mục> [--config ...] [--only ID] [--no-extract] --out <thư mục>
  │

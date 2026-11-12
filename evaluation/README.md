@@ -6,7 +6,7 @@
 |---|---|
 | [`run_eval.py`](../run_eval.py) (gốc repo) | Lệnh duy nhất: chạy kịch bản qua agent thật, gắn nhãn câu hỏi/claim bằng extractor, rồi chấm bằng `reference_eval.py` của BTC |
 | `apps/ai-agent-service/src/ai_agent_service/pipeline/eval/` | Mã của lệnh trên: `cli.py`, `runner.py`, `trace.py`, `scenarios.py`, `report.py`, `relabel.py`, `performance.py`, `tables.py`, `rag.py` |
-| `apps/ai-agent-service/src/ai_agent_service/components/evaluation/scorers.py` | Extractor (nhãn `questions`, `claims`, `facts_used`) |
+| `apps/ai-agent-service/src/ai_agent_service/components/evaluation/scorers.py` | Extractor (nhãn `questions`, `claims`, `facts_used`) | --accept-suggestions
 | [`config/prompts/evaluation/extractor.txt`](../config/prompts/evaluation/extractor.txt) | Prompt của extractor, nạp nguyên văn |
 | `apps/ai-agent-service/data/btc/` | Gói dữ liệu của BTC, bản duy nhất trong repo; `tests/agent/test_btc_pack.py` ghim hash từng file. `eval/mock_tools.py`, `eval/reference_eval.py`, `schemas/tools.schema.json` là bản cập nhật 11/2026 (đơn nhiều máy lọc không khí, so cụm theo nguyên từ): xem [scoring-flow §3](../docs/evaluation/scoring-flow.md#3-công-cụ-nghiệp-vụ) |
 | [`../data/dev/scenarios/`](../data/dev/README.md) | Kịch bản để chấm: 409 kịch bản theo định dạng BTC, khớp CRM hiện tại (SCN-ADV-0155..0159 thêm ngày 12/11/2026, chưa người duyệt ký: `review/added.json`). Nhãn là bản r4 (08–09/11/2026), dựng bằng `datasets/ground-truth-review/build_dev_r4.py` từ bản r3 ở commit `46b2f2ff`; người duyệt đã chấp nhận mọi nhóm (1–31), không còn thay đổi chờ duyệt; `golden_manifest.json` duyệt 801/801 nhãn (578 hội thoại), `official_gt_approved: true` (10/11/2026). Không so số với run cũ (chấm trên r3) mà không ghi rõ là đổi nhãn. Thay đổi từng trường ở `conversion-report.json`, lý do ở `DISPUTES.md`. Hội thoại mẫu và audio của các lượt khách đã đổi lời đã sinh lại (09–10/11/2026) |
@@ -61,8 +61,12 @@ python run_eval.py --report agent,performance --run router=evaluation/runs/<a> -
 # Chạy mới rồi in các bảng, run này là cột Router, TỐN PHÍ model
 python run_eval.py --scenarios data/dev/scenarios --report all --out evaluation/runs/<tên>
 
-# Cột GapLoop/Reflection: chạy trên knowledge version có mục đã duyệt, TỐN PHÍ model
-python run_eval.py --scenarios data/dev/scenarios --kb-version 1 --out evaluation/runs/<tên>
+# Router: đường chuẩn, dùng knowledge và skills đang active (TỐN PHÍ model)
+python run_eval.py --scenarios data/dev/scenarios --profile router --out evaluation/runs/router-<tên>
+# GapLoop: chạy trên một knowledge version đã duyệt, TỐN PHÍ model
+python run_eval.py --scenarios data/dev/scenarios --profile gaploop --kb-version 1 --out evaluation/runs/gap-<tên>
+# Reflection: chạy trên một skills version đã duyệt, TỐN PHÍ model
+python run_eval.py --scenarios data/dev/scenarios --profile reflection --skills-version 1 --out evaluation/runs/reflection-<tên>
 
 # Recall@k của kho tri thức, miễn phí
 python evaluation/rag_offline.py
@@ -87,6 +91,23 @@ RQR, CCR, TSR, HR đều do `reference_eval.py` của BTC tính, chạy nguyên 
 
 `ADVISOR_CONTEXT=full` nạp đủ luật và đủ brief; không đặt thì chạy chế độ tập trung. Biến này đọc cả từ `.env`, và biến của shell thắng `.env`. Lệnh in dòng `Advisor context`, manifest ghi `advisor_context`: đọc hai chỗ này trước khi so hai run.
 
+### Nhiều phép đo
+
+Mỗi profile là một run độc lập nhưng dùng cùng `--scenarios`, model, extractor và cấu hình database. `--profile` chỉ ghi rõ biến thể được đo; nó không thay công thức của `reference_eval.py` và không tự chạy vòng cải tiến. `gaploop` bắt buộc `--kb-version <N>`, còn `reflection` bắt buộc `--skills-version <N>`; version `0` của Reflection là `config/prompts/agent/advisor/skills.yaml`.
+
+Vòng học và phê duyệt chạy riêng bằng `pipeline.improve`. Sau khi có version mới, chạy lại cùng cohort frozen rồi ghép bảng:
+
+```bash
+python -m ai_agent_service.pipeline.improve round --name learn-1 --learn data/gap-loop --frozen data/reflection --scripted
+python run_eval.py --report all \
+	--run router=evaluation/runs/router-<tên> \
+	--run gaploop=evaluation/runs/gap-<tên> \
+	--run reflection=evaluation/runs/reflection-<tên> \
+	--out evaluation/runs/comparison.md
+```
+
+`--report` không gọi model. Cột phải được đặt tên đúng profile; manifest ghi profile, knowledge override và skills override để báo cáo cảnh báo khi gắn nhãn sai hoặc hai cột thực ra dùng cùng version. So sánh chỉ hợp lệ khi cohort, model, extractor và context giống nhau; xem thêm [scoring-flow](../docs/evaluation/scoring-flow.md).
+
 ### Bảng báo cáo
 
 `--report` ghép ba bảng từ file của các run đã xong, cột nào chưa đo thì ghi `chưa đo`, không điền số. Cột Baseline lấy từ baseline của run `router`.
@@ -98,7 +119,7 @@ RQR, CCR, TSR, HR đều do `reference_eval.py` của BTC tính, chạy nguyên 
 | Subagent, A/B Testing | Agent phải có chế độ đó | Chưa có, cột ghi `chưa có` |
 | ASR | Một run `--asr` | Đo được |
 
-`--run` nhận `router`, `subagent`, `gaploop`, `reflection`, `ab`; thêm `--out <file>` để lưu bảng. `--report` đứng một mình bị từ chối để không vô tình chạy tốn phí. Run có `--config` không có `report.json`, nên cột Agent ghi `chưa đo`: chạy không `--config` để có cột đầy đủ. Bảng ASR đọc `main_scorer` của run `--asr`, mỗi tầng văn bản một cột.
+`--run` nhận `router`, `subagent`, `gaploop`, `reflection`, `ab`; thêm `--out <file>` để lưu bảng. `--report` đứng một mình bị từ chối để không vô tình chạy tốn phí. Run có `--config` không có `report.json`, nên cột Agent ghi `chưa đo`: chạy không `--config` để có cột đầy đủ. Bảng ASR đọc `main_scorer` của run `--asr`, mỗi tầng văn bản một cột. `subagent` và `ab` vẫn hiện `chưa có` vì chưa có profile thực thi.
 
 Ghi chú dưới bảng báo khi hai cột khác bộ kịch bản, khác model, hoặc cùng knowledge.
 

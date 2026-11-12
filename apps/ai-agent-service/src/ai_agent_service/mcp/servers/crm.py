@@ -18,7 +18,9 @@ the other.
 
 from __future__ import annotations
 
-from typing import Any, Literal, TypedDict
+from typing import Any, Literal
+
+from typing_extensions import TypedDict
 
 from ...components import clock
 from ..server_base import Server, ToolFailure, apply_schema

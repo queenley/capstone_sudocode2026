@@ -21,6 +21,28 @@ Loại: ... · Trạng thái: ... · Chỉ số: TSR / CCR / RQR / HR / latency 
 
 ## Các mục
 
+### 2026-11-12 · Sửa MCP startup trên Python 3.10
+
+Loại: evaluation · Trạng thái: đang đo · Chỉ số: startup / evaluation
+
+- **Vấn đề:** evaluation báo `MCPError: Connection closed` vì tiến trình MCP `crm` chết khi FastMCP tạo schema cho `order_create`; Pydantic 2.13 yêu cầu `typing_extensions.TypedDict` trên Python 3.10.
+- **Bằng chứng:** `evaluation/runs/eval_2/mcp-servers.log` ghi `PydanticUserError: Please use typing_extensions.TypedDict instead of typing.TypedDict on Python < 3.12`; sau sửa, advisor handshake với `app_db_eval` mở được và liệt kê 26 tools.
+- **Sửa:** đổi import `TypedDict` sang `typing_extensions` trong `mcp/servers/crm.py` và `mcp/servers/catalog.py`, giữ nguyên schema nghiệp vụ.
+- **Đã kiểm:** CRM và Catalog child server sống qua startup; MCP client handshake advisor thành công; MCP lifecycle/order schema/evaluation tests chạy qua.
+- **Số đo:** chưa chạy lại toàn bộ `data/dev`; lần chạy `eval_2` cũ vẫn là `INCOMPLETE` và không được ghi đè.
+- **Còn lại:** chạy một scenario nhỏ trước khi chạy cohort đầy đủ; `EVAL_BUDGET_DB` vẫn chưa đặt nên model calls không có spending cap.
+
+### 2026-11-12 · Tách profile Router, GapLoop và Reflection trong evaluation
+
+Loại: evaluation · Trạng thái: đang đo · Chỉ số: TSR / CCR / RQR / HR / latency
+
+- **Vấn đề:** `--report` đã có các cột GapLoop và Reflection nhưng một run không ghi rõ đang dùng knowledge hay skills version nào; Reflection còn được hướng dẫn như một knowledge run.
+- **Bằng chứng:** lần chạy `evaluation/runs/eval_2` dừng trước khi có bảng vì MCP đóng kết nối; manifest cũ không đủ metadata để phân biệt profile khi ghép nhiều run.
+- **Sửa:** thêm `--profile router|gaploop|reflection`, `--kb-version` bắt buộc cho GapLoop, `--skills-version` bắt buộc cho Reflection; ghi override vào `manifest.json`; báo cảnh báo khi tên cột không khớp profile hoặc hai cột dùng cùng version; cập nhật `evaluation/README.md`, `docs/evaluation/scoring-flow.md` và `docs/evaluation/system-map.md`.
+- **Đã kiểm:** `tests/agent/test_eval_tables.py` 10 passed; `py_compile` các module evaluation; version Reflection không tồn tại bị từ chối trước khi khởi động MCP/model.
+- **Số đo:** chưa đo trên agent thật.
+- **Còn lại:** cần chạy cùng cohort frozen cho Router, GapLoop và Reflection sau khi có version đã duyệt; lỗi MCP của `eval_2` là vấn đề khởi động riêng, chưa được sửa trong thay đổi này.
+
 Sáu mục đầu được ghi lại sau khi làm, từ đợt sửa ngày 05-06/11/2026. Chưa mục nào có số đo trên agent thật.
 
 ### 2026-11-12 · Số đo agent gốc trước và sau đợt sửa (commit `40fea307`)
@@ -142,7 +164,11 @@ Loại: dữ liệu · Trạng thái: đang đo · Chỉ số: TSR, HR
 - **Đã kiểm:**
   - data-generation 112/112 test qua.
   - Oracle dev và test tuyệt đối; validator dev 807/807, test 192/193 (GEN-0042/c3 cũ, người duyệt chọn không sửa).
-  - `auto_verify`: nhãn của 6/7 cuộc mới qua mọi kiểm. ADV-0155 bị kiểm `consent` bắt: hai lượt cuối thiếu lời đồng ý.
+  - `auto_verify`: nhãn của 7/7 cuộc mới qua mọi kiểm.
+  - ADV-0155 lúc đầu bị kiểm `consent` bắt: khách chưa nói đồng ý mà agent mẫu đã tạo đơn. Đã sửa tận gốc:
+    - `planner.check_draft` trả lại bản nháp của một cuộc chốt đơn nếu lượt cuối của khách không phải lời đồng ý (`CONSENT`, cùng mẫu với `auto_verify`);
+    - quy tắc 6 của `dialogue_full_call.jinja`: `order.create` chỉ đến ngay sau câu đồng ý.
+    - Sinh lại riêng ADV-0155 (`--advanced-limit 1`): bản nháp đầu bị trả lại đúng vì lỗi này, bản sau đạt.
 - **Số đo:** chưa đo trên agent.
 - **Còn lại:**
   - Người duyệt ký 7 cuộc mới trong `review_sheet.csv`, rồi chạy `approve_gold.py`.

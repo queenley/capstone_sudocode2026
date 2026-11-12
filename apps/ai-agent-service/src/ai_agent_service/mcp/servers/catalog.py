@@ -21,7 +21,9 @@ answer the same through ``pipeline/eval/bridge.py``.
 
 from __future__ import annotations
 
-from typing import Any, TypedDict
+from typing import Any
+
+from typing_extensions import TypedDict
 
 from ..server_base import Server, ToolFailure, apply_schema
 from . import btc

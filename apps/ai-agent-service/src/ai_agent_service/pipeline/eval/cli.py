@@ -149,11 +149,15 @@ def parser() -> argparse.ArgumentParser:
     parser.add_argument("--report", nargs="?", const="all", type=_sections, metavar="all|asr,agent,performance",
                         help="Print the report's tables (default all). With --run or --asr-run, from finished runs: no "
                              "model call. With --scenarios, of the run this command makes, as the Router column.")
+    parser.add_argument("--profile", choices=("router", "gaploop", "reflection"), default="router",
+                        help="Evaluation profile recorded in the manifest: router (default), gaploop, or reflection.")
     parser.add_argument("--run", action="append", default=[], type=_named_run, metavar="COLUMN=RUN_DIR",
                         help="With --report: a finished run as a column: router, subagent, gaploop, reflection or ab; repeat.")
     parser.add_argument("--asr-run", type=Path, metavar="RUN_DIR", help="With --report: a finished --asr run.")
     parser.add_argument("--kb-version", type=int, metavar="N",
-                        help="Run on data/kb/v<N>.jsonl instead of config/knowledge.yaml's version: the GapLoop or Reflection column.")
+                        help="Run on data/kb/v<N>.jsonl instead of config/knowledge.yaml's version; required by gaploop.")
+    parser.add_argument("--skills-version", type=int, metavar="N",
+                        help="Run on data/skills/v<N>.yaml instead of the active skills pointer; required by reflection.")
     parser.add_argument("--provider", help="The advisor's provider, overriding config/models.yaml.")
     parser.add_argument("--model", help="The advisor's model, overriding config/models.yaml.")
     return parser
@@ -215,6 +219,25 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 2
         # In the environment, so the MCP servers this command starts read the same version.
         os.environ["KNOWLEDGE_VERSION"] = str(args.kb_version)
+    if args.profile == "gaploop" and args.kb_version is None:
+        print("--profile gaploop requires --kb-version <N>")
+        return 2
+    if args.profile == "reflection" and args.skills_version is None:
+        print("--profile reflection requires --skills-version <N>")
+        return 2
+    if args.profile == "router" and (args.kb_version is not None or args.skills_version is not None):
+        print("--profile router cannot be combined with --kb-version or --skills-version")
+        return 2
+    if args.skills_version is not None:
+        if args.skills_version < 0:
+            print("--skills-version must be nonnegative")
+            return 2
+        skills_dir = ROOT / "data" / "skills"
+        skills_path = skills_dir / f"v{args.skills_version}.yaml"
+        if args.skills_version != 0 and not skills_path.is_file():
+            print(f"No skills version {args.skills_version} in {skills_dir}")
+            return 2
+        os.environ["EVAL_SKILLS_VERSION"] = str(args.skills_version)
     from ...mcp.server_base import use_selector_loop_on_windows
 
     use_selector_loop_on_windows()
@@ -426,7 +449,9 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
     ready = [replace(s, path=frozen / s.path.name) for s in ready]
     configs = list(layout.traces)
     _write_json(layout.side("manifest.json"), {"run_id": run_id, "status": "INCOMPLETE",
-                "configs": {config: {"memory": config == "full"} for config in configs}, "database": database})
+                "configs": {config: {"memory": config == "full"} for config in configs}, "database": database,
+                "evaluation": {"profile": args.profile, "knowledge_version_override": args.kb_version,
+                                "skills_version_override": args.skills_version}})
     runs: dict[str, ConfigRun] = {}
     found: dict[str, dict[str, int]] = {}
     extractor = None
@@ -499,6 +524,7 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
         configs=configs, advisor=advisor,
         extractor={"model": extractor.model_name, **extractor.stats()} if extractor else None,
         warmup=args.warmup, database=database, found=found,
+        profile=args.profile, kb_version=args.kb_version, skills_version=args.skills_version,
     )
     record["status"] = "INCOMPLETE" if report.blocking(found) else "TRACED"
     _write_json(layout.side("manifest.json"), record)

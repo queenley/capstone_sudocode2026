@@ -12,68 +12,101 @@
   "turns": [
     {
       "speaker": "agent_ai",
-      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC. Em sẵn sàng hỗ trợ chị đặt máy lọc không khí AirPure Pro cho từng phòng ạ.",
+      "text": "Dạ em chào chị ạ, em là trợ lý ảo của shop BTC, em có thể hỗ trợ mình mua máy lọc không khí AirPure Pro.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 500,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Alo, chị muốn mua 2 máy lọc không khí AirPure Pro cho 2 phòng khác nhau.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ vâng, em xác nhận chị muốn mua 2 máy lọc không khí AirPure Pro cho 2 phòng. Hiện tại đơn hàng của chị sẽ được áp dụng chương trình mua máy thứ 2 giảm 50% ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "qty",
+          "value": 2
+        },
+        {
+          "field": "in_stock",
+          "value": true
+        },
+        {
+          "field": "promo_AIR-OCT_active",
+          "value": true
+        }
+      ],
+      "tool_calls": [],
+      "memory_writes": [],
+      "entities": [],
+      "pause_before_ms": 400,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Máy nào được giảm 50% vậy em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 300,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ theo chính sách, chương trình AIR-2ND-50 giảm 50% cho máy thứ hai trong đơn, tức là máy thứ hai sẽ được tính giá ưu đãi ạ.",
       "questions": [],
       "facts_used": [],
       "claims": [],
       "tool_calls": [],
       "memory_writes": [],
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 350,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Alo, chị muốn mua 2 máy lọc không khí AirPure Pro cho mỗi phòng.",
+      "text": "Chị nghe nói có khuyến mãi gì đó, em cho chị biết giá từng máy với nhé.",
       "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 300,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ vâng chị, hiện tại máy lọc không khí AirPure Pro đang còn hàng. Em kiểm tra đơn 2 máy, mỗi máy sẽ được áp dụng chương trình ưu đãi khác nhau theo chính sách của shop. Chị muốn em báo khuyến mãi cụ thể cho từng máy không ạ?",
-      "questions": [
-        {
-          "slot": "other",
-          "type": "open",
-          "text": "Chị muốn em báo khuyến mãi cụ thể cho từng máy không ạ?"
-        }
-      ],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "in_stock",
-          "value": true
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Máy nào đang có khuyến mãi giảm 50% vậy em?",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 500,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, đơn 2 máy AirPure Pro sẽ áp dụng đồng thời hai chương trình: máy đầu tiên được giảm trực tiếp 300.000đ còn 7.690.000đ theo AIR-OCT, máy thứ hai giảm 50% còn 3.995.000đ nhờ chương trình AIR-2ND-50. Khuyến mãi giảm 50% chỉ áp dụng cho đúng một máy trong đơn ạ.",
+      "text": "Dạ, giá từng máy cho chị như sau: máy AirPure Pro thứ nhất là 7.690.000đ được áp dụng mã AIR-OCT, máy thứ hai giảm 50% còn 3.995.000đ theo chương trình AIR-2ND-50 chị nhé.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "promo_active",
-          "value": true
+          "field": "price_quoted_vnd",
+          "value": 7690000
+        },
+        {
+          "field": "promo_code",
+          "value": "AIR-OCT"
         }
       ],
       "tool_calls": [
@@ -93,33 +126,6 @@
         }
       ],
       "memory_writes": [],
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "customer",
-      "text": "Chị muốn biết giá từng máy một luôn.",
-      "facts_stated": {},
-      "entities": [],
-      "pause_before_ms": 600,
-      "emotion": null,
-      "barge_in": false
-    },
-    {
-      "speaker": "agent_ai",
-      "text": "Dạ, giá từng máy AirPure Pro đang được áp dụng như sau: máy thứ nhất giá 7.690.000đ, máy thứ hai giá 3.995.000đ, tổng cộng hai máy là 11.685.000đ. Cả hai đều là hàng chính hãng, bảo hành 24 tháng tại trung tâm AirPure trên toàn quốc ạ.",
-      "questions": [],
-      "facts_used": [],
-      "claims": [
-        {
-          "field": "total_vnd",
-          "value": 11685000
-        }
-      ],
-      "tool_calls": [],
-      "memory_writes": [],
       "entities": [
         {
           "type": "money",
@@ -130,29 +136,27 @@
           "type": "money",
           "value": "3995000",
           "spoken": "3.995.000đ"
-        },
-        {
-          "type": "money",
-          "value": "11685000",
-          "spoken": "11.685.000đ"
         }
       ],
-      "pause_before_ms": 500,
+      "pause_before_ms": 450,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Tổng giá cho 2 máy là bao nhiêu em nhỉ?",
-      "facts_stated": {},
+      "text": "Chị ở TP Huế, thanh toán bằng chuyển khoản.",
+      "facts_stated": {
+        "delivery_area": "TP Huế",
+        "payment": "bank"
+      },
       "entities": [],
-      "pause_before_ms": 600,
+      "pause_before_ms": 350,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ, tổng giá cho 2 máy lọc không khí AirPure Pro là 11.685.000đ, đã gồm đủ khuyến mãi và miễn phí vận chuyển tới TP Huế cho chị luôn ạ.",
+      "text": "Dạ em đã ghi nhận địa chỉ giao hàng tại TP Huế và phương thức thanh toán chuyển khoản cho chị. Đơn hàng này tổng cộng là 11.685.000đ, miễn phí vận chuyển toàn quốc, dự kiến giao ngày 28/10/2026.",
       "questions": [],
       "facts_used": [],
       "claims": [
@@ -161,8 +165,66 @@
           "value": 11685000
         },
         {
+          "field": "delivery_days",
+          "value": 4
+        },
+        {
+          "field": "estimated_delivery",
+          "value": "2026-10-28"
+        },
+        {
           "field": "freeship",
           "value": true
+        }
+      ],
+      "tool_calls": [
+        {
+          "name": "delivery_estimate",
+          "args": {
+            "address": "TP Huế",
+            "on": "2026-10-22"
+          }
+        }
+      ],
+      "memory_writes": [],
+      "entities": [
+        {
+          "type": "money",
+          "value": "11685000",
+          "spoken": "11.685.000đ"
+        },
+        {
+          "type": "date",
+          "value": "2026-10-28",
+          "spoken": "28/10/2026"
+        }
+      ],
+      "pause_before_ms": 450,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "customer",
+      "text": "Tổng tiền cho 2 máy này là bao nhiêu em?",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 350,
+      "emotion": null,
+      "barge_in": false
+    },
+    {
+      "speaker": "agent_ai",
+      "text": "Dạ tổng tiền cho 2 máy lọc không khí AirPure Pro là 11.685.000đ chị nhé, đơn này đã áp dụng đầy đủ chương trình khuyến mãi và thanh toán bằng chuyển khoản, vì đơn trên 10 triệu không áp dụng COD ạ.",
+      "questions": [],
+      "facts_used": [],
+      "claims": [
+        {
+          "field": "total_vnd",
+          "value": 11685000
+        },
+        {
+          "field": "cod_allowed",
+          "value": false
         }
       ],
       "tool_calls": [],
@@ -180,30 +242,28 @@
     },
     {
       "speaker": "customer",
-      "text": "Chị định thanh toán bằng chuyển khoản cho đơn này.",
-      "facts_stated": {
-        "payment": "bank"
-      },
+      "text": "Đúng rồi em, chốt đơn giúp chị nhé.",
+      "facts_stated": {},
       "entities": [],
-      "pause_before_ms": 500,
+      "pause_before_ms": 350,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em ghi nhận mình chọn thanh toán chuyển khoản, vì đơn trên 10 triệu nên shop chỉ nhận chuyển khoản và không áp dụng COD chị nhé. Chị xác nhận giúp em các thông tin đơn hàng: 2 máy lọc không khí AirPure Pro, tổng tiền 11.685.000đ, giao tại TP Huế và thanh toán chuyển khoản đúng không ạ?",
+      "text": "Dạ em xác nhận đặt 2 máy lọc không khí AirPure Pro, tổng 11.685.000đ, giao tại TP Huế, thanh toán chuyển khoản, dự kiến giao ngày 28/10/2026. Chị đồng ý với thông tin trên để em tạo đơn nhé?",
       "questions": [
         {
           "slot": "order_summary",
           "type": "confirm",
-          "text": "Chị xác nhận giúp em các thông tin đơn hàng: 2 máy lọc không khí AirPure Pro, tổng tiền 11.685.000đ, giao tại TP Huế và thanh toán chuyển khoản đúng không ạ?"
+          "text": "Chị đồng ý với thông tin em vừa đọc lại để em tạo đơn nhé?"
         }
       ],
       "facts_used": [],
       "claims": [
         {
-          "field": "cod_allowed",
-          "value": false
+          "field": "total_vnd",
+          "value": 11685000
         }
       ],
       "tool_calls": [],
@@ -215,46 +275,31 @@
           "spoken": "11.685.000đ"
         }
       ],
-      "pause_before_ms": 600,
+      "pause_before_ms": 450,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "customer",
-      "text": "Vậy em cho chị biết khu vực giao hàng là TP Huế nhé.",
-      "facts_stated": {
-        "delivery_area": "TP Huế"
-      },
-      "entities": [
-        {
-          "type": "address",
-          "value": "TP Huế",
-          "spoken": "TP Huế"
-        }
-      ],
-      "pause_before_ms": 600,
+      "text": "Đúng rồi em, chốt đơn giúp chị nhé.",
+      "facts_stated": {},
+      "entities": [],
+      "pause_before_ms": 300,
       "emotion": null,
       "barge_in": false
     },
     {
       "speaker": "agent_ai",
-      "text": "Dạ em đã ghi nhận địa chỉ giao hàng là TP Huế. Em tiến hành tạo đơn với 2 máy AirPure Pro, thanh toán chuyển khoản tổng cộng 11.685.000đ, dự kiến giao hàng tới chị trong vòng 4 ngày, khoảng ngày 28/10/2026. Shop sẽ gửi thông tin chuyển khoản và mã đơn hàng OD600001 cho chị ngay sau cuộc gọi ạ.",
+      "text": "Dạ em đã chốt đơn cho chị thành công ạ. Đơn hàng gồm 2 máy lọc không khí AirPure Pro, tổng 11.685.000đ, giao tại TP Huế, thanh toán chuyển khoản. Shop sẽ gửi thông tin tài khoản ngân hàng và liên hệ khi đơn được xử lý xong, dự kiến giao hàng ngày 28/10/2026.",
       "questions": [],
       "facts_used": [],
       "claims": [
         {
-          "field": "estimated_delivery",
-          "value": "2026-10-28"
+          "field": "total_vnd",
+          "value": 11685000
         }
       ],
       "tool_calls": [
-        {
-          "name": "delivery_estimate",
-          "args": {
-            "address": "TP Huế",
-            "on": "2026-10-22"
-          }
-        },
         {
           "name": "order.create",
           "args": {
@@ -282,19 +327,19 @@
           "key": "delivery_area",
           "value": "TP Huế",
           "op": "set",
-          "source": "call_1#turn11"
+          "source": "call_1#turn7"
         },
         {
           "key": "payment",
           "value": "bank",
           "op": "set",
-          "source": "call_1#turn9"
+          "source": "call_1#turn7"
         },
         {
           "key": "product_advised",
           "value": "SKU-AP-PRO",
           "op": "set",
-          "source": "call_1#turn3"
+          "source": "call_1#turn1"
         },
         {
           "key": "price_quoted_vnd",
@@ -312,68 +357,43 @@
           "key": "order_id",
           "value": "OD600001",
           "op": "set",
-          "source": "call_1#turn11"
+          "source": "call_1#turn13"
         }
       ],
       "entities": [
         {
-          "type": "address",
-          "value": "TP Huế",
-          "spoken": "TP Huế"
+          "type": "money",
+          "value": "11685000",
+          "spoken": "11.685.000đ"
         },
         {
           "type": "date",
           "value": "2026-10-28",
           "spoken": "28/10/2026"
-        },
-        {
-          "type": "order_id",
-          "value": "OD600001",
-          "spoken": "OD600001"
         }
       ],
-      "pause_before_ms": 700,
+      "pause_before_ms": 500,
       "emotion": null,
       "barge_in": false
     }
   ],
   "gold": {
-    "intent": "dat_hang_2_may_loc_khong_khi",
+    "intent": "dat_mua_2_may_airpure_pro",
     "outcome": "chot_don",
     "objection_type": null,
     "objection_handling": null,
     "sentiment": "positive",
     "decision_maker": null,
-    "commitments": [
-      {
-        "product": "Máy lọc không khí AirPure Pro",
-        "qty": 2,
-        "total_vnd": 11685000,
-        "delivery_area": "TP Huế",
-        "payment": "bank",
-        "order_id": "OD600001"
-      }
-    ],
+    "commitments": [],
     "supersedes": [],
     "callback": null,
     "order": {
-      "lines": [
-        {
-          "sku": "SKU-AP-PRO",
-          "qty": 1,
-          "price_vnd": 7690000
-        },
-        {
-          "sku": "SKU-AP-PRO",
-          "qty": 1,
-          "price_vnd": 3995000
-        }
-      ],
+      "sku": "SKU-AP-PRO",
+      "qty": 2,
+      "total_vnd": 11685000,
       "payment": "bank",
       "address": "TP Huế",
-      "total_vnd": 11685000,
-      "order_id": "OD600001",
-      "estimated_delivery": "2026-10-28"
+      "order_id": "OD600001"
     }
   }
 }

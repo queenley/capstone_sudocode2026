@@ -26,6 +26,9 @@ def versions_dir() -> Path:
 
 
 def active_version(folder: Path) -> int:
+    forced = os.environ.get("EVAL_SKILLS_VERSION", "").strip()
+    if forced:
+        return int(forced)
     path = folder / ACTIVE
     return int(json.loads(path.read_text(encoding="utf-8"))["version"]) if path.is_file() else 0
 

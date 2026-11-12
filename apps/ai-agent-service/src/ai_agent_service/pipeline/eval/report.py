@@ -81,7 +81,8 @@ def blocking(found: Mapping[str, Mapping[str, int]]) -> dict[str, int]:
 def manifest(
     *, run_id: str, started: datetime, scenarios_dir: Path, scenarios: list[Scenario], rejected: list[Rejected],
     configs: list[str], advisor: Mapping[str, Any], extractor: Mapping[str, Any] | None, warmup: int,
-    database: str, found: Mapping[str, Mapping[str, int]],
+    database: str, found: Mapping[str, Mapping[str, int]], profile: str = "router",
+    kb_version: int | None = None, skills_version: int | None = None,
 ) -> dict[str, Any]:
     """Appendix D: what ran, on what, with which models, prompts and switches."""
     models = get_models_config()
@@ -112,6 +113,11 @@ def manifest(
         "knowledge_sha256": _sha({path.name: hashlib.sha256(path.read_bytes()).hexdigest()
                                   for path in sorted((btc_data_dir() / "policy").glob("*.md"))}),
         "knowledge": knowledge_record(),
+        "evaluation": {
+            "profile": profile,
+            "knowledge_version_override": kb_version,
+            "skills_version_override": skills_version,
+        },
         "scenarios": {
             "dir": str(scenarios_dir),
             "files": {s.path.name: hashlib.sha256(s.path.read_bytes()).hexdigest() for s in scenarios},
