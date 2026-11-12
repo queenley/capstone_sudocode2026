@@ -27,7 +27,7 @@ from ...agents.policy import PolicyInput
 from ...components.context import compact, focus
 from ...components.context.budget import tokens as count_tokens
 from ...components.guardrails import actions, fallback, purchase
-from ...components.guardrails.hard import (MAX_SENTENCES, ORDER_SUMMARY, GuardInput, check, clean, moved_callback,
+from ...components.guardrails.hard import (MAX_SENTENCES, ORDER_CODE, ORDER_SUMMARY, GuardInput, check, clean, moved_callback,
                                            open_amounts)
 from ...config.config_manager import review_head_start
 from .review import Reviews
@@ -175,7 +175,8 @@ async def _knowledge(state: dict[str, Any], context: HotContext, said: str) -> d
     order_date, other_orders = _order_days(state, said)
     found = await context.harness.data("kb_search", query=said, k=5, on=state["on"], order_date=order_date,
                                        other_order_dates=list(other_orders),
-                                       about=[p["sku"] for p in state.get("seen_products") or [] if p.get("sku")])
+                                       about=[p["sku"] for p in state.get("seen_products") or [] if p.get("sku")],
+                                       include=list(skill_book.LEARNED_CITES))
     if not found:
         return None
     return {key: found.get(key) for key in ("hits", "top_score", "threshold", "abstain", "reason", "mode",
@@ -656,7 +657,7 @@ def _agent_context(state: HotState, context: HotContext, summary: str | None) ->
         },
         switches=dict(state.get("switches") or {}),
         turn_id=state.get("turn_id"),
-        knowledge=_passages(state),
+        knowledge=_passages_in_reach(state),
         knowledge_note=_knowledge_note(state),
         confirm_reason="probable" if state.get("awaiting") == "confirm" else None,
         notes=tuple(state.get("route_notes") or ()),
@@ -1276,6 +1277,10 @@ def guard_input(state: HotState, context: HotContext, text: str, results: tuple[
         warnings=tuple(state.get("freshness") or []) if tier == "VERIFIED" else (),
         promotions=promotions(),
         on=state.get("on"),
+        own_orders=frozenset(
+            [str(o["order_id"]) for o in state.get("created_orders") or [] if o.get("order_id")]
+            + [code for r in results if r.get("name") == "order.create" and (r.get("result") or {}).get("ok")
+               for code in ORDER_CODE.findall(json.dumps(r.get("result"), default=str))]),
     )
 
 
@@ -1431,6 +1436,21 @@ def _passages(state: HotState) -> tuple[dict[str, Any], ...]:
     explains = set(found.get("explains") or ())
     return (*(hit for hit in found["hits"] if hit.get("chunk_id") not in explains),
             *({**entry, "explains": True} for entry in found.get("changelog") or () if entry.get("chunk_id") in explains))
+
+
+def _passages_in_reach(state: HotState) -> tuple[dict[str, Any], ...]:
+    """This turn's passages, then the ones the advisor read on earlier turns of the call and this turn's search did
+    not bring back, the latest first (``earlier``).
+
+    A follow-up question is searched by its own few words: "nếu gửi hàng thì mất bao lâu để xử lý", asked right
+    after the warranty procedure was read out, ranked the delivery table first and the warranty section fifth, so the
+    advisor no longer had what it had just said, answered that it had no information and transferred the call
+    (2026-11-11). What was read stays readable; ``agents.advisor.shown_passages`` bounds how many are shown."""
+    now = _passages(state)
+    have = {str(p.get("chunk_id")) for p in now}
+    earlier = [{"chunk_id": chunk_id, "title": "", "text": text, "earlier": True}
+               for chunk_id, text in reversed(list((state.get("passages_read") or {}).items())) if chunk_id not in have]
+    return (*now, *earlier)
 
 
 #: The knowledge search found the documents do not answer the turn (nothing relevant, or a passage

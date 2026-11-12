@@ -303,6 +303,26 @@ def _schedule_callback(args: Mapping[str, Any], *, now: datetime | None, has_pho
             f"({clock.tool_time(slot)}) rồi mới đặt lịch."]
 
 
+#: The transfer's reason for a question nothing answers (the advisor's rule 4, DIEU-CHINH-DE 4).
+OUT_OF_DOCUMENTS = "ngoai_pham_vi_tai_lieu"
+EARLY_TRANSFER = ("Em đang tra tool trong cùng lượt này: đọc kết quả trước. Kết quả trả lời được điều khách hỏi thì trả lời, "
+                  "không chuyển máy; chỉ khi tài liệu và kết quả tool đều không trả lời được mới gọi lại handoff_transfer "
+                  "(luật 4).")
+
+
+def early_transfer(args: Mapping[str, Any], together: Sequence[str]) -> bool:
+    """A transfer for "nothing answers this" asked in the same model round as a lookup whose result is not back yet.
+
+    Rule 4 says to look up first. The model sometimes asks for both at once (2026-11-11: a price question, in half
+    the runs: ``catalog_search`` and ``handoff_transfer`` together, the reason given "the documents do not hold the
+    price"), and the transfer then ran before the lookup that answered. *together* are the tools of that round,
+    by wire name. A transfer for any other reason (the customer asks for a person, a health question, a complaint)
+    is never held back, and neither is one asked alone."""
+    reason = (args.get("brief") or {}).get("escalation_reason") or args.get("escalation_reason")
+    lookups = [name for name in together if name not in WRITE_TOOLS and name != "load_skill"]
+    return reason == OUT_OF_DOCUMENTS and bool(lookups)
+
+
 def _handoff(args: Mapping[str, Any], *, lane: str | None, warranted: bool | None) -> list[str]:
     reasons = []
     if lane != "HANDOFF" and warranted is False:

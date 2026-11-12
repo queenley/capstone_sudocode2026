@@ -249,8 +249,9 @@ def failures(
 
 
 def rubric_failures(scenario: Mapping[str, Any], call: str, judgment: Mapping[str, Any]) -> list[Failure]:
-    """The QaAgent's FAIL verdicts of one call as failures; an incomplete judgment yields none (it is not a verdict)."""
-    if judgment.get("status") != "COMPLETE":
+    """The QaAgent's FAIL verdicts of one call as failures; an incomplete judgment yields none (it is not a verdict).
+    A partial one (``agents.qa.settled``) holds only the verdicts that show the call's words."""
+    if judgment.get("status") not in ("COMPLETE", "PARTIAL"):
         return []
     return [Failure(code=f"J.{item['criterion_id']}", route=route(f"J.{item['criterion_id']}"),
                     scenario_id=str(scenario["scenario_id"]), call=call, turn=None, customer=customer_of(scenario),

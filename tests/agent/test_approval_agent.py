@@ -235,3 +235,47 @@ def test_the_evaluation_judge_keeps_its_exact_quote():
 
     judge = BtcJudge(FakeModel())
     assert judge.quoted("giá 5.200.000đ", "Dạ giá 5.200.000đ ạ") and not judge.quoted('"giá 5.200.000đ"', "Dạ giá 5.200.000đ ạ")
+
+
+#: What the assistant said in real runs (2026-11-10, 2026-11-11), by what it did.
+OFFERS = ["Chị có thể mua thêm gói bảo hành 12 tháng trong vòng 15 ngày từ ngày nhận hàng, áp dụng cho sản phẩm này.",
+          "Bên em có gói bảo hành mở rộng thêm 12 tháng, phí bằng 8% giá sản phẩm và cần mua trong 15 ngày.",
+          "Ngoài ra, chị có thể mua thêm 12 tháng bảo hành với phí bằng 8% giá sản phẩm trong vòng 15 ngày."]
+NO_OFFERS = ["Máy được bảo hành 24 tháng cho lỗi kỹ thuật do nhà sản xuất như motor, bo mạch, cảm biến và nguồn.",
+             "Mẫu này có bảo hành 12 tháng; giá sản phẩm 1.890.000đ nên chưa thuộc diện mua thêm bảo hành mở rộng của shop."]
+
+
+@pytest.mark.parametrize("said, offered", [*((text, True) for text in OFFERS), *((text, False) for text in NO_OFFERS)])
+def test_the_grader_reads_an_offer_in_the_words_the_assistant_uses_and_a_true_refusal_is_no_offer(said, offered):
+    """A call is judged by what was done, not by one wording: on 2026-11-10 the original agent offered the package as
+    "mua thêm gói bảo hành 12 tháng" and failed, and a control would have passed with the same words."""
+    from ai_agent_service.components.improvement import signals
+
+    rows = [{"turn": 1, "customer_text": "x", "agent_text": said, "tool_calls": []}]
+    for scenario in read("frozen"):
+        spec = scenario["calls"]["call_1"]
+        target = "must_say_any" in spec["success_if"]
+        if target and "chưa thuộc diện" in said:
+            continue  # a phrase match cannot tell "not eligible" from an offer; only the controls can be asked that
+        passed, _ = signals.grader().check_call(spec, rows)
+        assert passed == (offered == target), (scenario["scenario_id"], said)
+
+
+def test_a_pass_needs_no_quote_and_a_fail_without_the_call_s_words_is_dropped_not_the_whole_judgment():
+    from ai_agent_service.agents.qa import settled
+    from ai_agent_service.components.improvement import signals
+
+    words = "Dạ AirPure Y giá 5.200.000đ ạ\nChị muốn hỏi thêm"
+    judged = {"status": "INCOMPLETE", "criteria": ["J02", "J06", "J08"], "verdicts": [
+        {"criterion_id": "J02", "verdict": "PASS", "evidence": "Agent nói đúng giá công cụ."},
+        {"criterion_id": "J06", "verdict": "FAIL", "evidence": 'Agent nói "AirPure Y giá 5.200.000đ" mà không xưng hô.'},
+        {"criterion_id": "J08", "verdict": "FAIL", "evidence": "Agent xác nhận lặp lại nhiều lần."}]}
+    kept = settled(judged, words)
+    assert kept["status"] == "PARTIAL" and kept["dropped"] == ["J08"]
+    assert [v["criterion_id"] for v in kept["verdicts"]] == ["J02", "J06"]
+    scenario = {"scenario_id": "S", "customer_phone": "0900000001"}
+    assert [f.code for f in signals.rubric_failures(scenario, "call_1", kept)] == ["J.J06"]
+    assert settled({**judged, "verdicts": judged["verdicts"][:2]}, words) is None  # a criterion left unanswered
+    assert settled({**judged, "error": "TimeoutError"}, words) is None
+    only_pass = settled({**judged, "verdicts": [{**v, "verdict": "PASS"} for v in judged["verdicts"]]}, words)
+    assert only_pass["status"] == "COMPLETE" and "dropped" not in only_pass

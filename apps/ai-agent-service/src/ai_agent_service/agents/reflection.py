@@ -11,8 +11,10 @@ When enough customers share one lesson it drafts the change to the skill,
 one sentence (:class:`SkillPatch`); code merges it, the PolicyAgent checks
 it, a person approves it. It never approves anything itself.
 
-It reflects only on what the skill does not say (``skill_gap``): a skill that
-already says it and was not followed is a product matter, not a lesson.
+It reflects on a failure of conduct the grader checks in code: what the skill
+does not say (``skill_gap``), or what a skill or a fixed rule says and the
+advisor did not do (``not_followed``: the lesson is how to keep it in that
+situation; a fixed rule itself is never changed).
 
 Off the hot path, so its model is ``agents.reflection`` in
 ``config/models.yaml``, chosen for reasoning rather than for the first token
@@ -110,7 +112,7 @@ class ReflectionAgent(BaseAgent):
 
     async def lesson(self, code: str, check: str, transcript: str, *, skill: str, skills: Mapping[str, Mapping[str, Any]],
                      rules: Mapping[str, str], situations: Mapping[str, str], fixed_rules: str = "",
-                     covering: str = "") -> LessonCard | None:
+                     covering: str = "", found: str = "") -> LessonCard | None:
         """One card for one call; None without a model or when the call fails.
 
         It reads the failed check by name and meaning, never the grader's
@@ -118,6 +120,10 @@ class ReflectionAgent(BaseAgent):
         the test looks for. What every card of a round shares comes first (the
         instructions, the rules, the situations), then the skill, then this
         call, so the provider's prompt cache serves the long common part.
+
+        *found* is the QaAgent's diagnosis of this call in a sentence: the lesson answers it. Without it each card
+        guessed the fault again from a check that names none, and on 2026-11-11 two of three cards of one situation
+        taught something else than what the reviewer had found.
         """
         if self.llm is None or skill not in skills:
             return None
@@ -125,9 +131,10 @@ class ReflectionAgent(BaseAgent):
                                "SITUATIONS:\n" + json.dumps(dict(situations), ensure_ascii=False, indent=0),
                                _skill_block(skill, skills[skill]), f"CHECK FAILED: {code}\n{check}",
                                ("ALREADY SAID, NOT DONE: " + covering) if covering else "ALREADY SAID, NOT DONE: (nothing)",
+                               "QA FOUND: " + (found.strip() or "(nothing said)"),
                                "CALL:\n" + transcript])
-        found = await self._ask("lesson", LessonCard, request)
-        return LessonCard.model_validate(found) if found else None
+        card = await self._ask("lesson", LessonCard, request)
+        return LessonCard.model_validate(card) if card else None
 
     async def patch(self, cards: Sequence[Mapping[str, Any]], *, skill: str, skills: Mapping[str, Mapping[str, Any]],
                     rules: Mapping[str, str], fixed_rules: str = "",

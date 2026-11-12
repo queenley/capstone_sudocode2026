@@ -99,6 +99,24 @@ def quoted(evidence: str, words: str) -> bool:
     return bool(parts) and all(part in said for part in parts)
 
 
+def settled(judged: Mapping[str, Any], words: str) -> dict[str, Any] | None:
+    """A rubric judgment the organisers' completeness rule refused, kept where it still says something true.
+
+    Their rule wants every verdict's evidence to be a quote of the call. A PASS on a criterion about the whole call
+    ("xưng hô nhất quán", "không xác nhận lặp lại") has no one sentence to quote, and such a verdict voided three
+    learning calls of four on 2026-11-11. The loop learns only from a FAIL, so only a FAIL must show its words: a
+    PASS is kept as it is, a FAIL without a quote of the call is dropped and named (``PARTIAL``). A judgment that
+    does not answer every criterion, or failed, stays unscored (None)."""
+    verdicts = list(judged.get("verdicts") or [])
+    if judged.get("error") or sorted(str(v.get("criterion_id")) for v in verdicts) != sorted(judged.get("criteria") or []):
+        return None
+    dropped = [str(v.get("criterion_id")) for v in verdicts
+               if v.get("verdict") != "PASS" and not quoted(str(v.get("evidence") or ""), words)]
+    kept = [v for v in verdicts if str(v.get("criterion_id")) not in dropped]
+    return {"status": "PARTIAL" if dropped else "COMPLETE", "criteria": list(judged.get("criteria") or []),
+            "verdicts": kept, **({"dropped": dropped} if dropped else {})}
+
+
 class QaAgent(BaseAgent):
     """Scores calls and diagnoses their failures; never writes or approves a change."""
 
@@ -202,8 +220,12 @@ class QaAgent(BaseAgent):
 
         async def grade() -> dict[str, Any] | None:
             judged = await self._judge.grade(scenario, call, rows)
-            if judged.get("status") != "COMPLETE":  # an incomplete one is asked again; say why, it is not scored
+            if judged.get("status") != "COMPLETE":
                 words = "\n".join(str(row.get(key) or "") for row in rows for key in ("customer_text", "agent_text"))
+                kept = settled(judged, words)
+                if kept is not None:
+                    return kept
+                # Still incomplete: asked again next time; say why, it is not scored.
                 unquoted = [v.get("evidence") for v in judged.get("verdicts") or [] if not quoted(str(v.get("evidence") or ""), words)]
                 logger.warning("Rubric for %s %s incomplete: %s", scenario.get("scenario_id"), call,
                                judged.get("error") or f"{len(judged.get('verdicts') or [])} verdicts for "
@@ -216,7 +238,7 @@ class QaAgent(BaseAgent):
 
     async def diagnose(self, code: str, check: str, transcript: str, *, skills: Mapping[str, Mapping[str, Any]],
                        situations: Mapping[str, str], fixed_rules: str = "",
-                       policy: Mapping[str, str] | None = None) -> Diagnosis | None:
+                       policy: Mapping[str, str] | None = None, relevant: Sequence[str] = ()) -> Diagnosis | None:
         """What kind of failure *code* is in this call; None without a model or when the call fails.
 
         It reads the failed check by name and meaning (*check*), the call and the
@@ -224,6 +246,11 @@ class QaAgent(BaseAgent):
         every diagnosis of a round shares (the instructions, the skills, the
         situations) comes first, so the provider's prompt cache serves it once
         it has been read; the check and the call come last.
+
+        *relevant* are the policy sections the call's scenario says it is about (``relevant_policy_ids``): which
+        sections, never what the grader expected to hear. A check that only says "something was not told" leaves
+        ninety-nine sections to guess from, and on 2026-11-12 three calls of one situation got three different
+        diagnoses, so no lesson was shared.
         """
         if self.llm is None:
             return None
@@ -232,6 +259,7 @@ class QaAgent(BaseAgent):
         request = "\n\n".join([load_prompt("qa_diagnose.md"), "POLICY:\n" + shown, "FIXED RULES:\n" + fixed_rules,
                                "SKILLS:\n" + written,
                                "SITUATIONS:\n" + json.dumps(dict(situations), ensure_ascii=False, indent=0),
+                               "RELEVANT POLICY: " + (", ".join(c for c in relevant if c in (policy or {})) or "(not stated)"),
                                f"CHECK FAILED: {code}\n{check}", "CALL:\n" + transcript])
 
         async def ask() -> dict[str, Any] | None:

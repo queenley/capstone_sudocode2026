@@ -117,10 +117,11 @@ def approve_scripted(path: Path, reviewer: str) -> None:
 
 def blocking(item: Mapping[str, Any]) -> list[str]:
     """The flags that keep a change out: all of them, except the PolicyAgent's when the ApprovalAgent read them and
-    approved anyway (its reason says why). The screen's flags always hold."""
+    approved anyway (its reason says why). The screen's flags always hold, and so does a policy check that did not
+    run (``policy:unavailable``): nobody read what it would have said."""
     flags = [str(flag) for flag in item.get("flags") or []]
     if item.get("reviewer") == APPROVAL_AGENT and item.get("decision") == "approved":
-        return [flag for flag in flags if not flag.startswith("policy:")]
+        return [flag for flag in flags if not flag.startswith("policy:") or flag == "policy:unavailable"]
     return flags
 
 

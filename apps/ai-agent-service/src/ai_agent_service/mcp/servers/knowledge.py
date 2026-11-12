@@ -211,6 +211,7 @@ def hit_view(hit: Hit, *, reveal: bool) -> dict[str, Any]:
         "situation": chunk.situation,
         "campaign": chunk.campaign,
         "for_product": hit.for_product,
+        "pinned": hit.pinned,
         "rank": hit.rank,
         "score": hit.score,
         "cosine": hit.cosine,
@@ -245,6 +246,7 @@ async def kb_search(
     situation: str | None = None,
     other_order_dates: list[str] | None = None,
     about: list[str] | None = None,
+    include: list[str] | None = None,
 ) -> dict[str, Any]:
     """Search the shop's policies, FAQ and playbook for what applies to a question.
 
@@ -261,12 +263,13 @@ async def kb_search(
         situation: The call's situation, to prefer the playbook entry written for it.
         other_order_dates: The customer's other order days, when the question names no order.
         about: The SKUs this call is on: entries for them are preferred, entries for other products left out.
+        include: Section ids returned after the ranked passages whatever their rank, when public and in force.
     """
     if not query.strip():
         raise ToolFailure("BAD_REQUEST", "An empty query has no passages")
     kb = await base()
     result = kb.search(query, k=max(1, min(k, MAX_K)), on=on, order_date=order_date, situation=situation,
-                       other_order_dates=other_order_dates or (), about=about or ())
+                       other_order_dates=other_order_dates or (), about=about or (), include=include or ())
     settings = kb.settings
     threshold = settings.abstain_cosine if kb.mode == "hybrid" else settings.abstain_coverage
     return result_view(result, reveal=current_role() == "admin", threshold=threshold)

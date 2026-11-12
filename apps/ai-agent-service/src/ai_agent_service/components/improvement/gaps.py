@@ -60,10 +60,14 @@ def record_from_run(rows: Sequence[Mapping[str, Any]], diagnostics: Sequence[Map
     """The questions a finished run could not answer, recorded as a live call records them.
 
     A run of the evaluation does not go through the live call's store, so its gaps are read from the trace: a turn
-    whose retrieval abstained (no passage, or the passage says there is no information, the harness's own rule) or
-    in which the advisor transferred the call because the documents do not answer. Both are structured fields of
-    the trace, not words. The earlier turns of the call go with it, for :func:`restate_open` to resolve "máy này".
+    in which the advisor transferred the call because the documents do not answer, or one whose retrieval abstained
+    (no passage, or the passage says there is no information, the harness's own rule) and in which the assistant
+    told the customer it has no information, as the organisers' grader reads that (its ``ABSTAIN_KW``). Retrieval
+    abstaining alone is not a gap: it also abstains on "Dạ chị hiểu rồi, cảm ơn em", and ten such lines were
+    recorded as open questions on 2026-11-12. The earlier turns of the call go with it, for :func:`restate_open` to
+    resolve "máy này".
     """
+    grader = signals.grader()
     abstained = {(str(d["scenario_id"]), str(d["call"]), int(d["turn"])) for d in diagnostics
                  if d.get("config") in (None, "full") and d.get("turn") is not None
                  and ((d.get("knowledge") or {}).get("abstain") in ("no_match", "absence"))}
@@ -79,7 +83,8 @@ def record_from_run(rows: Sequence[Mapping[str, Any]], diagnostics: Sequence[Map
                               for tool in row.get("tool_calls") or [])
             if not str(row.get("customer_text") or "").strip():
                 continue
-            if not transferred and (scenario, call, int(row.get("turn") or 0)) not in abstained:
+            told = any(grader.said(grader._say_norm(str(row.get("agent_text") or "")), phrase) for phrase in grader.ABSTAIN_KW)
+            if not transferred and not ((scenario, call, int(row.get("turn") or 0)) in abstained and told):
                 continue
             recent = [str(t.get(key) or "") for t in turns[max(0, index - 2):index] for key in ("customer_text", "agent_text")]
             if record(str(row.get("customer_text") or ""), call_id=f"{scenario}/{call}", turn_id=str(row.get("turn")),
@@ -149,7 +154,8 @@ async def merge_same(embed: Callable[[Sequence[str]], Any], same: Same, *, thres
 
 
 async def answer_from_script(script: Sequence[Mapping[str, Any]], embed: Callable[[Sequence[str]], Any], fits: Same, *,
-                             threshold: float = SAME_CANDIDATE) -> list[dict]:
+                             threshold: float = SAME_CANDIDATE,
+                             questions_of: Callable[[str, str], Awaitable[Sequence[str]]] | None = None) -> list[dict]:
     """In an evaluation there is no consultant: each scripted answer goes to the open gap it answers.
 
     The embedding ranks the open gaps by the scripted question; the model reads the gap's question and the answer and
@@ -178,8 +184,9 @@ async def answer_from_script(script: Sequence[Mapping[str, Any]], embed: Callabl
         if flags:
             results.append({"question": item["question"], "status": "refused", "flags": list(flags)})
             continue
+        asked = await questions_of(gap_row["restated"], str(item["answer"])) if questions_of else ()
         version = resolve(gap_row["id"], answer=str(item["answer"]), cites=list(item.get("cites") or []), reviewer=SCRIPTED,
-                          source=str(item.get("source") or "documents"))
+                          source=str(item.get("source") or "documents"), questions=list(asked))
         results.append({"question": item["question"], "status": "published", "gap": gap_row["id"], "version": version})
     return results
 
@@ -195,7 +202,7 @@ SOURCES = ("documents", "consultant")
 
 
 def resolve(key: str, *, answer: str, cites: list[str], reviewer: str, source: str = "documents",
-            directory: Path | None = None, config_path: Path | None = None) -> int:
+            directory: Path | None = None, config_path: Path | None = None, questions: Sequence[str] = ()) -> int:
     """Publish a reviewed answer to gap *key* as a knowledge entry.
 
     ``source="documents"``: every cited section must be public and in force. ``source="consultant"``: new knowledge
@@ -226,6 +233,10 @@ def resolve(key: str, *, answer: str, cites: list[str], reviewer: str, source: s
         entry = {"chunk_id": "FAQ-GAP-" + key.upper(), "source": "faq", "title": title,
                  "text": answer.strip(), "approved_by": reviewer,
                  "provenance": {"gap_id": key, "cites": cites, "source": source}}
+        # Other ways a customer asks it (knowledge/expand.entry_questions): indexed, never read out, no personal data.
+        asked = [q.strip() for q in questions if q.strip() and pii.tokenise(q, pii.Vault()) == q]
+        if asked:
+            entry["questions"] = asked
         options = {"directory": directory} if directory else {}
         if config_path is not None:
             options["config_path"] = config_path

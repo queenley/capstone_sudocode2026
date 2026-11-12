@@ -194,9 +194,27 @@ def stored(*, skills_version: int | None = None) -> list[dict[str, Any]]:
             if skills_version is None or card.get("skills_version") == skills_version]
 
 
-def clusters(cards: Sequence[Mapping[str, Any]]) -> dict[tuple[str, str], list[Mapping[str, Any]]]:
-    """General cards by situation, where at least :data:`MIN_SUPPORT` customers share one, keyed by (the skill most
-    of them would change, situation).
+#: What a failed check is about. One lesson shows as several checks of one kind (asking again, one question too
+#: many, a weak opening, confirming twice); checks of another kind in the same situation are another lesson. First
+#: match wins; a code none matches is a kind of its own.
+KINDS: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile(r"^(RQR\.|TSR\.too_many_questions$|J\.J0[18]_)"), "asking"),
+    (re.compile(r"^J\.J06_"), "manner"),
+    (re.compile(r"^GUARD\.over_escalation$"), "transfer"),
+    (re.compile(r"^TSR\.(must_say|forbidden_phrase)$"), "telling"),
+)
+
+
+def kind_of(code: str) -> str:
+    return next((kind for pattern, kind in KINDS if pattern.search(code)), code)
+
+
+def clusters(cards: Sequence[Mapping[str, Any]]) -> dict[tuple[str, str, str], list[Mapping[str, Any]]]:
+    """General cards by situation and kind of failed check (:func:`kind_of`), where at least :data:`MIN_SUPPORT`
+    customers share one, keyed by (the skill most of them would change, situation, kind).
+
+    Cards of different kinds are never drafted into one change: with the rubric scored (2026-11-11) a situation
+    holds cards about what was not said and cards about the manner of address, and the change follows the majority.
 
     A lesson is about a situation (the brief, C.5: a structured lesson of what happened in which situation); the
     failed check is its symptom, and one lesson shows as several (asking again, one question too many, a weak
@@ -204,17 +222,17 @@ def clusters(cards: Sequence[Mapping[str, Any]]) -> dict[tuple[str, str], list[M
     2026-11-10 and no group reached three customers, so the skill is the one most cards name. A card of one
     customer's own preference is never a rule for others; two cards of the same customer are one vote.
     """
-    groups: dict[str, list[Mapping[str, Any]]] = {}
+    groups: dict[tuple[str, str], list[Mapping[str, Any]]] = {}
     for card in cards:
         if card.get("scope") != "general":
             continue
-        groups.setdefault(str(card.get("situation")), []).append(card)
-    shared: dict[tuple[str, str], list[Mapping[str, Any]]] = {}
-    for situation, items in groups.items():
+        groups.setdefault((str(card.get("situation")), kind_of(str(card.get("failure_code") or ""))), []).append(card)
+    shared: dict[tuple[str, str, str], list[Mapping[str, Any]]] = {}
+    for (situation, kind), items in groups.items():
         if len({c.get("customer") for c in items}) < MIN_SUPPORT:
             continue
         skill = Counter(str(c.get("skill")) for c in items).most_common(1)[0][0]
-        shared[(skill, situation)] = items
+        shared[(skill, situation, kind)] = items
     return shared
 
 

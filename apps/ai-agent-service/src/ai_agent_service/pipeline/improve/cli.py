@@ -13,9 +13,9 @@ Two mechanisms and nothing else. Run from the repository's root with the agent's
     python -m ai_agent_service.pipeline.improve round --name <name> --learn <dir> --frozen <dir> --frozen-ids <ids.json> [--answers <json>] [--scripted]
 
 **round** is a whole round from the original agent, one command, so anyone can run it again: it refuses to start
-unless skills and knowledge are at version 0, measures the frozen sets (R0), runs the learning sets, runs the loop,
-publishes what was approved, measures again (R1), compares, and points the agent back to version 0, keeping what it
-learned with the round's runs. Without ``--scripted`` it stops at the review files for a person and goes on with
+unless skills and knowledge are at version 0, runs the learning sets and the loop, and when that gave a change
+measures the frozen sets (R0), publishes what was approved, measures again (R1), compares, and points the agent
+back to version 0, keeping what it learned with the round's runs. With no change it stops there and says so. Without ``--scripted`` it stops at the review files for a person and goes on with
 ``--approved``.
 
 **Reflection** (the brief, C.5 mechanism 3: after each call the agent writes a structured lesson, checked before it
@@ -24,9 +24,9 @@ is written to memory) changes skills, and only where a skill does not say what t
 1. ``harvest``: the organisers' grader finds what failed in each call of a learning run. No model.
 2. ``score``: the QaAgent scores each call on the BTC rubric and diagnoses each failure of how a task was done:
    the skill already says it (``not_followed``), it does not (``skill_gap``), or no procedure is at stake.
-3. ``reflect``: for each call with a skill gap the ReflectionAgent writes one lesson card; code screens it and only a
-   clean card is stored. Where at least three customers share a lesson (same skill, same failed check, same
-   situation) it drafts one sentence of the skill; the screen and the PolicyAgent check it.
+3. ``reflect``: for each diagnosed call the ReflectionAgent writes one lesson card; code screens it and only a
+   clean card is stored. Where at least three customers share a lesson (same situation) it drafts one sentence of
+   the skill; the screen and the PolicyAgent check it.
 4. A person approves in the review file; ``publish`` writes the next skills version. ``--scripted`` is for an
    evaluation, where no person is there: the record says so, and a report must too.
 
@@ -308,7 +308,9 @@ async def score(round_name: str, qa: Any = None) -> int:
             continue
         diagnosis = await qa.diagnose(failure.code, signals.describe(failure.code),
                                       history(by_call, failure.scenario_id, failure.call),
-                                      skills=book, situations=known, fixed_rules=fixed, policy=lessons.rule_texts())
+                                      skills=book, situations=known, fixed_rules=fixed, policy=lessons.rule_texts(),
+                                      relevant=((scenarios.get(failure.scenario_id) or {}).get("calls") or {}).get(
+                                          failure.call, {}).get("relevant_policy_ids") or ())
         if diagnosis is None:
             rows_out.append({**row, "kind": "undiagnosed"})
             continue
@@ -396,7 +398,8 @@ async def reflect(round_name: str, reflection: Any = None, policy: Any = None, a
         card = await reflection.lesson(row["failure_code"], signals.describe(row["failure_code"]),
                                        history(by_call, row["scenario_id"], row["call"]),
                                        skill=target, skills=book, rules=rules, situations=known, fixed_rules=fixed,
-                                       covering=str(row.get("covering_sentence") or "") if row["kind"] == "not_followed" else "")
+                                       covering=str(row.get("covering_sentence") or "") if row["kind"] == "not_followed" else "",
+                                       found=str(row.get("why") or ""))
         if card is None or card.no_lesson:
             continue
         written = {**card.model_dump(exclude={"no_lesson"}), "skill": target, "failure_code": row["failure_code"],
@@ -410,7 +413,7 @@ async def reflect(round_name: str, reflection: Any = None, policy: Any = None, a
     clean = [card for card in cards if not card["flags"]]
     proposals: list[dict[str, Any]] = []
     shared = lessons.clusters([*lessons.stored(skills_version=version), *clean])
-    for (skill, situation), items in shared.items():
+    for (skill, situation, _kind), items in shared.items():
         code = ", ".join(sorted({str(c.get("failure_code")) for c in items}))
         patch = await reflection.patch(items[:6], skill=skill, skills=book, rules=rules, fixed_rules=fixed)
         if patch is None or patch.no_change:
@@ -523,6 +526,22 @@ def _embed() -> Any:
     return lambda texts: embedder.embed(list(texts), kind="query")
 
 
+def _questions_of() -> Any:
+    """Writes the questions a customer would ask of a new entry, with the model that writes the policy sections'
+    (``agents.knowledge``); None without that model, and the entry is then indexed by its own words only."""
+    from ...agents.base import model_for
+    from ...components.knowledge import expand
+
+    llm = model_for(expand.AGENT)
+    if llm is None:
+        return None
+
+    async def questions_of(title: str, text: str) -> list[str]:
+        return await expand.entry_questions(title, text, llm)
+
+    return questions_of
+
+
 async def gaps_round(answers: Path | None, *, qa: Any = None, embed: Any = None) -> int:
     from ...agents.qa import QaAgent
 
@@ -532,7 +551,7 @@ async def gaps_round(answers: Path | None, *, qa: Any = None, embed: Any = None)
     print(f"Restated {restated}; joined {await gap_loop.merge_same(embed, qa.same_question)}")
     if answers is not None:
         script = json.loads(answers.read_text(encoding="utf-8"))
-        results = await gap_loop.answer_from_script(script, embed, qa.answers_question)
+        results = await gap_loop.answer_from_script(script, embed, qa.answers_question, questions_of=_questions_of())
         for result, count in Counter(r["status"] for r in results).items():
             print(f"  {result}: {count}")
     for gap in gap_loop.list_gaps():
@@ -573,14 +592,15 @@ def _failed_share(runs: Sequence[Path]) -> tuple[dict[tuple[str, str, str], floa
 def compare(before: Sequence[Path], after: Sequence[Path]) -> int:
     """The numbers of each side and the checks that changed, call by call: what a round must show, harm included.
 
-    With several runs a side (the same version run again), a check counts as failing on a side when it failed in more
-    than half of that side's runs, and each metric shows its mean and range: a change inside the range of one
-    version's own reruns is noise, not a result (section 10.4).
+    With several runs a side (the same version run again) each metric shows its mean and range. A check is **fixed**
+    only when it failed in every run before and in no run after, **broken** only the other way round. One that fails
+    in some runs of a side is the agent varying, not the change: it is listed as unstable and counted on neither side
+    (2026-11-10: a transfer that already happened in one of two runs before was reported as broken by the lesson).
     """
     sides = {"before": list(before), "after": list(after)}
     reports = {side: [json.loads(_report(run).read_text(encoding="utf-8"))["system"] for run in runs]
                for side, runs in sides.items()}
-    print(f"{'':<12}{'before':>22}{'after':>22}")
+    print(f"{'':<20}{'before':>22}{'after':>22}")
     for name, read in METRICS:
         cells = []
         for side in sides:
@@ -588,22 +608,48 @@ def compare(before: Sequence[Path], after: Sequence[Path]) -> int:
             numbers = [v for v in values if isinstance(v, (int, float))]
             cells.append(f"{mean(numbers):.3g} [{min(numbers):.3g}-{max(numbers):.3g}]" if len(numbers) > 1
                          else str(values[0]))
-        print(f"{name:<12}{cells[0]:>22}{cells[1]:>22}")
+        print(f"{name:<20}{cells[0]:>22}{cells[1]:>22}")
     measured = {side: _failed_share(runs) for side, runs in sides.items()}
     shares = {side: measured[side][0] for side in sides}
     both = measured["before"][1] & measured["after"][1]
+    # What Reflection learns from, counted the same way on both sides: the checks of conduct the grader makes in code.
+    conduct = [sum(share for key, share in shares[side].items() if signals.route(key[2]) == "behaviour" and key[:2] in both)
+               for side in sides]
+    print(f"{'conduct failures':<20}{conduct[0]:>22.3g}{conduct[1]:>22.3g}   (mean per run, {len(both)} calls)")
     if both != measured["before"][1] | measured["after"][1]:
         print(f"Only the {len(both)} calls every run played are compared call by call.")
-    failing = {side: {key for key, share in shares[side].items() if share > 0.5 and key[:2] in both} for side in sides}
-    for label, keys in (("fixed", failing["before"] - failing["after"]), ("broken", failing["after"] - failing["before"])):
-        print(f"{label}: {len(keys)}")
-        for scenario, call, code in sorted(keys):
+    changes = changed(shares["before"], shares["after"], both)
+    for label in ("fixed", "broken", "unstable"):
+        print(f"{label}: {len(changes[label])}")
+        for scenario, call, code in changes[label]:
             print(f"  {scenario} {call} {code}  (before {shares['before'].get((scenario, call, code), 0):.0%}, "
                   f"after {shares['after'].get((scenario, call, code), 0):.0%})")
-    harm = [key for key in failing["after"] - failing["before"] if violated([key[2]])]
+    harm = [key for key in changes["broken"] if violated([key[2]])]
     if harm:
         print(f"HARM: {len(harm)} new violations; roll the skills back (improve rollback) and run the set again.")
     return 0
+
+
+Check = tuple[str, str, str]
+
+
+def changed(before: dict[Check, float], after: dict[Check, float], calls: set[tuple[str, str]]) -> dict[str, list[Check]]:
+    """Each check of *calls* that differs between the sides, by the share of a side's runs it failed in.
+
+    fixed: failed in every run before, in none after. broken: the reverse. unstable: anything else that is not the
+    same on both sides at 0% or 100%, so the runs of one version disagree with each other."""
+    found: dict[str, list[Check]] = {"fixed": [], "broken": [], "unstable": []}
+    for key in sorted(set(before) | set(after)):
+        if key[:2] not in calls:
+            continue
+        was, now = before.get(key, 0.0), after.get(key, 0.0)
+        if was == 1 and now == 0:
+            found["fixed"].append(key)
+        elif was == 0 and now == 1:
+            found["broken"].append(key)
+        elif not (was == now and was in (0, 1)):
+            found["unstable"].append(key)
+    return found
 
 
 # ── a whole round ─────────────────────────────────────────────────────────
@@ -694,14 +740,13 @@ async def _round(args: argparse.Namespace) -> int:
     os.environ.setdefault("IMPROVEMENT_CACHE", str(runs_dir() / "cache" / "improvement-answers.jsonl"))
     learn = [path.resolve() for path in args.learn]
     frozen = [path.resolve() for path in args.frozen]
+    if skill_versions.active() or versions.active():
+        print(f"Not the original agent: skills version {skill_versions.active()}, knowledge version "
+              f"{versions.active()}. A round starts from version 0; roll back first (improve rollback).")
+        return 2
+    reviews = [folder / "improvement" / "review" / f"{args.name}-{_label(path)}.json" for path in learn]
     if not args.approved:
-        if skill_versions.active() or versions.active():
-            print(f"Not the original agent: skills version {skill_versions.active()}, knowledge version "
-                  f"{versions.active()}. A round starts from version 0; roll back first (improve rollback).")
-            return 2
-        for path in frozen:
-            for index in range(1, args.r0_runs + 1):
-                _evaluate(path, folder / f"r0-{_label(path)}-{index}")
+        # Learning comes first: the frozen set is measured only when there is a change to measure.
         for path in learn:
             run = _evaluate(path, folder / f"learn-{_label(path)}")
             name = f"{args.name}-{_label(path)}"
@@ -711,14 +756,32 @@ async def _round(args: argparse.Namespace) -> int:
                 return 2
             if await reflect(name) != 0:
                 return 2
-        if args.answers:
-            await gaps_round(args.answers)
-        if not args.scripted:
-            print(f"Review files in {folder / 'improvement' / 'review'}: a person fills decision, reviewer and note, "
-                  f"then: improve round --name {args.name} --approved (with the same --learn and --frozen).")
-            return 0
-    for path in learn:
-        review_file = folder / "improvement" / "review" / f"{args.name}-{_label(path)}.json"
+    proposed = sum(len(json.loads(path.read_text(encoding="utf-8")).get("proposals") or [])
+                   for path in reviews if path.is_file())
+    if not proposed and not args.answers:
+        print("Nothing to measure: the learning set gave no change. The original agent already does what these calls "
+              "check, or fewer than three customers share a lesson (diagnoses.jsonl says which).")
+        return 0
+    if not args.approved and not args.scripted:
+        print(f"Review files in {folder / 'improvement' / 'review'}: a person fills decision, reviewer and note, "
+              f"then: improve round --name {args.name} --approved (with the same --learn and --frozen).")
+        return 0
+    if args.scripted:
+        for review_file in reviews:
+            if review_file.is_file():
+                review.approve_scripted(review_file, gap_loop.SCRIPTED)
+    taken = sum(len(review.approved(path)[0]) for path in reviews if path.is_file())
+    if not taken and not args.answers:
+        print("Nothing to measure: no change was approved (the review files say why). The frozen set is not run.")
+        return 0
+    for path in frozen:  # R0: still the original agent, nothing is published yet
+        for index in range(1, args.r0_runs + 1):
+            _evaluate(path, folder / f"r0-{_label(path)}-{index}")
+    if args.answers:
+        # Only now: answering a gap publishes a knowledge version, and R0 is the agent before it. On 2026-11-12 the
+        # answers were published before R0 and both sides measured the same knowledge.
+        await gaps_round(args.answers)
+    for review_file in reviews:
         if review_file.is_file():
             publish(review_file, scripted=args.scripted)
     for path in frozen:

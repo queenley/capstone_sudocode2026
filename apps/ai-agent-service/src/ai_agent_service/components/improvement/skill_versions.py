@@ -35,6 +35,12 @@ def apply(book: Mapping[str, Any], patch: Mapping[str, Any]) -> dict[str, Any]:
     text, find = str(patch.get("text") or "").strip(), str(patch.get("find") or "").strip()
     if not text:
         raise ValueError("An empty change")
+    # The rules a change rests on are written at its end, as every line of a skill does ("(PB-02, PB-04)"): the
+    # skill's text is where the hot path reads which passages come along (context/skills.py, learned_cites). A change
+    # that kept them only in ``cites`` was published without its rule on 2026-11-12 and was not followed.
+    unnamed = [str(code) for code in patch.get("cites") or [] if code and str(code) not in text]
+    if unnamed and part == "body":
+        text = f"{text.rstrip('.')} ({', '.join(unnamed)})."
     current = str(changed[name][part])
     if find:
         if current.count(find) != 1:

@@ -23,6 +23,102 @@ Loại: ... · Trạng thái: ... · Chỉ số: TSR / CCR / RQR / HR / latency 
 
 Sáu mục đầu được ghi lại sau khi làm, từ đợt sửa ngày 05-06/11/2026. Chưa mục nào có số đo trên agent thật.
 
+### 2026-11-12 · Số đo agent gốc trước và sau đợt sửa (commit `40fea307`)
+
+Loại: sửa agent gốc · Trạng thái: xong · Chỉ số: TSR, HR, RQR, CCR, vi phạm, TTFT
+
+- **Vấn đề:** các lỗi ở hai mục 12/11 bên dưới, cộng ba lỗi đọc từ trace lần chạy đầu: điều kiện chính sách không đạt bị coi là "chưa có thông tin" (`SCN-HARD-03`), nhắc lại con số của chính sách cũ (`SCN-HARD-05`), cuộc Zalo không có `channel_identity` bị coi là khách lạ (`SAMPLE-06`).
+- **Sửa:** `rules.md` (luật 4, 6), `skills.yaml` (`product-advice`), `pipeline/eval/scenarios.connection`, nhãn `SCN-HARD-02`; vòng cải tiến publish câu trả lời Gap Loop sau R0; `gaps.record_from_run` chỉ ghi lượt agent nói không có thông tin.
+- **Đã kiểm:** `tests/agent` trừ ASR: 1.453 qua.
+- **Số đo:** advisor `gpt-5.6-luna`, mỗi bộ chạy 1 lần; "trước" là cây làm việc sáng 12/11, "sau" là commit `40fea307`.
+
+  | Bộ | | TSR | HR (giá) | RQR | CCR | Vi phạm | TTFT p50 / p95 (ms) |
+  |---|---|---|---|---|---|---|---|
+  | `data/hard-cases` (5) | trước | 60,0 | 28,6 (20,0) | | | 1 | 1.349 / 4.320 |
+  | | sau | 100,0 | 0 (0) | | | 0 | 1.136 / 3.679 |
+  | Mẫu BTC (7) | trước | 71,4 | 19,4 (22,2) | 9,1 | 90,5 | 0 | 1.269 / 3.765 |
+  | | sau | 85,7 | 21,2 (25,0) | 10,0 | 76,2 | 0 | 1.606 / 3.886 |
+  | `data/gap-loop` frozen (13) | R0, `40fea307` | 23,1 | | | | 4 | 996 / 4.957 |
+  | | R1, 5 mục đã học | 100,0 | | | | 0 | 942 / 3.739 |
+
+  - R1 của Gap Loop đo ở `evaluation/runs/gap-20261112` (trước ba sửa prompt cuối), R0 đo ở `base-40fea307-gap-r0`: hai phía không cùng một commit.
+  - Bộ chấm cảnh báo cần từ 100 lượt để p95 có ý nghĩa; các bộ này có 19 đến 52 lượt.
+- **Còn lại:** `SAMPLE-01` vẫn trượt (tư vấn AirPure X thay vì Y, kéo theo 4 lần báo giá bị tính sai); CCR mẫu BTC tụt 90,5 → 76,2 chưa rõ nguyên nhân; `SAMPLE-07` vẫn kể thêm "30 ngày" và "30.000đ"; `SAMPLE-04` vẫn hỏi lại sản phẩm ở lượt mở đầu; TTFT p95 vẫn trên 3 giây. Hai cơ chế bớt vòng model và phép so sánh model chưa làm.
+
+### 2026-11-12 · Agent gốc: giữ tài liệu đã đọc, đọc được mã đơn vừa tạo; mục Gap Loop có câu hỏi lập chỉ mục
+
+Loại: sửa agent gốc + Knowledge Gap Loop · Trạng thái: đang đo · Chỉ số: TSR, vi phạm guardrail (chuyển máy thừa), TTFT
+
+- **Vấn đề** (tìm bằng trace có sẵn, không gọi model):
+  - `SCN-ADV-0069`: lượt 3 agent đọc "7–15 ngày làm việc" (BH-03); lượt 4 khách hỏi lại "gửi hàng thì mất bao lâu", lần tìm kiếm mới xếp BH-03 thứ 5, advisor chỉ đọc 3 đoạn đầu, nói "chưa có thông tin" và chuyển máy.
+  - Khách mới vừa đặt đơn: câu có mã đơn bị guard chặn ("chưa xác minh danh tính nên không được đọc mã đơn") 33 lần trong 4 lần chạy nhỏ; mỗi lần thêm một vòng model và khách không nghe được mã đơn.
+  - TTFT theo số vòng model của lượt (4 run, 119 lượt): 1 vòng p95 1,2–2,4 giây; 2 vòng p50 2,4–3,7 giây; 3 vòng p50 4,9–6,4 giây. Mọi lượt có tool đều từ 2 vòng.
+  - Gap Loop, 5 mục đã học của `proof-4`: 8/10 câu frozen tìm thấy mục của mình trong 3 đoạn đầu; F05 (showroom) và F06 (tự đến lấy hàng) thì không.
+- **Sửa:**
+  - `pipeline/hot/nodes._passages_in_reach`, `agents/advisor.shown_passages`: tối đa 3 đoạn đã đọc ở lượt trước vẫn hiển thị; bước kiểm chuyển máy nhận riêng hai nhóm đoạn.
+  - `guardrails/hard._tier`, `guard_input`: khách chưa xác minh được nghe mã của đơn tạo trong chính cuộc gọi; mã khác vẫn bị chặn.
+  - `knowledge/expand.entry_questions`, `improvement/gaps.resolve`, `corpus.entry_chunk`: mục Gap Loop mang theo các câu khách có thể hỏi, viết lúc publish, lưu trong dòng của phiên bản và đi qua `kb_chunks`.
+  - `data/hard-cases`: 5 kịch bản theo định dạng BTC cho các lỗi trên và hai lỗi của ngày 12/11 (chuyển máy sớm, quyền lợi có điều kiện).
+- **Đã kiểm:** `tests/agent` trừ ASR: 1.451 qua, 3 bỏ qua. Truy xuất trên 60 câu có nhãn của BTC (`evaluation/runs/rag-20261112`): recall@3 89,8, recall@5 91,5, từ chối đúng câu ngoài tài liệu 75,0, từ chối nhầm 0. Thêm 5 mục Gap Loop không đẩy đoạn đúng nào khỏi top 3 (39/47 trước và sau) và không đổi quyết định từ chối.
+- **Số đo:** chưa đo bằng lần chạy agent thật.
+- **Còn lại:** chạy `data/hard-cases` và mẫu BTC; đo lại Gap Loop với câu hỏi do model viết; latency: mỗi vòng model khoảng 1,1–2 giây, muốn TTFT p95 dưới 3 giây phải bớt một vòng ở lượt hỏi sản phẩm (chưa làm, cần quyết định thiết kế). ASR không chạy được trên máy này (thiếu `soundfile`, `sherpa_onnx`).
+
+### 2026-11-12 · Reflection học đủ ba cuộc warranty; sửa chuyển máy sớm của agent gốc
+
+Loại: cải tiến (vòng tự cải tiến) + sửa agent gốc · Trạng thái: xong · Chỉ số: TSR frozen của `data/reflection/warranty`, vi phạm guardrail
+
+- **Vấn đề:** vòng 11/11 chỉ sửa ổn định 1/3 cuộc cần học, và chạy lại thì bài học đổi. Agent gốc chuyển máy thừa ở cuộc đối chứng F06 trong khoảng một nửa số lần chạy.
+- **Bằng chứng:** `evaluation/runs/reflect-warranty-{4,5,6,7}` (bảng ở [06-vong-cai-tien.md](../ai/06-vong-cai-tien.md) mục 6).
+  - QaAgent đoán lỗi giữa 99 đoạn chính sách: 3 cuộc ra 3 chẩn đoán.
+  - Dòng skill publish không ghi mã luật thì luật không đi kèm: 0/3 cuộc áp dụng; có ghi: 3/3.
+  - F06: model gọi `handoff_transfer` cùng lượt với `catalog_search`, lý do "giá không có trong tài liệu".
+- **Sửa:**
+  - `agents/qa.py`, `qa_diagnose.md`: chẩn đoán đọc `relevant_policy_ids` của kịch bản; rubric giữ verdict dùng được (`settled`).
+  - `skill_versions.apply`: mã luật được trích ghi vào cuối dòng khi publish.
+  - `lessons.clusters`: gom theo tình huống và loại lỗi.
+  - `reflection_patch.md`, `approval_decide.md`: nêu đủ điều luật cho gì và cả trường hợp không đủ điều kiện; cùng bài học diễn đạt hẹp hơn vẫn được chấp nhận.
+  - `agents/policy.py`, `review.blocking`: kiểm thay đổi chờ 45 giây, hỏi lại một lần; không trả lời thì luôn chặn.
+  - `guardrails/actions.early_transfer`, `agents/advisor.py`: giữ lại lần chuyển máy `ngoai_pham_vi_tai_lieu` gọi cùng lượt với tool tra cứu.
+  - `policy_rules.md` (`over_promise`): mời quyền lợi có điều kiện khi bằng chứng cho thấy rõ điều kiện không đạt.
+  - `config/models.yaml`: Reflection và ApprovalAgent sang `gpt-6.1-terra`. Cả sol và terra từ chối `temperature`.
+  - Nhãn đối chứng warranty: cấm thêm câu gợi ý tư vấn gói.
+- **Đã kiểm:** toàn bộ `tests/agent` trừ ASR: 1.444 qua, 3 bỏ qua.
+- **Số đo:** `evaluation/runs/reflect-warranty-8/`, advisor `gpt-5.6-luna`, 6 cuộc frozen, mỗi phía 1 lần, duyệt bởi `approval-agent` (không phải người).
+
+  | | R0 | R1 |
+  |---|---|---|
+  | TSR | 50 | 100 |
+  | Cần học (F01–F03) | 0/3 | 3/3 |
+  | Đối chứng (F04–F06) | 3/3 | 3/3 |
+  | Vi phạm | 0 | 0 |
+
+- **Còn lại:** một lần đo mỗi phía; ở vòng 7 đối chứng F05 hỏng (chào gói cho món 2.450.000đ). Luật `over_promise` mới chưa đo trên `data/dev` và mẫu BTC. Cần người duyệt cho vòng chính thức.
+
+### 2026-11-11 · Reflection: bài học đúng lỗi QaAgent tìm ra, và luật được trích đi kèm
+
+Loại: cải tiến (vòng tự cải tiến) · Trạng thái: xong · Chỉ số: TSR frozen của `data/reflection/warranty`
+
+- **Vấn đề:** vòng `proof-warranty` (10/11) chỉ sửa được 1/3 cuộc frozen cần học; chạy lại hôm nay thì không học được gì.
+- **Bằng chứng:**
+  - Agent chỉ nhắc gói bảo hành mở rộng ở lượt mà đoạn BH-05 được truy xuất (L01). Luật cố định 3 chỉ cho nói chính sách có trong "Tài liệu liên quan", và advisor chỉ đọc 3 đoạn đầu.
+  - `reflect-warranty-2`: ReflectionAgent không đọc chẩn đoán của QaAgent, 2/3 thẻ dạy điều khác; ApprovalAgent từ chối.
+  - Bộ chấm so chuỗi: L01 nói "mua thêm gói bảo hành 12 tháng" vẫn trượt.
+- **Sửa:**
+  - `agents/reflection.py`, `reflection_lesson.md`, `pipeline/improve/cli.py`: thẻ bài học đọc câu chẩn đoán của QaAgent (`QA FOUND`).
+  - `components/context/skills.py` (`learned_cites`), `components/knowledge/search.py` (`include`, `pinned`), `mcp/servers/knowledge.py`, `agents/advisor.py` (`shown_passages`), `pipeline/hot/nodes.py`: luật mà dòng skill đã publish trích dẫn đi kèm tài liệu của lượt.
+  - `pipeline/improve/cli.py`: vòng học trước, chỉ đo frozen khi có thay đổi được duyệt; `compare` chỉ tính fixed/broken khi mọi lần chạy của mỗi phía đồng ý, còn lại là unstable.
+  - Nhãn `data/reflection/warranty`: các cách nói một lời chào gói; đối chứng cấm thứ chỉ lời chào mới có.
+- **Đã kiểm:** 144 test của vòng cải tiến, kho tri thức và skill qua (`test_approval_agent`, `test_reflection_changes_skills`, `test_reflection_dataset`, `test_improvement_loop`, `test_knowledge_in_force`, `test_skills_on_demand`). Toàn bộ `tests/agent`: 1.606 qua; 9 hỏng và 12 lỗi đều thuộc ASR, có từ trước (thiếu `soundfile`).
+- **Số đo:** `evaluation/runs/reflect-warranty-3/`, advisor `gpt-5.6-luna`, 6 cuộc frozen, mỗi phía 2 lần, duyệt bởi `approval-agent` (không phải người).
+
+  | | R0 | R1 |
+  |---|---|---|
+  | TSR | 50 / 50 | 83,3 / 66,7 |
+  | Cần học (F01–F03) | 0/3, 0/3 | 2/3, 1/3 |
+  | Đối chứng (F04–F06) | 3/3, 3/3 | 3/3, 3/3 |
+
+- **Còn lại:** F03 trượt 2/2 và F02 đạt 1/2; chữ của bài học đổi giữa các vòng. F06 chuyển máy thừa ở agent gốc 1/2 lần. Chi tiết ở [06-vong-cai-tien.md](../ai/06-vong-cai-tien.md) mục 9.
+
 ### 2026-11-10 · Combo, phụ kiện cùng tên sản phẩm; thử ngữ cảnh cuộc gọi (scenario-commerce-v14)
 
 Loại: evaluation (bộ trích entity ASR) · Trạng thái: xong · Chỉ số: entity accuracy ASR, `sku`
