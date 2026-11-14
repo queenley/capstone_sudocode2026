@@ -21,6 +21,35 @@ Loại: ... · Trạng thái: ... · Chỉ số: TSR / CCR / RQR / HR / latency 
 
 ## Các mục
 
+### 2026-11-14 · Từ điển ASR: tên sản phẩm BTC đọc theo cách Việt ("e pia", "ka rô phi", "cê ô đê", "run lai")
+
+Loại: evaluation (từ điển sửa lỗi ASR, dùng chung với agent) · Trạng thái: đang đo · Chỉ số: entity accuracy ASR, `sku`, `payment`
+
+- **Vấn đề:** audio BTC đọc tên đúng như viết theo cách Việt. Các model ASR viết những tên này nhiều kiểu mà từ điển chưa có, nên bộ trích không ra `sku` hoặc `payment`. Ví dụ "e pia y" thành "aipai", "epay", "EPIE"; "ka rô phi" thành "carophy"; "cê ô đê" thành "ko d", "KOD".
+- **Bằng chứng:** `evaluation/runs/20261114-btc-d01-d04/` gồm Zipformer 30M và 150M, VieGem và Qwen3-ASR-0.6B. Các cách viết mới xuất hiện 0 lần trong văn bản chuẩn của `data/dev`, `data/test` và gói BTC. Một số cách viết cũng có trong bản Zipformer dev/test: "epi" 168 lần (đứng trước "pro" 125 lần, "mini" 22 lần), "epix" 13, "ko d" 13, "kod" 13, "epay" 9, "ep x" 8, "carophy" 8, "aipai" 6.
+- **Sửa:** `config/models.yaml`, `voice.lexicon.corrections`: thêm 19 mục.
+  - AirPure: `ep x`, `epix` thành AirPure X; `epay`, `epie`, `aipai` thành AirPure Y; `aipr`, `epi` thành AirPure (mất chữ chỉ model nên chỉ ra hãng).
+  - Karofi: `carophy`, `carofy`, `carofi`, `calie`, `carie`.
+  - COD: `ko d`, `kod`, `kê ô đê`.
+  - RunLite: `rung lai`, `trung lai`.
+- **Đã kiểm:** `tests/agent/test_lexicon_btc_audio.py` (16 ca, câu tự viết, gồm cả câu đúng phải giữ nguyên như "ko được", "trung tâm"). Các test từ điển, bộ trích, bộ nhớ, ASR và gói BTC: 686 qua.
+- **Số đo:** chưa đo. "epi" có 168 lần trong bản Zipformer dev/test nên số `agent_input` của dev/test sẽ đổi; phải chạy lại trước khi so.
+- **Còn lại:** "aipr" và "epi" không cho biết X hay Y; cần đoán model theo giá đã báo (chưa làm).
+
+### 2026-11-14 · Từ điển ASR: "nâng sát" → "ngân sách", "còn hàn" → "còn hàng"
+
+Loại: evaluation (từ điển sửa lỗi ASR, dùng chung với agent) · Trạng thái: đang đo · Chỉ số: entity accuracy ASR
+
+- **Vấn đề:** trên audio BTC D01–D04, Zipformer 30M (greedy) đúng 24/29 entity. Hai lỗi do ASR viết sai từ khóa mà bộ trích dựa vào: D01 "ngân sách" thành "nâng sát" (nên `budget_vnd` lấy nhầm 4.890.000 thay vì 5.000.000), D04 "còn hàng" thành "còn hàn" (mất `in_stock`).
+- **Bằng chứng:** `evaluation/runs/20261114-btc-d01-d04/zipformer-30m` (audio người dùng cung cấp, nhãn `ground_truth.json` của gói BTC). Hai cụm sai này xuất hiện 0 lần trong `data/dev`, `data/test` và gói BTC.
+- **Sửa:** `config/models.yaml`, `voice.lexicon.corrections`: thêm `nâng sát: ngân sách` và `còn hàn: còn hàng`. Từ điển so khớp nguyên văn nên không loại trừ được "còn hàn quốc"; cụm này cũng xuất hiện 0 lần trong dữ liệu trên. Không đổi code bộ trích (`scenario-commerce-v14` giữ nguyên), nhưng mã băm từ điển trong report đổi.
+- **Đã kiểm:** `tests/agent/test_lexicon_btc_audio.py` (3 ca, câu tự viết). Các test từ điển, bộ trích, ASR và gói BTC: 572 qua.
+- **Số đo:** chưa đo. Hai cột `corrected` và `agent_input` sẽ đổi; cột `raw` không đổi.
+- **Còn lại:**
+  - Chạy lại D01–D04, dev và test để kiểm không mất entity nào.
+  - Mỗi cụm mới nghe một lần; nhắm vào giọng đọc audio BTC.
+  - Nhãn D01 (`sku`, `price_vnd`) chờ `ground_truth.json` mới của BTC có `entities_multi`.
+
 ### 2026-11-13 · `--no-baseline`: run profile chỉ chạy và chấm `full`
 
 Loại: evaluation · Trạng thái: xong · Chỉ số: chi phí của run ablation
