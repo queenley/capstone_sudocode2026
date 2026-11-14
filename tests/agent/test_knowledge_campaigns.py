@@ -127,6 +127,14 @@ def test_a_run_from_before_the_count_says_unknown_not_zero():
     assert _per_turn(new, 1)["cached_share"] == 25.0
 
 
+def test_cached_tokens_are_summed_once_across_calls():
+    # eval_3 showed 133.6%: from the second call on, "cached" was added twice.
+    entry = {"turns": {"advisor": {"calls": 1, "input": 100, "output": 5, "cached": 25}}}
+    tokens = _tokens([entry, entry, entry], "turns")
+    assert tokens["advisor"] == {"calls": 3, "input": 300, "output": 15, "cached": 75}
+    assert _per_turn(tokens, 3)["cached_share"] == 25.0
+
+
 def test_requests_carry_a_cache_key_per_agent():
     from langchain_openai import ChatOpenAI
 

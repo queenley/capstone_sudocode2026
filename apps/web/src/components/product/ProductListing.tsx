@@ -20,7 +20,10 @@ const ROOMS: { label: string; min: number; above?: boolean }[] = [
   { label: "Trên 45 m²", min: 45, above: true },
 ];
 
-type Sort = "popular" | "price-asc" | "price-desc" | "discount";
+/** Brands listed before "Xem thêm": a long brand list pushed the other filters off the screen. */
+const BRANDS_SHOWN = 6;
+
+type Sort ="popular" | "price-asc" | "price-desc" | "discount";
 
 export default function ProductListing({ products, empty, error, onRetry }: { products: ShopProduct[] | null; empty?: string; error?: string; onRetry?: () => void }) {
   const filterId = useId();
@@ -30,6 +33,7 @@ export default function ProductListing({ products, empty, error, onRetry }: { pr
   const [inStock, setInStock] = useState(false);
   const [sort, setSort] = useState<Sort>("popular");
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [allBrandsOpen, setAllBrandsOpen] = useState(false);
 
   const hasRooms = useMemo(() => (products || []).some((p) => roomArea(p.description) !== null), [products]);
   const fits = (p: ShopProduct) => {
@@ -63,7 +67,8 @@ export default function ProductListing({ products, empty, error, onRetry }: { pr
         {allBrands.length > 1 && (
           <fieldset>
             <legend>Thương hiệu</legend>
-            {allBrands.map((brand) => (
+            {/* The first six, and any already ticked; the rest behind one button. */}
+            {allBrands.filter((brand, i) => allBrandsOpen || i < BRANDS_SHOWN || brands.includes(brand)).map((brand) => (
               <label key={brand} className="s-check">
                 <input
                   type="checkbox"
@@ -73,6 +78,11 @@ export default function ProductListing({ products, empty, error, onRetry }: { pr
                 {brand}
               </label>
             ))}
+            {allBrands.length > BRANDS_SHOWN && (
+              <button type="button" className="s-link-btn" aria-expanded={allBrandsOpen} onClick={() => setAllBrandsOpen(!allBrandsOpen)}>
+                {allBrandsOpen ? "Thu gọn" : `Xem thêm ${allBrands.length - BRANDS_SHOWN} thương hiệu`}
+              </button>
+            )}
           </fieldset>
         )}
         <fieldset>

@@ -3,6 +3,7 @@
 Hai cách chạy:
 
 - **Docker Compose**: máy local, hoặc cả hệ thống trên **một máy chủ cloud (VM)**. Xem mục 0 ngay dưới.
+- **AWS**: thiết kế ở [aws-plan.md](aws-plan.md); Terraform (`infra/terraform/aws`), compose AWS và hai workflow GitHub Actions, hướng dẫn từng bước ở [aws-terraform-cicd.md](aws-terraform-cicd.md). Chưa apply trên tài khoản thật.
 - **Cloud có quản lý (GKE, Cloud SQL)**: mục 1–4. Gồm ba thành phần, và **không thành phần nào tự triển khai ứng dụng**:
 
 - `infra/terraform/gcp`: GKE Autopilot private node, Cloud SQL PostgreSQL HA có backup, Memorystore Redis HA (TLS), Artifact Registry, một secret rỗng trong Secret Manager, VPC peering và Cloud NAT. **Có phát sinh chi phí.**
@@ -101,7 +102,8 @@ Tạo secret `telesales-secrets` trong namespace, qua Secret Manager và secret 
 | `APP_SECRET` | ngẫu nhiên, ≥ 32 byte; AI Agent dùng để sinh khóa PII vault và khóa định danh. **Đổi giá trị này thì vault cũ không giải mã được nữa** |
 | `ENCRYPTION_KEY` | khóa Fernet |
 | `ADMIN_TOKEN`, `AGENT_TOKEN`, `SELLER_TOKEN`, `DEVELOPER_TOKEN` | mạnh, khác nhau, ≥ 32 ký tự |
-| `GOOGLE_API_KEY` / `GROQ_API_KEY` / `NVIDIA_API_KEY` | ít nhất key của provider advisor đang dùng trong `config/models.yaml` |
+| `OPENAI_API_KEY` | bắt buộc với `config/models.yaml` hiện tại: mọi agent (advisor, memory, qa, extractor...) và `evaluators.policy` đều dùng `openai` |
+| `GOOGLE_API_KEY` / `GROQ_API_KEY` / `NVIDIA_API_KEY` | chỉ khi chuyển một agent sang provider đó trong `config/models.yaml` |
 | `TYPESAFE_API_KEY` | Jev (soft guard), gọi thẳng TypeSafe; thiếu thì agent chỉ chạy hard guard |
 | `AI_GATEWAY_API_KEY` | Jev qua Vercel AI Gateway, nếu `evaluators.policy` trỏ về `vercel_gateway` |
 | `LANGFUSE_*`, `OTP_DELIVERY_URL`/`OTP_DELIVERY_TOKEN` | tùy chọn |

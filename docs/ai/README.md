@@ -10,7 +10,7 @@ Mã nguồn chính: [`apps/ai-agent-service`](../../apps/ai-agent-service/). REA
 
 | # | Tài liệu | Trả lời câu hỏi | Dành cho |
 |---|---|---|---|
-| 0 | [Kiến trúc hệ thống](00-kien-truc.md) | Trợ lý nằm ở đâu trong hệ thống? PostgreSQL, Redis, Kafka, LiveKit dùng làm gì? Chat, gọi thoại, hotline, Zalo, chốt đơn, chuyển nhân viên, sau cuộc gọi đi qua luồng nào? Embedding của tri thức lưu ở đâu, có dùng Qdrant không? | mọi người |
+| 0 | [Kiến trúc hệ thống](00-kien-truc.md) | Trợ lý nằm ở đâu trong hệ thống? PostgreSQL, Redis, Kafka, LiveKit dùng làm gì? Chat, gọi thoại, hotline, Zalo, chốt đơn, chuyển nhân viên, sau cuộc gọi đi qua luồng nào? Bên trong `ai-agent-service` chia thành module nào, chúng gọi nhau ra sao, MCP chia vai thế nào, thêm code thì đặt ở đâu? Embedding của tri thức lưu ở đâu? | mọi người, người phát triển agent |
 | 1 | [Pipeline xử lý](01-pipeline.md) | Một tin nhắn đi qua những bước nào? Sau cuộc gọi xảy ra gì? Voice chạy ra sao? | mọi người |
 | 2 | [Xử lý tình huống](02-xu-ly-tinh-huong.md) | Khách mới, khách quen, số dùng chung, khiếu nại, hết hàng, hỏi ngoài tài liệu... được xử lý thế nào? | PM, QA, dev |
 | 3 | [Thuật toán](03-thuat-toan.md) | Truy hồi tri thức, chọn lane, guardrail, chuẩn hóa số nói, che PII, cổng ghi bộ nhớ hoạt động thế nào? | dev, người làm AI |
@@ -82,7 +82,7 @@ Ba ý chính để nhớ:
 | **BTC** | Ban tổ chức cuộc thi. Họ cung cấp catalog, chính sách, `mock_tools.py` (logic giá/kho/đơn) và `reference_eval.py` (code chấm điểm chính thức) |
 | **Lượt** (turn) | Một câu của khách và câu trả lời của trợ lý |
 | **Cuộc gọi** (call) | Một phiên liên hệ. Một kịch bản test có 1–3 cuộc, cách nhau vài ngày |
-| **Lane** | Hướng xử lý của lượt (`NEW`, `CONTINUITY`, `ORDER_SERVICE`, `HANDOFF`...). Lane quyết định model được dùng tool nào |
+| **Lane** | Hướng xử lý của lượt, một trong 5: `NEW`, `CONTINUITY`, `CLARIFY`, `CONFIRM_IDENTITY`, `HANDOFF` ([rules.py](../../apps/ai-agent-service/src/ai_agent_service/components/orchestration/rules.py)). Lane quyết định model được dùng tool nào ([lanes.yaml](../../apps/ai-agent-service/config/lanes.yaml)) |
 | **Tier** | Mức chắc chắn về danh tính: `VERIFIED`, `PROBABLE`, `AMBIGUOUS`, `UNKNOWN` |
 | **CallBrief** | Bản tóm tắt về khách quen, dựng từ bộ nhớ ở đầu cuộc gọi: đã tư vấn gì, báo giá bao nhiêu, còn vướng gì, không được hỏi lại gì |
 | **Fact ledger** | Sổ ghi các thông tin về khách (ngân sách, diện tích phòng, size...), có phiên bản và nguồn gốc |
@@ -105,7 +105,7 @@ Ba ý chính để nhớ:
 | Bộ nhớ giữa các cuộc (ledger, CallBrief, after_call) | chạy được, có test contract với schema BTC |
 | Tri thức (BM25 + embedding + RRF + ngưỡng từ chối) | chạy được; Recall@5 93,2% trên 60 câu BTC |
 | Voice (VAD, Smart Turn, ASR, TTS, barge-in) | chạy được; WER 6,2% trên 674 lượt nói tổng hợp |
-| Vòng tự cải tiến (`components/improvement/*`), QA chấm rubric | **còn là stub**, chưa có trên đường chạy |
+| Vòng tự cải tiến (`components/improvement/*`, `pipeline/improve`), QA chấm rubric | có CLI `python -m ai_agent_service.pipeline.improve`, chạy offline, không trên đường chạy của khách; chưa có số đo trên `data/dev` (cập nhật 12/11/2026, xem [Vòng cải tiến](06-vong-cai-tien.md)) |
 | Chất lượng end-to-end | TSR M2 còn 25–40% trên các cohort nhỏ, xa ngưỡng 70% của BTC. Mọi nhãn còn là diagnostic, chưa có người duyệt |
 
 Chi tiết số liệu và giới hạn: [Đánh giá](05-danh-gia.md#6-kết-quả-đến-hiện-tại).

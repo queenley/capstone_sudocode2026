@@ -1106,6 +1106,8 @@
   align-items: center;
   gap: 8px;
   margin: 0 !important;
+  flex: none;
+  white-space: nowrap; /* "Sắp xếp" on one line beside its select, at every width */
 }
 .s-filter-toggle {
   display: none !important;
@@ -2363,3 +2365,417 @@
   display: flex;
   align-items: center;
 }
+
+/* ---------- motion: the storefront's own ----------
+   What the kit's motion layer (public/assets/motion/motion.css) does not reach: a page entering, the product
+   grid, the chat opening and its messages, the cart count and the "Đã thêm" line. Same tokens as the kit
+   (--m-ease-enter, --m-panel); off with <html data-motion="off">. Entrances sit under no-preference, so a
+   person who asked for less motion sees every element at once, never waiting for a delay. */
+@media (prefers-reduced-motion: no-preference) {
+  /* A page enters once: ShopMain keys .s-route by the path. */
+  html:not([data-motion="off"]) .s-route { animation: s-rise 360ms var(--m-ease-enter, ease-out) both; }
+
+  /* Product cards come in one after another, the first eight 45ms apart; the rest with the eighth. The loading
+     cards keep their own shimmer. */
+  html:not([data-motion="off"]) .s-grid > :not(.s-skeleton) { animation: s-rise 420ms var(--m-ease-enter, ease-out) both; animation-delay: 315ms; }
+  html:not([data-motion="off"]) .s-grid > :not(.s-skeleton):nth-child(1) { animation-delay: 0ms; }
+  html:not([data-motion="off"]) .s-grid > :not(.s-skeleton):nth-child(2) { animation-delay: 45ms; }
+  html:not([data-motion="off"]) .s-grid > :not(.s-skeleton):nth-child(3) { animation-delay: 90ms; }
+  html:not([data-motion="off"]) .s-grid > :not(.s-skeleton):nth-child(4) { animation-delay: 135ms; }
+  html:not([data-motion="off"]) .s-grid > :not(.s-skeleton):nth-child(5) { animation-delay: 180ms; }
+  html:not([data-motion="off"]) .s-grid > :not(.s-skeleton):nth-child(6) { animation-delay: 225ms; }
+  html:not([data-motion="off"]) .s-grid > :not(.s-skeleton):nth-child(7) { animation-delay: 270ms; }
+
+  /* The chat opens from its button's corner; the room behind it dims softly. */
+  html:not([data-motion="off"]) .s-chat[open] { transform-origin: bottom right; animation: s-pop 240ms var(--m-ease-enter, ease-out) both; }
+  html:not([data-motion="off"]) .s-chat[open]::backdrop { animation: s-fade 240ms ease-out both; }
+
+  /* A message slides in from its own side; the reply being written breathes. */
+  html:not([data-motion="off"]) .s-msg { animation: s-from-left 260ms var(--m-ease-enter, ease-out) both; }
+  html:not([data-motion="off"]) .s-msg-me { animation-name: s-from-right; }
+  html:not([data-motion="off"]) .s-typing { animation: s-breathe 1.4s ease-in-out infinite; }
+
+  /* The online dot rings three times when the button appears, then rests. */
+  html:not([data-motion="off"]) .s-chat-fab { animation: s-rise 420ms var(--m-ease-enter, ease-out) 300ms both; }
+  html:not([data-motion="off"]) .s-chat-fab-dot { animation: s-ring 1.8s ease-out 900ms 3; }
+
+  /* The cart count pops when it changes (Header keys it by the number); "Đã thêm" rises in. */
+  html:not([data-motion="off"]) .nav__count { display: inline-block; animation: s-bump 420ms var(--m-ease-enter, ease-out); }
+  html:not([data-motion="off"]) .s-card-confirmation a { display: inline-block; animation: s-rise 260ms var(--m-ease-enter, ease-out) both; }
+}
+
+/* Pointer only, so a phone never keeps a stuck hover: the chat button lifts, a product photo zooms in its frame. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  html:not([data-motion="off"]) .s-chat-fab { transition: transform 150ms var(--m-ease, ease-out), box-shadow 150ms var(--m-ease, ease-out); }
+  html:not([data-motion="off"]) .s-chat-fab:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgb(var(--shadow-rgb) / 0.4); }
+  html:not([data-motion="off"]) .s-chat-fab:active { transform: translateY(0) scale(.98); }
+  html:not([data-motion="off"]) .s-card-media .s-art-photo { overflow: hidden; }
+  html:not([data-motion="off"]) .s-card-media .s-art-photo img { transition: transform 400ms var(--m-ease, ease-out); }
+  html:not([data-motion="off"]) .s-card:hover .s-art-photo img { transform: scale(1.04); transition-duration: 600ms; }
+}
+
+@keyframes s-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes s-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes s-pop { from { opacity: 0; transform: translateY(12px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes s-from-left { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+@keyframes s-from-right { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: none; } }
+@keyframes s-breathe { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+@keyframes s-ring { 0% { box-shadow: 0 0 0 0 rgb(5 150 105 / 0.45); } 100% { box-shadow: 0 0 0 10px rgb(5 150 105 / 0); } }
+@keyframes s-bump { 0% { transform: scale(1); } 35% { transform: scale(1.35); } 100% { transform: scale(1); } }
+
+/* ---------- the home hero ----------
+   The photograph is the hero's ground (.hero__bg, so the kit's entrance settles it), a dark emerald gradient
+   over its left half carries the words in white, and the assistant's small conversation (HeroChat) sits on the
+   right. The kit's own hero box (main > .hero: one screen, the fixed header over its top) is kept. */
+.s-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: #06231a;
+  color: #fff;
+  --ink: #ffffff;
+  --muted: rgb(255 255 255 / 0.82);
+  --line-strong: rgb(255 255 255 / 0.55);
+}
+.s-hero > .hero__bg {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: var(--ly-pos, 50% 50%);
+}
+.s-hero__shade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgb(3 32 24 / 0.72) 0%, rgb(3 32 24 / 0.5) 34%, rgb(3 32 24 / 0.12) 62%, transparent 100%),
+    linear-gradient(0deg, rgb(3 32 24 / 0.3) 0%, transparent 34%);
+}
+.s-hero__grid {
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  align-items: center;
+  gap: var(--gutter, 24px);
+}
+.s-hero__copy { max-width: 620px; }
+/* a lighter shade leaves less behind the words: a soft shadow keeps them clear of the bright parts */
+.s-hero h1 { color: #fff; max-width: 13ch; text-shadow: 0 2px 24px rgb(3 32 24 / 0.45); }
+.s-hero .hero__lead { margin-top: var(--s-5, 20px); max-width: 46ch; color: rgb(255 255 255 / 0.92); text-shadow: 0 1px 12px rgb(3 32 24 / 0.55); }
+/* the kit mixes the secondary button from --ink and --bg (white on white here): on the photograph it is glass */
+.s-hero .btn-row { margin-top: var(--s-7, 32px); --bg: transparent; }
+.s-hero .btn-row .btn--secondary { color: #fff; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.6); backdrop-filter: blur(8px); }
+
+/* the conversation: a white card, two exchanges tall, the newest at its foot */
+.s-hero-chat-wrap { width: 100%; justify-self: end; }
+.s-hero-chat {
+  width: 100%;
+  box-shadow: 0 24px 60px rgb(0 0 0 / 0.35);
+  color: var(--u-ink);
+}
+.s-hero-chat .ui-chat__body { height: 300px; min-height: 0; align-content: end; overflow: hidden; }
+.s-hero-dots { display: inline-flex; gap: 4px; align-items: center; height: 22px; padding: 0 4px; }
+.s-hero-dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--u-muted, #6b6b6b); animation: ui-chat-dot 900ms ease-in-out infinite; }
+.s-hero-dots i:nth-child(2) { animation-delay: 150ms; }
+.s-hero-dots i:nth-child(3) { animation-delay: 300ms; }
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion="off"]) .s-hero-msg { animation: s-from-left 280ms var(--m-ease-enter, ease-out) both; }
+  html:not([data-motion="off"]) .s-hero-msg--me { animation-name: s-from-right; }
+}
+
+/* a tablet and a phone: the words, then the conversation, on the photograph under a deeper shade */
+@media (max-width: 1023px) {
+  main > .hero.s-hero { height: auto; min-height: 100svh; }
+  .s-hero__grid { grid-template-columns: minmax(0, 1fr); align-content: center; row-gap: var(--s-8, 40px); padding-block: var(--s-6, 24px); }
+  .s-hero__shade { background: linear-gradient(180deg, rgb(3 32 24 / 0.5) 0%, rgb(3 32 24 / 0.7) 100%); }
+  .s-hero-chat-wrap { justify-self: start; max-width: 420px; }
+}
+@media (max-width: 639px) {
+  .s-hero-chat .ui-chat__body { height: 220px; }
+  .s-hero-chat .ui-chat__body > :nth-last-child(n + 3) { display: none; }
+}
+
+/* ---------- a chat preview opens the chat ----------
+   The pictures of a conversation (the hero's, #tro-ly's) are one button each: a click anywhere on the card
+   opens the real chat. The button lies over the card; the card's own words are hidden from a screen reader,
+   the button's label says what they show. */
+.s-hero-chat, .s-chat-preview { position: relative; cursor: pointer; }
+.s-hero-chat-wrap, .s-chat-preview { transition: transform 150ms var(--m-ease, ease-out); }
+.s-chat-preview-open {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+.s-chat-preview-open:focus-visible { outline: 2px solid var(--action, #059669); outline-offset: 3px; }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  html:not([data-motion="off"]) :is(.s-hero-chat-wrap, .s-chat-preview):hover { transform: translateY(-3px); }
+}
+:is(.s-hero-chat, .s-chat-preview):hover .ui-chat__send { background: var(--action, #059669); }
+
+/* ---------- the home page's section heads ----------
+   Smaller than the kit's h2 (48px at 1440) and on one line where the screen allows: the head is as wide as the
+   section, so "Hàng đang bán. Giá và tồn kho theo kho của cửa hàng." reads in one line beside its link on a
+   desktop; a narrower screen wraps it into balanced lines. Only the home page's sections (main > .section). */
+main > .section .section-head,
+main > .section .section-head--split > div,
+main > .section[data-moment="photo-chapters"] .mo-ph__head { max-width: none; }
+main > .section :is(.section-head, .mo-ph__head) h2 {
+  font-size: clamp(22px, 0.9vw + 17px, 32px);
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+/* ---------- the footer ----------
+   footer--dark on the inverse ground (components/shop/Footer.tsx), its ground the home hero's deep emerald
+   instead of the kit's near-black; the kit's inverse tokens give the light ink, the lighter emerald action
+   (so the logo, drawn in --action, turns light green) and the hairlines. */
+footer.s-footer.ground-inverse {
+  --bg: #06231a;
+  --surface: #0b3024;
+  --line: rgb(255 255 255 / 0.12);
+  --line-strong: rgb(255 255 255 / 0.4);
+  --muted: rgb(255 255 255 / 0.66);
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgb(16 185 129 / 0.16) 0%, transparent 60%),
+    var(--bg);
+  color: var(--ink);
+  padding-block: clamp(56px, 6vw, 88px) var(--s-6, 24px);
+  margin-top: 0;      /* the older .s-footer rule above (46px, 14px) is not this footer's */
+  font-size: 16px;
+}
+.s-footer__top {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(40px, 5vw, 80px);
+  align-items: start;
+}
+.s-footer__brand { display: grid; gap: var(--s-5, 20px); justify-items: start; max-width: 440px; }
+.s-footer__lede { margin: 0; font-size: 17px; line-height: 1.55; color: rgb(255 255 255 / 0.82); }
+.s-footer__reach { display: flex; flex-wrap: wrap; gap: var(--s-3, 12px); margin-top: var(--s-2, 8px); }
+/* the kit mixes the pill secondary from --ink and --bg: on the dark ground it is a quiet glass pill */
+.s-footer__reach .btn--secondary { color: #fff; box-shadow: inset 0 0 0 1px var(--line-strong); white-space: nowrap; }
+.s-footer__cols { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-6, 24px); }
+.s-footer .footer__col h3 {
+  margin: 0 0 var(--s-4, 16px);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.s-footer .footer__col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; font-size: 15px; }
+.s-footer .footer__col :is(a, .footer__link) { color: rgb(255 255 255 / 0.9); transition: color 150ms var(--m-ease, ease-out); }
+.s-footer .footer__col :is(a, .footer__link):hover { color: var(--action); }
+.s-footer .footer__legal { margin-top: clamp(40px, 5vw, 64px); align-items: center; }
+.s-footer .footer__legal .credits { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-strong); }
+.s-footer .footer__legal .credits:hover { color: #fff; }
+@media (max-width: 1023px) {
+  .s-footer__top { grid-template-columns: minmax(0, 1fr); }
+  .s-footer__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: var(--s-7, 32px); }
+  .s-footer .s-footer__cols > .footer__col { grid-column: auto; }   /* the kit spans each column 6 of 12 here */
+}
+
+/* ---------- rows with icons (#tro-ly) ----------
+   The kit's .rows (a name, its line, a rule under each) with an icon in a tinted round tile on the left,
+   beside both the name and the line. */
+.rows.s-rows-icons > li { grid-template-columns: 44px minmax(0, 1fr); column-gap: var(--s-4, 16px); align-items: start; }
+.rows.s-rows-icons > li > .rows__name { grid-column: 2; align-self: center; }
+.rows.s-rows-icons > li > p { grid-column: 2; margin: 0; }
+.s-row-icon {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--action, #059669);
+  background: color-mix(in oklab, var(--action, #059669) 12%, var(--bg, #fff));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--action, #059669) 22%, transparent);
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  html:not([data-motion="off"]) .s-row-icon { transition: transform 200ms var(--m-ease, ease-out), background-color 200ms var(--m-ease, ease-out); }
+  html:not([data-motion="off"]) .s-rows-icons > li:hover .s-row-icon { transform: scale(1.08) rotate(-4deg); background: color-mix(in oklab, var(--action, #059669) 20%, var(--bg, #fff)); }
+}
+
+/* ---------- the departments' panels (Header) ----------
+   On a desktop every panel has one shape: a 200px column of words (the department, its other categories, "Xem
+   tất cả"), then four picture slots of one size at 4:3, so Gia dụng (four cards) and Thời trang (three) show
+   pictures of the same size, none flattened into a strip; a photograph fills its slot and is cropped at its
+   middle. The sheet under 1024px keeps the kit's rows (its pictures hidden). */
+@media (min-width: 1024px) {
+  .nav__menu .s-mega {
+    display: grid;
+    grid-template-columns: 200px repeat(4, minmax(0, 1fr));
+    gap: var(--s-5, 20px) var(--gutter, 24px);
+    align-items: start;
+  }
+  .nav__menu .s-mega > * { grid-column: auto; }
+  .nav__menu .s-mega .menu-card { gap: var(--s-3, 12px); }
+  .nav__menu .s-mega .menu-card .panel {
+    --p-h: 0px;
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--r-md, 12px);
+    overflow: hidden;
+  }
+  .nav__menu .s-mega .menu-card .frame__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 45%;
+  }
+  .nav__menu .s-mega .menu-card .t-card { font-size: 16px; }
+  .nav__menu .s-mega .menu-card:hover .t-card { color: var(--action); }
+  .s-mega__all { margin-top: var(--s-2, 8px); color: var(--action) !important; font-size: 14px; }
+}
+
+/* ---------- the search page ----------
+   Its own search box under the title (the kit's .s-search), common searches when the box is empty. */
+.s-search-head { display: grid; gap: 14px; margin-bottom: 28px; }
+.s-search-title { margin: 0; font-size: clamp(24px, 1vw + 18px, 30px); font-weight: 400; letter-spacing: -0.02em; }
+.s-search-q { color: var(--action, #059669); }
+.s-search-head .s-search { max-width: 640px; }
+.s-search-head .s-search input { flex: 1; min-width: 0; font-size: 15px; }
+.s-search-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 2px 0 0; padding: 0; list-style: none; }
+.s-search-chips a {
+  display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border-radius: 999px;
+  border: 1px solid var(--line); font-size: 13.5px; color: var(--ink-2, var(--ink));
+  transition: border-color 150ms, color 150ms, background-color 150ms;
+}
+.s-search-chips a:hover { border-color: var(--action, #059669); color: var(--action, #059669); background: color-mix(in oklab, var(--action, #059669) 6%, transparent); }
+
+/* ---------- listings: a lighter product card and filters ----------
+   Search, a category, the promotions: four narrower cards a row on a desktop (was three at 305x534), the photo
+   flush with the card's top edge, the words in the body face (the price was in the monospace), one quiet
+   outline button. The filters lose their grey box: headings over hairlines, as a sidebar reads. */
+@media (min-width: 1101px) { .s-listing .s-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; } }
+@media (min-width: 861px) { .s-listing { grid-template-columns: 210px minmax(0, 1fr); gap: 32px; } }   /* 860 and under: one column, the filters behind their button */
+.s-listing .s-card { background: var(--bg, #fff); border-radius: 14px; }
+.s-listing .s-card:hover { box-shadow: 0 10px 28px rgb(18 53 42 / 0.1); }
+.s-listing .s-card-media { padding: 0; }
+.s-listing .s-card-media .s-art { border-radius: 0; }
+.s-listing .s-badge { top: 10px; left: 10px; font-size: 11px; padding: 2px 8px; }
+.s-listing .s-badge-out { left: auto; right: 10px; }
+.s-listing .s-card-body { padding: 12px 12px 4px; gap: 4px; }
+.s-listing .s-card-cat { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.s-listing .s-card-title { font-size: 14.5px; line-height: 1.4; min-height: 40px; }
+.s-listing .s-card-specs { flex-wrap: nowrap; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 12px; margin-top: 2px; }
+.s-listing .s-price { margin-top: 6px; gap: 6px; }
+.s-listing .s-price strong { font-family: inherit; font-size: 16px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; }
+.s-listing .s-price s { font-family: inherit; font-size: 12px; }
+.s-listing .s-card-note { font-size: 11.5px; }
+.s-listing .s-card-actions { padding: 8px 12px 12px; }
+.s-listing .s-card-actions .s-btn-ghost {
+  min-height: 36px; padding: 6px 12px; font-size: 13.5px; border-radius: 999px;
+  background: transparent; color: var(--ink); border: 1px solid var(--line-strong, rgb(18 53 42 / 0.2)); box-shadow: none;
+}
+.s-listing .s-card-actions .s-btn-ghost:hover { background: var(--action, #059669); border-color: var(--action, #059669); color: #fff; }
+.s-listing .s-card-confirmation { min-height: 0; margin-top: 6px; }
+.s-listing .s-skeleton { min-height: 340px; }
+
+.s-listing .s-filters { background: none; border: 0; border-radius: 0; padding: 0; top: calc(var(--nav, 72px) + 20px); }
+.s-listing .s-filters h3 { font-size: 15px; font-weight: 600; margin: 0 0 4px; }
+.s-listing .s-filters fieldset { margin: 14px 0 0; padding-top: 14px; border-top: 1px solid var(--line); }
+.s-listing .s-filters legend { float: left; width: 100%; margin-bottom: 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.s-listing .s-filters legend + * { clear: both; }
+.s-listing .s-check { font-size: 14px; margin: 6px 0 !important; }
+.s-listing .s-check input { accent-color: var(--action, #059669); }
+.s-listing .s-link-btn { margin-top: 4px; font-size: 13px; color: var(--action, #059669); }
+
+/* ---------- a smaller chat widget ----------
+   The button: a compact pill (was 14px 20px with a large shadow); the panel: 360 wide, at most 540 tall
+   (was 390x600). A phone keeps its own rules (the round icon button, the full-height sheet). */
+@media (min-width: 601px) {
+  .s-chat-fab { right: 20px; bottom: 20px; padding: 10px 16px 10px 14px; gap: 8px; font-size: 14px; box-shadow: 0 6px 18px rgb(var(--shadow-rgb) / 0.28); }
+  .s-chat-fab-dot { width: 8px; height: 8px; box-shadow: 0 0 0 3px rgb(5 150 105 / 0.28); }
+  .s-chat { right: 20px; bottom: 20px; width: 360px; height: min(540px, calc(100dvh - 40px)); }
+}
+
+/* ---------- the account pages (AuthParts) ----------
+   Đăng nhập, đăng ký, quên mật khẩu: on a desktop one framed shell, the shop's photograph under the hero's
+   emerald shade with what an account gives on the left, the form on white on the right; on a phone the form
+   alone. Inputs 46px on white, the eye inside the password box, one full-width action. */
+.s-auth { display: block; padding-top: clamp(16px, 3vw, 40px); padding-bottom: clamp(32px, 5vw, 72px); }
+.s-auth-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  max-width: 980px;
+  margin: 0 auto;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--bg, #fff);
+  box-shadow: 0 18px 48px rgb(18 53 42 / 0.08);
+}
+.s-auth-side { position: relative; min-height: 560px; color: #fff; isolation: isolate; }
+.s-auth-side img { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
+.s-auth-side::after {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(180deg, rgb(3 32 24 / 0.15) 0%, rgb(3 32 24 / 0.55) 45%, rgb(3 32 24 / 0.9) 100%);
+}
+.s-auth-side__words { position: absolute; left: 0; right: 0; bottom: 0; padding: 36px; display: grid; gap: 14px; }
+.s-auth-side__kicker { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #a7f3d0; }
+.s-auth-side__title { margin: 0; font-size: 26px; line-height: 1.25; letter-spacing: -0.02em; max-width: 18ch; }
+.s-auth-side ul { margin: 4px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; font-size: 14.5px; color: rgb(255 255 255 / 0.9); }
+.s-auth-side li { display: flex; align-items: center; gap: 10px; }
+.s-auth-side li .icon { color: #6ee7b7; flex: none; }
+
+.s-auth-card {
+  max-width: none;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: clamp(28px, 4vw, 48px);
+  align-self: center;
+}
+.s-auth-title { margin: 0; font-size: 28px; font-weight: 500; letter-spacing: -0.02em; }
+.s-auth-lead { margin: 8px 0 18px; font-size: 14.5px; line-height: 1.6; color: var(--muted); }
+.s-auth-card label, .s-auth-card .s-field-head label { font-size: 13.5px; font-weight: 500; color: var(--ink); }
+.s-auth-card :is(input[type="tel"], input[type="text"], input[type="password"], input[type="email"], input:not([type])) {
+  height: 46px; padding: 0 14px; border-radius: 10px; background: var(--bg, #fff); font-size: 15px;
+  border: 1px solid var(--line-strong, rgb(18 53 42 / 0.2));
+  transition: border-color 150ms, box-shadow 150ms;
+}
+.s-auth-card input:focus { border-color: var(--action, #059669); box-shadow: 0 0 0 3px rgb(5 150 105 / 0.15); }
+.s-auth-submit { width: 100%; min-height: 46px; margin-top: 14px; border-radius: 999px; font-size: 15px; }
+.s-auth-foot { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); text-align: left; font-size: 14px; color: var(--muted); }
+.s-auth-foot a { color: var(--action, #059669); font-weight: 500; }
+.s-auth-foot a:hover { text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 860px) {
+  .s-auth-shell { grid-template-columns: minmax(0, 1fr); max-width: 480px; box-shadow: none; }
+  .s-auth-side { display: none; }
+}
+
+/* a field whose label row carries a link (PasswordInput's aside), and the password's eye */
+.s-field { margin: 12px 0; }
+.s-field-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.s-field-head label { margin: 0 !important; font-size: 13px; }
+.s-field-link { font-size: 13px; color: var(--action, #059669); font-weight: 500; }
+.s-field-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.s-field .s-password { position: relative; display: block; margin-top: 7px; }
+.s-field .s-password input { width: 100%; padding-right: 46px; margin: 0; }
+.s-password-eye {
+  position: absolute; top: 50%; right: 6px; transform: translateY(-50%);
+  display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 8px;
+  background: transparent; color: var(--muted); cursor: pointer;
+  transition: color 150ms, background-color 150ms;
+}
+.s-password-eye:hover { color: var(--ink); background: color-mix(in oklab, var(--ink) 6%, transparent); }
+.s-password-eye:focus-visible { outline: 2px solid var(--action, #059669); outline-offset: 1px; }
+.s-password-eye[aria-pressed="true"] { color: var(--action, #059669); }

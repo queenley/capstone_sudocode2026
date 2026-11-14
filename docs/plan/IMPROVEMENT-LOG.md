@@ -21,6 +21,162 @@ Loại: ... · Trạng thái: ... · Chỉ số: TSR / CCR / RQR / HR / latency 
 
 ## Các mục
 
+### 2026-11-13 · `--no-baseline`: run profile chỉ chạy và chấm `full`
+
+Loại: evaluation · Trạng thái: xong · Chỉ số: chi phí của run ablation
+
+- **Vấn đề:** `run_eval.py --profile gaploop --kb-version 1 --out <dir>` chạy cả `full` lẫn `baseline_no_memory`. Bảng `--report` lấy cột Baseline từ run Router, nên baseline của run GapLoop, Reflection hay Kết hợp chỉ tốn khoảng một nửa phí model mà không được dùng.
+- **Bằng chứng:** `tables.py` đọc `report["baseline"]` chỉ từ run `router`. Với các cột khác, nó chỉ đọc `system`.
+- **Sửa:** [cli.py](../../apps/ai-agent-service/src/ai_agent_service/pipeline/eval/cli.py):
+  - `--no-baseline` làm layout chỉ có `full`, và `report.grade(..., baseline=None)` vẫn ghi `report.json` có `system`;
+  - `--resume` nhận ra run chỉ có `full` từ manifest;
+  - từ chối dùng chung với `--config`.
+
+  Ghi chú trong bảng `--report` và `evaluation/README.md` có nhắc cờ này.
+- **Đã kiểm:** 3 test mới trong `test_eval_resume.py`. Các test eval, improve, tables và DAG qua hết.
+- **Số đo:** không đổi số; chỉ bớt lượt gọi model của baseline.
+- **Còn lại:** chưa chạy thật một run `--no-baseline` có model; `reference_eval.py` không có `--baseline` thì không in phần so sánh.
+
+### 2026-11-13 · Rate limit của gateway dùng IP thật của khách sau proxy
+
+Loại: bảo mật / vận hành · Trạng thái: đang đo · Chỉ số: 429 sai
+
+- **Vấn đề:** gateway giới hạn 120 request/phút theo `request.client.host`. Uvicorn mặc định chỉ tin `X-Forwarded-For` từ `127.0.0.1`. Vì vậy, sau Caddy (cloud một máy) hay ALB, mọi khách dùng chung IP của proxy và chung một hạn mức; khi đông khách thì ai cũng bị 429.
+- **Bằng chứng:** đọc `apps/api-gateway/src/main.py`, CMD trong `apps/api-gateway/Dockerfile` (không có `--forwarded-allow-ips`) và `uvicorn.middleware.proxy_headers` 0.54.
+- **Sửa:** đặt `FORWARDED_ALLOW_IPS=10.0.0.0/8,172.16.0.0/12,192.168.0.0/16` cho `api-gateway` ở 3 nơi:
+  - `infra/compose/docker-compose.cloud.yml`;
+  - `infra/compose/docker-compose.aws.yml`;
+  - `infra/kubernetes/base/workloads.yaml`.
+
+  Uvicorn lấy địa chỉ ngoài cùng bên phải không thuộc các dải này, nên `X-Forwarded-For` giả không qua mặt được giới hạn.
+- **Đã kiểm:** `tests/agent/test_improve_runner.py` kiểm cấu hình của hai file compose, và kiểm uvicorn chọn đúng IP khi header có IP giả đứng trước.
+- **Số đo:** chưa đo trên cloud: hai IP khác nhau, mỗi bên 100 request/phút, không bên nào nhận 429.
+- **Còn lại:** request mà `web` gọi gateway từ phía server (`/backend`) vẫn mang IP của container `web`.
+
+### 2026-11-13 · Version knowledge (`data/kb`) không mất khi tạo lại container
+
+Loại: dữ liệu / vận hành · Trạng thái: xong · Chỉ số: không
+
+- **Vấn đề:** `data/kb` được copy vào image nhưng không nằm trên volume. Version knowledge mà Gap Loop hay admin tạo trong container sẽ mất khi container được tạo lại.
+- **Sửa:**
+  - `docker-compose.yml` mount volume `agent-kb:/app/agent/data/kb`. Docker chép `data/kb` của image vào volume ở lần dùng đầu tiên.
+  - `infra/airflow/docker-compose.airflow.yml` mount cùng volume đó.
+  - Trên AWS, kb nằm trên EFS, được chép từ image một lần cho cả nhóm máy (user data, có khóa trên EFS).
+- **Đã kiểm:** `docker compose config`; test `test_knowledge_versions_survive_a_recreated_container`.
+- **Còn lại:** ở local, sửa `data/kb` trong repo sẽ không vào container đang dùng volume cũ nữa. Muốn bắt đầu lại từ repo thì chạy `docker volume rm telesales-ai_agent-kb`.
+
+### 2026-11-13 · AWS giai đoạn 2: Terraform, compose AWS, vòng cải tiến trên Fargate, CI/CD GitHub Actions
+
+Loại: tính năng (triển khai) · Trạng thái: đang đo · Chỉ số: không
+
+- **Vấn đề:** [aws-plan.md](../deployment/aws-plan.md) mới là thiết kế. Chưa có compose cho AWS, Terraform, image cho vòng cải tiến hay pipeline phát hành.
+- **Sửa:**
+  - **Hạ tầng:** `infra/terraform/aws` gồm VPC 2 AZ không NAT, ALB + ACM, ASG chạy Docker Compose, RDS Single-AZ có PITR, EFS, ECR, S3 cho release, Secrets Manager, ECS chỉ cho Fargate task, hai lịch EventBridge (mặc định tắt), OIDC GitHub với ba role, alarm và budget.
+  - **Ứng dụng:** `infra/compose/docker-compose.aws.yml`.
+  - **Vòng cải tiến:** `infra/improve` (Dockerfile, whitelist dockerignore, `run.py`).
+  - **Phát hành:** `.github/workflows/deploy-aws.yml` và `terraform-aws.yml`.
+  - **Tài liệu:** hướng dẫn [aws-terraform-cicd.md](../deployment/aws-terraform-cicd.md).
+- **Đã kiểm:**
+  - `terraform fmt` và `terraform validate` qua (provider AWS 6.73); lock có hash cho linux, windows, darwin;
+  - `actionlint` 1.7.7 sạch, `shellcheck` 0.10 sạch trên user data đã điền biến;
+  - `docker compose config` của file AWS: không service nào build, không có postgres hay seed, kb/skills/improvement trên EFS;
+  - image `telesales-improve` build được (938 MB): uid 1000, `run.py` dựng đúng lệnh, `run_eval.py --help` chạy, hash hợp đồng của extractor đọc được;
+  - 11 test trong `tests/agent/test_improve_runner.py`.
+- **Số đo:** chưa đo. Chưa `terraform apply` hay deploy lên tài khoản AWS thật.
+- **Còn lại:**
+  - lần apply đầu theo bước 1–6 của hướng dẫn là lần kiểm đầu tiên;
+  - `provision_db_role.py` và `create_admin.py` hỏi mật khẩu tương tác, nên còn làm tay qua SSM;
+  - chưa có môi trường staging;
+  - giá trong aws-plan 3.1 chưa kiểm bằng Pricing Calculator.
+
+### 2026-11-13 · Tỷ lệ token lấy từ prompt cache bị cộng hai lần
+
+Loại: evaluation · Trạng thái: xong · Chỉ số: bảng hiệu năng ("Token đầu vào lấy từ prompt cache")
+
+- **Vấn đề:** bảng `--report` của `eval_3` ghi 133.6% token đầu vào lấy từ prompt cache, trong khi tỷ lệ này không thể quá 100%.
+- **Bằng chứng:** `evaluation/runs/eval_3`. Theo `usage.json` (cấu hình `full`), advisor dùng 61,4 triệu token đầu vào, trong đó 49,0 triệu từ cache; policy dùng 30,7 triệu, trong đó 12,6 triệu từ cache. Không entry nào có `cached` > `input`. Cộng `cached` hai lần thì ra đúng 133.6%.
+- **Sửa:** [performance.py](../../apps/ai-agent-service/src/ai_agent_service/pipeline/eval/performance.py), `_tokens`. Từ entry thứ hai trở đi, bucket đã có khóa `cached`, nên vòng `for key in bucket` cộng nó một lần, rồi nhánh `if "cached" in counts` cộng thêm lần nữa. Giờ vòng chỉ cộng `calls`, `input`, `output`. Số token mỗi lượt và chi phí không đổi, vì hai số này không dùng `cached`.
+- **Đã kiểm:** thêm `test_cached_tokens_are_summed_once_across_calls` (3 entry). `test_knowledge_campaigns.py`, `test_eval_performance.py` và `test_eval_tables.py` qua hết, 44 test.
+- **Số đo:** `eval_3`: trước 133.6% / sau 66.8% (65.7% nếu tính cả after_call). Không gọi model.
+- **Còn lại:** các bảng đã in trước bản sửa, kể cả `eval_3/table.txt`, vẫn ghi số sai cho đến khi `--report` được chạy lại.
+
+### 2026-11-12 · Vòng cải tiến hằng tuần, admin duyệt trên web, dashboard đánh giá
+
+Loại: evaluation, tính năng · Trạng thái: đang đo · Chỉ số: theo dõi TSR / CCR / RQR / HR / latency / chi phí theo tuần (không đổi công thức)
+
+- **Vấn đề:**
+  - Vòng cải tiến chỉ chạy tay, và bước duyệt là sửa tay file JSON.
+  - Kết quả đánh giá chỉ nằm trong thư mục run, không xem được theo thời gian.
+  - Một vòng `round` luôn quay về version 0, nên không dùng được cho agent đang phục vụ.
+- **Bằng chứng:** `pipeline/improve/cli.py` (`_round`, `_back_to_original`), `components/improvement/review.py` (review là file), `evaluation/runs/*` (không có lịch sử chung).
+- **Sửa** ([001](001-vong-cai-tien-hang-tuan-va-dashboard.md), phần B, C, D):
+  - **Lưu trữ:** bảng `eval_runs`, `eval_metrics`, `improvement_rounds`, `improvement_proposals` trong schema `agent` (`runtime/evaluations.py`, tạo trong `db.init_db`).
+  - **Ingest:** `run_eval.py --ingest` (`pipeline/eval/history.py`) đọc cả run hai cấu hình, run một trace và run relabel; không bao giờ ghi vào database `*_eval`.
+  - **Vòng hằng tuần:** `improve weekly-learn | weekly-status | weekly-measure` (`pipeline/improve/weekly.py`).
+  - **Version ứng viên:** `skill_versions.publish(activate=False)` và `activate`, để version mới được đo trước khi bật.
+  - **So sánh:** `compare` tách thành `comparison()` trả dữ liệu; phần in giữ nguyên.
+  - **API:** `api/routes/improvement.py` (duyệt, bật, quay lui, lịch sử).
+  - **Giao diện:** tab "Cải tiến hằng tuần" và "Đánh giá" trong `/admin`. Biểu đồ SVG có màu đã validate cho nền sáng và tối, đường dọc và tooltip khi rê chuột, bảng số.
+  - **Airflow:** DAG `infra/airflow/dags/improvement_weekly.py` và `infra/airflow/docker-compose.airflow.yml`.
+  - **Compose:** thêm volume `agent-skills`, `agent-improvement`; Dockerfile tạo sẵn hai thư mục đó cho user `app`.
+  - **Contract:** xuất lại contract OpenAPI của ai-agent-service.
+- **Đã kiểm:**
+  - Test backend: `test_weekly_improvement.py` 11 và `test_airflow_dag.py` 3 qua; nhóm evaluation/improvement 330 passed; `tests/agent` toàn bộ 1.632 passed, 48 lỗi ASR/voice do môi trường.
+  - Playwright: `improvement-admin.spec.ts` 3, cùng các spec admin khác, 14 passed; `tsc` sạch.
+  - Chạy thật: ingest `thu-1` và `eval2-full-relabel-3` vào `app_db`, ingest hai lần không nhân đôi; `docker compose ... config` hợp lệ.
+- **Số đo:** chưa đo; chưa chạy một tuần thật, chưa build image Airflow.
+- **Còn lại:**
+  - Reflection chưa học từ tín hiệu cuộc gọi thật (`harvest-production` chưa có).
+  - Bật skills phải restart agent.
+  - `data/kb` chưa nằm trên volume.
+  - DAG dùng `BashOperator`, phải đổi khi lên MWAA.
+  - `eval_3` chưa ingest được vì chưa chấm xong.
+
+### 2026-11-12 · Tách trang quản trị khỏi trang bán hàng
+
+Loại: tính năng (frontend) · Trạng thái: xong · Chỉ số: không áp dụng (không đổi agent)
+
+- **Vấn đề:** admin và sales dùng chung một trang.
+  - Tài khoản admin đăng nhập xong vào `/ban-hang`.
+  - `/ban-hang` hiện link "Quản trị" và "Agent Console" cho mọi vai.
+  - `/admin` là trang cũ tiếng Anh, bắt dán "Staff access token", có link sang trang của mọi vai.
+- **Bằng chứng:** `destination()` trong `apps/web/src/app/login/page.tsx` chỉ tách `developer`; chân thanh bên của `apps/web/src/app/ban-hang/page.tsx` không xét vai. Backend đã tách quyền đúng (`/api/admin/*` chỉ nhận `admin`).
+- **Sửa:**
+  - `apps/web/src/app/admin/page.tsx` mới, cùng giao diện với `/ban-hang`, đọc token đăng nhập, bốn mục: Kiến thức (knowledge gap + FAQ), Đề xuất cải tiến, Sản phẩm, Nhân sự & kho.
+  - Đăng nhập chuyển `admin` → `/admin`.
+  - `/ban-hang` chỉ hiện "Quản trị" cho `admin`, "Agent Console" cho `admin` và `developer`; đăng xuất xóa cả `staff-role`.
+  - Quyền vẫn do API kiểm. Phần A của [001](001-vong-cai-tien-hang-tuan-va-dashboard.md).
+- **Đã kiểm:**
+  - `tsc --noEmit` sạch.
+  - Playwright `e2e/staff-roles.spec.ts` (mới, 5 test), cùng `faq-admin`, `gap-admin`, `call-console`: 17 passed. Chạy với `CI=1` và dev server `http://localhost:3100`; `127.0.0.1` bị `allowedDevOrigins` chặn JS client.
+- **Số đo:** không áp dụng.
+- **Còn lại:**
+  - Phần `AdminTools` (tài khoản, kho, khuyến mãi) vẫn ghi nhãn tiếng Anh.
+  - Panel FAQ sập cả trang nếu API trả sai dạng.
+  - Phần B, C, D của 001 chờ duyệt.
+
+### 2026-11-12 · Cột "GapLoop + Reflection" và bảng ablation trong `--report`
+
+Loại: evaluation · Trạng thái: đang đo · Chỉ số: không đổi công thức (TSR / CCR / RQR / HR / hiệu năng)
+
+- **Vấn đề:** bảng `--report` chỉ có cột từng phương pháp, không đo được GapLoop và Reflection bật cùng lúc. `--profile gaploop` vẫn nhận thêm `--skills-version`, nên một run kết hợp sẽ hiện dưới nhãn GapLoop mà không có cảnh báo. Ghi chú "chỉ là chạy lại Router" so `knowledge_sha256`; hash này chỉ tính trên `policy/*.md` của BTC, nên cột GapLoop và Reflection luôn bị báo là chạy lại Router.
+- **Bằng chứng:** đọc `pipeline/eval/tables.py` (`notes`) và `report.manifest` (`knowledge_sha256` từ `btc_data_dir()/policy/*.md`); chưa có run GapLoop hay Reflection thật trên `data/dev`.
+- **Sửa:** thêm `--profile combined` (bắt buộc cả `--kb-version` và `--skills-version`); `gaploop` từ chối `--skills-version`, `reflection` từ chối `--kb-version` (`pipeline/eval/cli.py`). Thêm cột `combined` ("Agent Harness (GapLoop + Reflection)") vào cả bảng Agent và bảng hiệu năng; `notes` so version override trong manifest (knowledge: override, không có thì `knowledge.version`), báo khi cột trùng Router, khi cột một phương pháp đổi cả phần kia, khi cột Kết hợp thiếu một phần. Cập nhật `evaluation/README.md`, `docs/evaluation/scoring-flow.md`, `docs/evaluation/system-map.md`.
+- **Đã kiểm:** `tests/agent/test_eval_tables.py` thêm test cho cột kết hợp, Reflection không bị báo nhầm, cột một phương pháp đổi cả hai và luật profile; test cột cũ sửa theo 7 cột. `tests/agent -k "eval or relabel or judge or performance or improve or reflection or gap"` (venv `apps/ai-agent-service/.venv`): 273 passed, 2 skipped.
+- **Số đo:** chưa đo; cần các run Router, GapLoop, Reflection và Kết hợp trên cùng cohort.
+- **Còn lại:** run với `--profile gaploop --kb-version N --skills-version M` trước đây giờ bị từ chối, phải chạy lại với `--profile combined`. Manifest cũ không có `knowledge.version` (manifest tạm của run dừng giữa chừng) thì phần so knowledge dựa vào override.
+
+### 2026-11-12 · `--resume`: chạy tiếp một run evaluation bị dừng
+
+Loại: evaluation · Trạng thái: đang đo · Chỉ số: không đổi công thức (TSR / CCR / RQR / HR / hiệu năng)
+
+- **Vấn đề:** một run bị dừng giữa chừng (tắt terminal, máy ngủ, Ctrl+C) không chạy tiếp được: CLI từ chối thư mục đã có bằng chứng, và chạy lại vào cùng thư mục sẽ ghi đè trace vì mỗi lần ghi viết lại cả file từ bộ nhớ.
+- **Bằng chứng:** `evaluation/runs/eval_3` (run `20261112-110513`, `data/dev/scenarios`, 409 kịch bản) dừng lúc 15:11 sau 334/409 kịch bản `full`, `baseline_no_memory` chưa chạy; manifest `INCOMPLETE`, không có `evaluation-error.log`, nên process bị dừng từ ngoài chứ không phải exception.
+- **Sửa:** thêm `--resume RUN_DIR` trong `pipeline/eval/cli.py`. Lấy `run_id`, cohort đã đóng băng (`<run>/scenarios`), cấu hình và profile từ manifest; từ chối `--scenarios/--out/--config/--only` và profile khác. `load_resume` chép bằng chứng sang `resume-backup-<giờ>/`, giữ kịch bản đủ mọi lượt đúng một lần, không lỗi lượt/`after_call`, không nằm trong `scenario-errors.jsonl`; kịch bản dở chạy lại từ đầu (mỗi kịch bản bắt đầu bằng `runner.reset()`, nên không phụ thuộc kịch bản trước). Nhãn extractor làm lại sau các lượt như run mới (lượt cũ trúng cache). Giữ một `run_id` vì `report.trace_errors` đòi đúng một run id; manifest ghi `resumes`. Cập nhật `evaluation/README.md`.
+- **Đã kiểm:** `tests/agent/test_eval_resume.py` mới (9 test) cùng `test_eval_output_integrity`, `test_eval_seed_failure_reporting`, `test_relabel_one_config`: 39 passed. Thử `load_resume` trên bản sao của `eval_3` (không model, không DB): giữ 334/409 `full` (3.693 lượt, 644 mục usage), `baseline_no_memory` 0.
+- **Số đo:** chưa đo; chưa chạy `--resume` thật trên `eval_3`.
+- **Còn lại:** latency của phần trước và sau khi resume đo ở hai phiên máy khác nhau; manifest tạm của run cũ không ghi `--provider/--model`, người chạy phải truyền lại như lần đầu. Chạy tiếp vẫn tốn phí model, không có trần nếu chưa đặt `EVAL_BUDGET_DB`.
+
 ### 2026-11-12 · Sửa MCP startup trên Python 3.10
 
 Loại: evaluation · Trạng thái: đang đo · Chỉ số: startup / evaluation

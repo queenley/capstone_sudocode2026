@@ -44,7 +44,8 @@ def _tokens(entries: Iterable[Mapping[str, Any]], part: str) -> dict[str, dict[s
     for entry in entries:
         for agent, counts in (entry.get(part) or {}).items():
             bucket = total.setdefault(agent, {"calls": 0, "input": 0, "output": 0})
-            for key in bucket:
+            # The fixed keys only: ``cached`` joins the bucket below, and must not be added twice.
+            for key in ("calls", "input", "output"):
                 bucket[key] += int(counts.get(key, 0))
             # Runs older than the cached count have none: unknown, not zero.
             if "cached" in counts:

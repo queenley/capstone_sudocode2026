@@ -129,6 +129,9 @@ services:
   api-gateway:
     environment:
       CORS_ORIGINS: https://${DOMAIN:?set DOMAIN}
+      # Behind Caddy the gateway sees Caddy's address: without this every customer shared one 120/minute bucket.
+      # uvicorn takes the right-most X-Forwarded-For address outside these private ranges (the real client).
+      FORWARDED_ALLOW_IPS: 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
     restart: unless-stopped
     logging: *logging
 

@@ -1,0 +1,6 @@
+# Copy to backend.hcl, then: terraform init -backend-config=backend.hcl
+bucket       = "your-terraform-state-bucket"   # versioning on, made once by hand (docs/deployment/aws-terraform-cicd.md, step 1)
+key          = "telesales/aws/production.tfstate"
+region       = "ap-southeast-1"
+encrypt      = true
+use_lockfile = true                            # S3-native locking, no DynamoDB table

@@ -17,6 +17,11 @@ the same way, without running the agent again (:mod:`.relabel`)::
 
     python run_eval.py --relabel evaluation/runs/<day>-work/<run> --out <dir>
 
+A run that stopped part-way continued in place, same run id and frozen cohort: its finished scenarios are kept,
+the rest run (:func:`load_resume`)::
+
+    python run_eval.py --resume evaluation/runs/<run>
+
 Exit codes: 0 when every turn ran and was labelled; 1 when a failed turn, an
 unlabelled turn, a failed ``after_call`` or a line outside the schema voids
 the numbers (the traces are kept, no table is printed); 2 when the input or
@@ -115,8 +120,22 @@ def parser() -> argparse.ArgumentParser:
                         help="One configuration. Without it, both, then the organisers' table.")
     parser.add_argument("--out", type=Path,
                         help="With --config, the trace file; without, the run's directory (default: evaluation/runs/<run id>).")
+    parser.add_argument("--no-baseline", action="store_true",
+                        help="Run and score only full, in a run directory: for a --profile run of the --report "
+                             "ablation, whose Baseline column is the router run's own. Half the model calls.")
     parser.add_argument("--only", action="append", default=[], metavar="SCENARIO_ID",
                         help="Run only this scenario; repeat for more.")
+    parser.add_argument("--ingest", type=Path, metavar="RUN_DIR",
+                        help="Keep a scored run's numbers in the agent's database, for the admin's evaluation "
+                             "dashboard. No model call, and the main database, not the *_eval one.")
+    parser.add_argument("--purpose", choices=("weekly_frozen", "weekly_candidate", "dev_full", "adhoc"),
+                        default="adhoc", help="With --ingest: which series of the dashboard the run belongs to.")
+    parser.add_argument("--round", dest="round_name", metavar="NAME",
+                        help="With --ingest: the weekly improvement round the run measured.")
+    parser.add_argument("--resume", type=Path, metavar="RUN_DIR",
+                        help="Continue a run that stopped (terminal closed, sleep, Ctrl+C): keep its finished scenarios, "
+                             "run the rest under the same run id. RUN_DIR is the run's directory, or its trace file "
+                             "for a --config run. Its evidence is copied to resume-backup-<time>/ first.")
     parser.add_argument("--warmup", type=int, default=3, help="Untraced turns before the first measured one (default 3).")
     parser.add_argument("--no-extract", action="store_true",
                         help="Skip the question and claim extractor: no model call for it, and RQR and HR come out empty.")
@@ -149,8 +168,9 @@ def parser() -> argparse.ArgumentParser:
     parser.add_argument("--report", nargs="?", const="all", type=_sections, metavar="all|asr,agent,performance",
                         help="Print the report's tables (default all). With --run or --asr-run, from finished runs: no "
                              "model call. With --scenarios, of the run this command makes, as the Router column.")
-    parser.add_argument("--profile", choices=("router", "gaploop", "reflection"), default="router",
-                        help="Evaluation profile recorded in the manifest: router (default), gaploop, or reflection.")
+    parser.add_argument("--profile", choices=("router", "gaploop", "reflection", "combined"), default="router",
+                        help="Evaluation profile recorded in the manifest: router (default); gaploop (--kb-version only), "
+                             "reflection (--skills-version only), or combined (both: GapLoop and Reflection together).")
     parser.add_argument("--run", action="append", default=[], type=_named_run, metavar="COLUMN=RUN_DIR",
                         help="With --report: a finished run as a column: router, subagent, gaploop, reflection or ab; repeat.")
     parser.add_argument("--asr-run", type=Path, metavar="RUN_DIR", help="With --report: a finished --asr run.")
@@ -200,6 +220,12 @@ def _tables(args: argparse.Namespace) -> int:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = parser().parse_args(argv)
+    if args.ingest:
+        return ingest(args.ingest, purpose=args.purpose, round_name=args.round_name)
+    if args.resume:
+        code = _resume_arguments(args)
+        if code is not None:
+            return code
     if (args.run or args.asr_run) and args.report is None:
         print("--run and --asr-run go with --report")
         return 2
@@ -219,11 +245,18 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 2
         # In the environment, so the MCP servers this command starts read the same version.
         os.environ["KNOWLEDGE_VERSION"] = str(args.kb_version)
-    if args.profile == "gaploop" and args.kb_version is None:
-        print("--profile gaploop requires --kb-version <N>")
+    # Each profile changes exactly what its column says, so Router, GapLoop, Reflection and Combined read as an ablation.
+    for profile, option, value in (("gaploop", "--kb-version", args.kb_version), ("combined", "--kb-version", args.kb_version),
+                                   ("reflection", "--skills-version", args.skills_version),
+                                   ("combined", "--skills-version", args.skills_version)):
+        if args.profile == profile and value is None:
+            print(f"--profile {profile} requires {option} <N>")
+            return 2
+    if args.profile == "gaploop" and args.skills_version is not None:
+        print("--profile gaploop measures knowledge alone; with --skills-version too, use --profile combined")
         return 2
-    if args.profile == "reflection" and args.skills_version is None:
-        print("--profile reflection requires --skills-version <N>")
+    if args.profile == "reflection" and args.kb_version is not None:
+        print("--profile reflection measures skills alone; with --kb-version too, use --profile combined")
         return 2
     if args.profile == "router" and (args.kb_version is not None or args.skills_version is not None):
         print("--profile router cannot be combined with --kb-version or --skills-version")
@@ -337,6 +370,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 2
         return asyncio.run(relabel.relabel(args.relabel.resolve(), out, extractor,
                                            (args.config,) if args.config else None))
+    if args.no_baseline and args.config:
+        print("--no-baseline is for a run directory; --config already runs one configuration.")
+        return 2
     if not args.scenarios.is_dir():
         print(f"{args.scenarios} is not a directory")
         return 2
@@ -353,12 +389,15 @@ def main(argv: Sequence[str] | None = None) -> int:
             print("No scenario to run")
         return 2
     args.prepared = ready
-    run_id = datetime.now().strftime("%Y%m%d-%H%M%S")
+    run_id = args.resume_run_id if args.resume else datetime.now().strftime("%Y%m%d-%H%M%S")
     layout = _layout(args, run_id)
     try:
         capped = validate_ledger()
-        prepare_output(layout)
-    except (OSError, ValueError, RuntimeError) as error:
+        if args.resume:
+            args.resumed = load_resume(layout, ready, run_id)
+        else:
+            prepare_output(layout)
+    except (OSError, ValueError, RuntimeError, KeyError) as error:
         print(error)
         return 2
     _say_cap(capped)
@@ -397,6 +436,8 @@ def _layout(args: argparse.Namespace, run_id: str) -> Layout:
         trace = (args.out or RUNS / run_id / name).resolve()
         return Layout(trace.parent, {args.config: trace}, prefix=f"{trace.stem}.")
     directory = (args.out or RUNS / run_id).resolve()
+    if getattr(args, "no_baseline", False):
+        return Layout(directory, {"full": directory / "full.jsonl"})
     return Layout(directory, {"full": directory / "full.jsonl", "baseline_no_memory": directory / "baseline.jsonl"})
 
 
@@ -423,6 +464,167 @@ def prepare_output(layout: Layout) -> None:
         claim.unlink()
 
 
+def ingest(directory: Path, *, purpose: str = "adhoc", round_name: str | None = None) -> int:
+    """``--ingest``: one scored run into ``eval_runs`` and ``eval_metrics`` (``runtime/evaluations.py``)."""
+    from . import history
+
+    try:
+        record = history.summary(directory, purpose=purpose, round_name=round_name)
+    except (OSError, ValueError) as error:
+        print(error)
+        return 2
+    from ...mcp.server_base import use_selector_loop_on_windows
+
+    use_selector_loop_on_windows()  # psycopg's async connection refuses Windows' default event loop
+    try:
+        asyncio.run(_save(record))
+    except Exception as error:  # the database: the message names what failed, never a secret
+        print(f"Could not save {record['run']['run_id']}: {type(error).__name__}: {error}")
+        return 1
+    run = record["run"]
+    print(f"Ingested {run['run_id']} ({purpose}, week {run['week']}): {len(record['metrics'])} numbers, "
+          f"cohort {str(run['cohort_sha256'])[:12]}, extractor {run['extractor_version']}")
+    return 0
+
+
+async def _save(record: dict[str, Any]) -> None:
+    from ...runtime import evaluations
+
+    async with evaluations.cli_connection() as conn:
+        await evaluations.save_run(conn, record)
+
+
+def _resume_arguments(args: argparse.Namespace) -> int | None:
+    """``--resume``: the stopped run's own cohort, configurations and profile, so the rest runs as it would have.
+
+    Returns an exit code when the request cannot be honoured, ``None`` when *args* now describe the run.
+    """
+    other = [name for name, given in (("--out", args.out), ("--config", args.config), ("--only", args.only),
+                                      ("--relabel", args.relabel), ("--judge-run", args.judge_run),
+                                      ("--asr", args.asr or args.asr_audio or args.asr_package),
+                                      ("--performance RUN_DIR", isinstance(args.performance, Path)))
+             if given]
+    if other or args.scenarios != parser().get_default("scenarios"):
+        print("--resume continues a run as it was started; it takes no --scenarios, "
+              + ", ".join(other or ["--scenarios"]) + " (the cohort and configurations come from the run).")
+        return 2
+    path = args.resume.resolve()
+    if path.is_dir():
+        directory, prefix = path, ""
+    elif path.suffix == ".jsonl":
+        directory, prefix = path.parent, f"{path.stem}."
+    else:
+        print(f"--resume takes a run directory, or the trace file of a --config run: {path}")
+        return 2
+    manifest_path = directory / f"{prefix}manifest.json"
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        run_id, configs = manifest["run_id"], list(manifest["configs"])
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        print(f"Nothing to resume: {manifest_path} is missing or unreadable ({type(error).__name__}).")
+        return 2
+    if manifest.get("status") == "COMPLETE":
+        print(f"{directory} is a COMPLETE run; nothing to resume.")
+        return 2
+    if prefix:
+        if len(configs) != 1:
+            print(f"{manifest_path} does not describe one configuration.")
+            return 2
+        args.config, args.out = configs[0], path
+    elif configs in (["full", "baseline_no_memory"], ["full"]):
+        args.out, args.no_baseline = directory, configs == ["full"]
+    else:
+        print(f"{manifest_path} lists configurations {configs}; expected full and baseline_no_memory, or full alone.")
+        return 2
+    frozen = directory / f"{prefix}scenarios"
+    if not frozen.is_dir():
+        print(f"No frozen cohort in {frozen}; the run stopped before its first scenario. Start a new run instead.")
+        return 2
+    args.scenarios = frozen
+    evaluation = manifest.get("evaluation") or {}
+    recorded = {"profile": evaluation.get("profile", "router"),
+                "kb_version": evaluation.get("knowledge_version_override"),
+                "skills_version": evaluation.get("skills_version_override")}
+    for name, value in recorded.items():
+        given = getattr(args, name)
+        if given not in (parser().get_default(name), value):
+            print(f"--resume: the run was started with {name}={value!r}, not {given!r}.")
+            return 2
+        setattr(args, name, value)
+    args.resume_run_id, args.resume_manifest = run_id, manifest
+    return None
+
+
+def _read_jsonl(path: Path) -> list[dict[str, Any]]:
+    if not path.is_file():
+        return []
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def load_resume(layout: Layout, cohort: Sequence[Any], run_id: str) -> dict[str, ConfigRun]:
+    """The finished scenarios of a stopped run, per configuration, after its evidence is copied aside.
+
+    A scenario is finished when every planned turn of it is in the trace exactly once, no turn or ``after_call``
+    of it failed and it is not in ``scenario-errors.jsonl``; its lines, diagnostics and usage are kept as written.
+    Any other scenario is dropped and runs again from its first call. Every scenario starts from an emptied
+    database (:func:`runner.reset`), so the ones kept do not change the ones that run now. Labels are made
+    again after the turns, as in a new run, so old extraction errors are cleared (kept labels hit the cache).
+    """
+    import shutil
+    from collections import Counter
+
+    backup = layout.directory / f"{layout.prefix}resume-backup-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+    backup.mkdir()
+    for path in [*layout.traces.values(), *layout.directory.iterdir()]:
+        if (path.is_file() and path.name.startswith(layout.prefix) and path.name != "run.lock"
+                and not (backup / path.name).exists()):
+            shutil.copy2(path, backup / path.name)
+    layout.directory.joinpath("run.lock").touch()
+
+    expected = {s.scenario_id: {(call.name, turn) for call in s.calls for turn in range(1, len(call.turns) + 2)}
+                for s in cohort}
+    diagnostics = _read_jsonl(layout.side("diagnostics.jsonl"))
+    usage_path = layout.side("usage.json")
+    usage = json.loads(usage_path.read_text(encoding="utf-8")) if usage_path.is_file() else {}
+    stopped = {(item["config"], item["scenario_id"]) for item in _read_jsonl(layout.side("scenario-errors.jsonl"))
+               if item.get("stage") != "extraction"}
+    runs: dict[str, ConfigRun] = {}
+    for config, trace_path in layout.traces.items():
+        rows = _read_jsonl(trace_path)
+        diagnosed = [d for d in diagnostics if d.get("config") == config]
+        if len(rows) != len(diagnosed):
+            raise ValueError(f"{config}: {len(rows)} trace lines but {len(diagnosed)} diagnostics; "
+                             "cannot tell which turns finished. Start a new run.")
+        for row, diagnosis in zip(rows, diagnosed):
+            if row.get("run_id") != run_id or row.get("config") != config:
+                raise ValueError(f"{trace_path} holds a line of another run or configuration; refusing to resume.")
+            if (row["scenario_id"], row["call"], row["turn"]) != (
+                    diagnosis.get("scenario_id"), diagnosis.get("call"), diagnosis.get("turn")):
+                raise ValueError(f"{config}: trace and diagnostics are out of step; start a new run.")
+        counts = Counter(row["scenario_id"] for row in rows)
+        seen: dict[str, set[tuple[str, int]]] = {}
+        for row in rows:
+            seen.setdefault(row["scenario_id"], set()).add((row["call"], row["turn"]))
+        failed = {d["scenario_id"] for d in diagnosed
+                  if d.get("error") or (d.get("after_call") or {}).get("status") == "failed"}
+        done = {sid for sid, keys in seen.items()
+                if sid in expected and keys == expected[sid] and counts[sid] == len(expected[sid])
+                and sid not in failed and (config, sid) not in stopped}
+        run = runs[config] = ConfigRun()
+        for row, diagnosis in zip(rows, diagnosed):
+            if row["scenario_id"] in done:
+                run.rows.append(row)
+                run.diagnostics.append({key: value for key, value in diagnosis.items()
+                                        if not key.startswith("extraction_") and key != "schema_errors"})
+        run.usage = [item for item in usage.get(config, []) if item.get("scenario_id") in done]
+        dropped = sorted(set(seen) - done)
+        print(f"Resume {config}: {len(done)} of {len(cohort)} scenarios kept"
+              + (f", {len(dropped)} partial or failed run again ({', '.join(dropped[:5])}"
+                 + (", ..." if len(dropped) > 5 else "") + ")" if dropped else ""))
+    print(f"Previous evidence copied to {backup}")
+    return runs
+
+
 async def _evaluate_locked(args, **kwargs) -> int:
     from . import runner
 
@@ -436,6 +638,12 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
     from . import report, runner, scenarios, trace
 
     started = datetime.now(timezone.utc)
+    prior: dict[str, ConfigRun] | None = getattr(args, "resumed", None)
+    resumes: list[str] = []
+    if prior is not None:
+        # The run id is when the run first started (local time); every resume is listed after it.
+        started = datetime.strptime(run_id, "%Y%m%d-%H%M%S").astimezone(timezone.utc)
+        resumes = [*getattr(args, "resume_manifest", {}).get("resumes", []), datetime.now(timezone.utc).isoformat()]
     ready, rejected = (args.prepared, []) if hasattr(args, "prepared") else scenarios.load(args.scenarios, set(args.only) or None)
     for item in rejected:
         print(f"  rejected {item.path.name}: {item.reason}")
@@ -451,8 +659,10 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
     _write_json(layout.side("manifest.json"), {"run_id": run_id, "status": "INCOMPLETE",
                 "configs": {config: {"memory": config == "full"} for config in configs}, "database": database,
                 "evaluation": {"profile": args.profile, "knowledge_version_override": args.kb_version,
-                                "skills_version_override": args.skills_version}})
-    runs: dict[str, ConfigRun] = {}
+                                "skills_version_override": args.skills_version},
+                **({"resumes": resumes} if resumes else {})})
+    # On a resume every configuration's kept turns are here from the start, so each write below keeps them all.
+    runs: dict[str, ConfigRun] = dict(prior or {})
     found: dict[str, dict[str, int]] = {}
     extractor = None
     load: list[dict[str, Any]] = []
@@ -465,8 +675,13 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
         await runner.warm_up(rig, ready[0], args.warmup, print)
         for config in configs:
             print(f"{config}:")
-            run = runs[config] = ConfigRun()
+            run = runs.setdefault(config, ConfigRun())
+            kept = {row["scenario_id"] for row in run.rows}
+            if kept:
+                print(f"  {len(kept)} of {len(ready)} scenarios kept from before the resume")
             for scenario in ready:
+                if scenario.scenario_id in kept:
+                    continue
                 result = await runner.run_scenario(rig, scenario, config, run_id=run_id, progress=print)
                 run.rows += result.rows
                 run.diagnostics += result.diagnostics
@@ -526,6 +741,8 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
         warmup=args.warmup, database=database, found=found,
         profile=args.profile, kb_version=args.kb_version, skills_version=args.skills_version,
     )
+    if resumes:
+        record["resumes"] = resumes
     record["status"] = "INCOMPLETE" if report.blocking(found) else "TRACED"
     _write_json(layout.side("manifest.json"), record)
 
@@ -544,7 +761,7 @@ async def _evaluate(args: argparse.Namespace, *, run_id: str, layout: Layout, da
         _write_json(layout.side("manifest.json"), record)
         return 0
     retrieval = _retrieval(layout.side("rag"))
-    code, table = report.grade(frozen, full=layout.traces["full"], baseline=layout.traces["baseline_no_memory"],
+    code, table = report.grade(frozen, full=layout.traces["full"], baseline=layout.traces.get("baseline_no_memory"),
                                out=layout.side("report.json"), rag=layout.side("rag") / "rag_results.json")
     if code != 0:
         record.update(status="INCOMPLETE", failure={"stage": "scoring", "exit_code": code})

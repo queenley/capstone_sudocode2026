@@ -43,7 +43,9 @@ COPY apps/ai-agent-service/data/btc/ /app/agent/data/btc/
 COPY contracts/scenario/scenario-keys.yaml /app/agent/contracts/scenario/scenario-keys.yaml
 COPY apps/ai-agent-service/data/kb/ /app/agent/data/kb/
 
-RUN useradd --create-home app && mkdir -p /app/models /app/agent/runs \
+# data/skills and data/improvement exist here, owned by app, so the named volumes compose mounts on them
+# (docker-compose.yml) start writable by the agent.
+RUN useradd --create-home app && mkdir -p /app/models /app/agent/runs /app/agent/data/skills /app/agent/data/improvement \
     && chown -R app:app /app
 USER app
 VOLUME ["/app/models"]

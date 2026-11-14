@@ -12,15 +12,16 @@ Một trang để biết một con số RQR, CCR, TSR hay HR đến từ đâu. 
 
 ### 2.1. Profile cho nhiều phép đo
 
-`run_eval.py` có ba profile cho cùng một đường chấm:
+`run_eval.py` có bốn profile cho cùng một đường chấm:
 
 | Profile | Lệnh bổ sung | Biến thể được đo |
 |---|---|---|
 | `router` | `--profile router` hoặc bỏ qua | Knowledge và skills đang active |
 | `gaploop` | `--profile gaploop --kb-version N` | Knowledge `data/kb/v<N>.jsonl` |
 | `reflection` | `--profile reflection --skills-version N` | Skills `data/skills/v<N>.yaml`; `0` là prompt gốc |
+| `combined` | `--profile combined --kb-version N --skills-version M` | Cả hai cùng lúc: GapLoop + Reflection |
 
-Profile được ghi trong `manifest.json` cùng các version override. Nó không thay `reference_eval.py`, không trộn trace giữa các run và không tự phê duyệt thay đổi. Vòng học/phê duyệt nằm ở `pipeline/improve`; sau đó đo R0/R1 trên cohort frozen bằng các profile tương ứng rồi dùng `--report --run ...` để ghép bảng. Vì vậy một cột Reflection chỉ có ý nghĩa khi skills version khác Router, và một cột GapLoop chỉ có ý nghĩa khi knowledge version khác Router.
+Profile được ghi trong `manifest.json` cùng các version override. Nó không thay `reference_eval.py`, không trộn trace giữa các run và không tự phê duyệt thay đổi. Vòng học/phê duyệt nằm ở `pipeline/improve`; sau đó đo R0/R1 trên cohort frozen bằng các profile tương ứng rồi dùng `--report --run ...` để ghép bảng. Vì vậy một cột Reflection chỉ có ý nghĩa khi skills version khác Router, một cột GapLoop chỉ có ý nghĩa khi knowledge version khác Router, và cột Kết hợp cần cả hai. `gaploop` từ chối `--skills-version`, `reflection` từ chối `--kb-version`, để mỗi cột một phương pháp chỉ đổi đúng phần đó (ablation). Ghi chú của `--report` so version override trong manifest, không so `knowledge_sha256`: hash này chỉ tính trên `policy/*.md` của BTC, không đổi theo version đã học.
 
 Sơ đồ dưới đây cho thấy cách tạo và ghép ba phép đo:
 

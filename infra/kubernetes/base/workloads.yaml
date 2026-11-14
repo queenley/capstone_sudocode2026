@@ -55,6 +55,9 @@ spec:
             - name: REDIS_URL
               valueFrom:
                 secretKeyRef: {name: telesales-secrets, key: REDIS_URL}
+            # Behind the ingress: the client is the right-most X-Forwarded-For address outside these ranges.
+            - name: FORWARDED_ALLOW_IPS
+              value: 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true

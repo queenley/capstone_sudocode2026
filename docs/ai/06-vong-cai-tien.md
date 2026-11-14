@@ -11,6 +11,19 @@ Mã nguồn: [`pipeline/improve/cli.py`](../../apps/ai-agent-service/src/ai_agen
 
 ---
 
+## 0. Vòng chứng minh và vòng hằng tuần
+
+Trang này chủ yếu mô tả **vòng chứng minh** `improve round`: nó bắt đầu từ version 0, đo trước và sau, rồi đưa agent về version 0. Vòng này dùng để chứng minh cơ chế học hoạt động.
+
+**Vòng hằng tuần** chạy trên agent đang phục vụ, bằng `pipeline/improve/weekly.py`, theo lịch Airflow (`infra/airflow/dags/improvement_weekly.py`):
+
+1. Đo bộ frozen với version đang chạy.
+2. Học, rồi đưa các đề xuất lên `/admin` cho admin duyệt.
+3. Đo version ứng viên.
+4. Admin xem phép đo rồi mới bấm bật; vòng không tự bật version nào.
+
+Thiết kế, các bảng database và chỗ còn khác kế hoạch: [docs/plan/001](../plan/001-vong-cai-tien-hang-tuan-va-dashboard.md).
+
 ## 1. Một vòng (`improve round`)
 
 Một vòng chạy những bước nào, và bước nào gọi model?

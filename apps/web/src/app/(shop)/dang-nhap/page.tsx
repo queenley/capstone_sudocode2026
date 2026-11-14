@@ -37,15 +37,11 @@ export default function LoginPage() {
         }}
       >
         <PhoneInput value={phone} onChange={setPhone} />
-        <PasswordInput label="Mật khẩu" value={password} onChange={setPassword} />
-        <div className="s-row s-row-between">
-          <button className="s-btn" disabled={busy}>
-            {busy ? "Đang đăng nhập…" : "Đăng nhập"}
-          </button>
-          <Link href="/quen-mat-khau" className="s-link-btn">
-            Quên mật khẩu?
-          </Link>
-        </div>
+        <PasswordInput label="Mật khẩu" value={password} onChange={setPassword}
+          aside={<Link href="/quen-mat-khau" className="s-field-link">Quên mật khẩu?</Link>} />
+        <button className="s-btn s-auth-submit" disabled={busy}>
+          {busy ? "Đang đăng nhập…" : "Đăng nhập"}
+        </button>
         <ErrorLine error={error} />
       </form>
     </AuthCard>

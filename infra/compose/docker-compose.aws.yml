@@ -1,0 +1,175 @@
+# AWS, phase 2 (docs/deployment/aws-plan.md, section 3): the same stack on every EC2 of the Auto Scaling group,
+# behind an ALB, with RDS for PostgreSQL and EFS for the agent's shared files. The instance's user data
+# (infra/terraform/aws/templates/user_data.sh.tftpl) writes .env and runs:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.aws.yml pull
+#   docker compose -f docker-compose.yml -f docker-compose.aws.yml up -d --no-build
+#
+# What differs from the one-server cloud file (docker-compose.cloud.yml):
+# - no caddy: the ALB holds TLS (ACM) and routes /api/* to the gateway, the rest to web; only those two publish a port;
+# - no postgres: DATABASE_URL points at RDS. Migrations and the catalog seed run once per release as an ECS task
+#   (.github/workflows/deploy-aws.yml), not on each instance;
+# - images come from ECR at one immutable tag (IMAGE_TAG), so every instance runs the same release; nothing is built;
+# - skills, improvement state and knowledge versions live on EFS (EFS_DIR), shared by every instance and the weekly
+#   improvement task; the embedding and voice weights stay on the instance's disk (voice-models);
+# - logs go to CloudWatch Logs (awslogs).
+# Needs Docker Compose 2.24 or later (!reset, !override).
+
+x-logging: &logging
+  driver: awslogs
+  options:
+    awslogs-region: ${AWS_REGION:?set AWS_REGION}
+    awslogs-group: ${LOG_GROUP:?set LOG_GROUP}
+    tag: "${INSTANCE_ID:-local}/{{.Name}}"
+
+# Merged over the development defaults of docker-compose.yml's x-runtime environment.
+x-secrets: &secrets
+  DATABASE_URL: ${DATABASE_URL:?set DATABASE_URL (RDS, sslmode=require)}
+  APP_SECRET: ${APP_SECRET:?set APP_SECRET (changing it later makes stored PII unreadable)}
+  ENCRYPTION_KEY: ${ENCRYPTION_KEY:?set ENCRYPTION_KEY (a Fernet key)}
+  ENVIRONMENT: ${ENVIRONMENT:-production}
+  ADMIN_TOKEN: ${ADMIN_TOKEN:?set ADMIN_TOKEN}
+  AGENT_TOKEN: ${AGENT_TOKEN:?set AGENT_TOKEN}
+  SELLER_TOKEN: ${SELLER_TOKEN:?set SELLER_TOKEN}
+  DEVELOPER_TOKEN: ${DEVELOPER_TOKEN:?set DEVELOPER_TOKEN}
+
+services:
+  # RDS replaces it; the profile keeps it from ever starting.
+  postgres:
+    profiles: ["local-database"]
+  # Run once per release by the deploy workflow, as an ECS task.
+  seed:
+    profiles: ["release-task"]
+
+  redis:
+    restart: unless-stopped
+    logging: *logging
+
+  commerce-service:
+    build: !reset null
+    image: ${ECR_REGISTRY:?set ECR_REGISTRY}/telesales-commerce:${IMAGE_TAG:?set IMAGE_TAG}
+    environment: *secrets
+    depends_on: !reset {}
+    restart: unless-stopped
+    logging: *logging
+  identity-service:
+    build: !reset null
+    image: ${ECR_REGISTRY}/telesales-identity:${IMAGE_TAG}
+    environment: *secrets
+    depends_on: !reset {}
+    restart: unless-stopped
+    logging: *logging
+  sales-service:
+    build: !reset null
+    image: ${ECR_REGISTRY}/telesales-sales:${IMAGE_TAG}
+    environment: *secrets
+    depends_on: !reset {}
+    restart: unless-stopped
+    logging: *logging
+
+  # Written out one by one: a YAML alias would not carry the !reset and !override tags.
+  commerce-events:
+    build: !reset null
+    image: ${ECR_REGISTRY}/telesales-backend-common:${IMAGE_TAG}
+    environment: *secrets
+    depends_on: !override
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    logging: *logging
+  identity-events:
+    build: !reset null
+    image: ${ECR_REGISTRY}/telesales-backend-common:${IMAGE_TAG}
+    environment: *secrets
+    depends_on: !override
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    logging: *logging
+  sales-events:
+    build: !reset null
+    image: ${ECR_REGISTRY}/telesales-backend-common:${IMAGE_TAG}
+    environment: *secrets
+    depends_on: !override
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    logging: *logging
+  ai-agent-events:
+    build: !reset null
+    image: ${ECR_REGISTRY}/telesales-backend-common:${IMAGE_TAG}
+    environment: *secrets
+    depends_on: !override
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    logging: *logging
+
+  asr-service:
+    build: !reset null
+    image: ${ECR_REGISTRY}/telesales-asr:${IMAGE_TAG}
+    environment:
+      ASR_API_KEY: ${ASR_API_KEY:-}
+    deploy:
+      # A GPU host by default (ASR_URL); ASR_LOCAL=1 runs it on this instance's CPU.
+      replicas: ${ASR_LOCAL:-0}
+    restart: unless-stopped
+    logging: *logging
+
+  ai-agent-service:
+    build: !reset null
+    image: ${ECR_REGISTRY}/telesales-ai-agent:${IMAGE_TAG}
+    environment:
+      <<: *secrets
+      VOICE_TTS: ${VOICE_TTS:-openai:coral}
+      ASR_URL: ${ASR_URL:-http://asr-service:8500}
+      ASR_API_KEY: ${ASR_API_KEY:-}
+      HOTLINE_BRIDGE_KEY: ${HOTLINE_BRIDGE_KEY:?set HOTLINE_BRIDGE_KEY}
+      SHOP_PUBLIC_URL: https://${DOMAIN:?set DOMAIN}
+      ZALO_WEBHOOK_INSECURE: "0"
+      ZALO_OPENAPI_URL: ""
+      ZALO_OAUTH_URL: ""
+    volumes: !override
+      - voice-models:/app/models
+      # EFS, mounted on the instance by its user data; the same directories the weekly improvement task mounts.
+      - ${EFS_DIR:-/mnt/efs}/skills:/app/agent/data/skills
+      - ${EFS_DIR:-/mnt/efs}/improvement:/app/agent/data/improvement
+      - ${EFS_DIR:-/mnt/efs}/kb:/app/agent/data/kb
+    depends_on: !reset {}
+    restart: unless-stopped
+    logging: *logging
+
+  api-gateway:
+    build: !reset null
+    image: ${ECR_REGISTRY}/telesales-gateway:${IMAGE_TAG}
+    environment:
+      CORS_ORIGINS: https://${DOMAIN}
+      # The ALB is the connecting client: the real one is the right-most X-Forwarded-For address outside the VPC.
+      FORWARDED_ALLOW_IPS: 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+    ports:
+      - "8000:8000"
+    depends_on: !override
+      commerce-service:
+        condition: service_healthy
+      identity-service:
+        condition: service_healthy
+      sales-service:
+        condition: service_healthy
+      ai-agent-service:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    logging: *logging
+
+  web:
+    build: !reset null
+    # NEXT_PUBLIC_* are baked in at build time: the deploy workflow builds web with DOMAIN's voice URL.
+    image: ${ECR_REGISTRY}/telesales-web:${IMAGE_TAG}
+    ports:
+      - "3000:3000"
+    depends_on: !override
+      api-gateway:
+        condition: service_healthy
+    restart: unless-stopped
+    logging: *logging

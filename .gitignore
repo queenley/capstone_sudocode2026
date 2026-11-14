@@ -20,6 +20,7 @@ infra/terraform/**/.terraform/
 *.tfstate
 *.tfstate.*
 *.tfvars
+infra/terraform/**/backend.hcl
 
 # Local data-generation environment and generated artifacts
 evaluation/data-generation/.venv/
@@ -60,6 +61,9 @@ evaluation/agent-evaluation/runs/
 
 # User-supplied private ASR hard-test audio and references
 data/seed/catalog/asr_hard_vi/
+
+# Synthetic D01–D04 audio from scripts/asr/elevenlabs_d01_d04.py (paid to regenerate; cache included)
+data/dev/asr_elevenlabs/
 
 # A label revision being built (ground-truth-review/SKILL.md) stays local until it replaces data/dev or data/test.
 # Its build script and the reviewer's notes (ground-truth-review/notes/) are in git; the script rebuilds it.

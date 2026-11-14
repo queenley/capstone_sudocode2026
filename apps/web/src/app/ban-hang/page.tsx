@@ -80,8 +80,12 @@ export default function SalesPage() {
   // The call the bell opened, for the console (``at``: the same call can be opened again).
   const [focus, setFocus] = useState<{ id: number; at: number } | null>(null);
 
+  // The role the login returned: only decides which links to other workspaces are shown; the API still checks.
+  const [role, setRole] = useState("");
+
   useEffect(() => {
     setToken(sessionStorage.getItem("staff-token") || "");
+    setRole(sessionStorage.getItem("staff-role") || "");
     const wanted = new URLSearchParams(window.location.search).get("tab") as Tab | null;
     if (wanted && TABS.some((t) => t.id === wanted)) setTab(wanted);
   }, []);
@@ -161,15 +165,20 @@ export default function SalesPage() {
         </nav>
         <span className="sl-side-label">Hệ thống</span>
         <div className="sl-side-foot">
-          <Link href="/developer">
-            <Icon name="console" /> Agent Console
-          </Link>
-          <Link href="/admin">
-            <Icon name="admin" /> Quản trị
-          </Link>
+          {(role === "admin" || role === "developer") && (
+            <Link href="/developer">
+              <Icon name="console" /> Agent Console
+            </Link>
+          )}
+          {role === "admin" && (
+            <Link href="/admin">
+              <Icon name="admin" /> Quản trị
+            </Link>
+          )}
           <button
             onClick={() => {
               sessionStorage.removeItem("staff-token");
+              sessionStorage.removeItem("staff-role");
               setToken("");
             }}
           >

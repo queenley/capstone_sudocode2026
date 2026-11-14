@@ -1,12 +1,18 @@
 "use client";
-import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import ProductListing from "@/components/product/ProductListing";
+import Icon from "@/components/ui/Icon";
 import { fetchProducts, ShopProduct } from "@/lib/catalog";
 import { shopContext } from "@/lib/shop-context";
 
+/** Common searches offered when the box is empty: the shop's departments, as a customer types them. */
+const SUGGEST = ["máy lọc không khí", "máy lọc nước", "nồi chiên", "quạt", "giày", "áo khoác", "xe đẩy"];
+
 function Results() {
   const q = useSearchParams().get("q") || "";
+  const router = useRouter();
   const [products, setProducts] = useState<ShopProduct[] | null>(null);
   const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
@@ -31,8 +37,34 @@ function Results() {
   }, [q, attempt]);
 
   return (
-    <div className="s-wrap s-page">
-      <h1 className="s-page-title">Kết quả cho “{q}”</h1>
+    <div className="s-wrap s-page s-search-page">
+      {/* The page's own search box (shop.css, "the search page"): the words searched stay in it, and with
+          none the page lists everything under a few common searches. */}
+      <header className="s-search-head">
+        <h1 className="s-search-title">
+          {q ? <>Kết quả cho <span className="s-search-q">“{q}”</span></> : "Tìm sản phẩm"}
+        </h1>
+        <form
+          role="search"
+          className="s-search"
+          onSubmit={(event) => {
+            event.preventDefault();
+            const value = String(new FormData(event.currentTarget).get("q") || "").trim();
+            router.push(value ? `/tim-kiem?q=${encodeURIComponent(value)}` : "/tim-kiem");
+          }}
+        >
+          <Icon name="search" />
+          <input key={q} type="search" name="q" defaultValue={q} placeholder="Máy lọc, nồi chiên, giày chạy bộ…" aria-label="Tìm sản phẩm" />
+          <button type="submit">Tìm</button>
+        </form>
+        {!q && (
+          <ul className="s-search-chips" aria-label="Tìm nhanh">
+            {SUGGEST.map((word) => (
+              <li key={word}><Link href={`/tim-kiem?q=${encodeURIComponent(word)}`}>{word}</Link></li>
+            ))}
+          </ul>
+        )}
+      </header>
       <ProductListing
         products={products}
         error={error}

@@ -152,10 +152,14 @@ async def connection() -> AsyncIterator[Any]:
 
 async def init_db() -> None:
     """Create the schema and the call tables. Safe to run on every start."""
+    from . import evaluations
+
     await asyncio.to_thread(ensure_schema)
     try:
         async with connection() as conn:
             await conn.execute(SCHEMA, prepare=False)
+            # The evaluation history and the weekly rounds the admin reviews (runtime/evaluations.py).
+            await conn.execute(evaluations.SCHEMA, prepare=False)
     except (psycopg.errors.UniqueViolation, psycopg.errors.DuplicateTable, psycopg.errors.DuplicateObject):
         logger.info("Another process created the agent tables first; continuing")
 

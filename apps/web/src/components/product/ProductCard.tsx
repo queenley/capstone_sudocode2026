@@ -50,7 +50,7 @@ export default function ProductCard({ product }: { product: ShopProduct }) {
             {soldOut ? "Xem chi tiết" : "Chọn phân loại"}
           </Link>
         )}
-        {single && !soldOut && <p className="s-card-confirmation" role="status">{added > 0 && <Link href="/gio-hang">Đã thêm {added} · Xem giỏ hàng →</Link>}</p>}
+        {single && !soldOut && <p className="s-card-confirmation" role="status">{added > 0 && <Link key={added} href="/gio-hang">Đã thêm {added} · Xem giỏ hàng →</Link>}</p>}
       </div>
     </article>
   );

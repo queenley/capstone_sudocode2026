@@ -69,8 +69,12 @@ def active(folder: Path | None = None) -> int:
     return skill_book.active_version(folder or skill_book.versions_dir())
 
 
-def publish(patches: Sequence[Mapping[str, Any]], *, reviewer: str, note: str = "", folder: Path | None = None) -> int:
-    """The version in force with *patches*, as the next version; never edits a file that exists."""
+def publish(patches: Sequence[Mapping[str, Any]], *, reviewer: str, note: str = "", folder: Path | None = None,
+            activate: bool = True) -> int:
+    """The version in force with *patches*, as the next version; never edits a file that exists.
+
+    ``activate=False`` writes the version as a candidate only: the weekly round measures it with
+    ``run_eval.py --skills-version`` before an admin switches it on (:func:`activate`)."""
     if not reviewer.strip():
         raise ValueError("Publishing needs the reviewer who approved the change")
     where = folder or skill_book.versions_dir()
@@ -81,10 +85,28 @@ def publish(patches: Sequence[Mapping[str, Any]], *, reviewer: str, note: str = 
         book = apply(book, patch)
     target = max([current, *_versions(where)]) + 1
     atomic_text(where / f"v{target}.yaml", yaml.safe_dump(book, allow_unicode=True, sort_keys=False, width=110))
-    atomic_text(where / skill_book.ACTIVE, json.dumps({"version": target}))
-    review.log("publish_skills", version=target, previous=current, reviewer=reviewer, note=note,
+    if activate:
+        atomic_text(where / skill_book.ACTIVE, json.dumps({"version": target}))
+    review.log("publish_skills" if activate else "candidate_skills", version=target, previous=current,
+               reviewer=reviewer, note=note,
                patches=[{k: p.get(k) for k in ("skill", "part", "find", "text", "cites")} for p in patches])
     return target
+
+
+def activate(version: int, *, reviewer: str, note: str = "", folder: Path | None = None) -> int:
+    """Switch a candidate written by ``publish(activate=False)`` on; returns the version it replaces.
+
+    The running service reads the skills when it starts (``components/context/skills.py``), so it serves the new
+    version after a restart."""
+    where = folder or skill_book.versions_dir()
+    if version not in _versions(where):
+        raise ValueError(f"No skills version {version}")
+    if not reviewer.strip():
+        raise ValueError("Switching a version on needs the reviewer")
+    previous = active(where)
+    atomic_text(where / skill_book.ACTIVE, json.dumps({"version": version}))
+    review.log("activate_skills", version=version, previous=previous, reviewer=reviewer, note=note)
+    return previous
 
 
 def rollback(to: int, *, reviewer: str, reason: str, folder: Path | None = None) -> int:

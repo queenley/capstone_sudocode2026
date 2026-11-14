@@ -100,6 +100,19 @@ def parser() -> argparse.ArgumentParser:
     round_.add_argument("--approved", action="store_true", help="Go on after a person filled the review files")
     round_.add_argument("--deadline-minutes", type=float, default=90.0,
                         help="The watchdog ends the round past this, as it does at the spend limit (llm/spend_guard.py)")
+    # The weekly round (pipeline/improve/weekly.py): learn, wait for the admin, measure; never switches a version on.
+    w_learn = commands.add_parser("weekly-learn", help="This week: measure R0, learn, file proposals for the admin")
+    w_status = commands.add_parser("weekly-status", help="Exit 0 once no proposal of the week waits for the admin")
+    w_measure = commands.add_parser("weekly-measure", help="Approved changes as a candidate version, measured (R1)")
+    for sub in (w_learn, w_status, w_measure):
+        sub.add_argument("--week", help="ISO week, e.g. 2026-W46 (default: this week)")
+    for sub in (w_learn, w_measure):
+        sub.add_argument("--frozen", type=Path, action="append", default=[], required=True,
+                         help="A frozen set's scenarios directory; repeat")
+    w_learn.add_argument("--learn", type=Path, action="append", default=[], required=True,
+                         help="A learning set's scenarios directory; repeat")
+    w_learn.add_argument("--frozen-ids", type=Path, action="append", default=[], required=True,
+                         help="A JSON list of frozen ids, so the loop never learns from what it is measured on")
     return parser
 
 
@@ -128,10 +141,27 @@ def main(argv: Sequence[str] | None = None) -> int:
             return compare(args.before, args.after)
         if args.command == "round":
             return asyncio.run(run_round(args))
+        if args.command.startswith("weekly-"):
+            return _weekly(args)
     except (OSError, KeyError, ValueError) as error:
         print(error)
         return 2
     return 2
+
+
+def _weekly(args: argparse.Namespace) -> int:
+    from ...mcp.server_base import use_selector_loop_on_windows
+    from . import weekly
+
+    use_selector_loop_on_windows()  # psycopg's async connection refuses Windows' default event loop
+    week = weekly.iso_week(args.week)
+    frozen = [path.resolve() for path in getattr(args, "frozen", [])]
+    if args.command == "weekly-learn":
+        return asyncio.run(weekly.learn(week, learn_sets=[p.resolve() for p in args.learn], frozen_sets=frozen,
+                                        frozen_ids=args.frozen_ids))
+    if args.command == "weekly-status":
+        return asyncio.run(weekly.status(week))
+    return asyncio.run(weekly.measure(week, frozen_sets=frozen))
 
 
 # ── a run on disk ─────────────────────────────────────────────────────────
@@ -597,37 +627,56 @@ def compare(before: Sequence[Path], after: Sequence[Path]) -> int:
     in some runs of a side is the agent varying, not the change: it is listed as unstable and counted on neither side
     (2026-11-10: a transfer that already happened in one of two runs before was reported as broken by the lesson).
     """
+    result = comparison(before, after)
+    print(f"{'':<20}{'before':>22}{'after':>22}")
+    for name, cells in result["metrics"].items():
+        print(f"{name:<20}{cells['before']:>22}{cells['after']:>22}")
+    conduct, calls = result["conduct"], result["calls"]
+    print(f"{'conduct failures':<20}{conduct['before']:>22.3g}{conduct['after']:>22.3g}   (mean per run, {calls} calls)")
+    if not result["same_calls"]:
+        print(f"Only the {calls} calls every run played are compared call by call.")
+    for label in ("fixed", "broken", "unstable"):
+        print(f"{label}: {len(result[label])}")
+        for item in result[label]:
+            print(f"  {item['scenario_id']} {item['call']} {item['code']}  (before {item['before']:.0%}, "
+                  f"after {item['after']:.0%})")
+    if result["harm"]:
+        print(f"HARM: {len(result['harm'])} new violations; roll the skills back (improve rollback) and run the set again.")
+    return 0
+
+
+def comparison(before: Sequence[Path], after: Sequence[Path]) -> dict[str, Any]:
+    """What :func:`compare` prints, as data: each metric's cell per side, conduct failures, the checks fixed, broken
+    and unstable call by call, and the broken ones that are violations (``harm``). The weekly round keeps it with
+    the round, for the admin to read before switching a version on."""
     sides = {"before": list(before), "after": list(after)}
     reports = {side: [json.loads(_report(run).read_text(encoding="utf-8"))["system"] for run in runs]
                for side, runs in sides.items()}
-    print(f"{'':<20}{'before':>22}{'after':>22}")
+    metrics: dict[str, dict[str, str]] = {}
     for name, read in METRICS:
-        cells = []
+        cells = {}
         for side in sides:
             values = [read(report) for report in reports[side]]
             numbers = [v for v in values if isinstance(v, (int, float))]
-            cells.append(f"{mean(numbers):.3g} [{min(numbers):.3g}-{max(numbers):.3g}]" if len(numbers) > 1
-                         else str(values[0]))
-        print(f"{name:<20}{cells[0]:>22}{cells[1]:>22}")
+            cells[side] = (f"{mean(numbers):.3g} [{min(numbers):.3g}-{max(numbers):.3g}]" if len(numbers) > 1
+                           else str(values[0]))
+        metrics[name] = cells
     measured = {side: _failed_share(runs) for side, runs in sides.items()}
     shares = {side: measured[side][0] for side in sides}
     both = measured["before"][1] & measured["after"][1]
     # What Reflection learns from, counted the same way on both sides: the checks of conduct the grader makes in code.
-    conduct = [sum(share for key, share in shares[side].items() if signals.route(key[2]) == "behaviour" and key[:2] in both)
-               for side in sides]
-    print(f"{'conduct failures':<20}{conduct[0]:>22.3g}{conduct[1]:>22.3g}   (mean per run, {len(both)} calls)")
-    if both != measured["before"][1] | measured["after"][1]:
-        print(f"Only the {len(both)} calls every run played are compared call by call.")
+    conduct = {side: sum(share for key, share in shares[side].items()
+                         if signals.route(key[2]) == "behaviour" and key[:2] in both) for side in sides}
     changes = changed(shares["before"], shares["after"], both)
-    for label in ("fixed", "broken", "unstable"):
-        print(f"{label}: {len(changes[label])}")
-        for scenario, call, code in changes[label]:
-            print(f"  {scenario} {call} {code}  (before {shares['before'].get((scenario, call, code), 0):.0%}, "
-                  f"after {shares['after'].get((scenario, call, code), 0):.0%})")
-    harm = [key for key in changes["broken"] if violated([key[2]])]
-    if harm:
-        print(f"HARM: {len(harm)} new violations; roll the skills back (improve rollback) and run the set again.")
-    return 0
+
+    def rows(keys: Iterable[Check]) -> list[dict[str, Any]]:
+        return [{"scenario_id": s, "call": c, "code": code, "before": shares["before"].get((s, c, code), 0),
+                 "after": shares["after"].get((s, c, code), 0)} for s, c, code in keys]
+
+    return {"metrics": metrics, "conduct": conduct, "calls": len(both),
+            "same_calls": both == measured["before"][1] | measured["after"][1],
+            **{label: rows(changes[label]) for label in ("fixed", "broken", "unstable")},
+            "harm": rows(key for key in changes["broken"] if violated([key[2]]))}
 
 
 Check = tuple[str, str, str]
@@ -662,21 +711,31 @@ def _label(scenarios: Path) -> str:
     return scenarios.parent.parent.name if scenarios.name == "scenarios" else scenarios.name
 
 
-def _evaluate(scenarios: Path, out: Path) -> Path:
-    """One run of the evaluation command on *scenarios*, then the organisers' table beside its trace."""
+def _evaluate(scenarios: Path, out: Path, extra: Sequence[str] = ()) -> Path:
+    """One run of the evaluation command on *scenarios*, then the organisers' table beside its trace.
+
+    *extra* goes to ``run_eval.py`` as is: the weekly round measures a candidate with
+    ``("--profile", "reflection", "--skills-version", "<N>")``."""
+    import os
     import subprocess
     import sys
 
+    # The organisers' script prints Vietnamese; on Windows a redirected stdout defaults to cp1252 and crashes it.
+    env = {**os.environ, "PYTHONIOENCODING": "utf-8", "PYTHONUTF8": "1"}
     out.mkdir(parents=True, exist_ok=True)
     manifest = out / "full.manifest.json"
     finished = manifest.is_file() and json.loads(manifest.read_text(encoding="utf-8")).get("finished_at")
     if not finished:  # a run that finished is never paid for again; one that stopped is run again from the start
+        if any(out.iterdir()):  # run_eval.py never writes over evidence: the stopped run is kept beside, not deleted
+            stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+            out.rename(out.with_name(f"{out.name}.stopped-{stamp}"))
+            out.mkdir(parents=True)
         subprocess.run([sys.executable, str(REPOSITORY / "run_eval.py"), "--scenarios", str(scenarios), "--config", "full",
-                        "--out", str(out / "full.jsonl")], cwd=REPOSITORY, check=True)
+                        "--out", str(out / "full.jsonl"), *extra], cwd=REPOSITORY, check=True, env=env)
     if not (out / "report.json").is_file():
         subprocess.run([sys.executable, str(btc_data_dir() / "eval" / "reference_eval.py"), "--scenarios",
                         str(out / "full.scenarios"), "--trace", str(out / "full.jsonl"), "--out", str(out / "report.json")],
-                       cwd=REPOSITORY, check=True, stdout=subprocess.DEVNULL)
+                       cwd=REPOSITORY, check=True, stdout=subprocess.DEVNULL, env=env)
     return out
 
 

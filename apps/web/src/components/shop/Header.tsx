@@ -73,15 +73,16 @@ export default function Header() {
                 </Link>
                 {cards.length > 0 && (
                   <div className="nav__menu">
-                    <div className="wrap grid">
-                      {rest.length > 0 && (
-                        <div className="menu-col span-3">
-                          <p className="t-label">Thêm trong {categoryName(dept.slug).toLowerCase()}</p>
-                          {rest.map((child) => <Link key={child} href={`/danh-muc/${child}`}>{categoryName(child)}</Link>)}
-                        </div>
-                      )}
+                    {/* Every department's panel has the same shape (shop.css, "the departments' panels"): a
+                        narrow column of words, then four picture slots of one size, whatever the count. */}
+                    <div className="wrap grid s-mega">
+                      <div className="menu-col span-3">
+                        <p className="t-label">{categoryName(dept.slug)}</p>
+                        {rest.map((child) => <Link key={child} href={`/danh-muc/${child}`}>{categoryName(child)}</Link>)}
+                        <Link className="s-mega__all" href={`/danh-muc/${dept.slug}`}>Xem tất cả {categoryName(dept.slug).toLowerCase()} →</Link>
+                      </div>
                       {cards.map((child) => (
-                        <Link key={child} className={`menu-card ${rest.length ? "span-3" : "span-4"}`} href={`/danh-muc/${child}`}>
+                        <Link key={child} className="menu-card span-3" href={`/danh-muc/${child}`}>
                           <div className="panel"><img className="frame__img" src={PICTURE[child]} alt="" /></div>
                           <span className="t-card">{categoryName(child)}</span>
                         </Link>
@@ -101,9 +102,9 @@ export default function Header() {
             {status === "signed-in" ? firstName(account) : "Đăng nhập"}
           </Link>
           <Link className="nav__link" href="/gio-hang" aria-label={`Giỏ hàng, ${count} sản phẩm`}>
-            Giỏ hàng{count > 0 ? ` (${count})` : ""}
+            Giỏ hàng{count > 0 && <> (<span key={count} className="nav__count">{count}</span>)</>}
           </Link>
-          <button className="btn btn--primary" type="button" onClick={() => shopContext.openChat()}>{MAIN_ACTION}</button>
+          {/* <button className="btn btn--primary" type="button" onClick={() => shopContext.openChat()}>{MAIN_ACTION}</button> */}
         </div>
         <button
           ref={menuButton}

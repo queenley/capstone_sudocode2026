@@ -10,6 +10,8 @@ import { api } from "@/services/api";
 function destination(role: string): string {
   const next = new URLSearchParams(window.location.search).get("next") || "";
   if (next.startsWith("/") && !next.startsWith("//")) return next;
+  // Each role has its own home: the admin's is not the sales team's.
+  if (role === "admin") return "/admin";
   return role === "developer" ? "/developer" : "/ban-hang";
 }
 

@@ -19,12 +19,19 @@ COLUMNS = {
     "subagent": "Agent Harness (Subagent)",
     "gaploop": "Agent Harness (GapLoop)",
     "reflection": "Agent Harness (Reflection)",
+    "combined": "Agent Harness (GapLoop + Reflection)",
     "ab": "Agent Harness (A/B Testing)",
 }
 #: Columns the agent has no mode for yet: a run of it would be the Router again.
 NOT_BUILT = {"subagent": "Subagent", "ab": "A/B Testing"}
-#: Columns that differ from the Router only in the approved entries of the knowledge version.
-FROM_KNOWLEDGE = {"gaploop": "GapLoop", "reflection": "Reflection"}
+#: The columns that are the Router plus a learned version, and which they change: (label, knowledge, skills). Each
+#: changes exactly what it says and nothing else, so the four columns read as an ablation: Router, each mechanism
+#: alone, both together.
+VARIANTS = {
+    "gaploop": ("GapLoop", True, False),
+    "reflection": ("Reflection", False, True),
+    "combined": ("GapLoop + Reflection", True, True),
+}
 AGENT_METRICS = (
     ("1. Repeat-Question Rate (RQR)", "repeat_question_rate", None),
     ("2. Context Carryover Rate (CCR)", "context_carryover_rate", None),
@@ -171,29 +178,43 @@ def _scenario_set(manifest: Mapping[str, Any]) -> Any:
     return scenarios.get("files") if isinstance(scenarios, Mapping) else scenarios
 
 
+def _versions(manifest: Mapping[str, Any]) -> tuple[Any, Any]:
+    """The knowledge and skills version a run read: its override, or the knowledge version in force (skills: active)."""
+    evaluation = manifest.get("evaluation") or {}
+    knowledge = evaluation.get("knowledge_version_override")
+    if knowledge is None:
+        knowledge = (manifest.get("knowledge") or {}).get("version")
+    return knowledge, evaluation.get("skills_version_override")
+
+
 def notes(runs: Mapping[str, Path]) -> list[str]:
     """Why a cell is empty, and which columns must not be read side by side."""
     found = [f"{label}: agent chưa có chế độ này, nên cột không có số." for name, label in NOT_BUILT.items() if name not in runs]
     manifests = {name: _json(directory / "manifest.json") or {} for name, directory in runs.items()}
     router = manifests.get("router") or {}
-    expected_profiles = {"router": "router", "gaploop": "gaploop", "reflection": "reflection"}
     for name, manifest in manifests.items():
         profile = (manifest.get("evaluation") or {}).get("profile")
-        expected = expected_profiles.get(name)
-        if profile and expected and profile != expected:
-            found.append(f"{COLUMNS[name]}: nhãn cột là {expected} nhưng manifest ghi profile {profile}.")
-    for name, label in FROM_KNOWLEDGE.items():
+        if profile and name in ("router", *VARIANTS) and profile != name:
+            found.append(f"{COLUMNS[name]}: nhãn cột là {name} nhưng manifest ghi profile {profile}.")
+    router_knowledge, router_skills = _versions(router)
+    for name, (label, knowledge, skills) in VARIANTS.items():
         if name not in runs:
-            requirement = "knowledge version có mục đã duyệt, rồi chạy với --kb-version <N>" if name == "gaploop" \
-                else "skills version đã duyệt, rồi chạy với --skills-version <N>"
-            found.append(f"{label}: chưa có run; cần {requirement}.")
-        elif manifests[name].get("knowledge_sha256") == router.get("knowledge_sha256"):
-            found.append(f"{label}: cùng knowledge với Router, nên số này chỉ là chạy lại Router.")
-    reflection = manifests.get("reflection") or {}
-    reflection_version = (reflection.get("evaluation") or {}).get("skills_version_override")
-    router_version = (router.get("evaluation") or {}).get("skills_version_override")
-    if "reflection" in manifests and reflection_version is not None and reflection_version == router_version:
-        found.append("Reflection: cùng skills version với Router, nên đây không phải phép đo thay đổi Reflection.")
+            needs = " và ".join(part for part, wanted in (("--kb-version <N>", knowledge), ("--skills-version <N>", skills))
+                                if wanted)
+            found.append(f"{label}: chưa có run; cần version đã duyệt, rồi chạy --profile {name} với {needs} (thêm --no-baseline: cột Baseline lấy từ run Router).")
+            continue
+        evaluation = manifests[name].get("evaluation") or {}
+        run_knowledge, run_skills = _versions(manifests[name])
+        changed = {"knowledge": run_knowledge != router_knowledge, "skills": run_skills != router_skills}
+        if not any(changed.values()):
+            found.append(f"{label}: cùng knowledge và skills với Router, nên số này chỉ là chạy lại Router.")
+            continue
+        for part, wanted, override in (("knowledge", knowledge, "knowledge_version_override"),
+                                       ("skills", skills, "skills_version_override")):
+            if wanted and not changed[part]:
+                found.append(f"{label}: {part} giống Router, nên cột này không đo phần {part}.")
+            if not wanted and evaluation.get(override) is not None:
+                found.append(f"{label}: run còn đổi cả {part}, nên không phải phép đo riêng {label}.")
     for name, manifest in manifests.items():
         if name != "router" and router and _scenario_set(manifest) != _scenario_set(router):
             found.append(f"{COLUMNS[name]}: khác bộ kịch bản với Router, không so được.")

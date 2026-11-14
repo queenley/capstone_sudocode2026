@@ -1,0 +1,58 @@
+# The weekly improvement round on Airflow, beside the app's compose (it uses its postgres network and the agent's
+# shared volumes). Local only: `airflow standalone` is Airflow's single-process dev mode. On AWS the same commands
+# run as a Fargate task on an EventBridge schedule (infra/improve, docs/deployment/aws-plan.md 3.7).
+#
+#   docker compose -f docker-compose.yml -f infra/airflow/docker-compose.airflow.yml up -d --build airflow
+#   # UI: http://127.0.0.1:8080 (user admin; its password is printed in the airflow container's log on first start)
+#
+# Spends model calls every week. Set EVAL_BUDGET_DB in .env to cap them.
+services:
+  airflow-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: airflow
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: ${AIRFLOW_DB_PASSWORD:-airflow-local-only}
+    volumes:
+      - airflow-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow -d airflow"]
+      interval: 10s
+      retries: 10
+
+  airflow:
+    build:
+      context: .
+      dockerfile: infra/airflow/Dockerfile
+    command: standalone
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__DAGS_FOLDER: /opt/telesales/infra/airflow/dags
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:${AIRFLOW_DB_PASSWORD:-airflow-local-only}@airflow-db:5432/airflow
+      AIRFLOW__CORE__DEFAULT_TIMEZONE: Asia/Ho_Chi_Minh
+      IMPROVE_REPO: /opt/telesales
+      IMPROVE_PYTHON: /opt/agent-venv/bin/python
+      # The round's commands: the app's database for the history and the rounds, an *_eval one for its runs.
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-local-postgres-change-me}@postgres:5432/app_db
+      EVAL_DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-local-postgres-change-me}@postgres:5432/app_db_eval
+      AGENT_DB_SCHEMA: ${AGENT_DB_SCHEMA:-agent}
+      APP_SECRET: ${APP_SECRET:-local-development-secret-change-before-deploy}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      EVAL_BUDGET_DB: ${EVAL_BUDGET_DB:-}
+    volumes:
+      - .:/opt/telesales
+      # The same skills versions and improvement state the agent serves from (docker-compose.yml).
+      - agent-skills:/opt/telesales/apps/ai-agent-service/data/skills
+      - agent-improvement:/opt/telesales/apps/ai-agent-service/data/improvement
+      - agent-kb:/opt/telesales/apps/ai-agent-service/data/kb
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      airflow-db:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+volumes:
+  airflow-db:

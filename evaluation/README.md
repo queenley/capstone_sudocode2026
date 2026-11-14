@@ -54,6 +54,22 @@ python run_eval.py --performance evaluation/runs/<tên>
 # Chạy kèm bảng hiệu năng; --sessions thêm phép thử tải, TỐN PHÍ model (mỗi phiên tối đa 3 lượt)
 python run_eval.py --scenarios data/dev/scenarios --performance --sessions 1,3,5 --out evaluation/runs/<tên>
 
+# Lưu số của một run đã chấm vào database chính cho dashboard /admin (tab Đánh giá), miễn phí, không model.
+# --purpose: weekly_frozen, weekly_candidate, dev_full, adhoc (mặc định). Chạy lại không nhân đôi. Run chưa chấm bị từ chối.
+# Không có DATABASE_URL thì lấy EVAL_DATABASE_URL bỏ đuôi _eval; không bao giờ ghi vào database *_eval.
+python run_eval.py --ingest evaluation/runs/<tên> --purpose dev_full
+
+# Vòng cải tiến hằng tuần (thường do Airflow chạy, infra/airflow), TỐN PHÍ model. Không tự duyệt, không tự bật version.
+python -m ai_agent_service.pipeline.improve weekly-learn --week 2026-W46 --learn data/reflection/budget/learn/scenarios --frozen data/reflection/budget/frozen/scenarios --frozen-ids data/reflection/budget/frozen.json
+python -m ai_agent_service.pipeline.improve weekly-status --week 2026-W46     # 0: không còn đề xuất chờ admin; 1: còn chờ
+python -m ai_agent_service.pipeline.improve weekly-measure --week 2026-W46 --frozen data/reflection/budget/frozen/scenarios
+
+# Chạy tiếp một run bị dừng (tắt terminal, máy ngủ, Ctrl+C), TỐN PHÍ model cho phần còn lại. Giữ các kịch bản đã
+# đủ lượt, chạy lại từ đầu kịch bản dở hoặc lỗi, cùng run_id và cohort đã đóng băng trong <run>/scenarios.
+# Không nhận --scenarios/--out/--config/--only; vẫn truyền lại --performance, --sessions, --report, --provider/--model
+# như lần đầu. Bằng chứng cũ được chép sang <run>/resume-backup-<giờ>/ trước khi ghi; manifest ghi "resumes".
+python run_eval.py --resume evaluation/runs/<tên> --performance --sessions 1,3,5 --report all
+
 # Ba bảng báo cáo từ các run đã xong, miễn phí; chọn all hoặc asr,agent,performance
 python run_eval.py --report all --run router=evaluation/runs/<tên> --asr-run evaluation/runs/<asr>
 python run_eval.py --report agent,performance --run router=evaluation/runs/<a> --run gaploop=evaluation/runs/<b>
@@ -65,8 +81,13 @@ python run_eval.py --scenarios data/dev/scenarios --report all --out evaluation/
 python run_eval.py --scenarios data/dev/scenarios --profile router --out evaluation/runs/router-<tên>
 # GapLoop: chạy trên một knowledge version đã duyệt, TỐN PHÍ model
 python run_eval.py --scenarios data/dev/scenarios --profile gaploop --kb-version 1 --out evaluation/runs/gap-<tên>
+# Thêm --no-baseline vào một run profile để chỉ chạy và chấm full: bảng --report lấy cột Baseline từ run Router,
+# nên baseline của run GapLoop/Reflection/Kết hợp không được dùng; bớt khoảng một nửa phí model
+python run_eval.py --scenarios data/dev/scenarios --profile gaploop --kb-version 1 --no-baseline --out evaluation/runs/gap-<tên>
 # Reflection: chạy trên một skills version đã duyệt, TỐN PHÍ model
 python run_eval.py --scenarios data/dev/scenarios --profile reflection --skills-version 1 --out evaluation/runs/reflection-<tên>
+# Kết hợp GapLoop + Reflection: cả knowledge và skills version đã duyệt cùng lúc, TỐN PHÍ model
+python run_eval.py --scenarios data/dev/scenarios --profile combined --kb-version 1 --skills-version 1 --out evaluation/runs/combined-<tên>
 
 # Recall@k của kho tri thức, miễn phí
 python evaluation/rag_offline.py
@@ -93,7 +114,7 @@ RQR, CCR, TSR, HR đều do `reference_eval.py` của BTC tính, chạy nguyên 
 
 ### Nhiều phép đo
 
-Mỗi profile là một run độc lập nhưng dùng cùng `--scenarios`, model, extractor và cấu hình database. `--profile` chỉ ghi rõ biến thể được đo; nó không thay công thức của `reference_eval.py` và không tự chạy vòng cải tiến. `gaploop` bắt buộc `--kb-version <N>`, còn `reflection` bắt buộc `--skills-version <N>`; version `0` của Reflection là `config/prompts/agent/advisor/skills.yaml`.
+Mỗi profile là một run độc lập nhưng dùng cùng `--scenarios`, model, extractor và cấu hình database. `--profile` chỉ ghi rõ biến thể được đo; nó không thay công thức của `reference_eval.py` và không tự chạy vòng cải tiến. `gaploop` chỉ nhận `--kb-version <N>`, `reflection` chỉ nhận `--skills-version <N>`, `combined` bắt buộc cả hai; mỗi profile đổi đúng phần cột của nó nói, nên bốn cột Router, GapLoop, Reflection, Kết hợp đọc được như một bảng ablation; version `0` của Reflection là `config/prompts/agent/advisor/skills.yaml`.
 
 Vòng học và phê duyệt chạy riêng bằng `pipeline.improve`. Sau khi có version mới, chạy lại cùng cohort frozen rồi ghép bảng:
 
@@ -103,10 +124,11 @@ python run_eval.py --report all \
 	--run router=evaluation/runs/router-<tên> \
 	--run gaploop=evaluation/runs/gap-<tên> \
 	--run reflection=evaluation/runs/reflection-<tên> \
+	--run combined=evaluation/runs/combined-<tên> \
 	--out evaluation/runs/comparison.md
 ```
 
-`--report` không gọi model. Cột phải được đặt tên đúng profile; manifest ghi profile, knowledge override và skills override để báo cáo cảnh báo khi gắn nhãn sai hoặc hai cột thực ra dùng cùng version. So sánh chỉ hợp lệ khi cohort, model, extractor và context giống nhau; xem thêm [scoring-flow](../docs/evaluation/scoring-flow.md).
+`--report` không gọi model. Cột phải được đặt tên đúng profile; manifest ghi profile, knowledge override và skills override để báo cáo cảnh báo khi gắn nhãn sai, khi một cột thực ra dùng cùng version với Router, khi cột một phương pháp đổi cả phần kia, hoặc khi cột Kết hợp thiếu một phần. So sánh chỉ hợp lệ khi cohort, model, extractor và context giống nhau; xem thêm [scoring-flow](../docs/evaluation/scoring-flow.md).
 
 ### Bảng báo cáo
 
@@ -115,11 +137,12 @@ python run_eval.py --report all \
 | Cột | Cần gì | Hiện trạng |
 |---|---|---|
 | Baseline, Router | Một run không `--config` | Đo được |
-| GapLoop, Reflection | Run với `--kb-version N`, `v<N>.jsonl` có mục đã duyệt | `v0.jsonl` đang rỗng: run lúc này chỉ lặp lại Router, ghi chú sẽ báo |
+| GapLoop, Reflection | GapLoop: `--profile gaploop --kb-version N`, `v<N>.jsonl` có mục đã duyệt; Reflection: `--profile reflection --skills-version N` | `v0.jsonl` đang rỗng: run lúc này chỉ lặp lại Router, ghi chú sẽ báo |
+| GapLoop + Reflection | `--profile combined --kb-version N --skills-version M` | Đo được khi có cả hai version; ghi chú báo nếu một phần giống Router |
 | Subagent, A/B Testing | Agent phải có chế độ đó | Chưa có, cột ghi `chưa có` |
 | ASR | Một run `--asr` | Đo được |
 
-`--run` nhận `router`, `subagent`, `gaploop`, `reflection`, `ab`; thêm `--out <file>` để lưu bảng. `--report` đứng một mình bị từ chối để không vô tình chạy tốn phí. Run có `--config` không có `report.json`, nên cột Agent ghi `chưa đo`: chạy không `--config` để có cột đầy đủ. Bảng ASR đọc `main_scorer` của run `--asr`, mỗi tầng văn bản một cột. `subagent` và `ab` vẫn hiện `chưa có` vì chưa có profile thực thi.
+`--run` nhận `router`, `subagent`, `gaploop`, `reflection`, `combined`, `ab`; thêm `--out <file>` để lưu bảng. `--report` đứng một mình bị từ chối để không vô tình chạy tốn phí. Run có `--config` không có `report.json`, nên cột Agent ghi `chưa đo`: chạy không `--config` để có cột đầy đủ. Bảng ASR đọc `main_scorer` của run `--asr`, mỗi tầng văn bản một cột. `subagent` và `ab` vẫn hiện `chưa có` vì chưa có profile thực thi.
 
 Ghi chú dưới bảng báo khi hai cột khác bộ kịch bản, khác model, hoặc cùng knowledge.
 

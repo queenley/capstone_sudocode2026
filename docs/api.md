@@ -179,6 +179,13 @@ Các thay đổi runtime (model, voice, ngày) chỉ sống trong tiến trình 
 
 - `GET /api/agent/calls/{call_id}/context` (agent/admin): đọc facts, episodes và đơn của chính agent; hồ sơ chỉ trả khi danh tính VERIFIED. Order fields được whitelist, không trả địa chỉ hoặc số điện thoại thô.
 - `GET /api/developer/knowledge-gaps` (developer/admin): gap đã khử PII và nguồn policy công khai. `POST /api/developer/knowledge-gaps/{gap_id}/resolve` nhận `{answer,cites,approved:true}`; reviewer lấy từ token staff, không tin tên do client khai. FAQ được publish vào version mới, proposal regression vẫn chờ người duyệt. Restart dịch vụ tri thức để nạp version đã duyệt.
+- Vòng cải tiến hằng tuần ([001](plan/001-vong-cai-tien-hang-tuan-va-dashboard.md), `api/routes/improvement.py`). Đọc: developer/admin; ghi: chỉ admin, reviewer lấy từ token staff dạng `staff:<id>`, tên agent bị từ chối.
+  - `GET /api/developer/improvement/rounds`: các vòng gần nhất (số đề xuất, số còn chờ) và `skills_version` đang chạy.
+  - `GET /api/developer/improvement/rounds/{name}`: một vòng, các đề xuất và phép đo (`detail.comparison`).
+  - `POST /api/developer/improvement/proposals/{id}/review`: body `{decision: approved|rejected, note}`; từ chối phải có `note` ≥ 3 ký tự; 409 khi vòng không còn chờ duyệt.
+  - `POST /api/developer/improvement/rounds/{name}/activate`: bật version ứng viên; 409 khi phép đo thấy vi phạm (`harm`), chưa đo, hoặc skills đang chạy đã khác version vòng học từ. Trả `reload_required: true`: phải restart agent.
+  - `POST /api/developer/improvement/skills/rollback`: body `{to, reason}`.
+  - `GET /api/developer/evaluations?purpose=&limit=`: lịch sử đánh giá do `run_eval.py --ingest` ghi, kèm `metrics: {config: {metric: value}}`.
 - `POST /internal/customer-deletions` chỉ dùng giữa Identity worker và agent, gateway không route tới đây. Body `{request_id,customer_id,conversation_ids}` phải có `X-Deletion-Signature` HMAC-SHA256 theo APP_SECRET chung. Agent bận trả 503/Retry-After để worker retry. Consumer không commit offset khi cleanup lỗi.
 - Checkout yêu cầu expected price/total khớp quote. Cùng idempotency key phải giữ nguyên lines/quantity/price/total/address/payment/confirmation. Bỏ phương thức nghĩa là COD, vẫn chịu giới hạn dưới 10 triệu.
 - Staff chỉ reply khi đã nhận cuộc còn mở. `force` không vượt quyền sở hữu, bảo vệ PII hoặc bí mật nội bộ. Warning được override hợp lệ lưu cùng lượt trả lời.

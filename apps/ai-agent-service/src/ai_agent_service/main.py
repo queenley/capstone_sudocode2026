@@ -28,7 +28,7 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from src.core.service_runtime import configure_service, database_ready
 
-from .api.routes import agent_calls, channels, conversations, developer, voice, privacy, welcome
+from .api.routes import agent_calls, channels, conversations, developer, improvement, voice, privacy, welcome
 from .components import voice as voice_component
 from .llm import tracing
 from .mcp import client as mcp_client
@@ -125,6 +125,7 @@ app.include_router(conversations.router)
 app.include_router(voice.router)
 app.include_router(agent_calls.router)
 app.include_router(developer.router)
+app.include_router(improvement.router)
 app.include_router(channels.router)
 app.include_router(privacy.router)
 app.include_router(welcome.router)

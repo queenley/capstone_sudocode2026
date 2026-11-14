@@ -1,0 +1,69 @@
+#!/bin/bash
+# Boot of one application instance (infra/terraform/aws/compute.tf): Docker, EFS, the release in SSM, the secrets,
+# then the compose stack. Nothing here is kept: a replaced instance runs this again.
+set -euo pipefail
+exec > >(tee -a /var/log/telesales-boot.log) 2>&1
+
+REGION="${region}"
+APP=/opt/telesales
+EFS=/mnt/efs
+
+# --- Docker and Compose --------------------------------------------------------------------------------------
+dnf install -y docker amazon-efs-utils jq
+systemctl enable --now docker
+mkdir -p /usr/local/lib/docker/cli-plugins
+curl -fsSL "https://github.com/docker/compose/releases/download/${compose_version}/docker-compose-linux-x86_64" \
+  -o /usr/local/lib/docker/cli-plugins/docker-compose
+chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+
+# --- EFS: skills, improvement state, knowledge versions, the weekly round's runs -------------------------------
+mkdir -p "$EFS"
+grep -q "${efs_id}" /etc/fstab || echo "${efs_id}:/ $EFS efs _netdev,tls,iam 0 0" >> /etc/fstab
+for _ in $(seq 1 30); do mount -a && mountpoint -q "$EFS" && break; sleep 10; done
+mountpoint -q "$EFS"
+mkdir -p "$EFS/skills" "$EFS/improvement" "$EFS/kb" "$EFS/runs"
+# uid 1000 is "app" in the agent and improve images.
+chown 1000:1000 "$EFS/skills" "$EFS/improvement" "$EFS/kb" "$EFS/runs"
+
+# --- The release ---------------------------------------------------------------------------------------------
+TAG=$(aws ssm get-parameter --region "$REGION" --name "${release_parameter}" --query Parameter.Value --output text)
+if [ "$TAG" = "none" ]; then
+  echo "No release yet (${release_parameter} = none): run the deploy workflow. The instance stays up, unhealthy."
+  exit 0
+fi
+mkdir -p "$APP"
+cd "$APP"
+aws s3 cp --region "$REGION" "s3://${release_bucket}/releases/$TAG/docker-compose.yml" docker-compose.yml
+aws s3 cp --region "$REGION" "s3://${release_bucket}/releases/$TAG/docker-compose.aws.yml" docker-compose.aws.yml
+
+# Secrets (one JSON object) to .env, single-quoted so compose takes them literally: a value must not hold a quote.
+TOKEN=$(curl -fsS -X PUT http://169.254.169.254/latest/api/token -H "X-aws-ec2-metadata-token-ttl-seconds: 300")
+INSTANCE_ID=$(curl -fsS -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
+umask 077
+aws secretsmanager get-secret-value --region "$REGION" --secret-id "${app_secret_arn}" \
+  --query SecretString --output text | jq -r 'to_entries[] | "\(.key)='"'"'\(.value)'"'"'"' > .env
+cat >> .env <<ENV
+AWS_REGION=$REGION
+LOG_GROUP=${log_group}
+ECR_REGISTRY=${ecr_registry}
+IMAGE_TAG=$TAG
+INSTANCE_ID=$INSTANCE_ID
+EFS_DIR=$EFS
+DOMAIN=${domain}
+ENV
+
+aws ecr get-login-password --region "$REGION" | docker login --username AWS --password-stdin "${ecr_registry}"
+COMPOSE="docker compose -f docker-compose.yml -f docker-compose.aws.yml"
+
+# Knowledge versions start from the image's data/kb, once for the whole group (the lock is on EFS).
+flock "$EFS/.seed.lock" bash -c "
+  [ -e '$EFS/kb/.seeded' ] && exit 0
+  docker run --rm --entrypoint sh -v '$EFS/kb:/seed' '${ecr_registry}/telesales-ai-agent:$TAG' \
+    -c 'cp -a /app/agent/data/kb/. /seed/'
+  touch '$EFS/kb/.seeded'
+"
+
+# asr-service runs only with ASR_LOCAL=1, so its image may not exist: a missing image is not an error here.
+$COMPOSE pull --ignore-pull-failures
+$COMPOSE up -d --no-build
+echo "Release $TAG started on $INSTANCE_ID"

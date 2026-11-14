@@ -171,6 +171,26 @@
         }
       }
     },
+    "/api/agent/handoffs/stream": {
+      "get": {
+        "tags": [
+          "agent-console"
+        ],
+        "summary": "Handoff Stream",
+        "description": "Who waits for a consultant, pushed as it changes (Kafka, or this process), read again every few seconds.",
+        "operationId": "handoff_stream_api_agent_handoffs_stream_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/agent/callbacks": {
       "get": {
         "tags": [
@@ -560,7 +580,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/FaqEntry"
+                "$ref": "#/components/schemas/ai_agent_service__api__routes__agent_calls__FaqEntry"
               }
             }
           }
@@ -644,6 +664,279 @@
             "content": {
               "application/json": {
                 "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/developer/knowledge-gaps/{gap_id}/faq": {
+      "post": {
+        "tags": [
+          "developer"
+        ],
+        "summary": "Gap To Faq",
+        "description": "A draft FAQ from a gap, live within seconds once approved, with no new knowledge version.",
+        "operationId": "gap_to_faq_api_developer_knowledge_gaps__gap_id__faq_post",
+        "parameters": [
+          {
+            "name": "gap_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Gap Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GapAnswer"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Gap To Faq Api Developer Knowledge Gaps  Gap Id  Faq Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/developer/knowledge-gaps/{gap_id}/dismiss": {
+      "post": {
+        "tags": [
+          "developer"
+        ],
+        "summary": "Dismiss Gap",
+        "operationId": "dismiss_gap_api_developer_knowledge_gaps__gap_id__dismiss_post",
+        "parameters": [
+          {
+            "name": "gap_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Gap Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GapDismissal"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Dismiss Gap Api Developer Knowledge Gaps  Gap Id  Dismiss Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/developer/faq": {
+      "get": {
+        "tags": [
+          "developer"
+        ],
+        "summary": "List Faq",
+        "operationId": "list_faq_api_developer_faq_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response List Faq Api Developer Faq Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "developer"
+        ],
+        "summary": "Create Faq",
+        "operationId": "create_faq_api_developer_faq_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ai_agent_service__api__routes__developer__FaqEntry"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Create Faq Api Developer Faq Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/developer/faq/{chunk_id}": {
+      "put": {
+        "tags": [
+          "developer"
+        ],
+        "summary": "Update Faq",
+        "operationId": "update_faq_api_developer_faq__chunk_id__put",
+        "parameters": [
+          {
+            "name": "chunk_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Chunk Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ai_agent_service__api__routes__developer__FaqEntry"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Update Faq Api Developer Faq  Chunk Id  Put"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "developer"
+        ],
+        "summary": "Delete Faq",
+        "operationId": "delete_faq_api_developer_faq__chunk_id__delete",
+        "parameters": [
+          {
+            "name": "chunk_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Chunk Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Delete Faq Api Developer Faq  Chunk Id  Delete"
+                }
               }
             }
           },
@@ -1168,6 +1461,289 @@
         }
       }
     },
+    "/api/developer/improvement/rounds": {
+      "get": {
+        "tags": [
+          "improvement"
+        ],
+        "summary": "Rounds",
+        "operationId": "rounds_api_developer_improvement_rounds_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Rounds Api Developer Improvement Rounds Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/developer/improvement/rounds/{name}": {
+      "get": {
+        "tags": [
+          "improvement"
+        ],
+        "summary": "One Round",
+        "operationId": "one_round_api_developer_improvement_rounds__name__get",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Name"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response One Round Api Developer Improvement Rounds  Name  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/developer/improvement/proposals/{proposal_id}/review": {
+      "post": {
+        "tags": [
+          "improvement"
+        ],
+        "summary": "Decide",
+        "operationId": "decide_api_developer_improvement_proposals__proposal_id__review_post",
+        "parameters": [
+          {
+            "name": "proposal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Proposal Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Decision"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Decide Api Developer Improvement Proposals  Proposal Id  Review Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/developer/improvement/rounds/{name}/activate": {
+      "post": {
+        "tags": [
+          "improvement"
+        ],
+        "summary": "Activate",
+        "description": "Switch a measured candidate on. Refused when the measurement found harm, or when the skills in force are no\nlonger the ones the round learned from (another version went live since).",
+        "operationId": "activate_api_developer_improvement_rounds__name__activate_post",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Name"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Activation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Activate Api Developer Improvement Rounds  Name  Activate Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/developer/improvement/skills/rollback": {
+      "post": {
+        "tags": [
+          "improvement"
+        ],
+        "summary": "Rollback",
+        "operationId": "rollback_api_developer_improvement_skills_rollback_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Rollback"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Rollback Api Developer Improvement Skills Rollback Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/developer/evaluations": {
+      "get": {
+        "tags": [
+          "improvement"
+        ],
+        "summary": "History",
+        "operationId": "history_api_developer_evaluations_get",
+        "parameters": [
+          {
+            "name": "purpose",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 32
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Purpose"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "default": 200,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response History Api Developer Evaluations Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/channels/zalo/webhook": {
       "post": {
         "tags": [
@@ -1381,6 +1957,18 @@
   },
   "components": {
     "schemas": {
+      "Activation": {
+        "properties": {
+          "note": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Note",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "title": "Activation"
+      },
       "AdvisorUpdate": {
         "properties": {
           "provider": {
@@ -1504,6 +2092,29 @@
         ],
         "title": "ConsultantReply"
       },
+      "Decision": {
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approved",
+              "rejected"
+            ],
+            "title": "Decision"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Note",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "decision"
+        ],
+        "title": "Decision"
+      },
       "Deletion": {
         "properties": {
           "request_id": {
@@ -1533,27 +2144,43 @@
         ],
         "title": "Deletion"
       },
-      "FaqEntry": {
+      "GapAnswer": {
         "properties": {
-          "question": {
-            "type": "string",
-            "maxLength": 500,
-            "minLength": 3,
-            "title": "Question"
-          },
           "answer": {
             "type": "string",
             "maxLength": 2000,
             "minLength": 3,
             "title": "Answer"
+          },
+          "cites": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Cites"
           }
         },
         "type": "object",
         "required": [
-          "question",
           "answer"
         ],
-        "title": "FaqEntry"
+        "title": "GapAnswer"
+      },
+      "GapDismissal": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "title": "GapDismissal"
       },
       "GapResolution": {
         "properties": {
@@ -1638,6 +2265,27 @@
           "model"
         ],
         "title": "ModelSelection"
+      },
+      "Rollback": {
+        "properties": {
+          "to": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "To"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "to",
+          "reason"
+        ],
+        "title": "Rollback"
       },
       "SuggestionFeedback": {
         "properties": {
@@ -1899,6 +2547,116 @@
           "valid_until"
         ],
         "title": "WelcomeBlocker"
+      },
+      "ai_agent_service__api__routes__agent_calls__FaqEntry": {
+        "properties": {
+          "question": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Question"
+          },
+          "answer": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 3,
+            "title": "Answer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "question",
+          "answer"
+        ],
+        "title": "FaqEntry"
+      },
+      "ai_agent_service__api__routes__developer__FaqEntry": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 3,
+            "title": "Title"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 3,
+            "title": "Text"
+          },
+          "valid_from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valid From"
+          },
+          "valid_to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valid To"
+          },
+          "campaign": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Campaign"
+          },
+          "applies_to": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Applies To"
+          },
+          "cites": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Cites"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "live"
+            ],
+            "title": "Status",
+            "default": "draft"
+          },
+          "approved": {
+            "type": "boolean",
+            "title": "Approved",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "text"
+        ],
+        "title": "FaqEntry"
       }
     }
   }

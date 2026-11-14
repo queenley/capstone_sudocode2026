@@ -213,6 +213,15 @@ services:
       SIP_TRUNK_ID: ${SIP_TRUNK_ID:-}
     volumes:
       - voice-models:/app/models
+      # Reflection's skills versions and the improvement state (knowledge gaps, signals, review log): shared with
+      # the weekly round's runner (infra/airflow), and kept when the container is recreated.
+      # docs/plan/001-vong-cai-tien-hang-tuan-va-dashboard.md, part C.
+      - agent-skills:/app/agent/data/skills
+      - agent-improvement:/app/agent/data/improvement
+      # Knowledge versions (data/kb): seeded from the image on the volume's first use, then written by the Gap Loop
+      # and the admin. Without it a version made in the container was lost when the container was recreated.
+      # To start again from the repository's data/kb: docker volume rm telesales-ai_agent-kb.
+      - agent-kb:/app/agent/data/kb
     depends_on:
       postgres:
         condition: service_healthy
@@ -367,3 +376,6 @@ volumes:
   postgres-data:
   qdrant-data:
   voice-models:
+  agent-skills:
+  agent-improvement:
+  agent-kb:
